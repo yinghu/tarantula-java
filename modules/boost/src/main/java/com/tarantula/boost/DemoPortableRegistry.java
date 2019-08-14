@@ -1,0 +1,26 @@
+package com.tarantula.boost;
+
+import com.hazelcast.nio.serialization.Portable;
+import com.tarantula.platform.AbstractRecoverableListener;
+
+public class DemoPortableRegistry extends AbstractRecoverableListener {
+
+    public static final int OID = 100;
+    public static final int TIMER_OID = 1;
+    @Override
+    public int registryId() {
+        return OID;
+    }
+
+    @Override
+    public Portable create(int i) {
+        Portable pt = null;
+        switch (i){
+            case TIMER_OID:
+                pt = new Timer();
+                break;
+            default:
+        }
+        return pt;
+    }
+}
