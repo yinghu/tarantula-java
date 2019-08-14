@@ -27,13 +27,6 @@ public class GameApplication extends TarantulaApplicationHeader implements Sessi
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        this.builder.registerTypeAdapter(Seat.class,new SeatSerializer());
-        this.builder.registerTypeAdapter(BetLine.class,new BetLineSerializer());
-        this.builder.registerTypeAdapter(CountOnRank.class,new CountOnRankSerializer());
-        this.builder.registerTypeAdapter(GameStatisticsEntry.class,new GameStatisticsEntrySerializer());
-        this.builder.registerTypeAdapter(CashInBalance.class,new CashInBalanceSerializer());
-        this.builder.registerTypeAdapter(SessionIdle.class,new SessionIdleSerializer());
-        this.builder.registerTypeAdapter(CommandResponse.class,new CommandResponseSerializer());
     }
 
     @Override
