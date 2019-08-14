@@ -92,8 +92,8 @@ var TARA_API = (function(){
         if(aj.status === 200 && aj.readyState === 4){
             let jsb = JSON.parse(aj.responseText);
             _parse(jsb,callback);
-            qdata.google = jsb.google;
-            qdata.stripe = jsb.stripe;
+            //qdata.google = jsb.google;
+            //qdata.stripe = jsb.stripe;
         }
     };
     aj.open("GET","/user/index",true);
@@ -101,7 +101,7 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-tag','index');
     aj.send();               
   };       
-  
+  /**
   let _token = function(payload,callback){
     let _payload = JSON.stringify(payload);
     let aj = new XMLHttpRequest();   
@@ -133,7 +133,7 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-payload-size',_payload.length);
     aj.send(_payload);
   };
-    
+  **/
   let _subscribe = function(payload,callback){
     let _ps = JSON.stringify(payload);
     let aj = new XMLHttpRequest();   
@@ -274,11 +274,11 @@ var TARA_API = (function(){
     _service(payload,function(resp){
         //amap.clear();
         presence = null;
-        let cid = qdata.google;
-        let sid = qdata.stripe;
+        //let cid = qdata.google;
+        //let sid = qdata.stripe;
         qdata ={};
-        qdata.google = cid;
-        qdata.stripe = sid;
+        //qdata.google = cid;
+        //qdata.stripe = sid;
         wsWorker.postMessage({cmd:'close'});
         callback(resp);
     });              
@@ -290,7 +290,7 @@ var TARA_API = (function(){
       onIndex : _index,  
       onView : _view,
       onResource : _resource,
-      onToken : _token,
+      //onToken : _token,
       onRegister : _subscribe,
       onLogin : _login,
       onReset : _reset,

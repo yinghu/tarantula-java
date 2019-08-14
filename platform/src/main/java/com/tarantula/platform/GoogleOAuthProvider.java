@@ -1,28 +1,33 @@
 package com.tarantula.platform;
-
+/**
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-
+**/
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by yinghu lu on 1/31/2019.
+ * Uncomment the file to enable google auth
  */
 public class GoogleOAuthProvider extends OAuthObject {
 
+    @Override
+    public boolean validate(Map<String,Object> params){
+        return false;
+    }
+    /**
     private final GoogleIdTokenVerifier googleIdTokenVerifier;
-
+    **/
     public GoogleOAuthProvider(String clientId, String secureKey, String authUri, String tokenUri, String certUri, String[] origins) {
         super("google", clientId, secureKey, authUri, tokenUri, certUri, origins);
-        final NetHttpTransport transport = new NetHttpTransport();
-        final JacksonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-        googleIdTokenVerifier = new GoogleIdTokenVerifier.Builder(transport,jsonFactory).setAudience(Collections.singletonList(this.clientId())).build();
+        //final NetHttpTransport transport = new NetHttpTransport();
+        //final JacksonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+        //googleIdTokenVerifier = new GoogleIdTokenVerifier.Builder(transport,jsonFactory).setAudience(Collections.singletonList(this.clientId())).build();
     }
-
+    /**
     @Override
     public boolean validate(Map<String,Object> params){
         try{
@@ -46,5 +51,5 @@ public class GoogleOAuthProvider extends OAuthObject {
             ex.printStackTrace();
             return false;
         }
-    }
+    }**/
 }

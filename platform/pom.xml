@@ -16,18 +16,6 @@
   		<artifactId>gson</artifactId>
   		<version>2.8.1</version>
   	 </dependency>
-	  <!--
-	  <dependency>
-       	<groupId>org.slf4j</groupId>
-       	<artifactId>slf4j-api</artifactId>
-       	<version>1.7.25</version>
-   	</dependency>
-	  <dependency>
-		  <groupId>ch.qos.logback</groupId>
-		  <artifactId>logback-classic</artifactId>
-		  <version>1.2.3</version>
-	  </dependency>
-	-->
    	<dependency>
 		<groupId>com.hazelcast</groupId>
 		<artifactId>hazelcast</artifactId>
@@ -38,6 +26,7 @@
 		  <artifactId>hazelcast-client</artifactId>
 		  <version>3.12</version>
 	  </dependency>
+	  <!--
 	  <dependency>
 		  <groupId>com.google.api-client</groupId>
 		  <artifactId>google-api-client</artifactId>
@@ -47,7 +36,7 @@
 		  <groupId>com.stripe</groupId>
 		  <artifactId>stripe-java</artifactId>
 		  <version>8.0.2</version>
-	  </dependency>
+	  </dependency>-->
 	  <dependency>
 		  <groupId>com.je</groupId>
 		  <artifactId>je</artifactId>

@@ -46,10 +46,11 @@
 </div>
 
 <script>
-    tx_on_google_auth();
+    //tx_on_google_auth();
     let _cmd = 'login';
     document.querySelector("#tx-nickname-input").style.display = 'none';
     document.querySelector("#tx-email-input").style.display = 'none';
+    /**
     function tx_on_google_auth(){
         let m = document.getElementsByTagName('head')[0];
         let m1 = document.createElement('meta');
@@ -98,7 +99,7 @@
                 document.querySelector('#tx-auth-message-output').innerHTML = resp.message;
             }
         });  
-    } 
+    }**/ 
     function tx_close_authentication(){
          this.style.display = 'none';
          let m1 = document.querySelector('#m3');

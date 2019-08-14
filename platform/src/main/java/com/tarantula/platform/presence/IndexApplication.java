@@ -35,9 +35,9 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
                 ic.lobbyList.add(this.context.lobby(n));
             });
             ic.view = view;
-            ic.oAuthVendorList = new ArrayList<>();
-            ic.oAuthVendorList.add(this.context.validator().vendor("google"));
-            ic.oAuthVendorList.add(this.context.validator().vendor("stripe"));
+            //ic.oAuthVendorList = new ArrayList<>();
+            //ic.oAuthVendorList.add(this.context.validator().vendor("google"));
+            //ic.oAuthVendorList.add(this.context.validator().vendor("stripe"));
             session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("resource")){
@@ -74,7 +74,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
             v.moduleResourceFile(c.property("moduleResourceFile"));
             _viewList.put(v.viewId(),v);
         });
-        this.context.log(this.context.validator().vendor("google").clientId(),OnLog.WARN);
+        //this.context.log(this.context.validator().vendor("google").clientId(),OnLog.WARN);
         this.context.log("Index application started",OnLog.INFO);
     }
     /**

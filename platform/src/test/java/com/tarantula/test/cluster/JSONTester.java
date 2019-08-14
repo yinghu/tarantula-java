@@ -1,14 +1,10 @@
 package com.tarantula.test.cluster;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonToken;
-import com.tarantula.Countable;
-import com.tarantula.platform.service.deployment.DynamicModuleClassLoader;
 
 import java.io.FileReader;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
+
 import java.util.jar.JarFile;
 
 public class JSONTester {
@@ -53,7 +49,7 @@ public class JSONTester {
         //JsonElement j = jp.parse(jr);
         //.getAsJsonObject().getAsJsonObject("connection");
         //System.out.println(j.getAsJsonObject().get("connection").getAsJsonObject().get("host"));
-
+        /**
         JsonFactory jf = new JsonFactory();
         com.fasterxml.jackson.core.JsonParser xjp = jf.createParser(jr);
         //StringBuffer sb = new StringBuffer();
@@ -80,7 +76,7 @@ public class JSONTester {
                 }
             }
 
-        }
+        }**/
         //System.out.println(sb);
         long ed = System.currentTimeMillis();
         System.out.println("dur->"+(ed-st));//50 ms

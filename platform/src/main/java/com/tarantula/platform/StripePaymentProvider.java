@@ -1,6 +1,6 @@
 package com.tarantula.platform;
-import com.stripe.Stripe;
-import com.stripe.model.Charge;
+//import com.stripe.Stripe;
+//import com.stripe.model.Charge;
 import java.util.Map;
 
 /**
@@ -12,7 +12,11 @@ public class StripePaymentProvider extends OAuthObject {
     public StripePaymentProvider(String clientId, String secureKey) {
         super("stripe", clientId, secureKey, null, null, null, null);
     }
-
+    @Override
+    public boolean validate(Map<String,Object> params){
+        return false;
+    }
+    /**
     @Override
     public boolean validate(Map<String,Object> params){
         try {
@@ -24,5 +28,5 @@ public class StripePaymentProvider extends OAuthObject {
             ex.printStackTrace();
             return false;
         }
-    }
+    }**/
 }

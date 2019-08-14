@@ -163,7 +163,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         _deployServiceStarted = new CountDownLatch(2);
         _systemServiceStarted = new CountDownLatch(1);
         node_started = new AtomicBoolean(false);
-        this.loadOAthVendorConfig();
+        //this.loadOAthVendorConfig();
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
         PortableProviderConfigurationParser pcs = new PortableProviderConfigurationParser("tarantula-platform-portable-provider.xml");
         pcs.parse().forEach((r)->{
@@ -505,6 +505,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
  	    this.memberDiscovery.scope(scope);
  	    return this.memberDiscovery;
     }
+    /** google auth and stripe integration
     public void loadOAthVendorConfig() throws Exception{
         OAuthObject oa = loadGoogleCredentials();
         oVendors.put(oa.name(),oa);
@@ -512,7 +513,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         oVendors.put(sp.name(),sp);
     }
  	private OAuthObject loadGoogleCredentials() throws Exception{
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(this.authContext+"-google-auth.json");
+ 	    InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(this.authContext+"-google-auth.json");
         byte[] data = new byte[in.available()];
         in.read(data);
         in.close();
@@ -528,5 +529,5 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         GsonBuilder gb = new GsonBuilder();
         gb.registerTypeAdapter(OAuthObject.class,new StripePaymentCredentialsDeserializer());
         return gb.create().fromJson(new String(data),OAuthObject.class);
-    }
+    }**/
 }

@@ -73,6 +73,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 session.write(this.builder.create().toJson(new ResponseHeader("onTicket", "invalid ticket", false)).getBytes(),this.descriptor.responseLabel());
             }
         }
+        /**
         else if(session.action().equals("onToken")){
             OnAccess tcc = builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             TokenValidator.OAuthVendor auth = this.context.validator().vendor(tcc.name());
@@ -104,7 +105,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             else{
                 session.write(this.builder.create().toJson(new ResponseHeader("onToken", "invalid token", false)).getBytes(),this.descriptor.responseLabel());
             }
-        }
+        }**/
         else if(session.action().equals("onRegister")){
             this.register(session,acc);
         }
