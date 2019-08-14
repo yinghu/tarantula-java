@@ -28,7 +28,7 @@ public class SicBoApplication extends GameApplication {
             this.onStream(session);
         }
         else if(session.action().equals("onQuery")){
-            this.sicBo.reset();
+            //this.sicBo.reset();
             session.write(payload,"sicbo");
         }
         else if(session.action().equals("onBackup")){
@@ -90,12 +90,12 @@ public class SicBoApplication extends GameApplication {
         super.setup(context);
         this.builder.registerTypeAdapter(SicBo.class,new SicBoSerializer());
         this.sicBo = new SicBo();
-        this.sicBo.pendingQueue = this.uQueue;
-        this.sicBo.instanceId(this.context.onRegistry().distributionKey());
-        this.sicBo.name(this.descriptor.name());
-        this.sicBo.entryCost(this.descriptor.entryCost());
-        this.sicBo.context = this.context;
-        this.sicBo.currentCheckPoint = this.sicBo;
+        //this.sicBo.pendingQueue = this.uQueue;
+        //this.sicBo.instanceId(this.context.onRegistry().distributionKey());
+        //this.sicBo.name(this.descriptor.name());
+        //this.sicBo.entryCost(this.descriptor.entryCost());
+        //this.sicBo.context = this.context;
+        //this.sicBo.currentCheckPoint = this.sicBo;
         //this.sicBo.tQueue.offer(this.sicBo);
         //this.context.schedule(sicBo);
         this.context.schedule(this);
