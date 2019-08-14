@@ -30,6 +30,7 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.builder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
         this.builder.registerTypeAdapter(DeltaStatistics.class,new StatisticsSerializer());
+        this.builder.registerTypeAdapter(SessionIdle.class,new SessionIdleSerializer());
     }
 
 

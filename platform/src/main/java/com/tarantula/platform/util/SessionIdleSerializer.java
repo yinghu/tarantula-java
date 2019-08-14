@@ -1,9 +1,11 @@
-package com.tarantula.game;
+package com.tarantula.platform.util;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.tarantula.platform.SessionIdle;
+import com.tarantula.platform.util.ResponseSerializer;
 
 import java.lang.reflect.Type;
 
@@ -13,11 +15,10 @@ import java.lang.reflect.Type;
 public class SessionIdleSerializer implements JsonSerializer<SessionIdle> {
     @Override
     public JsonElement serialize(SessionIdle sessionIdle, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject jo = (JsonObject) new GameComponentSerializer().serialize(sessionIdle,type,jsonSerializationContext);
-        //jo.addProperty("name",sessionIdle.name());
-        //jo.addProperty("componentId",sessionIdle.componentId);
-        //jo.addProperty("systemId",sessionIdle.systemId());
+        JsonObject jo = (JsonObject) new ResponseSerializer().serialize(sessionIdle,type,jsonSerializationContext);
+        jo.addProperty("systemId",sessionIdle.systemId());
         jo.addProperty("stub",sessionIdle.stub());
+        //jo.addProperty("systemId",sessionIdle.systemId());
         return jo;
     }
 }

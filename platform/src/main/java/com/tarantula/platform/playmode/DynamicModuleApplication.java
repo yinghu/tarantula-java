@@ -2,8 +2,7 @@ package com.tarantula.platform.playmode;
 
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.game.SessionIdle;
-import com.tarantula.game.SessionIdleSerializer;
+import com.tarantula.platform.SessionIdle;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.TarantulaApplicationHeader;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,7 +54,6 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        this.builder.registerTypeAdapter(SessionIdle.class,new SessionIdleSerializer());
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.serviceProvider.registerPostOffice().registerMessageListener(this.context.onRegistry().distributionKey(),(m)->{
             this.context.log("message received->"+m.destination()+"<>"+m.source()+"<>"+m.payload().length,OnLog.INFO);

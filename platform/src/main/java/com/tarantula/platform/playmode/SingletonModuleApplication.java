@@ -2,8 +2,6 @@ package com.tarantula.platform.playmode;
 
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.game.SessionIdle;
-import com.tarantula.game.SessionIdleSerializer;
 import com.tarantula.platform.TarantulaApplicationHeader;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,7 +44,6 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        this.builder.registerTypeAdapter(SessionIdle.class,new SessionIdleSerializer());
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         module = this.serviceProvider.module(this.descriptor);
 

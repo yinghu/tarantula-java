@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.tarantula</groupId>
-  <artifactId>tarantula-platform</artifactId>
-  <version>2.0</version>
+  <artifactId>gec-platform</artifactId>
+  <version>1.0</version>
   <packaging>jar</packaging>
-  <name>tarantula</name>
-  <description>Tarantula Platform</description>
+  <name>Game Engine Cluster Platform</name>
+  <description>Game Engine Cluster Platform</description>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -26,17 +26,6 @@
 		  <artifactId>hazelcast-client</artifactId>
 		  <version>3.12</version>
 	  </dependency>
-	  <!--
-	  <dependency>
-		  <groupId>com.google.api-client</groupId>
-		  <artifactId>google-api-client</artifactId>
-		  <version>1.25.0</version>
-	  </dependency>
-	  <dependency>
-		  <groupId>com.stripe</groupId>
-		  <artifactId>stripe-java</artifactId>
-		  <version>8.0.2</version>
-	  </dependency>-->
 	  <dependency>
 		  <groupId>com.je</groupId>
 		  <artifactId>je</artifactId>

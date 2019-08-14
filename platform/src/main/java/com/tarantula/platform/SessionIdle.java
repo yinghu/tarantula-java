@@ -1,14 +1,16 @@
-package com.tarantula.game;
+package com.tarantula.platform;
+
+import com.tarantula.platform.OnApplicationHeader;
 
 /**
  * Created by yinghu lu on 3/20/2019.
  */
-public class SessionIdle extends GameComponent {
+public class SessionIdle extends OnApplicationHeader {
+
 
     public SessionIdle(String label,String systemId,int stub){
-        this.name = "idle";
         this.label = label;
-        this.systemId = systemId;
+        this.owner = systemId;
         this.stub = stub;
     }
 }
