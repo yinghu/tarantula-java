@@ -1,0 +1,306 @@
+<div class="tx-modal-content">
+    <canvas id="tx-lobby-canvas"></canvas>
+</div>
+<script>
+    let wz = wsize();
+    let sc = wz.scale;
+    let app = TGL.start(wz.width,wz.height,document.querySelector("#tx-lobby-canvas"));  
+    let pView = TGL.container();
+    let lobbyTitle = UI.text('Game Lobby',{fontWeight: 600,fontFamily:'Felipa, Arial',fontSize:48,fill:'0xff33cc'});
+    pView.container.addChild(lobbyTitle.container);
+    let applicationList = [];   
+    let appIdex = -1;
+    let loaded = 0;
+    let tournament;
+    let pmessage = UI.confirmation();
+    pmessage.close();
+    pmessage.yes.button.command = function(){pmessage.close();};
+    let pexit = UI.exit();
+    pexit.hide();
+    pexit.close.icon.texture = PIXI.Texture.from('assets/close.png');
+    pexit.close.button.command = function(){
+        pexit.hide();
+    };
+    pexit.logout.button.command = function(){
+        GameLobby.exit(function(idx){
+            tx_close_presence();
+            google_sign_out();
+            TGL.shutdown();
+            normalscreen();
+        });     
+    };
+    pexit.home.button.command = function(){
+        tx_close_presence();
+        TGL.shutdown();
+        normalscreen();
+        currentModule = null; 
+    };
+    let mp = UI.balanceView();
+    pView.container.addChild(mp.container); 
+    let ashort1 = UI.applicationShortcut();
+    ashort1.button.command = function(){
+        applicationList[appIdex].container.visible = false;
+        appIdex = ashort1.index;
+        applicationList[appIdex].container.visible = true;
+        tx_application(wsize());
+    };
+    pView.container.addChild(ashort1.container);
+    let ashort2 = UI.applicationShortcut();
+    ashort2.button.command = function(){
+        applicationList[appIdex].container.visible = false;
+        appIdex = ashort2.index;
+        applicationList[appIdex].container.visible = true;
+        tx_application(wsize());
+    };
+    pView.container.addChild(ashort2.container);
+    let menuBoard = UI.menu(1);
+    menuBoard.container.visible = false;
+    menuBoard.list[0].button.command = function(){
+        menuBoard.container.visible = false;
+        return false;    
+    };
+    menuBoard.list[0].button.icon.texture = PIXI.Texture.from('assets/left_arrow.png');
+    menuBoard.list[1].button.icon.texture = PIXI.Texture.from('assets/friend.png');
+    menuBoard.list[2].button.icon.texture = PIXI.Texture.from('assets/gear.png');
+    menuBoard.list[3].button.command = function(){
+        let wp = wsize();
+        pexit.position(sc,(wp.width-pexit.width*sc)/2,(wp.height-pexit.height*sc)/2); 
+        pexit.open();
+        menuBoard.container.visible = false;
+    };
+    menuBoard.list[3].button.icon.texture = PIXI.Texture.from('assets/home.png');
+    let mc = UI.iconCommand(96,96);
+    mc.button.command = function(){
+        menuBoard.container.visible = true; 
+        return false;
+    };
+    mc.icon.texture = PIXI.Texture.from('assets/table.png');
+    let aleft = UI.iconCommand(120,120);
+    aleft.icon.texture = PIXI.Texture.from('assets/left_arrow.png');
+    aleft.button.command = function(){
+        applicationList[appIdex].container.visible = false;
+        if(appIdex-1>0){
+            appIdex--;
+        }
+        else{
+            appIdex=applicationList.length-1;
+        }
+        applicationList[appIdex].container.visible = true;
+        let wz = wsize();
+        tx_application(wz);
+    };
+    pView.container.addChild(aleft.container);
+    
+    let aright = UI.iconCommand(120,120);
+    aright.icon.texture = PIXI.Texture.from('assets/right_arrow.png');
+    aright.button.command = function(){
+        applicationList[appIdex].container.visible = false;
+        if(appIdex+1>(applicationList.length-1)){
+            appIdex=0;
+        }
+        else{
+            appIdex++;
+        }
+        applicationList[appIdex].container.visible = true;
+        let wz = wsize();
+        tx_application(wz);
+    };
+    pView.container.addChild(aright.container);
+    TARA_API.onProfile(TARA_API.query().systemId,function(resp){
+            mp.avatar.icon.texture = PIXI.Texture.from(resp.profile.avatar+'?token='+TARA_API.query().token);
+            mp.name(resp.profile.nickname);
+    });
+    TARA_API.onService({serviceTag:"presence",command:"onBalance"},function(resp){
+        mp.balance(resp.presence.balance);
+    });    
+    app.stage.addChild(pView.container);  
+    GameLobby.start(function(){
+        _lobby_scale();
+    },function(resp){
+        _game_lobby_setup(resp);
+        pView.container.addChild(pmessage.container);    
+        pView.container.addChild(pexit.container);
+        pView.container.addChild(mc.container); 
+        pView.container.addChild(menuBoard.container);
+        _lobby_scale();
+    },function(lb){
+        lobby = lb;
+        lobbyTitle.title(lb.name+" Lobby");
+    });
+    //_lobby_scale();
+    
+    function _lobby_scale(){
+        let wz = wsize();
+        app.renderer.resize(wz.width,wz.height); 
+        mc.position(sc,5,5);
+        menuBoard.position(sc,5,5);
+        mp.position(sc,wz.width-mp.width*sc-5,5); 
+        let y = mp.height*sc+10;
+        if(loaded === 1){
+            tx_application(wz);
+        }
+        lobbyTitle.position(sc,(wz.width-lobbyTitle.width*sc)/2,wz.height - lobbyTitle.height*sc -15);
+        lobbyTitle.container.x = (wz.width-lobbyTitle.width*sc)/2;
+        aleft.container.scale.set(sc);
+        aleft.container.x = 15;
+        aleft.container.y = (wz.height-aleft.height*sc)-15;
+        aright.container.scale.set(sc);
+        aright.container.x = wz.width-aright.width*sc-15;
+        aright.container.y = (wz.height-aright.height*sc)-15;
+        
+        ashort1.container.scale.set(sc);
+        ashort2.container.scale.set(sc);
+        if(wz.portrait){
+            if(appIdex != -1){
+                ashort1.container.x = (wz.width-ashort1.width*sc)/2;
+                ashort2.container.x = (wz.width-ashort2.width*sc)/2;
+                ashort1.container.y = applicationList[appIdex].container.y-ashort1.height*sc-20;
+                ashort2.container.y = (applicationList[appIdex].container.y+applicationList[appIdex].height*sc)+20;
+            }
+        }
+        else{
+            if(appIdex!=-1){
+                ashort1.container.y = (wz.height-ashort1.height*sc)/2;
+                ashort2.container.y = (wz.height-ashort2.height*sc)/2;
+                ashort1.container.x = applicationList[appIdex].container.x-ashort1.width*sc-20;
+                ashort2.container.x = (applicationList[appIdex].container.x+applicationList[appIdex].width*sc)+20;
+            }
+        }
+    }
+    function _game_lobby_setup(resp){
+        //let ix =0;
+        resp.gameList.forEach(function(g){
+            g.deckSize='--';
+            g.minWagerAsString='--';
+            g.maxWagerAsString='--';
+            g.dealerSeatFeeAsString='--';
+            g.entryCostAsString=g.entryCostAsString;
+            if(g.configuration){
+                if(g.configuration.deckSize){
+                    g.deckSize = g.configuration.deckSize;
+                }                
+                g.minWagerAsString=g.configuration.minWager;
+                g.maxWagerAsString=g.configuration.maxWager;
+                g.dealerSeatFeeAsString=g.configuration.dealerSeatFee
+            }
+            if(!g.singleton){
+                let ix =  applicationList.push(UI.applicationList(3))-1;
+                pView.container.addChild(applicationList[ix].container);
+                let bGame = applicationList[ix].application;
+                bGame.game = g;
+                bGame.set(g.name,g.tournamentEnabled?'Tournament':'Regular',g.deckSize,g.minWagerAsString+'/'+g.maxWagerAsString,g.dealerSeatFeeAsString,g.capacity,g.entryCostAsString);
+                bGame.rules.button.command = function(){console.log('opening rules page');};
+                bGame.play.button.command = function(){_game_play({index:ix,accessMode:2})};
+            }
+            else{
+                if(g.category == 'lobby'){
+                    //lobby = g; //no longer use
+                } 
+                else if(g.category == 'tournament'){
+                    tournament = g;
+                }
+                else{
+                    let ix =  applicationList.push(UI.applicationList(0))-1;
+                    pView.container.addChild(applicationList[ix].container);
+                    let bGame = applicationList[ix].application;
+                    bGame.game = g;
+                    bGame.set(g.name,g.tournamentEnabled?'Tournament':'Regular',g.deckSize,g.minWagerAsString+'/'+g.maxWagerAsString,g.dealerSeatFeeAsString,g.capacity,g.entryCostAsString);
+                    bGame.rules.button.command = function(){console.log('opening rules page');};
+                    bGame.play.button.command = function(){_game_play({index:ix,accessMode:2})}; 
+                }
+            }
+        });
+        appIdex = 0;
+        applicationList[appIdex].container.visible = true;
+        _list_game_instance();
+        loaded = 1;
+        //lobbyTitle.title(lobby.name+" Lobby");
+    }
+    function _list_game_instance(){
+        let _g = applicationList[appIdex].application.game;
+        if(_g.singleton){//skip on singleton
+            return;
+        }
+        let _pax = {serviceTag:lobby.tag,command:'onList',size:3,applicationId:_g.applicationId};
+        TARA_API.onService(_pax,function(resp){
+            //console.log(resp);
+            let ap = applicationList[appIdex];
+            let aix = appIdex;
+            resp.onLobby.forEach(function(ins){
+                let tix = ap.index;
+                ap.instances.list[tix].status.text='Players ('+ins.count+'/'+ins.capacity+')';
+                ap.instances.list[tix].join.button.command = function(){
+                    _game_play({index:aix,accessMode:4,instanceId:ins.instanceId});    
+                };
+                ap.index++;
+            });
+            ap.index = 0;
+        });
+    }
+    function _game_play(pmode){      
+        let gix = pmode.index;
+        var _play ={serviceTag:'presence',command:'onPlay'};
+        _play.applicationId=applicationList[gix].application.game.applicationId;
+        _play.accessMode=pmode.accessMode;
+        _play.instanceId=pmode.instanceId;
+        //console.log(_play);
+        TARA_API.onService(_play,function(resp){
+            if(resp.successful){
+                TARA_API.query().tournament = tournament;
+                TGL.shutdown();
+                tx_close_presence();
+                applicationList[gix].application.game.instanceId = resp.instanceId;
+                resp.applicationId = applicationList[gix].application.game.applicationId;
+                resp.tag = applicationList[gix].application.game.tag;
+                if(applicationList[gix].application.game.responseLabel){
+                    resp.responseLabel = applicationList[gix].application.game.responseLabel;
+                }
+                _view({viewId:applicationList[gix].application.game.viewId,containerId:'#m2',game:resp});
+            }
+            else{
+                if(resp.code === 1){
+                    TARA_API.query().applicationId = applicationList[gix].application.game.applicationId
+                    _open_buy();
+                }
+                else{
+                    //popup to nitify player
+                    console.log(resp);
+                    let wp = wsize();
+                    pmessage.message(resp.message);
+                    pmessage.position(sc,(wp.width-pmessage.width*sc)/2,(wp.height-pmessage.height*sc)/2); 
+                    pmessage.open();
+                }
+            }
+        });
+    }
+    function tx_close_presence(){
+         let m1 = document.querySelector('#m1');
+         m1.innerHTML='';
+         m1.style.display = 'none';
+    }
+    function tx_application(wz){
+        applicationList[appIdex].container.scale.set(sc);
+        applicationList[appIdex].container.x = (wz.width-applicationList[appIdex].width*sc)/2;
+        applicationList[appIdex].container.y = (wz.height-applicationList[appIdex].height*sc)/2;
+
+        if(appIdex>0&&appIdex<(applicationList.length-1)){
+            ashort1.set(applicationList[appIdex-1].application.game.name);
+            ashort2.set(applicationList[appIdex+1].application.game.name);
+            ashort1.index = appIdex-1;
+            ashort2.index = appIdex+1;
+        }
+        else if(appIdex===0){//first
+            ashort1.set(applicationList[applicationList.length-1].application.game.name);
+            ashort2.set(applicationList[1].application.game.name);
+            ashort1.index = applicationList.length-1;
+            ashort2.index = 1;
+        }
+        else if(appIdex===applicationList.length-1){//last
+            ashort1.set(applicationList[applicationList.length-2].application.game.name);
+            ashort2.set(applicationList[0].application.game.name);
+            ashort1.index = applicationList.length-2;
+            ashort2.index = 0;
+        }
+        _list_game_instance();
+    }
+</script>

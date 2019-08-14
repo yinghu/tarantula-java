@@ -1,0 +1,32 @@
+package com.tarantula.platform.marketplace;
+
+import com.hazelcast.nio.serialization.Portable;
+import com.tarantula.platform.AbstractRecoverableListener;
+
+
+/**
+ * Created by yinghu lu on 3/31/2018.
+ */
+public class MarketplacePortableRegistry extends AbstractRecoverableListener {
+
+    public static final int OID = 12;
+
+    public static final int VIRTUAL_CREDITS_PACK = 1;
+
+
+    public Portable create(int i) {
+        Portable pt = null;
+        switch (i){
+            case VIRTUAL_CREDITS_PACK:
+                pt = new VirtualCreditsPack();
+                break;
+
+            default:
+        }
+        return pt;
+    }
+
+    public int registryId() {
+        return OID;
+    }
+}

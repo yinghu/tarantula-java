@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula>
+    <lobby-context>
+        <type-id>presence</type-id>
+        <type>lobby</type>
+        <category>service</category>
+        <access-mode>11</access-mode>
+        <name>presence</name>
+        <description>Tarantula Lobby Index</description>
+        <view-id>presence</view-id>
+        <deploy-priority>10</deploy-priority>
+        <application-list>
+            <application><!--could be exposing on login successful -->
+                <type-id>presence</type-id>
+                <subtype-id>tx04</subtype-id>
+                <name>Presence</name>
+                <type>application</type>
+                <singleton>true</singleton>
+                <tag>presence</tag>
+                <description>Tarantula Presence</description>
+                <class-name>com.tarantula.platform.presence.PresenceApplication</class-name>
+                <configuration-name>presence</configuration-name>
+                <response-label>presence</response-label>
+            </application>
+        </application-list>
+        <configuration-list>
+            <configuration tag="presence" priority="10">
+                <presence type="setup">
+                    <property name="lobbyListenerEnabled">false</property>
+                    <property name="lobbyList">tarantula,market,leaderboard,level,profile</property>
+                </presence>
+            </configuration>
+        </configuration-list>
+    </lobby-context>
+</tarantula>

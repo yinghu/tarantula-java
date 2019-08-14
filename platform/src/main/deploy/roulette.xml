@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula>
+    <lobby-context>
+        <type-id>roulette</type-id>
+        <type>lobby</type>
+        <category>game</category>
+        <tag>roulette</tag>
+        <icon>html/roulette/roulette_icon.png</icon>
+        <view-id>game.lobby</view-id>
+        <name>Roulette</name>
+        <access-mode>12</access-mode>
+        <deploy-code>1</deploy-code>
+        <description>Tarantula Roulette Game Service</description>
+        <application-list>
+            <application>
+                <type-id>roulette</type-id>
+                <subtype-id>roulette</subtype-id>
+                <name>Roulette</name>
+                <type>application</type>
+                <category>lobby</category>
+                <singleton>true</singleton>
+                <tag>roulette</tag>
+                <description>Tarantula roulette Lobby Service</description>
+                <class-name>com.tarantula.platform.playmode.GameLobbyApplication</class-name>
+                <deploy-priority>15</deploy-priority>
+                <configuration-name>roulette</configuration-name>
+                <response-label>roulette</response-label>
+            </application>
+            <application>
+                <type-id>roulette</type-id>
+                <subtype-id>roulette1</subtype-id>
+                <view-id>roulette.game</view-id>
+                <name>Pot</name>
+                <type>application</type>
+                <category>casino</category>
+                <description>Tarantula Roulette Service</description>
+                <class-name>com.tarantula.game.casino.RouletteApplication</class-name>
+                <entry-cost>1000</entry-cost>
+                <capacity>10</capacity>
+                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
+                <max-instances-per-partition>10</max-instances-per-partition>
+                <max-idles-on-instance>3</max-idles-on-instance>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <configuration-name>roulette</configuration-name>
+                <configuration-type>v1</configuration-type>
+                <leader-board-header>roulette</leader-board-header>
+                <response-label>roulette</response-label>
+            </application>
+            <application>
+                <type-id>roulette</type-id>
+                <subtype-id>roulette2</subtype-id>
+                <view-id>roulette.game</view-id>
+                <name>Sky</name>
+                <type>application</type>
+                <category>casino</category>
+                <description>Tarantula Roulette Service</description>
+                <class-name>com.tarantula.game.casino.RouletteApplication</class-name>
+                <entry-cost>50000</entry-cost>
+                <capacity>10</capacity>
+                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
+                <max-instances-per-partition>10</max-instances-per-partition>
+                <max-idles-on-instance>3</max-idles-on-instance>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <configuration-name>roulette</configuration-name>
+                <configuration-type>v2</configuration-type>
+                <leader-board-header>roulette</leader-board-header>
+                <response-label>roulette</response-label>
+            </application>
+            <application>
+                <type-id>roulette</type-id>
+                <subtype-id>roulette3</subtype-id>
+                <view-id>roulette.game</view-id>
+                <name>Sun</name>
+                <type>application</type>
+                <category>casino</category>
+                <description>Tarantula Roulette Service</description>
+                <class-name>com.tarantula.game.casino.RouletteApplication</class-name>
+                <entry-cost>1000000</entry-cost>
+                <capacity>10</capacity>
+                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
+                <max-instances-per-partition>10</max-instances-per-partition>
+                <max-idles-on-instance>3</max-idles-on-instance>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <configuration-name>roulette</configuration-name>
+                <configuration-type>v3</configuration-type>
+                <leader-board-header>roulette</leader-board-header>
+                <response-label>roulette</response-label>
+            </application>
+        </application-list>
+        <view-list>
+            <view type="roulette.game">
+                <property name="flag">HD2</property>
+                <property name="moduleFile">html/roulette/roulette.game.module.js</property>
+                <property name="moduleName">RouletteGame</property>
+                <property name="moduleResourceFile">html/roulette/roulette.game.view.html</property>
+            </view>
+        </view-list>
+        <configuration-list>
+            <configuration tag="roulette" priority="10">
+                <roulette type="v1">
+                    <property name="dealerSeatFee">1000</property>
+                    <property name="seats">8</property>
+                    <property name="minWager">100</property>
+                    <property name="maxWager">1000</property>
+                </roulette>
+                <roulette type="v2">
+                    <property name="dealerSeatFee">500000</property>
+                    <property name="seats">8</property>
+                    <property name="minWager">5000</property>
+                    <property name="maxWager">50000</property>
+                </roulette>
+                <roulette type="v3">
+                    <property name="dealerSeatFee">1000000</property>
+                    <property name="seats">8</property>
+                    <property name="minWager">100000</property>
+                    <property name="maxWager">1000000</property>
+                </roulette>
+            </configuration>
+        </configuration-list>
+    </lobby-context>
+</tarantula>

@@ -1,0 +1,285 @@
+<div class="tx-modal-content">
+    <canvas id="tx-scc-canvas"></canvas>              
+</div>
+<script>
+    let gameObject ={inGame:false};
+    let wz = wsize();
+    let sc = wz.scale;
+    app = TGL.start(wz.width,wz.height,document.querySelector("#tx-scc-canvas")); 
+    let devTitle = UI.text('Under Developing',{fontWeight: 600,fontFamily:'Oswald, Arial',fontSize:32,fill:'0xD1BC22'});
+    let pView = TGL.container();
+    let gameListView = TGL.container();
+    let tableView = TGL.container();
+    pView.container.addChild(devTitle.container);
+    let pConfirmation = UI.confirmation();
+    let menuBoard = UI.menu(1);
+    menuBoard.list[0].button.command = function(){
+        menuBoard.close();
+        return false;    
+    };
+    menuBoard.list[0].button.icon.texture = PIXI.Texture.from('assets/left_arrow.png');
+    menuBoard.list[1].button.icon.texture = PIXI.Texture.from('assets/square.png');
+    menuBoard.list[2].button.icon.texture = PIXI.Texture.from('assets/gear.png');
+    menuBoard.list[3].button.icon.texture = PIXI.Texture.from('assets/home.png');
+    menuBoard.list[3].button.command = function(){
+        _scc_popup('Are you sure to leave the game?',()=>{
+            pConfirmation.close();    
+        },()=>{
+            ShipCaptainCrewGame.leave((resp)=>{
+                    console.log(resp);
+                });
+                TGL.shutdown();
+                normalscreen();
+                document.querySelector("#m2").innerHTML="";
+                document.querySelector("#m2").style.display = "none";
+                currentModule = null;
+        });
+        menuBoard.close();
+    };
+    menuBoard.list[2].button.command = ()=>{
+        ShipCaptainCrewGame.pick(5,(resp)=>{
+            console.log(resp);
+        });
+    };
+    let cm = UI.iconCommand(96,96);
+    cm.button.command = function(){
+        menuBoard.open(); 
+        return false;
+    }; 
+    cm.button.icon.texture = PIXI.Texture.from('assets/table.png');
+    let stable = SCC.table(5,120,120);
+    let ship = SCC.header(200,120,'SHIP');
+    let captain = SCC.header(200,120,'CAPTAIN');
+    let crew = SCC.header(200,120,'CREW');
+    let cargo = SCC.cargo(200,120);
+    let game = SCC.game('Pot Game');
+    let agame = SCC.game('Pot Game');
+    let bgame = SCC.game('Pot Game');
+    //game.set('100M',10000,'50K')
+    let inGame = SCC.inGame('In Game');
+    stable.lines.forEach(function(e,i){
+        e.command = function(){
+            ShipCaptainCrewGame.pick(i,(resp)=>{
+                if(resp.name=='dice'&&resp.released){
+                    e.icon.visible = true;
+                    e.icon.texture = PIXI.Texture.from('assets/casino/red_dice_'+resp.rank+'.png');
+                }
+                else if(resp.name=='ship'){
+                   _scc_ship(resp); 
+                }
+                else if(resp.name=='gameOver'){
+                    _scc_ship(resp); 
+                }
+            });    
+        };
+    });
+    let rankBoard ={lines:[]};
+    let rankBoard1 = SCC.rankBoard(5);
+    rankBoard1.lines[0].set('##','SCORE','PRIZE','PLAYER');
+    rankBoard1.lines[0].icon.texture = PIXI.Texture.from('assets/player.png');
+    rankBoard1.lines.forEach((r)=>{rankBoard.lines.push(r)});
+    rankBoard1.close();
+    let rankBoard2 = SCC.rankBoard(5);
+    rankBoard2.lines[0].set('##','SCORE','PRIZE','PLAYER');
+    rankBoard2.lines[0].icon.texture = PIXI.Texture.from('assets/player.png');
+    rankBoard2.lines.forEach((r,i)=>{if(i>0){rankBoard.lines.push(r);}});
+    rankBoard2.close();
+    rankBoard1.command = function(){rankBoard1.close();rankBoard2.close();};
+    rankBoard2.command = function(){rankBoard1.close();rankBoard2.close();};
+    tableView.container.addChild(ship.container);
+    tableView.container.addChild(captain.container);
+    tableView.container.addChild(crew.container);
+    tableView.container.addChild(cargo.container);
+    tableView.container.addChild(inGame.container);
+    gameListView.container.addChild(game.container);
+    gameListView.container.addChild(agame.container);
+    gameListView.container.addChild(bgame.container);
+    tableView.container.addChild(stable.container);
+    tableView.container.addChild(rankBoard2.container);
+    tableView.container.addChild(rankBoard1.container);
+    pView.container.addChild(cm.container);
+    pView.container.addChild(menuBoard.container);
+    pView.container.addChild(pConfirmation.container);
+    
+    
+    app.stage.addChild(gameListView.container);
+    app.stage.addChild(tableView.container);
+    app.stage.addChild(pView.container);
+    //swap, server push callback, game setup
+    ShipCaptainCrewGame.start(()=>{
+         _scc_scale();
+    },(jx)=>{
+        //let jx = JSON.parse(j);
+        if(jx.componentId == 'potGame'){
+            _scc_game(jx);
+        }
+        else if(jx.componentId == 'ship'){
+            _scc_ship(jx);
+        }
+        else if(jx.componentId == 'onPotGame'){
+            _scc_on_pot_game(jx);
+        }
+    },(g)=>{
+       
+       if(g.game){
+            _scc_ship(g.game);
+           gameObject.inGame = true;
+       }
+       if(g.gameList){
+           g.gameList.forEach(function(gm){
+                game.title(gm.name);
+                game.set(gm.prizePot,gm.players,gm.ante);
+                game.gameId = gm.gameId;
+                game.command = ()=>{
+                    ShipCaptainCrewGame.join(gm.gameId,(resp)=>{
+                        gameObject.inGame = true;
+                        _scc_ship(resp);
+                        _scc_scale();
+                    });
+                };
+           });
+       }  
+       _scc_scale();     
+    });
+    function _scc_on_pot_game(pt){
+        console.log(pt);
+        let wp = wsize();
+        TARA_API.onProfile(pt.systemId,function(resp){
+            rankBoard.lines[pt.rank].set(pt.rank,pt.score,pt.prize,resp.profile.nickname);
+            rankBoard.lines[pt.rank].icon.texture = PIXI.Texture.from(resp.profile.avatar+'?token='+TARA_API.query().token);
+        });
+        if(wp.portrait){
+            rankBoard1.position(sc,(wp.width-rankBoard1.width*sc)/2,(wp.height/2)-rankBoard1.height*sc);
+            rankBoard1.open();
+            rankBoard2.position(sc,(wp.width-rankBoard2.width*sc)/2,(wp.height/2)-rankBoard2.lines[0].height*sc);
+            rankBoard2.open();
+        }else{
+            rankBoard1.position(sc,(wp.width/2)-rankBoard1.width*sc,(wp.height-rankBoard1.height*sc)/2);
+            rankBoard1.open();
+            rankBoard2.position(sc,(wp.width)/2,(wp.height-rankBoard2.height*sc)/2);
+            rankBoard2.open();
+        }     
+    }
+    function _scc_game(g){
+        console.log(g);
+        game.title(g.name);
+        game.set(g.prizePot,g.players,g.ante);
+        inGame.set(g.prizePot,g.players,g.remainingTime);
+    }
+    function _scc_ship(sp){
+        if(sp.ship){
+            ship.icon.visible = true;
+            ship.icon.texture = PIXI.Texture.from('assets/casino/white_dice_6.png');
+        }
+        else{
+            ship.icon.visible = false;    
+        }
+        if(sp.captain){
+            captain.icon.visible = true;
+            captain.icon.texture = PIXI.Texture.from('assets/casino/blue_dice_5.png'); 
+        }
+        else{
+            captain.icon.visible = false;    
+        }
+        if(sp.crew){
+            crew.icon.visible = true;
+            crew.icon.texture = PIXI.Texture.from('assets/casino/red_dice_4.png');
+        }
+        else{
+            crew.icon.visible = false;    
+        }
+        stable.set(sp.board.length);
+        sp.board.forEach((e,i)=>{
+            if(e.released){
+               stable.lines[i].icon.visible = true;
+               stable.lines[i].icon.texture = PIXI.Texture.from('assets/casino/red_dice_'+e.rank+'.png'); 
+            }   
+        });
+        ship.frame.tint = Math.random()*0xffffff;
+        captain.frame.tint = Math.random()*0xffffff;
+        crew.frame.tint = Math.random()*0xffffff;
+        cargo.frame.tint = Math.random()*0xffffff;
+        if(sp.cargo.score>0){
+            cargo.icon1.visible = true;
+            cargo.icon1.texture = PIXI.Texture.from('assets/casino/blue_dice_'+sp.cargo.dice1+'.png'); 
+            cargo.icon2.visible = true;
+            cargo.icon2.texture = PIXI.Texture.from('assets/casino/blue_dice_'+sp.cargo.dice2+'.png');
+        }
+        else{
+            cargo.icon1.visible = false;
+            cargo.icon2.visible = false;
+        }
+        if(sp.roundOver){
+            _scc_popup('Start New Round',()=>{
+                pConfirmation.close();
+                gameObject.inGame = false;
+                _scc_scale();
+            },()=>{
+                ShipCaptainCrewGame.join(game.gameId,(resp)=>{
+                    gameObject.inGame = true;
+                    _scc_ship(resp);
+                    _scc_scale();
+                    pConfirmation.close();
+                });            
+            });               
+        }
+    }
+    function _scc_scale(){
+        let wz = wsize();
+        app.renderer.resize(wz.width,wz.height); 
+        menuBoard.position(sc,5,5);
+        cm.position(sc,5,5);
+        stable.position(sc,(wz.width-stable.width*sc)/2,(wz.height-stable.height*sc-10));
+        if(wz.portrait){
+            cargo.position(sc,(wz.width-cargo.width*sc)/2,stable.container.y-cargo.height*sc-cargo.overflow*sc-5);
+            captain.position(sc,(wz.width-captain.width*sc)/2,cargo.container.y-captain.height*sc-captain.overflow*sc-5);
+            ship.position(sc,10,captain.container.y);
+            crew.position(sc,wz.width-crew.width*sc-10,captain.container.y);
+            game.position(sc,(wz.width-game.width*sc)/2,(wz.height-game.height*sc)/2);
+            agame.position(sc,game.container.x,game.container.y-agame.height*sc-20);
+            bgame.position(sc,game.container.x,game.container.y+game.height*sc+20);
+        }
+        else{
+            ship.position(sc,10,cm.container.y+cm.height*sc+ship.overflow*sc+5);
+            captain.position(sc,10,ship.container.y+ship.height*sc+captain.overflow*sc+5);
+            crew.position(sc,10,captain.container.y+captain.height*sc+crew.overflow*sc+5);
+            cargo.position(sc,10,crew.container.y+crew.height*sc+cargo.overflow*sc+5);
+            game.position(sc,(wz.width-game.width*sc)/2,(wz.height-game.height*sc)/2);
+            agame.position(sc,game.container.x-agame.width*sc-20,game.container.y);
+            bgame.position(sc,game.container.x+game.width*sc+20,game.container.y);
+        }
+        cargo.frame.tint = Math.random()*0xffffff;
+        captain.frame.tint = Math.random()*0xffffff;
+        ship.frame.tint = Math.random()*0xffffff;
+        crew.frame.tint = Math.random()*0xffffff;
+        game.frame.tint = Math.random()*0xffffff;
+        agame.frame.tint = Math.random()*0xffffff;
+        bgame.frame.tint = Math.random()*0xffffff;
+        let gp = wz.height-stable.height*sc-10;
+        let fg = inGame.height*sc+inGame.overflow*sc;
+        console.log("1>"+gp);
+        console.log("2>"+fg);
+        if(gp<(fg+10)){
+            let xsc = gp/(fg+10);
+            console.log("3>"+sc);
+            console.log("4>"+xsc*sc);
+            inGame.position(sc*xsc,(wz.width-inGame.width*sc*xsc)/2,inGame.overflow*sc*xsc+5);
+        }else{
+            inGame.position(sc,(wz.width-inGame.width*sc)/2,inGame.overflow*sc+5);
+        }
+        inGame.frame.tint = Math.random()*0xffffff;
+        devTitle.position(sc,cm.container.x+cm.width*sc+10,10);
+        
+        gameListView.container.visible = !gameObject.inGame;
+        tableView.container.visible = gameObject.inGame; 
+    }
+    function _scc_popup(msg,ncmd,ycmd){
+        let wp = wsize();
+        pConfirmation.message(msg);
+        //pConfirmation.yes.title(ct);
+        pConfirmation.no.button.command = ncmd;
+        pConfirmation.yes.button.command = ycmd;
+        pConfirmation.position(sc,(wp.width-pConfirmation.width*sc)/2,(wp.height-pConfirmation.height*sc)/2);
+        pConfirmation.open();    
+    }
+</script>

@@ -1,0 +1,176 @@
+<div class="tx-modal-content">
+    <canvas id="tx-pot-bj-canvas"></canvas>              
+</div>
+<script>
+    var app;
+    let wz = wsize();
+    let sc = wz.scale;
+    app = TGL.start(wz.width,wz.height,document.querySelector("#tx-pot-bj-canvas")); 
+    let pView = TGL.container();
+    let pConfirmation = UI.confirmation();
+    pConfirmation.no.button.command = function(){pConfirmation.close();};
+    let menuBoard = UI.menu(1);
+    menuBoard.container.x = 5;
+    menuBoard.container.y = 5;
+    menuBoard.container.scale.set(sc);
+    menuBoard.container.visible = false;
+    menuBoard.list[0].button.command = function(){
+        menuBoard.container.visible = false;
+        return false;    
+    };
+    menuBoard.list[0].button.icon.texture = PIXI.Texture.from('assets/left_arrow.png');
+    menuBoard.list[1].button.icon.texture = PIXI.Texture.from('assets/square.png');
+    menuBoard.list[2].button.icon.texture = PIXI.Texture.from('assets/gear.png');
+    menuBoard.list[3].button.icon.texture = PIXI.Texture.from('assets/home.png');
+    menuBoard.list[3].button.command = function(){
+        let wp = wsize();
+        pConfirmation.message('Leave pending page to play games!');
+        pConfirmation.yes.button.command = function(){
+                DemoSyncGame.leave((reps)=>{console.log(reps)});
+                TGL.shutdown();
+                normalscreen();
+                document.querySelector("#m2").innerHTML="";
+                document.querySelector("#m2").style.display = "none";
+                currentModule = null;     
+        };
+        pConfirmation.position(sc,(wp.width-pConfirmation.width*sc)/2,(wp.height-pConfirmation.height*sc)/2);
+        pConfirmation.open();
+        menuBoard.container.visible = false;
+    };
+
+    let cm = UI.iconCommand(96,96);
+    cm.button.command = function(){
+        menuBoard.container.visible = true; 
+        return false;
+    }; 
+    cm.button.icon.texture = PIXI.Texture.from('assets/table.png');
+    cm.container.x = 5;
+    cm.container.y = 5;
+    cm.container.scale.set(sc);
+    
+    let statBoard = UI.statisticsBoard(8);
+    statBoard.lines[0].set('##','Demo Sync','Total Inbound Statistics');
+    statBoard.command = ()=>{};
+    statBoard.lines[1].t={tn:0,tc:0,tm:Date.now()};
+    statBoard.lines[2].t={tn:0,tc:0,tm:Date.now()};
+    statBoard.lines[3].t={tn:0,tc:0,tm:Date.now()};
+    statBoard.lines[4].t={tn:0,tc:0,tm:Date.now()};
+    statBoard.lines[5].t={tn:0,tc:0,tm:Date.now()};
+    
+    let nrt = UI.text('Request Timed',{fontWeight: 700,fontFamily:'Oswald, Arial',fontSize:32,fill:'0xD1BC22'});
+    pView.container.addChild(nrt.container);
+    
+    let commandList = UI.textCommandList(4,120);
+    commandList.list[0].title('1K');
+    commandList.list[0].button.command = function(){
+        statBoard.lines[2].t.tm = Date.now();
+        DemoSyncGame.sit('a',(resp)=>{
+            if(resp.successful){
+                let nt = Date.now();
+                let bt = JSON.stringify(resp).length;
+                nrt.title("Response bytes ["+bt+"] timed (ms)->"+(nt-statBoard.lines[2].t.tm));
+            }else{
+                console.log(resp);
+            }
+        });
+    };
+    commandList.list[1].title('2K');
+    commandList.list[1].button.command = function(){
+        statBoard.lines[3].t.tm = Date.now();
+        DemoSyncGame.sit('b',(resp)=>{
+            let nt = Date.now();
+            let bt = JSON.stringify(resp).length;
+            nrt.title("Response bytes ["+bt+"] timed (ms)->"+(nt-statBoard.lines[3].t.tm));
+        });
+    };
+    commandList.list[2].title('4K');
+    commandList.list[2].button.command = function(){
+        statBoard.lines[4].t.tm = Date.now();
+        DemoSyncGame.sit('c',(resp)=>{
+            let nt = Date.now();
+            let bt = JSON.stringify(resp).length;
+            nrt.title("Response bytes ["+bt+"] timed (ms)->"+(nt-statBoard.lines[4].t.tm));
+        });
+    };
+    commandList.list[3].title('Reset');
+    commandList.list[3].button.command = function(){DemoSyncGame.sit('onReset',(resp)=>{console.log(resp)})};
+    pView.container.addChild(commandList.container);
+    
+    
+    
+    pView.container.addChild(statBoard.container);
+    
+    let nTimer = UI.text('Timer',{fontWeight: 700,fontFamily:'Oswald, Arial',fontSize:40,fill:'0xD1BC22'});
+    pView.container.addChild(nTimer.container);
+    pView.container.addChild(cm.container);
+    pView.container.addChild(menuBoard.container);
+    pView.container.addChild(pConfirmation.container);
+    app.stage.addChild(pView.container);
+    DemoSyncGame.start(
+        ()=>{
+            _demo_scale();    
+        },(m)=>{
+           _demo_event(m); 
+        },(g)=>{
+            _demo_event(g);
+            _demo_scale();
+        },(n)=>{
+            _demo_event(n);
+        }
+    ); 
+    function _demo_event(m){
+        //console.log(m);
+        let nt = Date.now();
+        if(m.label == 'timer'){     
+                nTimer.title(m.hh+':'+m.mm+':'+m.ss+':'+m.ms);
+                statBoard.lines[1].t.tn += JSON.stringify(m).length;
+                statBoard.lines[1].set(1,'Timer Bytes',statBoard.lines[1].t.tn);
+                statBoard.lines[6].set(6,'Timer Elapsed (ms)',nt-statBoard.lines[1].t.tm);
+                statBoard.lines[1].t.tm = nt;
+                statBoard.lines[1].t.tc++;
+                statBoard.lines[8].set(8,'Timer Count',statBoard.lines[1].t.tc);
+        }     
+        else if(m.label == 'connection'){
+            statBoard.lines[2].t.tn += JSON.stringify(m).length;
+            statBoard.lines[2].set(2,'Connection Bytes',statBoard.lines[2].t.tn);
+            statBoard.lines[5].set(5,'Connection Elapsed (ms)',nt-statBoard.lines[2].t.tm);
+            statBoard.lines[2].t.tm = nt;
+            statBoard.lines[2].t.tc++;
+            statBoard.lines[7].set(7,'Connection Count',statBoard.lines[2].t.tc);
+        }
+        else if(m.label == 'presence'){
+            statBoard.lines[3].t.tn += JSON.stringify(m).length;
+            statBoard.lines[3].set(3,'Presence Bytes',statBoard.lines[3].t.tn);
+            statBoard.lines[5].set(5,'Presence Elapsed (ms)',nt-statBoard.lines[3].t.tm);
+            statBoard.lines[3].t.tm = nt;
+            statBoard.lines[3].t.tc++;
+            statBoard.lines[7].set(7,'Presence Count',statBoard.lines[3].t.tc);
+        }
+        else if(m.label == 'game'){
+            statBoard.lines[4].t.tn += JSON.stringify(m).length;
+            statBoard.lines[4].set(4,'Game Bytes',statBoard.lines[4].t.tn);
+            statBoard.lines[5].set(5,'Game Elapsed (ms)',nt-statBoard.lines[4].t.tm);
+            statBoard.lines[4].t.tm = nt;
+            statBoard.lines[4].t.tc++;
+            statBoard.lines[7].set(7,'Game Count',statBoard.lines[4].t.tc);
+        }
+        
+        else if(m.label == 'error'){
+            let wp = wsize();
+            pConfirmation.message(m.message);
+            pConfirmation.position(sc,(wp.width-pConfirmation.width*sc)/2,(wp.height-pConfirmation.height*sc)/2);
+            pConfirmation.open();
+        }
+        
+    }
+    function _demo_scale(){
+        let wz = wsize();
+        app.renderer.resize(wz.width,wz.height); 
+        menuBoard.position(sc,5,5);
+        cm.position(sc,5,5);
+        commandList.position(sc,wz.width-commandList.width*sc-5,5);
+        statBoard.position(sc,(wz.width-statBoard.width*sc)/2,(wz.height-statBoard.height*sc)/2);
+        nTimer.position(sc,10,wz.height-nTimer.height*sc-10);
+        nrt.position(sc,10,cm.container.y+cm.height*sc+20);
+    }   
+</script>

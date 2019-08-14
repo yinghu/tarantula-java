@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service-configuration>
+
+    <!-- view configurations-->
+    <configuration tag="index" type="com.tarantula.platform.ApplicationConfiguration" priority="10">
+
+        <index type="pending">
+            <property name="flag">HD2</property>
+            <property name="moduleResourceFile">html/pending.view.html</property>
+        </index>
+        <index type="shopping">
+            <property name="flag">HD2</property>
+            <property name="moduleResourceFile">html/stripe.card.view.html</property>
+        </index>
+        <index type="terms">
+            <property name="flag">HD2</property>
+            <property name="moduleResourceFile">html/terms.view.html</property>
+        </index>
+        <index type="privacy">
+            <property name="flag">HD2</property>
+            <property name="moduleResourceFile">html/privacy.view.html</property>
+        </index>
+        <index type="authentication">
+            <property name="flag">HD2</property>
+            <property name="moduleResourceFile">html/authentication.view.html</property>
+        </index>
+        <index type="game.lobby">
+            <property name="flag">HD2</property>
+            <property name="moduleFile">game.lobby.module.js</property>
+            <property name="moduleName">GameLobby</property>
+            <property name="moduleResourceFile">html/game.lobby.view.html</property>
+        </index>
+        <index type="demo.sync.game">
+            <property name="flag">HD2</property>
+            <property name="moduleFile">html/demo/demo.sync.game.module.js</property>
+            <property name="moduleName">DemoSyncGame</property>
+            <property name="moduleResourceFile">html/demo/demo.sync.game.view.html</property>
+        </index>
+    </configuration>
+
+</service-configuration>

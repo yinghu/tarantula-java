@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula-platform-portable-provider>
+    <portable-registry registry-id="1">com.tarantula.platform.service.cluster.PortableRegistry</portable-registry>
+    <portable-registry registry-id="2">com.tarantula.platform.event.PortableEventRegistry</portable-registry>
+    <portable-registry registry-id="6">com.tarantula.platform.presence.UserPortableRegistry</portable-registry>
+    <portable-registry registry-id="7">com.tarantula.platform.playlist.SessionPortableRegistry</portable-registry>
+    <portable-registry registry-id="8">com.tarantula.platform.leveling.LevelingPortableRegistry</portable-registry>
+    <portable-registry registry-id="9">com.tarantula.platform.playlist.BuddyListPortableRegistry</portable-registry>
+    <portable-registry registry-id="10">com.tarantula.platform.presence.PresencePortableRegistry</portable-registry>
+    <portable-registry registry-id="11">com.tarantula.platform.leaderboard.LeaderBoardPortableRegistry</portable-registry>
+    <portable-registry registry-id="12">com.tarantula.platform.marketplace.MarketplacePortableRegistry</portable-registry>
+</tarantula-platform-portable-provider>

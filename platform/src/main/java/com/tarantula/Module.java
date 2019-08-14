@@ -1,0 +1,25 @@
+package com.tarantula;
+
+import java.io.InputStream;
+
+public interface Module {
+
+    default void onJoin(Session session) throws Exception{}
+
+    boolean onRequest(Session session, byte[] payload,OnUpdate update) throws Exception;
+
+    void setup(ApplicationContext context) throws Exception;
+
+    String label();
+    default void clear(){}
+
+    default void onTimer(OnUpdate update){
+
+    }
+    interface OnUpdate{
+        void on(byte[] delta);
+    }
+    interface OnResource{
+        void on(InputStream in);
+    }
+}

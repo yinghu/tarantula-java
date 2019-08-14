@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula>
+    <lobby-context>
+        <type-id>baccarat</type-id>
+        <type>lobby</type>
+        <category>game</category>
+        <tag>baccarat</tag><!-- lobby tag -->
+        <icon>html/baccarat/baccarat_icon.png</icon>
+        <view-id>game.lobby</view-id>
+        <name>Baccarat</name>
+        <access-mode>12</access-mode>
+        <deploy-code>1</deploy-code>
+        <description>Tarantula baccarat Game Service</description>
+        <application-list>
+            <application>
+                <type-id>baccarat</type-id>
+                <subtype-id>baccarat</subtype-id>
+                <name>Baccarat</name>
+                <type>application</type>
+                <category>lobby</category>
+                <singleton>true</singleton>
+                <tag>baccarat</tag>
+                <description>Tarantula baccarat Lobby Service</description>
+                <class-name>com.tarantula.platform.playmode.GameLobbyApplication</class-name>
+                <configuration-name>baccarat</configuration-name>
+                <deploy-priority>15</deploy-priority>
+                <response-label>baccarat</response-label>
+            </application>
+            <application>
+                <type-id>baccarat</type-id>
+                <subtype-id>baccarat1</subtype-id><!-- decouple from lobby tag-->
+                <view-id>baccarat.game</view-id>
+                <name>Boss</name>
+                <type>application</type>
+                <category>casino</category>
+                <description>Tarantula baccarat Service</description>
+                <class-name>com.tarantula.game.casino.BaccaratApplication</class-name>
+                <entry-cost>1000</entry-cost>
+                <capacity>10</capacity>
+                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
+                <max-instances-per-partition>10</max-instances-per-partition>
+                <max-idles-on-instance>3</max-idles-on-instance>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <configuration-name>baccarat</configuration-name>
+                <configuration-type>v1</configuration-type>
+                <leader-board-header>baccarat</leader-board-header>
+                <response-label>baccarat</response-label>
+            </application>
+            <application>
+                <type-id>baccarat</type-id>
+                <subtype-id>baccarat2</subtype-id>
+                <view-id>baccarat.game</view-id>
+                <name>Queen</name>
+                <type>application</type>
+                <category>casino</category>
+                <description>Tarantula baccarat Service</description>
+                <class-name>com.tarantula.game.casino.BaccaratApplication</class-name>
+                <entry-cost>50000</entry-cost>
+                <capacity>10</capacity>
+                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
+                <max-instances-per-partition>10</max-instances-per-partition>
+                <max-idles-on-instance>3</max-idles-on-instance>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <configuration-name>baccarat</configuration-name>
+                <configuration-type>v2</configuration-type>
+                <leader-board-header>baccarat</leader-board-header>
+                <response-label>baccarat</response-label>
+            </application>
+            <application>
+                <type-id>baccarat</type-id>
+                <subtype-id>baccarat3</subtype-id>
+                <view-id>baccarat.game</view-id>
+                <name>King</name>
+                <type>application</type>
+                <category>casino</category>
+                <description>Tarantula baccarat Service</description>
+                <class-name>com.tarantula.game.casino.BaccaratApplication</class-name>
+                <entry-cost>1000000</entry-cost>
+                <capacity>10</capacity>
+                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
+                <max-instances-per-partition>10</max-instances-per-partition>
+                <max-idles-on-instance>3</max-idles-on-instance>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <configuration-name>baccarat</configuration-name>
+                <configuration-type>v3</configuration-type>
+                <leader-board-header>baccarat</leader-board-header>
+                <response-label>baccarat</response-label>
+            </application>
+        </application-list>
+        <view-list>
+            <view type="baccarat.game">
+                <property name="flag">HD2</property>
+                <property name="moduleFile">html/baccarat/baccarat.game.module.js</property>
+                <property name="moduleName">BaccaratGame</property>
+                <property name="moduleResourceFile">html/baccarat/baccarat.game.view.html</property>
+            </view>
+        </view-list>
+        <configuration-list>
+            <configuration tag="baccarat" priority="10">
+                <baccarat type="v1">
+                    <property name="dealerSeatFee">1000</property>
+                    <property name="seats">8</property>
+                    <property name="deckSize">4</property>
+                    <property name="minWager">100</property>
+                    <property name="maxWager">1000</property>
+                </baccarat>
+                <baccarat type="v2">
+                    <property name="dealerSeatFee">50000</property>
+                    <property name="seats">8</property>
+                    <property name="deckSize">4</property>
+                    <property name="minWager">5000</property>
+                    <property name="maxWager">50000</property>
+                </baccarat>
+                <baccarat type="v3">
+                    <property name="dealerSeatFee">1000000</property>
+                    <property name="seats">8</property>
+                    <property name="deckSize">4</property>
+                    <property name="minWager">100000</property>
+                    <property name="maxWager">1000000</property>
+                </baccarat>
+            </configuration>
+        </configuration-list>
+    </lobby-context>
+</tarantula>

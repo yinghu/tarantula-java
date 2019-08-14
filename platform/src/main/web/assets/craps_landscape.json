@@ -1,0 +1,284 @@
+{"frames": {
+
+"landscape_balance_window_no_coins.png":
+{
+	"frame": {"x":1505,"y":609,"w":165,"h":57},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":165,"h":57},
+	"sourceSize": {"w":165,"h":57}
+},
+"landscape_balance_window_with_coins.png":
+{
+	"frame": {"x":1722,"y":532,"w":285,"h":59},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":285,"h":59},
+	"sourceSize": {"w":285,"h":59}
+},
+"landscape_cash_in_button_off.png":
+{
+	"frame": {"x":1175,"y":901,"w":134,"h":57},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":134,"h":57},
+	"sourceSize": {"w":134,"h":57}
+},
+"landscape_cash_in_button_on.png":
+{
+	"frame": {"x":1887,"y":712,"w":134,"h":57},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":134,"h":57},
+	"sourceSize": {"w":134,"h":57}
+},
+"landscape_cash_out_button_off.png":
+{
+	"frame": {"x":1887,"y":771,"w":134,"h":57},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":134,"h":57},
+	"sourceSize": {"w":134,"h":57}
+},
+"landscape_cash_out_button_on.png":
+{
+	"frame": {"x":1887,"y":830,"w":134,"h":57},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":134,"h":57},
+	"sourceSize": {"w":134,"h":57}
+},
+"landscape_roll_dice_button_off.png":
+{
+	"frame": {"x":1540,"y":867,"w":180,"h":75},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":180,"h":75},
+	"sourceSize": {"w":180,"h":75}
+},
+"landscape_roll_dice_button_on.png":
+{
+	"frame": {"x":1505,"y":532,"w":180,"h":75},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":180,"h":75},
+	"sourceSize": {"w":180,"h":75}
+},
+"landscape_screen_background.png":
+{
+	"frame": {"x":1,"y":1,"w":1334,"h":750},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":1334,"h":750},
+	"sourceSize": {"w":1334,"h":750}
+},
+"landscape_table_rollover3.png":
+{
+	"frame": {"x":1432,"y":477,"w":569,"h":53},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":569,"h":53},
+	"sourceSize": {"w":569,"h":53}
+},
+"landscape_table_rollover4.png":
+{
+	"frame": {"x":700,"y":869,"w":93,"h":94},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":93,"h":94},
+	"sourceSize": {"w":93,"h":94}
+},
+"landscape_table_rollover5.png":
+{
+	"frame": {"x":795,"y":869,"w":93,"h":94},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":93,"h":94},
+	"sourceSize": {"w":93,"h":94}
+},
+"landscape_table_rollover6.png":
+{
+	"frame": {"x":890,"y":869,"w":93,"h":94},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":93,"h":94},
+	"sourceSize": {"w":93,"h":94}
+},
+"landscape_table_rollover7.png":
+{
+	"frame": {"x":985,"y":869,"w":93,"h":94},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":93,"h":94},
+	"sourceSize": {"w":93,"h":94}
+},
+"landscape_table_rollover8.png":
+{
+	"frame": {"x":1080,"y":869,"w":93,"h":94},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":93,"h":94},
+	"sourceSize": {"w":93,"h":94}
+},
+"landscape_table_rollover9.png":
+{
+	"frame": {"x":1337,"y":869,"w":93,"h":94},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":93,"h":94},
+	"sourceSize": {"w":93,"h":94}
+},
+"landscape_table_rollover10.png":
+{
+	"frame": {"x":1390,"y":532,"w":113,"h":238},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":113,"h":238},
+	"sourceSize": {"w":113,"h":238}
+},
+"landscape_table_rollover11.png":
+{
+	"frame": {"x":1337,"y":477,"w":51,"h":390},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":51,"h":390},
+	"sourceSize": {"w":51,"h":390}
+},
+"landscape_table_rollover12.png":
+{
+	"frame": {"x":1,"y":753,"w":570,"h":172},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":570,"h":172},
+	"sourceSize": {"w":570,"h":172}
+},
+"landscape_table_rollover13.png":
+{
+	"frame": {"x":573,"y":753,"w":548,"h":102},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":548,"h":102},
+	"sourceSize": {"w":548,"h":102}
+},
+"landscape_table_rollover14.png":
+{
+	"frame": {"x":1,"y":927,"w":526,"h":41},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":526,"h":41},
+	"sourceSize": {"w":526,"h":41}
+},
+"landscape_table_rollover15.png":
+{
+	"frame": {"x":573,"y":869,"w":125,"h":96},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":125,"h":96},
+	"sourceSize": {"w":125,"h":96}
+},
+"landscape_table_rollover16.png":
+{
+	"frame": {"x":1337,"y":1,"w":701,"h":474},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":701,"h":474},
+	"sourceSize": {"w":701,"h":474}
+},
+"sm_betting_area_rollover1.png":
+{
+	"frame": {"x":1687,"y":593,"w":325,"h":58},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":325,"h":58},
+	"sourceSize": {"w":325,"h":58}
+},
+"sm_betting_area_rollover2.png":
+{
+	"frame": {"x":1505,"y":668,"w":163,"h":72},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":163,"h":72},
+	"sourceSize": {"w":163,"h":72}
+},
+"sm_betting_area_rollover3.png":
+{
+	"frame": {"x":1175,"y":827,"w":160,"h":72},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":160,"h":72},
+	"sourceSize": {"w":160,"h":72}
+},
+"sm_betting_area_rollover4.png":
+{
+	"frame": {"x":1722,"y":816,"w":163,"h":71},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":163,"h":71},
+	"sourceSize": {"w":163,"h":71}
+},
+"sm_betting_area_rollover5.png":
+{
+	"frame": {"x":1722,"y":889,"w":160,"h":71},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":160,"h":71},
+	"sourceSize": {"w":160,"h":71}
+},
+"sm_betting_area_rollover6.png":
+{
+	"frame": {"x":1390,"y":772,"w":111,"h":93},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":111,"h":93},
+	"sourceSize": {"w":111,"h":93}
+},
+"sm_betting_area_rollover7.png":
+{
+	"frame": {"x":1503,"y":772,"w":104,"h":93},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":104,"h":93},
+	"sourceSize": {"w":104,"h":93}
+},
+"sm_betting_area_rollover8.png":
+{
+	"frame": {"x":1432,"y":867,"w":106,"h":93},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":106,"h":93},
+	"sourceSize": {"w":106,"h":93}
+},
+"sm_betting_area_rollover9.png":
+{
+	"frame": {"x":1609,"y":742,"w":163,"h":72},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":163,"h":72},
+	"sourceSize": {"w":163,"h":72}
+},
+"sm_betting_area_rollover10.png":
+{
+	"frame": {"x":1175,"y":753,"w":160,"h":72},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":160,"h":72},
+	"sourceSize": {"w":160,"h":72}
+},
+"sm_betting_area_rollover11.png":
+{
+	"frame": {"x":1672,"y":653,"w":325,"h":57},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":325,"h":57},
+	"sourceSize": {"w":325,"h":57}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "craps_landscape.png",
+	"format": "RGBA8888",
+	"size": {"w":2039,"h":969},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:5c7c9c06b471b8d11a71893b1bcbe1da:f19e22963adafd142b3b2d5087b0c113:425acbf174c3fffb3c28eee924c704ee$"
+}
+}

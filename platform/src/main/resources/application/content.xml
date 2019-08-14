@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula>
+    <lobby-context>
+        <type-id>content</type-id>
+        <type>lobby</type>
+        <category>service</category>
+        <name>Content</name>
+        <access-mode>12</access-mode>
+        <description>Tarantula Content Service</description>
+
+        <application-list>
+            <application>
+                <type-id>content</type-id>
+                <subtype-id>ctn01</subtype-id>
+                <name>Avatar</name>
+                <type>application</type>
+                <category>avatar</category>
+                <singleton>true</singleton>
+                <tag>avatar</tag>
+                <view-id>avatar</view-id>
+                <description>Tarantula Content Avatar Service</description>
+                <class-name>com.tarantula.platform.presence.AvatarContentApplication</class-name>
+                <configuration-name>content</configuration-name>
+                <response-label>content</response-label>
+            </application>
+        </application-list>
+        <configuration-list>
+            <configuration tag="content" priority="10">
+                <content type="setup">
+                    <property name="uploadChunkSize">1200000</property>
+                    <property name="contentPath">/tarantula/content</property>
+                </content>
+            </configuration>
+        </configuration-list>
+    </lobby-context>
+</tarantula>

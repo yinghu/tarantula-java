@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="tarantula.css"/>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.8.6/pixi.min.js"></script>-->
+    <script src="https://pixijs.download/v5.0.0/pixi.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/pixi-filters@2.6.1/dist/pixi-filters.js"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/screenfull.js/4.2.0/screenfull.min.js"></script>
+    <script src="resource/tarantula.api.js"></script>
+    <script src="resource/tarantula.webgl.js"></script>
+    <script src="resource/tarantula.ui.js"></script>
+    <script src="resource/tarantula.casino.js"></script>
+    <script src="resource/tarantula.craps.js"></script>
+    <script src="resource/tarantula.blackjack.js"></script>
+    <script src="resource/tarantula.roulette.js"></script>
+    <script src="resource/tarantula.baccarat.js"></script>
+    <script src="resource/tarantula.scc.js"></script>
+    <title>REAL NUMBER GAME NET</title>
+</head>
+<body class='w3-green' onload="_ready()"> 
+    <div>
+        <div class="w3-display-container w3-cyan w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='demo-sync'>
+            <div class="w3-display-topright w3-padding"><span id="demo-sync-name" class="tx-game-title">DemoSync</span></div>
+            <div class="w3-display-topleft w3-padding">
+                <img id ='demo-sync-icon' src="assets/minus.png" width="120px" height="120px" style='filter:drop-shadow(8px 8px 16px white)'>
+            </div>
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode'>Demo Sync</span></div>
+        </div>
+        <div class="w3-display-container w3-cyan w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='baccarat'>
+            <div class="w3-display-topright w3-padding"><span id="baccarat-name" class="tx-game-title">Baccarat</span></div>
+            <div class="w3-display-topleft w3-padding">
+                <img id ='baccarat-icon' src="assets/minus.png" width="120px" height="120px" style='filter:drop-shadow(8px 8px 16px white)'>
+            </div>
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode'>Multiple Players,Play As The House</span></div>
+        </div>
+        <div class="w3-display-container w3-blue w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='blackjack'>
+            <div class="w3-display-topright w3-padding"><span id='blackjack-name' class="tx-game-title">BlackJack</span></div>
+            <div class="w3-display-topleft w3-padding">
+                <img id='blackjack-icon' src="assets/minus.png" width="100px" height="100px" style='filter:drop-shadow(8px 8px 16px white)'>
+            </div>
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode'>Multiple Players,Play As The House</span></div>
+        </div>
+        <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='craps'>
+            <div class="w3-display-topright w3-padding"><span id="craps-name" class="tx-game-title">Craps</span></div>
+            <div class="w3-display-topleft w3-padding">
+                <img id="craps-icon" src="assets/minus.png" width="100px" height="100px" style='filter:drop-shadow(8px 8px 16px white)'>
+            </div>
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode'>Multiple Players,Play As The House</span></div>
+        </div>
+        <div class="w3-display-container w3-purple w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='roulette'>
+            <div class="w3-display-topright w3-padding"><span id="roulette-name" class="tx-game-title">Roulette</span></div>
+            <div class="w3-display-left w3-padding">
+                <img id ='roulette-icon' src="assets/minus.png" width="100px" height="100px" style='filter:drop-shadow(8px 8px 16px white)'>
+            </div>
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode'>Multiple Players,Play As The House</span></div>
+        </div>
+        <!--
+        <div class="w3-display-container w3-indigo w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='tuck'>
+            <div class="w3-display-topright w3-padding"><span id="tuck-name" class="tx-game-title">Coming Soon</span></div>
+            <div class="w3-display-left w3-padding"><img id ='tuck-icon' src="assets/minus.png" width="100px" height="100px"></div>
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode'>Play On Tournament, Win Big</span></div>
+        </div>
+        -->
+        <div class="w3-display-container w3-lime w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='sicbo'>
+            <div class="w3-display-topright w3-padding"><span id="sicbo-name" class="tx-game-title">Coming Soon</span></div>
+            <div class="w3-display-left w3-padding"><img id ='sicbo-icon' src="assets/minus.png" width="100px" height="100px"></div>
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode'>Under Developing</span></div>           
+        </div>
+        <!--
+        <div class="w3-display-container w3-orange w3-border-bottom w3-border-white tx-content-100 tx-lobby" view-id='pending' id='pachinko'>
+            <div class="w3-display-topright w3-padding" id="pachinko-name">Pending</div>
+            <div class="w3-display-left w3-padding"><img id ='pachinko-icon' src="assets/minus.png" width="70px" height="70px"></div>
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode'>Multiple Players,Team Up,Tournament</span></div>
+        </div>
+        <div class="w3-display-container w3-pink w3-border-bottom w3-border-white tx-content-100 tx-lobby" view-id='pending' id='videopoker'>
+            <div class="w3-display-topright w3-padding" id="videopoker-name">Pending</div>
+            <div class="w3-display-left w3-padding"><img id ='videopoker-icon' src="assets/minus.png" width="70px" height="70px"></div>
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode'>Multiple Players,Team Up,Tournament</span></div>
+        </div>
+        -->
+    </div>
+    
+    <!-- POPUP GAME LOBBY FULL SCREEN  CONTENT -->
+    <div id="m1" class="tx-modal w3-animate-zoom">
+        
+    </div>
+    
+    <!-- POPUP GAME FULL SCREEN CONTENT -->
+    <div id="m2" class="tx-modal w3-animate-zoom">
+        
+    </div>
+   
+    <!-- POPUP HTML CONTENT POPUP-->
+    <div id="m3" class="w3-modal w3-animate-zoom" style="z-index: 10">
+        
+    </div>
+    <!-- Privacy and terms HTML CONTENT POPUP-->
+    <div id="m4" class="w3-modal w3-animate-zoom" style="z-index: 11">
+        
+    </div>
+    <script>
+        var currentModule;
+        //var _robotoFamily = "Roboto,Arial";//Arial as backup
+        //var _robotoDensFamily = "\'Roboto Condensed\',Arial";//Arial as backup
+        //var _oswaldFamily = 'Oswald, Arial';
+        //var _felipaFamily = 'Felipa, Arial';
+        
+        document.querySelectorAll('.tx-lobby').forEach(function(a){
+            a.onclick = _open_lobby;     
+        });
+        function _ready(){
+            WebFont.load({
+              google: {
+                families: ['Felipa','Oswald'],
+              },
+              fontloading : function(){
+                    //console.log("loading");     
+              },    
+              active: function() {
+                    //console.log("loaded");  
+              }
+            });
+            TARA_API.onIndex(function(vb){
+                let lb = vb.descriptor;
+                let ix = document.querySelector('#'+lb.typeId);
+                if(ix){
+                    ix.setAttribute('view-id',lb.viewId);
+                    ix.querySelector('#'+lb.typeId+'-name').innerHTML = lb.name;
+                    ix.querySelector('#'+lb.typeId+'-icon').src = lb.icon;
+                }
+            }); 
+            if(window.orientation){
+                window.addEventListener('orientationchange',_resize,false);
+                //window.addEventListener('deviceorientation',_resize,false);
+            }else{
+                window.addEventListener('resize',_resize,false);
+            }
+        }
+        function _view(setup){
+            TARA_API.onView(setup.viewId,function(v){
+                //load js module if v.moduleFile 
+                if(v.moduleFile){
+                    TARA_API.onResource({name:v.moduleFile,type:'text/javascript'},function(j){
+                        if(!window[v.moduleName]){
+                            let md = document.createElement('script');
+                            md.appendChild(document.createTextNode(j));
+                            document.head.appendChild(md);
+                        }
+                        window[v.moduleName].setup(setup);    
+                        currentModule = v.moduleName;
+                        _view_load(v,setup.containerId);    
+                    });    
+                }
+                else{
+                    _view_load(v,setup.containerId);
+                }
+            });   
+        }
+        function _view_load(v,cid){
+            TARA_API.onResource({name:v.moduleResourceFile,type:'text/html'},function(h){
+                let m0 = document.querySelector(cid);
+                m0.insertAdjacentHTML("afterbegin",h);   
+                _api_script(m0,function(exe){
+                    m0.style.display = 'block';
+                });
+            });
+        }
+        function _api_script(p,callback) {
+            let exe = p.querySelector('script');
+            new Function(exe.textContent).call();
+            callback(exe);
+        }
+        function _resize(e){
+            try{
+                if(currentModule){
+                    window[currentModule]['swap']();
+                }
+            }catch(err){}//ignore errors
+        }
+        function _open_lobby(){
+            let vid = this.getAttribute('view-id');
+            let typeId = this.getAttribute('id');
+            if(TARA_API.query().systemId){
+                fullscreen();
+                _view({viewId:vid,containerId:'#m1',typeId:typeId});
+            }
+            else{
+                TARA_API.query().target = {viewId:vid,containerId:'#m1',typeId:typeId};
+                _view({viewId:'authentication',containerId:'#m3'});
+            }
+        }
+        function _open_buy(){
+            if(TARA_API.query().systemId){
+                _view({viewId:'shopping',containerId:'#m3'});
+            }
+            else{
+                TARA_API.query().target = {viewId:'shopping',containerId:'#m3'};
+                _view({viewId:'authentication',containerId:'#m3'});
+            }
+        }
+        function fullscreen(){
+            if(screenfull.enabled&&(!screenfull.isFullscreen)){
+                screenfull.request();
+            }
+        }
+        function normalscreen(){
+            if(screenfull.enabled&&(screenfull.isFullscreen)){
+                screenfull.exit();
+            }     
+        }
+        function wsize(){
+            let _portrait = (window.innerWidth<window.innerHeight); 
+            if(window.orientation){
+                _portrait = window.orientation == 0 || window.orientation == 180;
+            }
+            let ws = {portrait:_portrait};
+            if( window.navigator.standalone && (!_portrait)){
+                ws.height =  screen.width;            
+                ws.width = screen.height;
+            }
+            else{
+                ws.width = window.innerWidth;
+                ws.height = window.innerHeight;
+            }
+            ws.scale = screen.width<800?screen.width/800:1;
+            return ws;
+        }
+        function google_sign_out() {
+            let auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function () {
+                //console.log('User signed out.');
+            });
+        }
+    </script>
+</body>
+</html>

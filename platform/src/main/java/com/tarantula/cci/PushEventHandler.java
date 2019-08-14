@@ -1,0 +1,96 @@
+package com.tarantula.cci;
+
+import com.tarantula.*;
+import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.event.ServerPushEvent;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+
+public class PushEventHandler implements RequestHandler {
+
+    private static TarantulaLogger log = JDKLogger.getLogger(PushEventHandler.class);
+
+    private String bucket;
+    private EventService eventService;
+
+
+    private String serverTopic;
+    private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
+
+    public PushEventHandler(){
+
+    }
+    public String name(){
+        return "/push";
+    }
+    public void onRequest(OnExchange exchange){
+        try{
+            String action = exchange.header(Session.TARANTULA_ACTION);
+            byte[] _payload = exchange.payload();
+            if(action.equals("onConnect")){
+                //log.warn("push->"+exchange.path()+"/"+exchange.header("serverId")+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
+                String sid = exchange.id();
+                _hex.put(sid,exchange);
+                ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,false);
+                pushEvent.bucket(this.bucket);
+                pushEvent.clientId(exchange.header("serverId"));
+                pushEvent.owner(this.eventService.subscription());
+                pushEvent.destination(DeploymentServiceProvider.DEPLOY_TOPIC);
+                pushEvent.payload(_payload);
+                eventService.publish(pushEvent);
+            }
+            else if(action.equals("onDisconnect")){
+                String serverId = exchange.header("serverId");
+                _hex.forEach((k,v)->{
+                    if(v.header("serverId").equals(serverId)){
+                        _hex.remove(k);
+                        ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,k,true);
+                        pushEvent.bucket(this.bucket);
+                        pushEvent.clientId(exchange.header("serverId"));
+                        pushEvent.owner(this.eventService.subscription());
+                        pushEvent.destination(DeploymentServiceProvider.DEPLOY_TOPIC);
+                        pushEvent.payload(_payload);
+                        eventService.publish(pushEvent);
+                    }
+                });
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+            _hex.remove(exchange.id()); //removed cache on any errors
+            exchange.onError(ex,"Bad request");
+        }
+    }
+
+    @Override
+    public void start() throws Exception {
+        this.serverTopic = UUID.randomUUID().toString();
+        this.eventService.registerEventListener(this.serverTopic,this);
+        log.info("Push event handler started");
+    }
+
+    @Override
+    public void shutdown() throws Exception {
+
+    }
+    @Override
+    public void setup(TokenValidator tokenValidator,EventService eventService,AccessIndexService accessIndexService,String bucket) {
+        this.eventService = eventService;
+        this.bucket = bucket;
+    }
+    public boolean onEvent(Event event){
+       OnExchange hx = this._hex.get(event.sessionId());
+       if(hx!=null){
+           if(hx.onEvent(event)){ //remove on true marked as closed connect or session
+               _hex.remove(event.sessionId());
+           }
+       }
+       else{
+           log.warn(event.toString()+" unexpected removed");
+       }
+       return true;
+    }
+    public void onCheck(){
+        log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
+    }
+}

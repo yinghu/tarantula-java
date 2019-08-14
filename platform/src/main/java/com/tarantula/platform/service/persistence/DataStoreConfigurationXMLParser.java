@@ -1,0 +1,127 @@
+package com.tarantula.platform.service.persistence;
+
+import com.tarantula.ServiceProvider;
+import com.tarantula.Serviceable;
+import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.DataStoreProvider;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Updated by yinghu on 6/27/2019.
+ */
+public class DataStoreConfigurationXMLParser extends DefaultHandler implements Serviceable {
+
+
+    public final ConcurrentHashMap<String,ServiceProvider> _loaded;
+
+    String currentLoad;
+    HashMap<String,String> properties = new HashMap();
+    String currentProperty;
+    String value;
+
+    private String dataBucketGroup;
+    private String dataBucketNode;
+    private String dataBucketId;
+    private String dataStoreProviderConfiguration;
+    private String dataDir;
+    private String dataRecoveryDir;
+    private boolean dRecovered;
+    private boolean iRecovered;
+
+    private String dataStoreDailyBackup;
+    public DataStoreConfigurationXMLParser(String dconfig,TarantulaContext tx, ConcurrentHashMap<String,ServiceProvider> _providers){
+        this.dataStoreProviderConfiguration = dconfig;
+        this.dataBucketGroup = tx.dataBucketGroup;
+        this.dataBucketNode = tx.dataBucketNode;
+        this.dataBucketId = tx.dataBucketId;
+        this.dataDir = tx.dataStoreDir;
+        this.dataRecoveryDir = tx.dataStoreRecoveryDir;
+        this.dRecovered = tx.dRecovered.get();
+        this.iRecovered = tx.iRecovered.get();
+        this.dataStoreDailyBackup = tx.dataStoreDailyBackup?"true":"false";
+        this._loaded = _providers;
+    }
+    private void parse(InputStream xml) throws Exception{
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        SAXParser p = factory.newSAXParser();
+        p.parse(xml,this);
+    }
+
+    @Override
+    public void endElement(String uri, String lname, String qname) throws SAXException {
+        if(qname.equals("data-source")){
+            DataStoreProvider ds = (DataStoreProvider)_loaded.get(currentLoad);
+            ds.configure(properties);
+            _start(ds);
+            properties.clear();
+        }
+        else if(qname.equals("property")){
+            properties.put(currentProperty, value);
+        }
+
+    }
+    @Override
+    public void startElement(String uri, String lname, String qname, Attributes attributes) throws SAXException {
+        if(qname.equals("data-source")){
+            String name = (attributes.getValue("name"));
+            String provider = (attributes.getValue("provider"));
+            this._loaded.put(name.trim(),this.dataStoreProvider(provider.trim()));
+            properties.put("name",name.trim());
+            properties.put("bucket",this.dataBucketGroup);
+            properties.put("node",this.dataBucketNode);
+            properties.put("bucketId",this.dataBucketId);
+            properties.put("dir",this.dataDir);
+            properties.put("recoveryDir",this.dataRecoveryDir);
+            properties.put("dRecovered",this.dRecovered?"true":"false");
+            properties.put("iRecovered",this.iRecovered?"true":"false");
+            properties.put("dailyBackup",dataStoreDailyBackup);
+            this.currentLoad = name.trim();
+        }
+        else if(qname.equals("property")){
+            currentProperty = attributes.getValue("name").trim();
+        }
+    }
+    @Override
+    public void characters(char[] ch, int start, int length)throws SAXException {
+        value = new String(ch,start,length);
+    }
+    DataStoreProvider dataStoreProvider(String provider){
+        try {
+            return (DataStoreProvider)Class.forName(provider).getConstructor().newInstance();
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
+    void _start(DataStoreProvider ds){
+        try{
+            ds.start();
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public void start() throws Exception {
+        try{
+            File f = new File("/etc/tarantula/"+this.dataStoreProviderConfiguration);
+            InputStream in = new FileInputStream(f);
+            this.parse(in);
+        }catch (Exception ex){
+            this.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(this.dataStoreProviderConfiguration));
+        }
+    }
+
+
+    public void shutdown() throws Exception {
+
+    }
+}

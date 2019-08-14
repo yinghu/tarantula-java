@@ -1,0 +1,28 @@
+.tx-modal{display: none;position: fixed; z-index: 10;padding-top: 0px;left: 0;top: 0;width: 100%; height: 100%;overflow: 'hidden';background-color: rgb(0,0,0); background-color:rgba(0,0,0,0.4)}
+.tx-modal-content {background-color: #fefefe;margin: 0px;padding: 0px;border: none;position: fixed; width:  100%; height: 100%}
+.tx-checkout{position: absolute;left: 0;top: 0;bottom: 0;right: 0; max-width: 300px; width: 80%; height: 400px; margin: auto; display: none}
+.tx-content-36{height: 36px; width: 100%;}
+.tx-content-100{height: 100px; width: 100%;}
+.tx-content-110{height: 110px; width: 100%;}
+.tx-content-120{height: 120px; width: 100%;}
+.tx-content-160{height: 160px; width: 100%;}
+.tx-margin-left-4{margin-left: 4px;}.tx-margin-right-4{margin-right: 4px;}.tx-margin-top-4{margin-top: 4px;}.tx-margin-bottom-4{margin-bottom: 4px;}
+.tx-margin-left-8{margin-left: 8px;}.tx-margin-right-8{margin-right: 8px;}.tx-margin-top-8{margin-top: 8px;}.tx-margin-bottom-8{margin-bottom: 8px;}
+.tx-margin-left-16{margin-left: 16px;}.tx-margin-right-16{margin-right: 16px;}.tx-margin-top-16{margin-top: 16px;}.tx-margin-bottom-16{margin-bottom: 16px;}
+.tx-margin-left-32{margin-left: 32px;}.tx-margin-right-32{margin-right: 32px;}.tx-margin-top-32{margin-top: 32px;}.tx-margin-bottom-32{margin-bottom: 32px;}
+.tx-text-12{padding: 4px;font: normal 12px Oswald;text-shadow: 1px 1px #fe4902, 2px 2px #fe4902, 3px 3px #fe4902;color: white;}
+.tx-lobby{font-family: "Oswald";font-size: 24px; cursor: pointer;}.tx-lobby:hover{background: linear-gradient(lightgreen,green);}
+.tx-popup{font-family: "Oswald";font-size: 24px;}
+.tx-pay-now{font-family: "Oswald";font-size: 20px!important;}
+.tx-pay-note{font-family: "Oswald";font-size: 14px;}
+.tx-pay-no-refund{font-family: "Oswald";font-size: 12px;}
+.tx-game-mode{font-family: "Oswald";font-size: 16px;}
+.tx-game-title{font-weight: 700;font-family: "Felipa";font-size: 32px;}
+.tx-pay-with-card{font-family: "Oswald";font-size: 16px!important;}
+.tx-pay-price{font-family: "Oswald";font-size: 30px;}
+.tx-pay-amount{font-family: "Oswald";font-size: 20px;color: blueviolet}
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+} 
+.tx-hide-scroll{overflow: hidden!important}

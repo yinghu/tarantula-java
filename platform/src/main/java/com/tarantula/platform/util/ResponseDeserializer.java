@@ -1,0 +1,51 @@
+package com.tarantula.platform.util;
+
+import com.google.gson.*;
+import com.tarantula.Response;
+import com.tarantula.platform.ResponseHeader;
+
+import java.lang.reflect.Type;
+
+
+/**
+ * Updated by yinghu on 10/7/2018.
+ */
+public class ResponseDeserializer implements JsonDeserializer<Response> {
+
+    private Response response;
+
+    public ResponseDeserializer(){}
+    public ResponseDeserializer(Response response){
+        this.response = response;
+    }
+
+    @Override
+    public Response deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+        if(response==null){
+            response = new ResponseHeader();
+        }
+        JsonObject jo = jsonElement.getAsJsonObject();
+        if(jo.has("command")){
+            response.command(jo.get("command").getAsString());
+        }
+        if(jo.has("code")){
+            response.code(jo.get("code").getAsInt());
+        }
+        if(jo.has("successful")){
+            response.successful(jo.get("successful").getAsBoolean());
+        }
+        if(jo.has("message")){
+            response.message(jo.get("message").getAsString());
+        }
+        if(jo.has("typeId")){
+            response.toMap().put("typeId",jo.get("typeId").getAsString());
+        }
+        if(jo.has("applicationId")){
+            response.toMap().put("applicationId",jo.get("applicationId").getAsString());
+        }
+        if(jo.has("disabled")){
+            response.toMap().put("disabled",jo.get("disabled").getAsBoolean());
+        }
+        return this.response;
+    }
+}

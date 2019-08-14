@@ -1,0 +1,92 @@
+package com.tarantula.platform;
+
+
+import com.tarantula.*;
+import com.tarantula.platform.service.cluster.PortableRegistry;
+import com.tarantula.platform.util.SystemUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Updated by yinghu on 4/16/2019.
+ */
+public class ApplicationConfiguration extends DeploymentObject implements Configuration{
+
+    protected String tag;
+    protected String type;
+
+    public static final String LABEL = "AFC";
+
+    public ApplicationConfiguration(){
+        this.vertex = "ApplicationConfiguration";
+        this.label = LABEL;
+        this.onEdge = true;
+    }
+
+    public String tag() {
+        return this.tag;
+    }
+
+    public void tag(String tag) {
+        this.tag = tag;
+        this.properties.put("tag",tag);
+    }
+    public String type() {
+        return this.type;
+    }
+
+    public void type(String type) {
+        this.type = type;
+        this.properties.put("type",type);
+    }
+
+    public String label(){
+        return SystemUtil.toString(new String[]{this.label,this.tag});
+    }
+    public void configure(String name,String value){
+        this.properties.put(name,value);
+    }
+    public List<Property> properties(){
+        ArrayList<Property> _alist = new ArrayList();
+        properties.forEach((String k,Object v)->{
+            if((!k.equals("tag"))&&(!k.equals("type"))){
+                DistributedProperty _p = new DistributedProperty(k,v.toString());
+                _alist.add(_p);
+            }
+        });
+        return _alist;
+    }
+    public String property(String name){
+        Object v = this.properties.get(name);
+        return v!=null?v.toString():null;
+    }
+
+    @Override
+    public Map<String,Object> toMap(){
+        this.properties.put("disabled",this.disabled);
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        this.tag = (String)properties.get("tag");
+        this.type = (String)properties.get("type");
+        this.disabled = (boolean)properties.get("disabled");
+        properties.forEach((String k,Object v)->{
+            this.properties.put(k,v);
+        });
+    }
+
+    public int getFactoryId() {
+        return PortableRegistry.OID;
+    }
+
+    public int getClassId() {
+        return PortableRegistry.APPLICATION_CONFIGURATION_CID;
+    }
+    @Override
+    public String toString(){
+        return "application configuration ["+tag+","+type+"]";
+    }
+}

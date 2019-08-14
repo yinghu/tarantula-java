@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula>
+    <lobby-context>
+        <type-id>craps</type-id>
+        <type>lobby</type>
+        <category>game</category>
+        <tag>craps</tag>
+        <icon>html/craps/craps_icon.png</icon>
+        <view-id>game.lobby</view-id>
+        <name>Craps</name>
+        <access-mode>12</access-mode>
+        <deploy-code>1</deploy-code>
+        <description>Tarantula craps Game Service</description>
+        <application-list>
+            <application>
+                <type-id>craps</type-id>
+                <subtype-id>craps</subtype-id>
+                <name>Craps</name>
+                <type>application</type>
+                <category>lobby</category>
+                <singleton>true</singleton>
+                <tag>craps</tag>
+                <description>Tarantula craps Lobby Service</description>
+                <class-name>com.tarantula.platform.playmode.GameLobbyApplication</class-name>
+                <deploy-priority>15</deploy-priority>
+                <configuration-name>craps</configuration-name>
+                <response-label>craps</response-label>
+            </application>
+            <application>
+                <type-id>craps</type-id>
+                <subtype-id>craps1</subtype-id>
+                <view-id>craps.game</view-id>
+                <name>Wise</name>
+                <type>application</type>
+                <category>casino</category>
+                <description>Tarantula craps Service</description>
+                <class-name>com.tarantula.game.casino.CrapsApplication</class-name>
+                <entry-cost>10000</entry-cost>
+                <capacity>32</capacity>
+                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
+                <max-instances-per-partition>10</max-instances-per-partition>
+                <max-idles-on-instance>3</max-idles-on-instance>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <configuration-name>craps</configuration-name>
+                <configuration-type>v1</configuration-type>
+                <leader-board-header>craps</leader-board-header>
+                <response-label>craps</response-label>
+            </application>
+            <application>
+                <type-id>craps</type-id>
+                <subtype-id>craps2</subtype-id>
+                <view-id>craps.game</view-id>
+                <name>Stone</name>
+                <type>application</type>
+                <category>casino</category>
+                <description>Tarantula craps Service</description>
+                <class-name>com.tarantula.game.casino.CrapsApplication</class-name>
+                <entry-cost>50000</entry-cost>
+                <capacity>32</capacity>
+                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
+                <max-instances-per-partition>10</max-instances-per-partition>
+                <max-idles-on-instance>3</max-idles-on-instance>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <configuration-name>craps</configuration-name>
+                <configuration-type>v2</configuration-type>
+                <leader-board-header>craps</leader-board-header>
+                <response-label>craps</response-label>
+            </application>
+            <application>
+                <type-id>craps</type-id>
+                <subtype-id>craps3</subtype-id>
+                <view-id>craps.game</view-id>
+                <name>VIP</name>
+                <type>application</type>
+                <category>casino</category>
+                <description>Tarantula craps Service</description>
+                <class-name>com.tarantula.game.casino.CrapsApplication</class-name>
+                <entry-cost>1000000</entry-cost>
+                <capacity>32</capacity>
+                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
+                <max-instances-per-partition>10</max-instances-per-partition>
+                <max-idles-on-instance>3</max-idles-on-instance>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <configuration-name>craps</configuration-name>
+                <configuration-type>v3</configuration-type>
+                <leader-board-header>craps</leader-board-header>
+                <response-label>craps</response-label>
+            </application>
+        </application-list>
+        <view-list>
+            <view type="craps.game">
+                <property name="flag">HD2</property>
+                <property name="moduleFile">html/craps/craps.game.module.js</property>
+                <property name="moduleName">CrapsGame</property>
+                <property name="moduleResourceFile">html/craps/craps.game.view.html</property>
+            </view>
+        </view-list>
+        <configuration-list>
+            <configuration tag="craps" priority="10">
+                <craps type="v1">
+                    <property name="dealerSeatFee">1000</property>
+                    <property name="minWager">100</property>
+                    <property name="maxWager">1000</property>
+                    <property name="seats">8</property>
+                </craps>
+                <craps type="v2">
+                    <property name="dealerSeatFee">50000</property>
+                    <property name="minWager">5000</property>
+                    <property name="maxWager">50000</property>
+                    <property name="seats">8</property>
+                </craps>
+                <craps type="v3">
+                    <property name="dealerSeatFee">100000</property>
+                    <property name="minWager">100000</property>
+                    <property name="maxWager">1000000</property>
+                    <property name="seats">8</property>
+                </craps>
+            </configuration>
+        </configuration-list>
+    </lobby-context>
+</tarantula>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula>
+    <lobby-context>
+        <type-id>index</type-id><!-- mapping to lobbyTypeId on application descriptor-->
+        <type>lobby</type>
+        <category>service</category>
+        <access-mode>10</access-mode>
+        <name>Index</name>
+        <description>Tarantula Lobby Index</description>
+        <view-id>index</view-id>
+        <deploy-priority>28</deploy-priority>
+        <application-list>
+            <application>
+                <type-id>index</type-id>
+                <subtype-id>user-inx</subtype-id>
+                <name>User</name>
+                <type>application</type>
+                <singleton>true</singleton>
+                <tag>user</tag>
+                <description>Tarantula User Management</description>
+                <class-name>com.tarantula.platform.presence.UserManagementApplication</class-name>
+                <configuration-name>user</configuration-name>
+                <leader-board-header>presence</leader-board-header>
+                <response-label>user</response-label>
+            </application>
+            <application>
+                <type-id>index</type-id>
+                <subtype-id>landing-inx</subtype-id>
+                <name>Index</name>
+                <type>application</type>
+                <category>index</category>
+                <view-id>index</view-id>
+                <singleton>true</singleton>
+                <tag>index</tag>
+                <description>Index Service</description>
+                <configuration-name>index</configuration-name>
+                <class-name>com.tarantula.platform.presence.IndexApplication</class-name>
+                <response-label>index</response-label>
+            </application>
+        </application-list>
+        <configuration-list>
+            <configuration tag="user" priority="10">
+                <user type="setup">
+                    <property name="lobbyId">presence</property>
+                    <property name="activated">true</property>
+                    <property name="initialBalance">1000000</property>
+                </user>
+            </configuration>
+        </configuration-list>
+    </lobby-context>
+</tarantula>

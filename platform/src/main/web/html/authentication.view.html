@@ -1,0 +1,201 @@
+<div class="w3-modal-content">
+    <div class="w3-card-4 tx-popup">
+        <div class="w3-bar w3-teal w3-text-white w3-border-bottom w3-border-orange">
+            <div class="w3-bar-item w3-left"><span>Authentication</span></div>
+            <div class="w3-bar-item w3-right w3-button" id='tx-authentication-close'><i class='fa fa-close'></i></div>
+        </div>
+        <div class="w3-container w3-border-bottom w3-border-orange w3-padding-16">
+            <div style="width: 240px; margin: auto"><div id="tx-google-button"></div></div>            
+        </div>    
+        <div class="w3-panel w3-center w3-text-red tx-pay-error" id="tx-auth-message-output"></div>
+        <div class="w3-container w3-text-teal w3-border-bottom w3-border-orange">
+            <div class="w3-panel" id="tx-user-input">
+                <input id ="rname" class="w3-input w3-round w3-border" type="text" placeholder='user name'/>
+            </div>
+            <div class="w3-panel" id="tx-password-input">    
+                 <input id ="rpwd" class="w3-input w3-round w3-border" type="password" placeholder='password'/>
+            </div>
+            <div class="w3-panel" id="tx-nickname-input">
+                 <input id ="snick" class="w3-input w3-round w3-border" type="text" placeholder='screen name'/>
+            </div>
+            <div class="w3-panel">  
+                <div id="tx-command" class="w3-block w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Log In</div>     
+            </div>
+        </div>
+        <div class="w3-container w3-text-teal w3-border-bottom w3-border-orange">
+            <div class="w3-panel">
+                <div id="tx-new-account" class="w3-block w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Register</div>     
+            </div>
+            <div class="w3-panel" id="tx-email-input">
+                 <input id ="remail" class="w3-input w3-round w3-border" type="text" placeholder='email address'/>
+                 <div class="w3-panel">
+                    <div id='tx-reset-cancel' class='w3-button w3-round w3-teal'>Cancel</div><div id='tx-reset-send' class='w3-button w3-round w3-teal w3-right'>Send</div>
+                 </div>
+            </div>
+            <div class="w3-panel" id="tx-password-reset">
+                <div id="tx-change-password" class="w3-block w3-button w3-round w3-teal tx-margin-bottom-8">Reset Password</div>   
+            </div>
+        </div>
+        <div class="w3-container w3-text-teal w3-border-bottom w3-border-orange">
+            <div class='w3-right tx-margin-right-8'><span class="w3-tiny w3-round w3-button" id="tx-privacy">Privacy</span><span class="w3-tiny w3-round w3-button" id="tx-terms">Terms</span></div>
+        </div>   
+        <div class="w3-container w3-border-bottom w3-border-orange w3-teal">
+            <div class="w3-right tx-margin-right-8 tx-margin-top-8 tx-margin-bottom-8 tx-text-12">Powered By Game Engine Cluster</div>            
+        </div>
+    </div>
+</div>
+
+<script>
+    tx_on_google_auth();
+    let _cmd = 'login';
+    document.querySelector("#tx-nickname-input").style.display = 'none';
+    document.querySelector("#tx-email-input").style.display = 'none';
+    function tx_on_google_auth(){
+        let m = document.getElementsByTagName('head')[0];
+        let m1 = document.createElement('meta');
+        m1.name = 'google-signin-scope';
+        m1.content = 'profile email';
+        m.parentNode.insertBefore(m1,m);
+        let m2 = document.createElement('meta');
+        m2.name = 'google-signin-client_id';
+        m2.content = TARA_API.query().google.clientId;
+        m.parentNode.insertBefore(m2,m);    
+        let glib = document.createElement('script');
+        glib.type = 'text/javascript';
+        glib.async = true;
+        glib.defer = true;
+        glib.src = 'https://apis.google.com/js/platform.js';
+        glib.onload = renderButton;
+        let t = document.getElementsByTagName("script")[0];
+        t.parentNode.insertBefore(glib,t); 
+    }
+    function renderButton() {
+        gapi.signin2.render('tx-google-button', {
+            'width': '240px',
+            'height': '48px',
+            'longtitle': true,
+            'theme': 'dark',
+            'onsuccess': onSignIn,
+            'onfailure': function(err){console.log(err);},
+        });
+    }
+    function onSignIn(googleUser) {
+        let uid = googleUser.getBasicProfile().getEmail();
+        //console.log(googleUser.getBasicProfile().getId());
+        let id_token = googleUser.getAuthResponse().id_token;
+        TARA_API.onToken({name:'google',accessKey:id_token,command:'onToken',login:uid},function(resp){
+            if(resp.successful){
+                TARA_API.onPresence(function(pdx){
+                    if(pdx.successful){
+                        m1 = document.querySelector('#m3');
+                        m1.innerHTML='';
+                        m1.style.display = 'none';
+                        _view(TARA_API.query().target);                    
+                    }        
+                });    
+            }else{
+                //normalscreen();
+                document.querySelector('#tx-auth-message-output').innerHTML = resp.message;
+            }
+        });  
+    } 
+    function tx_close_authentication(){
+         this.style.display = 'none';
+         let m1 = document.querySelector('#m3');
+         m1.innerHTML='';
+         m1.style.display = 'none';
+     }
+     document.querySelector("#tx-authentication-close").onclick = tx_close_authentication;
+     document.querySelector('#tx-new-account').onclick = function(){
+         if(_cmd==='login'){
+            document.querySelector('#tx-nickname-input').style.display = 'block';
+            document.querySelector('#tx-auth-message-output').innerHTML = 'Please Register';
+            _cmd = 'register';
+            document.querySelector('#tx-command').innerHTML = 'Register';
+            document.querySelector('#tx-new-account').innerHTML = 'Login';
+         }
+         else if(_cmd==='register'){
+            document.querySelector('#tx-nickname-input').style.display = 'none';
+            document.querySelector('#tx-auth-message-output').innerHTML = 'Please Login';
+            _cmd = 'login';
+            document.querySelector('#tx-command').innerHTML = 'Login';
+            document.querySelector('#tx-new-account').innerHTML = 'Register';
+         }
+     };
+     document.querySelector('#tx-change-password').onclick = function(){
+         document.querySelector('#tx-email-input').style.display = 'block';
+         document.querySelector('#tx-password-reset').style.display = 'none';
+     };
+     document.querySelector('#tx-reset-cancel').onclick = function(){
+         document.querySelector('#tx-email-input').style.display = 'none';
+         document.querySelector('#tx-password-reset').style.display = 'block';
+     }; 
+     document.querySelector('#tx-reset-send').onclick = function(){
+        let _e = document.querySelector('#remail').value;
+         if(_e==''){
+             document.querySelector('#tx-auth-message-output').innerHTML = 'wrong email address';
+         } 
+         else{
+             TARA_API.onReset({email:_e},function(resp){
+                 console.log(resp);
+             });
+         }
+     };
+     document.querySelector('#tx-command').onclick = function(){
+        let _n = document.querySelector('#rname').value;
+        let _p = document.querySelector('#rpwd').value;
+        let _c = document.querySelector('#snick').value;
+        if(_cmd==='login'){
+            if(_n==''||_p==''){
+                document.querySelector('#tx-auth-message-output').innerHTML = 'please input user/password';
+                return;
+            }
+            fullscreen();
+            TARA_API.onLogin({login:_n,password:_p},function(resp){
+                if(resp.successful){
+                    /** server push register/unregister
+                    TARA_API.onMessage('ws',function(m){
+                        console.log(m);
+                        if(m.code == 200){
+                            console.log("connected");
+                            TARA_API.onMessage('presence/notice',function(mx){
+                                console.log(mx);
+                                let req1 = {action:'onStop',streaming:true,label:'presence/notice',data:{command:'onStop'}};
+                                TARA_API.send(req1);
+                            });
+                            let req = {action:'onStart',streaming:true,label:'presence/notice',data:{command:'onStart'}};
+                            TARA_API.send(req);
+                        }
+                    });**/
+                    TARA_API.onPresence(function(pdx){
+                        if(pdx.successful){
+                            m1 = document.querySelector('#m3');
+                            m1.innerHTML='';
+                            m1.style.display = 'none';
+                            _view(TARA_API.query().target);                    
+                        }        
+                    });    
+                }else{
+                    //setTimeout(normalscreen(),100);
+                    document.querySelector('#tx-auth-message-output').innerHTML = resp.message;
+                }
+            });   
+        }
+        else if(_cmd==='register'){
+            if(_n==''||_p==''||_c==''){
+                document.querySelector('#tx-auth-message-output').innerHTML = 'please input user/password/screen name';
+                return;
+            }
+            TARA_API.onRegister({login:_n,password:_p,nickname:_c},function(resp){
+                document.querySelector('#tx-auth-message-output').innerHTML = resp.message;
+            });
+        }
+     };
+     document.querySelector('#tx-privacy').onclick = function(){
+        _view({viewId:'privacy',containerId:'#m4'});    
+     };
+     document.querySelector('#tx-terms').onclick = function(){
+        _view({viewId:'terms',containerId:'#m4'});
+     };
+         
+</script>

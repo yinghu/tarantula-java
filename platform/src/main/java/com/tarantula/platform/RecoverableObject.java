@@ -1,0 +1,197 @@
+package com.tarantula.platform;
+
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
+import com.tarantula.*;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Updated by yinghu on 4/17/2018.
+ */
+public abstract class RecoverableObject implements Recoverable {
+
+    protected String bucket;
+
+    protected String oid;
+    protected String owner;
+    protected  String label;
+
+    protected  boolean disabled;
+
+    protected  Map<String,Object> properties = new HashMap();
+
+    protected  String vertex;
+
+    protected  boolean onEdge;
+
+    protected long timestamp;
+    protected int version;
+    protected long sequence;
+    protected int routingNumber;
+
+    protected boolean binary;
+
+    protected boolean distributable;
+    protected String index;
+
+
+    protected DataStore dataStore;
+
+    public long timestamp(){
+        return this.timestamp;
+    }
+    public void timestamp(long timestamp){
+        this.timestamp = timestamp;
+    }
+
+    public String bucket() {
+        return bucket;
+    }
+
+    public void bucket(String bucket) {
+        this.bucket = bucket;
+    }
+
+    public String oid(){
+        return this.oid;
+    }
+    public void oid(String oid){
+        this.oid = oid;
+    }
+
+    public String owner(){
+        return this.owner;
+    }
+    public void owner(String owner){
+        this.owner = owner;
+    }
+    public String vertex(){ return this.vertex;}
+    public void vertex(String vertex){ this.vertex = vertex;}
+
+    public String label(){
+        return this.label;
+    }
+    public void label(String label){
+        this.label = label;
+    }
+
+    public Map<String,Object> toMap(){
+        return this.properties;
+    }
+    public void fromMap(Map<String,Object> properties){
+        properties.forEach((String k,Object v)->this.properties.put(k,v));
+    }
+    public byte[] toByteArray(){
+        return null;
+    }
+    public void fromByteArray(byte[] data){
+
+    }
+    public boolean binary(){
+        return this.binary;
+    }
+    public void binary(boolean binary){
+        this.binary = binary;
+    }
+    public boolean disabled() {
+        return this.disabled;
+    }
+    public void distributable(boolean distributable){
+        this.distributable = distributable;
+    }
+    public void index(String index){
+        this.index = index;
+    }
+    public boolean distributable(){
+        return this.distributable;
+    }
+    public String index(){
+        return this.index;
+    }
+    public void disabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+    public int version(){
+        return this.version;
+    }
+    public void version(int version){
+        this.version = version;
+    }
+    public long sequence(){
+        return this.sequence;
+    }
+    public void sequence(long sequence){
+        this.sequence = sequence;
+    }
+    public int routingNumber(){
+        return this.routingNumber;
+    }
+    public void routingNumber(int routingNumber){
+        this.routingNumber = routingNumber;
+    }
+    abstract public int getFactoryId();
+    abstract public int getClassId();
+
+    public String distributionKey() {
+        if(this.bucket!=null&&this.oid!=null){
+            return new StringBuffer(this.bucket).append(Recoverable.PATH_SEPARATOR).append(oid).toString();
+        }
+        else{
+            return null;
+        }
+    }
+
+    public void distributionKey(String distributionKey){
+        String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
+        this.bucket = klist[0];
+        this.oid = klist[1];
+    }
+    public int scope(){
+        return Distributable.DATA_SCOPE;
+    }
+    public void writePortable(PortableWriter out) throws IOException {
+        out.writeUTF("_bucket",this.bucket);
+        out.writeUTF("_oid",this.oid);
+        out.writeUTF("_vertex",this.vertex);
+        out.writeUTF("_label",this.label);
+        out.writeBoolean("_edge",this.onEdge);
+        out.writeInt("_routingNumber",this.routingNumber);
+
+    }
+    public void readPortable(PortableReader in) throws IOException {
+        this.bucket = in.readUTF("_bucket");
+        this.oid = in.readUTF("_oid");
+        this.vertex = in.readUTF("_vertex");
+        this.label = in.readUTF("_label");
+        this.onEdge = in.readBoolean("_edge");
+        this.routingNumber = in.readInt("_routingNumber");
+    }
+    public boolean onEdge(){
+        return this.onEdge;
+    }
+    public void onEdge(boolean onEdge){
+        this.onEdge = onEdge;
+    }
+
+    public void dataStore(DataStore dataStore){
+        this.dataStore = dataStore;
+    }
+    public void onUpdate(){
+    }
+    public Key key(){
+        return new DistributionKey(this.bucket,this.oid);
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        Recoverable tc =(Recoverable) obj;
+        return this.distributionKey().equals(tc.distributionKey());
+    }
+    @Override
+    public int hashCode(){
+        return this.distributionKey().hashCode();
+    }
+}

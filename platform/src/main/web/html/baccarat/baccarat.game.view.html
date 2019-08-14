@@ -1,0 +1,563 @@
+<div class="tx-modal-content">
+    <canvas id="t-game-canvas"></canvas>              
+</div>
+<script>
+    let gameObject ={}
+    let wz = wsize();
+    let sc = wz.scale;
+    let app = TGL.start(wz.width,wz.height,document.querySelector("#t-game-canvas"));    
+    gameObject.dealerFee = 1000; 
+    let tableListView = TGL.container(); //table view
+    let popupListView = TGL.container(); //pop view
+    let commandListView = TGL.container();
+    let pBoard = UI.bar(2000,112);
+    commandListView.container.addChild(pBoard.container);
+    let pConfirmation = UI.confirmation();
+    pConfirmation.close();
+    pConfirmation.no.button.command = function(){pConfirmation.close();};
+    
+    let cashinView = UI.cashInView();
+    cashinView.container.visible = false;
+    cashinView.close.button.command = function(){cashinView.container.visible=false;};
+    cashinView.close.icon.texture = PIXI.Texture.from('assets/close.png');
+    cashinView.cashin.button.command = function(){
+        BaccaratGame.cashin(function(resp){cashinView.balance = resp.presence.balance;cashinView.set();});
+    };
+    cashinView.buy.button.command = function(){
+        TARA_API.query().applicationId = gameObject.applicationId;
+        _open_buy();
+    };
+   
+    let playerListView = TGL.container();
+   
+    let his1 = UI.labelList(72,20);
+    playerListView.container.addChild(his1.container);
+    
+    let pTurn = CASINO.turn();
+    pTurn.icon.texture = PIXI.Texture.from('assets/duration.png');
+    
+    let menuBoard = UI.menu(1);
+    menuBoard.list[0].button.command = function(){
+        menuBoard.close();
+        return false;    
+    };
+    menuBoard.list[0].button.icon.texture = PIXI.Texture.from('assets/left_arrow.png');
+    menuBoard.list[1].button.icon.texture = PIXI.Texture.from('assets/statistics.png');
+    menuBoard.list[2].button.icon.texture = PIXI.Texture.from('assets/gear.png');
+    menuBoard.list[3].button.icon.texture = PIXI.Texture.from('assets/home.png');
+    menuBoard.list[3].button.command = function(){
+        let wp = wsize();
+        pConfirmation.message('Are you sure to leave game ?')
+        pConfirmation.yes.button.command = function(){
+            BaccaratGame.leave();
+            pTurn.cancel();
+            TGL.shutdown();
+            normalscreen();
+            document.querySelector("#m2").innerHTML="";
+            document.querySelector("#m2").style.display = "none";     
+        };
+        pConfirmation.position(sc,(wp.width-pConfirmation.width*sc)/2,(wp.height-pConfirmation.height*sc)/2);
+        pConfirmation.open();   
+        menuBoard.close();    
+    };
+    let houseSeat = UI.dealer();
+    let dealerBar = BACCARAT.dealerBar();
+    let playerBar = dealerBar.playerBar;
+    let bankerBar = dealerBar.bankerBar;
+    let tieBar = dealerBar.tieBar;//BACCARAT.tieBar();
+    dealerBar.lines.push(PIXI.Texture.from('assets/star.png'));
+    dealerBar.lines.push(PIXI.Texture.from('assets/close.png'));
+    dealerBar.lines.push(PIXI.Texture.from('assets/minus.png'));
+    dealerBar.clear();
+    tableListView.container.addChild(houseSeat.container);
+    tableListView.container.addChild(playerBar.container);
+    tableListView.container.addChild(bankerBar.container);
+    tableListView.container.addChild(tieBar.container);
+    houseSeat.name('Baccarat Dealer');
+    houseSeat.avatar.icon.texture = PIXI.Texture.from('assets/player.png');
+    houseSeat.seatBox.command = function(){
+        if(!houseSeat.occupied){
+            let wp = wsize();
+            pConfirmation.message('Are you sure to play as dealer \nwith seat fee $'+gameObject.dealerFee+' ?');
+            pConfirmation.yes.button.command = function(){
+                BaccaratGame.onDealerSeat(function(resp){
+                    if(resp.code == 0){
+                        pConfirmation.message(resp.message);
+                        setTimeout(function(){pConfirmation.close();},2000);
+                    }
+                    else if(resp.code ==1){
+                        pConfirmation.message(resp.message);
+                    }
+                    else if(resp.code==2){
+                        pConfirmation.message(resp.message);
+                        get_more_chips();   
+                    }
+                });
+            };
+            pConfirmation.position(sc,(wp.width-pConfirmation.width*sc)/2,(wp.height-pConfirmation.height*sc)/2);
+            pConfirmation.open();
+        }
+        else if(houseSeat.occupied&&houseSeat.systemId === TARA_API.query().systemId){
+            let wp = wsize();
+            pConfirmation.message('Are you leaving as the dealer?');
+            pConfirmation.yes.button.command = function(){
+                BaccaratGame.offDealerSeat(function(resp){
+                    if(resp.code == 0){
+                        pConfirmation.message(resp.message);
+                        setTimeout(function(){pConfirmation.close();},2000);
+                    }
+                    else if(resp.code ==1){
+                        pConfirmation.message(resp.message);
+                    }
+                });
+            };
+            pConfirmation.position(sc,(wp.width-pConfirmation.width*sc)/2,(wp.height-pConfirmation.height*sc)/2);
+            pConfirmation.open();
+        }
+        //houseSeat.background.tint = Math.random()*0xffffff;
+    };
+    
+    
+    let wagerBar = UI.wagerBar();
+    commandListView.container.addChild(wagerBar.container);
+    wagerBar.minus.icon.texture = PIXI.Texture.from('assets/minus.png');
+    wagerBar.plus.icon.texture = PIXI.Texture.from('assets/plus.png');
+    let ctable = BACCARAT.table(11);
+    let betLineList = ctable.lines;
+    
+    betLineList.forEach(function(bl,ix){
+        //bl.tieBet.tint = Math.random()*0xffffff;
+        bl.tieBet.command = function(e){
+            let x = (e.data.global.x - bl.tieBox.getGlobalPosition().x)/sc;
+            let y = (e.data.global.y - bl.tieBox.getGlobalPosition().y)/sc;
+            BaccaratGame.wager(3,wagerBar.wager,x,y,ix,function(resp){
+                if(resp.code == 2){
+                    get_more_chips();    
+                }    
+            });
+        };
+        //bl.bankerBet.tint = Math.random()*0xffffff;
+        bl.bankerBet.command = function(e){
+            let x = (e.data.global.x - bl.bankerBox.getGlobalPosition().x)/sc;
+            let y = (e.data.global.y - bl.bankerBox.getGlobalPosition().y)/sc;
+            BaccaratGame.wager(2,wagerBar.wager,x,y,ix,function(resp){
+                if(resp.code == 2){
+                    get_more_chips();    
+                }    
+            });
+        };
+        //bl.playerBet.tint = Math.random()*0xffffff;
+        bl.playerBet.command = function(e){
+            let x = (e.data.global.x - bl.playerBox.getGlobalPosition().x)/sc;
+            let y = (e.data.global.y - bl.playerBox.getGlobalPosition().y)/sc;
+            BaccaratGame.wager(1,wagerBar.wager,x,y,ix,function(resp){
+                if(resp.code == 2){
+                    get_more_chips();    
+                }    
+            });
+        };
+        bl.seat.command = function(){
+            BaccaratGame.seat(ix,(resp)=>{
+                console.log(resp);
+                //bl.player.avatar.icon.texture = gameObject.avatar;//PIXI.Texture.from('assets/player.png');
+                //bl.player.balance.text = '100.02M';
+            });  
+        };
+    });
+    tableListView.container.addChild(ctable.container);
+    
+    tableListView.container.addChild(pTurn.container);
+    let mc = UI.iconCommand(96,96);
+    mc.button.command = function(){
+        menuBoard.open(); 
+        return false;
+    };
+    mc.icon.texture = PIXI.Texture.from('assets/table.png');
+    commandListView.container.addChild(mc.container); 
+    
+    let sm = UI.iconCommand(96,96);
+    sm.button.command = function(){
+        
+        return false;
+    }; 
+    sm.icon.texture = PIXI.Texture.from('assets/friend.png');   
+    commandListView.container.addChild(sm.container);
+    
+    
+    let dk = CASINO.deck();
+    //dk.back.texture = PIXI.Texture.from('assets/casino/back.png');  
+    dk.back.tint = 0xcc00ff;
+    tableListView.container.addChild(dk.container);
+    
+    let lmt = CASINO.limits();
+    tableListView.container.addChild(lmt.container);
+    
+    let mp = UI.balanceView();
+    mp.button.command = function(){get_more_chips();};
+    mp.container.y = 5;
+    commandListView.container.addChild(mp.container); 
+    
+    let commandList = UI.textCommandList(1,96);
+    commandListView.container.addChild(commandList.container);
+    let bDeal = commandList.list[0];
+    bDeal.title('Deal');
+    bDeal.button.command = function(){
+        BaccaratGame.deal(function(resp){
+            console.log(resp);
+        });
+    };
+    let hc1 = CASINO.hand(3,1.02);
+    hc1.deck.visible = false;
+    let hc2 = CASINO.hand(3,1.02);
+    hc2.deck.visible = false;
+    hc1.container.visible = false;
+    hc2.container.visible = false;
+    popupListView.container.addChild(menuBoard.container);
+    
+    tableListView.container.addChild(hc1.container);
+    tableListView.container.addChild(hc2.container);
+    popupListView.container.addChild(pConfirmation.container);
+    popupListView.container.addChild(cashinView.container);
+    app.stage.addChild(commandListView.container);
+    app.stage.addChild(tableListView.container);
+    app.stage.addChild(playerListView.container);
+    app.stage.addChild(popupListView.container);
+    
+    BaccaratGame.start(function(){
+        _scale();
+    },function(jx){//server push update
+        //let jx = JSON.parse(e);
+        if(jx.name == 'betline'){//update chips
+            bc_on_bet(jx);
+        }
+        else if(jx.name == 'turn'){//update game reminder
+            bc_on_turn(jx);
+        }
+        else if(jx.name == 'deck'){//update deck 
+            bc_on_deck(jx);
+        }
+        else if(jx.name == 'countOnRank'){
+            bc_on_count(jx);
+        }
+        else if(jx.name == 'BaccaratBankerHand'){
+            bc_on_banker(jx);
+        }
+        else if(jx.name == 'BaccaratPlayerHand'){
+            bc_on_player(jx);
+        }
+        else if(jx.name == 'seat'){//update player seat
+            bc_on_seat(jx);
+        }
+        else if(jx.name == 'dealer'){//update dealer balance
+            bc_on_dealer(jx);
+        } 
+        else if(jx.name == 'dealerSeat'){//update dealer seat
+            bc_on_dealer_seat(jx);
+        }
+        else if(jx.name == 'balance'){ //update player balance
+            bc_on_balance(jx);
+        }
+        else if(jx.name == 'onStatistics'){//update statistics item
+            bc_on_statistics(jx);
+        }
+        else if(jx.name == 'idle'){//ping back on idle event
+            bc_on_idle(jx);
+        }
+    },function(g){
+        //console.log(g.configuration);
+        gameObject.entryCost = g.entryCost;
+        gameObject.dealerFee = g.dealerSeatFee;
+        gameObject.applicationId = g.applicationId;
+        gameObject.instanceId = g.instanceId;
+        gameObject.tournamentEnabled = g.tournamentEnabled;
+        wagerBar.min = g.minWager;
+        wagerBar.max = g.maxWager;
+        wagerBar.wager = wagerBar.max;
+        wagerBar.set();
+        lmt.limits(g.minWagerAsString,g.maxWagerAsString);
+        TARA_API.onProfile(TARA_API.query().systemId,function(resp){
+            gameObject.profile = resp.profile;
+            gameObject.avatar = PIXI.Texture.from(gameObject.profile.avatar+'?token='+TARA_API.query().token);
+            mp.avatar.icon.texture = gameObject.avatar;
+            mp.name(gameObject.profile.nickname);
+            cashinView.avatar.icon.texture = gameObject.avatar;
+            cashinView.name = gameObject.profile.nickname;
+            cashinView.set();
+            baccrat_update(g);
+            pTurn.countdown();
+        });
+    });
+    _scale();
+    function _scale(){
+        let wz = wsize();
+        gameObject.w = wz.width;
+        gameObject.h = wz.height;
+        app.renderer.resize(wz.width,wz.height);
+        pBoard.position(sc,(wz.width-pBoard.width*sc)/2,wz.height-pBoard.height*sc);
+        mc.position(sc,5,5);
+        sm.position(sc,wz.width-sm.width*sc-5,5);
+        mp.position(sc,wz.width-mp.width*sc-5,wz.height-pBoard.height*sc+(pBoard.height-mp.height)*sc/2); 
+        menuBoard.position(sc,5,5); 
+        houseSeat.position(sc,(wz.width-houseSeat.width*sc)/2,5); 
+        pTurn.position(sc,(wz.width-pTurn.width*sc)/2,(wz.height-pTurn.height*sc)/2);
+        if(wz.portrait){ 
+            ctable.position(sc,(wz.width-ctable.width*sc)/2,wz.height-2*pBoard.height*sc-ctable.height*sc-5); 
+            let wl = (wz.width-20)/(ctable.lines[0].width*sc);
+            let wcc = parseInt(wl);
+            wcc = wcc%2==0?(wcc-1):wcc;
+            ctable.set(5,wcc);
+            dk.position(sc,wz.width-dk.width*sc-10,houseSeat.container.y+houseSeat.height*sc+dk.overflow*sc+5);
+            lmt.position(sc,10,dk.container.y);
+            tieBar.position(sc,(wz.width-tieBar.width*sc)/2,houseSeat.container.y+houseSeat.height*sc+tieBar.overflow*sc+5);
+            playerBar.position(sc,10,lmt.container.y+lmt.height*sc+playerBar.overflow*sc+5);
+            bankerBar.position(sc,wz.width-bankerBar.width*sc-10,playerBar.container.y);    
+        }
+        else{//show landscale view     
+            ctable.position(sc,(wz.width-ctable.width*sc)/2,wz.height-pBoard.height*sc-ctable.height*sc-5); 
+            let wl = (wz.width-20)/(ctable.lines[0].width*sc);
+            let wcc = parseInt(wl);
+            wcc = wcc%2==0?(wcc-1):wcc;
+            ctable.set(5,wcc);
+            dk.position(sc,sm.container.x-dk.width*sc-5,dk.overflow*sc+5);
+            lmt.position(sc,mc.container.x+mc.width*sc+5,dk.container.y);
+            tieBar.position(sc,(wz.width-tieBar.width*sc)/2,houseSeat.container.y+houseSeat.height*sc+tieBar.overflow*sc+5);
+            playerBar.position(sc,tieBar.container.x-playerBar.width*sc-10,tieBar.container.y);
+            bankerBar.position(sc,tieBar.container.x+tieBar.width*sc+10,tieBar.container.y);
+        }
+        wagerBar.position(sc,mp.container.x-wagerBar.width*sc-10,wz.height-pBoard.height*sc+((pBoard.height-wagerBar.height)*sc)/2);
+        commandList.position(sc,10,wz.height-pBoard.height*sc+((pBoard.height-commandList.height)*sc)/2);
+        _bcc_h1();
+        _bcc_h2();
+        if(wz.portrait){
+            let ty = ((ctable.container.y-(tieBar.container.y+tieBar.height*sc+tieBar.overflow*sc))-pTurn.height*sc)/2;
+            his1.position(sc,10,wz.height-2*pBoard.height*sc+(pBoard.height*sc-his1.height*sc)/2);
+            ty = parseInt((wz.width)/(his1.list[0].width*sc));
+            his1.set(ty-1);
+        }
+        else{
+            let ty = ((ctable.container.y-(tieBar.container.y+tieBar.height*sc+tieBar.overflow*sc))-pTurn.height*sc)/2;
+           
+            his1.position(sc,commandList.container.x+commandList.width*sc+5,wz.height-pBoard.height*sc+((pBoard.height-his1.height)*sc)/2);
+            ty = parseInt((wagerBar.container.x-commandList.container.x-commandList.width*sc)/(his1.list[0].width*sc));
+            his1.set(ty-1);
+            
+        }
+    }
+    function _bcc_h1(){   
+        hc1.position(sc,(gameObject.w/2-hc1.width*sc)/2,playerBar.container.y+playerBar.height*sc+10);    
+    }
+    function _bcc_h2(){
+        hc2.position(sc,gameObject.w/2+(gameObject.w/2-hc2.width*sc)/2,playerBar.container.y+playerBar.height*sc+10);
+        
+    }
+    function baccrat_update(g){
+        //console.log(g);
+        mp.update(g.entryCost);
+        bc_on_dealer_seat(g.dealer);
+        bc_on_player(g.playerHand);
+        bc_on_banker(g.bankerHand);
+        if(g.betList){
+            g.betList.forEach(function(b){
+                bc_on_bet(b);
+            });
+        }
+        else{
+            bc_clear_chips();
+        }
+        g.seatList.forEach(function(t){
+            bc_on_seat(t);
+        });
+        if(g.statisticsList){
+            g.statisticsList.forEach(function(st){
+                bc_on_statistics(st);    
+            });
+        }
+        if(g.resultList){
+            g.resultList.forEach(function(r){his1.post(r)});
+        }
+    }
+    function bc_on_seat(seat){
+        //console.log(seat);
+        if(seat.systemId === TARA_API.query().systemId){
+            mp.update(seat.balance);
+        }
+        if(seat.occupied&&seat.index>=0){//onstage seat
+            let bl = betLineList[seat.index];
+            bl.player.avatar.icon.texture = gameObject.avatar;//PIXI.Texture.from('assets/player.png');
+            bl.player.balance.text = seat.balanceAsString;
+        }
+        else if(!seat.occupied&&seat.index>=0){//onstage seat
+            let bl = betLineList[seat.index];
+            bl.player.avatar.icon.texture = PIXI.Texture.from('assets/player.png');
+            bl.player.balance.text = 'Sit Down';
+        } 
+    }
+    function bc_on_statistics(st){
+        //console.log(st);
+        //sb.list[st.index].name = st.key;
+        //sb.list[st.index].value = st.value;
+        //sb.list[st.index].set();
+    }
+    function bc_on_turn(turn){
+        //console.log(turn);
+        pTurn.time = turn.remainingTime;
+        pTurn.message('OnTurn ['+turn.event+']');
+        //pTurn.frame.tint = Math.random()*0xffffff;
+    }
+    function bc_on_dealer_seat(dealer){
+        //console.log(dealer);
+        houseSeat.update(dealer.balance);
+        houseSeat.occupied = dealer.occupied;
+        if(dealer.occupied&&dealer.systemId){
+            houseSeat.systemId = dealer.systemId;
+            if(houseSeat.systemId === TARA_API.query().systemId){
+                houseSeat.avatar.icon.texture = gameObject.avatar;
+                houseSeat.name(gameObject.profile.nickname);
+                mp.update(dealer.balance);
+            }else{
+                TARA_API.onProfile(dealer.systemId,function(resp){
+                    houseSeat.avatar.icon.texture = PIXI.Texture.from(resp.profile.avatar+'?token='+TARA_API.query().token);
+                    houseSeat.name(resp.profile.nickname);
+                });
+            }
+        }
+        else{
+           houseSeat.avatar.icon.texture = PIXI.Texture.from('assets/player.png'); 
+           houseSeat.name('House Dealer');     
+        }
+        houseSeat.title.text = dealer.occupied?'Leave':'Sit Down';
+    }
+    function bc_on_dealer(d){
+       //console.log(d); 
+       houseSeat.update(d.balance); 
+       if(houseSeat.occupied&&houseSeat.systemId === TARA_API.query().systemId){
+            mp.update(d.balance);
+       }        
+    }
+    function bc_on_balance(d){
+       //console.log(d); 
+       if(d.systemId === TARA_API.query().systemId){
+            mp.update(d.balance);
+       }
+       if(d.index>=0){
+            let bl = betLineList[d.index];
+            bl.player.balance.text = d.balanceAsString;
+       }      
+    }
+    function bc_on_banker(bankerHand){
+        if(bankerHand.cardList){
+            hc2.container.visible = true;
+            bankerHand.cardList.forEach(function(c,i){
+                hc2.cardList[i].container.visible = true;
+                let cr = 'red';
+                if(c.suit === 'Spades'||c.suit === 'Clubs'){
+                    cr = 'black';
+                }
+                hc2.cardList[i].set({name:c.name,color:cr});
+                hc2.cardList[i].suit.texture = PIXI.Texture.from('html/blackjack/'+c.suit+'.png');
+            });
+            hc2.hand({rank:bankerHand.rank});
+            _bcc_h2();
+            bankerBar.setting.view.text = bankerHand.rank;
+            bankerBar.setting.rank = bankerHand.rank;
+            bankerBar.setting.standing = bankerHand.standing;
+            dealerBar.set();
+            if(dealerBar.standing){
+                //tieBar.set(dealerBar.result.tie);
+                bc_update_history(dealerBar.result.flag); 
+            }
+        }else{
+            dealerBar.clear();
+            //tieBar.clear();
+            hc2.clear();
+            bc_clear_chips();
+        }
+    }
+    function bc_on_player(playerHand){
+        if(playerHand.cardList){
+            hc1.container.visible = true;
+            playerHand.cardList.forEach(function(c,i){
+                hc1.cardList[i].container.visible = true;
+                let cr = 'red';
+                if(c.suit === 'Spades'||c.suit === 'Clubs'){
+                    cr = 'black';
+                }
+                hc1.cardList[i].set({name:c.name,color:cr});
+                hc1.cardList[i].suit.texture = PIXI.Texture.from('html/blackjack/'+c.suit+'.png');
+            });
+            hc1.hand({rank:playerHand.rank});
+            _bcc_h1();
+            playerBar.setting.view.text = playerHand.rank;
+            playerBar.setting.rank = playerHand.rank;
+            playerBar.setting.standing = playerHand.standing;
+            dealerBar.set();
+            if(dealerBar.standing){
+                //tieBar.set(dealerBar.result.tie);
+                bc_update_history(dealerBar.result.flag);       
+            }
+        }else{
+            dealerBar.clear();
+            //tieBar.clear();
+            hc1.clear();
+            bc_clear_chips();
+        }    
+    }
+    function bc_on_deck(deck){
+        //console.log(deck);
+        dk.sequence(deck.index);    
+    }
+    function bc_on_idle(idl){
+        if(idl.systemId === TARA_API.query().systemId){
+            BaccaratGame.ping(function(resp){
+                console.log(resp);
+            });
+        }
+        
+    }
+    function bc_on_count(jx){
+        //console.log(jx);
+    }
+    function bc_on_bet(b){
+        //console.log(b);
+        var chip = CASINO.chip(b.wager);
+        if(b.betLineId === 1){
+            chip.container.x = b.x;
+            chip.container.y = b.y;
+            betLineList[b.index].playerBox.addChild(chip.container);
+            playerBar.setting.wager.text = b.totalWager;
+        }
+        else if(b.betLineId === 2){
+            chip.container.x = b.x;
+            chip.container.y = b.y;
+            betLineList[b.index].bankerBox.addChild(chip.container);
+            bankerBar.setting.wager.text = b.totalWager;
+        }
+        else if(b.betLineId === 3){
+            chip.container.x = b.x;
+            chip.container.y = b.y;
+            betLineList[b.index].tieBox.addChild(chip.container);
+            tieBar.wager.text = b.totalWager;
+        }
+    }
+    function bc_clear_chips(){
+        betLineList.forEach(function(tl){
+            tl.tieBox.removeChildren();
+            tl.playerBox.removeChildren();
+            tl.bankerBox.removeChildren();    
+        });
+    }
+    function bc_update_history(rt){
+        his1.post(rt);
+    }
+    function get_more_chips(){
+        //mp.background.background.tint =  Math.random()*0xffffff;
+        let wp = wsize();
+        cashinView.position(sc,(wp.width-cashinView.width*sc)/2,(wp.height-cashinView.height*sc)/2);
+        cashinView.open();
+        let _payload = {serviceTag:"presence",command:"onBalance"};
+        TARA_API.onService(_payload,function(resp){
+            cashinView.balance = resp.presence.balance;
+            cashinView.set();
+        });   
+    }
+</script>

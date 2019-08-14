@@ -1,0 +1,420 @@
+<div class="tx-modal-content">
+    <canvas id="tx-roulette-canvas"></canvas>              
+</div>
+<script>
+    let gameObject ={};
+    let wz = wsize();
+    let sc = wz.scale;
+    gameObject.dealerFee = 2000; 
+    gameObject.asDealer = false;
+    let app = TGL.start(wz.width,wz.height,document.querySelector("#tx-roulette-canvas"));    
+    let tableListView = TGL.container();
+    let commandListView = TGL.container(); //common view
+    let popupListView = TGL.container(); //popup view
+    let pBoard = UI.bar(2000,112);
+    commandListView.container.addChild(pBoard.container);
+    let pConfirmation = UI.confirmation();
+    pConfirmation.close();
+    pConfirmation.no.button.command = function(){pConfirmation.close();};
+    
+    let cashInView = UI.cashInView();
+    cashInView.close.button.command = function(){cashInView.container.visible=false;};
+    cashInView.close.icon.texture = PIXI.Texture.from('assets/close.png');
+    cashInView.cashin.button.command = function(){
+        RouletteGame.cashin(function(resp){
+            cashInView.balance = resp.presence.balance;
+            cashInView.set();
+        });
+    };
+    cashInView.buy.button.command = function(){
+        TARA_API.query().applicationId = gameObject.applicationId;
+        _open_buy();
+    };
+    let menuBoard = UI.menu(1);
+    menuBoard.close();
+    menuBoard.list[0].button.command = function(){
+        menuBoard.close();
+        return false;    
+    };
+    menuBoard.list[0].button.icon.texture = PIXI.Texture.from('assets/left_arrow.png');
+    menuBoard.list[1].button.icon.texture = PIXI.Texture.from('assets/square.png');
+    menuBoard.list[2].button.icon.texture = PIXI.Texture.from('assets/gear.png');
+    menuBoard.list[3].button.icon.texture = PIXI.Texture.from('assets/home.png');
+    menuBoard.list[3].button.command = function(){
+        let wp = wsize();
+        pConfirmation.message('Are you sure to leave roullete game ?')
+        pConfirmation.yes.button.command = function(){
+            RouletteGame.leave();
+            TGL.shutdown();
+            normalscreen();
+            document.querySelector("#m2").innerHTML="";
+            document.querySelector("#m2").style.display = "none";     
+        };
+        pConfirmation.position(sc,(wp.width-pConfirmation.width*sc)/2,(wp.height-pConfirmation.height*sc)/2);
+        pConfirmation.open();
+        menuBoard.close();    
+    };
+    let dealer = UI.dealer();
+    dealer.name('House Dealer');
+    dealer.avatar.icon.texture = PIXI.Texture.from('assets/player.png');
+    commandListView.container.addChild(dealer.container);
+    dealer.occupied = false;
+    dealer.seatBox.command = function(){
+        if(!dealer.occupied){
+            let wp = wsize();
+            pConfirmation.message('Dear '+gameObject.profile.nickname+':\nAre you sure to play as dealer\n with seat fee $'+gameObject.dealerFee+' ?');
+            pConfirmation.yes.button.command = function(){
+                RouletteGame.onDealer(function(resp){
+                    pConfirmation.message(resp.message);
+                    if(resp.code == 0){
+                        gameObject.asDealer = true;
+                        dealer.occupied = true;
+                        pConfirmation.close();  
+                    }
+                    else if(resp.code==1){
+                           
+                    }
+                    else if(resp.code==2){
+                        get_more_chips();   
+                    }
+                });
+            };
+            pConfirmation.position(sc,(wp.width-pConfirmation.width*sc)/2,(wp.height-pConfirmation.height*sc)/2);
+            pConfirmation.open();
+        }
+        else if(dealer.occupied&&gameObject.asDealer){
+            let wp = wsize();
+            pConfirmation.message('Are you leaving as the dealer?');
+            pConfirmation.yes.button.command = function(){
+                RouletteGame.offDealer(function(resp){
+                    pConfirmation.message(resp.message);
+                    if(resp.code==0){
+                        gameObject.asDealer = false;
+                        dealer.occupied = false;
+                        pConfirmation.close();  
+                    }
+                });
+            };
+            pConfirmation.position(sc,(wp.width-pConfirmation.width*sc)/2,(wp.height-pConfirmation.height*sc)/2);
+            pConfirmation.open();
+        }
+    };
+    let mc = UI.iconCommand(96,96)
+    mc.button.command = function(){
+        menuBoard.container.visible = true; 
+        return false;
+    };
+    mc.button.icon.texture = PIXI.Texture.from('assets/table.png');
+    commandListView.container.addChild(mc.container); 
+    popupListView.container.addChild(menuBoard.container);
+    
+    let mp = UI.balanceView();
+    //mp.background.set();
+    mp.button.command = function(){get_more_chips();};
+    mp.container.y = 5;
+    commandListView.container.addChild(mp.container); 
+      
+    let sm = UI.iconCommand(96,96);
+    sm.button.command = function(){
+       
+        return false;
+    }; 
+    sm.button.icon.texture = PIXI.Texture.from('assets/friend.png');
+    commandListView.container.addChild(sm.container);
+    
+    let his1 = UI.labelList(72,20);
+    commandListView.container.addChild(his1.container);
+    
+    let wagerBar = UI.wagerBar();
+    commandListView.container.addChild(wagerBar.container);
+    wagerBar.minus.icon.texture = PIXI.Texture.from('assets/minus.png');
+    wagerBar.plus.icon.texture = PIXI.Texture.from('assets/plus.png');
+    
+    let lmt = CASINO.limits();
+    tableListView.container.addChild(lmt.container);
+    
+    let rtable = ROULETTE.table();
+    rtable.target.texture = PIXI.Texture.from('assets/circle.png');
+    rtable.target.visible = false;
+    let betList = rtable.betList;
+    rtable.items.forEach(function(bi,i){
+        //console.log(bi.lineId+"//"+i);
+        bi.bet.command = function(){
+            roulette_wager(bi.lineId,i);
+        };    
+    });
+    let tp = ROULETTE.player(120,120);
+    tp.icon.texture = PIXI.Texture.from('assets/player.png');
+    tableListView.container.addChild(tp.container);
+    let bWheel = UI.textCommand(100,96,'Wheel');
+    bWheel.button.command = function(){
+        RouletteGame.wheel(function(resp){
+            console.log(resp);
+        });
+    };
+    commandListView.container.addChild(bWheel.container);
+ 
+    let wheel = rtable.wheel;
+    /**
+    wheel.lines.forEach((wt)=>{
+        console.log(wt.t);
+        if(wt.t == '00'){
+            let xc = rtable.items[37];
+            console.log(xc.lineId);
+        }else{
+            let xc = rtable.items[wt.t];
+            console.log(xc.lineId);
+        }
+    });**/
+    tableListView.container.addChild(rtable.container);
+    popupListView.container.addChild(pConfirmation.container);
+    popupListView.container.addChild(cashInView.container);
+    //app.stage.addChild(dealerHistoryListView.container);
+    app.stage.addChild(commandListView.container);
+    app.stage.addChild(tableListView.container);
+    //app.stage.addChild(playerListView.container);
+    app.stage.addChild(popupListView.container);
+    RouletteGame.start(function(){
+        _scale();
+    },function(jx){
+        //let jx = JSON.parse(e);
+        //console.log(jx);
+        if(jx.name == 'stop'){
+            ro_on_stop(jx);
+        }
+        else if(jx.name == 'betline'){
+            ro_on_wager(jx);
+        }
+        else if(jx.name == 'balance'){
+            ro_on_balance(jx);
+        }
+        else if(jx.name == 'seat'){
+            ro_on_seat(jx);
+        }
+        else if(jx.name == 'dealerSeat'){
+            ro_on_dealer_seat(jx);
+        }
+        else if(jx.name == 'dealer'){
+            ro_on_dealer(jx);
+        }
+        else if(jx.name == 'onStatistics'){
+            ro_on_statistics(jx);
+        }
+    },function(g){
+        //set up game context
+        gameObject.entryCost = g.entryCost;
+        gameObject.dealerFee = g.dealerSeatFee;
+        gameObject.applicationId = g.applicationId;
+        gameObject.instanceId = g.instanceId;
+        gameObject.tournamentEnabled = g.tournamentEnabled;
+        wagerBar.min = g.minWager;
+        wagerBar.max = g.maxWager;
+        wagerBar.wager = wagerBar.max;
+        wagerBar.set();
+        lmt.limits(g.minWagerAsString,g.maxWagerAsString);
+        TARA_API.onProfile(TARA_API.query().systemId,function(resp){
+            //load profile
+            gameObject.profile = resp.profile;
+            gameObject.avatar = PIXI.Texture.from(gameObject.profile.avatar+'?token='+TARA_API.query().token);
+            mp.avatar.icon.texture = gameObject.avatar;
+            mp.name(gameObject.profile.nickname);
+            cashInView.avatar.icon.texture = gameObject.avatar;
+            tp.icon.texture = gameObject.avatar;
+            cashInView.name = gameObject.profile.nickname;
+            cashInView.set();
+            roullete_update(g);
+        });
+    });
+    _scale();
+    function _scale(){
+        let wz = wsize();
+        app.renderer.resize(wz.width,wz.height);
+        mp.position(sc,wz.width-mp.width*sc-5,wz.height-pBoard.height*sc+(pBoard.height-mp.height)*sc/2);
+        pBoard.position(sc,(wz.width-pBoard.width*sc)/2,wz.height-pBoard.height*sc);
+        mc.position(sc,5,5);
+        menuBoard.position(sc,5,5);
+        dealer.position(sc,(wz.width-dealer.width*sc)/2,5);
+        sm.position(sc,wz.width-sm.width*sc-5,5);
+        gameObject.pz = 1; //tool bar stack
+        gameObject.py = pBoard.container.y; //tool bar y
+        wagerBar.position(sc,mp.container.x-wagerBar.width*sc-10,wz.height-pBoard.height*sc+((pBoard.height-wagerBar.height)*sc)/2);
+        bWheel.container.scale.set(sc);
+        bWheel.container.x = 10;
+        bWheel.container.y = wz.height-pBoard.height*sc+((pBoard.height-bWheel.height)*sc)/2;
+        tp.container.x = 10;
+        tp.container.y = mc.container.y+mc.height*sc*3;
+        tp.container.scale.set(sc);
+        if(wz.portrait){
+            lmt.position(sc,10,dealer.container.y+dealer.height*sc);
+            let _tsc = (wz.height-dealer.height*sc-2*pBoard.height*sc-20)/(rtable.width); 
+            let xg = rtable.height*_tsc-(wz.width-20); 
+            if(xg>=0){
+                _tsc = _tsc*(1-(xg+100)/rtable.height*_tsc);
+            }
+            rtable.container.scale.set(_tsc);
+            rtable.container.rotation = Math.PI/2;
+            rtable.container.x = (wz.width)/2;
+            rtable.container.y = (wz.height)/2+(pBoard.container.y-pBoard.height*sc - (wz.height/2+rtable.width*_tsc/2))/2;
+            his1.position(sc,10,wz.height-2*pBoard.height*sc+(pBoard.height*sc-his1.height*sc)*0.75);
+            let tcc = parseInt((wz.width-15)/(his1.list[0].width*sc));
+            //console.log("xl->"+tcc);
+            his1.set(tcc-1);
+            gameObject.pz = 2;
+            gameObject.py = his1.container.y;
+        }
+        else{//show landscale view 
+            lmt.position(sc,mc.container.x+mc.width*sc+5,dealer.container.y+lmt.overflow*sc);
+            let _tsc = (wz.width-30)/(rtable.width); 
+            let yg = rtable.height*_tsc - (wz.height-pBoard.height*sc-dealer.height*sc-30); 
+            if(yg>=0){
+                _tsc = _tsc*(1-(yg+100)/rtable.height*_tsc);
+            }
+            rtable.container.scale.set(_tsc);
+            rtable.container.rotation = 0;
+            rtable.container.x = (wz.width)/2;
+            rtable.container.y = (wz.height)/2;
+            his1.position(sc,bWheel.width*sc+15,wz.height-pBoard.height*sc+((pBoard.height-his1.height)*sc)/2);
+            let tcc = parseInt((wagerBar.container.x-bWheel.container.x-bWheel.width*sc)/(his1.list[0].width*sc));
+            his1.set(tcc-1);
+        } 
+    }
+    function roullete_update(g){
+        if(g.stop){
+            ro_on_stop(g.stop);
+        }
+        else{
+            wheel.container.visible = false;
+        }
+        ro_on_dealer_seat(g.dealer);
+        g.seatList.forEach(function(t){
+            ro_on_seat(t);
+        });
+        if(g.betList){
+            g.betList.forEach(function(b){
+                ro_on_wager(b);    
+            });
+        }else{
+            betList.removeChildren();
+        }
+    }
+    function ro_on_wager(b){
+        let bx = rtable.items[b.index];
+        if(bx){ 
+            var chip = CASINO.chip(b.wager);
+            chip.container.x = bx.container.x;//+ (bx.width*sc-chip.width*sc)/2;
+            chip.container.y = bx.container.y;//+ (bx.height*sc-chip.height*sc)/2;
+            betList.addChild(chip.container);
+        }
+    }
+    function ro_on_balance(b){
+       console.log(b);
+       if(b.systemId === TARA_API.query().systemId){
+            mp.update(b.balance);
+       }
+       if(b.index>=0){
+           //plist[b.index].score = b.balanceAsString;
+           //plist[b.index].set();
+       }    
+    }
+    function ro_on_seat(seat){
+       if(seat.occupied&&seat.index>=0){
+           //plist[seat.index].score = seat.balanceAsString;
+           //plist[seat.index].set();
+           if(seat.systemId === TARA_API.query().systemId){        
+                //plist[seat.index].icon.texture = gameObject.avatar;
+           }
+           else{
+                TARA_API.onProfile(seat.systemId,function(resp){
+                     //plist[seat.index].icon.texture = PIXI.Texture.from(resp.profile.avatar+'?token='+TARA_API.query().token);        
+                }); 
+           }      
+       }
+       else if(!seat.occupied&&seat.index>=0){//reset seat 
+           //plist[seat.index].score =0;
+           //plist[seat.index].icon.texture = PIXI.Texture.from('assets/player.png');
+           //plist[seat.index].set();
+       }        
+       if(seat.systemId === TARA_API.query().systemId){
+            mp.update(seat.balance);
+       }        
+    }
+    function ro_on_dealer_seat(d){
+        if(d.occupied){
+            dealer.occupied = true;
+            dealer.title.text = 'Leave';
+            dealer.systemId = d.systemId;
+            if(d.systemId === TARA_API.query().systemId){
+                dealer.avatar.icon.texture = gameObject.avatar;            
+                dealer.name(gameObject.profile.nickname);    
+                mp.balance(d.balance);
+            }
+            else{
+                TARA_API.onProfile(d.systemId,function(resp){
+                    dealer.avatar.icon.texture = PIXI.Texture.from(resp.profile.avatar+'?token='+TARA_API.query().token);            
+                    dealer.name(resp.profile.nickname);
+                });
+            }
+        }
+        else{
+            dealer.occupied = false;
+            dealer.title.text = 'Sit Down';
+            dealer.systemId = null;
+            dealer.name('Roulette Dealer');
+            dealer.avatar.icon.texture = PIXI.Texture.from('assets/player.png');
+        }
+        dealer.balance(d.balance);
+    }
+    function ro_on_dealer(d){
+        dealer.update(d.balance); 
+        if(dealer.occupied&&gameObject.asDealer){
+            mp.update(d.balance);
+        }
+    }
+    function ro_on_stop(stop){
+        wheel.stopNumber = stop.stopNumber; 
+        wheel.stopIndex = stop.stopIndex;
+        wheel.container.visible = true;
+        rtable.target.visible = false;
+        wheel.roll(function(){
+            RouletteGame.payout(function(resp){
+                let tw = wheel.lines[stop.stopIndex].t;
+                if(tw == '00'){
+                    tw = 37;
+                }
+                rtable.target.x = rtable.items[tw].container.x;
+                rtable.target.y = rtable.items[tw].container.y;
+                rtable.target.visible = true;
+                setTimeout(function(){wheel.container.visible=false;},2000);   
+                betList.removeChildren();
+                his1.post(stop.stopNumber);
+            });    
+        });    
+    }
+    function ro_on_statistics(st){
+        //console.log(st);
+        //sb.list[st.index].name = st.key;
+        //sb.list[st.index].value = st.value;
+        //sb.list[st.index].set();
+    }
+    function roulette_wager(lineId,ixx){
+        RouletteGame.wager(lineId,wagerBar.wager,ixx,function(resp){
+            if(resp.code == 2){
+                get_more_chips();
+            }
+            else{
+                //display small text info     
+            }
+        });    
+    }
+    function get_more_chips(){
+        //mp.background.background.tint =  Math.random()*0xffffff;
+        let wp = wsize();
+        cashInView.position(sc,(wp.width-cashInView.width*sc)/2,(wp.height-cashInView.height*sc)/2);
+        cashInView.open();
+        let _payload = {serviceTag:"presence",command:"onBalance"};
+        TARA_API.onService(_payload,function(resp){
+            cashInView.balance= resp.presence.balance;
+            cashInView.set();
+        });   
+    }
+</script>
