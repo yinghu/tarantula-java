@@ -2,8 +2,6 @@ package com.tarantula.platform.marketplace;
 
 import com.tarantula.DataStore;
 import com.tarantula.Serviceable;
-import com.tarantula.game.casino.craps.PassLine;
-
 import java.util.ArrayList;
 import java.util.List;
 

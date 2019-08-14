@@ -79,7 +79,7 @@ public class Seat extends BetLine {
     }
     @Override
     public int getClassId() {
-        return GameRecoverableRegistry.BLACKJACK_SEAT_CID;
+        return 10;//GameRecoverableRegistry.BLACKJACK_SEAT_CID;
     }
     @Override
     public String toString(){

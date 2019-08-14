@@ -1,11 +1,11 @@
 package com.tarantula.platform;
 
-import java.io.InputStream;
+//import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.google.gson.GsonBuilder;
+//import com.google.gson.GsonBuilder;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
@@ -18,8 +18,8 @@ import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationXMLParser;
-import com.tarantula.platform.util.GoogleAuthCredentialsDeserializer;
-import com.tarantula.platform.util.StripePaymentCredentialsDeserializer;
+//import com.tarantula.platform.util.GoogleAuthCredentialsDeserializer;
+//import com.tarantula.platform.util.StripePaymentCredentialsDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
 public class TarantulaContext implements Serviceable,ServiceContext{
