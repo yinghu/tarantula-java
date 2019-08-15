@@ -89,7 +89,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         try{
             this.module.onJoin(event);
         }catch (Exception ex){
-            //
+            //write error to client
         }
         return false;
     }
