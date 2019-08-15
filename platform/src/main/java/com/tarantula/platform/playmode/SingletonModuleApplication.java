@@ -86,7 +86,11 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         }
     }
     public boolean onEvent(Event event){
-        //this.module.onJoin((Session) event);
+        try{
+            this.module.onJoin(event);
+        }catch (Exception ex){
+            //
+        }
         return false;
     }
 }
