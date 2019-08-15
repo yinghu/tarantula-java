@@ -20,7 +20,7 @@
                 <category>lobby</category>
                 <singleton>true</singleton>
                 <tag>admin</tag>
-                <description>Tarantula Admin Lobby Service</description>
+                <description>Tarantula Admin Service</description>
                 <class-name>com.tarantula.platform.playmode.GameLobbyApplication</class-name>
                 <deploy-priority>15</deploy-priority>
                 <response-label>admin</response-label>
@@ -29,16 +29,15 @@
                 <type-id>admin</type-id>
                 <subtype-id>admin1</subtype-id>
                 <view-id>admin.game</view-id>
-                <name>Admin 1</name>
+                <name>Monitor</name>
                 <type>application</type>
                 <category>admin</category>
-                <description>Tarantula admin Service</description>
+                <singleton>true</singleton>
+                <tag>monitor</tag>
+                <description>Tarantula Monitor Service</description>
                 <class-name>com.tarantula.admin.AdminApplication</class-name>
                 <entry-cost>0</entry-cost>
                 <capacity>10</capacity>
-                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
-                <max-instances-per-partition>10</max-instances-per-partition>
-                <max-idles-on-instance>3</max-idles-on-instance>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <response-label>admin</response-label>
@@ -47,16 +46,15 @@
                 <type-id>admin</type-id>
                 <subtype-id>admin2</subtype-id>
                 <view-id>admin.game</view-id>
-                <name>Admin 2</name>
+                <name>Admin Tool</name>
                 <type>application</type>
                 <category>admin</category>
-                <description>Tarantula admin Service</description>
+                <singleton>true</singleton>
+                <tag>manager</tag>
+                <description>Tarantula Admin Tool Service</description>
                 <class-name>com.tarantula.admin.AdminApplication</class-name>
                 <entry-cost>0</entry-cost>
                 <capacity>10</capacity>
-                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
-                <max-instances-per-partition>10</max-instances-per-partition>
-                <max-idles-on-instance>3</max-idles-on-instance>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <response-label>admin</response-label>
@@ -65,16 +63,15 @@
                 <type-id>admin</type-id>
                 <subtype-id>admin3</subtype-id>
                 <view-id>admin.game</view-id>
-                <name>Admin 3</name>
+                <name>Customer</name>
                 <type>application</type>
                 <category>admin</category>
-                <description>Tarantula admin Service</description>
+                <singleton>true</singleton>
+                <tag>customer</tag>
+                <description>Tarantula Customer Service</description>
                 <class-name>com.tarantula.admin.AdminApplication</class-name>
                 <entry-cost>0</entry-cost>
                 <capacity>10</capacity>
-                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
-                <max-instances-per-partition>10</max-instances-per-partition>
-                <max-idles-on-instance>3</max-idles-on-instance>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <response-label>admin</response-label>

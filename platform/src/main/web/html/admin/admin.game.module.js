@@ -5,72 +5,73 @@ var AdminGame = (function(){
     let _start = function(c,u,s,n){
         sw = c;
         TARA_API.onMessage('sicbo',u);
-        let req = {action:'onStream',applicationId:game.applicationId,instanceId:game.instanceId,streaming:true,path:'/application/instance',data:{command:'onStream'}};
+        let req = {action:'onStream',tag:game.tag,streaming:true,path:'/service/action',data:{command:'onStream'}};
         TARA_API.send(req);
         s(game);  
         TARA_API.onMessage('presence/notice',n);
         TARA_API.send({action:'onStart',streaming:true,label:'presence/notice',data:{command:'onStart'}});
     };
     let _query = function(){
-        let _payload = {applicationId:game.applicationId,instanceId:game.instanceId,command:"onQuery"};
-        TARA_API.onInstance(_payload,function(resp){
+        let _payload = {serviceTag:game.tag,command:"onQuery"};
+        TARA_API.onService(_payload,function(resp){
             console.log(resp);
         });
     }; 
     let _backup = function(){
-        let _payload = {applicationId:game.applicationId,instanceId:game.instanceId,command:"onBackup"};
-        TARA_API.onInstance(_payload,function(resp){
+        let _payload = {serviceTag:game.tag,command:"onBackup"};
+        TARA_API.onService(_payload,function(resp){
             console.log(resp);
         });
     };
     let _add_lobby = function(fin,fout){
-        let _payload = {applicationId:game.applicationId,instanceId:game.instanceId,command:"addLobby"};
+        let _payload = {serviceTag:game.tag,command:"addLobby"};
         fin(_payload);
-        TARA_API.onInstance(_payload,fout);
+        TARA_API.onService(_payload,fout);
     };
     let _add_app = function(fin,fout){
-        let _payload = {applicationId:game.applicationId,instanceId:game.instanceId,command:"addApplication"};
+        let _payload = {serviceTag:game.tag,command:"addApplication"};
         fin(_payload);
-        TARA_API.onInstance(_payload,fout);
+        TARA_API.onService(_payload,fout);
     };
     let _enable_app = function(appid){
-        let _payload = {applicationId:game.applicationId,instanceId:game.instanceId,command:"enableApplication",accessId:appid};
-        TARA_API.onInstance(_payload,function(resp){
+        let _payload = {serviceTag:game.tag,command:"enableApplication",accessId:appid};
+        TARA_API.onService(_payload,function(resp){
             console.log(resp);
         });
     };
     let _disable_app = function(appid){
-        let _payload = {applicationId:game.applicationId,instanceId:game.instanceId,command:"disableApplication",accessId:appid};
-        TARA_API.onInstance(_payload,function(resp){
+        let _payload = {serviceTag:game.tag,command:"disableApplication",accessId:appid};
+        TARA_API.onService(_payload,function(resp){
             console.log(resp);
         });
     };
     let _launch = function(){
-        let _payload = {applicationId:game.applicationId,instanceId:game.instanceId,command:"onLaunch"};
-        TARA_API.onInstance(_payload,function(resp){
+        let _payload = {serviceTag:game.tag,command:"onLaunch"};
+        TARA_API.onService(_payload,function(resp){
             console.log(resp);
         });
     };
     let _shutdown = function(){
-        let _payload = {applicationId:game.applicationId,instanceId:game.instanceId,command:"onShutdown"};
-        TARA_API.onInstance(_payload,function(resp){
+        let _payload = {serviceTag:game.tag,command:"onShutdown"};
+        TARA_API.onService(_payload,function(resp){
             console.log(resp);
         });
     };
     let _reset = function(){
-        let _payload = {applicationId:game.applicationId,instanceId:game.instanceId,command:"onReset"};
-        TARA_API.onInstance(_payload,function(resp){
+        let _payload = {serviceTag:game.tag,command:"onReset"};
+        TARA_API.onService(_payload,function(resp){
             console.log(resp);
         });
     };
     let _leave = function(){
         TARA_API.send({action:'onStop',streaming:true,label:'presence/notice',data:{command:'onStop'}});
-        let _payload = {applicationId:game.applicationId,instanceId:game.instanceId,command:"onLeave"};
-        TARA_API.onInstance(_payload,function(resp){
+        let _payload = {serviceTag:game.tag,command:"onLeave"};
+        TARA_API.onService(_payload,function(resp){
             currentModule = null;
         });
     };   
     let _setup = function(setup){
+        console.log(setup);
         game = setup.game;
     };
     let _swap = function(){

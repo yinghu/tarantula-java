@@ -33,7 +33,7 @@
             <div class="w3-display-topleft w3-padding">
                 <img id ='demo-sync-icon' src="assets/minus.png" width="120px" height="120px" style='filter:drop-shadow(8px 8px 16px white)'>
             </div>
-            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode'>Demo Sync</span></div>
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode' id="demo-sync-desc">Demo Sync</span></div>
         </div>
         <div class="w3-display-container w3-cyan w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='baccarat'>
             <div class="w3-display-topright w3-padding"><span id="baccarat-name" class="tx-game-title">Baccarat</span></div>
@@ -66,7 +66,7 @@
         <div class="w3-display-container w3-lime w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='admin'>
             <div class="w3-display-topright w3-padding"><span id="admin-name" class="tx-game-title">Admin Tool</span></div>
             <div class="w3-display-left w3-padding"><img id ='admin-icon' src="assets/minus.png" width="100px" height="100px"></div>
-            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode'>Admin Tool</span></div>           
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode' id="admin-desc">Admin Tool</span></div>           
         </div>
         <!--
         <div class="w3-display-container w3-orange w3-border-bottom w3-border-white tx-content-100 tx-lobby" view-id='pending' id='pachinko'>
@@ -129,6 +129,7 @@
                     ix.setAttribute('view-id',lb.viewId);
                     ix.querySelector('#'+lb.typeId+'-name').innerHTML = lb.name;
                     ix.querySelector('#'+lb.typeId+'-icon').src = lb.icon;
+                    ix.querySelector('#'+lb.typeId+'-desc').src = lb.description;
                 }
             }); 
             if(window.orientation){

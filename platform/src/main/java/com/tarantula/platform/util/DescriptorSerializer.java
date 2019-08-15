@@ -22,6 +22,7 @@ public class DescriptorSerializer implements JsonSerializer<Descriptor> {
         jo.addProperty("category",descriptor.category());
         jo.addProperty("capacity",descriptor.capacity());
         jo.addProperty("name",descriptor.name());
+        jo.addProperty("description",descriptor.description());
         jo.addProperty("icon",descriptor.icon());
         jo.addProperty("viewId",descriptor.viewId());
         jo.addProperty("applicationId",descriptor.distributionKey());

@@ -6,28 +6,28 @@ import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.util.SystemUtil;
 
-public class AdminApplication extends TarantulaApplicationHeader implements SessionTimeoutListener {
+public class AdminApplication extends TarantulaApplicationHeader {
 
     private DBObject dbObject;
     TarantulaContext tcx;
     @Override
     public void initialize(Session session) throws Exception {
-        session.joined(true);
-        this.dbObject.join(session.systemId());
-        session.write(this.builder.create().toJson(dbObject.setup()).getBytes(),this.descriptor.responseLabel());
+        //session.joined(true);
+        //this.dbObject.join(session.systemId());
+        //session.write(this.builder.create().toJson(dbObject.setup()).getBytes(),this.descriptor.responseLabel());
     }
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onLeave")){
-            this.onTimeout(session);
+            //this.onTimeout(session);
             session.write(payload,this.descriptor.responseLabel());
         }
         else if(session.action().equals("onStream")){
             //this.onStream(session);
         }
         else if(session.action().equals("onQuery")){
-            this.dbObject.reset();
-            session.write(this.builder.create().toJson(this.dbObject.setup()).getBytes(),this.descriptor.responseLabel());
+            //this.dbObject.reset();
+            //session.write(this.builder.create().toJson(this.dbObject.setup()).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onBackup")){
             this.tcx.dataStoreProvider().backup(Distributable.DATA_SCOPE);
@@ -35,16 +35,27 @@ public class AdminApplication extends TarantulaApplicationHeader implements Sess
             session.write(payload,this.descriptor.responseLabel());
         }
         else if(session.action().equals("addLobby")){
-            //this.context.log(new String(payload),OnLog.WARN);
+            this.context.log(new String(payload),OnLog.WARN);
             DeploymentServiceProvider dps = this.context.serviceProvider(DeploymentServiceProvider.NAME);
             DeploymentDescriptor desc = new DeploymentDescriptor();
             desc.fromMap(SystemUtil.toMap(payload));
+            desc.type("lobby");
+            desc.category("game");
+            desc.accessMode(Session.PROTECT_ACCESS_MODE);
+            desc.deployCode(1);
             session.write(dps.createLobby(desc).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("addApplication")){
+            this.context.log(new String(payload),OnLog.WARN);
             DeploymentServiceProvider dps = this.context.serviceProvider(DeploymentServiceProvider.NAME);
             DeploymentDescriptor desc = new DeploymentDescriptor();
             desc.fromMap(SystemUtil.toMap(payload));
+            desc.type("application");
+            desc.category("demo");
+            desc.deployPriority(10);
+            desc.maxIdlesOnInstance(3);
+            desc.maxInstancesPerPartition(100);
+            desc.instancesOnStartupPerPartition(1);
             session.write(dps.createApplication(desc).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onLaunch")){
@@ -89,7 +100,7 @@ public class AdminApplication extends TarantulaApplicationHeader implements Sess
         this.builder.registerTypeAdapter(DBObject.class,new DBObjectSerializer());
         this.dbObject = new DBObject();
         this.dbObject.successful(true);
-        this.dbObject.instanceId(this.context.onRegistry().distributionKey());
+        //this.dbObject.instanceId(this.context.onRegistry().distributionKey());
         this.dbObject.name(this.descriptor.name());
         this.dbObject.entryCost(this.descriptor.entryCost());
         this.dbObject.context = this.context;
@@ -98,12 +109,9 @@ public class AdminApplication extends TarantulaApplicationHeader implements Sess
     }
 
     @Override
-    public void onIdle(Session session) {
-
-    }
-
-    @Override
-    public void onTimeout(Session session) {
-
+    public boolean onEvent(Event event) {
+        this.context.log("join event",OnLog.INFO);
+        event.write(this.builder.create().toJson(dbObject).getBytes(),this.descriptor.label());
+        return false;
     }
 }
