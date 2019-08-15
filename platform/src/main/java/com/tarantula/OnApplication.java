@@ -3,7 +3,7 @@ package com.tarantula;
 
 /**
  * Developer: YINGHU LU
- * Updated 3/5/2018
+ * Updated 8/14/19
  *
  * On Application represents an application state of the player
  */

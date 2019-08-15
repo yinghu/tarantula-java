@@ -1,91 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tarantula>
     <lobby-context>
-        <type-id>sicbo</type-id>
+        <type-id>admin</type-id>
         <type>lobby</type>
         <category>game</category>
-        <tag>sicbo</tag>
-        <icon>html/craps/craps_icon.png</icon>
+        <tag>admin</tag>
+        <icon>assets/gear.png</icon>
         <view-id>game.lobby</view-id>
-        <name>SicBo</name>
+        <name>Admin</name>
         <access-mode>12</access-mode>
         <deploy-code>1</deploy-code>
-        <description>Tarantula SicBo Game Service</description>
+        <description>Tarantula Admin Service</description>
         <application-list>
             <application>
-                <type-id>sicbo</type-id>
-                <subtype-id>sicbo</subtype-id>
-                <name>Lobby Sicbo</name>
+                <type-id>admin</type-id>
+                <subtype-id>admin-lobby</subtype-id>
+                <name>Lobby Admin</name>
                 <type>application</type>
                 <category>lobby</category>
                 <singleton>true</singleton>
-                <tag>sicbo</tag>
-                <description>Tarantula roulette Lobby Service</description>
+                <tag>admin</tag>
+                <description>Tarantula Admin Lobby Service</description>
                 <class-name>com.tarantula.platform.playmode.GameLobbyApplication</class-name>
                 <deploy-priority>15</deploy-priority>
-                <response-label>sicbo</response-label>
+                <response-label>admin</response-label>
             </application>
             <application>
-                <type-id>sicbo</type-id>
-                <subtype-id>sicbo1</subtype-id>
-                <view-id>sicbo.game</view-id>
-                <name>SicBo 1</name>
+                <type-id>admin</type-id>
+                <subtype-id>admin1</subtype-id>
+                <view-id>admin.game</view-id>
+                <name>Admin 1</name>
                 <type>application</type>
-                <category>casino</category>
-                <description>Tarantula SicBo Service</description>
-                <class-name>com.tarantula.game.casino.SicBoApplication</class-name>
-                <entry-cost>1000</entry-cost>
+                <category>admin</category>
+                <description>Tarantula admin Service</description>
+                <class-name>com.tarantula.admin.AdminApplication</class-name>
+                <entry-cost>0</entry-cost>
                 <capacity>10</capacity>
                 <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
                 <max-instances-per-partition>10</max-instances-per-partition>
                 <max-idles-on-instance>3</max-idles-on-instance>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
-                <response-label>sicbo</response-label>
+                <response-label>admin</response-label>
             </application>
             <application>
-                <type-id>sicbo</type-id>
-                <subtype-id>sicbo3</subtype-id>
-                <view-id>sicbo.game</view-id>
-                <name>SicBo 2</name>
+                <type-id>admin</type-id>
+                <subtype-id>admin2</subtype-id>
+                <view-id>admin.game</view-id>
+                <name>Admin 2</name>
                 <type>application</type>
-                <category>casino</category>
-                <description>Tarantula SicBo Service</description>
-                <class-name>com.tarantula.game.casino.SicBoApplication</class-name>
-                <entry-cost>50000</entry-cost>
+                <category>admin</category>
+                <description>Tarantula admin Service</description>
+                <class-name>com.tarantula.admin.AdminApplication</class-name>
+                <entry-cost>0</entry-cost>
                 <capacity>10</capacity>
                 <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
                 <max-instances-per-partition>10</max-instances-per-partition>
                 <max-idles-on-instance>3</max-idles-on-instance>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
-                <response-label>sicbo</response-label>
+                <response-label>admin</response-label>
             </application>
             <application>
-                <type-id>sicbo</type-id>
-                <subtype-id>sicbo2</subtype-id>
-                <view-id>sicbo.game</view-id>
-                <name>SicBo 3</name>
+                <type-id>admin</type-id>
+                <subtype-id>admin3</subtype-id>
+                <view-id>admin.game</view-id>
+                <name>Admin 3</name>
                 <type>application</type>
-                <category>casino</category>
-                <description>Tarantula SicBo Service</description>
-                <class-name>com.tarantula.game.casino.SicBoApplication</class-name>
-                <entry-cost>1000000</entry-cost>
+                <category>admin</category>
+                <description>Tarantula admin Service</description>
+                <class-name>com.tarantula.admin.AdminApplication</class-name>
+                <entry-cost>0</entry-cost>
                 <capacity>10</capacity>
                 <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
                 <max-instances-per-partition>10</max-instances-per-partition>
                 <max-idles-on-instance>3</max-idles-on-instance>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
-                <response-label>sicbo</response-label>
+                <response-label>admin</response-label>
             </application>
         </application-list>
         <view-list>
-            <view type="sicbo.game">
+            <view type="admin.game">
                 <property name="flag">HD2</property>
-                <property name="moduleFile">html/sicbo/sicbo.game.module.js</property>
-                <property name="moduleName">SicBoGame</property>
-                <property name="moduleResourceFile">html/sicbo/sicbo.game.view.html</property>
+                <property name="moduleFile">html/admin/admin.game.module.js</property>
+                <property name="moduleName">AdminGame</property>
+                <property name="moduleResourceFile">html/admin/admin.game.view.html</property>
             </view>
         </view-list>
 

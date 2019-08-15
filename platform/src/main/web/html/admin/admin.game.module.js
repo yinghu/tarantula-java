@@ -1,4 +1,4 @@
-var SicBoGame = (function(){
+var AdminGame = (function(){
     
     let sw;
     let game;

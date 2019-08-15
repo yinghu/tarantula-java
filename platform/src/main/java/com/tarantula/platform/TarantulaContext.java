@@ -109,6 +109,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     public String dataStoreRecoveryDir;
     public AtomicBoolean dRecovered;
     public AtomicBoolean iRecovered;
+    public int bootstrapRetries = 1 ;
     public String dataStoreMaster;
 
     public boolean dataStoreDailyBackup;
@@ -150,7 +151,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         });
         dRecovered = new AtomicBoolean(false);
         iRecovered = new AtomicBoolean(false);
-        new ClusterRecoveryService(dconf,iconf,this.dataStoreRecoveryDir,this.scheduledExecutorService,dRecovered,iRecovered).start();
+        new ClusterRecoveryService(dconf,iconf,this.dataStoreRecoveryDir,this.scheduledExecutorService,dRecovered,iRecovered,bootstrapRetries).start();
  	    _systemStorageInstanceStarted = new CountDownLatch(1);
          _storageInstanceStarted = new CountDownLatch(1);
         _tarantulaClusterStarted = new CountDownLatch(1);

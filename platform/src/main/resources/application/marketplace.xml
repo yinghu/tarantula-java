@@ -25,6 +25,20 @@
                 <leader-board-header>presence</leader-board-header>
                 <response-label>marketplace</response-label>
             </application>
+            <application>
+                <type-id>market</type-id>
+                <subtype-id>market-admin</subtype-id>
+                <name>Admin</name>
+                <type>application</type>
+                <category>admin</category>
+                <singleton>true</singleton>
+                <tag>tarantula-admin</tag>
+                <view-id>admin</view-id>
+                <description>Tarantula Admin Service</description>
+                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <module-name>com.tarantula.platform.marketplace.AdminModule</module-name>
+                <response-label>admin</response-label>
+            </application>
         </application-list>
         <configuration-list>
             <configuration tag="marketplace" priority="10">

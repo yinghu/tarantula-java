@@ -19,14 +19,7 @@ public class OnApplicationHeader extends ResponseHeader{
     protected double balance;
     protected String event;
     protected boolean redeemed;
-    protected String from;
-    protected int action; //tournament command
-    protected String tag;
-    protected String viewId;
-    protected String type;
 
-    protected String title;
-    protected String description;
     protected int stub;
 
 
@@ -46,13 +39,7 @@ public class OnApplicationHeader extends ResponseHeader{
     public boolean redeemed(){
         return this.redeemed;
     }
-    public String from() {
-        return this.from;
-    }
 
-    public void from(String from) {
-        this.from = from;
-    }
     public boolean tournamentEnabled(){
         return this.tournamentEnabled;
     }
@@ -99,24 +86,6 @@ public class OnApplicationHeader extends ResponseHeader{
     public void entryCost(double entryCost) {
         this.entryCost = entryCost;
     }
-    public void tag(String tag){
-        this.tag = tag;
-    }
-    public String tag(){
-        return this.tag;
-    }
-    public String viewId(){
-        return this.viewId;
-    }
-    public void viewId(String viewId){
-        this.viewId = viewId;
-    }
-    public void type(String type){
-        this.type = type;
-    }
-    public String type(){
-        return this.type;
-    }
 
     public int accessMode(){
         return this.accessMode;
@@ -151,25 +120,7 @@ public class OnApplicationHeader extends ResponseHeader{
         return this.event;
     }
 
-    public void action(int command){
-        this.action = command;
-    }
-    public int action(){
-        return this.action;
-    }
-    public String title(){
-        return this.title;
-    }
-    public void title(String title){
-        this.title = title;
-    }
 
-    public String description(){
-        return this.description;
-    }
-    public void description(String description){
-        this.description = description;
-    }
     public int stub(){return this.stub;}
     public void stub(int stub){ this.stub = stub;}
 

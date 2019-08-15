@@ -36,13 +36,15 @@ public class ClusterRecoveryService implements Serviceable {
     private final ScheduledExecutorService scheduledExecutorService;
     private final AtomicBoolean dLoaded;
     private final AtomicBoolean iLoaded;
-    public ClusterRecoveryService(ClientConfig dConfig, ClientConfig iConfig, String rPath, ScheduledExecutorService scheduledExecutorService, AtomicBoolean dRecovered,AtomicBoolean iRecovered){
+    private final int retries;
+    public ClusterRecoveryService(ClientConfig dConfig, ClientConfig iConfig, String rPath, ScheduledExecutorService scheduledExecutorService, AtomicBoolean dRecovered,AtomicBoolean iRecovered,int retries){
         this.dConfig = dConfig;
         this.iConfig = iConfig;
         this.recoverPath = rPath;
         this.scheduledExecutorService = scheduledExecutorService;
         this.dLoaded = dRecovered;
         this.iLoaded = iRecovered;
+        this.retries = retries;
     }
     private void _writeDisk(String fn,RecoveryBatch rb,ConcurrentHashMap<String,RecoveryBatch> cache,String dataPath){
         try{
@@ -67,7 +69,7 @@ public class ClusterRecoveryService implements Serviceable {
         AtomicInteger tc = new AtomicInteger(0);
         ConcurrentHashMap<String, RecoveryBatch> mlist = new ConcurrentHashMap<>();
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        for(int t=0;t<3;t++){
+        for(int t=0;t<retries;t++){
             try{
                 HazelcastInstance hc = HazelcastClient.newHazelcastClient(clientConfig);
                 Iterator<Member> im = hc.getCluster().getMembers().iterator();

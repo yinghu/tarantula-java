@@ -1,20 +1,21 @@
-package com.tarantula.game.casino.sicbo;
+package com.tarantula.admin;
 
 import com.tarantula.ApplicationContext;
-import com.tarantula.game.Game;
+import com.tarantula.OnApplication;
+import com.tarantula.platform.OnApplicationHeader;
+
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SicBo extends Game {
+public class DBObject extends OnApplicationHeader implements OnApplication {
 
     public ConcurrentHashMap<String,Long> kv = new ConcurrentHashMap<>();
     public ApplicationContext context;
-    public SicBo(){
-        this.label = "sicbo";
-        this.duration = 1000*Game.CHECK_POINT_INTERVAL;
+    public DBObject(){
+        this.label = "admin";
     }
     public void join(String systemId){}
-    public SicBo setup(){return  this;}
+    public DBObject setup(){return  this;}
 
     public void reset(){
         long total =0;
@@ -37,6 +38,15 @@ public class SicBo extends Game {
         this.kv.put("AccessIndex",ai);
         total += this.kv.get("AccessIndex");
         this.kv.put("Total",total);
-        pendingQueue.offer(this);
+    }
+
+    @Override
+    public int getFactoryId() {
+        return 0;
+    }
+
+    @Override
+    public int getClassId() {
+        return 0;
     }
 }

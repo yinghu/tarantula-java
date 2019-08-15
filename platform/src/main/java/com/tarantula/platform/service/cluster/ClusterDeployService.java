@@ -366,7 +366,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     private List<String> systemDeploy(){
         ArrayList<String> arrayList = new ArrayList<>();
         try{
-            JarFile file = new JarFile("../lib/tarantula-platform-"+tarantulaContext.platformVersion+".jar");
+            JarFile file = new JarFile("../lib/gec-platform-"+tarantulaContext.platformVersion+".jar");
             Enumeration e = file.entries();
             while (e.hasMoreElements()) {
                 JarEntry je = (JarEntry) e.nextElement();

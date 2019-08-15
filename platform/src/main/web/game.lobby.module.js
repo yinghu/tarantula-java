@@ -25,6 +25,7 @@ var GameLobby = (function(){
     };
     let _setup = function(setup){
         lobby = TARA_API.descriptor(setup.typeId).descriptor;
+        //console.log(setup);
         //console.log(lobby);
         //typeId = lob.typeId;
     };

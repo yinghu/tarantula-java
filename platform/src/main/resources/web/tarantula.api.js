@@ -9,7 +9,7 @@ var TARA_API = (function(){
     
   let _parse = function(data,cb){
       data.lobbyList.forEach(function(v){
-          amap.set(v.descriptor.typeId,v);    
+          amap.set(v.descriptor.typeId,v);
           v.applications.forEach(function(b){
             if(b.singleton){
                 amap.set(b.tag,b);

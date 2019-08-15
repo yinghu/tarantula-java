@@ -65,6 +65,7 @@ public class TarantulaMain {
 			btx.memberDiscovery = (ScopedMemberDiscovery) Class.forName(override(overriding,"tarantula.member.discovery.name",_user,_config)).getConstructor().newInstance();
 			btx.platformVersion = override(overriding,"tarantula.platform.version",_user,_config);
 			btx.platformRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.routing.number",_user,_config));
+			btx.bootstrapRetries = Integer.parseInt(override(overriding,"tarantula.bootstrap.max.retries",_user,_config));
 			btx.clusterNamePrefix = override(overriding,"tarantula.cluster.name",_user,_config);
 			btx.dataBucketGroup = override(overriding,"tarantula.data.bucket.group",_user,_config);
 			btx.dataBucketNode = override(overriding,"tarantula.data.bucket.node",_user,_config);

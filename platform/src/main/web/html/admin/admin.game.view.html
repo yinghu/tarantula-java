@@ -19,18 +19,18 @@
     menuBoard.list[0].button.icon.texture = PIXI.Texture.from('assets/left_arrow.png');
     menuBoard.list[1].button.icon.texture = PIXI.Texture.from('assets/square.png');
     menuBoard.list[1].button.command = function(){
-        SicBoGame.query();
+        AdminGame.query();
     };
     menuBoard.list[2].button.icon.texture = PIXI.Texture.from('assets/gear.png');
     menuBoard.list[2].button.command = function(){
-        SicBoGame.backup();
+        AdminGame.backup();
     };
     menuBoard.list[3].button.icon.texture = PIXI.Texture.from('assets/home.png');
     menuBoard.list[3].button.command = function(){
         let wp = wsize();
         pConfirmation.message('Are you sure to leave the game?');
         pConfirmation.yes.button.command = function(){
-                SicBoGame.leave((resp)=>{console.log(resp);});
+                AdminGame.leave((resp)=>{console.log(resp);});
                 TGL.shutdown();
                 normalscreen();
                 document.querySelector("#m2").innerHTML="";
@@ -50,15 +50,15 @@
     
     let commandList = UI.textCommandList(5,160);
     commandList.list[0].title('List');
-    commandList.list[0].button.command = function(){SicBoGame.query();};
+    commandList.list[0].button.command = function(){AdminGame.query();};
     commandList.list[1].title('Backup');
-    commandList.list[1].button.command = function(){SicBoGame.backup();};
+    commandList.list[1].button.command = function(){AdminGame.backup();};
     commandList.list[2].title('AddLobby');
-    commandList.list[2].button.command = function(){SicBoGame.addLobby();};
+    commandList.list[2].button.command = function(){AdminGame.addLobby();};
     commandList.list[3].title('AddApplication');
-    commandList.list[3].button.command = function(){SicBoGame.addApplication();};
+    commandList.list[3].button.command = function(){AdminGame.addApplication();};
     commandList.list[4].title('Launch');
-    commandList.list[4].button.command = function(){SicBoGame.launch();};
+    commandList.list[4].button.command = function(){AdminGame.launch();};
     
     pView.container.addChild(commandList.container);
     
@@ -67,26 +67,26 @@
     commandList1.list[0].button.command = function(){
         let _payload ={serviceTag:'demo-sync',command:'onLobby',typeId:'demo-sync'};
         TARA_API.onService(_payload,function(resp){
-            SicBoGame.disableApplication(resp.gameList[0].applicationId);        
+            AdminGame.disableApplication(resp.gameList[0].applicationId);
         });
     };
     commandList1.list[1].title('EnableApplication');
     commandList1.list[1].button.command = function(){
         let _payload ={serviceTag:'demo-sync',command:'onLobby',typeId:'demo-sync'};
         TARA_API.onService(_payload,function(resp){
-            SicBoGame.enableApplication(resp.gameList[0].applicationId);            
+            AdminGame.enableApplication(resp.gameList[0].applicationId);
         });
     };
     commandList1.list[2].title('Reset');
-    commandList1.list[2].button.command = function(){SicBoGame.reset();};
+    commandList1.list[2].button.command = function(){AdminGame.reset();};
     commandList1.list[3].title('Shutdown');
-    commandList1.list[3].button.command = function(){SicBoGame.shutdown();};
+    commandList1.list[3].button.command = function(){AdminGame.shutdown();};
     //commandList1.list[4].title('Launch');
-    //commandList1.list[4].button.command = function(){SicBoGame.launch();};
+    //commandList1.list[4].button.command = function(){AdminGame.launch();};
     //commandList1.list[5].title('Reset');
-    //commandList1.list[5].button.command = function(){SicBoGame.reset();};
+    //commandList1.list[5].button.command = function(){AdminGame.reset();};
     //commandList1.list[6].title('Shutdown');
-    //commandList1.list[6].button.command = function(){SicBoGame.shutdown();};
+    //commandList1.list[6].button.command = function(){AdminGame.shutdown();};
     
     pView.container.addChild(commandList1.container);
     
@@ -103,7 +103,7 @@
     
     
     //swap, server push callback, game setup
-    SicBoGame.start(()=>{
+    AdminGame.start(()=>{
          _scb_scale();
     },(jx)=>{
         //let jx = JSON.parse(j);
