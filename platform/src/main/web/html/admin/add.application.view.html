@@ -1,0 +1,87 @@
+<div class="w3-modal-content w3-white">
+    <div class="w3-card-4 tx-popup">
+        <div class="w3-bar w3-teal w3-text-white w3-border-bottom w3-border-orange">
+            <div class="w3-bar-item w3-left"><span>Add Application</span></div>
+            <div class="w3-bar-item w3-right w3-button" id='tx-close-terms'><i class='fa fa-close'></i></div>
+        </div>
+        <div class="w3-container w3-text-teal w3-border-bottom w3-border-orange">
+            <div class="w3-panel">
+                <input id ="b_type_id" class="w3-input w3-round w3-border" type="text" placeholder='typeId'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="b_name" class="w3-input w3-round w3-border" type="password" placeholder='name'/>
+            </div>
+            <div class="w3-panel">
+                 <input id ="b_icon" class="w3-input w3-round w3-border" type="text" placeholder='icon'/>
+            </div>
+            <div class="w3-panel">
+                <input id ="b_type_id1" class="w3-input w3-round w3-border" type="text" placeholder='typeId'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="b_name1" class="w3-input w3-round w3-border" type="password" placeholder='name'/>
+            </div>
+            <div class="w3-panel">
+                 <input id ="b_icon1" class="w3-input w3-round w3-border" type="text" placeholder='icon'/>
+            </div>
+            <div class="w3-panel">
+                <input id ="b_type_id2" class="w3-input w3-round w3-border" type="text" placeholder='typeId'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="b_name2" class="w3-input w3-round w3-border" type="password" placeholder='name'/>
+            </div>
+            <div class="w3-panel">
+                 <input id ="b_icon2" class="w3-input w3-round w3-border" type="text" placeholder='icon'/>
+            </div>
+            <div class="w3-panel">
+                <input id ="b_type_id3" class="w3-input w3-round w3-border" type="text" placeholder='typeId'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="b_name3" class="w3-input w3-round w3-border" type="password" placeholder='name'/>
+            </div>
+            <div class="w3-panel">
+                 <input id ="b_icon3" class="w3-input w3-round w3-border" type="text" placeholder='icon'/>
+            </div>
+            <div class="w3-panel">  
+                <div id="b_command" class="w3-block w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Add Application</div>     
+            </div>
+        </div>  
+        <div class="w3-display-container w3-border-bottom w3-border-white w3-teal tx-content-36">
+            <div class="w3-display-bottomright tx-margin-right-32 tx-margin-bottom-4 tx-text-12">Powered By Game Engine Cluster</div>            
+        </div>
+    </div>
+</div>
+<script>
+  document.querySelector("#b_command").onclick = function(){
+    AdminGame.addApplication(function(payload){
+        payload.typeId = 'demo-sync';
+        payload.subtypeId='demo-sync-a';
+        payload.type='application';
+        payload.category='casino';
+        payload.deployPriority=10;
+        payload.deployVersion=1;
+        payload.viewId = 'demo.sync.game';     
+        payload.name='Demo Sync';
+        payload.description='Applicaton Module Game';     
+        payload.codebase='file:///development/boost/target';
+        payload.moduleArtifact='tarantula-boost';
+        payload.moduleVersion='1.1';
+        payload.moduleName='com.tarantula.boost.Demo';      
+        payload.capacity=10;
+        payload.entryCost=5000; 
+        payload.maxInstancesPerPartition = 10;
+        payload.instancesOnStartupPerPartition =1;
+        payload.maxIdlesOnInstance =3;
+        payload.runtimeDuration=10;
+        payload.runtimeDurationOnInstance=1;
+    },function(resp){
+        console.log(resp);
+    });    
+ };    
+ document.querySelector("#tx-close-terms").onclick = tx_close_add_application;
+ function tx_close_add_application(){
+     this.style.display = 'none';
+     let m1 = document.querySelector('#m3');
+     m1.innerHTML='';
+     m1.style.display = 'none';
+ }
+</script>

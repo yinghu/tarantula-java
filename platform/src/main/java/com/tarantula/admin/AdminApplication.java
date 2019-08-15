@@ -26,7 +26,8 @@ public class AdminApplication extends TarantulaApplicationHeader implements Sess
             //this.onStream(session);
         }
         else if(session.action().equals("onQuery")){
-            session.write(payload,this.descriptor.responseLabel());
+            this.dbObject.reset();
+            session.write(this.builder.create().toJson(this.dbObject.setup()).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onBackup")){
             this.tcx.dataStoreProvider().backup(Distributable.DATA_SCOPE);

@@ -11,22 +11,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!--
-    <repositories>
-         <repository>
-            <id>Maven Central</id>
-            <url>http://repo1.maven.org/maven2/</url>
-            <snapshots>
-              <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>gec-repo</id>
-            <name>game engine cluster</name>
-            <url>https://gameenginecluster.com/repository</url>
-        </repository>
-    </repositories>
-        -->
     <build>
         <plugins>
             <plugin>
@@ -55,8 +39,8 @@
         </dependency>
         <dependency>
             <groupId>com.tarantula</groupId>
-            <artifactId>tarantula-platform</artifactId>
-            <version>2.0</version>
+            <artifactId>gec-platform</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 </project>

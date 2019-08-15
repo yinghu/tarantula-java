@@ -87,6 +87,14 @@
                 <property name="moduleName">AdminGame</property>
                 <property name="moduleResourceFile">html/admin/admin.game.view.html</property>
             </view>
+            <view type="admin.add.lobby">
+                <property name="flag">HD2</property>
+                <property name="moduleResourceFile">html/admin/add.lobby.view.html</property>
+            </view>
+            <view type="admin.add.application">
+                <property name="flag">HD2</property>
+                <property name="moduleResourceFile">html/admin/add.application.view.html</property>
+            </view>
         </view-list>
 
     </lobby-context>

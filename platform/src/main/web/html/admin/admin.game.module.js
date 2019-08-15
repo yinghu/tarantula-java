@@ -23,52 +23,15 @@ var AdminGame = (function(){
             console.log(resp);
         });
     };
-    let _add_lobby = function(){
+    let _add_lobby = function(fin,fout){
         let _payload = {applicationId:game.applicationId,instanceId:game.instanceId,command:"addLobby"};
-        _payload.typeId = "demo-sync";
-        _payload.subtypeId ="demo-sync-lobby";
-        _payload.type="lobby";
-        _payload.category="game";
-        _payload.tag="demo-sync";
-        _payload.responseLabel = "demo";
-        _payload.icon="html/blackjack/blackjack_icon.png";
-        _payload.accessMode=12;
-        _payload.deployCode=1;
-        _payload.deployVersion=1;
-        _payload.viewId = "game.lobby";
-        _payload.name="Demo Sync";
-        _payload.description="Application Module Demo";
-        //_payload.configurationName="demo-sync";
-        TARA_API.onInstance(_payload,function(resp){
-            console.log(resp);
-        });
+        fin(_payload);
+        TARA_API.onInstance(_payload,fout);
     };
-    let _add_app = function(){
+    let _add_app = function(fin,fout){
         let _payload = {applicationId:game.applicationId,instanceId:game.instanceId,command:"addApplication"};
-        _payload.typeId = 'demo-sync';
-        _payload.subtypeId='demo-sync-a';
-        _payload.type='application';
-        _payload.category='casino';
-        _payload.deployPriority=10;
-        _payload.deployVersion=1;
-        _payload.viewId = 'demo.sync.game';     
-        _payload.name='Demo Sync';
-        _payload.description='Applicaton Module Game';     
-        _payload.codebase='file:///development/boost/target';
-        _payload.moduleArtifact='tarantula-boost';
-        _payload.moduleVersion='1.1';
-        _payload.moduleName='com.tarantula.boost.Demo';      
-        _payload.capacity=10;
-        _payload.entryCost=5000; 
-        _payload.maxInstancesPerPartition = 10;
-        _payload.instancesOnStartupPerPartition =1;
-        _payload.maxIdlesOnInstance =3;
-        _payload.runtimeDuration=10;
-        _payload.runtimeDurationOnInstance=1;
-        //_payload.configurationType="v1";
-        TARA_API.onInstance(_payload,function(resp){
-            console.log(resp);
-        });
+        fin(_payload);
+        TARA_API.onInstance(_payload,fout);
     };
     let _enable_app = function(appid){
         let _payload = {applicationId:game.applicationId,instanceId:game.instanceId,command:"enableApplication",accessId:appid};
