@@ -27,15 +27,16 @@
             </application>
             <application>
                 <type-id>admin</type-id>
-                <subtype-id>admin1</subtype-id>
+                <subtype-id>admin-tool</subtype-id>
                 <view-id>admin.game</view-id>
                 <name>Monitor</name>
                 <type>application</type>
                 <category>admin</category>
                 <singleton>true</singleton>
-                <tag>monitor</tag>
+                <tag>admin-monitor</tag>
                 <description>Tarantula Monitor Service</description>
-                <class-name>com.tarantula.admin.AdminApplication</class-name>
+                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <module-name>com.tarantula.admin.AdminMonitorModule</module-name>
                 <entry-cost>0</entry-cost>
                 <capacity>10</capacity>
                 <deploy-priority>10</deploy-priority>
@@ -44,15 +45,16 @@
             </application>
             <application>
                 <type-id>admin</type-id>
-                <subtype-id>admin2</subtype-id>
+                <subtype-id>admin-tool</subtype-id>
                 <view-id>admin.game</view-id>
-                <name>Admin Tool</name>
+                <name>Admin Setup</name>
                 <type>application</type>
                 <category>admin</category>
                 <singleton>true</singleton>
-                <tag>manager</tag>
+                <tag>admin-setup</tag>
                 <description>Tarantula Admin Tool Service</description>
-                <class-name>com.tarantula.admin.AdminApplication</class-name>
+                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <module-name>com.tarantula.admin.AdminSetupModule</module-name>
                 <entry-cost>0</entry-cost>
                 <capacity>10</capacity>
                 <deploy-priority>10</deploy-priority>
@@ -61,15 +63,16 @@
             </application>
             <application>
                 <type-id>admin</type-id>
-                <subtype-id>admin3</subtype-id>
+                <subtype-id>admin-tool</subtype-id>
                 <view-id>admin.game</view-id>
-                <name>Customer</name>
+                <name>DataStore</name>
                 <type>application</type>
                 <category>admin</category>
                 <singleton>true</singleton>
-                <tag>customer</tag>
+                <tag>admin-data-store</tag>
                 <description>Tarantula Customer Service</description>
-                <class-name>com.tarantula.admin.AdminApplication</class-name>
+                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <module-name>com.tarantula.admin.AdminDataStoreModule</module-name>
                 <entry-cost>0</entry-cost>
                 <capacity>10</capacity>
                 <deploy-priority>10</deploy-priority>
