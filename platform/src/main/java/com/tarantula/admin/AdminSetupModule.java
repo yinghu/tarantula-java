@@ -13,27 +13,25 @@ public class AdminSetupModule implements Module {
     private DeploymentServiceProvider serviceProvider;
     private DataStore dataStore;
     private GsonBuilder builder;
-    private AdminObject dbObject;
+    private AdminSetupObject dbObject;
 
     @Override
     public void onJoin(Session session) throws Exception {
-        session.write(this.builder.create().toJson(dbObject.setup()).getBytes(),label());
+        session.write(this.builder.create().toJson(dbObject).getBytes(),label());
     }
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         if(session.action().equals("addLobby")){
-            DeploymentServiceProvider dps = this.context.serviceProvider(DeploymentServiceProvider.NAME);
             DeploymentDescriptor desc = new DeploymentDescriptor();
             desc.fromMap(SystemUtil.toMap(payload));
             desc.type("lobby");
             desc.category("game");
             desc.accessMode(Session.PROTECT_ACCESS_MODE);
             desc.deployCode(1);
-            session.write(dps.createLobby(desc).getBytes(),this.label());
+            session.write(this.serviceProvider.createLobby(desc).getBytes(),this.label());
         }
         else if(session.action().equals("addApplication")){
-            DeploymentServiceProvider dps = this.context.serviceProvider(DeploymentServiceProvider.NAME);
             DeploymentDescriptor desc = new DeploymentDescriptor();
             desc.fromMap(SystemUtil.toMap(payload));
             desc.type("application");
@@ -42,7 +40,16 @@ public class AdminSetupModule implements Module {
             desc.maxIdlesOnInstance(3);
             desc.maxInstancesPerPartition(100);
             desc.instancesOnStartupPerPartition(1);
-            session.write(dps.createApplication(desc).getBytes(),this.label());
+            session.write(serviceProvider.createApplication(desc).getBytes(),this.label());
+        }
+        else if(session.action().equals("onLaunch")){
+            session.write(payload,label());
+        }
+        else if(session.action().equals("onShutdown")){
+            session.write(payload,label());
+        }
+        else if(session.action().equals("disableApplication")){
+            session.write(payload,label());
         }
         else if(session.action().equals("onReset")){
             session.write(payload,label());
@@ -59,12 +66,12 @@ public class AdminSetupModule implements Module {
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.dataStore = this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE);
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(AdminObject.class,new AdminObjectSerializer());
-        this.dbObject = new AdminObject();
-        this.dbObject.successful(true);
+        this.builder.registerTypeAdapter(AdminSetupObject.class,new AdminObjectSerializer());
+        this.dbObject = new AdminSetupObject(this.label());
         this.dbObject.name("setup tool");
         this.dataStore.list(new LobbyQuery(dataStore.bucket()),(a)->{
             this.context.log(a.name(),OnLog.INFO);
+            this.dbObject.list.add(a);
             return true;
         });
         this.context.log("Admin setup module started", OnLog.INFO);
@@ -72,6 +79,6 @@ public class AdminSetupModule implements Module {
 
     @Override
     public String label() {
-        return "admin";
+        return "admin-setup";
     }
 }

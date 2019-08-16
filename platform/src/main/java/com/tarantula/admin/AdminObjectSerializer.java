@@ -12,8 +12,9 @@ import java.lang.reflect.Type;
 public class AdminObjectSerializer implements JsonSerializer<AdminObject> {
 
     @Override
-    public JsonElement serialize(AdminObject sicBo, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject jo = (JsonObject)new OnApplicationSerializer().serialize(sicBo,type,jsonSerializationContext);
+    public JsonElement serialize(AdminObject adminObject, Type type, JsonSerializationContext jsonSerializationContext) {
+        JsonObject jo = (JsonObject)new OnApplicationSerializer().serialize(adminObject,type,jsonSerializationContext);
+        jo.add("payload",adminObject.setup());
         return jo;
     }
 }

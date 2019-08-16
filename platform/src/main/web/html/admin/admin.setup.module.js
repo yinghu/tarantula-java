@@ -11,18 +11,6 @@ var AdminSetup= (function(){
         TARA_API.onMessage('presence/notice',n);
         TARA_API.send({action:'onStart',streaming:true,label:'presence/notice',data:{command:'onStart'}});
     };
-    let _query = function(){
-        let _payload = {serviceTag:adminObject.tag,command:"onQuery"};
-        TARA_API.onService(_payload,function(resp){
-            console.log(resp);
-        });
-    }; 
-    let _backup = function(){
-        let _payload = {serviceTag:adminObject.tag,command:"onBackup"};
-        TARA_API.onService(_payload,function(resp){
-            console.log(resp);
-        });
-    };
     let _add_lobby = function(fin,fout){
         let _payload = {serviceTag:adminObject.tag,command:"addLobby"};
         fin(_payload);
@@ -84,8 +72,6 @@ var AdminSetup= (function(){
         swap : _swap,    
         start : _start,
         leave : _leave,
-        query : _query,
-        backup : _backup,
         addLobby : _add_lobby,
         addApplication : _add_app,
         enableApplication : _enable_app,

@@ -10,10 +10,10 @@ public class AdminMonitorModule implements Module {
 
     private ApplicationContext context;
     private GsonBuilder builder;
-    private AdminObject dbObject;
+    private AdminMonitorObject dbObject;
 
     public void onJoin(Session session) throws Exception{
-        session.write(this.builder.create().toJson(dbObject.setup()).getBytes(),label());
+        session.write(this.builder.create().toJson(dbObject).getBytes(),label());
     }
 
     @Override
@@ -27,16 +27,15 @@ public class AdminMonitorModule implements Module {
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(AdminObject.class,new AdminObjectSerializer());
-        this.dbObject = new AdminObject();
-        this.dbObject.successful(true);
+        this.builder.registerTypeAdapter(AdminMonitorObject.class,new AdminObjectSerializer());
+        this.dbObject = new AdminMonitorObject(this.label());
         this.context.log("Admin monitor module started", OnLog.INFO);
     }
     public void onTimer(OnUpdate update){
-        update.on(this.builder.create().toJson(dbObject.setup()).getBytes());
+        update.on(this.builder.create().toJson(dbObject).getBytes());
     }
     @Override
     public String label() {
-        return "admin";
+        return "admin-monitor";
     }
 }
