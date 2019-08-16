@@ -28,7 +28,7 @@
             <application>
                 <type-id>admin</type-id>
                 <subtype-id>admin-tool</subtype-id>
-                <view-id>admin.game</view-id>
+                <view-id>admin.monitor</view-id>
                 <name>Monitor</name>
                 <type>application</type>
                 <category>admin</category>
@@ -41,12 +41,13 @@
                 <capacity>10</capacity>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
+                <timer-on-module>5000</timer-on-module>
                 <response-label>admin</response-label>
             </application>
             <application>
                 <type-id>admin</type-id>
                 <subtype-id>admin-tool</subtype-id>
-                <view-id>admin.game</view-id>
+                <view-id>admin.setup</view-id>
                 <name>Admin Setup</name>
                 <type>application</type>
                 <category>admin</category>
@@ -64,7 +65,7 @@
             <application>
                 <type-id>admin</type-id>
                 <subtype-id>admin-tool</subtype-id>
-                <view-id>admin.game</view-id>
+                <view-id>admin.data.store</view-id>
                 <name>DataStore</name>
                 <type>application</type>
                 <category>admin</category>
@@ -77,15 +78,28 @@
                 <capacity>10</capacity>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
+                <timer-on-module>5000</timer-on-module>
                 <response-label>admin</response-label>
             </application>
         </application-list>
         <view-list>
-            <view type="admin.game">
+            <view type="admin.setup">
                 <property name="flag">HD2</property>
-                <property name="moduleFile">html/admin/admin.game.module.js</property>
-                <property name="moduleName">AdminGame</property>
-                <property name="moduleResourceFile">html/admin/admin.game.view.html</property>
+                <property name="moduleFile">html/admin/admin.setup.module.js</property>
+                <property name="moduleName">AdminSetup</property>
+                <property name="moduleResourceFile">html/admin/admin.setup.view.html</property>
+            </view>
+            <view type="admin.data.store">
+                <property name="flag">HD2</property>
+                <property name="moduleFile">html/admin/admin.data.store.module.js</property>
+                <property name="moduleName">AdminDataStore</property>
+                <property name="moduleResourceFile">html/admin/admin.data.store.view.html</property>
+            </view>
+            <view type="admin.monitor">
+                <property name="flag">HD2</property>
+                <property name="moduleFile">html/admin/admin.monitor.module.js</property>
+                <property name="moduleName">AdminMonitor</property>
+                <property name="moduleResourceFile">html/admin/admin.monitor.view.html</property>
             </view>
             <view type="admin.add.lobby">
                 <property name="flag">HD2</property>

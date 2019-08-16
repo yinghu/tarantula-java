@@ -7,6 +7,7 @@ package com.tarantula;
 public interface DeploymentServiceProvider extends ServiceProvider{
 
     String DEPLOY_TOPIC = "tarantula-deployment";
+    String DEPLOY_DATA_STORE = "tarantula";
 
     String NAME = "DeploymentServiceProvider";
 

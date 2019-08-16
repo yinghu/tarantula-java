@@ -7,6 +7,7 @@
         <name>Profile</name>
         <access-mode>12</access-mode>
         <description>Tarantula Profile Service</description>
+        <deploy-priority>100</deploy-priority>
         <application-list>
             <application>
                 <type-id>profile</type-id>

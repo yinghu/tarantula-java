@@ -1,0 +1,95 @@
+<div class="tx-modal-content">
+    <canvas id="tx-scb-canvas"></canvas>              
+</div>
+<script>
+    let gameObject ={};
+    let wz = wsize();
+    let sc = wz.scale;
+    app = TGL.start(wz.width,wz.height,document.querySelector("#tx-scb-canvas")); 
+    let devTitle = UI.text('Under Developing',{fontWeight: 600,fontFamily:'Oswald, Arial',fontSize:32,fill:'0xD1BC22'});
+    let pView = TGL.container();
+    pView.container.addChild(devTitle.container);
+    let pConfirmation = UI.confirmation();
+    pConfirmation.no.button.command = function(){pConfirmation.close();};
+    let menuBoard = UI.menu(1);
+    menuBoard.list[0].button.command = function(){
+        menuBoard.close();
+        return false;    
+    };
+    menuBoard.list[0].button.icon.texture = PIXI.Texture.from('assets/left_arrow.png');
+    menuBoard.list[1].button.icon.texture = PIXI.Texture.from('assets/square.png');
+    menuBoard.list[1].button.command = function(){};
+    menuBoard.list[2].button.icon.texture = PIXI.Texture.from('assets/gear.png');
+    menuBoard.list[2].button.command = function(){    };
+    menuBoard.list[3].button.icon.texture = PIXI.Texture.from('assets/home.png');
+    menuBoard.list[3].button.command = function(){
+        let wp = wsize();
+        pConfirmation.message('Are you sure to leave the game?');
+        pConfirmation.yes.button.command = function(){
+                AdminMonitor.leave((resp)=>{console.log(resp);});
+                TGL.shutdown();
+                normalscreen();
+                document.querySelector("#m2").innerHTML="";
+                document.querySelector("#m2").style.display = "none";
+                currentModule = null;     
+        };
+        pConfirmation.position(sc,(wp.width-pConfirmation.width*sc)/2,(wp.height-pConfirmation.height*sc)/2);
+        pConfirmation.open();
+        menuBoard.close();
+    };
+    let cm = UI.iconCommand(96,96);
+    cm.button.command = function(){
+        menuBoard.open(); 
+        return false;
+    }; 
+    cm.button.icon.texture = PIXI.Texture.from('assets/table.png');
+    
+    let commandList = UI.textCommandList(1,160);
+    commandList.list[0].title('Reset');
+    commandList.list[0].button.command = function(){AdminMonitor.reset();};
+    
+    pView.container.addChild(commandList.container);
+    
+    
+    let statBoard = UI.statisticsBoard(8);
+    statBoard.lines[0].set('##','DataStore','Total Records');
+    let nTitle = UI.text('Notification',{fontWeight: 500,fontFamily:'Oswald, Arial',fontSize:28,fill:'0xffffff'});
+    
+    pView.container.addChild(nTitle.container);
+    pView.container.addChild(statBoard.container);
+    pView.container.addChild(cm.container);
+    pView.container.addChild(menuBoard.container);
+    pView.container.addChild(pConfirmation.container);
+    app.stage.addChild(pView.container);
+    
+    
+    //swap, server push callback, game setup
+    AdminMonitor.start(()=>{
+         _scb_scale();
+    },(jx)=>{
+        console.log(jx);
+        //statBoard.lines[1].set(1,'Tarantula',jx.Tarantula);
+        //statBoard.lines[2].set(2,'Presence',jx.Presence);
+        //statBoard.lines[3].set(3,'Session',jx.Session);
+        //statBoard.lines[4].set(4,'User',jx.User);
+        //statBoard.lines[5].set(5,'Profile',jx.Profile);
+        //statBoard.lines[6].set(6,'Level',jx.Level);
+        //statBoard.lines[7].set(7,'AccessIndex',jx.AccessIndex);
+        //statBoard.lines[8].set(8,"Total Records",jx.Total);
+    },(g)=>{
+       _scb_scale();       
+    },(n)=>{    
+      nTitle.title(n.message);  
+    });
+   
+    function _scb_scale(){
+        let wz = wsize();
+        app.renderer.resize(wz.width,wz.height); 
+        menuBoard.position(sc,5,5);
+        cm.position(sc,5,5);
+        commandList.position(sc,wz.width-commandList.width*sc-5,5); 
+        statBoard.position(sc,(wz.width-statBoard.width*sc)/2,(wz.height-statBoard.height*sc)/2);
+        nTitle.position(sc,10,wz.height-nTitle.height*sc-10);
+        devTitle.position(sc,cm.container.x+cm.width*sc+10,10);
+    }
+</script>

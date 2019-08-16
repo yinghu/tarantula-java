@@ -91,6 +91,6 @@ public class PushEventHandler implements RequestHandler {
        return true;
     }
     public void onCheck(){
-        //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
+        log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
     }
 }

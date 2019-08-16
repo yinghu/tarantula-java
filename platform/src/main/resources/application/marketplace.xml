@@ -8,7 +8,7 @@
         <access-mode>12</access-mode>
         <description>Tarantula Marketplace Service</description>
 
-        <deploy-priority>20</deploy-priority>
+        <deploy-priority>120</deploy-priority>
         <application-list>
             <application>
                 <type-id>market</type-id>

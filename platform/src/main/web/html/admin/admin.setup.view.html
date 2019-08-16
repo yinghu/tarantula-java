@@ -18,19 +18,15 @@
     };
     menuBoard.list[0].button.icon.texture = PIXI.Texture.from('assets/left_arrow.png');
     menuBoard.list[1].button.icon.texture = PIXI.Texture.from('assets/square.png');
-    menuBoard.list[1].button.command = function(){
-        AdminGame.query();
-    };
+    menuBoard.list[1].button.command = function(){};
     menuBoard.list[2].button.icon.texture = PIXI.Texture.from('assets/gear.png');
-    menuBoard.list[2].button.command = function(){
-        AdminGame.backup();
-    };
+    menuBoard.list[2].button.command = function(){};
     menuBoard.list[3].button.icon.texture = PIXI.Texture.from('assets/home.png');
     menuBoard.list[3].button.command = function(){
         let wp = wsize();
         pConfirmation.message('Are you sure to leave the game?');
         pConfirmation.yes.button.command = function(){
-                AdminGame.leave((resp)=>{console.log(resp);});
+                AdminSetup.leave((resp)=>{console.log(resp);});
                 TGL.shutdown();
                 normalscreen();
                 document.querySelector("#m2").innerHTML="";
@@ -50,9 +46,9 @@
     
     let commandList = UI.textCommandList(5,160);
     commandList.list[0].title('List');
-    commandList.list[0].button.command = function(){AdminGame.query();};
+    commandList.list[0].button.command = function(){AdminSetup.query();};
     commandList.list[1].title('Backup');
-    commandList.list[1].button.command = function(){AdminGame.backup();};
+    commandList.list[1].button.command = function(){AdminSetup.backup();};
     commandList.list[2].title('AddLobby');
     commandList.list[2].button.command = function(){
         _view({viewId:'admin.add.lobby',containerId:'#m3'});
@@ -62,7 +58,7 @@
         _view({viewId:'admin.add.application',containerId:'#m3'});
     };
     commandList.list[4].title('Launch');
-    commandList.list[4].button.command = function(){AdminGame.launch();};
+    commandList.list[4].button.command = function(){AdminSetup.launch();};
     
     pView.container.addChild(commandList.container);
     
@@ -71,20 +67,20 @@
     commandList1.list[0].button.command = function(){
         let _payload ={serviceTag:'demo-sync',command:'onLobby',typeId:'demo-sync'};
         TARA_API.onService(_payload,function(resp){
-            AdminGame.disableApplication(resp.gameList[0].applicationId);
+            AdminSetup.disableApplication(resp.gameList[0].applicationId);
         });
     };
     commandList1.list[1].title('EnableApplication');
     commandList1.list[1].button.command = function(){
         let _payload ={serviceTag:'demo-sync',command:'onLobby',typeId:'demo-sync'};
         TARA_API.onService(_payload,function(resp){
-            AdminGame.enableApplication(resp.gameList[0].applicationId);
+            AdminSetup.enableApplication(resp.gameList[0].applicationId);
         });
     };
     commandList1.list[2].title('Reset');
-    commandList1.list[2].button.command = function(){AdminGame.reset();};
+    commandList1.list[2].button.command = function(){AdminSetup.reset();};
     commandList1.list[3].title('Shutdown');
-    commandList1.list[3].button.command = function(){AdminGame.shutdown();};
+    commandList1.list[3].button.command = function(){AdminSetup.shutdown();};
     //commandList1.list[4].title('Launch');
     //commandList1.list[4].button.command = function(){AdminGame.launch();};
     //commandList1.list[5].title('Reset');
@@ -94,12 +90,12 @@
     
     pView.container.addChild(commandList1.container);
     
-    let statBoard = UI.statisticsBoard(8);
-    statBoard.lines[0].set('##','DataStore','Total Records');
+    //let statBoard = UI.statisticsBoard(8);
+    //statBoard.lines[0].set('##','DataStore','Total Records');
     let nTitle = UI.text('Notification',{fontWeight: 500,fontFamily:'Oswald, Arial',fontSize:28,fill:'0xffffff'});
     
     pView.container.addChild(nTitle.container);
-    pView.container.addChild(statBoard.container);
+    //pView.container.addChild(statBoard.container);
     pView.container.addChild(cm.container);
     pView.container.addChild(menuBoard.container);
     pView.container.addChild(pConfirmation.container);
@@ -107,29 +103,25 @@
     
     
     //swap, server push callback, game setup
-    AdminGame.start(()=>{
+    AdminSetup.start(()=>{
          _scb_scale();
     },(jx)=>{
-        //let jx = JSON.parse(j);
-        statBoard.lines[1].set(1,'Tarantula',jx.Tarantula);
-        statBoard.lines[2].set(2,'Presence',jx.Presence);
-        statBoard.lines[3].set(3,'Session',jx.Session);
-        statBoard.lines[4].set(4,'User',jx.User);
-        statBoard.lines[5].set(5,'Profile',jx.Profile);
-        statBoard.lines[6].set(6,'Level',jx.Level);
-        statBoard.lines[7].set(7,'AccessIndex',jx.AccessIndex);
-        statBoard.lines[8].set(8,"Total Records",jx.Total);
-        //console.log(jx);    
+        
+        //statBoard.lines[1].set(1,'Tarantula',jx.Tarantula);
+        //statBoard.lines[2].set(2,'Presence',jx.Presence);
+        //statBoard.lines[3].set(3,'Session',jx.Session);
+        //statBoard.lines[4].set(4,'User',jx.User);
+        //statBoard.lines[5].set(5,'Profile',jx.Profile);
+        ///statBoard.lines[6].set(6,'Level',jx.Level);
+        //statBoard.lines[7].set(7,'AccessIndex',jx.AccessIndex);
+        //statBoard.lines[8].set(8,"Total Records",jx.Total);
+        console.log(jx);    
     },(g)=>{
        _scb_scale();    
-       //console.log(g); 
-       let _payload ={serviceTag:'demo-sync',command:'onLobby',typeId:'demo-sync'};
-        TARA_API.onService(_payload,function(resp){
-            console.log(resp);        
-        });    
+       console.log(g); 
+          
     },(n)=>{
-      //let jn = JSON.parse(n);   
-      //console.log(n);    
+       
       nTitle.title(n.message);  
     });
    
@@ -141,7 +133,7 @@
         commandList.position(sc,wz.width-commandList.width*sc-5,5);
         commandList1.position(sc,wz.width-commandList1.width*sc-5,wz.height-commandList1.height*sc-5);
         
-        statBoard.position(sc,(wz.width-statBoard.width*sc)/2,(wz.height-statBoard.height*sc)/2);
+        //statBoard.position(sc,(wz.width-statBoard.width*sc)/2,(wz.height-statBoard.height*sc)/2);
         nTitle.position(sc,10,wz.height-nTitle.height*sc-10);
         devTitle.position(sc,cm.container.x+cm.width*sc+10,10);
     }

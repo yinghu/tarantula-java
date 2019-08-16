@@ -20,7 +20,7 @@ public interface ApplicationContext{
     List<Configuration> configuration();
 
     TokenValidator validator();
-
+    Descriptor descriptor();
     Descriptor descriptor(String applicationId);
 
     Statistics onStatistics();

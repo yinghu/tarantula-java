@@ -8,7 +8,7 @@
 		<name>Heydere</name>
 		<description>Tarantula  Service</description>
 
-        <deploy-priority>30</deploy-priority>
+        <deploy-priority>130</deploy-priority>
 		<application-list>
             <application>
                 <type-id>tarantula</type-id>

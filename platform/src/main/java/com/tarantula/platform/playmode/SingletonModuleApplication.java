@@ -2,6 +2,7 @@ package com.tarantula.platform.playmode;
 
 import com.tarantula.*;
 import com.tarantula.Module;
+import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.TarantulaApplicationHeader;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,10 +25,6 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         if(session.action().equals("onStream")){
             this._onStream.put(session.systemId(),session);
         }
-        else if(session.action().equals("onReset")){
-            serviceProvider.reset(this.descriptor);
-            session.write(payload,this.module.label());
-        }
         else{
             if(this.module.onRequest(session,payload,(delta)->{
                 this._onStream.forEach((k,v)->{
@@ -36,7 +33,10 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
                 //server push
             })){
                 //clean up on leave
-                //this.onTimeout(session);
+                this.context.log("Session->"+session.systemId(),OnLog.INFO);
+                Session rm = this._onStream.remove(session.systemId());
+                ResponseHeader resp = new ResponseHeader(session.action(),"close session");
+                rm.write(this.builder.create().toJson(resp).getBytes(),module.label(),true);
             }
         }
     }
@@ -46,7 +46,6 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         super.setup(context);
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         module = this.serviceProvider.module(this.descriptor);
-
         pendingTimer = descriptor.timerOnModule();
         if(descriptor.timerOnModule()>0){
             this.context.schedule(this);

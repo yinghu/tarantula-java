@@ -45,7 +45,7 @@
 </div>
 <script>
  document.querySelector("#a_command").onclick = function(){
-    AdminGame.addLobby(function(payload){
+    AdminSetup.addLobby(function(payload){
         payload.typeId = document.querySelector('#a_typeId').value;//"demo-sync";
         payload.subtypeId = document.querySelector('#a_subtypeId').value;//"demo-sync-lobby";
         payload.name= document.querySelector('#a_name').value;//"Demo Sync";

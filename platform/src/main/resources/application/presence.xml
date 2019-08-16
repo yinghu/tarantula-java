@@ -8,7 +8,7 @@
         <name>presence</name>
         <description>Tarantula Lobby Index</description>
         <view-id>presence</view-id>
-        <deploy-priority>10</deploy-priority>
+        <deploy-priority>110</deploy-priority>
         <application-list>
             <application><!--could be exposing on login successful -->
                 <type-id>presence</type-id>

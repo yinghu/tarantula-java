@@ -7,7 +7,7 @@
         <name>XPLevel</name>
         <access-mode>12</access-mode>
         <description>Tarantula XP Level Service</description>
-
+        <deploy-priority>100</deploy-priority>
         <application-list>
             <application>
                 <type-id>level</type-id>

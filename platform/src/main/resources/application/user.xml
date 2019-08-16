@@ -8,7 +8,7 @@
         <name>Index</name>
         <description>Tarantula Lobby Index</description>
         <view-id>index</view-id>
-        <deploy-priority>28</deploy-priority>
+        <deploy-priority>125</deploy-priority>
         <application-list>
             <application>
                 <type-id>index</type-id>

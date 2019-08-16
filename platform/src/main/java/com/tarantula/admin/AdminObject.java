@@ -7,15 +7,14 @@ import com.tarantula.platform.OnApplicationHeader;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DBObject extends OnApplicationHeader implements OnApplication {
+public class AdminObject extends OnApplicationHeader implements OnApplication {
 
     public ConcurrentHashMap<String,Long> kv = new ConcurrentHashMap<>();
     public ApplicationContext context;
-    public DBObject(){
+    public AdminObject(){
         this.label = "admin";
     }
-    public void join(String systemId){}
-    public DBObject setup(){return  this;}
+    public AdminObject setup(){return  this;}
 
     public void reset(){
         long total =0;

@@ -58,7 +58,7 @@
 </div>
 <script>
   document.querySelector("#b_command").onclick = function(){
-    AdminGame.addApplication(function(payload){
+    AdminSetup.addApplication(function(payload){
         payload.typeId = document.querySelector('#b_typeId').value;//'demo-sync';
         payload.subtypeId= document.querySelector('#b_subtypeId').value;//'demo-sync-a';
         payload.viewId = document.querySelector('#b_viewId').value;//'demo.sync.game';     
