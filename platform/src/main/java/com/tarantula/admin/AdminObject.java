@@ -2,9 +2,11 @@ package com.tarantula.admin;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
 import com.tarantula.OnApplication;
 import com.tarantula.platform.OnApplicationHeader;
 
+import java.lang.reflect.Type;
 
 
 public class AdminObject extends OnApplicationHeader implements OnApplication {
@@ -14,7 +16,7 @@ public class AdminObject extends OnApplicationHeader implements OnApplication {
         this.label = label;
         this.successful = true;
     }
-    public JsonElement setup(){
+    public JsonElement setup(Type type, JsonSerializationContext jsonSerializationContext){
         return new JsonObject();
     }
 

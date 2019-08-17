@@ -895,6 +895,27 @@ var UI = (function(){
          ret.position = function(sc,x,y){ctn.scale.set(sc),ctn.x = x; ctn.y = y;};
          return ret;
      };
+     var _tpx_lobby_view = function(){
+         const ret ={};
+         ret.width = 360;
+         ret.height = 500;
+         const ctn = new PIXI.Container();
+         const bk = _tpx_base_v5({w:ret.width,h:ret.height,r:20,b:8,t:'0x000000',a:'1'});
+         ctn.addChild(bk.base);
+         const t = _tpx_text_v5(500,30,'Oswald','yellow');
+         ctn.addChild(t);
+         t.x = 10;
+         t.y = 10;
+         const cmd = _tpx_text_command(120,80,'Setup');
+         ctn.addChild(cmd.container);
+         cmd.container.x = ret.width-cmd.width-30;
+         cmd.container.y = ret.height-cmd.height-30;
+         ret.container = ctn;
+         ret.setup = cmd;
+         ret.set = function(t){t.text = t;};
+         ret.position = function(sc,x,y){ctn.scale.set(sc),ctn.x = x; ctn.y = y;};
+         return ret;
+    };
     return {
         cashInView : _tpx_cashin_view,
         balanceView : _tpx_balance_view,
@@ -915,5 +936,6 @@ var UI = (function(){
         dealer : _tpx_dealer,
         statisticsBoard : _tpx_stat_board,
         avatar : _tpx_avatar,
+        lobby : _tpx_lobby_view,
     };
 })();

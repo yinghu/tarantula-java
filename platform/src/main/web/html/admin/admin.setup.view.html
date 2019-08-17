@@ -73,6 +73,18 @@
     
     let nTitle = UI.text('Notification',{fontWeight: 500,fontFamily:'Oswald, Arial',fontSize:28,fill:'0xffffff'});
     
+    let aright = UI.iconCommand(120,120);
+    aright.icon.texture = PIXI.Texture.from('assets/right_arrow.png');
+    let aleft = UI.iconCommand(120,120);
+    aleft.icon.texture = PIXI.Texture.from('assets/left_arrow.png');
+    
+    let lbv = UI.lobby();
+    lbv.setup.button.command = function(){
+        _view({viewId:'admin.add.application',containerId:'#m3'});
+    };
+    pView.container.addChild(aleft.container);
+    pView.container.addChild(aright.container);
+    pView.container.addChild(lbv.container);
     pView.container.addChild(nTitle.container);
     pView.container.addChild(cm.container);
     pView.container.addChild(menuBoard.container);
@@ -87,7 +99,7 @@
         console.log(jx);    
     },(g)=>{
        _admin_setup_scale();    
-       console.log(g);    
+       console.log(lbv.set("lobby item"));    
     },(n)=>{
        
       nTitle.title(n.message);  
@@ -98,8 +110,11 @@
         app.renderer.resize(wz.width,wz.height); 
         menuBoard.position(sc,5,5);
         cm.position(sc,5,5);
+        aright.position(sc,(wz.width-aright.width*sc-20),(wz.height-aright.height*sc)/2);
+        aleft.position(sc,20,(wz.height-aright.height*sc)/2);
         commandList.position(sc,wz.width-commandList.width*sc-5,5);
         commandList1.position(sc,wz.width-commandList1.width*sc-5,wz.height-commandList1.height*sc-5);
+        lbv.position(sc,(wz.width-lbv.width*sc)/2,(wz.height-lbv.height*sc)/2);
         nTitle.position(sc,10,wz.height-nTitle.height*sc-10);
     }
 </script>

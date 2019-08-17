@@ -14,7 +14,7 @@ public class AdminObjectSerializer implements JsonSerializer<AdminObject> {
     @Override
     public JsonElement serialize(AdminObject adminObject, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = (JsonObject)new OnApplicationSerializer().serialize(adminObject,type,jsonSerializationContext);
-        jo.add("payload",adminObject.setup());
+        jo.add("payload",adminObject.setup(type,jsonSerializationContext));
         return jo;
     }
 }
