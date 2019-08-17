@@ -2,7 +2,7 @@
     <canvas id="tx-admin-setup-canvas"></canvas>              
 </div>
 <script>
-    let gameObject ={};
+    let adminObject={index:0,setup:'Lobby'};
     let wz = wsize();
     let sc = wz.scale;
     app = TGL.start(wz.width,wz.height,document.querySelector("#tx-admin-setup-canvas")); 
@@ -42,45 +42,73 @@
     }; 
     cm.button.icon.texture = PIXI.Texture.from('assets/table.png');
     
-    let commandList = UI.textCommandList(3,160);
+    let commandList = UI.textCommandList(1,160);
     commandList.list[0].title('AddLobby');
     commandList.list[0].button.command = function(){
         _view({viewId:'admin.add.lobby',containerId:'#m3'});
-    };
-    commandList.list[1].title('AddApp');
-    commandList.list[1].button.command = function(){
+    };  
+    let setupList = UI.textCommandList(3,160);
+    setupList.list[0].title('AddApp');
+    setupList.list[0].button.command = function(){
         _view({viewId:'admin.add.application',containerId:'#m3'});
     };
-    commandList.list[2].title('Launch');
-    commandList.list[2].button.command = function(){AdminSetup.launch();};
-    
-    pView.container.addChild(commandList.container);
-    
-    let commandList1 = UI.textCommandList(3,160);
-    commandList1.list[0].title('DisableApp');
-    commandList1.list[0].button.command = function(){
-        let _payload ={serviceTag:'demo-sync',command:'onLobby',typeId:'demo-sync'};
-        TARA_API.onService(_payload,function(resp){
-            AdminSetup.disableApplication(resp.gameList[0].applicationId);
-        });
+    setupList.list[1].title('Shutdown');
+    setupList.list[1].button.command = function(){
+        AdminSetup.shutdown();
     };
-    commandList1.list[1].title('Reset');
-    commandList1.list[1].button.command = function(){AdminSetup.reset();};
-    commandList1.list[2].title('Shutdown');
-    commandList1.list[2].button.command = function(){AdminSetup.shutdown();};
-    
-    pView.container.addChild(commandList1.container);
-    
+    setupList.list[2].title('Launch');
+    setupList.list[2].button.command = function(){
+        AdminSetup.launch();
+    };
+    pView.container.addChild(setupList.container);
+    pView.container.addChild(commandList.container);
     let nTitle = UI.text('Notification',{fontWeight: 500,fontFamily:'Oswald, Arial',fontSize:28,fill:'0xffffff'});
     
     let aright = UI.iconCommand(120,120);
     aright.icon.texture = PIXI.Texture.from('assets/right_arrow.png');
+    aright.button.command = function(){
+        if(adminObject.index<adminObject.list.length-1){
+            adminObject.index++;
+        }
+        else{
+            adminObject.index=0;
+        }
+        _on_admin_stage();
+    }
     let aleft = UI.iconCommand(120,120);
     aleft.icon.texture = PIXI.Texture.from('assets/left_arrow.png');
-    
-    let lbv = UI.lobby();
+    aleft.button.command = function(){
+        if(adminObject.index>0){
+            adminObject.index--;
+        }
+        else{
+            adminObject.index=adminObject.list.length-1;
+        }
+        _on_admin_stage();
+    }
+    let lbv = UI.lobbySetup();
     lbv.setup.button.command = function(){
-        _view({viewId:'admin.add.application',containerId:'#m3'});
+        //_view({viewId:'admin.add.application',containerId:'#m3'});
+        if(adminObject.setup == 'Lobby'){
+            lbv.setup.title("Application");
+            adminObject.setup = 'Application';
+            AdminSetup.applicationList(adminObject.list[adminObject.index].applicationId,(resp)=>{
+                console.log(resp);
+                adminObject.index=0;
+                adminObject.list = resp.payload.list;
+                _on_admin_stage();
+            });
+        }
+        else{
+            lbv.setup.title("Lobby");
+            adminObject.setup = 'Lobby';
+            AdminSetup.lobbyList((resp)=>{
+                console.log(resp);
+                adminObject.index=0;
+                adminObject.list = resp.payload.list;
+                _on_admin_stage();
+            });
+        }
     };
     pView.container.addChild(aleft.container);
     pView.container.addChild(aright.container);
@@ -98,13 +126,19 @@
     },(jx)=>{
         console.log(jx);    
     },(g)=>{
-       _admin_setup_scale();    
-       console.log(lbv.set("lobby item"));    
-    },(n)=>{
-       
+       _admin_setup_scale();   
+       adminObject.list = g.payload.list;
+       console.log(adminObject.list.length);    
+       _on_admin_stage();
+            
+    },(n)=>{ 
       nTitle.title(n.message);  
     });
-   
+    function _on_admin_stage(){
+        let lb = adminObject.list[adminObject.index];
+        lbv.set('Name->'+lb.name+'\nTypeId->'+lb.typeId+'\nType->'+lb.type+'\nSubtypeId->'+lb.subtypeId+'\nTag->'+lb.tag+'\nSingleton->'+lb.singleton+'\nDeployCode->'+lb.deployCode);
+        nTitle.title('Lobby Type ID->'+lb.typeId);
+    }
     function _admin_setup_scale(){
         let wz = wsize();
         app.renderer.resize(wz.width,wz.height); 
@@ -113,8 +147,8 @@
         aright.position(sc,(wz.width-aright.width*sc-20),(wz.height-aright.height*sc)/2);
         aleft.position(sc,20,(wz.height-aright.height*sc)/2);
         commandList.position(sc,wz.width-commandList.width*sc-5,5);
-        commandList1.position(sc,wz.width-commandList1.width*sc-5,wz.height-commandList1.height*sc-5);
+        setupList.position(sc,(wz.width-setupList.width*sc)/2,wz.height-setupList.height*sc-5);
         lbv.position(sc,(wz.width-lbv.width*sc)/2,(wz.height-lbv.height*sc)/2);
-        nTitle.position(sc,10,wz.height-nTitle.height*sc-10);
+        nTitle.position(sc,cm.width*sc+10,cm.height*sc/2);
     }
 </script>

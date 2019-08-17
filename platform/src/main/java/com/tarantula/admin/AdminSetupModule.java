@@ -4,7 +4,9 @@ import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.DeploymentDescriptor;
+import com.tarantula.platform.service.deployment.ApplicationQuery;
 import com.tarantula.platform.service.deployment.LobbyQuery;
+import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
 public class AdminSetupModule implements Module {
@@ -22,7 +24,24 @@ public class AdminSetupModule implements Module {
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
-        if(session.action().equals("addLobby")){
+        if(session.action().equals("applicationList")){
+            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            this.dbObject.list.clear();
+            this.dataStore.list(new ApplicationQuery(access.accessId()),(a)->{
+                this.dbObject.list.add(a);
+                return true;
+            });
+            session.write(this.builder.create().toJson(this.dbObject).getBytes(),label());
+        }
+        else if(session.action().equals("lobbyList")){
+            this.dbObject.list.clear();
+            this.dataStore.list(new LobbyQuery(dataStore.bucket()),(a)->{
+                this.dbObject.list.add(a);
+                return true;
+            });
+            session.write(this.builder.create().toJson(this.dbObject).getBytes(),label());
+        }
+        else if(session.action().equals("addLobby")){
             DeploymentDescriptor desc = new DeploymentDescriptor();
             desc.fromMap(SystemUtil.toMap(payload));
             desc.type("lobby");
@@ -42,16 +61,24 @@ public class AdminSetupModule implements Module {
             desc.instancesOnStartupPerPartition(1);
             session.write(serviceProvider.createApplication(desc).getBytes(),this.label());
         }
-        else if(session.action().equals("onLaunch")){
+        else if(session.action().equals("onLaunch")){//typeId
+            //OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             session.write(payload,label());
         }
-        else if(session.action().equals("onShutdown")){
+        else if(session.action().equals("onShutdown")){//typeId
+            //OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             session.write(payload,label());
         }
-        else if(session.action().equals("disableApplication")){
+        else if(session.action().equals("disableApplication")){//applicationId
+            //OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             session.write(payload,label());
         }
-        else if(session.action().equals("onReset")){
+        else if(session.action().equals("enableApplication")){//applicationId
+            //OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            session.write(payload,label());
+        }
+        else if(session.action().equals("onReset")){//subtypeId
+            //OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             session.write(payload,label());
         }
         else{
@@ -66,6 +93,7 @@ public class AdminSetupModule implements Module {
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.dataStore = this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE);
         this.builder = new GsonBuilder();
+        this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.builder.registerTypeAdapter(AdminSetupObject.class,new AdminObjectSerializer());
         this.dbObject = new AdminSetupObject(this.label());
         this.dbObject.name("setup tool");

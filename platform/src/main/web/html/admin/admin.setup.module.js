@@ -51,6 +51,14 @@ var AdminSetup= (function(){
             console.log(resp);
         });
     };
+    let _list_app = function(lobbyId,out){
+        let _payload = {serviceTag:adminObject.tag,command:"applicationList",accessId:lobbyId};
+        TARA_API.onService(_payload,out);
+    };
+    let _list_lobby = function(out){
+        let _payload = {serviceTag:adminObject.tag,command:"lobbyList"};
+        TARA_API.onService(_payload,out);
+    };
     let _leave = function(){
         TARA_API.send({action:'onStop',streaming:true,label:'presence/notice',data:{command:'onStop'}});
         let _payload = {serviceTag:adminObject.tag,command:"onLeave"};
@@ -79,6 +87,8 @@ var AdminSetup= (function(){
         launch : _launch,
         reset : _reset,
         shutdown : _shutdown,
+        applicationList : _list_app,
+        lobbyList : _list_lobby,
     }; 
 
 }());

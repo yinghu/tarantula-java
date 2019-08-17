@@ -895,7 +895,7 @@ var UI = (function(){
          ret.position = function(sc,x,y){ctn.scale.set(sc),ctn.x = x; ctn.y = y;};
          return ret;
      };
-     var _tpx_lobby_view = function(){
+     var _tpx_lobby_setup = function(){
          const ret ={};
          ret.width = 360;
          ret.height = 500;
@@ -906,13 +906,13 @@ var UI = (function(){
          ctn.addChild(t);
          t.x = 10;
          t.y = 10;
-         const cmd = _tpx_text_command(120,80,'Setup');
+         const cmd = _tpx_text_command(160,80,'Lobby');
          ctn.addChild(cmd.container);
          cmd.container.x = ret.width-cmd.width-30;
          cmd.container.y = ret.height-cmd.height-30;
          ret.container = ctn;
          ret.setup = cmd;
-         ret.set = function(t){t.text = t;};
+         ret.set = function(tx){t.text = tx;};
          ret.position = function(sc,x,y){ctn.scale.set(sc),ctn.x = x; ctn.y = y;};
          return ret;
     };
@@ -936,6 +936,6 @@ var UI = (function(){
         dealer : _tpx_dealer,
         statisticsBoard : _tpx_stat_board,
         avatar : _tpx_avatar,
-        lobby : _tpx_lobby_view,
+        lobbySetup : _tpx_lobby_setup,
     };
 })();

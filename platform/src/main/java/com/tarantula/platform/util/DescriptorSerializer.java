@@ -15,6 +15,7 @@ public class DescriptorSerializer implements JsonSerializer<Descriptor> {
     public JsonElement serialize(Descriptor descriptor, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = new JsonObject();
         jo.addProperty("singleton",descriptor.singleton());
+        jo.addProperty("deployCode",descriptor.deployCode());
         jo.addProperty("tag",descriptor.tag());
         jo.addProperty("type",descriptor.type());
         jo.addProperty("typeId",descriptor.typeId());
