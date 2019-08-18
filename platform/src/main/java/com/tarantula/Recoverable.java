@@ -50,7 +50,7 @@ public interface Recoverable extends Distributable,Portable{
 
     Key key();
 
-    interface Key extends Portable,PartitionAware<String> {
+    interface Key extends Recoverable,PartitionAware<String> {
         String asString();
         byte[] toByteArray();
         void fromByteArray(byte[] data);

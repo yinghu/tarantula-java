@@ -1,6 +1,7 @@
 package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.Portable;
+import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 
 
@@ -44,8 +45,8 @@ public class PortableEventRegistry extends AbstractRecoverableListener {
 
     public static final int MESSAGE_EVENT_CID = 19;
 
-    public Portable create(int cid) {
-		Portable _ins;
+    public Recoverable create(int cid) {
+        Recoverable _ins;
 		switch(cid){
 			case APPLICATION_ACTION_EVENT_CID:
 				_ins = new ApplicationActionEvent();

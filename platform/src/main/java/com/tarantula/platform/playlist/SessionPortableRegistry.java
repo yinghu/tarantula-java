@@ -1,6 +1,7 @@
 package com.tarantula.platform.playlist;
 
 import com.hazelcast.nio.serialization.Portable;
+import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 import com.tarantula.platform.OnSessionTrack;
 
@@ -13,8 +14,8 @@ public class SessionPortableRegistry extends AbstractRecoverableListener {
 
     public static final int ON_SESSION_CID = 2;
 
-    public Portable create(int i) {
-        Portable pt = null;
+    public Recoverable create(int i) {
+        Recoverable pt = null;
         switch (i){
             case ON_SESSION_CID:
                 pt = new OnSessionTrack();

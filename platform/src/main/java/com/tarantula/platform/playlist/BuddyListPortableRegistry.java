@@ -1,6 +1,7 @@
 package com.tarantula.platform.playlist;
 
 import com.hazelcast.nio.serialization.Portable;
+import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 
 /**
@@ -14,8 +15,8 @@ public class BuddyListPortableRegistry extends AbstractRecoverableListener {
     public static final int ON_PLAY_CID = 3;
     public static final int RECENT_PLAY_LIST_CID = 4;
     public static final int ON_BUDDY_CID = 6;
-    public Portable create(int i) {
-        Portable pt = null;
+    public Recoverable create(int i) {
+        Recoverable pt = null;
         switch (i){
             case MY_PLAY_LIST_CID:
                 pt = new BuddyList();

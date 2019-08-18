@@ -1,6 +1,5 @@
 package com.tarantula.platform;
 
-import com.hazelcast.nio.serialization.Portable;
 import com.tarantula.Metadata;
 import com.tarantula.Recoverable;
 import com.tarantula.RecoverableListener;
@@ -22,7 +21,7 @@ public abstract class AbstractRecoverableListener implements RecoverableListener
     public void onUpdated(Metadata metadata, byte[] key, byte[] value) {
         OnFilter onFilter = oMap.get(metadata.classId());
         if(onFilter!=null){
-            Recoverable recoverable = (Recoverable) this.create(metadata.classId());
+            Recoverable recoverable = this.create(metadata.classId());
             if(recoverable.binary()){
                 recoverable.fromByteArray(value);
             }
@@ -43,7 +42,7 @@ public abstract class AbstractRecoverableListener implements RecoverableListener
     }
     abstract public int registryId();
 
-    abstract public Portable create(int i);
+    abstract public Recoverable create(int i);
 
     private static class OnFilter{
         List<Filter> list = new CopyOnWriteArrayList<>();

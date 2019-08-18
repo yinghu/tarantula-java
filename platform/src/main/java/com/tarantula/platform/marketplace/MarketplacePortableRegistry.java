@@ -1,6 +1,7 @@
 package com.tarantula.platform.marketplace;
 
 import com.hazelcast.nio.serialization.Portable;
+import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 
 
@@ -14,8 +15,8 @@ public class MarketplacePortableRegistry extends AbstractRecoverableListener {
     public static final int VIRTUAL_CREDITS_PACK = 1;
 
 
-    public Portable create(int i) {
-        Portable pt = null;
+    public Recoverable create(int i) {
+        Recoverable pt = null;
         switch (i){
             case VIRTUAL_CREDITS_PACK:
                 pt = new VirtualCreditsPack();

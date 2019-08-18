@@ -2,6 +2,7 @@ package com.tarantula.platform.leaderboard;
 
 import com.hazelcast.nio.serialization.Portable;
 import com.tarantula.Metadata;
+import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 
 
@@ -18,8 +19,8 @@ public class LeaderBoardPortableRegistry extends AbstractRecoverableListener {
 
     public static final int TOP10_LEADER_BOARD_CID = 7;
 
-    public Portable create(int i) {
-        Portable pt = null;
+    public Recoverable create(int i) {
+        Recoverable pt = null;
         switch (i){
             case LEADER_BOARD_ENTRY_CID:
                 pt = new LeaderBoardEntry();

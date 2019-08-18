@@ -11,7 +11,7 @@ import java.nio.charset.Charset;
 /**
  * Updated by yinghu on 6/15/2018.
  */
-public class NaturalKey implements Recoverable.Key {
+public class NaturalKey extends RecoverableObject implements Recoverable.Key {
 
 
     public String key;

@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.cluster;
 
 import com.hazelcast.nio.serialization.Portable;
+import com.tarantula.Recoverable;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.deployment.ServiceConfiguration;
@@ -37,8 +38,8 @@ public class PortableRegistry extends AbstractRecoverableListener{
 
     public static final int INSTANCE_INDEX_CID = 24;
 
-    public Portable create(int cid) {
-		Portable _ins;
+    public Recoverable create(int cid) {
+        Recoverable _ins;
 		switch(cid){
             case DISTRIBUTION_KEY_CID:
                 _ins = new DistributionKey();

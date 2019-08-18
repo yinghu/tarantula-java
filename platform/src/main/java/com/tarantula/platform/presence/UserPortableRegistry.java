@@ -1,6 +1,7 @@
 package com.tarantula.platform.presence;
 
 import com.hazelcast.nio.serialization.Portable;
+import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 
 /**
@@ -16,8 +17,8 @@ public class UserPortableRegistry extends AbstractRecoverableListener {
     public static final int CONTENT_CHUNK_CID = 4;
 
 
-    public Portable create(int i) {
-        Portable pt = null;
+    public Recoverable create(int i) {
+        Recoverable pt = null;
         switch (i){
             case ACCESS_CID:
                 pt = new AccessTrack();

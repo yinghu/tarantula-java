@@ -91,7 +91,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         }
         this.tarantulaContext.serverTopic = this.bucket;
          this.tarantulaContext.fMap.forEach((k,r)->{
-            config.getSerializationConfig().addPortableFactory(r.registryId(),r);
+            config.getSerializationConfig().addPortableFactory(r.registryId(),new DynamicPortableRegistry(r));
         });
          this.config.getListenerConfigs().add(new ListenerConfig(this));
         _cluster = Hazelcast.newHazelcastInstance(this.config);

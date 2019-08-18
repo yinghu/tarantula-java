@@ -1,6 +1,7 @@
 package com.tarantula.platform.leveling;
 
 import com.hazelcast.nio.serialization.Portable;
+import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 import com.tarantula.platform.OnStatisticsTrack;
 
@@ -14,8 +15,8 @@ public class LevelingPortableRegistry extends AbstractRecoverableListener {
     public static final int LEVEL_CID = 1;
     public static final int XP_CID = 2;
     public static final int ON_STATS_CID = 3;
-    public Portable create(int i) {
-        Portable pt = null;
+    public Recoverable create(int i) {
+        Recoverable pt = null;
         switch (i){
             case LEVEL_CID:
                 pt = new XPLevel();

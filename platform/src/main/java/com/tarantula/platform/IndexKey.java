@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * Created by yinghu lu on 9/21/2018.
  */
-public class IndexKey implements Recoverable.Key {
+public class IndexKey extends RecoverableObject implements Recoverable.Key {
 
     private String bucket;
     private String oid;

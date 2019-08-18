@@ -11,7 +11,7 @@ import java.nio.charset.Charset;
 /**
  * Updated by yinghu on 6/15/2018.
  */
-public class ResourceKey implements Recoverable.Key {
+public class ResourceKey extends RecoverableObject implements Recoverable.Key {
 
     public String bucket;
     public String oid;

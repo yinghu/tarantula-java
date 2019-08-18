@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
- * Update by yinghu on 10/10/2017.
+ * Update by yinghu on 8/17/19
  */
-public class DistributionKey implements Recoverable.Key{
+public class DistributionKey extends RecoverableObject implements Recoverable.Key{
 
     private String bucket;
     private String oid;

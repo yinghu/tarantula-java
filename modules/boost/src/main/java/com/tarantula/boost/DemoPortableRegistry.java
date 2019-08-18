@@ -1,6 +1,6 @@
 package com.tarantula.boost;
 
-import com.hazelcast.nio.serialization.Portable;
+import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 
 public class DemoPortableRegistry extends AbstractRecoverableListener {
@@ -13,8 +13,8 @@ public class DemoPortableRegistry extends AbstractRecoverableListener {
     }
 
     @Override
-    public Portable create(int i) {
-        Portable pt = null;
+    public Recoverable create(int i) {
+        Recoverable pt = null;
         switch (i){
             case TIMER_OID:
                 pt = new Timer();
