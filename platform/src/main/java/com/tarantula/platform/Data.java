@@ -283,11 +283,4 @@ public class Data extends RecoverableObject{
         this.eventService.publish(new ResponsiveEvent(this.source,this.sessionId,payload,label,closed));
     }
 
-    public int getFactoryId(){
-        return -1;
-    }
-    public int getClassId(){
-        return -1;
-    }
-
 }
