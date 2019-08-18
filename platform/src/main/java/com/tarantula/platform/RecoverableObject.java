@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Updated by yinghu on 4/17/2018.
  */
-public abstract class RecoverableObject implements Recoverable {
+public class RecoverableObject implements Recoverable {
 
     protected String bucket;
 
@@ -132,8 +132,12 @@ public abstract class RecoverableObject implements Recoverable {
     public void routingNumber(int routingNumber){
         this.routingNumber = routingNumber;
     }
-    abstract public int getFactoryId();
-    abstract public int getClassId();
+    public int getFactoryId(){
+        return -1;
+    }
+    public int getClassId(){
+        return -1;
+    }
 
     public String distributionKey() {
         if(this.bucket!=null&&this.oid!=null){

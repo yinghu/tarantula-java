@@ -4,11 +4,10 @@ package com.tarantula;
 //portable interface, which could be replicated in cluster wide or persistent in storage
 
 import com.hazelcast.core.PartitionAware;
-import com.hazelcast.nio.serialization.Portable;
 
 import java.util.Map;
 
-public interface Recoverable extends Distributable,Portable{
+public interface Recoverable extends Distributable{
 
     String PATH_SEPARATOR = "/";
 
@@ -52,8 +51,8 @@ public interface Recoverable extends Distributable,Portable{
 
     interface Key extends Recoverable,PartitionAware<String> {
         String asString();
-        byte[] toByteArray();
-        void fromByteArray(byte[] data);
+        //byte[] toByteArray();
+        //void fromByteArray(byte[] data);
     }
     void dataStore(DataStore dataStore);
 
