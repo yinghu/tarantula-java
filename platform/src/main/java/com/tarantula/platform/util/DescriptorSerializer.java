@@ -32,6 +32,7 @@ public class DescriptorSerializer implements JsonSerializer<Descriptor> {
         jo.addProperty("entryCostAsString",SystemUtil.toCreditsString(descriptor.entryCost()));
         jo.addProperty("responseLabel",descriptor.responseLabel());
         jo.addProperty("tournamentEnabled",descriptor.tournamentEnabled());
+        jo.addProperty("disabled",descriptor.disabled());
         return jo;
     }
 }
