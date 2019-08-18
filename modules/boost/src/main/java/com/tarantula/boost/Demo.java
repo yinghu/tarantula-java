@@ -15,7 +15,7 @@ public class Demo implements Module {
     private GsonBuilder builder;
 
     private long delta = 50;
-    private long noticeInterval = 500;
+    //private long noticeInterval = 500;
     private String action = "presence";
     private Timer timer;
     private DataStore dataStore;
@@ -66,7 +66,7 @@ public class Demo implements Module {
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(Timer.class,new TimerSerializer());
-        this.timer = new Timer(2000*60*60,delta);
+        this.timer = new Timer(this.context.descriptor().runtimeDurationOnInstance(),delta);
         timer.distributionKey(this.context.onRegistry().distributionKey());
         this.dataStore = this.context.dataStore("demo");
         dataStore.createIfAbsent(timer,true);
@@ -80,6 +80,7 @@ public class Demo implements Module {
         jo.addProperty("responseLabel",this.label());
         jo.addProperty("successful",true);
         jo.addProperty("instanceId",context.onRegistry().distributionKey());
+
         //RecoverableListener r = dataStore.registerRecoverableListener(new DemoPortableRegistry());
         //r.addRecoverableFilter(DemoPortableRegistry.TIMER_OID,(c)->{
             //this.context.log(c.toString(),OnLog.INFO);
@@ -104,18 +105,10 @@ public class Demo implements Module {
     public void onTimer(OnUpdate update){
         timer.onUpdate();
         update.on(this.builder.create().toJson(timer).getBytes());
-        noticeInterval -=delta;
-        if(noticeInterval<=0){
-            JsonObject jn = toPayload(action,action);
-            update.on(this.builder.create().toJson(jn).getBytes());
-            postOffice.onNotification(this.builder.create().toJson(jn).getBytes(),"presence/notice");
-            noticeInterval = 500;
-        }
     }
     public void clear(){
         this.dataStore.update(timer);
         this.context.log("sync->"+this.context.onRegistry().distributionKey(),OnLog.WARN);
-        //this.dataStore.unregisterRecoverableListener(DemoPortableRegistry.OID);
     }
 
 }

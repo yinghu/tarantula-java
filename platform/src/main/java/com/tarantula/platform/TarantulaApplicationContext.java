@@ -54,10 +54,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         this.configurations = configurations;
     }
 
-    //public void initialize(Event me){
-        //this.initializeOnApplication(me,poll(me));
-    //}
-
     public OnInstance poll(Event event){
         //load joined on instance if already existed
         OnInstance oi = onInstances.get(event.systemId());
@@ -208,7 +204,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                         _instance.count(1);
                         a.idle(true);
                         this.onInstances.put(a.systemId(),a);
-                        //this.watchDog.watch(new InstanceOnRecoveryEvent(this.applicationId,this._instance.distributionKey(),a.systemId()));
                         _instance.onInstanceListener.onUpdated(new OnInstanceTrack(a.systemId(),a.stub(),this.applicationId,_instance.distributionKey(),true));
                     }
                     else{
@@ -301,8 +296,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         on.initialized(false);
         on.joined(false);
         on.onUpdate();
-        if(on.tournamentEnabled()){
-        }
         if((!on.tournamentEnabled())&&on.balance()>0){//move remaining balance to presence on non-tournament mode
             this.publish(this.routingKey(systemId,"presence",on.routingNumber()),new OnBalanceTrack(systemId,on.balance()));
         }

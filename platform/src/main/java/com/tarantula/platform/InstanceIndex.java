@@ -132,10 +132,6 @@ public class InstanceIndex  extends OnApplicationHeader implements InstanceRegis
     public synchronized boolean transact(String systemId,double delta){
         OnInstance onInstance = this.applicationContext.onInstance(systemId);
         if(onInstance!=null&&onInstance.transact(delta)) {
-            if(tournamentEnabled()){
-                //this.tournamentListener.onCommit(onInstance.onTournament());
-                //onInstance.onTournament().reset();
-            }
             return true;
         }
         else{

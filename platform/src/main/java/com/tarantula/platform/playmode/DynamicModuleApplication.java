@@ -35,7 +35,6 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         }
         else if(session.action().equals("onReset")){
             serviceProvider.reset(this.descriptor);
-            //serviceProvider.enableApplication(this.descriptor.distributionKey(),false);
             session.write(payload,this.module.label());
         }
         else{
@@ -55,10 +54,10 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        this.serviceProvider.registerPostOffice().registerMessageListener(this.context.onRegistry().distributionKey(),(m)->{
-            this.context.log("message received->"+m.destination()+"<>"+m.source()+"<>"+m.payload().length,OnLog.INFO);
-            return false;
-        });
+        ///this.serviceProvider.registerPostOffice().registerMessageListener(this.context.onRegistry().distributionKey(),(m)->{
+            //this.context.log("message received->"+m.destination()+"<>"+m.source()+"<>"+m.payload().length,OnLog.INFO);
+            //return false;
+        //});
         try{
             module = this.serviceProvider.module(this.descriptor);
             this.pendingTimer = descriptor.timerOnModule();
