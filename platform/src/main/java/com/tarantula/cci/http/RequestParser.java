@@ -10,22 +10,29 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * updated by yinghu on 8/13/2017.
+ * updated by yinghu on 8/18/2019.
  */
 public class RequestParser{
 
     public Map<String,Object> parse(HttpExchange httpExchange) throws IOException {
         HashMap<String,Object> requestMapping = new HashMap<>();
+        int pz = 0;
         for(Map.Entry<String,List<String>> hv : httpExchange.getRequestHeaders().entrySet()){
             if(!hv.getValue().isEmpty()){
                 requestMapping.put(hv.getKey(), hv.getValue().get(0));
+                if(hv.getKey().equals(Session.TARANTULA_PAYLOAD_SIZE)){
+                    pz = Integer.parseInt(hv.getValue().get(0));
+                }
             }
         }
+
         if(httpExchange.getRequestMethod().equalsIgnoreCase("POST")){ //skip GET METHOD
             boolean onJson = requestMapping.get(Session.HTTP_CONTENT_TYPE).toString().startsWith("application/x-www-form-urlencoded");
             if(onJson){
                 InputStream in = httpExchange.getRequestBody();
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream(in.available());
+                byte[] buffer = new byte[pz>0?pz:in.available()];
+                in.read(buffer);
+                /**
                 int b;
                 do{
                     b = in.read();
@@ -33,9 +40,9 @@ public class RequestParser{
                         buffer.write(b);
                     }
 
-                }while(b!=-1);
-                requestMapping.put(Session.TARANTULA_PAYLOAD,buffer.toByteArray());
-                buffer.close();
+                }while(b!=-1);**/
+                requestMapping.put(Session.TARANTULA_PAYLOAD,buffer);
+                //buffer.close();
             }
             else{
                 BufferedReader bread = new BufferedReader(new InputStreamReader(httpExchange.getRequestBody()));
