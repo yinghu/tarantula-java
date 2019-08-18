@@ -80,7 +80,7 @@ public class AdminSetupModule implements Module {
         else if(session.action().equals("onReset")){//subtypeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Descriptor desc = this.context.descriptor(access.applicationId());
-            if(desc!=null&&desc.subtypeId()!=null){
+            if(desc!=null&&desc.subtypeId()!=null&&(!desc.subtypeId().equals("lobby"))){
                 session.write(this.serviceProvider.reset(desc).getBytes(),label());
             }
             else{

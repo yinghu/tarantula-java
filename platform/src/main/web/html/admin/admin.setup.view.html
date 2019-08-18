@@ -134,7 +134,8 @@
        _on_admin_stage();
             
     },(n)=>{ 
-      nTitle.title(n.message);  
+        console.log(n);
+        nTitle.title(n.message);  
     });
     function _on_add_app(){
         if(adminObject.setup == 'Lobby'){
@@ -171,7 +172,7 @@
     }
     function _on_admin_stage(){
         let lb = adminObject.list[adminObject.index];
-        lbv.set('Name->'+lb.name+'\nTypeId->'+lb.typeId+'\nType->'+lb.type+'\nSubtypeId->'+lb.subtypeId+'\nTag->'+lb.tag+'\nSingleton->'+lb.singleton+'\nDeployCode->'+lb.deployCode);
+        lbv.set('Index->'+adminObject.index+'\nName->'+lb.name+'\nTypeId->'+lb.typeId+'\nType->'+lb.type+'\nSubtypeId->'+lb.subtypeId+'\nTag->'+lb.tag+'\nSingleton->'+lb.singleton+'\nDeployCode->'+lb.deployCode+"\nDisabled->"+lb.disabled);
         nTitle.title('Lobby Type ID->'+lb.typeId);
     }
     function _admin_setup_scale(){
