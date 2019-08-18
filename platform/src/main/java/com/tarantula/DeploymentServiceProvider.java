@@ -40,11 +40,11 @@ public interface DeploymentServiceProvider extends ServiceProvider{
     String createLobby(Descriptor descriptor);
     String createApplication(Descriptor descriptor);
     String enableApplication(String applicationId,boolean enabled);
-    void launch(String typeId);
-    void shutdown(String typeId);
+    String launch(String typeId);
+    String shutdown(String typeId);
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
-    void reset(Descriptor descriptor);
+    String reset(Descriptor descriptor);
     //END OF MODULE OPERATION API
 
 

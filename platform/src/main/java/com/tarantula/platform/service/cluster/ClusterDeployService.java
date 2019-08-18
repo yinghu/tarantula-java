@@ -498,7 +498,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         return this.builder.create().toJson(resp);
     }
     public String resetModule(String lobbyId,Descriptor descriptor){
-        ResponseHeader resp = new ResponseHeader("resetModule");
+        ResponseHeader resp = new ResponseHeader("resetModule",descriptor.subtypeId(),false);
         DataStore dataStore = this.tarantulaContext.masterDataStore();
         dataStore.list(new ApplicationQuery(lobbyId),(a)->{
             if(a.subtypeId().equals(descriptor.subtypeId())){
@@ -506,6 +506,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 a.moduleArtifact(descriptor.moduleArtifact());
                 a.moduleVersion(descriptor.moduleVersion());
                 dataStore.update(a);
+                resp.successful(true);
             }
             return true;
         });

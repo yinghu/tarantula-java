@@ -21,35 +21,25 @@ var AdminSetup= (function(){
         fin(_payload);
         TARA_API.onService(_payload,fout);
     };
-    let _enable_app = function(appid){
-        let _payload = {serviceTag:adminObject.tag,command:"enableApplication",accessId:appid};
-        TARA_API.onService(_payload,function(resp){
-            console.log(resp);
-        });
+    let _enable_app = function(appid,out){
+        let _payload = {serviceTag:adminObject.tag,command:"enableApplication",applicationId:appid};
+        TARA_API.onService(_payload,out);
     };
-    let _disable_app = function(appid){
-        let _payload = {serviceTag:adminObject.tag,command:"disableApplication",accessId:appid};
-        TARA_API.onService(_payload,function(resp){
-            console.log(resp);
-        });
+    let _disable_app = function(appid,out){
+        let _payload = {serviceTag:adminObject.tag,command:"disableApplication",applicationId:appid};
+        TARA_API.onService(_payload,out);
     };
-    let _launch = function(){
-        let _payload = {serviceTag:adminObject.tag,command:"onLaunch"};
-        TARA_API.onService(_payload,function(resp){
-            console.log(resp);
-        });
+    let _launch = function(typeId,out){
+        let _payload = {serviceTag:adminObject.tag,command:"onLaunch",typeId:typeId};
+        TARA_API.onService(_payload,out);
     };
-    let _shutdown = function(){
-        let _payload = {serviceTag:adminObject.tag,command:"onShutdown"};
-        TARA_API.onService(_payload,function(resp){
-            console.log(resp);
-        });
+    let _shutdown = function(typeId,out){
+        let _payload = {serviceTag:adminObject.tag,command:"onShutdown",typeId:typeId};
+        TARA_API.onService(_payload,out);
     };
-    let _reset = function(){
-        let _payload = {serviceTag:adminObject.tag,command:"onReset"};
-        TARA_API.onService(_payload,function(resp){
-            console.log(resp);
-        });
+    let _reset = function(appId,out){
+        let _payload = {serviceTag:adminObject.tag,command:"onReset",applicationId:appId};
+        TARA_API.onService(_payload,out);
     };
     let _list_app = function(lobbyId,out){
         let _payload = {serviceTag:adminObject.tag,command:"applicationList",accessId:lobbyId};

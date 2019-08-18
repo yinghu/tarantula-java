@@ -34,7 +34,8 @@
                 <p id="a_message"></p>
             </div>
             <div class="w3-panel">  
-                <div id="a_command" class="w3-block w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Add Lobby</div>     
+                <div id="a_command_cancel" class="w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Cancel</div>
+                <div id="a_command" class="w3-right w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Add Lobby</div>     
             </div>
         </div>            
         
@@ -65,5 +66,5 @@
      m1.style.display = 'none';
  }
  document.querySelector("#tx-close-privacy").onclick = tx_close_add_lobby;
-    
+ document.querySelector("#a_command_cancel").onclick = tx_close_add_lobby;   
 </script>

@@ -48,7 +48,8 @@
                 <p id="b_message"></p>
             </div>
             <div class="w3-panel">  
-                <div id="b_command" class="w3-block w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Add Application</div>     
+                <div id="b_command_cancel" class="w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Cancel</div>
+                <div id="b_command" class="w3-right w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Add Application</div>     
             </div>
         </div>  
         <div class="w3-display-container w3-border-bottom w3-border-white w3-teal tx-content-36">
@@ -77,6 +78,7 @@
     });    
  };    
  document.querySelector("#tx-close-terms").onclick = tx_close_add_application;
+ document.querySelector("#b_command_cancel").onclick = tx_close_add_application;
  function tx_close_add_application(){
      this.style.display = 'none';
      let m1 = document.querySelector('#m3');

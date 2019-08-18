@@ -75,11 +75,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         DynamicModuleClassLoader dyn = cMap.get(descriptor.subtypeId());
         dyn.loadResource(name,onResource);
     }
-    public void reset(Descriptor descriptor){
+    public String reset(Descriptor descriptor){
         //update app desc via subtypeId
         Lobby lobby = tarantulaContext.lobby(descriptor.typeId());
-        this.tarantulaContext.tarantulaCluster.deployService().resetModule(lobby.descriptor().distributionKey(),descriptor);
-        this.integrationEventService.publish(new ModuleResetEvent(this.eventTopic,descriptor));
+        String suc = this.tarantulaContext.tarantulaCluster.deployService().resetModule(lobby.descriptor().distributionKey(),descriptor);
+        ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
+        if(resp.successful()){
+            this.integrationEventService.publish(new ModuleResetEvent(this.eventTopic,descriptor));
+        }
+        return suc;
     }
     private Module _internalModule(String mname){
         try{
@@ -139,17 +143,21 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         });
     }
-    public void launch(String typeId){
-        ResponseHeader resp = this.builder.create().fromJson(this.tarantulaContext.tarantulaCluster.deployService().enableLobby(typeId,true),ResponseHeader.class);
+    public String launch(String typeId){
+        String suc = this.tarantulaContext.tarantulaCluster.deployService().enableLobby(typeId,true);
+        ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
         if(resp.successful()){
             this.integrationEventService.publish(new ModuleLaunchEvent(this.eventTopic,typeId));
         }
+        return suc;
     }
-    public void shutdown(String typeId){
-        ResponseHeader resp = this.builder.create().fromJson(this.tarantulaContext.tarantulaCluster.deployService().enableLobby(typeId,false),ResponseHeader.class);
+    public String shutdown(String typeId){
+        String suc = this.tarantulaContext.tarantulaCluster.deployService().enableLobby(typeId,false);
+        ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
         if(resp.successful()){
             this.integrationEventService.publish(new ModuleShutdownEvent(this.eventTopic,typeId));
         }
+        return suc;
     }
     private void _shutdown(String typeId){
         this.oListeners.forEach((ol)->{

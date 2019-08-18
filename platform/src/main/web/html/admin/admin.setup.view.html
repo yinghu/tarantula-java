@@ -2,7 +2,7 @@
     <canvas id="tx-admin-setup-canvas"></canvas>              
 </div>
 <script>
-    let adminObject={index:0,setup:'Lobby'};
+    let adminObject={index:0,setup:'Lobby',list:[]};
     let wz = wsize();
     let sc = wz.scale;
     app = TGL.start(wz.width,wz.height,document.querySelector("#tx-admin-setup-canvas")); 
@@ -49,17 +49,14 @@
     };  
     let setupList = UI.textCommandList(3,160);
     setupList.list[0].title('AddApp');
-    setupList.list[0].button.command = function(){
-        _view({viewId:'admin.add.application',containerId:'#m3'});
-    };
+    setupList.list[0].button.command = _on_add_app,
+        //function(){
+        //_view({viewId:'admin.add.application',containerId:'#m3'});
+    //};
     setupList.list[1].title('Shutdown');
-    setupList.list[1].button.command = function(){
-        AdminSetup.shutdown();
-    };
+    setupList.list[1].button.command = _on_shutdown;
     setupList.list[2].title('Launch');
-    setupList.list[2].button.command = function(){
-        AdminSetup.launch();
-    };
+    setupList.list[2].button.command = _on_launch,
     pView.container.addChild(setupList.container);
     pView.container.addChild(commandList.container);
     let nTitle = UI.text('Notification',{fontWeight: 500,fontFamily:'Oswald, Arial',fontSize:28,fill:'0xffffff'});
@@ -96,6 +93,9 @@
                 console.log(resp);
                 adminObject.index=0;
                 adminObject.list = resp.payload.list;
+                setupList.list[0].title('EnableApp');
+                setupList.list[1].title('DisableApp');
+                setupList.list[2].title('Reset');
                 _on_admin_stage();
             });
         }
@@ -106,6 +106,9 @@
                 console.log(resp);
                 adminObject.index=0;
                 adminObject.list = resp.payload.list;
+                setupList.list[0].title('AddApp');
+                setupList.list[1].title('Shutdown');
+                setupList.list[2].title('Launch');
                 _on_admin_stage();
             });
         }
@@ -127,13 +130,45 @@
         console.log(jx);    
     },(g)=>{
        _admin_setup_scale();   
-       adminObject.list = g.payload.list;
-       console.log(adminObject.list.length);    
+       adminObject.list = g.payload.list;    
        _on_admin_stage();
             
     },(n)=>{ 
       nTitle.title(n.message);  
     });
+    function _on_add_app(){
+        if(adminObject.setup == 'Lobby'){
+            _view({viewId:'admin.add.application',containerId:'#m3'});
+        }else{
+            AdminSetup.enableApplication(adminObject.list[adminObject.index].applicationId,(resp)=>{
+                console.log(resp);
+            });
+        }
+    }
+    function _on_shutdown(){
+        if(adminObject.setup == 'Lobby'){
+            AdminSetup.shutdown(adminObject.list[adminObject.index].typeId,(resp)=>{
+                console.log(resp);
+            });
+        }
+        else{
+            AdminSetup.disableApplication(adminObject.list[adminObject.index].applicationId,(resp)=>{
+                console.log(resp);
+            });
+        }
+    }
+    function _on_launch(){
+        if(adminObject.setup == 'Lobby'){
+            AdminSetup.launch(adminObject.list[adminObject.index].typeId,(resp)=>{
+                console.log(resp);
+            });
+        }
+        else{
+            AdminSetup.reset(adminObject.list[adminObject.index].applicationId,(resp)=>{
+                console.log(resp);
+            });
+        }
+    }
     function _on_admin_stage(){
         let lb = adminObject.list[adminObject.index];
         lbv.set('Name->'+lb.name+'\nTypeId->'+lb.typeId+'\nType->'+lb.type+'\nSubtypeId->'+lb.subtypeId+'\nTag->'+lb.tag+'\nSingleton->'+lb.singleton+'\nDeployCode->'+lb.deployCode);

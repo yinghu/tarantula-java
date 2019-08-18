@@ -62,24 +62,24 @@ public class AdminSetupModule implements Module {
             session.write(serviceProvider.createApplication(desc).getBytes(),this.label());
         }
         else if(session.action().equals("onLaunch")){//typeId
-            //OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            session.write(payload,label());
+            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            session.write(this.serviceProvider.launch(access.typeId()).getBytes(),label());
         }
         else if(session.action().equals("onShutdown")){//typeId
-            //OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            session.write(payload,label());
+            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            session.write(this.serviceProvider.shutdown(access.typeId()).getBytes(),label());
         }
         else if(session.action().equals("disableApplication")){//applicationId
-            //OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            session.write(payload,label());
+            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            session.write(this.serviceProvider.enableApplication(access.applicationId(),false).getBytes(),label());
         }
         else if(session.action().equals("enableApplication")){//applicationId
-            //OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            session.write(payload,label());
+            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            session.write(this.serviceProvider.enableApplication(access.applicationId(),true).getBytes(),label());
         }
         else if(session.action().equals("onReset")){//subtypeId
-            //OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            session.write(payload,label());
+            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            session.write(this.serviceProvider.reset(this.context.descriptor(access.applicationId())).getBytes(),label());
         }
         else{
             session.write(payload,label());
