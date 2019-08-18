@@ -340,9 +340,11 @@ public class TarantulaContext implements Serviceable,ServiceContext{
                     lab = d;
                 }
             }
-            Application lbb = this.availableApplicationManagers.remove(lab.distributionKey());
-            lbb.shutdown();
-            listener.on(lab);
+            if(lab!=null){
+                Application lbb = this.availableApplicationManagers.remove(lab.distributionKey());
+                lbb.shutdown();
+                listener.on(lab);
+            }
             _codeBase.forEach((k,v)-> listener.on(v)); //clean module class loader
         }catch (Exception ex){
             ex.printStackTrace();

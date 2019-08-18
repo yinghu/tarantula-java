@@ -50,16 +50,13 @@
     let setupList = UI.textCommandList(3,160);
     setupList.list[0].title('AddApp');
     setupList.list[0].button.command = _on_add_app,
-        //function(){
-        //_view({viewId:'admin.add.application',containerId:'#m3'});
-    //};
     setupList.list[1].title('Shutdown');
     setupList.list[1].button.command = _on_shutdown;
     setupList.list[2].title('Launch');
     setupList.list[2].button.command = _on_launch,
     pView.container.addChild(setupList.container);
     pView.container.addChild(commandList.container);
-    let nTitle = UI.text('Notification',{fontWeight: 500,fontFamily:'Oswald, Arial',fontSize:28,fill:'0xffffff'});
+    let nTitle = UI.text('Notification',{fontWeight: 500,fontFamily:'Oswald, Arial',fontSize:32,fill:'0xffffff'});
     
     let aright = UI.iconCommand(120,120);
     aright.icon.texture = PIXI.Texture.from('assets/right_arrow.png');
@@ -172,7 +169,7 @@
     }
     function _on_admin_stage(){
         let lb = adminObject.list[adminObject.index];
-        lbv.set('Index->'+adminObject.index+'\nName->'+lb.name+'\nTypeId->'+lb.typeId+'\nType->'+lb.type+'\nSubtypeId->'+lb.subtypeId+'\nTag->'+lb.tag+'\nSingleton->'+lb.singleton+'\nDeployCode->'+lb.deployCode+"\nDisabled->"+lb.disabled);
+        lbv.set('Index->'+adminObject.index+'\nName->'+lb.name+'\nTypeId->'+lb.typeId+'\nType->'+lb.type+'\nCategtory->'+lb.category+'\nSubtypeId->'+lb.subtypeId+'\nTag->'+lb.tag+'\nSingleton->'+lb.singleton+'\nDeployCode->'+lb.deployCode+'\nViewId->'+lb.viewId+"\nDisabled->"+lb.disabled);
         nTitle.title('Lobby Type ID->'+lb.typeId);
     }
     function _admin_setup_scale(){

@@ -44,7 +44,7 @@ public interface Descriptor extends Recoverable{
     String type(); //application type
     String subtypeId();//application group id associated with the module artifact
 
-    String category(); //
+    String category(); //application category
     String responseLabel();
 
 	String name();
@@ -59,7 +59,7 @@ public interface Descriptor extends Recoverable{
 
     boolean singleton(); //single instance per node
 
-    int accessMode(); // fast play  | open play  | invitation play
+    int accessMode(); // fast play  | instance play
 
     String tag(); //service deploy tag
     double entryCost();
