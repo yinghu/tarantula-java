@@ -103,6 +103,6 @@ public class ApplicationEventHandler  implements RequestHandler {
         this.bucket = bucket;
     }
     public void onCheck(){
-        log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
+        //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
     }
 }

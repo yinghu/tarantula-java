@@ -5,8 +5,8 @@ var DemoSyncGame = (function(){
         TARA_API.onMessage(game.responseLabel,onMessage);
         let req = {action:'onStream',applicationId:game.applicationId,instanceId:game.instanceId,streaming:true,path:'/application/instance',data:{command:'onStream'}};
         TARA_API.send(req); 
-        TARA_API.onMessage('jackpot/notice',onNotification);
-        TARA_API.send({action:'onStart',streaming:true,label:'jackpot/notice',data:{command:'onStart'}});
+        TARA_API.onMessage('presence/notice',onNotification);
+        TARA_API.send({action:'onStart',streaming:true,label:'presence/notice',data:{command:'onStart'}});
         setup(game);
     };
     let _setup = function(setup){

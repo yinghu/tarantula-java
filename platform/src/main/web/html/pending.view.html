@@ -1,5 +1,5 @@
 <div class="tx-modal-content">
-    <canvas id="tx-lobby-canvas"></canvas>              
+    <canvas id="tx-pending-canvas"></canvas>              
 </div>
 <script>
     var Pending = (function(){
@@ -7,7 +7,7 @@
         var _setup = function(){
             let wz = wsize();
             let sc = wz.scale;
-            app = TGL.start(wz.width,wz.height,document.querySelector("#tx-lobby-canvas")); 
+            app = TGL.start(wz.width,wz.height,document.querySelector("#tx-pending-canvas")); 
             let pView = TGL.container();
             let pConfirmation = UI.confirmation();
             pConfirmation.container.visible = false;
@@ -27,7 +27,7 @@
             menuBoard.list[3].button.icon.texture = PIXI.Texture.from('assets/home.png');
             menuBoard.list[3].button.command = function(){
                 let wp = wsize();
-                pConfirmation.message('Comming sonn to play game!');
+                pConfirmation.message('Comming soon to play game!');
                 pConfirmation.yes.button.command = function(){
                         TGL.shutdown();
                         normalscreen();
