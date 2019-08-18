@@ -38,6 +38,9 @@
             <div class="w3-panel">    
                  <input id ="b_entryCost" class="w3-input w3-round w3-border" type="text" placeholder='entryCost'/>
             </div>
+             <div class="w3-panel">
+                 <input id ="b_timerOnModule" class="w3-input w3-round w3-border" type="text" placeholder='timerOnModule'/>
+            </div>
             <div class="w3-panel">
                  <input id ="b_runtimeDuration" class="w3-input w3-round w3-border" type="text" placeholder='runtimeDuration'/>
             </div>
@@ -71,6 +74,7 @@
         payload.moduleName=document.querySelector('#b_moduleName').value;//'com.tarantula.boost.Demo';      
         payload.capacity= parseInt(document.querySelector('#b_capacity').value);//10;
         payload.entryCost= parseInt(document.querySelector('#b_entryCost').value);//5000; 
+        payload.timerOnModule = parseInt(document.querySelector('#b_timerOnModule').value);//10
         payload.runtimeDuration= parseInt(document.querySelector('#b_runtimeDuration').value);//10;
         payload.runtimeDurationOnInstance= parseInt(document.querySelector('#b_runtimeDurationOnInstance').value);//1;
     },function(resp){

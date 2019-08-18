@@ -26,7 +26,7 @@ public interface Descriptor extends Recoverable{
     String moduleName();
     void moduleName(String moduleName);
 
-
+    //module update timer milliseconds. 50ms per server frame
     long timerOnModule();
     void timerOnModule(long timerOnModule);
 
@@ -64,10 +64,10 @@ public interface Descriptor extends Recoverable{
     String tag(); //service deploy tag
     double entryCost();
 
-	void typeId(String id);
+	void typeId(String id);//the system lobby unique ID
 
     void type(String type);
-    void subtypeId(String subtypeId);
+    void subtypeId(String subtypeId);//the none-unique group ID
 
     void category(String category);
     void responseLabel(String responseLabel);
@@ -84,7 +84,7 @@ public interface Descriptor extends Recoverable{
     void tag(String tag);
     void entryCost(double entryCost);
 
-    int maxIdlesOnInstance();
+    int maxIdlesOnInstance(); //max client no-action idles before timeout. per idle time is the setting of per app ticker 60 seconds
     void maxIdlesOnInstance(int maxIdlesOnInstance);
 
     int maxInstancesPerPartition();
@@ -108,10 +108,10 @@ public interface Descriptor extends Recoverable{
     String configurationType();
     void configurationType(String configurationType);
 
-    long runtimeDuration();
+    long runtimeDuration(); //the application duration time in minutes
     void runtimeDuration(long runtimeDuration);
 
-    long runtimeDurationOnInstance();
+    long runtimeDurationOnInstance(); //the instance duration time in minutes
     void runtimeDurationOnInstance(long runtimeDuration);
 
 

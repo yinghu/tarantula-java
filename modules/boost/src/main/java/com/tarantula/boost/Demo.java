@@ -66,7 +66,7 @@ public class Demo implements Module {
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(Timer.class,new TimerSerializer());
-        this.timer = new Timer(this.context.descriptor().runtimeDurationOnInstance(),delta);
+        this.timer = new Timer(60*1000,delta);
         timer.distributionKey(this.context.onRegistry().distributionKey());
         this.dataStore = this.context.dataStore("demo");
         dataStore.createIfAbsent(timer,true);
