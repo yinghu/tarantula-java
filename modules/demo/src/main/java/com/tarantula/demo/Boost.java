@@ -1,4 +1,4 @@
-package com.tarantula.boost;
+package com.tarantula.demo;
 
 import com.google.gson.*;
 import com.tarantula.*;
@@ -7,7 +7,7 @@ import com.tarantula.Module;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class Demo implements Module {
+public class Boost implements Module {
 
     private JsonElement game;
     private PostOffice postOffice;

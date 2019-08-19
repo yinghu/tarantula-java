@@ -1,4 +1,4 @@
-package com.tarantula.boost;
+package com.tarantula.demo;
 
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AssociateKey;

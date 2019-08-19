@@ -1,4 +1,4 @@
-package com.tarantula.boost;
+package com.tarantula.demo;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
