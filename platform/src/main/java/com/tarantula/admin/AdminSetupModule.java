@@ -84,7 +84,6 @@ public class AdminSetupModule implements Module {
                 desc.moduleArtifact(access.header("moduleArtifact"));
                 desc.moduleVersion(access.header("moduleVersion"));
                 desc.codebase(access.header("codebase"));
-                desc.moduleName(access.header("moduleName"));
                 session.write(this.serviceProvider.reset(desc).getBytes(),label());
             }
             else{

@@ -16,9 +16,6 @@
                  <input id ="s_moduleVersion" class="w3-input w3-round w3-border" type="text" placeholder='moduleVersion'/>
             </div>
             <div class="w3-panel">
-                 <input id ="s_moduleName" class="w3-input w3-round w3-border" type="text" placeholder='moduleName'/>
-            </div>
-            <div class="w3-panel">
                 <p id="s_message"></p>
             </div>
             <div class="w3-panel">  
@@ -37,14 +34,14 @@
  document.querySelector("#s_codebase").value = TARA_API.query().app.codebase;
  document.querySelector("#s_moduleArtifact").value = TARA_API.query().app.moduleArtifact;
  document.querySelector("#s_moduleVersion").value = TARA_API.query().app.moduleVersion;
- document.querySelector("#s_moduleName").value = TARA_API.query().app.moduleName;
+ //document.querySelector("#s_moduleName").value = TARA_API.query().app.moduleName;
  document.querySelector("#s_command").onclick = function(){
     AdminSetup.reset(function(payload){
         payload.applicationId = TARA_API.query().app.applicationId;//'demo-sync';
         payload.codebase= document.querySelector('#s_codebase').value;//'file:///development/boost/target';
         payload.moduleArtifact=document.querySelector('#s_moduleArtifact').value;//'tarantula-boost';
         payload.moduleVersion= document.querySelector('#s_moduleVersion').value;//'1.1';
-        payload.moduleName=document.querySelector('#s_moduleName').value;//'com.tarantula.boost.Demo'; 
+        //payload.moduleName=document.querySelector('#s_moduleName').value;//'com.tarantula.boost.Demo'; 
     },function(resp){
         document.querySelector("#s_message").innerHTML = resp.message;
     });    
