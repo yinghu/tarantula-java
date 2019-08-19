@@ -37,8 +37,9 @@ var AdminSetup= (function(){
         let _payload = {serviceTag:adminObject.tag,command:"onShutdown",typeId:typeId};
         TARA_API.onService(_payload,out);
     };
-    let _reset = function(appId,out){
-        let _payload = {serviceTag:adminObject.tag,command:"onReset",applicationId:appId};
+    let _reset = function(fin,out){
+        let _payload = {serviceTag:adminObject.tag,command:"onReset"};
+        fin(_payload);
         TARA_API.onService(_payload,out);
     };
     let _list_app = function(lobbyId,out){

@@ -1,41 +1,29 @@
 <div class="w3-modal-content w3-white">
     <div class="w3-card-4 tx-popup">
         <div class="w3-bar w3-teal w3-text-white w3-border-bottom w3-border-orange">
-            <div class="w3-bar-item w3-left"><span>Add Lobby</span></div>
-            <div class="w3-bar-item w3-right w3-button" id='tx-close-privacy'><i class='fa fa-close'></i></div>
+            <div class="w3-bar-item w3-left"><span>Reset Module</span></div>
+            <div class="w3-bar-item w3-right w3-button" id='tx-close-reset-module'><i class='fa fa-close'></i></div>
         </div>
             
         <div class="w3-container w3-text-teal w3-border-bottom w3-border-orange">
             <div class="w3-panel">
-                <input id ="a_typeId" class="w3-input w3-round w3-border" type="text" placeholder='typeId'/>
+                 <input id ="s_codebase" class="w3-input w3-round w3-border" type="text" placeholder='codebase'/>
+            </div>
+            <div class="w3-panel">
+                <input id ="s_moduleArtifact" class="w3-input w3-round w3-border" type="text" placeholder='moduleArtifact'/>
             </div>
             <div class="w3-panel">    
-                 <input id ="a_subtypeId" class="w3-input w3-round w3-border" type="text" placeholder='subtypeId'/>
+                 <input id ="s_moduleVersion" class="w3-input w3-round w3-border" type="text" placeholder='moduleVersion'/>
             </div>
             <div class="w3-panel">
-                 <input id ="a_name" class="w3-input w3-round w3-border" type="text" placeholder='name'/>
+                 <input id ="s_moduleName" class="w3-input w3-round w3-border" type="text" placeholder='moduleName'/>
             </div>
             <div class="w3-panel">
-                <input id ="a_tag" class="w3-input w3-round w3-border" type="text" placeholder='tag'/>
-            </div>
-            <div class="w3-panel">    
-                 <input id ="a_responseLabel" class="w3-input w3-round w3-border" type="text" placeholder='responseLabel'/>
-            </div>
-            <div class="w3-panel">
-                 <input id ="a_viewId" class="w3-input w3-round w3-border" type="text" placeholder='viewId'/>
-            </div>
-            <div class="w3-panel">
-                <input id ="a_icon" class="w3-input w3-round w3-border" type="text" placeholder='icon'/>
-            </div>
-            <div class="w3-panel">    
-                 <input id ="a_description" class="w3-input w3-round w3-border" type="text" placeholder='description'/>
-            </div>
-            <div class="w3-panel">
-                <p id="a_message"></p>
+                <p id="s_message"></p>
             </div>
             <div class="w3-panel">  
-                <div id="a_command_cancel" class="w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Cancel</div>
-                <div id="a_command" class="w3-right w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Add Lobby</div>     
+                <div id="s_command_cancel" class="w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Cancel</div>
+                <div id="s_command" class="w3-right w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Reset Module</div>     
             </div>
         </div>            
         
@@ -45,26 +33,28 @@
     </div>
 </div>
 <script>
- document.querySelector("#a_command").onclick = function(){
-    AdminSetup.addLobby(function(payload){
-        payload.typeId = document.querySelector('#a_typeId').value;//"demo-sync";
-        payload.subtypeId = document.querySelector('#a_subtypeId').value;//"demo-sync-lobby";
-        payload.name= document.querySelector('#a_name').value;//"Demo Sync";
-        payload.tag= document.querySelector('#a_tag').value;//"demo-sync";
-        payload.responseLabel = document.querySelector('#a_responseLabel').value;//"demo";
-        payload.viewId = document.querySelector('#a_viewId').value;//"game.lobby";
-        payload.icon= document.querySelector('#a_icon').value;//"assets/duration.png";
-        payload.description= document.querySelector('#a_description').value;//"Application Module Demo";
+ document.querySelector("#s_message").innerHTML= 'Reset module ->'+TARA_API.query().app.applicationId;
+ document.querySelector("#s_codebase").value = TARA_API.query().app.codebase;
+ document.querySelector("#s_moduleArtifact").value = TARA_API.query().app.moduleArtifact;
+ document.querySelector("#s_moduleVersion").value = TARA_API.query().app.moduleVersion;
+ document.querySelector("#s_moduleName").value = TARA_API.query().app.moduleName;
+ document.querySelector("#s_command").onclick = function(){
+    AdminSetup.reset(function(payload){
+        payload.applicationId = TARA_API.query().app.applicationId;//'demo-sync';
+        payload.codebase= document.querySelector('#s_codebase').value;//'file:///development/boost/target';
+        payload.moduleArtifact=document.querySelector('#s_moduleArtifact').value;//'tarantula-boost';
+        payload.moduleVersion= document.querySelector('#s_moduleVersion').value;//'1.1';
+        payload.moduleName=document.querySelector('#s_moduleName').value;//'com.tarantula.boost.Demo'; 
     },function(resp){
-        document.querySelector("#a_message").innerHTML = resp.message;
+        document.querySelector("#s_message").innerHTML = resp.message;
     });    
  };
- function tx_close_add_lobby(){
+ function tx_close_reset_module(){
      this.style.display = 'none';
      let m1 = document.querySelector('#m3');
      m1.innerHTML='';
      m1.style.display = 'none';
  }
- document.querySelector("#tx-close-privacy").onclick = tx_close_add_lobby;
- document.querySelector("#a_command_cancel").onclick = tx_close_add_lobby;   
+ document.querySelector("#tx-close-reset-module").onclick = tx_close_reset_module;
+ document.querySelector("#s_command_cancel").onclick = tx_close_reset_module;   
 </script>

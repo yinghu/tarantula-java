@@ -136,6 +136,7 @@
     });
     function _on_add_app(){
         if(adminObject.setup == 'Lobby'){
+            TARA_API.query().app = adminObject.list[adminObject.index];
             _view({viewId:'admin.add.application',containerId:'#m3'});
         }else{
             AdminSetup.enableApplication(adminObject.list[adminObject.index].applicationId,(resp)=>{
@@ -162,9 +163,9 @@
             });
         }
         else{
-            AdminSetup.reset(adminObject.list[adminObject.index].applicationId,(resp)=>{
-                console.log(resp);
-            });
+            //open reset page
+            TARA_API.query().app = adminObject.list[adminObject.index];
+            _view({viewId:'admin.reset.module',containerId:'#m3'});
         }
     }
     function _on_admin_stage(){

@@ -81,6 +81,10 @@ public class AdminSetupModule implements Module {
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Descriptor desc = this.context.descriptor(access.applicationId());
             if(desc!=null&&desc.subtypeId()!=null&&(!desc.subtypeId().equals("lobby"))){
+                desc.moduleArtifact(access.header("moduleArtifact"));
+                desc.moduleVersion(access.header("moduleVersion"));
+                desc.codebase(access.header("codebase"));
+                desc.moduleName(access.header("moduleName"));
                 session.write(this.serviceProvider.reset(desc).getBytes(),label());
             }
             else{
