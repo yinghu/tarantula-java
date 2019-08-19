@@ -1,0 +1,70 @@
+<div class="w3-modal-content w3-white">
+    <div class="w3-card-4 tx-popup">
+        <div class="w3-bar w3-teal w3-text-white w3-border-bottom w3-border-orange">
+            <div class="w3-bar-item w3-left"><span>Add Lobby</span></div>
+            <div class="w3-bar-item w3-right w3-button" id='tx-close-privacy'><i class='fa fa-close'></i></div>
+        </div>
+            
+        <div class="w3-container w3-text-teal w3-border-bottom w3-border-orange">
+            <div class="w3-panel">
+                <input id ="a_typeId" class="w3-input w3-round w3-border" type="text" placeholder='typeId'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="a_subtypeId" class="w3-input w3-round w3-border" type="text" placeholder='subtypeId'/>
+            </div>
+            <div class="w3-panel">
+                 <input id ="a_name" class="w3-input w3-round w3-border" type="text" placeholder='name'/>
+            </div>
+            <div class="w3-panel">
+                <input id ="a_tag" class="w3-input w3-round w3-border" type="text" placeholder='tag'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="a_responseLabel" class="w3-input w3-round w3-border" type="text" placeholder='responseLabel'/>
+            </div>
+            <div class="w3-panel">
+                 <input id ="a_viewId" class="w3-input w3-round w3-border" type="text" placeholder='viewId'/>
+            </div>
+            <div class="w3-panel">
+                <input id ="a_icon" class="w3-input w3-round w3-border" type="text" placeholder='icon'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="a_description" class="w3-input w3-round w3-border" type="text" placeholder='description'/>
+            </div>
+            <div class="w3-panel">
+                <p id="a_message"></p>
+            </div>
+            <div class="w3-panel">  
+                <div id="a_command_cancel" class="w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Cancel</div>
+                <div id="a_command" class="w3-right w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Add Lobby</div>     
+            </div>
+        </div>            
+        
+        <div class="w3-display-container w3-border-bottom w3-border-white w3-teal tx-content-36">
+            <div class="w3-display-bottomright tx-margin-right-32 tx-margin-bottom-4 tx-text-12">Powered By Game Engine Cluster</div>            
+        </div>
+    </div>
+</div>
+<script>
+ document.querySelector("#a_command").onclick = function(){
+    AdminSetup.addLobby(function(payload){
+        payload.typeId = document.querySelector('#a_typeId').value;//"demo-sync";
+        payload.subtypeId = document.querySelector('#a_subtypeId').value;//"demo-sync-lobby";
+        payload.name= document.querySelector('#a_name').value;//"Demo Sync";
+        payload.tag= document.querySelector('#a_tag').value;//"demo-sync";
+        payload.responseLabel = document.querySelector('#a_responseLabel').value;//"demo";
+        payload.viewId = document.querySelector('#a_viewId').value;//"game.lobby";
+        payload.icon= document.querySelector('#a_icon').value;//"assets/duration.png";
+        payload.description= document.querySelector('#a_description').value;//"Application Module Demo";
+    },function(resp){
+        document.querySelector("#a_message").innerHTML = resp.message;
+    });    
+ };
+ function tx_close_add_lobby(){
+     this.style.display = 'none';
+     let m1 = document.querySelector('#m3');
+     m1.innerHTML='';
+     m1.style.display = 'none';
+ }
+ document.querySelector("#tx-close-privacy").onclick = tx_close_add_lobby;
+ document.querySelector("#a_command_cancel").onclick = tx_close_add_lobby;   
+</script>
