@@ -30,11 +30,10 @@
     </div>
 </div>
 <script>
- document.querySelector("#s_message").innerHTML= 'Reset module ->'+TARA_API.query().app.applicationId;
+ document.querySelector("#s_message").innerHTML= 'Reset module ->'+TARA_API.query().app.applicationId+'/'+TARA_API.query().app.singleton;
  document.querySelector("#s_codebase").value = TARA_API.query().app.codebase;
  document.querySelector("#s_moduleArtifact").value = TARA_API.query().app.moduleArtifact;
  document.querySelector("#s_moduleVersion").value = TARA_API.query().app.moduleVersion;
- //document.querySelector("#s_moduleName").value = TARA_API.query().app.moduleName;
  document.querySelector("#s_command").onclick = function(){
     AdminSetup.reset(function(payload){
         payload.applicationId = TARA_API.query().app.applicationId;//'demo-sync';

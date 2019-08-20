@@ -5,6 +5,10 @@
             <div class="w3-bar-item w3-right w3-button" id='tx-close-add-app'><i class='fa fa-close'></i></div>
         </div>
         <div class="w3-container w3-text-teal w3-border-bottom w3-border-orange">
+            <div class="w3-panel">
+                 <label class="tx-margin-left-8 tx-margin-top-8">Singleton</label>
+                 <input id ="b_singleton" class="w3-check w3-round w3-border tx-margin-left-8" type="checkbox" checked='false'/>
+            </div>
             <div class="w3-panel">    
                  <input id ="b_subtypeId" class="w3-input w3-round w3-border" type="text" placeholder='subtypeId'/>
             </div>
@@ -35,7 +39,7 @@
             <div class="w3-panel">    
                  <input id ="b_entryCost" class="w3-input w3-round w3-border" type="text" placeholder='entryCost'/>
             </div>
-             <div class="w3-panel">
+            <div class="w3-panel">
                  <input id ="b_timerOnModule" class="w3-input w3-round w3-border" type="text" placeholder='timerOnModule'/>
             </div>
             <div class="w3-panel">
@@ -62,6 +66,7 @@
   document.querySelector("#b_command").onclick = function(){
     AdminSetup.addApplication(function(payload){
         payload.typeId = TARA_API.query().app.typeId;//'demo-sync';
+        payload.singleton = document.querySelector('#b_singleton').checked; 
         payload.subtypeId= document.querySelector('#b_subtypeId').value;//'demo-sync-a';
         payload.viewId = document.querySelector('#b_viewId').value;//'demo.sync.game';     
         payload.name= document.querySelector('#b_name').value;//'Demo Sync';
