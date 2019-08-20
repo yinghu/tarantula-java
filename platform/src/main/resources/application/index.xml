@@ -12,7 +12,7 @@
         <application-list>
             <application>
                 <type-id>index</type-id>
-                <subtype-id>user-inx</subtype-id>
+                <subtype-id>index-user</subtype-id>
                 <name>User</name>
                 <type>application</type>
                 <singleton>true</singleton>
@@ -25,7 +25,7 @@
             </application>
             <application>
                 <type-id>index</type-id>
-                <subtype-id>landing-inx</subtype-id>
+                <subtype-id>index-lobby</subtype-id>
                 <name>Index</name>
                 <type>application</type>
                 <category>index</category>
