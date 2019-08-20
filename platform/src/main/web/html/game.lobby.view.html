@@ -110,7 +110,7 @@
             mp.avatar.icon.texture = PIXI.Texture.from(resp.profile.avatar+'?token='+TARA_API.query().token);
             mp.name(resp.profile.nickname);
     });
-    TARA_API.onService({serviceTag:"presence",command:"onBalance"},function(resp){
+    TARA_API.onService({serviceTag:"presence/lobby",command:"onBalance"},function(resp){
         mp.balance(resp.presence.balance);
     });    
     app.stage.addChild(pView.container);  
@@ -239,7 +239,7 @@
     }
     function _game_play(pmode){      
         let gix = pmode.index;
-        var _play ={serviceTag:'presence',command:'onPlay'};
+        var _play ={serviceTag:'presence/lobby',command:'onPlay'};
         _play.applicationId=applicationList[gix].application.game.applicationId;
         _play.accessMode=pmode.accessMode;
         _play.instanceId=pmode.instanceId;

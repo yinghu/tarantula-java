@@ -217,7 +217,7 @@ function validateOnTarantula(url,callback){
     var _payload = querystring.parse(url.substring(url.indexOf('?')+1));
     const data = JSON.stringify(_payload);
     //const opts ={hostname:'realnumber.net',path:'/user/action',method:'POST',headers:{Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Content-length':data.length,'Tarantula-magic-key':_payload.systemId,'Tarantula-tag':'user','Tarantula-action':'onTicket'}};
-    const optsx ={hostname:cfg.server.web.host,port:cfg.server.web.port,path:'/user/action',method:'POST',headers:{Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Content-length':data.length,'Tarantula-magic-key':_payload.systemId,'Tarantula-tag':'user','Tarantula-action':'onTicket'}};
+    const optsx ={hostname:cfg.server.web.host,port:cfg.server.web.port,path:'/user/action',method:'POST',headers:{Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Content-length':data.length,'Tarantula-magic-key':_payload.systemId,'Tarantula-tag':'index/user','Tarantula-action':'onTicket'}};
     const req = http.request(optsx,(res)=>{
         var resp=[];
         res.on('data', (data) => {

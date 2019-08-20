@@ -33,7 +33,7 @@ public class ContentEventHandler implements RequestHandler {
             String clientId = exchange.header(Session.X_REAL_IP)!=null?exchange.header(Session.X_REAL_IP):exchange.remoteAddress().toString();
             OnSession ox = this.auth.validToken(token,clientId);
             String[] plist = path.substring(1).split("/");
-            PendingRequestEvent ctn = new PendingRequestEvent(plist[1]);
+            PendingRequestEvent ctn = new PendingRequestEvent(plist[0]+"/"+plist[1]);
             ctn.action(plist[2]+Recoverable.PATH_SEPARATOR+plist[3]);
             ctn.systemId(ox.systemId());
             ctn.ticket(ox.ticket());

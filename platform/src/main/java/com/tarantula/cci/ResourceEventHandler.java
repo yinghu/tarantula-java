@@ -31,7 +31,7 @@ public class ResourceEventHandler implements RequestHandler {
             String sid = exchange.id();
             _hex.put(sid,exchange);
             String path = exchange.path();
-            RoutingKey routingKey = eventService.routingKey((this.bucket+"/"+sid),"index");
+            RoutingKey routingKey = eventService.routingKey((this.bucket+"/"+sid),"index/lobby");
             IndexEvent indexEvent = new IndexEvent(this.serverTopic,sid);
             indexEvent.destination(routingKey.route());
             indexEvent.action("resource");

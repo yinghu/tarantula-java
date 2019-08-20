@@ -15,7 +15,7 @@
                 <name>Leaderboard</name>
                 <type>application</type>
                 <singleton>true</singleton>
-                <tag>leaderboard</tag>
+                <tag>leaderboard/top10</tag>
                 <view-id>leaderboard</view-id>
                 <description>Tarantula Leaderboard Service</description>
                 <class-name>com.tarantula.platform.leaderboard.LeaderBoardApplication</class-name>

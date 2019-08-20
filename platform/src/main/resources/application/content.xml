@@ -16,7 +16,7 @@
                 <type>application</type>
                 <category>avatar</category>
                 <singleton>true</singleton>
-                <tag>avatar</tag>
+                <tag>content/avatar</tag>
                 <view-id>avatar</view-id>
                 <description>Tarantula Content Avatar Service</description>
                 <class-name>com.tarantula.platform.presence.AvatarContentApplication</class-name>

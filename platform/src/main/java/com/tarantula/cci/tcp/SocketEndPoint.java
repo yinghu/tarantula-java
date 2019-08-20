@@ -118,7 +118,7 @@ public class SocketEndPoint implements EndPoint{
                             PendingRequest pr = pMap.get(k.attachment());
                             StringBuffer sp = new StringBuffer("{serverId:");
                             sp.append("\"").append(pr.serverId()).append("\"}");
-                            PendingData pendingData = new PendingData("/push/streaming","user","onDisconnect",sp.toString().getBytes());
+                            PendingData pendingData = new PendingData("/push/streaming","index/user","onDisconnect",sp.toString().getBytes());
                             pendingData.headers.put("serverId",pr.serverId());
                             SocketSession send = new SocketSession(pr,pendingData);
                             resource.requestHandler("/push").onRequest(send);

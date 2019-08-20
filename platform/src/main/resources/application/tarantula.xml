@@ -17,7 +17,7 @@
                 <type>application</type>
                 <category>social</category>
                 <singleton>true</singleton>
-                <tag>buddylist</tag>
+                <tag>tarantula/buddylist</tag>
                 <view-id>buddy</view-id>
                 <description>Tarantula Social Play List Service</description>
                 <class-name>com.tarantula.platform.playlist.BuddyListApplication</class-name>
@@ -31,7 +31,7 @@
                 <type>application</type>
                 <category>onstate</category>
                 <singleton>true</singleton>
-                <tag>onstate</tag>
+                <tag>tarantula/onstate</tag>
                 <description>On State Service</description>
                 <class-name>com.tarantula.platform.playlist.OnStateApplication</class-name>
                 <response-label>userState</response-label>
@@ -43,7 +43,7 @@
                 <type>application</type>
                 <category>recentlyplaylist</category>
                 <singleton>true</singleton>
-                <tag>recentlyplaylist</tag>
+                <tag>tarantula/recentlyplaylist</tag>
                 <view-id>recentlyplaylist</view-id>
                 <description>Recently Play List Service</description>
                 <configuration-name>playlist</configuration-name>

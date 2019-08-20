@@ -16,19 +16,40 @@
                 <name>Presence</name>
                 <type>application</type>
                 <singleton>true</singleton>
-                <tag>presence</tag>
+                <tag>presence/lobby</tag>
                 <description>Tarantula Presence</description>
                 <class-name>com.tarantula.platform.presence.PresenceApplication</class-name>
                 <configuration-name>presence</configuration-name>
                 <response-label>presence</response-label>
+            </application>
+            <application>
+                <type-id>presence</type-id>
+                <subtype-id>pf01</subtype-id>
+                <name>Profile</name>
+                <type>application</type>
+                <category>profile</category>
+                <singleton>true</singleton>
+                <tag>presence/profile</tag>
+                <view-id>profile</view-id>
+                <description>Tarantula Profile Service</description>
+                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <module-name>com.tarantula.platform.presence.ProfileModule</module-name>
+                <configuration-name>profile</configuration-name>
+                <response-label>profile</response-label>
             </application>
         </application-list>
         <configuration-list>
             <configuration tag="presence" priority="10">
                 <presence type="setup">
                     <property name="lobbyListenerEnabled">false</property>
-                    <property name="lobbyList">tarantula,market,leaderboard,level,profile</property>
+                    <property name="lobbyList">tarantula,market,leaderboard,level</property>
                 </presence>
+            </configuration>
+            <configuration tag="profile" priority="10">
+                <profile type="setup">
+                    <property name="uploadChunkSize">1200000</property>
+                    <property name="contentPath">/tarantula/content</property>
+                </profile>
             </configuration>
         </configuration-list>
     </lobby-context>

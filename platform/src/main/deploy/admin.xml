@@ -4,7 +4,7 @@
         <type-id>admin</type-id>
         <type>lobby</type>
         <category>game</category>
-        <tag>admin</tag>
+        <tag>admin/lobby</tag>
         <icon>assets/gear.png</icon>
         <view-id>game.lobby</view-id>
         <name>Admin</name>
@@ -19,7 +19,7 @@
                 <type>application</type>
                 <category>lobby</category>
                 <singleton>true</singleton>
-                <tag>admin</tag>
+                <tag>admin/lobby</tag>
                 <description>Tarantula Admin Service</description>
                 <class-name>com.tarantula.platform.playmode.GameLobbyApplication</class-name>
                 <deploy-priority>15</deploy-priority>
@@ -33,7 +33,7 @@
                 <type>application</type>
                 <category>admin</category>
                 <singleton>true</singleton>
-                <tag>admin-monitor</tag>
+                <tag>admin/monitor</tag>
                 <description>Tarantula Monitor Service</description>
                 <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.admin.AdminMonitorModule</module-name>
@@ -51,7 +51,7 @@
                 <type>application</type>
                 <category>admin</category>
                 <singleton>true</singleton>
-                <tag>admin-setup</tag>
+                <tag>admin/setup</tag>
                 <description>Tarantula Admin Tool Service</description>
                 <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.admin.AdminSetupModule</module-name>
@@ -68,7 +68,7 @@
                 <type>application</type>
                 <category>admin</category>
                 <singleton>true</singleton>
-                <tag>admin-data-store</tag>
+                <tag>admin/datastore</tag>
                 <description>Tarantula Customer Service</description>
                 <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.admin.AdminDataStoreModule</module-name>

@@ -17,7 +17,7 @@
                 <type>application</type>
                 <category>marketplace</category>
                 <singleton>true</singleton>
-                <tag>marketplace</tag>
+                <tag>marketplace/purchase</tag>
                 <view-id>marketplace</view-id>
                 <description>Tarantula Marketplace Service</description>
                 <class-name>com.tarantula.platform.marketplace.MarketplaceApplication</class-name>

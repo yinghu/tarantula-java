@@ -16,7 +16,7 @@
                 <name>User</name>
                 <type>application</type>
                 <singleton>true</singleton>
-                <tag>user</tag>
+                <tag>index/user</tag>
                 <description>Tarantula User Management</description>
                 <class-name>com.tarantula.platform.presence.UserManagementApplication</class-name>
                 <configuration-name>user</configuration-name>
@@ -31,7 +31,7 @@
                 <category>index</category>
                 <view-id>index</view-id>
                 <singleton>true</singleton>
-                <tag>index</tag>
+                <tag>index/lobby</tag>
                 <description>Index Service</description>
                 <configuration-name>index</configuration-name>
                 <class-name>com.tarantula.platform.presence.IndexApplication</class-name>

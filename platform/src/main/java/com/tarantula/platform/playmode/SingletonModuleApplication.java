@@ -35,8 +35,10 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
                 //clean up on leave
                 this.context.log("Session->"+session.systemId(),OnLog.INFO);
                 Session rm = this._onStream.remove(session.systemId());
-                ResponseHeader resp = new ResponseHeader(session.action(),"close session");
-                rm.write(this.builder.create().toJson(resp).getBytes(),module.label(),true);
+                if(rm!=null){
+                    ResponseHeader resp = new ResponseHeader(session.action(),"close session");
+                    rm.write(this.builder.create().toJson(resp).getBytes(),module.label(),true);
+                }
             }
         }
     }

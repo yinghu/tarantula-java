@@ -16,7 +16,7 @@
                 <type>application</type>
                 <category>level</category>
                 <singleton>true</singleton>
-                <tag>level</tag>
+                <tag>level/xp</tag>
                 <view-id>level</view-id>
                 <description>Tarantula XP Level Service</description>
                 <class-name>com.tarantula.platform.leveling.XPLevelApplication</class-name>

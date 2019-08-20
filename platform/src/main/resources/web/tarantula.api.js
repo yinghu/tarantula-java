@@ -64,7 +64,7 @@ var TARA_API = (function(){
         aj.open("GET","/user/view",true);
         aj.setRequestHeader('Accept','application/json');
         aj.setRequestHeader('View-id',viewId);
-        aj.setRequestHeader('Tarantula-tag','index');
+        aj.setRequestHeader('Tarantula-tag','index/lobby');
         aj.send();
     }
     else{
@@ -98,7 +98,7 @@ var TARA_API = (function(){
     };
     aj.open("GET","/user/index",true);
     aj.setRequestHeader('Accept','application/json');
-    aj.setRequestHeader('Tarantula-tag','index');
+    aj.setRequestHeader('Tarantula-tag','index/lobby');
     aj.send();               
   };       
   /**
@@ -147,7 +147,7 @@ var TARA_API = (function(){
     aj.open("POST","/user/action",true);
     aj.setRequestHeader('Accept','application/json');
     aj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    aj.setRequestHeader('Tarantula-tag','user');
+    aj.setRequestHeader('Tarantula-tag','index/user');
     aj.setRequestHeader('Tarantula-magic-key',payload.login);
     aj.setRequestHeader('Tarantula-action','onRegister');
     aj.setRequestHeader('Tarantula-payload-size',_ps.length);  
@@ -166,7 +166,7 @@ var TARA_API = (function(){
       aj.open("POST","/user/action",true);
       aj.setRequestHeader('Accept','application/json');
       aj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      aj.setRequestHeader('Tarantula-tag','user');
+      aj.setRequestHeader('Tarantula-tag','index/user');
       aj.setRequestHeader('Tarantula-magic-key',payload.email);
       aj.setRequestHeader('Tarantula-action','onReset');
       aj.setRequestHeader('Tarantula-payload-size',_ps.length);
@@ -196,14 +196,14 @@ var TARA_API = (function(){
     aj.open("POST","/user/action",true);
     aj.setRequestHeader('Accept','application/json');
     aj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    aj.setRequestHeader('Tarantula-tag','user');
+    aj.setRequestHeader('Tarantula-tag','index/user');
     aj.setRequestHeader('Tarantula-magic-key',payload.login);
     aj.setRequestHeader('Tarantula-action','onLogin');
     aj.setRequestHeader('Tarantula-payload-size',_ps.length);  
     aj.send(_ps);                
   };
   let _presence = function(callback){   
-    let payload = {serviceTag:'presence',command:'onPresence'};
+    let payload = {serviceTag:'presence/lobby',command:'onPresence'};
     _service(payload,function(resp){
         qdata.balance = resp.presence.balance;
         //qdata.ticket = resp.presence.ticket;
@@ -217,14 +217,14 @@ var TARA_API = (function(){
     });               
   }; 
   let _connect = function(){
-    let payload = {serviceTag:'presence',command:'onTicket'};
+    let payload = {serviceTag:'presence/lobby',command:'onTicket'};
     _service(payload,function(resp){
         qdata.ticket = resp.presence.ticket;
         wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});
     });
   };
   let _profile = function(playerId,callback){
-    let payload = {serviceTag:'profile',command:'onProfile',systemId:playerId};
+    let payload = {serviceTag:'presence/profile',command:'onProfile',systemId:playerId};
     _service(payload,function(resp){
         callback(resp);
     });
@@ -270,7 +270,7 @@ var TARA_API = (function(){
     aj.send(_jp);
   };     
   let _logout = function(callback){   
-    let payload = {serviceTag:'presence',command:'onAbsence'};
+    let payload = {serviceTag:'presence/lobby',command:'onAbsence'};
     _service(payload,function(resp){
         //amap.clear();
         presence = null;
