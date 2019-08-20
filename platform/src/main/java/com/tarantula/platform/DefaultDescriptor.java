@@ -4,7 +4,7 @@ import com.tarantula.Descriptor;
 
 import java.util.Map;
 
-abstract  public class DefaultDescriptor extends DeploymentObject implements Descriptor{
+public class DefaultDescriptor extends DeploymentObject implements Descriptor{
 
 	protected String typeId;
     protected String applicationId;
@@ -50,6 +50,8 @@ abstract  public class DefaultDescriptor extends DeploymentObject implements Des
     protected int maxIdlesOnInstance;
     protected long runtimeDuration;
     protected long runtimeDurationOnInstance;
+
+    protected boolean resetEnabled;
 
     public DefaultDescriptor(){}
 
@@ -182,7 +184,12 @@ abstract  public class DefaultDescriptor extends DeploymentObject implements Des
     public void responseLabel(String responseLabel){
         this.responseLabel = responseLabel;
     }
-
+    public boolean resetEnabled(){
+        return this.resetEnabled;
+    }
+    public void resetEnabled(boolean resetEnabled){
+        this.resetEnabled = resetEnabled;
+    }
 	@Override
 	public String toString(){
 		return "DESCRIPTOR(typeId/subtypeId/applicationId/instanceId) ["+this.typeId+"/"+this.subtypeId+"/"+this.applicationId+"/"+this.instanceId+"]";
@@ -265,6 +272,7 @@ abstract  public class DefaultDescriptor extends DeploymentObject implements Des
         _props.put("responseLabel",this.responseLabel);
         _props.put("runtimeDuration",this.runtimeDuration);
         _props.put("runtimeDurationOnInstance",this.runtimeDurationOnInstance);
+        _props.put("resetEnabled",this.resetEnabled);
         return _props;
     }
 
@@ -303,6 +311,7 @@ abstract  public class DefaultDescriptor extends DeploymentObject implements Des
         this.responseLabel =properties.get("responseLabel")!=null? (String)properties.get("responseLabel"):null;
         this.runtimeDuration = properties.get("runtimeDuration")!=null?((Number)properties.get("runtimeDuration")).longValue():0;
         this.runtimeDurationOnInstance = properties.get("runtimeDurationOnInstance")!=null?((Number)properties.get("runtimeDurationOnInstance")).longValue():0;
+        this.resetEnabled = properties.get("resetEnabled")!=null?(boolean)properties.get("resetEnabled"):false;
     }
 
     public String applicationClassName() {

@@ -149,11 +149,17 @@ public class XMLParser extends DefaultHandler{
             }
 			else if(tblock.equals("application-list")&&qname.equals("type")){
                 this.applicationDescriptor.type(value);
-            } else if(tblock.equals("application-list")&&qname.equals("category")){
+            }
+            else if(tblock.equals("application-list")&&qname.equals("category")){
                 this.applicationDescriptor.category(value);
-            } else if (tblock.equals("application-list")&&qname.equals("singleton")){
+            }
+            else if (tblock.equals("application-list")&&qname.equals("singleton")){
                 this.applicationDescriptor.singleton(Boolean.parseBoolean(value));
-            } else if(tblock.equals("application-list")&&qname.equals("entry-cost")){
+            }
+            else if (tblock.equals("application-list")&&qname.equals("reset-enabled")){
+                this.applicationDescriptor.resetEnabled(Boolean.parseBoolean(value));
+            }
+            else if(tblock.equals("application-list")&&qname.equals("entry-cost")){
                 this.applicationDescriptor.entryCost(Long.parseLong(value));
             }
             else if (tblock.equals("application-list")&&qname.equals("tournament-enabled")){

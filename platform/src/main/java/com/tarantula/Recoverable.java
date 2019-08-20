@@ -49,14 +49,11 @@ public interface Recoverable extends Distributable{
 
     Key key();
 
-    interface Key extends Recoverable,PartitionAware<String> {
-        String asString();
-        //byte[] toByteArray();
-        //void fromByteArray(byte[] data);
-    }
     void dataStore(DataStore dataStore);
 
     void onUpdate();
 
-
+    interface Key extends Recoverable,PartitionAware<String> {
+        String asString();
+    }
 }

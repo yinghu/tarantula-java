@@ -170,7 +170,8 @@
     }
     function _on_admin_stage(){
         let lb = adminObject.list[adminObject.index];
-        lbv.set('Index->'+adminObject.index+'\nName->'+lb.name+'\nTypeId->'+lb.typeId+'\nType->'+lb.type+'\nCategtory->'+lb.category+'\nSubtypeId->'+lb.subtypeId+'\nTag->'+lb.tag+'\nSingleton->'+lb.singleton+'\nDeployCode->'+lb.deployCode+'\nViewId->'+lb.viewId+"\nDisabled->"+lb.disabled);
+        setupList.container.visible = lb.resetEnabled;
+        lbv.set('Index->'+adminObject.index+'\nName->'+lb.name+'\nTypeId->'+lb.typeId+'\nType->'+lb.type+'\nCategtory->'+lb.category+'\nSubtypeId->'+lb.subtypeId+'\nTag->'+lb.tag+'\nSingleton->'+lb.singleton+'\nDeployCode->'+lb.deployCode+'\nViewId->'+lb.viewId+'\nDisabled->'+lb.disabled+'\nResetEnabled->'+lb.resetEnabled);
         nTitle.title('Lobby Type ID->'+lb.typeId);
     }
     function _admin_setup_scale(){

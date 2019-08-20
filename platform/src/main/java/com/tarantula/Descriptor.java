@@ -39,12 +39,13 @@ public interface Descriptor extends Recoverable{
 
     boolean logEnabled();
     void logEnabled(boolean logEnabled);
+
     String typeId(); //application type ID that should be associated with the lobby
 
     String type(); //application type
     String subtypeId();//application group id associated with the module artifact
 
-    String category(); //application category
+    String category(); //lobby, game, service, etc
     String responseLabel();
 
 	String name();
@@ -118,5 +119,7 @@ public interface Descriptor extends Recoverable{
     boolean tournamentEnabled();
     void tournamentEnabled(boolean tournamentEnabled);
 
+    boolean resetEnabled();
+    void resetEnabled(boolean resetEnabled);
 
 }

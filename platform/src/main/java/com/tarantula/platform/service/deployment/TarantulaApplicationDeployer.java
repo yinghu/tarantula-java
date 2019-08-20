@@ -36,7 +36,7 @@ public class TarantulaApplicationDeployer implements Serviceable{
 			this.context.configureViews(c);//deploy views
 			c.applications = this.context.query(new String[]{c.descriptor.distributionKey()},new ApplicationQuery(c.descriptor.distributionKey()));
 			OnLobby _ob = this.context.configure(c);
-			if(c.descriptor.deployCode()>0&&c.descriptor.deployCode()<10){
+			if(c.descriptor.deployCode()>0){//system lobby if deploy code <=0, default 0
 				this.onLobby(_ob);
 			}
 		}

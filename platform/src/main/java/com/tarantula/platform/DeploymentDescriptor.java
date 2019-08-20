@@ -89,6 +89,7 @@ public class DeploymentDescriptor extends DefaultDescriptor{
         ins.maxIdlesOnInstance(this.maxIdlesOnInstance);
         ins.runtimeDuration(this.runtimeDuration);
         ins.runtimeDurationOnInstance(this.runtimeDurationOnInstance);
+        ins.resetEnabled(this.resetEnabled);
         return ins;
     }
 }

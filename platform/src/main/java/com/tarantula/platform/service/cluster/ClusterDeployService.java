@@ -401,6 +401,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         descriptor.owner(ds.bucket());
         descriptor.label(query.label());
         descriptor.onEdge(true);
+        descriptor.resetEnabled(true);
         ds.create(descriptor);
         DeploymentDescriptor lobby = new DeploymentDescriptor();
         lobby.typeId(descriptor.typeId());
@@ -481,6 +482,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         else{
             descriptor.applicationClassName("com.tarantula.platform.playmode.SingletonModuleApplication");
         }
+        descriptor.resetEnabled(true);
         descriptor.runtimeDuration(descriptor.runtimeDuration()*60*1000);
         descriptor.runtimeDurationOnInstance(descriptor.runtimeDurationOnInstance()*60*1000);
         descriptor.owner(lobby[0].distributionKey());

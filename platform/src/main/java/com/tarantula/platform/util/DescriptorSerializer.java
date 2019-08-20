@@ -37,6 +37,7 @@ public class DescriptorSerializer implements JsonSerializer<Descriptor> {
         jo.addProperty("moduleArtifact",descriptor.moduleArtifact());
         jo.addProperty("moduleVersion",descriptor.moduleVersion());
         jo.addProperty("moduleName",descriptor.moduleName());
+        jo.addProperty("resetEnabled",descriptor.resetEnabled());
         return jo;
     }
 }

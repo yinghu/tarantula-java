@@ -898,7 +898,7 @@ var UI = (function(){
      var _tpx_lobby_setup = function(){
          const ret ={};
          ret.width = 360;
-         ret.height = 500;
+         ret.height = 520;
          const ctn = new PIXI.Container();
          const bk = _tpx_base_v5({w:ret.width,h:ret.height,r:20,b:8,t:'0x000000',a:'1'});
          ctn.addChild(bk.base);
@@ -909,7 +909,7 @@ var UI = (function(){
          const cmd = _tpx_text_command(160,80,'Lobby');
          ctn.addChild(cmd.container);
          cmd.container.x = ret.width-cmd.width-30;
-         cmd.container.y = ret.height-cmd.height-30;
+         cmd.container.y = ret.height-cmd.height-10;
          ret.container = ctn;
          ret.setup = cmd;
          ret.set = function(tx){t.text = tx;};

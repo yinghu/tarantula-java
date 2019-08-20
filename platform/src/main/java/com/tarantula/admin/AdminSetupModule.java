@@ -54,7 +54,7 @@ public class AdminSetupModule implements Module {
             DeploymentDescriptor desc = new DeploymentDescriptor();
             desc.fromMap(SystemUtil.toMap(payload));
             desc.type("application");
-            desc.category("demo");
+            desc.category(desc.singleton()?"service":"game");
             desc.deployPriority(10);
             desc.maxIdlesOnInstance(3);
             desc.maxInstancesPerPartition(100);
