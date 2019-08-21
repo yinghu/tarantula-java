@@ -1,7 +1,5 @@
 package com.tarantula.platform.leaderboard;
 
-import com.hazelcast.nio.serialization.Portable;
-import com.tarantula.Metadata;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 
@@ -11,7 +9,7 @@ import com.tarantula.platform.AbstractRecoverableListener;
  */
 public class LeaderBoardPortableRegistry extends AbstractRecoverableListener {
 
-    public static final int OID = 11;
+    public static final int OID = 6;
 
     public static final int LEADER_BOARD_ENTRY_CID = 2;
     public static final int ON_LEADER_BOARD_CID = 3;

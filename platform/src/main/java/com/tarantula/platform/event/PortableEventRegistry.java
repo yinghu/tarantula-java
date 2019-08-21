@@ -1,6 +1,5 @@
 package com.tarantula.platform.event;
 
-import com.hazelcast.nio.serialization.Portable;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 

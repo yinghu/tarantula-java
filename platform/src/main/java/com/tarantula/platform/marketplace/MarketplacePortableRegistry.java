@@ -1,6 +1,5 @@
 package com.tarantula.platform.marketplace;
 
-import com.hazelcast.nio.serialization.Portable;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 
@@ -10,7 +9,7 @@ import com.tarantula.platform.AbstractRecoverableListener;
  */
 public class MarketplacePortableRegistry extends AbstractRecoverableListener {
 
-    public static final int OID = 12;
+    public static final int OID = 7;
 
     public static final int VIRTUAL_CREDITS_PACK = 1;
 

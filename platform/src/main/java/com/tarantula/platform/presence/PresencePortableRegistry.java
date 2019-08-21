@@ -1,6 +1,5 @@
 package com.tarantula.platform.presence;
 
-import com.hazelcast.nio.serialization.Portable;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 import com.tarantula.platform.OnBalanceTrack;
@@ -11,7 +10,7 @@ import com.tarantula.platform.PresenceIndex;
  */
 public class PresencePortableRegistry extends AbstractRecoverableListener {
 
-    public static final int OID = 10;
+    public static final int OID = 5;
 
     public static final int PRESENCE_CID = 1;
     public static final int ON_BALANCE_CID = 2;

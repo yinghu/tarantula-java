@@ -1,6 +1,5 @@
 package com.tarantula.platform.presence;
 
-import com.hazelcast.nio.serialization.Portable;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 
@@ -9,7 +8,7 @@ import com.tarantula.platform.AbstractRecoverableListener;
  */
 public class UserPortableRegistry extends AbstractRecoverableListener {
 
-    public static final int OID = 6;
+    public static final int OID = 3;
 
     public static final int ACCESS_CID = 1;
     public static final int PROFILE_CID = 2;

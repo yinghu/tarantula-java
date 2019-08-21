@@ -1,6 +1,5 @@
 package com.tarantula.platform.service.cluster;
 
-import com.hazelcast.nio.serialization.Portable;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.Batch;
@@ -37,6 +36,8 @@ public class PortableRegistry extends AbstractRecoverableListener{
     public static final int ON_INSTANCE_CID = 23;
 
     public static final int INSTANCE_INDEX_CID = 24;
+
+    public static final int ON_SESSION_CID = 25;
 
     public Recoverable create(int cid) {
         Recoverable _ins;
@@ -101,6 +102,9 @@ public class PortableRegistry extends AbstractRecoverableListener{
                 break;
             case INSTANCE_INDEX_CID:
                 _ins = new InstanceIndex();
+                break;
+            case ON_SESSION_CID:
+                _ins = new OnSessionTrack();
                 break;
             default:
                 throw new IllegalArgumentException("Not supported event type");

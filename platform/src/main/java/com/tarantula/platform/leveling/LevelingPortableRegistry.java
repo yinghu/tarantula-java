@@ -10,7 +10,7 @@ import com.tarantula.platform.OnStatisticsTrack;
  */
 public class LevelingPortableRegistry extends AbstractRecoverableListener {
 
-    public static final int OID = 8;
+    public static final int OID = 4;
 
     public static final int LEVEL_CID = 1;
     public static final int XP_CID = 2;

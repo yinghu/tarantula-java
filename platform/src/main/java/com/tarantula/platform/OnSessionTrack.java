@@ -3,14 +3,14 @@ package com.tarantula.platform;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.OnSession;
-import com.tarantula.platform.playlist.SessionPortableRegistry;
+import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
 /**
- * Updated by yinghu lu on 5/23/2018.
+ * Updated by yinghu lu on 8/20/19
  */
 public class OnSessionTrack extends OnApplicationHeader implements OnSession {
 
@@ -54,12 +54,12 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     }
     @Override
     public int getFactoryId() {
-        return SessionPortableRegistry.OID;
+        return PortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return SessionPortableRegistry.ON_SESSION_CID;
+        return PortableRegistry.ON_SESSION_CID;
     }
 
     @Override
