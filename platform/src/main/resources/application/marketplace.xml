@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tarantula>
     <lobby-context>
-        <type-id>market</type-id>
+        <type-id>marketplace</type-id>
         <type>lobby</type>
         <category>service</category>
         <name>Marketplace</name>
         <access-mode>12</access-mode>
         <description>Tarantula Marketplace Service</description>
-
         <deploy-priority>120</deploy-priority>
         <application-list>
             <application>
-                <type-id>market</type-id>
-                <subtype-id>mp01</subtype-id>
+                <type-id>marketplace</type-id>
+                <subtype-id>marketplace-purchase</subtype-id>
                 <name>Marketplace</name>
                 <type>application</type>
                 <category>marketplace</category>
                 <singleton>true</singleton>
                 <tag>marketplace/purchase</tag>
-                <view-id>marketplace</view-id>
                 <description>Tarantula Marketplace Service</description>
                 <class-name>com.tarantula.platform.marketplace.MarketplaceApplication</class-name>
                 <configuration-name>marketplace</configuration-name>

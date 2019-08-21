@@ -49,7 +49,7 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
             Level l = this._loadLevel(statistics.owner());
             this.executeOnLevel(l,statistics);
         });
-        this.context.log("XP Level Application Started", OnLog.INFO);
+        this.context.log("Level application started on ["+descriptor.tag()+"]", OnLog.INFO);
     }
 
     private Level _load(String systemId){

@@ -7,7 +7,6 @@ import com.tarantula.DeploymentServiceProvider;
 import com.tarantula.platform.util.IndexContextSerializer;
 
 import java.io.BufferedInputStream;
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -18,6 +17,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
 
     private ConcurrentHashMap<String,OnView> _viewList = new ConcurrentHashMap<>();
     private CopyOnWriteArraySet<String> _lobbyList = new CopyOnWriteArraySet<>();
+    private ConcurrentHashMap<String,byte[]> _resourceList = new ConcurrentHashMap<>();
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         if(session.action().equals("view")){
@@ -35,26 +35,36 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
                 ic.lobbyList.add(this.context.lobby(n));
             });
             ic.view = view;
-            //ic.oAuthVendorList = new ArrayList<>();
-            //ic.oAuthVendorList.add(this.context.validator().vendor("google"));
-            //ic.oAuthVendorList.add(this.context.validator().vendor("stripe"));
             session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("resource")){
             IndexEvent ie = (IndexEvent)session;
             String res = ie.viewId.replace("resource","web");
-            BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(res));
-            byte[] ret = new byte[in.available()];
-            in.read(ret);
-            session.write(ret,0,"text/javascript",this.descriptor.responseLabel(),true);
-            in.close();
+            byte[] data = _resourceList.computeIfAbsent(res,(rk)->{
+                BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(res));
+                try{
+                    byte[] ret = new byte[in.available()];
+                    in.read(ret);
+                    return ret;
+                }catch (Exception ex){
+                    this.context.log("Resource ["+res+"] not existed",OnLog.WARN);
+                    return new byte[0];
+                }
+                finally {
+                    try{
+                        if(in!=null){
+                            in.close();
+                        }
+                    }catch (Exception ex){}
+                }
+            });
+            session.write(data,this.descriptor.label());
         }
         else{
             this.context.log(session.action(),OnLog.WARN);
             throw new RuntimeException("operation not supported");
         }
     }
-
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
@@ -74,39 +84,11 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
             v.moduleResourceFile(c.property("moduleResourceFile"));
             _viewList.put(v.viewId(),v);
         });
-        //this.context.log(this.context.validator().vendor("google").clientId(),OnLog.WARN);
-        this.context.log("Index application started",OnLog.INFO);
+        this.context.log("Index application started on tag ["+this.descriptor.tag()+"]",OnLog.INFO);
     }
-    /**
-    @Override
-    public boolean onEvent(Event event) {
-        if(event.action().equals("index")){
-            IndexContext ic = new IndexContext();
-            OnView view = this._viewList.get("index");
-            ic.lobbyList = this.context.index();
-            _lobbyList.forEach((n)->{
-                context.log(n,OnLog.WARN);
-                ic.lobbyList.add(this.context.lobby(n));
-            });
-            ic.view = view;
-            event.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
-        }
-        else if(event.action().equals("view")){
-            IndexEvent ie = (IndexEvent)event;
-            IndexContext ic = new IndexContext();
-            OnView view = this._viewList.get(ie.viewId);
-            ic.view = view;
-            event.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
-        }
-        else{
-            this.context.log(event.toString(),OnLog.WARN);
-        }
-        return true;
-    }
-    **/
     @Override
     public void onView(OnView onView) {
-        //this.context.log("VIEW ADDED-->>"+onView.viewId(),OnLog.WARN);
+        this.context.log("View Added-->>"+onView.viewId(),OnLog.WARN);
         this._viewList.put(onView.viewId(),onView);
     }
 

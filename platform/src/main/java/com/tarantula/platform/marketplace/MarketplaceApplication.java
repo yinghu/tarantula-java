@@ -14,8 +14,6 @@ import java.util.Map;
 public class MarketplaceApplication extends TarantulaApplicationHeader {
 
 
-    //private Statistics statistics;
-
     private SmartPackageGenerator smartPackageGenerator;
     private TokenValidator.OAuthVendor strip;
     private DataStore dataStore;
@@ -31,6 +29,7 @@ public class MarketplaceApplication extends TarantulaApplicationHeader {
         smartPackageGenerator = new SmartPackageGenerator(basePackageSize,basePrice,baseVirtualCredits,this.dataStore);
         smartPackageGenerator.start();
         strip = this.context.validator().vendor("stripe");
+        this.context.log("Marketplace application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
     }
 
 

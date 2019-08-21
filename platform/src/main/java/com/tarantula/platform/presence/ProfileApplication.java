@@ -85,9 +85,10 @@ public class ProfileApplication extends TarantulaApplicationHeader {
         this.builder.registerTypeAdapter(ProfileContext.class,new ProfileContextSerializer());
         this.dataStore = this.context.dataStore("profile");
         this.avatarDataStore = this.context.dataStore("avatar");
-        this.avatarDataStore.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.CONTENT_TRANSACTION_CID,(a)->{
-            this.context.log("AVATAR UPDATED->"+a.toString(),OnLog.WARN);
-        });
+        this.context.log("Profile application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
+        //this.avatarDataStore.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.CONTENT_TRANSACTION_CID,(a)->{
+            //this.context.log("AVATAR UPDATED->"+a.toString(),OnLog.WARN);
+        //});
     }
 
     private Profile _load(String systemId){

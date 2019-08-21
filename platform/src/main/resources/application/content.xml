@@ -11,13 +11,12 @@
         <application-list>
             <application>
                 <type-id>content</type-id>
-                <subtype-id>ctn01</subtype-id>
+                <subtype-id>content-avatar</subtype-id>
                 <name>Avatar</name>
                 <type>application</type>
                 <category>avatar</category>
                 <singleton>true</singleton>
                 <tag>content/avatar</tag>
-                <view-id>avatar</view-id>
                 <description>Tarantula Content Avatar Service</description>
                 <class-name>com.tarantula.platform.presence.AvatarContentApplication</class-name>
                 <configuration-name>content</configuration-name>

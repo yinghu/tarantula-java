@@ -4,10 +4,7 @@ import com.tarantula.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.util.PresenceContextSerializer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 
 /**
  * Developer: YINGHU LU
@@ -19,7 +16,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     private boolean activated;
     private double initialBalance;
     private AccessIndexService accessIndexService;
-    //private DeploymentServiceProvider deploymentServiceProvider;
     private PostOffice postOffice;
 
     @Override
@@ -31,9 +27,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         this.initialBalance = Double.parseDouble(configuration.property("initialBalance"));
         builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
-        //this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         postOffice = this.context.postOffice();
-        this.context.log("User management application started",OnLog.INFO);
+        this.context.log("User management application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
     }
     @Override
     public void callback(Session session,byte[] payload) throws Exception {
@@ -73,39 +68,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 session.write(this.builder.create().toJson(new ResponseHeader("onTicket", "invalid ticket", false)).getBytes(),this.descriptor.responseLabel());
             }
         }
-        /**
-        else if(session.action().equals("onToken")){
-            OnAccess tcc = builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            TokenValidator.OAuthVendor auth = this.context.validator().vendor(tcc.name());
-            Map<String,Object> auser = new HashMap<>();
-            auser.put("token",tcc.accessKey());
-            if(auth.validate(auser)){
-                //AccessIndex aix = accessIndexService.get(auser.get("email").toString());
-                OnSession oss;
-                if(session.systemId()!=null){
-                    //String sysId = aix.distributionKey();
-                    oss = this.login(session.systemId(),"password",session);
-                }
-                else{
-                    oss = this.createAndLogin(auser.get("email").toString(),auser.get("fullName").toString(),session);
-                }
-                if(oss.successful()){
-                    PresenceContext ptx = new PresenceContext("onLogin");
-                    ptx.presence= oss;
-                    List<Lobby> lobbyList = new ArrayList();
-                    lobbyList.add(this.context.lobby(this.lobbyId));
-                    ptx.lobbyList=(lobbyList);
-                    session.write(this.builder.create().toJson(ptx).getBytes(),this.descriptor.responseLabel());
-                }
-                else{
-                    //never happen
-                    session.write(this.builder.create().toJson(new ResponseHeader("onToken", "invalid token", false)).getBytes(),this.descriptor.responseLabel());
-                }
-            }
-            else{
-                session.write(this.builder.create().toJson(new ResponseHeader("onToken", "invalid token", false)).getBytes(),this.descriptor.responseLabel());
-            }
-        }**/
         else if(session.action().equals("onRegister")){
             this.register(session,acc);
         }

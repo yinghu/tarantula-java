@@ -11,12 +11,11 @@
         <application-list>
             <application>
                 <type-id>leaderboard</type-id>
-                <subtype-id>ld01</subtype-id>
+                <subtype-id>leaderboard-top10</subtype-id>
                 <name>Leaderboard</name>
                 <type>application</type>
                 <singleton>true</singleton>
                 <tag>leaderboard/top10</tag>
-                <view-id>leaderboard</view-id>
                 <description>Tarantula Leaderboard Service</description>
                 <class-name>com.tarantula.platform.leaderboard.LeaderBoardApplication</class-name>
                 <configuration-name>leaderboard</configuration-name>

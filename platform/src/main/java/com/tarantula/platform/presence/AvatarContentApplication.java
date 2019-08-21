@@ -49,7 +49,7 @@ public class AvatarContentApplication extends TarantulaApplicationHeader {
         defaultAvatarList[1]=b;
         fis.close();
         avatarDataStore = context.dataStore("avatar");
-        context.log("Avatar Content Application Started", OnLog.INFO);
+        context.log("Avatar content application started on ["+descriptor.tag()+"]", OnLog.INFO);
     }
     private void onDefault(Session session){
         session.write(defaultAvatarList[0],0,"image/png",this.descriptor.responseLabel(),true);

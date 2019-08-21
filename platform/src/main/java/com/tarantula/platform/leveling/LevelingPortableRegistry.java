@@ -1,6 +1,5 @@
 package com.tarantula.platform.leveling;
 
-import com.hazelcast.nio.serialization.Portable;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 import com.tarantula.platform.OnStatisticsTrack;

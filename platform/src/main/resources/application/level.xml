@@ -11,13 +11,12 @@
         <application-list>
             <application>
                 <type-id>level</type-id>
-                <subtype-id>lv01</subtype-id>
+                <subtype-id>level-xp</subtype-id>
                 <name>Level</name>
                 <type>application</type>
                 <category>level</category>
                 <singleton>true</singleton>
                 <tag>level/xp</tag>
-                <view-id>level</view-id>
                 <description>Tarantula XP Level Service</description>
                 <class-name>com.tarantula.platform.leveling.XPLevelApplication</class-name>
                 <configuration-name>level</configuration-name>
