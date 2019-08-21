@@ -102,7 +102,7 @@ public class AdminSetupModule implements Module {
 
     private AdminObject _adminObjectOnLobby(){
         AdminSetupObject ao = new AdminSetupObject(label());
-        ao.name("setup tool");
+        ao.name("lobby list");
         this.dataStore.list(new LobbyQuery(dataStore.bucket()),(a)->{
             ao.list.add(a);
             return true;
@@ -111,7 +111,7 @@ public class AdminSetupModule implements Module {
     }
     private AdminObject _adminObjectOnApplication(String lobbyId){
         AdminSetupObject ao = new AdminSetupObject(label());
-        ao.name("setup tool");
+        ao.name("application list");
         this.dataStore.list(new ApplicationQuery(lobbyId),(a)->{
             ao.list.add(a);
             return true;
