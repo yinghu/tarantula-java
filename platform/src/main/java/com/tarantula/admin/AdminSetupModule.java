@@ -15,31 +15,20 @@ public class AdminSetupModule implements Module {
     private DeploymentServiceProvider serviceProvider;
     private DataStore dataStore;
     private GsonBuilder builder;
-    private AdminSetupObject dbObject;
 
     @Override
     public void onJoin(Session session) throws Exception {
-        session.write(this.builder.create().toJson(dbObject).getBytes(),label());
+        session.write(this.builder.create().toJson(this._adminObjectOnLobby()).getBytes(),label());
     }
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         if(session.action().equals("applicationList")){
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            this.dbObject.list.clear();
-            this.dataStore.list(new ApplicationQuery(access.accessId()),(a)->{
-                this.dbObject.list.add(a);
-                return true;
-            });
-            session.write(this.builder.create().toJson(this.dbObject).getBytes(),label());
+            session.write(this.builder.create().toJson(this._adminObjectOnApplication(access.accessId())).getBytes(),label());
         }
         else if(session.action().equals("lobbyList")){
-            this.dbObject.list.clear();
-            this.dataStore.list(new LobbyQuery(dataStore.bucket()),(a)->{
-                this.dbObject.list.add(a);
-                return true;
-            });
-            session.write(this.builder.create().toJson(this.dbObject).getBytes(),label());
+            session.write(this.builder.create().toJson(this._adminObjectOnLobby()).getBytes(),label());
         }
         else if(session.action().equals("addLobby")){
             DeploymentDescriptor desc = new DeploymentDescriptor();
@@ -104,18 +93,29 @@ public class AdminSetupModule implements Module {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.builder.registerTypeAdapter(AdminSetupObject.class,new AdminObjectSerializer());
-        this.dbObject = new AdminSetupObject(this.label());
-        this.dbObject.name("setup tool");
-        this.dataStore.list(new LobbyQuery(dataStore.bucket()),(a)->{
-            this.context.log(a.name(),OnLog.INFO);
-            this.dbObject.list.add(a);
-            return true;
-        });
         this.context.log("Admin setup module started", OnLog.INFO);
     }
-
     @Override
     public String label() {
         return "admin-setup";
+    }
+
+    private AdminObject _adminObjectOnLobby(){
+        AdminSetupObject ao = new AdminSetupObject(label());
+        ao.name("setup tool");
+        this.dataStore.list(new LobbyQuery(dataStore.bucket()),(a)->{
+            ao.list.add(a);
+            return true;
+        });
+        return ao;
+    }
+    private AdminObject _adminObjectOnApplication(String lobbyId){
+        AdminSetupObject ao = new AdminSetupObject(label());
+        ao.name("setup tool");
+        this.dataStore.list(new ApplicationQuery(lobbyId),(a)->{
+            ao.list.add(a);
+            return true;
+        });
+        return ao;
     }
 }
