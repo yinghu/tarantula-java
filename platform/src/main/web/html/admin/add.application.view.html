@@ -15,6 +15,9 @@
             <div class="w3-panel">    
                  <input id ="b_subtypeId" class="w3-input w3-round w3-border" type="text" placeholder='subtypeId'/>
             </div>
+            <div class="w3-panel">    
+                 <input id ="b_category" class="w3-input w3-round w3-border" type="text" placeholder='category'/>
+            </div>
             <div class="w3-panel">
                  <input id ="b_name" class="w3-input w3-round w3-border" type="text" placeholder='name'/>
             </div>
@@ -43,13 +46,13 @@
                  <input id ="b_entryCost" class="w3-input w3-round w3-border" type="text" placeholder='entryCost'/>
             </div>
             <div class="w3-panel">
-                 <input id ="b_timerOnModule" class="w3-input w3-round w3-border" type="text" placeholder='timerOnModule'/>
+                 <input id ="b_timerOnModule" class="w3-input w3-round w3-border" type="text" placeholder='timerOnModuleMilliseconds'/>
             </div>
             <div class="w3-panel">
-                 <input id ="b_runtimeDuration" class="w3-input w3-round w3-border" type="text" placeholder='runtimeDuration'/>
+                 <input id ="b_runtimeDuration" class="w3-input w3-round w3-border" type="text" placeholder='runtimeDurationMinutes'/>
             </div>
             <div class="w3-panel">
-                 <input id ="b_runtimeDurationOnInstance" class="w3-input w3-round w3-border" type="text" placeholder='runtimeDurationOnInstance'/>
+                 <input id ="b_runtimeDurationOnInstance" class="w3-input w3-round w3-border" type="text" placeholder='runtimeDurationMinutesOnInstance'/>
             </div>
              <div class="w3-panel">
                 <p id="b_message"></p>
@@ -65,30 +68,42 @@
     </div>
 </div>
 <script>
+  document.querySelector('#b_tag').style.display='none';     
   document.querySelector("#b_message").innerHTML= 'Add application ->'+TARA_API.query().app.typeId;
   document.querySelector("#b_command").onclick = function(){
     AdminSetup.addApplication(function(payload){
         payload.typeId = TARA_API.query().app.typeId;//'demo-sync';
+        payload.category = document.querySelector('#b_category').value;
         payload.singleton = document.querySelector('#b_singleton').checked; 
         if(payload.singleton){
             payload.tag = document.querySelector('#b_tag').value;    
         }
-        payload.subtypeId= document.querySelector('#b_subtypeId').value;//'demo-sync-a';
-        payload.viewId = document.querySelector('#b_viewId').value;//'demo.sync.game';     
-        payload.name= document.querySelector('#b_name').value;//'Demo Sync';
-        payload.description= document.querySelector('#b_description').value;//'Applicaton Module Game';     
-        payload.codebase= document.querySelector('#b_codebase').value;//'file:///development/boost/target';
-        payload.moduleArtifact=document.querySelector('#b_moduleArtifact').value;//'tarantula-boost';
-        payload.moduleVersion= document.querySelector('#b_moduleVersion').value;//'1.1';
-        payload.moduleName=document.querySelector('#b_moduleName').value;//'com.tarantula.boost.Demo';      
-        payload.capacity= parseInt(document.querySelector('#b_capacity').value);//10;
-        payload.entryCost= parseInt(document.querySelector('#b_entryCost').value);//5000; 
-        payload.timerOnModule = parseInt(document.querySelector('#b_timerOnModule').value);//10
-        payload.runtimeDuration= parseInt(document.querySelector('#b_runtimeDuration').value);//10;
-        payload.runtimeDurationOnInstance= parseInt(document.querySelector('#b_runtimeDurationOnInstance').value);//1;
+        payload.subtypeId= document.querySelector('#b_subtypeId').value;
+        payload.viewId = document.querySelector('#b_viewId').value;     
+        payload.name= document.querySelector('#b_name').value;
+        payload.description= document.querySelector('#b_description').value;     
+        payload.codebase= document.querySelector('#b_codebase').value;
+        payload.moduleArtifact=document.querySelector('#b_moduleArtifact').value;
+        payload.moduleVersion= document.querySelector('#b_moduleVersion').value;
+        payload.moduleName=document.querySelector('#b_moduleName').value;      
+        payload.capacity= parseInt(document.querySelector('#b_capacity').value);
+        payload.entryCost= parseInt(document.querySelector('#b_entryCost').value); 
+        payload.timerOnModule = parseInt(document.querySelector('#b_timerOnModule').value);
+        payload.runtimeDuration= parseInt(document.querySelector('#b_runtimeDuration').value);
+        payload.runtimeDurationOnInstance= parseInt(document.querySelector('#b_runtimeDurationOnInstance').value);
     },function(resp){
         document.querySelector("#b_message").innerHTML = resp.message;
     });    
+ }; 
+ document.querySelector("#b_singleton").onclick = function(){
+    if(document.querySelector('#b_singleton').checked){
+        document.querySelector('#b_tag').style.display='block';
+        document.querySelector('#b_runtimeDurationOnInstance').style.display='none';
+    }  
+    else{
+        document.querySelector('#b_tag').style.display='none';
+        document.querySelector('#b_runtimeDurationOnInstance').style.display='block';
+    } 
  };    
  document.querySelector("#tx-close-add-app").onclick = tx_close_add_application;
  document.querySelector("#b_command_cancel").onclick = tx_close_add_application;

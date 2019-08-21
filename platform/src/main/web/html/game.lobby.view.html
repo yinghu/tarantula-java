@@ -11,7 +11,7 @@
     let applicationList = [];   
     let appIdex = -1;
     let loaded = 0;
-    let tournament;
+    //let tournament;
     let pmessage = UI.confirmation();
     pmessage.close();
     pmessage.yes.button.command = function(){pmessage.close();};
@@ -196,8 +196,8 @@
                 if(g.category == 'lobby'){
                     //lobby = g; //no longer use
                 } 
-                else if(g.category == 'tournament'){
-                    tournament = g;
+                else if(g.category == 'service'){
+                    //tournament = g;
                 }
                 else{
                     let ix =  applicationList.push(UI.applicationList(0))-1;
@@ -246,7 +246,7 @@
         //console.log(_play);
         TARA_API.onService(_play,function(resp){
             if(resp.successful){
-                TARA_API.query().tournament = tournament;
+                //TARA_API.query().tournament = tournament;
                 TGL.shutdown();
                 tx_close_presence();
                 applicationList[gix].application.game.instanceId = resp.instanceId;

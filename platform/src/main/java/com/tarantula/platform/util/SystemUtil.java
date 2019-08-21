@@ -188,7 +188,7 @@ public class SystemUtil {
                     _mv.put(e.getKey(),m.getAsBoolean());
                 }
             }
-            else{
+            else if(!je.isJsonNull()){
                 _mv.put(e.getKey(),je);
             }
         });

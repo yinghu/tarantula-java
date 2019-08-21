@@ -28,7 +28,10 @@ var DemoSyncGame = (function(){
         TARA_API.send(_payload);
         //TARA_API.onInstance(_payload,callback);
     };
-    
+    let _item = function(out){
+        let _payload = {serviceTag:'demo/item',command:"applicationList"};
+        TARA_API.onService(_payload,out);
+    };  
     return{
         setup : _setup,
         swap : _swap,
@@ -36,6 +39,7 @@ var DemoSyncGame = (function(){
         
         leave : _leave,
         sit : _sit,
+        item: _item,
     };
 
 }());

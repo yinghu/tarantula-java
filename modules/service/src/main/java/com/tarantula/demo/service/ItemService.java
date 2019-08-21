@@ -2,11 +2,14 @@ package com.tarantula.demo.service;
 
 import com.tarantula.ApplicationContext;
 import com.tarantula.Module;
+import com.tarantula.OnLog;
 import com.tarantula.Session;
 
 public class ItemService implements Module {
 
     private ApplicationContext context;
+
+
 
     @Override
     public void onJoin(Session session) throws Exception{
@@ -22,11 +25,12 @@ public class ItemService implements Module {
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
+        this.context.log("Item service started", OnLog.INFO);
     }
 
     @Override
     public String label() {
-        return "itemService";
+        return "item";
     }
     @Override
     public void clear(){

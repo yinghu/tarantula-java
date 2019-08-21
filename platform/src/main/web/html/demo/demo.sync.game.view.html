@@ -96,6 +96,10 @@
     commandList.list[3].button.command = function(){DemoSyncGame.sit('onReset',(resp)=>{console.log(resp)})};
     pView.container.addChild(commandList.container);
     
+    let itemSerice = UI.textCommandList(4,120);
+    pView.container.addChild(itemSerice.container);
+    itemSerice.list[3].title('Item');
+    itemSerice.list[3].button.command = function(){DemoSyncGame.item((resp)=>{console.log(resp)})};
     
     
     pView.container.addChild(statBoard.container);
@@ -169,6 +173,7 @@
         menuBoard.position(sc,5,5);
         cm.position(sc,5,5);
         commandList.position(sc,wz.width-commandList.width*sc-5,5);
+        itemSerice.position(sc,wz.width-commandList.width*sc-5,wz.height-itemSerice.height*sc-5);
         statBoard.position(sc,(wz.width-statBoard.width*sc)/2,(wz.height-statBoard.height*sc)/2);
         nTimer.position(sc,10,wz.height-nTimer.height*sc-10);
         nrt.position(sc,10,cm.container.y+cm.height*sc+20);

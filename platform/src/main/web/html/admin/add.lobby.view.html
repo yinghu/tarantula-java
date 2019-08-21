@@ -10,22 +10,19 @@
                 <input id ="a_typeId" class="w3-input w3-round w3-border" type="text" placeholder='typeId'/>
             </div>
             <div class="w3-panel">    
-                 <input id ="a_subtypeId" class="w3-input w3-round w3-border" type="text" placeholder='subtypeId'/>
+                 <input id ="a_category" class="w3-input w3-round w3-border" type="text" placeholder='category'/>
             </div>
             <div class="w3-panel">
                  <input id ="a_name" class="w3-input w3-round w3-border" type="text" placeholder='name'/>
             </div>
-            <div class="w3-panel">
-                <input id ="a_tag" class="w3-input w3-round w3-border" type="text" placeholder='tag'/>
-            </div>
             <div class="w3-panel">    
                  <input id ="a_responseLabel" class="w3-input w3-round w3-border" type="text" placeholder='responseLabel'/>
             </div>
-            <div class="w3-panel">
-                 <input id ="a_viewId" class="w3-input w3-round w3-border" type="text" placeholder='viewId'/>
+             <div class="w3-panel">
+                <input id ="a_icon" class="w3-input w3-round w3-border" type="text" placeholder='icon'/>
             </div>
             <div class="w3-panel">
-                <input id ="a_icon" class="w3-input w3-round w3-border" type="text" placeholder='icon'/>
+                 <input id ="a_viewId" class="w3-input w3-round w3-border" type="text" placeholder='viewId'/>
             </div>
             <div class="w3-panel">    
                  <input id ="a_description" class="w3-input w3-round w3-border" type="text" placeholder='description'/>
@@ -47,14 +44,13 @@
 <script>
  document.querySelector("#a_command").onclick = function(){
     AdminSetup.addLobby(function(payload){
-        payload.typeId = document.querySelector('#a_typeId').value;//"demo-sync";
-        payload.subtypeId = document.querySelector('#a_subtypeId').value;//"demo-sync-lobby";
-        payload.name= document.querySelector('#a_name').value;//"Demo Sync";
-        payload.tag= document.querySelector('#a_tag').value;//"demo-sync";
-        payload.responseLabel = document.querySelector('#a_responseLabel').value;//"demo";
-        payload.viewId = document.querySelector('#a_viewId').value;//"game.lobby";
-        payload.icon= document.querySelector('#a_icon').value;//"assets/duration.png";
-        payload.description= document.querySelector('#a_description').value;//"Application Module Demo";
+        payload.typeId = document.querySelector('#a_typeId').value;
+        payload.category = document.querySelector('#a_category').value;
+        payload.name= document.querySelector('#a_name').value;
+        payload.responseLabel = document.querySelector('#a_responseLabel').value;
+        payload.viewId = document.querySelector('#a_viewId').value;
+        payload.icon= document.querySelector('#a_icon').value;
+        payload.description= document.querySelector('#a_description').value;
     },function(resp){
         document.querySelector("#a_message").innerHTML = resp.message;
     });    

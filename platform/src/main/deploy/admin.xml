@@ -3,7 +3,7 @@
     <lobby-context>
         <type-id>admin</type-id>
         <type>lobby</type>
-        <category>game</category>
+        <category>service</category>
         <tag>admin/lobby</tag>
         <icon>assets/gear.png</icon>
         <view-id>game.lobby</view-id>

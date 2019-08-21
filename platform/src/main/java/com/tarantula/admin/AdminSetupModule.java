@@ -45,16 +45,16 @@ public class AdminSetupModule implements Module {
             DeploymentDescriptor desc = new DeploymentDescriptor();
             desc.fromMap(SystemUtil.toMap(payload));
             desc.type("lobby");
-            desc.category("game");
+            desc.subtypeId(desc.typeId()+"-lobby");
             desc.accessMode(Session.PROTECT_ACCESS_MODE);
             desc.deployCode(1);
+            desc.tag(desc.typeId()+Recoverable.PATH_SEPARATOR+"lobby");
             session.write(this.serviceProvider.createLobby(desc).getBytes(),this.label());
         }
         else if(session.action().equals("addApplication")){
             DeploymentDescriptor desc = new DeploymentDescriptor();
             desc.fromMap(SystemUtil.toMap(payload));
             desc.type("application");
-            desc.category(desc.singleton()?"service":"game");
             desc.deployPriority(10);
             desc.maxIdlesOnInstance(3);
             desc.maxInstancesPerPartition(100);
