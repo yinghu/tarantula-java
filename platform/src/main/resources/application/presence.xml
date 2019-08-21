@@ -42,7 +42,7 @@
             <configuration tag="presence" priority="10">
                 <presence type="setup">
                     <property name="lobbyListenerEnabled">false</property>
-                    <property name="lobbyList">tarantula,market,leaderboard,level</property>
+                    <property name="lobbyList">market,leaderboard,level</property>
                 </presence>
             </configuration>
             <configuration tag="profile" priority="10">
