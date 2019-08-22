@@ -29,7 +29,7 @@ var DemoSyncGame = (function(){
         //TARA_API.onInstance(_payload,callback);
     };
     let _item = function(out){
-        let _payload = {serviceTag:'demo/item',command:"applicationList"};
+        let _payload = {serviceTag:'demo/service',command:"applicationList"};
         TARA_API.onService(_payload,out);
     };  
     return{

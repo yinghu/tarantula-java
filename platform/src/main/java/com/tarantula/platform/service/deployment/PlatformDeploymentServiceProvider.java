@@ -461,7 +461,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 this.clear();//clear on old instance
                 this.module = moduleClassLoader.newModule(descriptor.moduleName());
                 this.module.setup(applicationContext);
-                log.warn("Module ["+descriptor.moduleName()+"] reset on instance ["+applicationContext.onRegistry().distributionKey()+"]");
+                if(descriptor.singleton()){
+                    log.warn("Module ["+descriptor.moduleName()+"] reset on singleton instance ["+descriptor.tag()+"]");
+                }else{
+                    log.warn("Module ["+descriptor.moduleName()+"] reset on instance ["+applicationContext.onRegistry().distributionKey()+"]");
+                }
             }catch (Exception ex){
                 log.error("error on module reset, fix it and reset again",ex);
             }

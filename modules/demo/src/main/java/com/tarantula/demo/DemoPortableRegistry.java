@@ -11,7 +11,6 @@ public class DemoPortableRegistry extends AbstractRecoverableListener {
     public int registryId() {
         return OID;
     }
-
     @Override
     public Recoverable create(int i) {
         Recoverable pt = null;
