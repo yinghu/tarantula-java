@@ -6,7 +6,6 @@ import com.tarantula.platform.event.IndexEvent;
 import com.tarantula.DeploymentServiceProvider;
 import com.tarantula.platform.util.IndexContextSerializer;
 
-import java.io.BufferedInputStream;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -17,7 +16,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
 
     private ConcurrentHashMap<String,OnView> _viewList = new ConcurrentHashMap<>();
     private CopyOnWriteArraySet<String> _lobbyList = new CopyOnWriteArraySet<>();
-    private ConcurrentHashMap<String,byte[]> _resourceList = new ConcurrentHashMap<>();
+    //private ConcurrentHashMap<String,byte[]> _resourceList = new ConcurrentHashMap<>();
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         if(session.action().equals("view")){
@@ -37,6 +36,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
             ic.view = view;
             session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }
+        /**
         else if(session.action().equals("resource")){
             IndexEvent ie = (IndexEvent)session;
             String res = ie.viewId.replace("resource","web");
@@ -59,7 +59,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
                 }
             });
             session.write(data,this.descriptor.label());
-        }
+        }**/
         else{
             this.context.log(session.action(),OnLog.WARN);
             throw new RuntimeException("operation not supported");

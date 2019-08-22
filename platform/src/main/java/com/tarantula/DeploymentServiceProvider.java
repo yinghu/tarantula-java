@@ -32,6 +32,7 @@ public interface DeploymentServiceProvider extends ServiceProvider{
     //deploy and callback on lobby
     void deploy(OnLobby onLobby);
     void registerOnLobbyListener(OnLobby.Listener onLobbyListener);
+    byte[] resource(String name);
 
     //message publisher
     PostOffice registerPostOffice();

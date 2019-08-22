@@ -4,8 +4,6 @@ import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
 
-import java.io.BufferedInputStream;
-
 public class RootContentHandler implements RequestHandler {
 
     private static final JDKLogger log = JDKLogger.getLogger(RootContentHandler.class);
@@ -16,22 +14,11 @@ public class RootContentHandler implements RequestHandler {
     public void onRequest(OnExchange exchange){
         try{
             String path = exchange.path();
-            log.info(path);
             if(path.equals("/")){
                 path = "/tarantula.html";
             }
-            byte[] _load;
             String contentType = "text/html";
-            BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(path.substring(1)));
-            try{
-                _load = new byte[in.available()];
-                in.read(_load);
-            }catch (Exception ex){
-                throw new RuntimeException(path);
-            }
-            finally {
-                try{in.close();}catch (Exception exx){}
-            }
+            byte[] _load = this.deploymentServiceProvider.resource(path.substring(1));
             if(path.endsWith(".css")){
                 contentType = "text/css";
             }
@@ -66,7 +53,7 @@ public class RootContentHandler implements RequestHandler {
 
     @Override
     public void start() throws Exception {
-
+        log.info("Root content event handler started");
     }
 
     @Override

@@ -12,6 +12,8 @@ import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.util.ConfigurationDeserializer;
 import com.tarantula.platform.util.ResponseDeserializer;
 import com.tarantula.platform.util.SystemUtil;
+
+import java.io.BufferedInputStream;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -38,6 +40,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ConcurrentHashMap<String,Event> pushRegistry = new ConcurrentHashMap<>();
 
     private ConcurrentHashMap<String,DynamicModuleClassLoader> cMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,byte[]> rMap = new ConcurrentHashMap<>();
 
     private TarantulaContext tarantulaContext;
     private GsonBuilder builder;
@@ -70,6 +73,25 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         else{
             return _internalModule(descriptor.moduleName());
         }
+    }
+    public byte[] resource(String name){
+        log.warn("loading resource->"+name);
+        return rMap.computeIfAbsent(name,(rk)->{
+            byte[] ret = new byte[0];
+            BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(name));
+            try{
+                ret = new byte[in.available()];
+                in.read(ret);
+            }catch (Exception ex){
+                log.warn("Resource ["+name+"] not existed",ex);
+            }
+            finally {
+                if(in!=null){
+                    try{in.close();}catch (Exception ex){}
+                }
+            }
+            return ret;
+        });
     }
     public void resource(Descriptor descriptor, String name, Module.OnResource onResource){
         DynamicModuleClassLoader dyn = cMap.get(descriptor.subtypeId());
