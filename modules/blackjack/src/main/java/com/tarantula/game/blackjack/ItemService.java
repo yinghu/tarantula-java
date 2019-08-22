@@ -1,4 +1,4 @@
-package com.tarantula.demo.service;
+package com.tarantula.game.blackjack;
 
 import com.tarantula.ApplicationContext;
 import com.tarantula.Module;

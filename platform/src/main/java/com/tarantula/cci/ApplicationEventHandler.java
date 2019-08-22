@@ -94,9 +94,8 @@ public class ApplicationEventHandler  implements RequestHandler {
         }
         return true;
     }
-
     @Override
-    public void setup(TokenValidator tokenValidator, EventService eventService, AccessIndexService accessIndexService,String bucket) {
+    public void setup(TokenValidator tokenValidator, EventService eventService, AccessIndexService accessIndexService,String bucket,DeploymentServiceProvider deploymentServiceProvider) {
         this.auth = tokenValidator;
         this.eventService = eventService;
         this.accessIndexService = accessIndexService;

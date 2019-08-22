@@ -1,4 +1,4 @@
-package com.tarantula.demo.service;
+package com.tarantula.game.blackjack;
 
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;

@@ -27,34 +27,42 @@ public class EndpointService implements Serviceable,EndPoint.Resource,Scheduling
 
     public void start() throws Exception {
         AccessIndexService ais = (AccessIndexService)this.tarantulaContext.serviceProvider(AccessIndexService.NAME);
+
+        RootContentHandler rootContentHandler = new RootContentHandler();
+        rootContentHandler.setup(this.tarantulaContext.tokenValidatorProvider.tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup,this.tarantulaContext.deploymentServiceProvider);
+        rootContentHandler.start();
+        rMap.put(rootContentHandler.name(),rootContentHandler);
+
         ResourceEventHandler resourceEventHandler = new ResourceEventHandler();
-        resourceEventHandler.setup(this.tarantulaContext.tokenValidatorProvider.tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup);
+        resourceEventHandler.setup(this.tarantulaContext.tokenValidatorProvider.tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup,this.tarantulaContext.deploymentServiceProvider);
         resourceEventHandler.start();
         rMap.put(resourceEventHandler.name(),resourceEventHandler);
 
         ContentEventHandler contentHandler = new ContentEventHandler();
-        contentHandler.setup(this.tarantulaContext.tokenValidatorProvider.tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup);
+        contentHandler.setup(this.tarantulaContext.tokenValidatorProvider.tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup,this.tarantulaContext.deploymentServiceProvider);
         contentHandler.start();
         rMap.put(contentHandler.name(),contentHandler);
 
         UserEventHandler userHandler = new UserEventHandler();
-        userHandler.setup(this.tarantulaContext.tokenValidatorProvider.tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup);
+        userHandler.setup(this.tarantulaContext.tokenValidatorProvider.tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup,this.tarantulaContext.deploymentServiceProvider);
         userHandler.start();
         rMap.put(userHandler.name(),userHandler);
 
         ServiceEventHandler serviceEventHandler = new ServiceEventHandler();
-        serviceEventHandler.setup(this.tarantulaContext.tokenValidatorProvider.tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup);
+        serviceEventHandler.setup(this.tarantulaContext.tokenValidatorProvider.tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup,this.tarantulaContext.deploymentServiceProvider);
         serviceEventHandler.start();
         rMap.put(serviceEventHandler.name(),serviceEventHandler);
 
         ApplicationEventHandler applicationHandler = new ApplicationEventHandler();
-        applicationHandler.setup(this.tarantulaContext.tokenValidatorProvider.tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup);
+        applicationHandler.setup(this.tarantulaContext.tokenValidatorProvider.tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup,this.tarantulaContext.deploymentServiceProvider);
         applicationHandler.start();
         rMap.put(applicationHandler.name(),applicationHandler);
 
         //PushEventHandler pushEventHandler = new PushEventHandler(this.endPointListenerList);
-        pushEventHandler.setup(this.tarantulaContext.tokenValidatorProvider.tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup);
+        pushEventHandler.setup(this.tarantulaContext.tokenValidatorProvider.tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup,this.tarantulaContext.deploymentServiceProvider);
         pushEventHandler.start();
+
+
         rMap.put(pushEventHandler.name(),pushEventHandler);
         for(EndPoint endPoint : endPointList){
             endPoint.resource(this);

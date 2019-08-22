@@ -37,7 +37,7 @@ public class HttpEndpoint implements EndPoint {
 		hserver = HttpServer.create(ip,this.backlog);
 		hserver.setExecutor(this.tpool);
 		log.info("Initializing web context ...");
-		HttpRootHandler root = new HttpRootHandler();
+		HttpRootHandler root = new HttpRootHandler(this.resource.requestHandler("/"));
 		this.hserver.createContext("/",root);
 
 		HttpResourceHandler resource = new HttpResourceHandler(this.resource.requestHandler("/resource"));

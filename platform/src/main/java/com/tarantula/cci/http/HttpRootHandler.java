@@ -3,18 +3,19 @@ package com.tarantula.cci.http;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.tarantula.Session;
-
-import java.io.BufferedInputStream;
+import com.tarantula.cci.RequestHandler;
 import java.io.IOException;
 
 public class HttpRootHandler extends RequestParser implements HttpHandler {
+    private final RequestHandler resourceEventHandler;
 
-
-    public HttpRootHandler(){
-
+    public HttpRootHandler(RequestHandler eventHandler){
+        this.resourceEventHandler = eventHandler;
     }
     public void handle(HttpExchange hex) throws IOException {
+        HttpSession hs = new HttpSession("id",hex);
+        this.resourceEventHandler.onRequest(hs);
+        /**
         try{
             String path = hex.getRequestURI().getPath();
             if(path.equals("/")){
@@ -22,6 +23,8 @@ public class HttpRootHandler extends RequestParser implements HttpHandler {
             }
             byte[] _load;
             String contentType = "text/html";
+            HttpSession hs = new HttpSession("id",hex);
+            this.resourceEventHandler.onRequest(hs);
             BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(path.substring(1)));
             try{
                 _load = new byte[in.available()];
@@ -53,10 +56,13 @@ public class HttpRootHandler extends RequestParser implements HttpHandler {
             hex.getResponseHeaders().set(Session.HTTP_CONTENT_TYPE,contentType);
             hex.sendResponseHeaders(200,_load.length);
             hex.getResponseBody().write(_load);
-            hex.close();
+            //hex.close();
         } catch (Exception exx){
             throw exx;
         }
+        finally {
+            hex.close();
+        }**/
     }
 
 }

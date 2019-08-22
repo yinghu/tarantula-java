@@ -10,6 +10,6 @@ import com.tarantula.*;
 public interface RequestHandler extends EventListener,Serviceable{
     String name();
     void onRequest(OnExchange exchange);
-    void setup(TokenValidator tokenValidator, EventService eventService, AccessIndexService accessIndexService,String bucket);
+    void setup(TokenValidator tokenValidator, EventService eventService, AccessIndexService accessIndexService,String bucket,DeploymentServiceProvider deploymentServiceProvider);
     default void onCheck(){}
 }

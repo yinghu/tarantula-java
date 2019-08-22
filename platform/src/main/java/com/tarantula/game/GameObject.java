@@ -1,21 +1,15 @@
-package com.tarantula.admin;
+package com.tarantula.game;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import com.tarantula.OnApplication;
 import com.tarantula.platform.OnApplicationHeader;
+
 
 import java.lang.reflect.Type;
 
+public class GameObject extends OnApplicationHeader {
 
-public class AdminObject extends OnApplicationHeader implements OnApplication {
-
-
-    public AdminObject(String label){
-        this.label = label;
-        this.successful = true;
-    }
     public JsonElement setup(Type type, JsonSerializationContext jsonSerializationContext){
         return new JsonObject();
     }
