@@ -5,7 +5,7 @@ import com.tarantula.Module;
 import com.tarantula.OnLog;
 import com.tarantula.Session;
 
-public class Service implements Module {
+public class DemoService implements Module {
 
     private ApplicationContext context;
 
@@ -18,7 +18,7 @@ public class Service implements Module {
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
-        this.context.log("Service started", OnLog.INFO);
+        this.context.log("DemoService started", OnLog.INFO);
     }
 
     @Override
