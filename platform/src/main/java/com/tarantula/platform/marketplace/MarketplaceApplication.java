@@ -54,7 +54,7 @@ public class MarketplaceApplication extends TarantulaApplicationHeader {
                 if(strip.validate(chargeParams)){
                     //charge successfully
                     OnBalanceTrack onBalanceTrack = new OnBalanceTrack(session.systemId(),co.credits);
-                    this.context.publish(this.context.routingKey(session.systemId(),"presence"),onBalanceTrack);
+                    this.context.publish(this.context.routingKey(session.systemId(),Presence.LOBBY_TAG),onBalanceTrack);
                     suc = true;
                 }
             }

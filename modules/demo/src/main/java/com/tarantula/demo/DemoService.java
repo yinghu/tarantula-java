@@ -18,11 +18,19 @@ public class DemoService implements Module {
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
+        this.context.registerRecoverableListener(new DemoPortableRegistry()).addRecoverableFilter(DemoPortableRegistry.TIMER_OID,(t)->{
+            this.context.log(t.toString(),OnLog.INFO);
+        });
         this.context.log("DemoService started", OnLog.INFO);
     }
 
     @Override
     public String label() {
         return "demo";
+    }
+
+    @Override
+    public void clear(){
+
     }
 }

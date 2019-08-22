@@ -297,7 +297,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         on.joined(false);
         on.onUpdate();
         if((!on.tournamentEnabled())&&on.balance()>0){//move remaining balance to presence on non-tournament mode
-            this.publish(this.routingKey(systemId,"presence",on.routingNumber()),new OnBalanceTrack(systemId,on.balance()));
+            this.publish(this.routingKey(systemId,Presence.LOBBY_TAG,on.routingNumber()),new OnBalanceTrack(systemId,on.balance()));
         }
         this.waitingList.offer(on);
         return 1;

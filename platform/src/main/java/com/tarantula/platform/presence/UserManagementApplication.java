@@ -48,7 +48,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 OnStatistics delta = new OnStatisticsTrack(this.context.onStatistics().leaderBoardHeader(),access.systemId());
                 delta.xpDelta(1);
                 delta.entryList(new Statistics.Entry[]{new StatisticsEntry("LoginCount",1)});
-                this.context.publish(this.context.routingKey(delta.owner(),"level"),delta);
+                this.context.publish(this.context.routingKey(delta.owner(),Level.LEVEL_TAG),delta);
                 this.context.onStatistics().value("Login",1);
             }
             else{

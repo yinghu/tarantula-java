@@ -18,7 +18,7 @@ public class DynamicModuleClassLoader extends ClassLoader{
     public DynamicModuleClassLoader(Descriptor descriptor){
         this.codeUrl = "jar:"+descriptor.codebase()+"/"+descriptor.moduleArtifact()+"-"+descriptor.moduleVersion()+".jar!/";
     }
-    void _load(){
+    synchronized void _load(){
         JarFile _jar=null;
         try{
             JarURLConnection jarURLConnection = (JarURLConnection) new URL(codeUrl).openConnection();
@@ -51,7 +51,7 @@ public class DynamicModuleClassLoader extends ClassLoader{
         }
     }
 
-    void _clear(){
+    synchronized void _clear(){
         proxies.clear();
         //_cached.forEach((k,v)->{
             //System.out.println(k+" removed");
@@ -84,7 +84,7 @@ public class DynamicModuleClassLoader extends ClassLoader{
         _cached.put(name,result);
         return result;
     }
-    public Module newModule(String name){
+    public synchronized Module newModule(String name){
         try{
             return (Module)loadClass(name,true).getConstructor().newInstance();
         }catch (Exception ex){

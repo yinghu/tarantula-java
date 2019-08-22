@@ -33,6 +33,8 @@ public class Boost extends GameObject implements Module {
             byte[] ret = this.builder.create().toJson(timer).getBytes();
             session.write(ret,this.label());
             update.on(ret);
+            RoutingKey rk = this.context.routingKey(session.systemId(),"demo/service");
+            //this.context.publish();
         }
         else if(session.action().equals("b")){
             byte[] ret = this.builder.create().toJson(timer).getBytes();
