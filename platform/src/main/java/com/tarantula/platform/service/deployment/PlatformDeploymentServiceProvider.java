@@ -75,7 +75,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     public byte[] resource(String name){
-        log.warn("loading resource->"+name);
+        //log.warn("loading resource->"+name);
         return rMap.computeIfAbsent(name,(rk)->{
             byte[] ret = new byte[0];
             BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(name));

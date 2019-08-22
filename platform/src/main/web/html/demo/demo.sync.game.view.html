@@ -116,23 +116,22 @@
         },(m)=>{
            _demo_event(m); 
         },(g)=>{
-            _demo_event(g);
+            _demo_event(g.gameObject);
             _demo_scale();
         },(n)=>{
             _demo_event(n);
         }
     ); 
     function _demo_event(m){
-        //console.log(m);
         let nt = Date.now();
-        if(m.label == 'timer'){     
-                nTimer.title(m.hh+':'+m.mm+':'+m.ss+':'+m.ms);
-                statBoard.lines[1].t.tn += JSON.stringify(m).length;
-                statBoard.lines[1].set(1,'Timer Bytes',statBoard.lines[1].t.tn);
-                statBoard.lines[6].set(6,'Timer Elapsed (ms)',nt-statBoard.lines[1].t.tm);
-                statBoard.lines[1].t.tm = nt;
-                statBoard.lines[1].t.tc++;
-                statBoard.lines[8].set(8,'Timer Count',statBoard.lines[1].t.tc);
+        if(m.label == 'timer'){        
+            nTimer.title(m.hh+':'+m.mm+':'+m.ss+':'+m.ms);
+            statBoard.lines[1].t.tn += JSON.stringify(m).length;
+            statBoard.lines[1].set(1,'Timer Bytes',statBoard.lines[1].t.tn);
+            statBoard.lines[6].set(6,'Timer Elapsed (ms)',nt-statBoard.lines[1].t.tm);
+            statBoard.lines[1].t.tm = nt;
+            statBoard.lines[1].t.tc++;
+            statBoard.lines[8].set(8,'Timer Count',statBoard.lines[1].t.tc);
         }     
         else if(m.label == 'connection'){
             statBoard.lines[2].t.tn += JSON.stringify(m).length;

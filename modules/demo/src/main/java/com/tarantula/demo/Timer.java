@@ -19,6 +19,7 @@ public class Timer extends RecoverableObject {
     public long delta = 50;
     public long duration;
 
+
     public Timer(){
         this.vertex = "Timer";
         this.label = "timer";
@@ -59,7 +60,7 @@ public class Timer extends RecoverableObject {
         return new AssociateKey(this.bucket,this.oid,this.vertex);
     }
     @Override
-    public void onUpdate(){
+    public synchronized void onUpdate(){
         timestamp -= delta;
         if(timestamp<=0){
             timestamp = duration;
@@ -70,10 +71,8 @@ public class Timer extends RecoverableObject {
         long mr = hr%60000;
         second = mr/1000;
         millisecond = mr%1000;
-        //this.dataStore.update(this);
     }
     public String toString(){
         return "["+duration+"/"+delta+"/"+timestamp+"]";
     }
-
 }

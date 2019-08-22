@@ -2,7 +2,7 @@ var DemoSyncGame = (function(){
     let sw,game;
     let _start = function(swap,onMessage,setup,onNotification){
         sw = swap;
-        TARA_API.onMessage(game.responseLabel,onMessage);
+        TARA_API.onMessage(game.label,onMessage);
         let req = {action:'onStream',applicationId:game.applicationId,instanceId:game.instanceId,streaming:true,path:'/application/instance',data:{command:'onStream'}};
         TARA_API.send(req); 
         TARA_API.onMessage('presence/notice',onNotification);
