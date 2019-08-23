@@ -37,7 +37,7 @@ public class PortableRegistry extends AbstractRecoverableListener{
 
     public static final int KEY_INDEX_CID = 26;
 
-    //start 100
+    //START 100 working with EVENT PORTABLE on same OID
     public static final int SINGLETON_FORWARD_CID = PortableEventRegistry.SINGLETON_FORWARD_CID;
 
     public static final int METADATA_CID = PortableEventRegistry.METADATA_CID;

@@ -92,7 +92,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     private ConcurrentHashMap<String,ServiceProvider> dataStoreProviders = new ConcurrentHashMap();
     public ConcurrentHashMap<String,List<Configuration>> configurations = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, TokenValidator.OAuthVendor> oVendors = new ConcurrentHashMap<>();
-    public ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
 
 
     public String serviceConfiguration;

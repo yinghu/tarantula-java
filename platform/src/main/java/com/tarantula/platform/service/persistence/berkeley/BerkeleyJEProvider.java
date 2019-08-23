@@ -397,14 +397,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Sc
     public void onUpdated(Metadata metadata, byte[] key, byte[] value) {
         if(metadata.scope()==Recoverable.DATA_SCOPE){
             this.activeDataStore.put(null,new DatabaseEntry(key),new DatabaseEntry(new ActiveEntry(metadata.source()).toByteArray()));
-            this.dataScopePublisher.publish(new MapStoreSyncEvent(this.replicationTopic,this.node.nodeName,key,value,metadata));
+            this.dataScopePublisher.publish(new MapStoreSyncEvent(this.replicationTopic,this.node.nodeName,key,value,(RecoverableMetadata) metadata));
             if(metadata.distributable()){
                 this.dataCluster.set(metadata,key,value);
             }
         }
         else if(metadata.scope()==Recoverable.INTEGRATION_SCOPE){
             this.activeIntegrationStore.put(null,new DatabaseEntry(key),new DatabaseEntry(new ActiveEntry(metadata.source()).toByteArray()));
-            this.integrationScopePublisher.publish(new MapStoreSyncEvent(this.backupTopic,this.node.nodeName,key,value,metadata));
+            this.integrationScopePublisher.publish(new MapStoreSyncEvent(this.backupTopic,this.node.nodeName,key,value,(RecoverableMetadata)metadata));
             if(metadata.distributable()){
                 this.integrationCluster.set(metadata,key,value);
             }

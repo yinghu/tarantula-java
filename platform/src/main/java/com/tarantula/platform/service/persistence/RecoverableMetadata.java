@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
+import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.Distributable;
@@ -12,7 +13,7 @@ import java.io.IOException;
 /**
  * Updated by yinghu lu on 4/7/2019.
  */
-public class RecoverableMetadata extends RecoverableObject implements Metadata {
+public class RecoverableMetadata extends RecoverableObject implements Metadata, Portable {
 
     private String source;
     private int factoryId;

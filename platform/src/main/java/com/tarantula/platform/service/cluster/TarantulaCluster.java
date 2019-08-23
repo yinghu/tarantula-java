@@ -180,9 +180,6 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         }
         //add platform portable provider from conf
         config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
-        //this._tarantulaContext.fMap.forEach((k,r)->{
-            //config.getSerializationConfig().addPortableFactory(r.registryId(),new DynamicPortableRegistry(r));
-        //});
         config.getListenerConfigs().add(new ListenerConfig(this));
         _hazel = Hazelcast.newHazelcastInstance(this.config);
         _tarantulaContext._tarantulaInstanceStarted.await();

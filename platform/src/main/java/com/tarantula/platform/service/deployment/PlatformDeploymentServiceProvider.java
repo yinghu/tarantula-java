@@ -281,7 +281,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(!event.trackId().equals(registerKey)){
                 //log.warn("VOTING EVENT->"+event.source()+"/"+event.trackId());
                 vMap.forEach((ks,v)->{
-                    Metadata mt = new RecoverableMetadata(v.getFactoryId(),v.getClassId());
+                    RecoverableMetadata mt = new RecoverableMetadata(v.getFactoryId(),v.getClassId());
                     byte[] k = ks.getBytes();//v.key().asString()!=null?v.key().asString().getBytes():"".getBytes();
                     MapStoreSyncEvent mse = new MapStoreSyncEvent(event.source(),event.trackId(),k,SystemUtil.toJson(v.toMap()),mt);
                     mse.trackId(event.trackId());
@@ -322,7 +322,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         }
         else if(event instanceof ModuleResetEvent){
-            _reset((Descriptor)event.portable());
+            ModuleResetEvent mse = (ModuleResetEvent)event;
+            _reset((Descriptor)mse.portable());
         }
         else if(event instanceof ModuleLaunchEvent){
             _launch(event.typeId());
@@ -336,7 +337,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         rListeners.put(instanceRegistryListener.onLobby(),instanceRegistryListener);
     }
     public void deploy(OnView onView){
-        Metadata mt = new RecoverableMetadata(onView.getFactoryId(),onView.getClassId());
+        RecoverableMetadata mt = new RecoverableMetadata(onView.getFactoryId(),onView.getClassId());
         byte[] k = onView.key().asString()!=null?onView.key().asString().getBytes():"".getBytes();
         MapStoreSyncEvent mse = new MapStoreSyncEvent(this.eventTopic,this.localTopic,k,SystemUtil.toJson(onView.toMap()),mt);
         this.integrationEventService.publish(mse);
@@ -365,7 +366,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public void deploy(Configuration configuration){
-        Metadata mt = new RecoverableMetadata(configuration.getFactoryId(),configuration.getClassId());
+        RecoverableMetadata mt = new RecoverableMetadata(configuration.getFactoryId(),configuration.getClassId());
         byte[] k = configuration.key().asString()!=null?configuration.key().asString().getBytes():"".getBytes();
         byte[] v = SystemUtil.toJson(configuration.toMap());
         if(configuration.disabled()){

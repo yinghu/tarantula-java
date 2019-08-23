@@ -1,11 +1,9 @@
 package com.tarantula;
 
-import com.hazelcast.nio.serialization.Portable;
-
 /**
- * Created by yinghu lu on 9/24/2018.
+ * Updated by yinghu lu on 8/23/2019.
  */
-public interface Metadata extends Portable {
+public interface Metadata extends Recoverable {
 
      String source();
      int factoryId();

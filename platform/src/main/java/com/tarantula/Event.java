@@ -1,10 +1,8 @@
 package com.tarantula;
 
-import com.hazelcast.nio.serialization.Portable;
-
 /**
  * Event represents an asynchronous message
- * Updated by yinghu lu on 10/8/2018
+ * Updated by yinghu lu on 8/23/2019
  * */
 public interface Event extends Session{
 
@@ -19,7 +17,7 @@ public interface Event extends Session{
 	int retries();
 	void retries(int retries);
 
-	void portable(Portable portable);
-	Portable portable();
+	//void portable(Portable portable);
+	//Portable portable();
 
 }

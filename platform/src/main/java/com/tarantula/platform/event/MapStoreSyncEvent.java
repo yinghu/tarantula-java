@@ -3,8 +3,8 @@ package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.Event;
-import com.tarantula.Metadata;
 import com.tarantula.platform.Data;
+import com.tarantula.platform.service.persistence.RecoverableMetadata;
 
 import java.io.IOException;
 
@@ -14,12 +14,12 @@ import java.io.IOException;
 public class MapStoreSyncEvent extends Data implements Event {
 
     public byte[] key;
-    public Metadata metadata;
+    public RecoverableMetadata metadata;
 
     public MapStoreSyncEvent(){
         this.forwarding = true;
     }
-    public MapStoreSyncEvent(String destination, String source,byte[] key,byte[] value, Metadata metadata){
+    public MapStoreSyncEvent(String destination, String source,byte[] key,byte[] value, RecoverableMetadata metadata){
         this();
         this.destination = destination;
         this.source = source;
@@ -27,7 +27,7 @@ public class MapStoreSyncEvent extends Data implements Event {
         this.payload = value;
         this.metadata = metadata;
     }
-    public MapStoreSyncEvent(String destination, String source,String systemId,byte[] key,byte[] value, Metadata metadata){
+    public MapStoreSyncEvent(String destination, String source,String systemId,byte[] key,byte[] value, RecoverableMetadata metadata){
         this();
         this.destination = destination;
         this.source = source;
