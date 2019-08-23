@@ -44,18 +44,6 @@ public class OnAccessTrack extends OnApplicationHeader implements OnAccess {
         });
         return _hs;
     }
-
-    @Override
-    public int getFactoryId() {
-        return 0;
-    }
-
-    @Override
-    public int getClassId() {
-        return 0;
-    }
-
-
     @Override
     public String toString(){
         return "On Access ["+applicationId+","+instanceId+","+accessMode+"]";

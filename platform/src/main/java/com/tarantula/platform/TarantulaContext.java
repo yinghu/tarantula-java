@@ -137,14 +137,14 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
  	    ClientConfig dconf = new ClientConfig();
         dconf.getGroupConfig().setName(this.clusterNamePrefix+"-"+this.dataBucketGroup);
-        dconf.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new DynamicPortableRegistry(new PortableEventRegistry()));
+        dconf.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         this.memberDiscovery(Distributable.DATA_SCOPE).find().forEach((ia)->{
             String ip = ia.getHostAddress();
             dconf.getNetworkConfig().addAddress(ip+":5701");
         });
         ClientConfig iconf = new ClientConfig();
         iconf.getGroupConfig().setName(this.clusterNamePrefix+"-integration");
-        iconf.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new DynamicPortableRegistry(new PortableEventRegistry()));
+        iconf.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         this.memberDiscovery(Distributable.INTEGRATION_SCOPE).find().forEach((ia)->{
             String ip = ia.getHostAddress();
             iconf.getNetworkConfig().addAddress(ip+":5702");

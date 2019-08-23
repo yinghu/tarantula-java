@@ -1,11 +1,9 @@
 package com.tarantula.platform;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
+
 import com.tarantula.*;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -40,26 +38,7 @@ public class OnInstanceTrack extends OnApplicationHeader implements OnInstance {
     public int getClassId() {
         return PortableRegistry.ON_INSTANCE_CID;
     }
-    @Override
-    public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("1", this.systemId);
-        out.writeUTF("3", this.instanceId);
-        out.writeInt("5", this.accessMode);
-        out.writeBoolean("6", this.initialized);
-        out.writeBoolean("7", this.joined);
-        out.writeDouble("9", this.balance);
-        out.writeLong("15",this.timestamp);
-    }
-    @Override
-    public void readPortable(PortableReader in) throws IOException {
-        this.systemId = in.readUTF("1");
-        this.instanceId = in.readUTF("3");
-        this.accessMode = in.readInt("5");
-        this.initialized = in.readBoolean("6");
-        this.joined = in.readBoolean("7");
-        this.balance = in.readDouble("9");
-        this.timestamp = in.readLong("15");
-    }
+
     @Override
     public String toString(){
         return "["+this.systemId+","+this.stub+"]["+"On Instance "+this.applicationId+","+this.instanceId+","+this.joined+"]";

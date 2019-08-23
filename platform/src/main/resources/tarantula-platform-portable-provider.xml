@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tarantula-platform-portable-provider>
     <portable-registry registry-id="1">com.tarantula.platform.service.cluster.PortableRegistry</portable-registry>
-    <portable-registry registry-id="2">com.tarantula.platform.event.PortableEventRegistry</portable-registry>
     <portable-registry registry-id="3">com.tarantula.platform.presence.UserPortableRegistry</portable-registry>
     <portable-registry registry-id="4">com.tarantula.platform.leveling.LevelingPortableRegistry</portable-registry>
     <portable-registry registry-id="5">com.tarantula.platform.presence.PresencePortableRegistry</portable-registry>

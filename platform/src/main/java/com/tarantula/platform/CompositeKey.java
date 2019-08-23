@@ -21,9 +21,6 @@ public class CompositeKey extends RecoverableObject implements Recoverable.Key {
         this.owner = owner;
         this.key = key;
     }
-    public String getPartitionKey() {
-        return this.owner;
-    }
 
     public int getFactoryId() {
         return PortableRegistry.OID;

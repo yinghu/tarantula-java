@@ -1,12 +1,10 @@
 package com.tarantula.platform.service.persistence;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
+
 import com.tarantula.platform.DistributionKey;
 import com.tarantula.platform.NoReplicationObject;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
@@ -39,18 +37,7 @@ public class Node extends NoReplicationObject {
     public int getClassId() {
         return PortableRegistry.NODE_CID;
     }
-    @Override
-    public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("1",this.bucketName);
-        out.writeUTF("2",this.nodeName);
-        out.writeInt("3",this.bucketId);
-    }
-    @Override
-    public void readPortable(PortableReader in) throws IOException {
-        this.bucketName = in.readUTF("1");
-        this.nodeName = in.readUTF("2");
-        this.bucketId = in.readInt("3");
-    }
+
     @Override
     public byte[] toByteArray(){
         byte[] bn = bucketName.getBytes();

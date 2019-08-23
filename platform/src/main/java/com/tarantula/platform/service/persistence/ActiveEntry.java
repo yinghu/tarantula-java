@@ -11,16 +11,6 @@ public class ActiveEntry extends RecoverableObject {
         this.vertex = source;
         this.timestamp = System.currentTimeMillis();
     }
-
-    @Override
-    public int getFactoryId() {
-        return 0;
-    }
-
-    @Override
-    public int getClassId() {
-        return 0;
-    }
     @Override
     public byte[] toByteArray(){
         ByteBuffer buffer = ByteBuffer.allocate(12+vertex.length());

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.platform.service.cluster.PortableRegistry;
+import com.tarantula.platform.event.PortableEventRegistry;
 
 public class DeploymentDescriptor extends DefaultDescriptor{
 
@@ -16,11 +16,11 @@ public class DeploymentDescriptor extends DefaultDescriptor{
 
     @Override
 	public int getClassId() {
-		return PortableRegistry.APPLICATION_DESCRIPTOR_CID;
+		return PortableEventRegistry.APPLICATION_DESCRIPTOR_CID;
 	}
     @Override
 	public int getFactoryId() {
-		return PortableRegistry.OID;
+		return PortableEventRegistry.OID;
 	}
     @Override
 	public void readPortable(PortableReader in) throws IOException {

@@ -1,10 +1,7 @@
 package com.tarantula.platform;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.*;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -155,23 +152,6 @@ public class RecoverableObject implements Recoverable {
     }
     public int scope(){
         return Distributable.DATA_SCOPE;
-    }
-    public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("_bucket",this.bucket);
-        out.writeUTF("_oid",this.oid);
-        out.writeUTF("_vertex",this.vertex);
-        out.writeUTF("_label",this.label);
-        out.writeBoolean("_edge",this.onEdge);
-        out.writeInt("_routingNumber",this.routingNumber);
-
-    }
-    public void readPortable(PortableReader in) throws IOException {
-        this.bucket = in.readUTF("_bucket");
-        this.oid = in.readUTF("_oid");
-        this.vertex = in.readUTF("_vertex");
-        this.label = in.readUTF("_label");
-        this.onEdge = in.readBoolean("_edge");
-        this.routingNumber = in.readInt("_routingNumber");
     }
     public boolean onEdge(){
         return this.onEdge;

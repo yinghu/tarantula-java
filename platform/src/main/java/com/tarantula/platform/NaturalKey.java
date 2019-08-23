@@ -1,9 +1,10 @@
 package com.tarantula.platform;
 
+import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.Recoverable;
-import com.tarantula.platform.service.cluster.PortableRegistry;
+import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -11,7 +12,7 @@ import java.nio.charset.Charset;
 /**
  * Updated by yinghu on 6/15/2018.
  */
-public class NaturalKey extends RecoverableObject implements Recoverable.Key {
+public class NaturalKey extends RecoverableObject implements Recoverable.Key, Portable {
 
 
     public String key;
@@ -21,16 +22,12 @@ public class NaturalKey extends RecoverableObject implements Recoverable.Key {
 
         this.key = key;
     }
-    public String getPartitionKey() {
-        return this.key;
-    }
-
     public int getFactoryId() {
-        return PortableRegistry.OID;
+        return PortableEventRegistry.OID;
     }
 
     public int getClassId() {
-        return PortableRegistry.NATURAL_KEY_CID;
+        return PortableEventRegistry.NATURAL_KEY_CID;
     }
 
     public void writePortable(PortableWriter out) throws IOException {

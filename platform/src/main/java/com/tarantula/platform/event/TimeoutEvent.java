@@ -1,7 +1,11 @@
 package com.tarantula.platform.event;
 
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.Event;
 import com.tarantula.platform.Data;
+
+import java.io.IOException;
 
 /**
  * Updated by yinghu on 4/8/2018.
@@ -15,5 +19,15 @@ public class TimeoutEvent extends Data implements Event {
     @Override
     public String toString(){
         return "Time out ["+systemId+"/"+stub+"/"+routingNumber+"]";
+    }
+
+    @Override
+    public void writePortable(PortableWriter portableWriter) throws IOException {
+
+    }
+
+    @Override
+    public void readPortable(PortableReader portableReader) throws IOException {
+
     }
 }

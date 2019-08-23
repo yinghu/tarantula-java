@@ -4,6 +4,7 @@ import com.tarantula.RecoverableFactory;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
+
 /**
  * Updated by yinghu on 4/8/2019.
  */
@@ -35,8 +36,6 @@ public class LobbyQuery implements RecoverableFactory<DeploymentDescriptor> {
     public String label(){
         return "LB";
     }
-    public boolean onEdge(){
-        return false;
-    }
+
 
 }

@@ -5,7 +5,7 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.Distributable;
 import com.tarantula.Metadata;
 import com.tarantula.platform.RecoverableObject;
-import com.tarantula.platform.service.cluster.PortableRegistry;
+import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 
@@ -55,12 +55,12 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata {
     }
     @Override
     public int getFactoryId() {
-        return PortableRegistry.OID;
+        return PortableEventRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PortableRegistry.METADATA_CID;
+        return PortableEventRegistry.METADATA_CID;
     }
 
     @Override

@@ -1,13 +1,9 @@
 package com.tarantula.platform.presence;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.Profile;
 
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
-
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -64,23 +60,7 @@ public class ProfileTrack extends RecoverableObject implements Profile {
     public int getClassId() {
         return UserPortableRegistry.PROFILE_CID;
     }
-    @Override
-    public void writePortable(PortableWriter out) throws IOException {
-        super.writePortable(out);
-        out.writeUTF("1",this.nickname);
-        out.writeUTF("2",this.avatar);
-        out.writeUTF("3",this.emailAddress);
-        out.writeUTF("4",this.video);
-    }
 
-    @Override
-    public void readPortable(PortableReader in) throws IOException {
-        super.readPortable(in);
-        this.nickname = in.readUTF("1");
-        this.avatar = in.readUTF("2");
-        this.emailAddress = in.readUTF("3");
-        this.video = in.readUTF("4");
-    }
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("emailAddress",this.emailAddress!=null?this.emailAddress:"n/a");

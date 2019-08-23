@@ -69,15 +69,4 @@ public class ResponseHeader extends RecoverableObject implements Response {
     public void successful(boolean successful) {
         this.successful = successful;
     }
-
-
-    @Override
-    public int getFactoryId() {
-        return 0;
-    }
-
-    @Override
-    public int getClassId() {
-        return 0;
-    }
 }

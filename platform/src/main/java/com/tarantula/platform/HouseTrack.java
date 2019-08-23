@@ -1,13 +1,7 @@
 package com.tarantula.platform;
-
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.*;
 import com.tarantula.platform.service.cluster.PortableRegistry;
-
-import java.io.IOException;
 import java.util.Map;
-
 /**
  * Updated by yinghu on 6/8/2018.
  */
@@ -40,20 +34,7 @@ public class HouseTrack extends OnApplicationHeader implements House {
         return PortableRegistry.HOUSE_CID;
     }
 
-    @Override
-    public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("o",this.oid);
-        out.writeDouble("3", this.balance);
-        out.writeBoolean("4",this.bank);
 
-    }
-    @Override
-    public void readPortable(PortableReader in) throws IOException {
-        this.oid = in.readUTF("o");
-        this.balance = in.readDouble("3");
-        this.bank = in.readBoolean("4");
-
-    }
     @Override
     public String toString(){
         return "House ["+this.oid+"]"+systemId+"/"+owner+"/"+balance+"/"+bank+"]";

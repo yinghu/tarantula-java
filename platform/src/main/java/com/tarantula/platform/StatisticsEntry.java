@@ -1,11 +1,9 @@
 package com.tarantula.platform;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
+
 import com.tarantula.Statistics;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
@@ -43,16 +41,6 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     @Override
     public void value(double delta) {
         this.value +=delta;
-    }
-    @Override
-    public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("1",this.name);
-        out.writeDouble("2",this.value);
-    }
-    @Override
-    public void readPortable(PortableReader in) throws IOException {
-        this.name = in.readUTF("1");
-        this.value = in.readDouble("2");
     }
 
     @Override

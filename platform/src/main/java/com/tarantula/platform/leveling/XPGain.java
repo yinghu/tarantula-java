@@ -47,28 +47,7 @@ public class XPGain extends RecoverableObject implements XP {
     public int getClassId() {
         return LevelingPortableRegistry.XP_CID;
     }
-    @Override
-    public void writePortable(PortableWriter out) throws IOException {
-        super.writePortable(out);
-        out.writeUTF("2",(String)this.properties.get("name"));
-        out.writeDouble("3",(Double)this.properties.get("Daily"));
-        out.writeDouble("4",(Double)this.properties.get("Weekly"));
-        out.writeDouble("5",(Double)this.properties.get("Monthly"));
-        out.writeDouble("6",(Double)this.properties.get("Yearly"));
-        out.writeDouble("7",(Double)this.properties.get("Total"));
 
-    }
-    @Override
-    public void readPortable(PortableReader in) throws IOException {
-        super.readPortable(in);
-        this.properties.put("name",in.readUTF("2"));
-        this.properties.put("Daily",in.readDouble("3"));
-        this.properties.put("Weekly",in.readDouble("4"));
-        this.properties.put("Monthly",in.readDouble("5"));
-        this.properties.put("Yearly",in.readDouble("6"));
-        this.properties.put("Total",in.readDouble("7"));
-
-    }
     @Override
     public byte[] toByteArray(){
         byte[] _hb = header.getBytes();

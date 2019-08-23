@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Updated by yinghu on 4/16/2019.
  */
-public class ApplicationConfiguration extends DeploymentObject implements Configuration{
+public class ApplicationConfiguration extends RecoverableObject implements Configuration{
 
     protected String tag;
     protected String type;

@@ -2,7 +2,6 @@ package com.tarantula.platform.presence;
 
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AssociateKey;
-import com.tarantula.platform.NoReplicationObject;
 import com.tarantula.platform.RecoverableObject;
 
 import java.nio.ByteBuffer;

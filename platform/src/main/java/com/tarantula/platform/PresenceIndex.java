@@ -1,11 +1,8 @@
 package com.tarantula.platform;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.*;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 /**
  * Updated by yinghu on 6/17/19.
@@ -90,18 +87,6 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     @Override
     public int getClassId() {
         return PresencePortableRegistry.PRESENCE_CID;
-    }
-
-    @Override
-    public void writePortable(PortableWriter out) throws IOException {
-        super.writePortable(out);
-        out.writeDouble("4",this.balance);
-    }
-
-    @Override
-    public void readPortable(PortableReader in) throws IOException {
-        super.readPortable(in);
-        this.balance = in.readDouble("4");
     }
 
     @Override

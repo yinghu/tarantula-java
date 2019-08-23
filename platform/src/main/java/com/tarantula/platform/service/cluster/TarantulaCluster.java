@@ -14,6 +14,7 @@ import com.tarantula.EventListener;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
+import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.Closable;
 import com.tarantula.platform.service.ClusterProvider;
 import com.tarantula.platform.service.DeployService;
@@ -178,9 +179,10 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
             this.replicationPool.execute(ese);
         }
         //add platform portable provider from conf
-        this._tarantulaContext.fMap.forEach((k,r)->{
-            config.getSerializationConfig().addPortableFactory(r.registryId(),new DynamicPortableRegistry(r));
-        });
+        config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
+        //this._tarantulaContext.fMap.forEach((k,r)->{
+            //config.getSerializationConfig().addPortableFactory(r.registryId(),new DynamicPortableRegistry(r));
+        //});
         config.getListenerConfigs().add(new ListenerConfig(this));
         _hazel = Hazelcast.newHazelcastInstance(this.config);
         _tarantulaContext._tarantulaInstanceStarted.await();

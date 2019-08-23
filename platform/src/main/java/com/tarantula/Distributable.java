@@ -1,11 +1,8 @@
 package com.tarantula;
-
-import com.hazelcast.nio.serialization.Portable;
-
 /**
- * Updated by yinghu on 4/6/2018.
+ * Updated by yinghu on 8/23/19
  */
-public interface Distributable extends Portable {
+public interface Distributable {
 
     int LOCAL_SCOPE = 0; //NO REPLICATION
     int DATA_SCOPE = 1; //REPLICATION WITHIN DATA CLUSTER

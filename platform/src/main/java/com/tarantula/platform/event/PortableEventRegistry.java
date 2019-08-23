@@ -1,12 +1,17 @@
 package com.tarantula.platform.event;
 
-import com.tarantula.Recoverable;
-import com.tarantula.platform.AbstractRecoverableListener;
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableFactory;
+import com.tarantula.platform.DeploymentDescriptor;
+import com.tarantula.platform.NaturalKey;
+import com.tarantula.platform.SessionForward;
+import com.tarantula.platform.service.Batch;
+import com.tarantula.platform.service.persistence.RecoverableMetadata;
 
 
-public class PortableEventRegistry extends AbstractRecoverableListener {
+public class PortableEventRegistry implements PortableFactory {
 
-	public static final int OID =2;
+	public static final int OID =1;
 
 	public static final int APPLICATION_ACTION_EVENT_CID = 1;
 
@@ -44,8 +49,20 @@ public class PortableEventRegistry extends AbstractRecoverableListener {
 
     public static final int MESSAGE_EVENT_CID = 19;
 
-    public Recoverable create(int cid) {
-        Recoverable _ins;
+    //EVENT PORTABLE OBJECTS
+    public static final int SINGLETON_FORWARD_CID = 100;
+
+    public static final int METADATA_CID = 101;
+
+    public static final int LOBBY_CID = 102;
+    public static final int APPLICATION_DESCRIPTOR_CID =103;
+
+    public static final int BATCH_CID = 104;
+
+    public static final int NATURAL_KEY_CID = 105;
+
+    public Portable create(int cid) {
+        Portable _ins;
 		switch(cid){
 			case APPLICATION_ACTION_EVENT_CID:
 				_ins = new ApplicationActionEvent();
@@ -103,13 +120,27 @@ public class PortableEventRegistry extends AbstractRecoverableListener {
             case MODULE_SHUTDOWN_EVENT_CID:
                 _ins = new ModuleShutdownEvent();
                 break;
+            case SINGLETON_FORWARD_CID:
+                _ins = new SessionForward();
+                break;
+            case METADATA_CID:
+                _ins = new RecoverableMetadata();
+                break;
+            case APPLICATION_DESCRIPTOR_CID:
+                _ins = new DeploymentDescriptor();
+                break;
+            case  NATURAL_KEY_CID:
+                _ins = new NaturalKey();
+                break;
+            case BATCH_CID:
+                _ins = new Batch();
+                break;
             default:
 				throw new IllegalArgumentException("Not supported event type");
 		}
 		return _ins;
 	}
 
-    @Override
     public int registryId() {
         return OID;
     }

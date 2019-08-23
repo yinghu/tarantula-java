@@ -1,14 +1,12 @@
 package com.tarantula.platform.leveling;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
+
 import com.tarantula.Level;
 import com.tarantula.Recoverable;
 import com.tarantula.XP;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.*;
 import java.util.ArrayList;
@@ -46,26 +44,7 @@ public class XPLevel extends RecoverableObject implements Level {
         return LevelingPortableRegistry.LEVEL_CID;
     }
 
-    @Override
-    public void writePortable(PortableWriter out) throws IOException {
-        super.writePortable(out);
-        out.writeLong("d",this.dailyTimestamp.toInstant(ZoneOffset.UTC).toEpochMilli());
-        out.writeLong("w",this.weeklyTimestamp.toInstant(ZoneOffset.UTC).toEpochMilli());
-        out.writeLong("m",this.monthlyTimestamp.toInstant(ZoneOffset.UTC).toEpochMilli());
-        out.writeLong("y",this.yearlyTimestamp.toInstant(ZoneOffset.UTC).toEpochMilli());
-        out.writeInt("3",this.level);
-        out.writeDouble("7", this.levelXP);
-    }
-    @Override
-    public void readPortable(PortableReader in) throws IOException {
-        super.readPortable(in);
-        this.dailyTimestamp = LocalDateTime.ofInstant(Instant.ofEpochMilli(in.readLong("d")), ZoneOffset.UTC);
-        this.weeklyTimestamp = LocalDateTime.ofInstant(Instant.ofEpochMilli(in.readLong("w")), ZoneOffset.UTC);
-        this.monthlyTimestamp = LocalDateTime.ofInstant(Instant.ofEpochMilli(in.readLong("m")), ZoneOffset.UTC);
-        this.yearlyTimestamp = LocalDateTime.ofInstant(Instant.ofEpochMilli(in.readLong("y")), ZoneOffset.UTC);
-        this.level = in.readInt("3");
-        this.levelXP = in.readDouble("7");
-    }
+
 
     @Override
     public byte[] toByteArray(){

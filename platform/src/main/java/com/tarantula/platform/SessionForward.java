@@ -2,13 +2,13 @@ package com.tarantula.platform;
 
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.platform.service.cluster.PortableRegistry;
+import com.tarantula.platform.event.PortableEventRegistry;
 import java.io.IOException;
 
 /**
  * Updated by yinghu on 6/6/2018.
  */
-public class SessionForward extends RecoverableObject{
+public class SessionForward extends Data{
 
     private String applicationId;
     private String instanceId;
@@ -53,11 +53,11 @@ public class SessionForward extends RecoverableObject{
         this.source = source;
     }
     public int getFactoryId() {
-        return PortableRegistry.OID;
+        return PortableEventRegistry.OID;
     }
 
     public int getClassId() {
-        return PortableRegistry.SINGLETON_FORWARD_CID;
+        return PortableEventRegistry.SINGLETON_FORWARD_CID;
     }
 
     public void writePortable(PortableWriter out) throws IOException {

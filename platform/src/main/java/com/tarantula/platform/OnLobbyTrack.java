@@ -1,10 +1,8 @@
 package com.tarantula.platform;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
+
 import com.tarantula.OnLobby;
 import com.tarantula.platform.service.cluster.PortableRegistry;
-import java.io.IOException;
 
 
 /**
@@ -42,17 +40,7 @@ public class OnLobbyTrack extends RecoverableObject implements OnLobby {
     public String toString(){
         return "Lobby["+typeId+"/"+closed+"]";
     }
-    @Override
-    public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("3",typeId);
-        out.writeBoolean("4",this.closed);
-    }
-    @Override
-    public void readPortable(PortableReader in) throws IOException {
-        this.typeId = in.readUTF("3");
-        this.closed = in.readBoolean("4");
 
-    }
     @Override
     public int getFactoryId() {
         return PortableRegistry.OID;

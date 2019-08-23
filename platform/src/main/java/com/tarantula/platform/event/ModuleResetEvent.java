@@ -2,9 +2,9 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.Descriptor;
 import com.tarantula.Event;
 import com.tarantula.platform.Data;
+import com.tarantula.platform.DeploymentDescriptor;
 
 import java.io.IOException;
 
@@ -26,7 +26,7 @@ public class ModuleResetEvent extends Data implements Event {
     public ModuleResetEvent(){
 
     }
-    public ModuleResetEvent(String destination, Descriptor descriptor){
+    public ModuleResetEvent(String destination, DeploymentDescriptor descriptor){
         this.destination = destination;
         this.portable = descriptor;
     }

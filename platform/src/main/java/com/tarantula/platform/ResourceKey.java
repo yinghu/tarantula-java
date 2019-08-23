@@ -1,12 +1,8 @@
 package com.tarantula.platform;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
+
 import com.tarantula.Recoverable;
 import com.tarantula.platform.service.cluster.PortableRegistry;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
 
 /**
  * Updated by yinghu on 6/15/2018.
@@ -23,9 +19,6 @@ public class ResourceKey extends RecoverableObject implements Recoverable.Key {
         this.oid = oid;
         this.key = key;
     }
-    public String getPartitionKey() {
-        return this.oid;
-    }
 
     public int getFactoryId() {
         return PortableRegistry.OID;
@@ -35,17 +28,6 @@ public class ResourceKey extends RecoverableObject implements Recoverable.Key {
         return PortableRegistry.RESOURCE_KEY_CID;
     }
 
-    public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("1", this.bucket);
-        out.writeUTF("2",this.oid);
-        out.writeUTFArray("3",this.key);
-    }
-
-    public void readPortable(PortableReader in) throws IOException {
-        this.bucket = in.readUTF("1");
-        this.oid = in.readUTF("2");
-        this.key = in.readUTFArray("3");
-    }
     public byte[] toByteArray(){
         return this.asString().getBytes();
     }

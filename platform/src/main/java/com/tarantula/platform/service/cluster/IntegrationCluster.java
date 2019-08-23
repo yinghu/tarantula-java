@@ -12,6 +12,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
 import com.tarantula.platform.bootstrap.TarantulaMain;
+import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -90,10 +91,11 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             this.inboundEventPool.execute(ese);
         }
         this.tarantulaContext.serverTopic = this.bucket;
-         this.tarantulaContext.fMap.forEach((k,r)->{
-            config.getSerializationConfig().addPortableFactory(r.registryId(),new DynamicPortableRegistry(r));
-        });
-         this.config.getListenerConfigs().add(new ListenerConfig(this));
+        config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
+        //this.tarantulaContext.fMap.forEach((k,r)->{
+            //config.getSerializationConfig().addPortableFactory(r.registryId(),new DynamicPortableRegistry(r));
+        //});
+        this.config.getListenerConfigs().add(new ListenerConfig(this));
         _cluster = Hazelcast.newHazelcastInstance(this.config);
         this.tarantulaContext._integrationInstanceStarted.await();
         mIndex = this._cluster.getMultiMap(INDEX_MAP);

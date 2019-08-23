@@ -1,5 +1,6 @@
 package com.tarantula.platform;
 
+import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.AccessIndex;
@@ -12,7 +13,7 @@ import java.nio.ByteBuffer;
 /**
  * Created by yinghu lu on 10/8/2017.
  */
-public class AccessIndexTrack extends IntegrationScopeObject implements AccessIndex{
+public class AccessIndexTrack extends IntegrationScopeObject implements AccessIndex, Portable {
 
     public AccessIndexTrack(){
         this.binary = true;

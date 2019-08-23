@@ -45,14 +45,13 @@ public class OnLeaderBoardTrack extends OnApplicationHeader implements OnLeaderB
         return LeaderBoardPortableRegistry.ON_LEADER_BOARD_CID;
     }
 
-    @Override
+
     public void writePortable(PortableWriter out) throws IOException {
         out.writeUTF("1",this.systemId);
         out.writeUTF("3",this.leaderBoardHeader);
-        out.writePortableArray("4",this.entryList);
+        //out.writePortableArray("4",this.entryList);
     }
 
-    @Override
     public void readPortable(PortableReader in) throws IOException {
         this.systemId = in.readUTF("1");
         this.leaderBoardHeader = in.readUTF("3");

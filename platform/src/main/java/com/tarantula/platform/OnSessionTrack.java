@@ -1,11 +1,9 @@
 package com.tarantula.platform;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
+
 import com.tarantula.OnSession;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
@@ -62,23 +60,6 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         return PortableRegistry.ON_SESSION_CID;
     }
 
-    @Override
-    public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("1",this.oid);
-        out.writeUTF("2",systemId);
-        out.writeInt("3",this.stub);
-        out.writeLong("4",this.timestamp);
-        out.writeBoolean("6",this.disabled);
-    }
-
-    @Override
-    public void readPortable(PortableReader in) throws IOException {
-        this.oid = in.readUTF("1");
-        this.systemId = in.readUTF("2");
-        this.stub = in.readInt("3");
-        this.timestamp = in.readLong("4");
-        this.disabled = in.readBoolean("6");
-    }
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("systemId",systemId);

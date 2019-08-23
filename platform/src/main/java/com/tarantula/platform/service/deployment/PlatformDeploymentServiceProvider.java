@@ -103,7 +103,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         String suc = this.tarantulaContext.tarantulaCluster.deployService().resetModule(lobby.descriptor().distributionKey(),descriptor);
         ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
         if(resp.successful()){
-            this.integrationEventService.publish(new ModuleResetEvent(this.eventTopic,descriptor));
+            this.integrationEventService.publish(new ModuleResetEvent(this.eventTopic,(DeploymentDescriptor) descriptor));
         }
         return suc;
     }
@@ -251,7 +251,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             MapStoreSyncEvent mse = (MapStoreSyncEvent)event;
             Metadata mt = mse.metadata;
             RecoverableRegistry r = tarantulaContext.recoverableRegistry(mt.factoryId());
-            Recoverable ot = (Recoverable)r.create(mt.classId());
+            Recoverable ot = r.create(mt.classId());
             if(ot.binary()){
                 ot.fromByteArray(event.payload());
             }

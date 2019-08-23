@@ -1,7 +1,5 @@
 package com.tarantula.platform;
 
-import com.tarantula.platform.OnApplicationHeader;
-
 /**
  * Created by yinghu lu on 3/20/2019.
  */

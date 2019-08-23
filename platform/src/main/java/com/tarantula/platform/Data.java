@@ -3,7 +3,7 @@ import com.hazelcast.nio.serialization.Portable;
 import com.tarantula.EventService;
 import com.tarantula.platform.event.ResponsiveEvent;
 
-public class Data extends RecoverableObject{
+abstract public class Data extends RecoverableObject implements Portable{
 
 
     protected String systemId;

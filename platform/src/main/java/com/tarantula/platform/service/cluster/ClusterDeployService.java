@@ -338,7 +338,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             List vlist = dataStore.list(new OnViewQuery(params[0]));
             batchCache = new BatchCache(UUID.randomUUID().toString(),vlist);
         }
-        else if(registryId==PortableRegistry.APPLICATION_DESCRIPTOR_CID){
+        else if(registryId== PortableRegistry.APPLICATION_DESCRIPTOR_CID){
             List dlist = new ArrayList();
             dataStore.list(new ApplicationQuery(params[0]),(a)->{
                 //log.warn("app->"+a.disabled()+"/"+a.name()+"/"+a.category());

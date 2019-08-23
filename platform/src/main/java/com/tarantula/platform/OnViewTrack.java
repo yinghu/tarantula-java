@@ -1,17 +1,13 @@
 package com.tarantula.platform;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.OnView;
 import com.tarantula.platform.service.cluster.PortableRegistry;
-
-import java.io.IOException;
 import java.util.Map;
 
 /**
  * Updated by yinghu lu on 11/20/2018.
  */
-public class OnViewTrack extends DeploymentObject implements OnView {
+public class OnViewTrack extends RecoverableObject implements OnView {
 
     protected String contentBaseUrl;
     protected String moduleFile;
@@ -80,30 +76,6 @@ public class OnViewTrack extends DeploymentObject implements OnView {
     }
 
     @Override
-    public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("1",this.contentBaseUrl);
-        out.writeUTF("2",this.moduleFile);
-        out.writeUTF("3",this.moduleName);
-        out.writeUTF("4",this.moduleResourceFile);
-        out.writeUTF("5",this.icon);
-        out.writeUTF("6",this.viewId);
-        out.writeUTF("7",this.flag);
-        out.writeUTF("8",this.category);
-    }
-
-    @Override
-    public void readPortable(PortableReader in) throws IOException {
-        this.contentBaseUrl = in.readUTF("1");
-        this.moduleFile = in.readUTF("2");
-        this.moduleName = in.readUTF("3");
-        this.moduleResourceFile = in.readUTF("4");
-        this.icon = in.readUTF("5");
-        this.viewId = in.readUTF("6");
-        this.flag = in.readUTF("7");
-        this.category = in.readUTF("8");
-    }
-    @Override
-
     public Map<String,Object> toMap(){
         this.properties.put("1",viewId);
         this.properties.put("2",flag);
@@ -124,10 +96,6 @@ public class OnViewTrack extends DeploymentObject implements OnView {
         this.moduleName = (String)properties.get("6");
         this.moduleResourceFile = (String)properties.get("7");
     }
-    //@Override
-    //public Key key(){
-        //return new CompositeKey(this.viewId,flag);
-    //}
     @Override
     public int getFactoryId() {
         return PortableRegistry.OID;

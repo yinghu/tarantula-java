@@ -4,7 +4,7 @@ import com.tarantula.Descriptor;
 
 import java.util.Map;
 
-public class DefaultDescriptor extends DeploymentObject implements Descriptor{
+abstract public class DefaultDescriptor extends DeploymentObject implements Descriptor{
 
 	protected String typeId;
     protected String applicationId;

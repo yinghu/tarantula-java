@@ -1,10 +1,8 @@
 package com.tarantula.platform;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
+
 import com.tarantula.Recoverable;
 
-import java.io.IOException;
 
 /**
  * Created by yinghu lu on 9/21/2018.
@@ -36,10 +34,6 @@ public class AssociateKey extends RecoverableObject implements Recoverable.Key {
 
     }
 
-    @Override
-    public String getPartitionKey() {
-        return bucket;
-    }
 
     @Override
     public int getFactoryId() {
@@ -51,13 +45,5 @@ public class AssociateKey extends RecoverableObject implements Recoverable.Key {
         return 0;
     }
 
-    @Override
-    public void writePortable(PortableWriter portableWriter) throws IOException {
 
-    }
-
-    @Override
-    public void readPortable(PortableReader portableReader) throws IOException {
-
-    }
 }

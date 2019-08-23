@@ -1,12 +1,9 @@
 package com.tarantula.platform;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.*;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.service.deployment.InstanceManager;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -69,26 +66,7 @@ public class InstanceIndex  extends OnApplicationHeader implements InstanceRegis
     public int getClassId() {
         return PortableRegistry.INSTANCE_INDEX_CID;
     }
-    @Override
-    public void writePortable(PortableWriter out) throws IOException {
-        super.writePortable(out);
-        out.writeUTF("1",this.applicationId);
-        out.writeInt("2", this.capacity);
-        out.writeInt("3",this.accessMode);
-        out.writeBoolean("5",this.bank);
-        out.writeBoolean("6",this.tournamentEnabled);
 
-    }
-    @Override
-    public void readPortable(PortableReader in) throws IOException {
-        super.readPortable(in);
-        this.applicationId = in.readUTF("1");
-        this.capacity = in.readInt("2");
-        this.accessMode = in.readInt("3");
-        this.bank = in.readBoolean("5");
-        this.tournamentEnabled = in.readBoolean("6");
-        this.instanceId = this.distributionKey();
-    }
     @Override
     public Map<String,Object> toMap(){
         //this.properties.put("applicationId",applicationId);

@@ -3,8 +3,6 @@ package com.tarantula;
 
 //portable interface, which could be replicated in cluster wide or persistent in storage
 
-import com.hazelcast.core.PartitionAware;
-
 import java.util.Map;
 
 public interface Recoverable extends Distributable{
@@ -46,6 +44,8 @@ public interface Recoverable extends Distributable{
 
     boolean onEdge();
     void onEdge(boolean onEdge);
+    int getFactoryId();
+    int getClassId();
 
     Key key();
 
@@ -53,7 +53,7 @@ public interface Recoverable extends Distributable{
 
     void onUpdate();
 
-    interface Key extends Recoverable,PartitionAware<String> {
+    interface Key extends Recoverable{
         String asString();
     }
 }

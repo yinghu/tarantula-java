@@ -21,10 +21,6 @@ public class DistributionKey extends RecoverableObject implements Recoverable.Ke
         this.bucket = bucket;
         this.oid = oid;
     }
-    public String getPartitionKey() {
-        return bucket;
-    }
-
 
     public int getFactoryId() {
         return PortableRegistry.OID;
@@ -64,7 +60,7 @@ public class DistributionKey extends RecoverableObject implements Recoverable.Ke
     }
     @Override
     public boolean equals(Object obj){
-        return this.oid.equals(((Recoverable.Key)obj).getPartitionKey());
+        return this.oid.equals(((Recoverable.Key)obj).oid());
     }
     @Override
     public int hashCode(){
