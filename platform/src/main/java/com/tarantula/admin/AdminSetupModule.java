@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.DeploymentDescriptor;
+import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.service.deployment.ApplicationQuery;
 import com.tarantula.platform.service.deployment.LobbyQuery;
 import com.tarantula.platform.util.OnAccessDeserializer;
@@ -112,7 +113,17 @@ public class AdminSetupModule implements Module {
     private AdminObject _adminObjectOnApplication(String lobbyId){
         AdminSetupObject ao = new AdminSetupObject(label());
         ao.name("application list");
-        this.dataStore.list(new ApplicationQuery(lobbyId),(a)->{
+        ApplicationQuery aq = new ApplicationQuery(lobbyId);
+        IndexSet iset = new IndexSet();
+        iset.distributionKey(lobbyId);
+        iset.label(aq.label());
+        if(this.dataStore.load(iset)) {
+            iset.keySet.forEach((s) -> {
+                this.context.log("KEY->" + s, OnLog.INFO);
+            });
+            this.context.log("OUTPUT->"+new String(iset.toByteArray()),OnLog.INFO);
+        }
+        this.dataStore.list(aq,(a)->{
             ao.list.add(a);
             return true;
         });

@@ -39,6 +39,8 @@ public class PortableRegistry extends AbstractRecoverableListener{
 
     public static final int ON_SESSION_CID = 25;
 
+    public static final int KEY_INDEX_CID = 26;
+
     public Recoverable create(int cid) {
         Recoverable _ins;
 		switch(cid){
@@ -105,6 +107,9 @@ public class PortableRegistry extends AbstractRecoverableListener{
                 break;
             case ON_SESSION_CID:
                 _ins = new OnSessionTrack();
+                break;
+            case KEY_INDEX_CID:
+                _ins = new IndexSet();
                 break;
             default:
                 throw new IllegalArgumentException("Not supported event type");
