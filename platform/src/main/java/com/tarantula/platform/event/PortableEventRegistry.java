@@ -3,7 +3,6 @@ package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
 import com.tarantula.platform.DeploymentDescriptor;
-import com.tarantula.platform.NaturalKey;
 import com.tarantula.platform.SessionForward;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
@@ -59,7 +58,6 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int BATCH_CID = 104;
 
-    public static final int NATURAL_KEY_CID = 105;
 
     public Portable create(int cid) {
         Portable _ins;
@@ -128,9 +126,6 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case APPLICATION_DESCRIPTOR_CID:
                 _ins = new DeploymentDescriptor();
-                break;
-            case  NATURAL_KEY_CID:
-                _ins = new NaturalKey();
                 break;
             case BATCH_CID:
                 _ins = new Batch();

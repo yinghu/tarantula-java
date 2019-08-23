@@ -1,8 +1,6 @@
 package com.tarantula.platform;
 
-
 import com.tarantula.Recoverable;
-import com.tarantula.platform.service.cluster.PortableRegistry;
 
 /**
  * Updated by yinghu on 6/15/2018.
@@ -13,19 +11,10 @@ public class ResourceKey extends RecoverableObject implements Recoverable.Key {
     public String oid;
     public String[] key;
 
-    public ResourceKey(){}
     public ResourceKey(String bucket,String oid, String[] key){
         this.bucket = bucket;
         this.oid = oid;
         this.key = key;
-    }
-
-    public int getFactoryId() {
-        return PortableRegistry.OID;
-    }
-
-    public int getClassId() {
-        return PortableRegistry.RESOURCE_KEY_CID;
     }
 
     public byte[] toByteArray(){

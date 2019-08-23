@@ -11,13 +11,10 @@ public class PortableRegistry extends AbstractRecoverableListener{
 
 	public static final int OID = 1;
 
-    public static final int DISTRIBUTION_KEY_CID = 1;
-
     public static final int PROPERTY_CID = 3;
     public static final int DELTA_STAT_CID = 4;
 
     public static final int HOUSE_CID = 6;
-    public static final int COMPOSITE_KEY_CID = 7;
 
     public static final int ACCESS_INDEX_CID = 10;
     public static final int APPLICATION_CONFIGURATION_CID = 11; //DEPLOY OBJECT
@@ -25,7 +22,6 @@ public class PortableRegistry extends AbstractRecoverableListener{
     public static final int ON_VIEW_OID = 13; //DEPLOY OBJECT
     public static final int STATISTICS_ENTRY_CID = 14; //DEPLOY OBJECT
     public static final int NODE_CID = 15;
-    public static final int RESOURCE_KEY_CID = 16;
 
     public static final int SERVICE_CONFIGURATION_CID = 20;//DEPLOY OBJECT
 
@@ -48,15 +44,11 @@ public class PortableRegistry extends AbstractRecoverableListener{
 
     public static final int BATCH_CID = PortableEventRegistry.BATCH_CID;
 
-    public static final int NATURAL_KEY_CID = PortableEventRegistry.NATURAL_KEY_CID;
 
 
     public Recoverable create(int cid) {
         Recoverable _ins;
 		switch(cid){
-            case DISTRIBUTION_KEY_CID:
-                _ins = new DistributionKey();
-                break;
             case PROPERTY_CID:
                 _ins = new DistributedProperty();
                 break;
@@ -66,10 +58,6 @@ public class PortableRegistry extends AbstractRecoverableListener{
             case HOUSE_CID:
                 _ins = new HouseTrack();
                 break;
-            case COMPOSITE_KEY_CID:
-                _ins = new CompositeKey();
-                break;
-
             case ACCESS_INDEX_CID:
                 _ins = new AccessIndexTrack();
                 break;
@@ -88,10 +76,6 @@ public class PortableRegistry extends AbstractRecoverableListener{
             case NODE_CID:
                 _ins = new Node();
                 break;
-            case RESOURCE_KEY_CID:
-                _ins = new ResourceKey();
-                break;
-
             case SERVICE_CONFIGURATION_CID:
                 _ins = new ServiceConfiguration();
                 break;
@@ -117,9 +101,6 @@ public class PortableRegistry extends AbstractRecoverableListener{
                 break;
             case APPLICATION_DESCRIPTOR_CID:
                 _ins = new DeploymentDescriptor();
-                break;
-            case  NATURAL_KEY_CID:
-                _ins = new NaturalKey();
                 break;
             case BATCH_CID:
                 _ins = new Batch();

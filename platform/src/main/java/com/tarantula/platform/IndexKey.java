@@ -7,8 +7,8 @@ import com.tarantula.Recoverable;
  */
 public class IndexKey extends RecoverableObject implements Recoverable.Key {
 
-    private String bucket;
-    private String oid;
+    //private String bucket;
+    //private String oid;
     private int index;
 
     public IndexKey(String bucket, String oid, int  index){
@@ -31,16 +31,5 @@ public class IndexKey extends RecoverableObject implements Recoverable.Key {
     public void fromByteArray(byte[] data) {
 
     }
-
-    @Override
-    public int getFactoryId() {
-        return 0;
-    }
-
-    @Override
-    public int getClassId() {
-        return 0;
-    }
-
 
 }

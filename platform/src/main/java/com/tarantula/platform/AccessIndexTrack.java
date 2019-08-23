@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
- * Created by yinghu lu on 10/8/2017.
+ * updated 8/23/19
  */
 public class AccessIndexTrack extends IntegrationScopeObject implements AccessIndex, Portable {
 
