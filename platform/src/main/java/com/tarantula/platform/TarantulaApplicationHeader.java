@@ -60,10 +60,10 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
     public void refund(String systemId,String applicationId){
         Descriptor desc = this.context.descriptor(applicationId);
         OnBalanceTrack onBalanceTrack = new OnBalanceTrack(systemId,desc.entryCost());
-        this.context.publish(this.context.routingKey(systemId,Presence.LOBBY_TAG),onBalanceTrack);
+        this.context.postOffice().onTag(Presence.LOBBY_TAG).send(systemId,onBalanceTrack);
     }
     public void refund(String systemId,double balance){
         OnBalanceTrack onBalanceTrack = new OnBalanceTrack(systemId,balance);
-        this.context.publish(this.context.routingKey(systemId,Presence.LOBBY_TAG),onBalanceTrack);
+        this.context.postOffice().onTag(Presence.LOBBY_TAG).send(systemId,onBalanceTrack);
     }
 }

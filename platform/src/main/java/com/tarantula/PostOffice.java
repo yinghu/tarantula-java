@@ -2,11 +2,21 @@ package com.tarantula;
 
 public interface PostOffice{
 
-    void onNotification(byte[] data,String label);
-
+    OnLabel onLabel();
+    OnTag onTag(String tag);
+    OnApplication onApplication(String applicationId);
     void onMessage(String from,String to,byte[] message);
 
     void registerMessageListener(String subscription,EventListener messageListener);
     void unregisterMessageListener(String subscription);
 
+    interface OnLabel{
+        void send(String label,byte[] data);
+    }
+    interface OnTag{
+       void send(String distributionKey,Recoverable data);
+    }
+    interface OnApplication{
+        void send(String distributionKey,Recoverable data);
+    }
 }

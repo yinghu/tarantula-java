@@ -28,7 +28,12 @@ var DemoSyncGame = (function(){
         TARA_API.send(_payload);
         //TARA_API.onInstance(_payload,callback);
     };
-    let _item = function(out){
+    var _item = function(callback){
+        var _payload = {serviceTag:"presence/lobby",command:"onTransfer",applicationId:game.applicationId,instanceId:game.instanceId,balance:5000};
+        TARA_API.onService(_payload,callback);    
+    };
+    let _item1 = function(out){
+        
         let _payload = {serviceTag:'demo/service',command:"applicationList"};
         TARA_API.onService(_payload,out);
     };  

@@ -389,12 +389,31 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return new PostOfficeSession();
     }
     private class PostOfficeSession implements PostOffice{
-        @Override
-        public void onNotification(byte[] data, String label) {
-            pushRegistry.forEach((k,v)->{
-                v.write(data,label);
-            });
+
+        public OnLabel onLabel(){
+            return (label,data)-> pushRegistry.forEach((k,v)-> v.write(data,label));
         }
+        public OnTag onTag(String tag){
+           return (dkey,t)->{
+               String key = t.key().asString();
+               RecoverableMetadata m = new RecoverableMetadata(t.getFactoryId(),t.getClassId());
+               byte[] payload = t.binary()?t.toByteArray(): SystemUtil.toJson(t.toMap());
+               RoutingKey routingKey = integrationEventService.routingKey(dkey,tag);
+               MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),routingKey.source(),t.owner(),key!=null?key.getBytes():new byte[0],payload,m);
+               integrationEventService.publish(mapStoreSyncEvent);
+           };
+        }
+        public OnApplication onApplication(String applicationId){
+            return (dkey,t)->{
+                String key = t.key().asString();
+                RecoverableMetadata m = new RecoverableMetadata(t.getFactoryId(),t.getClassId());
+                byte[] payload = t.binary()?t.toByteArray(): SystemUtil.toJson(t.toMap());
+                RoutingKey routingKey = integrationEventService.instanceRoutingKey(applicationId,dkey);
+                MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),routingKey.source(),t.owner(),key!=null?key.getBytes():new byte[0],payload,m);
+                integrationEventService.publish(mapStoreSyncEvent);
+            };
+        }
+
         @Override
         public void onMessage(String from,String to,byte[] message){
             integrationEventService.publish(new MessageEvent(from,to,message));
@@ -408,7 +427,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             tarantulaContext.integrationCluster.unsubscribe(systemId);
         }
     }
-
     class ModuleProxy implements Module{
 
         private Module module;

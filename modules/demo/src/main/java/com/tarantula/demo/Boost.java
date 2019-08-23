@@ -5,6 +5,7 @@ import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.GameObject;
 import com.tarantula.game.GameObjectSerializer;
+import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.lang.reflect.Type;
 
@@ -33,7 +34,8 @@ public class Boost extends GameObject implements Module {
             byte[] ret = this.builder.create().toJson(timer).getBytes();
             session.write(ret,this.label());
             update.on(ret);
-            RoutingKey rk = this.context.routingKey(session.systemId(),"demo/service");
+            postOffice.onLabel().send("presence/notice",ret);
+            //RoutingKey rk = this.context.routingKey(session.systemId(),"demo/service");
             //this.context.publish();
         }
         else if(session.action().equals("b")){
@@ -72,6 +74,7 @@ public class Boost extends GameObject implements Module {
         timer.dataStore(dataStore);
         this.name("boost");
         this.instanceId(context.onRegistry().distributionKey());
+        //this.context.registerRecoverableListener(new PortableRegistry()).addRecoverableFilter();
         this.successful(true);
     }
     @Override

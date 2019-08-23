@@ -48,7 +48,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 OnStatistics delta = new OnStatisticsTrack(this.context.onStatistics().leaderBoardHeader(),access.systemId());
                 delta.xpDelta(1);
                 delta.entryList(new Statistics.Entry[]{new StatisticsEntry("LoginCount",1)});
-                this.context.publish(this.context.routingKey(delta.owner(),Level.LEVEL_TAG),delta);
+                this.postOffice.onTag(Level.LEVEL_TAG).send(delta.owner(),delta);
                 this.context.onStatistics().value("Login",1);
             }
             else{
@@ -114,7 +114,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             _onSession=this.context.validator().validPassword(access,password,session.clientId());
             _onSession.systemId(systemId);
             ResponseHeader resp = new ResponseHeader(session.action(), "User [" + access.login() + "] signed in",true);
-            postOffice.onNotification(this.builder.create().toJson(resp).getBytes(),"presence/notice");
+            postOffice.onLabel().send("presence/notice",this.builder.create().toJson(resp).getBytes());
         }
         return _onSession;
     }

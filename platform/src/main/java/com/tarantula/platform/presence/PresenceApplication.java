@@ -95,7 +95,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                     OnBalance onBalance = new OnBalanceTrack(session.systemId(),ex.entryCost());
                     onBalance.applicationId(ex.applicationId());
                     onBalance.instanceId(ex.instanceId());
-                    this.context.publish(this.context.instanceRoutingKey(ex.applicationId(),ex.instanceId()),onBalance);
+                    this.context.postOffice().onApplication(ex.applicationId()).send(ex.instanceId(),onBalance);
                 }else {
                     pb.successful(false);
                     pb.code(desc.tournamentEnabled()?Presence.IN_TOURNAMENT_MODE:Presence.NOT_ENOUGH_BALANCE);

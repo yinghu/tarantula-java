@@ -109,7 +109,9 @@
     };
     
     itemSerice.list[3].title('Item');
-    itemSerice.list[3].button.command = function(){DemoSyncGame.item((resp)=>{console.log(resp)})};
+    itemSerice.list[3].button.command = function(){
+        DemoSyncGame.item((resp)=>{console.log(resp)})
+    };
     
     
     pView.container.addChild(statBoard.container);

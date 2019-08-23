@@ -6,7 +6,6 @@ import com.tarantula.Module;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.BucketReceiver;
-import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
@@ -41,7 +40,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     private TarantulaLogger logger;
 
     private TokenValidator validator;
-    private EventService eventService;
+    //private EventService eventService;
 
     private AtomicBoolean started = new AtomicBoolean(false);
     public long duration;
@@ -146,7 +145,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     public void setup(ApplicationContext applicationContext,DeploymentDescriptor d) throws Exception{
         this.validator = this.tarantulaContext.tokenValidatorProvider.tokenValidator();
-        this.eventService = this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE);
+        //this.eventService = this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE);
         this.duration = d.runtimeDurationOnInstance();
         this.timed = this.duration>0;
         this.logEnabled = d.logEnabled();
@@ -297,7 +296,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         on.joined(false);
         on.onUpdate();
         if((!on.tournamentEnabled())&&on.balance()>0){//move remaining balance to presence on non-tournament mode
-            this.publish(this.routingKey(systemId,Presence.LOBBY_TAG,on.routingNumber()),new OnBalanceTrack(systemId,on.balance()));
+            this.postOffice().onTag(Presence.LOBBY_TAG).send(systemId,new OnBalanceTrack(systemId,on.balance()));
         }
         this.waitingList.offer(on);
         return 1;
@@ -347,13 +346,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public <T extends ServiceProvider> T serviceProvider(String name){
         return (T)this.tarantulaContext.serviceProvider(name);
     }
-    public <T extends Recoverable> void publish(RoutingKey routingKey,T t){
-        String key = t.key().asString();
-        RecoverableMetadata m = new RecoverableMetadata(t.getFactoryId(),t.getClassId());
-        byte[] payload = t.binary()?t.toByteArray(): SystemUtil.toJson(t.toMap());
-        MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),routingKey.source(),t.owner(),key!=null?key.getBytes():new byte[0],payload,m);
-        this.eventService.publish(mapStoreSyncEvent);
-    }
+
     public RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener){
         return rMap.computeIfAbsent(recoverableListener.registryId(),(rid)-> recoverableListener);
     }
@@ -368,15 +361,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         return this.tarantulaContext.masterDataStore();
     }
 
-    public RoutingKey routingKey(String magicKey,String tag){
-        return this.tarantulaContext.integrationCluster.routingKey(magicKey,tag);
-    }
-    public RoutingKey routingKey(String magicKey,String tag,int routingNumber){
-        return this.tarantulaContext.integrationCluster.routingKey(magicKey,tag,routingNumber);
-    }
-    public RoutingKey instanceRoutingKey(String applicationId,String instanceId){
-        return this.tarantulaContext.integrationCluster.instanceRoutingKey(applicationId,instanceId);
-    }
     public void log(String message,int level){
         if(this.logEnabled){
             switch (level){
@@ -424,11 +408,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         }
         this.application.onBucket(bucket,state);
     }
-
-    public int routingNumber(){
-        return this.tarantulaContext.platformRoutingNumber;
-    }
-
     public void resource(String name,Module.OnResource onResource){
         this.tarantulaContext.deploymentService().resource(this.descriptor(),name,onResource);
     }
