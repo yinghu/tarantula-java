@@ -1,14 +1,11 @@
 package com.tarantula.platform;
-
-
-
 import com.tarantula.Property;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.util.Map;
 
 /**
- * Updated 5/23/2018 yinghu lu
+ * Updated 8/23/19 yinghu lu
  */
 public class DistributedProperty extends RecoverableObject implements Property{
     public String name;

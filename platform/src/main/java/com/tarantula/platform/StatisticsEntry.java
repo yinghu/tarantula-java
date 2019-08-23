@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
- * Created by yinghu lu on 11/23/2017.
+ * Updated by yinghu lu on 8/23/19.
  */
 public class StatisticsEntry extends RecoverableObject implements Statistics.Entry {
 

@@ -1,12 +1,11 @@
 package com.tarantula.platform;
 
 import com.tarantula.OnInstance;
-import com.tarantula.Recoverable;
 import com.tarantula.RecoverableFactory;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 /**
- * Updated by yinghu on 4/16/2018.
+ * Updated by yinghu on 8/23/19.
  */
 public class OnInstanceQuery implements RecoverableFactory<OnInstance> {
 

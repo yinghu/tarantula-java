@@ -5,7 +5,7 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 import java.util.Map;
 
 /**
- * Updated by yinghu lu on 11/20/2018.
+ * Updated by yinghu lu on 8/23/19.
  */
 public class OnViewTrack extends RecoverableObject implements OnView {
 

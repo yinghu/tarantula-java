@@ -6,7 +6,7 @@ import com.tarantula.platform.event.PortableEventRegistry;
 import java.io.IOException;
 
 /**
- * Updated by yinghu on 6/6/2018.
+ * Updated by yinghu on 8/23/19.
  */
 public class SessionForward extends Data{
 

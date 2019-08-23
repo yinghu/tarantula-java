@@ -3,12 +3,10 @@ package com.tarantula.platform;
 import com.tarantula.Recoverable;
 
 /**
- * Created by yinghu lu on 9/21/2018.
+ * Created by yinghu lu on 8/23/19
  */
 public class IndexKey extends RecoverableObject implements Recoverable.Key {
 
-    //private String bucket;
-    //private String oid;
     private int index;
 
     public IndexKey(String bucket, String oid, int  index){
@@ -21,15 +19,13 @@ public class IndexKey extends RecoverableObject implements Recoverable.Key {
     public String asString() {
         return new StringBuffer(bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(index).toString();
     }
-
     @Override
-    public byte[] toByteArray() {
-        return new StringBuffer(bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(index).toString().getBytes();
+    public int hashCode(){
+        return this.asString().hashCode();
     }
-
     @Override
-    public void fromByteArray(byte[] data) {
-
+    public boolean equals(Object obj){
+        NaturalKey r = (NaturalKey)obj;
+        return this.asString().equals(r.asString());
     }
-
 }

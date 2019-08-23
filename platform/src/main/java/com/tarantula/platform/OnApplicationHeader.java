@@ -1,7 +1,7 @@
 package com.tarantula.platform;
 
 /**
- * Updated by yinghu on 5/26/2018.
+ * Updated by yinghu on 8/23/19.
  */
 public class OnApplicationHeader extends ResponseHeader{
 

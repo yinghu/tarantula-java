@@ -53,7 +53,7 @@ public interface Recoverable extends Distributable{
 
     void onUpdate();
 
-    interface Key extends Recoverable{
+    interface Key{
         String asString();
     }
 }

@@ -5,7 +5,7 @@ import com.tarantula.Recoverable;
 
 
 /**
- * Update by yinghu on 8/17/19
+ * Update by yinghu on 8/23/19
  */
 public class DistributionKey extends RecoverableObject implements Recoverable.Key{
 
@@ -17,12 +17,6 @@ public class DistributionKey extends RecoverableObject implements Recoverable.Ke
         this.oid = oid;
     }
 
-    public byte[] toByteArray(){
-        return new StringBuffer(bucket).append(Recoverable.PATH_SEPARATOR).append(oid).toString().getBytes();
-    }
-    public void fromByteArray(byte[] data){
-
-    }
     public String asString(){
         if(bucket!=null&&oid!=null){
             return new StringBuffer(bucket).append(Recoverable.PATH_SEPARATOR).append(oid).toString();
@@ -37,10 +31,10 @@ public class DistributionKey extends RecoverableObject implements Recoverable.Ke
     }
     @Override
     public boolean equals(Object obj){
-        return this.oid.equals(((Recoverable.Key)obj).oid());
+        return this.asString().equals(((DistributionKey)obj).asString());
     }
     @Override
     public int hashCode(){
-        return this.oid.hashCode();
+        return this.asString().hashCode();
     }
 }

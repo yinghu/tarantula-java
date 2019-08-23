@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Updated by yinghu on 6/15/2018.
+ * Updated by yinghu on 8/23/19.
  */
 public class OnAccessTrack extends OnApplicationHeader implements OnAccess {
 

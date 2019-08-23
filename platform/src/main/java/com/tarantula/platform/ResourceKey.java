@@ -3,12 +3,10 @@ package com.tarantula.platform;
 import com.tarantula.Recoverable;
 
 /**
- * Updated by yinghu on 6/15/2018.
+ * Updated by yinghu on 8/23/19
  */
 public class ResourceKey extends RecoverableObject implements Recoverable.Key {
 
-    public String bucket;
-    public String oid;
     public String[] key;
 
     public ResourceKey(String bucket,String oid, String[] key){
@@ -17,15 +15,6 @@ public class ResourceKey extends RecoverableObject implements Recoverable.Key {
         this.key = key;
     }
 
-    public byte[] toByteArray(){
-        return this.asString().getBytes();
-    }
-    public void fromByteArray(byte[] data){
-        StringBuffer sb = new StringBuffer();
-        for(byte b : data){
-            sb.append((char)b);
-        }
-    }
     public String asString(){
         StringBuffer sb = new StringBuffer(bucket);
         sb.append(Recoverable.PATH_SEPARATOR).append(oid);
@@ -40,15 +29,15 @@ public class ResourceKey extends RecoverableObject implements Recoverable.Key {
         return asString();
     }
 
-    /**
+
     @Override
     public int hashCode(){
-        return this.owner.hashCode()+this.key.hashCode();
+        return this.asString().hashCode();
     }
     @Override
     public boolean equals(Object obj){
         ResourceKey r = (ResourceKey)obj;
-        return owner.equals(r.owner)&&key.equals(r.key);
-    }**/
+        return this.asString().equals(r.asString());
+    }
 }
 

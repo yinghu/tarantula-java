@@ -1,9 +1,7 @@
 package com.tarantula.platform;
 
-
 import com.tarantula.RecoverableFactory;
 import com.tarantula.platform.service.cluster.PortableRegistry;
-import com.tarantula.platform.util.SystemUtil;
 
 /**
  * Update by yinghu lu on 4/10/2019.

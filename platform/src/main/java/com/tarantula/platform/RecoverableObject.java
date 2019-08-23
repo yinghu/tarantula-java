@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Updated by yinghu on 4/17/2018.
+ * Updated by yinghu on 8/23/19.
  */
 public class RecoverableObject implements Recoverable {
 
