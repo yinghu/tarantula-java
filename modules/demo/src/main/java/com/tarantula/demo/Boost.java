@@ -5,7 +5,7 @@ import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.GameObject;
 import com.tarantula.game.GameObjectSerializer;
-import com.tarantula.platform.service.cluster.PortableRegistry;
+import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.lang.reflect.Type;
 
@@ -29,14 +29,11 @@ public class Boost extends GameObject implements Module {
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception{
         boolean leaving = false;
         context.log("test update from module->"+session.action(),OnLog.INFO);
-        postOffice.onMessage(session.systemId(),this.context.onRegistry().distributionKey(),payload);
         if(session.action().equals("a")){
             byte[] ret = this.builder.create().toJson(timer).getBytes();
             session.write(ret,this.label());
             update.on(ret);
             postOffice.onLabel().send("presence/notice",ret);
-            //RoutingKey rk = this.context.routingKey(session.systemId(),"demo/service");
-            //this.context.publish();
         }
         else if(session.action().equals("b")){
             byte[] ret = this.builder.create().toJson(timer).getBytes();
@@ -74,8 +71,11 @@ public class Boost extends GameObject implements Module {
         timer.dataStore(dataStore);
         this.name("boost");
         this.instanceId(context.onRegistry().distributionKey());
-        //this.context.registerRecoverableListener(new PortableRegistry()).addRecoverableFilter();
         this.successful(true);
+        this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
+            OnBalance ob = (OnBalance)t;
+            this.context.onRegistry().transact(ob.owner(),ob.balance());
+        });
     }
     @Override
     public synchronized JsonElement setup(Type type, JsonSerializationContext jsonSerializationContext){

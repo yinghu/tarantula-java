@@ -5,10 +5,6 @@ public interface PostOffice{
     OnLabel onLabel();
     OnTag onTag(String tag);
     OnApplication onApplication(String applicationId);
-    void onMessage(String from,String to,byte[] message);
-
-    void registerMessageListener(String subscription,EventListener messageListener);
-    void unregisterMessageListener(String subscription);
 
     interface OnLabel{
         void send(String label,byte[] data);

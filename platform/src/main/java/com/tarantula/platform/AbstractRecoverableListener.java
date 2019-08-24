@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Created by yinghu lu on 9/29/2018.
+ * Updated by yinghu lu on 8/23/2019.
  */
 public abstract class AbstractRecoverableListener implements RecoverableListener {
 
@@ -29,7 +29,6 @@ public abstract class AbstractRecoverableListener implements RecoverableListener
                 recoverable.fromMap(SystemUtil.toMap(value));
             }
             recoverable.distributionKey(new String(key));
-            //recoverable.timestamp(metadata.timestamp());
             onFilter.onUpdated(recoverable);
         }
     }

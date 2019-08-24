@@ -5,8 +5,6 @@ import com.tarantula.Module;
 import com.tarantula.platform.SessionIdle;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.TarantulaApplicationHeader;
-import com.tarantula.platform.presence.PresencePortableRegistry;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
@@ -56,13 +54,6 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        ///this.serviceProvider.registerPostOffice().registerMessageListener(this.context.onRegistry().distributionKey(),(m)->{
-            //this.context.log("message received->"+m.destination()+"<>"+m.source()+"<>"+m.payload().length,OnLog.INFO);
-            //return false;
-        //});
-        this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
-            this.context.log(t.toString(), OnLog.INFO);
-        });
         try{
             module = this.serviceProvider.module(this.descriptor);
             this.pendingTimer = descriptor.timerOnModule();
@@ -136,7 +127,6 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             s.write(resp,module.label(),true);
         });
         _onStream.clear();
-        this.serviceProvider.registerPostOffice().unregisterMessageListener(this.context.onRegistry().distributionKey());
         this.module.clear();
         if(timerSchedule!=null){
             timerSchedule.cancel(true);

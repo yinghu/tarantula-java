@@ -413,19 +413,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 integrationEventService.publish(mapStoreSyncEvent);
             };
         }
-
-        @Override
-        public void onMessage(String from,String to,byte[] message){
-            integrationEventService.publish(new MessageEvent(from,to,message));
-        }
-        @Override
-        public void registerMessageListener(String systemId,EventListener messageListener){
-            tarantulaContext.integrationCluster.subscribe(systemId,messageListener);
-        }
-        @Override
-        public void unregisterMessageListener(String systemId){
-            tarantulaContext.integrationCluster.unsubscribe(systemId);
-        }
     }
     class ModuleProxy implements Module{
 

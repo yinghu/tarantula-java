@@ -27,20 +27,12 @@ public interface ApplicationContext{
 
     DataStore dataStore(String name);
 
-    //<T extends Recoverable> void publish(RoutingKey routingKey,T t);
     RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener);
 
     void log(String message,int level);
     void log(String message,Exception error,int level);
 
     <T extends ServiceProvider> T serviceProvider(String name);
-
-    //RoutingKey instanceRoutingKey(String application,String instanceId);
-    //RoutingKey routingKey(String magicKey,String tag);
-    //RoutingKey routingKey(String magicKey,String tag,int routingNumber);
-
-    //total partition number
-    //int routingNumber();
 
     void resource(String name,Module.OnResource onResource);
 
