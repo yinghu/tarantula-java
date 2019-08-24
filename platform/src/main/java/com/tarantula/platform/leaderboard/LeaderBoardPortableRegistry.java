@@ -5,15 +5,13 @@ import com.tarantula.platform.AbstractRecoverableListener;
 
 
 /**
- * Created by yinghu lu on 3/31/2018.
+ * Updated by yinghu lu on 8/24/2019.
  */
 public class LeaderBoardPortableRegistry extends AbstractRecoverableListener {
 
     public static final int OID = 6;
 
     public static final int LEADER_BOARD_ENTRY_CID = 2;
-    public static final int ON_LEADER_BOARD_CID = 3;
-    public static final int ON_LEADER_BOARD_ENTRY_CID = 4;
 
     public static final int TOP10_LEADER_BOARD_CID = 7;
 
@@ -22,12 +20,6 @@ public class LeaderBoardPortableRegistry extends AbstractRecoverableListener {
         switch (i){
             case LEADER_BOARD_ENTRY_CID:
                 pt = new LeaderBoardEntry();
-                break;
-            case ON_LEADER_BOARD_CID:
-                pt = new OnLeaderBoardTrack();
-                break;
-            case ON_LEADER_BOARD_ENTRY_CID:
-                pt = new OnLeaderBoardEntryTrack();
                 break;
             case TOP10_LEADER_BOARD_CID:
                 pt = new Top10LeaderBoard();

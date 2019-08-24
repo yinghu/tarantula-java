@@ -4,7 +4,7 @@ import com.tarantula.Recoverable;
 import com.tarantula.RecoverableFactory;
 
 /**
- * Updated by yinghu lu on 9/26/2018.
+ * Updated by yinghu lu on 8/24/19
  */
 public class LeaderBoardQuery implements RecoverableFactory<Top10LeaderBoard>{
 
@@ -28,7 +28,5 @@ public class LeaderBoardQuery implements RecoverableFactory<Top10LeaderBoard>{
     public String distributionKey(){
         return this.bucket+ Recoverable.PATH_SEPARATOR+"TOP10";
     }
-    public boolean onEdge(){
-        return true;
-    }
+
 }

@@ -7,6 +7,12 @@ package com.tarantula;
  */
 public interface LeaderBoard extends Recoverable {
 
+    String TOTAL = "T";
+    String DAILY = "D";
+    String WEEKLY = "W";
+    String MONTHLY = "M";
+    String YEARLY = "Y";
+
     String name();
     void name(String name);
 
@@ -25,13 +31,17 @@ public interface LeaderBoard extends Recoverable {
 
     void registerReset(Reset reset);
 
-    void onBoard(String systemId,OnLeaderBoard.Entry entry);
+    void onBoard(String systemId,LeaderBoard.Entry entry);
 
     void reset();
     Entry[] list();
 
 
     interface Entry extends Recoverable{
+        String header();
+        String category();
+        String classifier();
+
         String name();
         String systemId();
         void value(double value);

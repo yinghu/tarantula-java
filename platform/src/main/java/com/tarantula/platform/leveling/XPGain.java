@@ -1,17 +1,15 @@
 package com.tarantula.platform.leveling;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.OnLeaderBoard;
+import com.tarantula.LeaderBoard;
 import com.tarantula.XP;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.ResourceKey;
+import com.tarantula.platform.leaderboard.LeaderBoardEntry;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
- * Updated by yinghu lu on 4/23/2018.
+ * Updated by yinghu lu on 8/24/19
  */
 public class XPGain extends RecoverableObject implements XP {
 
@@ -87,16 +85,16 @@ public class XPGain extends RecoverableObject implements XP {
     }
 
     public void reset(String xName){
-        if(xName.equals(OnLeaderBoard.DAILY)){
+        if(xName.equals(LeaderBoard.DAILY)){
             dailyGain = 0;
         }
-        else if(xName.equals(OnLeaderBoard.WEEKLY)){
+        else if(xName.equals(LeaderBoard.WEEKLY)){
             weeklyGain = 0;
         }
-        else if(xName.equals(OnLeaderBoard.MONTHLY)){
+        else if(xName.equals(LeaderBoard.MONTHLY)){
             monthlyGain = 0;
         }
-        else if(xName.equals(OnLeaderBoard.YEARLY)){
+        else if(xName.equals(LeaderBoard.YEARLY)){
             yearlyGain = 0;
         }
     }
@@ -114,25 +112,25 @@ public class XPGain extends RecoverableObject implements XP {
         this.category = category;
     }
 
-    public double dailyGain(double delta){
+    public LeaderBoard.Entry dailyGain(double delta){
         this.dailyGain = dailyGain+delta;
-        return dailyGain;
+        return new LeaderBoardEntry(header,category,LeaderBoard.DAILY,dailyGain);
     }
-    public double weeklyGain(double delta){
+    public LeaderBoard.Entry weeklyGain(double delta){
         this.weeklyGain = weeklyGain+delta;
-        return weeklyGain;
+        return new LeaderBoardEntry(header,category,LeaderBoard.WEEKLY,weeklyGain);
     }
-    public double monthlyGain(double delta){
+    public LeaderBoard.Entry monthlyGain(double delta){
         this.monthlyGain = monthlyGain+delta;
-        return monthlyGain;
+        return new LeaderBoardEntry(header,category,LeaderBoard.MONTHLY,monthlyGain);
     }
-    public double yearlyGain(double delta){
+    public LeaderBoard.Entry yearlyGain(double delta){
         this.yearlyGain = yearlyGain+delta;
-        return yearlyGain;
+        return new LeaderBoardEntry(header,category,LeaderBoard.YEARLY,yearlyGain);
     }
-    public double totalGain(double delta){
+    public LeaderBoard.Entry totalGain(double delta){
         this.totalGain = totalGain+delta;
-        return totalGain;
+        return new LeaderBoardEntry(header,category,LeaderBoard.TOTAL,totalGain);
     }
     @Override
     public Key key(){

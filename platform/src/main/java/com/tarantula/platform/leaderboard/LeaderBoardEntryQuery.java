@@ -3,7 +3,7 @@ package com.tarantula.platform.leaderboard;
 import com.tarantula.RecoverableFactory;
 
 /**
- * Updated by yinghu lu on 9/26/2018.
+ * Updated by yinghu lu on 8/24/19
  */
 public class LeaderBoardEntryQuery implements RecoverableFactory<LeaderBoardEntry>{
 
@@ -27,7 +27,5 @@ public class LeaderBoardEntryQuery implements RecoverableFactory<LeaderBoardEntr
     public String distributionKey(){
         return leaderBoardId;
     }
-    public boolean onEdge(){
-        return true;
-    }
+
 }

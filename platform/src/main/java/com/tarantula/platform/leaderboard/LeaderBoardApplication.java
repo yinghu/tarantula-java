@@ -32,7 +32,7 @@ public class LeaderBoardApplication extends TarantulaApplicationHeader{
         super.setup(context);
         builder.registerTypeAdapter(Top10LeaderBoard.class,new LeaderBoardSerializer());
         builder.registerTypeAdapter(LeaderBoardRegistryContext.class,new LeaderBoardRegistryContextSerializer());
-        leaderBoardServiceProvider = context.serviceProvider(LeaderBoardServiceProvider.NAME);
+        leaderBoardServiceProvider = context.serviceProvider("TOP10");
         this.context.log("Leader board application started on ["+descriptor.tag()+"]",OnLog.INFO);
     }
 }

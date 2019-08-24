@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Developer: YINGHU LU
- * Date Updated: 4/23/2018
+ * Date Updated: 8/24/19
  * Time: 4:41 PM
  */
 public class XPLevel extends RecoverableObject implements Level {
@@ -131,11 +131,6 @@ public class XPLevel extends RecoverableObject implements Level {
             return true;
         }
     }
-    /**
-    public XP xp(String header,String category, OnTransaction<XP> onTransaction){
-        String qk = new StringBuffer(header).append("_").append(category).toString();
-        return xpMapping.computeIfAbsent(qk,(String k)->onTransaction.commit(new XPGain(this.key().asString(),this.bucket,this.oid,header,category)));
-    }**/
     public void xp(XP xp){
         String qk = new StringBuffer(xp.header()).append("_").append(xp.category()).toString();
         xpMapping.put(qk,xp);

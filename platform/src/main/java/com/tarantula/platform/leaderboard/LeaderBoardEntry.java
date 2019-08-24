@@ -9,10 +9,13 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
- * Updated by yinghu on 6/15/2018.
+ * Updated by yinghu on 8/24/19
  */
 public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.Entry {
 
+    private String header;
+    private String category;
+    private String classifier;
     private String name;
     private String systemId="--";
     private double value=0;
@@ -20,6 +23,12 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
         this.vertex ="LeaderBoardEntry";
         this.label = "E";
         this.onEdge = true;
+    }
+    public LeaderBoardEntry(String header,String category,String classifier,double value){
+        this.header = header;
+        this.category = category;
+        this.classifier = classifier;
+        this.value = value;
     }
     public LeaderBoardEntry(String name){
         this();
@@ -29,6 +38,15 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
         this.systemId = systemId;
         this.value = replace;
         this.timestamp = SystemUtil.toUTCMilliseconds(LocalDateTime.now());
+    }
+    public String header(){
+        return this.header;
+    }
+    public String category(){
+        return this.category;
+    }
+    public String classifier(){
+        return this.classifier;
     }
     public String name(){
         return name;
@@ -56,7 +74,7 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
     }
     @Override
     public String toString(){
-        return this.name+","+this.systemId+","+value;
+        return this.header+","+category+","+classifier+","+this.systemId+","+value+"/"+name;
     }
 
     @Override

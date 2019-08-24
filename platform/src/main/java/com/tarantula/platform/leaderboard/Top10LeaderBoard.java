@@ -2,11 +2,11 @@ package com.tarantula.platform.leaderboard;
 
 import com.tarantula.DataStore;
 import com.tarantula.LeaderBoard;
-import com.tarantula.OnLeaderBoard;
+import com.tarantula.Recoverable;
+import com.tarantula.platform.NaturalKey;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.ResourceKey;
 import com.tarantula.platform.util.SystemUtil;
-
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by yinghu lu on 6/15/2018.
+ * Updated 8/24/19
  */
 public class Top10LeaderBoard extends RecoverableObject implements LeaderBoard {
 
@@ -134,20 +134,20 @@ public class Top10LeaderBoard extends RecoverableObject implements LeaderBoard {
     }
 
     @Override
-    public void onBoard(String systemId, OnLeaderBoard.Entry entry) {
+    public void onBoard(String systemId, LeaderBoard.Entry entry) {
         Entry last = entryList[9];
-        if(entry.value(this.classifier)>=last.value()){
+        if(entry.value()>=last.value()){
             Entry ix = entryIndex.get(systemId);
             if(ix==null){//kick off last
                 entryIndex.remove(last.systemId());
                 entryIndex.put(systemId,last);
-                last.update(systemId,entry.value(this.classifier));
+                last.update(systemId,entry.value());
                 if(dataStore!=null){
                     dataStore.update(last);
                 }
             }
             else{//update existing entry
-                ix.value(entry.value(this.classifier));
+                ix.value(entry.value());
                 if(dataStore!=null){
                     dataStore.update(ix);
                 }
@@ -191,5 +191,11 @@ public class Top10LeaderBoard extends RecoverableObject implements LeaderBoard {
     @Override
     public int getClassId() {
         return LeaderBoardPortableRegistry.TOP10_LEADER_BOARD_CID;
+    }
+    public Key key(){
+        return new NaturalKey(this.name+ Recoverable.PATH_SEPARATOR+header+Recoverable.PATH_SEPARATOR+category+Recoverable.PATH_SEPARATOR+classifier);
+    }
+    public String toString(){
+        return this.name+"/"+header+"/"+category+"/"+classifier+"/"+size;
     }
 }

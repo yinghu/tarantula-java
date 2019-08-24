@@ -3,8 +3,6 @@ package com.tarantula.platform.leveling;
 import com.tarantula.*;
 import com.tarantula.Level;
 import com.tarantula.platform.*;
-import com.tarantula.platform.leaderboard.OnLeaderBoardEntryTrack;
-import com.tarantula.platform.leaderboard.OnLeaderBoardTrack;
 import com.tarantula.platform.util.LevelContextSerializer;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -18,6 +16,7 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
     private XPLevelRule rule;
     private DataStore _dataStore;
     private Set<XPHeader> _headers;
+    private LeaderBoardServiceProvider leaderBoardServiceProvider;
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         OnAccess acc = builder.create().fromJson(new String(payload),OnAccess.class);
@@ -40,6 +39,7 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
         super.setup(context);
         _headers = new CopyOnWriteArraySet<>();
         Configuration xp = this.context.configuration("xp");
+        this.leaderBoardServiceProvider = this.context.serviceProvider(this.context.configuration("setup").property("leaderBoardProvider"));
         this._dataStore = this.context.dataStore("level");
         this.rule = new XPLevelRule(xp);
         this.rule.start();
@@ -75,35 +75,27 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
         this._dataStore.createIfAbsent(_px,true);
         return _px;
     }
-    private void executeOnXP(Level l,String name,XP _xp,Statistics.Entry xlist){
+    private void executeOnXP(Level l,String systemId,XP _xp,Statistics.Entry xlist){
         if(l.onDailyGainReset()){
-            _xp.reset(OnLeaderBoard.DAILY);//daily reset
+            _xp.reset(LeaderBoard.DAILY);//daily reset
         }
         if(l.onWeeklyGainReset()){
-            _xp.reset(OnLeaderBoard.WEEKLY);//weekly reset
+            _xp.reset(LeaderBoard.WEEKLY);//weekly reset
         }
         if(l.onMonthlyGainReset()){
-            _xp.reset(OnLeaderBoard.MONTHLY);//monthly reset
+            _xp.reset(LeaderBoard.MONTHLY);//monthly reset
         }
         if(l.onYearlyGainReset()){
-            _xp.reset(OnLeaderBoard.YEARLY);//yearly reset
+            _xp.reset(LeaderBoard.YEARLY);//yearly reset
         }
-        double vx =  _xp.totalGain(xlist.value());
-        double vd = _xp.dailyGain(xlist.value());
-        double vw = _xp.weeklyGain(xlist.value());
-        double vm = _xp.monthlyGain(xlist.value());
-        double vy = _xp.yearlyGain(xlist.value());
-        OnLeaderBoard.Entry ol = new OnLeaderBoardEntryTrack(xlist.name());
-        ol.value(OnLeaderBoard.TOTAL,vx);
-        ol.value(OnLeaderBoard.DAILY,vd);
-        ol.value(OnLeaderBoard.WEEKLY,vw);
-        ol.value(OnLeaderBoard.MONTHLY,vm);
-        ol.value(OnLeaderBoard.YEARLY,vy);
+        LeaderBoard.Entry[] entries = new LeaderBoard.Entry[5];
+        entries[0] = _xp.totalGain(xlist.value());
+        entries[1] = _xp.dailyGain(xlist.value());
+        entries[2] = _xp.weeklyGain(xlist.value());
+        entries[3] = _xp.monthlyGain(xlist.value());
+        entries[4] = _xp.yearlyGain(xlist.value());
         this._dataStore.update(_xp);
-        OnLeaderBoardTrack xt = new OnLeaderBoardTrack(name,new OnLeaderBoard.Entry[]{ol});
-        xt.systemId(l.distributionKey());
-        LeaderBoardServiceProvider leaderBoardServiceProvider = this.context.serviceProvider(LeaderBoardServiceProvider.NAME);
-        leaderBoardServiceProvider.onLeaderBoard(xt);
+        this.leaderBoardServiceProvider.onLeaderBoard(systemId,entries);
     }
     private void executeOnLevel(Level l,OnStatistics delta){
         l.levelXP(delta.xpDelta());
@@ -114,8 +106,9 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
             for(Statistics.Entry entry : delta.entryList()){
                 _headers.add(new XPHeader(delta.name(),entry.name()));
                 XP xp = new XPGain(l.distributionKey(),l.bucket(),l.oid(),delta.name(),entry.name());
+                this.context.log(xp.key().asString(),OnLog.INFO);
                 _dataStore.createIfAbsent(xp,true);
-                this.executeOnXP(l,delta.name(),xp,entry);
+                this.executeOnXP(l,delta.owner(),xp,entry);
             }
         }
     }
