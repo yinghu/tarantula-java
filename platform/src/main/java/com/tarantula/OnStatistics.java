@@ -14,5 +14,5 @@ public interface OnStatistics extends Recoverable{
     void xpDelta(double delta);
 
     List<Statistics.Entry> entryList();
-    void addEntry(String name,double value);
+    void onEntry(String name,double value);
 }

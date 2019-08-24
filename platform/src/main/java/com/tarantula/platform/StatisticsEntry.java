@@ -25,11 +25,6 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         this();
         this.name  = name;
     }
-    public StatisticsEntry(String name,double value){
-        this();
-        this.name  = name;
-        this.value = value;
-    }
     @Override
     public String name() {
         return name;

@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 
 /**
- * Update by yinghu on 6/15/2018.
+ * Update by yinghu on 8/23/29
  */
 public class XPLevelApplication extends TarantulaApplicationHeader{
 
@@ -110,7 +110,7 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
         this.rule.execute(l);
         _dataStore.update(l);
         //execute XP
-        if(delta.name()!=null){//process leader board data
+        if(delta.name()!=null){
             for(Statistics.Entry entry : delta.entryList()){
                 _headers.add(new XPHeader(delta.name(),entry.name()));
                 XP xp = new XPGain(l.distributionKey(),l.bucket(),l.oid(),delta.name(),entry.name());

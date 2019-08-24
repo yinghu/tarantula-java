@@ -7,7 +7,7 @@ import com.tarantula.Serviceable;
 import java.util.HashMap;
 
 /**
- * Created by yinghu lu on 7/15/2016.
+ * Updated by yinghu lu on 8/23/2019.
  */
 public class XPLevelRule implements Serviceable{
 
@@ -30,8 +30,6 @@ public class XPLevelRule implements Serviceable{
                 XPRule nex = rules.get(i);
                 if(nex.onMatch(level.levelXP(0))){
                     level.level(nex.rank);
-                    //level.name(nex.name);
-                    //level.icon(nex.icon);
                     break;
                 }
             }
@@ -39,8 +37,6 @@ public class XPLevelRule implements Serviceable{
         else if(cur==null){
             XPRule nex = rules.get(1);
             level.level(nex.rank);
-            //level.name(nex.name);
-            //level.icon(nex.icon);
         }
         level.timestamp(System.currentTimeMillis());
     }

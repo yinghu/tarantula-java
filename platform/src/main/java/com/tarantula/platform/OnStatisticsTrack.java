@@ -5,6 +5,9 @@ import com.tarantula.OnStatistics;
 import com.tarantula.Statistics;
 import com.tarantula.platform.leveling.LevelingPortableRegistry;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,12 +16,11 @@ import java.util.Map;
 public class OnStatisticsTrack extends OnApplicationHeader implements OnStatistics {
 
     private double xpDelta;
-    private Statistics.Entry[] entryList;
+    private HashMap<String, Statistics.Entry> eMap = new HashMap<>();
 
     public OnStatisticsTrack(){}
     public OnStatisticsTrack(String name){
         this.name = name;
-        this.owner = systemId;
     }
     public double xpDelta() {
         return this.xpDelta;
@@ -29,23 +31,27 @@ public class OnStatisticsTrack extends OnApplicationHeader implements OnStatisti
         this.xpDelta = delta;
     }
 
-    public Statistics.Entry[] entryList(){
-        return entryList;
+    public List<Statistics.Entry> entryList(){
+        List<Statistics.Entry> elist = new ArrayList<>();
+        eMap.forEach((k,v)->elist.add(v));
+        return elist;
     }
-    public void entryList(Statistics.Entry[] entryList){
-        this.entryList = entryList;
+    public void onEntry(String name,double value){
+        Statistics.Entry e = eMap.computeIfAbsent(name,(k)-> new StatisticsEntry(name));
+        e.value(value);
     }
-
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("owner",this.owner);
         this.properties.put("name",this.name);
         this.properties.put("xpDelta",this.xpDelta);
-        this.properties.put("size",entryList.length);
-        for(int i=0;i<entryList.length;i++){
-            this.properties.put("n"+i,entryList[0].name());
-            this.properties.put("v"+i,entryList[0].value());
-        }
+        final int[] i={0};
+        eMap.forEach((k,v)->{
+            this.properties.put("n"+i[0],k);
+            this.properties.put("v"+i[0],v.value());
+            i[0]++;
+        });
+        this.properties.put("size",i[0]);
         return this.properties;
     }
     @Override
@@ -54,11 +60,10 @@ public class OnStatisticsTrack extends OnApplicationHeader implements OnStatisti
         this.name = (String)properties.get("name");
         this.xpDelta = ((Number)properties.get("xpDelta")).doubleValue();
         int sz = ((Number)properties.get("size")).intValue();
-        entryList = new Statistics.Entry[sz];
         for(int i=0;i<sz;i++){
             String n = (String)properties.get("n"+i);
             double v = ((Number)properties.get("v"+i)).doubleValue();
-            entryList[i]=new StatisticsEntry(n,v);
+            eMap.computeIfAbsent(n,(k)->new StatisticsEntry(n)).value(v);
         }
     }
     @Override

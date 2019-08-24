@@ -26,16 +26,16 @@
         <configuration-list>
             <configuration tag="level" priority="10">
                 <level type="xp">
-                    <property name="1">fish,assets/bug.png,0,10</property>
-                    <property name="2">rock,assets/bug.png,10,20</property>
-                    <property name="3">star,assets/bug.png,20,30</property>
-                    <property name="4">rush,assets/bug.png,30,40</property>
-                    <property name="5">pop,assets/bug.png,40,50</property>
-                    <property name="6">wise,assets/bug.png,50,60</property>
-                    <property name="7">wine,assets/bug.png,60,70</property>
-                    <property name="8">killer,assets/bug.png,70,80</property>
-                    <property name="9">super,assets/bug.png,80,90</property>
-                    <property name="10">lion,assets/bug.png,90,100</property>
+                    <property name="1">fish,assets/badge.png,0,10</property>
+                    <property name="2">rock,assets/badge.png,10,20</property>
+                    <property name="3">star,assets/badge.png,20,30</property>
+                    <property name="4">rush,assets/badge.png,30,40</property>
+                    <property name="5">pop,assets/badge.png,40,50</property>
+                    <property name="6">wise,assets/badge.png,50,60</property>
+                    <property name="7">wine,assets/badge.png,60,70</property>
+                    <property name="8">killer,assets/badge.png,70,80</property>
+                    <property name="9">super,assets/badge.png,80,90</property>
+                    <property name="10">lion,assets/badge.png,90,100</property>
                 </level>
             </configuration>
         </configuration-list>
