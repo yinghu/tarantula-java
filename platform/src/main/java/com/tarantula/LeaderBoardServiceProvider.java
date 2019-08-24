@@ -10,7 +10,7 @@ public interface LeaderBoardServiceProvider extends ServiceProvider {
 
     LeaderBoard leaderBoard(String header,String category,String classifier);
 
-    List<LeaderBoard.Registry> onRegistry();
+    ///List<LeaderBoard.Registry> onRegistry();
 
     void onLeaderBoard(String systemId,LeaderBoard.Entry[] entries);
 }

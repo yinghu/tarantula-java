@@ -1,14 +1,11 @@
 package com.tarantula.platform.leaderboard;
 
-
-import com.tarantula.LeaderBoard;
-
 import java.util.*;
 
 /**
  * Updated by yinghu on 6/15/2018.
  */
-public class LeaderBoardRegistry implements LeaderBoard.Registry{
+public class LeaderBoardRegistry{
     public String name;
     public int size;
     public Set<String> classifierList = new HashSet<>();

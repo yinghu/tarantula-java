@@ -5,7 +5,6 @@ import com.tarantula.LeaderBoard;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.NaturalKey;
 import com.tarantula.platform.RecoverableObject;
-import com.tarantula.platform.ResourceKey;
 import com.tarantula.platform.util.SystemUtil;
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
@@ -34,9 +33,6 @@ public class Top10LeaderBoard extends RecoverableObject implements LeaderBoard {
 
     public Top10LeaderBoard(){
         this.vertex = "Top10LeaderBoard";
-        this.label = "TLP";
-        this.onEdge = true;
-        //this.binary = true;
     }
     public Top10LeaderBoard(String name, String header, String category, String classifier, int size, DataStore dataStore){
         this();
@@ -47,10 +43,6 @@ public class Top10LeaderBoard extends RecoverableObject implements LeaderBoard {
         this.size = size;
         this.entryList = new Entry[size];
         this.timestamp = SystemUtil.toUTCMilliseconds(LocalDateTime.now());
-        this.dataStore = dataStore;
-    }
-    public void preload(DataStore dataStore){
-        this.entryList = new Entry[size];
         this.dataStore = dataStore;
     }
     @Override
@@ -104,19 +96,11 @@ public class Top10LeaderBoard extends RecoverableObject implements LeaderBoard {
     }
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("1",this.name);
-        this.properties.put("2",this.header);
-        this.properties.put("3",category);
-        this.properties.put("4",this.classifier);
         this.properties.put("5",this.size);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.name = (String) properties.get("1");
-        this.header = (String) properties.get("2");
-        this.category = (String) properties.get("3");
-        this.classifier = (String) properties.get("4");
         this.size = ((Number)properties.get("5")).intValue();
     }
     @Override
@@ -191,6 +175,9 @@ public class Top10LeaderBoard extends RecoverableObject implements LeaderBoard {
     @Override
     public int getClassId() {
         return LeaderBoardPortableRegistry.TOP10_LEADER_BOARD_CID;
+    }
+    public void distributionKey(String distributionKey){
+        //skip the natural key
     }
     public Key key(){
         return new NaturalKey(this.name+ Recoverable.PATH_SEPARATOR+header+Recoverable.PATH_SEPARATOR+category+Recoverable.PATH_SEPARATOR+classifier);

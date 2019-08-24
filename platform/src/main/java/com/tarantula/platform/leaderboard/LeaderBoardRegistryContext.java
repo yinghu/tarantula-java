@@ -10,5 +10,5 @@ import java.util.List;
  */
 public class LeaderBoardRegistryContext extends ResponseHeader{
 
-    public List<LeaderBoard.Registry> registryList;
+    //public List<LeaderBoard.Registry> registryList;
 }

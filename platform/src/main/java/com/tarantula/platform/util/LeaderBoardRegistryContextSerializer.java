@@ -16,9 +16,9 @@ public class LeaderBoardRegistryContextSerializer implements JsonSerializer<Lead
         JsonObject pc = (JsonObject)new ResponseSerializer().serialize(leaderBoardRegistryContext,type,jsonSerializationContext);
         LeaderBoardRegistrySerializer serializer = new LeaderBoardRegistrySerializer();
         JsonArray blist = new JsonArray();
-        leaderBoardRegistryContext.registryList.forEach((r)->{
-            blist.add(serializer.serialize((LeaderBoardRegistry) r,type,jsonSerializationContext));
-        });
+        //leaderBoardRegistryContext.registryList.forEach((r)->{
+            //blist.add(serializer.serialize((LeaderBoardRegistry) r,type,jsonSerializationContext));
+        //});
         pc.add("registryList",blist);
         return pc;
     }

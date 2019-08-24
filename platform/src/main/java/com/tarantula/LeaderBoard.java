@@ -42,16 +42,16 @@ public interface LeaderBoard extends Recoverable {
         String category();
         String classifier();
 
-        String name();
+        //String name();
         String systemId();
         void value(double value);
         double value();
         void update(String systemId,double replace);
     }
 
-    interface Registry{
+    //interface Registry{
 
-    }
+    //}
 
     interface Reset{
         boolean reset(LeaderBoard leaderBoard);

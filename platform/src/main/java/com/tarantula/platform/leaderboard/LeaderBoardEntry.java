@@ -16,7 +16,7 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
     private String header;
     private String category;
     private String classifier;
-    private String name;
+    //private String name;
     private String systemId="--";
     private double value=0;
     public LeaderBoardEntry(){
@@ -25,14 +25,11 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
         this.onEdge = true;
     }
     public LeaderBoardEntry(String header,String category,String classifier,double value){
+        this();
         this.header = header;
         this.category = category;
         this.classifier = classifier;
         this.value = value;
-    }
-    public LeaderBoardEntry(String name){
-        this();
-        this.name = name;
     }
     public void update(String systemId,double replace){
         this.systemId = systemId;
@@ -47,9 +44,6 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
     }
     public String classifier(){
         return this.classifier;
-    }
-    public String name(){
-        return name;
     }
     public String systemId() {
         return systemId;
@@ -74,19 +68,17 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
     }
     @Override
     public String toString(){
-        return this.header+","+category+","+classifier+","+this.systemId+","+value+"/"+name;
+        return this.header+","+category+","+classifier+","+this.systemId+","+value+"/";
     }
 
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("1",this.name);
         this.properties.put("2",this.systemId);
         this.properties.put("3",value);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.name = (String) properties.get("1");
         this.systemId = (String) properties.get("2");
         this.value = ((Number)properties.get("3")).doubleValue();
     }

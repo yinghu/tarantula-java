@@ -23,7 +23,7 @@ public class LeaderBoardApplication extends TarantulaApplicationHeader{
         }
         else if(session.action().equals("onRegistry")){
             LeaderBoardRegistryContext _cbr = new LeaderBoardRegistryContext();
-            _cbr.registryList = leaderBoardServiceProvider.onRegistry();
+            //_cbr.registryList = leaderBoardServiceProvider.onRegistry();
             session.write(this.builder.create().toJson(_cbr).getBytes(),this.descriptor.responseLabel());
         }
 
