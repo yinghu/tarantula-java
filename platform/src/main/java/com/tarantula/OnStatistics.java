@@ -1,8 +1,10 @@
 package com.tarantula;
 
 
+import java.util.List;
+
 /**
- * Updated by yinghu lu on 7/30/2018.
+ * Updated by yinghu lu on 8/23/19
  */
 public interface OnStatistics extends Recoverable{
 
@@ -11,6 +13,6 @@ public interface OnStatistics extends Recoverable{
     double xpDelta();
     void xpDelta(double delta);
 
-    Statistics.Entry[] entryList();
-    void entryList(Statistics.Entry[] entryList);
+    List<Statistics.Entry> entryList();
+    void addEntry(String name,double value);
 }

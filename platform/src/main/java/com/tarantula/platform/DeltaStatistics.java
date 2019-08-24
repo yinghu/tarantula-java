@@ -1,10 +1,6 @@
 package com.tarantula.platform;
-
-
 import com.tarantula.*;
 import com.tarantula.platform.service.cluster.PortableRegistry;
-import com.tarantula.platform.util.SystemUtil;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DeltaStatistics extends OnApplicationHeader implements Statistics {
 
-    private transient Level level;
 
     private String leaderBoardHeader ;
 
@@ -23,12 +18,6 @@ public class DeltaStatistics extends OnApplicationHeader implements Statistics {
     public DeltaStatistics(){
         this.vertex = "Statistics";
         this.label = "STAT";
-    }
-    public Level level(){
-        return this.level;
-    }
-    public void level(Level level){
-        this.level = level;
     }
 
     public String leaderBoardHeader() {
@@ -43,8 +32,8 @@ public class DeltaStatistics extends OnApplicationHeader implements Statistics {
     public void entry(Entry entry){
         this.mappings.put(entry.name(),entry);
     }
-    public double value(String key, double value) {
-        return this.mappings.compute(key,(k,v)->{
+    public OnStatistics value(String key, double value) {
+        this.mappings.compute(key,(k,v)->{
             if(v==null){
                 v = new StatisticsEntry(key);
                 v.owner(this.key().asString());
@@ -55,7 +44,8 @@ public class DeltaStatistics extends OnApplicationHeader implements Statistics {
                 dataStore.update(v);
             }
             return v;
-        }).value();
+        });
+        return new OnStatisticsTrack(this.leaderBoardHeader);
     }
     public Map<String,Double> list(){
         Map<String,Double> _mv = new HashMap<>();
@@ -94,8 +84,8 @@ public class DeltaStatistics extends OnApplicationHeader implements Statistics {
     public void onUpdate(){
         this.dataStore.update(this);
         mappings.forEach((k,v)->{
-            v.distributable(this.distributable);
-            v.index(SystemUtil.toString(new String[]{v.owner(),v.label()}));
+            //v.distributable(this.distributable);
+            //v.index(SystemUtil.toString(new String[]{v.owner(),v.label()}));
             dataStore.update(v);
         });
     }

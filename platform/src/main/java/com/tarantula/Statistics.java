@@ -7,18 +7,12 @@ import java.util.Map;
  */
 public interface Statistics extends OnApplication {
 
-
-    Level level();
-    void level(Level level);
-
     String leaderBoardHeader();
     void leaderBoardHeader(String header);
 
-    double value(String key,double value);
+    OnStatistics value(String key,double value);
 
     Map<String,Double> list();
-
-    void entry(Entry entry);
 
     interface Entry extends Recoverable{
         String name();

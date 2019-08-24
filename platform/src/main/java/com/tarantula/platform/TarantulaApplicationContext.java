@@ -35,7 +35,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     public InstanceIndex _instance;
 
-    private Statistics onStatistics;
+    private DeltaStatistics onStatistics;
     private boolean logEnabled;
     private TarantulaLogger logger;
 
@@ -350,7 +350,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener){
         return rMap.computeIfAbsent(recoverableListener.registryId(),(rid)-> recoverableListener);
     }
-    public Statistics onStatistics(){
+    public Statistics statistics(){
         return this.singleton?this.onStatistics:this._instance.statistics();
     }
 

@@ -23,7 +23,7 @@ public interface ApplicationContext{
     Descriptor descriptor();
     Descriptor descriptor(String applicationId);
 
-    Statistics onStatistics();
+    Statistics statistics();
 
     DataStore dataStore(String name);
 

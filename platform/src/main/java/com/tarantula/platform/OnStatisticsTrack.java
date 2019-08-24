@@ -16,7 +16,7 @@ public class OnStatisticsTrack extends OnApplicationHeader implements OnStatisti
     private Statistics.Entry[] entryList;
 
     public OnStatisticsTrack(){}
-    public OnStatisticsTrack(String name,String systemId){
+    public OnStatisticsTrack(String name){
         this.name = name;
         this.owner = systemId;
     }

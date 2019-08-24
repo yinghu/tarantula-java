@@ -45,11 +45,11 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 session.systemId(access.systemId());
                 session.stub(access.stub());
                 session.ticket(access.ticket());
-                OnStatistics delta = new OnStatisticsTrack(this.context.onStatistics().leaderBoardHeader(),access.systemId());
+                OnStatistics delta = this.context.statistics().value("Login",1);
                 delta.xpDelta(1);
-                delta.entryList(new Statistics.Entry[]{new StatisticsEntry("LoginCount",1)});
+                delta.owner(session.systemId());
+                delta.addEntry("LoginCount",1);
                 this.postOffice.onTag(Level.LEVEL_TAG).send(delta.owner(),delta);
-                this.context.onStatistics().value("Login",1);
             }
             else{
                 session.write(this.builder.create().toJson(new ResponseHeader("login", access.message(), false)).getBytes(),this.descriptor.responseLabel());
