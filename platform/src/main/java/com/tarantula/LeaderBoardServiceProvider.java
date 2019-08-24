@@ -1,16 +1,13 @@
 package com.tarantula;
 
-import java.util.List;
-
 /**
  *  Updated by yinghu lu on 8/24/2019.
  */
 public interface LeaderBoardServiceProvider extends ServiceProvider {
 
-
+    //query leader board with {header}/{category}/{classifier} ex presence/LoginCount/daily
     LeaderBoard leaderBoard(String header,String category,String classifier);
 
-    ///List<LeaderBoard.Registry> onRegistry();
-
+    //commit leader board
     void onLeaderBoard(String systemId,LeaderBoard.Entry[] entries);
 }

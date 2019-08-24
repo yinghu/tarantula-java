@@ -26,7 +26,7 @@
         <configuration-list>
             <configuration tag="level" priority="10">
                 <level type="setup">
-                    <property name="leaderBoardProvider">TOP10</property>
+                    <property name="leaderBoardProvider">top10</property>
                 </level>
                 <level type="xp">
                     <property name="1">fish,assets/badge.png,0,10</property>

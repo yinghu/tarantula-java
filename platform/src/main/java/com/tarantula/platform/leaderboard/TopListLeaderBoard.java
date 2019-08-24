@@ -6,16 +6,15 @@ import com.tarantula.Recoverable;
 import com.tarantula.platform.NaturalKey;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.util.SystemUtil;
-import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Updated 8/24/19
  */
-public class Top10LeaderBoard extends RecoverableObject implements LeaderBoard {
+public class TopListLeaderBoard extends RecoverableObject implements LeaderBoard {
 
     private String name;
     private String header;
@@ -24,17 +23,19 @@ public class Top10LeaderBoard extends RecoverableObject implements LeaderBoard {
     private int size;
     private Entry[] entryList;
 
-    private ConcurrentHashMap<String,Entry> entryIndex = new ConcurrentHashMap<>();
+    private HashMap<String,Entry> entryIndex = new HashMap<>();
 
     private EntryComparator comparator = new EntryComparator();
 
     private Reset reset;
     private DataStore dataStore;
+    private boolean updating;
 
-    public Top10LeaderBoard(){
-        this.vertex = "Top10LeaderBoard";
+    public TopListLeaderBoard(){
+        this.vertex = "TopListLeaderBoard";
+        this.label = "ldb";
     }
-    public Top10LeaderBoard(String name, String header, String category, String classifier, int size, DataStore dataStore){
+    public TopListLeaderBoard(String name, String header, String category, String classifier, int size, DataStore dataStore, boolean updating){
         this();
         this.name = name;
         this.header = header;
@@ -44,99 +45,64 @@ public class Top10LeaderBoard extends RecoverableObject implements LeaderBoard {
         this.entryList = new Entry[size];
         this.timestamp = SystemUtil.toUTCMilliseconds(LocalDateTime.now());
         this.dataStore = dataStore;
+        this.updating = updating;
     }
     @Override
     public String name() {
         return name;
     }
-
-    @Override
-    public void name(String name) {
-        this.name = name;
-    }
-
     @Override
     public int size() {
         return size;
     }
-
     @Override
-    public void size(int size) {
-        this.size = size;
-    }
-
-    @Override
-    public String leaderBoardHeader() {
+    public String header() {
         return header;
     }
-
-    @Override
-    public void leaderBoardHeader(String header) {
-        this.header = header;
-    }
-
     @Override
     public String classifier() {
         return classifier;
     }
-
-    @Override
-    public void classifier(String classifier) {
-        this.classifier = classifier;
-    }
-
     @Override
     public String category() {
         return category;
     }
 
     @Override
-    public void category(String category) {
-        this.category = category;
-    }
-    @Override
     public Map<String,Object> toMap(){
-        this.properties.put("5",this.size);
+        this.properties.put("1",this.size);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.size = ((Number)properties.get("5")).intValue();
-    }
-    @Override
-    public byte[] toByteArray(){
-        ByteBuffer buffer = ByteBuffer.allocate(12);
-        buffer.putInt(size);
-        buffer.putLong(timestamp);
-        return buffer.array();
-    }
-    @Override
-    public void fromByteArray(byte[] data){
-        ByteBuffer buffer = ByteBuffer.wrap(data);
-        this.size = buffer.getInt();
-        this.timestamp = buffer.getLong();
+        this.size = ((Number)properties.get("1")).intValue();
     }
 
+
     @Override
-    public void onBoard(String systemId, LeaderBoard.Entry entry) {
-        Entry last = entryList[9];
-        if(entry.value()>=last.value()){
+    public synchronized boolean onBoard(String systemId, LeaderBoard.Entry entry) {
+        Entry last = entryList[size-1];
+        if(entry.value()>=last.value()){//update on board
             Entry ix = entryIndex.get(systemId);
             if(ix==null){//kick off last
                 entryIndex.remove(last.systemId());
                 entryIndex.put(systemId,last);
-                last.update(systemId,entry.value());
-                if(dataStore!=null){
+                last.update(systemId,entry.value(),entry.timestamp());
+                if(updating){
                     dataStore.update(last);
                 }
             }
             else{//update existing entry
-                ix.value(entry.value());
-                if(dataStore!=null){
+                ix.update(systemId,entry.value(),entry.timestamp());
+                if(updating){
                     dataStore.update(ix);
                 }
             }
             Arrays.sort(entryList,comparator);
+            return true;
+        }
+        else{
+            return false;
         }
     }
 
@@ -155,12 +121,9 @@ public class Top10LeaderBoard extends RecoverableObject implements LeaderBoard {
     }
     public void reset(){
         if(reset.reset(this)){
-            if(this.dataStore!=null){
-                this.dataStore.update(this);
-            }
             for(Entry e : entryList){
-                e.update("--",0);
-                if(this.dataStore!=null){
+                e.update("--",0,0);
+                if(updating){
                     this.dataStore.update(e);
                 }
             }
@@ -171,7 +134,6 @@ public class Top10LeaderBoard extends RecoverableObject implements LeaderBoard {
     public int getFactoryId() {
         return LeaderBoardPortableRegistry.OID;
     }
-
     @Override
     public int getClassId() {
         return LeaderBoardPortableRegistry.TOP10_LEADER_BOARD_CID;
@@ -183,6 +145,6 @@ public class Top10LeaderBoard extends RecoverableObject implements LeaderBoard {
         return new NaturalKey(this.name+ Recoverable.PATH_SEPARATOR+header+Recoverable.PATH_SEPARATOR+category+Recoverable.PATH_SEPARATOR+classifier);
     }
     public String toString(){
-        return this.name+"/"+header+"/"+category+"/"+classifier+"/"+size;
+        return this.key().asString()+"["+size+"]";
     }
 }

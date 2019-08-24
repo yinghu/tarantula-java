@@ -114,23 +114,23 @@ public class XPGain extends RecoverableObject implements XP {
 
     public LeaderBoard.Entry dailyGain(double delta){
         this.dailyGain = dailyGain+delta;
-        return new LeaderBoardEntry(header,category,LeaderBoard.DAILY,dailyGain);
+        return new LeaderBoardEntry(header,category,LeaderBoard.DAILY,dailyGain,System.currentTimeMillis());
     }
     public LeaderBoard.Entry weeklyGain(double delta){
         this.weeklyGain = weeklyGain+delta;
-        return new LeaderBoardEntry(header,category,LeaderBoard.WEEKLY,weeklyGain);
+        return new LeaderBoardEntry(header,category,LeaderBoard.WEEKLY,weeklyGain,System.currentTimeMillis());
     }
     public LeaderBoard.Entry monthlyGain(double delta){
         this.monthlyGain = monthlyGain+delta;
-        return new LeaderBoardEntry(header,category,LeaderBoard.MONTHLY,monthlyGain);
+        return new LeaderBoardEntry(header,category,LeaderBoard.MONTHLY,monthlyGain,System.currentTimeMillis());
     }
     public LeaderBoard.Entry yearlyGain(double delta){
         this.yearlyGain = yearlyGain+delta;
-        return new LeaderBoardEntry(header,category,LeaderBoard.YEARLY,yearlyGain);
+        return new LeaderBoardEntry(header,category,LeaderBoard.YEARLY,yearlyGain,System.currentTimeMillis());
     }
     public LeaderBoard.Entry totalGain(double delta){
         this.totalGain = totalGain+delta;
-        return new LeaderBoardEntry(header,category,LeaderBoard.TOTAL,totalGain);
+        return new LeaderBoardEntry(header,category,LeaderBoard.TOTAL,totalGain,System.currentTimeMillis());
     }
     @Override
     public Key key(){

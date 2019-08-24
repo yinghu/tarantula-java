@@ -22,7 +22,7 @@ public class LeaderBoardPortableRegistry extends AbstractRecoverableListener {
                 pt = new LeaderBoardEntry();
                 break;
             case TOP10_LEADER_BOARD_CID:
-                pt = new Top10LeaderBoard();
+                pt = new TopListLeaderBoard();
                 break;
             default:
         }

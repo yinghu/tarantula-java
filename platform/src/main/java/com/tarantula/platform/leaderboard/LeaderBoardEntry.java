@@ -2,10 +2,6 @@ package com.tarantula.platform.leaderboard;
 
 import com.tarantula.LeaderBoard;
 import com.tarantula.platform.RecoverableObject;
-import com.tarantula.platform.util.SystemUtil;
-
-import java.nio.ByteBuffer;
-import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -16,25 +12,26 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
     private String header;
     private String category;
     private String classifier;
-    //private String name;
     private String systemId="--";
     private double value=0;
+
     public LeaderBoardEntry(){
         this.vertex ="LeaderBoardEntry";
         this.label = "E";
         this.onEdge = true;
     }
-    public LeaderBoardEntry(String header,String category,String classifier,double value){
+    public LeaderBoardEntry(String header,String category,String classifier,double value,long timestamp){
         this();
         this.header = header;
         this.category = category;
         this.classifier = classifier;
         this.value = value;
+        this.timestamp = timestamp;
     }
-    public void update(String systemId,double replace){
+    public void update(String systemId,double replace,long timestamp){
         this.systemId = systemId;
         this.value = replace;
-        this.timestamp = SystemUtil.toUTCMilliseconds(LocalDateTime.now());
+        this.timestamp = timestamp;
     }
     public String header(){
         return this.header;
@@ -52,10 +49,6 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
     public double value() {
         return value;
     }
-    public void value(double value){
-        this.value = value;
-    }
-
 
     @Override
     public int getFactoryId() {
@@ -68,43 +61,23 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
     }
     @Override
     public String toString(){
-        return this.header+","+category+","+classifier+","+this.systemId+","+value+"/";
+        return this.header+","+category+","+classifier+","+this.systemId+","+value+","+timestamp;
     }
 
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("2",this.systemId);
-        this.properties.put("3",value);
+        this.properties.put("1",this.systemId);
+        this.properties.put("2",value);
+        this.properties.put("3",timestamp);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.systemId = (String) properties.get("2");
-        this.value = ((Number)properties.get("3")).doubleValue();
+        this.systemId = (String) properties.get("1");
+        this.value = ((Number)properties.get("2")).doubleValue();
+        this.timestamp = ((Number)properties.get("3")).longValue();
     }
 
-    @Override
-    public byte[] toByteArray(){
-        byte[] _sb = systemId.getBytes();
-        ByteBuffer buffer = ByteBuffer.allocate(20+_sb.length);
-        buffer.putDouble(this.value);
-        buffer.putLong(this.timestamp);
-        buffer.putInt(_sb.length);
-        buffer.put(_sb);
-        return buffer.array();
-    }
-    @Override
-    public void fromByteArray(byte[] data){
-        ByteBuffer buffer = ByteBuffer.wrap(data);
-        this.value = buffer.getDouble();
-        this.timestamp = buffer.getLong();
-        int len = buffer.getInt();
-        StringBuffer sb = new StringBuffer();
-        for(int i=0;i<len;i++){
-            sb.append((char) buffer.get());
-        }
-        this.systemId = sb.toString();
-    }
     @Override
     public boolean equals(Object obj){
         LeaderBoardEntry lde = (LeaderBoardEntry)obj;

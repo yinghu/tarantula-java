@@ -2,8 +2,6 @@ package com.tarantula.platform.leaderboard;
 
 import com.tarantula.*;
 import com.tarantula.platform.TarantulaApplicationHeader;
-
-import com.tarantula.platform.util.LeaderBoardRegistryContextSerializer;
 import com.tarantula.platform.util.LeaderBoardSerializer;
 
 
@@ -21,18 +19,15 @@ public class LeaderBoardApplication extends TarantulaApplicationHeader{
            LeaderBoard ldx = leaderBoardServiceProvider.leaderBoard(cmd.header("header"),cmd.header("category"),cmd.header("classifier"));
            session.write(this.builder.create().toJson(ldx).getBytes(),this.descriptor.responseLabel());
         }
-        else if(session.action().equals("onRegistry")){
-            LeaderBoardRegistryContext _cbr = new LeaderBoardRegistryContext();
-            //_cbr.registryList = leaderBoardServiceProvider.onRegistry();
-            session.write(this.builder.create().toJson(_cbr).getBytes(),this.descriptor.responseLabel());
+        else{
+            throw new RuntimeException("action ["+session.action()+"] not supported");
         }
 
     }
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        builder.registerTypeAdapter(Top10LeaderBoard.class,new LeaderBoardSerializer());
-        builder.registerTypeAdapter(LeaderBoardRegistryContext.class,new LeaderBoardRegistryContextSerializer());
-        leaderBoardServiceProvider = context.serviceProvider("TOP10");
+        builder.registerTypeAdapter(TopListLeaderBoard.class,new LeaderBoardSerializer());
+        leaderBoardServiceProvider = context.serviceProvider("top10");
         this.context.log("Leader board application started on ["+descriptor.tag()+"]",OnLog.INFO);
     }
 }

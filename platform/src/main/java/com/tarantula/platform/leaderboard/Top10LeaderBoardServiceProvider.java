@@ -2,6 +2,7 @@ package com.tarantula.platform.leaderboard;
 
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,30 +11,35 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Updated by yinghu lu on 8/24/2019.
  */
-public class Top10LeaderBoardServiceProvider implements LeaderBoardServiceProvider,SchedulingTask {
+public class Top10LeaderBoardServiceProvider implements LeaderBoardServiceProvider,SchedulingTask,EventListener {
 
     private static TarantulaLogger log = JDKLogger.getLogger(Top10LeaderBoardServiceProvider.class);
+
+    private static String _NAME = "top10";
 
     private DataStore dataStore;
     private int size = 10;
 
-    private ConcurrentHashMap<String,Top10LeaderBoard> vMap = new ConcurrentHashMap<>();
+    //global board view
+    private ConcurrentHashMap<String, TopListLeaderBoard> vMap = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<String,Top10LeaderBoard> lMap = new ConcurrentHashMap<>();
-
+    //local board view
+    private ConcurrentHashMap<String, TopListLeaderBoard> lMap = new ConcurrentHashMap<>();
 
     private AtomicLong taskDelay;
 
     private ServiceContext serviceContext;
-    public LeaderBoard leaderBoard(String header, String category, String classifier){
-        return load(header,category,classifier);
+    private EventService eventService;
+    public LeaderBoard leaderBoard(String h, String c,String a){
+        String k = new StringBuffer(_NAME).append(Recoverable.PATH_SEPARATOR).append(h).append(Recoverable.PATH_SEPARATOR).append(c).append(Recoverable.PATH_SEPARATOR).append(a).toString();
+        return vMap.get(k);
     }
     public void onLeaderBoard(String systemId,LeaderBoard.Entry[] entries){
         for(LeaderBoard.Entry e : entries){
             LeaderBoard ldb = load(e.header(),e.category(),e.classifier());
-            ldb.onBoard(systemId,e);
-            for(LeaderBoard.Entry ex : ldb.list()){
-                log.info(ex.toString());
+            if(ldb.onBoard(systemId,e)){
+                e.update(systemId,e.value(),e.timestamp());
+                this.eventService.publish(new LeaderBoardGlobalEvent(_NAME,e));
             }
         }
     }
@@ -49,13 +55,19 @@ public class Top10LeaderBoardServiceProvider implements LeaderBoardServiceProvid
 
     @Override
     public String name() {
-        return "TOP10";
+        return _NAME;
     }
-
+    public boolean onEvent(Event event){
+        LeaderBoardEntry entry = new LeaderBoardEntry(event.applicationId(),event.instanceId(),event.clientId(),event.balance(),event.timestamp());
+        LeaderBoard gdb = vMap.get(_toKey(event.applicationId(),event.instanceId(),event.clientId()));
+        gdb.onBoard(event.systemId(),entry);
+        return false;
+    }
     @Override
     public void setup(ServiceContext serviceContext){
         this.dataStore = serviceContext.dataStore("leaderBoard",serviceContext.partitionNumber());
         this.serviceContext = serviceContext;
+        this.eventService = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).subscribe(_NAME,this);
         taskDelay = new AtomicLong(SystemUtil.toMidnight());
         this.serviceContext.schedule(this);
         log.info("Top 10 leader board service provider started");
@@ -65,26 +77,39 @@ public class Top10LeaderBoardServiceProvider implements LeaderBoardServiceProvid
     public void waitForData() {
 
     }
-
+    private String _toKey(String h,String c,String a){
+        return new StringBuffer(_NAME).append(Recoverable.PATH_SEPARATOR).append(h).append(Recoverable.PATH_SEPARATOR).append(c).append(Recoverable.PATH_SEPARATOR).append(a).toString();
+    }
     private LeaderBoard load(String h,String c,String a){
-        String k = new StringBuffer("top10").append(Recoverable.PATH_SEPARATOR).append(h).append(Recoverable.PATH_SEPARATOR).append(c).append(Recoverable.PATH_SEPARATOR).append(a).toString();
+        String k = _toKey(h,c,a);
         return lMap.computeIfAbsent(k,(kc)->{
-           Top10LeaderBoard top = new Top10LeaderBoard("top10",h,c,a,size,this.dataStore);
-           if(a.equals(LeaderBoard.DAILY)){
+            TopListLeaderBoard top = new TopListLeaderBoard(_NAME,h,c,a,size,this.dataStore,true);
+            TopListLeaderBoard gview = new TopListLeaderBoard(_NAME,h,c,a,size,this.dataStore,false);
+            if(a.equals(LeaderBoard.DAILY)){
                top.registerReset(new DailyReset());
+               gview.registerReset(new DailyReset());
            }
            else if(a.equals(LeaderBoard.WEEKLY)){
                 top.registerReset(new WeeklyReset());
+                gview.registerReset(new WeeklyReset());
            }
            else if(a.equals(LeaderBoard.MONTHLY)){
                 top.registerReset(new MonthlyReset());
+                gview.registerReset(new MonthlyReset());
            }
            else if(a.equals(LeaderBoard.YEARLY)){
                top.registerReset(new YearlyReset());
+               gview.registerReset(new YearlyReset());
            }
            else if(a.equals(LeaderBoard.TOTAL)){
                top.registerReset(new TotalReset());
+               gview.registerReset(new TotalReset());
            }
+           for(int i=0;i<size;i++){
+               gview.entry(i,new LeaderBoardEntry());
+           }
+           gview.reset();
+           vMap.put(k,gview);
            if(dataStore.createIfAbsent(top,true)){
                for(int i=0;i<size;i++){
                     LeaderBoardEntry e = new LeaderBoardEntry();
@@ -99,8 +124,10 @@ public class Top10LeaderBoardServiceProvider implements LeaderBoardServiceProvid
                int[] ix={0};
                this.dataStore.list(lq,(e)->{
                    top.entry(ix[0],e);
+                   if(!e.systemId().equals("--")){
+                       gview.onBoard(e.systemId(),e);
+                   }
                    ix[0]++;
-                   log.info(">>>>>>>>>>>>>>>>>>>>>>"+e.toString());
                    return true;
                });
            }

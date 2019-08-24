@@ -33,8 +33,7 @@ var DemoSyncGame = (function(){
         TARA_API.onService(_payload,callback);    
     };
     let _item1 = function(out){
-        
-        let _payload = {serviceTag:'demo/service',command:"applicationList"};
+        let _payload = {serviceTag:'leaderboard/top10',header:'presence',category:'LoginCount',classifier:'T'};
         TARA_API.onService(_payload,out);
     };  
     return{

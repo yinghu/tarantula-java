@@ -7,14 +7,15 @@ import java.lang.reflect.Type;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Updated by yinghu 6/15/2018
+ * Updated by yinghu 8/24/19
  */
 public class LeaderBoardSerializer implements JsonSerializer<LeaderBoard> {
 
 
     public JsonElement serialize(LeaderBoard leaderBoard, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = new JsonObject();
-        jo.addProperty("header",leaderBoard.leaderBoardHeader());
+        jo.addProperty("label",leaderBoard.label());
+        jo.addProperty("header",leaderBoard.header());
         jo.addProperty("name",leaderBoard.name());
         jo.addProperty("classifier",leaderBoard.classifier());
         jo.addProperty("category",leaderBoard.category());
@@ -25,7 +26,7 @@ public class LeaderBoardSerializer implements JsonSerializer<LeaderBoard> {
                 JsonObject b = new JsonObject();
                 b.addProperty("systemId",e.systemId());
                 b.addProperty("value",e.value());
-                b.addProperty("lastUpdated",SystemUtil.fromUTCMilliseconds(e.timestamp()).format(DateTimeFormatter.ISO_LOCAL_DATE));
+                b.addProperty("lastUpdated",SystemUtil.fromUTCMilliseconds(e.timestamp()).format(DateTimeFormatter.ISO_DATE_TIME));
                 blist.add(b);
             }
         }
