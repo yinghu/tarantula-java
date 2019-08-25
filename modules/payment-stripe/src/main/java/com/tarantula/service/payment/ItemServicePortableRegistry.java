@@ -1,4 +1,4 @@
-package com.tarantula.game.blackjack;
+package com.tarantula.service.payment;
 
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
