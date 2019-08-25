@@ -33,6 +33,7 @@ public class XPLevel extends RecoverableObject implements Level {
 
     public XPLevel(){
         this.vertex = "XPLevel";
+        this.label = "lev";
         this.binary = true;
     }
     @Override

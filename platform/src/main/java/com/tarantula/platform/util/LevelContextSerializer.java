@@ -7,7 +7,7 @@ import com.tarantula.platform.leveling.LevelContext;
 import java.lang.reflect.Type;
 
 /**
- * Updated by yinghu on 3/5/2018.
+ * Updated by yinghu on 8/24/19
  */
 public class LevelContextSerializer implements JsonSerializer<LevelContext> {
 
@@ -23,14 +23,6 @@ public class LevelContextSerializer implements JsonSerializer<LevelContext> {
                 xlist.add(xs.serialize(x,type,jsonSerializationContext));
             }
             pc.add("xp",xlist);
-        }
-        if(levelContext.headers!=null){
-            JsonArray hlist = new JsonArray();
-            XPHeaderSerializer headerSerializer = new XPHeaderSerializer();
-            levelContext.headers.forEach((xh)->{
-                hlist.add(headerSerializer.serialize(xh,type,jsonSerializationContext));
-            });
-            pc.add("headers",hlist);
         }
         return pc;
     }

@@ -12,7 +12,7 @@ var AdminMonitor = (function(){
         TARA_API.send({action:'onStart',streaming:true,label:'presence/notice',data:{command:'onStart'}});
     };
     let _reset = function(){
-        let _payload = {serviceTag:'leaderboard/top10',header:'presence',category:'LoginCount',classifier:'T',command:'onLeaderBoard'};
+        let _payload = {serviceTag:'level/xp',header:'presence',category:'LoginCount',classifier:'T',command:'onXP'};
         TARA_API.onService(_payload,function(resp){
             console.log(resp);
         });

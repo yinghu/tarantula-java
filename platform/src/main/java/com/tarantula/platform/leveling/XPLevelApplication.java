@@ -4,9 +4,7 @@ import com.tarantula.*;
 import com.tarantula.Level;
 import com.tarantula.platform.*;
 import com.tarantula.platform.util.LevelContextSerializer;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArraySet;
-
+import com.tarantula.platform.util.XPLevelSerializer;
 
 /**
  * Update by yinghu on 8/23/19
@@ -15,29 +13,31 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
 
     private XPLevelRule rule;
     private DataStore _dataStore;
-    private Set<XPHeader> _headers;
     private LeaderBoardServiceProvider leaderBoardServiceProvider;
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         OnAccess acc = builder.create().fromJson(new String(payload),OnAccess.class);
-        String header = acc.header("header");
-        String category = acc.header("category");
-        XPLevel l = (XPLevel) this._load(session.systemId());
-        rule.onLevel(l);
         LevelContext lcx = new LevelContext();
-        if(header==null){
+        if(session.action().equals("onLevel")){
+            XPLevel l = (XPLevel)this._load(session.systemId());
             lcx.level = l;
-            lcx.headers = _headers;
-        }else{
-            lcx.xp = l.list(header,category);
+            session.write(this.builder.create().toJson(lcx).getBytes(),this.descriptor.responseLabel());
         }
-        session.write(this.builder.create().toJson(lcx).getBytes(),this.descriptor.responseLabel());
+        else if(session.action().equals("onXP")){
+            String header = acc.header("header");
+            String category = acc.header("category");
+            XPLevel l = (XPLevel) this._load(session.systemId());
+            lcx.xp = l.list(header,category);
+            session.write(this.builder.create().toJson(lcx).getBytes(),this.descriptor.responseLabel());
+        }
+        else{
+            throw new RuntimeException("operation not supported ["+session.action()+"]");
+        }
     }
 
     @Override
    public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        _headers = new CopyOnWriteArraySet<>();
         Configuration xp = this.context.configuration("xp");
         this.leaderBoardServiceProvider = this.context.serviceProvider(this.context.configuration("setup").property("leaderBoardProvider"));
         this._dataStore = this.context.dataStore("level");
@@ -100,11 +100,11 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
     private void executeOnLevel(Level l,OnStatistics delta){
         l.levelXP(delta.xpDelta());
         this.rule.execute(l);
+        this.rule.onLevel((XPLevel)l);
         _dataStore.update(l);
         //execute XP
         if(delta.name()!=null){
             for(Statistics.Entry entry : delta.entryList()){
-                _headers.add(new XPHeader(delta.name(),entry.name()));
                 XP xp = new XPGain(l.distributionKey(),l.bucket(),l.oid(),delta.name(),entry.name());
                 this.context.log(xp.key().asString(),OnLog.INFO);
                 _dataStore.createIfAbsent(xp,true);
