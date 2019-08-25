@@ -1,7 +1,8 @@
-package com.tarantula.platform.marketplace;
+package com.tarantula.service.payment;
 
 import com.tarantula.DataStore;
 import com.tarantula.Serviceable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,13 +19,13 @@ public class SmartPackageGenerator implements Serviceable {
     private final ArrayList<VirtualCreditsPack> plist = new ArrayList<>();
 
 
-    public SmartPackageGenerator(int basePackageSize,double basePrice,double baseVirtualCredits,DataStore dataStore){
+    public SmartPackageGenerator(int basePackageSize, double basePrice, double baseVirtualCredits, DataStore dataStore){
         this.basePackageSize = basePackageSize;
         this.basePrice = basePrice;
         this.baseVirtualCredits = baseVirtualCredits;
         this.dataStore = dataStore;
     }
-    public List<VirtualCreditsPack> list(double requestingCredits,int size){
+    public List<VirtualCreditsPack> list(double requestingCredits, int size){
 
         return plist;
     }

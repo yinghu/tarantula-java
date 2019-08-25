@@ -1,8 +1,7 @@
-package com.tarantula.platform.marketplace;
+package com.tarantula.service.payment;
 
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
-
 
 /**
  * Created by yinghu lu on 3/31/2018.

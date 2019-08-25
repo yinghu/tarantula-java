@@ -85,10 +85,11 @@
 <script>
     document.querySelector("#tx_close_shopping").onclick = tx_close_shopping;
     //let desc = TARA_API.descriptor(TARA_API.query().applicationId);
-    var _mgt ={serviceTag:'marketplace',command:'onList',requestingCredits:5000,packSize:3};  
+    var _mgt ={serviceTag:'service/marketplace',command:'onList',requestingCredits:5000,packSize:3};  
     TARA_API.onService(_mgt,function(mst){
+        console.log(mst);
+        TARA_API.query().stripeId = mst.paymentClientId;
         mst.packList.forEach(function(pk,i){
-            console.log(pk);
             document.querySelector("#tx_shopping_commit_"+i).setAttribute('oid',pk.oid);
             document.querySelector("#tx_shopping_commit_"+i).setAttribute('amount',pk.amount);
             document.querySelector("#tx_shopping_commit_"+i).setAttribute('pname',pk.name);
@@ -146,7 +147,7 @@
         document.querySelector("#tx_checkout_message").style.display = "block";
         document.querySelector("#tx_checkout").style.display = 'block';    
         try{
-        var stripe = Stripe(TARA_API.query().stripe.clientId);
+        var stripe = Stripe(TARA_API.query().stripeId);
         var elements = stripe.elements();
         var card = elements.create('cardNumber',{style:elementStyles,placeholder:'card number'});
         var expiry = elements.create('cardExpiry',{style:elementStyles,placeholder:'expiry month/year'});
@@ -182,7 +183,7 @@
         }   
     }
     function tx_shopping_commit(token){
-        let _mcommit ={serviceTag:'marketplace/stripe',command:'onCommit',checkoutId:TARA_API.query().packId,orderId:token.id};  
+        let _mcommit ={serviceTag:'service/marketplace',command:'onCommit',checkoutId:TARA_API.query().packId,orderId:token.id};  
         TARA_API.onService(_mcommit,function(resp){
             //popup web payment integration page    
             console.log(resp);

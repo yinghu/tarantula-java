@@ -7,6 +7,7 @@ import com.stripe.Stripe;
 import com.stripe.model.Charge;
 import com.tarantula.*;
 import com.tarantula.Module;
+import com.tarantula.platform.OnBalanceTrack;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
 import java.io.InputStreamReader;
@@ -20,6 +21,9 @@ public class StripePaymentService implements Module {
     private String privateKey;
     private String publicKey;
 
+    private SmartPackageGenerator smartPackageGenerator;
+
+    private DataStore dataStore;
     private GsonBuilder builder;
     @Override
     public void onJoin(Session session) throws Exception{
@@ -28,15 +32,33 @@ public class StripePaymentService implements Module {
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
-        session.write(payload,label());
         OnAccess ex = this.builder.create().fromJson(new String(payload),OnAccess.class);
-        Map<String, Object> chargeParams = new HashMap<>();
-        chargeParams.put("amount",3000);//pass penney number as integer
-        chargeParams.put("currency", "usd");
-        chargeParams.put("description", "Charge for ["+"sample"+"]");
-        chargeParams.put("source",ex.header("orderId"));
-        if(validate(chargeParams)){
-            //
+        if(session.action().equals("onList")){
+            MarketplaceContext mc = new MarketplaceContext(session.action());
+            mc.paymentClientId = publicKey;
+            mc.virtualCreditsPackList = this.smartPackageGenerator.list(Double.parseDouble(ex.header("requestingCredits")),Integer.parseInt(ex.header("packSize")));
+            session.write(this.builder.create().toJson(mc).getBytes(),this.label());
+        }
+        else if(session.action().equals("onCommit")){ //finish the checkout process with confirmation ticket to verify
+            VirtualCreditsPack co = new VirtualCreditsPack();
+            co.distributionKey(ex.header("checkoutId"));
+            boolean suc = false;
+            if(this.dataStore.load(co)){
+                Map<String, Object> chargeParams = new HashMap<>();
+                chargeParams.put("amount",Double.valueOf(co.price).intValue());//pass penney number as integer
+                chargeParams.put("currency", "usd");
+                chargeParams.put("description", "Charge for ["+co.distributionKey()+"]");
+                chargeParams.put("source",ex.header("orderId"));
+                if(validate(chargeParams)){
+                    //charge successfully
+                    OnBalanceTrack onBalanceTrack = new OnBalanceTrack(session.systemId(),co.credits);
+                    this.context.postOffice().onTag(Presence.LOBBY_TAG).send(session.systemId(),onBalanceTrack);
+                    suc = true;
+                }
+            }
+            MarketplaceContext mc = new MarketplaceContext(session.action());
+            mc.successful(suc);
+            session.write(this.builder.create().toJson(mc).getBytes(),this.label());
         }
         return false;
     }
@@ -46,12 +68,19 @@ public class StripePaymentService implements Module {
         this.context = applicationContext;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
+        this.builder.registerTypeAdapter(MarketplaceContext.class,new MarketplaceContextSerializer());
         this.context.resource("stripe-credentials.json",(in)->{
             JsonParser jp = new JsonParser();
             JsonObject jo = jp.parse(new InputStreamReader(in)).getAsJsonObject();
             privateKey = jo.get("private_key").getAsString();
             publicKey = jo.get("public_key").getAsString();
         });
+        this.dataStore = this.context.dataStore("marketplace");
+        double basePrice = 100;
+        double baseVirtualCredits = 500000;
+        int basePackageSize = 4;
+        smartPackageGenerator = new SmartPackageGenerator(basePackageSize,basePrice,baseVirtualCredits,this.dataStore);
+        smartPackageGenerator.start();
         this.context.log("Stripe payment service started", OnLog.INFO);
     }
 

@@ -1,4 +1,4 @@
-package com.tarantula.platform.marketplace;
+package com.tarantula.service.payment;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
