@@ -466,7 +466,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 DynamicModuleClassLoader moduleClassLoader = cMap.get(descriptor.subtypeId());
                 this.clear();//clear on old instance
                 this.module = moduleClassLoader.newModule(descriptor.moduleName());
-                this.module.setup(applicationContext);
+                this.module.setup(applicationContext);//inject the limited content to prevent unexpected calls from modules
                 if(descriptor.singleton()){
                     log.warn("Module ["+descriptor.moduleName()+"] reset on singleton instance ["+descriptor.tag()+"]");
                 }else{
