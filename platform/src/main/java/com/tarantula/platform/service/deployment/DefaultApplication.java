@@ -105,11 +105,10 @@ public class DefaultApplication implements Application {
             TarantulaApplicationContext app;
             TarantulaApplication _app = (TarantulaApplication)Class.forName(this.deploymentDescriptor.applicationClassName()).getConstructor().newInstance();
             _app.descriptor(dd);
-            app = new TarantulaApplicationContext(tarantulaContext,_app,instanceRegistry,this.configurations);
+            app = new TarantulaApplicationContext(tarantulaContext,dd,_app,instanceRegistry,this.configurations);
             if(instanceRegistry!=null){
                 instanceRegistry.applicationContext = app;
             }
-            app.setup(app,dd);
             return app;
 
         }catch (Exception ex){

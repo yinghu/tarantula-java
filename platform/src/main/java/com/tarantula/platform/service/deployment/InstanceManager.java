@@ -70,9 +70,14 @@ public class InstanceManager implements Instance {
         return tMap.computeIfAbsent(event.instanceId(),(k)-> {
             TarantulaApplicationContext tc = this.applicationManager.launch(event);
             if(tc!=null){
-                tc.setupOnInstanceRegistry();//loading instance state
-                tc.onBucketReceiver(partition,state);
-                log.warn("Instance ["+tc._instance.distributionKey()+"] is running limited time mode ["+(durationOnInstance>0)+"]");
+                try{
+                    tc._setup();//inject the app context proxy to decouple the TarantulaApplicationContext
+                    tc.setupOnInstanceRegistry();//loading instance state
+                    tc.onBucketReceiver(partition,state);
+                    log.warn("Instance ["+tc._instance.distributionKey()+"] is running limited time mode ["+(durationOnInstance>0)+"]");
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
             }
             return tc;
         });

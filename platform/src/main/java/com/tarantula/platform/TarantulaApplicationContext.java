@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TarantulaApplicationContext implements ApplicationContext, EventListener{
 
+    private Descriptor _descriptor;
 	private TarantulaApplication application;
 
     private TarantulaContext tarantulaContext;
@@ -46,8 +47,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public long duration;
     private boolean timed;
 
-    public TarantulaApplicationContext(TarantulaContext tarantulaContext,TarantulaApplication application,InstanceIndex index,HashMap<String,Configuration> configurations){
+    public TarantulaApplicationContext(TarantulaContext tarantulaContext,Descriptor descriptor,TarantulaApplication application,InstanceIndex index,HashMap<String,Configuration> configurations){
         this.tarantulaContext = tarantulaContext;
+        this._descriptor = descriptor;
         this.application = application;
         this._instance = index; //null on singleton instance
         this.configurations = configurations;
@@ -143,21 +145,20 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 		
 	}
 
-    public void setup(ApplicationContext applicationContext,DeploymentDescriptor d) throws Exception{
+    public void _setup() throws Exception{
         this.validator = this.tarantulaContext.tokenValidatorProvider.tokenValidator();
-        //this.eventService = this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE);
-        this.duration = d.runtimeDurationOnInstance();
+        this.duration = _descriptor.runtimeDurationOnInstance();
         this.timed = this.duration>0;
-        this.logEnabled = d.logEnabled();
+        this.logEnabled = _descriptor.logEnabled();
         if(logEnabled){
             this.logger = this.tarantulaContext.logger(this.application.getClass());
         }
-        if(d.singleton()){ //per header per singleton
+        if(_descriptor.singleton()){ //per header per singleton
             DataStore ds = this.tarantulaContext.masterDataStore();
             this.onStatistics = new DeltaStatistics(); //LOCAL NODE ONLY
             this.onStatistics.vertex(SystemUtil.toString(new String[]{this.onStatistics.vertex(),ds.node()}));
-            this.onStatistics.distributionKey(d.distributionKey());
-            this.onStatistics.leaderBoardHeader(d.leaderBoardHeader);
+            this.onStatistics.distributionKey(_descriptor.distributionKey());
+            this.onStatistics.leaderBoardHeader(_descriptor.leaderBoardHeader());
             //this.onStatistics.distributable(true);
             if(this.tarantulaContext.tarantulaCluster.load(this.onStatistics)||ds.load(this.onStatistics)){
                 ds.createIfAbsent(this.onStatistics,false);
@@ -176,7 +177,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                 //logger.warn("Node only statistics ->"+this.onStatistics.key().asString());
             }
         }
-        this._setup(applicationContext, d.distributionKey(), d.singleton());
+        this._setup(this, _descriptor.distributionKey(), _descriptor.singleton());
     }
     private void _setup(ApplicationContext context,String applicationId,boolean singleton) throws Exception {
         this.applicationId = applicationId;
@@ -226,14 +227,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         }
     }
     public void releaseOnInstanceRegistry(){//call on bucket closed
-        this._instance.house().onUpdate();
-        this._instance.statistics().onUpdate();
-        onInstances.forEach((k,v)->{
-            v.onUpdate();
-        });
-    }
-    public void shutdownOnInstanceRegistry(){
-        //push current state to local data store only
         this._instance.house().onUpdate();
         this._instance.statistics().onUpdate();
         onInstances.forEach((k,v)->{
@@ -338,7 +331,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         return app!=null?app.descriptor():null;
     }
     public Descriptor descriptor(){
-        return this.application.descriptor();
+        return this._descriptor;
     }
     public TokenValidator validator(){
         return this.validator;
@@ -399,7 +392,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                 this.releaseOnInstanceRegistry();
             }
             else if(state==BucketReceiver.SHUT_DOWN){
-                this.shutdownOnInstanceRegistry();
+                this.releaseOnInstanceRegistry();
             }
         }
         else{

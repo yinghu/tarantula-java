@@ -26,6 +26,7 @@ public class SingletonApplicationManager extends DefaultApplication implements B
         dd.owner(dd.distributionKey());
         accessMode = dd.accessMode();
         this.singleton = this.launch(dd,null);
+        this.singleton._setup();//inject the app context proxy to decouple the TarantulaApplicationContext
         if(accessMode!=Session.PRIVATE_ACCESS_MODE){
             for(int r=0;r<this.tarantulaContext.platformRoutingNumber;r++){
                 StringBuffer bs = new StringBuffer(this.tarantulaContext.dataBucketGroup).append(Recoverable.PATH_SEPARATOR).append(singleton.descriptor().tag()).append(Recoverable.PATH_SEPARATOR).append(r);
