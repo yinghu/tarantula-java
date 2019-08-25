@@ -46,13 +46,14 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     private AtomicBoolean started = new AtomicBoolean(false);
     public long duration;
     private boolean timed;
-
-    public TarantulaApplicationContext(TarantulaContext tarantulaContext,Descriptor descriptor,TarantulaApplication application,InstanceIndex index,HashMap<String,Configuration> configurations){
+    private final boolean resetEnabled;
+    public TarantulaApplicationContext(TarantulaContext tarantulaContext,Descriptor descriptor,TarantulaApplication application,InstanceIndex index,HashMap<String,Configuration> configurations,boolean resetEnabled){
         this.tarantulaContext = tarantulaContext;
         this._descriptor = descriptor;
         this.application = application;
         this._instance = index; //null on singleton instance
         this.configurations = configurations;
+        this.resetEnabled = resetEnabled;
     }
 
     public OnInstance poll(Event event){

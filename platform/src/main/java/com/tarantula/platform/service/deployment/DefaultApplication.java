@@ -94,18 +94,18 @@ public class DefaultApplication implements Application {
         if(index!=null){
             DeploymentDescriptor dd = this.deploymentDescriptor.deploy(index.distributionKey());
             dd.owner(index.owner());
-            TarantulaApplicationContext app = this.launch(dd,index);
+            TarantulaApplicationContext app = this.launch(dd,index,deploymentDescriptor.resetEnabled());
             return app;
         }else{
             return null;
         }
     }
-    protected TarantulaApplicationContext launch(DeploymentDescriptor dd,InstanceIndex instanceRegistry){ //private instance launched by owner
+    protected TarantulaApplicationContext launch(DeploymentDescriptor dd,InstanceIndex instanceRegistry,boolean resetEnabled){ //private instance launched by owner
         try{
             TarantulaApplicationContext app;
             TarantulaApplication _app = (TarantulaApplication)Class.forName(this.deploymentDescriptor.applicationClassName()).getConstructor().newInstance();
             _app.descriptor(dd);
-            app = new TarantulaApplicationContext(tarantulaContext,dd,_app,instanceRegistry,this.configurations);
+            app = new TarantulaApplicationContext(tarantulaContext,dd,_app,instanceRegistry,this.configurations,resetEnabled);
             if(instanceRegistry!=null){
                 instanceRegistry.applicationContext = app;
             }

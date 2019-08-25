@@ -9,7 +9,6 @@ import java.util.concurrent.ScheduledFuture;
 
 public class ApplicationContextProxy implements ApplicationContext {
     private TarantulaApplicationContext tarantulaApplicationContext;
-
     public ApplicationContextProxy(TarantulaApplicationContext tarantulaApplicationContext){
         this.tarantulaApplicationContext = tarantulaApplicationContext;
     }
