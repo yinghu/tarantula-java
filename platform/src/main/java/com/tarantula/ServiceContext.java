@@ -16,7 +16,6 @@ public interface ServiceContext {
     ClusterProvider clusterProvider(int scope);
     ServiceProvider serviceProvider(String name);
     AccessIndexService accessIndexService();
-    TokenValidator.OAuthVendor authVendor(String name);
     TarantulaLogger logger(Class c);
     OnPartition[] partitions();
     int partitionNumber();

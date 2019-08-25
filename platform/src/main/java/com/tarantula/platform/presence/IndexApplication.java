@@ -10,13 +10,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * Updated by yinghu on 3/2/2018.
+ * Updated by yinghu on 8/24/19
  */
 public class IndexApplication extends TarantulaApplicationHeader implements OnView.Listener,OnLobby.Listener {
 
     private ConcurrentHashMap<String,OnView> _viewList = new ConcurrentHashMap<>();
     private CopyOnWriteArraySet<String> _lobbyList = new CopyOnWriteArraySet<>();
-    //private ConcurrentHashMap<String,byte[]> _resourceList = new ConcurrentHashMap<>();
+
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         if(session.action().equals("view")){
@@ -36,30 +36,6 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
             ic.view = view;
             session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }
-        /**
-        else if(session.action().equals("resource")){
-            IndexEvent ie = (IndexEvent)session;
-            String res = ie.viewId.replace("resource","web");
-            byte[] data = _resourceList.computeIfAbsent(res,(rk)->{
-                BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(res));
-                try{
-                    byte[] ret = new byte[in.available()];
-                    in.read(ret);
-                    return ret;
-                }catch (Exception ex){
-                    this.context.log("Resource ["+res+"] not existed",OnLog.WARN);
-                    return new byte[0];
-                }
-                finally {
-                    try{
-                        if(in!=null){
-                            in.close();
-                        }
-                    }catch (Exception ex){}
-                }
-            });
-            session.write(data,this.descriptor.label());
-        }**/
         else{
             this.context.log(session.action(),OnLog.WARN);
             throw new RuntimeException("operation not supported");

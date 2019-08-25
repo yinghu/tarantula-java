@@ -15,7 +15,7 @@ public class MarketplaceApplication extends TarantulaApplicationHeader {
 
 
     private SmartPackageGenerator smartPackageGenerator;
-    private TokenValidator.OAuthVendor strip;
+
     private DataStore dataStore;
     @Override
     public void setup(ApplicationContext context) throws Exception {
@@ -28,7 +28,6 @@ public class MarketplaceApplication extends TarantulaApplicationHeader {
         int basePackageSize = Integer.parseInt(cfg.property("basePackageSize"));
         smartPackageGenerator = new SmartPackageGenerator(basePackageSize,basePrice,baseVirtualCredits,this.dataStore);
         smartPackageGenerator.start();
-        strip = this.context.validator().vendor("stripe");
         this.context.log("Marketplace application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
     }
 
@@ -51,12 +50,12 @@ public class MarketplaceApplication extends TarantulaApplicationHeader {
                 chargeParams.put("currency", "usd");
                 chargeParams.put("description", "Charge for ["+co.distributionKey()+"]");
                 chargeParams.put("source",ex.header("orderId"));
-                if(strip.validate(chargeParams)){
+                //if(strip.validate(chargeParams)){
                     //charge successfully
                     OnBalanceTrack onBalanceTrack = new OnBalanceTrack(session.systemId(),co.credits);
                     this.context.postOffice().onTag(Presence.LOBBY_TAG).send(session.systemId(),onBalanceTrack);
                     suc = true;
-                }
+                //}
             }
             MarketplaceContext mc = new MarketplaceContext(session.action());
             mc.successful(suc);

@@ -45,9 +45,6 @@ public class SystemValidator implements Serviceable{
         return new _TokenValidator(this);
 
     }
-    public TokenValidator.OAuthVendor vendor(String name){
-        return this.tsc.authVendor(name);
-    }
 
     public void setup(ServiceContext serviceContext){
         this.tsc = serviceContext;
@@ -132,10 +129,6 @@ public class SystemValidator implements Serviceable{
                 systemValidatorProvider.offSession(systemId);
                 dataStore.update(offSession);
             }
-        }
-        @Override
-        public OAuthVendor vendor(String name){
-            return this._singleton.vendor(name);
         }
     }
 }

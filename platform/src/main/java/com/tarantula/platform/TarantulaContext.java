@@ -87,7 +87,6 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     public ConcurrentHashMap<String,ServiceProvider> serviceProviders = new ConcurrentHashMap();
     private ConcurrentHashMap<String,ServiceProvider> dataStoreProviders = new ConcurrentHashMap();
     public ConcurrentHashMap<String,List<Configuration>> configurations = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, TokenValidator.OAuthVendor> oVendors = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
 
 
@@ -201,9 +200,6 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         }
     }
 
-    public TokenValidator.OAuthVendor authVendor(String name){
- 	    return this.oVendors.get(name);
-    }
 	public ScheduledFuture<?> schedule(SchedulingTask task){
         if(task.oneTime()){
             return this.scheduledExecutorService.schedule(task,task.initialDelay()+task.delay(),TimeUnit.MILLISECONDS);

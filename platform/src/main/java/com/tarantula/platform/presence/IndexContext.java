@@ -14,5 +14,4 @@ public class IndexContext extends ResponseHeader {
 
     public OnView view;
     public List<Lobby> lobbyList;
-    public List<TokenValidator.OAuthVendor> oAuthVendorList;
 }

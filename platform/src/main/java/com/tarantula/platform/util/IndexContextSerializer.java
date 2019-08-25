@@ -4,13 +4,12 @@ import com.google.gson.*;
 import com.tarantula.Descriptor;
 import com.tarantula.Lobby;
 import com.tarantula.Session;
-import com.tarantula.TokenValidator;
 import com.tarantula.platform.presence.IndexContext;
 
 import java.lang.reflect.Type;
 
 /**
- * Updated by yinghu on 10/7/2018.
+ * Updated by yinghu on 8/24/19
  */
 public class IndexContextSerializer implements JsonSerializer<IndexContext> {
 
@@ -36,12 +35,6 @@ public class IndexContextSerializer implements JsonSerializer<IndexContext> {
                 blist.add(jlobby);
             }
             pc.add("lobbyList",blist);
-        }
-        if(presenceContext.oAuthVendorList!=null){
-            OAuthVendorSerializer oser = new OAuthVendorSerializer();
-            for(TokenValidator.OAuthVendor oa : presenceContext.oAuthVendorList){
-                pc.add(oa.name(),oser.serialize(oa,type,jsonSerializationContext));
-            }
         }
         return pc;
     }
