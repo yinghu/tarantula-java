@@ -6,6 +6,7 @@ import com.tarantula.Module;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.BucketReceiver;
+import com.tarantula.platform.service.deployment.ApplicationContextProxy;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
@@ -41,7 +42,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     private TarantulaLogger logger;
 
     private TokenValidator validator;
-    //private EventService eventService;
 
     private AtomicBoolean started = new AtomicBoolean(false);
     public long duration;
@@ -177,13 +177,13 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                 //logger.warn("Node only statistics ->"+this.onStatistics.key().asString());
             }
         }
-        this._setup(this, _descriptor.distributionKey(), _descriptor.singleton());
+        this._setup( _descriptor.distributionKey(), _descriptor.singleton());
     }
-    private void _setup(ApplicationContext context,String applicationId,boolean singleton) throws Exception {
+    private void _setup(String applicationId,boolean singleton) throws Exception {
         this.applicationId = applicationId;
         this.singleton = singleton;
         if(singleton){
-            this.application.setup(context);
+            this.application.setup(new ApplicationContextProxy(this));
         }
         else{
             if(this.application instanceof SessionTimeoutListener){
@@ -220,7 +220,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                 elist.forEach((e)->statistics.entry(e));
                 _instance.statistics(statistics);
                 _instance.statistics().dataStore(this.tarantulaContext.masterDataStore());
-                this.application.setup(this);
+                this.application.setup(new ApplicationContextProxy(this));
             }catch (Exception ex){
                 throw new RuntimeException(ex);
             }

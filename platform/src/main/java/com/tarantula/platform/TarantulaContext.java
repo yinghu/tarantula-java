@@ -240,7 +240,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         if(conf.serviceProviderName!=null){
             ServiceProvider serviceProvider = (ServiceProvider) Class.forName(conf.serviceProviderName).getConstructor().newInstance();
             serviceProvider.start();
-            serviceProvider.setup(this);
+            serviceProvider.setup(this);//inject the proxy to service provider instead of the singleton
             serviceProvider.waitForData();
             this.serviceProviders.put(serviceProvider.name(),serviceProvider);
         }
