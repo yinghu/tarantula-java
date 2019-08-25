@@ -2,13 +2,12 @@ package com.tarantula.platform.presence;
 
 import com.tarantula.Lobby;
 import com.tarantula.OnView;
-import com.tarantula.TokenValidator;
 import com.tarantula.platform.ResponseHeader;
 
 import java.util.List;
 
 /**
- * Updated by yinghu lu on 10/9/2018.
+ * Updated by yinghu lu on 8/25/19
  */
 public class IndexContext extends ResponseHeader {
 
