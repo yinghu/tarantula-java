@@ -182,7 +182,7 @@
         }   
     }
     function tx_shopping_commit(token){
-        let _mcommit ={serviceTag:'marketplace',command:'onCommit',checkoutId:TARA_API.query().packId,orderId:token.id};  
+        let _mcommit ={serviceTag:'marketplace/stripe',command:'onCommit',checkoutId:TARA_API.query().packId,orderId:token.id};  
         TARA_API.onService(_mcommit,function(resp){
             //popup web payment integration page    
             console.log(resp);

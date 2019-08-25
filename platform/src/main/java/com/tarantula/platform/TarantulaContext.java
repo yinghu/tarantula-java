@@ -1,11 +1,9 @@
 package com.tarantula.platform;
 
-//import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-//import com.google.gson.GsonBuilder;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
@@ -18,8 +16,6 @@ import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationXMLParser;
-//import com.tarantula.platform.util.GoogleAuthCredentialsDeserializer;
-//import com.tarantula.platform.util.StripePaymentCredentialsDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
 public class TarantulaContext implements Serviceable,ServiceContext{
@@ -508,29 +504,4 @@ public class TarantulaContext implements Serviceable,ServiceContext{
  	    this.memberDiscovery.scope(scope);
  	    return this.memberDiscovery;
     }
-    /** google auth and stripe integration
-    public void loadOAthVendorConfig() throws Exception{
-        OAuthObject oa = loadGoogleCredentials();
-        oVendors.put(oa.name(),oa);
-        OAuthObject sp = loadStripeCredentials();
-        oVendors.put(sp.name(),sp);
-    }
- 	private OAuthObject loadGoogleCredentials() throws Exception{
- 	    InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(this.authContext+"-google-auth.json");
-        byte[] data = new byte[in.available()];
-        in.read(data);
-        in.close();
-        GsonBuilder gb = new GsonBuilder();
-        gb.registerTypeAdapter(OAuthObject.class,new GoogleAuthCredentialsDeserializer());
-        return gb.create().fromJson(new String(data),OAuthObject.class);
-    }
-    private OAuthObject loadStripeCredentials() throws Exception{
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("stripe-credentials.json");
-        byte[] data = new byte[in.available()];
-        in.read(data);
-        in.close();
-        GsonBuilder gb = new GsonBuilder();
-        gb.registerTypeAdapter(OAuthObject.class,new StripePaymentCredentialsDeserializer());
-        return gb.create().fromJson(new String(data),OAuthObject.class);
-    }**/
 }
