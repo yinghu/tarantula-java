@@ -5,10 +5,9 @@ import java.util.Map;
 /**
  * Updated by yinghu on 8/23/2019.
  */
-public interface Statistics extends OnApplication {
+public interface Statistics extends OnApplication,Updatable{
 
     String leaderBoardHeader();
-    void leaderBoardHeader(String header);
 
     OnStatistics value(String key,double value);
 

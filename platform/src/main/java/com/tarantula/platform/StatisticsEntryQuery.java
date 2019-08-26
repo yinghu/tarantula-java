@@ -21,8 +21,6 @@ public class StatisticsEntryQuery implements RecoverableFactory<StatisticsEntry>
 
     public StatisticsEntry create() {
         StatisticsEntry se = new StatisticsEntry();
-        //se.distributable(true);
-        //se.index(SystemUtil.toString(new String[]{statisticsId,label()}));
         return se;
     }
 
@@ -33,8 +31,5 @@ public class StatisticsEntryQuery implements RecoverableFactory<StatisticsEntry>
 
     public String label(){
         return "SSE";
-    }
-    public boolean onEdge(){
-        return true;
     }
 }

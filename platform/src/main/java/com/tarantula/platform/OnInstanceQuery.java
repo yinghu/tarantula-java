@@ -17,11 +17,8 @@ public class OnInstanceQuery implements RecoverableFactory<OnInstance> {
 
     public OnInstance create() {
         OnInstanceTrack ocx = new OnInstanceTrack();
-        //ocx.distributable(true);
-        //ocx.index(instanceId+ Recoverable.PATH_SEPARATOR+label());
         return ocx;
     }
-
 
     public String distributionKey() {
         return this.instanceId;
@@ -34,8 +31,5 @@ public class OnInstanceQuery implements RecoverableFactory<OnInstance> {
 
     public String label(){
         return "IOI";
-    }
-    public boolean onEdge(){
-        return true;
     }
 }

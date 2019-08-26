@@ -98,8 +98,11 @@ public class OnInstanceTrack extends OnApplicationHeader implements OnInstance {
         this.idle = reset?0:(this.idle+1);
         return this.idle;
     }
+    public void dataStore(DataStore dataStore){
+        this.dataStore = dataStore;
+    }
     @Override
-    public void onUpdate(){
+    public void update(){
         this.dataStore.update(this);
     }
 

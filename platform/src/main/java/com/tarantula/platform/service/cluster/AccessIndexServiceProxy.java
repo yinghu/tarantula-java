@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.cluster;
 
+import com.hazelcast.core.DistributedObject;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
@@ -11,7 +12,7 @@ import java.util.concurrent.Future;
 /**
  * updated by yinghu lu on 6/12/2018.
  */
-public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessIndexClusterService> implements AccessIndexService {
+public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessIndexClusterService> implements AccessIndexService, DistributedObject {
 
 
     private final String objectName;//unique proxy name

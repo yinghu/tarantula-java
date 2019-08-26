@@ -26,7 +26,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public synchronized boolean transact(double delta) {
         if((balance+(delta)>=0)){
             balance = balance+(delta);
-            this.dataStore.update(this);
+            this.update();
             return true;
         }else{
             return false;
@@ -109,5 +109,12 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     @Override
     public Key key(){
         return new AssociateKey(this.bucket,this.oid,this.vertex);
+    }
+    public void dataStore(DataStore dataStore){
+        this.dataStore = dataStore;
+    }
+    @Override
+    public void update(){
+        this.dataStore.update(this);
     }
 }

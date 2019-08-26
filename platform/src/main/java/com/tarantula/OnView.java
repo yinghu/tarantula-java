@@ -1,7 +1,7 @@
 package com.tarantula;
 
 /**
- * Created by yinghu lu on 4/9/2017.
+ * Updated by yinghu lu on 8/26/2019.
  */
 public interface OnView extends Recoverable {
 

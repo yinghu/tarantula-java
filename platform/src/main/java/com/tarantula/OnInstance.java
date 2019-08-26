@@ -6,7 +6,7 @@ package com.tarantula;
  * Date: Updated 3/6/2019
  * Time: 8:28 PM
  */
-public interface OnInstance extends OnBalance{
+public interface OnInstance extends OnBalance,Updatable{
 
     boolean initialized();
     boolean joined();

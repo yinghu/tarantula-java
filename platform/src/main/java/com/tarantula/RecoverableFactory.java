@@ -19,9 +19,6 @@ public interface RecoverableFactory<T extends Recoverable>{
      * */
     String label();
 
-
-    //boolean onEdge();
-
     /**
      * The owner key of the edge mapping or the vertext filter string
      * */

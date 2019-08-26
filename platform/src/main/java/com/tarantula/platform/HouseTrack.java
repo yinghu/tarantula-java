@@ -60,7 +60,10 @@ public class HouseTrack extends OnApplicationHeader implements House {
         this.dataStore.update(this);
         return true;
     }
-    public void onUpdate(){
+    public void dataStore(DataStore dataStore){
+        this.dataStore = dataStore;
+    }
+    public void update(){
         this.dataStore.update(this);
     }
 }

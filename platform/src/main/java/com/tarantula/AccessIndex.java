@@ -1,7 +1,8 @@
 package com.tarantula;
 
 /**
- * Created by yinghu lu on 10/18/2017.
+ * Updated by yinghu lu on 8/26/2019.
+ * Global scope unique key index mark api
  */
 public interface AccessIndex extends Recoverable {
 }

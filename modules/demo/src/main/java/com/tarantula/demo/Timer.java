@@ -59,8 +59,8 @@ public class Timer extends RecoverableObject {
     public Recoverable.Key key(){
         return new AssociateKey(this.bucket,this.oid,this.vertex);
     }
-    @Override
-    public synchronized void onUpdate(){
+
+    public synchronized void update(){
         timestamp -= delta;
         if(timestamp<=0){
             timestamp = duration;

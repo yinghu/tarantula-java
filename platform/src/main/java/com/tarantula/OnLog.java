@@ -3,9 +3,9 @@ package com.tarantula;
 
 
 /**
- * Updated by yinghu on 6/29/2018.
+ * Updated by yinghu on 8/26/19
  */
-public interface OnLog extends Recoverable,OnHeader{
+public interface OnLog{
 
     int DEBUG = 1;
     int INFO = 2;

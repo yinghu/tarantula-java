@@ -1,11 +1,10 @@
 package com.tarantula;
 
-import com.hazelcast.core.DistributedObject;
 
 /**
- * Updated by yinghu lu on 7/11/2018.
+ * Updated by yinghu lu on 8/26/19
  */
-public interface AccessIndexService extends DistributedObject,ServiceProvider{
+public interface AccessIndexService extends ServiceProvider{
 
     String NAME = "AccessIndexService";
 

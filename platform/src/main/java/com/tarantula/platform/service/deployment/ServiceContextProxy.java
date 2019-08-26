@@ -1,0 +1,71 @@
+package com.tarantula.platform.service.deployment;
+
+import com.tarantula.*;
+import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.ClusterProvider;
+
+import java.util.concurrent.ScheduledFuture;
+
+public class ServiceContextProxy implements ServiceContext {
+
+    private TarantulaContext tarantulaContext;
+
+    public ServiceContextProxy(TarantulaContext tarantulaContext){
+        this.tarantulaContext = tarantulaContext;
+    }
+
+    @Override
+    public DataStore dataStore(String name) {
+        return this.tarantulaContext.dataStore(name);
+    }
+
+    @Override
+    public DataStore dataStore(String name, int partition) {
+        return this.tarantulaContext.dataStore(name,partition);
+    }
+
+    @Override
+    public ScheduledFuture<?> schedule(SchedulingTask task) {
+        return this.tarantulaContext.schedule(task);
+    }
+
+    @Override
+    public EventService eventService(int scope) {
+        return this.tarantulaContext.eventService(scope);
+    }
+
+    @Override
+    public ClusterProvider clusterProvider(int scope) {
+        return this.tarantulaContext.clusterProvider(scope);
+    }
+
+    @Override
+    public ServiceProvider serviceProvider(String name) {
+        return this.tarantulaContext.serviceProvider(name);
+    }
+
+    @Override
+    public AccessIndexService accessIndexService() {
+        return this.tarantulaContext.accessIndexService();
+    }
+
+    @Override
+    public TarantulaLogger logger(Class c) {
+        return this.tarantulaContext.logger(c);
+    }
+
+    @Override
+    public OnPartition[] partitions() {
+        return this.tarantulaContext.partitions();
+    }
+
+    @Override
+    public int partitionNumber() {
+        return this.tarantulaContext.partitionNumber();
+    }
+
+    @Override
+    public RecoverableRegistry recoverableRegistry(int registryId) {
+        return this.tarantulaContext.recoverableRegistry(registryId);
+    }
+}

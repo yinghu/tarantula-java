@@ -93,7 +93,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                     this.application.initialize(me);
                 }
                 onApplication.joined(me.joined());
-                onApplication.onUpdate();
+                onApplication.update();
             }
             else{
                 throw new RuntimeException("session expired ["+me.ticket()+"]");
@@ -230,10 +230,10 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         }
     }
     public void releaseOnInstanceRegistry(){//call on bucket closed
-        this._instance.house().onUpdate();
-        this._instance.statistics().onUpdate();
+        this._instance.house().update();
+        this._instance.statistics().update();
         onInstances.forEach((k,v)->{
-            v.onUpdate();
+            v.update();
         });
     }
     public Configuration configuration(String type){
@@ -290,7 +290,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         OnInstance on = this.onInstances.remove(systemId);
         on.initialized(false);
         on.joined(false);
-        on.onUpdate();
+        on.update();
         if((!on.tournamentEnabled())&&on.balance()>0){//move remaining balance to presence on non-tournament mode
             this.postOffice().onTag(Presence.LOBBY_TAG).send(systemId,new OnBalanceTrack(systemId,on.balance()));
         }
@@ -403,7 +403,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         }
         else{
             this.onStatistics.distributable(state==BucketReceiver.CLOSE);
-            this.onStatistics.onUpdate();
+            this.onStatistics.update();
         }
         this.application.onBucket(bucket,state);
     }

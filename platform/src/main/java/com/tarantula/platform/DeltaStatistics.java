@@ -81,11 +81,13 @@ public class DeltaStatistics extends OnApplicationHeader implements Statistics {
     public String toString(){
         return "On Statistics ["+this.vertex+"]";
     }
-    public void onUpdate(){
+
+    public void dataStore(DataStore dataStore){
+        this.dataStore = dataStore;
+    }
+    public void update(){
         this.dataStore.update(this);
         mappings.forEach((k,v)->{
-            //v.distributable(this.distributable);
-            //v.index(SystemUtil.toString(new String[]{v.owner(),v.label()}));
             dataStore.update(v);
         });
     }

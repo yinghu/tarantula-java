@@ -4,7 +4,7 @@ package com.tarantula;
 /**
  * updated by yinghu on 4/11/2019.
  */
-public interface Presence extends Balance{
+public interface Presence extends Balance,Updatable{
 
     String LOBBY_TAG = "presence/lobby";
     String PROFILE_TAG = "presence/profile";

@@ -39,7 +39,7 @@
             <configuration tag="presence" priority="10">
                 <presence type="setup">
                     <property name="lobbyListenerEnabled">false</property>
-                    <property name="lobbyList">marketplace,leaderboard,level</property>
+                    <property name="lobbyList">leaderboard,level</property>
                 </presence>
             </configuration>
             <configuration tag="profile" priority="10">

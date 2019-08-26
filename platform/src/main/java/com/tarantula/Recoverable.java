@@ -49,9 +49,9 @@ public interface Recoverable extends Distributable{
 
     Key key();
 
-    void dataStore(DataStore dataStore);
+    //void dataStore(DataStore dataStore);
 
-    void onUpdate();
+    //void update();
 
     interface Key{
         String asString();

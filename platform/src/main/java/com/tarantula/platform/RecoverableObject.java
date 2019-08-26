@@ -160,11 +160,6 @@ public class RecoverableObject implements Recoverable {
         this.onEdge = onEdge;
     }
 
-    public void dataStore(DataStore dataStore){
-        this.dataStore = dataStore;
-    }
-    public void onUpdate(){
-    }
     public Key key(){
         return new DistributionKey(this.bucket,this.oid);
     }

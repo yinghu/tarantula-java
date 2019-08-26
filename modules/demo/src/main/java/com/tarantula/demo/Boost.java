@@ -28,22 +28,30 @@ public class Boost extends GameObject implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception{
         boolean leaving = false;
-        context.log("test update from module->"+session.action(),OnLog.INFO);
         if(session.action().equals("a")){
             byte[] ret = this.builder.create().toJson(timer).getBytes();
             session.write(ret,this.label());
             update.on(ret);
             postOffice.onLabel().send("presence/notice",ret);
+            this.context.onRegistry().transact(session.systemId(),1000);
+            OnStatistics delta = this.context.statistics().value("WonCount",1000);
+            //context.log("test update from module->"+delta.name(),OnLog.INFO);
+            delta.xpDelta(1000);
+            delta.owner(session.systemId());
+            delta.onEntry("WonCount",1000);
+            this.postOffice.onTag(Level.LEVEL_TAG).send(delta.owner(),delta);
         }
         else if(session.action().equals("b")){
             byte[] ret = this.builder.create().toJson(timer).getBytes();
             session.write(ret,this.label());
             update.on(ret);
+            this.context.onRegistry().transact(session.systemId(),2000);
         }
         else if(session.action().equals("c")){
             byte[] ret = this.builder.create().toJson(timer).getBytes();
             session.write(ret,this.label());
             update.on(ret);
+            this.context.onRegistry().transact(session.systemId(),4000);
         }
         else if(session.action().equals("onLeave")){
             session.write(payload,this.label());
@@ -68,7 +76,6 @@ public class Boost extends GameObject implements Module {
         this.timer.distributionKey(this.context.onRegistry().distributionKey());
         this.dataStore = this.context.dataStore("demo");
         dataStore.createIfAbsent(timer,true);
-        timer.dataStore(dataStore);
         this.name("boost");
         this.instanceId(context.onRegistry().distributionKey());
         this.successful(true);
@@ -82,7 +89,7 @@ public class Boost extends GameObject implements Module {
         return new TimerSerializer().serialize(this.timer,type,jsonSerializationContext);
     }
     public void onTimer(OnUpdate update){
-        timer.onUpdate();
+        timer.update();
         update.on(this.builder.create().toJson(timer).getBytes());
     }
     public void clear(){
