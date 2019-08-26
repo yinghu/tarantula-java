@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by yinghu lu on 8/10/2018.
+ * Updated by yinghu lu on 8/26/2019.
  */
 public class StaticMemberDiscovery implements ScopedMemberDiscovery {
 
@@ -39,7 +39,7 @@ public class StaticMemberDiscovery implements ScopedMemberDiscovery {
                 }
             }while (line!=null);
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw new RuntimeException("not found host file in ["+scope+"]");
         }
         return alist;
     }

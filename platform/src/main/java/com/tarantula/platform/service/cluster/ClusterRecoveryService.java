@@ -102,11 +102,9 @@ public class ClusterRecoveryService implements Serviceable {
                             }
                         }
                         if(e.retries()==0){
-                            //log.warn(e.toString());
                             countDownLatch.countDown();
                         }
                         if(e.retries()==tc.get()){
-                            //log.warn(e.toString());
                             countDownLatch.countDown();
                         }
                     });
