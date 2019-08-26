@@ -17,7 +17,4 @@ public interface Event extends Session{
 	int retries();
 	void retries(int retries);
 
-	//void portable(Portable portable);
-	//Portable portable();
-
 }

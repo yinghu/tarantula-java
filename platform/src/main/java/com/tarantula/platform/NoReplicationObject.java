@@ -5,7 +5,7 @@ import com.tarantula.Distributable;
 /**
  * Created by yinghu lu on 4/17/2018.
  */
-abstract  public class NoReplicationObject extends RecoverableObject {
+public class NoReplicationObject extends RecoverableObject {
 
 
     public int scope(){
