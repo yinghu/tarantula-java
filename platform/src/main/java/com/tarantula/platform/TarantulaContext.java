@@ -21,7 +21,7 @@ import com.tarantula.platform.util.SystemUtil;
 public class TarantulaContext implements Serviceable,ServiceContext{
 
 
-    private TarantulaLogger log = JDKLogger.getLogger(TarantulaContext.class);
+    private static TarantulaLogger log = JDKLogger.getLogger(TarantulaContext.class);
 	
 	private static final TarantulaContext BC = new TarantulaContext();
 
@@ -125,7 +125,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     }
 
 	public static TarantulaContext getInstance(){
-		return BC;
+ 	    return BC;
 	}
 
 	public void start() throws Exception {
@@ -159,7 +159,6 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         _deployServiceStarted = new CountDownLatch(2);
         _systemServiceStarted = new CountDownLatch(1);
         node_started = new AtomicBoolean(false);
-        //this.loadOAthVendorConfig();
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
         PortableProviderConfigurationParser pcs = new PortableProviderConfigurationParser("tarantula-platform-portable-provider.xml");
         pcs.parse().forEach((r)->{
@@ -482,7 +481,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     public boolean deployServiceProvider(ServiceProvider serviceProvider){
         try{
             this.serviceProviders.computeIfAbsent(serviceProvider.name(),(sn)->{
-                serviceProvider.setup(this);
+                serviceProvider.setup(new ServiceContextProxy(this));
                 serviceProvider.waitForData();
                 return serviceProvider;
             });
