@@ -47,13 +47,15 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public long duration;
     private boolean timed;
     private final boolean resetEnabled;
-    public TarantulaApplicationContext(TarantulaContext tarantulaContext,Descriptor descriptor,TarantulaApplication application,InstanceIndex index,HashMap<String,Configuration> configurations,boolean resetEnabled){
+    private final String dataStore;
+    public TarantulaApplicationContext(TarantulaContext tarantulaContext,Descriptor descriptor,TarantulaApplication application,InstanceIndex index,HashMap<String,Configuration> configurations){
         this.tarantulaContext = tarantulaContext;
         this._descriptor = descriptor;
         this.application = application;
         this._instance = index; //null on singleton instance
         this.configurations = configurations;
-        this.resetEnabled = resetEnabled;
+        this.resetEnabled = descriptor.resetEnabled();
+        this.dataStore = descriptor.typeId();
     }
 
     public OnInstance poll(Event event){
@@ -349,6 +351,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     }
 
     public DataStore dataStore(String name){
+        if(resetEnabled){
+            return this.tarantulaContext.dataStore(dataStore);
+        }
         return this.tarantulaContext.dataStore(name,this.tarantulaContext.partitionNumber());
     }
     private DataStore dataStore(){

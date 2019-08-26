@@ -75,13 +75,13 @@ public class StripePaymentService implements Module {
             privateKey = jo.get("private_key").getAsString();
             publicKey = jo.get("public_key").getAsString();
         });
-        this.dataStore = this.context.dataStore("marketplace");
+        this.dataStore = this.context.dataStore(this.context.descriptor().typeId());
         double basePrice = 100;
         double baseVirtualCredits = 500000;
         int basePackageSize = 4;
         smartPackageGenerator = new SmartPackageGenerator(basePackageSize,basePrice,baseVirtualCredits,this.dataStore);
         smartPackageGenerator.start();
-        this.context.log("Stripe payment service started", OnLog.INFO);
+        this.context.log("Stripe payment service started with data store ["+dataStore.name()+"]", OnLog.INFO);
     }
 
     @Override

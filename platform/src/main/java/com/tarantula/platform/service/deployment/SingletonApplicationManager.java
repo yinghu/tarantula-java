@@ -25,7 +25,7 @@ public class SingletonApplicationManager extends DefaultApplication implements B
         DeploymentDescriptor dd = this.deploymentDescriptor.deploy(deploymentDescriptor.instanceId());
         dd.owner(dd.distributionKey());
         accessMode = dd.accessMode();
-        this.singleton = this.launch(dd,null,this.deploymentDescriptor.resetEnabled());
+        this.singleton = this.launch(dd,null);
         this.singleton._setup();//inject the app context proxy to decouple the TarantulaApplicationContext
         if(accessMode!=Session.PRIVATE_ACCESS_MODE){
             for(int r=0;r<this.tarantulaContext.platformRoutingNumber;r++){
