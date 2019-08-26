@@ -33,7 +33,4 @@ public class XPQuery implements RecoverableFactory<XP> {
         return "LXG";
     }
 
-    public boolean onEdge(){
-        return true;
-    }
 }

@@ -4,10 +4,12 @@ import com.tarantula.Profile;
 
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
+
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Updated by yinghu lu on 10/9/2018.
+ * Updated by yinghu lu on 8/26/19
  */
 public class ProfileTrack extends RecoverableObject implements Profile {
 
@@ -15,7 +17,6 @@ public class ProfileTrack extends RecoverableObject implements Profile {
     private String nickname;
     private String avatar;
     private String emailAddress;
-    private String video;
     public ProfileTrack(){
         this.vertex = "Profile";
     }
@@ -45,11 +46,17 @@ public class ProfileTrack extends RecoverableObject implements Profile {
         return this.emailAddress;
     }
 
-    public String video(){
-        return this.video;
+    public void header(String header,String value){
+        this.properties.put(header,value);
     }
-    public void video(String video){
-        this.video = video;
+    public String header(String header){
+        return (String) this.properties.get(header);
+    }
+
+    public Map<String,String> header(){
+        HashMap<String,String> hm = new HashMap<>();
+        properties.forEach((k,v)->hm.put(k,(String)v));
+        return hm;
     }
 
     @Override
@@ -66,7 +73,6 @@ public class ProfileTrack extends RecoverableObject implements Profile {
         this.properties.put("emailAddress",this.emailAddress!=null?this.emailAddress:"n/a");
         this.properties.put("avatar",this.avatar!=null?this.avatar:"n/a");
         this.properties.put("nickname",this.nickname!=null?this.nickname:"n/a");
-        this.properties.put("video",this.video!=null?this.video:"n/a");
         return this.properties;
     }
     @Override
@@ -74,7 +80,6 @@ public class ProfileTrack extends RecoverableObject implements Profile {
         this.emailAddress = (String)properties.get("emailAddress");
         this.avatar = (String)properties.get("avatar");
         this.nickname = (String)properties.get("nickname");
-        this.video = (String)properties.get("video");
     }
 
     @Override

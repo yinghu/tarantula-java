@@ -4,7 +4,6 @@ package com.tarantula.platform.service.deployment;
 import com.tarantula.RecoverableFactory;
 import com.tarantula.platform.InstanceIndex;
 import com.tarantula.platform.service.cluster.PortableRegistry;
-import com.tarantula.platform.util.SystemUtil;
 
 /**
  * Update by yinghu on 4/16/2019.
@@ -21,8 +20,6 @@ public class InstanceRegistryQuery implements RecoverableFactory<InstanceIndex> 
     public InstanceIndex create() {
         InstanceIndex ix = new InstanceIndex();
         ix.applicationId(applicationId);
-        //ix.index(SystemUtil.toString(new String[]{applicationId,label()}));
-        //ix.distributable(true);
         return ix;
     }
 
@@ -35,8 +32,5 @@ public class InstanceRegistryQuery implements RecoverableFactory<InstanceIndex> 
 
     public String label(){
         return "INS";
-    }
-    public boolean onEdge(){
-        return true;
     }
 }

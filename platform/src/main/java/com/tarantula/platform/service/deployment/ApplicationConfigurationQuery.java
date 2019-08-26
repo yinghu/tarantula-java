@@ -21,8 +21,6 @@ public class ApplicationConfigurationQuery implements RecoverableFactory<Applica
     @Override
     public ApplicationConfiguration create() {
         ApplicationConfiguration ac = new ApplicationConfiguration();
-        //ac.distributable(true);
-        //ac.index(SystemUtil.toString(new String[]{this.serviceConfigurationId,this.label()}));
         return ac;
     }
 

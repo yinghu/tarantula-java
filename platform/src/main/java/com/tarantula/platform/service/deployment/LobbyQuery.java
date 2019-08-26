@@ -18,8 +18,6 @@ public class LobbyQuery implements RecoverableFactory<DeploymentDescriptor> {
 
     public DeploymentDescriptor create() {
         DeploymentDescriptor lb =  new DeploymentDescriptor();
-        //lb.distributable(true);
-        //lb.index(this.distributionKey()+Recoverable.PATH_SEPARATOR+this.label());
         lb.vertex("Lobby");
         return lb;
     }

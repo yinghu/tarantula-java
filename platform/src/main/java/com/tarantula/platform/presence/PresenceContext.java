@@ -9,15 +9,17 @@ import java.util.List;
 
 /**
  * Developer: YINGHU LU
- * Updated by yinghu lu on 10/9/2018.
+ * Updated by yinghu lu on 8/29/2019.
  */
 public class PresenceContext extends ResponseHeader {
 
     public List<Lobby> lobbyList;
     public XPLevel level;
+    public List<XP> xp;
     public OnSession presence;
     public OnView view;
     public Configuration connection;
+    public Profile profile;
     public PresenceContext(){
 
     }

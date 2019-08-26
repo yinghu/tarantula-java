@@ -1,10 +1,9 @@
 package com.tarantula;
 
 /**
- * updated by yinghu on 4/17/2018
+ * updated by yinghu on 8/26/19
  */
-public interface Profile extends Recoverable {
-
+public interface Profile extends Recoverable,OnHeader {
 
     void nickname(String nickname);
     String nickname();
@@ -12,6 +11,4 @@ public interface Profile extends Recoverable {
     String avatar();
     void emailAddress(String emailAddress);
     String emailAddress();
-    String video();
-    void video(String video);
 }

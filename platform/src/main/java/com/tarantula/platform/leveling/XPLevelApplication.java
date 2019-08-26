@@ -3,8 +3,9 @@ package com.tarantula.platform.leveling;
 import com.tarantula.*;
 import com.tarantula.Level;
 import com.tarantula.platform.*;
-import com.tarantula.platform.util.LevelContextSerializer;
-import com.tarantula.platform.util.XPLevelSerializer;
+import com.tarantula.platform.presence.PresenceContext;
+import com.tarantula.platform.util.PresenceContextSerializer;
+
 
 /**
  * Update by yinghu on 8/23/19
@@ -17,7 +18,7 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         OnAccess acc = builder.create().fromJson(new String(payload),OnAccess.class);
-        LevelContext lcx = new LevelContext();
+        PresenceContext lcx = new PresenceContext();
         if(session.action().equals("onLevel")){
             XPLevel l = (XPLevel)this._load(session.systemId());
             lcx.level = l;
@@ -43,7 +44,7 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
         this._dataStore = this.context.dataStore("level");
         this.rule = new XPLevelRule(xp);
         this.rule.start();
-        this.builder.registerTypeAdapter(LevelContext.class,new LevelContextSerializer());
+        this.builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.context.registerRecoverableListener(new LevelingPortableRegistry()).addRecoverableFilter(LevelingPortableRegistry.ON_STATS_CID,(t)->{
             OnStatistics statistics = (OnStatistics)t;
             Level l = this._loadLevel(statistics.owner());

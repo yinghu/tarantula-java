@@ -31,7 +31,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     private HashMap<String,Configuration> configurations;
 
-    private SessionTimeoutListener sessionTimeoutListener;
+    private Session.TimeoutListener sessionTimeoutListener;
 
     private boolean singleton;
 
@@ -189,11 +189,11 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
             this.application.setup(new ApplicationContextProxy(this));
         }
         else{
-            if(this.application instanceof SessionTimeoutListener){
+            if(this.application instanceof Session.TimeoutListener){
                 if(this.application.descriptor().maxIdlesOnInstance()<=0){
                     this.application.descriptor().maxIdlesOnInstance(this.tarantulaContext.maxIdlesOnInstance);//use default count
                 }
-                this.sessionTimeoutListener=((SessionTimeoutListener)this.application);
+                this.sessionTimeoutListener=((Session.TimeoutListener)this.application);
             }
         }
     }

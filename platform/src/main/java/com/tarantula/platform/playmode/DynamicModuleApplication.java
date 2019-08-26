@@ -11,7 +11,7 @@ import java.util.concurrent.ScheduledFuture;
 /**
  * Created by yinghu lu on 7/20/2019.
  */
-public class DynamicModuleApplication extends TarantulaApplicationHeader implements SessionTimeoutListener, SchedulingTask {
+public class DynamicModuleApplication extends TarantulaApplicationHeader implements Session.TimeoutListener, SchedulingTask {
 
     private ConcurrentHashMap<String,Session> _onStream = new ConcurrentHashMap<>();
 

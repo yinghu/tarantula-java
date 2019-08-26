@@ -78,33 +78,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             throw new UnsupportedOperationException(session.action());
         }
     }
-    private OnSession createAndLogin(String email,String nickname,Session session) throws Exception{
-        DataStore ds = this.context.dataStore("user");
-        AccessIndex _query = accessIndexService.set(email,session.trackId());
-        if(_query!=null){
-            Access acc = new AccessTrack(_query.owner());
-            acc.oid(_query.oid());
-            acc.bucket(_query.bucket());
-            acc.password(this.context.validator().hashPassword("password"));
-            acc.active(this.activated);//if false do email validation
-            if(ds.create(acc)){
-                PresenceIndex px = new PresenceIndex(initialBalance);
-                px.distributionKey(acc.distributionKey());
-                this.context.dataStore("presence").create(px);
-                ProfileTrack _p = new ProfileTrack(acc.bucket(),acc.oid());
-                _p.nickname(nickname);
-                _p.emailAddress(email);
-                _p.avatar("content/avatar/"+acc.distributionKey());
-                _p.video("content/video/"+acc.distributionKey());
-                this.context.dataStore("profile").create(_p);
-                OnSession onSession = new OnSessionTrack();
-                onSession.distributionKey(acc.distributionKey());
-                this.context.dataStore("session").create(onSession);
-                session.systemId(acc.distributionKey());
-            }
-        }
-        return login(_query.distributionKey(),"password",session);
-    }
     private OnSession login(String systemId,String password,Session session){
         Access access = new AccessTrack();
         access.distributionKey(systemId);
@@ -135,7 +108,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 _p.nickname(payload.header("nickname")!=null?payload.header("nickname"):acc.login());
                 _p.emailAddress("n/a");
                 _p.avatar("content/avatar/"+acc.distributionKey());
-                _p.video("content/video/"+acc.distributionKey());
                 this.context.dataStore("profile").create(_p);
                 OnSession onSession = new OnSessionTrack();
                 onSession.oid(acc.oid());
@@ -144,7 +116,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 session.systemId(acc.distributionKey());
                 ResponseHeader resp = new ResponseHeader(session.action(),"User [" + acc.login() + "] registered",true);
                 session.write(builder.create().toJson(resp).getBytes(),this.descriptor.responseLabel());
-
             }else{
                 session.write(builder.create().toJson(new ResponseHeader(session.action(),false,0,"login [" + acc.login() + "] cannot be registered","error")).getBytes(),this.descriptor.responseLabel());
             }

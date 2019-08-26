@@ -8,16 +8,14 @@ import java.lang.reflect.Type;
 
 
 /**
- * Updated by yinghu on 10/7/2018.
+ * Updated by yinghu on 8/26/19
  */
 public class ResponseDeserializer implements JsonDeserializer<Response> {
 
     private Response response;
 
     public ResponseDeserializer(){}
-    public ResponseDeserializer(Response response){
-        this.response = response;
-    }
+
 
     @Override
     public Response deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {

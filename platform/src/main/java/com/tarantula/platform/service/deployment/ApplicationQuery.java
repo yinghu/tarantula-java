@@ -19,8 +19,6 @@ public class ApplicationQuery implements RecoverableFactory<DeploymentDescriptor
 
     public DeploymentDescriptor create() {
         DeploymentDescriptor app = new DeploymentDescriptor();
-        //app.distributable(true);
-        //app.index(lobbyId+Recoverable.PATH_SEPARATOR+label());
         return app;
     }
 
@@ -29,15 +27,11 @@ public class ApplicationQuery implements RecoverableFactory<DeploymentDescriptor
         return lobbyId;
     }
 
-
     public  int registryId(){
         return PortableRegistry.APPLICATION_DESCRIPTOR_CID;
     }
 
     public String label(){
         return "LDA";
-    }
-    public boolean onEdge(){
-        return true;
     }
 }

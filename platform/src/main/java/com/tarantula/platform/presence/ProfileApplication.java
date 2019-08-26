@@ -3,7 +3,7 @@ package com.tarantula.platform.presence;
 import com.tarantula.*;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.TarantulaApplicationHeader;
-import com.tarantula.platform.util.ProfileContextSerializer;
+import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.Base64;
@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
- * Updated by yinghu lu on 4/27/2018.
+ * Updated by yinghu lu on 8/26/19
  */
 public class ProfileApplication extends TarantulaApplicationHeader {
 
@@ -27,7 +27,7 @@ public class ProfileApplication extends TarantulaApplicationHeader {
         if(session.action().equals("onProfile")){
             OnAccess cmd = this.builder.create().fromJson(new String((payload)).trim(),OnAccess.class);
             Profile u = this._load(cmd.systemId());
-            ProfileContext pcx  = new ProfileContext();
+            PresenceContext pcx  = new PresenceContext();
             pcx.command("onProfile");
             pcx.profile = u;
             pcx.successful(true);
@@ -55,7 +55,7 @@ public class ProfileApplication extends TarantulaApplicationHeader {
             if(_bx.onTransaction(cc.toByteArray().length)){
                 this._pendingProgress.remove(_bx.distributionKey());
                 Profile u = this._load(session.systemId());
-                ProfileContext pcx  = new ProfileContext();
+                PresenceContext pcx  = new PresenceContext();
                 pcx.code(1);
                 pcx.command(session.action());
                 pcx.profile = u;
@@ -69,7 +69,7 @@ public class ProfileApplication extends TarantulaApplicationHeader {
         else{
             OnAccess cmd = this.builder.create().fromJson(new String((payload)).trim(),OnAccess.class);
             Profile u = this._load(cmd.systemId());
-            ProfileContext pcx  = new ProfileContext();
+            PresenceContext pcx  = new PresenceContext();
             pcx.command("onProfile");
             pcx.profile = u;
             pcx.successful(true);
@@ -82,13 +82,10 @@ public class ProfileApplication extends TarantulaApplicationHeader {
         super.setup(context);
         Configuration cfg = this.context.configuration("setup");
         this.uploadChunkSize = Integer.parseInt(cfg.property("uploadChunkSize"));
-        this.builder.registerTypeAdapter(ProfileContext.class,new ProfileContextSerializer());
+        this.builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.dataStore = this.context.dataStore("profile");
         this.avatarDataStore = this.context.dataStore("avatar");
         this.context.log("Profile application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
-        //this.avatarDataStore.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.CONTENT_TRANSACTION_CID,(a)->{
-            //this.context.log("AVATAR UPDATED->"+a.toString(),OnLog.WARN);
-        //});
     }
 
     private Profile _load(String systemId){

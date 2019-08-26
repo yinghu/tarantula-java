@@ -2,7 +2,6 @@ package com.tarantula.platform.service.deployment;
 
 import com.tarantula.RecoverableFactory;
 import com.tarantula.platform.service.cluster.PortableRegistry;
-import com.tarantula.platform.util.SystemUtil;
 
 /**
  * Created by yinghu lu on 4/10/2019
@@ -18,9 +17,7 @@ public class ServiceConfigurationQuery implements RecoverableFactory<ServiceConf
     @Override
     public ServiceConfiguration create() {
         ServiceConfiguration ac = new ServiceConfiguration();
-        //ac.distributable(true);
         ac.owner(this.bucket);
-        //ac.index(SystemUtil.toString(new String[]{this.distributionKey(),this.label()}));
         return ac;
     }
 
