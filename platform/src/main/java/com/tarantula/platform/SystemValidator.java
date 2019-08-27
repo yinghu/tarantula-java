@@ -9,7 +9,7 @@ import java.security.MessageDigest;
 public class SystemValidator implements Serviceable{
 
     private DataStore dataStore;
-    private ServiceContext tsc;
+    //private ServiceContext tsc;
     private int timeoutMinutes;
     private int timeoutSeconds =10;
     private MessageDigest _messageDigest;
@@ -32,9 +32,9 @@ public class SystemValidator implements Serviceable{
     public void shutdown() throws Exception {
 
     }
-    public void dataStore(DataStore dataStore){
-        this.dataStore = dataStore;
-    }
+    //public void dataStore(DataStore dataStore){
+        //this.dataStore = dataStore;
+    //}
     public void systemValidatorProvider(SystemValidatorProvider systemValidatorProvider){
         this.systemValidatorProvider = systemValidatorProvider;
     }
@@ -49,7 +49,7 @@ public class SystemValidator implements Serviceable{
     }
 
     public void setup(ServiceContext serviceContext){
-        this.tsc = serviceContext;
+        this.dataStore = serviceContext.dataStore("session",serviceContext.partitionNumber());
     }
 
     private class _TokenValidator implements TokenValidator{
@@ -119,11 +119,11 @@ public class SystemValidator implements Serviceable{
             return onSession;
         }
         @Override
-        public boolean onSession(String systemId, int stub, String trackId, String ticket) {
+        public boolean onSession(String systemId, int stub,String ticket) {
             return this.validTicket(systemId,stub,ticket);
         }
         @Override
-        public void offSession(String systemId, int stub, String trackId) {
+        public void offSession(String systemId, int stub) {
             OnSessionTrack offSession = new OnSessionTrack();
             offSession.distributionKey(systemId);
             if(dataStore.load(offSession)){

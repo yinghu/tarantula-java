@@ -250,7 +250,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     }
 
     public void absence(Session session){
-        this.validator.offSession(session.systemId(),session.stub(),session.trackId());
+        this.validator.offSession(session.systemId(),session.stub());
     }
 
     public Lobby lobby(String typeId){

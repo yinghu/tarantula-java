@@ -77,7 +77,7 @@ public class SingletonApplicationManager extends DefaultApplication implements B
                 break;
             case Session.PROTECT_ACCESS_MODE:
             case Session.FORWARD_ACCESS_MODE:
-                if(this.singleton.validator().onSession(event.systemId(),event.stub(),event.trackId(),event.ticket())){
+                if(this.singleton.validator().onSession(event.systemId(),event.stub(),event.ticket())){
                     this.singleton.onRequestCallback(event);
                 }
                 else{

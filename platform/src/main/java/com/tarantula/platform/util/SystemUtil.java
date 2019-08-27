@@ -8,8 +8,6 @@ import com.tarantula.OnSession;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.OnSessionTrack;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.time.*;

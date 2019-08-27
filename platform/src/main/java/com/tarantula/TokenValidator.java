@@ -16,6 +16,7 @@ public interface TokenValidator{
     boolean validTicket(String systemId,int stub,String ticket);
 
     OnSession token(String systemId,int stub);
-    boolean onSession(String systemId,int stub,String trackId,String ticket);
-    void offSession(String systemId,int stub,String trackId);
+
+    boolean onSession(String systemId,int stub,String ticket);
+    void offSession(String systemId,int stub);
 }

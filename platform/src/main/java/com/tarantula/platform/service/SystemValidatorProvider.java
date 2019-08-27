@@ -57,7 +57,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.pds =  this.serviceContext.dataStore("presence",this.serviceContext.partitionNumber());
-        this.systemValidator.dataStore(this.serviceContext.dataStore("session",this.serviceContext.partitionNumber()));
+        //this.systemValidator.dataStore(this.serviceContext.dataStore("session",this.serviceContext.partitionNumber()));
         this.systemValidator.setup(serviceContext);
     }
 
