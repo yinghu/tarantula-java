@@ -2,7 +2,7 @@ package com.tarantula;
 
 
 /**
- * Updated by yinghu on 03/22/2018.
+ * Updated by yinghu on 8/26/2019.
  */
 public interface Access extends Recoverable {
 
@@ -12,7 +12,7 @@ public interface Access extends Recoverable {
     void password(String password);
     boolean active();
     void active(boolean active);
+    String role();
+    void role(String role);
 
-    int routingNumber();
-    void routingNumber(int routingNumber);
 }

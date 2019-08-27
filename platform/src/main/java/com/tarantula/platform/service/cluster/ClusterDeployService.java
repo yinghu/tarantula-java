@@ -437,6 +437,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             if(typeId.equals(d.typeId())){
                 d.disabled(!enabled);
                 resp.successful(true);
+                resp.message(d.distributionKey()+" disabled ["+d.disabled()+"]");
                 ds.update(d);
                 return false;
             }
@@ -453,6 +454,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         if(ds.load(app)){
             app.disabled(!enabled);
             ds.update(app);
+            resp.message(app.distributionKey()+" disabled ["+app.disabled()+"]");
             resp.toMap().put("typeId",app.typeId());
             resp.toMap().put("disabled",app.disabled());
             resp.successful(true);

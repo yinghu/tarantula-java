@@ -90,7 +90,7 @@
                 console.log(resp);
                 adminObject.index=0;
                 adminObject.list = resp.payload.list;
-                setupList.list[0].title('EnableApp');
+                setupList.list[0].title('UpdateApp');
                 setupList.list[1].title('DisableApp');
                 setupList.list[2].title('Reset');
                 _on_admin_stage();
@@ -139,9 +139,11 @@
             TARA_API.query().app = adminObject.list[adminObject.index];
             _view({viewId:'admin.add.application',containerId:'#m3'});
         }else{
-            AdminSetup.enableApplication(adminObject.list[adminObject.index].applicationId,(resp)=>{
-                console.log(resp);
-            });
+            //AdminSetup.enableApplication(adminObject.list[adminObject.index].applicationId,(resp)=>{
+                //console.log(resp);
+            //});
+            TARA_API.query().app = adminObject.list[adminObject.index];
+            _view({viewId:'admin.update.application',containerId:'#m3'});
         }
     }
     function _on_shutdown(){

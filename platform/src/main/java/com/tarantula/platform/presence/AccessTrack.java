@@ -5,21 +5,21 @@ import com.tarantula.Access;
 import com.tarantula.platform.RecoverableObject;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 /**
- * Updated by yinghu on 3/5/2018.
+ * Updated by yinghu on 8/26/19
  */
 public class AccessTrack extends RecoverableObject implements Access {
 
     private String login;
     private String password;
     private boolean active;
-    private int routingNumber;
-
+    private String role;
     public AccessTrack(){
         this.vertex = "Access";
         this.label = "VA";
-        this.binary = true;
+        this.binary = false;
     }
     public AccessTrack(String login){
         this();
@@ -44,11 +44,11 @@ public class AccessTrack extends RecoverableObject implements Access {
         this.active = active;
     }
 
-    public int routingNumber(){
-        return this.routingNumber;
+    public String role(){
+        return this.role;
     }
-    public void routingNumber(int routingNumber){
-        this.routingNumber = routingNumber;
+    public void role(String role){
+        this.role = role;
     }
     public int getFactoryId() {
         return UserPortableRegistry.OID;
@@ -58,7 +58,21 @@ public class AccessTrack extends RecoverableObject implements Access {
     public int getClassId() {
         return UserPortableRegistry.ACCESS_CID;
     }
-
+    public Map<String,Object> toMap(){
+        properties.put("1",login);
+        properties.put("2",password);
+        properties.put("3",role);
+        properties.put("4",active);
+        properties.put("5",routingNumber);
+        return properties;
+    }
+    public void fromMap(Map<String,Object> properties){
+        this.login = (String) properties.get("1");
+        this.password = (String) properties.get("2");
+        this.role = (String) properties.get("3");
+        this.active = (boolean) properties.get("4");
+        this.routingNumber = ((Number) properties.get("5")).intValue();
+    }
 
     public byte[] toByteArray(){
         byte[] _login = login.getBytes(Charset.forName("UTF-8"));
@@ -92,6 +106,6 @@ public class AccessTrack extends RecoverableObject implements Access {
     }
     @Override
     public String toString(){
-        return "Access ["+bucket+"]["+oid+"]["+active+"/"+login+"]";
+        return "Access ["+bucket+"]["+oid+"]["+active+"/"+login+"/"+role+"/"+routingNumber+"]";
     }
 }

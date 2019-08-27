@@ -21,8 +21,9 @@ var AdminSetup= (function(){
         fin(_payload);
         TARA_API.onService(_payload,fout);
     };
-    let _enable_app = function(appid,out){
+    let _enable_app = function(appid,fin,out){
         let _payload = {serviceTag:adminObject.tag,command:"enableApplication",applicationId:appid};
+        fin(_payload);
         TARA_API.onService(_payload,out);
     };
     let _disable_app = function(appid,out){

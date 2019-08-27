@@ -1,0 +1,130 @@
+<div class="w3-modal-content w3-white">
+    <div class="w3-card-4 tx-popup">
+        <div class="w3-bar w3-teal w3-text-white w3-border-bottom w3-border-orange">
+            <div class="w3-bar-item w3-left"><span>Update Application</span></div>
+            <div class="w3-bar-item w3-right w3-button" id='tx-close-update-app'><i class='fa fa-close'></i></div>
+        </div>
+        <div class="w3-container w3-text-teal w3-border-bottom w3-border-orange">
+            <div class="w3-panel">
+                 <label class="tx-margin-left-8 tx-margin-top-8">Singleton</label>
+                 <input id ="u_singleton" class="w3-check w3-round w3-border tx-margin-left-8" type="checkbox"/>
+            </div>
+            <div class="w3-panel">
+                <input id ="u_tag" class="w3-input w3-round w3-border" type="text" placeholder='tag'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="u_subtypeId" class="w3-input w3-round w3-border" type="text" placeholder='subtypeId'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="u_category" class="w3-input w3-round w3-border" type="text" placeholder='category'/>
+            </div>
+            <div class="w3-panel">
+                 <input id ="u_name" class="w3-input w3-round w3-border" type="text" placeholder='name'/>
+            </div>
+            <div class="w3-panel">
+                <input id ="u_viewId" class="w3-input w3-round w3-border" type="text" placeholder='viewId'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="u_description" class="w3-input w3-round w3-border" type="text" placeholder='description'/>
+            </div>
+            <div class="w3-panel">
+                 <input id ="u_codebase" class="w3-input w3-round w3-border" type="text" placeholder='codebase'/>
+            </div>
+            <div class="w3-panel">
+                <input id ="u_moduleArtifact" class="w3-input w3-round w3-border" type="text" placeholder='moduleArtifact'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="u_moduleVersion" class="w3-input w3-round w3-border" type="text" placeholder='moduleVersion'/>
+            </div>
+            <div class="w3-panel">
+                 <input id ="u_moduleName" class="w3-input w3-round w3-border" type="text" placeholder='moduleName'/>
+            </div>
+            <div class="w3-panel">
+                <input id ="u_capacity" class="w3-input w3-round w3-border" type="text" placeholder='capacity'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="u_entryCost" class="w3-input w3-round w3-border" type="text" placeholder='entryCost'/>
+            </div>
+            <div class="w3-panel">
+                 <input id ="u_timerOnModule" class="w3-input w3-round w3-border" type="text" placeholder='timerOnModuleMilliseconds'/>
+            </div>
+            <div class="w3-panel">
+                 <input id ="u_runtimeDuration" class="w3-input w3-round w3-border" type="text" placeholder='runtimeDurationMinutes'/>
+            </div>
+            <div class="w3-panel">
+                 <input id ="u_runtimeDurationOnInstance" class="w3-input w3-round w3-border" type="text" placeholder='runtimeDurationMinutesOnInstance'/>
+            </div>
+             <div class="w3-panel">
+                <p id="u_message"></p>
+            </div>
+            <div class="w3-panel">  
+                <div id="u_command_cancel" class="w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Cancel</div>
+                <div id="u_command" class="w3-right w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Update Application</div>     
+            </div>
+        </div>  
+        <div class="w3-display-container w3-border-bottom w3-border-white w3-teal tx-content-36">
+            <div class="w3-display-bottomright tx-margin-right-32 tx-margin-bottom-4 tx-text-12">Powered By Game Engine Cluster</div>            
+        </div>
+    </div>
+</div>
+<script>
+  if(TARA_API.query().app.singleton){
+     document.querySelector('#u_tag').style.display='block';
+     document.querySelector('#u_runtimeDurationOnInstance').style.display='none';
+     document.querySelector('#u_singleton').checked = true; 
+  }
+  else{
+     document.querySelector('#u_tag').style.display='none';
+     document.querySelector('#u_singleton').style.display='none';
+     document.querySelector('#u_runtimeDurationOnInstance').style.display='block'; 
+  }
+  document.querySelector('#u_category').value = TARA_API.query().app.category;    
+  document.querySelector('#u_subtypeId').value = TARA_API.query().app.subtypeId   
+  document.querySelector('#u_viewId').value= TARA_API.query().app.viewId     
+  document.querySelector('#u_name').value= TARA_API.query().app.name
+  document.querySelector('#u_description').value= TARA_API.query().app.description     
+  document.querySelector('#u_codebase').value= TARA_API.query().app.codebase
+  document.querySelector('#u_moduleArtifact').value= TARA_API.query().app.moduleArtifact
+  document.querySelector('#u_moduleVersion').value= TARA_API.query().app.moduleVersion
+  document.querySelector('#u_moduleName').value= TARA_API.query().app.moduleName      
+  document.querySelector('#u_capacity').value= TARA_API.query().app.capacity
+  document.querySelector('#u_entryCost').value= TARA_API.query().app.entryCost 
+  document.querySelector('#u_timerOnModule').value= TARA_API.query().app.timerOnModule
+  document.querySelector('#u_runtimeDuration').value= TARA_API.query().app.runtimeDuration
+  document.querySelector('#u_runtimeDurationOnInstance').value= TARA_API.query().app.runtimeDurationOnInstance
+  document.querySelector("#u_message").innerHTML= 'Update application ->'+TARA_API.query().app.typeId;
+  document.querySelector("#u_command").onclick = function(){
+    AdminSetup.enableApplication(TARA_API.query().app.applicationId,function(payload){
+        payload.typeId = TARA_API.query().app.typeId;//'demo-sync';
+        payload.category = document.querySelector('#u_category').value;
+        payload.singleton = document.querySelector('#u_singleton').checked; 
+        if(payload.singleton){
+            payload.tag = document.querySelector('#u_tag').value;    
+        }
+        payload.subtypeId= document.querySelector('#u_subtypeId').value;
+        payload.viewId = document.querySelector('#u_viewId').value;     
+        payload.name= document.querySelector('#u_name').value;
+        payload.description= document.querySelector('#u_description').value;     
+        payload.codebase= document.querySelector('#u_codebase').value;
+        payload.moduleArtifact=document.querySelector('#u_moduleArtifact').value;
+        payload.moduleVersion= document.querySelector('#u_moduleVersion').value;
+        payload.moduleName=document.querySelector('#u_moduleName').value;      
+        payload.capacity= parseInt(document.querySelector('#u_capacity').value);
+        payload.entryCost= parseInt(document.querySelector('#u_entryCost').value); 
+        payload.timerOnModule = parseInt(document.querySelector('#u_timerOnModule').value);
+        payload.runtimeDuration= parseInt(document.querySelector('#u_runtimeDuration').value);
+        payload.runtimeDurationOnInstance= parseInt(document.querySelector('#u_runtimeDurationOnInstance').value);
+    },function(resp){
+        console.log(resp);
+        document.querySelector("#u_message").innerHTML = resp.message;
+    });    
+ };  
+ document.querySelector("#tx-close-update-app").onclick = tx_close_update_application;
+ document.querySelector("#u_command_cancel").onclick = tx_close_update_application;
+ function tx_close_update_application(){
+     this.style.display = 'none';
+     let m1 = document.querySelector('#m3');
+     m1.innerHTML='';
+     m1.style.display = 'none';
+ }
+</script>
