@@ -57,7 +57,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         }
         else if(session.action().equals("onTicket")){
             if(this.context.validator().validTicket(session.systemId(),acc.stub(),acc.accessKey())){
-                OnSession onSession = this.context.validator().token(session.systemId(),acc.stub(),20);
+                OnSession onSession = this.context.validator().token(session.systemId(),acc.stub());//web socket request
                 onSession.successful(true);
                 PresenceContext ptx = new PresenceContext();
                 ptx.successful(true);
@@ -84,7 +84,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         OnSession _onSession = OnSessionTrack.PASSWORD_NOT_MATCHED;
         if(this.context.dataStore("user").load(access)){
             access.routingNumber(session.routingNumber());
-            _onSession=this.context.validator().validPassword(access,password,session.clientId());
+            _onSession=this.context.validator().validPassword(access,password);
             _onSession.systemId(systemId);
             ResponseHeader resp = new ResponseHeader(session.action(), "User [" + access.login() + "] signed in",true);
             postOffice.onLabel().send("presence/notice",this.builder.create().toJson(resp).getBytes());

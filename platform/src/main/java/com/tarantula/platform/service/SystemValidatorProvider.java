@@ -13,6 +13,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     private SystemValidator systemValidator;
     private int timeoutInMinutes;
+    private int timeoutInSeconds;
 
     private ServiceContext serviceContext;
     private ConcurrentHashMap<String,Presence> pMap;
@@ -43,8 +44,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void offSession(String systemId){
         pMap.remove(systemId);
     }
-    public void timeout(int minutes){
+    public void timeout(int minutes,int seconds){
         this.timeoutInMinutes = minutes;
+        this.timeoutInSeconds = seconds;
     }
     @Override
     public String name() {
@@ -69,7 +71,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.pMap = new ConcurrentHashMap<>();
         this.systemValidator = new SystemValidator();
         this.systemValidator.systemValidatorProvider(this);
-        this.systemValidator.timeout(this.timeoutInMinutes);
+        this.systemValidator.timeout(this.timeoutInMinutes,this.timeoutInSeconds);
         this.systemValidator.start();
     }
 

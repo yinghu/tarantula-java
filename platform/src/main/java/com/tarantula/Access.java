@@ -6,6 +6,7 @@ package com.tarantula;
  */
 public interface Access extends Recoverable {
 
+
     String login();
     void login(String login);
     String password();
@@ -14,5 +15,10 @@ public interface Access extends Recoverable {
     void active(boolean active);
     String role();
     void role(String role);
+
+    interface Role{
+        String name();
+        int accessControl();
+    }
 
 }

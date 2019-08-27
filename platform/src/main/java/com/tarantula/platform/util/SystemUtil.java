@@ -46,13 +46,13 @@ public class SystemUtil {
         }
         return sb.toString().toUpperCase();
     }
-    public static String ticket(MessageDigest messageDigest, String input, int stub, int durationSeconds) {
+    public static String ticket(MessageDigest messageDigest, String systemId, int stub, int durationSeconds) {
         LocalDateTime _st = LocalDateTime.now().plusSeconds(durationSeconds);
         long end = SystemUtil.toUTCMilliseconds(_st);
         StringBuffer _ticket = new StringBuffer();
-        _ticket.append("tarantula").append(" ").append(stub).append(" ").append(end).append(" ");
+        _ticket.append("tarantula").append(" ").append(end).append(" ");
         messageDigest.reset();
-        messageDigest.update(input.getBytes());
+        messageDigest.update(systemId.getBytes());
         messageDigest.update(Integer.toHexString(stub).getBytes());
         messageDigest.update(Long.toHexString(end).getBytes());
         String hash = SystemUtil.toHexString(messageDigest.digest());
@@ -62,12 +62,12 @@ public class SystemUtil {
 
     public static boolean validTicket(MessageDigest messageDigest,String systemId,int stub,String ticket){
         String[] tlist = ticket.split(" ");//validate
-        long end = Long.parseLong(tlist[2]);
+        long end = Long.parseLong(tlist[1]);
         messageDigest.reset();
         messageDigest.update(systemId.getBytes());
         messageDigest.update(Integer.toHexString(stub).getBytes());
         messageDigest.update(Long.toHexString(end).getBytes());
-        if(tlist[3].equals(SystemUtil.toHexString(messageDigest.digest()))){
+        if(tlist[2].equals(SystemUtil.toHexString(messageDigest.digest()))){
             LocalDateTime ending = SystemUtil.fromUTCMilliseconds(end);
             return ending.isAfter(LocalDateTime.now());
         }
@@ -75,36 +75,39 @@ public class SystemUtil {
             return false;
         }
     }
-    public static  String token(MessageDigest messageDigest, OnSession presence, String clientId, int timeoutMinutes) {
+    public static  String token(MessageDigest messageDigest, OnSession presence,int timeoutMinutes) {
+        //{systemId} {ticket}-{routing}-{stub}-{cid}-{start}-{hash}
+        //ticket=> {tarantula} {stub} {end} {hash}
         StringBuffer token = new StringBuffer(presence.systemId());
         messageDigest.reset();
         messageDigest.update(presence.systemId().getBytes());
         messageDigest.update(Integer.toHexString(presence.stub()).getBytes());
-        messageDigest.update("clientId".getBytes()); //caller clientId
         long start = SystemUtil.toUTCMilliseconds(LocalDateTime.now());
         messageDigest.update(Long.toHexString(start).getBytes());
         String hash = SystemUtil.toHexString(messageDigest.digest());
         presence.ticket(SystemUtil.ticket(messageDigest,presence.systemId(),presence.stub(),timeoutMinutes*60));//assign a ticket
-        token.append(" ").append(presence.ticket());//embedded to token
-        token.append("-").append(presence.routingNumber());
-        token.append("-").append(presence.stub());
-        token.append("-").append("clientId");
-        token.append("-").append(start);
-        token.append("-").append(hash);
+        token.append(" ").append(presence.ticket());//0 embedded to token
+        //token.append("-").append(presence.routingNumber());
+        token.append("-").append(presence.stub());//1
+        //token.append("-").append("clientId");
+        token.append("-").append(start); //2
+        token.append("-").append(hash); //3
+        //System.out.println(">token<"+token.toString());
         return token.toString();
     }
-    public  static OnSession validToken(MessageDigest messageDigest,String token,String clientId) {
+    public  static OnSession validToken(MessageDigest messageDigest,String token) {
         //System.out.println(token);
         int sp = token.indexOf(" ");
         String systemId = token.substring(0,sp);
         String[] vm = token.substring(sp+1).split("-");
+        //vm[0] - ticket vm[1] - stub vm[2] - start vm[3] --hash
         messageDigest.reset();
         messageDigest.update(systemId.getBytes());//systemId
-        messageDigest.update(Integer.toHexString(Integer.parseInt(vm[2])).getBytes());//stub
-        messageDigest.update("clientId".getBytes());//client ID
-        messageDigest.update(Long.toHexString(Long.parseLong(vm[4])).getBytes());//start
-        if(SystemUtil.toHexString(messageDigest.digest()).equals(vm[5])){// hash
-            return new OnSessionTrack(systemId,Integer.parseInt(vm[2]),vm[0],vm[3],Integer.parseInt(vm[1]));
+        messageDigest.update(Integer.toHexString(Integer.parseInt(vm[1])).getBytes());//stub
+        //messageDigest.update("clientId".getBytes());//client ID
+        messageDigest.update(Long.toHexString(Long.parseLong(vm[2])).getBytes());//start
+        if(SystemUtil.toHexString(messageDigest.digest()).equals(vm[3])){// hash
+            return new OnSessionTrack(systemId,Integer.parseInt(vm[1]),vm[0]);
         }
         else{
             throw new RuntimeException("Wrong session token");
@@ -115,46 +118,7 @@ public class SystemUtil {
         messageDigest.update(password.getBytes());
         return SystemUtil.toHexString(messageDigest.digest());
     }
-    public static BufferedImage scale(BufferedImage img, int targetWidth, int targetHeight) {
-        int type = (img.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
-        BufferedImage ret = img;
-        BufferedImage scratchImage = null;
-        Graphics2D g2 = null;
-        int w = img.getWidth();
-        int h = img.getHeight();
-        int prevW = w;
-        int prevH = h;
-        do {
-            if (w > targetWidth) {
-                w /= 2;
-                w = (w < targetWidth) ? targetWidth : w;
-            }
-            if (h > targetHeight) {
-                h /= 2;
-                h = (h < targetHeight) ? targetHeight : h;
-            }
-            if (scratchImage == null) {
-                scratchImage = new BufferedImage(w, h, type);
-                g2 = scratchImage.createGraphics();
-            }
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g2.drawImage(ret, 0, 0, w, h, 0, 0, prevW, prevH, null);
-            prevW = w;
-            prevH = h;
-            ret = scratchImage;
-        } while (w != targetWidth || h != targetHeight);
-        if (g2 != null) {
-            g2.dispose();
-        }
-        if (targetWidth != ret.getWidth() || targetHeight != ret.getHeight()) {
-            scratchImage = new BufferedImage(targetWidth, targetHeight, type);
-            g2 = scratchImage.createGraphics();
-            g2.drawImage(ret, 0, 0, null);
-            g2.dispose();
-            ret = scratchImage;
-        }
-        return ret;
-    }
+
     public static byte[] toJson(Map<String,Object> kv){
         JsonObject json = new JsonObject();
         kv.forEach((k,v)->{

@@ -30,8 +30,8 @@ public class ContentEventHandler implements RequestHandler {
             _hex.put(sid,exchange);
             String path = exchange.path();
             String token = exchange.query().split("=")[1];
-            String clientId = exchange.header(Session.X_REAL_IP)!=null?exchange.header(Session.X_REAL_IP):exchange.remoteAddress();
-            OnSession ox = this.auth.validToken(token,clientId);
+            //String clientId = exchange.header(Session.X_REAL_IP)!=null?exchange.header(Session.X_REAL_IP):exchange.remoteAddress();
+            OnSession ox = this.auth.validToken(token);
             String[] plist = path.substring(1).split("/");
             PendingRequestEvent ctn = new PendingRequestEvent(plist[0]+"/"+plist[1]);
             ctn.action(plist[2]+Recoverable.PATH_SEPARATOR+plist[3]);

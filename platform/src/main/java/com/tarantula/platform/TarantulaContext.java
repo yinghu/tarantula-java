@@ -72,6 +72,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     public String tarantulaDeploymentProvider;
     public int maxActiveSessionNumber;
     public int tokenTimeout;
+    public int ticketTimeout;
 
     public TokenValidatorProvider tokenValidatorProvider;
     public DeploymentServiceProvider deploymentServiceProvider;
@@ -179,7 +180,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         new ServiceBootstrap(_tarantulaClusterStarted,_integrationClusterStarted,this.integrationCluster,"integration-cluster",true).start(); //integration cluster start
         new ServiceBootstrap(_accessIndexServiceStarted, _tarantulaApplicationStarted, new TarantulaApplicationDeployer(this),"application-deployer",true).start();
         this.tokenValidatorProvider = (TokenValidatorProvider)Class.forName(this.tarantulaServerValidator).getConstructor().newInstance();
-        this.tokenValidatorProvider.timeout(this.tokenTimeout);
+        this.tokenValidatorProvider.timeout(this.tokenTimeout,this.ticketTimeout);
         this.tokenValidatorProvider.start();
         this.deploymentServiceProvider = (DeploymentServiceProvider) Class.forName(this.tarantulaDeploymentProvider).getConstructor().newInstance();
         this.deploymentServiceProvider.start();

@@ -7,6 +7,6 @@ import com.tarantula.TokenValidator;
 public interface TokenValidatorProvider extends ServiceProvider {
     String NAME = "TokenValidatorProvider";
     TokenValidator tokenValidator();
-    void timeout(int minutes);
+    void timeout(int minutes,int seconds);
     Presence presence(String systemId);
 }

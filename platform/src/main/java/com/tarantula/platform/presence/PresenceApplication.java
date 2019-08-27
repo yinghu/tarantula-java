@@ -68,7 +68,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                 //request new ticket
                 PresenceContext ptc = new PresenceContext(session.action());
                 ptc.presence = new OnSessionTrack(session.systemId(),session.stub());
-                ptc.presence.ticket(this.context.validator().ticket(session.systemId(),session.stub(),20));
+                ptc.presence.ticket(this.context.validator().ticket(session.systemId(),session.stub()));
                 session.write(this.builder.create().toJson(ptc).getBytes(),this.descriptor.responseLabel());
             }
 

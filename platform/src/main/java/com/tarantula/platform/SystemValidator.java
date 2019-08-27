@@ -11,10 +11,11 @@ public class SystemValidator implements Serviceable{
     private DataStore dataStore;
     private ServiceContext tsc;
     private int timeoutMinutes;
-
+    private int timeoutSeconds =10;
     private MessageDigest _messageDigest;
 
-    SystemValidatorProvider systemValidatorProvider;
+    private SystemValidatorProvider systemValidatorProvider;
+
     private MessageDigest messageDigest(){
         try{
             return (MessageDigest)this._messageDigest.clone();
@@ -37,8 +38,9 @@ public class SystemValidator implements Serviceable{
     public void systemValidatorProvider(SystemValidatorProvider systemValidatorProvider){
         this.systemValidatorProvider = systemValidatorProvider;
     }
-    public void timeout(int timeoutMinutes){
+    public void timeout(int timeoutMinutes,int timeoutSeconds){
         this.timeoutMinutes = timeoutMinutes;
+        this.timeoutSeconds = timeoutSeconds;
     }
 
     public TokenValidator tokenValidator(){
@@ -58,12 +60,12 @@ public class SystemValidator implements Serviceable{
             this._singleton = _singleton;
 
         }
-        private  String token(OnSession presence,String clientId) {
-           return SystemUtil.token(messageDigest(),presence,clientId,timeoutMinutes);
+        private  String token(OnSession presence) {
+           return SystemUtil.token(messageDigest(),presence,timeoutMinutes);
         }
         @Override
-        public OnSession validToken(String token, String clientId) {
-            return SystemUtil.validToken(this._singleton.messageDigest(),token,clientId);
+        public OnSession validToken(String token) {
+            return SystemUtil.validToken(this._singleton.messageDigest(),token);
         }
         @Override
         public String hashPassword(String password) {
@@ -71,7 +73,7 @@ public class SystemValidator implements Serviceable{
             return SystemUtil.hashPassword(messageDigest,password);
         }
         @Override
-        public OnSession validPassword(Access hash, String password, String clientId) {
+        public OnSession validPassword(Access hash, String password) {
             if((SystemUtil.hashPassword(messageDigest(),password)).equals(hash.password())){
                 OnSession ox = new OnSessionTrack();
                 ox.distributionKey(hash.key().asString());
@@ -83,8 +85,8 @@ public class SystemValidator implements Serviceable{
                     _ox.stub(ox.stub());
                     _ox.login(hash.login());
                     _ox.routingNumber(hash.routingNumber());
-                    _ox.token(this.token(_ox,clientId));
-                    _ox.ticket(this.ticket(hash.distributionKey(),ox.stub(),30));
+                    _ox.token(this.token(_ox));
+                    _ox.ticket(this.ticket(hash.distributionKey(),ox.stub()));
                     _ox.successful(true);
                     ox.activeSessions(1);
                     ox.timestamp(System.currentTimeMillis());
@@ -103,17 +105,17 @@ public class SystemValidator implements Serviceable{
             }
         }
         @Override
-        public String ticket(String input, int stub, int durationSeconds) {
-            return SystemUtil.ticket(messageDigest(),input,stub,durationSeconds);
+        public String ticket(String input, int stub) {
+            return SystemUtil.ticket(messageDigest(),input,stub,timeoutSeconds);
         }
         @Override
         public boolean validTicket(String systemId, int stub, String ticket) {
             return SystemUtil.validTicket(messageDigest(),systemId,stub,ticket);
         }
         @Override
-        public OnSession token(String systemId,int stub,int durationSeconds){
+        public OnSession token(String systemId,int stub){
             OnSession onSession = new OnSessionTrack(systemId,stub);
-            onSession.token(SystemUtil.token(messageDigest(),onSession,"clientId",durationSeconds));
+            onSession.token(SystemUtil.token(messageDigest(),onSession,timeoutMinutes));
             return onSession;
         }
         @Override

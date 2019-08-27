@@ -33,18 +33,17 @@ public class ServiceEventHandler implements RequestHandler {
                 String action = exchange.header(Session.TARANTULA_ACTION);
                 String tag = exchange.header(Session.TARANTULA_TAG);
                 byte[]  _payload = exchange.payload();
-                String clientId = exchange.header(Session.X_REAL_IP)!=null?exchange.header(Session.X_REAL_IP):exchange.remoteAddress();
+                //String clientId = exchange.header(Session.X_REAL_IP)!=null?exchange.header(Session.X_REAL_IP):exchange.remoteAddress();
                 String sid = exchange.id();
                 this._hex.put(sid,exchange);
                 if(path.startsWith("/service/action")){
                     OnSession id = new OnSessionTrack();//place holder for public access applications
                     RoutingKey routingKey = eventService.routingKey(this.bucket+"/"+sid,tag);
                     if((token!=null)&&(!token.equals("undefined"))){
-                        id = auth.validToken(token,clientId);//first entry point check
-                        routingKey = eventService.routingKey(id.systemId(),tag,id.routingNumber());
+                        id = auth.validToken(token);//first entry point check
+                        routingKey = eventService.routingKey(id.systemId(),tag);
                     }
                     ServiceActionEvent actionEvent = new ServiceActionEvent(this.serverTopic,sid,_payload);
-                    actionEvent.clientId(clientId);
                     actionEvent.systemId(id.systemId());
                     actionEvent.stub(id.stub());
                     actionEvent.ticket(id.ticket());

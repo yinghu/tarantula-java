@@ -82,6 +82,7 @@ public class TarantulaMain {
 		    btx.tarantulaDeploymentProvider = override(overriding,"tarantula.service.deployment.service.provider",_user,_config);
 		    btx.maxActiveSessionNumber = Integer.parseInt(override(overriding,"tarantula.endpoint.session.max.number",_user,_config));
 			btx.tokenTimeout = Integer.parseInt(override(overriding,"tarantula.endpoint.session.timeout.m",_user,_config));
+			btx.ticketTimeout = Integer.parseInt(override(overriding,"tarantula.endpoint.ticket.timeout.s",_user,_config));
 		    btx.maxIdlesOnInstance = Integer.parseInt(override(overriding,"tarantula.instance.session.idle.number",_user,_config));
 		    btx.timeoutOnInstance = 1000*Long.parseLong(override(overriding,"tarantula.instance.session.timeout.s",_user,_config));
 			btx.applicationSchedulingPoolSetting = override(overriding,"tarantula.scheduler.pool.setting",_user,_config);
