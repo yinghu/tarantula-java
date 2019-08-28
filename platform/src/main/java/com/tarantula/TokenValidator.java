@@ -26,4 +26,6 @@ public interface TokenValidator{
     OnSession token(String systemId,int stub);
 
     void offSession(String systemId,int stub);
+
+    Access.Role role(String name);
 }
