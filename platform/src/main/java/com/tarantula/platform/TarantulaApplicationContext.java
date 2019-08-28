@@ -79,7 +79,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     public void initializeOnApplication(Event me,OnInstance onApplication){//operate on on instance node
         try{
-            if(this.validator().validateTicket(me.systemId(),me.stub(),me.ticket())){
+            //if(this.validator().validateTicket(me.systemId(),me.stub(),me.ticket())){
                 onInstances.put(me.systemId(),onApplication);
                 _instance.entryCost(this.descriptor().entryCost());
                 if(onApplication.tournamentEnabled()){
@@ -94,58 +94,36 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                 }
                 onApplication.joined(me.joined());
                 onApplication.update();
-            }
-            else{
-                throw new RuntimeException("session expired ["+me.ticket()+"]");
-            }
+            //}
+            //else{
+                //throw new RuntimeException("session expired ["+me.ticket()+"]");
+            //}
         }catch (Exception ex){
             ex.printStackTrace();
             waitingList.offer(onApplication);
             this.application.onError(me, ex);
         }
     }
-    public void onRequestCallback(Event me){
-        if((!singleton)){
-            this.actOnApplication(me);
-        }
-        else{
-            this.actOnSingleton(me);
-        }
-    }
     public void onError(Event me,Exception ex){
         this.application.onError(me, ex);
     }
-    private void actOnSingleton(Event me){
-        try{
-            this.application.callback(me,me.payload());
-        }catch (Exception ex){
-            this.application.onError(me, ex);
-        }
+    public void actOnSingleton(Event me) throws Exception{
+        this.application.callback(me,me.payload());
     }
 
-	private void actOnApplication(Event me){//operate on instance ID node
-        try{
-            if(this.validator().validateTicket(me.systemId(),me.stub(),me.ticket())){
-                OnInstance onApplication = this.onInstances.get(me.systemId());
-                if(onApplication==null){
-                    throw new IllegalArgumentException("access rejected from ["+me.systemId()+"]");//have to registered on application
-                }
-                me.balance(onApplication.balance());
-                if(onApplication.initialized()){//callback per session without validation
-                    me.joined(onApplication.joined());
-                    this.application.callback(me,me.payload());
-                }
-                else{
-                    throw new RuntimeException("session not initialized");
-                }
-            }else{
-                throw new RuntimeException("session expired ["+me.ticket()+"/"+me.systemId()+"/"+me.stub()+"/"+me.action()+"]");
-            }
+	public void actOnInstance(Event me) throws Exception{//operate on instance ID node
+        OnInstance onApplication = this.onInstances.get(me.systemId());
+        if(onApplication==null){
+            throw new IllegalArgumentException("access rejected from ["+me.systemId()+"]");//have to registered on application
         }
-        catch (Exception ex){
-            this.application.onError(me, ex);
+        me.balance(onApplication.balance());
+        if(onApplication.initialized()){//callback per session without validation
+            me.joined(onApplication.joined());
+            this.application.callback(me,me.payload());
         }
-		
+        else{
+            throw new RuntimeException("session not initialized");
+        }
 	}
 
     public void _setup() throws Exception{
@@ -261,22 +239,18 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     }
 
     public boolean onEvent(Event event) {
-        try{
-            if(event instanceof MapStoreSyncEvent){
-                MapStoreSyncEvent msc = (MapStoreSyncEvent)event;
-                Metadata md = msc.metadata;
-                RecoverableListener rc = this.rMap.get(md.factoryId());
-                if(rc!=null){
-                    rc.onUpdated(md,msc.key,msc.payload());
-                }
-                else{
-                    this.application.onEvent(event);
-                }
-            }else{
+        if(event instanceof MapStoreSyncEvent){
+            MapStoreSyncEvent msc = (MapStoreSyncEvent)event;
+            Metadata md = msc.metadata;
+            RecoverableListener rc = this.rMap.get(md.factoryId());
+            if(rc!=null){
+                rc.onUpdated(md,msc.key,msc.payload());
+            }
+            else{
                 this.application.onEvent(event);
             }
-        }catch (Exception ex){
-            this.application.onError(event,ex);
+        }else{
+            this.application.onEvent(event);
         }
         return true;
     }

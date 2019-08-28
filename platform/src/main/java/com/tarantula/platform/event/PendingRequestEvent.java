@@ -2,7 +2,7 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.Event;
+import com.tarantula.EventOnAction;
 import com.tarantula.platform.Data;
 
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Updated by yinghu lu on 7/1/2018.
  */
-public class PendingRequestEvent extends Data implements Event {
+public class PendingRequestEvent extends Data implements EventOnAction {
 
     public PendingRequestEvent(){
     }

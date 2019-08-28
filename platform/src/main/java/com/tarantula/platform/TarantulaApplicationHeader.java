@@ -44,6 +44,7 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
     }
 
     public boolean onEvent(Event event) {
+        this.context.log("MISSING EVENT->"+event.toString(),OnLog.WARN);
         return false;
     }
 

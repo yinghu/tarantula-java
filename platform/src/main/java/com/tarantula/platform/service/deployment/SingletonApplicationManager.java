@@ -10,7 +10,7 @@ import com.tarantula.platform.service.cluster.ApplicationBucketReceiver;
 /**
  * Updated by yinghu 6/3/2019
  */
-public class SingletonApplicationManager extends DefaultApplication implements BucketReceiverListener{
+public class SingletonApplicationManager extends DefaultApplication implements BucketReceiverListener,EventListener{
 
     private TarantulaApplicationContext singleton;
 
@@ -39,58 +39,23 @@ public class SingletonApplicationManager extends DefaultApplication implements B
     }
     @Override
     public boolean onEvent(Event event){
-        if(!event.forwarding()){
-            this.onCallback(event);
-        }
-        else{
-            this._onEvent(event);
+        try{
+            if(event instanceof EventOnAction){
+                if(this.checkAccessControl(event)){
+                    this.singleton.actOnSingleton(event);
+                }
+                else{
+                    throw new IllegalAccessException("Illegal access ->"+deploymentDescriptor.tag());
+                }
+            }
+            else{
+                this.singleton.onEvent(event);
+            }
+        }catch (Exception ex){
+            this.singleton.onError(event,ex);
         }
         return false;
     }
-    public boolean _onEvent(Event event){
-        switch (accessControl){
-            case Access.PUBLIC_ACCESS_MODE:
-                this.singleton.onEvent(event);
-                break;
-            case Access.PROTECT_ACCESS_MODE:
-                this.singleton.onEvent(event);
-                break;
-            case Access.FORWARD_ACCESS_MODE:
-                //CHECKING FORWARD TICKET BEFORE CALL APPLICATION
-                this.singleton.onEvent(event);
-                break;
-            case Access.PRIVATE_ACCESS_MODE:
-                this.singleton.onEvent(event);
-                break;
-            default:
-                //no access
-                this.singleton.onError(event,new IllegalAccessException("IllegalAccess ["+accessControl+"] on ["+event.toString()+"]"));
-                break;
-        }
-        return true;
-    }
-    @Override
-    public void onCallback(Event event) {
-        switch (accessControl){
-            case Access.PUBLIC_ACCESS_MODE:
-                this.singleton.onRequestCallback(event);
-                break;
-            case Access.PROTECT_ACCESS_MODE:
-            case Access.FORWARD_ACCESS_MODE:
-                if(this.singleton.validator().validateTicket(event.systemId(),event.stub(),event.ticket())){
-                    this.singleton.onRequestCallback(event);
-                }
-                else{
-                    this.singleton.onError(event,new IllegalAccessException("Session expired on ["+event.action()+"]"));
-                }
-                break;
-            default:
-                //no access
-                this.singleton.onError(event,new IllegalAccessException("IllegalAccess"));
-                break;
-        }
-    }
-
     @Override
     public void onBucketReceiver(int state,BucketReceiver bucketReceiver) {
         //forward state to singleton application to update app state

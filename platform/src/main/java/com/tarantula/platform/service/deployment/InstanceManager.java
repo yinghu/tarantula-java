@@ -94,16 +94,22 @@ public class InstanceManager implements Instance {
             event.write(this.builder.create().toJson(rend).getBytes(),"error");
             return false;
         }
-        if(event instanceof EventOnAction){
-            tac.onRequestCallback(event);
+        try{
+            if(event instanceof EventOnAction){
+                if(this.applicationManager.checkAccessControl(event)){
+                    tac.actOnInstance(event);
+                }
+                else{
+                    throw new IllegalAccessException("Illegal access ->"+applicationManager.deploymentDescriptor.name());
+                }
+            }
+            else{
+                tac.onEvent(event);
+            }
+            tac.onTouch(event);
+        }catch (Exception ex){
+            tac.onError(event,ex);
         }
-        //else if(event instanceof EventOnInitialization){
-            //tac.initialize(event);
-        //}
-        else{
-            tac.onEvent(event);
-        }
-        tac.onTouch(event);
         return false;
     }
 

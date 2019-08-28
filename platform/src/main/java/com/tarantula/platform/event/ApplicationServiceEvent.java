@@ -2,13 +2,13 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.Event;
+import com.tarantula.EventOnAction;
 import com.tarantula.platform.Data;
 
 import java.io.IOException;
 
 
-public class ApplicationServiceEvent extends Data implements Event {
+public class ApplicationServiceEvent extends Data implements EventOnAction {
 
 
 	public ApplicationServiceEvent(){}
@@ -37,7 +37,6 @@ public class ApplicationServiceEvent extends Data implements Event {
 		out.writeInt("12",this.routingNumber);
 		out.writeUTF("13",this.destination);
 		out.writeBoolean("14",this.streaming);
-		//out.writeBoolean("15",this.forwarding);
 	}
 	@Override
 	public void readPortable(PortableReader in) throws IOException {
@@ -55,7 +54,6 @@ public class ApplicationServiceEvent extends Data implements Event {
 		this.routingNumber = in.readInt("12");
 		this.destination = in.readUTF("13");
 		this.streaming = in.readBoolean("14");
-		//this.forwarding = in.readBoolean("15");
 	}
 	@Override
 	public int getClassId() {

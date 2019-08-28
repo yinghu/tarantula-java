@@ -35,12 +35,11 @@ public class DefaultApplication implements Application {
         this.deploymentDescriptor = deploymentDescriptor;
     }
 
-    @Override
-    public void onCallback(Event event) {
-    }
-    @Override
-    public boolean onEvent(Event event) {
-        return true;
+    public boolean checkAccessControl(Event event){
+        if(this.deploymentDescriptor.accessControl()==Access.PUBLIC_ACCESS_MODE){
+            return true;
+        }
+        return this.tarantulaContext.tokenValidatorProvider.tokenValidator().validateTicket(event.systemId(),event.stub(),event.ticket());
     }
     @Override
     public Descriptor descriptor() {

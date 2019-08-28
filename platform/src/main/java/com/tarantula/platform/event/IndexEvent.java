@@ -2,7 +2,7 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.Event;
+import com.tarantula.EventOnAction;
 import com.tarantula.platform.Data;
 
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Updated by yinghu on 4/28//2018.
  */
-public class IndexEvent extends Data implements Event {
+public class IndexEvent extends Data implements EventOnAction {
 
     public String userAgent;
 

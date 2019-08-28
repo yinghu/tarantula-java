@@ -68,6 +68,7 @@ public interface Session extends OnApplication{
     //client payload on wire
     byte[] payload();
     void payload(byte[] data);
+
     String trackId();
     void trackId(String trackId);
 
