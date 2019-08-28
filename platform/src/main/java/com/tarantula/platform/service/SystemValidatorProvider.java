@@ -17,7 +17,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     private ServiceContext serviceContext;
     private ConcurrentHashMap<String,Presence> pMap;
-    private DataStore pds;
+    private DataStore dataStore;
     public TokenValidator tokenValidator(){
         return systemValidator.tokenValidator();
     }
@@ -25,24 +25,16 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return pMap.computeIfAbsent(systemId,(k)->{
             PresenceIndex px = new PresenceIndex();
             px.distributionKey(systemId);
-            pds.load(px);
-            px.dataStore(pds);
-            px.registerEventService(this.serviceContext.eventService(Distributable.INTEGRATION_SCOPE));
-            return px;
-        });
-    }
-    public void onSession(String systemId){
-        pMap.computeIfAbsent(systemId,(k)->{
-            PresenceIndex px = new PresenceIndex();
-            px.distributionKey(systemId);
-            pds.load(px);
-            px.dataStore(pds);
+            dataStore.load(px);
+            px.dataStore(dataStore);
             px.registerEventService(this.serviceContext.eventService(Distributable.INTEGRATION_SCOPE));
             return px;
         });
     }
     public void offSession(String systemId){
-        pMap.remove(systemId);
+        Presence presence = pMap.remove(systemId);
+        presence.disabled(true);
+        presence.update();
     }
     public void timeout(int minutes,int seconds){
         this.timeoutInMinutes = minutes;
@@ -56,9 +48,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.pds =  this.serviceContext.dataStore("presence",this.serviceContext.partitionNumber());
-        //this.systemValidator.dataStore(this.serviceContext.dataStore("session",this.serviceContext.partitionNumber()));
-        this.systemValidator.setup(serviceContext);
+        this.dataStore =  this.serviceContext.dataStore("presence",this.serviceContext.partitionNumber());
     }
 
     @Override

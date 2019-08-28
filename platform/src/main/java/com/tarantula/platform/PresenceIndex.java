@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
  */
 public class PresenceIndex extends RecoverableObject implements Presence {
     private double balance;
+    private int counter;
     private EventService eventService;
     public PresenceIndex(double initialBalance){
         this();
@@ -91,20 +92,31 @@ public class PresenceIndex extends RecoverableObject implements Presence {
 
     @Override
     public byte[] toByteArray(){
-        ByteBuffer buffer = ByteBuffer.allocate(16);
+        ByteBuffer buffer = ByteBuffer.allocate(24);
         buffer.putLong(timestamp);
         buffer.putDouble(balance);
+        buffer.putInt(counter);
+        buffer.putInt(disabled?1:0);
         return buffer.array();
     }
     @Override
     public void fromByteArray(byte[] data){
         ByteBuffer buffer = ByteBuffer.wrap(data);
         this.timestamp = buffer.getLong();
-        this.balance = buffer.getDouble();//new BigDecimal(buffer.getDouble()).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        this.balance = buffer.getDouble();
+        this.counter = buffer.getInt();
+        this.disabled = buffer.getInt()==1;
+    }
+    public int count(int delta){
+        this.disabled = false;
+        return (counter = counter + delta);
+    }
+    public boolean online(){
+        return (!this.disabled);
     }
     @Override
     public String toString(){
-        return "On Presence ["+this.distributionKey()+"/"+timestamp+"/"+balance+"]";
+        return "On Presence ["+this.distributionKey()+"/"+timestamp+"/"+balance+"/"+counter+"/"+disabled+"]";
     }
     @Override
     public Key key(){

@@ -36,7 +36,6 @@ public class UserEventHandler implements RequestHandler {
             String action = onExchange.header(Session.TARANTULA_ACTION);
             String  sid = onExchange.id();
             this._hex.put(sid,onExchange);
-            //logger.warn(">>>>>>"+action+"/"+path+"/"+magicKey);
             if(path.equals("/user/action")){
                 byte[] _payload = onExchange.payload();
                 RoutingKey routingKey = eventService.routingKey(magicKey!=null?(this.bucket+"/"+magicKey):(this.bucket+"/"+sid),tag);

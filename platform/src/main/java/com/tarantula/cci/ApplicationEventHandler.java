@@ -39,7 +39,7 @@ public class ApplicationEventHandler  implements RequestHandler {
             //String clientId = exchange.header(Session.X_REAL_IP)!=null?exchange.header(Session.X_REAL_IP):exchange.remoteAddress();
             String sid = exchange.id();
             this._hex.put(sid,exchange);
-            OnSession id = auth.validToken(token);
+            OnSession id = auth.validateToken(token);
             if(path.startsWith("/application/instance")){
                 ApplicationActionEvent magic = new ApplicationActionEvent(this.serverTopic,sid,id.systemId(),applicationId,instanceId,_payload);
                 magic.stub(id.stub());

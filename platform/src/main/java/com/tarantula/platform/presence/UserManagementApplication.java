@@ -7,8 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Developer: YINGHU LU
- * Updated 6/14/2019
+ * Updated 8/27/2019
  */
 public class UserManagementApplication extends TarantulaApplicationHeader{
 
@@ -56,7 +55,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             }
         }
         else if(session.action().equals("onTicket")){
-            if(this.context.validator().validTicket(session.systemId(),acc.stub(),acc.accessKey())){
+            if(this.context.validator().validateTicket(session.systemId(),acc.stub(),acc.accessKey())){
                 OnSession onSession = this.context.validator().token(session.systemId(),acc.stub());//web socket request
                 onSession.successful(true);
                 PresenceContext ptx = new PresenceContext();
@@ -84,7 +83,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         OnSession _onSession = OnSessionTrack.PASSWORD_NOT_MATCHED;
         if(this.context.dataStore("user").load(access)){
             access.routingNumber(session.routingNumber());
-            _onSession=this.context.validator().validPassword(access,password);
+            _onSession=this.context.validator().validatePassword(access,password);
             _onSession.systemId(systemId);
             ResponseHeader resp = new ResponseHeader(session.action(), "User [" + access.login() + "] signed in",true);
             postOffice.onLabel().send("presence/notice",this.builder.create().toJson(resp).getBytes());
@@ -102,7 +101,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             acc.active(this.activated);//if false do email validation
             acc.role("admin");
             if(ds.create(acc)){
-                this.context.log(acc.toString(),OnLog.INFO);
                 PresenceIndex px = new PresenceIndex(initialBalance);
                 px.distributionKey(acc.distributionKey());
                 this.context.dataStore("presence").create(px);
@@ -111,10 +109,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 _p.emailAddress("n/a");
                 _p.avatar("content/avatar/"+acc.distributionKey());
                 this.context.dataStore("profile").create(_p);
-                OnSession onSession = new OnSessionTrack();
-                onSession.oid(acc.oid());
-                onSession.bucket(acc.bucket());
-                this.context.dataStore("session").create(onSession);
                 session.systemId(acc.distributionKey());
                 ResponseHeader resp = new ResponseHeader(session.action(),"User [" + acc.login() + "] registered",true);
                 session.write(builder.create().toJson(resp).getBytes(),this.descriptor.responseLabel());

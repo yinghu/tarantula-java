@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * updated by yinghu lu on 7/2/19.
+ * updated by yinghu lu on 8/27/19.
  */
 public class SystemUtil {
 
@@ -73,24 +73,21 @@ public class SystemUtil {
             return false;
         }
     }
-    public static  String token(MessageDigest messageDigest, OnSession presence,int timeoutMinutes) {
+    public static  String token(MessageDigest messageDigest, String systemId,int stub,int timeoutMinutes) {
         //{systemId} {ticket}-{routing}-{stub}-{cid}-{start}-{hash}
         //ticket=> {tarantula} {stub} {end} {hash}
-        StringBuffer token = new StringBuffer(presence.systemId());
+        StringBuffer token = new StringBuffer(systemId);
         messageDigest.reset();
-        messageDigest.update(presence.systemId().getBytes());
-        messageDigest.update(Integer.toHexString(presence.stub()).getBytes());
+        messageDigest.update(systemId.getBytes());
+        messageDigest.update(Integer.toHexString(stub).getBytes());
         long start = SystemUtil.toUTCMilliseconds(LocalDateTime.now());
         messageDigest.update(Long.toHexString(start).getBytes());
         String hash = SystemUtil.toHexString(messageDigest.digest());
-        presence.ticket(SystemUtil.ticket(messageDigest,presence.systemId(),presence.stub(),timeoutMinutes*60));//assign a ticket
-        token.append(" ").append(presence.ticket());//0 embedded to token
-        //token.append("-").append(presence.routingNumber());
-        token.append("-").append(presence.stub());//1
-        //token.append("-").append("clientId");
+        String ticket = SystemUtil.ticket(messageDigest,systemId,stub,timeoutMinutes*60);//assign a ticket
+        token.append(" ").append(ticket);//0 embedded to token
+        token.append("-").append(stub);//1
         token.append("-").append(start); //2
         token.append("-").append(hash); //3
-        //System.out.println(">token<"+token.toString());
         return token.toString();
     }
     public  static OnSession validToken(MessageDigest messageDigest,String token) {
@@ -102,7 +99,6 @@ public class SystemUtil {
         messageDigest.reset();
         messageDigest.update(systemId.getBytes());//systemId
         messageDigest.update(Integer.toHexString(Integer.parseInt(vm[1])).getBytes());//stub
-        //messageDigest.update("clientId".getBytes());//client ID
         messageDigest.update(Long.toHexString(Long.parseLong(vm[2])).getBytes());//start
         if(SystemUtil.toHexString(messageDigest.digest()).equals(vm[3])){// hash
             return new OnSessionTrack(systemId,Integer.parseInt(vm[1]),vm[0]);

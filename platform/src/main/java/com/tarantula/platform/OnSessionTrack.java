@@ -17,10 +17,7 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     private String login;
     private String ticket;
 
-    private int totalSessions;
-    private int activeSessions;
-
-    public static final OnSession ON_SESSION_NOT_AVAILABLE = new OnSessionTrack("ON SESSION NOT AVAILABLE");
+    //public static final OnSession ON_SESSION_NOT_AVAILABLE = new OnSessionTrack("ON SESSION NOT AVAILABLE");
     public static final OnSession PASSWORD_NOT_MATCHED = new OnSessionTrack("PASSWORD NOT MATCHED");
 
     public OnSessionTrack(){
@@ -74,8 +71,8 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     @Override
     public byte[] toByteArray(){
         ByteBuffer buffer = ByteBuffer.allocate(20);
-        buffer.putInt(totalSessions);
-        buffer.putInt(activeSessions);
+        //buffer.putInt(totalSessions);
+        //buffer.putInt(activeSessions);
         buffer.putInt(stub);
         buffer.putLong(timestamp);
         return buffer.array();
@@ -83,8 +80,8 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     @Override
     public void fromByteArray(byte[] data){
         ByteBuffer buffer = ByteBuffer.wrap(data);
-        this.totalSessions = buffer.getInt();
-        this.activeSessions = buffer.getInt();
+        //this.totalSessions = buffer.getInt();
+        //this.activeSessions = buffer.getInt();
         this.stub = buffer.getInt();
         this.timestamp = buffer.getLong();
     }
@@ -108,29 +105,11 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         this.ticket = ticket;
     }
 
-    public boolean online(){
-        return activeSessions>0;
-    }
-
-    public int activeSessions(int delta){
-        this.activeSessions = activeSessions+(delta);
-        if(this.activeSessions<0){
-            activeSessions = 0;
-        }
-        if(delta>0){
-            totalSessions=totalSessions+delta;
-        }
-        return this.activeSessions;
-    }
-    public int totalSessions(){
-        return this.totalSessions;
-    }
-
     @Override
     public Key key(){
         return new AssociateKey(this.bucket,this.oid,this.vertex);
     }
     public String toString(){
-        return "TotalSession["+totalSessions+"]ActiveSessions["+activeSessions+"]Stub["+stub+"]";
+        return "OnSession->"+systemId+"/"+stub;
     }
 }

@@ -13,7 +13,7 @@ import java.util.Map;
 public class AccessTrack extends RecoverableObject implements Access {
 
     private String login;
-    private String password;
+    private String password;//hash of the password
     private boolean active;
     private String role;
     public AccessTrack(){

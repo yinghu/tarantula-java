@@ -8,8 +8,6 @@ import java.security.MessageDigest;
 
 public class SystemValidator implements Serviceable{
 
-    private DataStore dataStore;
-    //private ServiceContext tsc;
     private int timeoutMinutes;
     private int timeoutSeconds =10;
     private MessageDigest _messageDigest;
@@ -32,9 +30,7 @@ public class SystemValidator implements Serviceable{
     public void shutdown() throws Exception {
 
     }
-    //public void dataStore(DataStore dataStore){
-        //this.dataStore = dataStore;
-    //}
+
     public void systemValidatorProvider(SystemValidatorProvider systemValidatorProvider){
         this.systemValidatorProvider = systemValidatorProvider;
     }
@@ -48,10 +44,6 @@ public class SystemValidator implements Serviceable{
 
     }
 
-    public void setup(ServiceContext serviceContext){
-        this.dataStore = serviceContext.dataStore("session",serviceContext.partitionNumber());
-    }
-
     private class _TokenValidator implements TokenValidator{
 
         private final SystemValidator _singleton;
@@ -60,11 +52,8 @@ public class SystemValidator implements Serviceable{
             this._singleton = _singleton;
 
         }
-        private  String token(OnSession presence) {
-           return SystemUtil.token(messageDigest(),presence,timeoutMinutes);
-        }
         @Override
-        public OnSession validToken(String token) {
+        public OnSession validateToken(String token) {
             return SystemUtil.validToken(this._singleton.messageDigest(),token);
         }
         @Override
@@ -73,31 +62,19 @@ public class SystemValidator implements Serviceable{
             return SystemUtil.hashPassword(messageDigest,password);
         }
         @Override
-        public OnSession validPassword(Access hash, String password) {
-            if((SystemUtil.hashPassword(messageDigest(),password)).equals(hash.password())){
-                OnSession ox = new OnSessionTrack();
-                ox.distributionKey(hash.key().asString());
-                if(dataStore.load(ox)){
-                    OnSession _ox = new OnSessionTrack();
-                    _ox.distributionKey(ox.key().asString());
-                    _ox.systemId(hash.distributionKey());
-                    ox.stub(ox.stub()+1);
-                    _ox.stub(ox.stub());
-                    _ox.login(hash.login());
-                    _ox.routingNumber(hash.routingNumber());
-                    _ox.token(this.token(_ox));
-                    _ox.ticket(this.ticket(hash.distributionKey(),ox.stub()));
-                    _ox.successful(true);
-                    ox.activeSessions(1);
-                    ox.timestamp(System.currentTimeMillis());
-                    dataStore.update(ox);
-                    systemValidatorProvider.onSession(hash.key().asString());
-                    return _ox;
-                }
-                else{
-                    //max sessions reached
-                    return OnSessionTrack.ON_SESSION_NOT_AVAILABLE;
-                }
+        public OnSession validatePassword(Access access, String password) {
+            if((SystemUtil.hashPassword(messageDigest(),password)).equals(access.password())){
+                Presence presence = systemValidatorProvider.presence(access.distributionKey());
+                OnSession _ox = new OnSessionTrack();
+                _ox.systemId(access.distributionKey());
+                _ox.stub(presence.count(1));
+                _ox.login(access.login());
+                _ox.routingNumber(access.routingNumber());
+                _ox.token(SystemUtil.token(messageDigest(),access.distributionKey(),_ox.stub(),timeoutMinutes));
+                _ox.ticket(this.ticket(access.distributionKey(),_ox.stub()));
+                _ox.successful(true);
+                System.out.println(presence.toString());
+                return _ox;
             }
             else{
                 //return on failed password check
@@ -109,28 +86,18 @@ public class SystemValidator implements Serviceable{
             return SystemUtil.ticket(messageDigest(),input,stub,timeoutSeconds);
         }
         @Override
-        public boolean validTicket(String systemId, int stub, String ticket) {
+        public boolean validateTicket(String systemId, int stub, String ticket) {
             return SystemUtil.validTicket(messageDigest(),systemId,stub,ticket);
         }
         @Override
         public OnSession token(String systemId,int stub){
             OnSession onSession = new OnSessionTrack(systemId,stub);
-            onSession.token(SystemUtil.token(messageDigest(),onSession,timeoutMinutes));
+            onSession.token(SystemUtil.token(messageDigest(),systemId,stub,timeoutMinutes));
             return onSession;
         }
         @Override
-        public boolean onSession(String systemId, int stub,String ticket) {
-            return this.validTicket(systemId,stub,ticket);
-        }
-        @Override
         public void offSession(String systemId, int stub) {
-            OnSessionTrack offSession = new OnSessionTrack();
-            offSession.distributionKey(systemId);
-            if(dataStore.load(offSession)){
-                offSession.activeSessions(-1);
-                systemValidatorProvider.offSession(systemId);
-                dataStore.update(offSession);
-            }
+            systemValidatorProvider.offSession(systemId);
         }
     }
 }

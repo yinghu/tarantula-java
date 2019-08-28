@@ -11,20 +11,6 @@ public interface OnSession extends OnApplication,Response{
     String login();
     void login(String login);
 
-    double balance();
-    void balance(double balance);
-
     String ticket();
     void ticket(String ticket);
-
-    boolean online();
-    /**
-     * current active sessions
-     * */
-    int activeSessions(int delta);
-    /**
-     * total history sessions
-     * */
-    int totalSessions();
-
 }

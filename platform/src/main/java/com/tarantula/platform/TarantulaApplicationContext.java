@@ -79,7 +79,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     public void initializeOnApplication(Event me,OnInstance onApplication){//operate on on instance node
         try{
-            if(this.validator().validTicket(me.systemId(),me.stub(),me.ticket())){
+            if(this.validator().validateTicket(me.systemId(),me.stub(),me.ticket())){
                 onInstances.put(me.systemId(),onApplication);
                 _instance.entryCost(this.descriptor().entryCost());
                 if(onApplication.tournamentEnabled()){
@@ -125,7 +125,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
 	private void actOnApplication(Event me){//operate on instance ID node
         try{
-            if(this.validator().validTicket(me.systemId(),me.stub(),me.ticket())){
+            if(this.validator().validateTicket(me.systemId(),me.stub(),me.ticket())){
                 OnInstance onApplication = this.onInstances.get(me.systemId());
                 if(onApplication==null){
                     throw new IllegalArgumentException("access rejected from ["+me.systemId()+"]");//have to registered on application

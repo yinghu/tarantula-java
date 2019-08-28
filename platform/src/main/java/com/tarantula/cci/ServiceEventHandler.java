@@ -15,7 +15,6 @@ public class ServiceEventHandler implements RequestHandler {
 
     private EventService eventService;
     private TokenValidator auth;
-    //private AccessIndexService accessIndexService;
     private String serverTopic;
     private String bucket;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
@@ -33,14 +32,13 @@ public class ServiceEventHandler implements RequestHandler {
                 String action = exchange.header(Session.TARANTULA_ACTION);
                 String tag = exchange.header(Session.TARANTULA_TAG);
                 byte[]  _payload = exchange.payload();
-                //String clientId = exchange.header(Session.X_REAL_IP)!=null?exchange.header(Session.X_REAL_IP):exchange.remoteAddress();
                 String sid = exchange.id();
                 this._hex.put(sid,exchange);
                 if(path.startsWith("/service/action")){
                     OnSession id = new OnSessionTrack();//place holder for public access applications
                     RoutingKey routingKey = eventService.routingKey(this.bucket+"/"+sid,tag);
                     if((token!=null)&&(!token.equals("undefined"))){
-                        id = auth.validToken(token);//first entry point check
+                        id = auth.validateToken(token);//first entry point check
                         routingKey = eventService.routingKey(id.systemId(),tag);
                     }
                     ServiceActionEvent actionEvent = new ServiceActionEvent(this.serverTopic,sid,_payload);
@@ -52,7 +50,6 @@ public class ServiceEventHandler implements RequestHandler {
                     actionEvent.routingNumber(routingKey.routingNumber());
                     actionEvent.destination(routingKey.route());
                     actionEvent.streaming(exchange.streaming());
-                    //log.warn("Routing Number->"+actionEvent.routingNumber()+"/"+actionEvent.forwarding()+"/"+actionEvent.destination()+"/");
                     this.eventService.publish(actionEvent);
                 }
                 else{
@@ -88,12 +85,10 @@ public class ServiceEventHandler implements RequestHandler {
         }
         return true;
     }
-
     @Override
     public void setup(TokenValidator tokenValidator, EventService eventService, AccessIndexService accessIndexService,String bucket,DeploymentServiceProvider deploymentServiceProvider) {
         this.auth = tokenValidator;
         this.eventService = eventService;
-        //this.accessIndexService = accessIndexService;
         this.bucket = bucket;
     }
     public void onCheck(){
