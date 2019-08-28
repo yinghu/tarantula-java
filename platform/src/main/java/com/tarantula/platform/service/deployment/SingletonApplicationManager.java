@@ -14,7 +14,7 @@ public class SingletonApplicationManager extends DefaultApplication implements B
 
     private TarantulaApplicationContext singleton;
 
-    private int accessMode;
+    private int accessControl;
 
     public SingletonApplicationManager(TarantulaContext tarantulaContext, DeploymentDescriptor deploymentDescriptor){
         super(tarantulaContext,deploymentDescriptor);
@@ -24,10 +24,10 @@ public class SingletonApplicationManager extends DefaultApplication implements B
         super.start();
         DeploymentDescriptor dd = this.deploymentDescriptor.deploy(deploymentDescriptor.instanceId());
         dd.owner(dd.distributionKey());
-        accessMode = dd.accessMode();
+        accessControl = dd.accessControl();
         this.singleton = this.launch(dd,null);
         this.singleton._setup();//inject the app context proxy to decouple the TarantulaApplicationContext
-        if(accessMode!=Session.PRIVATE_ACCESS_MODE){
+        if(accessControl!=Access.PRIVATE_ACCESS_MODE){
             for(int r=0;r<this.tarantulaContext.platformRoutingNumber;r++){
                 StringBuffer bs = new StringBuffer(this.tarantulaContext.dataBucketGroup).append(Recoverable.PATH_SEPARATOR).append(singleton.descriptor().tag()).append(Recoverable.PATH_SEPARATOR).append(r);
                 this.tarantulaContext.integrationCluster.registerBucketReceiver(new ApplicationBucketReceiver(bs.toString(),r,this,this));
@@ -48,35 +48,35 @@ public class SingletonApplicationManager extends DefaultApplication implements B
         return false;
     }
     public boolean _onEvent(Event event){
-        switch (accessMode){
-            case Session.PUBLIC_ACCESS_MODE:
+        switch (accessControl){
+            case Access.PUBLIC_ACCESS_MODE:
                 this.singleton.onEvent(event);
                 break;
-            case Session.PROTECT_ACCESS_MODE:
+            case Access.PROTECT_ACCESS_MODE:
                 this.singleton.onEvent(event);
                 break;
-            case Session.FORWARD_ACCESS_MODE:
+            case Access.FORWARD_ACCESS_MODE:
                 //CHECKING FORWARD TICKET BEFORE CALL APPLICATION
                 this.singleton.onEvent(event);
                 break;
-            case Session.PRIVATE_ACCESS_MODE:
+            case Access.PRIVATE_ACCESS_MODE:
                 this.singleton.onEvent(event);
                 break;
             default:
                 //no access
-                this.singleton.onError(event,new IllegalAccessException("IllegalAccess ["+accessMode+"] on ["+event.toString()+"]"));
+                this.singleton.onError(event,new IllegalAccessException("IllegalAccess ["+accessControl+"] on ["+event.toString()+"]"));
                 break;
         }
         return true;
     }
     @Override
     public void onCallback(Event event) {
-        switch (accessMode){
-            case Session.PUBLIC_ACCESS_MODE:
+        switch (accessControl){
+            case Access.PUBLIC_ACCESS_MODE:
                 this.singleton.onRequestCallback(event);
                 break;
-            case Session.PROTECT_ACCESS_MODE:
-            case Session.FORWARD_ACCESS_MODE:
+            case Access.PROTECT_ACCESS_MODE:
+            case Access.FORWARD_ACCESS_MODE:
                 if(this.singleton.validator().validateTicket(event.systemId(),event.stub(),event.ticket())){
                     this.singleton.onRequestCallback(event);
                 }

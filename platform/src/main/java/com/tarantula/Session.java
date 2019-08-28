@@ -30,11 +30,6 @@ public interface Session extends OnApplication{
 
     int INSTANCE_PLAY_MODE = 4;
 
-    int PUBLIC_ACCESS_MODE = 10;
-    int PROTECT_ACCESS_MODE = 11;
-    int FORWARD_ACCESS_MODE = 12;
-
-    int PRIVATE_ACCESS_MODE = 13;
 
     String source();
     void source(String source);

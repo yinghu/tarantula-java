@@ -109,9 +109,11 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
     public int count(int delta){
         this.disabled = false;
+        this.timestamp = System.currentTimeMillis();
         return (counter = counter + delta);
     }
     public boolean online(){
+        this.timestamp = System.currentTimeMillis();
         return (!this.disabled);
     }
     @Override

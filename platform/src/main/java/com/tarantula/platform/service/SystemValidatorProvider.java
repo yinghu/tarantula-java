@@ -2,9 +2,11 @@ package com.tarantula.platform.service;
 
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.SystemValidator;
 
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SystemValidatorProvider implements TokenValidatorProvider {
@@ -17,6 +19,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     private ServiceContext serviceContext;
     private ConcurrentHashMap<String,Presence> pMap;
+    private HashMap<String,Access.Role> rMap;
     private DataStore dataStore;
     public TokenValidator tokenValidator(){
         return systemValidator.tokenValidator();
@@ -40,6 +43,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.timeoutInMinutes = minutes;
         this.timeoutInSeconds = seconds;
     }
+    public Access.Role role(String name){
+        return new AccessControl(name,10);
+    }
     @Override
     public String name() {
         return TokenValidatorProvider.NAME;
@@ -59,6 +65,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     @Override
     public void start() throws Exception {
         this.pMap = new ConcurrentHashMap<>();
+        this.rMap = new HashMap<>();
+        Access.Role admin = new AccessControl("admin",100);
+        Access.Role player = new AccessControl("player",100);
+        rMap.put(admin.name(),admin);
+        rMap.put(player.name(),player);
         this.systemValidator = new SystemValidator();
         this.systemValidator.systemValidatorProvider(this);
         this.systemValidator.timeout(this.timeoutInMinutes,this.timeoutInSeconds);

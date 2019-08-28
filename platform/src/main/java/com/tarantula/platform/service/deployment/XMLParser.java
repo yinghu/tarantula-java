@@ -110,8 +110,8 @@ public class XMLParser extends DefaultHandler{
             else if(tblock.equals("lobby-context")&&qname.equals("tag")){
                 this.configuration.descriptor.tag(value);
             }
-            else if(tblock.equals("lobby-context")&&qname.equals("access-mode")){
-                this.configuration.descriptor.accessMode(Integer.parseInt(value));
+            else if(tblock.equals("lobby-context")&&qname.equals("access-control")){
+                this.configuration.descriptor.accessControl(Integer.parseInt(value));
             }
 			else if(tblock.equals("lobby-context")&&qname.equals("description")){
 				this.configuration.descriptor.description(value);
@@ -174,8 +174,8 @@ public class XMLParser extends DefaultHandler{
             else if(tblock.equals("application-list")&&qname.equals("deploy-priority")){
                 this.applicationDescriptor.deployPriority(Integer.parseInt(value));
             }
-            else if(tblock.equals("application-list")&&qname.equals("access-mode")){
-                this.applicationDescriptor.accessMode(Integer.parseInt(value));
+            else if(tblock.equals("application-list")&&qname.equals("access-control")){
+                this.applicationDescriptor.accessControl(Integer.parseInt(value));
             }
 			else if(tblock.equals("application-list")&&qname.equals("description")){
 				this.applicationDescriptor.description(value);

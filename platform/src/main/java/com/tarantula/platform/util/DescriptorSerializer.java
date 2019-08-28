@@ -9,7 +9,7 @@ import com.tarantula.Descriptor;
 import java.lang.reflect.Type;
 
 /**
- * Updated by yinghu on 7/16/2019.
+ * Updated by yinghu on 8/28/2019.
  */
 public class DescriptorSerializer implements JsonSerializer<Descriptor> {
     public JsonElement serialize(Descriptor descriptor, Type type, JsonSerializationContext jsonSerializationContext) {
@@ -27,7 +27,7 @@ public class DescriptorSerializer implements JsonSerializer<Descriptor> {
         jo.addProperty("icon",descriptor.icon());
         jo.addProperty("viewId",descriptor.viewId());
         jo.addProperty("applicationId",descriptor.distributionKey());
-        jo.addProperty("accessMode",descriptor.accessMode());
+        jo.addProperty("accessControl",descriptor.accessControl());
         jo.addProperty("entryCost",descriptor.entryCost());
         jo.addProperty("entryCostAsString",SystemUtil.toCreditsString(descriptor.entryCost()));
         jo.addProperty("responseLabel",descriptor.responseLabel());

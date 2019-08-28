@@ -36,7 +36,7 @@ public class AdminSetupModule implements Module {
             desc.fromMap(SystemUtil.toMap(payload));
             desc.type("lobby");
             desc.subtypeId(desc.typeId()+"-lobby");
-            desc.accessMode(Session.PROTECT_ACCESS_MODE);
+            desc.accessControl(Access.PROTECT_ACCESS_MODE);
             desc.deployCode(1);
             desc.tag(desc.typeId()+Recoverable.PATH_SEPARATOR+"lobby");
             session.write(this.serviceProvider.createLobby(desc).getBytes(),this.label());

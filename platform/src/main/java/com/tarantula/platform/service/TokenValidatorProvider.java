@@ -1,5 +1,6 @@
 package com.tarantula.platform.service;
 
+import com.tarantula.Access;
 import com.tarantula.Presence;
 import com.tarantula.ServiceProvider;
 import com.tarantula.TokenValidator;
@@ -9,4 +10,6 @@ public interface TokenValidatorProvider extends ServiceProvider {
     TokenValidator tokenValidator();
     void timeout(int minutes,int seconds);
     Presence presence(String systemId);
+
+    Access.Role role(String name);
 }

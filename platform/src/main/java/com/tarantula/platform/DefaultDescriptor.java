@@ -15,7 +15,7 @@ abstract public class DefaultDescriptor extends DeploymentObject implements Desc
     protected String category;
     protected boolean singleton;
 
-    protected int accessMode;
+    protected int accessControl;
 
     protected String tag;
     protected double entryCost;
@@ -203,11 +203,11 @@ abstract public class DefaultDescriptor extends DeploymentObject implements Desc
     }
 
 
-    public int accessMode(){
-        return this.accessMode;
+    public int accessControl(){
+        return this.accessControl;
     }
-    public void accessMode(int accessMode){
-        this.accessMode = accessMode;
+    public void accessControl(int accessControl){
+        this.accessControl = accessControl;
     }
 
     public String tag(){
@@ -252,7 +252,7 @@ abstract public class DefaultDescriptor extends DeploymentObject implements Desc
         _props.put("capacity",this.capacity); //0 unlimited
         _props.put("category",this.category);
         _props.put("disabled",this.disabled);
-        _props.put("accessMode",this.accessMode);
+        _props.put("accessControl",this.accessControl);
         _props.put("deployCode",this.deployCode);
         _props.put("deployPriority",this.deployPriority);
         _props.put("codebase",this.codebase);
@@ -291,7 +291,7 @@ abstract public class DefaultDescriptor extends DeploymentObject implements Desc
         this.capacity=properties.get("capacity")!=null?((Number)properties.get("capacity")).intValue():0;
         this.category=properties.get("category")!=null?(String)properties.get("category"):null;
         this.disabled = properties.get("disabled")!=null?(boolean)properties.get("disabled"):false;
-        this.accessMode  = properties.get("accessMode")!=null?((Number)properties.get("accessMode")).intValue():12;
+        this.accessControl  = properties.get("accessControl")!=null?((Number)properties.get("accessControl")).intValue():12;
         this.moduleArtifact  = properties.get("moduleArtifact")!=null?(String) properties.get("moduleArtifact"):null;
         this.moduleVersion  = properties.get("moduleVersion")!=null?(String) properties.get("moduleVersion"):null;
         this.deployCode = properties.get("deployCode")!=null?((Number)properties.get("deployCode")).intValue():0;

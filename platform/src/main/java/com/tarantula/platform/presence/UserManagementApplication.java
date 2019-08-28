@@ -13,6 +13,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
 
     private String lobbyId;
     private boolean activated;
+    private String role = "player";
     private double initialBalance;
     private AccessIndexService accessIndexService;
     private PostOffice postOffice;
@@ -99,7 +100,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             acc.oid(_query.oid());
             acc.password(this.context.validator().hashPassword(payload.header("password")));
             acc.active(this.activated);//if false do email validation
-            acc.role("admin");
+            acc.role(role);
             if(ds.create(acc)){
                 PresenceIndex px = new PresenceIndex(initialBalance);
                 px.distributionKey(acc.distributionKey());

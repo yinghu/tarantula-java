@@ -73,7 +73,6 @@ public class SystemValidator implements Serviceable{
                 _ox.token(SystemUtil.token(messageDigest(),access.distributionKey(),_ox.stub(),timeoutMinutes));
                 _ox.ticket(this.ticket(access.distributionKey(),_ox.stub()));
                 _ox.successful(true);
-                System.out.println(presence.toString());
                 return _ox;
             }
             else{

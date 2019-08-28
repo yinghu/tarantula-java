@@ -4,7 +4,7 @@
         <type-id>index</type-id><!-- mapping to lobbyTypeId on application descriptor-->
         <type>lobby</type>
         <category>service</category>
-        <access-mode>10</access-mode>
+        <access-control>10</access-control>
         <name>Index</name>
         <description>Tarantula Lobby Index</description>
         <deploy-priority>125</deploy-priority>

@@ -4,7 +4,7 @@
         <type-id>presence</type-id>
         <type>lobby</type>
         <category>service</category>
-        <access-mode>11</access-mode>
+        <access-control>11</access-control>
         <name>presence</name>
         <description>Tarantula Presence Service</description>
         <deploy-priority>110</deploy-priority>

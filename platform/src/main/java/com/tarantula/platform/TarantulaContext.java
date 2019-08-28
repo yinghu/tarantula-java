@@ -214,7 +214,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     private void setApplicationManager(DeploymentDescriptor c,Lobby lb) throws Exception{
         if(c.singleton()){
             c.instanceId(UUID.randomUUID().toString());
-            c.accessMode(lb.descriptor().accessMode());
+            c.accessControl(lb.descriptor().accessControl());
             SingletonApplicationManager singletonApplicationManager = new SingletonApplicationManager(this,c);//pass the class loader
             this.availableApplicationManagers.put(c.distributionKey(),singletonApplicationManager);
             singletonApplicationManager.start();
@@ -263,7 +263,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         for (DeploymentDescriptor c : conf.applications) {
             this.setApplicationManager(c, lb);
         }
-        if(lb.descriptor().accessMode()==Session.PUBLIC_ACCESS_MODE){
+        if(lb.descriptor().accessControl()==Access.PUBLIC_ACCESS_MODE){
             this.mlobbyList.add(lb);
         }
         return _onLobby;

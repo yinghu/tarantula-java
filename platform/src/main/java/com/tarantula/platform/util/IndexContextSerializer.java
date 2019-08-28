@@ -1,9 +1,9 @@
 package com.tarantula.platform.util;
 
 import com.google.gson.*;
+import com.tarantula.Access;
 import com.tarantula.Descriptor;
 import com.tarantula.Lobby;
-import com.tarantula.Session;
 import com.tarantula.platform.presence.IndexContext;
 
 import java.lang.reflect.Type;
@@ -25,7 +25,7 @@ public class IndexContextSerializer implements JsonSerializer<IndexContext> {
                 JsonObject jlobby = new JsonObject();
                 jlobby.add("descriptor",ser.serialize(lobby.descriptor(),type,jsonSerializationContext));
                 JsonArray jlist = new JsonArray();
-                if(lobby.descriptor().accessMode()== Session.PUBLIC_ACCESS_MODE){
+                if(lobby.descriptor().accessControl()== Access.PUBLIC_ACCESS_MODE){
                     for(Descriptor d : lobby.entryList()){
                         //add application list
                         jlist.add(ser.serialize(d,type,jsonSerializationContext));

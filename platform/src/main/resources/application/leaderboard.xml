@@ -5,7 +5,7 @@
         <type>lobby</type>
         <category>service</category>
         <name>Leaderboard</name>
-        <access-mode>12</access-mode>
+        <access-control>12</access-control>
         <description>Tarantula LeaderBoard Service</description>
         <deploy-priority>100</deploy-priority>
         <application-list>
