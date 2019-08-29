@@ -8,6 +8,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.ClusterProvider;
 import com.tarantula.DeploymentServiceProvider;
+import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.util.ConfigurationDeserializer;
 import com.tarantula.platform.util.ResponseDeserializer;
@@ -58,6 +59,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public String name() {
         return DeploymentServiceProvider.NAME;
+    }
+    public DataStoreProvider dataStoreProvider(){
+        return this.tarantulaContext.dataStoreProvider();
     }
     public Module module(Descriptor descriptor){
         if(descriptor.codebase()!=null){

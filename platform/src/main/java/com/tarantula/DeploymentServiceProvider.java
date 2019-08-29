@@ -1,5 +1,7 @@
 package com.tarantula;
 
+import com.tarantula.platform.service.DataStoreProvider;
+
 /**
  * Updated by yinghu lu on 6/15/2019.
  */
@@ -47,6 +49,8 @@ public interface DeploymentServiceProvider extends ServiceProvider{
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
     String reset(Descriptor descriptor);
     //END OF MODULE OPERATION API
+
+    DataStoreProvider dataStoreProvider();
 
 
 }

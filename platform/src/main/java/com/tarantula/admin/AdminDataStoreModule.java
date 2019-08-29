@@ -3,7 +3,6 @@ package com.tarantula.admin;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.DataStoreProvider;
 
 public class AdminDataStoreModule implements Module {
@@ -21,8 +20,7 @@ public class AdminDataStoreModule implements Module {
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         this.context.log(session.action(),OnLog.INFO);
         if(session.action().equals("onBackup")){
-            TarantulaContext tcx =TarantulaContext.getInstance();
-            DataStoreProvider dp = tcx.dataStoreProvider();
+            DataStoreProvider dp = deploymentServiceProvider.dataStoreProvider();
             dp.backup(Distributable.DATA_SCOPE);
         }
         session.write(payload,label());
