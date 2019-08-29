@@ -64,6 +64,7 @@ public class DeploymentDescriptor extends DefaultDescriptor{
         ins.subtypeId(this.subtypeId);
         ins.capacity(this.capacity);
         ins.accessControl(this.accessControl);
+        ins.accessMode(this.accessMode);
         ins.entryCost(this.entryCost);
         ins.tag(this.tag);
         ins.singleton(this.singleton);

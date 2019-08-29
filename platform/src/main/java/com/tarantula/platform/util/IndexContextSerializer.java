@@ -25,7 +25,7 @@ public class IndexContextSerializer implements JsonSerializer<IndexContext> {
                 JsonObject jlobby = new JsonObject();
                 jlobby.add("descriptor",ser.serialize(lobby.descriptor(),type,jsonSerializationContext));
                 JsonArray jlist = new JsonArray();
-                if(lobby.descriptor().accessControl()== Access.PUBLIC_ACCESS_MODE){
+                if(lobby.descriptor().accessMode()== Access.PUBLIC_ACCESS_MODE){
                     for(Descriptor d : lobby.entryList()){
                         //add application list
                         jlist.add(ser.serialize(d,type,jsonSerializationContext));

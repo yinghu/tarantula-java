@@ -25,6 +25,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         this.lobbyId = configuration.property("lobbyId");
         this.activated = Boolean.parseBoolean(configuration.property("activated"));
         this.initialBalance = Double.parseDouble(configuration.property("initialBalance"));
+        this.role = configuration.property("roleName");
         builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         postOffice = this.context.postOffice();

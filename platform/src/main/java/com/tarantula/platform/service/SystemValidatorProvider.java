@@ -5,6 +5,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.SystemValidator;
+import com.tarantula.platform.presence.AccessTrack;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,7 +21,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private ServiceContext serviceContext;
     private ConcurrentHashMap<String,Presence> pMap;
     private HashMap<String,Access.Role> rMap;
-    private DataStore dataStore;
+    private DataStore pdataStore;
+    private DataStore udataStore;
     public TokenValidator tokenValidator(){
         return systemValidator.tokenValidator();
     }
@@ -28,8 +30,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return pMap.computeIfAbsent(systemId,(k)->{
             PresenceIndex px = new PresenceIndex();
             px.distributionKey(systemId);
-            dataStore.load(px);
-            px.dataStore(dataStore);
+            pdataStore.load(px);
+            px.dataStore(pdataStore);
             px.registerEventService(this.serviceContext.eventService(Distributable.INTEGRATION_SCOPE));
             return px;
         });
@@ -43,8 +45,18 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.timeoutInMinutes = minutes;
         this.timeoutInSeconds = seconds;
     }
-    public Access.Role role(String name){
-        return new AccessControl(name,10);
+    public Access.Role role(String systemId){
+        if(systemId==null){
+            return rMap.get("player");
+        }
+        Access acc = new AccessTrack();
+        acc.distributionKey(systemId);
+        if(udataStore.load(acc)){
+            return rMap.get(acc.role());
+        }
+        else{
+            return rMap.get("player");
+        }
     }
     @Override
     public String name() {
@@ -54,7 +66,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.dataStore =  this.serviceContext.dataStore("presence",this.serviceContext.partitionNumber());
+        this.pdataStore =  this.serviceContext.dataStore("presence",this.serviceContext.partitionNumber());
+        this.udataStore =  this.serviceContext.dataStore("user",this.serviceContext.partitionNumber());
     }
 
     @Override
@@ -66,8 +79,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void start() throws Exception {
         this.pMap = new ConcurrentHashMap<>();
         this.rMap = new HashMap<>();
-        Access.Role admin = new AccessControl("admin",100);
-        Access.Role player = new AccessControl("player",100);
+        Access.Role admin = new AccessControl("admin",Access.ADMIN_ACCESS_CONTROL);
+        Access.Role player = new AccessControl("player",Access.PLAYER_ACCESS_CONTROL);
         rMap.put(admin.name(),admin);
         rMap.put(player.name(),player);
         this.systemValidator = new SystemValidator();

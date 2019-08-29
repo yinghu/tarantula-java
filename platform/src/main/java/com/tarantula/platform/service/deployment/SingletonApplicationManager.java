@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.deployment;
 
 import com.tarantula.*;
+import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.TarantulaApplicationContext;
 import com.tarantula.platform.TarantulaContext;
@@ -14,7 +15,7 @@ public class SingletonApplicationManager extends DefaultApplication implements B
 
     private TarantulaApplicationContext singleton;
 
-    private int accessControl;
+    private static TarantulaLogger log = JDKLogger.getLogger(SingletonApplicationManager.class);
 
     public SingletonApplicationManager(TarantulaContext tarantulaContext, DeploymentDescriptor deploymentDescriptor){
         super(tarantulaContext,deploymentDescriptor);
@@ -24,10 +25,9 @@ public class SingletonApplicationManager extends DefaultApplication implements B
         super.start();
         DeploymentDescriptor dd = this.deploymentDescriptor.deploy(deploymentDescriptor.instanceId());
         dd.owner(dd.distributionKey());
-        accessControl = dd.accessControl();
         this.singleton = this.launch(dd,null);
         this.singleton._setup();//inject the app context proxy to decouple the TarantulaApplicationContext
-        if(accessControl!=Access.PRIVATE_ACCESS_MODE){
+        if(dd.accessMode()!=Access.PRIVATE_ACCESS_MODE){
             for(int r=0;r<this.tarantulaContext.platformRoutingNumber;r++){
                 StringBuffer bs = new StringBuffer(this.tarantulaContext.dataBucketGroup).append(Recoverable.PATH_SEPARATOR).append(singleton.descriptor().tag()).append(Recoverable.PATH_SEPARATOR).append(r);
                 this.tarantulaContext.integrationCluster.registerBucketReceiver(new ApplicationBucketReceiver(bs.toString(),r,this,this));
@@ -36,6 +36,14 @@ public class SingletonApplicationManager extends DefaultApplication implements B
         else{
             this.singleton.log("["+singleton.descriptor().tag()+"] has no public access",OnLog.WARN);
         }
+    }
+    @Override
+    public boolean checkAccessControl(Event event){
+        log.info(this.tarantulaContext.tokenValidatorProvider.role(event.systemId()).toString());
+        if(this.deploymentDescriptor.accessControl()>0){ //check if caller role has enough access control
+            return super.checkAccessControl(event)&&this.tarantulaContext.tokenValidatorProvider.role(event.systemId()).accessControl()>=this.deploymentDescriptor.accessControl();
+        }
+        return super.checkAccessControl(event);
     }
     @Override
     public boolean onEvent(Event event){

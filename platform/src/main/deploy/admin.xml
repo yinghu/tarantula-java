@@ -8,7 +8,7 @@
         <icon>assets/gear.png</icon>
         <view-id>game.lobby</view-id>
         <name>Admin</name>
-        <access-control>12</access-control>
+        <access-mode>12</access-mode>
         <deploy-code>1</deploy-code>
         <description>Tarantula Admin Service</description>
         <application-list>

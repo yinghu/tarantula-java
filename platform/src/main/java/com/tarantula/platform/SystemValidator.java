@@ -52,8 +52,8 @@ public class SystemValidator implements Serviceable{
             this._singleton = _singleton;
 
         }
-        public Access.Role role(String name){
-            return systemValidatorProvider.role(name);
+        public Access.Role role(String systemId){
+            return systemValidatorProvider.role(systemId);
         }
         @Override
         public OnSession validateToken(String token) {

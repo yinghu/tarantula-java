@@ -21,4 +21,7 @@ public class AccessControl implements Access.Role {
     public int accessControl() {
         return accessControl;
     }
+    public String toString(){
+        return "Role->"+name+"/"+accessControl;
+    }
 }

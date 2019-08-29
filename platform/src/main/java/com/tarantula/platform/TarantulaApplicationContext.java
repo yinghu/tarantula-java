@@ -39,7 +39,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     private DeltaStatistics onStatistics;
     private boolean logEnabled;
-    private TarantulaLogger logger;
+    private TarantulaLogger log;
 
     private TokenValidator validator;
 
@@ -77,32 +77,31 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         return oi;
     }
 
-    public void initializeOnApplication(Event me,OnInstance onApplication){//operate on on instance node
+    public boolean initializeOnInstance(Event me,OnInstance onApplication){//operate on on instance node
+        boolean suc = false;
         try{
-            //if(this.validator().validateTicket(me.systemId(),me.stub(),me.ticket())){
-                onInstances.put(me.systemId(),onApplication);
-                _instance.entryCost(this.descriptor().entryCost());
-                if(onApplication.tournamentEnabled()){
-                }
-                me.balance(onApplication.balance());
-                if((!onApplication.initialized())){//without calling auditor
-                    onApplication.initialized(true);
-                    this.application.initialize(me);//initialize on application
-                }
-                else{
-                    this.application.initialize(me);
-                }
-                onApplication.joined(me.joined());
-                onApplication.update();
-            //}
-            //else{
-                //throw new RuntimeException("session expired ["+me.ticket()+"]");
-            //}
+            onInstances.put(me.systemId(),onApplication);
+            _instance.entryCost(this.descriptor().entryCost());
+            me.balance(onApplication.balance());
+            if((!onApplication.initialized())){//without calling auditor
+                onApplication.initialized(true);
+                this.application.initialize(me);//initialize on application
+            }
+            else{
+                this.application.initialize(me);
+            }
+            onApplication.joined(me.joined());
+            onApplication.update();
+            suc = true;
         }catch (Exception ex){
-            ex.printStackTrace();
+            this.log("error on initializeOnInstance",ex,OnLog.ERROR);
             waitingList.offer(onApplication);
+            onApplication.joined(false);
+            onApplication.initialized(false);
+            onApplication.update();
             this.application.onError(me, ex);
         }
+        return suc;
     }
     public void onError(Event me,Exception ex){
         this.application.onError(me, ex);
@@ -132,7 +131,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         this.timed = this.duration>0;
         this.logEnabled = _descriptor.logEnabled();
         if(logEnabled){
-            this.logger = this.tarantulaContext.logger(this.application.getClass());
+            this.log = this.tarantulaContext.logger(this.application.getClass());
         }
         if(_descriptor.singleton()){ //per header per singleton
             DataStore ds = this.tarantulaContext.masterDataStore();
@@ -338,13 +337,13 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         if(this.logEnabled){
             switch (level){
                 case OnLog.DEBUG:
-                    this.logger.debug(message);
+                    this.log.debug(message);
                     break;
                 case OnLog.INFO:
-                    this.logger.info(message);
+                    this.log.info(message);
                     break;
                 case OnLog.WARN:
-                    this.logger.warn(message);
+                    this.log.warn(message);
                     break;
             }
         }
@@ -354,14 +353,14 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
             switch (level){
                 case OnLog.WARN:
                     if(error!=null){
-                        this.logger.warn(message);
+                        this.log.warn(message);
                     }
                     else{
-                        this.logger.warn(message,error);
+                        this.log.warn(message,error);
                     }
                     break;
                 case OnLog.ERROR:
-                    this.logger.error(message,error);
+                    this.log.error(message,error);
                     break;
             }
         }

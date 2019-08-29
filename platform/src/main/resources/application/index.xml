@@ -4,7 +4,7 @@
         <type-id>index</type-id><!-- mapping to lobbyTypeId on application descriptor-->
         <type>lobby</type>
         <category>service</category>
-        <access-control>10</access-control>
+        <access-mode>10</access-mode>
         <name>Index</name>
         <description>Tarantula Lobby Index</description>
         <deploy-priority>125</deploy-priority>
@@ -42,6 +42,7 @@
                     <property name="lobbyId">presence</property>
                     <property name="activated">true</property>
                     <property name="initialBalance">1000000</property>
+                    <property name="roleName">player</property>
                 </user>
             </configuration>
         </configuration-list>

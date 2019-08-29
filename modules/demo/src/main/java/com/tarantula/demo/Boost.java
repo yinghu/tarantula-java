@@ -28,6 +28,7 @@ public class Boost extends GameObject implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception{
         boolean leaving = false;
+        context.log("test update from module->"+session.action(),OnLog.INFO);
         if(session.action().equals("a")){
             byte[] ret = this.builder.create().toJson(timer).getBytes();
             session.write(ret,this.label());

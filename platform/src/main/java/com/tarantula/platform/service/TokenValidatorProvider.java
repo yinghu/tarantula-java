@@ -11,5 +11,5 @@ public interface TokenValidatorProvider extends ServiceProvider {
     void timeout(int minutes,int seconds);
     Presence presence(String systemId);
 
-    Access.Role role(String name);
+    Access.Role role(String systemId);
 }

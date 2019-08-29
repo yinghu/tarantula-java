@@ -16,6 +16,7 @@ abstract public class DefaultDescriptor extends DeploymentObject implements Desc
     protected boolean singleton;
 
     protected int accessControl;
+    protected int accessMode;
 
     protected String tag;
     protected double entryCost;
@@ -210,6 +211,13 @@ abstract public class DefaultDescriptor extends DeploymentObject implements Desc
         this.accessControl = accessControl;
     }
 
+    public int accessMode(){
+        return this.accessMode;
+    }
+    public void accessMode(int accessMode){
+        this.accessMode = accessMode;
+    }
+
     public String tag(){
         return this.tag;
     }
@@ -253,6 +261,7 @@ abstract public class DefaultDescriptor extends DeploymentObject implements Desc
         _props.put("category",this.category);
         _props.put("disabled",this.disabled);
         _props.put("accessControl",this.accessControl);
+        _props.put("accessMode",this.accessMode);
         _props.put("deployCode",this.deployCode);
         _props.put("deployPriority",this.deployPriority);
         _props.put("codebase",this.codebase);
@@ -292,6 +301,7 @@ abstract public class DefaultDescriptor extends DeploymentObject implements Desc
         this.category=properties.get("category")!=null?(String)properties.get("category"):null;
         this.disabled = properties.get("disabled")!=null?(boolean)properties.get("disabled"):false;
         this.accessControl  = properties.get("accessControl")!=null?((Number)properties.get("accessControl")).intValue():12;
+        this.accessMode  = properties.get("accessMode")!=null?((Number)properties.get("accessMode")).intValue():0;
         this.moduleArtifact  = properties.get("moduleArtifact")!=null?(String) properties.get("moduleArtifact"):null;
         this.moduleVersion  = properties.get("moduleVersion")!=null?(String) properties.get("moduleVersion"):null;
         this.deployCode = properties.get("deployCode")!=null?((Number)properties.get("deployCode")).intValue():0;

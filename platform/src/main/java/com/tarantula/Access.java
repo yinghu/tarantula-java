@@ -6,12 +6,11 @@ package com.tarantula;
 public interface Access extends Recoverable {
 
     int PUBLIC_ACCESS_MODE = 10;
-
-    int PROTECT_ACCESS_MODE = 11;
-
-    int FORWARD_ACCESS_MODE = 12;
-
+    int PROTECT_ACCESS_MODE = 12;
     int PRIVATE_ACCESS_MODE = 13;
+
+    int PLAYER_ACCESS_CONTROL = 0;
+    int ADMIN_ACCESS_CONTROL = 10;
 
 
     String login();

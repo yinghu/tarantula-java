@@ -27,7 +27,7 @@ public class DescriptorSerializer implements JsonSerializer<Descriptor> {
         jo.addProperty("icon",descriptor.icon());
         jo.addProperty("viewId",descriptor.viewId());
         jo.addProperty("applicationId",descriptor.distributionKey());
-        jo.addProperty("accessControl",descriptor.accessControl());
+        jo.addProperty("accessMode",descriptor.accessMode());
         jo.addProperty("entryCost",descriptor.entryCost());
         jo.addProperty("entryCostAsString",SystemUtil.toCreditsString(descriptor.entryCost()));
         jo.addProperty("responseLabel",descriptor.responseLabel());

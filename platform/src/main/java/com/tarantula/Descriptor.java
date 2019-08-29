@@ -60,6 +60,7 @@ public interface Descriptor extends Recoverable{
 
     boolean singleton(); //single instance per node
 
+    int accessMode();
     int accessControl(); // 0 - 10
 
     String tag(); //service deploy tag
@@ -81,7 +82,7 @@ public interface Descriptor extends Recoverable{
     void singleton(boolean singleton);
 
     void accessControl(int accessControl);
-
+    void accessMode(int accessMode);
     void tag(String tag);
     void entryCost(double entryCost);
 

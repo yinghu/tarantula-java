@@ -144,8 +144,9 @@ public class InstanceManager implements Instance {
         int ret = InstanceRegistry.INSTANCE_FULL;
         if(onInstance!=null){//check applicationId on event with deployment id
             ret = onInstance.initialized()?InstanceRegistry.ALREADY_ON_INSTANCE:InstanceRegistry.ON_INSTANCE;
-            tcx.initializeOnApplication(event,onInstance);
-            onInstanceListener.onUpdated(new OnInstanceTrack(event.systemId(),event.stub(),applicationManager.deploymentDescriptor.distributionKey(),onInstance.instanceId(),true));
+            if(tcx.initializeOnInstance(event,onInstance)){
+                onInstanceListener.onUpdated(new OnInstanceTrack(event.systemId(),event.stub(),applicationManager.deploymentDescriptor.distributionKey(),onInstance.instanceId(),true));
+            }
         }
         else{
             if(event.retries()>3&&instancesOnPartition.get()<this.applicationManager.deploymentDescriptor.maxInstancesPerPartition()){//check max instances per partition

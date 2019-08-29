@@ -5,7 +5,7 @@
         <type>lobby</type>
         <category>service</category>
         <name>Content</name>
-        <access-control>12</access-control>
+        <access-mode>12</access-mode>
         <description>Tarantula Content Service</description>
         <deploy-priority>100</deploy-priority>
         <application-list>
