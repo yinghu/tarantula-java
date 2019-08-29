@@ -43,6 +43,8 @@
                     <property name="activated">true</property>
                     <property name="initialBalance">1000000</property>
                     <property name="roleName">player</property>
+                    <property name="root">root</property>
+                    <property name="password">root</property>
                 </user>
             </configuration>
         </configuration-list>

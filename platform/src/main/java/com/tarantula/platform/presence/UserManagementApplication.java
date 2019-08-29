@@ -3,6 +3,8 @@ package com.tarantula.platform.presence;
 import com.tarantula.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.util.PresenceContextSerializer;
+import com.tarantula.platform.util.SystemUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +31,14 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         postOffice = this.context.postOffice();
+        String root = configuration.property("root");
+        String pwd = configuration.property("password");
+        OnAccess onAccess = new OnAccessTrack();
+        onAccess.header("login",root);
+        onAccess.header("password",pwd);
+        onAccess.header("nickname","super user");
+        DataStore ds = this.context.dataStore("user");
+        createLogin(onAccess, ds.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid(),"root");
         this.context.log("User management application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
     }
     @Override
@@ -70,7 +80,15 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             }
         }
         else if(session.action().equals("onRegister")){
-            this.register(session,acc);
+            Access access = this.createLogin(acc,session.systemId(),role);
+            if(access!=null){
+                session.systemId(access.distributionKey());
+                ResponseHeader resp = new ResponseHeader(session.action(),"User [" + access.login() + "] registered",true);
+                session.write(builder.create().toJson(resp).getBytes(),this.descriptor.responseLabel());
+            }
+            else{
+                session.write(builder.create().toJson(new ResponseHeader(session.action(),false,0,"login [" + acc.header("login") + "] cannot be registered","error")).getBytes(),this.descriptor.responseLabel());
+            }
         }
         else if(session.action().equals("onReset")){
             session.write(payload,this.descriptor.responseLabel());
@@ -92,34 +110,29 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         }
         return _onSession;
     }
-    private void register(Session session,OnAccess payload) throws Exception{
+    private Access createLogin(OnAccess payload,String systemId,String roleName){
+        this.context.log("User Create->"+payload.header("login")+"<>"+systemId,OnLog.INFO);
         DataStore ds = this.context.dataStore("user");
-        AccessIndex _query = accessIndexService.set(payload.header("login"),session.systemId());
-        if(_query!=null){
-            Access acc = new AccessTrack(_query.owner());
-            acc.bucket(_query.bucket());
-            acc.oid(_query.oid());
-            acc.password(this.context.validator().hashPassword(payload.header("password")));
-            acc.active(this.activated);//if false do email validation
-            acc.role(role);
-            if(ds.create(acc)){
-                PresenceIndex px = new PresenceIndex(initialBalance);
-                px.distributionKey(acc.distributionKey());
-                this.context.dataStore("presence").create(px);
-                ProfileTrack _p = new ProfileTrack(acc.bucket(),acc.oid());
-                _p.nickname(payload.header("nickname")!=null?payload.header("nickname"):acc.login());
-                _p.emailAddress("n/a");
-                _p.avatar("content/avatar/"+acc.distributionKey());
-                this.context.dataStore("profile").create(_p);
-                session.systemId(acc.distributionKey());
-                ResponseHeader resp = new ResponseHeader(session.action(),"User [" + acc.login() + "] registered",true);
-                session.write(builder.create().toJson(resp).getBytes(),this.descriptor.responseLabel());
-            }else{
-                session.write(builder.create().toJson(new ResponseHeader(session.action(),false,0,"login [" + acc.login() + "] cannot be registered","error")).getBytes(),this.descriptor.responseLabel());
-            }
+        AccessIndex _query = accessIndexService.set(payload.header("login"),systemId);
+        if(_query==null){
+            return null;
         }
-        else{
-            session.write(builder.create().toJson(new ResponseHeader(session.action(),false,0,"login [" + payload.header("login") + "] cannot be registered","error")).getBytes(),this.descriptor.responseLabel());
+        Access acc = new AccessTrack(_query.owner());
+        acc.bucket(_query.bucket());
+        acc.oid(_query.oid());
+        acc.password(this.context.validator().hashPassword(payload.header("password")));
+        acc.active(this.activated);//if false do email validation
+        acc.role(roleName);
+        if(ds.create(acc)){
+            PresenceIndex px = new PresenceIndex(initialBalance);
+            px.distributionKey(acc.distributionKey());
+            this.context.dataStore("presence").create(px);
+            ProfileTrack _p = new ProfileTrack(acc.bucket(),acc.oid());
+            _p.nickname(payload.header("nickname")!=null?payload.header("nickname"):acc.login());
+            _p.emailAddress("n/a");
+            _p.avatar("content/avatar/"+acc.distributionKey());
+            this.context.dataStore("profile").create(_p);
         }
+        return acc;
     }
 }

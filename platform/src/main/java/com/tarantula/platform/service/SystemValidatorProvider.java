@@ -79,8 +79,10 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void start() throws Exception {
         this.pMap = new ConcurrentHashMap<>();
         this.rMap = new HashMap<>();
+        Access.Role root = new AccessControl("root",Access.ROOT_ACCESS_CONTROL);
         Access.Role admin = new AccessControl("admin",Access.ADMIN_ACCESS_CONTROL);
         Access.Role player = new AccessControl("player",Access.PLAYER_ACCESS_CONTROL);
+        rMap.put(root.name(),root);
         rMap.put(admin.name(),admin);
         rMap.put(player.name(),player);
         this.systemValidator = new SystemValidator();
