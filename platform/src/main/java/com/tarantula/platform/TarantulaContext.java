@@ -56,7 +56,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 	public EndpointService endpointService;
 
   
-	public String serverTopic;
+	//private String serverTopic;
 
     private final ConcurrentHashMap<String,DefaultLobby> _lobbyMapping = new ConcurrentHashMap<>();
 
@@ -74,8 +74,9 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     public int tokenTimeout;
     public int ticketTimeout;
 
-    public TokenValidatorProvider tokenValidatorProvider;
-    public DeploymentServiceProvider deploymentServiceProvider;
+    private TokenValidatorProvider tokenValidatorProvider;
+    private DeploymentServiceProvider deploymentServiceProvider;
+
     public  String eventThreadPoolSetting;
 
     public int retries; //event retries
@@ -85,10 +86,10 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     public long operationRejectInterval;
 
 
-    public ConcurrentHashMap<String,ServiceProvider> serviceProviders = new ConcurrentHashMap();
-    private ConcurrentHashMap<String,ServiceProvider> dataStoreProviders = new ConcurrentHashMap();
-    public ConcurrentHashMap<String,List<Configuration>> configurations = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,ServiceProvider> serviceProviders = new ConcurrentHashMap();
+    private final ConcurrentHashMap<String,ServiceProvider> dataStoreProviders = new ConcurrentHashMap();
+    private final ConcurrentHashMap<String,List<Configuration>> configurations = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
 
 
     public String serviceConfiguration;
@@ -293,7 +294,9 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     public DeploymentServiceProvider deploymentService(){
  	    return this.deploymentServiceProvider;
     }
-
+    public TokenValidatorProvider tokenValidatorProvider(){
+ 	    return this.tokenValidatorProvider;
+    }
     public synchronized void setOnLobby(String typeId,OnLobby.Listener listener){
         if(this._lobbyMapping.containsKey(typeId)){
             return;
@@ -476,8 +479,20 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         }
         return _slist;
     }
+    public List<Configuration> configurations(String name){
+ 	    return this.configurations.get(name);
+    }
     public ServiceProvider serviceProvider(String name){
         return this.serviceProviders.get(name);
+    }
+    public void serviceProvider(ServiceProvider serviceProvider){
+ 	    this.serviceProviders.put(serviceProvider.name(),serviceProvider);
+    }
+    public void _setup(){
+        this.serviceProviders.forEach((k,v)->{ //synchronize data and setup
+            v.setup(this);
+            v.waitForData();//block for global data sync
+        });
     }
     public boolean deployServiceProvider(ServiceProvider serviceProvider){
         try{

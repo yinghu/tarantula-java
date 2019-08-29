@@ -46,6 +46,6 @@ public class TarantulaApplicationDeployer implements Serviceable{
 		
 	}
 	private void onLobby(OnLobby deployed){
-		this.context.deploymentServiceProvider.deploy(deployed);
+		this.context.deploymentService().deploy(deployed);
 	}
 }

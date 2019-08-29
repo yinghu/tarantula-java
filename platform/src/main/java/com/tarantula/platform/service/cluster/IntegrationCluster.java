@@ -90,7 +90,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             wlist.add(ese);
             this.inboundEventPool.execute(ese);
         }
-        this.tarantulaContext.serverTopic = this.bucket;
+        //this.tarantulaContext.serverTopic = this.bucket;
         config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         this.config.getListenerConfigs().add(new ListenerConfig(this));
         _cluster = Hazelcast.newHazelcastInstance(this.config);
@@ -98,7 +98,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         mIndex = this._cluster.getMultiMap(INDEX_MAP);
         vMap = this._cluster.getMap(VALUE_MAP);
         AccessIndexService accessIndexService =_cluster.getDistributedObject(AccessIndexService.NAME,AccessIndexService.NAME);
-        this.tarantulaContext.serviceProviders.put(accessIndexService.name(),accessIndexService);
+        this.tarantulaContext.serviceProvider(accessIndexService);
         this.memberId = this._cluster.getCluster().getLocalMember().getUuid();
         this.subscribe(this.memberId,this);
         this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);

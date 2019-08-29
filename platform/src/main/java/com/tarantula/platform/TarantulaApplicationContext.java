@@ -126,7 +126,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 	}
 
     public void _setup() throws Exception{
-        this.validator = this.tarantulaContext.tokenValidatorProvider.tokenValidator();
+        this.validator = this.tarantulaContext.tokenValidatorProvider().tokenValidator();
         this.duration = _descriptor.runtimeDurationOnInstance();
         this.timed = this.duration>0;
         this.logEnabled = _descriptor.logEnabled();
@@ -223,7 +223,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         return this.tarantulaContext.schedule(task);
     }
     public Presence presence(String systemId){ //always available on cluster scope if access is active
-        return this.tarantulaContext.tokenValidatorProvider.presence(systemId);
+        return this.tarantulaContext.tokenValidatorProvider().presence(systemId);
     }
 
     public void absence(Session session){
@@ -385,7 +385,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     }
 
     public PostOffice postOffice(){
-        return this.tarantulaContext.deploymentServiceProvider.registerPostOffice();
+        return this.tarantulaContext.deploymentService().registerPostOffice();
     }
     public void onTouch(Event event){
         try{

@@ -39,7 +39,7 @@ public class DefaultApplication implements Application {
         if(this.deploymentDescriptor.accessMode()==Access.PUBLIC_ACCESS_MODE){
             return true;
         }
-        return this.tarantulaContext.tokenValidatorProvider.tokenValidator().validateTicket(event.systemId(),event.stub(),event.ticket());
+        return this.tarantulaContext.tokenValidatorProvider().tokenValidator().validateTicket(event.systemId(),event.stub(),event.ticket());
     }
     @Override
     public Descriptor descriptor() {
@@ -49,7 +49,7 @@ public class DefaultApplication implements Application {
     @Override
     public void start() throws Exception{
         if(this.deploymentDescriptor.configurationName()!=null){
-            List<Configuration> clist = this.tarantulaContext.configurations.get(this.deploymentDescriptor.configurationName());
+            List<Configuration> clist = this.tarantulaContext.configurations(this.deploymentDescriptor.configurationName());
             if(clist!=null){
                 clist.forEach((c)->{
                     this.configurations.put(c.type(),c);
@@ -63,7 +63,7 @@ public class DefaultApplication implements Application {
     public void shutdown() throws Exception {
         onAvailable.forEach((String k,InstanceRegistry ir)->{
             ir.disabled(true);
-            this.tarantulaContext.deploymentServiceProvider.deploy(ir);
+            this.tarantulaContext.deploymentService().deploy(ir);
         });
         onAvailable.clear();
         log.warn("Application ["+this.deploymentDescriptor.name()+"/"+this.deploymentDescriptor.distributionKey()+"] shutdown");
@@ -72,7 +72,7 @@ public class DefaultApplication implements Application {
        InstanceRegistry ir = onAvailable.remove(instanceId);
        ir.disabled(true);
        this.tarantulaContext.masterDataStore().update(ir);
-       this.tarantulaContext.deploymentServiceProvider.deploy(ir);
+       this.tarantulaContext.deploymentService().deploy(ir);
        log.warn("Instance ["+ir.distributionKey()+"] unloaded");
     }
     private InstanceIndex _loadIndex(String rid){
@@ -127,7 +127,7 @@ public class DefaultApplication implements Application {
            if(v.routingNumber()==instance.partition()){
                v.typeId(this.deploymentDescriptor.typeId());
                v.subtypeId(this.deploymentDescriptor.tag());
-               this.tarantulaContext.deploymentServiceProvider.deploy(v);
+               this.tarantulaContext.deploymentService().deploy(v);
                instance.onPartition(k);
            }
        });
@@ -137,7 +137,7 @@ public class DefaultApplication implements Application {
         if(instanceRegistry!=null){
             instanceRegistry.typeId(this.deploymentDescriptor.typeId());
             instanceRegistry.subtypeId(this.deploymentDescriptor.tag());
-            this.tarantulaContext.deploymentServiceProvider.deploy(instanceRegistry);
+            this.tarantulaContext.deploymentService().deploy(instanceRegistry);
             instance.onPartition(instanceRegistry.distributionKey());
             return true;
         }

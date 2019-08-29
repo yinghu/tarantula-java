@@ -1,10 +1,10 @@
 package com.tarantula.admin;
 
 import com.google.gson.GsonBuilder;
-import com.tarantula.ApplicationContext;
+import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.OnLog;
-import com.tarantula.Session;
+import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.DataStoreProvider;
 
 public class AdminDataStoreModule implements Module {
 
@@ -12,6 +12,7 @@ public class AdminDataStoreModule implements Module {
     private GsonBuilder builder;
     private AdminDataStoreObject dbObject;
 
+    private DeploymentServiceProvider deploymentServiceProvider;
     public void onJoin(Session session) throws Exception{
          session.write(this.builder.create().toJson(dbObject).getBytes(),label());
     }
@@ -19,6 +20,11 @@ public class AdminDataStoreModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         this.context.log(session.action(),OnLog.INFO);
+        if(session.action().equals("onBackup")){
+            TarantulaContext tcx =TarantulaContext.getInstance();
+            DataStoreProvider dp = tcx.dataStoreProvider();
+            dp.backup(Distributable.DATA_SCOPE);
+        }
         session.write(payload,label());
         return session.action().equals("onLeave");
     }
@@ -29,6 +35,7 @@ public class AdminDataStoreModule implements Module {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(AdminDataStoreObject.class,new AdminObjectSerializer());
         this.dbObject = new AdminDataStoreObject(this.label());
+        this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.context.log("Admin data store module started", OnLog.INFO);
     }
 

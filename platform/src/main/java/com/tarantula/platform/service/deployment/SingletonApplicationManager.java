@@ -46,7 +46,7 @@ public class SingletonApplicationManager extends DefaultApplication implements B
         return super.checkAccessControl(event);
     }
     private boolean checkRole(Event event){
-        return this.tarantulaContext.tokenValidatorProvider.role(event.systemId()).accessControl()>=this.deploymentDescriptor.accessControl();
+        return this.tarantulaContext.tokenValidatorProvider().role(event.systemId()).accessControl()>=this.deploymentDescriptor.accessControl();
     }
     @Override
     public boolean onEvent(Event event){
