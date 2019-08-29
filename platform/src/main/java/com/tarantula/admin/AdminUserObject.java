@@ -4,12 +4,12 @@ import com.tarantula.ApplicationContext;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AdminMonitorObject extends AdminObject {
+public class AdminUserObject extends AdminObject {
 
     public ConcurrentHashMap<String,Long> kv = new ConcurrentHashMap<>();
     public ApplicationContext context;
 
-    public AdminMonitorObject(String label){
+    public AdminUserObject(String label){
         super(label);
     }
     public void reset(){

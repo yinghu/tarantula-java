@@ -26,7 +26,7 @@
         let wp = wsize();
         pConfirmation.message('Are you sure to leave the game?');
         pConfirmation.yes.button.command = function(){
-                AdminMonitor.leave((resp)=>{console.log(resp);});
+                AdminUser.leave((resp)=>{console.log(resp);});
                 TGL.shutdown();
                 normalscreen();
                 document.querySelector("#m2").innerHTML="";
@@ -46,7 +46,7 @@
     
     let commandList = UI.textCommandList(1,160);
     commandList.list[0].title('Reset');
-    commandList.list[0].button.command = function(){AdminMonitor.reset();};
+    commandList.list[0].button.command = function(){AdminUser.reset();};
     
     pView.container.addChild(commandList.container);
     
@@ -64,7 +64,7 @@
     
     
     //swap, server push callback, game setup
-    AdminMonitor.start(()=>{
+    AdminUser.start(()=>{
          _scb_scale();
     },(jx)=>{
         console.log(jx);

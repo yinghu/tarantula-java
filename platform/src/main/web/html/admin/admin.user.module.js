@@ -1,4 +1,4 @@
-var AdminMonitor = (function(){
+var AdminUser = (function(){
     
     let sw;
     let adminObject;

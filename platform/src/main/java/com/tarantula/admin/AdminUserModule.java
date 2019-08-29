@@ -6,11 +6,11 @@ import com.tarantula.Module;
 import com.tarantula.OnLog;
 import com.tarantula.Session;
 
-public class AdminMonitorModule implements Module {
+public class AdminUserModule implements Module {
 
     private ApplicationContext context;
     private GsonBuilder builder;
-    private AdminMonitorObject dbObject;
+    private AdminUserObject dbObject;
 
     public void onJoin(Session session) throws Exception{
         session.write(this.builder.create().toJson(dbObject).getBytes(),label());
@@ -27,15 +27,15 @@ public class AdminMonitorModule implements Module {
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(AdminMonitorObject.class,new AdminObjectSerializer());
-        this.dbObject = new AdminMonitorObject(this.label());
-        this.context.log("Admin monitor module started", OnLog.INFO);
+        this.builder.registerTypeAdapter(AdminUserObject.class,new AdminObjectSerializer());
+        this.dbObject = new AdminUserObject(this.label());
+        this.context.log("Admin user module started", OnLog.INFO);
     }
     public void onTimer(OnUpdate update){
         update.on(this.builder.create().toJson(dbObject).getBytes());
     }
     @Override
     public String label() {
-        return "admin-monitor";
+        return "admin-user";
     }
 }

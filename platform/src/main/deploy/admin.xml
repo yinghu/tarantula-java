@@ -28,15 +28,15 @@
             <application>
                 <type-id>admin</type-id>
                 <subtype-id>admin-tool</subtype-id>
-                <view-id>admin.monitor</view-id>
-                <name>Monitor</name>
+                <view-id>admin.user</view-id>
+                <name>User</name>
                 <type>application</type>
                 <category>admin</category>
                 <singleton>true</singleton>
-                <tag>admin/monitor</tag>
-                <description>Tarantula Monitor Service</description>
+                <tag>admin/user</tag>
+                <description>Tarantula User Service</description>
                 <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
-                <module-name>com.tarantula.admin.AdminMonitorModule</module-name>
+                <module-name>com.tarantula.admin.AdminUserModule</module-name>
                 <entry-cost>0</entry-cost>
                 <capacity>10</capacity>
                 <deploy-priority>10</deploy-priority>
@@ -93,11 +93,11 @@
                 <property name="moduleName">AdminDataStore</property>
                 <property name="moduleResourceFile">html/admin/admin.data.store.view.html</property>
             </view>
-            <view type="admin.monitor">
+            <view type="admin.user">
                 <property name="flag">HD2</property>
-                <property name="moduleFile">html/admin/admin.monitor.module.js</property>
-                <property name="moduleName">AdminMonitor</property>
-                <property name="moduleResourceFile">html/admin/admin.monitor.view.html</property>
+                <property name="moduleFile">html/admin/admin.user.module.js</property>
+                <property name="moduleName">AdminUser</property>
+                <property name="moduleResourceFile">html/admin/admin.user.view.html</property>
             </view>
             <view type="admin.add.lobby">
                 <property name="flag">HD2</property>

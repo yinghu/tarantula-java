@@ -14,6 +14,7 @@
     let pmessage = UI.confirmation();
     pmessage.close();
     pmessage.yes.button.command = function(){pmessage.close();};
+    pmessage.no.button.command = function(){pmessage.close();};
     let pexit = UI.exit();
     pexit.hide();
     pexit.close.icon.texture = PIXI.Texture.from('assets/close.png');
