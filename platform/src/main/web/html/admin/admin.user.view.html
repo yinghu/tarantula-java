@@ -1,11 +1,11 @@
 <div class="tx-modal-content">
-    <canvas id="tx-scb-canvas"></canvas>              
+    <canvas id="tx-admin-user-canvas"></canvas>              
 </div>
 <script>
     let gameObject ={};
     let wz = wsize();
     let sc = wz.scale;
-    app = TGL.start(wz.width,wz.height,document.querySelector("#tx-scb-canvas")); 
+    app = TGL.start(wz.width,wz.height,document.querySelector("#tx-admin-user-canvas")); 
     let devTitle = UI.text('Under Developing',{fontWeight: 600,fontFamily:'Oswald, Arial',fontSize:32,fill:'0xD1BC22'});
     let pView = TGL.container();
     pView.container.addChild(devTitle.container);
@@ -44,19 +44,22 @@
     }; 
     cm.button.icon.texture = PIXI.Texture.from('assets/table.png');
     
-    let commandList = UI.textCommandList(1,160);
-    commandList.list[0].title('Reset');
-    commandList.list[0].button.command = function(){AdminUser.reset();};
+    let commandList = UI.textCommandList(2,160);
+    commandList.list[0].title('Add User');
+    commandList.list[0].button.command = function(){
+        _view({viewId:'admin.add.user',containerId:'#m3'});
+    };
+    commandList.list[1].title('Update User');
+    commandList.list[1].button.command = function(){
+        _view({viewId:'admin.update.user',containerId:'#m3'});
+    };
+    
     
     pView.container.addChild(commandList.container);
     
-    
-    let statBoard = UI.statisticsBoard(8);
-    statBoard.lines[0].set('##','DataStore','Total Records');
     let nTitle = UI.text('Notification',{fontWeight: 500,fontFamily:'Oswald, Arial',fontSize:28,fill:'0xffffff'});
     
     pView.container.addChild(nTitle.container);
-    pView.container.addChild(statBoard.container);
     pView.container.addChild(cm.container);
     pView.container.addChild(menuBoard.container);
     pView.container.addChild(pConfirmation.container);
@@ -68,14 +71,6 @@
          _scb_scale();
     },(jx)=>{
         console.log(jx);
-        //statBoard.lines[1].set(1,'Tarantula',jx.Tarantula);
-        //statBoard.lines[2].set(2,'Presence',jx.Presence);
-        //statBoard.lines[3].set(3,'Session',jx.Session);
-        //statBoard.lines[4].set(4,'User',jx.User);
-        //statBoard.lines[5].set(5,'Profile',jx.Profile);
-        //statBoard.lines[6].set(6,'Level',jx.Level);
-        //statBoard.lines[7].set(7,'AccessIndex',jx.AccessIndex);
-        //statBoard.lines[8].set(8,"Total Records",jx.Total);
     },(g)=>{
        _scb_scale();       
     },(n)=>{    
@@ -88,7 +83,6 @@
         menuBoard.position(sc,5,5);
         cm.position(sc,5,5);
         commandList.position(sc,wz.width-commandList.width*sc-5,5); 
-        statBoard.position(sc,(wz.width-statBoard.width*sc)/2,(wz.height-statBoard.height*sc)/2);
         nTitle.position(sc,10,wz.height-nTitle.height*sc-10);
         devTitle.position(sc,cm.container.x+cm.width*sc+10,10);
     }

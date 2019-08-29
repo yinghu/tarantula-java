@@ -1,0 +1,66 @@
+<div class="w3-modal-content w3-white">
+    <div class="w3-card-4 tx-popup">
+        <div class="w3-bar w3-teal w3-text-white w3-border-bottom w3-border-orange">
+            <div class="w3-bar-item w3-left"><span>Update User</span></div>
+            <div class="w3-bar-item w3-right w3-button" id='tx-close-update-user'><i class='fa fa-close'></i></div>
+        </div>
+            
+        <div class="w3-container w3-text-teal w3-border-bottom w3-border-orange">
+            <div class="w3-panel">
+                <input id ="af_typeId" class="w3-input w3-round w3-border" type="text" placeholder='typeId'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="af_category" class="w3-input w3-round w3-border" type="text" placeholder='category'/>
+            </div>
+            <div class="w3-panel">
+                 <input id ="af_name" class="w3-input w3-round w3-border" type="text" placeholder='name'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="af_responseLabel" class="w3-input w3-round w3-border" type="text" placeholder='responseLabel'/>
+            </div>
+             <div class="w3-panel">
+                <input id ="af_icon" class="w3-input w3-round w3-border" type="text" placeholder='icon'/>
+            </div>
+            <div class="w3-panel">
+                 <input id ="af_viewId" class="w3-input w3-round w3-border" type="text" placeholder='viewId'/>
+            </div>
+            <div class="w3-panel">    
+                 <input id ="af_description" class="w3-input w3-round w3-border" type="text" placeholder='description'/>
+            </div>
+            <div class="w3-panel">
+                <p id="af_message"></p>
+            </div>
+            <div class="w3-panel">  
+                <div id="af_command_cancel" class="w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Cancel</div>
+                <div id="af_command" class="w3-right w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Add Lobby</div>     
+            </div>
+        </div>            
+        
+        <div class="w3-display-container w3-border-bottom w3-border-white w3-teal tx-content-36">
+            <div class="w3-display-bottomright tx-margin-right-32 tx-margin-bottom-4 tx-text-12">Powered By Game Engine Cluster</div>            
+        </div>
+    </div>
+</div>
+<script>
+ document.querySelector("#af_command").onclick = function(){
+    AdminSetup.addLobby(function(payload){
+        payload.typeId = document.querySelector('#a_typeId').value;
+        payload.category = document.querySelector('#a_category').value;
+        payload.name= document.querySelector('#a_name').value;
+        payload.responseLabel = document.querySelector('#a_responseLabel').value;
+        payload.viewId = document.querySelector('#a_viewId').value;
+        payload.icon= document.querySelector('#a_icon').value;
+        payload.description= document.querySelector('#a_description').value;
+    },function(resp){
+        document.querySelector("#af_message").innerHTML = resp.message;
+    });    
+ };
+ function tx_close_update_user(){
+     this.style.display = 'none';
+     let m1 = document.querySelector('#m3');
+     m1.innerHTML='';
+     m1.style.display = 'none';
+ }
+ document.querySelector("#tx-close-update-user").onclick = tx_close_update_user;
+ document.querySelector("#af_command_cancel").onclick = tx_close_update_user;   
+</script>

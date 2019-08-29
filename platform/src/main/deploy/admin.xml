@@ -99,6 +99,14 @@
                 <property name="moduleName">AdminUser</property>
                 <property name="moduleResourceFile">html/admin/admin.user.view.html</property>
             </view>
+            <view type="admin.add.user">
+                <property name="flag">HD2</property>
+                <property name="moduleResourceFile">html/admin/add.user.view.html</property>
+            </view>
+            <view type="admin.update.user">
+                <property name="flag">HD2</property>
+                <property name="moduleResourceFile">html/admin/update.user.view.html</property>
+            </view>
             <view type="admin.add.lobby">
                 <property name="flag">HD2</property>
                 <property name="moduleResourceFile">html/admin/add.lobby.view.html</property>

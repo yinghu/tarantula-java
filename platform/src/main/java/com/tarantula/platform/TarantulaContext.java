@@ -55,9 +55,6 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 	
 	private final EndpointService endpointService;
 
-  
-	//private String serverTopic;
-
     private final ConcurrentHashMap<String,DefaultLobby> _lobbyMapping = new ConcurrentHashMap<>();
 
 
