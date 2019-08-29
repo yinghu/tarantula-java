@@ -102,7 +102,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.memberId = this._cluster.getCluster().getLocalMember().getUuid();
         this.subscribe(this.memberId,this);
         this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);
-        this.tarantulaContext.tarantulaCluster.subscribe(this.memberId,this);
+        this.tarantulaContext.tarantulaCluster().subscribe(this.memberId,this);
         new ServiceBootstrap(this.tarantulaContext._deployServiceStarted,this.tarantulaContext._storageStarted,new StorageServiceBootstrap(this.tarantulaContext),"data-store-starter",true).start();
         new ServiceBootstrap(this.tarantulaContext._storageStarted,this.tarantulaContext._systemServiceStarted,new SystemServiceBootstrap(this.tarantulaContext),"system-service-starter",true).start();
     }

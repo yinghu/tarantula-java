@@ -50,10 +50,10 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
 	private static final String CONFIG_DATA = "hazelcast-bucket.xml";
     private static final String CONFIG_INTEGRATION = "hazelcast-integration.xml";
-	public TarantulaCluster tarantulaCluster;
-    public IntegrationCluster integrationCluster;
+	private TarantulaCluster tarantulaCluster;
+    private IntegrationCluster integrationCluster;
 	
-	public EndpointService endpointService;
+	private final EndpointService endpointService;
 
   
 	//private String serverTopic;
@@ -118,7 +118,8 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
     public String platformVersion;
     public int platformRoutingNumber;
-    public ScopedMemberDiscovery memberDiscovery;
+
+    public static ScopedMemberDiscovery memberDiscovery;
 
     public String authContext = "localhost";
 
@@ -479,6 +480,15 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         }
         return _slist;
     }
+    public EndpointService endpointService(){
+ 	    return this.endpointService;
+    }
+    public TarantulaCluster tarantulaCluster(){
+ 	    return tarantulaCluster;
+    }
+    public IntegrationCluster integrationCluster(){
+        return integrationCluster;
+    }
     public List<Configuration> configurations(String name){
  	    return this.configurations.get(name);
     }
@@ -511,8 +521,8 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         return JDKLogger.getLogger(target);
     }
 
-    public MemberDiscovery memberDiscovery(int scope){
- 	    this.memberDiscovery.scope(scope);
- 	    return this.memberDiscovery;
+    public static MemberDiscovery memberDiscovery(int scope){
+ 	    memberDiscovery.scope(scope);
+ 	    return memberDiscovery;
     }
 }

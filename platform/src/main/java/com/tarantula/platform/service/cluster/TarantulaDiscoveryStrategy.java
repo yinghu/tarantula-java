@@ -18,7 +18,6 @@ public class TarantulaDiscoveryStrategy extends AbstractDiscoveryStrategy {
 
     private int port;
     private int scope;
-    private TarantulaContext tarantulaContext;
 
     public TarantulaDiscoveryStrategy(ILogger logger, Map<String, Comparable> properties){
         super(logger,properties);
@@ -29,14 +28,13 @@ public class TarantulaDiscoveryStrategy extends AbstractDiscoveryStrategy {
     @Override
     public void start() {
         super.start();
-        this.tarantulaContext = TarantulaContext.getInstance();
     }
 
     @Override
     public Iterable<DiscoveryNode> discoverNodes() {
         try{
             Collection<DiscoveryNode> nlist = new ArrayList<>();
-            List<InetAddress> alist = tarantulaContext.memberDiscovery(this.scope).find();
+            List<InetAddress> alist = TarantulaContext.memberDiscovery(this.scope).find();
             alist.forEach((a)->{
                 Map<String,Object> props = new HashMap<>();
                 props.put("hostname",a.getHostName());

@@ -47,14 +47,14 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
     public void setup(){
         if(scope==Distributable.INTEGRATION_SCOPE){
-            this.tarantulaContext.integrationCluster.addEventListener(this.nodeEngine.getLocalMember().getUuid(),(e)->{
+            this.tarantulaContext.integrationCluster().addEventListener(this.nodeEngine.getLocalMember().getUuid(),(e)->{
                 log.warn(e.toString()+"["+this.scope+"]");
                 recover(e.source(),e.source(),true);
                 return false;
             });
         }
         else if(scope==Distributable.DATA_SCOPE){
-            this.tarantulaContext.tarantulaCluster.addEventListener(this.nodeEngine.getLocalMember().getUuid(),(e)->{
+            this.tarantulaContext.tarantulaCluster().addEventListener(this.nodeEngine.getLocalMember().getUuid(),(e)->{
                 log.warn(e.toString()+"["+scope+"]");
                 recover(e.source(),e.sessionId(),true);
                 return false;
@@ -84,10 +84,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
     private void _send(Event event){
         if(this.scope==Distributable.DATA_SCOPE){
-            this.tarantulaContext.tarantulaCluster.publish(event);
+            this.tarantulaContext.tarantulaCluster().publish(event);
         }
         else{
-            this.tarantulaContext.integrationCluster.publish(event);
+            this.tarantulaContext.integrationCluster().publish(event);
         }
     }
     private void _read(String fn, int c,int t, ReadableByteChannel vc,String destination,String registerId){
@@ -114,7 +114,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
     public void recover(String destination,String registerId,boolean fullBackup){
         DataStoreProvider dsp = this.tarantulaContext.dataStoreProvider();
-        String loc = this.scope==Distributable.DATA_SCOPE?this.tarantulaContext.tarantulaCluster.subscription():this.tarantulaContext.integrationCluster.subscription();
+        String loc = this.scope==Distributable.DATA_SCOPE?this.tarantulaContext.tarantulaCluster().subscription():this.tarantulaContext.integrationCluster().subscription();
         if(destination.equals(loc)){
             log.info("There is no need to recover from first node");
             MapStoreRecoveryEvent mre = new MapStoreRecoveryEvent(destination,"",new byte[0],registerId,0,0,0);
@@ -531,7 +531,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             }
             log.warn("partition updating on member added->["+pt+"/"+sz+"]"+lm.getUuid());
             for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
-                this.tarantulaContext.integrationCluster.onPartition(i,i%sz==pt);
+                this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
             }
         }
         this.deploymentServiceProvider.clusterUpdated(this.scope,membershipServiceEvent.getMember().getUuid(),true);
@@ -551,7 +551,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             }
             log.warn("partition updating on member removed->["+pt+"/"+sz+"]"+lm.getUuid());
             for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
-                this.tarantulaContext.integrationCluster.onPartition(i,i%sz==pt);
+                this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
             }
         }
         this.deploymentServiceProvider.clusterUpdated(this.scope,membershipServiceEvent.getMember().getUuid(),false);

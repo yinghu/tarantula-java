@@ -265,7 +265,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
                 this._tarantulaContext._tarantulaInstanceStarted.countDown();
                 break;
             case MERGING:
-                this._tarantulaContext.integrationCluster.onMerging();
+                this._tarantulaContext.integrationCluster().onMerging();
                 break;
             case MERGED:
                 //TarantulaContext.getInstance().integrationCluster.onMerged();

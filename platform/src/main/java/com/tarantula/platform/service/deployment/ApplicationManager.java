@@ -37,7 +37,7 @@ public class ApplicationManager extends DefaultApplication implements Scheduling
             InstanceManager pim = new InstanceManager(i,this);
             pim.start();
             managers[i]=pim;
-            this.tarantulaContext.integrationCluster.registerBucketReceiver(new ApplicationBucketReceiver(pim.routingKey(),i,pim,pim));
+            this.tarantulaContext.integrationCluster().registerBucketReceiver(new ApplicationBucketReceiver(pim.routingKey(),i,pim,pim));
         }
         this.duration = this.deploymentDescriptor.runtimeDuration();
         this.timed = this.duration>0;
@@ -53,7 +53,7 @@ public class ApplicationManager extends DefaultApplication implements Scheduling
             appSchedule.cancel(true);
         }
         for(InstanceManager pim : managers){
-            this.tarantulaContext.integrationCluster.unregisterBucketReceiver(pim.routingKey());
+            this.tarantulaContext.integrationCluster().unregisterBucketReceiver(pim.routingKey());
             pim.shutdown();
         }
         super.shutdown();

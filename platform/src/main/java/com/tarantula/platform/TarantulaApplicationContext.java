@@ -140,7 +140,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
             this.onStatistics.distributionKey(_descriptor.distributionKey());
             this.onStatistics.leaderBoardHeader(_descriptor.leaderBoardHeader());
             //this.onStatistics.distributable(true);
-            if(this.tarantulaContext.tarantulaCluster.load(this.onStatistics)||ds.load(this.onStatistics)){
+            if(this.tarantulaContext.tarantulaCluster().load(this.onStatistics)||ds.load(this.onStatistics)){
                 ds.createIfAbsent(this.onStatistics,false);
                 ds.list(new StatisticsEntryQuery(this.onStatistics.key().asString()),(e)->{
                     this.onStatistics.entry(e);
@@ -153,7 +153,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                 ds.create(this.onStatistics);
                 this.onStatistics.dataStore(this.dataStore());
             }
-            if(this.tarantulaContext.tarantulaCluster.load(this.onStatistics)){
+            if(this.tarantulaContext.tarantulaCluster().load(this.onStatistics)){
                 //logger.warn("Node only statistics ->"+this.onStatistics.key().asString());
             }
         }

@@ -101,7 +101,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
 
     private void onPartition(String memberId,int partition){
         DataStoreOnPartition dso = this.dataStoreOnPartitions[partition];
-        if(memberId.equals(this.tarantulaContext.integrationCluster.subscription())){
+        if(memberId.equals(this.tarantulaContext.integrationCluster().subscription())){
             dso.local.set(true);
             dso.enabled.set(true);
         }

@@ -62,7 +62,7 @@ public class TarantulaMain {
 				overriding = false;
 			}
 			TarantulaContext btx = TarantulaContext.getInstance();
-			btx.memberDiscovery = (ScopedMemberDiscovery) Class.forName(override(overriding,"tarantula.member.discovery.name",_user,_config)).getConstructor().newInstance();
+			TarantulaContext.memberDiscovery = (ScopedMemberDiscovery) Class.forName(override(overriding,"tarantula.member.discovery.name",_user,_config)).getConstructor().newInstance();
 			btx.platformVersion = override(overriding,"tarantula.platform.version",_user,_config);
 			btx.platformRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.routing.number",_user,_config));
 			btx.bootstrapRetries = Integer.parseInt(override(overriding,"tarantula.bootstrap.max.retries",_user,_config));
@@ -98,7 +98,7 @@ public class TarantulaMain {
 				se.port(Integer.parseInt(override(overriding,"tarantula.endpoint.socket.port",_user,_config)));
 				se.backlog(Integer.parseInt(override(overriding,"tarantula.endpoint.socket.backlog",_user,_config)));
 				se.inboundThreadPoolSetting(override(overriding,"tarantula.endpoint.socket.pool.in.setting",_user,_config));
-				btx.endpointService.addEndPoint(se);
+				btx.endpointService().addEndPoint(se);
 			}
 
 			boolean endpointEnabled = Boolean.parseBoolean(override(overriding,"tarantula.endpoint.http.enable",_user,_config));
@@ -108,7 +108,7 @@ public class TarantulaMain {
 				he.backlog(Integer.parseInt(override(overriding,"tarantula.endpoint.http.backlog",_user,_config)));
 				he.inboundThreadPoolSetting(override(overriding,"tarantula.endpoint.http.pool.in.setting",_user,_config));
 				he.port(Integer.parseInt(override(overriding,"tarantula.endpoint.http.port",_user,_config)));
-				btx.endpointService.addEndPoint(he);
+				btx.endpointService().addEndPoint(he);
 			}
 			btx.start();
 			hook = new ShutdownHook();
