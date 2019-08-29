@@ -111,12 +111,12 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         return _onSession;
     }
     private Access createLogin(OnAccess payload,String systemId,String roleName){
-        this.context.log("User Create->"+payload.header("login")+"<>"+systemId,OnLog.INFO);
         DataStore ds = this.context.dataStore("user");
         AccessIndex _query = accessIndexService.set(payload.header("login"),systemId);
         if(_query==null){
             return null;
         }
+        this.context.log("User Create->"+payload.header("login")+"<>"+systemId,OnLog.INFO);
         Access acc = new AccessTrack(_query.owner());
         acc.bucket(_query.bucket());
         acc.oid(_query.oid());

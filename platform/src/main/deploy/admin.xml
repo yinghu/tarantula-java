@@ -41,7 +41,7 @@
                 <capacity>10</capacity>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
-                <timer-on-module>5000</timer-on-module>
+                <access-control>30</access-control>
             </application>
             <application>
                 <type-id>admin</type-id>
@@ -59,6 +59,7 @@
                 <capacity>10</capacity>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
+                <access-control>20</access-control>
             </application>
             <application>
                 <type-id>admin</type-id>
@@ -76,7 +77,7 @@
                 <capacity>10</capacity>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
-                <timer-on-module>5000</timer-on-module>
+                <access-control>10</access-control>
             </application>
         </application-list>
         <view-list>

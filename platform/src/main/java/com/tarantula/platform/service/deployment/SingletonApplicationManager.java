@@ -39,11 +39,14 @@ public class SingletonApplicationManager extends DefaultApplication implements B
     }
     @Override
     public boolean checkAccessControl(Event event){
-        log.info(this.tarantulaContext.tokenValidatorProvider.role(event.systemId()).toString());
+        //log.info(this.tarantulaContext.tokenValidatorProvider.role(event.systemId()).toString());
         if(this.deploymentDescriptor.accessControl()>0){ //check if caller role has enough access control
-            return super.checkAccessControl(event)&&this.tarantulaContext.tokenValidatorProvider.role(event.systemId()).accessControl()>=this.deploymentDescriptor.accessControl();
+            return super.checkAccessControl(event)&&checkRole(event);
         }
         return super.checkAccessControl(event);
+    }
+    private boolean checkRole(Event event){
+        return this.tarantulaContext.tokenValidatorProvider.role(event.systemId()).accessControl()>=this.deploymentDescriptor.accessControl();
     }
     @Override
     public boolean onEvent(Event event){
@@ -57,7 +60,12 @@ public class SingletonApplicationManager extends DefaultApplication implements B
                 }
             }
             else{
-                this.singleton.onEvent(event);
+                if(checkRole(event)){
+                    this.singleton.onEvent(event);
+                }
+                else{
+                    throw new IllegalAccessException("Illegal access ->"+deploymentDescriptor.tag());
+                }
             }
         }catch (Exception ex){
             this.singleton.onError(event,ex);
