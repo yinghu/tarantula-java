@@ -1,4 +1,8 @@
 # gameenginecluster
 A scaling, fault-tolerant, asynchronous event server less game module integration platform.
 
-[See platform architecture document](doc/gec-summary.pdf)
+[Platform architecture document](doc/gec-summary.pdf)
+
+[Module document](doc/gec-module.pdf)
+
+[Setup document](doc/setup.txt)
