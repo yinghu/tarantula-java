@@ -6,7 +6,8 @@
     let wz = wsize();
     let sc = wz.scale;
     app = TGL.start(wz.width,wz.height,document.querySelector("#tx-scb-canvas")); 
-    let devTitle = UI.text('Under Developing',{fontWeight: 600,fontFamily:'Oswald, Arial',fontSize:32,fill:'0xD1BC22'});
+    let devTitle = UI.text('Data Store Admin Tool',{fontWeight: 600,fontFamily:'Oswald, Arial',fontSize:32,fill:'0xD1BC22'});
+    let nTitle = UI.text('Notification',{fontWeight: 500,fontFamily:'Oswald, Arial',fontSize:28,fill:'0xffffff'});
     let pView = TGL.container();
     pView.container.addChild(devTitle.container);
     let pConfirmation = UI.confirmation();
@@ -44,16 +45,38 @@
     }; 
     cm.button.icon.texture = PIXI.Texture.from('assets/table.png');
     
-    let commandList = UI.textCommandList(2,160);
-    commandList.list[0].title('Query');
-    commandList.list[0].button.command = function(){AdminDataStore.query();};
-    commandList.list[1].title('Backup');
-    commandList.list[1].button.command = function(){AdminDataStore.backup();};  
-    pView.container.addChild(commandList.container);
-    
     let statBoard = UI.statisticsBoard(8);
+    statBoard.command = ()=>{};
     statBoard.lines[0].set('##','DataStore','Total Records');
-    let nTitle = UI.text('Notification',{fontWeight: 500,fontFamily:'Oswald, Arial',fontSize:28,fill:'0xffffff'});
+    
+    let commandList = UI.textCommandList(2,160);
+    commandList.list[0].title('List');
+    commandList.list[0].button.command = function(){
+        AdminDataStore.onAction((payload)=>{
+            payload.command = 'list';
+        },(resp)=>{
+            console.log(resp);
+            let jx = resp.payload;
+            statBoard.lines[1].set(1,'Tarantula',jx.Tarantula);
+            statBoard.lines[2].set(2,'Presence',jx.Presence);
+            statBoard.lines[3].set(3,'User',jx.User);
+            statBoard.lines[4].set(4,'Profile',jx.Profile);
+            statBoard.lines[5].set(5,'Level',jx.Level);
+            statBoard.lines[6].set(6,'LeaderBoard',jx.LeaderBoard);
+            statBoard.lines[7].set(7,'AccessIndex',jx.AccessIndex);
+            statBoard.lines[8].set(8,"Total Records",jx.Total);
+        });
+    };
+    commandList.list[1].title('Backup');
+    commandList.list[1].button.command = function(){
+        AdminDataStore.onAction((payload)=>{
+            payload.command = 'backup';
+        },(resp)=>{
+            console.log(resp);
+            nTitle.title(resp.message); 
+        });
+    };  
+    pView.container.addChild(commandList.container);
     
     pView.container.addChild(nTitle.container);
     pView.container.addChild(statBoard.container);

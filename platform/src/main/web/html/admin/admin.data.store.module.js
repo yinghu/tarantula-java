@@ -11,17 +11,10 @@ var AdminDataStore = (function(){
         TARA_API.onMessage('presence/notice',n);
         TARA_API.send({action:'onStart',streaming:true,label:'presence/notice',data:{command:'onStart'}});
     };
-    let _query = function(){
-        let _payload = {serviceTag:adminObject.tag,command:"onQuery"};
-        TARA_API.onService(_payload,function(resp){
-            console.log(resp);
-        });
-    }; 
-    let _backup = function(){
-        let _payload = {serviceTag:adminObject.tag,command:"onBackup"};
-        TARA_API.onService(_payload,function(resp){
-            console.log(resp);
-        });
+    let _onAction = function(fin,out){
+        let _payload = {serviceTag:adminObject.tag};
+        fin(_payload);
+        TARA_API.onService(_payload,out);
     };
     let _leave = function(){
         TARA_API.send({action:'onStop',streaming:true,label:'presence/notice',data:{command:'onStop'}});
@@ -44,8 +37,7 @@ var AdminDataStore = (function(){
         swap : _swap,    
         start : _start,
         leave : _leave,
-        query : _query,
-        backup : _backup,
+        onAction : _onAction,
     }; 
 
 }());

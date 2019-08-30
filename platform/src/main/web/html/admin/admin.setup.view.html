@@ -56,6 +56,7 @@
     setupList.list[2].button.command = _on_launch,
     pView.container.addChild(setupList.container);
     pView.container.addChild(commandList.container);
+    let devTitle = UI.text('Application Admin Tool',{fontWeight: 600,fontFamily:'Oswald, Arial',fontSize:32,fill:'0xD1BC22'});
     let nTitle = UI.text('Notification',{fontWeight: 500,fontFamily:'Oswald, Arial',fontSize:32,fill:'0xffffff'});
     
     let aright = UI.iconCommand(120,120);
@@ -113,6 +114,7 @@
     pView.container.addChild(aleft.container);
     pView.container.addChild(aright.container);
     pView.container.addChild(lbv.container);
+    pView.container.addChild(devTitle.container);
     pView.container.addChild(nTitle.container);
     pView.container.addChild(cm.container);
     pView.container.addChild(menuBoard.container);
@@ -186,6 +188,7 @@
         commandList.position(sc,wz.width-commandList.width*sc-5,5);
         setupList.position(sc,(wz.width-setupList.width*sc)/2,wz.height-setupList.height*sc-5);
         lbv.position(sc,(wz.width-lbv.width*sc)/2,(wz.height-lbv.height*sc)/2);
-        nTitle.position(sc,cm.width*sc+10,cm.height*sc/2);
+        nTitle.position(sc,10,wz.height-nTitle.height*sc-10);
+        devTitle.position(sc,cm.container.x+cm.width*sc+10,10);
     }
 </script>
