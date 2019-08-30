@@ -7,8 +7,9 @@
             
         <div class="w3-container w3-text-teal w3-border-bottom w3-border-orange">
             <div class="w3-panel">
-                <input id ="af_typeId" class="w3-input w3-round w3-border" type="text" placeholder='typeId'/>
+                <input id ="af_login" class="w3-input w3-round w3-border" type="text" placeholder='input login to find'/>
             </div>
+            <!--
             <div class="w3-panel">    
                  <input id ="af_category" class="w3-input w3-round w3-border" type="text" placeholder='category'/>
             </div>
@@ -26,13 +27,13 @@
             </div>
             <div class="w3-panel">    
                  <input id ="af_description" class="w3-input w3-round w3-border" type="text" placeholder='description'/>
-            </div>
+            </div>-->
             <div class="w3-panel">
                 <p id="af_message"></p>
             </div>
             <div class="w3-panel">  
                 <div id="af_command_cancel" class="w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Cancel</div>
-                <div id="af_command" class="w3-right w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Add Lobby</div>     
+                <div id="af_command" class="w3-right w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Update</div>     
             </div>
         </div>            
         
@@ -43,15 +44,7 @@
 </div>
 <script>
  document.querySelector("#af_command").onclick = function(){
-    AdminSetup.addLobby(function(payload){
-        payload.typeId = document.querySelector('#a_typeId').value;
-        payload.category = document.querySelector('#a_category').value;
-        payload.name= document.querySelector('#a_name').value;
-        payload.responseLabel = document.querySelector('#a_responseLabel').value;
-        payload.viewId = document.querySelector('#a_viewId').value;
-        payload.icon= document.querySelector('#a_icon').value;
-        payload.description= document.querySelector('#a_description').value;
-    },function(resp){
+    AdminUser.findUser(document.querySelector('#af_login').value,function(resp){
         document.querySelector("#af_message").innerHTML = resp.message;
     });    
  };

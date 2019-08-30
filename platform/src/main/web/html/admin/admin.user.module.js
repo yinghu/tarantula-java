@@ -11,11 +11,9 @@ var AdminUser = (function(){
         TARA_API.onMessage('presence/notice',n);
         TARA_API.send({action:'onStart',streaming:true,label:'presence/notice',data:{command:'onStart'}});
     };
-    let _reset = function(){
-        let _payload = {serviceTag:'level/xp',header:'presence',category:'LoginCount',classifier:'T',command:'onXP'};
-        TARA_API.onService(_payload,function(resp){
-            console.log(resp);
-        });
+    let _findUser = function(login,out){
+        let _payload = {serviceTag:adminObject.tag,command:"findUser",login:login};
+        TARA_API.onService(_payload,out);
     };
     let _leave = function(){
         TARA_API.send({action:'onStop',streaming:true,label:'presence/notice',data:{command:'onStop'}});
@@ -38,7 +36,7 @@ var AdminUser = (function(){
         swap : _swap,    
         start : _start,
         leave : _leave,
-        reset : _reset,
+        findUser : _findUser,
     }; 
 
 }());

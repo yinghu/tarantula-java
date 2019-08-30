@@ -19,7 +19,12 @@ public class AdminUserModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         this.context.log(session.action(),OnLog.INFO);
-        session.write(payload,label());
+        if(session.action().equals("findUser")){
+            session.write(payload,label());
+        }
+        else{
+            session.write(payload,label());
+        }
         return session.action().equals("onLeave");
     }
 
