@@ -10,7 +10,8 @@ public class AdminUserModule implements Module {
 
     private ApplicationContext context;
     private GsonBuilder builder;
-
+    private AccessIndexService accessIndexService;
+    private DataStore user;
     public void onJoin(Session session) throws Exception{
         session.write(this.builder.create().toJson(_onMessage("joined")).getBytes(),label());
     }
@@ -20,8 +21,7 @@ public class AdminUserModule implements Module {
         this.context.log(session.action()+"=>"+new String(payload),OnLog.INFO);
         OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
         if(session.action().equals("findKey")){
-            AccessIndexService accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
-            AccessIndex ix = accessIndexService.get(onAccess.header("login"));
+            AccessIndex ix = this.accessIndexService.get(onAccess.header("login"));
             if(ix!=null){
                 session.write(this.builder.create().toJson(_onAccessIndex(ix)).getBytes(),label());
             }
@@ -32,21 +32,29 @@ public class AdminUserModule implements Module {
         else if(session.action().equals("resetPassword")){
             Access acc = new AccessTrack();
             acc.distributionKey(onAccess.systemId());
-            if(this.context.dataStore("user").load(acc)){
+            String p1 = onAccess.header("password1");
+            String p2 = onAccess.header("password2");
+            if(p1.equals(p2)&&this.user.load(acc)){
+                acc.password(this.context.validator().hashPassword(p1));
+                this.user.update(acc);
                 session.write(this.builder.create().toJson(_onMessage("password changed")).getBytes(),label());
             }
             else{
-                session.write(this.builder.create().toJson(_onMessage("no user found")).getBytes(),label());
+                session.write(this.builder.create().toJson(_onMessage("no user found or wrong data input")).getBytes(),label());
             }
         }
         else if(session.action().equals("changeRole")){
             Access acc = new AccessTrack();
             acc.distributionKey(onAccess.systemId());
-            if(this.context.dataStore("user").load(acc)){
+            String r1 = onAccess.header("role1");
+            String r2 = onAccess.header("role2");
+            if(r1.equals(r2)&&this.user.load(acc)){
+                acc.role(r1);
+                this.user.update(acc);
                 session.write(this.builder.create().toJson(_onMessage("role changed")).getBytes(),label());
             }
             else{
-                session.write(this.builder.create().toJson(_onMessage("no user found")).getBytes(),label());
+                session.write(this.builder.create().toJson(_onMessage("no user found or wrong data input")).getBytes(),label());
             }
         }
         else if(session.action().equals("addUser")){
@@ -64,6 +72,8 @@ public class AdminUserModule implements Module {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.builder.registerTypeAdapter(AdminUserObject.class,new AdminObjectSerializer());
+        this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
+        this.user = this.context.dataStore("user");
         this.context.log("Admin user module started", OnLog.INFO);
     }
     @Override
