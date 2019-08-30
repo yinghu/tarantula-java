@@ -11,8 +11,9 @@ var AdminUser = (function(){
         TARA_API.onMessage('presence/notice',n);
         TARA_API.send({action:'onStart',streaming:true,label:'presence/notice',data:{command:'onStart'}});
     };
-    let _findUser = function(login,out){
-        let _payload = {serviceTag:adminObject.tag,command:"findUser",login:login};
+    let _onAction = function(fin,out){
+        let _payload = {serviceTag:adminObject.tag};
+        fin(_payload);
         TARA_API.onService(_payload,out);
     };
     let _leave = function(){
@@ -36,7 +37,7 @@ var AdminUser = (function(){
         swap : _swap,    
         start : _start,
         leave : _leave,
-        findUser : _findUser,
+        onAction : _onAction,
     }; 
 
 }());

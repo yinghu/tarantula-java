@@ -37,7 +37,8 @@
 </div>
 <script>
  document.querySelector("#au_command").onclick = function(){
-    AdminSetup.addLobby(function(payload){
+    AdminUser.onAction(function(payload){
+        payload.command = 'addUser';
         payload.login = document.querySelector('#au_login').value;
         payload.nickname = document.querySelector('#au_nickname').value;
         payload.emailAddress= document.querySelector('#au_emailAddress').value;
