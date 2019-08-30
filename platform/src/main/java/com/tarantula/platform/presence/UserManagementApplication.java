@@ -39,8 +39,10 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         onAccess.header("nickname","super user");
         DataStore ds = this.context.dataStore("user");
         createLogin(onAccess, ds.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid(),"root");
-        this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ACCESS_CID,(a)->{
-            this.context.log(a.distributionKey(),OnLog.INFO);
+        this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ON_ACCESS_CID,(a)->{
+            //this.context.log(a.distributionKey(),OnLog.INFO);
+            //this.context.log(a.toString(),OnLog.INFO);
+            createLogin((OnAccess)a,a.distributionKey(),role);
         });
         this.context.log("User management application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
     }
@@ -83,14 +85,15 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             }
         }
         else if(session.action().equals("onRegister")){
-            Access access = this.createLogin(acc,session.systemId(),role);
-            if(access!=null){
+            AccessIndex _query = accessIndexService.set(acc.header("login"),session.systemId());
+            if(_query==null){
+                session.write(builder.create().toJson(new ResponseHeader(session.action(),false,0,"login [" + acc.header("login") + "] cannot be registered","error")).getBytes(),this.descriptor.responseLabel());
+            }
+            else{
+                Access access = this.createLogin(acc,session.systemId(),role);
                 session.systemId(access.distributionKey());
                 ResponseHeader resp = new ResponseHeader(session.action(),"User [" + access.login() + "] registered",true);
                 session.write(builder.create().toJson(resp).getBytes(),this.descriptor.responseLabel());
-            }
-            else{
-                session.write(builder.create().toJson(new ResponseHeader(session.action(),false,0,"login [" + acc.header("login") + "] cannot be registered","error")).getBytes(),this.descriptor.responseLabel());
             }
         }
         else if(session.action().equals("onReset")){
@@ -115,14 +118,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     }
     private Access createLogin(OnAccess payload,String systemId,String roleName){
         DataStore ds = this.context.dataStore("user");
-        AccessIndex _query = accessIndexService.set(payload.header("login"),systemId);
-        if(_query==null){
-            return null;
-        }
         this.context.log("User Create->"+payload.header("login")+"<>"+systemId,OnLog.INFO);
-        Access acc = new AccessTrack(_query.owner());
-        acc.bucket(_query.bucket());
-        acc.oid(_query.oid());
+        Access acc = new AccessTrack(payload.header("login"));
+        acc.distributionKey(systemId);
         acc.password(this.context.validator().hashPassword(payload.header("password")));
         acc.active(this.activated);//if false do email validation
         acc.role(roleName);

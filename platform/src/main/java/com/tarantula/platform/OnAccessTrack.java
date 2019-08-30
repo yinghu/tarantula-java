@@ -1,6 +1,8 @@
 package com.tarantula.platform;
 
 import com.tarantula.OnAccess;
+import com.tarantula.platform.presence.UserPortableRegistry;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,8 +46,16 @@ public class OnAccessTrack extends OnApplicationHeader implements OnAccess {
         });
         return _hs;
     }
+    public int getFactoryId() {
+        return UserPortableRegistry.OID;
+    }
+
+
+    public int getClassId() {
+        return UserPortableRegistry.ON_ACCESS_CID;
+    }
     @Override
     public String toString(){
-        return "On Access ["+applicationId+","+instanceId+","+accessMode+"]";
+        return new String(SystemUtil.toJson(properties));
     }
 }

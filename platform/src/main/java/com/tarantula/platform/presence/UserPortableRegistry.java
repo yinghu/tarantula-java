@@ -2,6 +2,7 @@ package com.tarantula.platform.presence;
 
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
+import com.tarantula.platform.OnAccessTrack;
 
 /**
  * Created by yinghu lu on 3/31/2018.
@@ -14,6 +15,7 @@ public class UserPortableRegistry extends AbstractRecoverableListener {
     public static final int PROFILE_CID = 2;
     public static final int CONTENT_TRANSACTION_CID = 3;
     public static final int CONTENT_CHUNK_CID = 4;
+    public static final int ON_ACCESS_CID = 5;
 
 
     public Recoverable create(int i) {
@@ -30,6 +32,9 @@ public class UserPortableRegistry extends AbstractRecoverableListener {
                 break;
             case CONTENT_CHUNK_CID:
                 pt = new ContentChunk();
+                break;
+            case ON_ACCESS_CID:
+                pt = new OnAccessTrack();
                 break;
             default:
         }

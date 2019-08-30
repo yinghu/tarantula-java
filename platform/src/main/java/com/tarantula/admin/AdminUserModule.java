@@ -5,6 +5,7 @@ import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.presence.AccessTrack;
 import com.tarantula.platform.util.OnAccessDeserializer;
+import com.tarantula.platform.util.SystemUtil;
 
 public class AdminUserModule implements Module {
 
@@ -35,8 +36,6 @@ public class AdminUserModule implements Module {
             String p1 = onAccess.header("password1");
             String p2 = onAccess.header("password2");
             if(p1.equals(p2)&&this.user.load(acc)){
-                acc.owner(session.systemId());
-                this.context.postOffice().onTag("index/user").send(acc.distributionKey(),acc);
                 acc.password(this.context.validator().hashPassword(p1));
                 this.user.update(acc);
                 session.write(this.builder.create().toJson(_onMessage("password changed")).getBytes(),label());
@@ -60,8 +59,16 @@ public class AdminUserModule implements Module {
             }
         }
         else if(session.action().equals("addUser")){
-            session.write(this.builder.create().toJson(_onMessage("user added")).getBytes(),label());
-            //this.context.postOffice().onTag("index/user").send();
+            AccessIndex query = accessIndexService.set(onAccess.header("login"), user.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid());
+            if(query!=null){
+                onAccess.owner(session.systemId());
+                onAccess.distributionKey(query.distributionKey());
+                this.context.postOffice().onTag("index/user").send(onAccess.distributionKey(),onAccess);
+                session.write(this.builder.create().toJson(_onMessage("user added")).getBytes(),label());
+            }
+            else{
+                session.write(this.builder.create().toJson(_onMessage("user already existed")).getBytes(),label());
+            }
         }
         else{
             session.write(payload,label());
