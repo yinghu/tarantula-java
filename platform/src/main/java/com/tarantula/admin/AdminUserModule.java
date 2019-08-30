@@ -35,6 +35,8 @@ public class AdminUserModule implements Module {
             String p1 = onAccess.header("password1");
             String p2 = onAccess.header("password2");
             if(p1.equals(p2)&&this.user.load(acc)){
+                acc.owner(session.systemId());
+                this.context.postOffice().onTag("index/user").send(acc.distributionKey(),acc);
                 acc.password(this.context.validator().hashPassword(p1));
                 this.user.update(acc);
                 session.write(this.builder.create().toJson(_onMessage("password changed")).getBytes(),label());
@@ -59,6 +61,7 @@ public class AdminUserModule implements Module {
         }
         else if(session.action().equals("addUser")){
             session.write(this.builder.create().toJson(_onMessage("user added")).getBytes(),label());
+            //this.context.postOffice().onTag("index/user").send();
         }
         else{
             session.write(payload,label());

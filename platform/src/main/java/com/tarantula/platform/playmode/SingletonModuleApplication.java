@@ -4,6 +4,7 @@ import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.TarantulaApplicationHeader;
+import com.tarantula.platform.event.FastPlayEvent;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -88,9 +89,12 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     }
     public boolean onEvent(Event event){
         try{
-            this.module.onJoin(event);
+            if(event instanceof FastPlayEvent){
+                this.module.onJoin(event);
+            }
         }catch (Exception ex){
             //write error to client
+            this.onError(event,ex);
         }
         return false;
     }

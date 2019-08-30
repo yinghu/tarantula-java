@@ -25,7 +25,6 @@ public class AdminUserObject extends AdminObject {
         if(accessIndex!=null){
             jo.addProperty("systemId",accessIndex.distributionKey());
         }
-
         return jo;
     }
 

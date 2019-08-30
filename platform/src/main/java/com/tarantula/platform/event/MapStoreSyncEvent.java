@@ -66,6 +66,6 @@ public class MapStoreSyncEvent extends Data implements Event {
     }
     @Override
     public String toString(){
-        return "Map store sync event ->"+metadata.toString()+"/"+destination+"/"+source+"/";
+        return "Map store sync event ->["+metadata.toString()+"/"+destination+"/"+source+"/"+systemId+"]";
     }
 }
