@@ -39,6 +39,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         onAccess.header("nickname","super user");
         DataStore ds = this.context.dataStore("user");
         createLogin(onAccess, ds.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid(),"root");
+        this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ACCESS_CID,(a)->{
+            this.context.log(a.distributionKey(),OnLog.INFO);
+        });
         this.context.log("User management application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
     }
     @Override
