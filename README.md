@@ -6,7 +6,7 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 ### 3. Univeral HTTP Support With Optional Web Socket Plugin
 ### 4. Easy Integration With Multiple Connections (TCP,WebSocket,UDP,etc)
 ### 5. High Performance Local Key-Value Disk Store With Fault-Tolerance Replication
-### 6. Multiple Ways For Messaging Without Third Party
+### 6. Multiple Ways For Messaging Without Third Party Providers
 ### 7. Advanced Modularization Architecture
 ### 8. Multiple Layer Access Control Policy
 ### 9. Distributed Application/Game Deployment
@@ -20,6 +20,7 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 [Programming Module Document](doc/gec-module.pdf)
 
 ## How To Code (Write A Module)
+    Coming Soon
 ## How To Deploy (Drop A Module In Runtime)
     Coming Soon    
 ## How To Use (Platform Setup)
