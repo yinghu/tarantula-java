@@ -6,9 +6,8 @@ import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.bootstrap.TarantulaThreadFactory;
 import com.tarantula.platform.presence.IndexContext;
 import com.tarantula.platform.presence.PresenceContext;
-import com.tarantula.platform.util.IndexContextDeserializer;
 import com.tarantula.platform.util.OnAccessSerializer;
-import com.tarantula.platform.util.PresenceContextDeserializer;
+
 import com.tarantula.platform.util.ResponseDeserializer;
 
 import java.util.UUID;
@@ -23,9 +22,9 @@ public class WebSocketTest {
     static GsonBuilder gsonBuilder;
     static {
         gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(IndexContext.class,new IndexContextDeserializer());
+        //gsonBuilder.registerTypeAdapter(IndexContext.class,new IndexContextDeserializer());
         gsonBuilder.registerTypeAdapter(Response.class,new ResponseDeserializer());
-        gsonBuilder.registerTypeAdapter(PresenceContext.class,new PresenceContextDeserializer());
+        //gsonBuilder.registerTypeAdapter(PresenceContext.class,new PresenceContextDeserializer());
         gsonBuilder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
     }
     static ExecutorService pool;

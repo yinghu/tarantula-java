@@ -28,7 +28,7 @@ public class DataStoreConfig {
         _dconfig.getGroupConfig().setName("tarantula-dev-BDS01");
         _dconfig.getNetworkConfig().addAddress("10.0.0.234:5701");
         _dconfig.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
-        _dconfig.getSerializationConfig().addPortableFactory(PortableRegistry.OID,new PortableRegistry());
+       // _dconfig.getSerializationConfig().addPortableFactory(PortableRegistry.OID,new PortableRegistry());
     }
     static ClientConfig _iconfig = new ClientConfig();
     static{
@@ -36,6 +36,6 @@ public class DataStoreConfig {
         _iconfig.getGroupConfig().setName("tarantula-dev-integration");
         _iconfig.getNetworkConfig().addAddress("10.0.0.234:5702");
         _iconfig.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
-        _iconfig.getSerializationConfig().addPortableFactory(PortableRegistry.OID,new PortableRegistry());
+       // _iconfig.getSerializationConfig().addPortableFactory(PortableRegistry.OID,new PortableRegistry());
     }
 }

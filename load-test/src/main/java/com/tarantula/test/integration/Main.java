@@ -4,9 +4,8 @@ import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.bootstrap.TarantulaThreadFactory;
-import com.tarantula.platform.marketplace.MarketplaceContext;
+
 import com.tarantula.platform.presence.IndexContext;
-import com.tarantula.platform.presence.PresenceContext;
 import com.tarantula.platform.util.*;
 
 import java.math.BigDecimal;
@@ -26,9 +25,9 @@ public class Main {
     static GsonBuilder gsonBuilder;
     static {
         gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(IndexContext.class,new IndexContextDeserializer());
+        //gsonBuilder.registerTypeAdapter(IndexContext.class,new IndexContextDeserializer());
         gsonBuilder.registerTypeAdapter(Response.class,new ResponseDeserializer());
-        gsonBuilder.registerTypeAdapter(PresenceContext.class,new PresenceContextDeserializer());
+        //gsonBuilder.registerTypeAdapter(PresenceContext.class,new PresenceContextDeserializer());
         //gsonBuilder.registerTypeAdapter(MarketplaceContext.class,new ShoppingPackageDeserializer());
         gsonBuilder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
     }

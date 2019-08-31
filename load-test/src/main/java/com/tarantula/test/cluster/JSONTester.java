@@ -1,7 +1,5 @@
 package com.tarantula.test.cluster;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonToken;
 import com.tarantula.Countable;
 import com.tarantula.platform.service.deployment.DynamicModuleClassLoader;
 
@@ -45,44 +43,5 @@ public class JSONTester {
         //System.out.println(ref.count(10));
         //System.out.println(ref1.count(100));
         //System.out.println(ref.toString()+"/"+ref1.toString()+"/"+ref.equals(ref1));
-    }
-    public static void cmain(String[] args) throws Exception{
-        FileReader jr = new FileReader(Thread.currentThread().getContextClassLoader().getResource("test.json").getFile());
-        //JsonParser jp = new JsonParser();
-        long st = System.currentTimeMillis();
-        //JsonElement j = jp.parse(jr);
-        //.getAsJsonObject().getAsJsonObject("connection");
-        //System.out.println(j.getAsJsonObject().get("connection").getAsJsonObject().get("host"));
-
-        JsonFactory jf = new JsonFactory();
-        com.fasterxml.jackson.core.JsonParser xjp = jf.createParser(jr);
-        //StringBuffer sb = new StringBuffer();
-        while (!xjp.isClosed()){
-            JsonToken jsonToken = xjp.nextToken();
-            if(JsonToken.FIELD_NAME.equals(jsonToken)){
-                String fieldName = xjp.getCurrentName();
-                //System.out.println(fieldName+">>");
-                //System.out.println();
-                if(fieldName.equals("connection")){
-                    JsonToken _xt = xjp.nextToken();
-                    StringBuffer sb = new StringBuffer();
-                    while (!_xt.equals(JsonToken.END_OBJECT)){
-                        if(_xt.equals(JsonToken.FIELD_NAME)){
-                            sb.append(xjp.getCurrentName());
-                        }
-                        _xt = xjp.nextToken();
-                        if(_xt.equals(JsonToken.VALUE_STRING)){
-                            sb.append(xjp.getText());
-                        }
-                    }
-                    System.out.println(sb.toString());
-                    break;
-                }
-            }
-
-        }
-        //System.out.println(sb);
-        long ed = System.currentTimeMillis();
-        System.out.println("dur->"+(ed-st));//50 ms
     }
 }

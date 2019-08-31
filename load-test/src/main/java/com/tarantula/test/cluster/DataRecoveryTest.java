@@ -4,10 +4,6 @@ import com.hazelcast.client.config.ClientConfig;
 
 import com.tarantula.platform.event.PortableEventRegistry;
 
-import com.tarantula.platform.service.cluster.ClusterRecoveryService;
-import com.tarantula.platform.service.cluster.PortableRegistry;
-
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -33,8 +29,8 @@ public class DataRecoveryTest {
         ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(3);
         AtomicBoolean a = new AtomicBoolean(false);
         AtomicBoolean b = new AtomicBoolean(false);
-        ClusterRecoveryService crs = new ClusterRecoveryService(_dconfig,_iconfig,"/mnt",scheduledExecutorService,a,b);
-        crs.start();
+        //ClusterRecoveryService crs = new ClusterRecoveryService(_dconfig,_iconfig,"/mnt",scheduledExecutorService,a,b);
+       // crs.start();
         scheduledExecutorService.shutdown();
     }
 }

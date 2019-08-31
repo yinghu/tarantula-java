@@ -3,7 +3,6 @@ package com.tarantula.test.integration;
 import com.google.gson.GsonBuilder;
 import com.tarantula.Descriptor;
 import com.tarantula.Response;
-import com.tarantula.platform.marketplace.MarketplaceContext;
 import com.tarantula.platform.presence.IndexContext;
 import com.tarantula.platform.presence.PresenceContext;
 
