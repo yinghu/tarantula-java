@@ -1,10 +1,11 @@
 package com.tarantula.platform;
 
 import com.tarantula.Descriptor;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.Map;
 
-abstract public class DefaultDescriptor extends DeploymentObject implements Descriptor{
+public class DefaultDescriptor extends DeploymentObject implements Descriptor{
 
 	protected String typeId;
     protected String applicationId;
@@ -193,7 +194,7 @@ abstract public class DefaultDescriptor extends DeploymentObject implements Desc
     }
 	@Override
 	public String toString(){
-		return "DESCRIPTOR(typeId/subtypeId/applicationId/instanceId) ["+this.typeId+"/"+this.subtypeId+"/"+this.applicationId+"/"+this.instanceId+"]";
+		return new String(SystemUtil.toJson(this.toMap()));
 	}
 
 	public boolean singleton(){
@@ -300,8 +301,8 @@ abstract public class DefaultDescriptor extends DeploymentObject implements Desc
         this.capacity=properties.get("capacity")!=null?((Number)properties.get("capacity")).intValue():0;
         this.category=properties.get("category")!=null?(String)properties.get("category"):null;
         this.disabled = properties.get("disabled")!=null?(boolean)properties.get("disabled"):false;
-        this.accessControl  = properties.get("accessControl")!=null?((Number)properties.get("accessControl")).intValue():12;
-        this.accessMode  = properties.get("accessMode")!=null?((Number)properties.get("accessMode")).intValue():0;
+        this.accessControl  = properties.get("accessControl")!=null?((Number)properties.get("accessControl")).intValue():0;
+        this.accessMode  = properties.get("accessMode")!=null?((Number)properties.get("accessMode")).intValue():12;
         this.moduleArtifact  = properties.get("moduleArtifact")!=null?(String) properties.get("moduleArtifact"):null;
         this.moduleVersion  = properties.get("moduleVersion")!=null?(String) properties.get("moduleVersion"):null;
         this.deployCode = properties.get("deployCode")!=null?((Number)properties.get("deployCode")).intValue():0;

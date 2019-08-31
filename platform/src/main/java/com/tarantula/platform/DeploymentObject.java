@@ -1,12 +1,11 @@
 package com.tarantula.platform;
 
-import com.hazelcast.nio.serialization.Portable;
 import com.tarantula.Distributable;
 
 /**
  * Created by yinghu lu on 4/17/2018.
  */
-abstract  public class DeploymentObject extends RecoverableObject implements Portable {
+abstract  public class DeploymentObject extends RecoverableObject {
 
 
     public int scope(){

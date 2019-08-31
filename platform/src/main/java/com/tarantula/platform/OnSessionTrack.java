@@ -17,7 +17,6 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     private String login;
     private String ticket;
 
-    //public static final OnSession ON_SESSION_NOT_AVAILABLE = new OnSessionTrack("ON SESSION NOT AVAILABLE");
     public static final OnSession PASSWORD_NOT_MATCHED = new OnSessionTrack("PASSWORD NOT MATCHED");
 
     public OnSessionTrack(){

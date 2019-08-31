@@ -1,6 +1,7 @@
 package com.tarantula.platform;
 
 import com.tarantula.*;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -172,5 +173,9 @@ public class RecoverableObject implements Recoverable {
     @Override
     public int hashCode(){
         return this.distributionKey().hashCode();
+    }
+    @Override
+    public String toString(){
+        return new String(SystemUtil.toJson(this.toMap()));
     }
 }

@@ -2,11 +2,13 @@ package com.tarantula.platform;
 
 import java.io.IOException;
 import java.util.Map;
+
+import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.platform.event.PortableEventRegistry;
 
-public class DeploymentDescriptor extends DefaultDescriptor{
+public class DeploymentDescriptor extends DefaultDescriptor implements Portable {
 
 
     public DeploymentDescriptor(){
@@ -46,13 +48,6 @@ public class DeploymentDescriptor extends DefaultDescriptor{
         super.fromMap(properties);
     }
 
-
-	@Override
-	public String toString(){
-        StringBuffer buff = new StringBuffer();
-        buff.append("[").append(this.type).append(",").append(this.name).append(",").append(typeId).append(",").append(capacity).append("]");
-		return buff.toString();
-	}
     public DeploymentDescriptor deploy(String instanceId){
         DeploymentDescriptor ins = new DeploymentDescriptor();
         ins.instanceId(instanceId);

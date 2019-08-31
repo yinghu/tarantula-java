@@ -1,14 +1,10 @@
 package com.tarantula.platform.service.deployment;
 
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.Configuration;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.DeploymentObject;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,18 +31,6 @@ public class ServiceConfiguration extends DeploymentObject {
 
     public HashMap<Recoverable.Key,Configuration> configurationMappings = new HashMap<>();
 
-    @Override
-    public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("1",this.tag);
-        out.writeUTF("2",this.serviceProviderName);
-        out.writeInt("3",this.priority);
-    }
-    @Override
-    public void readPortable(PortableReader in) throws IOException {
-        this.tag= in.readUTF("1");
-        this.serviceProviderName = in.readUTF("2");
-        this.priority = in.readInt("3");
-    }
 
     @Override
     public Map<String,Object> toMap(){

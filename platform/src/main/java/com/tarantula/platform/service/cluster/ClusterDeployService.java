@@ -208,6 +208,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             dataStore.list(query,(b)->{
                 if(!b.disabled()){
                     blist.add(b);
+                    //log.info(b.toString());
                 }
                 return true;
             });
@@ -341,7 +342,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         else if(registryId== PortableRegistry.APPLICATION_DESCRIPTOR_CID){
             List dlist = new ArrayList();
             dataStore.list(new ApplicationQuery(params[0]),(a)->{
-                //log.warn("app->"+a.disabled()+"/"+a.name()+"/"+a.category());
+                //log.warn(a.toString());
                 if(!a.disabled()){
                     dlist.add(a);
                 }
@@ -397,7 +398,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             resp.message(descriptor.typeId()+" already existed");
             return this.builder.create().toJson(resp);
         }
-        descriptor.vertex("Lobby");
         descriptor.owner(ds.bucket());
         descriptor.label(query.label());
         descriptor.onEdge(true);
@@ -405,7 +405,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         ds.create(descriptor);
         DeploymentDescriptor lobby = new DeploymentDescriptor();
         lobby.typeId(descriptor.typeId());
-        lobby.subtypeId(descriptor.subtypeId());
+        lobby.subtypeId(descriptor.typeId()+"-lobby");
         lobby.type("application");
         lobby.category("lobby");
         lobby.tag(descriptor.tag());

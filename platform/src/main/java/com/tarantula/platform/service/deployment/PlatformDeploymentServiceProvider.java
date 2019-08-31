@@ -142,9 +142,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         });
         xmlParser.configurations.forEach((a)->{
-            log.info(a.descriptor.typeId());
+            log.info(a.descriptor.toString());
             a.applications.forEach((b)->{
-                log.info(b.name());
+                log.info(b.toString());
             });
         });
         return "{}";

@@ -128,8 +128,14 @@ public class XMLParser extends DefaultHandler{
             else if(tblock.equals("lobby-context")&&qname.equals("deploy-code")){
                 this.configuration.descriptor.deployCode(Integer.parseInt(value));
             }
+            else if(tblock.equals("lobby-context")&&qname.equals("response-label")){
+                this.configuration.descriptor.responseLabel(value);
+            }
             else if(tblock.equals("lobby-context")&&qname.equals("configuration-name")){
                 this.configuration.descriptor.configurationName(value);
+            }
+            else if(tblock.equals("lobby-context")&&qname.equals("reset-enabled")){
+                this.configuration.descriptor.resetEnabled(Boolean.parseBoolean(value));
             }
 			//application-list
             else if(tblock.equals("application-list")&&qname.equals("type-id")){

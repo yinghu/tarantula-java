@@ -5,6 +5,7 @@ import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.IndexSet;
+import com.tarantula.platform.LobbyDescriptor;
 import com.tarantula.platform.service.deployment.ApplicationQuery;
 import com.tarantula.platform.service.deployment.LobbyQuery;
 import com.tarantula.platform.util.OnAccessDeserializer;
@@ -32,10 +33,9 @@ public class AdminSetupModule implements Module {
             session.write(this.builder.create().toJson(this._adminObjectOnLobby()).getBytes(),label());
         }
         else if(session.action().equals("addLobby")){
-            DeploymentDescriptor desc = new DeploymentDescriptor();
+            LobbyDescriptor desc = new LobbyDescriptor();
             desc.fromMap(SystemUtil.toMap(payload));
             desc.type("lobby");
-            desc.subtypeId(desc.typeId()+"-lobby");
             desc.accessMode(Access.PROTECT_ACCESS_MODE);
             desc.deployCode(1);
             desc.tag(desc.typeId()+Recoverable.PATH_SEPARATOR+"lobby");

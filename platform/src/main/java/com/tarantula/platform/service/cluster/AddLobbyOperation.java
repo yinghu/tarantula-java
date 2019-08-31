@@ -4,8 +4,7 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.tarantula.Descriptor;
-import com.tarantula.platform.DeploymentDescriptor;
-import com.tarantula.platform.service.Batch;
+import com.tarantula.platform.LobbyDescriptor;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.io.IOException;
@@ -47,7 +46,7 @@ public class AddLobbyOperation extends Operation {
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.descriptor = new DeploymentDescriptor();
+        this.descriptor = new LobbyDescriptor();
         this.descriptor.fromMap(SystemUtil.toMap(in.readByteArray()));
     }
 }
