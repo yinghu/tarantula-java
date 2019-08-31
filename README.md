@@ -3,7 +3,7 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 
 1. Global Unique Key Cluster Indexing Support 
 2. Univeral HTTP Support With Optional Web Socket Plugin
-3. Easy Integration With Multiple Connection (TCP,WebSocket,UDP,etc)
+3. Easy Integration With Multiple Connections (TCP,WebSocket,UDP,etc)
 4. High Performance Local Key-Value Disk Store With Fault-Tolerance Replication
 5. Multiple Ways For Messaging Without Third Party
 6. Advanced Modularization architecture
