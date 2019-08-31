@@ -1,4 +1,4 @@
-# gameenginecluster
+# Game Engine Cluster
 A scaling, fault-tolerant, asynchronous event messaging application/game integration platform.
 
 1. Global Unique Key Cluster Indexing Support 
