@@ -1,6 +1,6 @@
 # gameenginecluster
 A scaling, fault-tolerant, asynchronous event messaging application/game integration platform.
-Major Features:
+
 1. Global Unique Key Cluster Indexing Support 
 2. Univeral HTTP Support With Optional Web Socket Plugin
 3. Easy Integration With Multiple Connection (TCP,WebSocket,UDP,etc)
