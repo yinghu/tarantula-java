@@ -12,13 +12,12 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 ### 9. Server-Less Module Deployment Support
 ### 10. Pure JAVA Implmentation With High Concurrecy Throughput
 
-[Platform architecture document](doc/gec-summary.pdf)
+[Platform Architecture Document](doc/gec-summary.pdf)
 
-[Module document](doc/gec-module.pdf)
+[Programming Module Document](doc/gec-module.pdf)
 
-## How To Use
-    Coming Soon
-## Hot To Code
-    Coming Soon
-## How To Deploy
+## How To Code (Write A Module)
+## How To Deploy (Drop A Module In Runtime)
+    Coming Soon    
+## How To Use (Platform Setup)
     Coming Soon
