@@ -42,11 +42,15 @@
     }; 
     cm.button.icon.texture = PIXI.Texture.from('assets/table.png');
     
-    let commandList = UI.textCommandList(1,160);
+    let commandList = UI.textCommandList(2,160);
     commandList.list[0].title('AddLobby');
     commandList.list[0].button.command = function(){
         _view({viewId:'admin.add.lobby',containerId:'#m3'});
-    };  
+    }; 
+    commandList.list[1].title('AddModule');
+    commandList.list[1].button.command = function(){
+        _view({viewId:'admin.add.module',containerId:'#m3'});
+    };
     let setupList = UI.textCommandList(3,160);
     setupList.list[0].title('AddApp');
     setupList.list[0].button.command = _on_add_app,

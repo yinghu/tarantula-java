@@ -80,6 +80,13 @@ public class AdminSetupModule implements Module {
                 session.write(payload,label());
             }
         }
+        else if(session.action().equals("addModule")){
+            DeploymentDescriptor desc = new DeploymentDescriptor();
+            desc.fromMap(SystemUtil.toMap(payload));
+            String ret = this.serviceProvider.createModule(desc);
+            this.context.log(ret,OnLog.INFO);
+            session.write(this.builder.create().toJson(new AdminSetupObject("add module",label())).getBytes(),label());
+        }
         else{
             session.write(payload,label());
         }
@@ -102,7 +109,7 @@ public class AdminSetupModule implements Module {
     }
 
     private AdminObject _adminObjectOnLobby(){
-        AdminSetupObject ao = new AdminSetupObject(label());
+        AdminSetupObject ao = new AdminSetupObject("list lobby",label());
         ao.name("lobby list");
         this.dataStore.list(new LobbyQuery(dataStore.bucket()),(a)->{
             ao.list.add(a);
@@ -111,7 +118,7 @@ public class AdminSetupModule implements Module {
         return ao;
     }
     private AdminObject _adminObjectOnApplication(String lobbyId){
-        AdminSetupObject ao = new AdminSetupObject(label());
+        AdminSetupObject ao = new AdminSetupObject("list app",label());
         ao.name("application list");
         ApplicationQuery aq = new ApplicationQuery(lobbyId);
         IndexSet iset = new IndexSet();

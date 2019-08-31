@@ -38,7 +38,11 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         onAccess.header("password",pwd);
         onAccess.header("nickname","super user");
         DataStore ds = this.context.dataStore("user");
-        createLogin(onAccess, ds.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid(),"root");
+        String rootId = ds.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid();
+        AccessIndex accessIndex = accessIndexService.set(onAccess.header("login"),rootId);
+        if(accessIndex!=null){
+            createLogin(onAccess, rootId,"root");
+        }
         this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ON_ACCESS_CID,(a)->{
             //this.context.log(a.distributionKey(),OnLog.INFO);
             //this.context.log(a.toString(),OnLog.INFO);

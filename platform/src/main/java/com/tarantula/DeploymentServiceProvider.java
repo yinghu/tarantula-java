@@ -48,6 +48,7 @@ public interface DeploymentServiceProvider extends ServiceProvider{
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
     String reset(Descriptor descriptor);
+    String createModule(Descriptor descriptor);
     //END OF MODULE OPERATION API
 
     DataStoreProvider dataStoreProvider();

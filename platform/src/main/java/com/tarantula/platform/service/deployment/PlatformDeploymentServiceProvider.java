@@ -131,6 +131,24 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             mp.reset();
         });
     }
+    public String createModule(Descriptor descriptor){
+        DynamicModuleClassLoader mc = new DynamicModuleClassLoader(descriptor);
+        XMLParser xmlParser = new XMLParser();
+        mc.loadResource("descriptor.xml",(in)->{
+            try{
+                xmlParser.parse(in);
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+        });
+        xmlParser.configurations.forEach((a)->{
+            log.info(a.descriptor.typeId());
+            a.applications.forEach((b)->{
+                log.info(b.name());
+            });
+        });
+        return "{}";
+    }
     public String createLobby(Descriptor descriptor){
         return this.tarantulaContext.tarantulaCluster().deployService().addLobby(descriptor);
     }

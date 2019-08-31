@@ -115,6 +115,10 @@
                 <property name="flag">HD2</property>
                 <property name="moduleResourceFile">html/admin/add.application.view.html</property>
             </view>
+            <view type="admin.add.module">
+                <property name="flag">HD2</property>
+                <property name="moduleResourceFile">html/admin/add.module.view.html</property>
+            </view>
             <view type="admin.update.application">
                 <property name="flag">HD2</property>
                 <property name="moduleResourceFile">html/admin/update.application.view.html</property>

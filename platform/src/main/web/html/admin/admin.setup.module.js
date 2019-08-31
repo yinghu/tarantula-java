@@ -51,6 +51,11 @@ var AdminSetup= (function(){
         let _payload = {serviceTag:adminObject.tag,command:"lobbyList"};
         TARA_API.onService(_payload,out);
     };
+    let _onAction = function(fin,out){
+        let _payload = {serviceTag:adminObject.tag};
+        fin(_payload);
+        TARA_API.onService(_payload,out);
+    };
     let _leave = function(){
         TARA_API.send({action:'onStop',streaming:true,label:'presence/notice',data:{command:'onStop'}});
         let _payload = {serviceTag:adminObject.tag,command:"onLeave"};
@@ -81,6 +86,7 @@ var AdminSetup= (function(){
         shutdown : _shutdown,
         applicationList : _list_app,
         lobbyList : _list_lobby,
+        onAction : _onAction,
     }; 
 
 }());

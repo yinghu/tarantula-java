@@ -15,8 +15,9 @@ public class AdminSetupObject extends AdminObject{
 
     public List<Descriptor> list = new ArrayList();
 
-    public AdminSetupObject(String label){
+    public AdminSetupObject(String message,String label){
         super(label);
+        this.message = message;
     }
     public JsonElement setup(Type type, JsonSerializationContext jsonSerializationContext){
         JsonObject jo = super.setup(type,jsonSerializationContext).getAsJsonObject();
