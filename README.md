@@ -16,4 +16,9 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 
 [Module document](doc/gec-module.pdf)
 
-Write Code Simple 
+How To Use
+    Coming Soon
+Hot To Code
+    Coming Soon
+How To Deploy
+    Coming Soon
