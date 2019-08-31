@@ -6,7 +6,7 @@
         <category>game</category>
         <icon>html/blackjack/blackjack_icon.png</icon>
         <view-id>game.lobby</view-id>
-        <tag>demo-sync</tag>
+        <tag>demo/lobby</tag>
         <name>DemoSync</name>
         <response-label>demo</response-label>
         <access-mode>12</access-mode>
@@ -46,7 +46,7 @@
                 <description>Tarantula Demo Sync Game</description>
             </application>
             <application>
-                <type-id>demo-sync</type-id>
+                <type-id>demo</type-id>
                 <subtype-id>demo-sync</subtype-id>
                 <view-id>demo.sync.game</view-id>
                 <name>DemoSync3</name>

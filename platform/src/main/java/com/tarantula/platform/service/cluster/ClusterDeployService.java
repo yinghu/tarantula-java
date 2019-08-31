@@ -420,6 +420,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         lobby.owner(descriptor.distributionKey());
         lobby.onEdge(true);
         if(ds.create(lobby)){
+            log.warn(lobby.toString());
             resp.message(lobby.distributionKey()+" created on ["+descriptor.typeId()+"]");
         }
         else{

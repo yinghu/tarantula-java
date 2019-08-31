@@ -9,9 +9,11 @@ import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.ClusterProvider;
 import com.tarantula.DeploymentServiceProvider;
 import com.tarantula.platform.service.DataStoreProvider;
+import com.tarantula.platform.service.DeployService;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.util.ConfigurationDeserializer;
 import com.tarantula.platform.util.ResponseDeserializer;
+import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.io.BufferedInputStream;
@@ -50,6 +52,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ApplicationConfiguration.class,new ConfigurationDeserializer());
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseDeserializer());
+        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
     }
 
     @Override
@@ -134,20 +137,38 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public String createModule(Descriptor descriptor){
         DynamicModuleClassLoader mc = new DynamicModuleClassLoader(descriptor);
         XMLParser xmlParser = new XMLParser();
+        ResponseHeader resp = new ResponseHeader("createModule");
         mc.loadResource("descriptor.xml",(in)->{
             try{
                 xmlParser.parse(in);
             }catch (Exception ex){
-                ex.printStackTrace();
+                log.warn("failed to parse descriptor.xml",ex);
+                resp.message("failed to parse descriptor.xml");
+                resp.successful(false);
             }
         });
+        if(!resp.successful()){
+            return this.builder.create().toJson(resp);
+        }
+        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         xmlParser.configurations.forEach((a)->{
-            log.info(a.descriptor.toString());
+            ResponseHeader r = this.builder.create().fromJson(deployService.addLobby(a.descriptor),ResponseHeader.class);
+            if(!r.successful()){
+                resp.successful(false);
+                resp.message(r.message());
+                return;
+            }
             a.applications.forEach((b)->{
-                log.info(b.toString());
+                b.codebase(descriptor.codebase());
+                b.moduleArtifact(descriptor.moduleArtifact());
+                b.moduleVersion(descriptor.moduleVersion());
+                ResponseHeader x = this.builder.create().fromJson(deployService.addApplication(b),ResponseHeader.class);
+                if(!x.successful()){
+                    log.warn("Failed to add application ->"+b.toString());
+                }
             });
         });
-        return "{}";
+        return this.builder.create().toJson(resp);
     }
     public String createLobby(Descriptor descriptor){
         return this.tarantulaContext.tarantulaCluster().deployService().addLobby(descriptor);
