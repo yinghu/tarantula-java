@@ -19,7 +19,7 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 
 [Programming Module Document](doc/gec-module.pdf)
 
-[Load Test Result](doc/gec-test-result.odt)
+[Load Test Result](doc/gec-test-result.pdf)
 
 ## How To Code (Write A Module)
     Coming Soon
