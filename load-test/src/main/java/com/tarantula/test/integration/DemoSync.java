@@ -27,6 +27,7 @@ public class DemoSync implements OnGame {
             applicationId = joined.get("applicationId").getAsString();
             instanceId = joined.get("instanceId").getAsString();
             onStream(webSocket);
+            onAction(webSocket);
             Thread.sleep(10000);
             onLeave(caller);
 
@@ -36,6 +37,20 @@ public class DemoSync implements OnGame {
     }
     public void onMessage(CharSequence message){
         System.out.println(message);
+    }
+    private void onAction(WebSocket webSocket){
+        JsonObject data = new JsonObject();
+        data.addProperty("command","a");
+        JsonObject payload = new JsonObject();
+        payload.add("data",data);
+        payload.addProperty("path","/application/instance");
+        payload.addProperty("applicationId",applicationId);
+        payload.addProperty("instanceId",instanceId);
+        payload.addProperty("action","a");
+        payload.addProperty("streaming",false);
+        for(int i=0;i<10;i++){
+            webSocket.sendText(payload.toString(),true);
+        }
     }
     private void onStream(WebSocket webSocket){
         JsonObject jo = new JsonObject();
