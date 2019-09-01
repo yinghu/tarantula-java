@@ -1,62 +1,27 @@
 package com.tarantula.test.integration;
 
-import com.google.gson.GsonBuilder;
-import com.tarantula.*;
-import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.bootstrap.TarantulaThreadFactory;
-
-import com.tarantula.platform.presence.IndexContext;
-import com.tarantula.platform.util.*;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.security.MessageDigest;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by yinghu lu on 10/19/2017.
+ * Updated by yinghu lu on 8/31/2019.
  */
 public class Main {
 
     static ExecutorService pool;
-    static GsonBuilder gsonBuilder;
-    static {
-        gsonBuilder = new GsonBuilder();
-        //gsonBuilder.registerTypeAdapter(IndexContext.class,new IndexContextDeserializer());
-        gsonBuilder.registerTypeAdapter(Response.class,new ResponseDeserializer());
-        //gsonBuilder.registerTypeAdapter(PresenceContext.class,new PresenceContextDeserializer());
-        //gsonBuilder.registerTypeAdapter(MarketplaceContext.class,new ShoppingPackageDeserializer());
-        gsonBuilder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
-    }
-    static MessageDigest messageDigest;
 
-    public static void mainc(String[] args) throws Exception{
-        System.setProperty("javax.net.debug","ssl");
-        //System.setProperty("javax.net.ssl.keyStore","C:\\Users\\i7\\.keystore");
-        OnIndexCommand cmd = new OnIndexCommand(true,"realnumber.net",gsonBuilder);
-        IndexContext ic = cmd.call();
-        System.out.println(gsonBuilder.create().toJson(ic));
-       // System.out.println(SystemUtil.toMidnight()/(1000*60*60));
-        //System.out.println(SystemUtil.toString(new String[]{"A","B"}));
-    }
 
     public static void main(String[] args) throws Exception{
-        messageDigest = MessageDigest.getInstance(TokenValidator.MDA);
-        runSimulation(args);
+        Player caller = new Player(false,"localhost:8090",new CountDownLatch(1),UUID.randomUUID().toString(),jsonObject -> System.out.println(jsonObject));
+        caller.run();
+        //runSimulation(args);
     }
 
 
 
-    static MessageDigest messageDigest(){
-        try{
-            return (MessageDigest) messageDigest.clone();
-        }catch (Exception ex){
-            return null;
-        }
-    }
+
 
 
     public static void runSimulation(String[] args) throws Exception{
@@ -92,7 +57,7 @@ public class Main {
             for(int x=0;x<psize;x++){
                 String uname = prefix!=null?(prefix+"-"+ix):UUID.randomUUID().toString();
                 ix++;
-                Simulator simulator = new Simulator(secured,host,gsonBuilder,round,waiting,uname);
+                Player simulator = new Player(secured,host,waiting,uname,jsonObject -> round.incrementAndGet());
                 pool.execute(simulator);
             }
             waiting.await();

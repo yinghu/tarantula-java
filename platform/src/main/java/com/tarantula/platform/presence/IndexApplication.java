@@ -21,13 +21,13 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
     public void callback(Session session, byte[] payload) throws Exception {
         if(session.action().equals("view")){
             IndexEvent ie = (IndexEvent)session;
-            IndexContext ic = new IndexContext();
+            IndexContext ic = new IndexContext("view");
             OnView view = this._viewList.get(ie.viewId);
             ic.view = view;
             session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("index")){
-            IndexContext ic = new IndexContext();
+            IndexContext ic = new IndexContext("index");
             OnView view = this._viewList.get("index");
             ic.lobbyList = this.context.index();
             _lobbyList.forEach((n)->{

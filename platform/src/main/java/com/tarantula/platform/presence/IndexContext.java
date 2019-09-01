@@ -11,6 +11,11 @@ import java.util.List;
  */
 public class IndexContext extends ResponseHeader {
 
+    public IndexContext(String command){
+        this.successful = true;
+        this.command = command;
+    }
+
     public OnView view;
     public List<Lobby> lobbyList;
 }

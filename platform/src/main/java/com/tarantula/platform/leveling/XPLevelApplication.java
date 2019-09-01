@@ -107,7 +107,7 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
         if(delta.name()!=null){
             for(Statistics.Entry entry : delta.entryList()){
                 XP xp = new XPGain(l.distributionKey(),l.bucket(),l.oid(),delta.name(),entry.name());
-                this.context.log(xp.key().asString(),OnLog.INFO);
+                //this.context.log(xp.key().asString(),OnLog.INFO);
                 _dataStore.createIfAbsent(xp,true);
                 this.executeOnXP(l,delta.owner(),xp,entry);
             }
