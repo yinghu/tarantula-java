@@ -9,7 +9,7 @@ import com.tarantula.Response;
 import java.lang.reflect.Type;
 
 /**
- * Updated by yinghu on 10/7/2018.
+ * Updated by yinghu on 9/1/2019
  */
 public class ResponseSerializer implements JsonSerializer<Response> {
 
@@ -19,6 +19,7 @@ public class ResponseSerializer implements JsonSerializer<Response> {
         jo.addProperty("label",response.label());
         jo.addProperty("message",response.message());
         jo.addProperty("code",response.code());
+        jo.addProperty("timestamp",response.timestamp());//round trip stamp from client
         jo.addProperty("successful",response.successful());
         response.toMap().forEach((String k,Object v)->{
             jo.addProperty(k,v.toString());
