@@ -5,6 +5,7 @@ import com.tarantula.Session;
 
 import java.net.http.WebSocket;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class OnGame {
 
@@ -12,7 +13,11 @@ public class OnGame {
     protected String instanceId;
     protected JsonObject presence;
     protected HashMap<String,String> _headers = new HashMap<>();
+    protected AtomicLong totalBytesReceived;
 
+    public OnGame(){
+        this.totalBytesReceived = new AtomicLong(0);
+    }
     public String typeId(){
         return null;
     }
@@ -20,7 +25,7 @@ public class OnGame {
 
     }
     public void onMessage(CharSequence message){
-
+        totalBytesReceived.addAndGet(message.length());
     }
     protected void onAction(WebSocket webSocket,OnPayload onPayload){
         JsonObject data = new JsonObject();

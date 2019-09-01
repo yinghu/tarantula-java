@@ -6,6 +6,10 @@ import java.net.http.WebSocket;
 public class DemoSync extends OnGame {
 
 
+    public DemoSync(){
+        super();
+    }
+
     @Override
     public String typeId() {
         return "demo";
@@ -24,14 +28,15 @@ public class DemoSync extends OnGame {
             onAction(webSocket,data->data.addProperty("command","a"));
             onAction(webSocket,data->data.addProperty("command","b"));
             onAction(webSocket,data->data.addProperty("command","c"));
-            Thread.sleep(3000);
+            Thread.sleep(10);
             onAction(caller,data ->data.addProperty("command","onLeave"));
-
+            System.out.println("Total Bytes Received ["+totalBytesReceived.get()+"]");
         }catch (Exception ex){
 
         }
     }
     public void onMessage(CharSequence message){
+        super.onMessage(message);
         //System.out.println(message);
     }
 }
