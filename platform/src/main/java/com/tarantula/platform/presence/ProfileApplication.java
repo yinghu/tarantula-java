@@ -27,10 +27,8 @@ public class ProfileApplication extends TarantulaApplicationHeader {
         if(session.action().equals("onProfile")){
             OnAccess cmd = this.builder.create().fromJson(new String((payload)).trim(),OnAccess.class);
             Profile u = this._load(cmd.systemId());
-            PresenceContext pcx  = new PresenceContext();
-            pcx.command("onProfile");
+            PresenceContext pcx  = new PresenceContext("onProfile");
             pcx.profile = u;
-            pcx.successful(true);
             session.write(builder.create().toJson(pcx).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onUpload")){

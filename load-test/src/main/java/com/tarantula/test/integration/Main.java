@@ -14,9 +14,9 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception{
-        Player caller = new Player(false,"localhost:8090",new CountDownLatch(1),UUID.randomUUID().toString(),jsonObject -> System.out.println(jsonObject));
-        caller.run();
-        //runSimulation(args);
+        //Player caller = new Player(false,"localhost:8090",new CountDownLatch(1),UUID.randomUUID().toString(),new DemoSync(),jsonObject -> System.out.println(jsonObject));
+        //caller.run();
+        runSimulation(args);
     }
 
 
@@ -57,7 +57,7 @@ public class Main {
             for(int x=0;x<psize;x++){
                 String uname = prefix!=null?(prefix+"-"+ix):UUID.randomUUID().toString();
                 ix++;
-                Player simulator = new Player(secured,host,waiting,uname,jsonObject -> round.incrementAndGet());
+                Player simulator = new Player(secured,host,waiting,uname,new DemoSync(),jsonObject -> round.incrementAndGet());
                 pool.execute(simulator);
             }
             waiting.await();

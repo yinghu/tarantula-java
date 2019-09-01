@@ -33,10 +33,10 @@ public class HTTPCaller {
         this.requestOnJson(path,command,headers,payload);
         onResponse.on(jsonElement.getAsJsonObject());
     }
-    public String doAction(String command, String action, HashMap<String,String> headers, byte[] payload){
-        byte[] ret = this.request(action,command,headers,payload);
-        return new String(ret);
-    }
+    //public String doAction(String command, String action, HashMap<String,String> headers, byte[] payload){
+        //byte[] ret = this.request(action,command,headers,payload);
+        //return new String(ret);
+    //}
     private void requestOnJson(String path,String command,HashMap<String,String> headers,byte[] payload){
         HttpURLConnection http = null;
         try{
@@ -134,8 +134,5 @@ public class HTTPCaller {
             }
         }
         return buff;
-    }
-    interface OnResponse{
-        void on(JsonObject jsonObject);
     }
 }

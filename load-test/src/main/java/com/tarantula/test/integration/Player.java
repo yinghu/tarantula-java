@@ -8,6 +8,7 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.util.HashMap;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CountDownLatch;
 
 public class Player implements Runnable, WebSocket.Listener{
@@ -17,19 +18,23 @@ public class Player implements Runnable, WebSocket.Listener{
     private CountDownLatch counter;
     private HashMap<String,String> _headers = new HashMap<>();
     private String userName;
-    private HTTPCaller.OnResponse done;
+    private OnResponse done;
     private boolean[] continuing = {false};
     private JsonObject presence;
     private JsonObject connection;
     private WebSocket webSocket;
     private CountDownLatch waiting;
 
+    private OnGame onGame;
+    //private String gameTypeId ="demo";
 
-    public Player(boolean secure, String host, CountDownLatch counter,String userName, HTTPCaller.OnResponse done){
+    private JsonObject gameLobby;
+    public Player(boolean secure, String host, CountDownLatch counter,String userName,OnGame onGame,OnResponse done){
         this.secure = secure;
         this.host = host;
         this.counter = counter;
         this.userName = userName;
+        this.onGame = onGame;
         this.done = done;
         waiting = new CountDownLatch(1);
     }
@@ -47,6 +52,12 @@ public class Player implements Runnable, WebSocket.Listener{
             _headers.put(Session.TARANTULA_TAG,"index/lobby");
             caller.doAction("user/index","onIndex",_headers,null,(json -> {
                 isContinue(json);
+                json.getAsJsonArray("lobbyList").forEach(lb->{
+                    if(lb.getAsJsonObject().get("descriptor").getAsJsonObject().get("typeId").getAsString().equals(onGame.typeId())){
+                        gameLobby = lb.getAsJsonObject().get("descriptor").getAsJsonObject();
+                        //System.out.println(gameLobby);
+                    }
+                });
             }));
             if(continuing[0]){
                 JsonObject jsonObject = new JsonObject();
@@ -69,7 +80,6 @@ public class Player implements Runnable, WebSocket.Listener{
                 _headers.put(Session.TARANTULA_MAGIC_KEY,jsonObject.get("login").getAsString());
                 caller.doAction("user/action","onLogin",_headers,jsonObject.toString().getBytes(),json -> {
                     if(isContinue(json)){
-                        //System.out.println(json.get("presence"));
                         presence = json.get("presence").getAsJsonObject();
                     }
                 });
@@ -80,7 +90,6 @@ public class Player implements Runnable, WebSocket.Listener{
                 _headers.put(Session.TARANTULA_TOKEN,presence.get("token").getAsString());
                 caller.doAction("service/action","onPresence",_headers,"{}".getBytes(),json -> {
                     if(isContinue(json)){
-                        //System.out.println(json.get("connection"));
                         connection = json.get("connection").getAsJsonObject();
                     }
                 });
@@ -90,6 +99,8 @@ public class Player implements Runnable, WebSocket.Listener{
             }
             if(continuing[0]){
                 //onGame and play
+                onPlay(caller);
+                waiting.countDown();
             }
             if(continuing[0]){
                 waiting.await();
@@ -99,7 +110,6 @@ public class Player implements Runnable, WebSocket.Listener{
                 _headers.put(Session.TARANTULA_TOKEN,presence.get("token").getAsString());
                 caller.doAction("service/action","onAbsence",_headers,"{}".getBytes(),json -> {
                     if(isContinue(json)){
-                        //System.out.println(json);
                         done.on(json);
                     }
                 });
@@ -126,11 +136,7 @@ public class Player implements Runnable, WebSocket.Listener{
         JsonObject jd = new JsonObject();
         jd.addProperty("command","onStart");
         jo.add("data",jd);
-        System.out.println(jo.toString());
         webSocket.sendText(jo.toString(),true);
-        Thread.sleep(5000);
-        waiting.countDown();
-        //webSocket.sendClose(WebSocket.NORMAL_CLOSURE,"closed");
     }
     private void offWebSocket() throws Exception{
         JsonObject jo = new JsonObject();
@@ -140,7 +146,6 @@ public class Player implements Runnable, WebSocket.Listener{
         JsonObject jd = new JsonObject();
         jd.addProperty("command","onStop");
         jo.add("data",jd);
-        System.out.println(jo.toString());
         webSocket.sendText(jo.toString(),true);
         webSocket.sendClose(WebSocket.NORMAL_CLOSURE,"closed");
     }
@@ -160,10 +165,50 @@ public class Player implements Runnable, WebSocket.Listener{
 
     @Override
     public CompletionStage<?> onText(WebSocket ws, CharSequence data, boolean last) {
-        //start.compareAndSet(0,System.currentTimeMillis());
-        //end.set(System.currentTimeMillis());
-        //totalBytes.addAndGet(data.length()*8);
-        System.out.println(data);
+        onGame.onMessage(data);
         return WebSocket.Listener.super.onText(ws, data, last);
+    }
+    private void onPlay(HTTPCaller caller) throws Exception{
+        _headers.put(Session.TARANTULA_TAG,gameLobby.get("tag").getAsString());
+        _headers.put(Session.TARANTULA_TOKEN,presence.get("token").getAsString());
+        JsonObject payload = new JsonObject();
+        payload.addProperty("typeId",onGame.typeId());
+        ConcurrentLinkedDeque<JsonObject> aQueue = new ConcurrentLinkedDeque<>();
+        caller.doAction("service/action","onLobby",_headers,payload.toString().getBytes(),json->{
+            json.get("gameList").getAsJsonArray().forEach(a->{
+                aQueue.offer(a.getAsJsonObject());
+            });
+        });
+        JsonObject game;
+        do{
+            game = aQueue.poll();
+            if(game!=null){
+                String appId = game.get("applicationId").getAsString();
+                _headers.put(Session.TARANTULA_TAG,"presence/lobby");
+                _headers.put(Session.TARANTULA_TOKEN,presence.get("token").getAsString());
+                payload.addProperty("applicationId",appId);
+                payload.addProperty("accessMode",Session.FAST_PLAY_MODE);
+                caller.doAction("service/action","onPlay",_headers,payload.toString().getBytes(),jo->{
+                    jo.addProperty("applicationId",appId);
+                    onGame.onPlay(jo,webSocket,caller,presence);
+                });
+            }
+        }while (game!=null);
+    }
+    private void _onPlay() throws Exception{
+        JsonObject data = new JsonObject();
+        data.addProperty("systemId",presence.get("systemId").getAsString());
+        JsonObject payload = new JsonObject();
+        payload.add("data",data);
+        payload.addProperty("path","/service/action");
+        payload.addProperty("tag","presence/profile");
+        payload.addProperty("action","onProfile");
+        payload.addProperty("streaming",false);
+
+        _headers.put(Session.TARANTULA_TAG,"presence/profile");
+        _headers.put(Session.TARANTULA_TOKEN,presence.get("token").getAsString());
+        for(int i=0;i<10;i++){
+            webSocket.sendText(payload.toString(),true);}
+        Thread.sleep(2000);
     }
 }
