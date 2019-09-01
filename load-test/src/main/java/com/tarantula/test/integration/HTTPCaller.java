@@ -28,7 +28,7 @@ public class HTTPCaller {
         this.prefix = host;
         this.jsonParser = new JsonParser();
     }
-    public void doAction(String path, String command, HashMap<String,String> headers, byte[] payload, OnResponse onResponse){
+    public void doAction(String path, String command, HashMap<String,String> headers, byte[] payload, OnPayload onResponse){
         this.requestOnJson(path,command,headers,payload);
         onResponse.on(jsonElement.getAsJsonObject());
     }

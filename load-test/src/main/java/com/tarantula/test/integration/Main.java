@@ -18,13 +18,7 @@ public class Main {
         caller.run();
         //runSimulation(args);
     }
-
-
-
-
-
-
-    public static void runSimulation(String[] args) throws Exception{
+    private static void runSimulation(String[] args) throws Exception{
         long st = System.currentTimeMillis();
         AtomicInteger round = new AtomicInteger(0);
         int batch;
