@@ -26,7 +26,6 @@ public class Player implements Runnable, WebSocket.Listener{
     private CountDownLatch waiting;
 
     private OnGame onGame;
-    //private String gameTypeId ="demo";
 
     private JsonObject gameLobby;
     public Player(boolean secure, String host, CountDownLatch counter,String userName,OnGame onGame,OnResponse done){
