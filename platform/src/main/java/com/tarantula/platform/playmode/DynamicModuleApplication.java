@@ -133,4 +133,10 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         }
         this.context.log("Instance ["+descriptor.moduleName()+"/"+this.context.onRegistry().distributionKey()+"] closed",OnLog.WARN);
     }
+    @Override
+    public void onError(Session session, Exception ex) {
+        this.context.log(session.toString(),ex,OnLog.ERROR);
+        String msg = ex.getMessage()!=null?ex.getMessage():"Unexpected error";
+        session.write(this.builder.create().toJson(new ResponseHeader("onError",false,400,msg,"error")).getBytes(),this.module.label());
+    }
 }

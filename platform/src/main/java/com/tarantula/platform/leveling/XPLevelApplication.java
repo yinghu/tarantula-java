@@ -25,8 +25,8 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
             session.write(this.builder.create().toJson(lcx).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onXP")){
-            String header = acc.header("header");
-            String category = acc.header("category");
+            String header = acc.property("header");
+            String category = acc.property("category");
             XPLevel l = (XPLevel) this._load(session.systemId());
             lcx.xp = l.list(header,category);
             session.write(this.builder.create().toJson(lcx).getBytes(),this.descriptor.responseLabel());

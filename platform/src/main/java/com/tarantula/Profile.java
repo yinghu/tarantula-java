@@ -3,7 +3,7 @@ package com.tarantula;
 /**
  * updated by yinghu on 8/26/19
  */
-public interface Profile extends Recoverable,OnHeader {
+public interface Profile extends Recoverable, OnProperty {
 
     void nickname(String nickname);
     String nickname();

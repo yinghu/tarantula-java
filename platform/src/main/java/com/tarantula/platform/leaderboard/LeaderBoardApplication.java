@@ -6,7 +6,7 @@ import com.tarantula.platform.util.LeaderBoardSerializer;
 
 
 /**
- * Updated 4/24/2018 yinghu lu
+ * Updated 9/2/19yinghu lu
  */
 public class LeaderBoardApplication extends TarantulaApplicationHeader{
 
@@ -16,7 +16,7 @@ public class LeaderBoardApplication extends TarantulaApplicationHeader{
     public void callback(Session session, byte[] payload) throws Exception {
         OnAccess cmd = this.builder.create().fromJson(new String(payload).trim(), OnAccess.class);
         if(session.action().equals("onLeaderBoard")){// query header, name and classifier eg Presence, Top10, LoginCount ,Total
-           LeaderBoard ldx = leaderBoardServiceProvider.leaderBoard(cmd.header("header"),cmd.header("category"),cmd.header("classifier"));
+           LeaderBoard ldx = leaderBoardServiceProvider.leaderBoard(cmd.property("header"),cmd.property("category"),cmd.property("classifier"));
            session.write(this.builder.create().toJson(ldx).getBytes(),this.descriptor.responseLabel());
         }
         else{

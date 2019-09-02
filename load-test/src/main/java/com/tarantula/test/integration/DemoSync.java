@@ -25,10 +25,10 @@ public class DemoSync extends OnGame {
             this.applicationId = joined.get("applicationId").getAsString();
             this.instanceId = joined.get("instanceId").getAsString();
             onStream(webSocket);
-            onAction(webSocket,data->data.addProperty("command","a"));
-            onAction(webSocket,data->data.addProperty("command","b"));
-            onAction(webSocket,data->data.addProperty("command","c"));
-            Thread.sleep(10);
+            onAction(webSocket,data->{data.addProperty("command","a");data.addProperty("timestamp",System.currentTimeMillis());});
+            onAction(webSocket,data->{data.addProperty("command","b");data.addProperty("timestamp",System.currentTimeMillis());});
+            onAction(webSocket,data->{data.addProperty("command","c");data.addProperty("timestamp",System.currentTimeMillis());});
+            Thread.sleep(1000);
             onAction(caller,data ->data.addProperty("command","onLeave"));
             System.out.println("Total Bytes Received ["+totalBytesReceived.get()+"]");
         }catch (Exception ex){
@@ -37,6 +37,6 @@ public class DemoSync extends OnGame {
     }
     public void onMessage(CharSequence message){
         super.onMessage(message);
-        //System.out.println(message);
+        System.out.println(message);
     }
 }

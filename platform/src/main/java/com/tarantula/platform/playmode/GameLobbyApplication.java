@@ -52,7 +52,7 @@ public class GameLobbyApplication extends TarantulaApplicationHeader implements 
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onList")){ //return available instance list
-            int sz = Integer.parseInt(ex.header("size"));
+            int sz = Integer.parseInt(ex.property("size"));
             GameLobbyContext ic = new GameLobbyContext(session.action());
             ArrayList<InstanceRegistry> alist = new ArrayList<>();
             rMap.forEach((k,v)->{

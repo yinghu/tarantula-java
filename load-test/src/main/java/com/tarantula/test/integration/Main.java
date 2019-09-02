@@ -33,8 +33,8 @@ public class Main {
             prefix = args[3];
         }catch (Exception ex){
             //ex.printStackTrace();
-            batch = 100;
-            psize = 50;
+            batch = 10;
+            psize = 100;
             host = null;
             ///prefix = "test";
         }

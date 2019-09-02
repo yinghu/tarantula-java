@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
- * Updated by yinghu on 10/24/2018.
+ * Updated by yinghu on 9/2/2019.
  */
 public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
 
@@ -58,9 +58,12 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
             else if(k.equals("balance")){
                 access.entryCost(jo.getAsDouble());
             }
+            else if(k.equals("timestamp")){
+                access.timestamp(jo.getAsLong());
+            }
             else{
                 if(!jo.getAsString().trim().equals("")){
-                    access.header(k,jo.getAsString());
+                    access.property(k,jo.getAsString());
                 }
             }
         });

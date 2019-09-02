@@ -34,12 +34,12 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         String root = configuration.property("root");
         String pwd = configuration.property("password");
         OnAccess onAccess = new OnAccessTrack();
-        onAccess.header("login",root);
-        onAccess.header("password",pwd);
-        onAccess.header("nickname","super user");
+        onAccess.property("login",root);
+        onAccess.property("password",pwd);
+        onAccess.property("nickname","super user");
         DataStore ds = this.context.dataStore("user");
         String rootId = ds.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid();
-        AccessIndex accessIndex = accessIndexService.set(onAccess.header("login"),rootId);
+        AccessIndex accessIndex = accessIndexService.set(onAccess.property("login"),rootId);
         if(accessIndex!=null){
             createLogin(onAccess, rootId,"root");
         }
@@ -54,7 +54,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     public void callback(Session session,byte[] payload) throws Exception {
         OnAccess acc = builder.create().fromJson(new String(payload).trim(),OnAccess.class);
         if(session.action().equals("onLogin")){
-            OnSession access = this.login(session.systemId(),acc.header("password"),session);
+            OnSession access = this.login(session.systemId(),acc.property("password"),session);
             if(access.successful()){
                 PresenceContext ptx = new PresenceContext("onLogin");
                 ptx.presence= access;
@@ -89,9 +89,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             }
         }
         else if(session.action().equals("onRegister")){
-            AccessIndex _query = accessIndexService.set(acc.header("login"),session.systemId());
+            AccessIndex _query = accessIndexService.set(acc.property("login"),session.systemId());
             if(_query==null){
-                session.write(builder.create().toJson(new ResponseHeader(session.action(),false,0,"login [" + acc.header("login") + "] cannot be registered","error")).getBytes(),this.descriptor.responseLabel());
+                session.write(builder.create().toJson(new ResponseHeader(session.action(),false,0,"login [" + acc.property("login") + "] cannot be registered","error")).getBytes(),this.descriptor.responseLabel());
             }
             else{
                 Access access = this.createLogin(acc,session.systemId(),role);
@@ -123,9 +123,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     private Access createLogin(OnAccess payload,String systemId,String roleName){
         DataStore ds = this.context.dataStore("user");
         //this.context.log("User Create->"+payload.header("login")+"<>"+systemId,OnLog.INFO);
-        Access acc = new AccessTrack(payload.header("login"));
+        Access acc = new AccessTrack(payload.property("login"));
         acc.distributionKey(systemId);
-        acc.password(this.context.validator().hashPassword(payload.header("password")));
+        acc.password(this.context.validator().hashPassword(payload.property("password")));
         acc.active(this.activated);//if false do email validation
         acc.role(roleName);
         if(ds.create(acc)){
@@ -133,7 +133,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             px.distributionKey(acc.distributionKey());
             this.context.dataStore("presence").create(px);
             ProfileTrack _p = new ProfileTrack(acc.bucket(),acc.oid());
-            _p.nickname(payload.header("nickname")!=null?payload.header("nickname"):acc.login());
+            _p.nickname(payload.property("nickname")!=null?payload.property("nickname"):acc.login());
             _p.emailAddress("n/a");
             _p.avatar("content/avatar/"+acc.distributionKey());
             this.context.dataStore("profile").create(_p);

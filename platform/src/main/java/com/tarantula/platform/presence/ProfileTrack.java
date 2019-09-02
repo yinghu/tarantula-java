@@ -2,10 +2,13 @@ package com.tarantula.platform.presence;
 
 import com.tarantula.Profile;
 
+import com.tarantula.Property;
 import com.tarantula.platform.AssociateKey;
+import com.tarantula.platform.DistributedProperty;
 import com.tarantula.platform.RecoverableObject;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,16 +49,20 @@ public class ProfileTrack extends RecoverableObject implements Profile {
         return this.emailAddress;
     }
 
-    public void header(String header,String value){
+    public void property(String header,String value){
         this.properties.put(header,value);
     }
-    public String header(String header){
+    public String property(String header){
         return (String) this.properties.get(header);
     }
 
-    public Map<String,String> header(){
-        HashMap<String,String> hm = new HashMap<>();
-        properties.forEach((k,v)->hm.put(k,(String)v));
+    public List<Property> list(){
+        List<Property> hm = new ArrayList<>();
+        this.properties.forEach((String s,Object o)->{
+            if(o instanceof String){
+                hm.add(new DistributedProperty(s,(String)o));
+            }
+        });
         return hm;
     }
 

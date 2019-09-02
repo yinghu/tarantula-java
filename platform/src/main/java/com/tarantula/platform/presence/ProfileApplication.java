@@ -35,14 +35,14 @@ public class ProfileApplication extends TarantulaApplicationHeader {
             OnAccess acc = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             ContentTransaction ct = new ContentTransaction(session.systemId(),"Avatar");
             ct.chunkSize = uploadChunkSize;
-            ct.contentSize = Integer.parseInt(acc.header("size"));
+            ct.contentSize = Integer.parseInt(acc.property("size"));
             ct.batchSize = Math.floorDiv(ct.contentSize,uploadChunkSize)+((ct.contentSize%uploadChunkSize)>0?1:0);
-            ct.contentType = SystemUtil.mimeTypeFromWebBase64(acc.header("type"));
+            ct.contentType = SystemUtil.mimeTypeFromWebBase64(acc.property("type"));
             this.avatarDataStore.create(ct);
             ct._batched = ct.batchSize;
             this._pendingProgress.put(session.systemId(),ct);
-            acc.header("batchSize",ct.chunkSize+"");
-            acc.header("transactionId",session.systemId());
+            acc.property("batchSize",ct.chunkSize+"");
+            acc.property("transactionId",session.systemId());
             session.write(builder.create().toJson(acc).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().startsWith("avatar")){

@@ -22,7 +22,7 @@ public class AdminUserModule implements Module {
         this.context.log(session.action()+"=>"+new String(payload),OnLog.INFO);
         OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
         if(session.action().equals("findKey")){
-            AccessIndex ix = this.accessIndexService.get(onAccess.header("login"));
+            AccessIndex ix = this.accessIndexService.get(onAccess.property("login"));
             if(ix!=null){
                 session.write(this.builder.create().toJson(_onAccessIndex(ix)).getBytes(),label());
             }
@@ -33,8 +33,8 @@ public class AdminUserModule implements Module {
         else if(session.action().equals("resetPassword")){
             Access acc = new AccessTrack();
             acc.distributionKey(onAccess.systemId());
-            String p1 = onAccess.header("password1");
-            String p2 = onAccess.header("password2");
+            String p1 = onAccess.property("password1");
+            String p2 = onAccess.property("password2");
             if(p1.equals(p2)&&this.user.load(acc)){
                 acc.password(this.context.validator().hashPassword(p1));
                 this.user.update(acc);
@@ -47,8 +47,8 @@ public class AdminUserModule implements Module {
         else if(session.action().equals("changeRole")){
             Access acc = new AccessTrack();
             acc.distributionKey(onAccess.systemId());
-            String r1 = onAccess.header("role1");
-            String r2 = onAccess.header("role2");
+            String r1 = onAccess.property("role1");
+            String r2 = onAccess.property("role2");
             if(r1.equals(r2)&&this.user.load(acc)){
                 acc.role(r1);
                 this.user.update(acc);
@@ -59,7 +59,7 @@ public class AdminUserModule implements Module {
             }
         }
         else if(session.action().equals("addUser")){
-            AccessIndex query = accessIndexService.set(onAccess.header("login"), user.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid());
+            AccessIndex query = accessIndexService.set(onAccess.property("login"), user.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid());
             if(query!=null){
                 onAccess.owner(session.systemId());
                 onAccess.distributionKey(query.distributionKey());
