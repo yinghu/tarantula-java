@@ -2,6 +2,7 @@ package com.tarantula.demo;
 
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AssociateKey;
+import com.tarantula.platform.OnApplicationHeader;
 import com.tarantula.platform.RecoverableObject;
 
 import java.util.Map;
@@ -9,7 +10,7 @@ import java.util.Map;
 /**
  * Updated 7/25/19 by yinghu
  */
-public class Timer extends RecoverableObject {
+public class Timer extends OnApplicationHeader {
 
     public long hour;
     public long minute;
@@ -23,6 +24,7 @@ public class Timer extends RecoverableObject {
     public Timer(){
         this.vertex = "Timer";
         this.label = "timer";
+        this.command = "timer";
     }
     public Timer(long duration,long delta){
         this();
