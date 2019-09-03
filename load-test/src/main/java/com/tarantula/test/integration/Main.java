@@ -14,8 +14,8 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception{
-        Player caller = new Player(false,"localhost:8090",new CountDownLatch(1),UUID.randomUUID().toString(),new DemoSync(),jsonObject -> System.out.println(jsonObject));
-        caller.run();
+        //Player caller = new Player(false,"localhost:8090",new CountDownLatch(1),UUID.randomUUID().toString(),new DemoSync(),jsonObject -> System.out.println(jsonObject));
+        //caller.run();
         runSimulation(args);
     }
     private static void runSimulation(String[] args) throws Exception{
@@ -34,7 +34,7 @@ public class Main {
         }catch (Exception ex){
             //ex.printStackTrace();
             batch = 1;
-            psize = 10;
+            psize = 100;
             host = null;
             ///prefix = "test";
         }
@@ -53,6 +53,7 @@ public class Main {
                 ix++;
                 Player simulator = new Player(secured,host,waiting,uname,new DemoSync(),jsonObject -> round.incrementAndGet());
                 pool.execute(simulator);
+                Thread.sleep(4);
             }
             waiting.await();
         }

@@ -16,6 +16,7 @@ var mresult = {payload:[],cid:[],lbl:[],pos:0};
 var mlistener = connectOnTarantula();
 var connected = false;
 var web;
+var lastMessage;
 var serverId = uuidv1();
 if(secured){
     const options = {
@@ -68,12 +69,12 @@ wsServer.on('request', function(request) {
                            pMap.set(_pr.label,{payload:'{}',listeners:[]});
                         }
                         let pse = pMap.get(_pr.label);
-                        connection.sendUTF(pse.payload);
                         if(_pr.streaming){
                             //register callback if streaming required otherwise send back per request
                             if(_pr.action === 'onStart'){
                                 console.log('register on ['+_pr.label+'] from ['+connection.clientId+']');
                                 pse.listeners.push(connection.clientId);
+                                connection.sendUTF(pse.payload);
                             }
                             else if(_pr.action ==='onStop'){
                                 let ix = pse.listeners.indexOf(connection.clientId);
@@ -95,7 +96,7 @@ wsServer.on('request', function(request) {
             });**/
             connection.on('error',function(err){
                 console.log('Error on web socket connection');
-                console.log(err);
+                console.log(lastMessage);
                 cMap.delete(connection.clientId);
             });
             connection.on('close', function(reasonCode, description) {
@@ -145,10 +146,11 @@ function connectOnTarantula(){
                var conn = cMap.get(cid);
                if(conn){
                     try{
+                        lastMessage = mx;
                         conn.sendUTF(mx);
                     }catch(er){
-                        console.log('client removed->'+cid);
-                        cMap.delete(cid);
+                        //console.log('client removed->'+cid);
+                        //cMap.delete(cid);
                     }
                }
                else{//server push event

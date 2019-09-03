@@ -14,7 +14,7 @@ public class Boost implements Module {
     private ApplicationContext context;
     private GsonBuilder builder;
 
-    private long delta = 50;
+    private long delta = 500;
     //private long noticeInterval = 500;
     private Timer timer;
     private Statistics statistics;
@@ -29,7 +29,7 @@ public class Boost implements Module {
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception{
         boolean leaving = false;
         OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-        context.log("test update from module->"+session.action()+"/"+onAccess.timestamp(),OnLog.INFO);
+        //context.log("test update from module->"+session.action()+"/"+onAccess.timestamp(),OnLog.INFO);
         if(session.action().equals("a")){
             byte[] ret = this.builder.create().toJson(this.demoObject(session.action(),onAccess.timestamp())).getBytes();
             session.write(ret,this.label());
@@ -96,8 +96,12 @@ public class Boost implements Module {
     }
 
     public void onTimer(OnUpdate update){
-        timer.update();
-        update.on(this.builder.create().toJson(timer).getBytes());
+        delta -=50;
+        if(delta<=0){
+            timer.update();
+            update.on(this.builder.create().toJson(timer).getBytes());
+            delta = 500;
+        }
     }
     public void clear(){
         this.dataStore.update(timer);

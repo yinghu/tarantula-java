@@ -48,7 +48,7 @@ public class Player implements Runnable, WebSocket.Listener{
              json.addProperty("duration",(System.currentTimeMillis()-start));
              done.on(json);
          }
-         //this.onGame.onMessage(json.toString());
+         this.onGame.onMessage(json.toString());
          return continuing[0];
     }
     public void run() {
@@ -105,7 +105,7 @@ public class Player implements Runnable, WebSocket.Listener{
             if(continuing[0]){
                 //onGame and play
                 onPlay(caller);
-                onProfile();
+                //onProfile();
                 waiting.countDown();
             }
             if(continuing[0]){
