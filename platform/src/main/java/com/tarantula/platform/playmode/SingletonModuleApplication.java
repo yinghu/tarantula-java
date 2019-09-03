@@ -23,23 +23,21 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
 
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
-        if(session.action().equals("onStream")){
+        if(session.streaming()){
             this._onStream.put(session.systemId(),session);
         }
-        else{
-            if(this.module.onRequest(session,payload,((systemId, delta) ->{
-                this._onStream.forEach((k,v)->{
-                    v.write(delta,this.module.label());
-                });
-                //server push
-            }))){
-                //clean up on leave
-                this.context.log("Session->"+session.systemId(),OnLog.INFO);
-                Session rm = this._onStream.remove(session.systemId());
-                if(rm!=null){
-                    ResponseHeader resp = new ResponseHeader(session.action(),"close session");
-                    rm.write(this.builder.create().toJson(resp).getBytes(),module.label(),true);
-                }
+        if(this.module.onRequest(session,payload,((systemId, delta) ->{
+            this._onStream.forEach((k,v)->{
+                v.write(delta,this.module.label());
+            });
+            //server push
+        }))){
+            //clean up on leave
+            this.context.log("Session->"+session.systemId(),OnLog.INFO);
+            Session rm = this._onStream.remove(session.systemId());
+            if(rm!=null){
+                ResponseHeader resp = new ResponseHeader(session.action(),"close session");
+                rm.write(this.builder.create().toJson(resp).getBytes(),module.label(),true);
             }
         }
     }

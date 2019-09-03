@@ -30,19 +30,17 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     }
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
-        if(session.action().equals("onStream")){
+        if(session.streaming()){
             this._onStream.put(session.systemId(),session);
         }
-        else{
-            if(this.module.onRequest(session,payload,((systemId, delta) -> {
-                this._onStream.forEach((k,v)->{
-                    v.write(delta,this.module.label());
-                });
-                //server push
-            }))){
-                //clean up on leave
-                this.onTimeout(session);
-            }
+        if(this.module.onRequest(session,payload,((systemId, delta) -> {
+            this._onStream.forEach((k,v)->{
+                v.write(delta,this.module.label());
+            });
+            //server push
+        }))){
+            //clean up on leave
+            this.onTimeout(session);
         }
     }
 

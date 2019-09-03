@@ -14,7 +14,7 @@ public class Boost implements Module {
     private ApplicationContext context;
     private GsonBuilder builder;
 
-    private long delta = 500;
+    private long delta = 50;
     //private long noticeInterval = 500;
     private Timer timer;
     private Statistics statistics;
@@ -68,10 +68,6 @@ public class Boost implements Module {
             session.write(payload,this.label());
             leaving = true;
         }
-        else{
-            session.write(payload,this.label());
-            leaving = true;
-        }
         return leaving;
     }
     public String label(){
@@ -96,11 +92,11 @@ public class Boost implements Module {
     }
 
     public void onTimer(OnUpdate update){
-        delta -=50;
+        delta -= this.context.descriptor().timerOnModule();
         if(delta<=0){
             timer.update();
             update.on(null,this.builder.create().toJson(timer).getBytes());
-            delta = 500;
+            delta = 50;
         }
     }
     public void clear(){

@@ -27,7 +27,7 @@ public class DemoSync extends OnGame {
             this.presence = presence;
             this.applicationId = joined.get("applicationId").getAsString();
             this.instanceId = joined.get("instanceId").getAsString();
-            long waiting = 500;
+            long waiting = 250;
             onStream(webSocket);
             for(int i=0;i<10;i++){
                 onAction(webSocket,data->{data.addProperty("command","a");data.addProperty("timestamp",System.currentTimeMillis());});
@@ -50,7 +50,7 @@ public class DemoSync extends OnGame {
             JsonObject jo = parser.parse(message.subSequence(4,message.length()).toString()).getAsJsonObject();
             if(jo.has("command")){
                 String cmd = jo.get("command").getAsString();
-                if(cmd.equals("a")||cmd.equals("b")||cmd.equals("")){
+                if(cmd.equals("a")||cmd.equals("b")||cmd.equals("c")){
                     long dur = (System.currentTimeMillis()-jo.get("timestamp").getAsLong());
                     if(dur<=10){
                         LoadResult.totalRoundTrip1_10.incrementAndGet();

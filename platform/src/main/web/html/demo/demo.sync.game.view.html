@@ -60,7 +60,7 @@
     let nrt = UI.text('Request Timed',{fontWeight: 700,fontFamily:'Oswald, Arial',fontSize:32,fill:'0xD1BC22'});
     pView.container.addChild(nrt.container);
     
-    let commandList = UI.textCommandList(4,120);
+    let commandList = UI.textCommandList(3,120);
     commandList.list[0].title('1K');
     commandList.list[0].button.command = function(){
         statBoard.lines[2].t.tm = Date.now();
@@ -92,8 +92,8 @@
             nrt.title("Response bytes ["+bt+"] timed (ms)->"+(nt-statBoard.lines[4].t.tm));
         });
     };
-    commandList.list[3].title('Reset');
-    commandList.list[3].button.command = function(){DemoSyncGame.sit('onReset',(resp)=>{console.log(resp)})};
+    //commandList.list[3].title('Reset');
+    //commandList.list[3].button.command = function(){DemoSyncGame.sit('onReset',(resp)=>{console.log(resp)})};
     pView.container.addChild(commandList.container);
     
     let itemSerice = UI.textCommandList(4,120);
