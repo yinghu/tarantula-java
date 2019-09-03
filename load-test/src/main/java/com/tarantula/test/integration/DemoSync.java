@@ -2,7 +2,7 @@ package com.tarantula.test.integration;
 
 import com.google.gson.JsonObject;
 import java.net.http.WebSocket;
-
+import java.nio.CharBuffer;
 public class DemoSync extends OnGame {
 
 
@@ -37,6 +37,8 @@ public class DemoSync extends OnGame {
     }
     public void onMessage(CharSequence message){
         super.onMessage(message);
-        System.out.println(message);
+        if(message.charAt(4)=='{'){
+            System.out.println(message.subSequence(4,message.length()));
+        }
     }
 }

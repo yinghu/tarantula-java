@@ -7,6 +7,7 @@ import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CountDownLatch;
@@ -28,6 +29,8 @@ public class Player implements Runnable, WebSocket.Listener{
     private OnGame onGame;
     private long start;
     private JsonObject gameLobby;
+    private StringBuilder dataBuffer;
+    CompletableFuture<?> accumulatedMessage;
     public Player(boolean secure, String host, CountDownLatch counter, String userName, OnGame onGame, OnPayload done){
         this.secure = secure;
         this.host = host;
@@ -36,6 +39,8 @@ public class Player implements Runnable, WebSocket.Listener{
         this.onGame = onGame;
         this.done = done;
         waiting = new CountDownLatch(1);
+        this.dataBuffer = new StringBuilder();
+        this.accumulatedMessage = new CompletableFuture<>();
     }
     private boolean isContinue(JsonObject json){
          continuing[0]= json.get("successful").getAsBoolean();
@@ -43,6 +48,7 @@ public class Player implements Runnable, WebSocket.Listener{
              json.addProperty("duration",(System.currentTimeMillis()-start));
              done.on(json);
          }
+         this.onGame.onMessage(json.toString());
          return continuing[0];
     }
     public void run() {
@@ -169,8 +175,17 @@ public class Player implements Runnable, WebSocket.Listener{
 
     @Override
     public CompletionStage<?> onText(WebSocket ws, CharSequence data, boolean last) {
-        onGame.onMessage(data);
-        return WebSocket.Listener.super.onText(ws, data, last);
+        dataBuffer.append(data);
+        ws.request(1);
+        if(last){
+            onGame.onMessage(dataBuffer);
+            dataBuffer.setLength(0);
+            return null;
+        }
+        else{
+            System.out.println("more data coming ["+dataBuffer+"]");
+            return this.accumulatedMessage;
+        }
     }
     private void onPlay(HTTPCaller caller){
         _headers.put(Session.TARANTULA_TAG,gameLobby.get("tag").getAsString());
