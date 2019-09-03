@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) throws Exception{
         Player caller = new Player(false,"localhost:8090",new CountDownLatch(1),UUID.randomUUID().toString(),new DemoSync(),jsonObject -> System.out.println(jsonObject));
         caller.run();
-        //runSimulation(args);
+        runSimulation(args);
     }
     private static void runSimulation(String[] args) throws Exception{
         long st = System.currentTimeMillis();
@@ -33,8 +33,8 @@ public class Main {
             prefix = args[3];
         }catch (Exception ex){
             //ex.printStackTrace();
-            batch = 10;
-            psize = 100;
+            batch = 1;
+            psize = 10;
             host = null;
             ///prefix = "test";
         }

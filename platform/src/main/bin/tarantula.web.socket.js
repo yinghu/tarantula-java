@@ -144,7 +144,12 @@ function connectOnTarantula(){
                //console.log(mx);
                var conn = cMap.get(cid);
                if(conn){
-                    conn.sendUTF(mx);
+                    try{
+                        conn.sendUTF(mx);
+                    }catch(er){
+                        console.log('client removed->'+cid);
+                        cMap.delete(cid);
+                    }
                }
                else{//server push event
                     //console.log(mx);

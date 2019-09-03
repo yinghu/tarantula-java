@@ -48,7 +48,7 @@ public class Player implements Runnable, WebSocket.Listener{
              json.addProperty("duration",(System.currentTimeMillis()-start));
              done.on(json);
          }
-         this.onGame.onMessage(json.toString());
+         //this.onGame.onMessage(json.toString());
          return continuing[0];
     }
     public void run() {
@@ -183,7 +183,7 @@ public class Player implements Runnable, WebSocket.Listener{
             return null;
         }
         else{
-            System.out.println("more data coming ["+dataBuffer+"]");
+            //System.out.println("more data coming ["+dataBuffer+"]");
             return this.accumulatedMessage;
         }
     }
