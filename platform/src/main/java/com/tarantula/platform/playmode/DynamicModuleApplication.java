@@ -33,17 +33,13 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         if(session.action().equals("onStream")){
             this._onStream.put(session.systemId(),session);
         }
-        else if(session.action().equals("onReset")){
-            serviceProvider.reset(this.descriptor);
-            session.write(payload,this.module.label());
-        }
         else{
-            if(this.module.onRequest(session,payload,(delta)->{
+            if(this.module.onRequest(session,payload,((systemId, delta) -> {
                 this._onStream.forEach((k,v)->{
                     v.write(delta,this.module.label());
                 });
                 //server push
-            })){
+            }))){
                 //clean up on leave
                 this.onTimeout(session);
             }
@@ -107,11 +103,11 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         try{
             pendingTimer = pendingTimer-SERVER_PUSH_INTERVAL;
             if(pendingTimer<=0){
-                this.module.onTimer((delta)->
+                this.module.onTimer(((systemId, delta) ->
                     _onStream.forEach((k,v)->
                         v.write(delta,module.label())
                     )
-                );
+                ));
                 pendingTimer = descriptor.timerOnModule();//reset
             }
         }catch (Exception ex){

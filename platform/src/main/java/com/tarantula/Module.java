@@ -17,7 +17,7 @@ public interface Module {
 
     }
     interface OnUpdate{
-        void on(byte[] delta);
+        void on(String systemId,byte[] delta);
     }
     interface OnResource{
         void on(InputStream in);
