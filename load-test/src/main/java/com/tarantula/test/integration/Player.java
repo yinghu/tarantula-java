@@ -196,7 +196,7 @@ public class Player implements Runnable, WebSocket.Listener{
         caller.doAction("service/action","onLobby",_headers,payload.toString().getBytes(),json->{
             json.get("gameList").getAsJsonArray().forEach(a->{
                 aQueue.offer(a.getAsJsonObject());
-                System.out.println(a);
+                //System.out.println(a);
             });
         });
         JsonObject game;
