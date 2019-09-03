@@ -21,7 +21,8 @@ public class PresenceContext extends ResponseHeader {
     public Configuration connection;
     public Profile profile;
     public PresenceContext(){
-
+        this.code = 200;
+        this.successful=true;
     }
     public PresenceContext(String command){
         this.command = command;

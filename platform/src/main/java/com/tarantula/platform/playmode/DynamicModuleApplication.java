@@ -34,9 +34,14 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             this._onStream.put(session.systemId(),session);
         }
         if(this.module.onRequest(session,payload,((systemId, delta) -> {
-            this._onStream.forEach((k,v)->{
-                v.write(delta,this.module.label());
-            });
+            Session stream;
+            if(systemId!=null&&(stream =this._onStream.get(systemId))!=null){
+                stream.write(delta,module.label());
+            }else{//broadcasting to all streaming session
+                this._onStream.forEach((k,v)->{
+                    v.write(delta,this.module.label());
+                });
+            }
             //server push
         }))){
             //clean up on leave
@@ -69,7 +74,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             this.context.onRegistry().onLeave(session);
         }
         this._onStream.remove(session.systemId());
-        this.context.log("Timeout->"+session.systemId(),OnLog.INFO);
+        //this.context.log("Timeout->"+session.systemId(),OnLog.INFO);
     }
 
     @Override
@@ -79,7 +84,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         if(pending!=null){
             pending.write(this.builder.create().toJson(sessionIdle).getBytes(),module.label());
         }
-        this.context.log("Idle->"+session.systemId(),OnLog.INFO);
+        //this.context.log("Idle->"+session.systemId(),OnLog.INFO);
     }
     @Override
     public boolean oneTime() {

@@ -34,7 +34,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         }
         deploymentServiceProvider.registerConfigurationListener(this);
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
-            this.context.log(t.toString(),OnLog.INFO);
             Presence presence = this.context.presence(t.owner());
             OnBalance ob = (OnBalance)t;
             if(!(presence!=null&&presence.transact(ob.balance()))){

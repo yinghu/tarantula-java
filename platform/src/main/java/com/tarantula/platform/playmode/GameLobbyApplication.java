@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * Updated by yinghu lu on 4/30/2019.
+ * Updated by yinghu lu on 9/3/2019.
  */
 public class GameLobbyApplication extends TarantulaApplicationHeader implements OnInstance.Listener,SchedulingTask{
 
@@ -38,8 +38,8 @@ public class GameLobbyApplication extends TarantulaApplicationHeader implements 
             Lobby _lobby = this.context.lobby(ex.typeId());
             GameLobbyContext pc = new GameLobbyContext(session.action());
             List<GameDescriptor> gameList = new ArrayList();
-            _lobby.entryList().forEach((d)->{//should exclude the lobby app later if category is lobby
-                if(!d.category().equals("lobby")){
+            _lobby.entryList().forEach((d)->{
+                if((!d.category().equals("lobby"))&&(!(d.category().equals("service")))){//excludes lobby and service category apps
                     GameDescriptor c = new GameDescriptor();
                     if(d.configurationType()!=null){
                         c.configuration = cMap.get(d.configurationType());

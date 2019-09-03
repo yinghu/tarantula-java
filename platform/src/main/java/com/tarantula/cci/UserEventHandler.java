@@ -40,7 +40,6 @@ public class UserEventHandler implements RequestHandler {
                 byte[] _payload = onExchange.payload();
                 RoutingKey routingKey = eventService.routingKey(magicKey!=null?(this.bucket+"/"+magicKey):(this.bucket+"/"+sid),tag);
                 ServiceActionEvent event = new ServiceActionEvent(this.serverTopic,sid,_payload);
-                event.clientId(onExchange.header(Session.X_REAL_IP)!=null?onExchange.header(Session.X_REAL_IP):onExchange.remoteAddress());
                 event.action(action);
                 event.routingNumber(routingKey.routingNumber());
                 event.destination(routingKey.route());

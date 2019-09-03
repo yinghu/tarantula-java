@@ -17,17 +17,12 @@ public interface Session extends OnApplication{
     String TARANTULA_TOKEN ="Tarantula-token";
     String TARANTULA_PAYLOAD_SIZE ="Tarantula-payload-size";
     String TARANTULA_ACTION ="Tarantula-action";
-
     String TARANTULA_MAGIC_KEY ="Tarantula-magic-key"; //the routing key
-
     String TARANTULA_TAG ="Tarantula-tag";
-
-    String X_REAL_IP = "X-real-ip";
     String TARANTULA_PAYLOAD = "Tarantula-payload";
 
 
     int FAST_PLAY_MODE = 2;
-
     int INSTANCE_PLAY_MODE = 4;
 
 
