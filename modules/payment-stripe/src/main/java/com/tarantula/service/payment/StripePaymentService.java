@@ -36,19 +36,19 @@ public class StripePaymentService implements Module {
         if(session.action().equals("onList")){
             MarketplaceContext mc = new MarketplaceContext(session.action());
             mc.paymentClientId = publicKey;
-            mc.virtualCreditsPackList = this.smartPackageGenerator.list(Double.parseDouble(ex.header("requestingCredits")),Integer.parseInt(ex.header("packSize")));
+            mc.virtualCreditsPackList = this.smartPackageGenerator.list(Double.parseDouble(ex.property("requestingCredits")),Integer.parseInt(ex.property("packSize")));
             session.write(this.builder.create().toJson(mc).getBytes(),this.label());
         }
         else if(session.action().equals("onCommit")){ //finish the checkout process with confirmation ticket to verify
             VirtualCreditsPack co = new VirtualCreditsPack();
-            co.distributionKey(ex.header("checkoutId"));
+            co.distributionKey(ex.property("checkoutId"));
             boolean suc = false;
             if(this.dataStore.load(co)){
                 Map<String, Object> chargeParams = new HashMap<>();
                 chargeParams.put("amount",Double.valueOf(co.price).intValue());//pass penney number as integer
                 chargeParams.put("currency", "usd");
                 chargeParams.put("description", "Charge for ["+co.distributionKey()+"]");
-                chargeParams.put("source",ex.header("orderId"));
+                chargeParams.put("source",ex.property("orderId"));
                 if(validate(chargeParams)){
                     //charge successfully
                     OnBalanceTrack onBalanceTrack = new OnBalanceTrack(session.systemId(),co.credits);
