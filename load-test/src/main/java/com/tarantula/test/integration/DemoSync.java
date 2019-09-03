@@ -27,7 +27,7 @@ public class DemoSync extends OnGame {
             this.presence = presence;
             this.applicationId = joined.get("applicationId").getAsString();
             this.instanceId = joined.get("instanceId").getAsString();
-            long waiting = 4000;
+            long waiting = 500;
             onStream(webSocket);
             for(int i=0;i<10;i++){
                 onAction(webSocket,data->{data.addProperty("command","a");data.addProperty("timestamp",System.currentTimeMillis());});

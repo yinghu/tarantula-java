@@ -96,7 +96,6 @@ wsServer.on('request', function(request) {
             });**/
             connection.on('error',function(err){
                 console.log('Error on web socket connection');
-                console.log(lastMessage);
                 cMap.delete(connection.clientId);
             });
             connection.on('close', function(reasonCode, description) {
@@ -145,13 +144,7 @@ function connectOnTarantula(){
                //console.log(mx);
                var conn = cMap.get(cid);
                if(conn){
-                    try{
-                        lastMessage = mx;
-                        conn.sendUTF(mx);
-                    }catch(er){
-                        //console.log('client removed->'+cid);
-                        //cMap.delete(cid);
-                    }
+                  conn.sendUTF(mx);
                }
                else{//server push event
                     //console.log(mx);
