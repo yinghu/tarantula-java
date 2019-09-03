@@ -66,7 +66,6 @@ public class DemoSync extends OnGame {
                     }
                     else{
                         LoadResult.totalRoundTripMore500.incrementAndGet();
-                        System.out.println(dur);
                     }
                 }
             }
