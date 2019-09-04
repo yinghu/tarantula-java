@@ -22,7 +22,7 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 [Load Test Result](doc/gec-test-result.pdf)
 
 ## How To Code (Write A Module)
-   A module implementation is a deployable and distributed in the cluster scope.
+A module implementation is a deployable and distributed in the cluster scope.
    ```JAVA
    public interface Module {
         default void onJoin(Session session) throws Exception{}
@@ -99,6 +99,8 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
         }
     
     }
+    ```
+    end of code
     
 ## How To Deploy (Drop A Module In Runtime)
     Coming Soon    
