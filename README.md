@@ -46,6 +46,7 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
     }
     //Simple Echo module
     public class Echo implements Module{
+        //the application resource lookup context
         private ApplicationContext context;
         //call when a client join the instance
         public void onJoin(Session session) throws Exception{
@@ -74,7 +75,9 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
             context.postOffice().onTag(Level.LEVEL_TAG).send(delta.owner(),delta);
                 
             //save the original payload in distributed local key value store                                                                                       
-            context.dataStore("echo").set(session.systemId().getBytes(),payload);                                                                                                                                                                             
+            context.dataStore("echo").set(session.systemId().getBytes(),payload);                                                                                                   
+            //return false to keep in the instance                                                                                        
+            return false;                                                                                                                                                                   
         }
         //call at a defined interval time such as 100ms                                
         public void onTimer(OnUpdate update){
@@ -95,7 +98,8 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
     
         }
     
-    }         
+    }
+    
 ## How To Deploy (Drop A Module In Runtime)
     Coming Soon    
 ## How To Use (Platform Setup)
