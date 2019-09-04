@@ -103,7 +103,7 @@ A module implementation is a deployable and distributed in the cluster scope.
 
 ## How To Deploy the module
 
-```
+```XML
 <?xml version="1.0" encoding="UTF-8"?>
 <tarantula>
     <lobby-context>
