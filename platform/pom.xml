@@ -34,8 +34,8 @@
 		  <groupId>com.je</groupId>
 		  <artifactId>je</artifactId>
 		  <version>7.5.11</version>
-		  <scope>system</scope>
-		  <systemPath>${basedir}/src/main/lib/je-7.5.11.jar</systemPath>
+		  <!--<scope>system</scope>
+		  <systemPath>${basedir}/src/main/lib/je-7.5.11.jar</systemPath>-->
 	  </dependency>
   </dependencies>
   <build>
@@ -47,7 +47,7 @@
 			<version>2.5</version>
 			<executions>
 				<execution>
-					<phase>initialize</phase>
+					<phase>clean</phase>
 					<goals>
 						<goal>install-file</goal>
 					</goals>
@@ -56,7 +56,8 @@
 						<artifactId>je</artifactId>
 						<version>7.5.11</version>
 						<packaging>jar</packaging>
-						<file>${basedir}/src/main/lib/je-7.5.11.jar</file>
+						<generatePom>true</generatePom>
+						<file>../lib/je-7.5.11.jar</file>
 					</configuration>
 				</execution>
 			</executions>

@@ -1,3 +1,4 @@
+
 <div class="tx-modal-content">
     <canvas id="tx-admin-setup-canvas"></canvas>              
 </div>
@@ -86,7 +87,9 @@
         _on_admin_stage();
     }
     let lbv = UI.lobbySetup();
-    lbv.setup.button.command = function(){
+    lbv.setup.button.command = _admin_setup;
+    /**
+    function(){
         //_view({viewId:'admin.add.application',containerId:'#m3'});
         if(adminObject.setup == 'Lobby'){
             lbv.setup.title("Application");
@@ -114,7 +117,7 @@
                 _on_admin_stage();
             });
         }
-    };
+    };**/
     pView.container.addChild(aleft.container);
     pView.container.addChild(aright.container);
     pView.container.addChild(lbv.container);
@@ -175,6 +178,34 @@
             TARA_API.query().app = adminObject.list[adminObject.index];
             _view({viewId:'admin.reset.module',containerId:'#m3'});
         }
+    }
+    function _admin_setup(){
+        if(adminObject.setup == 'Lobby'){
+            lbv.setup.title("Application");
+            adminObject.setup = 'Application';
+            AdminSetup.applicationList(adminObject.list[adminObject.index].applicationId,(resp)=>{
+                console.log(resp);
+                adminObject.index=0;
+                adminObject.list = resp.payload.list;
+                setupList.list[0].title('UpdateApp');
+                setupList.list[1].title('DisableApp');
+                setupList.list[2].title('Reset');
+                _on_admin_stage();
+            });
+        }
+        else{
+            lbv.setup.title("Lobby");
+            adminObject.setup = 'Lobby';
+            AdminSetup.lobbyList((resp)=>{
+                console.log(resp);
+                adminObject.index=0;
+                adminObject.list = resp.payload.list;
+                setupList.list[0].title('AddApp');
+                setupList.list[1].title('Shutdown');
+                setupList.list[2].title('Launch');
+                _on_admin_stage();
+            });
+        }    
     }
     function _on_admin_stage(){
         let lb = adminObject.list[adminObject.index];
