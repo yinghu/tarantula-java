@@ -80,13 +80,18 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
             byte[] echoHello = "Echo->Hello".getBytes();
             update.on(null,echoHello);                                          
         }
+        //call when the instance is launched
         public void setup(ApplicationContext context) throws Exception{
             this.context = context;
         }
-
+        //the label is the client message filter
         public String label(){
             return "echo";
-        } 
+        }
+        //call before the module is reloaded or upgraded                                    
+        public void clear(){
+    
+        }
     
     }
                 
