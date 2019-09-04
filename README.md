@@ -200,11 +200,13 @@ A module is deployed as a lobby context including multiple modules. The typeId i
 ```
 
 ## How To Run (Run Module On Platform)
-1. Run node win.bootstrap.js on Windows or run node ux.bootstrap.js on linux/mac (use sudo).
+1. All modules are the runtime plugins on the platform runtime. Modules can be launching/shuttingdown on the platform in runtime.
+2. Build the platform from source (go to platform folder in the source tree and run mvn clean install).
+3. Run node win.bootstrap.js on Windows or run node ux.bootstrap.js on linux/mac (use sudo) in the target/release/gec-platform-bin-1.0/gec-platform-1.0/bin.
 2. Once it is runing, go to http://localhost:8090 via browsers.
 3. Use the admin tool to drop the module to run. (login/password as root/root created by the platform).
 4. Login as root and go to admin-setup application.
-5. Click Add Module to open the module setup page (place the module jar file some folder use file:/// as codebase). 
+5. Click Add Module to open the module setup page (place the module jar file some folder use file:/// as codebase, remote deployment use http:// ). 
 6. Input codebase, artifact name, and version for the module, then click add module.
 7. Launch the module on the main setup-tool under the module.
 
