@@ -22,7 +22,8 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 [Load Test Result](doc/gec-test-result.pdf)
 
 ## How To Code (Write A Module)
-   The module is a deployable unit in the cluster scope.
+   ### The module is a deployable unit in the cluster scope.
+   ```JAVA
    public interface Module {
         default void onJoin(Session session) throws Exception{}
 
@@ -43,7 +44,7 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
             void on(InputStream in);
         }
     }
-    
+    ```
            
 ## How To Deploy (Drop A Module In Runtime)
     Coming Soon    
