@@ -23,7 +23,7 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 
 ## How To Code (Write A Module)
 A module implementation is a deployable and distributed in the cluster scope.
-   ```
+```JAVA
    public interface Module {
         default void onJoin(Session session) throws Exception{}
 
@@ -99,9 +99,6 @@ A module implementation is a deployable and distributed in the cluster scope.
         }
     
     }
-    ```
-    
-## How To Deploy (Drop A Module In Runtime)
-    Coming Soon    
-## How To Use (Platform Setup)
-    Coming Soon
+```
+
+## How To Deploy the module
