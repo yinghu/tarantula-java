@@ -102,3 +102,5 @@ A module implementation is a deployable and distributed in the cluster scope.
 ```
 
 ## How To Deploy the module
+
+## How To Setup the platform
