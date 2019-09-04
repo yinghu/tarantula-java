@@ -44,7 +44,10 @@ A module implementation is a deployable and distributed in the cluster scope.
             void on(InputStream in);
         }
     }
-    //Simple Echo module
+    //Simple echo module with following TO-DO list:
+    1. A
+    2. B
+    3. C
     package com.tarantula.echo
     public class Echo implements Module{
         //the application resource lookup context
@@ -59,7 +62,7 @@ A module implementation is a deployable and distributed in the cluster scope.
             byte[] echo = ("Echo->"+new String(payload)).getBytes();
             //write echo back to the client event
             session.write(echo,label());
-            //<b>streaming echo to all clients in this module instance</b>
+            //streaming echo to all clients in this module instance
             update.on(null,echo); 
             //streaming another echo to myself                                                                                       
             update.on(session.systemId(),"stremaing to my self".getBytes());                                                                                       
