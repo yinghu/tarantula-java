@@ -22,8 +22,28 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 [Load Test Result](doc/gec-test-result.pdf)
 
 ## How To Code (Write A Module)
-   The module core contract method : boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception;
-   
+   The module is a deployable unit in the cluster scope.
+   public interface Module {
+        default void onJoin(Session session) throws Exception{}
+
+        boolean onRequest(Session session, byte[] payload,OnUpdate update) throws Exception;
+
+        void setup(ApplicationContext context) throws Exception;
+
+        String label();
+        default void clear(){}
+
+        default void onTimer(OnUpdate update){
+
+        }
+        interface OnUpdate{
+            void on(String systemId,byte[] delta);
+        }
+        interface OnResource{
+            void on(InputStream in);
+        }
+    }
+    
            
 ## How To Deploy (Drop A Module In Runtime)
     Coming Soon    
