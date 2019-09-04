@@ -284,7 +284,7 @@ var TARA_API = (function(){
       onIndex : _index,  
       onView : _view,
       onResource : _resource,
-      //onToken : _token,
+
       onRegister : _subscribe,
       onLogin : _login,
       onReset : _reset,

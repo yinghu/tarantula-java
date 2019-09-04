@@ -1,19 +1,13 @@
-package com.tarantula.platform;
+package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.platform.event.PortableEventRegistry;
 import java.io.IOException;
 
 /**
  * Updated by yinghu on 8/23/19.
  */
-public class SessionForward extends Data{
-
-    private String applicationId;
-    private String instanceId;
-    private String source;
-    private String sessionId;
+public class SessionForward extends Data {
 
     public SessionForward(){}
 
@@ -61,7 +55,6 @@ public class SessionForward extends Data{
     }
 
     public void writePortable(PortableWriter out) throws IOException {
-
         out.writeUTF("2", this.applicationId);
         out.writeUTF("3",this.instanceId);
         out.writeUTF("4",this.source);

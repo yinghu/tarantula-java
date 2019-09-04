@@ -4,7 +4,6 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.Event;
 import com.tarantula.LeaderBoard;
-import com.tarantula.platform.Data;
 
 import java.io.IOException;
 

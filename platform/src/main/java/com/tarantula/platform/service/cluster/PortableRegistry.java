@@ -3,6 +3,7 @@ package com.tarantula.platform.service.cluster;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.event.SessionForward;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.deployment.ServiceConfiguration;
 import com.tarantula.platform.service.persistence.*;

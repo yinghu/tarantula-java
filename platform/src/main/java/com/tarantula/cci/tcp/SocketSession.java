@@ -78,11 +78,10 @@ public class SocketSession implements OnExchange {
 
     @Override
     public boolean onEvent(Event event) {
-        ResponsiveEvent responsiveEvent = (ResponsiveEvent)event;
-        responsiveEvent.clientId(this.clientId);
-        ByteBuffer buffer = pendingRequest.toByteBuffer(responsiveEvent);
+        event.clientId(this.clientId);
+        ByteBuffer buffer = pendingRequest.toByteBuffer(event);
         pendingRequest.writeBuffer(buffer);
-        if(responsiveEvent.closed()){
+        if(event.closed()){
             return true;
         }
         return !streaming;

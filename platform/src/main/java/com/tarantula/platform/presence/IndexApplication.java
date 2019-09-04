@@ -22,7 +22,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
         if(session.action().equals("view")){
             IndexEvent ie = (IndexEvent)session;
             IndexContext ic = new IndexContext("view");
-            OnView view = this._viewList.get(ie.viewId);
+            OnView view = this._viewList.get(ie.trackId());
             ic.view = view;
             session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }

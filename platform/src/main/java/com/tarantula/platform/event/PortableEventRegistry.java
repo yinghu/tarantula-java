@@ -3,7 +3,6 @@ package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
 import com.tarantula.platform.DeploymentDescriptor;
-import com.tarantula.platform.SessionForward;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 
@@ -45,8 +44,6 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int MODULE_APPLICATION_EVENT_CID = 17;
 
     public static final int MODULE_SHUTDOWN_EVENT_CID = 18;
-
-    public static final int MESSAGE_EVENT_CID = 19;
 
     public static final int LEADER_BOARD_GLOBAL_EVENT_CID = 20;
 
@@ -110,9 +107,6 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case MODULE_LAUNCH_EVENT_CID:
                 _ins = new ModuleLaunchEvent();
-                break;
-            case MESSAGE_EVENT_CID:
-                _ins = new MessageEvent();
                 break;
             case MODULE_APPLICATION_EVENT_CID:
                 _ins = new ModuleApplicationEvent();

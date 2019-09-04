@@ -47,6 +47,8 @@ public interface Session extends OnApplication{
     void write(byte[] payload,String label);
     void write(byte[] payload,String label,boolean closed);
 
+    boolean closed();
+    void closed(boolean closed);
 
     String clientId();
     void clientId(String clientId);
@@ -59,6 +61,9 @@ public interface Session extends OnApplication{
 
     String action();
     void action(String action);
+
+    String contentType();
+    void contentType(String contentType);
 
     //client payload on wire
     byte[] payload();

@@ -2,7 +2,6 @@ package com.tarantula.cci.http;
 import com.sun.net.httpserver.HttpExchange;
 import com.tarantula.*;
 import com.tarantula.cci.OnExchange;
-import com.tarantula.platform.event.ResponsiveEvent;
 
 import java.io.IOException;
 import java.util.Map;
@@ -23,7 +22,7 @@ public class HttpSession extends RequestParser implements OnExchange{
 
     public boolean onEvent(Event event) {
         try{
-            ResponsiveEvent resp = (ResponsiveEvent)event;
+            Event resp = event;
             hex.getResponseHeaders().set(Session.HTTP_CONTENT_TYPE,resp.contentType());
             hex.sendResponseHeaders(200,resp.payload().length);
             hex.getResponseBody().write(resp.payload());

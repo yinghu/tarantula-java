@@ -113,7 +113,7 @@ public class UserEventHandler implements RequestHandler {
                 IndexEvent indexEvent = new IndexEvent(this.serverTopic,sid);
                 indexEvent.destination(routingKey.route());
                 indexEvent.action("view");
-                indexEvent.viewId = onExchange.header(Session.TARANTULA_VIEW_ID);
+                indexEvent.trackId(onExchange.header(Session.TARANTULA_VIEW_ID));
                 this.eventService.publish(indexEvent);
             }
         }catch (Exception ex){

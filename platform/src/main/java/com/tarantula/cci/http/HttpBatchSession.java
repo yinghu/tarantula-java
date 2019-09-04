@@ -4,7 +4,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.tarantula.Event;
 import com.tarantula.Session;
 import com.tarantula.cci.OnExchange;
-import com.tarantula.platform.event.ResponsiveEvent;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,7 +16,7 @@ public class HttpBatchSession extends RequestParser implements OnExchange{
     private Map<String,Object> requestMapping;
     private boolean headerSent;
     private int batchNumber = 0;
-    private Map<Integer,ResponsiveEvent> pMap = new HashMap<>();
+    private Map<Integer,Event> pMap = new HashMap<>();
 	public HttpBatchSession(String id, HttpExchange hex){
         this.id  = id;
 	    this.hex = hex;
@@ -26,7 +25,7 @@ public class HttpBatchSession extends RequestParser implements OnExchange{
 	    requestMapping = this.parse(this.hex);
 	}
 	public synchronized boolean onEvent(Event event){
-        ResponsiveEvent resp = (ResponsiveEvent)event;
+        Event resp = event;
         boolean closed = false;
         try{
             if((!headerSent)&&resp.retries()==0){

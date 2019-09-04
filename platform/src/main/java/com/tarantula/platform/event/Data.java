@@ -1,28 +1,18 @@
-package com.tarantula.platform;
+package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.Portable;
 import com.tarantula.EventService;
-import com.tarantula.platform.event.ResponsiveEvent;
+import com.tarantula.platform.OnApplicationHeader;
 
-abstract public class Data extends RecoverableObject implements Portable{
+abstract public class Data extends OnApplicationHeader implements Portable{
 
-
-    protected String systemId;
-    protected int stub;
     protected String sessionId;
     protected boolean joined;
-    protected int accessMode;
 
     protected String ticket;
 
-    protected String typeId;
-    protected String subtypeId;
 
     protected String source;
     protected String destination;
-
-    protected String name;
-    protected String applicationId;
-    protected String instanceId;
 
     protected String contentType ="application/json";
 
@@ -30,9 +20,6 @@ abstract public class Data extends RecoverableObject implements Portable{
 
     protected int retries;
 
-    protected boolean tournamentEnabled;
-
-    protected double balance;
 
     protected Portable portable;
 
@@ -45,12 +32,6 @@ abstract public class Data extends RecoverableObject implements Portable{
     protected String action;
 
     protected String trackId;
-
-
-    protected int level;
-    protected String message;
-    protected Exception error;
-
 
     protected boolean closed;
 
@@ -78,34 +59,8 @@ abstract public class Data extends RecoverableObject implements Portable{
     public void closed(boolean closed){
         this.closed = closed;
     }
-    public int level(){
-        return this.level;
-    }
-    public void level(int level){
-        this.level = level;
-    }
-    public String message(){
-        return message;
-    }
-    public void message(String message){
-        this.message = message;
-    }
-    public Exception error(){
-        return this.error;
-    }
-    public void error(Exception error){
-        this.error = error;
-    }
 
-    public String systemId() {
-        return this.systemId;
-    }
 
-    public void systemId(String systemId) {
-        this.systemId = systemId;
-    }
-    public int stub(){return this.stub;}
-    public void stub(int stub){ this.stub = stub;}
     public String sessionId() {
         return this.sessionId;
     }
@@ -119,18 +74,6 @@ abstract public class Data extends RecoverableObject implements Portable{
     }
     public boolean joined(){
         return this.joined;
-    }
-    public String typeId(){
-        return this.typeId;
-    }
-    public void typeId(String typeId){
-        this.typeId = typeId;
-    }
-    public String subtypeId(){
-        return this.subtypeId;
-    }
-    public void subtypeId(String subtypeId){
-        this.subtypeId = subtypeId;
     }
 
     public String source() {
@@ -170,40 +113,7 @@ abstract public class Data extends RecoverableObject implements Portable{
     public void contentType(String contentType){
         this.contentType = contentType;
     }
-    public boolean tournamentEnabled(){
-        return this.tournamentEnabled;
-    }
-    public void tournamentEnabled(boolean tournamentEnabled){
-        this.tournamentEnabled = tournamentEnabled;
-    }
 
-    public String name(){
-        return this.name;
-    }
-    public void name(String applicationName){
-        this.name = applicationName;
-    }
-    public String applicationId() {
-        return this.applicationId;
-    }
-
-    public void applicationId(String appId) {
-        this.applicationId= appId;
-    }
-
-    public String instanceId() {
-        return this.instanceId;
-    }
-
-    public void instanceId(String insId) {
-        this.instanceId = insId;
-    }
-    public int accessMode(){
-        return this.accessMode;
-    }
-    public void accessMode(int accessMode){
-        this.accessMode = accessMode;
-    }
     public String ticket(){
         return this.ticket;
     }
@@ -211,12 +121,6 @@ abstract public class Data extends RecoverableObject implements Portable{
         this.ticket = ticket;
     }
 
-    public double balance(){
-        return this.balance;
-    }
-    public void balance(double balance){
-        this.balance = balance;
-    }
     public Portable portable(){
         return this.portable;
     }
@@ -250,12 +154,6 @@ abstract public class Data extends RecoverableObject implements Portable{
         this.action =action;
     }
 
-    public double entryCost(){
-        return this.balance;
-    }
-    public void entryCost(double entryCost){
-        this.balance =entryCost;
-    }
 
     public String trackId(){
         return this.trackId;

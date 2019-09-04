@@ -1,6 +1,6 @@
 package com.tarantula.cci.tcp;
 
-import com.tarantula.platform.event.ResponsiveEvent;
+import com.tarantula.Event;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -78,7 +78,7 @@ public class PendingRequest {
         this.key.selector().wakeup();
         return plist;
     }
-    public ByteBuffer toByteBuffer(ResponsiveEvent responsiveEvent){
+    public ByteBuffer toByteBuffer(Event responsiveEvent){
         byte[] cid = responsiveEvent.clientId().getBytes();
         byte[] lbl = responsiveEvent.label().getBytes();
         byte[] resp = responsiveEvent.payload();
