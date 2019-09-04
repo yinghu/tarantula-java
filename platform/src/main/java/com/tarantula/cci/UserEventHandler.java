@@ -16,7 +16,6 @@ public class UserEventHandler implements RequestHandler {
     private static TarantulaLogger log = JDKLogger.getLogger(UserEventHandler.class);
 
     private EventService eventService;
-    //private TokenValidator auth;
     private AccessIndexService accessIndexService;
     private String serverTopic;
     private String bucket;
