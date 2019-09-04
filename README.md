@@ -59,7 +59,7 @@ A module implementation is a deployable and distributed in the cluster scope.
             byte[] echo = ("Echo->"+new String(payload)).getBytes();
             //write echo back to the client event
             session.write(echo,label());
-            //streaming echo to all clients in this module instance
+            //<b>streaming echo to all clients in this module instance</b>
             update.on(null,echo); 
             //streaming another echo to myself                                                                                       
             update.on(session.systemId(),"stremaing to my self".getBytes());                                                                                       
