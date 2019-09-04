@@ -47,14 +47,20 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
     //Simple Echo module
     public class Echo implements Module{
         private ApplicationContext context;
+        //call when a client join the instance
+        public void onJoin(Session session) throws Exception{
+            session.write("your joined".getBytes(),label());
+        }                                
+        
+        //call when a client request from http request or a web socket data send                                    
         public boolean onRequest(Session session, byte[] payload,OnUpdate update) throws Exception{
             byte[] echo = ("Echo->"+new String(payload)).getBytes();
             //write echo back to the client event
             session.write(echo,label());
             //streaming echo to all clients in this module instance
-            update(null,echo); 
+            update.on(null,echo); 
             //streaming another echo to myself                                                                                       
-            update(session.systemId(),"stremaing to my self".getBytes());                                                                                       
+            update.on(session.systemId(),"stremaing to my self".getBytes());                                                                                       
             //post notice to all subscribers with presence/notice in cluster scope                                                                                      
             context.postOffice().onLabel().send("presence/notice",echo);
             
@@ -66,11 +72,13 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
             delta.onEntry("EchoCount",1);
             //send the delta to level module
             context.postOffice().onTag(Level.LEVEL_TAG).send(delta.owner(),delta);
-                                                                                                       
-            
+                                                                                                                                                                                         
         }
+        //call at a defined interval time such as 100ms                                
         public void onTimer(OnUpdate update){
-                                                
+            //streaming echo hello every interval time
+            byte[] echoHello = "Echo->Hello".getBytes();
+            update.on(null,echoHello);                                          
         }
         public void setup(ApplicationContext context) throws Exception{
             this.context = context;
