@@ -103,4 +103,74 @@ A module implementation is a deployable and distributed in the cluster scope.
 
 ## How To Deploy the module
 
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula>
+    <lobby-context>
+        <type-id>demo</type-id>
+        <type>lobby</type>
+        <category>game</category>
+        <icon>html/blackjack/blackjack_icon.png</icon>
+        <view-id>game.lobby</view-id>
+        <tag>demo/lobby</tag>
+        <name>DemoSync</name>
+        <response-label>demo</response-label>
+        <access-mode>12</access-mode>
+        <deploy-code>1</deploy-code>
+        <description>Tarantula Demo Sync</description>
+        <application-list>
+            <application>
+                <type-id>demo</type-id>
+                <subtype-id>demo-sync</subtype-id>
+                <view-id>demo.sync.game</view-id>
+                <name>DemoSync1</name>
+                <type>application</type>
+                <category>demo</category>
+                <entry-cost>5000</entry-cost>
+                <capacity>10</capacity>
+                <max-instances-per-partition>10</max-instances-per-partition>
+                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
+                <max-idles-on-instance>3</max-idles-on-instance>
+                <timer-on-module>50</timer-on-module>
+                <module-name>com.tarantula.demo.Boost</module-name>
+                <description>Tarantula Demo Sync Game</description>
+            </application>
+            <application>
+                <type-id>demo</type-id>
+                <subtype-id>demo-sync</subtype-id>
+                <view-id>demo.sync.game</view-id>
+                <name>DemoSync2</name>
+                <type>application</type>
+                <category>demo</category>
+                <entry-cost>5000</entry-cost>
+                <capacity>10</capacity>
+                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
+                <max-instances-per-partition>10</max-instances-per-partition>
+                <max-idles-on-instance>3</max-idles-on-instance>
+                <timer-on-module>50</timer-on-module>
+                <module-name>com.tarantula.demo.Boost</module-name>
+                <description>Tarantula Demo Sync Game</description>
+            </application>
+            <application>
+                <type-id>demo</type-id>
+                <subtype-id>demo-sync</subtype-id>
+                <view-id>demo.sync.game</view-id>
+                <name>DemoSync3</name>
+                <type>application</type>
+                <category>demo</category>
+                <entry-cost>5000</entry-cost>
+                <capacity>10</capacity>
+                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
+                <max-instances-per-partition>10</max-instances-per-partition>
+                <max-idles-on-instance>3</max-idles-on-instance>
+                <timer-on-module>50</timer-on-module>
+                <module-name>com.tarantula.demo.Boost</module-name>
+                <description>Tarantula Demo Sync Game</description>
+            </application>
+        </application-list>
+
+    </lobby-context>
+</tarantula>    
+```
+
 ## How To Setup the platform
