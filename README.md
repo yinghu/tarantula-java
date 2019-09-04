@@ -20,6 +20,51 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 [Programming Module Document](doc/gec-module.pdf)
 
 [Load Test Result](doc/gec-test-result.pdf)
+## How To Build
+1. Over 9.* JAVA runtime is required. JDK 12 is suggested.
+2. Maven 3 is the build tool.
+3. Node JS 10.* is to run a websocket server working as the websocket frontend for the platform.
+4. Download the source tree from github.com/yinghu/gameenginecluster.
+5. Go to platform to run mvn clean install for maven local repository.
+6. Create a standard maven project for the following code.
+   src/main/java/com/tarantula/echo/Echo.java
+   src/main/resources/descriptor.xml
+   pom.xml   
+```XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <project xmlns="http://maven.apache.org/POM/4.0.0"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        <modelVersion>4.0.0</modelVersion>
+        <groupId>com.tarantula</groupId>
+        <artifactId>gec-echo</artifactId>
+        <version>1.0</version>
+        <properties>
+            <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        </properties>
+        <build>
+            <plugins>
+                <plugin>
+                    <inherited>true</inherited>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3.2</version>
+                    <configuration>
+                        <source>12</source>
+                        <target>12</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+        <dependencies>
+            <dependency>
+                <groupId>com.tarantula</groupId>
+                <artifactId>gec-platform</artifactId>
+                <version>1.0</version>
+            </dependency>
+        </dependencies>
+    </project>
+```
 
 ## How To Code (Write A Module)
 A module implementation is a deployable and distributed in the cluster scope.
