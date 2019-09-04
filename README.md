@@ -202,18 +202,11 @@ Example : tarantula-echo-1.0.jar
 ```
 
 ## How To Run (Run Module On Platform)
-Run the module package on the platform. First setup and bring the platform runtime up
-1. JDK12 Set up.
-2. Maven 3 Setup.
-3. NodeJS 10.* (need to run a nodejs websocket server).
-4. Download the game engine cluster source.
-5. Go to platform folder to run mvn clean install.
-6. Go to target/release/gec-platform-1.0-bin/gec-platform-1.0/bin.
-7. Run node win.bootstrap.js on Windows or run node ux.bootstrap.js on linux/mac (use sudo).
-8. Once it is runing, go to http://localhost:8090 via browsers.
-9. Use the admin tool to drop the module to run. (login/password as root/root created by the platform).
-10. Login as root and go to admin-setup application.
-11. Click Add Module to open the module setup page (place the module jar file some folder use file:/// as codebase). 
-12. Input codebase, artifact name, and version for the module, then click add module.
-13. Launch the module on the main setup-tool under the module.
+1. Run node win.bootstrap.js on Windows or run node ux.bootstrap.js on linux/mac (use sudo).
+2. Once it is runing, go to http://localhost:8090 via browsers.
+3. Use the admin tool to drop the module to run. (login/password as root/root created by the platform).
+4. Login as root and go to admin-setup application.
+5. Click Add Module to open the module setup page (place the module jar file some folder use file:/// as codebase). 
+6. Input codebase, artifact name, and version for the module, then click add module.
+7. Launch the module on the main setup-tool under the module.
 
