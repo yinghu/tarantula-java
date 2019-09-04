@@ -51,8 +51,10 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
             byte[] echo = ("Echo->"+new String(payload)).getBytes();
             //write echo back to the client event
             session.write(echo,label());
-            //broadcasting all clients in this module instance
-            update(null,echo);
+            //streaming echo to all clients in this module instance
+            update(null,echo); 
+            //streaming another echo to myself                                                                                       
+            update(session.systemId(),"stremaing to my self".getBytes());                                                                                       
             //post notice to all subscribers with presence/notice in cluster scope                                                                                      
             context.postOffice().onLabel().send("presence/notice",echo);
             
@@ -62,11 +64,14 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
             delta.xpDelta(10);
             delta.owner(session.systemId());
             delta.onEntry("EchoCount",1);
+            //send the delta to level module
             context.postOffice().onTag(Level.LEVEL_TAG).send(delta.owner(),delta);
                                                                                                        
-        
+            
         }
-
+        public void onTimer(OnUpdate update){
+                                                
+        }
         public void setup(ApplicationContext context) throws Exception{
             this.context = context;
         }
