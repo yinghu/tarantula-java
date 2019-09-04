@@ -3,6 +3,8 @@ package com.tarantula.cci;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
+import com.tarantula.platform.service.AccessIndexService;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 
 public class RootContentHandler implements RequestHandler {
 

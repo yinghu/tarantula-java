@@ -1,6 +1,6 @@
 package com.tarantula.platform.service.deployment;
 
-import com.tarantula.ServiceProvider;
+import com.tarantula.platform.service.ServiceProvider;
 import com.tarantula.Serviceable;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

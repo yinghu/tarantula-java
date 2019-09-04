@@ -15,6 +15,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.Closable;
 import com.tarantula.platform.service.ClusterProvider;
 import com.tarantula.platform.service.DeployService;

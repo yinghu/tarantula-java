@@ -3,6 +3,9 @@ package com.tarantula.cci;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.event.ServerPushEvent;
+import com.tarantula.platform.service.AccessIndexService;
+import com.tarantula.platform.service.DeploymentServiceProvider;
+
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -74,7 +77,7 @@ public class PushEventHandler implements RequestHandler {
 
     }
     @Override
-    public void setup(TokenValidator tokenValidator,EventService eventService,AccessIndexService accessIndexService,String bucket,DeploymentServiceProvider deploymentServiceProvider) {
+    public void setup(TokenValidator tokenValidator, EventService eventService, AccessIndexService accessIndexService, String bucket, DeploymentServiceProvider deploymentServiceProvider) {
         this.eventService = eventService;
         this.bucket = bucket;
     }

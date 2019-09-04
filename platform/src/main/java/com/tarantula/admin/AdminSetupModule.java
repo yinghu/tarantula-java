@@ -6,6 +6,7 @@ import com.tarantula.Module;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.LobbyDescriptor;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.deployment.ApplicationQuery;
 import com.tarantula.platform.service.deployment.LobbyQuery;
 import com.tarantula.platform.util.OnAccessDeserializer;

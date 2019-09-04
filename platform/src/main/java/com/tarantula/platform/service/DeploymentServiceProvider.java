@@ -1,12 +1,13 @@
-package com.tarantula;
+package com.tarantula.platform.service;
 
-import com.tarantula.platform.service.DataStoreProvider;
+import com.tarantula.*;
+import com.tarantula.Module;
 
 /**
  * Updated by yinghu lu on 6/15/2019.
  */
 
-public interface DeploymentServiceProvider extends ServiceProvider{
+public interface DeploymentServiceProvider extends ServiceProvider {
 
     String DEPLOY_TOPIC = "tarantula-deployment";
     String DEPLOY_DATA_STORE = "tarantula";
@@ -45,7 +46,7 @@ public interface DeploymentServiceProvider extends ServiceProvider{
     String enableApplication(String applicationId,boolean enabled);
     String launch(String typeId);
     String shutdown(String typeId);
-    Module module(Descriptor descriptor);
+    com.tarantula.Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
     String reset(Descriptor descriptor);
     String createModule(Descriptor descriptor);

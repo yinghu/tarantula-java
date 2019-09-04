@@ -6,6 +6,7 @@ import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.event.FastPlayEvent;
 import com.tarantula.platform.event.InstancePlayEvent;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.GameLobbyContextSerializer;
 
 import java.util.ArrayList;

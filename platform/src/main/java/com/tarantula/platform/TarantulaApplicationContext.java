@@ -6,6 +6,7 @@ import com.tarantula.Module;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.BucketReceiver;
+import com.tarantula.platform.service.ServiceProvider;
 import com.tarantula.platform.service.deployment.ApplicationContextProxy;
 import com.tarantula.platform.util.SystemUtil;
 

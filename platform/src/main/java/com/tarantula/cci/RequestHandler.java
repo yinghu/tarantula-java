@@ -1,6 +1,8 @@
 package com.tarantula.cci;
 
 import com.tarantula.*;
+import com.tarantula.platform.service.AccessIndexService;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 
 /**
  * Created by yinghu lu on 4/27/2018.
@@ -10,6 +12,6 @@ import com.tarantula.*;
 public interface RequestHandler extends EventListener,Serviceable{
     String name();
     void onRequest(OnExchange exchange);
-    void setup(TokenValidator tokenValidator, EventService eventService, AccessIndexService accessIndexService,String bucket,DeploymentServiceProvider deploymentServiceProvider);
+    void setup(TokenValidator tokenValidator, EventService eventService, AccessIndexService accessIndexService, String bucket, DeploymentServiceProvider deploymentServiceProvider);
     default void onCheck(){}
 }

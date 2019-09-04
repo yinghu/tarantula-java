@@ -7,6 +7,9 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;
 import com.tarantula.*;
 import com.tarantula.platform.AccessIndexTrack;
+import com.tarantula.platform.service.AccessIndexService;
+import com.tarantula.platform.service.ServiceContext;
+
 import java.util.concurrent.Future;
 
 /**

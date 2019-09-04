@@ -22,7 +22,9 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 [Load Test Result](doc/gec-test-result.pdf)
 
 ## How To Code (Write A Module)
-    Coming Soon
+   The module core contract method : boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception;
+   
+           
 ## How To Deploy (Drop A Module In Runtime)
     Coming Soon    
 ## How To Use (Platform Setup)

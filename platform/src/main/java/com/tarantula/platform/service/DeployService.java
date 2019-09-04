@@ -2,7 +2,6 @@ package com.tarantula.platform.service;
 
 
 import com.tarantula.Descriptor;
-import com.tarantula.ServiceProvider;
 
 public interface DeployService extends ServiceProvider {
 

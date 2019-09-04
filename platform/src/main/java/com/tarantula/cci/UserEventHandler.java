@@ -6,6 +6,8 @@ import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.IndexEvent;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServiceActionEvent;
+import com.tarantula.platform.service.AccessIndexService;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.UUID;
@@ -144,7 +146,7 @@ public class UserEventHandler implements RequestHandler {
     }
 
     @Override
-    public void setup(TokenValidator tokenValidator, EventService eventService,AccessIndexService accessIndexService,String bucket,DeploymentServiceProvider deploymentServiceProvider) {
+    public void setup(TokenValidator tokenValidator, EventService eventService, AccessIndexService accessIndexService, String bucket, DeploymentServiceProvider deploymentServiceProvider) {
         //this.auth = tokenValidator;
         this.eventService = eventService;
         this.accessIndexService = accessIndexService;

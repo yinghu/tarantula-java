@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.service.DataStoreProvider;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 
 public class AdminDataStoreModule implements Module {
 

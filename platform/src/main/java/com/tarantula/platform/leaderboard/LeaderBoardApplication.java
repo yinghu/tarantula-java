@@ -2,6 +2,7 @@ package com.tarantula.platform.leaderboard;
 
 import com.tarantula.*;
 import com.tarantula.platform.TarantulaApplicationHeader;
+import com.tarantula.platform.service.LeaderBoardServiceProvider;
 import com.tarantula.platform.util.LeaderBoardSerializer;
 
 

@@ -4,6 +4,7 @@ import com.tarantula.*;
 import com.tarantula.Level;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.PresenceContext;
+import com.tarantula.platform.service.LeaderBoardServiceProvider;
 import com.tarantula.platform.util.PresenceContextSerializer;
 
 

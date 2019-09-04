@@ -1,5 +1,7 @@
 package com.tarantula;
 
+import com.tarantula.platform.service.ServiceProvider;
+
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 

@@ -3,7 +3,7 @@ package com.tarantula.platform.presence;
 import com.tarantula.*;
 import com.tarantula.Response;
 import com.tarantula.platform.*;
-import com.tarantula.DeploymentServiceProvider;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.*;
 
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
-package com.tarantula;
+package com.tarantula.platform.service;
 
-import com.tarantula.platform.service.ClusterProvider;
+import com.tarantula.*;
 
 import java.util.concurrent.ScheduledFuture;
 

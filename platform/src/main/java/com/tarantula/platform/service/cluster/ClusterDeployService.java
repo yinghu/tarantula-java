@@ -11,6 +11,7 @@ import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.event.MapStoreRecoveryEvent;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.DataStoreProvider;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.deployment.ServiceConfigurationParser;
 import com.tarantula.platform.util.ResponseSerializer;

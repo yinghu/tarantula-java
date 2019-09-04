@@ -2,6 +2,7 @@ package com.tarantula.platform.presence;
 
 import com.tarantula.*;
 import com.tarantula.platform.*;
+import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 

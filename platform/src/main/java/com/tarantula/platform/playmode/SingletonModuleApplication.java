@@ -5,6 +5,7 @@ import com.tarantula.Module;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.event.FastPlayEvent;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 
 import java.util.concurrent.ConcurrentHashMap;
 

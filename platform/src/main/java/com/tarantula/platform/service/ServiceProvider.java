@@ -1,10 +1,12 @@
-package com.tarantula;
+package com.tarantula.platform.service;
+
+import com.tarantula.Serviceable;
 
 /**
  * Updated by yinghu lu on 4/17/2018.
  * ServiceProvider provides the API to hook the business logic to application context
  */
-public interface ServiceProvider extends Serviceable{
+public interface ServiceProvider extends Serviceable {
 
     String name();
 

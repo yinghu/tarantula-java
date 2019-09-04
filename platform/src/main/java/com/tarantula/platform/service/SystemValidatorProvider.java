@@ -6,7 +6,6 @@ import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.SystemValidator;
 import com.tarantula.platform.presence.AccessTrack;
-import com.tarantula.platform.presence.ProfileTrack;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,7 +23,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private HashMap<String,Access.Role> rMap;
     private DataStore pdataStore;
     private DataStore udataStore;
-    private AccessIndexService accessIndexService;
+    //private AccessIndexService accessIndexService;
     public TokenValidator tokenValidator(){
         return systemValidator.tokenValidator();
     }
@@ -68,7 +67,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.accessIndexService = serviceContext.accessIndexService();
+        //this.accessIndexService = serviceContext.accessIndexService();
         this.pdataStore =  this.serviceContext.dataStore("presence",this.serviceContext.partitionNumber());
         this.udataStore =  this.serviceContext.dataStore("user",this.serviceContext.partitionNumber());
     }

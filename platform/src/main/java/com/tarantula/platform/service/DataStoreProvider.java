@@ -1,7 +1,6 @@
 package com.tarantula.platform.service;
 
 import com.tarantula.DataStore;
-import com.tarantula.ServiceProvider;
 
 import java.nio.channels.ReadableByteChannel;
 import java.util.List;

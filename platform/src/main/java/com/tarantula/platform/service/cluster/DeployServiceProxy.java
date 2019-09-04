@@ -5,7 +5,7 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
 import com.tarantula.Descriptor;
-import com.tarantula.ServiceContext;
+import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.DeployService;
 

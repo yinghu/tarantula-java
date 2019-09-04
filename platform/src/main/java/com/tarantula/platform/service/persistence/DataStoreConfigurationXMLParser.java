@@ -1,6 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
-import com.tarantula.ServiceProvider;
+import com.tarantula.platform.service.ServiceProvider;
 import com.tarantula.Serviceable;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.DataStoreProvider;
