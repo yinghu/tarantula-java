@@ -34,8 +34,6 @@
 		  <groupId>com.je</groupId>
 		  <artifactId>je</artifactId>
 		  <version>7.5.11</version>
-		  <!--<scope>system</scope>
-		  <systemPath>${basedir}/src/main/lib/je-7.5.11.jar</systemPath>-->
 	  </dependency>
   </dependencies>
   <build>
