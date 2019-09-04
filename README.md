@@ -27,9 +27,11 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 4. Download the source tree from github.com/yinghu/gameenginecluster.
 5. Go to platform to run mvn clean install for maven local repository.
 6. Create a standard maven project for the following code.
+```
    src/main/java/com/tarantula/echo/Echo.java
    src/main/resources/descriptor.xml
-   pom.xml   
+   pom.xml
+```
 ```XML
     <?xml version="1.0" encoding="UTF-8"?>
     <project xmlns="http://maven.apache.org/POM/4.0.0"
