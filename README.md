@@ -144,6 +144,7 @@ A module implementation is a deployable and distributed in the cluster scope.
         //call when the instance is launched
         public void setup(ApplicationContext context) throws Exception{
             this.context = context;
+            context.log("echo application is started",OnLog.Info);
         }
         //the label is the client message filter
         public String label(){
