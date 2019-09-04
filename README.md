@@ -72,7 +72,9 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
             delta.onEntry("EchoCount",1);
             //send the delta to level module
             context.postOffice().onTag(Level.LEVEL_TAG).send(delta.owner(),delta);
-                                                                                                                                                                                         
+                
+            //save the original payload in distributed local key value store                                                                                       
+            context.dataStore("echo").set(session.systemId().getBytes(),payload);                                                                                                                                                                             
         }
         //call at a defined interval time such as 100ms                                
         public void onTimer(OnUpdate update){
@@ -93,11 +95,7 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
     
         }
     
-    }
-                
-       
-
-           
+    }         
 ## How To Deploy (Drop A Module In Runtime)
     Coming Soon    
 ## How To Use (Platform Setup)
