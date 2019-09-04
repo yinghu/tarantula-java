@@ -12,7 +12,7 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 ### 9. Distributed Application/Game Deployment
 ### 10. Server-Less Module Deployment Support
 ### 11. Pure JAVA Implmentation With High Concurrecy Throughput
-### 12. Simple Cloud Deployment  
+### 12. Hot Runtime Deployment Support 
 
 
 [Platform Architecture Document](doc/gec-summary.pdf)
@@ -155,3 +155,13 @@ Example : tarantula-echo-1.0.jar
 ```
 
 ## How To Run (Run Module On Platform)
+Run the module package on the platform. First setup and bring the platform runtime up
+1. JDK12 Set up.
+2. Maven 3 Setup
+3. NodeJS 10.* (need to run a nodejs websocket server)
+4. Download the game engine cluster source.
+5. Go to platform folder to run mvn clean install
+6. Go to target/release/gec-platform-1.0-bin/gec-platform-1.0/bin
+7. Run node win.bootstrap.js on Windows or run node ux.bootstrap.js on linux/mac (use sudo)
+8. Once it is runing, go to http://localhost:8090 via browsers.
+9. Use the admin tool to drop the module to run. (login/password as root/root created by the platform)
