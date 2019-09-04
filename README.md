@@ -46,12 +46,30 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
     }
     //Simple Echo module
     public class Echo implements Module{
-        
+        private ApplicationContext context;
         public boolean onRequest(Session session, byte[] payload,OnUpdate update) throws Exception{
-            session.write("Echo".getBytes(),label()); //write echo back to the client event
+            byte[] echo = ("Echo->"+new String(payload)).getBytes();
+            //write echo back to the client event
+            session.write(echo,label());
+            //broadcasting all clients in this module instance
+            update(null,echo);
+            //post notice to all subscribers with presence/notice in cluster scope                                                                                      
+            context.postOffice().onLabel().send("presence/notice",echo);
+            
+            //update statistics entry 
+            OnStatistics delta = this.context.statistics().value("EchoCount",1);                                                                                            
+            //update xp level and leader board in runtime
+            delta.xpDelta(10);
+            delta.owner(session.systemId());
+            delta.onEntry("EchoCount",1);
+            context.postOffice().onTag(Level.LEVEL_TAG).send(delta.owner(),delta);
+                                                                                                       
+        
         }
 
-        public void setup(ApplicationContext context) throws Exception{}
+        public void setup(ApplicationContext context) throws Exception{
+            this.context = context;
+        }
 
         public String label(){
             return "echo";
