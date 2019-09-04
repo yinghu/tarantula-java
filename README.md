@@ -25,7 +25,7 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 2. Maven 3 is the build tool.
 3. Node JS 10.* is to run a websocket server working as the websocket frontend for the platform.
 4. Download the source tree from github.com/yinghu/gameenginecluster.
-5. Go to platform to run mvn clean install for maven local repository.
+5. Go to platform to run mvn clean first (MAKE SURE Berkeley DB lib on local maven repository) and then run mvn install separately for maven local repository.
 6. Create a standard maven project for the following code.
 ```
    src/main/java/com/tarantula/echo/Echo.java
