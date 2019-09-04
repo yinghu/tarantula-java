@@ -4,7 +4,7 @@ import com.tarantula.DataStore;
 import com.tarantula.LeaderBoard;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.NaturalKey;
-import com.tarantula.platform.RecoverableObject;
+import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.util.SystemUtil;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Updated 8/24/19
  */
-public class TopListLeaderBoard extends RecoverableObject implements LeaderBoard {
+public class TopListLeaderBoard extends ResponseHeader implements LeaderBoard {
 
     private String name;
     private String header;
@@ -34,6 +34,7 @@ public class TopListLeaderBoard extends RecoverableObject implements LeaderBoard
     public TopListLeaderBoard(){
         this.vertex = "TopListLeaderBoard";
         this.label = "ldb";
+        this.successful = true;
     }
     public TopListLeaderBoard(String name, String header, String category, String classifier, int size, DataStore dataStore, boolean updating){
         this();

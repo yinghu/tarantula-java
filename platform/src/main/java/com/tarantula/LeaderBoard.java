@@ -3,7 +3,7 @@ package com.tarantula;
 /**
  * Updated by yinghu on 8/24/19
  */
-public interface LeaderBoard extends Recoverable {
+public interface LeaderBoard extends Response {
 
     String TOTAL = "T";
     String DAILY = "D";

@@ -15,8 +15,8 @@ public class GameLobbyContextSerializer implements JsonSerializer<GameLobbyConte
 
     public JsonElement serialize(GameLobbyContext gameContext, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = (JsonObject)new ResponseSerializer().serialize(gameContext,type,jsonSerializationContext);
-        jo.addProperty("successful",gameContext.successful());
-        jo.addProperty("command",gameContext.command());
+        //jo.addProperty("successful",gameContext.successful());
+        //jo.addProperty("command",gameContext.command());
         if(gameContext.gameList!=null){
             GameDescriptorSerializer ser = new GameDescriptorSerializer();
             JsonArray glist = new JsonArray();
