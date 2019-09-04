@@ -45,9 +45,14 @@ A module implementation is a deployable and distributed in the cluster scope.
         }
     }
     //Simple echo module with following TO-DO list:
-    1. A
-    2. B
-    3. C
+    1. Reponse a echo message back to the client.
+    2. Broadcast a echo message to all clients in the module instance.
+    3. Push a notification to all subscribers on presence/notice in cluster scope.
+    4. Update the entry of statistics of the module instance.
+    5. Update the Level XP and leader board in runtime.
+    6. Persistent the echo message into the distributed key value store.
+    7. Broadcast a hello message at a timer such as broadcasting per 100ms.
+    
     package com.tarantula.echo
     public class Echo implements Module{
         //the application resource lookup context
