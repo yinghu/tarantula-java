@@ -71,7 +71,8 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 ## How To Code (Write A Module)
 A module implementation is a deployable and distributed in the cluster scope.
 ```JAVA
-   public interface Module {
+    //the module contract interface 
+    public interface Module {
         default void onJoin(Session session) throws Exception{}
 
         boolean onRequest(Session session, byte[] payload,OnUpdate update) throws Exception;
@@ -137,6 +138,7 @@ A module implementation is a deployable and distributed in the cluster scope.
         }
         //call at a defined interval time such as 100ms                                
         public void onTimer(OnUpdate update){
+        
             //streaming echo hello every interval time
             byte[] echoHello = "Echo->Hello".getBytes();
             update.on(null,echoHello);                                          
@@ -152,19 +154,14 @@ A module implementation is a deployable and distributed in the cluster scope.
         }
         //call before the module is reloaded or upgraded                                    
         public void clear(){
-    
+            //you can save the instance state before the module reloaded.
+            //recover the state on setup call on reload.
         }
     
     }
 ```
-
-## How To Package (Wrap Module As A jar With A deploy descriptor)
-Put the XML deployment file in the top of the jar file named descriptor.xml
-Use maven artifact name format for jar file name {group-name}-{artifact-name}-{version}.jar
-Example : tarantula-echo-1.0.jar
-          com/tarantual/echo/Echo.class
-          descriptor.xml
-
+The deploymenet descriptor.xml defines the module behaviors in the platform runtime.
+A module is deployed as a lobby context including multiple modules. The typeId is the ID of the module package.
 ```XML
 <?xml version="1.0" encoding="UTF-8"?>
 <tarantula>
