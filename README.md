@@ -17,9 +17,9 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 
 [Platform Architecture Document](doc/gec-summary.pdf)
 
-[Programming Module Document](doc/gec-module.pdf)
+[Programming Server Module API](doc/gec-module.pdf)
 
-[Programming Client AJAX/WEBSOCKET API](doc/gec-test-result.pdf)
+[Programming Client AJAX/WEBSOCKET API](doc/gec-client-api.pdf)
 
 [Load Test Result](doc/gec-test-result.pdf)
 ## How To Build
