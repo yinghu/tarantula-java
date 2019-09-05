@@ -79,24 +79,25 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return _internalModule(descriptor.moduleName());
         }
     }
-    public byte[] resource(String name){
-        //log.warn("loading resource->"+name);
+    public byte[] resource(String name,String flag){
+        //log.warn("loading resource->"+name+"/"+flag);
         return rMap.computeIfAbsent(name,(rk)->{
-            byte[] ret = new byte[0];
-            BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(name));
-            try{
-                ret = new byte[in.available()];
-                in.read(ret);
-            }catch (Exception ex){
-                log.warn("Resource ["+name+"] not existed",ex);
-            }
-            finally {
-                if(in!=null){
-                    try{in.close();}catch (Exception ex){}
+                byte[] ret = new byte[0];
+                BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(name));
+                try{
+                    ret = new byte[in.available()];
+                    in.read(ret);
+                }catch (Exception ex){
+                    log.warn("Resource ["+name+"] not existed",ex);
                 }
+                finally {
+                    if(in!=null){
+                        try{in.close();}catch (Exception ex){}
+                    }
+                }
+                return ret;
             }
-            return ret;
-        });
+        );
     }
     public void resource(Descriptor descriptor, String name, Module.OnResource onResource){
         DynamicModuleClassLoader dyn = cMap.get(descriptor.subtypeId());

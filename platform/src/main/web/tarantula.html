@@ -143,7 +143,7 @@
             TARA_API.onView(setup.viewId,function(v){
                 //load js module if v.moduleFile 
                 if(v.moduleFile){
-                    TARA_API.onResource({name:v.moduleFile,type:'text/javascript'},function(j){
+                    TARA_API.onResource({name:v.moduleFile,flag:v.flag,type:'text/javascript'},function(j){
                         if(!window[v.moduleName]){
                             let md = document.createElement('script');
                             md.appendChild(document.createTextNode(j));
@@ -160,7 +160,7 @@
             });   
         }
         function _view_load(v,cid){
-            TARA_API.onResource({name:v.moduleResourceFile,type:'text/html'},function(h){
+            TARA_API.onResource({name:v.moduleResourceFile,flag:v.flag,type:'text/html'},function(h){
                 let m0 = document.querySelector(cid);
                 m0.insertAdjacentHTML("afterbegin",h);   
                 _api_script(m0,function(exe){

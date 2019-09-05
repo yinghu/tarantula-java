@@ -21,7 +21,7 @@ public class ResourceEventHandler implements RequestHandler {
     }
     public void onRequest(OnExchange exchange){
         String path = exchange.path();
-        byte[] _load = this.deploymentServiceProvider.resource(path.substring(1).replace("resource","web"));
+        byte[] _load = this.deploymentServiceProvider.resource(path.substring(1).replace("resource","web"),null);
         exchange.onEvent(new ResponsiveEvent("","",_load,0,"text/javascript","",true));
     }
     @Override

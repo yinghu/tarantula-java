@@ -20,7 +20,7 @@ public class RootContentHandler implements RequestHandler {
                 path = "/tarantula.html";
             }
             String contentType = "text/html";
-            byte[] _load = this.deploymentServiceProvider.resource(path.substring(1));
+            byte[] _load = this.deploymentServiceProvider.resource(path.substring(1),exchange.query());
             if(path.endsWith(".css")){
                 contentType = "text/css";
             }
