@@ -62,7 +62,13 @@
                 <description>Tarantula Demo Sync Game</description>
             </application>
         </application-list>
-
-
+        <view-list>
+            <view type="demo.sync.game">
+                <property name="flag">demo-sync</property>
+                <property name="moduleFile">demo.sync.game.module.js</property>
+                <property name="moduleName">DemoSyncGame</property>
+                <property name="moduleResourceFile">demo.sync.game.view.html</property>
+            </view>
+        </view-list>
     </lobby-context>
 </tarantula>

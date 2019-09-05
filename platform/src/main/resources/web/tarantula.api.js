@@ -80,7 +80,11 @@ var TARA_API = (function(){
             callback(aj.responseText);
         }
     };
-    aj.open("GET","/"+resource.name+'?flag='+resource.flag,true);
+    if(resource.flag === undefined){
+        aj.open("GET","/"+resource.name,true);
+    }else{
+        aj.open("GET","/"+resource.name+'?flag='+resource.flag,true);
+    }
     aj.setRequestHeader('Accept',resource.type);
     aj.send();    
   };    

@@ -80,7 +80,21 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     public byte[] resource(String name,String flag){
-        //log.warn("loading resource->"+name+"/"+flag);
+        if(flag!=null){
+            log.warn("load resource ["+name+"] from ["+flag+"]");
+            String rid = flag.split("=")[1].trim();
+            DynamicModuleClassLoader dc = cMap.get(rid);
+            byte[][] ret = {new byte[0]};
+            dc.loadResource(name,in -> {
+                try{
+                    ret[0] = new byte[in.available()];
+                    in.read(ret[0]);
+                }catch (Exception ex){
+                    log.warn("Resource ["+name+"] failed to load",ex);
+                }
+            });
+            return ret[0];
+        }
         return rMap.computeIfAbsent(name,(rk)->{
                 byte[] ret = new byte[0];
                 BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(name));
@@ -166,6 +180,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     log.warn("Failed to add application ->"+b.toString());
                 }
             });
+            a.views.forEach(v->this.deploy(v));
         });
         return this.builder.create().toJson(resp);
     }
