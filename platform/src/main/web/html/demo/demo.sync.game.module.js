@@ -23,8 +23,10 @@ var DemoSyncGame = (function(){
         let _payload = {applicationId:game.applicationId,instanceId:game.instanceId,command:'onLeave'};
         TARA_API.onInstance(_payload,callback);
     };
-    let _sit = function(cmd,callback){
-        let _payload = {action:cmd,applicationId:game.applicationId,instanceId:game.instanceId,streaming:false,path:'/application/instance',data:{command:cmd}};
+    let _send = function(fin){
+        let _data ={};
+        fin(_data);
+        let _payload = {action:_data.command,applicationId:game.applicationId,instanceId:game.instanceId,streaming:false,path:'/application/instance',data:_data};
         TARA_API.send(_payload);
         //TARA_API.onInstance(_payload,callback);
     };
@@ -42,7 +44,7 @@ var DemoSyncGame = (function(){
         start : _start,
         
         leave : _leave,
-        sit : _sit,
+        send : _send,
         item: _item,
     };
 

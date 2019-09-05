@@ -61,10 +61,15 @@
     pView.container.addChild(nrt.container);
     
     let commandList = UI.textCommandList(3,120);
-    commandList.list[0].title('1K');
+    commandList.list[0].title('A');
     commandList.list[0].button.command = function(){
         statBoard.lines[2].t.tm = Date.now();
-        DemoSyncGame.sit('a',(resp)=>{
+        DemoSyncGame.send((p)=>{
+            p.command = 'a';
+            p.timestamp = Date.now();
+        });
+        /**
+        DemoSyncGame.send('a',(resp)=>{
             if(resp.successful){
                 let nt = Date.now();
                 let bt = JSON.stringify(resp).length;
@@ -72,25 +77,35 @@
             }else{
                 console.log(resp);
             }
-        });
+        });**/
     };
-    commandList.list[1].title('2K');
+    commandList.list[1].title('B');
     commandList.list[1].button.command = function(){
         statBoard.lines[3].t.tm = Date.now();
-        DemoSyncGame.sit('b',(resp)=>{
+        DemoSyncGame.send((p)=>{
+            p.command = 'b';
+            p.timestamp = Date.now();
+        });
+        /**
+        DemoSyncGame.send('b',(resp)=>{
             let nt = Date.now();
             let bt = JSON.stringify(resp).length;
             nrt.title("Response bytes ["+bt+"] timed (ms)->"+(nt-statBoard.lines[3].t.tm));
-        });
+        });**/
     };
-    commandList.list[2].title('4K');
+    commandList.list[2].title('C');
     commandList.list[2].button.command = function(){
         statBoard.lines[4].t.tm = Date.now();
-        DemoSyncGame.sit('c',(resp)=>{
+        DemoSyncGame.send((p)=>{
+            p.command = 'c';
+            p.timestamp = Date.now();
+        });
+        /**
+        DemoSyncGame.send('c',(resp)=>{
             let nt = Date.now();
             let bt = JSON.stringify(resp).length;
             nrt.title("Response bytes ["+bt+"] timed (ms)->"+(nt-statBoard.lines[4].t.tm));
-        });
+        });**/
     };
     //commandList.list[3].title('Reset');
     //commandList.list[3].button.command = function(){DemoSyncGame.sit('onReset',(resp)=>{console.log(resp)})};
@@ -134,6 +149,14 @@
             _demo_event(n);
         }
     ); 
+    function _on_command(m){
+        console.log(m);
+        let nt = Date.now();
+        let bt = JSON.stringify(m).length;
+        if(m.command){
+            nrt.title("Command->["+m.command+"] Response bytes ["+bt+"] timed (ms)->"+(nt-m.timestamp));
+        }
+    }
     function _demo_event(m){
         let nt = Date.now();
         if(m.label == 'timer'){        
@@ -145,7 +168,7 @@
             statBoard.lines[1].t.tc++;
             statBoard.lines[8].set(8,'Timer Count',statBoard.lines[1].t.tc);
         }     
-        else if(m.label == 'connection'){
+        else if(m.label == 'demo1'){
             statBoard.lines[2].t.tn += JSON.stringify(m).length;
             statBoard.lines[2].set(2,'Connection Bytes',statBoard.lines[2].t.tn);
             statBoard.lines[5].set(5,'Connection Elapsed (ms)',nt-statBoard.lines[2].t.tm);
@@ -153,7 +176,7 @@
             statBoard.lines[2].t.tc++;
             statBoard.lines[7].set(7,'Connection Count',statBoard.lines[2].t.tc);
         }
-        else if(m.label == 'presence'){
+        else if(m.label == 'demo2'){
             statBoard.lines[3].t.tn += JSON.stringify(m).length;
             statBoard.lines[3].set(3,'Presence Bytes',statBoard.lines[3].t.tn);
             statBoard.lines[5].set(5,'Presence Elapsed (ms)',nt-statBoard.lines[3].t.tm);
@@ -169,14 +192,15 @@
             statBoard.lines[4].t.tc++;
             statBoard.lines[7].set(7,'Game Count',statBoard.lines[4].t.tc);
         }
-        
+        else if(m.label == 'demo'){
+            _on_command(m);
+        }
         else if(m.label == 'error'){
             let wp = wsize();
             pConfirmation.message(m.message);
             pConfirmation.position(sc,(wp.width-pConfirmation.width*sc)/2,(wp.height-pConfirmation.height*sc)/2);
             pConfirmation.open();
-        }
-        
+        }   
     }
     function _demo_scale(){
         let wz = wsize();
