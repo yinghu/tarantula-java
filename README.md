@@ -19,6 +19,8 @@ A scaling, fault-tolerant, asynchronous event messaging application/game integra
 
 [Programming Module Document](doc/gec-module.pdf)
 
+[Programming Client AJAX/WEBSOCKET API](doc/gec-test-result.pdf)
+
 [Load Test Result](doc/gec-test-result.pdf)
 ## How To Build
 1. Over 9.* JAVA runtime is required. JDK 12 is suggested.
