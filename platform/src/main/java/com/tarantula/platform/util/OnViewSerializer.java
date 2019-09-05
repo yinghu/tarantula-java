@@ -9,13 +9,15 @@ import com.tarantula.OnView;
 import java.lang.reflect.Type;
 
 /**
- * Updated by yinghu on 5/8/2018.
+ * Updated by yinghu on 9/5/2019.
  */
 public class OnViewSerializer implements JsonSerializer<OnView> {
     public JsonElement serialize(OnView descriptor, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = new JsonObject();
         jo.addProperty("viewId",descriptor.viewId());
-        jo.addProperty("flag",descriptor.flag());
+        if(descriptor.flag()!=null&&(!descriptor.flag().equals("n/a"))){
+            jo.addProperty("flag",descriptor.flag());
+        }
         if(descriptor.icon()!=null&&(!descriptor.icon().equals("n/a"))){
             jo.addProperty("icon",descriptor.icon());
         }
