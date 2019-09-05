@@ -306,6 +306,8 @@ public class TarantulaContext implements Serviceable,ServiceContext{
                 LobbyConfiguration lc = new LobbyConfiguration();
                 lc.descriptor = d;
                 lc.applications = this.query(new String[]{d.distributionKey()},new ApplicationQuery(d.distributionKey()));
+                lc.views = this.query(new String[]{d.distributionKey()},new OnViewQuery(d.distributionKey()));
+                this.configureViews(lc);
                 try{
                     listener.onLobby(this.configure(lc));
                 }catch (Exception ex){ex.printStackTrace();}

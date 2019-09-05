@@ -180,7 +180,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     log.warn("Failed to add application ->"+b.toString());
                 }
             });
-            a.views.forEach(v->this.deploy(v));
+            a.views.forEach(v->{
+                //add view to app
+                v.owner(a.descriptor.typeId());
+                ResponseHeader xv = this.builder.create().fromJson(deployService.addView(v),ResponseHeader.class);
+                log.warn(xv.message());
+                if(!xv.successful()){
+                    log.warn("Failed to add view ->"+v.toString());
+                }
+            });
         });
         return this.builder.create().toJson(resp);
     }

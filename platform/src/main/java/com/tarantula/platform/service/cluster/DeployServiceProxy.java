@@ -5,6 +5,7 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
 import com.tarantula.Descriptor;
+import com.tarantula.OnView;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.DeployService;
@@ -127,6 +128,17 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
     public String enableApplication(String applicationId,boolean enabled){
         NodeEngine nodeEngine = getNodeEngine();
         EnableApplicationOperation operation = new EnableApplicationOperation(applicationId,enabled);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<String> future = builder.invoke();
+            return future.get(); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
+    public String addView(OnView view){
+        NodeEngine nodeEngine = getNodeEngine();
+        AddViewOperation operation = new AddViewOperation(view);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<String> future = builder.invoke();

@@ -504,6 +504,34 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
         return this.builder.create().toJson(resp);
     }
+    public String addView(OnView view){
+        ResponseHeader resp = new ResponseHeader("addView");
+        DataStore ds = this.tarantulaContext.masterDataStore();
+        log.warn("Add view->"+view.owner());
+        LobbyQuery query = new LobbyQuery(ds.bucket());
+        Descriptor[] lobby={null};
+        ds.list(query,(d)->{
+            if(view.owner().equals(d.typeId())){
+                lobby[0] = d;
+                return false;
+            }
+            return true;
+        });
+        if(lobby[0]==null){
+            resp.successful(false);
+            resp.message("["+view.owner()+"] not found");
+            return this.builder.create().toJson(resp);
+        }
+        view.owner(lobby[0].distributionKey());
+        if(ds.create(view)){
+            resp.message(view.distributionKey());
+        }
+        else{
+            resp.successful(false);
+            resp.message("failed to create view ["+view.viewId()+"]");
+        }
+        return this.builder.create().toJson(resp);
+    }
     public String resetModule(String lobbyId,Descriptor descriptor){
         ResponseHeader resp = new ResponseHeader("resetModule",descriptor.subtypeId(),false);
         DataStore dataStore = this.tarantulaContext.masterDataStore();

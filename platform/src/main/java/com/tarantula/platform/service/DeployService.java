@@ -2,6 +2,7 @@ package com.tarantula.platform.service;
 
 
 import com.tarantula.Descriptor;
+import com.tarantula.OnView;
 
 public interface DeployService extends ServiceProvider {
 
@@ -16,6 +17,7 @@ public interface DeployService extends ServiceProvider {
     String addLobby(Descriptor lobby);
     String enableLobby(String typeId,boolean enabled);
     String addApplication(Descriptor application);
+    String addView(OnView view);
     String resetModule(String lobbyId,Descriptor descriptor);
     String enableApplication(String applicationId,boolean enabled);
 }
