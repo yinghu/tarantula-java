@@ -6,9 +6,6 @@
         <index type="pending">
             <property name="moduleResourceFile">html/pending.view.html</property>
         </index>
-        <index type="shopping">
-            <property name="moduleResourceFile">html/stripe.card.view.html</property>
-        </index>
         <index type="authentication">
             <property name="moduleResourceFile">html/authentication.view.html</property>
         </index>

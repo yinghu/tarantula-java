@@ -404,6 +404,11 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         descriptor.onEdge(true);
         descriptor.resetEnabled(true);
         ds.create(descriptor);
+        if(descriptor.deployCode()<=0){
+            resp.successful(true);
+            resp.message("lobby created with deployCode ->"+descriptor.deployCode());
+            return this.builder.create().toJson(resp);
+        }
         DeploymentDescriptor lobby = new DeploymentDescriptor();
         lobby.typeId(descriptor.typeId());
         lobby.subtypeId(descriptor.typeId()+"-lobby");
@@ -421,7 +426,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         lobby.owner(descriptor.distributionKey());
         lobby.onEdge(true);
         if(ds.create(lobby)){
-            log.warn(lobby.toString());
             resp.message(lobby.distributionKey()+" created on ["+descriptor.typeId()+"]");
         }
         else{

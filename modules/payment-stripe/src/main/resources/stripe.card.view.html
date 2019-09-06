@@ -85,7 +85,7 @@
 <script>
     document.querySelector("#tx_close_shopping").onclick = tx_close_shopping;
     //let desc = TARA_API.descriptor(TARA_API.query().applicationId);
-    var _mgt ={serviceTag:'service/marketplace',command:'onList',requestingCredits:5000,packSize:3};  
+    var _mgt ={serviceTag:'marketplace/purchase',command:'onList',requestingCredits:5000,packSize:3};  
     TARA_API.onService(_mgt,function(mst){
         console.log(mst);
         TARA_API.query().stripeId = mst.paymentClientId;
@@ -183,7 +183,7 @@
         }   
     }
     function tx_shopping_commit(token){
-        let _mcommit ={serviceTag:'service/marketplace',command:'onCommit',checkoutId:TARA_API.query().packId,orderId:token.id};  
+        let _mcommit ={serviceTag:'marketplace/purchase',command:'onCommit',checkoutId:TARA_API.query().packId,orderId:token.id};  
         TARA_API.onService(_mcommit,function(resp){
             //popup web payment integration page    
             console.log(resp);

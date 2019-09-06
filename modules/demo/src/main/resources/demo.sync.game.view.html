@@ -115,12 +115,13 @@
     pView.container.addChild(itemSerice.container);
     itemSerice.list[2].title('List');
     itemSerice.list[2].button.command = function(){
-        let desc = TARA_API.descriptor('demo').descriptor;
-        console.log(desc);
-        let _payload ={serviceTag:desc.tag,command:'onLobby',typeId:desc.typeId};
-        TARA_API.onService(_payload,function(resp){
-            console.log(resp);        
-        });    
+        _open_buy();
+        //let desc = TARA_API.descriptor('demo').descriptor;
+        //console.log(desc);
+        //let _payload ={serviceTag:desc.tag,command:'onLobby',typeId:desc.typeId};
+        //TARA_API.onService(_payload,function(resp){
+            //console.log(resp);        
+        //});    
     };
     
     itemSerice.list[3].title('Item');

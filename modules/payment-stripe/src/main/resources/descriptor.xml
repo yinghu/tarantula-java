@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula>
+    <lobby-context>
+        <type-id>marketplace</type-id>
+        <type>lobby</type>
+        <category>service</category>
+        <name>Marketplace</name>
+        <access-mode>12</access-mode>
+        <description>Tarantula Marketplace Service</description>
+        <deploy-priority>10</deploy-priority>
+        <application-list>
+            <application>
+                <type-id>marketplace</type-id>
+                <subtype-id>marketplace-purchase</subtype-id>
+                <name>Marketplace</name>
+                <type>application</type>
+                <category>marketplace</category>
+                <singleton>true</singleton>
+                <tag>marketplace/purchase</tag>
+                <module-name>com.tarantula.service.payment.StripePaymentService</module-name>
+                <description>Tarantula Marketplace Service</description>
+                <configuration-name>marketplace</configuration-name>
+                <leader-board-header>presence</leader-board-header>
+                <response-label>marketplace</response-label>
+            </application>
+        </application-list>
+        <view-list>
+            <view type="shopping">
+                <property name="flag">marketplace-purchase</property>
+                <property name="moduleResourceFile">stripe.card.view.html</property>
+            </view>
+        </view-list>
+    </lobby-context>
+</tarantula>

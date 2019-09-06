@@ -309,7 +309,10 @@ public class TarantulaContext implements Serviceable,ServiceContext{
                 lc.views = this.query(new String[]{d.distributionKey()},new OnViewQuery(d.distributionKey()));
                 this.configureViews(lc);
                 try{
-                    listener.onLobby(this.configure(lc));
+                    OnLobby ob = this.configure(lc);
+                    if(lc.descriptor.deployCode>0){
+                        listener.onLobby(ob);
+                    }
                 }catch (Exception ex){ex.printStackTrace();}
             }
         });
