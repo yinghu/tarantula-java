@@ -11,7 +11,7 @@ public interface Statistics extends OnApplication,Updatable{
 
     OnStatistics value(String key,double value);
 
-    Map<String,Double> list();
+    Map<String,Double> summary();
 
     interface Entry extends Recoverable{
         String name();

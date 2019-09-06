@@ -47,7 +47,7 @@ public class DeltaStatistics extends OnApplicationHeader implements Statistics {
         });
         return new OnStatisticsTrack(this.leaderBoardHeader);
     }
-    public Map<String,Double> list(){
+    public Map<String,Double> summary(){
         Map<String,Double> _mv = new HashMap<>();
         this.mappings.forEach((k,v)->{
             _mv.put(k,v.value());

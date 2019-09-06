@@ -211,7 +211,7 @@ var TARA_API = (function(){
         //qdata.ticket = resp.presence.ticket;
         //console.log(resp.connection);
         qdata.connection = resp.connection;
-        _parse(resp,function(v){});
+        //_parse(resp,function(v){});
         wsWorker = new Worker('/resource/tarantula.web.socket.source.js');//move to login
         wsWorker.onmessage = _onmessage;
         wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});

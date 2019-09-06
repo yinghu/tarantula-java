@@ -4,7 +4,7 @@ import com.tarantula.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.IndexEvent;
 import com.tarantula.platform.service.DeploymentServiceProvider;
-import com.tarantula.platform.util.IndexContextSerializer;
+import com.tarantula.platform.util.PresenceContextSerializer;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -21,13 +21,13 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
     public void callback(Session session, byte[] payload) throws Exception {
         if(session.action().equals("view")){
             IndexEvent ie = (IndexEvent)session;
-            IndexContext ic = new IndexContext("view");
+            PresenceContext ic = new PresenceContext("view");
             OnView view = this._viewList.get(ie.trackId());
             ic.view = view;
             session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("index")){
-            IndexContext ic = new IndexContext("index");
+            PresenceContext ic = new PresenceContext("index");
             OnView view = this._viewList.get("index");
             ic.lobbyList = this.context.index();
             _lobbyList.forEach((n)->{
@@ -44,7 +44,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        builder.registerTypeAdapter(IndexContext.class,new IndexContextSerializer());
+        builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.registerOnViewListener(this);
         deploymentServiceProvider.registerOnLobbyListener(this);

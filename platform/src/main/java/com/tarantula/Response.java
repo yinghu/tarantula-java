@@ -1,9 +1,9 @@
 package com.tarantula;
 
 /**
- * Updated by yinghu on 5/20/2018.
+ * Updated by yinghu on 9/6/2019
  */
-public interface Response extends Recoverable{
+public interface Response extends Recoverable,OnProperty{
 
     int INSUFFICIENT_BALANCE = 1;
     int ACCESS_MODE_NOT_SUPPORTED = 3;

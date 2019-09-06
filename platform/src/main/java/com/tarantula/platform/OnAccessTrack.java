@@ -4,11 +4,8 @@ import com.tarantula.OnAccess;
 import com.tarantula.Property;
 import com.tarantula.platform.presence.UserPortableRegistry;
 import com.tarantula.platform.util.SystemUtil;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Updated by yinghu on 8/23/19.

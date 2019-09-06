@@ -35,15 +35,16 @@ public class ResponseDeserializer implements JsonDeserializer<Response> {
         if(jo.has("message")){
             response.message(jo.get("message").getAsString());
         }
+        if(jo.has("disabled")){
+            response.disabled(jo.get("disabled").getAsBoolean());
+        }
         if(jo.has("typeId")){
-            response.toMap().put("typeId",jo.get("typeId").getAsString());
+            response.property("typeId",jo.get("typeId").getAsString());
         }
         if(jo.has("applicationId")){
-            response.toMap().put("applicationId",jo.get("applicationId").getAsString());
+            response.property("applicationId",jo.get("applicationId").getAsString());
         }
-        if(jo.has("disabled")){
-            response.toMap().put("disabled",jo.get("disabled").getAsBoolean());
-        }
+
         return this.response;
     }
 }

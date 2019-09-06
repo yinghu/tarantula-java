@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
- * Updated by yinghu on 10/7/2018.
+ * Updated by yinghu on 9/6/2019
  */
 public class StatisticsSerializer implements JsonSerializer<Statistics> {
 
@@ -19,7 +19,7 @@ public class StatisticsSerializer implements JsonSerializer<Statistics> {
         jo.addProperty("header",statistics.leaderBoardHeader());
         jo.addProperty("name",statistics.name());
         JsonArray ja = new JsonArray();
-        for(Map.Entry<String,Double> kv : statistics.list().entrySet()){
+        for(Map.Entry<String,Double> kv : statistics.summary().entrySet()){
             JsonObject xv = new JsonObject();
             xv.addProperty("name",kv.getKey());
             xv.addProperty("value",kv.getValue());

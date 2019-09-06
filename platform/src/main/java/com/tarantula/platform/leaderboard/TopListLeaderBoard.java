@@ -108,7 +108,7 @@ public class TopListLeaderBoard extends ResponseHeader implements LeaderBoard {
     }
 
     @Override
-    public Entry[] list() {
+    public Entry[] onBoard() {
         return entryList;
     }
     public void entry(int index,Entry entry){

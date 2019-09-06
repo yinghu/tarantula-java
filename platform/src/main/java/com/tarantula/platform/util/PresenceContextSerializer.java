@@ -1,6 +1,7 @@
 package com.tarantula.platform.util;
 
 import com.google.gson.*;
+import com.tarantula.Access;
 import com.tarantula.Descriptor;
 import com.tarantula.Lobby;
 import com.tarantula.XP;
@@ -25,9 +26,11 @@ public class PresenceContextSerializer implements JsonSerializer<PresenceContext
                 JsonObject jlobby = new JsonObject();
                 jlobby.add("descriptor",ser.serialize(lobby.descriptor(),type,jsonSerializationContext));
                 JsonArray jlist = new JsonArray();
-                for(Descriptor d : lobby.entryList()){
-                    //add application list
-                    jlist.add(ser.serialize(d,type,jsonSerializationContext));
+                if(lobby.descriptor().accessMode()== Access.PUBLIC_ACCESS_MODE){
+                    for(Descriptor d : lobby.entryList()){
+                        //add application list
+                        jlist.add(ser.serialize(d,type,jsonSerializationContext));
+                    }
                 }
                 jlobby.add("applications",jlist);
                 blist.add(jlobby);

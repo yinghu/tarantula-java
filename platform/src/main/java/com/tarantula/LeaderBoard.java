@@ -22,7 +22,7 @@ public interface LeaderBoard extends Response {
     boolean onBoard(String systemId,LeaderBoard.Entry entry);
 
     void reset();
-    Entry[] list();
+    Entry[] onBoard();
 
 
     interface Entry extends Recoverable{

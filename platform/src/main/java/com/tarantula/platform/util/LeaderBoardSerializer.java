@@ -21,7 +21,7 @@ public class LeaderBoardSerializer implements JsonSerializer<LeaderBoard> {
         jo.addProperty("category",leaderBoard.category());
         jo.addProperty("size",leaderBoard.size());
         JsonArray blist = new JsonArray();
-        for(LeaderBoard.Entry e : leaderBoard.list()){
+        for(LeaderBoard.Entry e : leaderBoard.onBoard()){
             if(e.value()>0){
                 JsonObject b = new JsonObject();
                 b.addProperty("systemId",e.systemId());

@@ -5,18 +5,13 @@ import com.tarantula.Response;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
-
 /**
  * Developer: YINGHU LU
  * Date: updated 6/16/2019.
  */
-public class PresenceApplication extends TarantulaApplicationHeader implements OnLobby.Listener,Configuration.Listener{
+public class PresenceApplication extends TarantulaApplicationHeader implements Configuration.Listener{
 
-    private String[] lobbyIdList;
+
     private DeploymentServiceProvider deploymentServiceProvider;
     private RingBuffer<Configuration> cBuffer;
 
@@ -24,14 +19,10 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         Configuration pc = this.context.configuration("setup");
-        this.lobbyIdList = pc.property("lobbyList").split(",");
-        boolean lobbyListenerEnabled = Boolean.parseBoolean(pc.property("lobbyListenerEnabled"));
+
         this.cBuffer = new RingBuffer<>(new Configuration[5]);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        if(lobbyListenerEnabled){
-            deploymentServiceProvider.registerOnLobbyListener(this);
-        }
         deploymentServiceProvider.registerConfigurationListener(this);
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
             Presence presence = this.context.presence(t.owner());
@@ -49,16 +40,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
          if (session.action().equals("onPresence")) {
                 Presence presence = this.context.presence(session.systemId());
                 PresenceContext pc = new PresenceContext(session.action());
-                List<Lobby> lobbyList = new ArrayList();
-                for (String s : this.lobbyIdList) {
-                    Lobby lx = this.context.lobby(s);
-                    if (lx != null) {
-                        lobbyList.add(lx);
-                    } else {
-                        this.context.log("Lobby [" + s + "] is not existed. Please check lobby list on presence",OnLog.WARN);
-                    }
-                }
-                pc.lobbyList=(lobbyList);
                 pc.connection = cBuffer.pop();
                 pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
                 session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
@@ -112,19 +93,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                 session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes(),this.descriptor.responseLabel());
             }
 
-    }
-
-    public void onLobby(OnLobby onLobby) {
-        //optional with a config flag
-        Configuration cx = this.context.configuration("setup");
-        String list = cx.property("lobbyList");
-        if(list!=null&&!cx.property("lobbyList").contains(onLobby.typeId())) {
-            cx.configure("lobbyList", cx.property("lobbyList") + "," +onLobby.typeId());
-        }
-        else{
-            cx.configure("lobbyList",onLobby.typeId());
-        }
-        this.lobbyIdList = cx.property("lobbyList").split(",");
     }
 
     @Override
