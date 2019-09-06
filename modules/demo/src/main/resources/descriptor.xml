@@ -4,7 +4,7 @@
         <type-id>demo</type-id>
         <type>lobby</type>
         <category>game</category>
-        <icon>html/blackjack/blackjack_icon.png</icon>
+        <icon>assets/duration.png</icon>
         <view-id>game.lobby</view-id>
         <tag>demo/lobby</tag>
         <name>DemoSync</name>
