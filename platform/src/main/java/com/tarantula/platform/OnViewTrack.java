@@ -107,6 +107,6 @@ public class OnViewTrack extends RecoverableObject implements OnView {
     }
 
     public String toString(){
-        return "OnView->["+viewId+"/"+moduleName+"/"+moduleFile+"/"+moduleResourceFile+"]";
+        return "OnView->["+viewId+"/"+disabled+"]";
     }
 }

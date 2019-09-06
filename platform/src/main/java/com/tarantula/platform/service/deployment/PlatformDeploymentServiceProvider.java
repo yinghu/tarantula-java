@@ -260,6 +260,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 if(dynamicModuleClassLoader!=null){
                     log.warn("Module resource clear on ["+d.codebase()+"/"+d.moduleArtifact()+"/"+d.moduleVersion()+"/"+d.subtypeId()+"]");
                     dynamicModuleClassLoader._clear();
+                    vMap.forEach((k,v)->{
+                        if(v instanceof OnView){
+                            OnView ov = (OnView)v;
+                            if(ov.flag().equals(d.subtypeId())){
+                                ov.disabled(true);
+                                vMap.remove(k);
+                                this.vListeners.forEach(listener -> listener.onView(ov));
+                            }
+                        }
+                    });
                 }
             }
         });
@@ -324,8 +334,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 ot.fromMap(SystemUtil.toMap(event.payload()));
             }
             if(ot instanceof OnView){
+                OnView ov = (OnView)ot;
+                log.warn(ov.viewId()+"->"+ov.flag());
                 this.vListeners.forEach((cl)->{
-                    cl.onView((OnView) ot);
+                    cl.onView(ov);
                 });
             }
             else if(ot instanceof Configuration){
