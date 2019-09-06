@@ -18,12 +18,12 @@
     <script src="resource/tarantula.api.js"></script>
     <script src="resource/tarantula.webgl.js"></script>
     <script src="resource/tarantula.ui.js"></script>
-    <script src="resource/tarantula.casino.js"></script>
+    <!--<script src="resource/tarantula.casino.js"></script>
     <script src="resource/tarantula.craps.js"></script>
     <script src="resource/tarantula.blackjack.js"></script>
     <script src="resource/tarantula.roulette.js"></script>
     <script src="resource/tarantula.baccarat.js"></script>
-    <script src="resource/tarantula.scc.js"></script>
+    <script src="resource/tarantula.scc.js"></script>-->
     <title>Game Engine Cluster</title>
 </head>
 <body class='w3-green' onload="_ready()"> 
@@ -35,51 +35,39 @@
             </div>
             <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode' id="demo-desc">Demo Sync</span></div>
         </div>
-        <div class="w3-display-container w3-cyan w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='baccarat'>
-            <div class="w3-display-topright w3-padding"><span id="baccarat-name" class="tx-game-title">Baccarat</span></div>
+        <div class="w3-display-container w3-cyan w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='game1'>
+            <div class="w3-display-topright w3-padding"><span id="game1-name" class="tx-game-title">Pending Game</span></div>
             <div class="w3-display-topleft w3-padding">
-                <img id ='baccarat-icon' src="assets/minus.png" width="120px" height="120px" style='filter:drop-shadow(8px 8px 16px white)'>
+                <img id ='game1-icon' src="assets/minus.png" width="120px" height="120px" style='filter:drop-shadow(8px 8px 16px white)'>
             </div>
-            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode' id="baccarat-desc">Multiple Players,Play As The House</span></div>
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode' id="game1-desc">Multiple Players</span></div>
         </div>
-        <div class="w3-display-container w3-blue w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='blackjack'>
-            <div class="w3-display-topright w3-padding"><span id='blackjack-name' class="tx-game-title">BlackJack</span></div>
+        <div class="w3-display-container w3-blue w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='game4'>
+            <div class="w3-display-topright w3-padding"><span id='game4-name' class="tx-game-title">Pending Game</span></div>
             <div class="w3-display-topleft w3-padding">
-                <img id='blackjack-icon' src="assets/minus.png" width="100px" height="100px" style='filter:drop-shadow(8px 8px 16px white)'>
+                <img id='game4-icon' src="assets/minus.png" width="100px" height="100px" style='filter:drop-shadow(8px 8px 16px white)'>
             </div>
-            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode' id='blackjack-desc'>Multiple Players,Play As The House</span></div>
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode' id='game4-desc'>Multiple Players</span></div>
         </div>
-        <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='craps'>
-            <div class="w3-display-topright w3-padding"><span id="craps-name" class="tx-game-title">Craps</span></div>
+        <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='game2'>
+            <div class="w3-display-topright w3-padding"><span id="game2-name" class="tx-game-title">Pending Game</span></div>
             <div class="w3-display-topleft w3-padding">
-                <img id="craps-icon" src="assets/minus.png" width="100px" height="100px" style='filter:drop-shadow(8px 8px 16px white)'>
+                <img id="game2-icon" src="assets/minus.png" width="100px" height="100px" style='filter:drop-shadow(8px 8px 16px white)'>
             </div>
-            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode' id='craps-desc'>Multiple Players,Play As The House</span></div>
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode' id='game2-desc'>Multiple Players</span></div>
         </div>
-        <div class="w3-display-container w3-purple w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='roulette'>
-            <div class="w3-display-topright w3-padding"><span id="roulette-name" class="tx-game-title">Roulette</span></div>
+        <div class="w3-display-container w3-purple w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='game3'>
+            <div class="w3-display-topright w3-padding"><span id="game3-name" class="tx-game-title">Pending Game</span></div>
             <div class="w3-display-left w3-padding">
-                <img id ='roulette-icon' src="assets/minus.png" width="100px" height="100px" style='filter:drop-shadow(8px 8px 16px white)'>
+                <img id ='game3-icon' src="assets/minus.png" width="100px" height="100px" style='filter:drop-shadow(8px 8px 16px white)'>
             </div>
-            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode' id='roulette-desc'>Multiple Players,Play As The House</span></div>
+            <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode' id='game3-desc'>Multiple Players,</span></div>
         </div>  
         <div class="w3-display-container w3-lime w3-border-bottom w3-border-white tx-content-160 tx-lobby" view-id='pending' id='admin'>
             <div class="w3-display-topright w3-padding"><span id="admin-name" class="tx-game-title">Admin Tool</span></div>
             <div class="w3-display-left w3-padding"><img id ='admin-icon' src="assets/minus.png" width="100px" height="100px"></div>
             <div class="w3-display-bottomright w3-padding"><span class='tx-game-mode' id="admin-desc">Admin Tool</span></div>           
         </div>
-        <!--
-        <div class="w3-display-container w3-orange w3-border-bottom w3-border-white tx-content-100 tx-lobby" view-id='pending' id='pachinko'>
-            <div class="w3-display-topright w3-padding" id="pachinko-name">Pending</div>
-            <div class="w3-display-left w3-padding"><img id ='pachinko-icon' src="assets/minus.png" width="70px" height="70px"></div>
-            <div class="w3-display-bottomright w3-padding"><span class='tx-admin-mode'>Multiple Players,Team Up,Tournament</span></div>
-        </div>
-        <div class="w3-display-container w3-pink w3-border-bottom w3-border-white tx-content-100 tx-lobby" view-id='pending' id='videopoker'>
-            <div class="w3-display-topright w3-padding" id="videopoker-name">Pending</div>
-            <div class="w3-display-left w3-padding"><img id ='videopoker-icon' src="assets/minus.png" width="70px" height="70px"></div>
-            <div class="w3-display-bottomright w3-padding"><span class='tx-admin-mode'>Multiple Players,Team Up,Tournament</span></div>
-        </div>
-        -->
     </div>
     
     <!-- POPUP GAME LOBBY FULL SCREEN  CONTENT -->
