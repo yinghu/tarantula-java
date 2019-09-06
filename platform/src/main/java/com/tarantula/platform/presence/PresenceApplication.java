@@ -18,8 +18,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        Configuration pc = this.context.configuration("setup");
-
         this.cBuffer = new RingBuffer<>(new Configuration[5]);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);

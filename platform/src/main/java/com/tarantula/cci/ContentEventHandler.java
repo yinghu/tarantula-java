@@ -32,18 +32,17 @@ public class ContentEventHandler implements RequestHandler {
             _hex.put(sid,exchange);
             String path = exchange.path();
             String token = exchange.query().split("=")[1];
-            //String clientId = exchange.header(Session.X_REAL_IP)!=null?exchange.header(Session.X_REAL_IP):exchange.remoteAddress();
             OnSession ox = this.auth.validateToken(token);
             String[] plist = path.substring(1).split("/");
             PendingRequestEvent ctn = new PendingRequestEvent(plist[0]+"/"+plist[1]);
-            ctn.action(plist[2]+Recoverable.PATH_SEPARATOR+plist[3]);
+            String rkey = plist[2]+Recoverable.PATH_SEPARATOR+plist[3];
             ctn.systemId(ox.systemId());
             ctn.ticket(ox.ticket());
             ctn.stub(ox.stub());
-            ctn.trackId(ox.oid());
+            ctn.trackId(rkey);
             ctn.sessionId(sid);
             ctn.source(this.serverTopic);
-            ctn.destination(eventService.routingKey(ox.systemId(),ctn.tag()).route());
+            ctn.destination(eventService.routingKey(rkey,Presence.PROFILE_TAG).route());
             this.eventService.publish(ctn);
 
         }catch (Exception ex){

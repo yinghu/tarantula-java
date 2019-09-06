@@ -5,7 +5,7 @@ import com.tarantula.platform.AbstractRecoverableListener;
 import com.tarantula.platform.OnAccessTrack;
 
 /**
- * Created by yinghu lu on 3/31/2018.
+ * Updated by yinghu lu on 9/6/2019.
  */
 public class UserPortableRegistry extends AbstractRecoverableListener {
 
@@ -13,8 +13,7 @@ public class UserPortableRegistry extends AbstractRecoverableListener {
 
     public static final int ACCESS_CID = 1;
     public static final int PROFILE_CID = 2;
-    public static final int CONTENT_TRANSACTION_CID = 3;
-    public static final int CONTENT_CHUNK_CID = 4;
+    public static final int AVATAR_CID = 3;
     public static final int ON_ACCESS_CID = 5;
 
 
@@ -27,14 +26,11 @@ public class UserPortableRegistry extends AbstractRecoverableListener {
             case PROFILE_CID:
                 pt = new ProfileTrack();
                 break;
-            case CONTENT_TRANSACTION_CID:
-                pt = new ContentTransaction();
-                break;
-            case CONTENT_CHUNK_CID:
-                pt = new ContentChunk();
-                break;
             case ON_ACCESS_CID:
                 pt = new OnAccessTrack();
+                break;
+            case AVATAR_CID:
+                pt = new Avatar();
                 break;
             default:
         }

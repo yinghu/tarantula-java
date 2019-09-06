@@ -35,19 +35,5 @@
                 <response-label>profile</response-label>
             </application>
         </application-list>
-        <configuration-list>
-            <configuration tag="presence" priority="10">
-                <presence type="setup">
-                    <property name="lobbyListenerEnabled">false</property>
-                    <property name="lobbyList">leaderboard,level</property>
-                </presence>
-            </configuration>
-            <configuration tag="profile" priority="10">
-                <profile type="setup">
-                    <property name="uploadChunkSize">1200000</property>
-                    <property name="contentPath">/tarantula/content</property>
-                </profile>
-            </configuration>
-        </configuration-list>
     </lobby-context>
 </tarantula>

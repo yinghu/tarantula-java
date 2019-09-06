@@ -14,7 +14,7 @@ public class PendingRequestEvent extends Data implements EventOnAction {
     public PendingRequestEvent(){
     }
     public PendingRequestEvent(String tag){
-        this.tag = tag;
+        this.action = tag;
     }
     public int getFactoryId() {
         return PortableEventRegistry.OID;
@@ -32,7 +32,7 @@ public class PendingRequestEvent extends Data implements EventOnAction {
         out.writeInt("6",this.stub);
         out.writeUTF("7",this.trackId);
         out.writeUTF("8",this.action);
-        out.writeUTF("9",this.tag);
+        //out.writeUTF("9",this.tag);
     }
 
     public void readPortable(PortableReader in) throws IOException {
@@ -44,7 +44,7 @@ public class PendingRequestEvent extends Data implements EventOnAction {
         this.stub = in.readInt("6");
         this.trackId = in.readUTF("7");
         this.action = in.readUTF("8");
-        this.tag = in.readUTF("9");
+        //this.tag = in.readUTF("9");
     }
     @Override
     public String toString(){

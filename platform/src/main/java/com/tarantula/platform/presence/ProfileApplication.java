@@ -1,14 +1,9 @@
 package com.tarantula.platform.presence;
 
 import com.tarantula.*;
-import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.TarantulaApplicationHeader;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.PresenceContextSerializer;
-import com.tarantula.platform.util.SystemUtil;
-
-import java.util.Base64;
-import java.util.concurrent.ConcurrentHashMap;
-
 
 /**
  * Updated by yinghu lu on 8/26/19
@@ -16,11 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ProfileApplication extends TarantulaApplicationHeader {
 
     private DataStore dataStore;
-    private ConcurrentHashMap<String,ContentTransaction> _pendingProgress = new ConcurrentHashMap<>();
 
-    private DataStore avatarDataStore;
-
-    private int uploadChunkSize;
+    private DeploymentServiceProvider deploymentServiceProvider;
 
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
@@ -31,37 +23,20 @@ public class ProfileApplication extends TarantulaApplicationHeader {
             pcx.profile = u;
             session.write(builder.create().toJson(pcx).getBytes(),this.descriptor.responseLabel());
         }
-        else if(session.action().equals("onUpload")){
-            OnAccess acc = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            ContentTransaction ct = new ContentTransaction(session.systemId(),"Avatar");
-            ct.chunkSize = uploadChunkSize;
-            ct.contentSize = Integer.parseInt(acc.property("size"));
-            ct.batchSize = Math.floorDiv(ct.contentSize,uploadChunkSize)+((ct.contentSize%uploadChunkSize)>0?1:0);
-            ct.contentType = SystemUtil.mimeTypeFromWebBase64(acc.property("type"));
-            this.avatarDataStore.create(ct);
-            ct._batched = ct.batchSize;
-            this._pendingProgress.put(session.systemId(),ct);
-            acc.property("batchSize",ct.chunkSize+"");
-            acc.property("transactionId",session.systemId());
-            session.write(builder.create().toJson(acc).getBytes(),this.descriptor.responseLabel());
-        }
-        else if(session.action().startsWith("avatar")){
-            this.context.log(session.action(),OnLog.WARN);
-            ContentTransaction _bx = this._pendingProgress.get(session.systemId());
-            ContentChunk cc = new ContentChunk(session.systemId(),session.action(),Base64.getDecoder().decode(payload));
-            this.avatarDataStore.create(cc);
-            if(_bx.onTransaction(cc.toByteArray().length)){
-                this._pendingProgress.remove(_bx.distributionKey());
-                Profile u = this._load(session.systemId());
-                PresenceContext pcx  = new PresenceContext();
-                pcx.code(1);
-                pcx.command(session.action());
-                pcx.profile = u;
-                pcx.successful(true);
-                session.write(builder.create().toJson(pcx).getBytes(),this.descriptor.responseLabel());
+        else if(session.action().equals("content/avatar")){
+            //this.context.log(session.trackId(),OnLog.INFO);
+            Avatar avatar = new Avatar();
+            avatar.distributionKey(session.trackId());
+            if(this.dataStore.load(avatar)){
+                byte[] icon = this.deploymentServiceProvider.resource(avatar.name(),null);
+                session.write(icon,0,avatar.type(),this.descriptor.responseLabel(),true);
             }
             else{
-                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),0)).getBytes(),this.descriptor.responseLabel());
+                byte[] icon = this.deploymentServiceProvider.resource("assets/man.png",null);
+                session.write(icon,0,"image/png",this.descriptor.responseLabel(),true);
+                avatar.type("image/png");
+                avatar.name("assets/man.png");
+                this.dataStore.createIfAbsent(avatar,false);
             }
         }
         else{
@@ -76,11 +51,9 @@ public class ProfileApplication extends TarantulaApplicationHeader {
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        Configuration cfg = this.context.configuration("setup");
-        this.uploadChunkSize = Integer.parseInt(cfg.property("uploadChunkSize"));
         this.builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.dataStore = this.context.dataStore("profile");
-        this.avatarDataStore = this.context.dataStore("avatar");
+        this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.context.log("Profile application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
     }
 
