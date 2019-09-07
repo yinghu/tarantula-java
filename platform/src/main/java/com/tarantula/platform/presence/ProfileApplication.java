@@ -4,6 +4,7 @@ import com.tarantula.*;
 import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.PresenceContextSerializer;
+import com.tarantula.platform.util.SystemUtil;
 
 /**
  * Updated by yinghu lu on 8/26/19
@@ -32,10 +33,11 @@ public class ProfileApplication extends TarantulaApplicationHeader {
                 session.write(icon,0,avatar.type(),this.descriptor.responseLabel(),true);
             }
             else{
-                byte[] icon = this.deploymentServiceProvider.resource("assets/man.png",null);
+                String dv = SystemUtil.partition(session.trackId(),2)==0?"assets/man.png":"assets/woman.png";
+                byte[] icon = this.deploymentServiceProvider.resource(dv,null);
                 session.write(icon,0,"image/png",this.descriptor.responseLabel(),true);
                 avatar.type("image/png");
-                avatar.name("assets/man.png");
+                avatar.name(dv);
                 this.dataStore.createIfAbsent(avatar,false);
             }
         }
