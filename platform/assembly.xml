@@ -17,18 +17,8 @@
       	<includes>
         	<include>tarantula.sh</include>
         	<include>tarantula.bat</include>
-        	<include>start.sh</include>
-        	<include>start.bat</include>
-            <include>load.sh</include>
-			<include>load.ws.sh</include>
 			<include>bootstrap.sh</include>
 			<include>license.txt</include>
-			<include>win.bootstrap.js</include>
-			<include>ux.bootstrap.js</include>
-			<include>ws.standalone.js</include>
-			<include>ws.config</include>
-			<include>tarantula.http.proxy.js</include>
-			<include>tarantula.web.socket.js</include>
       	</includes>
       	<fileMode>0777</fileMode>
      </fileSet>
