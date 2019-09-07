@@ -14,11 +14,13 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
 
     private DeploymentServiceProvider deploymentServiceProvider;
     private RingBuffer<Configuration> cBuffer;
+    private RingBuffer<Configuration> uBuffer;
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         this.cBuffer = new RingBuffer<>(new Configuration[5]);
+        this.uBuffer = new RingBuffer<>(new Configuration[5]);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.registerConfigurationListener(this);
@@ -92,9 +94,15 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             }
 
     }
-
-    @Override
     public void onConfiguration(Configuration c) {
+        if(c.type().equals("websocket")){
+            onWebSocket(c);
+        }
+        else if(c.type().equals("udp")){
+            onUdp(c);
+        }
+    }
+    private void onWebSocket(Configuration c) {
         this.context.log(c.type()+"/"+c.property("serverId")+"/"+c.disabled(),OnLog.INFO);
         if(!c.disabled()){
             if(!cBuffer.push(c)){
@@ -110,6 +118,33 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         }
         else{
             cBuffer.reset((ca,limit)->{
+                Configuration[] cn = new Configuration[ca.length];
+                int r=0;
+                for(int i=0;i<limit;i++){
+                    if(!(ca[i].property("serverId").equals(c.property("serverId")))){
+                        cn[r++]=ca[i];
+                    }
+                }
+                return cn;
+            });
+        }
+    }
+    private void onUdp(Configuration c) {
+        this.context.log(c.type()+"/"+c.property("serverId")+"/"+c.disabled(),OnLog.INFO);
+        if(!c.disabled()){
+            if(!uBuffer.push(c)){
+                uBuffer.reset(((ca,limit)->{
+                    Configuration[] cn = new Configuration[ca.length*2];
+                    for(int i=0;i<limit;i++){
+                        cn[i]=ca[i];
+                    }
+                    cn[limit]=c;
+                    return cn;
+                }));
+            }
+        }
+        else{
+            uBuffer.reset((ca,limit)->{
                 Configuration[] cn = new Configuration[ca.length];
                 int r=0;
                 for(int i=0;i<limit;i++){

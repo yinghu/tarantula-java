@@ -19,6 +19,7 @@ public class PresenceContext extends ResponseHeader {
     public OnSession presence;
     public OnView view;
     public Configuration connection;
+    public Configuration udp;
     public Profile profile;
     public PresenceContext(){
         this.code = 200;
