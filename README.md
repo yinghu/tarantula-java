@@ -211,7 +211,7 @@ A module is deployed as a lobby context including multiple modules. The typeId i
 3. Run node win.bootstrap.js on Windows or run node ux.bootstrap.js on linux/mac (use sudo) in the target/release/gec-platform-bin-1.0/gec-platform-1.0/bin.
 ```
     cd target/release/gec-platform-bin-1.0/gec-platform-1.0/bin
-    node win.bootstrap.js on Windows or run node ux.bootstrap.js
+    tarantula.bat on Windows or tarantula.sh on linux/mac
 ```
 2. Once it is runing, go to http://localhost:8090 via browsers.
 3. Use the admin tool to drop the module to run. (login/password as root/root created by the platform).
