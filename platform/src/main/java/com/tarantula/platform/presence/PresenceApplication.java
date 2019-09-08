@@ -7,7 +7,7 @@ import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.*;
 /**
  * Developer: YINGHU LU
- * Date: updated 6/16/2019.
+ * Date: updated 9/8/2019.
  */
 public class PresenceApplication extends TarantulaApplicationHeader implements Configuration.Listener{
 
@@ -41,6 +41,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
                 Presence presence = this.context.presence(session.systemId());
                 PresenceContext pc = new PresenceContext(session.action());
                 pc.connection = cBuffer.pop();
+                pc.udp = uBuffer.pop();
                 pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
                 session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
             }
@@ -87,7 +88,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             else if (session.action().equals("onAbsence")) {
                 this.context.absence(session);
                 session.write(this.builder.create().toJson(new ResponseHeader("onAbsence", "off session [" + session.stub() + "]", true)).getBytes(),this.descriptor.responseLabel());
-                //steam.write(payload,"presence/lobby");
             }
             else{
                 session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes(),this.descriptor.responseLabel());
@@ -95,6 +95,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
 
     }
     public void onConfiguration(Configuration c) {
+        this.context.log(c.type()+"/"+c.property("serverId")+"/"+(c.disabled()?"closed":"open"),OnLog.WARN);
         if(c.type().equals("websocket")){
             onWebSocket(c);
         }
@@ -103,7 +104,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         }
     }
     private void onWebSocket(Configuration c) {
-        this.context.log(c.type()+"/"+c.property("serverId")+"/"+c.disabled(),OnLog.INFO);
         if(!c.disabled()){
             if(!cBuffer.push(c)){
                 cBuffer.reset(((ca,limit)->{
@@ -130,7 +130,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         }
     }
     private void onUdp(Configuration c) {
-        this.context.log(c.type()+"/"+c.property("serverId")+"/"+c.disabled(),OnLog.INFO);
         if(!c.disabled()){
             if(!uBuffer.push(c)){
                 uBuffer.reset(((ca,limit)->{

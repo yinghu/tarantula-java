@@ -20,7 +20,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
- * updated by yinghu lu on 6/19/2019.
+ * updated by yinghu lu on 9/8/2019.
  */
 public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider,EventListener{
 
@@ -373,23 +373,22 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         }
         else if(event instanceof ServerPushEvent){
-            //log.warn(event.toString()+" Updated");
             ApplicationConfiguration cfg = this.builder.create().fromJson(new String(event.payload()),ApplicationConfiguration.class);
             cfg.tag(event.owner());
-            cfg.type("websocket");
             cfg.disabled(event.disabled());
             cfg.bucket(event.bucket());
             cfg.oid(cfg.property("serverId"));
-            this.cListeners.forEach((l)->{
-                l.onConfiguration(cfg);
-            });
             if(!event.disabled()){
                 pushRegistry.put(event.sessionId(),event);
                 vMap.putIfAbsent(cfg.key().asString(),cfg);
             }else{
                 pushRegistry.remove(event.sessionId());
-                vMap.remove(cfg.key().asString());
+                Configuration ref = (Configuration) vMap.remove(cfg.key().asString());
+                cfg.type(ref.type());//recover type from original connect
             }
+            this.cListeners.forEach((l)->{
+                l.onConfiguration(cfg);
+            });
         }
         else if(event instanceof ModuleApplicationEvent){
             if(!event.disabled()){
