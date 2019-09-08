@@ -15,7 +15,9 @@
       	<directory>src/main/bin</directory>
       	<outputDirectory>bin</outputDirectory>
       	<includes>
-            <include>load.sh</include>
+            <include>tarantula.sh</include>
+			<include>tarantula.bat</include>
+			<include>udp.conf</include>
       	</includes>
       	<fileMode>0777</fileMode>
      </fileSet>
