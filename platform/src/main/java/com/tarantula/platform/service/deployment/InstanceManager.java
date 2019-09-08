@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Updated by yinghu lu on 3/5/2019.
  */
-public class InstanceManager implements Instance {
+public class InstanceManager implements Instance,OnConnection.Listener {
 
     private int partition;
     private int state;
@@ -30,7 +30,8 @@ public class InstanceManager implements Instance {
         this.partition = partition;
         this.applicationManager = applicationManager;
         this.durationOnInstance = this.applicationManager.deploymentDescriptor.runtimeDurationOnInstance();
-        instancesOnPartition = new AtomicInteger(0);
+        this.instancesOnPartition = new AtomicInteger(0);
+        this.applicationManager.tarantulaContext.deploymentService().registerOnConnectionListener(this);
     }
     @Override
     public String routingKey(){
@@ -172,5 +173,10 @@ public class InstanceManager implements Instance {
                 }
             }
         });
+    }
+
+    @Override
+    public void onConnection(OnConnection c) {
+        log.warn(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open"));
     }
 }

@@ -9,21 +9,21 @@ import com.tarantula.platform.util.*;
  * Developer: YINGHU LU
  * Date: updated 9/8/2019.
  */
-public class PresenceApplication extends TarantulaApplicationHeader implements Configuration.Listener{
+public class PresenceApplication extends TarantulaApplicationHeader implements OnConnection.Listener{
 
 
     private DeploymentServiceProvider deploymentServiceProvider;
-    private RingBuffer<Configuration> cBuffer;
-    private RingBuffer<Configuration> uBuffer;
+    private RingBuffer<OnConnection> cBuffer;
+    private RingBuffer<OnConnection> uBuffer;
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        this.cBuffer = new RingBuffer<>(new Configuration[5]);
-        this.uBuffer = new RingBuffer<>(new Configuration[5]);
+        this.cBuffer = new RingBuffer<>(new OnConnection[5]);
+        this.uBuffer = new RingBuffer<>(new OnConnection[5]);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        deploymentServiceProvider.registerConfigurationListener(this);
+        deploymentServiceProvider.registerOnConnectionListener(this);
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
             Presence presence = this.context.presence(t.owner());
             OnBalance ob = (OnBalance)t;
@@ -94,8 +94,8 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             }
 
     }
-    public void onConfiguration(Configuration c) {
-        this.context.log(c.type()+"/"+c.property("serverId")+"/"+(c.disabled()?"closed":"open"),OnLog.WARN);
+    public void onConnection(OnConnection c) {
+        this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open"),OnLog.WARN);
         if(c.type().equals("websocket")){
             onWebSocket(c);
         }
@@ -103,11 +103,11 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             onUdp(c);
         }
     }
-    private void onWebSocket(Configuration c) {
+    private void onWebSocket(OnConnection c) {
         if(!c.disabled()){
             if(!cBuffer.push(c)){
                 cBuffer.reset(((ca,limit)->{
-                    Configuration[] cn = new Configuration[ca.length*2];
+                    OnConnection[] cn = new OnConnection[ca.length*2];
                     for(int i=0;i<limit;i++){
                         cn[i]=ca[i];
                     }
@@ -118,10 +118,10 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         }
         else{
             cBuffer.reset((ca,limit)->{
-                Configuration[] cn = new Configuration[ca.length];
+                OnConnection[] cn = new OnConnection[ca.length];
                 int r=0;
                 for(int i=0;i<limit;i++){
-                    if(!(ca[i].property("serverId").equals(c.property("serverId")))){
+                    if(!(ca[i].serverId().equals(c.serverId()))){
                         cn[r++]=ca[i];
                     }
                 }
@@ -129,11 +129,11 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             });
         }
     }
-    private void onUdp(Configuration c) {
+    private void onUdp(OnConnection c) {
         if(!c.disabled()){
             if(!uBuffer.push(c)){
                 uBuffer.reset(((ca,limit)->{
-                    Configuration[] cn = new Configuration[ca.length*2];
+                    OnConnection[] cn = new OnConnection[ca.length*2];
                     for(int i=0;i<limit;i++){
                         cn[i]=ca[i];
                     }
@@ -144,10 +144,10 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         }
         else{
             uBuffer.reset((ca,limit)->{
-                Configuration[] cn = new Configuration[ca.length];
+                OnConnection[] cn = new OnConnection[ca.length];
                 int r=0;
                 for(int i=0;i<limit;i++){
-                    if(!(ca[i].property("serverId").equals(c.property("serverId")))){
+                    if(!(ca[i].serverId().equals(c.serverId()))){
                         cn[r++]=ca[i];
                     }
                 }

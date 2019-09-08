@@ -34,6 +34,8 @@ public class PortableRegistry extends AbstractRecoverableListener{
 
     public static final int KEY_INDEX_CID = 26;
 
+    public static final int ON_CONNECTION_CID = 27;
+
     //START 100 working with EVENT PORTABLE on same OID
     public static final int SINGLETON_FORWARD_CID = PortableEventRegistry.SINGLETON_FORWARD_CID;
 
@@ -106,7 +108,9 @@ public class PortableRegistry extends AbstractRecoverableListener{
             case BATCH_CID:
                 _ins = new Batch();
                 break;
-
+            case ON_CONNECTION_CID:
+                _ins = new ConnectionInfo();
+                break;
             default:
                 throw new IllegalArgumentException("Not supported event type");
 		}

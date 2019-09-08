@@ -9,10 +9,7 @@ import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
-import com.tarantula.platform.util.ConfigurationDeserializer;
-import com.tarantula.platform.util.ResponseDeserializer;
-import com.tarantula.platform.util.ResponseSerializer;
-import com.tarantula.platform.util.SystemUtil;
+import com.tarantula.platform.util.*;
 
 import java.io.BufferedInputStream;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,6 +33,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private CopyOnWriteArrayList<OnLobby.Listener> oListeners = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<OnView.Listener> vListeners = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<Configuration.Listener> cListeners = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<OnConnection.Listener> wListeners = new CopyOnWriteArrayList<>();
+
 
     private ConcurrentHashMap<String,Recoverable> vMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Event> pushRegistry = new ConcurrentHashMap<>();
@@ -49,6 +48,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void start() throws Exception {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ApplicationConfiguration.class,new ConfigurationDeserializer());
+        this.builder.registerTypeAdapter(OnConnection.class,new OnConnectionDeserializer());
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseDeserializer());
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
     }
@@ -341,9 +341,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     cl.onView(ov);
                 });
             }
-            else if(ot instanceof Configuration){
-                this.cListeners.forEach((cl)->{
-                    cl.onConfiguration((Configuration)ot);
+            else if(ot instanceof OnConnection){
+                this.wListeners.forEach((cl)->{
+                    cl.onConnection((OnConnection)ot);
                 });
             }
             if(!ot.disabled()){
@@ -373,21 +373,19 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         }
         else if(event instanceof ServerPushEvent){
-            ApplicationConfiguration cfg = this.builder.create().fromJson(new String(event.payload()),ApplicationConfiguration.class);
-            cfg.tag(event.owner());
-            cfg.disabled(event.disabled());
-            cfg.bucket(event.bucket());
-            cfg.oid(cfg.property("serverId"));
+            OnConnection occ = this.builder.create().fromJson(new String(event.payload()),OnConnection.class);
+            log.warn(occ.toString());
+            occ.disabled(event.disabled());
             if(!event.disabled()){
                 pushRegistry.put(event.sessionId(),event);
-                vMap.putIfAbsent(cfg.key().asString(),cfg);
+                vMap.putIfAbsent(occ.key().asString(),occ);
             }else{
                 pushRegistry.remove(event.sessionId());
-                Configuration ref = (Configuration) vMap.remove(cfg.key().asString());
-                cfg.type(ref.type());//recover type from original connect
+                OnConnection ref = (OnConnection) vMap.remove(occ.key().asString());
+                occ.type(ref.type());//recover type from original connect
             }
-            this.cListeners.forEach((l)->{
-                l.onConfiguration(cfg);
+            this.wListeners.forEach((l)->{
+                l.onConnection(occ);
             });
         }
         else if(event instanceof ModuleApplicationEvent){
@@ -442,6 +440,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         oListeners.add(onLobbyListener);
     }
 
+    public void registerOnConnectionListener(OnConnection.Listener listener){
+        vMap.forEach((k,v)->{
+            if(v instanceof OnConnection){
+                listener.onConnection((OnConnection) v);
+            }
+        });
+        wListeners.add(listener);
+    }
     public void deploy(Configuration configuration){
         RecoverableMetadata mt = new RecoverableMetadata(configuration.getFactoryId(),configuration.getClassId());
         byte[] k = configuration.key().asString()!=null?configuration.key().asString().getBytes():"".getBytes();
