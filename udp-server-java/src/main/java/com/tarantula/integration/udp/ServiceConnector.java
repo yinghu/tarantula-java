@@ -5,6 +5,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.UUID;
 
+/*
+* Service Connector the single connection to the gec cluster to receive updates and publish those updates via udp package.
+* The connection should not write data from udp to gec cluster
+* */
 public class ServiceConnector implements Runnable {
     private SocketChannel socketChannel;
     private String serverId;
@@ -17,9 +21,6 @@ public class ServiceConnector implements Runnable {
         onRegister();
         Thread.sleep(10000);
         socketChannel.close();
-    }
-    public void write() throws Exception{
-
     }
     @Override
     public void run() {
