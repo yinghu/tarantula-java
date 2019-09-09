@@ -26,7 +26,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     private ScheduledFuture timerSchedule;
 
     @Override
-    public void initialize(Session session,OnConnection onConnection) throws Exception {
+    public void initialize(Session session) throws Exception {
         session.joined(true);
         module.onJoin(session,onConnection);
     }
@@ -43,6 +43,9 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
                 this._onStream.forEach((k,v)->{
                     v.write(delta,this.module.label());
                 });
+            }
+            if(onConnection.type().equals("udp")){
+                this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label(),delta);
             }
             //server push
         }))){

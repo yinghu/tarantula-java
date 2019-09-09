@@ -1,9 +1,9 @@
 package com.tarantula;
 
-public interface TarantulaApplication extends Initializer,EventListener,BucketListener{
+public interface TarantulaApplication extends Initializer,EventListener,BucketListener,OnConnection.Listener{
 
 
-    default void initialize(Session session,OnConnection onConnection) throws Exception{}
+    default void initialize(Session session) throws Exception{}
 	
 	void callback(Session session,byte[] payload) throws Exception;
 

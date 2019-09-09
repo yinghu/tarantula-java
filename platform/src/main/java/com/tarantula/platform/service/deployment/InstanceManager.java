@@ -76,7 +76,6 @@ public class InstanceManager implements Instance,OnConnection.Listener {
             if(tc!=null){
                 try{
                     tc._setup();//inject the app context proxy to decouple the TarantulaApplicationContext
-                    tc.onConnection(cBuffer.pop());
                     tc.setupOnInstanceRegistry();//loading instance state
                     tc.onBucketReceiver(partition,state);
                     log.warn("Instance ["+tc._instance.distributionKey()+"] is running limited time mode ["+(durationOnInstance>0)+"]");
@@ -149,6 +148,7 @@ public class InstanceManager implements Instance,OnConnection.Listener {
         int ret = InstanceRegistry.INSTANCE_FULL;
         if(onInstance!=null){//check applicationId on event with deployment id
             ret = onInstance.initialized()?InstanceRegistry.ALREADY_ON_INSTANCE:InstanceRegistry.ON_INSTANCE;
+            tcx.onConnection(cBuffer.pop());
             if(tcx.initializeOnInstance(event,onInstance)){
                 onInstanceListener.onUpdated(new OnInstanceTrack(event.systemId(),event.stub(),applicationManager.deploymentDescriptor.distributionKey(),onInstance.instanceId(),true));
             }

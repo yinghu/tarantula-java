@@ -96,10 +96,10 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
     }
     public void onConnection(OnConnection c) {
         this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open"),OnLog.WARN);
-        if(c.type().equals("websocket")){
+        if(c.type().equals(OnConnection.WEB_SOCKET)){
             onWebSocket(c);
         }
-        else if(c.type().equals("udp")){
+        else if(c.type().equals(OnConnection.UDP)){
             onUdp(c);
         }
     }
