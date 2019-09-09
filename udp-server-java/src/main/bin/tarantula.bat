@@ -1,5 +1,5 @@
 @echo off
-set JVM_ARGS=-server -XX:MaxDirectMemorySize=64M -Xms512M -Xmx1024M
+set JVM_ARGS=-server -XX:MaxDirectMemorySize=64M -Xms128M -Xmx256M
 setLocal EnableDelayedExpansion
 set CLASSPATH="
 for /R ../lib %%a in (*.jar) do (
