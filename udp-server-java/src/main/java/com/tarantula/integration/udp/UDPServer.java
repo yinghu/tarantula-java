@@ -5,7 +5,8 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 
-public class UDPServer implements Runnable {
+public class UDPServer implements Runnable
+{
     @Override
     public void run(){
         try{

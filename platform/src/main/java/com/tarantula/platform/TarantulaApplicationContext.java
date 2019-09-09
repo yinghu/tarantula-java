@@ -49,6 +49,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     private boolean timed;
     private final boolean resetEnabled;
     private final String dataStore;
+    private OnConnection onConnection;
     public TarantulaApplicationContext(TarantulaContext tarantulaContext,Descriptor descriptor,TarantulaApplication application,InstanceIndex index,HashMap<String,Configuration> configurations){
         this.tarantulaContext = tarantulaContext;
         this._descriptor = descriptor;
@@ -58,7 +59,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         this.resetEnabled = descriptor.resetEnabled();
         this.dataStore = descriptor.typeId();
     }
-
+    public void onConnection(OnConnection onConnection){
+        this.onConnection = onConnection;
+    }
     public OnInstance poll(Event event){
         //load joined on instance if already existed
         OnInstance oi = onInstances.get(event.systemId());
@@ -78,7 +81,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         return oi;
     }
 
-    public boolean initializeOnInstance(Event me,OnInstance onApplication,OnConnection onConnection){//operate on on instance node
+    public boolean initializeOnInstance(Event me,OnInstance onApplication){//operate on on instance node
         boolean suc = false;
         try{
             onInstances.put(me.systemId(),onApplication);
@@ -86,10 +89,10 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
             me.balance(onApplication.balance());
             if((!onApplication.initialized())){//without calling auditor
                 onApplication.initialized(true);
-                this.application.initialize(me,onConnection);//initialize on application
+                this.application.initialize(me,this.onConnection);//initialize on application
             }
             else{
-                this.application.initialize(me,onConnection);
+                this.application.initialize(me,this.onConnection);
             }
             onApplication.joined(me.joined());
             onApplication.update();
@@ -430,5 +433,33 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         waitingList.clear();
         configurations.clear();
         rMap.clear();
+    }
+    private class ApplicationContextPostOffice implements PostOffice{
+
+        private PostOffice _postOffice;
+
+        public ApplicationContextPostOffice(){
+            this._postOffice = tarantulaContext.deploymentService().registerPostOffice();
+        }
+
+        @Override
+        public OnTopic onTopic() {
+            return _postOffice.onTopic();
+        }
+
+        @Override
+        public OnConnection onConnection(String serverId) {
+            return _postOffice.onConnection(onConnection.serverId());
+        }
+
+        @Override
+        public OnTag onTag(String tag) {
+            return _postOffice.onTag(tag);
+        }
+
+        @Override
+        public OnApplication onApplication(String applicationId) {
+            return _postOffice.onApplication(applicationId);
+        }
     }
 }

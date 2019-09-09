@@ -20,6 +20,7 @@ public class Boost implements Module {
     private Statistics statistics;
     private DataStore dataStore;
     public void onJoin(Session session,OnConnection onConnection) throws Exception{
+        this.context.log(onConnection.type()+"/"+onConnection.serverId(),OnLog.INFO);
         this.statistics.value("playerCount",1);
         byte[] ret = this.builder.create().toJson(this.demoObject("onJoin",System.currentTimeMillis())).getBytes();
         session.write(ret,this.label());
@@ -34,7 +35,7 @@ public class Boost implements Module {
             byte[] ret = this.builder.create().toJson(this.demoObject(session.action(),onAccess.timestamp())).getBytes();
             session.write(ret,this.label());
             update.on(session.systemId(),ret);
-            postOffice.onLabel().send("presence/notice",ret);
+            postOffice.onTopic().send("presence/notice",ret);
             this.context.onRegistry().transact(session.systemId(),1000);
             OnStatistics delta = this.context.statistics().value("WonCount",1000);
             delta.xpDelta(1000);
@@ -96,6 +97,7 @@ public class Boost implements Module {
         if(delta<=0){
             timer.update();
             update.on(null,this.builder.create().toJson(timer).getBytes());
+            postOffice.onTopic().send("presence/notice",this.builder.create().toJson(timer).getBytes());
             delta = 50;
         }
     }

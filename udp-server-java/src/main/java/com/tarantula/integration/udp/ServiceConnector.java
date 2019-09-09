@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /*
 * Service Connector the single connection to the gec cluster to receive updates and publish those updates via udp package.
@@ -13,12 +14,16 @@ public class ServiceConnector implements Runnable {
     private SocketChannel socketChannel;
     private String serverId;
     private ByteBuffer readBuffer;
-    //private ConcurrentLinkedDeque<>
+    private ConcurrentLinkedDeque<OutboundMessage> outboundQueue;
+
+    private PendingData pending;
     public ServiceConnector(){
         this.serverId = UUID.randomUUID().toString();
     }
     public void start() throws Exception{
+        this.outboundQueue = new ConcurrentLinkedDeque<>();
         this.readBuffer = ByteBuffer.allocate(1024);
+        this.pending = new PendingData();
         socketChannel = SocketChannel.open();
         socketChannel.connect(new InetSocketAddress("localhost",6393));
         onRegister();
@@ -32,7 +37,32 @@ public class ServiceConnector implements Runnable {
                 if(rn>0){
                     readBuffer.flip();
                     while(readBuffer.hasRemaining()){
-                        System.out.println((char) readBuffer.get());
+                        char c = (char) readBuffer.get();
+                        if(!pending.onData){
+                            if(!pending.onLabel&&c != ','){
+                                pending.clientId.append(c);
+                            }
+                            else if(!pending.onLabel&&c==','){
+                                pending.onLabel = true;
+                            }
+                            else if(pending.onLabel&&c!='{'){
+                                pending.label.append(c);
+                                pending.data.append(c);
+                            }
+                            else{
+                                pending.data.append(c);
+                                pending.onData = true;
+                            }
+                        }
+                        else{
+                            if(c=='|'){
+                                outboundQueue.offer(pending.reset());
+                                System.out.println(outboundQueue.poll());
+                            }
+                            else{
+                                pending.data.append(c);
+                            }
+                        }
                     }
                 }
                 else{

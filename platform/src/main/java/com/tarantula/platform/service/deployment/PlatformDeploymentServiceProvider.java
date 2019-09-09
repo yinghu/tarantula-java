@@ -473,7 +473,18 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     private class PostOfficeSession implements PostOffice{
 
-        public OnLabel onLabel(){
+        public OnConnection onConnection(String serverId){
+            return (label,data)->{
+                //lookup push event via serverId
+                pushRegistry.forEach((k,v)->{
+                    if(v.clientId().equals(serverId)){
+                        v.write(data,label);
+                    }
+                });
+            };
+        }
+
+        public OnTopic onTopic(){
             return (label,data)-> pushRegistry.forEach((k,v)-> v.write(data,label));
         }
         public OnTag onTag(String tag){

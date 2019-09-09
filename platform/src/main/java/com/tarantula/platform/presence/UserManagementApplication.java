@@ -117,7 +117,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             _onSession=this.context.validator().validatePassword(access,password);
             _onSession.systemId(systemId);
             ResponseHeader resp = new ResponseHeader(session.action(), "User [" + access.login() + "] signed in",true);
-            postOffice.onLabel().send("presence/notice",this.builder.create().toJson(resp).getBytes());
+            postOffice.onTopic().send("presence/notice",this.builder.create().toJson(resp).getBytes());
         }
         return _onSession;
     }

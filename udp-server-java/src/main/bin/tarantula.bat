@@ -6,5 +6,5 @@ for /R ../lib %%a in (*.jar) do (
    set CLASSPATH=!CLASSPATH!;%%a
 )
 set CLASSPATH=!CLASSPATH!"
-java %JVM_ARGS% -classpath %CLASSPATH% com.tarantula.integration.udp.Main
+java %JVM_ARGS% -classpath %CLASSPATH%;. com.tarantula.integration.udp.Main
 

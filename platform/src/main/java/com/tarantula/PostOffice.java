@@ -2,11 +2,15 @@ package com.tarantula;
 
 public interface PostOffice{
 
-    OnLabel onLabel();
+    OnTopic onTopic();
+    OnConnection onConnection(String serverId);
     OnTag onTag(String tag);
     OnApplication onApplication(String applicationId);
 
-    interface OnLabel{
+    interface OnTopic{
+        void send(String topic,byte[] data);
+    }
+    interface OnConnection{
         void send(String label,byte[] data);
     }
     interface OnTag{
