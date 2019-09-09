@@ -182,7 +182,7 @@ public class InstanceManager implements Instance,OnConnection.Listener {
     @Override
     public void onConnection(OnConnection c) {
         log.warn(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open"));
-        if(!c.disabled()){
+        if(!c.disabled()&&c.type().equals(OnConnection.UDP)){//udp only
             cBuffer.push(c);
         }
     }

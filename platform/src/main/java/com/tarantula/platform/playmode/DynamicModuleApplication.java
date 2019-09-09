@@ -36,18 +36,19 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             this._onStream.put(session.systemId(),session);
         }
         if(this.module.onRequest(session,payload,((systemId, delta) -> {
-
             Session stream;
             if(systemId!=null&&(stream =this._onStream.get(systemId))!=null){
                 stream.write(delta,module.label());
-            }else{//broadcasting to all streaming session
-                this._onStream.forEach((k,v)->{
-                    v.write(delta,this.module.label());
-                });
+            }else{
+                if(onConnection!=null){
+                    this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label(),delta);
+                }
+                else{//broadcasting to all streaming session if no udp publisher
+                    this._onStream.forEach((k,v)->{
+                        v.write(delta,this.module.label());
+                    });
+                }
             }
-            //if(onConnection!=null){
-                //this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label(),delta);
-            //}
             //server push
         }))){
             //clean up on leave
