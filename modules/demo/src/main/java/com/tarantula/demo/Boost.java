@@ -19,7 +19,7 @@ public class Boost implements Module {
     private Timer timer;
     private Statistics statistics;
     private DataStore dataStore;
-    public void onJoin(Session session) throws Exception{
+    public void onJoin(Session session,OnConnection onConnection) throws Exception{
         this.statistics.value("playerCount",1);
         byte[] ret = this.builder.create().toJson(this.demoObject("onJoin",System.currentTimeMillis())).getBytes();
         session.write(ret,this.label());

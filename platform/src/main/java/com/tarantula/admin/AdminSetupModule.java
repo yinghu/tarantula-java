@@ -20,7 +20,7 @@ public class AdminSetupModule implements Module {
     private GsonBuilder builder;
 
     @Override
-    public void onJoin(Session session) throws Exception {
+    public void onJoin(Session session,OnConnection onConnection) throws Exception {
         session.write(this.builder.create().toJson(this._adminObjectOnLobby()).getBytes(),label());
     }
 

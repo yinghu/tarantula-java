@@ -12,7 +12,7 @@ public class AdminDataStoreModule implements Module {
     private GsonBuilder builder;
 
     private DeploymentServiceProvider deploymentServiceProvider;
-    public void onJoin(Session session) throws Exception{
+    public void onJoin(Session session,OnConnection onConnection) throws Exception{
          session.write(this.builder.create().toJson(_message("joined")).getBytes(),label());
     }
 

@@ -12,23 +12,34 @@ import java.util.UUID;
 public class ServiceConnector implements Runnable {
     private SocketChannel socketChannel;
     private String serverId;
+    private ByteBuffer readBuffer;
+    //private ConcurrentLinkedDeque<>
     public ServiceConnector(){
         this.serverId = UUID.randomUUID().toString();
     }
     public void start() throws Exception{
+        this.readBuffer = ByteBuffer.allocate(1024);
         socketChannel = SocketChannel.open();
         socketChannel.connect(new InetSocketAddress("localhost",6393));
         onRegister();
-        Thread.sleep(10000);
-        socketChannel.close();
     }
     @Override
     public void run() {
         while(true){
             try{
-
+                readBuffer.clear();
+                int rn = socketChannel.read(readBuffer);
+                if(rn>0){
+                    readBuffer.flip();
+                    while(readBuffer.hasRemaining()){
+                        System.out.println((char) readBuffer.get());
+                    }
+                }
+                else{
+                    Thread.sleep(10);
+                }
             }catch (Exception ex){
-
+                //ignore
             }
         }
     }

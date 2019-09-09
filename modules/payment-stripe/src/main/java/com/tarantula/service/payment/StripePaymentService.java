@@ -25,10 +25,7 @@ public class StripePaymentService implements Module {
 
     private DataStore dataStore;
     private GsonBuilder builder;
-    @Override
-    public void onJoin(Session session) throws Exception{
-        //session.write(ret,this.label());
-    }
+
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {

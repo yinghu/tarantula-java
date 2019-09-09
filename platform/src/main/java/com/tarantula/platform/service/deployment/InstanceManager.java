@@ -8,6 +8,7 @@ import com.tarantula.platform.event.OnDeployEvent;
 import com.tarantula.platform.service.BucketReceiver;
 import com.tarantula.platform.service.Instance;
 import com.tarantula.platform.util.ResponseSerializer;
+import com.tarantula.platform.util.RingBuffer;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,7 +27,9 @@ public class InstanceManager implements Instance,OnConnection.Listener {
 
     private final long durationOnInstance;
     private GsonBuilder builder;
+    private RingBuffer<OnConnection> cBuffer;
     public InstanceManager(int partition, ApplicationManager applicationManager){
+        this.cBuffer = new RingBuffer<>(new OnConnection[5]);
         this.partition = partition;
         this.applicationManager = applicationManager;
         this.durationOnInstance = this.applicationManager.deploymentDescriptor.runtimeDurationOnInstance();
@@ -145,7 +148,7 @@ public class InstanceManager implements Instance,OnConnection.Listener {
         int ret = InstanceRegistry.INSTANCE_FULL;
         if(onInstance!=null){//check applicationId on event with deployment id
             ret = onInstance.initialized()?InstanceRegistry.ALREADY_ON_INSTANCE:InstanceRegistry.ON_INSTANCE;
-            if(tcx.initializeOnInstance(event,onInstance)){
+            if(tcx.initializeOnInstance(event,onInstance,cBuffer.pop())){
                 onInstanceListener.onUpdated(new OnInstanceTrack(event.systemId(),event.stub(),applicationManager.deploymentDescriptor.distributionKey(),onInstance.instanceId(),true));
             }
         }
@@ -178,5 +181,8 @@ public class InstanceManager implements Instance,OnConnection.Listener {
     @Override
     public void onConnection(OnConnection c) {
         log.warn(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open"));
+        if(!c.disabled()){
+            cBuffer.push(c);
+        }
     }
 }

@@ -94,7 +94,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     public boolean onEvent(Event event){
         try{
             if(event instanceof FastPlayEvent){
-                this.module.onJoin(event);
+                this.module.onJoin(event,null);
             }
         }catch (Exception ex){
             //write error to client

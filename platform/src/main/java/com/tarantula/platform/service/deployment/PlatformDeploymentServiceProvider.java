@@ -506,8 +506,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.descriptor = descriptor;
         }
         @Override
-        public void onJoin(Session session) throws Exception {
-            this.module.onJoin(session);
+        public void onJoin(Session session,OnConnection onConnection) throws Exception {
+            this.module.onJoin(session,onConnection);
         }
 
         @Override

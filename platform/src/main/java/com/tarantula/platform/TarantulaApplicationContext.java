@@ -78,7 +78,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         return oi;
     }
 
-    public boolean initializeOnInstance(Event me,OnInstance onApplication){//operate on on instance node
+    public boolean initializeOnInstance(Event me,OnInstance onApplication,OnConnection onConnection){//operate on on instance node
         boolean suc = false;
         try{
             onInstances.put(me.systemId(),onApplication);
@@ -86,10 +86,10 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
             me.balance(onApplication.balance());
             if((!onApplication.initialized())){//without calling auditor
                 onApplication.initialized(true);
-                this.application.initialize(me);//initialize on application
+                this.application.initialize(me,onConnection);//initialize on application
             }
             else{
-                this.application.initialize(me);
+                this.application.initialize(me,onConnection);
             }
             onApplication.joined(me.joined());
             onApplication.update();

@@ -26,9 +26,9 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     private ScheduledFuture timerSchedule;
 
     @Override
-    public void initialize(Session session) throws Exception {
+    public void initialize(Session session,OnConnection onConnection) throws Exception {
         session.joined(true);
-        module.onJoin(session);
+        module.onJoin(session,onConnection);
     }
     @Override
     public void callback(Session session, byte[] payload) throws Exception {

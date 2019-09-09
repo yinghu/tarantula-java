@@ -4,7 +4,7 @@ import java.io.InputStream;
 
 public interface Module {
 
-    default void onJoin(Session session) throws Exception{}
+    default void onJoin(Session session,OnConnection onConnection) throws Exception{}
 
     boolean onRequest(Session session, byte[] payload,OnUpdate update) throws Exception;
 
