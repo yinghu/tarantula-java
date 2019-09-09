@@ -1,5 +1,7 @@
 # Goal
 Build a scaling, fault-tolerant, asynchronous event messaging application/game integration platform at lower cost.
+[Platform Architecture/Design Document](doc/gec-summary.pdf)
+
 # System Features
 ### 1. Global Unique Key Cluster Indexing Support 
 ### 2. Large Data Sharding And Distribution With Master To Master Replication Mode   
@@ -13,9 +15,6 @@ Build a scaling, fault-tolerant, asynchronous event messaging application/game i
 ### 10. Server-Less Module Deployment Support
 ### 11. Pure JAVA Implmentation With High Concurrecy Throughput
 ### 12. Hot Runtime Deployment Support 
-
-
-[Platform Architecture Document](doc/gec-summary.pdf)
 
 [Programming Server Module API](doc/gec-module.pdf)
 
