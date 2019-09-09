@@ -82,7 +82,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public byte[] resource(String name,String flag){
         //log.warn("load resource ["+name+"] from ["+flag+"]");
         if(flag!=null){
-            log.warn("load resource ["+name+"] from ["+flag+"]");
+            //log.warn("load resource ["+name+"] from ["+flag+"]");
             String rid = flag.split("=")[1].trim();
             DynamicModuleClassLoader dc = cMap.get(rid);
             byte[][] ret = {new byte[0]};
@@ -378,9 +378,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             occ.disabled(event.disabled());
             if(!event.disabled()){
                 pushRegistry.put(event.sessionId(),event);
+                pushRegistry.put(occ.key().asString(),event);
                 vMap.putIfAbsent(occ.key().asString(),occ);
             }else{
                 pushRegistry.remove(event.sessionId());
+                pushRegistry.remove(occ.key().asString());
                 OnConnection ref = (OnConnection) vMap.remove(occ.key().asString());
                 occ.type(ref.type());//recover type from original connect
             }
@@ -476,11 +478,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         public OnConnection onConnection(String serverId){
             return (label,data)->{
                 //lookup push event via serverId
-                pushRegistry.forEach((k,v)->{
-                    if(v.clientId().equals(serverId)){
-                        v.write(data,label);
-                    }
-                });
+                pushRegistry.get(serverId).write(data,label);
             };
         }
 
