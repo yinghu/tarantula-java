@@ -36,6 +36,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             this._onStream.put(session.systemId(),session);
         }
         if(this.module.onRequest(session,payload,((systemId, delta) -> {
+
             Session stream;
             if(systemId!=null&&(stream =this._onStream.get(systemId))!=null){
                 stream.write(delta,module.label());
@@ -44,9 +45,9 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
                     v.write(delta,this.module.label());
                 });
             }
-            if(onConnection.type().equals("udp")){
-                this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label(),delta);
-            }
+            //if(onConnection!=null){
+                //this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label(),delta);
+            //}
             //server push
         }))){
             //clean up on leave
