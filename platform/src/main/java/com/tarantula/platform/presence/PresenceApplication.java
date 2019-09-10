@@ -14,13 +14,13 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
 
     private DeploymentServiceProvider deploymentServiceProvider;
     private RingBuffer<Connection> cBuffer;
-    private RingBuffer<Connection> uBuffer;
+    //private RingBuffer<Connection> uBuffer;
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         this.cBuffer = new RingBuffer<>(new Connection[5]);
-        this.uBuffer = new RingBuffer<>(new Connection[5]);
+        //this.uBuffer = new RingBuffer<>(new Connection[5]);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.registerOnConnectionListener(this);
@@ -41,7 +41,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
                 Presence presence = this.context.presence(session.systemId());
                 PresenceContext pc = new PresenceContext(session.action());
                 pc.connection = cBuffer.pop();
-                pc.udp = uBuffer.pop();
+                //pc.udp = uBuffer.pop();
                 pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
                 session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
             }
@@ -99,9 +99,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         if(c.type().equals(Connection.WEB_SOCKET)){
             onWebSocket(c);
         }
-        else if(c.type().equals(Connection.UDP)){
-            onUdp(c);
-        }
     }
     private void onWebSocket(Connection c) {
         if(!c.disabled()){
@@ -129,6 +126,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             });
         }
     }
+    /**
     private void onUdp(Connection c) {
         if(!c.disabled()){
             if(!uBuffer.push(c)){
@@ -154,5 +152,5 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
                 return cn;
             });
         }
-    }
+    }**/
 }

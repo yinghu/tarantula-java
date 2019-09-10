@@ -26,6 +26,8 @@ public interface Connection extends Response {
     String path();
     void path(String path);
 
+    int maxConnections();
+    void maxConnections(int maxConnections);
 
     interface Listener{
         void onState(Connection connection);
