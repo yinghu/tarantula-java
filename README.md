@@ -1,9 +1,9 @@
 # Goal
 
-### Building a scaling, fault-tolerant application/game integration solution that supports large scale multiple million user base.
-### Providing a modularization architecture to support parallel programming mode.
-### Creating a stopless deployment mode to support real continuously building processing.
-### Using a simple programming API to decouple coding complexity such as threading, messaging, caching, etc.
+### 1. Building a scaling, fault-tolerant application/game integration solution that supports large scale multiple million user base.
+### 2. Providing a modularization architecture to support parallel programming mode.
+### 3. Creating a stopless deployment mode to support real continuously building processing.
+### 4. Using a simple programming API to decouple coding complexity such as threading, messaging, caching, etc.
 
 [Platform Architecture/Design Document](doc/gec-summary.pdf)
 
