@@ -1,6 +1,6 @@
 # Goal
 
-### Build a scaling, fault-tolerant, asynchronous event messaging application/game integration platform at lower cost.
+### Building a scaling, fault-tolerant, asynchronous event messaging application/game integration solution that supports large scale multiple million user base.
 
 [Platform Architecture/Design Document](doc/gec-summary.pdf)
 
