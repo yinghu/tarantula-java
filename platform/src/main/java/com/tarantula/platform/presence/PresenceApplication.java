@@ -14,13 +14,11 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
 
     private DeploymentServiceProvider deploymentServiceProvider;
     private RingBuffer<Connection> cBuffer;
-    //private RingBuffer<Connection> uBuffer;
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         this.cBuffer = new RingBuffer<>(new Connection[5]);
-        //this.uBuffer = new RingBuffer<>(new Connection[5]);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.registerOnConnectionListener(this);
@@ -126,31 +124,4 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             });
         }
     }
-    /**
-    private void onUdp(Connection c) {
-        if(!c.disabled()){
-            if(!uBuffer.push(c)){
-                uBuffer.reset(((ca,limit)->{
-                    Connection[] cn = new Connection[ca.length*2];
-                    for(int i=0;i<limit;i++){
-                        cn[i]=ca[i];
-                    }
-                    cn[limit]=c;
-                    return cn;
-                }));
-            }
-        }
-        else{
-            uBuffer.reset((ca,limit)->{
-                Connection[] cn = new Connection[ca.length];
-                int r=0;
-                for(int i=0;i<limit;i++){
-                    if(!(ca[i].serverId().equals(c.serverId()))){
-                        cn[r++]=ca[i];
-                    }
-                }
-                return cn;
-            });
-        }
-    }**/
 }

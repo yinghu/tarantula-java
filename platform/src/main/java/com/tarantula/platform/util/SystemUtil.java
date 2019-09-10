@@ -8,6 +8,8 @@ import com.tarantula.OnSession;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.OnSessionTrack;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.time.*;
@@ -130,7 +132,8 @@ public class SystemUtil {
     }
     public static Map<String,Object> toMap(byte[] json){
         JsonParser jp = new JsonParser();
-        JsonElement j = jp.parse(new String(json, Charset.forName("UTF-8")).trim());
+        InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(json));
+        JsonElement j = jp.parse(inr);
         Map<String,Object> _mv = new HashMap<>();
         j.getAsJsonObject().entrySet().forEach((e)->{
             JsonElement je = e.getValue();
