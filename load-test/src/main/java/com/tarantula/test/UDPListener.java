@@ -1,7 +1,6 @@
 package com.tarantula.test;
 
 import com.google.gson.JsonObject;
-import com.tarantula.test.integration.OnPayload;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -17,29 +16,24 @@ public class UDPListener implements Runnable{
         this.onData = onData;
     }
 
-    public void start() throws Exception{
+    private void start() throws Exception{
         readBuffer = ByteBuffer.allocate(4096);
         channel = DatagramChannel.open();
         channel.bind(null);
     }
     public void connect(String host,int port) throws Exception{
+        start();
         channel.connect(new InetSocketAddress(host,port));
+    }
+    public void register(String systemId,int stub,String ticket) throws Exception{
         JsonObject payload = new JsonObject();
-        payload.addProperty("systemId","BDS01/1234455");
-        payload.addProperty("stub",4);
-        payload.addProperty("ticket","ticket-0001");
+        payload.addProperty("systemId",systemId);
+        payload.addProperty("stub",stub);
+        payload.addProperty("ticket",ticket);
+        System.out.println(payload.toString());
         ByteBuffer buffer = ByteBuffer.wrap(payload.toString().getBytes());
         channel.write(buffer);
     }
-    public static void main(String[] args) throws Exception{
-        UDPListener udp = new UDPListener(data -> {
-            System.out.println(new String(data));
-        });
-        udp.start();
-        udp.connect("10.0.0.234",9999);
-        udp.run();
-    }
-
     @Override
     public void run() {
         try{

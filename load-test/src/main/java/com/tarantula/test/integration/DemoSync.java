@@ -3,12 +3,14 @@ package com.tarantula.test.integration;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.tarantula.test.HTTPCaller;
+import com.tarantula.test.UDPListener;
 
 import java.net.http.WebSocket;
 
 public class DemoSync extends OnGame {
 
     private JsonParser parser;
+    private UDPListener udpListener;
     public DemoSync(){
         super();
         parser = new JsonParser();
@@ -26,6 +28,12 @@ public class DemoSync extends OnGame {
                 return;
             }
             this.presence = presence;
+            udpListener = new UDPListener(data -> {
+                //System.out.println(new String(data));
+            });
+            udpListener.connect("10.0.0.234",9999);
+            udpListener.register(this.presence.get("login").getAsString(),this.presence.get("stub").getAsInt(),this.presence.get("ticket").getAsString());
+            new Thread(udpListener).start();
             this.applicationId = joined.get("applicationId").getAsString();
             this.instanceId = joined.get("instanceId").getAsString();
             long waiting = 250;

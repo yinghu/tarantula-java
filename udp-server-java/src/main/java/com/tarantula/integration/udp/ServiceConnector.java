@@ -55,6 +55,7 @@ public class ServiceConnector implements Runnable {
         boolean[] ret ={false};
         http.doAction("user/action","onTicket",_headers,payload.toString().getBytes(),jsonObject -> {
             System.out.println(jsonObject.toString());
+            ret[0]=true;
         });
         return ret[0];
     }
