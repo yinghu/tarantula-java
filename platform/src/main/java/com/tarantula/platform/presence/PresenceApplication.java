@@ -9,18 +9,18 @@ import com.tarantula.platform.util.*;
  * Developer: YINGHU LU
  * Date: updated 9/8/2019.
  */
-public class PresenceApplication extends TarantulaApplicationHeader implements OnConnection.Listener{
+public class PresenceApplication extends TarantulaApplicationHeader implements Connection.Listener{
 
 
     private DeploymentServiceProvider deploymentServiceProvider;
-    private RingBuffer<OnConnection> cBuffer;
-    private RingBuffer<OnConnection> uBuffer;
+    private RingBuffer<Connection> cBuffer;
+    private RingBuffer<Connection> uBuffer;
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        this.cBuffer = new RingBuffer<>(new OnConnection[5]);
-        this.uBuffer = new RingBuffer<>(new OnConnection[5]);
+        this.cBuffer = new RingBuffer<>(new Connection[5]);
+        this.uBuffer = new RingBuffer<>(new Connection[5]);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.registerOnConnectionListener(this);
@@ -94,20 +94,20 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             }
 
     }
-    public void onConnection(OnConnection c) {
+    public void onState(Connection c) {
         this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open"),OnLog.WARN);
-        if(c.type().equals(OnConnection.WEB_SOCKET)){
+        if(c.type().equals(Connection.WEB_SOCKET)){
             onWebSocket(c);
         }
-        else if(c.type().equals(OnConnection.UDP)){
+        else if(c.type().equals(Connection.UDP)){
             onUdp(c);
         }
     }
-    private void onWebSocket(OnConnection c) {
+    private void onWebSocket(Connection c) {
         if(!c.disabled()){
             if(!cBuffer.push(c)){
                 cBuffer.reset(((ca,limit)->{
-                    OnConnection[] cn = new OnConnection[ca.length*2];
+                    Connection[] cn = new Connection[ca.length*2];
                     for(int i=0;i<limit;i++){
                         cn[i]=ca[i];
                     }
@@ -118,7 +118,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         }
         else{
             cBuffer.reset((ca,limit)->{
-                OnConnection[] cn = new OnConnection[ca.length];
+                Connection[] cn = new Connection[ca.length];
                 int r=0;
                 for(int i=0;i<limit;i++){
                     if(!(ca[i].serverId().equals(c.serverId()))){
@@ -129,11 +129,11 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             });
         }
     }
-    private void onUdp(OnConnection c) {
+    private void onUdp(Connection c) {
         if(!c.disabled()){
             if(!uBuffer.push(c)){
                 uBuffer.reset(((ca,limit)->{
-                    OnConnection[] cn = new OnConnection[ca.length*2];
+                    Connection[] cn = new Connection[ca.length*2];
                     for(int i=0;i<limit;i++){
                         cn[i]=ca[i];
                     }
@@ -144,7 +144,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         }
         else{
             uBuffer.reset((ca,limit)->{
-                OnConnection[] cn = new OnConnection[ca.length];
+                Connection[] cn = new Connection[ca.length];
                 int r=0;
                 for(int i=0;i<limit;i++){
                     if(!(ca[i].serverId().equals(c.serverId()))){

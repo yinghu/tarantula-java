@@ -2,17 +2,17 @@ package com.tarantula.platform.util;
 
 import com.google.gson.*;
 
-import com.tarantula.OnConnection;
+import com.tarantula.Connection;
 import com.tarantula.platform.ConnectionInfo;
 
 import java.lang.reflect.Type;
 
-public class OnConnectionDeserializer implements JsonDeserializer<OnConnection> {
+public class OnConnectionDeserializer implements JsonDeserializer<Connection> {
 
     @Override
-    public OnConnection deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public Connection deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jo = jsonElement.getAsJsonObject();
-        OnConnection desc = new ConnectionInfo();
+        Connection desc = new ConnectionInfo();
         if(jo.has("type")){
             desc.type(jo.get("type").getAsString());
         }

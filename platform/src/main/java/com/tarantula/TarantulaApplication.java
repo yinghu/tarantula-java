@@ -1,6 +1,6 @@
 package com.tarantula;
 
-public interface TarantulaApplication extends Initializer,EventListener,BucketListener,OnConnection.Listener{
+public interface TarantulaApplication extends Initializer,EventListener,BucketListener, Connection.Listener{
 
 
     default void initialize(Session session) throws Exception{}

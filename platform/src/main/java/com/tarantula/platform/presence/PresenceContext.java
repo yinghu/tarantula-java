@@ -18,8 +18,8 @@ public class PresenceContext extends ResponseHeader {
     public List<XP> xp;
     public OnSession presence;
     public OnView view;
-    public OnConnection connection;
-    public OnConnection udp;
+    public Connection connection;
+    public Connection udp;
     public Profile profile;
     public PresenceContext(){
         this.code = 200;

@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Updated by yinghu lu on 3/5/2019.
  */
-public class InstanceManager implements Instance,OnConnection.Listener {
+public class InstanceManager implements Instance, Connection.Listener {
 
     private int partition;
     private int state;
@@ -27,9 +27,9 @@ public class InstanceManager implements Instance,OnConnection.Listener {
 
     private final long durationOnInstance;
     private GsonBuilder builder;
-    private RingBuffer<OnConnection> cBuffer;
+    private RingBuffer<Connection> cBuffer;
     public InstanceManager(int partition, ApplicationManager applicationManager){
-        this.cBuffer = new RingBuffer<>(new OnConnection[5]);
+        this.cBuffer = new RingBuffer<>(new Connection[5]);
         this.partition = partition;
         this.applicationManager = applicationManager;
         this.durationOnInstance = this.applicationManager.deploymentDescriptor.runtimeDurationOnInstance();
@@ -180,9 +180,9 @@ public class InstanceManager implements Instance,OnConnection.Listener {
     }
 
     @Override
-    public void onConnection(OnConnection c) {
+    public void onState(Connection c) {
         log.warn(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open"));
-        if(!c.disabled()&&c.type().equals(OnConnection.UDP)){//udp only
+        if(!c.disabled()&&c.type().equals(Connection.UDP)){//udp only
             cBuffer.push(c);
         }
     }

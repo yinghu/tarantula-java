@@ -33,7 +33,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private CopyOnWriteArrayList<OnLobby.Listener> oListeners = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<OnView.Listener> vListeners = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<Configuration.Listener> cListeners = new CopyOnWriteArrayList<>();
-    private CopyOnWriteArrayList<OnConnection.Listener> wListeners = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<Connection.Listener> wListeners = new CopyOnWriteArrayList<>();
 
 
     private ConcurrentHashMap<String,Recoverable> vMap = new ConcurrentHashMap<>();
@@ -48,7 +48,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void start() throws Exception {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ApplicationConfiguration.class,new ConfigurationDeserializer());
-        this.builder.registerTypeAdapter(OnConnection.class,new OnConnectionDeserializer());
+        this.builder.registerTypeAdapter(Connection.class,new OnConnectionDeserializer());
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseDeserializer());
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
     }
@@ -341,9 +341,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     cl.onView(ov);
                 });
             }
-            else if(ot instanceof OnConnection){
+            else if(ot instanceof Connection){
                 this.wListeners.forEach((cl)->{
-                    cl.onConnection((OnConnection)ot);
+                    cl.onState((Connection)ot);
                 });
             }
             if(!ot.disabled()){
@@ -373,7 +373,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         }
         else if(event instanceof ServerPushEvent){
-            OnConnection occ = this.builder.create().fromJson(new String(event.payload()),OnConnection.class);
+            Connection occ = this.builder.create().fromJson(new String(event.payload()), Connection.class);
             log.warn(occ.toString());
             occ.disabled(event.disabled());
             if(!event.disabled()){
@@ -383,11 +383,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }else{
                 pushRegistry.remove(event.sessionId());
                 pushRegistry.remove(occ.key().asString());
-                OnConnection ref = (OnConnection) vMap.remove(occ.key().asString());
+                Connection ref = (Connection) vMap.remove(occ.key().asString());
                 occ.type(ref.type());//recover type from original connect
             }
             this.wListeners.forEach((l)->{
-                l.onConnection(occ);
+                l.onState(occ);
             });
         }
         else if(event instanceof ModuleApplicationEvent){
@@ -442,10 +442,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         oListeners.add(onLobbyListener);
     }
 
-    public void registerOnConnectionListener(OnConnection.Listener listener){
+    public void registerOnConnectionListener(Connection.Listener listener){
         vMap.forEach((k,v)->{
-            if(v instanceof OnConnection){
-                listener.onConnection((OnConnection) v);
+            if(v instanceof Connection){
+                listener.onState((Connection) v);
             }
         });
         wListeners.add(listener);
@@ -515,7 +515,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.descriptor = descriptor;
         }
         @Override
-        public void onJoin(Session session,OnConnection onConnection) throws Exception {
+        public void onJoin(Session session, Connection onConnection) throws Exception {
             this.module.onJoin(session,onConnection);
         }
 

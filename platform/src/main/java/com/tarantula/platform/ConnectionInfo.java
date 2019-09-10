@@ -1,13 +1,12 @@
 package com.tarantula.platform;
 
-import com.tarantula.OnConnection;
-import com.tarantula.Recoverable;
+import com.tarantula.Connection;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.Map;
 
-public class ConnectionInfo extends ResponseHeader implements OnConnection {
+public class ConnectionInfo extends ResponseHeader implements Connection {
 
     private String type;
     private String serverId;

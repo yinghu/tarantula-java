@@ -1,6 +1,6 @@
 package com.tarantula;
 
-public interface OnConnection extends Response {
+public interface Connection extends Response {
 
     String WEB_SOCKET = "websocket";
     String UDP = "udp";
@@ -28,6 +28,6 @@ public interface OnConnection extends Response {
 
 
     interface Listener{
-        void onConnection(OnConnection onConnection);
+        void onState(Connection connection);
     }
 }

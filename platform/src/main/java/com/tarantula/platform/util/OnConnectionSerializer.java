@@ -4,15 +4,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.tarantula.OnConnection;
+import com.tarantula.Connection;
 
 import java.lang.reflect.Type;
 
 /**
  * Updated by yinghu on 9/8/2019.
  */
-public class OnConnectionSerializer implements JsonSerializer<OnConnection>{
-    public JsonElement serialize(OnConnection onConnection, Type type, JsonSerializationContext jsonSerializationContext) {
+public class OnConnectionSerializer implements JsonSerializer<Connection>{
+    public JsonElement serialize(Connection onConnection, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jp = (JsonObject) new ResponseSerializer().serialize(onConnection,type,jsonSerializationContext);
         jp.addProperty("type",onConnection.type());
         jp.addProperty("serverId",onConnection.serverId());
