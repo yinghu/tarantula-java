@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.logging.Level;
@@ -38,9 +39,24 @@ public class ServiceConnector implements Runnable {
         JsonObject conn = config.get("server").getAsJsonObject().get("connection").getAsJsonObject();
         socketChannel.connect(new InetSocketAddress(conn.get("host").getAsString(),conn.get("port").getAsInt()));
         onRegister();
-        UDPServer udpServer = new UDPServer(config.get("front").getAsJsonObject(),outboundQueue);
+        UDPServer udpServer = new UDPServer(config.get("front").getAsJsonObject(),outboundQueue,this);
         udpServer.start();
         log.warning("Tarantula UDP server started");
+    }
+    public boolean onTicket(String systemId,int stub,String ticket){
+        HashMap<String,String> _headers = new HashMap<>();
+        _headers.put(HTTPCaller.TARANTULA_TAG,"index/user");
+        _headers.put(HTTPCaller.TARANTULA_MAGIC_KEY,systemId);
+        JsonObject web = config.get("server").getAsJsonObject().get("web").getAsJsonObject();
+        HTTPCaller http = new HTTPCaller(false,web.get("host").getAsString()+":"+web.get("port").getAsInt());
+        JsonObject payload = new JsonObject();
+        payload.addProperty("stub",stub);
+        payload.addProperty("accessKey",ticket);
+        boolean[] ret ={false};
+        http.doAction("user/action","onTicket",_headers,payload.toString().getBytes(),jsonObject -> {
+            System.out.println(jsonObject.toString());
+        });
+        return ret[0];
     }
     @Override
     public void run() {

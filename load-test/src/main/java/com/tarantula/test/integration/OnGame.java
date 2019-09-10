@@ -2,6 +2,7 @@ package com.tarantula.test.integration;
 
 import com.google.gson.JsonObject;
 import com.tarantula.Session;
+import com.tarantula.test.HTTPCaller;
 
 import java.net.http.WebSocket;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public class OnGame {
     public String typeId(){
         return null;
     }
-    public void onPlay(JsonObject joined, WebSocket webSocket,HTTPCaller httpCaller,JsonObject presence){
+    public void onPlay(JsonObject joined, WebSocket webSocket, HTTPCaller httpCaller, JsonObject presence){
 
     }
     public void onMessage(CharSequence message){

@@ -2,6 +2,7 @@ package com.tarantula.test.integration;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.tarantula.test.HTTPCaller;
 
 import java.net.http.WebSocket;
 
@@ -19,7 +20,7 @@ public class DemoSync extends OnGame {
     }
 
     @Override
-    public void onPlay(JsonObject joined, WebSocket webSocket,HTTPCaller caller,JsonObject presence){
+    public void onPlay(JsonObject joined, WebSocket webSocket, HTTPCaller caller, JsonObject presence){
         try{
             if(!joined.get("successful").getAsBoolean()){
                 return;
