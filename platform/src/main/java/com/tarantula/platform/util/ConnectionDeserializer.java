@@ -7,7 +7,7 @@ import com.tarantula.platform.ConnectionInfo;
 
 import java.lang.reflect.Type;
 
-public class OnConnectionDeserializer implements JsonDeserializer<Connection> {
+public class ConnectionDeserializer implements JsonDeserializer<Connection> {
 
     @Override
     public Connection deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
@@ -33,6 +33,9 @@ public class OnConnectionDeserializer implements JsonDeserializer<Connection> {
         }
         if(jo.has("port")){
             desc.port(jo.get("port").getAsInt());
+        }
+        if(jo.has("maxConnections")){
+            desc.maxConnections(jo.get("maxConnections").getAsInt());
         }
         jo.entrySet().forEach((e)->{
             desc.property(e.getKey(),e.getValue().getAsString());

@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
 /**
  * Updated by yinghu on 9/8/2019.
  */
-public class OnConnectionSerializer implements JsonSerializer<Connection>{
+public class ConnectionSerializer implements JsonSerializer<Connection>{
     public JsonElement serialize(Connection onConnection, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jp = (JsonObject) new ResponseSerializer().serialize(onConnection,type,jsonSerializationContext);
         jp.addProperty("type",onConnection.type());

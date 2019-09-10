@@ -48,7 +48,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void start() throws Exception {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ApplicationConfiguration.class,new ConfigurationDeserializer());
-        this.builder.registerTypeAdapter(Connection.class,new OnConnectionDeserializer());
+        this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseDeserializer());
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
     }
