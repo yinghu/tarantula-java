@@ -2,9 +2,9 @@
 
 ### 1. Building a scaling, fault-tolerant application/game integration solution that supports large scale multiple million user base.
 ### 2. Providing a modularization architecture to support parallel programming mode.
-### 3. Creating a stopless deployment mode to support real continuously building processing.
+### 3. Creating a stopless deployment mode to support real continuously building/deployment processing.
 ### 4. Using a simple programming API to decouple coding complexity such as threading, messaging, caching, etc.
-### 5. Decoupling persistent connections such as TCP socket, web socket, or UDP from different client platforms.  
+### 5. Distributing persistent connections such as TCP socket, web socket, or UDP.  
 
 [Platform Architecture/Design Document](doc/gec-summary.pdf)
 
