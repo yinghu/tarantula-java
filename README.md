@@ -4,6 +4,7 @@
 ### 2. Providing a modularization architecture to support parallel programming mode.
 ### 3. Creating a stopless deployment mode to support real continuously building processing.
 ### 4. Using a simple programming API to decouple coding complexity such as threading, messaging, caching, etc.
+### 5. Decoupling persistent connections such as TCP socket, web socket, or UDP from different client platforms.  
 
 [Platform Architecture/Design Document](doc/gec-summary.pdf)
 
