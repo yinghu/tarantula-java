@@ -61,6 +61,7 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
     }
     public void onState(Connection onConnection){
         this.onConnection = onConnection;
+        this.context.log(this.onConnection.toString(),OnLog.WARN);
     }
     public void refund(String systemId,String applicationId){
         Descriptor desc = this.context.descriptor(applicationId);

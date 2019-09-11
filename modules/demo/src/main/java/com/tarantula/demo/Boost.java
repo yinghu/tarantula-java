@@ -22,10 +22,15 @@ public class Boost implements Module {
     public void onJoin(Session session,Connection connection) throws Exception{
         if(connection!=null){
             this.context.log(connection.type()+"/"+connection.serverId(),OnLog.INFO);
+            this.statistics.value("playerCount",1);
+            DemoObject dj = this.demoObject("onJoin",System.currentTimeMillis(),connection,this.context.validator().ticket(session.systemId(),session.stub()));
+            byte[] ret = this.builder.create().toJson(dj).getBytes();
+            session.write(ret,this.label());
+        }else{
+            this.statistics.value("playerCount",1);
+            byte[] ret = this.builder.create().toJson(this.demoObject("onJoin",System.currentTimeMillis())).getBytes();
+            session.write(ret,this.label());
         }
-        this.statistics.value("playerCount",1);
-        byte[] ret = this.builder.create().toJson(this.demoObject("onJoin",System.currentTimeMillis())).getBytes();
-        session.write(ret,this.label());
     }
 
     @Override
@@ -36,7 +41,7 @@ public class Boost implements Module {
         if(session.action().equals("a")){
             byte[] ret = this.builder.create().toJson(this.demoObject(session.action(),onAccess.timestamp())).getBytes();
             session.write(ret,this.label());
-            update.on(session.systemId(),ret);
+            update.on(ret);
             postOffice.onTopic().send("presence/notice",ret);
             this.context.onRegistry().transact(session.systemId(),1000);
             OnStatistics delta = this.context.statistics().value("WonCount",1000);
@@ -48,7 +53,7 @@ public class Boost implements Module {
         else if(session.action().equals("b")){
             byte[] ret = this.builder.create().toJson(this.demoObject(session.action(),onAccess.timestamp())).getBytes();
             session.write(ret,this.label());
-            update.on(session.systemId(),ret);
+            update.on(ret);
             OnStatistics delta = this.context.statistics().value("WagerCount",1000);
             delta.xpDelta(1000);
             delta.owner(session.systemId());
@@ -59,7 +64,7 @@ public class Boost implements Module {
         else if(session.action().equals("c")){
             byte[] ret = this.builder.create().toJson(this.demoObject(session.action(),onAccess.timestamp())).getBytes();
             session.write(ret,this.label());
-            update.on(session.systemId(),ret);
+            update.on(ret);
             OnStatistics delta = this.context.statistics().value("BlackJackCount",1000);
             delta.xpDelta(1000);
             delta.owner(session.systemId());
@@ -98,7 +103,7 @@ public class Boost implements Module {
         delta -= this.context.descriptor().timerOnModule();
         if(delta<=0){
             timer.update();
-            update.on(null,this.builder.create().toJson(timer).getBytes());
+            update.on(this.builder.create().toJson(timer).getBytes());
             ///postOffice.onTopic().send("presence/notice",this.builder.create().toJson(timer).getBytes());
             delta = 50;
         }
@@ -106,6 +111,14 @@ public class Boost implements Module {
     public void clear(){
         this.dataStore.update(timer);
         this.context.log("sync->"+this.context.onRegistry().distributionKey(),OnLog.WARN);
+    }
+    private DemoObject demoObject(String command,long timestamp,Connection connection,String ticket){
+        DemoObject mo = new DemoObject(command,this.statistics,this.timer,connection,ticket);
+        mo.timestamp(timestamp);
+        mo.instanceId(this.context.onRegistry().distributionKey());
+        mo.name("Boost");
+        mo.label(this.label());
+        return mo;
     }
     private DemoObject demoObject(String command,long timestamp){
         DemoObject mo = new DemoObject(command,this.statistics,this.timer);

@@ -27,16 +27,10 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         if(session.streaming()){
             this._onStream.put(session.systemId(),session);
         }
-        if(this.module.onRequest(session,payload,((systemId, delta) ->{
-            Session stream;
-            if(systemId!=null&&(stream =this._onStream.get(systemId))!=null){
-                stream.write(delta,module.label());
-            }else{
-                this._onStream.forEach((k,v)->{
-                    v.write(delta,this.module.label());
-                });
-            }
-            //server push
+        if(this.module.onRequest(session,payload,((delta) ->{
+            this._onStream.forEach((k,v)->{
+                v.write(delta,this.module.label());
+            });
         }))){
             //clean up on leave
             //this.context.log("Session->"+session.systemId(),OnLog.INFO);
@@ -80,7 +74,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         try{
             pendingTimer = pendingTimer-SERVER_PUSH_INTERVAL;
             if(pendingTimer<=0){
-                this.module.onTimer(((systemId, delta) ->
+                this.module.onTimer(((delta) ->
                     _onStream.forEach((k,v)->
                         v.write(delta,module.label())
                     )

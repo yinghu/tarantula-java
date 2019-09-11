@@ -27,12 +27,15 @@ public class DemoSync extends OnGame {
             if(!joined.get("successful").getAsBoolean()){
                 return;
             }
+            System.out.println(joined.toString());
+            JsonObject conn = joined.get("gameObject").getAsJsonObject().get("connection").getAsJsonObject();
+            String ticket = joined.get("gameObject").getAsJsonObject().get("ticket").getAsString();
             this.presence = presence;
             udpListener = new UDPListener(data -> {
-                //System.out.println(new String(data));
+                System.out.println(new String(data));
             });
-            udpListener.connect("10.0.0.234",9999);
-            udpListener.register(this.presence.get("login").getAsString(),this.presence.get("stub").getAsInt(),this.presence.get("ticket").getAsString());
+            udpListener.connect(conn.get("host").getAsString(),conn.get("port").getAsInt());
+            udpListener.register(this.presence.get("login").getAsString(),this.presence.get("stub").getAsInt(),ticket);
             new Thread(udpListener).start();
             this.applicationId = joined.get("applicationId").getAsString();
             this.instanceId = joined.get("instanceId").getAsString();
