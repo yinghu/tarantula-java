@@ -10,8 +10,10 @@ import com.tarantula.platform.service.Instance;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.RingBuffer;
 
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -214,6 +216,7 @@ public class InstanceManager implements Instance, Connection.Listener {
             checkPendingQueue();
         }
         else{
+            Set<String> cSet = new CopyOnWriteArraySet<>();
             cBuffer.reset((ca,limit)->{
                 ConnectionManager[] cn = new ConnectionManager[ca.length];
                 int r=0;
@@ -223,13 +226,18 @@ public class InstanceManager implements Instance, Connection.Listener {
                     }
                     else{
                         //kick off from apps
-                        ca[i].offConnection(instanceId ->
-                            log.info("Kick off->"+instanceId)
-                        );
+                        cSet.addAll(ca[i].onConnection());
                     }
                 }
                 return cn;
             });
+            for(String rc : cSet){
+                TarantulaApplicationContext tac = tMap.get(rc);
+                if(tac!=null){
+                    log.warn("Kickoff->"+rc);
+                    requestConnection(tac);
+                }
+            }
             //kick off apps from the connection
         }
     }

@@ -2,6 +2,7 @@ package com.tarantula.platform.service.deployment;
 
 import com.tarantula.Connection;
 
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 public class ConnectionManager {
@@ -19,13 +20,10 @@ public class ConnectionManager {
         cSet.add(instanceId);
         onConnection.on(connection);
     }
-    public void offConnection(OffConnection offConnection){
-        cSet.forEach(s -> offConnection.on(s));
-        cSet.clear();
+    public Set<String> onConnection(){
+        return cSet;
     }
-    interface OffConnection{
-        void on(String instanceId);
-    }
+
     interface OnConnection{
         void on(Connection connection);
     }
