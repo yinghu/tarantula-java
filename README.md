@@ -18,7 +18,7 @@
 ### 7. Advanced Modularization Architecture
 ### 8. Multiple Layer Access Control Policy
 ### 9. Distributed Application/Game Deployment
-### 10. Server-Less Module Deployment Support
+### 10. Stop-Less Module Deployment Support
 ### 11. Pure JAVA Implmentation With High Concurrecy Throughput
 ### 12. Hot Runtime Deployment Support 
 
