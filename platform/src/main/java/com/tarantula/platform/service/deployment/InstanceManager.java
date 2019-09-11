@@ -30,9 +30,11 @@ public class InstanceManager implements Instance, Connection.Listener {
 
     private final long durationOnInstance;
     private GsonBuilder builder;
-    private RingBuffer<Connection> cBuffer;
+    private RingBuffer<ConnectionManager> cBuffer;
+
+
     public InstanceManager(int partition, ApplicationManager applicationManager){
-        this.cBuffer = new RingBuffer<>(new Connection[5]);
+        this.cBuffer = new RingBuffer<>(new ConnectionManager[5]);
         this.partition = partition;
         this.applicationManager = applicationManager;
         this.durationOnInstance = this.applicationManager.deploymentDescriptor.runtimeDurationOnInstance();
@@ -182,9 +184,9 @@ public class InstanceManager implements Instance, Connection.Listener {
         });
     }
     public void requestConnection(TarantulaApplicationContext tac){
-        Connection connection = cBuffer.pop();
-        if(connection!=null){
-            tac.onState(connection);
+        ConnectionManager cm = cBuffer.pop();
+        if(cm!=null){
+            cm.onConnection(tac.instanceId(),connection -> tac.onState(connection));
         }
         else{
             pendingQueue.offer(tac);
@@ -199,13 +201,13 @@ public class InstanceManager implements Instance, Connection.Listener {
     }
     private void onUDP(Connection c) {
         if(!c.disabled()){
-            if(!cBuffer.push(c)){
+            if(!cBuffer.push(new ConnectionManager(c))){
                 cBuffer.reset(((ca,limit)->{
-                    Connection[] cn = new Connection[ca.length*2];
+                    ConnectionManager[] cn = new ConnectionManager[ca.length*2];
                     for(int i=0;i<limit;i++){
                         cn[i]=ca[i];
                     }
-                    cn[limit]=c;
+                    cn[limit]= new ConnectionManager(c);
                     return cn;
                 }));
             }
@@ -213,15 +215,17 @@ public class InstanceManager implements Instance, Connection.Listener {
         }
         else{
             cBuffer.reset((ca,limit)->{
-                Connection[] cn = new Connection[ca.length];
+                ConnectionManager[] cn = new ConnectionManager[ca.length];
                 int r=0;
                 for(int i=0;i<limit;i++){
-                    if(!(ca[i].serverId().equals(c.serverId()))){
+                    if(!(ca[i].connection().serverId().equals(c.serverId()))){
                         cn[r++]=ca[i];
                     }
                     else{
                         //kick off from apps
-                        log.info("Kick off->"+ca[i].toString());
+                        ca[i].offConnection(instanceId ->
+                            log.info("Kick off->"+instanceId)
+                        );
                     }
                 }
                 return cn;
@@ -230,13 +234,13 @@ public class InstanceManager implements Instance, Connection.Listener {
         }
     }
     private void checkPendingQueue(){
-        TarantulaApplicationContext pending = pendingQueue.poll();
+        final TarantulaApplicationContext[] pending = {pendingQueue.poll()};
         do{
-            if(pending!=null){
-                log.info("Assigning connection");
-                pending.onState(cBuffer.pop());
-                pending = pendingQueue.poll();
+            if(pending[0]!=null){
+                ConnectionManager cm = cBuffer.pop();
+                cm.onConnection(pending[0].instanceId(),connection -> pending[0].onState(connection));
+                pending[0] = pendingQueue.poll();
             }
-        }while (pending!=null);
+        }while (pending[0]!=null);
     }
 }
