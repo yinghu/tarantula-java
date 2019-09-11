@@ -1,7 +1,6 @@
 package com.tarantula.platform.service.deployment;
 
 import com.tarantula.*;
-import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.TarantulaApplicationContext;
 import com.tarantula.platform.TarantulaContext;
@@ -15,7 +14,7 @@ public class SingletonApplicationManager extends DefaultApplication implements B
 
     private TarantulaApplicationContext singleton;
 
-    private static TarantulaLogger log = JDKLogger.getLogger(SingletonApplicationManager.class);
+    //private static TarantulaLogger log = JDKLogger.getLogger(SingletonApplicationManager.class);
 
     public SingletonApplicationManager(TarantulaContext tarantulaContext, DeploymentDescriptor deploymentDescriptor){
         super(tarantulaContext,deploymentDescriptor);

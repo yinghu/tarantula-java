@@ -18,7 +18,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class TarantulaApplicationContext implements ApplicationContext, EventListener{
+public class TarantulaApplicationContext implements ApplicationContext, EventListener,Connection.Listener{
 
     private Descriptor _descriptor;
 	private TarantulaApplication application;
@@ -59,7 +59,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         this.resetEnabled = descriptor.resetEnabled();
         this.dataStore = descriptor.typeId();
     }
-    public void onConnection(Connection onConnection){
+    public void onState(Connection onConnection){
         this.application.onState(onConnection);
     }
     public OnInstance poll(Event event){

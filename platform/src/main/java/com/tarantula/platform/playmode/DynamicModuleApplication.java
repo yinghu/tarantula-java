@@ -39,11 +39,10 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             if(onConnection!=null){
                 this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label(),delta);
             }
-            else{//broadcasting to all streaming session if no udp publisher
-                this._onStream.forEach((k,v)->{
-                    v.write(delta,this.module.label());
-                });
-            }
+            //broadcasting to all streaming session if no udp publisher
+            this._onStream.forEach((k,v)->{
+                v.write(delta,this.module.label());
+            });
             //server push
         }))){
             //clean up on leave
@@ -108,10 +107,14 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         try{
             pendingTimer = pendingTimer-SERVER_PUSH_INTERVAL;
             if(pendingTimer<=0){
-                this.module.onTimer(((delta) ->
-                    _onStream.forEach((k,v)->
-                        v.write(delta,module.label())
-                    )
+                this.module.onTimer(((delta) ->{
+                        if(onConnection!=null){
+                            this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label(),delta);
+                        }
+                        _onStream.forEach((k,v)->
+                            v.write(delta,module.label())
+                        );
+                    }
                 ));
                 pendingTimer = descriptor.timerOnModule();//reset
             }

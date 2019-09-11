@@ -11,6 +11,7 @@ import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.RingBuffer;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -18,12 +19,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class InstanceManager implements Instance, Connection.Listener {
 
+    private static TarantulaLogger log = JDKLogger.getLogger(InstanceManager.class);
+
     private int partition;
     private int state;
     private AtomicInteger instancesOnPartition;
     private ConcurrentHashMap<String,TarantulaApplicationContext> tMap = new ConcurrentHashMap<>();
+    private ConcurrentLinkedDeque<TarantulaApplicationContext> pendingQueue = new ConcurrentLinkedDeque<>();
     private ApplicationManager applicationManager;
-    private static TarantulaLogger log = JDKLogger.getLogger(InstanceManager.class);
 
     private final long durationOnInstance;
     private GsonBuilder builder;
@@ -78,6 +81,7 @@ public class InstanceManager implements Instance, Connection.Listener {
                     tc._setup();//inject the app context proxy to decouple the TarantulaApplicationContext
                     tc.setupOnInstanceRegistry();//loading instance state
                     tc.onBucketReceiver(partition,state);
+                    this.requestConnection(tc);
                     log.warn("Instance ["+tc._instance.distributionKey()+"] is running limited time mode ["+(durationOnInstance>0)+"]");
                 }catch (Exception ex){
                     ex.printStackTrace();
@@ -148,7 +152,6 @@ public class InstanceManager implements Instance, Connection.Listener {
         int ret = InstanceRegistry.INSTANCE_FULL;
         if(onInstance!=null){//check applicationId on event with deployment id
             ret = onInstance.initialized()?InstanceRegistry.ALREADY_ON_INSTANCE:InstanceRegistry.ON_INSTANCE;
-            tcx.onConnection(cBuffer.pop());
             if(tcx.initializeOnInstance(event,onInstance)){
                 onInstanceListener.onUpdated(new OnInstanceTrack(event.systemId(),event.stub(),applicationManager.deploymentDescriptor.distributionKey(),onInstance.instanceId(),true));
             }
@@ -178,12 +181,62 @@ public class InstanceManager implements Instance, Connection.Listener {
             }
         });
     }
-
+    public void requestConnection(TarantulaApplicationContext tac){
+        Connection connection = cBuffer.pop();
+        if(connection!=null){
+            tac.onState(connection);
+        }
+        else{
+            pendingQueue.offer(tac);
+        }
+    }
     @Override
     public void onState(Connection c) {
         log.warn(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open"));
-        if(!c.disabled()&&c.type().equals(Connection.UDP)){//udp only
-            cBuffer.push(c);
+        if(c.type().equals(Connection.UDP)){//udp only
+            onUDP(c);
         }
+    }
+    private void onUDP(Connection c) {
+        if(!c.disabled()){
+            if(!cBuffer.push(c)){
+                cBuffer.reset(((ca,limit)->{
+                    Connection[] cn = new Connection[ca.length*2];
+                    for(int i=0;i<limit;i++){
+                        cn[i]=ca[i];
+                    }
+                    cn[limit]=c;
+                    return cn;
+                }));
+            }
+            checkPendingQueue();
+        }
+        else{
+            cBuffer.reset((ca,limit)->{
+                Connection[] cn = new Connection[ca.length];
+                int r=0;
+                for(int i=0;i<limit;i++){
+                    if(!(ca[i].serverId().equals(c.serverId()))){
+                        cn[r++]=ca[i];
+                    }
+                    else{
+                        //kick off from apps
+                        log.info("Kick off->"+ca[i].toString());
+                    }
+                }
+                return cn;
+            });
+            //kick off apps from the connection
+        }
+    }
+    private void checkPendingQueue(){
+        TarantulaApplicationContext pending = pendingQueue.poll();
+        do{
+            if(pending!=null){
+                log.info("Assigning connection");
+                pending.onState(cBuffer.pop());
+                pending = pendingQueue.poll();
+            }
+        }while (pending!=null);
     }
 }

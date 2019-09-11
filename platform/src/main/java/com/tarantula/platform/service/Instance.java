@@ -1,5 +1,6 @@
 package com.tarantula.platform.service;
 
+import com.tarantula.Connection;
 import com.tarantula.EventListener;
 import com.tarantula.Serviceable;
 
@@ -12,4 +13,5 @@ public interface Instance extends EventListener,Serviceable,BucketReceiverListen
     int partition();
     String routingKey();
     void onPartition(String instanceId);
+
 }
