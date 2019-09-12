@@ -41,7 +41,6 @@ public class ServiceConnector implements Runnable {
         onRegister();
         UDPServer udpServer = new UDPServer(config.get("front").getAsJsonObject(),outboundQueue,this);
         udpServer.start();
-        log.warning("Tarantula UDP server started");
     }
     public void onTicket(String systemId, int stub, String ticket, HTTPCaller.OnResponse onResponse){
         HashMap<String,String> _headers = new HashMap<>();

@@ -32,7 +32,9 @@ public class UDPServer implements Runnable {
     public void start() throws Exception{
         cMap = new ConcurrentHashMap<>();
         uchannel = DatagramChannel.open();
-        InetSocketAddress uAdd = new InetSocketAddress(front.get("host").getAsString(), front.get("port").getAsInt());
+        String host = front.get("host").getAsString();
+        int port = front.get("port").getAsInt();
+        InetSocketAddress uAdd = new InetSocketAddress(host,port);
         uchannel.bind(uAdd);
         new Thread(this,"tarantula-udp-server").start();
         new Thread(()->{
@@ -56,6 +58,7 @@ public class UDPServer implements Runnable {
                 }
             }
         },"tarantula-outbound-sender").start();
+        log.warning("Tarantula UDP server is listening at  ["+host+":"+port+"]");
     }
     @Override
     public void run(){
@@ -99,7 +102,6 @@ public class UDPServer implements Runnable {
             jsonObject = parser.parse(new InputStreamReader(new ByteArrayInputStream(data))).getAsJsonObject();
             String cmd = jsonObject.get("command").getAsString();
             onResponse.on(cmd,jsonObject);
-            //System.out.println(jsonObject.toString());
         }catch (Exception ex){
             ex.printStackTrace();
             jsonObject.addProperty("error",ex.getMessage());
