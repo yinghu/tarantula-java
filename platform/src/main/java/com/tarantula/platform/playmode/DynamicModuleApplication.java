@@ -76,6 +76,12 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         }
         this._onStream.remove(session.systemId());
         //this.context.log("Timeout->"+session.systemId(),OnLog.INFO);
+        if(onConnection!=null){
+            //send leave message on udp to removed udp entry
+            SessionIdle timeout = new SessionIdle("timeout",session.systemId(),session.stub());
+            this.context.postOffice().onConnection(onConnection.serverId()).send(timeout.label(),this.builder.create().toJson(timeout).getBytes());
+        }
+
     }
 
     @Override
@@ -86,6 +92,11 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             pending.write(this.builder.create().toJson(sessionIdle).getBytes(),module.label());
         }
         //this.context.log("Idle->"+session.systemId(),OnLog.INFO);
+        if(onConnection!=null){
+            //send leave message on udp to removed udp entry
+            SessionIdle timeout = new SessionIdle("timeout",session.systemId(),session.stub());
+            this.context.postOffice().onConnection(onConnection.serverId()).send(timeout.label(),this.builder.create().toJson(timeout).getBytes());
+        }
     }
     @Override
     public boolean oneTime() {

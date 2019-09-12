@@ -89,7 +89,7 @@ public class PushEventHandler implements RequestHandler {
            }
        }
        else{
-           log.warn(event.toString()+" unexpected removed");
+           //log.warn(event.toString()+" unexpected removed");
        }
        return true;
     }

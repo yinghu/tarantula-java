@@ -63,13 +63,16 @@ public class UDPServer implements Runnable {
         },"tarantula-outbound-sender").start();
         log.warning("Tarantula UDP server is listening at  ["+host+":"+port+"]");
     }
+    public void onTimeout(String systemId){
+        cMap.remove(systemId);
+    }
     @Override
     public void run(){
         ByteBuffer buffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
         while (true){
             try{
                 buffer.clear();
-                SocketAddress remoteAdd = uchannel.receive(buffer);
+                SocketAddress remoteAdd = uchannel.receive(buffer);//from udp client
                 buffer.flip();
                 byte[] data = new byte[buffer.limit()];
                 buffer.get(data,0,data.length);
@@ -83,14 +86,20 @@ public class UDPServer implements Runnable {
                                 String sysId= resp.get("presence").getAsJsonObject().get("systemId").getAsString();
                                 cMap.put(sysId,remoteAdd);
                             }
-                            else{
-                                //send back as ticket validation failed
-                            }
+                            //send back as ticket validation result
+                            buffer.clear();
+                            buffer.put("ticket".getBytes());
+                            buffer.put(resp.toString().getBytes());
+                            buffer.flip();
+                            try{uchannel.send(buffer,remoteAdd);}catch (Exception iex){iex.printStackTrace();}
                         });
                     }
                     else if(cmd.equals("onLeave")){
                         String sysId = jsonObject.get("systemId").getAsString();
                         cMap.remove(sysId);
+                    }
+                    else if(cmd.equals("onMessage")){
+                        //handle
                     }
                 });
             }catch (Exception ex){

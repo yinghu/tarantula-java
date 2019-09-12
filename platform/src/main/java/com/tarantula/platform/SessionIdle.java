@@ -8,7 +8,7 @@ public class SessionIdle extends OnApplicationHeader {
 
     public SessionIdle(String label,String systemId,int stub){
         this.label = label;
-        this.owner = systemId;
+        this.systemId = systemId;
         this.stub = stub;
     }
 }

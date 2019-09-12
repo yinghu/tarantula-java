@@ -24,13 +24,14 @@ public class ServiceConnector implements Runnable {
     private String serverId;
     private ByteBuffer readBuffer;
     private ConcurrentLinkedDeque<OutboundMessage> outboundQueue;
-
+    private JsonParser jsonParser;
     private PendingData pending;
+    private UDPServer udpServer;
     public ServiceConnector(){
         this.serverId = UUID.randomUUID().toString();
     }
     public void start() throws Exception{
-        JsonParser jsonParser = new JsonParser();
+        jsonParser = new JsonParser();
         config = jsonParser.parse(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("udp.conf"))).getAsJsonObject();
         this.outboundQueue = new ConcurrentLinkedDeque<>();
         this.readBuffer = ByteBuffer.allocate(1024);
@@ -39,7 +40,7 @@ public class ServiceConnector implements Runnable {
         JsonObject conn = config.get("server").getAsJsonObject().get("connection").getAsJsonObject();
         socketChannel.connect(new InetSocketAddress(conn.get("host").getAsString(),conn.get("port").getAsInt()));
         onRegister();
-        UDPServer udpServer = new UDPServer(config.get("front").getAsJsonObject(),outboundQueue,this);
+        udpServer = new UDPServer(config.get("front").getAsJsonObject(),outboundQueue,this);
         udpServer.start();
     }
     public void onTicket(String systemId, int stub, String ticket, HTTPCaller.OnResponse onResponse){
@@ -81,7 +82,13 @@ public class ServiceConnector implements Runnable {
                         }
                         else{
                             if(c=='|'){
-                                outboundQueue.offer(pending.reset());
+                                OutboundMessage out = pending.reset();
+                                if(out.label.equals("timeout")){
+                                    JsonObject jo = jsonParser.parse(out.data.substring(7)).getAsJsonObject();
+                                    udpServer.onTimeout(jo.get("systemId").getAsString());
+                                }else{
+                                    outboundQueue.offer(out);
+                                }
                             }
                             else{
                                 pending.data.append(c);

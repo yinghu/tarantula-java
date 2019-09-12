@@ -6,7 +6,6 @@ import com.tarantula.test.HTTPCaller;
 import com.tarantula.test.UDPListener;
 
 import java.net.http.WebSocket;
-import java.util.concurrent.atomic.DoubleAccumulator;
 
 public class DemoSync extends OnGame {
 
@@ -34,8 +33,13 @@ public class DemoSync extends OnGame {
             this.presence = presence;
             udpListener = new UDPListener(data -> {
                 LoadResult.totalBytesUDPReceived.addAndGet(data.length);
-                //System.out.println(new String(data));
+                StringBuilder buff = new StringBuilder();
+                buff.append((char) data[0]).append((char) data[1]).append((char) data[2]).append((char) data[3]).append((char) data[4]).append((char)data[5]);
+                if(buff.toString().equals("ticket")){
+                    System.out.println(new String(data));
+                }
             });
+            Thread.sleep(5000);
             udpListener.connect(conn.get("host").getAsString(),conn.get("port").getAsInt());
             udpListener.join(this.presence.get("login").getAsString(),this.presence.get("stub").getAsInt(),ticket);
             Thread tx = new Thread(udpListener);
