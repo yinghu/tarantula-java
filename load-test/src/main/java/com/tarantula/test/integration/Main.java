@@ -34,7 +34,7 @@ public class Main {
         }catch (Exception ex){
             //ex.printStackTrace();
             batch = 10;
-            psize = 100;
+            psize = 50;
             host = null;
             ///prefix = "test";
         }

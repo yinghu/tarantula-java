@@ -6,6 +6,7 @@ import com.tarantula.test.HTTPCaller;
 import com.tarantula.test.UDPListener;
 
 import java.net.http.WebSocket;
+import java.util.concurrent.atomic.DoubleAccumulator;
 
 public class DemoSync extends OnGame {
 
@@ -27,11 +28,12 @@ public class DemoSync extends OnGame {
             if(!joined.get("successful").getAsBoolean()){
                 return;
             }
-            System.out.println(joined.toString());
+            //System.out.println(joined.toString());
             JsonObject conn = joined.get("gameObject").getAsJsonObject().get("connection").getAsJsonObject();
             String ticket = joined.get("gameObject").getAsJsonObject().get("ticket").getAsString();
             this.presence = presence;
             udpListener = new UDPListener(data -> {
+                LoadResult.totalBytesUDPReceived.addAndGet(data.length);
                 //System.out.println(new String(data));
             });
             udpListener.connect(conn.get("host").getAsString(),conn.get("port").getAsInt());
@@ -41,7 +43,7 @@ public class DemoSync extends OnGame {
             this.applicationId = joined.get("applicationId").getAsString();
             this.instanceId = joined.get("instanceId").getAsString();
             long waiting = 250;
-            onStream(webSocket);
+            //onStream(webSocket);
             for(int i=0;i<10;i++){
                 onAction(webSocket,data->{data.addProperty("command","a");data.addProperty("timestamp",System.currentTimeMillis());});
                 Thread.sleep(waiting);

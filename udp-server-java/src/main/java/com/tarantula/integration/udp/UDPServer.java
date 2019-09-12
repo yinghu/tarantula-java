@@ -36,6 +36,7 @@ public class UDPServer implements Runnable {
         int port = front.get("port").getAsInt();
         InetSocketAddress uAdd = new InetSocketAddress(host,port);
         uchannel.bind(uAdd);
+        ByteBuffer outBuffer = ByteBuffer.allocate(4096);
         new Thread(this,"tarantula-udp-server").start();
         new Thread(()->{
             while (true){
@@ -44,8 +45,10 @@ public class UDPServer implements Runnable {
                     if(m!=null){
                         cMap.forEach((k,v)->{//broadcasting
                             try{
-                                ByteBuffer b = ByteBuffer.wrap(m.data.getBytes());
-                                uchannel.send(b,v);
+                                outBuffer.clear();
+                                outBuffer.put(m.data.getBytes());
+                                outBuffer.flip();
+                                uchannel.send(outBuffer,v);
                             }catch (Exception iex){}
                         });
                         //log.warning(m.toString());
