@@ -7,12 +7,17 @@ public class Main {
         try {
             LogManager.getLogManager().readConfiguration(Thread.currentThread().getContextClassLoader().getResourceAsStream("logging.properties"));
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw new RuntimeException(ex);
         }
     }
     public static void main(String[] args) throws Exception{
         ServiceConnector serviceConnector = new ServiceConnector();
         serviceConnector.start();
-        new Thread(serviceConnector,"tarantula-udp-connector").start();
+        Thread tm = new Thread(serviceConnector,"tarantula-udp-connector");
+        tm.start();
+        Runtime.getRuntime().addShutdownHook(new Thread(()->{
+            serviceConnector.stop();
+            tm.interrupt();
+        },"shutdown-hook"));
     }
 }

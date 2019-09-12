@@ -23,6 +23,8 @@ public class UDPServer implements Runnable {
     private ConcurrentLinkedDeque<OutboundMessage> oQueue;
     private ServiceConnector serviceConnector;
     private JsonParser parser;
+    private Thread tu;
+    private Thread tr;
     public UDPServer(JsonObject front, ConcurrentLinkedDeque<OutboundMessage> mQueue,ServiceConnector serviceConnector){
         this.front = front;
         this.oQueue = mQueue;
@@ -37,8 +39,9 @@ public class UDPServer implements Runnable {
         InetSocketAddress uAdd = new InetSocketAddress(host,port);
         uchannel.bind(uAdd);
         ByteBuffer outBuffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
-        new Thread(this,"tarantula-udp-server").start();
-        new Thread(()->{
+        tu = new Thread(this,"tarantula-udp-server");
+        tu.start();
+        tr = new Thread(()->{
             while (true){
                 try{
                     OutboundMessage m = oQueue.poll();
@@ -60,8 +63,14 @@ public class UDPServer implements Runnable {
                     //ignore ex
                 }
             }
-        },"tarantula-outbound-sender").start();
+        },"tarantula-outbound-sender");
+        tr.start();
         log.warning("Tarantula UDP server is listening at  ["+host+":"+port+"]");
+    }
+    public void stop(){
+        log.warning("udp shut down");
+        tu.interrupt();
+        tr.interrupt();
     }
     public void onTimeout(String systemId){
         cMap.remove(systemId);

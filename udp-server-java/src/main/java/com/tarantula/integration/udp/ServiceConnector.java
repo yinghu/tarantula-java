@@ -43,6 +43,10 @@ public class ServiceConnector implements Runnable {
         udpServer = new UDPServer(config.get("front").getAsJsonObject(),outboundQueue,this);
         udpServer.start();
     }
+    public void stop(){
+        log.warning("Udp shut down");
+        udpServer.stop();
+    }
     public void onTicket(String systemId, int stub, String ticket, HTTPCaller.OnResponse onResponse){
         HashMap<String,String> _headers = new HashMap<>();
         _headers.put(HTTPCaller.TARANTULA_TAG,"index/user");
@@ -87,7 +91,7 @@ public class ServiceConnector implements Runnable {
                                     JsonObject jo = jsonParser.parse(out.data.substring(7)).getAsJsonObject();
                                     udpServer.onTimeout(jo.get("systemId").getAsString());
                                 }else{
-                                    outboundQueue.offer(out);
+                                    outboundQueue.offer(out);//dispatch
                                 }
                             }
                             else{
