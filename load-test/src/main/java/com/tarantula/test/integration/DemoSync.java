@@ -32,11 +32,12 @@ public class DemoSync extends OnGame {
             String ticket = joined.get("gameObject").getAsJsonObject().get("ticket").getAsString();
             this.presence = presence;
             udpListener = new UDPListener(data -> {
-                System.out.println(new String(data));
+                //System.out.println(new String(data));
             });
             udpListener.connect(conn.get("host").getAsString(),conn.get("port").getAsInt());
-            udpListener.register(this.presence.get("login").getAsString(),this.presence.get("stub").getAsInt(),ticket);
-            new Thread(udpListener).start();
+            udpListener.join(this.presence.get("login").getAsString(),this.presence.get("stub").getAsInt(),ticket);
+            Thread tx = new Thread(udpListener);
+            tx.start();
             this.applicationId = joined.get("applicationId").getAsString();
             this.instanceId = joined.get("instanceId").getAsString();
             long waiting = 250;
@@ -50,6 +51,8 @@ public class DemoSync extends OnGame {
                 Thread.sleep(waiting);
             }
             Thread.sleep(5000);
+            udpListener.leave(presence.get("systemId").getAsString());
+            tx.interrupt();
             onAction(caller,data ->data.addProperty("command","onLeave"));
             System.out.println(LoadResult.print());
         }catch (Exception ex){

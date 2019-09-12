@@ -40,7 +40,7 @@ public class HTTPCaller {
     }
     public void doAction(String path, String command, HashMap<String,String> headers, byte[] payload,OnResponse onResponse){
         this.requestOnJson(path,command,headers,payload);
-        onResponse.on(jsonElement.getAsJsonObject());
+        onResponse.on(command,jsonElement.getAsJsonObject());
     }
     private void requestOnJson(String path,String command,HashMap<String,String> headers,byte[] payload){
         HttpURLConnection http = null;
@@ -90,6 +90,6 @@ public class HTTPCaller {
         }
     }
     interface OnResponse{
-        void on(JsonObject jsonObject);
+        void on(String cmd,JsonObject jsonObject);
     }
 }

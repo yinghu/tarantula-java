@@ -67,9 +67,24 @@ public class UDPServer implements Runnable {
                 buffer.flip();
                 byte[] data = new byte[buffer.limit()];
                 buffer.get(data,0,data.length);
-                parse(data,jsonObject -> {
-                    if(serviceConnector.onTicket(jsonObject.get("systemId").getAsString(),jsonObject.get("stub").getAsInt(),jsonObject.get("ticket").getAsString())){
-                        cMap.put(jsonObject.get("systemId").getAsString(),remoteAdd);
+                parse(data,(cmd,jsonObject) -> {
+                    if(cmd.equals("onJoin")){
+                        String systemId = jsonObject.get("systemId").getAsString();
+                        int stub = jsonObject.get("stub").getAsInt();
+                        String ticket = jsonObject.get("ticket").getAsString();
+                        serviceConnector.onTicket(systemId,stub,ticket,(c,resp)->{
+                            if(resp.get("successful").getAsBoolean()){
+                                String sysId= resp.get("presence").getAsJsonObject().get("systemId").getAsString();
+                                cMap.put(sysId,remoteAdd);
+                            }
+                            else{
+                                //send back as ticket validation failed
+                            }
+                        });
+                    }
+                    else if(cmd.equals("onLeave")){
+                        String sysId = jsonObject.get("systemId").getAsString();
+                        cMap.remove(sysId);
                     }
                 });
             }catch (Exception ex){
@@ -82,7 +97,9 @@ public class UDPServer implements Runnable {
         JsonObject jsonObject = new JsonObject();
         try{
             jsonObject = parser.parse(new InputStreamReader(new ByteArrayInputStream(data))).getAsJsonObject();
-            onResponse.on(jsonObject);
+            String cmd = jsonObject.get("command").getAsString();
+            onResponse.on(cmd,jsonObject);
+            //System.out.println(jsonObject.toString());
         }catch (Exception ex){
             ex.printStackTrace();
             jsonObject.addProperty("error",ex.getMessage());

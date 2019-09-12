@@ -11,7 +11,6 @@ public class UDPListener implements Runnable{
     private DatagramChannel channel;
     private ByteBuffer readBuffer;
     private OnData onData;
-
     public UDPListener(OnData onData){
         this.onData = onData;
     }
@@ -25,12 +24,19 @@ public class UDPListener implements Runnable{
         start();
         channel.connect(new InetSocketAddress(host,port));
     }
-    public void register(String systemId,int stub,String ticket) throws Exception{
+    public void join(String systemId,int stub,String ticket) throws Exception{
         JsonObject payload = new JsonObject();
+        payload.addProperty("command","onJoin");
         payload.addProperty("systemId",systemId);
         payload.addProperty("stub",stub);
         payload.addProperty("ticket",ticket);
-        System.out.println(payload.toString());
+        ByteBuffer buffer = ByteBuffer.wrap(payload.toString().getBytes());
+        channel.write(buffer);
+    }
+    public void leave(String systemId) throws Exception{
+        JsonObject payload = new JsonObject();
+        payload.addProperty("command","onLeave");
+        payload.addProperty("systemId",systemId);
         ByteBuffer buffer = ByteBuffer.wrap(payload.toString().getBytes());
         channel.write(buffer);
     }
@@ -39,7 +45,7 @@ public class UDPListener implements Runnable{
         try{
             while (true){
                 readBuffer.clear();
-                channel.receive(readBuffer);
+                channel.receive(readBuffer);//use interrupt
                 readBuffer.flip();
                 byte[] data = new byte[readBuffer.limit()];
                 readBuffer.get(data,0,data.length);

@@ -43,7 +43,7 @@ public class ServiceConnector implements Runnable {
         udpServer.start();
         log.warning("Tarantula UDP server started");
     }
-    public boolean onTicket(String systemId,int stub,String ticket){
+    public void onTicket(String systemId, int stub, String ticket, HTTPCaller.OnResponse onResponse){
         HashMap<String,String> _headers = new HashMap<>();
         _headers.put(HTTPCaller.TARANTULA_TAG,"index/user");
         _headers.put(HTTPCaller.TARANTULA_MAGIC_KEY,systemId);
@@ -52,12 +52,7 @@ public class ServiceConnector implements Runnable {
         JsonObject payload = new JsonObject();
         payload.addProperty("stub",stub);
         payload.addProperty("accessKey",ticket);
-        boolean[] ret ={false};
-        http.doAction("user/action","onTicket",_headers,payload.toString().getBytes(),jsonObject -> {
-            System.out.println(jsonObject.toString());
-            ret[0]=true;
-        });
-        return ret[0];
+        http.doAction("user/action","onTicket",_headers,payload.toString().getBytes(),onResponse);
     }
     @Override
     public void run() {
