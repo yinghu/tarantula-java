@@ -24,6 +24,11 @@ public class UDPListener implements Runnable{
         start();
         channel.connect(new InetSocketAddress(host,port));
     }
+    public void message() throws Exception{
+        JsonObject message = new JsonObject();
+        message.addProperty("command","onMessage");
+        channel.write(ByteBuffer.wrap(message.toString().getBytes()));
+    }
     public void join(String systemId,int stub,String ticket) throws Exception{
         JsonObject payload = new JsonObject();
         payload.addProperty("command","onJoin");

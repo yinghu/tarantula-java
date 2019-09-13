@@ -33,11 +33,22 @@ public class DemoSync extends OnGame {
             this.presence = presence;
             udpListener = new UDPListener(data -> {
                 LoadResult.totalBytesUDPReceived.addAndGet(data.length);
-                StringBuilder buff = new StringBuilder();
-                buff.append((char) data[0]).append((char) data[1]).append((char) data[2]).append((char) data[3]).append((char) data[4]).append((char)data[5]);
-                if(buff.toString().equals("ticket")){
+                StringBuilder label = new StringBuilder();
+                for(byte b : data){
+                    if(((char)b=='{')){
+                        break;
+                    }
+                    else{
+                        label.append((char)b);
+                    }
+                }
+                if(label.toString().equals("message")){
                     System.out.println(new String(data));
                 }
+                //buff.append((char) data[0]).append((char) data[1]).append((char) data[2]).append((char) data[3]).append((char) data[4]).append((char)data[5]);
+                //if(buff.toString().equals("ticket")){
+                    //System.out.println(new String(data));
+                //}
             });
             Thread.sleep(5000);
             udpListener.connect(conn.get("host").getAsString(),conn.get("port").getAsInt());
@@ -50,6 +61,7 @@ public class DemoSync extends OnGame {
             //onStream(webSocket);
             for(int i=0;i<10;i++){
                 onAction(webSocket,data->{data.addProperty("command","a");data.addProperty("timestamp",System.currentTimeMillis());});
+                udpListener.message();
                 Thread.sleep(waiting);
                 onAction(webSocket,data->{data.addProperty("command","b");data.addProperty("timestamp",System.currentTimeMillis());});
                 Thread.sleep(waiting);

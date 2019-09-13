@@ -68,7 +68,7 @@ public class UDPServer implements Runnable {
         log.warning("Tarantula UDP server is listening at  ["+host+":"+port+"]");
     }
     public void stop(){
-        log.warning("udp shut down");
+        log.warning("udp server is down");
         tu.interrupt();
         tr.interrupt();
     }
@@ -109,6 +109,13 @@ public class UDPServer implements Runnable {
                     }
                     else if(cmd.equals("onMessage")){
                         //handle
+                        buffer.clear();
+                        buffer.put("message".getBytes());
+                        buffer.put(jsonObject.toString().getBytes());
+                        cMap.forEach((k,v)->{
+                            buffer.flip();
+                            try{uchannel.send(buffer,remoteAdd);}catch (Exception iex){iex.printStackTrace();}
+                        });
                     }
                 });
             }catch (Exception ex){
