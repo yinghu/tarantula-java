@@ -11,4 +11,10 @@ public class SessionIdle extends OnApplicationHeader {
         this.systemId = systemId;
         this.stub = stub;
     }
+    public SessionIdle(String label,String systemId,int stub,String instanceId){
+        this.label = label;
+        this.systemId = systemId;
+        this.stub = stub;
+        this.instanceId = instanceId;
+    }
 }

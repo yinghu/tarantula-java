@@ -19,7 +19,7 @@ public class UDPServer implements Runnable {
     private static int MAX_PAYLOAD_SIZE = 4096;
     private JsonObject front;
     private DatagramChannel uchannel;
-    private ConcurrentHashMap<String,SocketAddress> cMap;
+    private ConcurrentHashMap<Session,SocketAddress> cMap;
     private ConcurrentLinkedDeque<OutboundMessage> oQueue;
     private ServiceConnector serviceConnector;
     private JsonParser parser;
@@ -72,8 +72,8 @@ public class UDPServer implements Runnable {
         tu.interrupt();
         tr.interrupt();
     }
-    public void onTimeout(String systemId){
-        cMap.remove(systemId);
+    public void onTimeout(String systemId,String instanceId){
+        cMap.remove(new Session(systemId,instanceId));
     }
     @Override
     public void run(){
@@ -87,13 +87,15 @@ public class UDPServer implements Runnable {
                 buffer.get(data,0,data.length);
                 parse(data,(cmd,jsonObject) -> {
                     if(cmd.equals("onJoin")){
+                        String insId = jsonObject.get("instanceId").getAsString();
                         String systemId = jsonObject.get("systemId").getAsString();
                         int stub = jsonObject.get("stub").getAsInt();
                         String ticket = jsonObject.get("ticket").getAsString();
                         serviceConnector.onTicket(systemId,stub,ticket,(c,resp)->{
                             if(resp.get("successful").getAsBoolean()){
                                 String sysId= resp.get("presence").getAsJsonObject().get("systemId").getAsString();
-                                cMap.put(sysId,remoteAdd);
+                                String token= resp.get("presence").getAsJsonObject().get("token").getAsString();
+                                cMap.put(new Session(sysId,stub,insId,token),remoteAdd);
                             }
                             //send back as ticket validation result
                             buffer.clear();
@@ -105,7 +107,8 @@ public class UDPServer implements Runnable {
                     }
                     else if(cmd.equals("onLeave")){
                         String sysId = jsonObject.get("systemId").getAsString();
-                        cMap.remove(sysId);
+                        String insId = jsonObject.get("instanceId").getAsString();
+                        this.onTimeout(sysId,insId);
                     }
                     else if(cmd.equals("onMessage")){
                         //handle

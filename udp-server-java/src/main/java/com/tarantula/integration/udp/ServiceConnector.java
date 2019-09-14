@@ -89,7 +89,7 @@ public class ServiceConnector implements Runnable {
                                 OutboundMessage out = pending.reset();
                                 if(out.label.equals("timeout")){
                                     JsonObject jo = jsonParser.parse(out.data.substring(7)).getAsJsonObject();
-                                    udpServer.onTimeout(jo.get("systemId").getAsString());
+                                    udpServer.onTimeout(jo.get("systemId").getAsString(),jo.get("instanceId").getAsString());
                                 }else{
                                     outboundQueue.offer(out);//dispatch
                                 }

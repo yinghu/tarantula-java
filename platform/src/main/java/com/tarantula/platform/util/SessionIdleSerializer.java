@@ -9,7 +9,7 @@ import com.tarantula.platform.SessionIdle;
 import java.lang.reflect.Type;
 
 /**
- * Created by yinghu lu on 3/13/2019.
+ * Updated by yinghu lu on 9/13/2019.
  */
 public class SessionIdleSerializer implements JsonSerializer<SessionIdle> {
     @Override
@@ -17,6 +17,7 @@ public class SessionIdleSerializer implements JsonSerializer<SessionIdle> {
         JsonObject jo = (JsonObject) new ResponseSerializer().serialize(sessionIdle,type,jsonSerializationContext);
         jo.addProperty("systemId",sessionIdle.systemId());
         jo.addProperty("stub",sessionIdle.stub());
+        jo.addProperty("instanceId",sessionIdle.instanceId());
         return jo;
     }
 }
