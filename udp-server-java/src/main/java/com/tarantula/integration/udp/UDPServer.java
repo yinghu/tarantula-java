@@ -48,13 +48,15 @@ public class UDPServer implements Runnable {
                     if(m!=null){
                         cMap.forEach((k,v)->{//broadcasting
                             try{
-                                outBuffer.clear();
-                                outBuffer.put(m.data.getBytes());
-                                outBuffer.flip();
-                                uchannel.send(outBuffer,v);
+                                String[] mh = m.label.split("#");
+                                if(mh[1].equals(k.instanceId)){
+                                    outBuffer.clear();
+                                    outBuffer.put(m.data.getBytes());
+                                    outBuffer.flip();
+                                    uchannel.send(outBuffer,v);
+                                }
                             }catch (Exception iex){}
                         });
-                        //log.warning(m.toString());
                     }
                     else{
                         Thread.sleep(100);
@@ -73,6 +75,7 @@ public class UDPServer implements Runnable {
         tr.interrupt();
     }
     public void onTimeout(String systemId,String instanceId){
+        log.warning("LEAVE FROM->"+systemId+"<><>"+instanceId);
         cMap.remove(new Session(systemId,instanceId));
     }
     @Override

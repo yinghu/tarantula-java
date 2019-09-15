@@ -20,7 +20,6 @@ public class Timer extends OnApplicationHeader {
     public long delta = 50;
     public long duration;
 
-
     public Timer(){
         this.vertex = "Timer";
         this.label = "timer";
@@ -31,6 +30,15 @@ public class Timer extends OnApplicationHeader {
         this.duration = duration;
         this.delta = delta;
         this.timestamp = duration;
+    }
+    public Timer(long h,long m,long s,long ms,long tm,long ss){
+        this();
+        this.hour = h;
+        this.minute= m;
+        this.second = s;
+        this.millisecond = ms;
+        this.timestamp = tm;
+        this.sequence = ss;
     }
 
     @Override
@@ -62,7 +70,7 @@ public class Timer extends OnApplicationHeader {
         return new AssociateKey(this.bucket,this.oid,this.vertex);
     }
 
-    public synchronized void update(){
+    public synchronized Timer update(){
         timestamp -= delta;
         if(timestamp<=0){
             timestamp = duration;
@@ -73,6 +81,8 @@ public class Timer extends OnApplicationHeader {
         long mr = hr%60000;
         second = mr/1000;
         millisecond = mr%1000;
+        sequence++;
+        return new Timer(hour,minute,second,millisecond,timestamp,sequence);
     }
     public String toString(){
         return "["+duration+"/"+delta+"/"+timestamp+"]";

@@ -102,8 +102,8 @@ public class Boost implements Module {
     public void onTimer(OnUpdate update){
         delta -= this.context.descriptor().timerOnModule();
         if(delta<=0){
-            timer.update();
-            update.on(this.builder.create().toJson(timer).getBytes());
+            Timer tuu = timer.update();
+            update.on(this.builder.create().toJson(tuu).getBytes());
             ///postOffice.onTopic().send("presence/notice",this.builder.create().toJson(timer).getBytes());
             delta = 50;
         }
