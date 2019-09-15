@@ -114,13 +114,16 @@ public class UDPServer implements Runnable {
                         this.onTimeout(sysId,insId);
                     }
                     else if(cmd.equals("onMessage")){
+                        log.warning(jsonObject.toString());
                         //handle
                         buffer.clear();
-                        buffer.put("message".getBytes());
-                        buffer.put(jsonObject.toString().getBytes());
+                        buffer.put(jsonObject.get("label").getAsString().getBytes());
+                        buffer.put(jsonObject.get("data").toString().getBytes());
                         cMap.forEach((k,v)->{
-                            buffer.flip();
-                            try{uchannel.send(buffer,remoteAdd);}catch (Exception iex){iex.printStackTrace();}
+                            if(k.instanceId.equals(jsonObject.get("instanceId").getAsString())){
+                                buffer.flip();
+                                try{uchannel.send(buffer,remoteAdd);}catch (Exception iex){iex.printStackTrace();}
+                            }
                         });
                     }
                 });
