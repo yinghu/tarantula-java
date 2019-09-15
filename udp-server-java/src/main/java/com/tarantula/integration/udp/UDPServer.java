@@ -57,6 +57,7 @@ public class UDPServer implements Runnable {
                                 }
                             }catch (Exception iex){}
                         });
+                        //log.warning(m.toString());
                     }
                     else{
                         Thread.sleep(100);

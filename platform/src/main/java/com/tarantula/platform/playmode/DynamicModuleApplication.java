@@ -36,9 +36,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             this._onStream.put(session.systemId(),session);
         }
         if(this.module.onRequest(session,payload,((delta) -> {
-            if(onConnection!=null){
-                this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label()+"#"+this.context.onRegistry().distributionKey(),delta);
-            }
+            pushEvent(delta);
             //broadcasting to all streaming session if no udp publisher
             this._onStream.forEach((k,v)->{
                 v.write(delta,this.module.label());
@@ -75,7 +73,6 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             this.context.onRegistry().onLeave(session);
         }
         this._onStream.remove(session.systemId());
-        //this.context.log("Timeout->"+session.systemId(),OnLog.INFO);
         if(onConnection!=null){
             //send leave message on udp to removed udp entry
             SessionIdle timeout = new SessionIdle("timeout",session.systemId(),session.stub(),this.context.onRegistry().distributionKey());
@@ -91,12 +88,6 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         if(pending!=null){
             pending.write(this.builder.create().toJson(sessionIdle).getBytes(),module.label());
         }
-        //this.context.log("Idle->"+session.systemId(),OnLog.INFO);
-        //if(onConnection!=null){
-            //send leave message on udp to removed udp entry
-            //SessionIdle timeout = new SessionIdle("timeout",session.systemId(),session.stub());
-            //this.context.postOffice().onConnection(onConnection.serverId()).send(timeout.label(),this.builder.create().toJson(timeout).getBytes());
-        //}
     }
     @Override
     public boolean oneTime() {
@@ -119,10 +110,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             pendingTimer = pendingTimer-SERVER_PUSH_INTERVAL;
             if(pendingTimer<=0){
                 this.module.onTimer(((delta) ->{
-                        if(onConnection!=null){
-                            this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label()+"#"+this.context.onRegistry().distributionKey(),delta);
-                            //this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label(),delta);
-                        }
+                        pushEvent(delta);
                         _onStream.forEach((k,v)->
                             v.write(delta,module.label())
                         );
@@ -154,5 +142,10 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         this.context.log(session.toString(),ex,OnLog.ERROR);
         String msg = ex.getMessage()!=null?ex.getMessage():"Unexpected error";
         session.write(this.builder.create().toJson(new ResponseHeader("onError",false,400,msg,"error")).getBytes(),this.module.label());
+    }
+    private void pushEvent(byte[] delta){
+        if(onConnection!=null&&this.context.onRegistry().count(0)>0){
+            this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label()+"#"+this.context.onRegistry().distributionKey(),delta);
+        }
     }
 }
