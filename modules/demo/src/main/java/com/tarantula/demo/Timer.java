@@ -3,7 +3,6 @@ package com.tarantula.demo;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.OnApplicationHeader;
-import com.tarantula.platform.RecoverableObject;
 
 import java.util.Map;
 
@@ -46,12 +45,16 @@ public class Timer extends OnApplicationHeader {
         properties.put("duration",duration);
         properties.put("timestamp",this.timestamp);
         properties.put("delta",this.delta);
+        properties.put("sequence",this.sequence);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.duration = ((Number)properties.get("duration")).longValue();
         this.timestamp = ((Number)properties.get("timestamp")).longValue();
+        if(properties.get("sequence")!=null){
+            this.sequence = ((Number)properties.get("sequence")).longValue();
+        }
         if(properties.get(delta)!=null){
             delta = ((Number)properties.get("delta")).longValue();
         }

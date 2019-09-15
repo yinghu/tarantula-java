@@ -113,7 +113,7 @@ public class Boost implements Module {
         this.context.log("sync->"+this.context.onRegistry().distributionKey(),OnLog.WARN);
     }
     private DemoObject demoObject(String command,long timestamp,Connection connection,String ticket){
-        DemoObject mo = new DemoObject(command,this.statistics,this.timer,connection,ticket);
+        DemoObject mo = new DemoObject(command,this.statistics,this.timer.update(),connection,ticket);
         mo.timestamp(timestamp);
         mo.instanceId(this.context.onRegistry().distributionKey());
         mo.name("Boost");
@@ -121,7 +121,7 @@ public class Boost implements Module {
         return mo;
     }
     private DemoObject demoObject(String command,long timestamp){
-        DemoObject mo = new DemoObject(command,this.statistics,this.timer);
+        DemoObject mo = new DemoObject(command,this.statistics,this.timer.update());
         mo.timestamp(timestamp);
         mo.instanceId(this.context.onRegistry().distributionKey());
         mo.name("Boost");
