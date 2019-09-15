@@ -21,7 +21,7 @@ public class Boost implements Module {
     private DataStore dataStore;
     public void onJoin(Session session,Connection connection) throws Exception{
         if(connection!=null){
-            this.context.log(connection.type()+"/"+connection.serverId(),OnLog.INFO);
+            //this.context.log(connection.type()+"/"+connection.serverId(),OnLog.INFO);
             this.statistics.value("playerCount",1);
             DemoObject dj = this.demoObject("onJoin",System.currentTimeMillis(),connection,this.context.validator().ticket(session.systemId(),session.stub()));
             byte[] ret = this.builder.create().toJson(dj).getBytes();
