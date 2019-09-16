@@ -336,7 +336,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             if(ot instanceof OnView){
                 OnView ov = (OnView)ot;
-                log.warn(ov.viewId()+"->"+ov.flag());
+                log.warn(ov.toString());
                 this.vListeners.forEach((cl)->{
                     cl.onView(ov);
                 });

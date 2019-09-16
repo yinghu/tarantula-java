@@ -107,6 +107,6 @@ public class OnViewTrack extends RecoverableObject implements OnView {
     }
 
     public String toString(){
-        return "OnView->["+viewId+"/"+disabled+"]";
+        return "OnView->["+viewId+"/"+disabled+"/"+flag+"]";
     }
 }
