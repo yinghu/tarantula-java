@@ -37,7 +37,7 @@ public class UDPServer implements Runnable {
         String host = front.get("host").getAsString();
         int port = front.get("port").getAsInt();
         InetSocketAddress uAdd = new InetSocketAddress(host,port);
-        uchannel.bind(uAdd);
+        uchannel.bind(null);
         ByteBuffer outBuffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
         tu = new Thread(this,"tarantula-udp-server");
         tu.start();
