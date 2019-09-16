@@ -7,7 +7,7 @@
         <access-mode>12</access-mode>
         <name>presence</name>
         <description>Tarantula Presence Service</description>
-        <deploy-priority>110</deploy-priority>
+        <deploy-priority>400</deploy-priority>
         <application-list>
             <application><!--could be exposing on login successful -->
                 <type-id>presence</type-id>

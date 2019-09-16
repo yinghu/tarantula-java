@@ -28,7 +28,7 @@ public class LeaderBoardApplication extends TarantulaApplicationHeader{
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         builder.registerTypeAdapter(TopListLeaderBoard.class,new LeaderBoardSerializer());
-        leaderBoardServiceProvider = context.serviceProvider("top10");
+        leaderBoardServiceProvider = context.serviceProvider(this.context.configuration("setup").property("name"));
         this.context.log("Leader board application started on ["+descriptor.tag()+"]",OnLog.INFO);
     }
 }

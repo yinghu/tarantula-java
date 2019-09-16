@@ -7,7 +7,7 @@
         <access-mode>10</access-mode>
         <name>Index</name>
         <description>Tarantula Lobby Index</description>
-        <deploy-priority>125</deploy-priority>
+        <deploy-priority>500</deploy-priority>
         <application-list>
             <application>
                 <type-id>index</type-id>
