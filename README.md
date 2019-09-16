@@ -225,3 +225,4 @@ A module is deployed as a lobby context including multiple modules. The typeId i
 6. Input codebase, artifact name, and version for the module, then click add module.
 7. Launch the module on the main setup-tool under the module.
 
+## How To Scale Persistent Connetions ( WEB SOCKET, UDP)
