@@ -371,11 +371,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     }
     public void onBucketReceiver(int bucket,int state){
         if(!this.singleton){
-            if(state== BucketReceiver.CLOSE){
+            if(state== BucketReceiver.CLOSE || state == BucketReceiver.SHUT_DOWN){
                 this.releaseOnInstanceRegistry();
-            }
-            else if(state==BucketReceiver.SHUT_DOWN){
-                this.releaseOnInstanceRegistry();
+                this.application.clear();
             }
         }
         else{

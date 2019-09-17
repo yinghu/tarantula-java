@@ -1,18 +1,16 @@
 package com.tarantula.game.blackjack;
 
-import com.tarantula.ApplicationContext;
+import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.OnLog;
-import com.tarantula.Session;
 
-public class ItemService implements Module {
+public class BlackjackModule implements Module {
 
     private ApplicationContext context;
 
 
 
     @Override
-    public void onJoin(Session session) throws Exception{
+    public void onJoin(Session session, Connection connection) throws Exception{
         //session.write(ret,this.label());
     }
 

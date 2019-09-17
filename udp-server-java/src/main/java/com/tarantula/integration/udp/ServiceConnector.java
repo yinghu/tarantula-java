@@ -43,6 +43,21 @@ public class ServiceConnector implements Runnable {
         udpServer = new UDPServer(config.get("front").getAsJsonObject(),outboundQueue,this);
         udpServer.start();
     }
+    private void _restart(){
+        while(true){
+            try{
+                socketChannel = SocketChannel.open();
+                JsonObject conn = config.get("server").getAsJsonObject().get("connection").getAsJsonObject();
+                socketChannel.connect(new InetSocketAddress(conn.get("host").getAsString(),conn.get("port").getAsInt()));
+                onRegister();
+                log.info("UDP server has reconnected to platform ["+conn.toString()+"]");
+                break;
+            }catch (Exception ex){
+                log.log(Level.WARNING,"failed to reconnect to platform");
+                try{Thread.sleep(5000);}catch (Exception tex){}
+            }
+        }
+    }
     public void stop(){
         log.warning("Udp shut down");
         udpServer.stop();
@@ -104,7 +119,8 @@ public class ServiceConnector implements Runnable {
                     Thread.sleep(10);
                 }
             }catch (Exception ex){
-                log.log(Level.WARNING,"error on loop",ex);
+                log.log(Level.WARNING,"reconnecting from disconnected platform",ex);
+                _restart();
             }
         }
     }
