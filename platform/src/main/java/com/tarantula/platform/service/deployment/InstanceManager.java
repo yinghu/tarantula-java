@@ -235,6 +235,7 @@ public class InstanceManager implements Instance, Connection.Listener {
                 TarantulaApplicationContext tac = tMap.get(rc);
                 if(tac!=null){
                     log.warn("Kickoff->"+rc+"from ["+c.serverId()+"]");
+                    tac.onState(c);
                     requestConnection(tac);
                 }
             }

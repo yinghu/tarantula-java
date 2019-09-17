@@ -143,6 +143,15 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         String msg = ex.getMessage()!=null?ex.getMessage():"Unexpected error";
         session.write(this.builder.create().toJson(new ResponseHeader("onError",false,400,msg,"error")).getBytes(),this.module.label());
     }
+    @Override
+    public void onState(Connection onConnection){
+        if(onConnection.disabled()){
+            this.onConnection = null;
+        }
+        else{
+            super.onState(onConnection);
+        }
+    }
     private void pushEvent(byte[] delta){
         if(onConnection!=null&&this.context.onRegistry().count(0)>0){
             this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label()+"#"+this.context.onRegistry().distributionKey(),delta);

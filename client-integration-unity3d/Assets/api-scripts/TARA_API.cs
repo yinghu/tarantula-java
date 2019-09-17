@@ -348,6 +348,9 @@ public class TARA_API : MonoBehaviour {
         }          
     }
     public void Forward(string label,string instanceId,JSONObject data){
+        if(!running){
+           return; 
+        }
         JSONObject payload = new JSONObject(JSONObject.Type.OBJECT);
         payload.AddField("command","onMessage");
         payload.AddField("label",label);
@@ -357,16 +360,17 @@ public class TARA_API : MonoBehaviour {
         byte[] mf = Encoding.UTF8.GetBytes(payload.ToString());
         udp.Send(mf,mf.Length,endPoint);
     }
-    public void StopUdp(){      
+    public void StopUdp(){  
+        if(!running){
+            return;
+        }
         try{
-            if(running){
-                running = false;
-                udp.Close();
-                udpListener.Interrupt();
-                Debug.Log("UDP ENDED");
-            }
+            running = false;
+            udp.Close();
+            udpListener.Interrupt();
+            logger.Log("UDP SESSION ENDED");
         }catch(Exception ex){
-            Debug.Log("EXXX");
+            logger.Error("EXXX");
         }
     }
     void initUdp(JSONObject conn){
@@ -403,6 +407,7 @@ public class TARA_API : MonoBehaviour {
         udp.Send(onjoin,onjoin.Length,endPoint);
         running = true;
         udpListener.IsBackground = true;
-        udpListener.Start();        
+        udpListener.Start();  
+        logger.Log("UDP SESSION STARTED");
     }
 }
