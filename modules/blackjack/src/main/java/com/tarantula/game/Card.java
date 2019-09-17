@@ -9,7 +9,7 @@ import java.lang.reflect.Type;
 /**
  * Updated by yinghu lu on 8/21/2019
  */
-public class Card extends GameObject{
+public class Card extends GameObject {
 
     public enum Suit {Spades,Hearts,Diamonds,Clubs,Back};
 

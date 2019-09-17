@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.tarantula.platform.OnApplicationHeader;
 
-
 import java.lang.reflect.Type;
 
 public class GameObject extends OnApplicationHeader {
