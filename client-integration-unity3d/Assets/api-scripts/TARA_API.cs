@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 using WebSocketSharp;
+
 public class TARA_API : MonoBehaviour {
     
     public string GEC_HOST;
@@ -35,7 +36,6 @@ public class TARA_API : MonoBehaviour {
         Debug.Log(this.messageQueue.IsSynchronized ? "synchronized" : "not synchronized" );
         StartCoroutine(Index());  
 	}
-	
 	void Update () {
         if(messageQueue.Count>0){
             Message m = (Message)messageQueue.Dequeue();
