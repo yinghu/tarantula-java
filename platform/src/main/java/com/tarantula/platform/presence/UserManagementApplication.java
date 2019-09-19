@@ -103,10 +103,49 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             }
         }
         else if(session.action().equals("onReset")){
-            session.write(payload,this.descriptor.responseLabel());
+            String deviceId = acc.property("deviceId");
+            if(session.systemId()!=null){//registered
+                OnSession access = this.login(session.systemId(),"password",session);
+                onSession(access,session);
+            }
+            else{
+                AccessIndex accessIndex = this.accessIndexService.set(deviceId,session.trackId());
+                if(accessIndex!=null){
+                    acc.property("login",deviceId);
+                    acc.property("password","password");
+                    acc.property("nickname","Player");
+                    this.createLogin(acc,session.trackId(),role);
+                    OnSession access = this.login(session.trackId(),acc.property("password"),session);
+                    onSession(access,session);
+                }
+                else{
+                    session.write(this.builder.create().toJson(new ResponseHeader("reset","wrong device id", false)).getBytes(),this.descriptor.responseLabel());
+                }
+            }
         }
         else{
             throw new UnsupportedOperationException(session.action());
+        }
+    }
+    private void onSession(OnSession access,Session session){
+        if(access.successful()){
+            PresenceContext ptx = new PresenceContext("onLogin");
+            ptx.presence= access;
+            List<Lobby> lobbyList = new ArrayList();
+            lobbyList.add(this.context.lobby(this.lobbyId));
+            ptx.lobbyList=(lobbyList);
+            session.write(this.builder.create().toJson(ptx).getBytes(),this.descriptor.responseLabel());
+            session.systemId(access.systemId());
+            session.stub(access.stub());
+            session.ticket(access.ticket());
+            OnStatistics delta = this.context.statistics().value("Login",1);
+            delta.xpDelta(1);
+            delta.owner(session.systemId());
+            delta.onEntry("LoginCount",1);
+            this.postOffice.onTag(Level.LEVEL_TAG).send(delta.owner(),delta);
+        }
+        else{
+            session.write(this.builder.create().toJson(new ResponseHeader("reset","wrong user/password", false)).getBytes(),this.descriptor.responseLabel());
         }
     }
     private OnSession login(String systemId,String password,Session session){

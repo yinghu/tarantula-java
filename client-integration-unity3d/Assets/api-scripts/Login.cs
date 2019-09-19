@@ -8,9 +8,8 @@ public class Login : MonoBehaviour {
     public Balance balance;
     public Notification notification;
     public DemoSync demoSync;
-    public string login;
-    public string password;
-	
+    public string deviceId;
+    
 	void Start () {	
 	}
 	
@@ -19,13 +18,16 @@ public class Login : MonoBehaviour {
 		
 	}
     public void OnMouseDown(){
-        api.Login(login,password,(b)=>{
+        api.Reset(deviceId,(b)=>{
             if(b){
                 api.Presence((a)=>{
                     balance.OnBalance();
                     notification.OnNotification();
                     demoSync.OnLobby();
                 });
+            }
+            else{
+                Debug.Log(deviceId);
             }
         });
     }

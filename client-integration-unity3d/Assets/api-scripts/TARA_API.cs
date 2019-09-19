@@ -91,8 +91,43 @@ public class TARA_API : MonoBehaviour {
             }
         }
     }
-    public void Login(string u,string p,Action<bool> callback){
-        StartCoroutine(_Login(u,p,callback));    
+    public void Reset(string u,Action<bool> callback){
+        StartCoroutine(_Reset(u,callback));    
+    }
+    IEnumerator _Reset(string u,Action<bool> callback){
+        JSONObject j = new JSONObject(JSONObject.Type.OBJECT);
+        j.AddField("deviceId",u);
+        byte[] payload = Encoding.UTF8.GetBytes(j.ToString());
+        using(UnityWebRequest www = new UnityWebRequest(GEC_HOST+"/user/action","POST")){
+		    www.certificateHandler = new KeyValidator();
+            www.uploadHandler = (UploadHandler)new UploadHandlerRaw(payload);
+            www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            www.SetRequestHeader("Accept","application/json");
+            www.SetRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            www.SetRequestHeader("Tarantula-tag","index/user");
+            www.SetRequestHeader("Tarantula-magic-key",u);
+            www.SetRequestHeader("Tarantula-action","onReset");
+            www.SetRequestHeader("Tarantula-payload-size",""+payload.Length);  
+            yield return www.SendWebRequest();
+            if (www.isNetworkError) {
+                  logger.Error(www.error);	
+            }
+            else{
+                JSONObject jn = new JSONObject(www.downloadHandler.text);
+                if(jn.GetField("successful").b){
+                    JSONObject pre = jn.GetField("presence");
+                    token = pre.GetField("token").str;
+                    systemId = pre.GetField("systemId").str;
+                    ticket = pre.GetField("ticket").str;
+                    stub = (int)pre.GetField("stub").n;
+                    login = pre.GetField("login").str;
+                    _Parse(jn.GetField("lobbyList"));
+                    callback(true);
+                }else{
+                    callback(false);
+                }
+            }
+        }
     }
     IEnumerator _Login(string u,string p,Action<bool> callback){
         JSONObject j = new JSONObject(JSONObject.Type.OBJECT);

@@ -79,7 +79,7 @@ public class UserEventHandler implements RequestHandler {
                     event.routingNumber(_routingKey.routingNumber());
                     this.eventService.publish(event);
                 }
-                else if(action.equals("onToken")){//to server topic
+                else if(action.equals("onReset")){//to server topic
                     AccessIndex acc = accessIndexService.get(magicKey);
                     if(acc!=null){
                         event.systemId(acc.distributionKey());
@@ -95,9 +95,10 @@ public class UserEventHandler implements RequestHandler {
                     }
                     this.eventService.publish(event);
                 }
+                /**
                 else if(action.equals("onReset")){
                     this.eventService.publish(event);
-                }
+                }**/
                 else{
                     throw new RuntimeException("["+action+"] not supported");
                 }
