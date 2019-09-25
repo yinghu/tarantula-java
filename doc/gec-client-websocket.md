@@ -24,23 +24,53 @@
        Sec-WebSocket-Protocol: tarantula-service
 ```
 ```C#
+    ------ SAMPLE C# CODE -----
     string ws = "ws://localhost:8080/tarantula?accessKey=auth_ticket&stub=1&systemId=abc123";
     WebSocket wc = new WebSocket(ws,"tarantula-service");
     wc.connect();
 ```
+
 ```
     5. SEND MESSAGE TO SERVICE ON SERVER VIA WEBSOCKET 
-    PAYLOAD : {action:"{command}",path:"/service/action",streaming:false,tag:{tag},data:{client payload}}
+    PAYLOAD : {action:"{command}",path:"/service/action",streaming:{true/false},tag:{tag},data:{client payload}}
 ```
+```C#
+    ------ SAMPLE C# CODE -----
+    string ws = "ws://localhost:8080/tarantula?accessKey=auth_ticket&stub=1&systemId=abc123";
+    WebSocket wc = new WebSocket(ws,"tarantula-service");
+    wc.connect();
+```
+
 ```
     6. SEND MESSAGE TO INSTANCE ON SERVER VIA WEBSOCKET 
-    PAYLOAD : {action:"{command}",path:"/application/instance",streaming:false,applicationId:{applicationId},instanceId:{instanceId},data:{client payload}}
+    PAYLOAD : {action:"{command}",path:"/application/instance",streaming:{true/false},applicationId:{applicationId},instanceId:{instanceId},data:{client payload}}
 ```
+```C#
+    ------ SAMPLE C# CODE -----
+    string ws = "ws://localhost:8080/tarantula?accessKey=auth_ticket&stub=1&systemId=abc123";
+    WebSocket wc = new WebSocket(ws,"tarantula-service");
+    wc.connect();
+```
+
 ```
     7. REGISTER NOTIFICATION ON SERVER VIA WEBSOCKET 
     PAYLOAD : {action:"onStart",streaming:true,label:{notice/label},data:{}}    
 ```
+```C#
+    ------ SAMPLE C# CODE -----
+    string ws = "ws://localhost:8080/tarantula?accessKey=auth_ticket&stub=1&systemId=abc123";
+    WebSocket wc = new WebSocket(ws,"tarantula-service");
+    wc.connect();
+```
+
+```
     8. UNREGISTER NOTIFICATION ON SERVER VIA WEBSOCKET 
     PAYLOAD : {action:"onStop",data:{}}
+```
+```C#
+    ------ SAMPLE C# CODE -----
+    string ws = "ws://localhost:8080/tarantula?accessKey=auth_ticket&stub=1&systemId=abc123";
+    WebSocket wc = new WebSocket(ws,"tarantula-service");
+    wc.connect();
 ```
 
