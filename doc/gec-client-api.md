@@ -169,7 +169,44 @@
       "runtimeDuration":0,
       "runtimeDurationOnInstance":0},"applications":[]}]}
 ```
-### Presence AJAX
+### Presence AJAX POST /service/action
+```
+    ------ REQUEST HTTP HEADERS
+    Accept: application/json
+    Content-Length: 54
+    Content-type: application/x-www-form-urlencoded
+    Tarantula-action: onPresence
+    Tarantula-payload-size: 54
+    Tarantula-tag: presence/lobby
+    Tarantula-token: BDS01/60c160f040164a43a5eeb4c67b9151ff tarantula 1569410852731 5E1863493D9657916F3CDB085B06ED8E6E3BE49A-4-1569404852731-2359BE7B3033779E793C7EB765D90A366C9CF0AB
+    
+    ------- RESPONSE HTTP HEADERS
+    Status Code: 200 OK
+    Content-length: 437
+    Content-type: application/json
+```
+```JSON
+    ------ SAMPLE RESPONSE CONTENT ------
+{"command":"onPresence","code":200,"timestamp":0,"sequence":0,"successful":true,
+ "presence":
+ {"successful":false,
+  "systemId":"BDS01/60c160f040164a43a5eeb4c67b9151ff",
+  "stub":0,
+  "balance":"1007000.00"},
+ "connection":
+ {"command":"onConnect",
+  "code":0,
+  "timestamp":0,
+  "sequence":0,
+  "successful":false,
+  "path":"tarantula",
+  "protocol":"ws",
+  "host":"10.0.0.29",
+  "type":"websocket",
+  "serverId":"da72b3f0-dfac-11e9-8148-af6b679bc459",
+  "secured":false,
+  "port":80}}
+```
 ### Lobby AJAX
 ### PLAY AJAX
 ### LOGOUT AJAX
