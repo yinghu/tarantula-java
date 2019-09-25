@@ -1,24 +1,15 @@
 ### CLIENT RESTFUL AJAX/JSON API LIST 
 ### Index AJAX GET /user/index
 ```
-    Request URL: http://localhost:8090/user/index
-    Request Method: GET
+    -----REQUEST HTTP HEADERS----- 
+    Accept: application/json
+    Tarantula-tag: index/lobby
+    
+    ----RESPONSE HTTP HEADERS------
     Status Code: 200 OK
-    Remote Address: [::1]:8090
-    Referrer Policy: no-referrer-when-downgrade
     Content-length: 2474
     Content-type: application/json
-    Date: Wed, 25 Sep 2019 16:10:00 GMT
-    Accept: application/json
-    Accept-Encoding: gzip, deflate, br
-    Accept-Language: en-US,en;q=0.9
-    Connection: keep-alive
-    Host: localhost:8090
-    Referer: http://localhost:8090/
-    Sec-Fetch-Mode: cors
-    Sec-Fetch-Site: same-origin
-    Tarantula-tag: index/lobby
-    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36 OPR/63.0.3368.94
+    
 ```
 ```JSON
 {"command":"index","code":200,"timestamp":0,"sequence":0,"successful":true,
