@@ -132,6 +132,9 @@
     Tarantula-action : onReset
     Tarantula-payload-size : 100
     
+    ----- FORM JSON PAYLOAD ------- 
+    {"serviceTag":"index/user","deviceId":"abc123","command":"onReset"}:
+    
     ----RESPONSE HTTP HEADERS------
     Status Code: 200 OK
     Content-length: 2474
@@ -180,6 +183,9 @@
     Tarantula-tag: presence/lobby
     Tarantula-token: BDS01/60c160f040164a43a5eeb4c67b9151ff tarantula 1569410852731 5E1863493D9657916F3CDB085B06ED8E6E3BE49A-4-1569404852731-2359BE7B3033779E793C7EB765D90A366C9CF0AB
     
+    ----- FORM JSON PAYLOAD ------- 
+    {"serviceTag":"presence/lobby","command":"onPresence"}:
+    
     ------- RESPONSE HTTP HEADERS
     Status Code: 200 OK
     Content-length: 437
@@ -209,6 +215,31 @@
 ```
 ### Lobby AJAX
 ### PLAY AJAX
+```JSON
+{"command":"onJoin",
+ "label":"demo",
+ "code":0,
+ "timestamp":1569432276366,
+ "sequence":0,
+ "successful":true,
+ "stub":0,
+ "name":"Boost",
+ "instanceId":"BDS01/65698de3ebc341e995ae90fffe021a24/2",
+ "balance":0,
+ "tournamentEnabled":false,
+ "gameObject":
+ {"timer":
+  {"command":"timer",
+   "label":"timer",
+   "code":0,
+   "timestamp":2400,
+   "sequence":224352,
+   "successful":false,
+   "stub":0,"balance":0,
+   "tournamentEnabled":false,
+   "hh":0,"mm":0,"ss":2,"ms":400},
+  "statistics":{"header":"demo","summary":[{"name":"playerCount","value":1.0}]}}}
+```
 ### LOGOUT AJAX
 ### SERVICE AJAX
 ### INSTANCE AJAX
