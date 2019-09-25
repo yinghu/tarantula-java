@@ -354,8 +354,31 @@
                         "hh":0,"mm":0,"ss":28,"ms":50},
                "statistics":{"header":"demo","summary":[{"name":"playerCount","value":3.0}]}}}
 ```
-### SERVICE AJAX
+### SERVICE AJAX POST /service/action (sample on profile application with the tag presence/profile)
+```
+    --------REQUEST HTTP HEADERS -----------
+    Accept: application/json
+    Content-Length: 107
+    Content-type: application/x-www-form-urlencoded
+    Tarantula-action: onProfile
+    Tarantula-payload-size: 107
+    Tarantula-tag: presence/profile
+    Tarantula-token: BDS01/60c160f040164a43a5eeb4c67b9151ff tarantula 1569417882675 61CEFEF4EC4DC38C027EA86912480D0390D5983B-14-1569411882675-2343D95D057BCD4DF7F28062FB9F3273C7D3FE7B
+    
+    ---------FORM JSON PAYLOAD-------------
+    {"serviceTag":"presence/profile","command":"onProfile","systemId":"BDS01/60c160f040164a43a5eeb4c67b9151ff"}: 
 
+    ---------RESPONSE HTTP HEADERS 
+    Status Code: 200 OK
+    Content-length: 180
+    Content-type: application/json
+    
+```
+```JSON
+    ------ SAMPLE RESPONSE CONTENT ------
+    {"command":"onProfile","code":200,"timestamp":0,"sequence":0,"successful":true,
+     "profile":{"nickname":"super user","avatar":"content/avatar/BDS01/60c160f040164a43a5eeb4c67b9151ff"}}
+```
 ### LOGOUT AJAX POST /service/action 
 ```
     --------REQUEST HTTP HEADERS -----------
