@@ -25,7 +25,7 @@
 
 [Programming Server Module API](doc/gec-module.pdf)
 
-[Programming Client AJAX/WEBSOCKET API](doc/gec-client-api.pdf)
+[Programming Client AJAX/WEBSOCKET API](doc/gec-client-api.md)
 
 [Load Test Result](doc/gec-test-result.pdf)
 ## How To Build
