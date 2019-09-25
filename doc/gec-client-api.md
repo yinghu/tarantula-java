@@ -12,6 +12,7 @@
     
 ```
 ```JSON
+    ------ SAMPLE RESPONSE CONTENT ----
 {"command":"index","code":200,"timestamp":0,"sequence":0,"successful":true,
  "lobbyList":[
     {"descriptor":
