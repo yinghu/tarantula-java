@@ -213,8 +213,75 @@
   "secured":false,
   "port":80}}
 ```
-### Lobby AJAX
-### PLAY AJAX
+### Lobby AJAX POST /service/action
+```
+    --------REQUEST HTTP HEADERS -----------
+    Accept: application/json
+    Content-Length: 63
+    Content-type: application/x-www-form-urlencoded
+    Tarantula-action: onLobby
+    Tarantula-payload-size: 63
+    Tarantula-tag: demo/lobby
+    Tarantula-token: BDS01/60c160f040164a43a5eeb4c67b9151ff tarantula 1569413429666 E47DE4F06CDD92014F8BD3FE30E95FFB133736FA-8-1569407429666-F1BB90078A50A2BF04B3CB060EB8D540D7CC655C
+
+    ---------FORM JSON PAYLOAD------------- 
+    {"serviceTag":"demo/lobby","command":"onLobby","typeId":"demo"}
+
+    ---------RESPONSE HTTP HEADERS
+    Status Code: 200 OK
+    Content-length: 2032
+    Content-type: application/json
+
+```
+```JSON
+            ------ SAMPLE RESPONSE CONTENT ------
+{"command":"onLobby","code":0,"timestamp":0,"sequence":0,"successful":true,
+ "gameList":
+ [{"singleton":false,
+   "deployCode":0,
+   "tag":"demo/lobby",
+   "type":"application",
+   "typeId":"demo",
+   "subtypeId":"demo-sync",
+   "category":"demo",
+   "capacity":10,
+   "name":"DemoSync3",
+   "description":"Tarantula Demo Sync Game",
+   "viewId":"demo.sync.game",
+   "applicationId":"BDS01/fd3032b0fbac4fb6adde79b0f366f80c",
+   "accessMode":0,
+   "entryCost":5000.0,
+   "entryCostAsString":"5.00K",
+   "tournamentEnabled":false,
+   "disabled":false,
+   "codebase":"file:///c:/development/gameenginecluster/modules/demo/target",
+   "moduleArtifact":"gec-demo",
+   "moduleVersion":"1.0",
+   "moduleName":"com.tarantula.demo.Boost",
+   "resetEnabled":true,
+   "timerOnModule":50,
+   "runtimeDuration":0,
+   "runtimeDurationOnInstance":0}]}
+```
+### PLAY AJAX POST /service/action
+```
+    --------REQUEST HTTP HEADERS -----------
+    Accept: application/json
+    Content-Length: 122
+    Content-type: application/x-www-form-urlencoded
+    Tarantula-action: onPlay
+    Tarantula-payload-size: 122
+    Tarantula-tag: presence/lobby
+    Tarantula-token: BDS01/60c160f040164a43a5eeb4c67b9151ff tarantula 1569413429666 E47DE4F06CDD92014F8BD3FE30E95FFB133736FA-8-1569407429666-F1BB90078A50A2BF04B3CB060EB8D540D7CC655C
+    
+    ---------FORM JSON PAYLOAD------------- 
+    {"serviceTag":"presence/lobby","command":"onPlay","applicationId":"BDS01/fd3032b0fbac4fb6adde79b0f366f80c","accessMode":2}
+
+    ---------RESPONSE HTTP HEADERS
+    Content-length: 496
+    Content-type: application/json
+    
+```
 ```JSON
 {"command":"onJoin",
  "label":"demo",
