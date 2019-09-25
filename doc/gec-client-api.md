@@ -122,7 +122,53 @@
       "runtimeDuration":0,
       "runtimeDurationOnInstance":0},"applications":[]}]}
 ```
-### Reset AJAX 
+### Reset AJAX POST /user/action
+```
+    -----REQUEST HTTP HEADERS----- 
+    Accept : application/json
+    Content-type :  application/x-www-form-urlencoded
+    Tarantula-tag : index/user
+    Tarantula-magic-key : deviceId
+    Tarantula-action : onReset
+    Tarantula-payload-size : 100
+    
+    ----RESPONSE HTTP HEADERS------
+    Status Code: 200 OK
+    Content-length: 2474
+    Content-type: application/json
+    
+```
+```JSON
+    ------ SAMPLE RESPONSE CONTENT ------
+{"command":"onLogin","code":200,"timestamp":0,"sequence":0,"successful":true,
+ "presence":
+ {"successful":true,
+  "systemId":"BDS01/d9a4e069ab444428ba2c97c063a684dc",
+  "stub":1,"token":"BDS01/d9a4e069ab444428ba2c97c063a684dc tarantula 1569410260021 9E90522AFD78F1B54D44C392A1F11B6C2E0C6B4E-1-1569404260020-38B5C99B0D32109672B606295B33EAE25C350689",
+  "ticket":"tarantula 1569404270021 7209E063FD8BF497D33A1F1CF85552B56ABC5AAD",
+  "balance":"0.00",
+  "login":"abc123678"},
+ "lobbyList":[
+    {"descriptor":
+     {"singleton":false,
+      "deployCode":0,
+      "type":"lobby",
+      "typeId":"presence",
+      "category":"service",
+      "capacity":0,
+      "name":"presence",
+      "description":"Tarantula Presence Service",
+      "applicationId":"BDS01/6a3cdf9110544c9d95900e7f3e508850",
+      "accessMode":12,
+      "entryCost":0.0,
+      "entryCostAsString":"0.00",
+      "tournamentEnabled":false,
+      "disabled":false,
+      "resetEnabled":false,
+      "timerOnModule":0,
+      "runtimeDuration":0,
+      "runtimeDurationOnInstance":0},"applications":[]}]}
+```
 ### Presence AJAX
 ### Lobby AJAX
 ### PLAY AJAX
