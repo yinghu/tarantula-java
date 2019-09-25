@@ -308,9 +308,53 @@
    "hh":0,"mm":0,"ss":2,"ms":400},
   "statistics":{"header":"demo","summary":[{"name":"playerCount","value":1.0}]}}}
 ```
-### SERVICE AJAX
 
-### INSTANCE AJAX
+### INSTANCE AJAX POST /application/instance
+```
+    --------REQUEST HTTP HEADERS -----------
+    Accept: application/json
+    Content-Length: 226
+    Content-type: application/x-www-form-urlencoded
+    Tarantula-action: a
+    Tarantula-application-id: BDS01/fd3032b0fbac4fb6adde79b0f366f80c
+    Tarantula-instance-id: BDS01/86a0d303a8fd4d0da5c6a632b92ceeef/6
+    Tarantula-payload-size: 226
+    Tarantula-tag: undefined
+    Tarantula-token: BDS01/60c160f040164a43a5eeb4c67b9151ff tarantula 1569417153986 067AD9E63B33D74E792607FE93F8C2D2C45FCED4-12-1569411153986-8A2C70322EC2A0704B2B9A4B2E7B883EF8DCB61A
+    
+    ---------FORM JSON PAYLOAD------------- {"command":"a","applicationId":"BDS01/fd3032b0fbac4fb6adde79b0f366f80c","instanceId":"BDS01/86a0d303a8fd4d0da5c6a632b92ceeef/6","streaming":false,"path":"/application/instance","data":{"command":"a","timestamp":1569436359357}}
+    
+    ---------RESPONSE HTTP HEADERS 
+    Status Code: 200 OK
+    Content-length: 209
+    Content-type: application/json
+```
+```JSON
+    ------ SAMPLE RESPONSE CONTENT ------
+{"command":"a",
+ "label":"demo",
+ "code":0,
+ "timestamp":0,
+ "sequence":0,
+ "successful":true,
+ "stub":0,
+ "name":"Boost",
+ "instanceId":"BDS01/f96731ea78084cd0933e02b7c954685c/1",
+ "balance":0,
+ "tournamentEnabled":false,
+ "gameObject":{"timer":{"command":"timer",
+                        "label":"timer",
+                        "code":0,
+                        "timestamp":28050,
+                        "sequence":316239,
+                        "successful":false,
+                        "stub":0,
+                        "balance":0,
+                        "tournamentEnabled":false,
+                        "hh":0,"mm":0,"ss":28,"ms":50},
+               "statistics":{"header":"demo","summary":[{"name":"playerCount","value":3.0}]}}}
+```
+### SERVICE AJAX
 
 ### LOGOUT AJAX POST /service/action 
 ```
