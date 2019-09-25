@@ -29,6 +29,8 @@
 
 [Programming Client WEB SOCKET API](doc/gec-client-websocket.md)
 
+[Programming Client UDP API](doc/gec-client-udp.md)
+
 [Load Test Result](doc/gec-test-result.pdf)
 ## How To Build
 1. Over 9.* JAVA runtime is required. JDK 12 is suggested.
