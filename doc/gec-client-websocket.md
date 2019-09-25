@@ -27,7 +27,7 @@
     ------ SAMPLE C# CODE -----
     string ws = "ws://localhost:8080/tarantula?accessKey=auth_ticket&stub=1&systemId=abc123";
     WebSocket wc = new WebSocket(ws,"tarantula-service");
-    wc.connect();
+    wc.Connect();
 ```
 
 ```
@@ -36,9 +36,8 @@
 ```
 ```C#
     ------ SAMPLE C# CODE -----
-    string ws = "ws://localhost:8080/tarantula?accessKey=auth_ticket&stub=1&systemId=abc123";
-    WebSocket wc = new WebSocket(ws,"tarantula-service");
-    wc.connect();
+    string payload = {action:"onProfile",path:"/service/action",streaming:false,tag:"presence/profile",data:{systemId:"BDS01/fd3032b0fbac4fb6adde79b0f366f80c"}};
+    websocket.Send(payload.ToString());
 ```
 
 ```
@@ -47,9 +46,8 @@
 ```
 ```C#
     ------ SAMPLE C# CODE -----
-    string ws = "ws://localhost:8080/tarantula?accessKey=auth_ticket&stub=1&systemId=abc123";
-    WebSocket wc = new WebSocket(ws,"tarantula-service");
-    wc.connect();
+    string payload = {action:"a",path:"/application/instance",streaming:false,applicationId="BDS01/fd3032b0fbac4fb6adde79b0f366f80c",instanceId="BDS01/fd3032b0fbac4fb6adde79b0f366f80c/2",data:{xp:500}};
+    websocket.Send(payload.ToString());
 ```
 
 ```
