@@ -25,15 +25,15 @@
 ```
 ```
     5. SEND MESSAGE TO SERVICE ON SERVER VIA WEBSOCKET 
-    SAMPLE : {action:"onProfile",path:"/service/action",streaming:false,tag:"presence/profile",data:{client payload}}
+    SAMPLE : {action:"{command}",path:"/service/action",streaming:false,tag:"presence/profile",data:{client payload}}
 ```
 ```
     6. SEND MESSAGE TO INSTANCE ON SERVER VIA WEBSOCKET 
-    SAMPLE : {action:"a",path:"/application/instance",streaming:false,applicationId:"",instanceId:"",data:{client payload}}
+    SAMPLE : {action:"{command}",path:"/application/instance",streaming:false,applicationId:{applicationId},instanceId:{instanceId},data:{client payload}}
 ```
 ```
     7. REGISTER NOTIFICATION ON SERVER VIA WEBSOCKET 
-    SAMPLE : {action:"onStart",data:{}}    
+    SAMPLE : {action:"onStart",streaming:true,label:{notice/label},data:{}}    
 ```
     8. UNREGISTER NOTIFICATION ON SERVER VIA WEBSOCKET 
     SAMPLE : {action:"onStop",data:{}}
