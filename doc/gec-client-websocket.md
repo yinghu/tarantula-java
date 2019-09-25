@@ -1,7 +1,7 @@
 ### CLIENT WEB SOCKET JSON API LIST
 ### W3C WEB SOCKET CALLBACK HOOK
 ```
-    1. WEB SOCKET RETURN PAYLOAD FORMAT [LABEL]{THE JSON PAYLOAD}.
+    1. WEB SOCKET RETURN PAYLOAD FORMAT [LABEL]{JSON PAYLOAD}.
        SAMPLE : demo{"timer":{"h":0,"m":2,"s":24}}
     2. MESSAGE DISPATCH ON CALLBACK WITH LABEL  
     3. PROCESS PAYLOAD ON MESSAGE WEB SOCKET CALLBACK 
@@ -18,7 +18,14 @@
     };
 ```
 ```
-    4. SEND MESSAGE TO SERVER VIA WEBSOCKET
+    4. CONNECT TO WEB SOCKET SERVER
+       ws{s}://localhost:80/tarantula?accessKey={ticket}&stub={1}&systemId={abc123};
+       ------- REQUEST SUB PROTOCOL HEADER -------
+       Sec-WebSocket-Protocol: tarantula-service
+```
+```
+    5. SEND MESSAGE TO SERVER VIA WEBSOCKET
+    SAMPLE : {action:"",""}
 ```
 ### Notification
 ### STREAMING CALLBACK
