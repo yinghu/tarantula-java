@@ -3,7 +3,13 @@
 ```
     1. WEB SOCKET RETURN PAYLOAD FORMAT [LABEL]{JSON PAYLOAD}.
        SAMPLE : demo{"timer":{"h":0,"m":2,"s":24}}
-    2. MESSAGE DISPATCH ON CALLBACK WITH LABEL  
+```
+
+```
+    2. MESSAGE DISPATCH ON CALLBACK WITH LABEL
+```
+
+```
     3. PROCESS PAYLOAD ON MESSAGE WEB SOCKET CALLBACK 
 ```
 ```C#
@@ -17,6 +23,7 @@
         }    
     };
 ```
+
 ```
     4. CONNECT TO WEB SOCKET SERVER
        ws{s}://{host}:{port}/tarantula?accessKey={ticket}&stub={stub}&systemId={user_login};
