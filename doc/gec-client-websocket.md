@@ -8,6 +8,10 @@
 ```
     2. MESSAGE DISPATCH ON CALLBACK WITH LABEL
 ```
+```C#
+    ------- SAMPLE C# CODE ----------
+    RegisterCallBack("presence/notice",(payload)=>{//TO DO PROCESS THE PAYLOAD//});
+```
 
 ```
     3. PROCESS PAYLOAD ON MESSAGE WEB SOCKET CALLBACK 
@@ -63,9 +67,8 @@
 ```
 ```C#
     ------ SAMPLE C# CODE -----
-    string ws = "ws://localhost:8080/tarantula?accessKey=auth_ticket&stub=1&systemId=abc123";
-    WebSocket wc = new WebSocket(ws,"tarantula-service");
-    wc.connect();
+     string payload = {action:"onStart",streaming:true,label:"presence/notice",data:{}}
+     websocket.Send(payload.ToString());
 ```
 
 ```
@@ -74,8 +77,7 @@
 ```
 ```C#
     ------ SAMPLE C# CODE -----
-    string ws = "ws://localhost:8080/tarantula?accessKey=auth_ticket&stub=1&systemId=abc123";
-    WebSocket wc = new WebSocket(ws,"tarantula-service");
-    wc.connect();
+     string payload = {action:"onStop",label:"presence/notice",data:{}}
+     websocket.Send(payload.ToString());
 ```
 
