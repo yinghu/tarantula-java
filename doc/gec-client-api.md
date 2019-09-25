@@ -283,6 +283,7 @@
     
 ```
 ```JSON
+     ------ SAMPLE RESPONSE CONTENT ------
 {"command":"onJoin",
  "label":"demo",
  "code":0,
@@ -307,6 +308,29 @@
    "hh":0,"mm":0,"ss":2,"ms":400},
   "statistics":{"header":"demo","summary":[{"name":"playerCount","value":1.0}]}}}
 ```
-### LOGOUT AJAX
 ### SERVICE AJAX
+
 ### INSTANCE AJAX
+
+### LOGOUT AJAX POST /service/action 
+```
+    --------REQUEST HTTP HEADERS -----------
+    Accept: application/json
+    Content-Length: 53
+    Content-type: application/x-www-form-urlencoded
+    Tarantula-action: onAbsence
+    Tarantula-payload-size: 53
+    Tarantula-tag: presence/lobby
+    Tarantula-token: BDS01/60c160f040164a43a5eeb4c67b9151ff tarantula 1569415225705 52B11E02BB431AF4A4040D16CB228361F7C8DC9F-9-1569409225705-80AC1112151DC434103BA2EF10364C8D5F0B3C5C
+    
+    ---------FORM JSON PAYLOAD-------------
+    {"serviceTag":"presence/lobby","command":"onAbsence"}
+    
+    ---------RESPONSE HTTP HEADERS 
+    Content-length: 105
+    Content-type: application/json
+```
+```JSON
+     ------ SAMPLE RESPONSE CONTENT ------
+{"command":"onAbsence","message":"off session [9]","code":0,"timestamp":0,"sequence":0,"successful":true}
+```
