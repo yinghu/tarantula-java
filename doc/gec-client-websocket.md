@@ -39,5 +39,3 @@
     SAMPLE : {action:"onStop",data:{}}
 ```
 
-### Notification
-### STREAMING CALLBACK
