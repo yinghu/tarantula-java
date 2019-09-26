@@ -11,8 +11,7 @@
     payload.AddField("systemId","abc123");
     payload.AddField("instanceId","BDS01/fd3032b0fbac4fb6adde79b0f366f80c/2");
     payload.AddField("stub",2);
-    payload.AddField("ticket","access timed
-                     ticket");
+    payload.AddField("ticket","access timed ticket");
     byte[] onjoin = Encoding.UTF8.GetBytes(payload.ToString());
     udp.Send(onjoin,onjoin.Length,endPoint);
 ```
