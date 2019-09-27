@@ -5,12 +5,26 @@ using UnityEngine;
 public class DemoSync : MonoBehaviour {
 
 	public TARA_API api;
+    public Balance balance;
+    public Notification notification; 
     
     public Demo[] demoList;
     
+    public string deviceId;
     
 	void Start () {
-	   	
+	   api.Reset(deviceId,(b)=>{
+            if(b){
+                api.Presence((a)=>{
+                    balance.OnBalance();
+                    notification.OnNotification();
+                    OnLobby();
+                });
+            }
+            else{
+                Debug.Log(deviceId);
+            }
+        });   	
 	}
 	
 	void Update () {

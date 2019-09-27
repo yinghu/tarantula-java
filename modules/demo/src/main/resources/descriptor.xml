@@ -61,6 +61,17 @@
                 <module-name>com.tarantula.demo.Boost</module-name>
                 <description>Tarantula Demo Sync Game</description>
             </application>
+            <application>
+                <type-id>demo</type-id>
+                <subtype-id>demo-sync</subtype-id>
+                <name>DemoService</name>
+                <type>application</type>
+                <category>service</category>
+                <entry-cost>0</entry-cost>
+                <singleton>true</singleton>
+                <module-name>com.tarantula.demo.DemoService</module-name>
+                <description>Tarantula Demo Sync Game</description>
+            </application>
         </application-list>
         <view-list>
             <view type="demo.sync.game">

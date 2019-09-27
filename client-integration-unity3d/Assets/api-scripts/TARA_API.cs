@@ -113,6 +113,7 @@ public class TARA_API : MonoBehaviour {
                   logger.Error(www.error);	
             }
             else{
+                Debug.Log(www.downloadHandler.text);
                 JSONObject jn = new JSONObject(www.downloadHandler.text);
                 if(jn.GetField("successful").b){
                     JSONObject pre = jn.GetField("presence");
