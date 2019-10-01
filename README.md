@@ -23,7 +23,7 @@
 ### 11. Pure JAVA Implmentation With High Concurrecy Throughput
 ### 12. Hot Runtime Deployment Support 
 
-[Programming Server Module API](doc/gec-module.pdf)
+[Programming Server Module API](doc/gec-module-api.md)
 
 [Programming Client AJAX HTTP API](doc/gec-client-api.md)
 
@@ -89,7 +89,7 @@ A module implementation is a deployable and distributed in the cluster scope.
 ```JAVA
     //the module contract interface 
     public interface Module {
-        default void onJoin(Session session,Connection connection) throws Exception{}
+        default void onJoin(Session session,Connection connection,OnUpdate update) throws Exception{}
 
         boolean onRequest(Session session, byte[] payload,OnUpdate update) throws Exception;
 
@@ -97,12 +97,10 @@ A module implementation is a deployable and distributed in the cluster scope.
 
         String label();
         default void clear(){}
-
-        default void onTimer(OnUpdate update){
-
-        }
+        default void onTimeout(Session session){}                     
+        default void onTimer(OnUpdate update){}
         interface OnUpdate{
-            void on(byte[] delta);
+            void on(String uid,byte[] delta);
         }
         interface OnResource{
             void on(InputStream in);
@@ -122,7 +120,7 @@ A module implementation is a deployable and distributed in the cluster scope.
         //the application resource lookup context
         private ApplicationContext context;
         //call when a client join the instance
-        public void onJoin(Session session,Connection connection) throws Exception{
+        public void onJoin(Session session,Connection connection,OnUpdate update) throws Exception{
             session.write("your joined".getBytes(),label());
         }                                
         
