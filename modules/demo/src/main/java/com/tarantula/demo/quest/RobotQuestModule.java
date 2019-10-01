@@ -38,13 +38,19 @@ public class RobotQuestModule implements Module {
 
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
-        //OnAccess access = this.builder.create().fromJson(new String(bytes),OnAccess.class);
+        /** PARSE THE CLIENT JSON PAYLOAD
+        OnAccess access = this.builder.create().fromJson(new String(bytes),OnAccess.class);
+        **/
+        //ADD MORE IF BLOCK TO PROCESS THE CLIENT REQUEST
         if(session.action().equals("onLeave")){
             OnInstance ox = this.context.onRegistry().onInstance(session.systemId());
-            gameList[ox.accessMode()].leave(session.systemId());
-            //onUpdate.on(gameList[ox.accessMode()].distributionKey(),);
+            RobotQuest ret = gameList[ox.accessMode()].leave(session.systemId());
+            onUpdate.on(gameList[ox.accessMode()].distributionKey(),this.builder.create().toJson(ret).getBytes());
+            session.write(bytes,this.label());
         }
-        session.write(bytes,this.label());
+        else{
+            throw new UnsupportedOperationException("Action["+session.action()+"] not supported");
+        }
         return session.action().equals("onLeave");
     }
     @Override
@@ -92,6 +98,7 @@ public class RobotQuestModule implements Module {
             }
         }
         rlist.forEach((r)->{
+            r.dataStore(this.dataStore);
             this.gameList[r.stub()]=r;
         });
         this.context.log("Robot Quest Game Instance started", OnLog.INFO);

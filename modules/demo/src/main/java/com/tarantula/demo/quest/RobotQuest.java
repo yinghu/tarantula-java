@@ -1,6 +1,8 @@
 package com.tarantula.demo.quest;
 
 import com.google.gson.JsonObject;
+import com.tarantula.DataStore;
+import com.tarantula.Updatable;
 import com.tarantula.platform.OnApplicationHeader;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -11,11 +13,14 @@ import java.util.Map;
 public class RobotQuest extends OnApplicationHeader {
 
     static String LABEL = "RQ";
-    static long START_COUNT_DOWN = 5000;
+    static long START_COUNT_DOWN = 5000; // 5 SECONDS
+    static long ROUND_COUNT_DOWN = 3000*60; // 3 MINUTES PER ROUND
     private String[] playerIndex;
     private boolean started;
     private long startCountdown;
-
+    private long roundCountdown;
+    private int round;
+    private DataStore dataStore;
     public RobotQuest(){
         this.label = LABEL;
         this.onEdge = true;
@@ -25,14 +30,21 @@ public class RobotQuest extends OnApplicationHeader {
         this();
         this.stub = index;
     }
+    public void dataStore(DataStore dataStore){
+        this.dataStore = dataStore;
+    }
     public synchronized RobotQuest onTimer(long delta){
-        if(started&&startCountdown>0){
-            startCountdown = startCountdown-delta;
-            return _snapshot();
-        }
-        else{
+        if(!started){
             return null;
         }
+        if(startCountdown>0){
+            startCountdown = startCountdown-delta;
+        }
+        else{
+            roundCountdown = roundCountdown-delta;
+        }
+        this.dataStore.update(this);
+        return _snapshot();
     }
     //return 1 one player 2 two players 0 fully joined
     public synchronized int join(String systemId){
@@ -44,10 +56,12 @@ public class RobotQuest extends OnApplicationHeader {
         started = ix==1;
         if(started){//
             startCountdown = START_COUNT_DOWN;
+            roundCountdown = ROUND_COUNT_DOWN;
         }
+        this.dataStore.update(this);
         return ix+1;
     }
-    public synchronized void leave(String systemId){
+    public synchronized RobotQuest leave(String systemId){
         if(systemId.equals(playerIndex[0])){
             playerIndex[0]="-";
         }
@@ -55,6 +69,8 @@ public class RobotQuest extends OnApplicationHeader {
             playerIndex[1]="-";
         }
         started = !(this.playerIndex[0]+this.playerIndex[1]).equals("--");
+        this.dataStore.update(this);
+        return _snapshot();
     }
     public synchronized RobotQuest snapshot(){
         return _snapshot();
@@ -65,6 +81,8 @@ public class RobotQuest extends OnApplicationHeader {
         properties.put("p0",this.playerIndex[0]);
         properties.put("p1",this.playerIndex[1]);
         properties.put("scc",this.startCountdown);
+        properties.put("rcc",this.roundCountdown);
+        properties.put("round",this.round);
         return this.properties;
     }
     @Override
@@ -73,6 +91,8 @@ public class RobotQuest extends OnApplicationHeader {
         this.playerIndex[0]=(String) properties.get("p0");
         this.playerIndex[1]=(String) properties.get("p1");
         this.startCountdown = ((Number)properties.get("scc")).longValue();
+        this.roundCountdown = ((Number)properties.get("rcc")).longValue();
+        this.round = ((Number)properties.get("round")).intValue();
         this.started = !(this.playerIndex[0]+this.playerIndex[1]).equals("--");
     }
 
@@ -91,18 +111,22 @@ public class RobotQuest extends OnApplicationHeader {
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("gameId",this.distributionKey());
+        jsonObject.addProperty("round",this.round);
         jsonObject.addProperty("player1",playerIndex[0]);
         jsonObject.addProperty("player2",playerIndex[1]);
         jsonObject.addProperty("started",started);
-        jsonObject.addProperty("startCountDown",startCountdown);
+        jsonObject.addProperty("startCountdown",startCountdown);
+        jsonObject.addProperty("roundCountdown",roundCountdown);
         return jsonObject;
     }
     private RobotQuest _snapshot(){
         RobotQuest robotQuest = new RobotQuest();
         robotQuest.distributionKey(this.distributionKey());
         robotQuest.stub = this.stub;
+        robotQuest.round = this.round;
         robotQuest.started = this.started;
         robotQuest.startCountdown = this.startCountdown;
+        robotQuest.roundCountdown = this.roundCountdown;
         robotQuest.playerIndex[0]=this.playerIndex[0];
         robotQuest.playerIndex[1]=this.playerIndex[1];
         return robotQuest;
