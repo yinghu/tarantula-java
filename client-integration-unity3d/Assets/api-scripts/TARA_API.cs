@@ -394,7 +394,7 @@ public class TARA_API : MonoBehaviour {
         payload.AddField("instanceId",instanceId);
         payload.AddField("data",data);
         byte[] mf = Encoding.UTF8.GetBytes(payload.ToString());
-        udp.Send(mf,mf.Length,endPoint);
+        udp.Send(mf,mf.Length);
     }
     public void StopUdp(){  
         if(!running){
@@ -414,7 +414,8 @@ public class TARA_API : MonoBehaviour {
         IPAddress[] ips = Dns.GetHostAddresses(conn.GetField("host").str);
         endPoint = new IPEndPoint(ips[0],(int)conn.GetField("port").n);
         //local receiver and sender
-        udp = new UdpClient();
+        udp = new UdpClient(conn.GetField("host").str,(int)conn.GetField("port").n);
+        //udp.Connect()
         udpListener = new Thread(()=>{
             Byte[] buff = new byte[0];
             while(running){
@@ -432,6 +433,9 @@ public class TARA_API : MonoBehaviour {
                 }
             }
         });
+        running = true;
+        udpListener.IsBackground = true;
+        udpListener.Start(); 
         JSONObject payload = new JSONObject(JSONObject.Type.OBJECT);
         payload.AddField("command","onJoin");
         payload.AddField("systemId",login);
@@ -440,10 +444,7 @@ public class TARA_API : MonoBehaviour {
         payload.AddField("ticket",conn.GetField("ticket").str);
         Debug.Log(payload.ToString());
         byte[] onjoin = Encoding.UTF8.GetBytes(payload.ToString());
-        udp.Send(onjoin,onjoin.Length,endPoint);
-        running = true;
-        udpListener.IsBackground = true;
-        udpListener.Start();  
+        udp.Send(onjoin,onjoin.Length);
         logger.Log("UDP SESSION STARTED");
     }
 }

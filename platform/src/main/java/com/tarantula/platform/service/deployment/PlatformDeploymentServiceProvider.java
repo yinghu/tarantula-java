@@ -518,15 +518,18 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.descriptor = descriptor;
         }
         @Override
-        public void onJoin(Session session, Connection onConnection) throws Exception {
-            this.module.onJoin(session,onConnection);
+        public void onJoin(Session session, Connection onConnection,OnUpdate onUpdate) throws Exception {
+            this.module.onJoin(session,onConnection,onUpdate);
         }
 
         @Override
         public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
             return this.module.onRequest(session,payload,update);
         }
-
+        @Override
+        public void onTimeout(Session session){
+            this.module.onTimeout(session);
+        }
         @Override
         public void setup(ApplicationContext context) throws Exception {
             this.applicationContext = context;

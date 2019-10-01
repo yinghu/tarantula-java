@@ -28,15 +28,21 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     @Override
     public void initialize(Session session) throws Exception {
         session.joined(true);
-        module.onJoin(session,onConnection);
+        module.onJoin(session,onConnection,(uid,delta)->{
+            pushEvent(uid,delta);
+            //broadcasting to all streaming session if no udp publisher
+            this._onStream.forEach((k,v)->{
+                v.write(delta,this.module.label());
+            });
+        });
     }
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         if(session.streaming()){
             this._onStream.put(session.systemId(),session);
         }
-        if(this.module.onRequest(session,payload,((delta) -> {
-            pushEvent(delta);
+        if(this.module.onRequest(session,payload,((uid,delta) -> {
+            pushEvent(uid,delta);
             //broadcasting to all streaming session if no udp publisher
             this._onStream.forEach((k,v)->{
                 v.write(delta,this.module.label());
@@ -70,6 +76,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     @Override
     public void onTimeout(Session session) {
         if(!this.descriptor.singleton()){
+            this.module.onTimeout(session);
             this.context.onRegistry().onLeave(session);
         }
         this._onStream.remove(session.systemId());
@@ -109,8 +116,8 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         try{
             pendingTimer = pendingTimer-SERVER_PUSH_INTERVAL;
             if(pendingTimer<=0){
-                this.module.onTimer(((delta) ->{
-                        pushEvent(delta);
+                this.module.onTimer(((uid,delta) ->{
+                        pushEvent(uid,delta);
                         _onStream.forEach((k,v)->
                             v.write(delta,module.label())
                         );
@@ -152,9 +159,9 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             super.onState(onConnection);
         }
     }
-    private void pushEvent(byte[] delta){
+    private void pushEvent(String uid,byte[] delta){
         if(onConnection!=null&&this.context.onRegistry().count(0)>0){
-            this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label()+"#"+this.context.onRegistry().distributionKey(),delta);
+            this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label()+"#"+uid,delta);
         }
     }
 }

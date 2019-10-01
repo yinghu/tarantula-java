@@ -4,7 +4,7 @@ import java.io.InputStream;
 
 public interface Module {
 
-    default void onJoin(Session session, Connection onConnection) throws Exception{}
+    default void onJoin(Session session, Connection onConnection,OnUpdate onUpdate) throws Exception{}
 
     boolean onRequest(Session session, byte[] payload,OnUpdate update) throws Exception;
 
@@ -13,11 +13,10 @@ public interface Module {
     String label();
     default void clear(){}
 
-    default void onTimer(OnUpdate update){
-
-    }
+    default void onTimeout(Session session){}
+    default void onTimer(OnUpdate update){}
     interface OnUpdate{
-        void on(byte[] delta);
+        void on(String updateId,byte[] delta);
     }
     interface OnResource{
         void on(InputStream in);

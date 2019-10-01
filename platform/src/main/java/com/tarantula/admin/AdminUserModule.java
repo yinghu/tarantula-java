@@ -14,7 +14,8 @@ public class AdminUserModule implements Module {
     private GsonBuilder builder;
     private AccessIndexService accessIndexService;
     private DataStore user;
-    public void onJoin(Session session, Connection onConnection) throws Exception{
+    @Override
+    public void onJoin(Session session, Connection onConnection,OnUpdate onUpdate) throws Exception{
         session.write(this.builder.create().toJson(_onMessage("joined")).getBytes(),label());
     }
 

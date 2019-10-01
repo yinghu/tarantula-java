@@ -27,7 +27,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         if(session.streaming()){
             this._onStream.put(session.systemId(),session);
         }
-        if(this.module.onRequest(session,payload,((delta) ->{
+        if(this.module.onRequest(session,payload,((uid,delta) ->{
             this._onStream.forEach((k,v)->{
                 v.write(delta,this.module.label());
             });
@@ -74,7 +74,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         try{
             pendingTimer = pendingTimer-SERVER_PUSH_INTERVAL;
             if(pendingTimer<=0){
-                this.module.onTimer(((delta) ->
+                this.module.onTimer(((uid,delta) ->
                     _onStream.forEach((k,v)->
                         v.write(delta,module.label())
                     )
@@ -88,7 +88,11 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     public boolean onEvent(Event event){
         try{
             if(event instanceof FastPlayEvent){
-                this.module.onJoin(event,null);
+                this.module.onJoin(event,null,(uid,delta)->{
+                    this._onStream.forEach((k,v)->{
+                        v.write(delta,this.module.label());
+                    });
+                });
             }
         }catch (Exception ex){
             //write error to client

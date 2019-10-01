@@ -82,4 +82,34 @@
             </view>
         </view-list>
     </lobby-context>
+        <lobby-context>
+        <type-id>quest</type-id>
+        <type>lobby</type>
+        <category>game</category>
+        <icon>assets/duration.png</icon>
+        <view-id>game.lobby</view-id>
+        <tag>quest/lobby</tag>
+        <name>QuestSync</name>
+        <response-label>quest</response-label>
+        <access-mode>12</access-mode>
+        <deploy-code>1</deploy-code>
+        <description>Tarantula Quest Sync</description>
+        <application-list>
+        <application>
+            <type-id>quest</type-id>
+            <subtype-id>demo-sync</subtype-id>
+            <name>Quest Sync</name>
+            <type>application</type>
+            <category>quest</category>
+            <entry-cost>0</entry-cost>
+            <capacity>20</capacity>
+            <max-instances-per-partition>10</max-instances-per-partition>
+            <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
+            <max-idles-on-instance>3</max-idles-on-instance>
+            <timer-on-module>50</timer-on-module>
+            <module-name>com.tarantula.demo.quest.RobotQuestModule</module-name>
+            <description>Tarantula Quest Sync Game</description>
+        </application>
+        </application-list>
+    </lobby-context>
 </tarantula>

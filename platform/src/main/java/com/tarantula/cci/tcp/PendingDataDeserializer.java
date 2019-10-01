@@ -22,7 +22,7 @@ public class PendingDataDeserializer implements JsonDeserializer<PendingData> {
             if(k.equals("clientId")){
                 pendingData.clientId = kv.getValue().getAsJsonPrimitive().getAsString();
             }
-            if(k.equals("serverId")){
+            else if(k.equals("serverId")){
                 pendingData.serverId = kv.getValue().getAsJsonPrimitive().getAsString();
                 pendingData.headers.put("serverId",pendingData.serverId);
             }
