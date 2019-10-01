@@ -51,12 +51,13 @@ public class RobotQuest extends OnApplicationHeader {
         if(started){
             return 0;
         }
-        int ix = playerIndex[0].equals("--")?0:1;
+        int ix = playerIndex[0].equals("-")?0:1;
         playerIndex[ix]=systemId;
         started = ix==1;
         if(started){//
             startCountdown = START_COUNT_DOWN;
             roundCountdown = ROUND_COUNT_DOWN;
+            round++;
         }
         this.dataStore.update(this);
         return ix+1;

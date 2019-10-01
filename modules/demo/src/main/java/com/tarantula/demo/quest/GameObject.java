@@ -22,6 +22,7 @@ public class GameObject extends OnApplicationHeader {
     public GameObject(Connection connection, String ticket,RobotQuest robotQuest){
         this.successful = true;
         this.command = "onJoin";
+        this.label = RobotQuestModule.ROBOT_QUEST_RESPONSE_LABEL;
         this.connection = connection;
         this.ticket = ticket;
         this.robotQuest = robotQuest;

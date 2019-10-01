@@ -48,9 +48,6 @@ public class RobotQuestModule implements Module {
             onUpdate.on(gameList[ox.accessMode()].distributionKey(),this.builder.create().toJson(ret).getBytes());
             session.write(bytes,this.label());
         }
-        else{
-            throw new UnsupportedOperationException("Action["+session.action()+"] not supported");
-        }
         return session.action().equals("onLeave");
     }
     @Override
@@ -80,7 +77,7 @@ public class RobotQuestModule implements Module {
         this.builder.registerTypeAdapter(RobotQuest.class,new RobotQuestSerializer());
         this.dataStore = this.context.dataStore(ROBOT_QUEST_DATA_STORE);
         this.dataStore.registerRecoverableListener(new RobotQuestPortableRegistry()).addRecoverableFilter(RobotQuestPortableRegistry.ROBOT_QUEST_OID,(t)->{
-            this.context.log(t.toString(),OnLog.INFO);
+            this.context.log(t.distributionKey()+"<>"+t.toString(),OnLog.INFO);
         });
         this.gameList = new RobotQuest[]{new RobotQuest(0),new RobotQuest(1),new RobotQuest(2),new RobotQuest(3),new RobotQuest(4),
                 new RobotQuest(5),new RobotQuest(6),new RobotQuest(7),new RobotQuest(8),new RobotQuest(9)};
