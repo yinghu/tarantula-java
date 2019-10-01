@@ -2,7 +2,6 @@ package com.tarantula.demo.quest;
 
 import com.google.gson.JsonObject;
 import com.tarantula.DataStore;
-import com.tarantula.Updatable;
 import com.tarantula.platform.OnApplicationHeader;
 import com.tarantula.platform.util.SystemUtil;
 
