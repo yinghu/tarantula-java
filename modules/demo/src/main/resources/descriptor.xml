@@ -106,7 +106,7 @@
             <max-instances-per-partition>10</max-instances-per-partition>
             <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
             <max-idles-on-instance>3</max-idles-on-instance>
-            <timer-on-module>50</timer-on-module>
+            <timer-on-module>100</timer-on-module>
             <module-name>com.tarantula.demo.quest.RobotQuestModule</module-name>
             <description>Tarantula Quest Sync Game</description>
         </application>
