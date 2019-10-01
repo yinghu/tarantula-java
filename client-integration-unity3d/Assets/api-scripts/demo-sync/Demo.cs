@@ -32,16 +32,17 @@ public class Demo : MonoBehaviour {
                 game = g;   
                 balance.OnBalance();
             },(m)=>{
-                   string lb = m.data.GetField("label").str;
-                   if(lb.Equals("timer")){
-                        OnTimer(m.data);
-                   }
-                   else if(lb.Equals("update")){
-                       Debug.Log(m.data.ToString());
-                   }
-                   else{
-                        OnNotice(m.data);      
-                   }
+                   Debug.Log(m.data.ToString());      
+                   //string lb = m.data.GetField("label").str;
+                   //if(lb.Equals("timer")){
+                        //OnTimer(m.data);
+                   //}
+                   //else if(lb.Equals("update")){
+                       //Debug.Log(m.data.ToString());
+                   //}
+                   //else{
+                        //OnNotice(m.data);      
+                   //}
             });
         }
         else if(desc!=null&&joined){

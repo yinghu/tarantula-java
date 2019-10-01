@@ -240,7 +240,7 @@ public class TARA_API : MonoBehaviour {
             if((conn=game.GetField("gameObject").GetField("connection"))!=null){
                 conn.AddField("ticket",game.GetField("gameObject").GetField("ticket").str);
                 conn.AddField("instanceId",rq.GetField("gameId").str);
-                AddMessageListener(game.GetField("label").str+"#"+game.GetField("instanceId").str,onstream);
+                AddMessageListener(game.GetField("label").str+"#"+rq.GetField("gameId").str,onstream);
                 initUdp(conn);
             }else{//stream on websocket if udp not available 
                 JSONObject ms = new JSONObject(JSONObject.Type.OBJECT);

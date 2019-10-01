@@ -13,7 +13,7 @@ public interface Module {
     String label();
     default void clear(){}
 
-    default void onTimeout(Session session){}
+    default void onTimeout(Session session,OnUpdate onUpdate){}
     default void onTimer(OnUpdate update){}
     interface OnUpdate{
         void on(String updateId,byte[] delta);

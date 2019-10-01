@@ -76,14 +76,16 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     @Override
     public void onTimeout(Session session) {
         if(!this.descriptor.singleton()){
-            this.module.onTimeout(session);
+            this.module.onTimeout(session,(uid,delta)->{
+                pushEvent(uid,delta);
+            });
             this.context.onRegistry().onLeave(session);
         }
         this._onStream.remove(session.systemId());
         if(onConnection!=null){
             //send leave message on udp to removed udp entry
-            SessionIdle timeout = new SessionIdle("timeout",session.systemId(),session.stub(),this.context.onRegistry().distributionKey());
-            this.context.postOffice().onConnection(onConnection.serverId()).send(timeout.label(),this.builder.create().toJson(timeout).getBytes());
+            //SessionIdle timeout = new SessionIdle("timeout",session.systemId(),session.stub(),this.context.onRegistry().distributionKey());
+            //this.context.postOffice().onConnection(onConnection.serverId()).send(timeout.label(),this.builder.create().toJson(timeout).getBytes());
         }
 
     }

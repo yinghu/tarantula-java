@@ -527,8 +527,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return this.module.onRequest(session,payload,update);
         }
         @Override
-        public void onTimeout(Session session){
-            this.module.onTimeout(session);
+        public void onTimeout(Session session,OnUpdate onUpdate){
+            this.module.onTimeout(session,onUpdate);
         }
         @Override
         public void setup(ApplicationContext context) throws Exception {

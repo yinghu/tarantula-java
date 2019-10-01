@@ -51,9 +51,10 @@ public class RobotQuestModule implements Module {
         return session.action().equals("onLeave");
     }
     @Override
-    public void onTimeout(Session session){
+    public void onTimeout(Session session,OnUpdate onUpdate){
         OnInstance ox = this.context.onRegistry().onInstance(session.systemId());
-        gameList[ox.accessMode()].leave(session.systemId());
+        RobotQuest ret = gameList[ox.accessMode()].leave(session.systemId());
+        onUpdate.on(ret.distributionKey(),this.builder.create().toJson(ret).getBytes());
     }
     @Override
     public void onTimer(OnUpdate update){
