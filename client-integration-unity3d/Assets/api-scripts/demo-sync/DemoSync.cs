@@ -32,7 +32,7 @@ public class DemoSync : MonoBehaviour {
 	}
     public void OnLobby(){
         int i = 0;
-        api.OnLobby("quest",(desp)=>{
+        api.OnLobby("demo",(desp)=>{
             if(!desp.Category().Equals("lobby")){
                 Debug.Log(desp.ApplicationId()+"/"+desp.Category());
                 demoList[i++].OnLobby(desp);

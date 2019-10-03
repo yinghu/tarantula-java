@@ -234,13 +234,13 @@ public class TARA_API : MonoBehaviour {
             game.AddField("applicationId",descriptor.ApplicationId());
             callback(game);
             JSONObject conn;
-            JSONObject rq = game.GetField("gameObject").GetField("robotQuest");
-            Debug.Log(rq);
+            //JSONObject rq = game.GetField("gameObject").GetField("robotQuest");
+            //Debug.Log(rq);
             AddMessageListener(game.GetField("label").str,onstream);//web socket listener
             if((conn=game.GetField("gameObject").GetField("connection"))!=null){
                 conn.AddField("ticket",game.GetField("gameObject").GetField("ticket").str);
-                conn.AddField("instanceId",rq.GetField("gameId").str);
-                AddMessageListener(game.GetField("label").str+"#"+rq.GetField("gameId").str,onstream);
+                conn.AddField("instanceId",game.GetField("instanceId").str);
+                AddMessageListener(game.GetField("label").str+"#"+game.GetField("instanceId").str,onstream);
                 initUdp(conn);
             }else{//stream on websocket if udp not available 
                 JSONObject ms = new JSONObject(JSONObject.Type.OBJECT);
@@ -417,6 +417,7 @@ public class TARA_API : MonoBehaviour {
         endPoint = new IPEndPoint(ips[0],(int)conn.GetField("port").n);
         //local receiver and sender
         udp = new UdpClient(conn.GetField("host").str,(int)conn.GetField("port").n);
+        //udp.ExclusiveAddressUse = true;
         //udp.Connect()
         udpListener = new Thread(()=>{
             Byte[] buff = new byte[0];

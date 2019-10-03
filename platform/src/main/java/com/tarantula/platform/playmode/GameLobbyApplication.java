@@ -94,7 +94,7 @@ public class GameLobbyApplication extends TarantulaApplicationHeader implements 
                     event.instanceId(ir.distributionKey());
                     event.accessMode(ir.accessMode());
                     int ret = ir.onJoin(event);
-                    rQueue.get(event.applicationId()).addLast(ir);
+                    rQueue.get(event.applicationId()).addFirst(ir);
                     switch (ret){
                         case InstanceRegistry.INSTANCE_FULL://retry
                             eQueue.addLast(event);
