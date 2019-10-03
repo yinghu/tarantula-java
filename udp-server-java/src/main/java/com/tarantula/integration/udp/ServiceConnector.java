@@ -36,10 +36,18 @@ public class ServiceConnector implements Runnable {
         this.outboundQueue = new ConcurrentLinkedDeque<>();
         this.readBuffer = ByteBuffer.allocate(1024);
         this.pending = new PendingData();
-        socketChannel = SocketChannel.open();
-        JsonObject conn = config.get("server").getAsJsonObject().get("connection").getAsJsonObject();
-        socketChannel.connect(new InetSocketAddress(conn.get("host").getAsString(),conn.get("port").getAsInt()));
-        onRegister();
+        while(true){
+            try{
+                socketChannel = SocketChannel.open();
+                JsonObject conn = config.get("server").getAsJsonObject().get("connection").getAsJsonObject();
+                socketChannel.connect(new InetSocketAddress(conn.get("host").getAsString(),conn.get("port").getAsInt()));
+                onRegister();
+                break;
+            }catch (Exception ex){
+                log.warning("waiting 5 seconds to connect again");
+                Thread.sleep(5000);
+            }
+        }
         udpServer = new UDPServer(config.get("front").getAsJsonObject(),outboundQueue,this);
         udpServer.start();
     }
