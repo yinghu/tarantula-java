@@ -8,10 +8,11 @@ package com.tarantula;
  */
 public interface OnInstance extends OnBalance,Updatable{
 
-    boolean initialized();
+    int gameIndex();
+    void gameIndex(int gameIndex);
+
     boolean joined();
 
-    void initialized(boolean initialized);
     void joined(boolean joined);
 
     void reset(double reset);

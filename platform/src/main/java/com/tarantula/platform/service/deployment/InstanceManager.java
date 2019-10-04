@@ -155,7 +155,7 @@ public class InstanceManager implements Instance, Connection.Listener {
         OnInstance onInstance = tcx.poll(event);//pre-join
         int ret = InstanceRegistry.INSTANCE_FULL;
         if(onInstance!=null){//check applicationId on event with deployment id
-            ret = onInstance.initialized()?InstanceRegistry.ALREADY_ON_INSTANCE:InstanceRegistry.ON_INSTANCE;
+            ret = onInstance.joined()?InstanceRegistry.ALREADY_ON_INSTANCE:InstanceRegistry.ON_INSTANCE;
             if(tcx.initializeOnInstance(event,onInstance)){
                 onInstanceListener.onUpdated(new OnInstanceTrack(event.systemId(),event.stub(),applicationManager.deploymentDescriptor.distributionKey(),onInstance.instanceId(),true));
             }

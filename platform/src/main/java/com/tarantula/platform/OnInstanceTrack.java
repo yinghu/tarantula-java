@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class OnInstanceTrack extends OnApplicationHeader implements OnInstance {
 
-    private boolean initialized;
+
     private boolean joined;
     private int idle;
     public OnInstanceTrack(){
@@ -49,7 +49,6 @@ public class OnInstanceTrack extends OnApplicationHeader implements OnInstance {
     public Map<String,Object> toMap(){
         this.properties.put("1", systemId);
         this.properties.put("2",stub);
-        this.properties.put("3",initialized);
         this.properties.put("4",joined);
         this.properties.put("5",accessMode);
         this.properties.put("6",balance);
@@ -59,17 +58,9 @@ public class OnInstanceTrack extends OnApplicationHeader implements OnInstance {
     public void fromMap(Map<String,Object> properties){
         this.systemId = (String)properties.get("1");
         this.stub = ((Number)properties.get("2")).intValue();
-        this.initialized =(Boolean)properties.get("3");
         this.joined = (Boolean)properties.get("4");
         this.accessMode = ((Number)properties.get("5")).intValue();
         this.balance = ((Number)properties.get("6")).doubleValue();
-    }
-    public boolean initialized() {
-        return this.initialized;
-    }
-
-    public void initialized(boolean initialized) {
-        this.initialized = initialized;
     }
     public  boolean joined(){
         return this.joined;
@@ -97,6 +88,12 @@ public class OnInstanceTrack extends OnApplicationHeader implements OnInstance {
     public synchronized int idle(boolean reset){
         this.idle = reset?0:(this.idle+1);
         return this.idle;
+    }
+    public int gameIndex(){
+        return this.accessMode;
+    }
+    public void gameIndex(int gameIndex){
+        this.accessMode = gameIndex;
     }
     public void dataStore(DataStore dataStore){
         this.dataStore = dataStore;

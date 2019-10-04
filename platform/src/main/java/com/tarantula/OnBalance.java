@@ -14,4 +14,5 @@ public interface OnBalance extends OnApplication {
 
     void redeemed(boolean redeemed);
     boolean redeemed();
+
 }

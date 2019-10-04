@@ -27,7 +27,7 @@ public class RobotQuestModule implements Module {
             if(gameList[i].join(session.systemId())>0){
                 rq = gameList[i].snapshot();
                 OnInstance ox = this.context.onRegistry().onInstance(session.systemId());
-                ox.accessMode(i);
+                ox.gameIndex(i);
                 break;
             }
         }
@@ -44,8 +44,8 @@ public class RobotQuestModule implements Module {
         //ADD MORE IF BLOCK TO PROCESS THE CLIENT REQUEST
         if(session.action().equals("onLeave")){
             OnInstance ox = this.context.onRegistry().onInstance(session.systemId());
-            RobotQuest ret = gameList[ox.accessMode()].leave(session.systemId());
-            onUpdate.on(gameList[ox.accessMode()].distributionKey(),this.builder.create().toJson(ret).getBytes());
+            RobotQuest ret = gameList[ox.gameIndex()].leave(session.systemId());
+            onUpdate.on(gameList[ox.gameIndex()].distributionKey(),this.builder.create().toJson(ret).getBytes());
             session.write(bytes,this.label());
         }
         return session.action().equals("onLeave");
@@ -53,7 +53,7 @@ public class RobotQuestModule implements Module {
     @Override
     public void onTimeout(Session session,OnUpdate onUpdate){
         OnInstance ox = this.context.onRegistry().onInstance(session.systemId());
-        RobotQuest ret = gameList[ox.accessMode()].leave(session.systemId());
+        RobotQuest ret = gameList[ox.gameIndex()].leave(session.systemId());
         onUpdate.on(ret.distributionKey(),this.builder.create().toJson(ret).getBytes());
     }
     @Override

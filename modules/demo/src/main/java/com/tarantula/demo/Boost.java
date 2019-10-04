@@ -3,6 +3,7 @@ package com.tarantula.demo;
 import com.google.gson.*;
 import com.tarantula.*;
 import com.tarantula.Module;
+import com.tarantula.demo.quest.RobotQuest;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
@@ -98,7 +99,10 @@ public class Boost implements Module {
             this.context.onRegistry().transact(ob.owner(),ob.balance());
         });
     }
-
+    @Override
+    public void onTimeout(Session session,OnUpdate onUpdate){
+        this.context.log("timeout->"+session.systemId(),OnLog.INFO);
+    }
     public void onTimer(OnUpdate update){
         delta -= this.context.descriptor().timerOnModule();
         if(delta<=0){

@@ -87,13 +87,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
             onInstances.put(me.systemId(),onApplication);
             _instance.entryCost(this.descriptor().entryCost());
             me.balance(onApplication.balance());
-            if((!onApplication.initialized())){//without calling auditor
-                onApplication.initialized(true);
-                this.application.initialize(me);//initialize on application
-            }
-            else{
-                this.application.initialize(me);
-            }
+            this.application.initialize(me);
             onApplication.joined(me.joined());
             onApplication.update();
             suc = true;
@@ -101,7 +95,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
             this.log("error on initializeOnInstance",ex,OnLog.ERROR);
             waitingList.offer(onApplication);
             onApplication.joined(false);
-            onApplication.initialized(false);
             onApplication.update();
             this.application.onError(me, ex);
         }
@@ -120,8 +113,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
             throw new IllegalArgumentException("access rejected from ["+me.systemId()+"]");//have to registered on application
         }
         me.balance(onApplication.balance());
-        if(onApplication.initialized()){//callback per session without validation
-            me.joined(onApplication.joined());
+        if(onApplication.joined()){//callback per session without validation
             this.application.callback(me,me.payload());
         }
         else{
@@ -184,7 +176,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                 List<OnInstance> olist = this.tarantulaContext.query(new String[]{this._instance.distributionKey()},new OnInstanceQuery(this._instance.distributionKey()));
                 olist.forEach((a)->{
                     a.instanceId(this._instance.distributionKey());
-                    if(a.initialized()){
+                    if(a.joined()){
                         _instance.count(1);
                         a.idle(true);
                         this.onInstances.put(a.systemId(),a);
@@ -265,7 +257,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     }
     private int _onLeave(String systemId){
         OnInstance on = this.onInstances.remove(systemId);
-        on.initialized(false);
         on.joined(false);
         on.update();
         if((!on.tournamentEnabled())&&on.balance()>0){//move remaining balance to presence on non-tournament mode
@@ -276,6 +267,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     }
 
     public InstanceRegistry onRegistry(){
+        if(_instance==null){
+            throw new UnsupportedOperationException("no instance associated with a singleton");
+        }
         return this._instance;
     }
 
