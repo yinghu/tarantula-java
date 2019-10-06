@@ -128,3 +128,42 @@
     
     }
 ```
+
+3.  The deploymenet descriptor.xml defines the module behaviors in the platform runtime.
+A module is deployed as a lobby context including multiple modules. The typeId is the ID of the module package.
+```XML
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula>
+    <lobby-context>
+        <type-id>echo</type-id>
+        <type>lobby</type>
+        <category>game</category>
+        <icon>game_lobby_icon.png</icon>
+        <view-id>game.lobby</view-id>
+        <tag>echo/lobby</tag>
+        <name>EchoSync</name>
+        <response-label>echo</response-label>
+        <access-mode>12</access-mode>
+        <deploy-code>1</deploy-code>
+        <description>Tarantula Echo Sync</description>
+        <application-list>
+            <application>
+                <type-id>echo</type-id>
+                <subtype-id>echo-sync</subtype-id>
+                <view-id>echo.sync.game</view-id>
+                <name>Echo Game</name>
+                <type>application</type>
+                <category>echo</category>
+                <entry-cost>0</entry-cost>
+                <capacity>100</capacity>
+                <max-instances-per-partition>10</max-instances-per-partition>
+                <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
+                <max-idles-on-instance>3</max-idles-on-instance>
+                <timer-on-module>100</timer-on-module>
+                <module-name>com.tarantula.echo.Echo</module-name>
+                <description>Tarantula Echo Sync Game</description>
+            </application>
+        </application-list>
+    </lobby-context>
+</tarantula>    
+```
