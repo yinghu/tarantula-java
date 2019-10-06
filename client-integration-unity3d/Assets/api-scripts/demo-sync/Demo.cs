@@ -35,7 +35,7 @@ public class Demo : MonoBehaviour {
                    Debug.Log(m.data.ToString());      
                    string lb = m.data.GetField("label").str;
                    if(lb.Equals("timer")){
-                        //OnTimer(m.data);
+                        OnTimer(m.data);
                    }
                    else if(lb.Equals("update")){
                        Debug.Log(m.data.ToString());

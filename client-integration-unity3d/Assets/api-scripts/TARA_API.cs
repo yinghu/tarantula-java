@@ -36,6 +36,11 @@ public class TARA_API : MonoBehaviour {
         Debug.Log(this.messageQueue.IsSynchronized ? "synchronized" : "not synchronized" );
         StartCoroutine(Index());  
 	}
+    void OnDestroy()
+    {
+        Debug.Log("OnDestroy1");
+        StopUdp();
+    }
 	void Update () {
         if(messageQueue.Count>0){
             Message m = (Message)messageQueue.Dequeue();
@@ -427,8 +432,8 @@ public class TARA_API : MonoBehaviour {
                     string json = Encoding.ASCII.GetString(buff);
                     int ix = json.IndexOf("{");
                     string lb = json.Substring(0,ix);
-                    //Debug.Log(lb+"=>"+json.Substring(ix));
-                    messageQueue.Enqueue(new Message(lb,new JSONObject(json.Substring(ix))));
+                    Debug.Log(lb+"=>"+json.Substring(ix));
+                    //messageQueue.Enqueue(new Message(lb,new JSONObject(json.Substring(ix))));
                 }catch(Exception ex){
                     running = false;
                     udp.Close();
