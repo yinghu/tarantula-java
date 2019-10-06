@@ -31,8 +31,9 @@
 
 [Programming Client UDP API](doc/gec-client-udp.md)
 
-[Load Test Result](doc/gec-test-result.pdf)
-## How To Build
+[Scalling UDP and WEB SOCKET Cluster](doc/gec-front-scaling.md)
+
+## How To Use
 1. Over 9.* JAVA runtime is required. JDK 12 is suggested.
 2. Maven 3 is the build tool.
 3. Node JS 10.* is to run a websocket server working as the websocket frontend for the platform.
@@ -57,5 +58,3 @@
 5. Click Add Module to open the module setup page (place the module jar file some folder use file:/// as codebase, remote deployment use http:// ). 
 6. Input codebase, artifact name, and version for the module, then click add module.
 7. Launch the module on the main setup-tool under the module.
-
-## How To Scale Persistent Connetions ( WEB SOCKET, UDP)
