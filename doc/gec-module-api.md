@@ -1,5 +1,46 @@
 ## How To Code (Write A Module)
-A module implementation is a deployable and distributed in the cluster scope.
+1. Create a standard maven project for the following code.
+```
+   src/main/java/com/tarantula/echo/Echo.java
+   src/main/resources/descriptor.xml
+   pom.xml
+```
+```XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <project xmlns="http://maven.apache.org/POM/4.0.0"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        <modelVersion>4.0.0</modelVersion>
+        <groupId>com.tarantula</groupId>
+        <artifactId>gec-echo</artifactId>
+        <version>1.0</version>
+        <properties>
+            <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        </properties>
+        <build>
+            <plugins>
+                <plugin>
+                    <inherited>true</inherited>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3.2</version>
+                    <configuration>
+                        <source>12</source>
+                        <target>12</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+        <dependencies>
+            <dependency>
+                <groupId>com.tarantula</groupId>
+                <artifactId>gec-platform</artifactId>
+                <version>1.0</version>
+            </dependency>
+        </dependencies>
+    </project>
+```
+2. A module implementation is a deployable and distributed in the cluster scope.
 ```JAVA
     //the module contract interface 
     public interface Module {
