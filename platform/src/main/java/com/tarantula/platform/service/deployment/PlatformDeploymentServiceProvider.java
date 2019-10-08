@@ -531,6 +531,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.module.onTimeout(session,onUpdate);
         }
         @Override
+        public void onIdle(Session session,OnUpdate onUpdate){
+            this.module.onIdle(session,onUpdate);
+        }
+        @Override
         public void setup(ApplicationContext context) throws Exception {
             this.applicationContext = context;
             _setup();

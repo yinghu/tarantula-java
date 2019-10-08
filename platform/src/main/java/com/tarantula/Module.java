@@ -14,6 +14,7 @@ public interface Module {
     default void clear(){}
 
     default void onTimeout(Session session,OnUpdate onUpdate){}
+    default void onIdle(Session session,OnUpdate onUpdate){}
     default void onTimer(OnUpdate update){}
     interface OnUpdate{
         void on(String updateId,byte[] delta);

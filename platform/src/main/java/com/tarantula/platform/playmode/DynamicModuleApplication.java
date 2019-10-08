@@ -32,7 +32,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             pushEvent(uid,delta);
             //broadcasting to all streaming session if no udp publisher
             this._onStream.forEach((k,v)->{
-                v.write(delta,this.module.label());
+                v.write(delta,this.module.label()+"#"+uid);
             });
         });
     }
@@ -45,7 +45,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             pushEvent(uid,delta);
             //broadcasting to all streaming session if no udp publisher
             this._onStream.forEach((k,v)->{
-                v.write(delta,this.module.label());
+                v.write(delta,this.module.label()+"#"+uid);
             });
             //server push
         }))){
@@ -92,10 +92,15 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
 
     @Override
     public void onIdle(Session session){
-        SessionIdle sessionIdle = new SessionIdle(module.label(),session.systemId(),session.stub());
-        Session pending = _onStream.get(session.systemId());
-        if(pending!=null){
-            pending.write(this.builder.create().toJson(sessionIdle).getBytes(),module.label());
+        if(!this.descriptor.singleton()){
+            this.module.onIdle(session,(uid,delta)->{
+                pushEvent(uid,delta);
+                //SessionIdle sessionIdle = new SessionIdle(module.label(),session.systemId(),session.stub());
+                Session pending = _onStream.get(session.systemId());
+                if(pending!=null){
+                    pending.write(delta,module.label()+"#"+uid);
+                }
+            });
         }
     }
     @Override
@@ -121,7 +126,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
                 this.module.onTimer(((uid,delta) ->{
                         pushEvent(uid,delta);
                         _onStream.forEach((k,v)->
-                            v.write(delta,module.label())
+                            v.write(delta,module.label()+"#"+uid)
                         );
                     }
                 ));

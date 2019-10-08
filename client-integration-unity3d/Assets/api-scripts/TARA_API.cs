@@ -176,6 +176,7 @@ public class TARA_API : MonoBehaviour {
         jn.AddField("command","onPresence");
         Application app = new Application("presence/lobby","onPresence",jn);
         Request(app,(jxn)=>{
+            Debug.Log(jxn);
             JSONObject jx = jxn.GetField("connection");
             string ws = jx.GetField("protocol").str+"://"+jx.GetField("host").str+":"+jx.GetField("port").n+"/"+jx.GetField("path").str+"?accessKey="+ticket+"&stub="+stub+"&systemId="+login;
             wc = new WebSocket(ws,"tarantula-service");
@@ -184,6 +185,7 @@ public class TARA_API : MonoBehaviour {
                 if(e.IsText){
                     int ix = e.Data.IndexOf("{");
                     string lb = e.Data.Substring(0,ix);
+                    Debug.Log(e.Data);
                     messageQueue.Enqueue(new Message(lb,new JSONObject(e.Data.Substring(ix))));
                 }    
             };

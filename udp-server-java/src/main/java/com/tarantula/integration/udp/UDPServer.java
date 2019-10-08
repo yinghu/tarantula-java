@@ -49,7 +49,7 @@ public class UDPServer implements Runnable {
                         cMap.forEach((k,v)->{//broadcasting
                             try{
                                 String[] mh = m.label.split("#");
-                                if(mh[1].equals(k.instanceId)){
+                                if(mh[1].startsWith(k.instanceId)){
                                     outBuffer.clear();
                                     outBuffer.put(m.data.getBytes());
                                     outBuffer.flip();

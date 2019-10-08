@@ -42,7 +42,7 @@ public class Boost implements Module {
         if(session.action().equals("a")){
             byte[] ret = this.builder.create().toJson(this.demoObject(session.action(),onAccess.timestamp())).getBytes();
             session.write(ret,this.label());
-            update.on(this.context.onRegistry().distributionKey(),ret);
+            update.on(this.context.onRegistry().distributionKey()+"?abc",ret);
             postOffice.onTopic().send("presence/notice",ret);
             this.context.onRegistry().transact(session.systemId(),1000);
             OnStatistics delta = this.context.statistics().value("WonCount",1000);
@@ -54,7 +54,7 @@ public class Boost implements Module {
         else if(session.action().equals("b")){
             byte[] ret = this.builder.create().toJson(this.demoObject(session.action(),onAccess.timestamp())).getBytes();
             session.write(ret,this.label());
-            update.on(this.context.onRegistry().distributionKey(),ret);
+            update.on(this.context.onRegistry().distributionKey()+"?abc",ret);
             OnStatistics delta = this.context.statistics().value("WagerCount",1000);
             delta.xpDelta(1000);
             delta.owner(session.systemId());
@@ -65,7 +65,7 @@ public class Boost implements Module {
         else if(session.action().equals("c")){
             byte[] ret = this.builder.create().toJson(this.demoObject(session.action(),onAccess.timestamp())).getBytes();
             session.write(ret,this.label());
-            update.on(this.context.onRegistry().distributionKey(),ret);
+            update.on(this.context.onRegistry().distributionKey()+"?abc",ret);
             OnStatistics delta = this.context.statistics().value("BlackJackCount",1000);
             delta.xpDelta(1000);
             delta.owner(session.systemId());
@@ -103,11 +103,15 @@ public class Boost implements Module {
     public void onTimeout(Session session,OnUpdate onUpdate){
         this.context.log("timeout->"+session.systemId(),OnLog.INFO);
     }
+    @Override
+    public void onIdle(Session session,OnUpdate onUpdate){
+        this.context.log("idle->"+session.systemId(),OnLog.INFO);
+    }
     public void onTimer(OnUpdate update){
         delta -= this.context.descriptor().timerOnModule();
         if(delta<=0){
             Timer tuu = timer.update();
-            update.on(this.context.onRegistry().distributionKey(),this.builder.create().toJson(tuu).getBytes());
+            update.on(this.context.onRegistry().distributionKey()+"?abc",this.builder.create().toJson(tuu).getBytes());
             ///postOffice.onTopic().send("presence/notice",this.builder.create().toJson(timer).getBytes());
             delta = 50;
         }

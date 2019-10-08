@@ -32,7 +32,7 @@ public class Demo : MonoBehaviour {
                 game = g;   
                 balance.OnBalance();
             },(m)=>{
-                   Debug.Log(m.data.ToString());      
+                   //Debug.Log(m.data.ToString());      
                    string lb = m.data.GetField("label").str;
                    if(lb.Equals("timer")){
                         OnTimer(m.data);
