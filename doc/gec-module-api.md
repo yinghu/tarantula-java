@@ -52,7 +52,8 @@
 
         String label();
         default void clear(){}
-        default void onTimeout(Session session){}                     
+        default void onTimeout(Session session,OnUpdate update){}   
+        default void onIdle(Session session,OnUpdate update){}                       
         default void onTimer(OnUpdate update){}
         interface OnUpdate{
             void on(String uid,byte[] delta);
@@ -85,7 +86,7 @@
             //write echo back to the client event
             session.write(echo,label());
             //streaming echo to all clients in this module instance
-            update.on(echo); 
+            update.on(this.context.onRegistry().distributionKey(),echo); 
                                                                                          
             //post notice to all subscribers with presence/notice in cluster scope                                                                                      
             context.postOffice().onLabel().send("presence/notice",echo);
@@ -109,7 +110,7 @@
         
             //streaming echo hello every interval time
             byte[] echoHello = "Echo->Hello".getBytes();
-            update.on(echoHello);                                          
+            update.on(this.context.onRegistry().distributionKey(),echoHello);                                          
         }
         //call when the instance is launched
         public void setup(ApplicationContext context) throws Exception{
