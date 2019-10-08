@@ -17,6 +17,7 @@ public class UDPServer implements Runnable {
 
     private static Logger log = Logger.getLogger(UDPServer.class.getName());
     private static int MAX_PAYLOAD_SIZE = 4096;
+    private static String MSG_HEADER_DELIMITER = "\\?";
     private JsonObject front;
     private DatagramChannel uchannel;
     private ConcurrentHashMap<Session,SocketAddress> cMap;
@@ -48,8 +49,8 @@ public class UDPServer implements Runnable {
                     if(m!=null){
                         cMap.forEach((k,v)->{//broadcasting
                             try{
-                                String[] mh = m.label.split("#");
-                                if(mh[1].contains(k.instanceId)){
+                                String[] mh = m.label.split("#")[1].split(MSG_HEADER_DELIMITER);
+                                if(mh[0].equals(k.instanceId)){
                                     outBuffer.clear();
                                     outBuffer.put(m.data.getBytes());
                                     outBuffer.flip();
