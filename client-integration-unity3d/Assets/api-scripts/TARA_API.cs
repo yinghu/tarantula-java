@@ -38,8 +38,8 @@ public class TARA_API : MonoBehaviour {
 	}
     void OnDestroy()
     {
-        Debug.Log("OnDestroy1");
         StopUdp();
+        Debug.Log("OnDestroy1");
     }
 	void Update () {
         if(messageQueue.Count>0){
@@ -412,7 +412,7 @@ public class TARA_API : MonoBehaviour {
         try{
             running = false;
             udp.Close();
-            udpListener.Interrupt();
+            udpListener.Abort();
             logger.Log("UDP SESSION ENDED");
         }catch(Exception ex){
             logger.Error("EXXX");
@@ -430,11 +430,13 @@ public class TARA_API : MonoBehaviour {
             Byte[] buff = new byte[0];
             while(running){
                 try{ 
-                    buff = udp.Receive(ref endPoint);
-                    string json = Encoding.ASCII.GetString(buff);
-                    int ix = json.IndexOf("{");
-                    string lb = json.Substring(0,ix);
-                    Debug.Log(lb+"=>"+json.Substring(ix));
+                    if(udp.Available>0){
+                        buff = udp.Receive(ref endPoint);
+                        string json = Encoding.ASCII.GetString(buff);
+                        int ix = json.IndexOf("{");
+                        string lb = json.Substring(0,ix);
+                        Debug.Log(lb+"=>"+json.Substring(ix));
+                    }
                     //messageQueue.Enqueue(new Message(lb,new JSONObject(json.Substring(ix))));
                 }catch(Exception ex){
                     running = false;
@@ -456,5 +458,6 @@ public class TARA_API : MonoBehaviour {
         byte[] onjoin = Encoding.UTF8.GetBytes(payload.ToString());
         udp.Send(onjoin,onjoin.Length);
         logger.Log("UDP SESSION STARTED");
+        
     }
 }
