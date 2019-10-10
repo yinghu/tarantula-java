@@ -402,7 +402,8 @@ public class TARA_API : MonoBehaviour {
         payload.AddField("systemId",systemId);
         payload.AddField("instanceId",instanceId);
         payload.AddField("data",data);
-        byte[] mf = Encoding.UTF8.GetBytes(payload.ToString());
+        string hp = label+"#"+instanceId+"?abc"+payload.ToString();
+        byte[] mf = Encoding.UTF8.GetBytes(hp);
         udp.Send(mf,mf.Length);
     }
     public void StopUdp(){  
@@ -454,8 +455,9 @@ public class TARA_API : MonoBehaviour {
         payload.AddField("instanceId",conn.GetField("instanceId"));
         payload.AddField("stub",stub);
         payload.AddField("ticket",conn.GetField("ticket").str);
+        string hp = "label#"+conn.GetField("instanceId").str+"?onJoin"+payload.ToString();
         Debug.Log(payload.ToString());
-        byte[] onjoin = Encoding.UTF8.GetBytes(payload.ToString());
+        byte[] onjoin = Encoding.UTF8.GetBytes(hp);
         udp.Send(onjoin,onjoin.Length);
         logger.Log("UDP SESSION STARTED");
         

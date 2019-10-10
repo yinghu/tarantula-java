@@ -3,6 +3,7 @@ package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.EventOnAction;
+import com.tarantula.platform.InstanceIndex;
 
 import java.io.IOException;
 
@@ -58,5 +59,14 @@ public class ServerPushEvent extends Data implements EventOnAction {
     @Override
     public String toString(){
         return "Server Push Event ["+this.sessionId+"/"+disabled+"/"+owner;
+    }
+    @Override
+    public int hashCode(){
+        return this.sessionId.hashCode();
+    }
+    @Override
+    public boolean equals(Object obj){
+        ServerPushEvent ix = (ServerPushEvent)obj;
+        return this.sessionId.equals(ix.sessionId());
     }
 }

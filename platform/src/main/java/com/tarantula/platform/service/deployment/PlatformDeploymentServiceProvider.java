@@ -14,6 +14,7 @@ import com.tarantula.platform.util.*;
 import java.io.BufferedInputStream;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 
 /**
@@ -38,7 +39,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private ConcurrentHashMap<String,Recoverable> vMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Event> pushRegistry = new ConcurrentHashMap<>();
-
+    private CopyOnWriteArraySet<Event> topicPushSet = new CopyOnWriteArraySet<>();
     private ConcurrentHashMap<String,DynamicModuleClassLoader> cMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,byte[]> rMap = new ConcurrentHashMap<>();
 
@@ -378,10 +379,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             occ.disabled(event.disabled());
             if(!event.disabled()){
                 pushRegistry.put(event.sessionId(),event);
+                topicPushSet.add(event);
                 pushRegistry.put(occ.key().asString(),event);
                 vMap.putIfAbsent(occ.key().asString(),occ);
             }else{
                 pushRegistry.remove(event.sessionId());
+                topicPushSet.remove(event);
                 pushRegistry.remove(occ.key().asString());
                 Connection ref = (Connection) vMap.remove(occ.key().asString());
                 occ.type(ref.type());//recover type from original connect
@@ -486,7 +489,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
 
         public OnTopic onTopic(){
-            return (label,data)-> pushRegistry.forEach((k,v)-> v.write(data,label));
+            return (label,data)-> topicPushSet.forEach((v)-> v.write(data,label));
         }
         public OnTag onTag(String tag){
            return (dkey,t)->{
