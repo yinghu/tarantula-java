@@ -4,8 +4,10 @@ import com.google.gson.*;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.demo.quest.RobotQuest;
+import com.tarantula.platform.SessionIdle;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.util.OnAccessDeserializer;
+import com.tarantula.platform.util.SessionIdleSerializer;
 
 
 public class Boost implements Module {
@@ -89,6 +91,7 @@ public class Boost implements Module {
         this.builder.registerTypeAdapter(DemoObject.class,new DemoObjectSerializer());
         this.builder.registerTypeAdapter(Timer.class,new TimerSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
+        this.builder.registerTypeAdapter(SessionIdle.class,new SessionIdleSerializer());
         this.timer = new Timer(60*1000,delta);
         this.timer.distributionKey(this.context.onRegistry().distributionKey());
         this.statistics = this.context.statistics();
@@ -102,6 +105,8 @@ public class Boost implements Module {
     @Override
     public void onTimeout(Session session,OnUpdate onUpdate){
         this.context.log("timeout->"+session.systemId(),OnLog.INFO);
+        SessionIdle sessionIdle = new SessionIdle(this.label(),session.systemId(),session.stub());
+        onUpdate.on(this.context.onRegistry().distributionKey()+"?onTimeout",this.builder.create().toJson(sessionIdle).getBytes());
     }
     @Override
     public void onIdle(Session session,OnUpdate onUpdate){

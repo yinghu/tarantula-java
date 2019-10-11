@@ -84,7 +84,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 PresenceContext ptx = new PresenceContext();
                 ptx.successful(true);
                 ptx.presence = onSession;
-                session.write(this.builder.create().toJson(ptx).getBytes(),this.descriptor.responseLabel());
+                session.write(this.builder.create().toJson(ptx).getBytes(),this.descriptor.responseLabel()+"?onTicket");
             }
             else{
                 session.write(this.builder.create().toJson(new ResponseHeader("onTicket", "invalid ticket", false)).getBytes(),this.descriptor.responseLabel());

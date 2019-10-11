@@ -2,9 +2,6 @@ package com.tarantula.integration.udp;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -20,7 +17,7 @@ public class UDPServer implements Runnable {
     private static char MSG_HEADER_DELIMITER = '?';
     private JsonObject front;
     private DatagramChannel uchannel;
-    private ConcurrentHashMap<Session,SocketAddress> cMap;
+    private ConcurrentHashMap<String,SessionGroup> cMap;
     private ConcurrentLinkedDeque<OutboundMessage> oQueue;
     private ServiceConnector serviceConnector;
     private JsonParser parser;
@@ -48,23 +45,29 @@ public class UDPServer implements Runnable {
                 try{
                     OutboundMessage m = oQueue.poll();
                     if(m!=null){
-                        cMap.forEach((k,v)->{//broadcasting
-                            try{
+                        try{
+                            if(m.label.indexOf('#')>0){//skip notifications
                                 String[] mh = m.label.split("#");
                                 int floc = mh[1].indexOf(MSG_HEADER_DELIMITER);
                                 String match = mh[1];
                                 if(floc>0){
                                     match = mh[1].substring(0,floc);
                                 }
-                                if(match.equals(k.instanceId)){
+                                SessionGroup sg = cMap.computeIfAbsent(match,k->new SessionGroup(k));
+                                if(mh[1].substring(floc+1).equals("onTimeout")){
+                                    JsonObject jt = parser.parse(m.data.substring(m.data.indexOf('{'))).getAsJsonObject();
+                                    sg.sessions.remove(new Session(jt.get("systemId").getAsString()));
+                                }
+                                sg.sessions.forEach(s->{
                                     outBuffer.clear();
                                     outBuffer.put(m.data.getBytes());
                                     outBuffer.flip();
-                                    uchannel.send(outBuffer,v);
-                                }
-                            }catch (Exception iex){}
-                        });
-                        //log.warning(m.toString());
+                                    try{uchannel.send(outBuffer,s.endpoint);}catch (Exception iexc){iexc.printStackTrace();}
+                                });
+                            }
+                        }catch (Exception iex){
+                            iex.printStackTrace();
+                        }
                     }
                     else{
                         Thread.sleep(100);
@@ -82,10 +85,10 @@ public class UDPServer implements Runnable {
         tu.interrupt();
         tr.interrupt();
     }
-    public void onTimeout(String systemId,String instanceId){
-        log.warning("LEAVE FROM->"+systemId+"<><>"+instanceId);
-        cMap.remove(new Session(systemId,instanceId));
-    }
+    //public void onTimeout(String systemId,String instanceId){
+        //log.warning("LEAVE FROM->"+systemId+"<><>"+instanceId);
+        //cMap.get(instanceId).sessions.remove(new Session(systemId));
+    //}
     @Override
     public void run(){
         ByteBuffer buffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
@@ -94,9 +97,9 @@ public class UDPServer implements Runnable {
                 buffer.clear();
                 SocketAddress remoteAdd = uchannel.receive(buffer);//from udp client
                 buffer.flip();
-                byte[] data = new byte[buffer.limit()];
-                buffer.get(data,0,data.length);
-                parse(data,(cmd,jsonObject) -> {
+                //byte[] data = new byte[buffer.limit()];
+                //buffer.get(data,0,data.length);
+                parse(buffer,(cmd,jsonObject) -> {
                     if(cmd.equals("onJoin")){
                         String insId = jsonObject.get("instanceId").getAsString();
                         String systemId = jsonObject.get("systemId").getAsString();
@@ -106,7 +109,8 @@ public class UDPServer implements Runnable {
                             if(resp.get("successful").getAsBoolean()){
                                 String sysId= resp.get("presence").getAsJsonObject().get("systemId").getAsString();
                                 String token= resp.get("presence").getAsJsonObject().get("token").getAsString();
-                                cMap.put(new Session(sysId,stub,insId,token),remoteAdd);
+                                SessionGroup sg = cMap.computeIfAbsent(insId,k->new SessionGroup(insId));
+                                sg.sessions.add(new Session(sysId,stub,token,remoteAdd));
                             }
                             //send back as ticket validation result
                             buffer.clear();
@@ -116,22 +120,21 @@ public class UDPServer implements Runnable {
                             try{uchannel.send(buffer,remoteAdd);}catch (Exception iex){iex.printStackTrace();}
                         });
                     }
-                    else if(cmd.equals("onLeave")){
-                        String sysId = jsonObject.get("systemId").getAsString();
-                        String insId = jsonObject.get("instanceId").getAsString();
-                        this.onTimeout(sysId,insId);
-                    }
+                    //else if(cmd.equals("onLeave")){
+                        //String sysId = jsonObject.get("systemId").getAsString();
+                        //String insId = jsonObject.get("instanceId").getAsString();
+                        //this.onTimeout(sysId,insId);
+                    //}
                     else if(cmd.equals("onMessage")){
-                        log.warning(jsonObject.toString());
+                        //log.warning(jsonObject.toString());
                         //handle
                         buffer.clear();
                         buffer.put(jsonObject.get("label").getAsString().getBytes());
                         buffer.put(jsonObject.get("data").toString().getBytes());
-                        cMap.forEach((k,v)->{
-                            if(k.instanceId.equals(jsonObject.get("instanceId").getAsString())){
-                                buffer.flip();
-                                try{uchannel.send(buffer,remoteAdd);}catch (Exception iex){iex.printStackTrace();}
-                            }
+                        SessionGroup sg = cMap.computeIfAbsent(jsonObject.get("instanceId").getAsString(),k->new SessionGroup(k));
+                        sg.sessions.forEach(s->{
+                            buffer.flip();
+                            try{uchannel.send(buffer,s.endpoint);}catch (Exception iex){iex.printStackTrace();}
                         });
                     }
                 });
@@ -141,10 +144,21 @@ public class UDPServer implements Runnable {
             }
         }
     }
-    private void parse(byte[] data, HTTPCaller.OnResponse onResponse){
+    private void parse(ByteBuffer buffer, HTTPCaller.OnResponse onResponse){
         JsonObject jsonObject = new JsonObject();
         try{
-            jsonObject = parser.parse(new InputStreamReader(new ByteArrayInputStream(data))).getAsJsonObject();
+            PendingData pendingData = new PendingData();
+            boolean p =false;
+            for(int i=0;i<buffer.limit();i++){
+                char c = (char) buffer.get();
+                if(c=='{'){
+                    p = true;
+                }
+                if(p){
+                    pendingData.data.append(c);
+                }
+            }
+            jsonObject = parser.parse(pendingData.data.toString()).getAsJsonObject();
             String cmd = jsonObject.get("command").getAsString();
             onResponse.on(cmd,jsonObject);
         }catch (Exception ex){
