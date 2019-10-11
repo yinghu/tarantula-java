@@ -379,7 +379,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             occ.disabled(event.disabled());
             if(!event.disabled()){
                 pushRegistry.put(event.sessionId(),event);
-                topicPushSet.add(event);
+                if(occ.type().equals(Connection.WEB_SOCKET)){topicPushSet.add(event);}
                 pushRegistry.put(occ.key().asString(),event);
                 vMap.putIfAbsent(occ.key().asString(),occ);
             }else{

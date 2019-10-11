@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class ServiceConnector implements Runnable {
 
     private static Logger log = Logger.getLogger(ServiceConnector.class.getName());
-
+    private static int READ_BUFFER_SIZE = 1024;
     private JsonObject config;
     private SocketChannel socketChannel;
     private String serverId;
@@ -34,7 +34,7 @@ public class ServiceConnector implements Runnable {
         jsonParser = new JsonParser();
         config = jsonParser.parse(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("udp.conf"))).getAsJsonObject();
         this.outboundQueue = new ConcurrentLinkedDeque<>();
-        this.readBuffer = ByteBuffer.allocate(1024);
+        this.readBuffer = ByteBuffer.allocate(READ_BUFFER_SIZE);
         this.pending = new PendingData();
         while(true){
             try{
@@ -118,7 +118,7 @@ public class ServiceConnector implements Runnable {
                     }
                 }
                 else{
-                    Thread.sleep(10);
+                    Thread.sleep(50);
                 }
             }catch (Exception ex){
                 log.log(Level.WARNING,"reconnecting from disconnected platform",ex);
