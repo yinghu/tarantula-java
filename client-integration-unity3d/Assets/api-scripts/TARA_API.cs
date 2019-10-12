@@ -402,7 +402,7 @@ public class TARA_API : MonoBehaviour {
         payload.AddField("systemId",systemId);
         payload.AddField("instanceId",instanceId);
         payload.AddField("data",data);
-        string hp = label+"#"+instanceId+"?abc"+payload.ToString();
+        string hp = label+"#"+instanceId+"?onMessage"+payload.ToString();
         byte[] mf = Encoding.UTF8.GetBytes(hp);
         udp.Send(mf,mf.Length);
     }
