@@ -37,6 +37,9 @@ public class ConnectionDeserializer implements JsonDeserializer<Connection> {
         if(jo.has("maxConnections")){
             desc.maxConnections(jo.get("maxConnections").getAsInt());
         }
+        if(jo.has("distributed")){
+            desc.distributable(jo.get("distributed").getAsBoolean());
+        }
         jo.entrySet().forEach((e)->{
             desc.property(e.getKey(),e.getValue().getAsString());
         });

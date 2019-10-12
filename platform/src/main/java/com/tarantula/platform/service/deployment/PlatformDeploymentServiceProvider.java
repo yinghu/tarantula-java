@@ -444,7 +444,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerOnLobbyListener(OnLobby.Listener onLobbyListener){
         oListeners.add(onLobbyListener);
     }
-
+    public void deploy(Connection connection){
+            
+    }
     public void registerOnConnectionListener(Connection.Listener listener){
         vMap.forEach((k,v)->{
             if(v instanceof Connection){

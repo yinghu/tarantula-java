@@ -96,6 +96,7 @@ public class ConnectionInfo extends ResponseHeader implements Connection {
         this.properties.put("port",this.port);
         this.properties.put("path",this.path);
         this.properties.put("maxConnections",maxConnections);
+        this.properties.put("distributable",this.distributable);
         this.properties.put("disabled",this.disabled);
         return this.properties;
     }
@@ -109,6 +110,7 @@ public class ConnectionInfo extends ResponseHeader implements Connection {
         this.port = ((Number)properties.get("port")).intValue();
         this.path = (String)properties.get("path");
         this.maxConnections = ((Number)properties.get("maxConnections")).intValue();
+        this.distributable = (Boolean)properties.get("distributable");
         this.disabled = (boolean)properties.get("disabled");
         properties.forEach((String k,Object v)->{
             this.properties.put(k,v);

@@ -29,6 +29,7 @@ public interface Connection extends Response {
     int maxConnections();
     void maxConnections(int maxConnections);
 
+
     interface Listener{
         void onState(Connection connection);
     }
