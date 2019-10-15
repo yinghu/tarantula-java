@@ -437,8 +437,8 @@ public class TARA_API : MonoBehaviour {
                         int ix = json.IndexOf("{");
                         string lb = json.Substring(0,ix);
                         Debug.Log(lb+"=>"+json.Substring(ix));
+                        //messageQueue.Enqueue(new Message(lb,new JSONObject(json.Substring(ix))));
                     }
-                    //messageQueue.Enqueue(new Message(lb,new JSONObject(json.Substring(ix))));
                 }catch(Exception ex){
                     running = false;
                     udp.Close();

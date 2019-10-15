@@ -38,7 +38,7 @@ public class UDPListener implements Runnable{
         payload.addProperty("instanceId",instanceId);
         payload.addProperty("stub",stub);
         payload.addProperty("ticket",ticket);
-        ByteBuffer buffer = ByteBuffer.wrap(payload.toString().getBytes());
+        ByteBuffer buffer = ByteBuffer.wrap(("demo#"+instanceId+"?onJoin"+payload.toString()).getBytes());
         channel.write(buffer);
     }
     public void leave(String systemId,String instanceId) throws Exception{

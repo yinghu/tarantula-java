@@ -14,9 +14,9 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception{
-        Player caller = new Player(false,"localhost:8090",new CountDownLatch(1),UUID.randomUUID().toString(),new DemoSync(),jsonObject -> System.out.println(jsonObject));
-        caller.run();
-        //runSimulation(args);
+        //Player caller = new Player(false,"localhost:8090",new CountDownLatch(1),UUID.randomUUID().toString(),new DemoSync(),jsonObject -> System.out.println(jsonObject));
+        //caller.run();
+        runSimulation(args);
     }
     private static void runSimulation(String[] args) throws Exception{
         long st = System.currentTimeMillis();
