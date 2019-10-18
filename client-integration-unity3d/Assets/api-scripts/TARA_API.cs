@@ -402,7 +402,7 @@ public class TARA_API : MonoBehaviour {
         payload.AddField("systemId",systemId);
         payload.AddField("instanceId",instanceId);
         payload.AddField("data",data);
-        string hp = label+"#"+instanceId+"?onMessage"+payload.ToString();
+        string hp = label+"#"+instanceId+"?onMessage"+payload.ToString()+"|";
         byte[] mf = Encoding.UTF8.GetBytes(hp);
         udp.Send(mf,mf.Length);
     }
@@ -455,7 +455,7 @@ public class TARA_API : MonoBehaviour {
         payload.AddField("instanceId",conn.GetField("instanceId"));
         payload.AddField("stub",stub);
         payload.AddField("ticket",conn.GetField("ticket").str);
-        string hp = "label#"+conn.GetField("instanceId").str+"?onJoin"+payload.ToString();
+        string hp = "label#"+conn.GetField("instanceId").str+"?onJoin"+payload.ToString()+"|";
         Debug.Log(payload.ToString());
         byte[] onjoin = Encoding.UTF8.GetBytes(hp);
         udp.Send(onjoin,onjoin.Length);

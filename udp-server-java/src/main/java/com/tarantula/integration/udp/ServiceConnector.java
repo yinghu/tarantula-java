@@ -25,7 +25,7 @@ public class ServiceConnector implements Runnable {
     private ByteBuffer readBuffer;
     private ConcurrentLinkedDeque<OutboundMessage> outboundQueue;
     private JsonParser jsonParser;
-    private PendingData pending;
+    private StringBuilder pending;
     private UDPServer udpServer;
     public ServiceConnector(){
         this.serverId = UUID.randomUUID().toString();
@@ -35,7 +35,7 @@ public class ServiceConnector implements Runnable {
         config = jsonParser.parse(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("udp.conf"))).getAsJsonObject();
         this.outboundQueue = new ConcurrentLinkedDeque<>();
         this.readBuffer = ByteBuffer.allocate(READ_BUFFER_SIZE);
-        this.pending = new PendingData();
+        this.pending = new StringBuilder();
         while(true){
             try{
                 socketChannel = SocketChannel.open();
@@ -83,39 +83,48 @@ public class ServiceConnector implements Runnable {
     }
     @Override
     public void run() {
+        //message format from server push event
+        /**
+         *  [clientId],[label]#[instanceId]?[query][json payload]
+         * */
         while(true){
             try{
                 readBuffer.clear();
                 int rn = socketChannel.read(readBuffer);//block read
                 if(rn>0){
+                    boolean p = false;
+                    OutboundMessage outboundMessage = new OutboundMessage();
                     readBuffer.flip();
                     while(readBuffer.hasRemaining()){
                         char c = (char) readBuffer.get();
-                        if(!pending.onData){
-                            if(!pending.onLabel&&c != ','){
-                                pending.clientId.append(c);
+                            if(!p&&c == ','){
+                                outboundMessage.clientId = pending.toString();
+                                pending.setLength(0);
                             }
-                            else if(!pending.onLabel&&c==','){
-                                pending.onLabel = true;
+                            else if(!p&&c=='#'){
+                                outboundMessage.label =pending.toString();
+                                pending.setLength(0);
                             }
-                            else if(pending.onLabel&&c!='{'){
-                                pending.label.append(c);
-                                pending.data.append(c);
+                            else if(!p&&c==UDPServer.MSG_HEADER_DELIMITER){
+                                outboundMessage.instanceId = pending.toString();
+                                pending.setLength(0);
                             }
-                            else{
-                                pending.data.append(c);
-                                pending.onData = true;
+                            else if(!p&&c=='{'){
+                                outboundMessage.query = pending.toString();
+                                pending.setLength(0);
+                                p = true;
                             }
-                        }
-                        else{
                             if(c=='|'){
-                                outboundQueue.offer(pending.reset());//dispatch
+                                break;
                             }
-                            else{
-                                pending.data.append(c);
+                            if((!p&&(c==','||c=='#'||c==UDPServer.MSG_HEADER_DELIMITER))){
+                                continue;
                             }
-                        }
+                            pending.append(c);
                     }
+                    outboundMessage.data = pending.toString();
+                    outboundQueue.offer(outboundMessage);
+                    pending.setLength(0);
                 }
                 else{
                     Thread.sleep(50);

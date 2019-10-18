@@ -59,7 +59,8 @@ public class DemoSync extends OnGame {
             tx.start();
             this.applicationId = joined.get("applicationId").getAsString();
             this.instanceId = joined.get("instanceId").getAsString();
-            long waiting = 250;
+
+            long waiting = 150;
             //onStream(webSocket);
             for(int i=0;i<10;i++){
                 onAction(webSocket,data->{data.addProperty("command","a");data.addProperty("timestamp",System.currentTimeMillis());});
@@ -70,8 +71,9 @@ public class DemoSync extends OnGame {
                 onAction(webSocket,data->{data.addProperty("command","c");data.addProperty("timestamp",System.currentTimeMillis());});
                 Thread.sleep(waiting);
             }
+
             Thread.sleep(5000);
-            udpListener.leave(presence.get("systemId").getAsString(),joined.get("instanceId").getAsString());
+            //udpListener.leave(presence.get("systemId").getAsString(),joined.get("instanceId").getAsString());
             tx.interrupt();
             onAction(caller,data ->data.addProperty("command","onLeave"));
             System.out.println(LoadResult.print());

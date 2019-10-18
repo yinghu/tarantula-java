@@ -1,11 +1,17 @@
 package com.tarantula.integration.udp;
 
+
 public class OutboundMessage {
     public String clientId;
+    public String instanceId;
     public String label;
+    public String query;
     public String data;
 
     public String toString(){
-        return clientId+"<<<>>>"+label+"<<<>>>"+data;
+        return clientId+"<<>>"+query+"<<>>"+label+"<<>>"+instanceId+"<<>>"+data;
+    }
+    interface OnResponse{
+        void on(OutboundMessage outboundMessage);
     }
 }
