@@ -38,6 +38,7 @@ public class TARA_API : MonoBehaviour {
 	}
     void OnDestroy()
     {
+        wc.Close();
         StopUdp();
         Debug.Log("OnDestroy1");
     }
@@ -271,6 +272,7 @@ public class TARA_API : MonoBehaviour {
         JSONObject jn = new JSONObject(JSONObject.Type.OBJECT);
         jn.AddField("command","onAbsence");
         wc.Close();
+        StopUdp();
         Application app = new Application("presence/lobby","onAbsence",jn);
         Request(app,(jm)=>{
             if(jm.GetField("successful").b){
