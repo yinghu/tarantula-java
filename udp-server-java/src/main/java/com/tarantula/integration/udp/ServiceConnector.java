@@ -154,7 +154,6 @@ public class ServiceConnector implements Runnable {
         jsonObject.addProperty("port",front.get("port").getAsInt());
         jsonObject.addProperty("path",front.get("path").getAsString());
         jsonObject.addProperty("maxConnections",front.get("maxConnections").getAsInt());
-        jsonObject.addProperty("distributed",front.get("distributed").getAsBoolean());
         jsonObject.addProperty("serverId",serverId);
         ByteBuffer buffer = ByteBuffer.wrap((payload.toString()+"|").getBytes());
         socketChannel.write(buffer);

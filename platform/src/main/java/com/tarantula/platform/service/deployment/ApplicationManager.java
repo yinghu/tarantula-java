@@ -25,7 +25,9 @@ public class ApplicationManager extends DefaultApplication implements Scheduling
     public ApplicationManager(TarantulaContext tarantulaContext, DeploymentDescriptor deploymentDescriptor){
         super(tarantulaContext,deploymentDescriptor);
     }
-
+    public int partitionNumber(){
+        return this.tarantulaContext.partitionNumber();
+    }
     @Override
     public void start() throws Exception{
         super.start();

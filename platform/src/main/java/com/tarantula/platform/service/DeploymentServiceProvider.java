@@ -24,7 +24,6 @@ public interface DeploymentServiceProvider extends ServiceProvider {
     void registerInstanceRegistryListener(InstanceRegistry.Listener deploymentListener);
     void deploy(InstanceRegistry registry);
 
-    void deploy(Connection connection);
     void registerOnConnectionListener(Connection.Listener listener);
 
     //deploy and callback configuration

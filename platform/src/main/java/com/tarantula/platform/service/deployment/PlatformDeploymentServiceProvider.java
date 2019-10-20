@@ -375,7 +375,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         else if(event instanceof ServerPushEvent){
             Connection occ = this.builder.create().fromJson(new String(event.payload()), Connection.class);
-            log.warn(occ.toString());
+            log.warn("Connection->"+occ.toString());
             occ.disabled(event.disabled());
             if(!event.disabled()){
                 pushRegistry.put(event.sessionId(),event);
@@ -444,9 +444,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerOnLobbyListener(OnLobby.Listener onLobbyListener){
         oListeners.add(onLobbyListener);
     }
-    public void deploy(Connection connection){
-            
-    }
+
     public void registerOnConnectionListener(Connection.Listener listener){
         vMap.forEach((k,v)->{
             if(v instanceof Connection){
