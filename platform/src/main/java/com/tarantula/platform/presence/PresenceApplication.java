@@ -93,8 +93,8 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
 
     }
     public void onState(Connection c) {
-        this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open"),OnLog.WARN);
         if(c.type().equals(Connection.WEB_SOCKET)){
+            this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on presence service application",OnLog.WARN);
             onWebSocket(c);
         }
     }

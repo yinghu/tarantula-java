@@ -195,8 +195,8 @@ public class InstanceManager implements Instance, Connection.Listener {
     }
     @Override
     public void onState(Connection c) {
-        log.warn(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on instance manager ["+this.routingKey()+"]");
         if(c.type().equals(Connection.UDP)){//udp only
+            log.warn(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on instance manager ["+this.routingKey()+"]");
             onUDP(c);
         }
     }
