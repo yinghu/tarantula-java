@@ -10,6 +10,7 @@ import com.tarantula.platform.service.Instance;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.RingBuffer;
 
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -185,31 +186,29 @@ public class InstanceManager implements Instance, Connection.Listener {
             }
         });
     }
-    public void requestConnection(TarantulaApplicationContext tac){
+    private void requestConnection(TarantulaApplicationContext tac){
         ConnectionManager cm = cBuffer.pop();
-        if(cm!=null){
-            cm.onConnection(tac.instanceId(),connection -> tac.onState(connection));
-        }
-        else{
+        if(cm==null||(!cm.onConnection(tac.instanceId(),tac.descriptor().capacity(),connection -> tac.onState(connection)))){
+            log.warn("Pending connections ->["+tac.instanceId()+","+tac.descriptor().capacity()+"]");
             pendingQueue.offer(tac);
         }
     }
     @Override
     public void onState(Connection c) {
-        log.warn(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open"));
+        log.warn(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on instance manager ["+this.routingKey()+"]");
         if(c.type().equals(Connection.UDP)){//udp only
             onUDP(c);
         }
     }
     private void onUDP(Connection c) {
         if(!c.disabled()){
-            if(!cBuffer.push(new ConnectionManager(c))){
+            if(!cBuffer.push(new ConnectionManager(c.maxConnections()/applicationManager.partitionNumber(),c))){
                 cBuffer.reset(((ca,limit)->{
                     ConnectionManager[] cn = new ConnectionManager[ca.length*2];
                     for(int i=0;i<limit;i++){
                         cn[i]=ca[i];
                     }
-                    cn[limit]= new ConnectionManager(c);
+                    cn[limit]= new ConnectionManager(c.maxConnections()/applicationManager.partitionNumber(),c);
                     return cn;
                 }));
             }
@@ -234,7 +233,7 @@ public class InstanceManager implements Instance, Connection.Listener {
             for(String rc : cSet){
                 TarantulaApplicationContext tac = tMap.get(rc);
                 if(tac!=null){
-                    log.warn("Kickoff->"+rc+"from ["+c.serverId()+"]");
+                    log.warn("Instance ["+rc+"] kicked off from connection ["+c.serverId()+"]");
                     tac.onState(c);
                     requestConnection(tac);
                 }
@@ -243,13 +242,15 @@ public class InstanceManager implements Instance, Connection.Listener {
         }
     }
     private void checkPendingQueue(){
-        final TarantulaApplicationContext[] pending = {pendingQueue.poll()};
+        final ArrayList<TarantulaApplicationContext> plist = new ArrayList<>();
+        TarantulaApplicationContext pending = pendingQueue.poll();
         do{
-            if(pending[0]!=null){
-                ConnectionManager cm = cBuffer.pop();
-                cm.onConnection(pending[0].instanceId(),connection -> pending[0].onState(connection));
-                pending[0] = pendingQueue.poll();
+            if(pending!=null){
+                plist.add(pending);
+                pending = pendingQueue.poll();
             }
-        }while (pending[0]!=null);
+        }while (pending!=null);
+        plist.forEach(t->requestConnection(t));
+        plist.clear();
     }
 }

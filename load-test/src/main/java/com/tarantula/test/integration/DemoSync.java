@@ -33,6 +33,8 @@ public class DemoSync extends OnGame {
             this.presence = presence;
             udpListener = new UDPListener(data -> {
                 LoadResult.totalBytesUDPReceived.addAndGet(data.length);
+                System.out.println(new String(data));
+                /**
                 StringBuilder label = new StringBuilder();
                 for(byte b : data){
                     if(((char)b=='{')){
@@ -44,7 +46,7 @@ public class DemoSync extends OnGame {
                 }
                 if(label.toString().equals("ticket")){
                     System.out.println(new String(data));
-                }
+                }**/
                 //buff.append((char) data[0]).append((char) data[1]).append((char) data[2]).append((char) data[3]).append((char) data[4]).append((char)data[5]);
                 //if(buff.toString().equals("ticket")){
                     //System.out.println(new String(data));
@@ -57,7 +59,8 @@ public class DemoSync extends OnGame {
             tx.start();
             this.applicationId = joined.get("applicationId").getAsString();
             this.instanceId = joined.get("instanceId").getAsString();
-            long waiting = 250;
+
+            long waiting = 150;
             //onStream(webSocket);
             for(int i=0;i<10;i++){
                 onAction(webSocket,data->{data.addProperty("command","a");data.addProperty("timestamp",System.currentTimeMillis());});
@@ -68,8 +71,9 @@ public class DemoSync extends OnGame {
                 onAction(webSocket,data->{data.addProperty("command","c");data.addProperty("timestamp",System.currentTimeMillis());});
                 Thread.sleep(waiting);
             }
+
             Thread.sleep(5000);
-            udpListener.leave(presence.get("systemId").getAsString(),joined.get("instanceId").getAsString());
+            //udpListener.leave(presence.get("systemId").getAsString(),joined.get("instanceId").getAsString());
             tx.interrupt();
             onAction(caller,data ->data.addProperty("command","onLeave"));
             System.out.println(LoadResult.print());
@@ -79,6 +83,7 @@ public class DemoSync extends OnGame {
     }
     public void onMessage(CharSequence message){
         super.onMessage(message);
+        /**
         if(message.charAt(4)=='{'){
             JsonObject jo = parser.parse(message.subSequence(4,message.length()).toString()).getAsJsonObject();
             if(jo.has("command")){
@@ -102,6 +107,6 @@ public class DemoSync extends OnGame {
                     }
                 }
             }
-        }
+        }**/
     }
 }

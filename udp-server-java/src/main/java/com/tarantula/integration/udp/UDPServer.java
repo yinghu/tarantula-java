@@ -14,7 +14,7 @@ public class UDPServer implements Runnable {
 
     private static Logger log = Logger.getLogger(UDPServer.class.getName());
     private static int MAX_PAYLOAD_SIZE = 4096;
-    private static char MSG_HEADER_DELIMITER = '?';
+    static char MSG_HEADER_DELIMITER = '?';
     private JsonObject front;
     private DatagramChannel uchannel;
     private ConcurrentHashMap<String,SessionGroup> cMap;
@@ -46,16 +46,11 @@ public class UDPServer implements Runnable {
                     OutboundMessage m = oQueue.poll();
                     if(m!=null){
                         try{
-                            if(m.label.indexOf('#')>0){//skip notifications
-                                String[] mh = m.label.split("#");
-                                int floc = mh[1].indexOf(MSG_HEADER_DELIMITER);
-                                String match = mh[1];
-                                if(floc>0){
-                                    match = mh[1].substring(0,floc);
-                                }
-                                SessionGroup sg = cMap.computeIfAbsent(match,k->new SessionGroup(k));
-                                if(mh[1].substring(floc+1).equals("onTimeout")){
-                                    JsonObject jt = parser.parse(m.data.substring(m.data.indexOf('{'))).getAsJsonObject();
+                            //log.warning(m.toString());
+                            if(m.instanceId!=null){//skip notifications
+                                SessionGroup sg = cMap.computeIfAbsent(m.instanceId,k->new SessionGroup(k));
+                                if(m.query.equals("onTimeout")){
+                                    JsonObject jt = parser.parse(m.data).getAsJsonObject();
                                     sg.sessions.remove(new Session(jt.get("systemId").getAsString()));
                                 }
                                 sg.sessions.forEach(s->{
@@ -85,10 +80,6 @@ public class UDPServer implements Runnable {
         tu.interrupt();
         tr.interrupt();
     }
-    //public void onTimeout(String systemId,String instanceId){
-        //log.warning("LEAVE FROM->"+systemId+"<><>"+instanceId);
-        //cMap.get(instanceId).sessions.remove(new Session(systemId));
-    //}
     @Override
     public void run(){
         ByteBuffer buffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
@@ -97,10 +88,9 @@ public class UDPServer implements Runnable {
                 buffer.clear();
                 SocketAddress remoteAdd = uchannel.receive(buffer);//from udp client
                 buffer.flip();
-                //byte[] data = new byte[buffer.limit()];
-                //buffer.get(data,0,data.length);
-                parse(buffer,(cmd,jsonObject) -> {
-                    if(cmd.equals("onJoin")){
+                parse(buffer,(outboundMessage) -> {
+                    if(outboundMessage.query.equals("onJoin")){
+                        JsonObject jsonObject = parser.parse(outboundMessage.data).getAsJsonObject();
                         String insId = jsonObject.get("instanceId").getAsString();
                         String systemId = jsonObject.get("systemId").getAsString();
                         int stub = jsonObject.get("stub").getAsInt();
@@ -120,18 +110,12 @@ public class UDPServer implements Runnable {
                             try{uchannel.send(buffer,remoteAdd);}catch (Exception iex){iex.printStackTrace();}
                         });
                     }
-                    //else if(cmd.equals("onLeave")){
-                        //String sysId = jsonObject.get("systemId").getAsString();
-                        //String insId = jsonObject.get("instanceId").getAsString();
-                        //this.onTimeout(sysId,insId);
-                    //}
-                    else if(cmd.equals("onMessage")){
+                    else if(outboundMessage.query.equals("onMessage")){
                         //log.warning(jsonObject.toString());
                         //handle
                         buffer.clear();
-                        buffer.put(jsonObject.get("label").getAsString().getBytes());
-                        buffer.put(jsonObject.get("data").toString().getBytes());
-                        SessionGroup sg = cMap.computeIfAbsent(jsonObject.get("instanceId").getAsString(),k->new SessionGroup(k));
+                        buffer.put(outboundMessage.data.getBytes());
+                        SessionGroup sg = cMap.computeIfAbsent(outboundMessage.clientId,k->new SessionGroup(k));
                         sg.sessions.forEach(s->{
                             buffer.flip();
                             try{uchannel.send(buffer,s.endpoint);}catch (Exception iex){iex.printStackTrace();}
@@ -144,26 +128,41 @@ public class UDPServer implements Runnable {
             }
         }
     }
-    private void parse(ByteBuffer buffer, HTTPCaller.OnResponse onResponse){
-        JsonObject jsonObject = new JsonObject();
-        try{
-            PendingData pendingData = new PendingData();
+    private void parse(ByteBuffer buffer, OutboundMessage.OnResponse onResponse){
+            //message format from UDP client
+            /**
+             *  [label]#[instanceId]?[query][json payload]
+             * */
+            OutboundMessage pendingData = new OutboundMessage();
             boolean p =false;
+            StringBuilder sb = new StringBuilder();
             for(int i=0;i<buffer.limit();i++){
                 char c = (char) buffer.get();
-                if(c=='{'){
+                if(!p&&c=='#'){
+                    pendingData.label = sb.toString();
+                    sb.setLength(0);
+                }
+                else if(!p&&c==MSG_HEADER_DELIMITER){
+                    pendingData.clientId = sb.toString();
+                    sb.setLength(0);
+                }
+                else if(!p&&c=='{'){
+                    pendingData.query = sb.toString();
+                    sb.setLength(0);
                     p = true;
                 }
-                if(p){
-                    pendingData.data.append(c);
+                if(c=='|'){
+                    break;
                 }
+                if((!p&&(c=='#'||c==MSG_HEADER_DELIMITER))){
+                    continue;
+                }
+                sb.append(c);
             }
-            jsonObject = parser.parse(pendingData.data.toString()).getAsJsonObject();
-            String cmd = jsonObject.get("command").getAsString();
-            onResponse.on(cmd,jsonObject);
-        }catch (Exception ex){
-            ex.printStackTrace();
-            jsonObject.addProperty("error",ex.getMessage());
-        }
+            pendingData.data = (sb.toString());
+            //log.warning(pendingData.toString());
+            //jsonObject = parser.parse(pendingData.data).getAsJsonObject();
+            //String cmd = jsonObject.get("command").getAsString();
+            onResponse.on(pendingData);
     }
 }

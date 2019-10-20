@@ -44,7 +44,7 @@ public class Boost implements Module {
         if(session.action().equals("a")){
             byte[] ret = this.builder.create().toJson(this.demoObject(session.action(),onAccess.timestamp())).getBytes();
             session.write(ret,this.label());
-            update.on(this.context.onRegistry().distributionKey()+"?abc",ret);
+            update.on(this.context.onRegistry().distributionKey()+"?abc",this.builder.create().toJson(ret).getBytes());
             postOffice.onTopic().send("presence/notice",ret);
             this.context.onRegistry().transact(session.systemId(),1000);
             OnStatistics delta = this.context.statistics().value("WonCount",1000);
@@ -56,7 +56,7 @@ public class Boost implements Module {
         else if(session.action().equals("b")){
             byte[] ret = this.builder.create().toJson(this.demoObject(session.action(),onAccess.timestamp())).getBytes();
             session.write(ret,this.label());
-            update.on(this.context.onRegistry().distributionKey()+"?abc",ret);
+            update.on(this.context.onRegistry().distributionKey()+"?abc",this.builder.create().toJson(ret).getBytes());
             OnStatistics delta = this.context.statistics().value("WagerCount",1000);
             delta.xpDelta(1000);
             delta.owner(session.systemId());
@@ -67,7 +67,7 @@ public class Boost implements Module {
         else if(session.action().equals("c")){
             byte[] ret = this.builder.create().toJson(this.demoObject(session.action(),onAccess.timestamp())).getBytes();
             session.write(ret,this.label());
-            update.on(this.context.onRegistry().distributionKey()+"?abc",ret);
+            update.on(this.context.onRegistry().distributionKey()+"?abc",this.builder.create().toJson(ret).getBytes());
             OnStatistics delta = this.context.statistics().value("BlackJackCount",1000);
             delta.xpDelta(1000);
             delta.owner(session.systemId());

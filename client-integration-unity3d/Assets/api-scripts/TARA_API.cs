@@ -38,6 +38,7 @@ public class TARA_API : MonoBehaviour {
 	}
     void OnDestroy()
     {
+        wc.Close();
         StopUdp();
         Debug.Log("OnDestroy1");
     }
@@ -271,6 +272,7 @@ public class TARA_API : MonoBehaviour {
         JSONObject jn = new JSONObject(JSONObject.Type.OBJECT);
         jn.AddField("command","onAbsence");
         wc.Close();
+        StopUdp();
         Application app = new Application("presence/lobby","onAbsence",jn);
         Request(app,(jm)=>{
             if(jm.GetField("successful").b){
@@ -402,7 +404,7 @@ public class TARA_API : MonoBehaviour {
         payload.AddField("systemId",systemId);
         payload.AddField("instanceId",instanceId);
         payload.AddField("data",data);
-        string hp = label+"#"+instanceId+"?abc"+payload.ToString();
+        string hp = label+"#"+instanceId+"?onMessage"+payload.ToString()+"|";
         byte[] mf = Encoding.UTF8.GetBytes(hp);
         udp.Send(mf,mf.Length);
     }
@@ -437,8 +439,8 @@ public class TARA_API : MonoBehaviour {
                         int ix = json.IndexOf("{");
                         string lb = json.Substring(0,ix);
                         Debug.Log(lb+"=>"+json.Substring(ix));
+                        //messageQueue.Enqueue(new Message(lb,new JSONObject(json.Substring(ix))));
                     }
-                    //messageQueue.Enqueue(new Message(lb,new JSONObject(json.Substring(ix))));
                 }catch(Exception ex){
                     running = false;
                     udp.Close();
@@ -455,7 +457,7 @@ public class TARA_API : MonoBehaviour {
         payload.AddField("instanceId",conn.GetField("instanceId"));
         payload.AddField("stub",stub);
         payload.AddField("ticket",conn.GetField("ticket").str);
-        string hp = "label#"+conn.GetField("instanceId").str+"?onJoin"+payload.ToString();
+        string hp = "label#"+conn.GetField("instanceId").str+"?onJoin"+payload.ToString()+"|";
         Debug.Log(payload.ToString());
         byte[] onjoin = Encoding.UTF8.GetBytes(hp);
         udp.Send(onjoin,onjoin.Length);
