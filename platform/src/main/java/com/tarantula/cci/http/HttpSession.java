@@ -27,7 +27,6 @@ public class HttpSession extends RequestParser implements OnExchange{
             hex.sendResponseHeaders(200,resp.payload().length);
             hex.getResponseBody().write(resp.payload());
         }catch(Exception ex){
-            ex.printStackTrace();
             //skip client disconnect
         }
         finally{

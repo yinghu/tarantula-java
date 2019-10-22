@@ -50,7 +50,7 @@ public class UDPServer implements Runnable {
                             if(m.instanceId!=null){//skip notifications
                                 SessionGroup sg = cMap.computeIfAbsent(m.instanceId,k->new SessionGroup(k));
                                 if(m.query.equals("onTimeout")){
-                                    JsonObject jt = parser.parse(m.data).getAsJsonObject();
+                                    JsonObject jt = new JsonParser().parse(m.data).getAsJsonObject();
                                     sg.sessions.remove(new Session(jt.get("systemId").getAsString()));
                                 }
                                 sg.sessions.forEach(s->{
@@ -160,9 +160,6 @@ public class UDPServer implements Runnable {
                 sb.append(c);
             }
             pendingData.data = (sb.toString());
-            //log.warning(pendingData.toString());
-            //jsonObject = parser.parse(pendingData.data).getAsJsonObject();
-            //String cmd = jsonObject.get("command").getAsString();
             onResponse.on(pendingData);
     }
 }

@@ -83,9 +83,6 @@ public class PendingRequest {
         byte[] lbl = responsiveEvent.label().getBytes();
         byte[] resp = responsiveEvent.payload();
         int bytes = resp.length+cid.length+lbl.length+2;
-        if(bytes>4096){
-            System.out.println("OVER SIZE >>>>>>>>>>>>>>>>>>>>>>>>>>>>"+bytes);
-        }
         ByteBuffer buffer = ByteBuffer.allocate(bytes);
         buffer.put(cid);
         buffer.put((byte)',');

@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class ServiceConnector implements Runnable {
 
     private static Logger log = Logger.getLogger(ServiceConnector.class.getName());
-    private static int READ_BUFFER_SIZE = 1024;
+    private static int READ_BUFFER_SIZE = 4096;
     private JsonObject config;
     private SocketChannel socketChannel;
     private String serverId;
@@ -87,44 +87,50 @@ public class ServiceConnector implements Runnable {
         /**
          *  [clientId],[label]#[instanceId]?[query][json payload]
          * */
+        OutboundMessage outboundMessage = new OutboundMessage();
         while(true){
             try{
                 readBuffer.clear();
                 int rn = socketChannel.read(readBuffer);//block read
                 if(rn>0){
-                    boolean p = false;
-                    OutboundMessage outboundMessage = new OutboundMessage();
                     readBuffer.flip();
                     while(readBuffer.hasRemaining()){
                         char c = (char) readBuffer.get();
-                            if(!p&&c == ','){
+                            if(outboundMessage.onHeader&&c == ','){
                                 outboundMessage.clientId = pending.toString();
                                 pending.setLength(0);
                             }
-                            else if(!p&&c=='#'){
+                            else if(outboundMessage.onHeader&&c=='#'){
                                 outboundMessage.label =pending.toString();
                                 pending.setLength(0);
                             }
-                            else if(!p&&c==UDPServer.MSG_HEADER_DELIMITER){
+                            else if(outboundMessage.onHeader&&c==UDPServer.MSG_HEADER_DELIMITER){
                                 outboundMessage.instanceId = pending.toString();
                                 pending.setLength(0);
                             }
-                            else if(!p&&c=='{'){
+                            else if(outboundMessage.onHeader&&c=='{'){
                                 outboundMessage.query = pending.toString();
                                 pending.setLength(0);
-                                p = true;
+                                outboundMessage.onHeader = false;
                             }
                             if(c=='|'){
+                                outboundMessage.ended = true;
                                 break;
                             }
-                            if((!p&&(c==','||c=='#'||c==UDPServer.MSG_HEADER_DELIMITER))){
+                            if((outboundMessage.onHeader&&(c==','||c=='#'))||c==UDPServer.MSG_HEADER_DELIMITER){
                                 continue;
                             }
                             pending.append(c);
                     }
-                    outboundMessage.data = pending.toString();
-                    outboundQueue.offer(outboundMessage);
-                    pending.setLength(0);
+                    if(outboundMessage.ended){
+                        outboundMessage.data = pending.toString();
+                        outboundQueue.offer(outboundMessage);
+                        pending.setLength(0);
+                        outboundMessage = new OutboundMessage();
+                    }
+                    else{
+                        log.warning("Oversize pending data->"+outboundMessage.toString()+"//"+pending.toString());
+                    }
                 }
                 else{
                     Thread.sleep(50);

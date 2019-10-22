@@ -39,7 +39,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
                 Presence presence = this.context.presence(session.systemId());
                 PresenceContext pc = new PresenceContext(session.action());
                 pc.connection = cBuffer.pop();
-                //pc.udp = uBuffer.pop();
                 pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
                 session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
             }

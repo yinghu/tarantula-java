@@ -436,6 +436,7 @@ public class TARA_API : MonoBehaviour {
                     if(udp.Available>0){
                         buff = udp.Receive(ref endPoint);
                         string json = Encoding.ASCII.GetString(buff);
+                        Debug.Log(json);
                         int ix = json.IndexOf("{");
                         string lb = json.Substring(0,ix);
                         Debug.Log(lb+"=>"+json.Substring(ix));

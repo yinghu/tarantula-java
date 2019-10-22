@@ -58,7 +58,7 @@ public class ResponsiveEvent extends Data implements Event {
 	}
 	@Override
 	public String toString(){
-		return "Responsive ["+this.sessionId+","+closed+","+retries+"]["+label+"]";
+		return "Responsive ["+this.sessionId+","+closed+","+retries+"]["+label+"]=>"+new String(payload);
 	}
 
 }
