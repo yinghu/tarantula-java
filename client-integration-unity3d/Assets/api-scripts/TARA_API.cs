@@ -33,7 +33,7 @@ public class TARA_API : MonoBehaviour {
     private bool running;
 	void Start () {	
         this.messageQueue = Queue.Synchronized(new Queue());
-        Debug.Log(this.messageQueue.IsSynchronized ? "synchronized" : "not synchronized" );
+        //Debug.Log(this.messageQueue.IsSynchronized ? "synchronized" : "not synchronized" );
         StartCoroutine(Index());  
 	}
     void OnDestroy()
@@ -45,11 +45,18 @@ public class TARA_API : MonoBehaviour {
 	void Update () {
         if(messageQueue.Count>0){
             Message m = (Message)messageQueue.Dequeue();
-            if(mCallback.ContainsKey(m.label)){
+            if(m.label!=null&&mCallback.ContainsKey(m.label)){
                 mCallback[m.label](m);        
-            }else{
+            }
+            else if(m.instanceId!=null&&mCallback.ContainsKey(m.instanceId)){
+                mCallback[m.instanceId](m);        
+            }
+            else if(m.query!=null&&mCallback.ContainsKey(m.query)){
+                mCallback[m.query](m);        
+            }
+            else{
                 //Debug.Log();
-                logger.Error(m.label+" not existed");
+                //logger.Error(m.label+" not existed");
             }
         }
 	}
@@ -184,10 +191,7 @@ public class TARA_API : MonoBehaviour {
             wc.Origin = GEC_HOST;
             wc.OnMessage += (sender,e) =>{
                 if(e.IsText){
-                    int ix = e.Data.IndexOf("{");
-                    string lb = e.Data.Substring(0,ix);
-                    Debug.Log(e.Data);
-                    messageQueue.Enqueue(new Message(lb,new JSONObject(e.Data.Substring(ix))));
+                    _message(e.Data);
                 }    
             };
             wc.OnClose += (sender,e)=>{
@@ -199,7 +203,7 @@ public class TARA_API : MonoBehaviour {
             };
             wc.OnError += (sender,e)=>{
                 Debug.Log(e.Exception);
-                logger.Error("ws failed");
+                logger.Error("ws failed");//request new connect info to reconnect 
             };
             wc.Connect();
         });    
@@ -242,13 +246,10 @@ public class TARA_API : MonoBehaviour {
             game.AddField("applicationId",descriptor.ApplicationId());
             callback(game);
             JSONObject conn;
-            //JSONObject rq = game.GetField("gameObject").GetField("robotQuest");
-            //Debug.Log(rq);
-            AddMessageListener(game.GetField("label").str,onstream);//web socket listener
+            AddMessageListener(game.GetField("instanceId").str,onstream);
             if((conn=game.GetField("gameObject").GetField("connection"))!=null){
                 conn.AddField("ticket",game.GetField("gameObject").GetField("ticket").str);
                 conn.AddField("instanceId",game.GetField("instanceId").str);
-                AddMessageListener(game.GetField("label").str+"#"+game.GetField("instanceId").str,onstream);
                 initUdp(conn);
             }else{//stream on websocket if udp not available 
                 JSONObject ms = new JSONObject(JSONObject.Type.OBJECT);
@@ -427,20 +428,14 @@ public class TARA_API : MonoBehaviour {
         endPoint = new IPEndPoint(ips[0],(int)conn.GetField("port").n);
         //local receiver and sender
         udp = new UdpClient(conn.GetField("host").str,(int)conn.GetField("port").n);
-        //udp.ExclusiveAddressUse = true;
-        //udp.Connect()
         udpListener = new Thread(()=>{
             Byte[] buff = new byte[0];
             while(running){
                 try{ 
                     if(udp.Available>0){
-                        buff = udp.Receive(ref endPoint);
+                        buff = udp.Receive(ref endPoint);        
                         string json = Encoding.ASCII.GetString(buff);
-                        Debug.Log(json);
-                        int ix = json.IndexOf("{");
-                        string lb = json.Substring(0,ix);
-                        Debug.Log(lb+"=>"+json.Substring(ix));
-                        //messageQueue.Enqueue(new Message(lb,new JSONObject(json.Substring(ix))));
+                        _message(json);                    
                     }
                 }catch(Exception ex){
                     running = false;
@@ -462,7 +457,24 @@ public class TARA_API : MonoBehaviour {
         Debug.Log(payload.ToString());
         byte[] onjoin = Encoding.UTF8.GetBytes(hp);
         udp.Send(onjoin,onjoin.Length);
-        logger.Log("UDP SESSION STARTED");
-        
+        logger.Log("UDP SESSION STARTED");   
+    }
+    void _message(string msg){
+        int bx = msg.IndexOf("#");
+        int ix = msg.IndexOf("{");
+        int cx = msg.IndexOf("?");
+        if(bx>0&&cx>0&&ix>0){//[label]#[instanceId]?[query][JSON]
+            string lb = msg.Substring(0,bx);
+            string ins = msg.Substring(bx+1,cx-bx-1);
+            string qry = msg.Substring(cx+1,ix-cx-1);
+            messageQueue.Enqueue(new Message(lb,ins,qry,new JSONObject(msg.Substring(ix))));
+        }
+        else if(bx<0&&cx<0&&ix>0){//[label][JSON]
+            string lb = msg.Substring(0,ix);
+            messageQueue.Enqueue(new Message(lb,new JSONObject(msg.Substring(ix))));
+        }
+        else{
+            Debug.Log("INGORE=>"+msg);
+        }
     }
 }

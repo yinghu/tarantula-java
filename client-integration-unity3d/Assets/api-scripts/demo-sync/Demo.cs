@@ -7,6 +7,7 @@ public class Demo : MonoBehaviour {
     public TARA_API api;
     public Balance balance;
     public Logger logger;
+    public CRotate rot;
     Descriptor desc;
     bool joined = false;
     JSONObject game;
@@ -49,6 +50,7 @@ public class Demo : MonoBehaviour {
             JSONObject jn = new JSONObject(JSONObject.Type.OBJECT);
             jn.AddField("command","onLeave");
             Instance ins = new Instance(desc.ApplicationId(),game.GetField("instanceId").str,"onLeave",jn);
+            rot._Update(false);
             api.Request(ins,(m)=>{
                 balance.OnBalance();
                 tb.text = desc.Name();
@@ -59,6 +61,7 @@ public class Demo : MonoBehaviour {
     }
     public void Sync(string cmd){
         if(joined){
+            rot._Update(true);
             JSONObject jn = new JSONObject(JSONObject.Type.OBJECT);
             jn.AddField("command",cmd);
             Instance ins = new Instance(desc.ApplicationId(),game.GetField("instanceId").str,cmd,jn);
