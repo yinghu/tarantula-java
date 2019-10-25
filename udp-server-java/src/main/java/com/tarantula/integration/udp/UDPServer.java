@@ -20,7 +20,6 @@ public class UDPServer implements Runnable {
     private ConcurrentHashMap<String,SessionGroup> cMap;
     private ConcurrentLinkedDeque<OutboundMessage> oQueue;
     private ServiceConnector serviceConnector;
-    private JsonParser parser;
     private Thread tu;
     private Thread tr;
     public UDPServer(JsonObject front, ConcurrentLinkedDeque<OutboundMessage> mQueue,ServiceConnector serviceConnector){
@@ -28,7 +27,6 @@ public class UDPServer implements Runnable {
         MSG_HEADER_DELIMITER = front.get("messageHeaderDelimiter").getAsCharacter();
         this.oQueue = mQueue;
         this.serviceConnector = serviceConnector;
-        this.parser = new JsonParser();
     }
     public void start() throws Exception{
         cMap = new ConcurrentHashMap<>();
@@ -38,6 +36,7 @@ public class UDPServer implements Runnable {
         InetSocketAddress uAdd = new InetSocketAddress(host,port);
         uchannel.bind(uAdd);
         ByteBuffer outBuffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
+        JsonParser parser = new JsonParser();
         tu = new Thread(this,"tarantula-udp-server");
         tu.start();
         tr = new Thread(()->{
@@ -50,11 +49,16 @@ public class UDPServer implements Runnable {
                             if(m.instanceId!=null){//skip notifications
                                 SessionGroup sg = cMap.computeIfAbsent(m.instanceId,k->new SessionGroup(k));
                                 if(m.query.equals("onTimeout")){
-                                    JsonObject jt = new JsonParser().parse(m.data).getAsJsonObject();
+                                    JsonObject jt = parser.parse(m.data).getAsJsonObject();
                                     sg.sessions.remove(new Session(jt.get("systemId").getAsString()));
                                 }
                                 sg.sessions.forEach(s->{
                                     outBuffer.clear();
+                                    outBuffer.put(m.label.getBytes());
+                                    outBuffer.put((byte)'#');
+                                    outBuffer.put(m.instanceId.getBytes());
+                                    outBuffer.put((byte)'?');
+                                    outBuffer.put(m.query.getBytes());
                                     outBuffer.put(m.data.getBytes());
                                     outBuffer.flip();
                                     try{uchannel.send(outBuffer,s.endpoint);}catch (Exception iexc){iexc.printStackTrace();}
@@ -83,6 +87,7 @@ public class UDPServer implements Runnable {
     @Override
     public void run(){
         ByteBuffer buffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
+        JsonParser parser = new JsonParser();
         while (true){
             try{
                 buffer.clear();
@@ -111,11 +116,16 @@ public class UDPServer implements Runnable {
                         });
                     }
                     else if(outboundMessage.query.equals("onMessage")){
-                        //log.warning(jsonObject.toString());
+                        //log.warning(outboundMessage.toString());
                         //handle
                         buffer.clear();
+                        buffer.put(outboundMessage.label.getBytes());
+                        buffer.put((byte)'#');
+                        buffer.put(outboundMessage.instanceId.getBytes());
+                        buffer.put((byte)'?');
+                        buffer.put(outboundMessage.query.getBytes());
                         buffer.put(outboundMessage.data.getBytes());
-                        SessionGroup sg = cMap.computeIfAbsent(outboundMessage.clientId,k->new SessionGroup(k));
+                        SessionGroup sg = cMap.computeIfAbsent(outboundMessage.instanceId,k->new SessionGroup(k));
                         sg.sessions.forEach(s->{
                             buffer.flip();
                             try{uchannel.send(buffer,s.endpoint);}catch (Exception iex){iex.printStackTrace();}
@@ -143,7 +153,7 @@ public class UDPServer implements Runnable {
                     sb.setLength(0);
                 }
                 else if(!p&&c==MSG_HEADER_DELIMITER){
-                    pendingData.clientId = sb.toString();
+                    pendingData.instanceId = sb.toString();
                     sb.setLength(0);
                 }
                 else if(!p&&c=='{'){
