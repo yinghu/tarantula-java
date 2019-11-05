@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 
 using UnityEngine;
@@ -379,7 +380,7 @@ public class TARA_API : MonoBehaviour {
         ms.AddField("data",target.data);    
         _Send(ms);
     } 
-    void _Send(JSONObject jms){
+    void _Send(JSONObject jms){ 
         wc.Send(jms.ToString());    
     }
     public string SystemId(){
@@ -419,7 +420,7 @@ public class TARA_API : MonoBehaviour {
             udpListener.Abort();
             logger.Log("UDP SESSION ENDED");
         }catch(Exception ex){
-            logger.Error("EXXX");
+            logger.Error(ex.ToString());
         }
     }
     void initUdp(JSONObject conn){

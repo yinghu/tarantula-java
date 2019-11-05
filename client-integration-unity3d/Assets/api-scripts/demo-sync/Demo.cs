@@ -38,7 +38,7 @@ public class Demo : MonoBehaviour {
                    if(lb.Equals("timer")){
                         OnTimer(m.data);
                    }
-                   else if(lb.Equals("update")){
+                   else if(lb.Equals("demo")){
                        Debug.Log(m.data.ToString());
                    }
                    else{
