@@ -19,7 +19,7 @@ public class ProfileApplication extends TarantulaApplicationHeader {
     public void callback(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onProfile")){
             OnAccess cmd = this.builder.create().fromJson(new String((payload)).trim(),OnAccess.class);
-            Profile u = this._load(cmd.systemId());
+            Profile u = this._load(cmd.property("systemId"));
             PresenceContext pcx  = new PresenceContext("onProfile");
             pcx.profile = u;
             session.write(builder.create().toJson(pcx).getBytes(),this.descriptor.responseLabel());

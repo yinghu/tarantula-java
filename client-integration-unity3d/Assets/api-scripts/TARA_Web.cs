@@ -75,6 +75,24 @@ namespace GameEngineCluster{
                 return false;
             }
         }
+        public  async Task<bool> Device(Device device){
+            try{
+                Header[] headers = new Header[]{
+                    new Header("Tarantula-tag","index/user"),
+                    new Header("Tarantula-magic-key",device.deviceId),
+                    new Header("Tarantula-action","onReset")
+                };
+                string json = JsonConvert.SerializeObject(device);
+                Debug.Log(json);
+                string jstr = await _ghc.PostJson("user/action",headers,json);
+                Debug.Log(jstr);
+                ParseLogin(jstr);
+                return true;
+            }catch(Exception ex){
+                OnException?.Invoke(ex);
+                return false;
+            }
+        }
         public  async Task<bool> Presence(){
             try{
                 Header[] headers = new Header[]{
@@ -95,6 +113,28 @@ namespace GameEngineCluster{
                 return false;
             }
         }
+        public  async Task<bool> Profile(string systemId){
+            try{
+                Header[] headers = new Header[]{
+                    new Header("Tarantula-tag","presence/profile"),
+                    new Header("Tarantula-token",presence.token),
+                    new Header("Tarantula-action","onProfile")
+                };
+                Payload p = new Payload();
+                p.command = "onProfile";
+                p.headers = new Header[]{new Header("systemId",presence.systemId),new Header("stub",presence.stub.ToString())};
+                string json = JsonConvert.SerializeObject(p);
+                Debug.Log(json);
+                string jstr = await _ghc.PostJson("service/action",headers,json);
+                Debug.Log(jstr);
+                //ParseProfile(jstr);
+                return true;
+            }catch(Exception ex){
+                OnException?.Invoke(ex);
+                return false;
+            }
+        }
+        
         private void ParsePresence(string json){
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
@@ -103,19 +143,7 @@ namespace GameEngineCluster{
             }
             JToken tk = jo.SelectToken("connection");
             connection = tk.ToObject<Connection>();
-            _gwc = new GecWebSocket(connection,presence,"tarantula-service");
-            /**
-            for(int i=0;i<tk.Count;i++){
-                Descriptor desc = tk[i].SelectToken("descriptor").ToObject<Descriptor>();
-                Debug.Log("Desc->"+desc.typeId+"/"+desc.name+"/"+desc.tag);
-                JArray ta = (JArray)tk[i].SelectToken("applications");
-                if(ta.Count>0){
-                    for(int j=0;j<ta.Count;j++){
-                        Descriptor app = ta[j].ToObject<Descriptor>();
-                        Debug.Log("App->"+app.typeId+"/"+app.name+"/"+desc.tag);
-                    }
-                }
-            } **/   
+            _gwc = new GecWebSocket(connection,presence,"tarantula-service"); 
         }
         private void ParseLogin(string json){
             JObject jo = JObject.Parse(json);
@@ -176,6 +204,11 @@ namespace GameEngineCluster{
         public async Task<bool> Connect(){
             await _websocket.ConnectAsync(new Uri(_url),new CancellationTokenSource(5000).Token);
             return _websocket.State == WebSocketState.Open;
+        }
+        public async Task<bool> Send(string json){
+           ArraySegment<Byte> om = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(json.ToString()));     
+           await _websocket.SendAsync(om, WebSocketMessageType.Text, true, CancellationToken.None);
+           return true;
         }
         public async Task<string> Receive(){
             ArraySegment<Byte> rbuff = new ArraySegment<Byte>(new byte[4096]);

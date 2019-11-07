@@ -7,6 +7,13 @@ namespace GameEngineCluster{
             this.value = value;
         }
     }
+    public class Payload{
+        public string command;
+        public Header[] headers;
+    }
+    public class Device{
+        public string deviceId { get; set; }
+    }
     public class User{
         public string login { get; set; }
         public string nickname { get; set; }
@@ -59,5 +66,9 @@ namespace GameEngineCluster{
         public string icon { get; set; }
         public string viewId { get; set; }
         public string responseLabel { get; set; }
+    }
+    public class Profile{
+        public string nickname { get; set; }
+        public string avatar { get; set; }
     }
 }
