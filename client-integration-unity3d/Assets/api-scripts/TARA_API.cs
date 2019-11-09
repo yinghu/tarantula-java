@@ -33,6 +33,7 @@ public class TARA_API : MonoBehaviour {
     private IPEndPoint endPoint;
     private bool running;
 	void Start () {	
+        DontDestroyOnLoad(this.gameObject);
         this.messageQueue = Queue.Synchronized(new Queue());
         //Debug.Log(this.messageQueue.IsSynchronized ? "synchronized" : "not synchronized" );
         StartCoroutine(Index());  

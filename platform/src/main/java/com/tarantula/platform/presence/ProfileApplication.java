@@ -17,6 +17,7 @@ public class ProfileApplication extends TarantulaApplicationHeader {
 
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
+        //this.context.log(new String(payload),OnLog.WARN);
         if(session.action().equals("onProfile")){
             OnAccess cmd = this.builder.create().fromJson(new String((payload)).trim(),OnAccess.class);
             Profile u = this._load(cmd.property("systemId"));

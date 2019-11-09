@@ -117,6 +117,9 @@
             <view type="admin.reset.module">
                 <property name="moduleResourceFile">html/admin/reset.module.view.html</property>
             </view>
+            <view type="admin.upload.module">
+                <property name="moduleResourceFile">html/admin/upload.module.view.html</property>
+            </view>
         </view-list>
 
     </lobby-context>

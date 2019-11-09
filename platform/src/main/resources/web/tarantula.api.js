@@ -226,7 +226,7 @@ var TARA_API = (function(){
     });
   };
   let _profile = function(playerId,callback){
-    let payload = {serviceTag:'presence/profile',command:'onProfile',systemId:playerId};
+    let payload = {serviceTag:'presence/profile',command:'onProfile',headers:[{name:'systemId',value:playerId}]};
     _service(payload,function(resp){
         callback(resp);
     });
