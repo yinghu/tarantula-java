@@ -20,11 +20,8 @@ public class Login : MonoBehaviour {
     public void OnMouseDown(){
         api.Reset(deviceId,(b)=>{
             if(b){
-                api.Presence((a)=>{
-                    balance.OnBalance();
-                    notification.OnNotification();
-                    demoSync.OnLobby();
-                });
+                notification.OnNotification();
+                demoSync.OnLobby();
             }
             else{
                 Debug.Log(deviceId);

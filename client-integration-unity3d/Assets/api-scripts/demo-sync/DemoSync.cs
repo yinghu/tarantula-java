@@ -12,14 +12,14 @@ public class DemoSync : MonoBehaviour {
     
     public string deviceId;
     
+    public void OnMouseDown(){
+        OnLobby();    
+    }
+    
 	void Start () {
 	   api.Reset(deviceId,(b)=>{
             if(b){
-                api.Presence((a)=>{
-                    balance.OnBalance();
-                    notification.OnNotification();
-                    OnLobby();
-                });
+                notification.OnNotification();     
             }
             else{
                 Debug.Log(deviceId);

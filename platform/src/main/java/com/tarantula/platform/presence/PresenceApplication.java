@@ -9,10 +9,10 @@ import com.tarantula.platform.util.*;
  * Developer: YINGHU LU
  * Date: updated 9/8/2019.
  */
-public class PresenceApplication extends TarantulaApplicationHeader implements Connection.Listener{
+public class PresenceApplication extends TarantulaApplicationHeader {
 
 
-    private DeploymentServiceProvider deploymentServiceProvider;
+    //private DeploymentServiceProvider deploymentServiceProvider;
     private RingBuffer<Connection> cBuffer;
 
     @Override
@@ -20,8 +20,8 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         super.setup(context);
         this.cBuffer = new RingBuffer<>(new Connection[5]);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
-        deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        deploymentServiceProvider.registerOnConnectionListener(this);
+        //deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        //deploymentServiceProvider.registerOnConnectionListener(this);
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
             Presence presence = this.context.presence(t.owner());
             OnBalance ob = (OnBalance)t;

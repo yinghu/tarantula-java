@@ -26,14 +26,24 @@ public class ProfileSync : MonoBehaviour {
             //request profile data
             JSONObject jp = new JSONObject(JSONObject.Type.OBJECT);
             jp.AddField("command","onProfile");
-            jp.AddField("systemId",api.SystemId());
+            JSONObject arr = new JSONObject(JSONObject.Type.ARRAY);
+            JSONObject hd = new JSONObject(JSONObject.Type.OBJECT);
+            hd.AddField("name","systemId");
+            hd.AddField("value",api.SystemId());
+            arr.Add(hd);
+            jp.AddField("headers",arr);
             Application app = new Application("presence/profile","onProfile",jp);
             fn=0;
             api.Send(app);
         }else if(protocol.Equals("http")){// http request
             JSONObject jp = new JSONObject(JSONObject.Type.OBJECT);
             jp.AddField("command","onProfile");
-            jp.AddField("systemId",api.SystemId());
+            JSONObject arr = new JSONObject(JSONObject.Type.ARRAY);
+            JSONObject hd = new JSONObject(JSONObject.Type.OBJECT);
+            hd.AddField("name","systemId");
+            hd.AddField("value",api.SystemId());
+            arr.Add(hd);
+            jp.AddField("headers",arr);
             Application app = new Application("presence/profile","onProfile",jp);
             fn=0;
             api.Request(app,(m)=>{

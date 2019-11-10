@@ -138,6 +138,8 @@ public class TARA_API : MonoBehaviour {
                     stub = (int)pre.GetField("stub").n;
                     login = pre.GetField("login").str;
                     _Parse(jn.GetField("lobbyList"));
+                    JSONObject jx = jn.GetField("connection");
+                    initWsc(jx);
                     callback(true);
                 }else{
                     callback(false);
@@ -174,6 +176,8 @@ public class TARA_API : MonoBehaviour {
                     stub = (int)pre.GetField("stub").n;
                     login = pre.GetField("login").str;
                     _Parse(jn.GetField("lobbyList"));
+                    JSONObject jx = jn.GetField("connection");
+                    initWsc(jx);
                     callback(true);
                 }else{
                     callback(false);
@@ -187,7 +191,9 @@ public class TARA_API : MonoBehaviour {
         Application app = new Application("presence/lobby","onPresence",jn);
         Request(app,(jxn)=>{
             Debug.Log(jxn);
-            JSONObject jx = jxn.GetField("connection");
+            //JSONObject jx = jxn.GetField("connection");
+            //initWsc(jx);
+            /**
             string ws = jx.GetField("protocol").str+"://"+jx.GetField("host").str+":"+jx.GetField("port").n+"/"+jx.GetField("path").str+"?accessKey="+ticket+"&stub="+stub+"&systemId="+login;
             wc = new WebSocket(ws,"tarantula-service");
             wc.Origin = GEC_HOST;
@@ -207,7 +213,7 @@ public class TARA_API : MonoBehaviour {
                 Debug.Log(e.Exception);
                 logger.Error("ws failed");//request new connect info to reconnect 
             };
-            wc.Connect();
+            wc.Connect();**/
         });    
     }
     public void Balance(Action<JSONObject> callback){
@@ -391,6 +397,7 @@ public class TARA_API : MonoBehaviour {
         for(int i=0;i<jo.list.Count;i++){
             Lobby lbl = new Lobby(jo.list[i]);
             string tk = lbl.Descriptor().TypeId();
+            Debug.Log(tk);
             if(lobbyMapping.ContainsKey(tk)){
                 lobbyMapping.Remove(tk);
             }
@@ -423,6 +430,29 @@ public class TARA_API : MonoBehaviour {
         }catch(Exception ex){
             logger.Error(ex.ToString());
         }
+    }
+    void initWsc(JSONObject jx){
+        //JSONObject jx = jxn.GetField("connection");
+        string ws = jx.GetField("protocol").str+"://"+jx.GetField("host").str+":"+jx.GetField("port").n+"/"+jx.GetField("path").str+"?accessKey="+ticket+"&stub="+stub+"&systemId="+login;
+        wc = new WebSocket(ws,"tarantula-service");
+        wc.Origin = GEC_HOST;
+        wc.OnMessage += (sender,e) =>{
+            if(e.IsText){
+                _message(e.Data);
+            }    
+        };
+        wc.OnClose += (sender,e)=>{
+            logger.Log("ws closed");   
+        };
+        wc.OnOpen += (sender,e)=>{
+            logger.Log("ws connected");
+            //callback(true);
+        };
+        wc.OnError += (sender,e)=>{
+            Debug.Log(e.Exception);
+            logger.Error("ws failed");//request new connect info to reconnect 
+        };
+        wc.Connect();
     }
     void initUdp(JSONObject conn){
         //remote end point

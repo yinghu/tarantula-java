@@ -3,8 +3,9 @@ package com.tarantula.platform.presence;
 import com.tarantula.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.AccessIndexService;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.PresenceContextSerializer;
-import com.tarantula.platform.util.ResponseSerializer;
+import com.tarantula.platform.util.RingBuffer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
@@ -21,10 +22,12 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     private double initialBalance;
     private AccessIndexService accessIndexService;
     private PostOffice postOffice;
-
+    private RingBuffer<Connection> cBuffer;
+    private DeploymentServiceProvider deploymentServiceProvider;
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
+        this.cBuffer = new RingBuffer<>(new Connection[5]);
         Configuration configuration = this.context.configuration("setup");
         this.lobbyId = configuration.property("lobbyId");
         this.activated = Boolean.parseBoolean(configuration.property("activated"));
@@ -32,6 +35,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         this.role = configuration.property("roleName");
         builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
+        deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        deploymentServiceProvider.registerOnConnectionListener(this);
         postOffice = this.context.postOffice();
         String root = configuration.property("root");
         String pwd = configuration.property("password");
@@ -57,6 +62,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         OnAccess acc = builder.create().fromJson(new String(payload).trim(),OnAccess.class);
         if(session.action().equals("onLogin")){
             OnSession access = this.login(session.systemId(),acc.property("password"),session);
+            onSession(access,session);
+            /**
             if(access.successful()){
                 PresenceContext ptx = new PresenceContext("onLogin");
                 ptx.presence= access;
@@ -75,7 +82,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             }
             else{
                 session.write(this.builder.create().toJson(new ResponseHeader("login", access.message(), false)).getBytes(),this.descriptor.responseLabel());
-            }
+            }**/
         }
         else if(session.action().equals("onTicket")){
             if(this.context.validator().validateTicket(session.systemId(),acc.stub(),acc.accessKey())){
@@ -134,6 +141,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             List<Lobby> lobbyList = new ArrayList();
             lobbyList.add(this.context.lobby(this.lobbyId));
             ptx.lobbyList=(lobbyList);
+            ptx.connection = cBuffer.pop();
             session.write(this.builder.create().toJson(ptx).getBytes(),this.descriptor.responseLabel());
             session.systemId(access.systemId());
             session.stub(access.stub());
@@ -156,7 +164,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             access.routingNumber(session.routingNumber());
             _onSession=this.context.validator().validatePassword(access,password);
             _onSession.systemId(systemId);
-            ResponseHeader resp = new ResponseHeader(session.action(), "User [" + access.login() + "] signed in",true);
+            //ResponseHeader resp = new ResponseHeader(session.action(), "User [" + access.login() + "] signed in",true);
             //postOffice.onTopic().send("presence/notice?login",this.builder.create().toJson(resp).getBytes());
         }
         return _onSession;
@@ -180,5 +188,38 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             this.context.dataStore("profile").create(_p);
         }
         return acc;
+    }
+    @Override
+    public void onState(Connection c) {
+        if(c.type().equals(Connection.WEB_SOCKET)){
+            this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on user management service application",OnLog.WARN);
+            onWebSocket(c);
+        }
+    }
+    private void onWebSocket(Connection c) {
+        if(!c.disabled()){
+            if(!cBuffer.push(c)){
+                cBuffer.reset(((ca,limit)->{
+                    Connection[] cn = new Connection[ca.length*2];
+                    for(int i=0;i<limit;i++){
+                        cn[i]=ca[i];
+                    }
+                    cn[limit]=c;
+                    return cn;
+                }));
+            }
+        }
+        else{
+            cBuffer.reset((ca,limit)->{
+                Connection[] cn = new Connection[ca.length];
+                int r=0;
+                for(int i=0;i<limit;i++){
+                    if(!(ca[i].serverId().equals(c.serverId()))){
+                        cn[r++]=ca[i];
+                    }
+                }
+                return cn;
+            });
+        }
     }
 }

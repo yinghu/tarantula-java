@@ -113,7 +113,7 @@ var TARA_API = (function(){
             callback(p);
         }
         else{
-            callback({successful:false});
+            callback({successful:false,message:'Please waiting .....'});
         }
     };
     aj.open('POST','/upload/'+fname,true);
@@ -174,6 +174,10 @@ var TARA_API = (function(){
                 qdata.ticket = presence.ticket;
                 qdata.stub = presence.stub;
                 qdata.login = presence.login;
+                qdata.connection = p.connection;
+                wsWorker = new Worker('/resource/tarantula.web.socket.source.js');//move to login
+                wsWorker.onmessage = _onmessage;
+                wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});
                 _parse(p,function(v){});
                 callback({successful:true});
             }else{
@@ -196,11 +200,11 @@ var TARA_API = (function(){
         qdata.balance = resp.presence.balance;
         //qdata.ticket = resp.presence.ticket;
         //console.log(resp.connection);
-        qdata.connection = resp.connection;
+        //qdata.connection = resp.connection;
         //_parse(resp,function(v){});
-        wsWorker = new Worker('/resource/tarantula.web.socket.source.js');//move to login
-        wsWorker.onmessage = _onmessage;
-        wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});
+        //wsWorker = new Worker('/resource/tarantula.web.socket.source.js');//move to login
+        //wsWorker.onmessage = _onmessage;
+        //wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});
         callback({successful:true});
     });               
   }; 

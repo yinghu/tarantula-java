@@ -46,7 +46,7 @@
  };    
  document.querySelector("#u_command").onclick = function(){
     TARA_API.onUpload(_data,_fd.name,(resp)=>{
-        console.log(resp);
+        document.querySelector("#u_message").innerHTML = resp.message;
     });  
  };
  function tx_close_upload_module(){
