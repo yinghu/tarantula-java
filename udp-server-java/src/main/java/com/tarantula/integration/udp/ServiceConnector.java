@@ -1,6 +1,9 @@
 package com.tarantula.integration.udp;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -32,7 +35,13 @@ public class ServiceConnector implements Runnable {
     }
     public void start() throws Exception{
         jsonParser = new JsonParser();
-        config = jsonParser.parse(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("udp.conf"))).getAsJsonObject();
+        File f = new File("/etc/tarantula/udp.conf");
+        if(f.exists()){
+            config = jsonParser.parse(new InputStreamReader(new FileInputStream(f))).getAsJsonObject();
+        }
+        else{
+            config = jsonParser.parse(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("udp.conf"))).getAsJsonObject();
+        }
         this.outboundQueue = new ConcurrentLinkedDeque<>();
         this.readBuffer = ByteBuffer.allocate(READ_BUFFER_SIZE);
         this.pending = new StringBuilder();
