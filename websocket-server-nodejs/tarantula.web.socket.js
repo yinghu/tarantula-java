@@ -3,7 +3,15 @@
 **/
 const WebSocketServer = require('websocket').server;
 const fs = require('fs');
-var  cfg = JSON.parse(fs.readFileSync('ws.config','utf-8'));
+var  cfg;
+if (fs.existsSync('/etc/tarantula/ws.config')) {
+    cfg = JSON.parse(fs.readFileSync('/etc/tarantula/ws.config','utf-8'));
+    console.log("using external configuration");
+}
+else{
+    cfg = JSON.parse(fs.readFileSync('ws.config','utf-8'));
+    console.log("using default configuration");
+}
 var secured = cfg.front.secured;
 const https = secured?require('https'):require('http');
 const http = require('http');
