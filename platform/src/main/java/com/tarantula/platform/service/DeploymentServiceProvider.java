@@ -3,6 +3,8 @@ package com.tarantula.platform.service;
 import com.tarantula.*;
 import com.tarantula.Module;
 
+import java.io.InputStream;
+
 /**
  * Updated by yinghu lu on 6/15/2019.
  */
@@ -15,6 +17,9 @@ public interface DeploymentServiceProvider extends ServiceProvider {
     String NAME = "DeploymentServiceProvider";
 
     void clusterUpdated(int scope,String nodeId,boolean state);
+
+
+
     /**
      * Deploys the service provider on service pool
      * */
@@ -45,12 +50,13 @@ public interface DeploymentServiceProvider extends ServiceProvider {
     PostOffice registerPostOffice();
 
     //Module application operation API
+    String upload(InputStream inputStream,String fname) throws Exception;
     String createLobby(Descriptor descriptor);
     String createApplication(Descriptor descriptor);
     String enableApplication(String applicationId,boolean enabled);
     String launch(String typeId);
     String shutdown(String typeId);
-    com.tarantula.Module module(Descriptor descriptor);
+    Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
     String reset(Descriptor descriptor);
     String createModule(Descriptor descriptor);

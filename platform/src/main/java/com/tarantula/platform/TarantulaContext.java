@@ -73,6 +73,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
     private TokenValidatorProvider tokenValidatorProvider;
     private DeploymentServiceProvider deploymentServiceProvider;
+    public String deployDir;
 
     public  String eventThreadPoolSetting;
 

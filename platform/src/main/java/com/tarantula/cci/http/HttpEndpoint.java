@@ -40,6 +40,9 @@ public class HttpEndpoint implements EndPoint {
 		HttpRootHandler root = new HttpRootHandler(this.resource.requestHandler("/"));
 		this.hserver.createContext("/",root);
 
+		HttpUploadHandler upload = new HttpUploadHandler(this.resource.requestHandler("/upload"));
+		this.hserver.createContext("/upload",upload);
+
 		HttpResourceHandler resource = new HttpResourceHandler(this.resource.requestHandler("/resource"));
 		this.hserver.createContext("/resource",resource);
 

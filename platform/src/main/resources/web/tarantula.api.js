@@ -103,39 +103,25 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-tag','index/lobby');
     aj.send();               
   };       
-  /**
-  let _token = function(payload,callback){
-    let _payload = JSON.stringify(payload);
+
+  let _upload = function(payload,fname,callback){
     let aj = new XMLHttpRequest();   
     aj.responseType = 'text';
     aj.onreadystatechange = function(){
         if(aj.status === 200 && aj.readyState === 4){
             let p = JSON.parse(aj.responseText);
-            if(p.successful){
-                presence = p.presence;
-                qdata.systemId = presence.systemId;
-                qdata.token = presence.token;
-                qdata.ticket = presence.ticket;
-                qdata.stub = presence.stub;
-                qdata.login = presence.login;
-                _parse(p,function(v){});
-                callback({successful:true});
-            }
-            else{
-                callback({successful:false});
-            }
+            callback(p);
+        }
+        else{
+            callback({successful:false});
         }
     };
-    aj.open("POST","/user/action",true);
+    aj.open('POST','/upload/'+fname,true);
     aj.setRequestHeader('Accept','application/json');
-    aj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    aj.setRequestHeader('Tarantula-tag','user');
-    aj.setRequestHeader('Tarantula-magic-key',payload.login);
-    aj.setRequestHeader('Tarantula-action','onToken');
-    aj.setRequestHeader('Tarantula-payload-size',_payload.length);
-    aj.send(_payload);
+    aj.setRequestHeader("Content-type", "application/java-archive");
+    aj.setRequestHeader('Tarantula-token',presence.token);
+    aj.send(payload);
   };
-  **/
   let _subscribe = function(payload,callback){
     let _ps = JSON.stringify(payload);
     let aj = new XMLHttpRequest();   
@@ -288,7 +274,7 @@ var TARA_API = (function(){
       onIndex : _index,  
       onView : _view,
       onResource : _resource,
-
+      onUpload : _upload,
       onRegister : _subscribe,
       onLogin : _login,
       onReset : _reset,

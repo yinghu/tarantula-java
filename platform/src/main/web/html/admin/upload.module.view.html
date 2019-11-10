@@ -7,12 +7,15 @@
             
         <div class="w3-container w3-text-teal w3-border-bottom w3-border-orange">
             <div class="w3-panel">
-                 <input id ="u_file" class="w3-input w3-round w3-border" type="file"/>
+                <label for="u_file" class="tx-file-upload w3-round">
+                    <i class="fa fa-cloud-upload tx-margin-right-8"></i>Module File
+                </label>
+                <input id ="u_file" type="file"/>
             </div>
             <div class="w3-panel">
                 <p id="u_message"></p>
             </div>
-            <div class="w3-panel">  
+            <div class="w3-panel" id="u_upload">  
                 <div id="u_command_cancel" class="w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Cancel</div>
                 <div id="u_command" class="w3-right w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Upload Module</div>     
             </div>
@@ -24,23 +27,27 @@
     </div>
 </div>
 <script>
+ document.querySelector("#u_upload").style.display = "none";   
  document.querySelector("#u_message").innerHTML= 'Choose file to upload';
+ let _data;
+ let _fd;    
+ document.querySelector("#u_file").onchange = function(e){
+     _fd = e.target.files[0];
+     document.querySelector("#u_message").innerHTML = _fd.name;
+     var reader = new FileReader();
+     reader.onload = (fe)=>{
+        _data = reader.result; 
+     };
+     reader.onloadend = (fe)=>{
+         console.log(_fd);
+         document.querySelector("#u_upload").style.display = "block";
+     };
+     reader.readAsArrayBuffer(_fd); 
+ };    
  document.querySelector("#u_command").onclick = function(){
-     let fd = document.querySelector("#u-file").value;
-     //let formData = new FormData();
-     //formData.append('payload',fd);
-     //console.log(formData.serialize());
-     var reader = new FileReader(fd);
-     
-     //AdminSetup.reset(function(payload){
-        //payload.applicationId = TARA_API.query().app.applicationId;//'demo-sync';
-        //payload.codebase= document.querySelector('#s_codebase').value;//'file:///development/boost/target';
-        //payload.moduleArtifact=document.querySelector('#s_moduleArtifact').value;//'tarantula-boost';
-        //payload.moduleVersion= document.querySelector('#s_moduleVersion').value;//'1.1';
-        //payload.moduleName=document.querySelector('#s_moduleName').value;//'com.tarantula.boost.Demo'; 
-    //},function(resp){
-        //document.querySelector("#u_message").innerHTML = resp.message;
-    //});    
+    TARA_API.onUpload(_data,_fd.name,(resp)=>{
+        console.log(resp);
+    });  
  };
  function tx_close_upload_module(){
      this.style.display = 'none';

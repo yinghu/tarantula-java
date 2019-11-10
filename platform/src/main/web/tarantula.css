@@ -21,8 +21,7 @@
 .tx-pay-with-card{font-family: "Oswald";font-size: 16px!important;}
 .tx-pay-price{font-family: "Oswald";font-size: 30px;}
 .tx-pay-amount{font-family: "Oswald";font-size: 20px;color: blueviolet}
-::-webkit-scrollbar {
-    width: 0px;
-    background: transparent;
-} 
+::-webkit-scrollbar {width: 0px;background: transparent;} 
 .tx-hide-scroll{overflow: hidden!important}
+.tx-file-upload{border: 1px solid #ccc;display: inline-block;padding: 6px 12px;cursor: pointer;}
+input[type="file"] {display: none;}

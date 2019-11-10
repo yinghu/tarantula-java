@@ -12,6 +12,11 @@ import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.util.*;
 
 import java.io.BufferedInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -64,6 +69,20 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public DataStoreProvider dataStoreProvider(){
         return this.tarantulaContext.dataStoreProvider();
+    }
+    public String upload(InputStream inputStream,String fname) throws Exception{
+        FileOutputStream fos = new FileOutputStream(this.tarantulaContext.deployDir+"/"+fname);
+        int b;
+        do{
+            b = inputStream.read();
+            if(b!=-1){
+                fos.write(b);
+            }
+        }while (b!=-1);
+        fos.flush();
+        fos.close();
+        ResponseHeader resp = new ResponseHeader("uploadModule",fname+" saved successfully",true);
+        return this.builder.create().toJson(resp);
     }
     public Module module(Descriptor descriptor){
         if(descriptor.codebase()!=null){
@@ -307,6 +326,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.integrationEventService = ics.subscribe(eventTopic,this);
         localTopic = ics.subscription();
         registerKey = ics.addEventListener(null,this);
+        try{
+            Path _path = Paths.get(this.tarantulaContext.deployDir);
+            if(!Files.exists(_path)){
+                Files.createDirectories(_path);
+            }
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+        log.info("Platform deployment provider started");
     }
 
     @Override

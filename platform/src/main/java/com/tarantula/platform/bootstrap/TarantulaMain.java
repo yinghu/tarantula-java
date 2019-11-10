@@ -80,6 +80,7 @@ public class TarantulaMain {
 			btx.operationRejectInterval = Long.parseLong(override(overriding,"tarantula.operation.reject.interval.ms",_user,_config));
 		    btx.tarantulaServerValidator = override(overriding,"tarantula.service.authenticator.provider",_user,_config);
 		    btx.tarantulaDeploymentProvider = override(overriding,"tarantula.service.deployment.service.provider",_user,_config);
+		    btx.deployDir  = override(overriding,"tarantula.service.deployment.dir",_user,_config);
 		    btx.maxActiveSessionNumber = Integer.parseInt(override(overriding,"tarantula.endpoint.session.max.number",_user,_config));
 			btx.tokenTimeout = Integer.parseInt(override(overriding,"tarantula.endpoint.session.timeout.m",_user,_config));
 			btx.ticketTimeout = Integer.parseInt(override(overriding,"tarantula.endpoint.ticket.timeout.s",_user,_config));
