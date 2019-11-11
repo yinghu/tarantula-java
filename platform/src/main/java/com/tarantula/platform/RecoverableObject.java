@@ -1,5 +1,6 @@
 package com.tarantula.platform;
 
+import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -177,5 +178,20 @@ public class RecoverableObject implements Recoverable {
     @Override
     public String toString(){
         return new String(SystemUtil.toJson(this.toMap()));
+    }
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        this.properties.forEach((k,v)->{
+            if(v instanceof String){
+                jsonObject.addProperty(k,(String)v);
+            }
+            else if(v instanceof Number){
+                jsonObject.addProperty(k,(Number)v);
+            }
+            else if(v instanceof Boolean){
+                jsonObject.addProperty(k,(Boolean)v);
+            }
+        });
+        return jsonObject;
     }
 }
