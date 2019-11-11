@@ -3,7 +3,7 @@ package com.tarantula.platform.presence;
 import com.tarantula.*;
 import com.tarantula.Response;
 import com.tarantula.platform.*;
-import com.tarantula.platform.service.DeploymentServiceProvider;
+
 import com.tarantula.platform.util.*;
 /**
  * Developer: YINGHU LU
@@ -12,16 +12,11 @@ import com.tarantula.platform.util.*;
 public class PresenceApplication extends TarantulaApplicationHeader {
 
 
-    //private DeploymentServiceProvider deploymentServiceProvider;
-    private RingBuffer<Connection> cBuffer;
-
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        this.cBuffer = new RingBuffer<>(new Connection[5]);
+
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
-        //deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        //deploymentServiceProvider.registerOnConnectionListener(this);
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
             Presence presence = this.context.presence(t.owner());
             OnBalance ob = (OnBalance)t;
@@ -38,7 +33,6 @@ public class PresenceApplication extends TarantulaApplicationHeader {
          if (session.action().equals("onPresence")) {
                 Presence presence = this.context.presence(session.systemId());
                 PresenceContext pc = new PresenceContext(session.action());
-                pc.connection = cBuffer.pop();
                 pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
                 session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
          }
@@ -90,37 +84,5 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes(),this.descriptor.responseLabel());
         }
 
-    }
-    public void onState(Connection c) {
-        if(c.type().equals(Connection.WEB_SOCKET)){
-            this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on presence service application",OnLog.WARN);
-            onWebSocket(c);
-        }
-    }
-    private void onWebSocket(Connection c) {
-        if(!c.disabled()){
-            if(!cBuffer.push(c)){
-                cBuffer.reset(((ca,limit)->{
-                    Connection[] cn = new Connection[ca.length*2];
-                    for(int i=0;i<limit;i++){
-                        cn[i]=ca[i];
-                    }
-                    cn[limit]=c;
-                    return cn;
-                }));
-            }
-        }
-        else{
-            cBuffer.reset((ca,limit)->{
-                Connection[] cn = new Connection[ca.length];
-                int r=0;
-                for(int i=0;i<limit;i++){
-                    if(!(ca[i].serverId().equals(c.serverId()))){
-                        cn[r++]=ca[i];
-                    }
-                }
-                return cn;
-            });
-        }
     }
 }

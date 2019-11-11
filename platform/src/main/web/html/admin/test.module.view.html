@@ -1,0 +1,57 @@
+<div class="w3-modal-content w3-white">
+    <div class="w3-card-4 tx-popup">
+        <div class="w3-bar w3-teal w3-text-white w3-border-bottom w3-border-orange">
+            <div class="w3-bar-item w3-left"><span>Service Test</span></div>
+            <div class="w3-bar-item w3-right w3-button" id='tx-close-test-module'><i class='fa fa-close'></i></div>
+        </div>
+            
+        <div class="w3-container w3-text-teal w3-border-bottom w3-border-orange">
+            <div class="w3-panel">
+                <span class="w3-round w3-center">Request Payload (JSON format required using double quote)</span>
+            </div>
+            <div class="w3-panel">
+                <span id="t_error" class="w3-round w3-center w3-red"></span>
+            </div>
+            <div class="w3-panel">
+                <textarea id="t_message"></textarea>  
+            </div>
+            <div class="w3-panel">  
+                <div id="t_command_cancel" class="w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Clear</div>
+                <div id="t_command" class="w3-right w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Test</div>     
+            </div>
+        </div>            
+        
+        <div class="w3-display-container w3-border-bottom w3-border-white w3-teal tx-content-36">
+            <div class="w3-display-bottomright tx-margin-right-32 tx-margin-bottom-4 tx-text-12">Powered By Game Engine Cluster</div>            
+        </div>
+    </div>
+</div>
+<script>
+   
+ document.querySelector("#t_message").style.fontSize='24px';    
+ document.querySelector("#t_command").onclick = function(){
+     let payload;
+     let jvalue = document.querySelector("#t_message").value;
+     try{
+        payload = JSON.parse(jvalue);
+     }catch(err){
+        document.querySelector("#t_error").innerHTML = err; 
+     }
+     if(payload){
+         TARA_API.onService(payload,(resp)=>{
+             document.querySelector("#t_error").innerHTML =jvalue; 
+             document.querySelector("#t_message").style.fontSize='16px';
+             var pretty = JSON.stringify(resp, undefined, 2);
+             document.querySelector("#t_message").value = pretty;
+         });
+     }  
+ };
+ function tx_close_test_module(){
+     this.style.display = 'none';
+     let m1 = document.querySelector('#m3');
+     m1.innerHTML='';
+     m1.style.display = 'none';
+ }
+ document.querySelector("#tx-close-test-module").onclick = tx_close_test_module;
+ document.querySelector("#t_command_cancel").onclick = ()=>{document.querySelector("#t_error").innerHTML='';document.querySelector("#t_message").value='';document.querySelector("#t_message").style.fontSize='24px'};  
+</script>

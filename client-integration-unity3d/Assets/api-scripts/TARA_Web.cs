@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using UnityEngine;
-
+using UnityEngine.Networking;
 namespace GameEngineCluster{
     
     public delegate void GecHandler(Exception ex);
@@ -221,6 +221,11 @@ namespace GameEngineCluster{
         private HttpClient _hc;
         
         public GecHttpClient(string host){
+            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            
+            HttpClientHandler handler = new HttpClientHandler();
+            //handler.UseDefaultCredentials = false;
+            //handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
             _hc = new HttpClient();
             _hc.BaseAddress = new Uri(host);
             _hc.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -246,6 +251,15 @@ namespace GameEngineCluster{
                 resp.EnsureSuccessStatusCode();
                 return await resp.Content.ReadAsStringAsync();
             }       
-        } 
+        }
+        //private static IEnumerator SendWebRequestCoroutine(UnityWebRequest request, TaskCompletionSource<string> tcs){
+			//yield return request.SendWebRequest();
+			//if (request.isNetworkError || request.isHttpError) {
+                //Debug.Log(www.error);	
+            //}
+            //else{
+                
+            //}
+		//}
     }
 }

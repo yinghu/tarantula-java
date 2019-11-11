@@ -43,13 +43,17 @@
     }; 
     cm.button.icon.texture = PIXI.Texture.from('assets/table.png');
     
-    let commandList = UI.textCommandList(2,160);
-    commandList.list[0].title('UploadModule');
+    let commandList = UI.textCommandList(3,160);
+    commandList.list[0].title('TestModule');
     commandList.list[0].button.command = function(){
+        _view({viewId:'admin.test.module',containerId:'#m3'});
+    };
+    commandList.list[1].title('UploadModule');
+    commandList.list[1].button.command = function(){
         _view({viewId:'admin.upload.module',containerId:'#m3'});
     }; 
-    commandList.list[1].title('AddModule');
-    commandList.list[1].button.command = function(){
+    commandList.list[2].title('AddModule');
+    commandList.list[2].button.command = function(){
         _view({viewId:'admin.add.module',containerId:'#m3'});
     };
     let setupList = UI.textCommandList(3,160);
@@ -189,7 +193,7 @@
                 adminObject.index=0;
                 adminObject.list = resp.payload.list;
                 setupList.list[0].title('UpdateApp');
-                setupList.list[1].title('DisableApp');
+                setupList.list[1].title('Test');
                 setupList.list[1].container.visible = false;
                 setupList.list[2].title('Reset');
                 _on_admin_stage();

@@ -120,6 +120,9 @@
             <view type="admin.upload.module">
                 <property name="moduleResourceFile">html/admin/upload.module.view.html</property>
             </view>
+            <view type="admin.test.module">
+                <property name="moduleResourceFile">html/admin/test.module.view.html</property>
+            </view>
         </view-list>
 
     </lobby-context>

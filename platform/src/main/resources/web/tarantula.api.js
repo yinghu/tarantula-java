@@ -239,7 +239,7 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-action',payload.command);
     aj.setRequestHeader('Tarantula-payload-size',_jp.length);  
     aj.send(_jp);
-  };  
+  };
   let _instance = function(payload,callback){
     let _jp = JSON.stringify(payload);
     let aj = new XMLHttpRequest();   
