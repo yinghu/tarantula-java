@@ -1,4 +1,6 @@
-namespace GameEngineCluster{
+using System.Collections;
+using System.Collections.Generic;
+namespace GameEngineCluster.Model{
     public class Header{
         public string name { get; set; }
         public string value { get; set; }
@@ -43,7 +45,7 @@ namespace GameEngineCluster{
         public bool secured { get; set; }
         public int port { get; set; }
     }
-    public class Descriptor{
+    public class Descriptor1{
         public bool singleton { get; set; }
         public int deployCode { get; set; }
         public string type { get; set; }
@@ -70,5 +72,18 @@ namespace GameEngineCluster{
     public class Profile{
         public string nickname { get; set; }
         public string avatar { get; set; }
+    }
+    public class ArenaZone{
+        public string name { get; set; }
+        public int rank { get; set; }
+        public string description { get; set; }
+        public bool enabled { get; set; }
+        public List<Arena> list { get; set; }
+    }
+    public class Arena{
+        public string name { get; set; }
+        public int level { get; set; }
+        public string description { get; set; }
+        public bool enabled { get; set; }
     }
 }

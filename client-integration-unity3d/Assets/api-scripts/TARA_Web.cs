@@ -3,6 +3,8 @@ using System.Net.WebSockets;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
@@ -12,6 +14,7 @@ using Newtonsoft.Json.Linq;
 
 using UnityEngine;
 using UnityEngine.Networking;
+using GameEngineCluster.Model;
 namespace GameEngineCluster{
     
     public delegate void GecHandler(Exception ex);
@@ -27,112 +30,6 @@ namespace GameEngineCluster{
         
         public NetworkingManager(string host){
             _ghc = new GecHttpClient(host);
-        }
-        
-        public  async Task<bool> Index(){
-            try{
-                string jstr = await _ghc.GetJson("user/index",new Header[]{new Header("Tarantula-tag","index/lobby")});
-                ParseLobbyList(jstr);
-                return true;
-            }catch(Exception ex){
-                OnException?.Invoke(ex);
-                return false;
-            }
-        }
-        public  async Task<bool> Register(User user){
-            try{
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","index/user"),
-                    new Header("Tarantula-magic-key",user.login),
-                    new Header("Tarantula-action","onRegister")
-                };
-                string json = JsonConvert.SerializeObject(user);
-                Debug.Log(json);
-                string jstr = await _ghc.PostJson("user/action",headers,json);
-                Debug.Log(jstr);
-                //ParseJson(jstr);
-                return true;
-            }catch(Exception ex){
-                OnException?.Invoke(ex);
-                return false;
-            }
-        }
-        public  async Task<bool> Login(User user){
-            try{
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","index/user"),
-                    new Header("Tarantula-magic-key",user.login),
-                    new Header("Tarantula-action","onLogin")
-                };
-                string json = JsonConvert.SerializeObject(user);
-                Debug.Log(json);
-                string jstr = await _ghc.PostJson("user/action",headers,json);
-                Debug.Log(jstr);
-                ParseLogin(jstr);
-                return true;
-            }catch(Exception ex){
-                OnException?.Invoke(ex);
-                return false;
-            }
-        }
-        public  async Task<bool> Device(Device device){
-            try{
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","index/user"),
-                    new Header("Tarantula-magic-key",device.deviceId),
-                    new Header("Tarantula-action","onReset")
-                };
-                string json = JsonConvert.SerializeObject(device);
-                Debug.Log(json);
-                string jstr = await _ghc.PostJson("user/action",headers,json);
-                Debug.Log(jstr);
-                ParseLogin(jstr);
-                return true;
-            }catch(Exception ex){
-                OnException?.Invoke(ex);
-                return false;
-            }
-        }
-        public  async Task<bool> Presence(){
-            try{
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","presence/lobby"),
-                    new Header("Tarantula-token",presence.token),
-                    new Header("Tarantula-action","onPresence")
-                };
-                //string json = JsonConvert.SerializeObject(user);
-                //Debug.Log(json);
-                string jstr = await _ghc.PostJson("service/action",headers,"{}");
-                Debug.Log(jstr);
-                ParsePresence(jstr);
-                bool suc = await _gwc.Connect();
-                Debug.Log("websocket->"+suc);
-                return true;
-            }catch(Exception ex){
-                OnException?.Invoke(ex);
-                return false;
-            }
-        }
-        public  async Task<bool> Profile(string systemId){
-            try{
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","presence/profile"),
-                    new Header("Tarantula-token",presence.token),
-                    new Header("Tarantula-action","onProfile")
-                };
-                Payload p = new Payload();
-                p.command = "onProfile";
-                p.headers = new Header[]{new Header("systemId",presence.systemId),new Header("stub",presence.stub.ToString())};
-                string json = JsonConvert.SerializeObject(p);
-                Debug.Log(json);
-                string jstr = await _ghc.PostJson("service/action",headers,json);
-                Debug.Log(jstr);
-                //ParseProfile(jstr);
-                return true;
-            }catch(Exception ex){
-                OnException?.Invoke(ex);
-                return false;
-            }
         }
         
         private void ParsePresence(string json){
@@ -177,13 +74,13 @@ namespace GameEngineCluster{
             }
             JArray tk = (JArray)jo.SelectToken("lobbyList");
             for(int i=0;i<tk.Count;i++){
-                Descriptor desc = tk[i].SelectToken("descriptor").ToObject<Descriptor>();
-                Debug.Log("Desc->"+desc.typeId+"/"+desc.name+"/"+desc.tag);
+                //Descriptor desc = tk[i].SelectToken("descriptor").ToObject<Descriptor>();
+                //Debug.Log("Desc->"+desc.typeId+"/"+desc.name+"/"+desc.tag);
                 JArray ta = (JArray)tk[i].SelectToken("applications");
                 if(ta.Count>0){
                     for(int j=0;j<ta.Count;j++){
-                        Descriptor app = ta[j].ToObject<Descriptor>();
-                        Debug.Log("App->"+app.typeId+"/"+app.name+"/"+desc.tag);
+                        //Descriptor app = ta[j].ToObject<Descriptor>();
+                        //Debug.Log("App->"+app.typeId+"/"+app.name+"/"+desc.tag);
                     }
                 }
             }    
@@ -218,48 +115,51 @@ namespace GameEngineCluster{
     }
     public class GecHttpClient{
         
-        private HttpClient _hc;
         
+        private string GEC_HOST = "localhost:8090";
         public GecHttpClient(string host){
-            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            GEC_HOST = host; 
             
-            HttpClientHandler handler = new HttpClientHandler();
-            //handler.UseDefaultCredentials = false;
-            //handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
-            _hc = new HttpClient();
-            _hc.BaseAddress = new Uri(host);
-            _hc.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
-        public async Task<string> GetJson(string path,Header[] headers){
-            using(HttpRequestMessage req = new HttpRequestMessage(new HttpMethod("GET"),path)){
+        
+        public async Task<string> GetJson(MonoBehaviour caller,string path,Header[] headers){
+            using(UnityWebRequest www = new UnityWebRequest(GEC_HOST+path,"GET")){
+                www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+                www.certificateHandler = new KeyValidator(); 
                 foreach(Header h in headers){
-                    req.Headers.Add(h.name,h.value);    
+                    www.SetRequestHeader(h.name,h.value);    
                 }
-                HttpResponseMessage resp = await _hc.SendAsync(req);
-                resp.EnsureSuccessStatusCode();
-                return await resp.Content.ReadAsStringAsync();
+                www.SetRequestHeader("Accept","application/json");
+                var tcs = new TaskCompletionSource<string>();
+                caller.StartCoroutine(SendWebRequest(www,tcs));    
+                return await tcs.Task;
             }
         }
-        public async Task<string> PostJson(string path,Header[] headers,string json){
-            using(HttpRequestMessage req = new HttpRequestMessage(new HttpMethod("POST"),path)){
-                req.Content = new StringContent(json,Encoding.UTF8,"application/x-www-form-urlencoded");
+        public async Task<string> PostJson(MonoBehaviour caller,string path,Header[] headers,string json){
+            using(UnityWebRequest www = new UnityWebRequest(GEC_HOST+path,"POST")){
+                byte[] payload = Encoding.UTF8.GetBytes(json.ToString());
+                www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+                www.certificateHandler = new KeyValidator(); 
+                www.uploadHandler = (UploadHandler)new UploadHandlerRaw(payload);
                 foreach(Header h in headers){
-                    req.Headers.Add(h.name,h.value);    
+                    www.SetRequestHeader(h.name,h.value);    
                 }
-                req.Headers.Add("Tarantula-payload-size",""+json.Length);  
-                HttpResponseMessage resp = await _hc.SendAsync(req);
-                resp.EnsureSuccessStatusCode();
-                return await resp.Content.ReadAsStringAsync();
-            }       
-        }
-        //private static IEnumerator SendWebRequestCoroutine(UnityWebRequest request, TaskCompletionSource<string> tcs){
-			//yield return request.SendWebRequest();
-			//if (request.isNetworkError || request.isHttpError) {
-                //Debug.Log(www.error);	
-            //}
-            //else{
-                
-            //}
-		//}
+                www.SetRequestHeader("Accept","application/json");
+                www.SetRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                www.SetRequestHeader("Tarantula-payload-size",""+payload.Length);
+                var tcs = new TaskCompletionSource<string>();
+                caller.StartCoroutine(SendWebRequest(www,tcs));    
+                return await tcs.Task;
+            }
+        }  
+        private static IEnumerator SendWebRequest(UnityWebRequest request, TaskCompletionSource<string> tcs){
+			yield return request.SendWebRequest();
+			if(request.isNetworkError || request.isHttpError) {
+                tcs.SetResult("{}"); 
+            }
+            else{
+                tcs.SetResult(request.downloadHandler.text);        
+            }
+		}
     }
 }
