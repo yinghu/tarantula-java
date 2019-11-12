@@ -1,5 +1,6 @@
 package com.tarantula.cci;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
@@ -8,6 +9,7 @@ import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServiceActionEvent;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.UUID;
@@ -21,6 +23,7 @@ public class UserEventHandler implements RequestHandler {
     private AccessIndexService accessIndexService;
     private String serverTopic;
     private String bucket;
+    private GsonBuilder builder;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
 
     public UserEventHandler(){
@@ -54,7 +57,7 @@ public class UserEventHandler implements RequestHandler {
                         this.eventService.publish(event);
                     }else{
                         //send login failed back
-                        byte[] eb = new Gson().toJson(new ResponseHeader("onLogin","wrong login/password combination",false)).getBytes();
+                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onLogin","wrong login/password combination",false)).getBytes();
                         _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
                     }
                 }
@@ -67,7 +70,7 @@ public class UserEventHandler implements RequestHandler {
                         event.routingNumber(_routingKey.routingNumber());
                         this.eventService.publish(event);
                     }else{
-                        byte[] eb = new Gson().toJson(new ResponseHeader("onTicket","ticket not exist",false)).getBytes();
+                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onTicket","ticket not exist",false)).getBytes();
                         _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
                     }
                 }
@@ -129,6 +132,8 @@ public class UserEventHandler implements RequestHandler {
     public void start() throws Exception {
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
+        this.builder = new GsonBuilder();
+        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         log.info("User handler started");
     }
 
