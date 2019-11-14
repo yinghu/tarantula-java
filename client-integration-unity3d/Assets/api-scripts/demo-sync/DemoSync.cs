@@ -19,9 +19,9 @@ public class DemoSync : MonoBehaviour {
         Device dev = new Device();
         dev.deviceId = "abc12345";
         bool suc = await crt.Device(dev);
-        Debug.Log("suc=>"+suc);
-        await crt.ArenaList();
-        rtt._Update(false);
+        if(suc){
+            await crt.OnWebSocket();
+        }
     }
     
 	void Start () {

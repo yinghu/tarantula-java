@@ -15,15 +15,21 @@ public class NetworkManager : MonoBehaviour{
     public string GEC_HOST;
     
     private GecHttpClient _ghc;
+    private GecWebSocket _gsc;
     
+    private Connection connection;
     private Presence presence;
+    
     public event GecHandler OnException;
     
     void Start(){
         _ghc = new GecHttpClient(GEC_HOST);
+        
     }
 
-    void Update(){}
+    void Update(){
+          
+    }
     
     public  async Task<bool> Index(){
         try{
@@ -61,11 +67,8 @@ public class NetworkManager : MonoBehaviour{
                 new Header("Tarantula-action","onLogin")
             };
             string json = JsonConvert.SerializeObject(user);
-            Debug.Log(json);
             string jstr = await _ghc.PostJson(this,"/user/action",headers,json);
-            Debug.Log(jstr);
-            ParseLogin(jstr);
-            return true;
+            return ParseLogin(jstr);            
         }catch(Exception ex){
             OnException?.Invoke(ex);
             return false;
@@ -100,11 +103,8 @@ public class NetworkManager : MonoBehaviour{
                 new Header("Tarantula-action","onReset")
             };
             string json = JsonConvert.SerializeObject(device);
-            Debug.Log(json);
             string jstr = await _ghc.PostJson(this,"/user/action",headers,json);
-            Debug.Log(jstr);
-            ParseLogin(jstr);
-            return true;
+            return ParseLogin(jstr);
         }catch(Exception ex){
             OnException?.Invoke(ex);
             return false;
@@ -128,29 +128,35 @@ public class NetworkManager : MonoBehaviour{
             return false;
         }
     }
-    private void ParseLogin(string json){
-            JObject jo = JObject.Parse(json);
-            bool suc = (bool)jo.SelectToken("successful");
-            if(!suc){
-                return;
-            }
-            JToken tk = jo.SelectToken("presence");
-            presence = tk.ToObject<Presence>();
-            Debug.Log(presence.systemId);
-            Debug.Log(presence.token);
-            Debug.Log(presence.login);
-            /**
-            for(int i=0;i<tk.Count;i++){
-                Descriptor desc = tk[i].SelectToken("descriptor").ToObject<Descriptor>();
-                Debug.Log("Desc->"+desc.typeId+"/"+desc.name+"/"+desc.tag);
-                JArray ta = (JArray)tk[i].SelectToken("applications");
-                if(ta.Count>0){
-                    for(int j=0;j<ta.Count;j++){
-                        Descriptor app = ta[j].ToObject<Descriptor>();
-                        Debug.Log("App->"+app.typeId+"/"+app.name+"/"+desc.tag);
-                    }
+    public async Task<bool> OnWebSocket(){
+        try{
+            _gsc = new GecWebSocket(connection,presence,"tarantula-service");     
+            bool connected = await _gsc.Connect();
+            if(connected){
+                for(;;){
+                    string rev = await _gsc.Receive();
+                    Debug.Log(rev);
                 }
-            }**/   
+            }
+            
+        }catch(Exception ex){
+            OnException?.Invoke(ex);
+        }
+        return true;
+    }
+    private bool ParseLogin(string json){
+        JObject jo = JObject.Parse(json);
+        bool suc = (bool)jo.SelectToken("successful");
+        if(!suc){
+            return suc;
+        }
+        JToken tk = jo.SelectToken("presence");
+        presence = tk.ToObject<Presence>();
+        //Debug.Log(presence.systemId);
+        //Debug.Log(presence.token);
+        //Debug.Log(presence.login);
+        connection = jo.SelectToken("connection").ToObject<Connection>();
+        return true;
     }
     private void ParseLobbyList(string json){
         JObject jo = JObject.Parse(json);

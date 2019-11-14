@@ -19,72 +19,8 @@ namespace GameEngineCluster{
     
     public delegate void GecHandler(Exception ex);
    
-    public class NetworkingManager{
+    public class GecUdpSocket{
         
-        private GecHttpClient _ghc;
-        private GecWebSocket _gwc;
-        private Presence presence;
-        private Connection connection;
-        
-        public event GecHandler OnException;
-        
-        public NetworkingManager(string host){
-            _ghc = new GecHttpClient(host);
-        }
-        
-        private void ParsePresence(string json){
-            JObject jo = JObject.Parse(json);
-            bool suc = (bool)jo.SelectToken("successful");
-            if(!suc){
-                return;
-            }
-            JToken tk = jo.SelectToken("connection");
-            connection = tk.ToObject<Connection>();
-            _gwc = new GecWebSocket(connection,presence,"tarantula-service"); 
-        }
-        private void ParseLogin(string json){
-            JObject jo = JObject.Parse(json);
-            bool suc = (bool)jo.SelectToken("successful");
-            if(!suc){
-                return;
-            }
-            JToken tk = jo.SelectToken("presence");
-            presence = tk.ToObject<Presence>();
-            Debug.Log(presence.systemId);
-            Debug.Log(presence.token);
-            Debug.Log(presence.login);
-            /**
-            for(int i=0;i<tk.Count;i++){
-                Descriptor desc = tk[i].SelectToken("descriptor").ToObject<Descriptor>();
-                Debug.Log("Desc->"+desc.typeId+"/"+desc.name+"/"+desc.tag);
-                JArray ta = (JArray)tk[i].SelectToken("applications");
-                if(ta.Count>0){
-                    for(int j=0;j<ta.Count;j++){
-                        Descriptor app = ta[j].ToObject<Descriptor>();
-                        Debug.Log("App->"+app.typeId+"/"+app.name+"/"+desc.tag);
-                    }
-                }
-            } **/   
-        }
-        private void ParseLobbyList(string json){
-            JObject jo = JObject.Parse(json);
-            bool suc = (bool)jo.SelectToken("successful");
-            if(!suc){
-                return;
-            }
-            JArray tk = (JArray)jo.SelectToken("lobbyList");
-            for(int i=0;i<tk.Count;i++){
-                //Descriptor desc = tk[i].SelectToken("descriptor").ToObject<Descriptor>();
-                //Debug.Log("Desc->"+desc.typeId+"/"+desc.name+"/"+desc.tag);
-                JArray ta = (JArray)tk[i].SelectToken("applications");
-                if(ta.Count>0){
-                    for(int j=0;j<ta.Count;j++){
-                        //Descriptor app = ta[j].ToObject<Descriptor>();
-                        //Debug.Log("App->"+app.typeId+"/"+app.name+"/"+desc.tag);
-                    }
-                }
-            }    
-        }
     }
     
     public class GecWebSocket{
@@ -113,6 +49,7 @@ namespace GameEngineCluster{
             return Encoding.UTF8.GetString(rbuff.Array,0,wrs.Count);
         }
     }
+    
     public class GecHttpClient{
         
         
