@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Balance : MonoBehaviour {
 
-    public TARA_API api;
+    public NetworkManager api;
 	
 	void Start () {
 		GetComponentInChildren<TextMesh>().text="-------";
@@ -14,11 +14,11 @@ public class Balance : MonoBehaviour {
 		
 	}
     public void OnBalance(){
-        api.Balance((resp)=>{
+        ///api.Balance((resp)=>{
             //JSONObject jmx = new JSONObject(resp);
             //Debug.Log(resp);
-            GetComponentInChildren<TextMesh>().text = resp.GetField("presence").GetField("balance").str;      
-        });
+            //GetComponentInChildren<TextMesh>().text = resp.GetField("presence").GetField("balance").str;      
+        //});
     }
     public void ClearBalance(){
         GetComponentInChildren<TextMesh>().text="-------";

@@ -11,16 +11,11 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 public class CRotate : MonoBehaviour {
 
-    public TARA_API api;
+    public NetworkManager api;
 	public float speed = 10.0f;
     private bool _active;
 
-    private GecHttpClient hc;
-    void Awake(){
-         hc = new GecHttpClient("https://gameenginecluster.com");
-         //hc.OnException += PrintException;
-         DontDestroyOnLoad(this.gameObject);
-    }
+    
     void Start () {
 		_active=false;
 	}

@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using GameEngineCluster.Model;
 public class Login : MonoBehaviour {
 
-    public TARA_API api;
+    public NetworkManager api;
     public Balance balance;
     public Notification notification;
     public DemoSync demoSync;
@@ -17,15 +17,9 @@ public class Login : MonoBehaviour {
 	void Update () {
 		
 	}
-    public void OnMouseDown(){
-        api.Reset(deviceId,(b)=>{
-            if(b){
-                notification.OnNotification();
-                demoSync.OnLobby();
-            }
-            else{
-                Debug.Log(deviceId);
-            }
-        });
+    public async void OnMouseDown(){
+        Device device = new Device();
+        device.deviceId="abc123";
+        await api.Device(device);
     }
 }

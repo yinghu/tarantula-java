@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ProfileSync : MonoBehaviour {
 
-    public TARA_API api;
+    public NetworkManager api;
     public Logger logger;
 	public string protocol;
     private int fn;
@@ -15,6 +15,7 @@ public class ProfileSync : MonoBehaviour {
 	void Update () {
 		fn++;
 	}
+    /**
     public void OnMouseDown(){
         if(protocol.Equals("ws")){//web socket request
             api.AddMessageListener("profile",(m)=>{
@@ -51,5 +52,5 @@ public class ProfileSync : MonoBehaviour {
                 logger.Log(ms);        
             });
         }     
-    }
+    }**/
 }

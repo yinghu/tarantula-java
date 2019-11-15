@@ -25,24 +25,13 @@ public class RequestParser{
                 }
             }
         }
-
         if(httpExchange.getRequestMethod().equalsIgnoreCase("POST")){ //skip GET METHOD
             boolean onJson = requestMapping.get(Session.HTTP_CONTENT_TYPE).toString().startsWith("application/x-www-form-urlencoded");
             if(onJson){
                 InputStream in = httpExchange.getRequestBody();
                 byte[] buffer = new byte[pz>0?pz:in.available()];
                 in.read(buffer);
-                /**
-                int b;
-                do{
-                    b = in.read();
-                    if(b!=-1){
-                        buffer.write(b);
-                    }
-
-                }while(b!=-1);**/
                 requestMapping.put(Session.TARANTULA_PAYLOAD,buffer);
-                //buffer.close();
             }
             else{
                 BufferedReader bread = new BufferedReader(new InputStreamReader(httpExchange.getRequestBody()));

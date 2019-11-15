@@ -17,7 +17,6 @@ public class ProfileApplication extends TarantulaApplicationHeader {
 
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
-        //this.context.log(new String(payload),OnLog.WARN);
         if(session.action().equals("onProfile")){
             OnAccess cmd = this.builder.create().fromJson(new String((payload)).trim(),OnAccess.class);
             Profile u = this._load(cmd.property("systemId"));
@@ -26,7 +25,6 @@ public class ProfileApplication extends TarantulaApplicationHeader {
             session.write(builder.create().toJson(pcx).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("content/avatar")){
-            //this.context.log(session.trackId(),OnLog.INFO);
             Avatar avatar = new Avatar();
             avatar.distributionKey(session.trackId());
             if(this.dataStore.load(avatar)){
@@ -42,9 +40,8 @@ public class ProfileApplication extends TarantulaApplicationHeader {
                 this.dataStore.createIfAbsent(avatar,false);
             }
         }
-        else{
-            OnAccess cmd = this.builder.create().fromJson(new String((payload)).trim(),OnAccess.class);
-            Profile u = this._load(cmd.systemId());
+        else{//get profile via GET
+            Profile u = this._load(session.systemId());
             PresenceContext pcx  = new PresenceContext("onProfile");
             pcx.profile = u;
             session.write(builder.create().toJson(pcx).getBytes(),this.descriptor.responseLabel());

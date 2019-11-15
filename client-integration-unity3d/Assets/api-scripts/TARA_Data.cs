@@ -13,6 +13,16 @@ namespace GameEngineCluster.Model{
         public string command;
         public Header[] headers;
     }
+    public class Streaming{
+        public string action { get; set; }
+        public string path { get; set; }
+        public bool streaming { get; set; }
+        public string label { get; set; }
+        public string applicationId { get; set; }
+        public string instanceId { get; set; }
+        public string tag { get; set; }
+        public Payload data{get;set;}
+    }
     public class Device{
         public string deviceId { get; set; }
     }

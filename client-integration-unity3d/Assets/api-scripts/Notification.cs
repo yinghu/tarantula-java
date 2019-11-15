@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Notification : MonoBehaviour {
     
-    public TARA_API api;
+    public NetworkManager api;
     
 	private TextMesh tb;
    
@@ -16,8 +16,8 @@ public class Notification : MonoBehaviour {
 	void Update () {   
 	}
     public void OnNotification(){
-        api.OnNotification("presence/notice",(jm)=>{
-            tb.text = jm.ToString();
-        });
+        //api.OnNotification("perfect-notification",(jm)=>{
+            //tb.text = jm.ToString();
+        //});
     }
 }

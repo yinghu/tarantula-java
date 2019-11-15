@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Demo : MonoBehaviour {
-    public TARA_API api;
+    public NetworkManager api;
     public Balance balance;
     public Logger logger;
     public CRotate rot;
@@ -26,6 +26,7 @@ public class Demo : MonoBehaviour {
         desc = descriptor; 
         tb.text = desc.Name();   
     }
+    /**
     public void OnMouseDown(){
         if(desc!=null&&(!joined)){
             api.Play(desc,(g)=>{
@@ -58,7 +59,7 @@ public class Demo : MonoBehaviour {
                 api.StopUdp();
             });
         }
-    }
+    }**/
     public void Sync(string cmd){
         if(joined){
             rot._Update(true);
@@ -66,13 +67,13 @@ public class Demo : MonoBehaviour {
             jn.AddField("command",cmd);
             Instance ins = new Instance(desc.ApplicationId(),game.GetField("instanceId").str,cmd,jn);
             fn=0;
-            api.Send(ins);
+            //api.Send(ins);
             JSONObject jp = new JSONObject(JSONObject.Type.OBJECT);
             jp.AddField("x",10);
             jp.AddField("y",10);
             jp.AddField("z",10);
             jp.AddField("label","update");
-            api.Forward(game.GetField("label").str,game.GetField("instanceId").str,jp);
+            //api.Forward(game.GetField("label").str,game.GetField("instanceId").str,jp);
         }
     }
     void OnTimer(JSONObject m){

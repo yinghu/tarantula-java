@@ -47,7 +47,7 @@ public class ApplicationEventHandler  implements RequestHandler {
                 magic.stub(id.stub());
                 magic.ticket(id.ticket());
                 magic.trackId(id.oid());
-                magic.action(action!=null?action:"");
+                magic.action(action!=null?action:path);
                 magic.routingNumber(id.routingNumber());
                 magic.destination(eventService.instanceRoutingKey(applicationId,instanceId).route());
                 magic.streaming(exchange.streaming());
@@ -58,7 +58,7 @@ public class ApplicationEventHandler  implements RequestHandler {
                 magic.stub(id.stub());
                 magic.ticket(id.ticket());
                 magic.trackId(id.oid());
-                magic.action(action!=null?action:"");
+                magic.action(action!=null?action:path);
                 magic.routingNumber(id.routingNumber());
                 magic.destination(eventService.routingKey(id.systemId(),tag).route());//use tag with systemId or instanceId partition to route event to target service endpoint
                 magic.streaming(exchange.streaming());

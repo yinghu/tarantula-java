@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using GameEngineCluster.Model;
 public class Register : MonoBehaviour {
 
-    public TARA_API api;
+    public NetworkManager api;
     
 	void Start () {
 		
@@ -13,9 +13,8 @@ public class Register : MonoBehaviour {
 	void Update () {
 		
 	}
-    public void OnMouseDown(){
-        api.Register("aaa","aaa","AndyQ",(m)=>{
-            Debug.Log(m);
-        });
+    public async void OnMouseDown(){
+        User user = new User();
+        await api.Register(user);
     }
 }

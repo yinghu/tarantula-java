@@ -22,8 +22,12 @@ public class NetworkManager : MonoBehaviour{
     
     public event GecHandler OnException;
     
+    void Awake(){
+         _ghc = new GecHttpClient(GEC_HOST);
+         DontDestroyOnLoad(this.gameObject);
+    }
+    
     void Start(){
-        _ghc = new GecHttpClient(GEC_HOST);
         
     }
 
@@ -74,19 +78,13 @@ public class NetworkManager : MonoBehaviour{
             return false;
         }
     }
-    public  async Task<bool> Profile(string systemId){
+    public  async Task<bool> Profile(){
         try{
             Header[] headers = new Header[]{
                 new Header("Tarantula-tag","presence/profile"),
                 new Header("Tarantula-token",presence.token),
-                new Header("Tarantula-action","onProfile")
             };
-            Payload p = new Payload();
-            p.command = "onProfile";
-            p.headers = new Header[]{new Header("systemId",presence.systemId),new Header("stub",presence.stub.ToString())};
-            string json = JsonConvert.SerializeObject(p);
-            Debug.Log(json);
-            string jstr = await _ghc.PostJson(this,"/service/action",headers,json);
+            string jstr = await _ghc.GetJson(this,"/service/action",headers);
             Debug.Log(jstr);
             //ParseProfile(jstr);
             return true;
@@ -119,7 +117,7 @@ public class NetworkManager : MonoBehaviour{
             };
             //string json = JsonConvert.SerializeObject(device);
             //Debug.Log(json);
-            string jstr = await _ghc.PostJson(this,"/service/action",headers,"{}");
+            string jstr = await _ghc.GetJson(this,"/service/action",headers);
             Debug.Log(jstr);
             //ParseLogin(jstr);
             return true;
@@ -128,11 +126,48 @@ public class NetworkManager : MonoBehaviour{
             return false;
         }
     }
+    public async Task<bool> OnNotification(string label){
+        try{
+            //AddMessageListener(label,callback);
+            Streaming ms = new Streaming();
+            ms.action="onStart";
+            ms.streaming=true;
+            ms.label=label;
+            Payload dt = new Payload();
+            dt.command="onStart";
+            ms.data=dt;
+            string json = JsonConvert.SerializeObject(ms);
+            Debug.Log(json);
+            return await _gsc.Send(json);
+        }catch(Exception ex){
+            Debug.Log(ex);
+            return false;
+        }
+    }
+    public async Task<bool> Send(Header[] headers,string json){
+        //JSONObject ms = new JSONObject(JSONObject.Type.OBJECT);
+        //ms.AddField("action",target.action);
+        //ms.AddField("streaming",target.streaming);
+        //ms.AddField("path",target.path);
+        //ms.AddField("tag",target.tag);
+        //ms.AddField("data",target.data); 
+        return await _gsc.Send("");
+    }
     public async Task<bool> OnWebSocket(){
         try{
             _gsc = new GecWebSocket(connection,presence,"tarantula-service");     
             bool connected = await _gsc.Connect();
             if(connected){
+                Streaming ms = new Streaming();
+                ms.action="onStart";
+                ms.streaming=true;
+                ms.label="perfect-notification";
+                Payload dt = new Payload();
+                dt.command="onStart";
+                ms.data=dt;
+                string json = JsonConvert.SerializeObject(ms,new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                Debug.Log(json);
+                await _gsc.Send(json);
                 for(;;){
                     string rev = await _gsc.Receive();
                     Debug.Log(rev);

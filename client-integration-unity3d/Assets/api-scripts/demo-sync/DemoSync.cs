@@ -2,37 +2,63 @@
 using System.Collections.Generic;
 using UnityEngine;
 using GameEngineCluster.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 public class DemoSync : MonoBehaviour {
 
-	public TARA_API api;
+	public NetworkManager api;
     public Balance balance;
     public Notification notification; 
     
     public Demo[] demoList;
     
     public string deviceId;
-    public NetworkManager crt;
+   
     public CRotate rtt;
     public async void OnMouseDown(){
         //OnLobby();   
         rtt._Update(true);
         Device dev = new Device();
         dev.deviceId = "abc12345";
-        bool suc = await crt.Device(dev);
+        bool suc = await api.Device(dev);
         if(suc){
-            await crt.OnWebSocket();
+            await api.ArenaList();
+            await api.Profile();
+            await api.OnWebSocket();
+            //await api.OnNotification("perfect-notification");
+        }
+        Streaming ms = new Streaming();
+        ms.action="onStart";
+        ms.streaming=true;
+        ms.label="label";
+        Payload dt = new Payload();
+        dt.command="onStart";
+        ms.data=dt;
+        string json = JsonConvert.SerializeObject(ms);
+        Debug.Log(json);
+    }
+    
+    public async void OnDemo(){
+        //OnLobby();   
+        rtt._Update(true);
+        Device dev = new Device();
+        dev.deviceId = "abc12345";
+        bool suc = await api.Device(dev);
+        if(suc){
+            await api.OnWebSocket();
         }
     }
     
 	void Start () {
-	   api.Reset(deviceId,(b)=>{
+	       /**
+        api.Reset(deviceId,(b)=>{
             if(b){
                 notification.OnNotification();     
             }
             else{
                 Debug.Log(deviceId);
             }
-        });   	
+        });  **/ 	
 	}
 	
 	void Update () {
@@ -40,11 +66,12 @@ public class DemoSync : MonoBehaviour {
 	}
     public void OnLobby(){
         int i = 0;
+        /**
         api.OnLobby("demo",(desp)=>{
             if(!desp.Category().Equals("lobby")){
                 Debug.Log(desp.ApplicationId()+"/"+desp.Category());
                 demoList[i++].OnLobby(desp);
             }    
-        });
+        });**/
     }
 }
