@@ -18,7 +18,6 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
     private LeaderBoardServiceProvider leaderBoardServiceProvider;
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
-        OnAccess acc = builder.create().fromJson(new String(payload),OnAccess.class);
         PresenceContext lcx = new PresenceContext();
         if(session.action().equals("onLevel")){
             XPLevel l = (XPLevel)this._load(session.systemId());
@@ -26,6 +25,7 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
             session.write(this.builder.create().toJson(lcx).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onXP")){
+            OnAccess acc = builder.create().fromJson(new String(payload),OnAccess.class);
             String header = acc.property("header");
             String category = acc.property("category");
             XPLevel l = (XPLevel) this._load(session.systemId());
@@ -65,6 +65,7 @@ public class XPLevelApplication extends TarantulaApplicationHeader{
         this._dataStore.list(new XPQuery(_px.distributionKey())).forEach((x)->{
             _px.xp(x);
         });
+        //((XPLevel) _px).levelView = this.rule.onLevel(_px);
         return _px;
     }
     private Level _loadLevel(String systemId){
