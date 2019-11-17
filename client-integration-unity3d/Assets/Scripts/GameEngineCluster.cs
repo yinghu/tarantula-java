@@ -23,6 +23,8 @@ namespace Tarantula.Networking{
         private GecHttpClient _ghc;
         private GecWebSocket _gwc;
         public Presence presence {set;get;}
+        public Profile profile {set;get;}
+        public string message {set;get;}
         private Connection connection;   
        
         public  GameEngineCluster(string host){
@@ -62,7 +64,7 @@ namespace Tarantula.Networking{
                 };
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
                 Debug.Log(jstr);
-                //ParseProfile(jstr);
+                ParseProfile(jstr);
                 return true;
             }catch(Exception ex){
                 OnException?.Invoke(ex);
@@ -123,7 +125,18 @@ namespace Tarantula.Networking{
             connection = jo.SelectToken("connection").ToObject<Connection>();
             _gwc = new GecWebSocket(connection,presence);
             return true;
-        }   
+        }
+        private bool ParseProfile(string json){
+            JObject jo = JObject.Parse(json);
+            bool suc = (bool)jo.SelectToken("successful");
+            if(!suc){
+                message = (string)jo.SelectToken("message");
+                return suc;
+            }
+            JToken tk = jo.SelectToken("profile");
+            profile = tk.ToObject<Profile>();
+            return true;
+        }
    } 
     
    public class GecWebSocket{
@@ -252,6 +265,10 @@ namespace Tarantula.Networking{
         public string nickname { get; set; }
         public string emailAddress { get; set; }
         public string password { get; set; }
+    }
+    public class Profile{
+        public string nickname { get; set; }
+        public string avatar { get; set; }
     }
     public class Connection{
         public string command { get; set; }

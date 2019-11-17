@@ -55,6 +55,12 @@ public class ConnectionInfo extends ResponseHeader implements Connection {
     public void protocol(String protocol) {
         this.protocol = protocol;
     }
+    public String subProtocol(){
+        return "tarantula-service";
+    }
+    public void subProtocol(String subProtocol){
+
+    }
     public String path(){
         return this.path;
     }

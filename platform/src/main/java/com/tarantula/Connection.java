@@ -17,6 +17,9 @@ public interface Connection extends Response {
     String protocol();
     void protocol(String protocol);
 
+    String subProtocol();
+    void subProtocol(String subProtocol);
+
     String host();
     void host(String host);
 

@@ -18,6 +18,7 @@ public class ConnectionSerializer implements JsonSerializer<Connection>{
         jp.addProperty("serverId",onConnection.serverId());
         jp.addProperty("secured",onConnection.secured());
         jp.addProperty("protocol",onConnection.protocol());
+        jp.addProperty("subProtocol",onConnection.subProtocol());
         jp.addProperty("host",onConnection.host());
         jp.addProperty("path",onConnection.path());
         jp.addProperty("port",onConnection.port());
