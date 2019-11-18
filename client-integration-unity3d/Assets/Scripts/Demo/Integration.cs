@@ -13,6 +13,7 @@ public class Integration : MonoBehaviour{
     
     
     private static Integration instance;
+    private bool onNotification;
 
 	public static Integration Instance{
 		get
@@ -40,7 +41,7 @@ public class Integration : MonoBehaviour{
          DontDestroyOnLoad(this.gameObject);
     }
     void Start(){
-           
+        onNotification = false;   
     }
 
    
@@ -51,6 +52,11 @@ public class Integration : MonoBehaviour{
     public async void profile(){
         bool suc = await gec.Profile(this);
         Debug.Log(gec.profile.nickname);
+    }
+    public async void notification(){
+        onNotification = !onNotification;
+        bool suc = await gec.OnNotification("perfect-notification",onNotification);
+        //Debug.Log(gec.profile.nickname);
     }
 
 }

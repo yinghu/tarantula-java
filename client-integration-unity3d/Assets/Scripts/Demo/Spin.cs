@@ -24,7 +24,7 @@ public class Spin : MonoBehaviour
         GameEngineCluster gec = Integration.Instance.gec;
         gec.OnException += (ex)=>{Debug.Log(ex);};
         Device device = new Device();
-        device.deviceId = "abc123";
+        device.deviceId = "abc123ggggggggggg";
         bool suc = await gec.Device(this,device);
         if(suc){
             Debug.Log(gec.presence.systemId);
@@ -35,6 +35,9 @@ public class Spin : MonoBehaviour
             suc = await gec.OnWebSocket();
             //to do success
             //_active = false;
+        }
+        else{
+            Debug.Log("opps=>"+gec.message);
         }
     }
 }
