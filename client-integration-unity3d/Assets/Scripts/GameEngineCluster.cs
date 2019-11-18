@@ -65,6 +65,14 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
                 Debug.Log(jstr);
                 ParseProfile(jstr);
+                //profile get over websocket 
+                Streaming strm = new Streaming();
+                strm.path = "/service/action";
+                strm.tag = "presence/profile";
+                strm.streaming = false;
+                string json = JsonConvert.SerializeObject(strm,new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
+                Debug.Log(json);
+                await _gwc.Send(json);
                 return true;
             }catch(Exception ex){
                 OnException?.Invoke(ex);
@@ -79,8 +87,26 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-action","onReset")
                 };
                 string json = JsonConvert.SerializeObject(device);
+                Debug.Log(json);
                 string jstr = await _ghc.PostJson(caller,"/user/action",headers,json);
                 return ParseLogin(jstr);
+            }catch(Exception ex){
+                OnException?.Invoke(ex);
+                return false;
+            }
+        }
+        public async Task<bool> OnNotification(string label,bool streaming){
+            try{
+                Streaming strm = new Streaming();
+                strm.action = streaming?"onStart":"onStop";
+                strm.label = label;
+                strm.streaming = true;
+                Payload p = new Payload();
+                p.command = strm.action;
+                strm.data = p;
+                string json = JsonConvert.SerializeObject(strm,new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
+                Debug.Log(json);
+                return await _gwc.Send(json);
             }catch(Exception ex){
                 OnException?.Invoke(ex);
                 return false;
@@ -100,13 +126,22 @@ namespace Tarantula.Networking{
             }catch(Exception ex){
                 OnException?.Invoke(ex);
                 return false;
+            }   
+        }
+        public async Task<bool> Close(){
+            try{
+                bool suc = await _gwc.Close();
+                return suc;
+            }catch(Exception ex){
+                OnException?.Invoke(ex);
+                return false;
             }
-            
         }
         private bool ParseIndex(string json){
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
             if(!suc){
+                message = (string)jo.SelectToken("message");
                 return suc;
             }
             //JToken tk = jo.SelectToken("presence");
@@ -118,6 +153,7 @@ namespace Tarantula.Networking{
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
             if(!suc){
+                message = (string)jo.SelectToken("message");
                 return suc;
             }
             JToken tk = jo.SelectToken("presence");
@@ -138,7 +174,9 @@ namespace Tarantula.Networking{
             return true;
         }
    } 
-    
+   public class GecUdpSocket{
+       
+   }    
    public class GecWebSocket{
         private ClientWebSocket _websocket;
         private string _url;
@@ -152,6 +190,10 @@ namespace Tarantula.Networking{
         public async Task<bool> Connect(){
             await _websocket.ConnectAsync(new Uri(_url),new CancellationTokenSource(5000).Token);
             return _websocket.State == WebSocketState.Open;
+        }
+        public async Task<bool> Close(){
+            await _websocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+            return _websocket.State == WebSocketState.Closed;
         }
         public async Task<bool> Send(string json){
            ArraySegment<Byte> om = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(json.ToString()));     
@@ -227,6 +269,21 @@ namespace Tarantula.Networking{
             this.name = name;
             this.value = value;
         }
+    }
+    public class Payload{
+        public string command;
+        public Header[] headers;
+    }
+    public class Streaming{
+        public string path;
+        public string action;
+        public string label;
+        public string applicationId;
+        public string instanceId;
+        public string tag;
+        public bool streaming;
+        
+        public Payload data;
     }
     public class Descriptor{
         public bool singleton { get; set; }
