@@ -150,8 +150,8 @@ namespace Tarantula.Networking{
             }
             JArray tk = (JArray)jo.SelectToken("lobbyList");
             for(int i=0;i<tk.Count;i++){
-                Descriptor desc = tk[i].SelectToken("descriptor").ToObject<Descriptor>();
-                Debug.Log(desc.name);
+                Lobby lb = tk[i].ToObject<Lobby>();
+                Debug.Log(lb.descriptor.name+"/"+lb.descriptor.typeId);
             }
             return true;
         } 
