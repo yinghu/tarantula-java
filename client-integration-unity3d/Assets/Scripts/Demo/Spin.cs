@@ -22,7 +22,8 @@ public class Spin : MonoBehaviour
     public async void OnMouseDown(){
         _active = true;
         GameEngineCluster gec = Integration.Instance.gec;
-        gec.OnException += (ex)=>{Debug.Log(ex);};
+        gec.OnException += (ex)=>{Debug.Log(ex);_active=false;};
+        await gec.Index(this);
         Device device = new Device();
         device.deviceId = "abc123ggggggggggg";
         bool suc = await gec.Device(this,device);
@@ -31,8 +32,14 @@ public class Spin : MonoBehaviour
             Debug.Log(gec.presence.ticket);
             Debug.Log(gec.presence.token);
             //GameObject ui = GameObject.Find("/UI/Menu");
-            menu.SetActive(true);
-            suc = await gec.OnWebSocket();
+            //menu.SetActive(true);
+            suc = await gec.OnWebSocket((mg)=>{
+                Debug.Log(mg);
+                menu.SetActive(true);
+                //transform.position += Vector3.left* speed ; 
+            });
+            Debug.Log("WEBSOC->"+suc);
+            //_active = suc;
             //to do success
             //_active = false;
         }

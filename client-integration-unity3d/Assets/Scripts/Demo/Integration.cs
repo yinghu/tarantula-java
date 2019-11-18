@@ -43,7 +43,9 @@ public class Integration : MonoBehaviour{
     void Start(){
         onNotification = false;   
     }
-
+    void OnDestroy(){
+        gec_stop();     
+    }
    
     void Update()
     {
@@ -57,6 +59,10 @@ public class Integration : MonoBehaviour{
         onNotification = !onNotification;
         bool suc = await gec.OnNotification("perfect-notification",onNotification);
         //Debug.Log(gec.profile.nickname);
+    }
+    public async void gec_stop(){
+        bool suc = await gec.Close();
+        Debug.Log("GEC CLOSED->"+suc);
     }
 
 }

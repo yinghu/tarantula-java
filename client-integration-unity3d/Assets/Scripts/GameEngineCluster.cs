@@ -22,13 +22,15 @@ namespace Tarantula.Networking{
 
         private GecHttpClient _ghc;
         private GecWebSocket _gwc;
+        private bool _live;
         public Presence presence {set;get;}
         public Profile profile {set;get;}
         public string message {set;get;}
         private Connection connection;   
        
         public  GameEngineCluster(string host){
-            _ghc = new GecHttpClient(host);                  
+            _ghc = new GecHttpClient(host);  
+            _live = false;
         }  
       
         public  async Task<bool> Index(MonoBehaviour caller){
@@ -112,20 +114,22 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public async Task<bool> OnWebSocket(){
+        public async Task<bool> OnWebSocket(Action<string> callback){
             try{
-                bool suc = await _gwc.Connect();
-                if(suc){//do receive loop
-                    for(;;){
+                _live = await _gwc.Connect();
+                if(_live){//do receive loop
+                    while(_live){
                         string msg = await _gwc.Receive();
-                        Debug.Log(msg);
+                        //Debug.Log(">>"+msg);
+                        callback(msg);
                         //processing msg;
                     }
                 }
-                return suc;
-            }catch(Exception ex){
-                OnException?.Invoke(ex);
                 return false;
+            }catch(Exception ex){
+                _live = false;
+                OnException?.Invoke(ex);
+                return _live;
             }   
         }
         public async Task<bool> Close(){
@@ -144,9 +148,11 @@ namespace Tarantula.Networking{
                 message = (string)jo.SelectToken("message");
                 return suc;
             }
-            //JToken tk = jo.SelectToken("presence");
-            //presence = tk.ToObject<Presence>();
-            //connection = jo.SelectToken("connection").ToObject<Connection>();
+            JArray tk = (JArray)jo.SelectToken("lobbyList");
+            for(int i=0;i<tk.Count;i++){
+                Descriptor desc = tk[i].SelectToken("descriptor").ToObject<Descriptor>();
+                Debug.Log(desc.name);
+            }
             return true;
         } 
         private bool ParseLogin(string json){
@@ -175,7 +181,7 @@ namespace Tarantula.Networking{
         }
    } 
    public class GecUdpSocket{
-       
+            
    }    
    public class GecWebSocket{
         private ClientWebSocket _websocket;
@@ -203,6 +209,11 @@ namespace Tarantula.Networking{
         public async Task<string> Receive(){
             ArraySegment<Byte> rbuff = new ArraySegment<Byte>(new byte[4096]);
             WebSocketReceiveResult wrs = await _websocket.ReceiveAsync(rbuff,CancellationToken.None);
+            //check erro here 
+            if(wrs.CloseStatus!=null){
+                //Debug.Log("Closed on ->"+wrs.CloseStatus);
+                return "{'successful':false,'message':'"+wrs.CloseStatus+"'}";
+            }
             return Encoding.UTF8.GetString(rbuff.Array,0,wrs.Count);
         }
    } 
