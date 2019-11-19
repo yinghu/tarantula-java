@@ -73,10 +73,54 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
                 JsonArray alist = ve.getAsJsonArray();
                 alist.forEach((a)->{
                     JsonObject jo = a.getAsJsonObject();
-                    access.property(jo.get("name").getAsString(),jo.get("value").getAsString());
+                    String hk = jo.get("name").getAsString();
+                    String hv = jo.get("value").getAsString();
+                    access.property(hk,hv);
+                    _setProperty(access,hk,hv);
                 });
             }
         });
         return access;
+    }
+    private void _setProperty(OnAccess access,String k,String v){
+        if(k.equals("systemId")){
+            access.systemId(v);
+        }
+        else if(k.equals("stub")){
+            access.stub(Integer.parseInt(v));
+        }
+        else if(k.equals("applicationId")){
+            access.applicationId(v);
+        }
+        else if(k.equals("name")){
+            access.name(v);
+        }
+        else if(k.equals("accessMode")){
+            access.accessMode(Integer.parseInt(v));
+        }
+        else if(k.equals("instanceId")){
+            access.instanceId(v);
+        }
+        else if(k.equals("accessKey")){
+            access.accessKey(v);
+        }
+        else if(k.equals("accessId")){
+            access.accessId(v);
+        }
+        else if(k.equals("typeId")){
+            access.typeId(v);
+        }
+        else if(k.equals("subtypeId")){
+            access.subtypeId(v);
+        }
+        else if(k.equals("oid")){
+            access.oid(v);
+        }
+        else if(k.equals("balance")){
+            access.entryCost(Double.parseDouble(v));
+        }
+        else if(k.equals("timestamp")){
+            access.timestamp(Long.parseLong(v));
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using Tarantula.Networking;
 public class Spin : MonoBehaviour
@@ -7,8 +8,7 @@ public class Spin : MonoBehaviour
     public float speed = 3.0f;
     public GameObject menu;
     bool _active;
-    void Start()
-    {
+    void Start(){
         _active = false;
         menu.SetActive(false);
     }
@@ -21,6 +21,7 @@ public class Spin : MonoBehaviour
     }
     public async void OnMouseDown(){
         _active = true;
+        Debug.Log(Thread.CurrentThread.Name);
         GameEngineCluster gec = Integration.Instance.gec;
         gec.OnException += (ex)=>{Debug.Log(ex);_active=false;};
         await gec.Index(this);
@@ -31,6 +32,7 @@ public class Spin : MonoBehaviour
             Debug.Log(gec.presence.systemId);
             Debug.Log(gec.presence.ticket);
             Debug.Log(gec.presence.token);
+            await gec.OnLobby(this,"robotquest");
             //GameObject ui = GameObject.Find("/UI/Menu");
             //menu.SetActive(true);
             suc = await gec.OnWebSocket((mg)=>{
