@@ -33,6 +33,7 @@ public class Spin : MonoBehaviour
             Debug.Log(gec.presence.ticket);
             Debug.Log(gec.presence.token);
             await gec.OnLobby(this,"robotquest");
+            await gec.OnPlay(this);
             //GameObject ui = GameObject.Find("/UI/Menu");
             //menu.SetActive(true);
             suc = await gec.OnWebSocket((mg)=>{

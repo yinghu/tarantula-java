@@ -151,13 +151,13 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-action","onPlay")
                 };
                 Payload p = new Payload();
-                p.command = "onLobby";
-                //p.headers = new Header[]{new Header("typeId",typeId)};
+                p.command = "onPlay";
+                p.headers = new Header[]{new Header("applicationId","BDS01/3b8ee3731a124cc198a671f3b90f1d80"),new Header("accessMode","2")};
                 string json = JsonConvert.SerializeObject(p);
                 Debug.Log(json);
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
                 Debug.Log(jstr);
-                ParseLobby(jstr);
+                //ParseLobby(jstr);
                 //profile get over websocket 
                 //Streaming strm = new Streaming();
                 //strm.path = "/service/action";
