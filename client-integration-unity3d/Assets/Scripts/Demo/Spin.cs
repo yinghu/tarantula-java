@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Tarantula.Networking;
 public class Spin : MonoBehaviour
 {
@@ -21,7 +22,6 @@ public class Spin : MonoBehaviour
     }
     public async void OnMouseDown(){
         _active = true;
-        Debug.Log(Thread.CurrentThread.Name);
         GameEngineCluster gec = Integration.Instance.gec;
         gec.OnException += (ex)=>{Debug.Log(ex);_active=false;};
         await gec.Index(this);
@@ -33,7 +33,13 @@ public class Spin : MonoBehaviour
             Debug.Log(gec.presence.ticket);
             Debug.Log(gec.presence.token);
             await gec.OnLobby(this,"robotquest");
-            await gec.OnPlay(this);
+            Debug.Log(gec.gameList()[0].applicationId);
+            await gec.OnPlay(this,gec.gameList()[0],(json)=>{
+                Debug.Log(json);
+            });
+            //SceneManager.LoadScene("Palm", LoadSceneMode.Additive);
+            //
+            menu.SetActive(false);
             //GameObject ui = GameObject.Find("/UI/Menu");
             //menu.SetActive(true);
             suc = await gec.OnWebSocket((mg)=>{
@@ -49,5 +55,14 @@ public class Spin : MonoBehaviour
         else{
             Debug.Log("opps=>"+gec.message);
         }
+    }
+    public class RobotQuest{
+        public string gameId { get; set; }
+        public int round { get; set; }
+        public string player1 { get; set; }
+        public string player2 { get; set; }
+        public bool started { get; set; }
+        public int startCountdown { get; set; }
+        public int roundCountdown { get; set; }
     }
 }

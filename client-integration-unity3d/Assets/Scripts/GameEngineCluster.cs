@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
@@ -23,13 +24,20 @@ namespace Tarantula.Networking{
         private GecHttpClient _ghc;
         private GecWebSocket _gwc;
         private bool _live;
+        private Dictionary<string,Lobby> _lobbyList;
+        private List<Descriptor> _gameList;
+        
         public Presence presence {set;get;}
         public Profile profile {set;get;}
         public string message {set;get;}
-        private Connection connection;   
-       
+        
+        public Lobby lobby(string typeId){ return _lobbyList[typeId];}  
+        public List<Descriptor> gameList(){ return _gameList;}
+        
         public  GameEngineCluster(string host){
             _ghc = new GecHttpClient(host);  
+            _lobbyList = new Dictionary<string,Lobby>();
+            _gameList = new List<Descriptor>();
             _live = false;
         }  
       
@@ -116,8 +124,12 @@ namespace Tarantula.Networking{
         }
         public async Task<bool> OnLobby(MonoBehaviour caller,string typeId){
             try{
+                if(!_lobbyList.ContainsKey(typeId)){
+                    return false;
+                }
+                Lobby lb = _lobbyList[typeId];
                 Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","robotquest/lobby"),
+                    new Header("Tarantula-tag",lb.descriptor.tag),
                     new Header("Tarantula-token",presence.token),
                     new Header("Tarantula-action","onLobby")
                 };
@@ -125,25 +137,14 @@ namespace Tarantula.Networking{
                 p.command = "onLobby";
                 p.headers = new Header[]{new Header("typeId",typeId)};
                 string json = JsonConvert.SerializeObject(p);
-                Debug.Log(json);
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
-                Debug.Log(jstr);
-                ParseLobby(jstr);
-                //profile get over websocket 
-                //Streaming strm = new Streaming();
-                //strm.path = "/service/action";
-                //strm.tag = "presence/profile";
-                //strm.streaming = false;
-                //string json = JsonConvert.SerializeObject(strm,new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
-                //Debug.Log(json);
-                //await _gwc.Send(json);
-                return true;
+                return ParseLobby(jstr);
             }catch(Exception ex){
                 OnException?.Invoke(ex);
                 return false;
             }   
         }
-        public async Task<bool> OnPlay(MonoBehaviour caller){
+        public async Task<bool> OnPlay(MonoBehaviour caller,Descriptor game,Action<string> callback){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-tag","presence/lobby"),
@@ -152,12 +153,10 @@ namespace Tarantula.Networking{
                 };
                 Payload p = new Payload();
                 p.command = "onPlay";
-                p.headers = new Header[]{new Header("applicationId","BDS01/3b8ee3731a124cc198a671f3b90f1d80"),new Header("accessMode","2")};
+                p.headers = new Header[]{new Header("applicationId",game.applicationId),new Header("accessMode","2")};
                 string json = JsonConvert.SerializeObject(p);
-                Debug.Log(json);
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
-                Debug.Log(jstr);
-                //ParseLobby(jstr);
+                callback(jstr);
                 //profile get over websocket 
                 //Streaming strm = new Streaming();
                 //strm.path = "/service/action";
@@ -171,6 +170,42 @@ namespace Tarantula.Networking{
                 OnException?.Invoke(ex);
                 return false;
             }
+        }
+       public async Task<bool> OnService(MonoBehaviour caller,Descriptor service,Payload payload,Action<string> callback){
+            try{
+                Header[] headers = new Header[]{
+                    new Header("Tarantula-tag",service.tag),
+                    new Header("Tarantula-token",presence.token),
+                    new Header("Tarantula-action",payload.command)
+                    //new Header("Tarantula-application-id",game.applicationId),
+                    //new Header("Tarantula-instance-id",game.instanceId)
+                };
+                string json = JsonConvert.SerializeObject(payload);
+                string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
+                callback(jstr);
+                return true;
+            }catch(Exception ex){
+                OnException?.Invoke(ex);
+                return false;
+            }        
+        }
+        public async Task<bool> OnInstance(MonoBehaviour caller,Descriptor game,Payload payload,Action<string> callback){
+            try{
+                Header[] headers = new Header[]{
+                    //new Header("Tarantula-tag","presence/lobby"),
+                    new Header("Tarantula-token",presence.token),
+                    new Header("Tarantula-action",payload.command),
+                    new Header("Tarantula-application-id",game.applicationId),
+                    new Header("Tarantula-instance-id",game.instanceId)
+                };
+                string json = JsonConvert.SerializeObject(payload);
+                string jstr = await _ghc.PostJson(caller,"/application/instance",headers,json);
+                callback(jstr);
+                return true;
+            }catch(Exception ex){
+                OnException?.Invoke(ex);
+                return false;
+            }        
         }
         public async Task<bool> OnWebSocket(Action<string> callback){
             try{
@@ -210,7 +245,7 @@ namespace Tarantula.Networking{
             JArray tk = (JArray)jo.SelectToken("gameList");
             for(int i=0;i<tk.Count;i++){
                 Descriptor gm = tk[i].ToObject<Descriptor>();
-                Debug.Log(gm.name+"/"+gm.applicationId);
+                _gameList.Add(gm);
             }
             return true;
         } 
@@ -225,6 +260,7 @@ namespace Tarantula.Networking{
             for(int i=0;i<tk.Count;i++){
                 Lobby lb = tk[i].ToObject<Lobby>();
                 Debug.Log(lb.descriptor.name+"/"+lb.descriptor.typeId);
+                _lobbyList.Add(lb.descriptor.typeId,lb);
             }
             return true;
         } 
@@ -237,7 +273,7 @@ namespace Tarantula.Networking{
             }
             JToken tk = jo.SelectToken("presence");
             presence = tk.ToObject<Presence>();
-            connection = jo.SelectToken("connection").ToObject<Connection>();
+            Connection connection = jo.SelectToken("connection").ToObject<Connection>();
             _gwc = new GecWebSocket(connection,presence);
             return true;
         }
@@ -343,6 +379,10 @@ namespace Tarantula.Networking{
 
         protected override bool ValidateCertificate(byte[] certificateData){
             //put key validation here
+            /** uncomment this block to valid the certificate
+            X509Certificate2 cert = new X509Certificate2(certificateData);
+            
+            **/
             return true;
         }
     }
@@ -379,6 +419,7 @@ namespace Tarantula.Networking{
         public string name { get; set; }
         public string description { get; set; }
         public string applicationId { get; set; }
+        public string instanceId { get; set; }
         public int accessMode { get; set; }
         public double entryCost { get; set; }
         public string entryCostAsString { get; set; }
