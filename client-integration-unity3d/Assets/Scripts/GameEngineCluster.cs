@@ -171,10 +171,11 @@ namespace Tarantula.Networking{
                 return false;
             }   
         }
-        public async Task<bool> OnPlay(MonoBehaviour caller,Descriptor game,Action<string> callback){
+        public async Task<bool> OnPlay(MonoBehaviour caller,string joinTag,Descriptor game,Action<string> callback){
             try{
                 Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","presence/lobby"),
+                    //new Header("Tarantula-tag","robotquest-service/live"),
+                    new Header("Tarantula-tag",joinTag),
                     new Header("Tarantula-token",presence.token),
                     new Header("Tarantula-action","onPlay")
                 };

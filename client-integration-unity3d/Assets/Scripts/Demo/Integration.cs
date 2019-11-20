@@ -71,7 +71,8 @@ public class Integration : MonoBehaviour{
                 suc = await gec.OnLobby(this,"robotquest");
                 if(suc){
                     game = gec.gameList()[0];
-                    suc = await gec.OnPlay(this,game,(gs)=>{
+                    Debug.Log(game.tag);
+                    suc = await gec.OnPlay(this,"robotquest-service/live",game,(gs)=>{
                         Debug.Log(gs);
                         ParseGame(gs);
                     });
