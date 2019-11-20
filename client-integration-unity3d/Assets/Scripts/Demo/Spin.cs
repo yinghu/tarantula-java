@@ -7,11 +7,10 @@ using Tarantula.Networking;
 public class Spin : MonoBehaviour
 {
     public float speed = 3.0f;
-    public GameObject menu;
+   
     bool _active;
     void Start(){
         _active = false;
-        menu.SetActive(false);
     }
 
    
@@ -20,49 +19,8 @@ public class Spin : MonoBehaviour
             transform.Rotate(10,speed,10);
         }    
     }
-    public async void OnMouseDown(){
-        _active = true;
-        GameEngineCluster gec = Integration.Instance.gec;
-        gec.OnException += (ex)=>{Debug.Log(ex);_active=false;};
-        await gec.Index(this);
-        Device device = new Device();
-        device.deviceId = "abc123ggggggggggg";
-        bool suc = await gec.Device(this,device);
-        if(suc){
-            Debug.Log(gec.presence.systemId);
-            Debug.Log(gec.presence.ticket);
-            Debug.Log(gec.presence.token);
-            await gec.OnLobby(this,"robotquest");
-            Debug.Log(gec.gameList()[0].applicationId);
-            await gec.OnPlay(this,gec.gameList()[0],(json)=>{
-                Debug.Log(json);
-            });
-            //SceneManager.LoadScene("Palm", LoadSceneMode.Additive);
-            //
-            menu.SetActive(false);
-            //GameObject ui = GameObject.Find("/UI/Menu");
-            //menu.SetActive(true);
-            suc = await gec.OnWebSocket((mg)=>{
-                Debug.Log(mg);
-                menu.SetActive(true);
-                //transform.position += Vector3.left* speed ; 
-            });
-            Debug.Log("WEBSOC->"+suc);
-            //_active = suc;
-            //to do success
-            //_active = false;
-        }
-        else{
-            Debug.Log("opps=>"+gec.message);
-        }
-    }
-    public class RobotQuest{
-        public string gameId { get; set; }
-        public int round { get; set; }
-        public string player1 { get; set; }
-        public string player2 { get; set; }
-        public bool started { get; set; }
-        public int startCountdown { get; set; }
-        public int roundCountdown { get; set; }
+    
+    public void OnSpin(bool active){
+        _active = active;
     }
 }

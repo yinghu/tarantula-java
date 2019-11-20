@@ -73,17 +73,15 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-token",presence.token),
                 };
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
-                Debug.Log(jstr);
-                ParseProfile(jstr);
+                return ParseProfile(jstr);
                 //profile get over websocket 
-                Streaming strm = new Streaming();
-                strm.path = "/service/action";
-                strm.tag = "presence/profile";
-                strm.streaming = false;
-                string json = JsonConvert.SerializeObject(strm,new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
-                Debug.Log(json);
-                await _gwc.Send(json);
-                return true;
+                //Streaming strm = new Streaming();
+                //strm.path = "/service/action";
+                //strm.tag = "presence/profile";
+                //strm.streaming = false;
+                //string json = JsonConvert.SerializeObject(strm,new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
+                //Debug.Log(json);
+                //await _gwc.Send(json);
             }catch(Exception ex){
                 OnException?.Invoke(ex);
                 return false;
@@ -97,7 +95,6 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-action","onReset")
                 };
                 string json = JsonConvert.SerializeObject(device);
-                Debug.Log(json);
                 string jstr = await _ghc.PostJson(caller,"/user/action",headers,json);
                 return ParseLogin(jstr);
             }catch(Exception ex){
@@ -111,6 +108,25 @@ namespace Tarantula.Networking{
                 strm.action = streaming?"onStart":"onStop";
                 strm.label = label;
                 strm.streaming = true;
+                Payload p = new Payload();
+                p.command = strm.action;
+                strm.data = p;
+                string json = JsonConvert.SerializeObject(strm,new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
+                Debug.Log(json);
+                return await _gwc.Send(json);
+            }catch(Exception ex){
+                OnException?.Invoke(ex);
+                return false;
+            }
+        }
+        public async Task<bool> OnStreaming(Descriptor instance){
+            try{
+                Streaming strm = new Streaming();
+                strm.action = "onStream";
+                strm.path = "/application/instance";
+                strm.streaming = true;
+                strm.applicationId = instance.applicationId;
+                strm.instanceId = instance.instanceId;
                 Payload p = new Payload();
                 p.command = strm.action;
                 strm.data = p;
@@ -157,14 +173,6 @@ namespace Tarantula.Networking{
                 string json = JsonConvert.SerializeObject(p);
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
                 callback(jstr);
-                //profile get over websocket 
-                //Streaming strm = new Streaming();
-                //strm.path = "/service/action";
-                //strm.tag = "presence/profile";
-                //strm.streaming = false;
-                //string json = JsonConvert.SerializeObject(strm,new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
-                //Debug.Log(json);
-                //await _gwc.Send(json);
                 return true;
             }catch(Exception ex){
                 OnException?.Invoke(ex);
@@ -177,8 +185,6 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-tag",service.tag),
                     new Header("Tarantula-token",presence.token),
                     new Header("Tarantula-action",payload.command)
-                    //new Header("Tarantula-application-id",game.applicationId),
-                    //new Header("Tarantula-instance-id",game.instanceId)
                 };
                 string json = JsonConvert.SerializeObject(payload);
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
@@ -189,14 +195,13 @@ namespace Tarantula.Networking{
                 return false;
             }        
         }
-        public async Task<bool> OnInstance(MonoBehaviour caller,Descriptor game,Payload payload,Action<string> callback){
+        public async Task<bool> OnInstance(MonoBehaviour caller,Descriptor instance,Payload payload,Action<string> callback){
             try{
                 Header[] headers = new Header[]{
-                    //new Header("Tarantula-tag","presence/lobby"),
                     new Header("Tarantula-token",presence.token),
                     new Header("Tarantula-action",payload.command),
-                    new Header("Tarantula-application-id",game.applicationId),
-                    new Header("Tarantula-instance-id",game.instanceId)
+                    new Header("Tarantula-application-id",instance.applicationId),
+                    new Header("Tarantula-instance-id",instance.instanceId)
                 };
                 string json = JsonConvert.SerializeObject(payload);
                 string jstr = await _ghc.PostJson(caller,"/application/instance",headers,json);
@@ -235,7 +240,7 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-       private bool ParseLobby(string json){
+        private bool ParseLobby(string json){
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
             if(!suc){
@@ -256,10 +261,10 @@ namespace Tarantula.Networking{
                 message = (string)jo.SelectToken("message");
                 return suc;
             }
+            _lobbyList.Clear();
             JArray tk = (JArray)jo.SelectToken("lobbyList");
             for(int i=0;i<tk.Count;i++){
                 Lobby lb = tk[i].ToObject<Lobby>();
-                Debug.Log(lb.descriptor.name+"/"+lb.descriptor.typeId);
                 _lobbyList.Add(lb.descriptor.typeId,lb);
             }
             return true;
