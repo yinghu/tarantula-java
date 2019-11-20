@@ -23,6 +23,7 @@ namespace Tarantula.Networking{
 
         private GecHttpClient _ghc;
         private GecWebSocket _gwc;
+        private GecUdpSocket _guc;
         private bool _live;
         private Dictionary<string,Lobby> _lobbyList;
         private List<Descriptor> _gameList;
@@ -182,8 +183,10 @@ namespace Tarantula.Networking{
                 p.headers = new Header[]{new Header("applicationId",game.applicationId),new Header("accessMode","2")};
                 string json = JsonConvert.SerializeObject(p);
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
+                //check if UDP connection is available 
+                bool suc = ParseGameObject(jstr);
                 callback(jstr);
-                return true;
+                return suc;
             }catch(Exception ex){
                 OnException?.Invoke(ex);
                 return false;
@@ -250,6 +253,21 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
+        private bool ParseGameObject(string json){
+            JObject jo = JObject.Parse(json);
+            bool suc = (bool)jo.SelectToken("successful");
+            if(!suc){
+                message = (string)jo.SelectToken("message");
+                return suc;
+            }
+            //check connection/ticket and create udp connection 
+            //JArray tk = (JArray)jo.SelectToken("gameList");
+            //for(int i=0;i<tk.Count;i++){
+                //Descriptor gm = tk[i].ToObject<Descriptor>();
+                //_gameList.Add(gm);
+            //}
+            return true;
+        } 
         private bool ParseLobby(string json){
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
