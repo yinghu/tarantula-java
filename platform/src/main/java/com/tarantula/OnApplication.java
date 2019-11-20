@@ -43,4 +43,10 @@ public interface OnApplication extends Recoverable{
     boolean tournamentEnabled();
     void tournamentEnabled(boolean tournamentEnabled);
 
+    Connection connection();
+    void connection(Connection connection);
+
+    String ticket();
+    void ticket(String ticket);
+
 }

@@ -36,8 +36,8 @@ public interface Session extends OnApplication{
     boolean joined();
     void joined(boolean joined);
 
-    String ticket();
-    void ticket(String ticket);
+    //String ticket();
+    //void ticket(String ticket);
 
     //write back on http batch
     void write(byte[] delta,int batch,String contentType,String label);

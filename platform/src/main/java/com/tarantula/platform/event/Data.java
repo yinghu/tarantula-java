@@ -8,7 +8,7 @@ abstract public class Data extends OnApplicationHeader implements Portable{
     protected String sessionId;
     protected boolean joined;
 
-    protected String ticket;
+    //protected String ticket;
 
 
     protected String source;
@@ -114,12 +114,12 @@ abstract public class Data extends OnApplicationHeader implements Portable{
         this.contentType = contentType;
     }
 
-    public String ticket(){
-        return this.ticket;
-    }
-    public void ticket(String ticket){
-        this.ticket = ticket;
-    }
+    //public String ticket(){
+        //return this.ticket;
+    //}
+    //public void ticket(String ticket){
+        //this.ticket = ticket;
+    //}
 
     public Portable portable(){
         return this.portable;
