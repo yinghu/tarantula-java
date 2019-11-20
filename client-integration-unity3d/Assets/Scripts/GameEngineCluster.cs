@@ -60,7 +60,12 @@ namespace Tarantula.Networking{
                 };
                 string json = JsonConvert.SerializeObject(user);
                 string jstr = await _ghc.PostJson(caller,"/user/action",headers,json);
-                return ParseLogin(jstr);            
+                bool suc = ParseLogin(jstr);
+                if(suc){
+                    suc = await _gwc.Connect();
+                    _live = suc;
+                }
+                return suc;            
             }catch(Exception ex){
                 OnException?.Invoke(ex);
                 return false;
@@ -96,7 +101,12 @@ namespace Tarantula.Networking{
                 };
                 string json = JsonConvert.SerializeObject(device);
                 string jstr = await _ghc.PostJson(caller,"/user/action",headers,json);
-                return ParseLogin(jstr);
+                bool suc = ParseLogin(jstr);
+                if(suc){
+                    suc = await _gwc.Connect();
+                    _live = suc;
+                }
+                return suc;
             }catch(Exception ex){
                 OnException?.Invoke(ex);
                 return false;
@@ -214,16 +224,15 @@ namespace Tarantula.Networking{
         }
         public async Task<bool> OnWebSocket(Action<string> callback){
             try{
-                _live = await _gwc.Connect();
-                if(_live){//do receive loop
-                    while(_live){
-                        string msg = await _gwc.Receive();
-                        //format [label]#[instanceId]?[query]{json payload}
-                        //Debug.Log(">>"+msg);
-                        callback(msg);
-                        //processing msg;
-                    }
+                //do receive loop
+                while(_live){
+                    string msg = await _gwc.Receive();
+                    //format [label]#[instanceId]?[query]{json payload}
+                    //Debug.Log(">>"+msg);
+                    callback(msg);
+                    //processing msg;
                 }
+                
                 return false;
             }catch(Exception ex){
                 _live = false;

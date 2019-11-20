@@ -65,20 +65,31 @@ public class Integration : MonoBehaviour{
         if(!started){
             bool suc = await gec.Index(this);
             Device device = new Device();
-            device.deviceId = "abc123ggggggggggg";
+            device.deviceId = "highttt";
             suc = await gec.Device(this,device);
             if(suc){
                 suc = await gec.OnLobby(this,"robotquest");
                 if(suc){
                     game = gec.gameList()[0];
                     suc = await gec.OnPlay(this,game,(gs)=>{
+                        Debug.Log(gs);
                         ParseGame(gs);
                     });
-                    //gec.OnWebSocket()
+                    if(suc){
+                        suc = await gec.OnStreaming(game);
+                    }else{
+                        Debug.Log("ops->"+gec.message);
+                    }
+                }
+                else{
+                    Debug.Log("ops->"+gec.message);
                 }
             }
             spin.OnSpin(suc);
             started = true;
+            await gec.OnWebSocket((msg)=>{
+                Debug.Log(msg);
+            });
             return suc;
         }
         else{
