@@ -14,7 +14,7 @@ public class OnAccessTrack extends OnApplicationHeader implements OnAccess {
 
     protected String accessKey;
     protected String accessId;
-
+    protected byte[] payload;
 
     public String accessKey(){
         return this.accessKey;
@@ -35,7 +35,13 @@ public class OnAccessTrack extends OnApplicationHeader implements OnAccess {
     public String property(String header){
         return (String)this.properties.get(header);
     }
+    public byte[] payload() {
+        return this.payload;
+    }
 
+    public void payload(byte[] payload) {
+        this.payload = payload;
+    }
 
     public List<Property> list() {
         List<Property> hm = new ArrayList<>();

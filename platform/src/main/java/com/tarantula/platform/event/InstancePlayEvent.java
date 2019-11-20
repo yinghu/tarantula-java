@@ -44,6 +44,7 @@ public class InstancePlayEvent extends Data implements Event {
         out.writeUTF("12",this.trackId);
         out.writePortable("13",this.forward);
         out.writeInt("14",this.routingNumber);
+        out.writeByteArray("15",payload!=null?payload:new byte[0]);
     }
     @Override
     public void readPortable(PortableReader in) throws IOException {
@@ -59,6 +60,7 @@ public class InstancePlayEvent extends Data implements Event {
         this.trackId = in.readUTF("12");
         this.forward = in.readPortable("13");
         this.routingNumber = in.readInt("14");
+        this.payload = in.readByteArray("15");
     }
     @Override
     public void write(byte[] payload,String label){

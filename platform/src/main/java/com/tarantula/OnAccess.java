@@ -10,4 +10,6 @@ public interface OnAccess extends OnApplication, OnProperty {
     String accessId();
     void accessId(String accessId);//data id
 
+    byte[] payload();
+    void payload(byte[] payload);
 }
