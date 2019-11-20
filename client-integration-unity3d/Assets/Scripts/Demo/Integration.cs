@@ -95,6 +95,11 @@ public class Integration : MonoBehaviour{
         else{
             started = false;
             spin.OnSpin(false);
+            Payload p = new Payload();
+            p.command = "onLeave";
+            p.headers = new Header[]{new Header("test","miss")};
+            await gec.OnInstance(this,game,p,(m)=>{Debug.Log(m);});
+            await gec.Close();
             return false;
         }
     }

@@ -213,7 +213,7 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-application-id",instance.applicationId),
                     new Header("Tarantula-instance-id",instance.instanceId)
                 };
-                string json = JsonConvert.SerializeObject(payload);
+                string json = JsonConvert.SerializeObject(payload,new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
                 string jstr = await _ghc.PostJson(caller,"/application/instance",headers,json);
                 callback(jstr);
                 return true;
@@ -242,6 +242,7 @@ namespace Tarantula.Networking{
         }
         public async Task<bool> Close(){
             try{
+                _live = false;
                 bool suc = await _gwc.Close();
                 return suc;
             }catch(Exception ex){
