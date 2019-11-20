@@ -17,6 +17,7 @@ public class Integration : MonoBehaviour{
     private static Integration instance;
     private bool onNotification;
     private bool started;
+    private Descriptor game;
 
 	public static Integration Instance{
 		get
@@ -69,11 +70,11 @@ public class Integration : MonoBehaviour{
             if(suc){
                 suc = await gec.OnLobby(this,"robotquest");
                 if(suc){
-                    Descriptor g = gec.gameList()[0];
-                    suc = await gec.OnPlay(this,g,(gs)=>{
-                        
-                        Debug.Log(gs);
+                    game = gec.gameList()[0];
+                    suc = await gec.OnPlay(this,game,(gs)=>{
+                        ParseGame(gs);
                     });
+                    //gec.OnWebSocket()
                 }
             }
             spin.OnSpin(suc);
@@ -103,6 +104,7 @@ public class Integration : MonoBehaviour{
                 //message = (string)jo.SelectToken("message");
                 return suc;
             }
+            game.instanceId = (string)jo.SelectToken("instanceId");
             JToken tk = jo.SelectToken("gameObject");
             //for(int i=0;i<tk.Count;i++){
                 //Descriptor gm = tk[i].ToObject<Descriptor>();
