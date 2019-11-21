@@ -2396,7 +2396,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fc3a51c580c45448aff5acbed9c20bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GEC_HOST: http://localhost:8090
+  GEC_HOST: http://10.0.0.234:8090
   spin: {fileID: 1771702382}
 --- !u!4 &1645342145
 Transform:
