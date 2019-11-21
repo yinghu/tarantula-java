@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
+using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Text;
 using System;
@@ -324,7 +325,38 @@ namespace Tarantula.Networking{
         }
    } 
    public class GecUdpSocket{
-            
+       private UdpClient _udpClient;
+       private IPEndPoint endPoint;
+       private Connection _connection;
+       private Presence _presence;
+       public GecUdpSocket(Connection connection,Presence presence){
+            IPAddress[] ips = Dns.GetHostAddresses(connection.host);
+            endPoint = new IPEndPoint(ips[0],connection.port); 
+            _connection = connection;
+            _presence = presence;
+       }
+       public async Task<bool> Init(string instanceId,string ticket){
+            _udpClient = new UdpClient(endPoint);
+            OnJoin payload = new OnJoin();
+            payload.command= "onJoin";
+            payload.systemId= _presence.login;
+            payload.instanceId= instanceId;
+            payload.stub= _presence.stub;
+            payload.ticket= ticket;
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] onjoin = Encoding.UTF8.GetBytes(json);
+            await _udpClient.SendAsync(onjoin,onjoin.Length);
+            return true;
+       }
+       public async Task<bool> Send(string json){
+           byte[] payload = Encoding.UTF8.GetBytes(json.ToString());
+           int bytes = await _udpClient.SendAsync(payload,payload.Length); 
+           return bytes>0;    
+       }
+       public async Task<string> Receive(){
+           UdpReceiveResult ret = await _udpClient.ReceiveAsync();
+           return Encoding.UTF8.GetString(ret.Buffer);
+       }
    }    
    public class GecWebSocket{
         private ClientWebSocket _websocket;
@@ -427,6 +459,13 @@ namespace Tarantula.Networking{
             this.name = name;
             this.value = value;
         }
+    }
+    public class OnJoin{
+        public string command;
+        public string systemId;
+        public string ticket;
+        public string instanceId;
+        public int stub;
     }
     public class Payload{
         public string command;
