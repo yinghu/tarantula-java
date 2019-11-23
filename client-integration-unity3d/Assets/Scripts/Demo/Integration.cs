@@ -64,33 +64,33 @@ public class Integration : MonoBehaviour{
     public async Task<bool> StartDemo(){
         if(!started){
             bool suc = await gec.Index(this);
-            Device device = new Device();
-            device.deviceId = "highttt";
-            suc = await gec.Device(this,device);
+            User device = new User();
+            device.login = "xbbbbb";
+            device.nickname = "xnbbbv";
+            device.password = "abc123";
+            suc = await gec.Login(this,device);
+            if(!suc){
+                Debug.Log(gec.message);
+            }
+            Debug.Log(suc);
+            
             if(suc){
                 suc = await gec.OnLobby(this,"robotquest");
                 if(suc){
                     game = gec.gameList()[0];
-                    Debug.Log(game.tag);
                     suc = await gec.OnPlay(this,"robotquest-service/live",game,(gs)=>{
-                        Debug.Log(gs);
-                        ParseGame(gs);
+                        Debug.Log(game.instanceId);
                     });
                     if(suc){
-                        suc = await gec.OnStreaming(game);
-                    }else{
-                        Debug.Log("ops->"+gec.message);
+                        spin.OnSpin(suc);
+                        started = true;
+                        await gec.OnWebSocketMessage();     
                     }
                 }
                 else{
                     Debug.Log("ops->"+gec.message);
                 }
             }
-            spin.OnSpin(suc);
-            started = true;
-            await gec.OnWebSocket((msg)=>{
-                Debug.Log(msg);
-            });
             return suc;
         }
         else{
