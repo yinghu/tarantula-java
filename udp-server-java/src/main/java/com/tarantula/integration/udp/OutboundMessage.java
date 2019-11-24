@@ -9,6 +9,7 @@ public class OutboundMessage {
     public String data;
 
     public boolean onHeader = true;
+    public boolean onQuery = false;
     public boolean ended = false;
 
 

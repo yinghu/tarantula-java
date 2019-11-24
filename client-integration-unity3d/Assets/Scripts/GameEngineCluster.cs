@@ -213,23 +213,21 @@ namespace Tarantula.Networking{
                 //do receive loop
                 while(_live){
                     string msg = await _gwc.Receive();
-                    //format [label]#[instanceId]?[query]{json payload}
-                    int idx1 = msg.IndexOf('#');
-                    if(idx1>0){
-                        Debug.Log("LABEL->"+msg.Substring(0,idx1));
-                    }
-                    int idx2 = msg.IndexOf('?');
-                    int idx3 = msg.IndexOf('{');
-                    if(idx2>0&idx3>0){
-                        int idx = idx1>0?idx1+1:0;
-                        Debug.Log("ID->"+msg.Substring(idx,idx2-idx));
-                        Debug.Log("QUERY->"+msg.Substring(idx2+1,idx3-idx2));
-                    }
-                    if(idx2<0&idx3>0){
-                        int idx = idx1>0?idx1+1:0;
-                        Debug.Log("ID->"+msg.Substring(idx,idx3-idx));
-                    }
-                    _onMessage["debug"](">>"+msg.Substring(idx3));
+                    ParseInboundMessage(msg);
+                }
+                return false;
+            }catch(Exception ex){
+                _live = false;
+                OnException?.Invoke(ex);
+                return _live;
+            }   
+        }
+        public async Task<bool> OnUdpSocketMessage(){
+            try{
+                //do receive loop
+                while(_live){
+                    string msg = await _guc.Receive();
+                    ParseInboundMessage(msg);
                 }
                 return false;
             }catch(Exception ex){
@@ -251,6 +249,25 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
+        private void ParseInboundMessage(string msg){
+            //format [label]#[instanceId]?[query]{json payload}
+            int idx1 = msg.IndexOf('#');
+            if(idx1>0){
+                Debug.Log("LABEL->"+msg.Substring(0,idx1));
+            }
+            int idx2 = msg.IndexOf('?');
+            int idx3 = msg.IndexOf('{');
+            if(idx2>0&idx3>0){
+                int idx = idx1>0?idx1+1:0;
+                Debug.Log("ID->"+msg.Substring(idx,idx2-idx));
+                Debug.Log("QUERY->"+msg.Substring(idx2+1,idx3-idx2-1));
+            }
+            if(idx2<0&idx3>0){
+                int idx = idx1>0?idx1+1:0;
+                Debug.Log("ID->"+msg.Substring(idx,idx3-idx));
+            }
+            _onMessage["debug"](">>"+msg.Substring(idx3));    
+        }
         private async Task<bool> ParseGameObject(string json,Descriptor game,Action<JObject> callback){
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
@@ -262,7 +279,9 @@ namespace Tarantula.Networking{
             string ticket = (string)jo.SelectToken("ticket");
             game.instanceId = tid;
             if(jo.ContainsKey("connection")){
-                Debug.Log("UDP AVAILABLE");    
+                //streaming on udp game session 
+                _guc = new GecUdpSocket(jo.SelectToken("connection").ToObject<Connection>(),presence);
+                suc = await _guc.Init(tid,ticket);
             }
             else{
                 //streaming on websocket
@@ -360,7 +379,7 @@ namespace Tarantula.Networking{
             _presence = presence;
        }
        public async Task<bool> Init(string instanceId,string ticket){
-            _udpClient = new UdpClient(endPoint);
+            _udpClient = new UdpClient(_connection.host,_connection.port);
             OnJoin payload = new OnJoin();
             payload.command= "onJoin";
             payload.systemId= _presence.login;
@@ -368,9 +387,11 @@ namespace Tarantula.Networking{
             payload.stub= _presence.stub;
             payload.ticket= ticket;
             string json = JsonConvert.SerializeObject(payload);
-            byte[] onjoin = Encoding.UTF8.GetBytes(json);
-            await _udpClient.SendAsync(onjoin,onjoin.Length);
-            return true;
+            string mex = "rt#"+instanceId+"?onJoin"+json;
+            byte[] onjoin = Encoding.UTF8.GetBytes(mex);
+            int bst = await _udpClient.SendAsync(onjoin,onjoin.Length);
+            Debug.Log(bst+"<>"+onjoin.Length+"///"+_connection.host+":"+_connection.port);
+            return bst==onjoin.Length;
        }
        public async Task<bool> Send(string json){
            byte[] payload = Encoding.UTF8.GetBytes(json.ToString());

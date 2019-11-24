@@ -45,7 +45,6 @@ public class UDPServer implements Runnable {
                     OutboundMessage m = oQueue.poll();
                     if(m!=null){
                         try{
-                            //log.warning(m.toString());
                             if(m.instanceId!=null){//skip notifications
                                 SessionGroup sg = cMap.computeIfAbsent(m.instanceId,k->new SessionGroup(k));
                                 if(m.query.equals("onTimeout")){
@@ -116,7 +115,6 @@ public class UDPServer implements Runnable {
                         });
                     }
                     else if(outboundMessage.query.equals("onMessage")){
-                        //log.warning(outboundMessage.toString());
                         //handle
                         buffer.clear();
                         buffer.put(outboundMessage.label.getBytes());
@@ -154,10 +152,16 @@ public class UDPServer implements Runnable {
                 }
                 else if(!p&&c==MSG_HEADER_DELIMITER){
                     pendingData.instanceId = sb.toString();
+                    pendingData.onQuery = true;
                     sb.setLength(0);
                 }
                 else if(!p&&c=='{'){
-                    pendingData.query = sb.toString();
+                    if(pendingData.onQuery){
+                        pendingData.query = sb.toString();
+                    }else{
+                        pendingData.instanceId = sb.toString();
+                        pendingData.query ="onMessage";
+                    }
                     sb.setLength(0);
                     p = true;
                 }

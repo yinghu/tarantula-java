@@ -115,10 +115,17 @@ public class ServiceConnector implements Runnable {
                             }
                             else if(outboundMessage.onHeader&&c==UDPServer.MSG_HEADER_DELIMITER){
                                 outboundMessage.instanceId = pending.toString();
+                                outboundMessage.onQuery = true;
                                 pending.setLength(0);
                             }
                             else if(outboundMessage.onHeader&&c=='{'){
-                                outboundMessage.query = pending.toString();
+                                if(outboundMessage.onQuery){
+                                    outboundMessage.query = pending.toString();
+                                }
+                                else{
+                                    outboundMessage.query ="onMessage";
+                                    outboundMessage.instanceId = pending.toString();
+                                }
                                 pending.setLength(0);
                                 outboundMessage.onHeader = false;
                             }
