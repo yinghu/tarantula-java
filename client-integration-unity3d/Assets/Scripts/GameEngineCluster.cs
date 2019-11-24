@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
@@ -18,11 +17,16 @@ using Newtonsoft.Json.Linq;
 namespace Tarantula.Networking{
    
    public delegate void ExceptionHandler(Exception ex);
-    
+   public delegate void MessageHandler(Message message);
+   public delegate void WebSocketHandler(bool connected);    
+   public delegate void UDPSocketHandler(bool connected);    
    public class GameEngineCluster{
       
         public event ExceptionHandler OnException;
-
+        public event MessageHandler OnMessage;
+        public event WebSocketHandler OnWebSocket;
+        public event UDPSocketHandler OnUDPSocket;
+        
         private GecHttpClient _ghc;
         private GecWebSocket _gwc;
         private GecUdpSocket _guc;
@@ -30,7 +34,6 @@ namespace Tarantula.Networking{
         private bool _liveUc;
         private Dictionary<string,Lobby> _lobbyList;
         private List<Descriptor> _gameList;
-        private ConcurrentDictionary<string,Action<Message>> _onMessage;
         private static JsonSerializerSettings JSON_SETTING = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
         
         public Presence presence {set;get;}
@@ -44,8 +47,6 @@ namespace Tarantula.Networking{
             _ghc = new GecHttpClient(host);  
             _lobbyList = new Dictionary<string,Lobby>();
             _gameList = new List<Descriptor>();
-            _onMessage = new ConcurrentDictionary<string,Action<Message>>();
-            _onMessage["debug"] = (msg)=>{Debug.Log(msg.payload);};
             _liveWc = false;
             _liveUc = false;
         }  
@@ -207,29 +208,32 @@ namespace Tarantula.Networking{
                 return false;
             }        
         }
-        public void RegisterMessageListener(string register,Action<Message> listener){
-            _onMessage[register]= listener;
-        }
-        public async Task<bool> OnMessage(){
+        public async Task<bool> OnWebSocketMessage(){
             try{
                 //do receive loop
-                if(_liveUc){
-                    while(_liveUc){
-                        string msg = await _guc.Receive();
-                        ParseInboundMessage(msg);
-                    }    
-                }
-                else{
-                    while(_liveWc){
-                        string msg = await _gwc.Receive();
-                        ParseInboundMessage(msg);
-                    }
+                while(_liveWc){
+                    string msg = await _gwc.Receive();
+                    ParseInboundMessage(msg);
                 }
                 return false;
             }catch(Exception ex){
                 _liveWc = false;
                 OnException?.Invoke(ex);
                 return _liveWc;
+            }   
+        }
+        public async Task<bool> OnUDPSocketMessage(){
+            try{
+                //do receive loop
+                while(_liveUc){
+                    string msg = await _guc.Receive();
+                    ParseInboundMessage(msg);
+                }    
+                return false;
+            }catch(Exception ex){
+                _liveUc = false;
+                OnException?.Invoke(ex);
+                return _liveUc;
             }   
         }
         public async Task<bool> Close(){
@@ -268,7 +272,7 @@ namespace Tarantula.Networking{
                 im.instanceId = msg.Substring(idx,idx3-idx);
             }
             im.payload = msg.Substring(idx3);
-            _onMessage["debug"](im);    
+            OnMessage?.Invoke(im);   
         }
         private async Task<bool> ParseGameObject(string json,Descriptor game,Action<JObject> callback){
             JObject jo = JObject.Parse(json);
@@ -282,9 +286,12 @@ namespace Tarantula.Networking{
             game.instanceId = tid;
             if(jo.ContainsKey("connection")){
                 //streaming on udp game session 
-                _guc = new GecUdpSocket(jo.SelectToken("connection").ToObject<Connection>(),presence);
-                suc = await _guc.Init(tid,ticket);
+                Connection conn = jo.SelectToken("connection").ToObject<Connection>();
+                _guc = new GecUdpSocket();
+                _guc.Connect(conn.host,conn.port);
                 _liveUc = true;
+                OnUDPSocket?.Invoke(_liveUc);
+                suc = await _guc.Init(presence,tid,ticket);
             }
             else{
                 //streaming on websocket
@@ -355,6 +362,7 @@ namespace Tarantula.Networking{
                 _gwc = new GecWebSocket(connection,presence);
                 suc = await _gwc.Connect();
                 _liveWc = suc;
+                OnWebSocket?.Invoke(suc);
             }
             return suc;
         }
@@ -372,28 +380,24 @@ namespace Tarantula.Networking{
    } 
    public class GecUdpSocket{
        private UdpClient _udpClient;
-       private IPEndPoint endPoint;
-       private Connection _connection;
-       private Presence _presence;
-       public GecUdpSocket(Connection connection,Presence presence){
-            IPAddress[] ips = Dns.GetHostAddresses(connection.host);
-            endPoint = new IPEndPoint(ips[0],connection.port); 
-            _connection = connection;
-            _presence = presence;
-       }
-       public async Task<bool> Init(string instanceId,string ticket){
-            _udpClient = new UdpClient(_connection.host,_connection.port);
+       public GecUdpSocket(){}
+       
+       public void Connect(string host,int port){
+           _udpClient = new UdpClient(host,port);
+       } 
+       
+       public async Task<bool> Init(Presence presence,string instanceId,string ticket){
+            //_udpClient = new UdpClient(connection.host,connection.port);
             OnJoin payload = new OnJoin();
             payload.command= "onJoin";
-            payload.systemId= _presence.login;
+            payload.systemId= presence.login;
             payload.instanceId= instanceId;
-            payload.stub= _presence.stub;
+            payload.stub= presence.stub;
             payload.ticket= ticket;
             string json = JsonConvert.SerializeObject(payload);
-            string mex = "rt#"+instanceId+"?onJoin"+json;
+            string mex = "connection#"+instanceId+"?onJoin"+json;
             byte[] onjoin = Encoding.UTF8.GetBytes(mex);
             int bst = await _udpClient.SendAsync(onjoin,onjoin.Length);
-            Debug.Log(bst+"<>"+onjoin.Length+"///"+_connection.host+":"+_connection.port);
             return bst==onjoin.Length;
        }
        public void Close(){

@@ -47,7 +47,28 @@ public class Integration : MonoBehaviour{
              spin.OnSpin(false);
              //gec.Close();
          };
+         gec.OnWebSocket += _OnWebSocketMessage;
+         gec.OnUDPSocket += _OnUDPSocketMessage;
+         gec.OnMessage += (msg)=>{
+             if(msg.label!=null&&msg.label.Equals("connection")){
+                Debug.Log(msg.label);
+                Debug.Log(msg.instanceId);
+                Debug.Log(msg.query);
+                Debug.Log(msg.payload);
+             }
+             else{
+                 Debug.Log(msg.payload);
+             }
+         };
          DontDestroyOnLoad(this.gameObject);
+    }
+    async void _OnWebSocketMessage(bool suc){
+        Debug.Log("web socket->"+suc);
+        await gec.OnWebSocketMessage();
+    }
+    async void _OnUDPSocketMessage(bool suc){
+        Debug.Log("udp socket->"+suc);
+        await gec.OnUDPSocketMessage();
     }
     void Start(){
         onNotification = false;  
@@ -84,7 +105,7 @@ public class Integration : MonoBehaviour{
                     if(suc){
                         spin.OnSpin(suc);
                         started = true;
-                        await gec.OnMessage();  
+                        //await gec.OnStreaming();  
                         
                     }
                 }
