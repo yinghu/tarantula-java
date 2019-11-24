@@ -275,6 +275,7 @@ namespace Tarantula.Networking{
             OnMessage?.Invoke(im);   
         }
         private async Task<bool> ParseGameObject(string json,Descriptor game,Action<JObject> callback){
+            Debug.Log(json);
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
             if(!suc){
@@ -282,6 +283,7 @@ namespace Tarantula.Networking{
                 return suc;
             }
             string tid = (string)jo.SelectToken("instanceId");
+            string ixx = (string)jo.SelectToken("index");
             string ticket = (string)jo.SelectToken("ticket");
             game.instanceId = tid;
             if(jo.ContainsKey("connection")){
@@ -291,7 +293,7 @@ namespace Tarantula.Networking{
                 _guc.Connect(conn.host,conn.port);
                 _liveUc = true;
                 OnUDPSocket?.Invoke(_liveUc);
-                suc = await _guc.Init(presence,tid,ticket);
+                suc = await _guc.Init(presence,ixx,ticket);
             }
             else{
                 //streaming on websocket
@@ -385,9 +387,7 @@ namespace Tarantula.Networking{
        public void Connect(string host,int port){
            _udpClient = new UdpClient(host,port);
        } 
-       
        public async Task<bool> Init(Presence presence,string instanceId,string ticket){
-            //_udpClient = new UdpClient(connection.host,connection.port);
             OnJoin payload = new OnJoin();
             payload.command= "onJoin";
             payload.systemId= presence.login;

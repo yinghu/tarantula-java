@@ -75,7 +75,7 @@ public class Integration : MonoBehaviour{
         started = false;
     }
     void OnDestroy(){
-             
+        gec.Close();            
     }
    
     void Update()
