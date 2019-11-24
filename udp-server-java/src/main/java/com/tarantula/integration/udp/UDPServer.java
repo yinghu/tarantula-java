@@ -100,7 +100,8 @@ public class UDPServer implements Runnable {
                         int stub = jsonObject.get("stub").getAsInt();
                         String ticket = jsonObject.get("ticket").getAsString();
                         serviceConnector.onTicket(systemId,stub,ticket,(c,resp)->{
-                            if(resp.get("successful").getAsBoolean()){
+                            boolean suc = resp.get("successful").getAsBoolean();
+                            if(suc){
                                 String sysId= resp.get("presence").getAsJsonObject().get("systemId").getAsString();
                                 String token= resp.get("presence").getAsJsonObject().get("token").getAsString();
                                 SessionGroup sg = cMap.computeIfAbsent(insId,k->new SessionGroup(insId));
@@ -108,8 +109,12 @@ public class UDPServer implements Runnable {
                             }
                             //send back as ticket validation result
                             buffer.clear();
-                            buffer.put("ticket".getBytes());
-                            buffer.put(resp.toString().getBytes());
+                            buffer.put(outboundMessage.label.getBytes());
+                            buffer.put((byte)'#');
+                            buffer.put(insId.getBytes());
+                            buffer.put((byte)'?');
+                            buffer.put(suc?"joined".getBytes():"failed".getBytes());
+                            buffer.put("{}".getBytes());
                             buffer.flip();
                             try{uchannel.send(buffer,remoteAdd);}catch (Exception iex){iex.printStackTrace();}
                         });
