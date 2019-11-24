@@ -26,10 +26,11 @@ namespace Tarantula.Networking{
         private GecHttpClient _ghc;
         private GecWebSocket _gwc;
         private GecUdpSocket _guc;
-        private bool _live;
+        private bool _liveWc;
+        private bool _liveUc;
         private Dictionary<string,Lobby> _lobbyList;
         private List<Descriptor> _gameList;
-        private ConcurrentDictionary<string,Action<string>> _onMessage;
+        private ConcurrentDictionary<string,Action<Message>> _onMessage;
         private static JsonSerializerSettings JSON_SETTING = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
         
         public Presence presence {set;get;}
@@ -43,9 +44,10 @@ namespace Tarantula.Networking{
             _ghc = new GecHttpClient(host);  
             _lobbyList = new Dictionary<string,Lobby>();
             _gameList = new List<Descriptor>();
-            _onMessage = new ConcurrentDictionary<string,Action<string>>();
-            _onMessage["debug"] = (msg)=>{Debug.Log(msg);};
-            _live = false;
+            _onMessage = new ConcurrentDictionary<string,Action<Message>>();
+            _onMessage["debug"] = (msg)=>{Debug.Log(msg.payload);};
+            _liveWc = false;
+            _liveUc = false;
         }  
       
         public  async Task<bool> Index(MonoBehaviour caller){
@@ -205,43 +207,41 @@ namespace Tarantula.Networking{
                 return false;
             }        
         }
-        public void RegisterMessageListener(string register,Action<string> listener){
+        public void RegisterMessageListener(string register,Action<Message> listener){
             _onMessage[register]= listener;
         }
-        public async Task<bool> OnWebSocketMessage(){
+        public async Task<bool> OnMessage(){
             try{
                 //do receive loop
-                while(_live){
-                    string msg = await _gwc.Receive();
-                    ParseInboundMessage(msg);
+                if(_liveUc){
+                    while(_liveUc){
+                        string msg = await _guc.Receive();
+                        ParseInboundMessage(msg);
+                    }    
+                }
+                else{
+                    while(_liveWc){
+                        string msg = await _gwc.Receive();
+                        ParseInboundMessage(msg);
+                    }
                 }
                 return false;
             }catch(Exception ex){
-                _live = false;
+                _liveWc = false;
                 OnException?.Invoke(ex);
-                return _live;
-            }   
-        }
-        public async Task<bool> OnUdpSocketMessage(){
-            try{
-                //do receive loop
-                while(_live){
-                    string msg = await _guc.Receive();
-                    ParseInboundMessage(msg);
-                }
-                return false;
-            }catch(Exception ex){
-                _live = false;
-                OnException?.Invoke(ex);
-                return _live;
+                return _liveWc;
             }   
         }
         public async Task<bool> Close(){
             try{
                 bool suc = false;
-                if(_live){
-                    _live = false;
+                if(_liveWc){
+                    _liveWc = false;
                     suc = await _gwc.Close();
+                }
+                if(_liveUc){
+                    _liveUc = false;
+                    _guc.Close();
                 }
                 return suc;
             }catch(Exception ex){
@@ -251,22 +251,24 @@ namespace Tarantula.Networking{
         }
         private void ParseInboundMessage(string msg){
             //format [label]#[instanceId]?[query]{json payload}
+            Message im = new Message();
             int idx1 = msg.IndexOf('#');
             if(idx1>0){
-                Debug.Log("LABEL->"+msg.Substring(0,idx1));
+                im.label = msg.Substring(0,idx1);
             }
             int idx2 = msg.IndexOf('?');
             int idx3 = msg.IndexOf('{');
             if(idx2>0&idx3>0){
                 int idx = idx1>0?idx1+1:0;
-                Debug.Log("ID->"+msg.Substring(idx,idx2-idx));
-                Debug.Log("QUERY->"+msg.Substring(idx2+1,idx3-idx2-1));
+                im.instanceId = msg.Substring(idx,idx2-idx);
+                im.query = msg.Substring(idx2+1,idx3-idx2-1);
             }
             if(idx2<0&idx3>0){
                 int idx = idx1>0?idx1+1:0;
-                Debug.Log("ID->"+msg.Substring(idx,idx3-idx));
+                im.instanceId = msg.Substring(idx,idx3-idx);
             }
-            _onMessage["debug"](">>"+msg.Substring(idx3));    
+            im.payload = msg.Substring(idx3);
+            _onMessage["debug"](im);    
         }
         private async Task<bool> ParseGameObject(string json,Descriptor game,Action<JObject> callback){
             JObject jo = JObject.Parse(json);
@@ -282,6 +284,7 @@ namespace Tarantula.Networking{
                 //streaming on udp game session 
                 _guc = new GecUdpSocket(jo.SelectToken("connection").ToObject<Connection>(),presence);
                 suc = await _guc.Init(tid,ticket);
+                _liveUc = true;
             }
             else{
                 //streaming on websocket
@@ -351,7 +354,7 @@ namespace Tarantula.Networking{
                 Connection connection = jo.SelectToken("connection").ToObject<Connection>();
                 _gwc = new GecWebSocket(connection,presence);
                 suc = await _gwc.Connect();
-                _live = suc;
+                _liveWc = suc;
             }
             return suc;
         }
@@ -392,6 +395,10 @@ namespace Tarantula.Networking{
             int bst = await _udpClient.SendAsync(onjoin,onjoin.Length);
             Debug.Log(bst+"<>"+onjoin.Length+"///"+_connection.host+":"+_connection.port);
             return bst==onjoin.Length;
+       }
+       public void Close(){
+           _udpClient.Close();
+           _udpClient.Dispose();
        }
        public async Task<bool> Send(string json){
            byte[] payload = Encoding.UTF8.GetBytes(json.ToString());
@@ -495,6 +502,12 @@ namespace Tarantula.Networking{
             **/
             return true;
         }
+    }
+    public class Message{
+        public string label;
+        public string instanceId;
+        public string query;
+        public string payload;
     }
     public class Header{
         public string name { get; set; }

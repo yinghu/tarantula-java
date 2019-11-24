@@ -84,7 +84,8 @@ public class Integration : MonoBehaviour{
                     if(suc){
                         spin.OnSpin(suc);
                         started = true;
-                        await gec.OnUdpSocketMessage();     
+                        await gec.OnMessage();  
+                        
                     }
                 }
                 else{
