@@ -49,7 +49,7 @@ public class Integration : MonoBehaviour{
          };
          gec.OnWebSocket += _OnWebSocketMessage;
          gec.OnUDPSocket += _OnUDPSocketMessage;
-         gec.OnMessage += (msg)=>{
+         gec.OnInboundMessage += (msg)=>{
              if(msg.label!=null&&msg.label.Equals("connection")){
                 Debug.Log(msg.label);
                 Debug.Log(msg.instanceId);
@@ -80,7 +80,9 @@ public class Integration : MonoBehaviour{
    
     void Update()
     {
-        
+        //if(started){
+            //profile();
+        //}        
     }
     public async Task<bool> StartDemo(){
         if(!started){
@@ -101,6 +103,7 @@ public class Integration : MonoBehaviour{
                     game = gec.gameList()[0];
                     suc = await gec.OnPlay(this,"robotquest-service/live",game,(gs)=>{
                         Debug.Log(game.instanceId);
+                        Debug.Log(game.gameId);
                     });
                     if(suc){
                         spin.OnSpin(suc);
@@ -128,13 +131,35 @@ public class Integration : MonoBehaviour{
     }
     
     public async void profile(){
-        bool suc = await gec.Profile(this);
-        Debug.Log(gec.profile.nickname);
+        //bool suc = await gec.Profile(this);
+        //Debug.Log(gec.profile.nickname);
+        User u = new User();
+        u.login = "abc";
+        u.nickname = "nvnv";
+        OutboundMessage<User> om = new OutboundMessage<User>();
+        om.instanceId = game.gameId;
+        om.query = "onMessage";
+        om.label = "game";
+        om.payload = u;
+        await gec.SendOnUDP(om);
     }
     public async void notification(){
-        onNotification = !onNotification;
-        bool suc = await gec.OnNotification("perfect-notification",onNotification);
+        //onNotification = !onNotification;
+        //bool suc = await gec.OnNotification("perfect-notification",onNotification);
         //Debug.Log(gec.profile.nickname);
+        Payload cmd = new Payload();
+        cmd.command = "abc";
+        //cmd.headers = new Header[]{new Header()}
+        await gec.SendOnService("robotquest-service/live",cmd);
+    }
+    public async void joo(){
+        //onNotification = !onNotification;
+        //bool suc = await gec.OnNotification("perfect-notification",onNotification);
+        //Debug.Log(gec.profile.nickname);
+        Payload cmd = new Payload();
+        cmd.command = "abc";
+        cmd.headers = new Header[]{new Header("a","1"),new Header("b","2")};
+        await gec.SendOnInstance(game.applicationId,game.instanceId,cmd);
     }
     private bool ParseGame(string json){
             JObject jo = JObject.Parse(json);

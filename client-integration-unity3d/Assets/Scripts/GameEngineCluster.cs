@@ -17,13 +17,13 @@ using Newtonsoft.Json.Linq;
 namespace Tarantula.Networking{
    
    public delegate void ExceptionHandler(Exception ex);
-   public delegate void MessageHandler(Message message);
+   public delegate void InboundMessageHandler(InboundMessage message);
    public delegate void WebSocketHandler(bool connected);    
    public delegate void UDPSocketHandler(bool connected);    
    public class GameEngineCluster{
       
         public event ExceptionHandler OnException;
-        public event MessageHandler OnMessage;
+        public event InboundMessageHandler OnInboundMessage;
         public event WebSocketHandler OnWebSocket;
         public event UDPSocketHandler OnUDPSocket;
         
@@ -222,27 +222,54 @@ namespace Tarantula.Networking{
                 return _liveWc;
             }   
         }
-        public async Task<bool> SendOnWebSocket(){
+        public async Task<bool> SendOnInstance(string applicationId,string instanceId,Payload payload){
             try{
                 //do receive loop
-                if(_liveWc){
-                    await _gwc.Send("");
+                if(!_liveWc){
+                    return false;
                 }
-                return false;
+                Streaming strm = new Streaming();
+                strm.path = "/application/instance";
+                strm.applicationId = applicationId;
+                strm.instanceId = instanceId;
+                strm.action = payload.command;
+                strm.data = payload;
+                string jstrm = JsonConvert.SerializeObject(strm,JSON_SETTING);
+                return await _gwc.Send(jstrm);
             }catch(Exception ex){
                 _liveWc = false;
                 OnException?.Invoke(ex);
                 return _liveWc;
             } 
         }
-        public async Task<bool> SendOnUDP(Message msg){
+        public async Task<bool> SendOnService(string tag,Payload payload){
             try{
                 //do receive loop
-                if(_liveUc){
-                    
-                    await _guc.Send("");
+                if(!_liveWc){
+                    return false;
                 }
-                return false;
+                Streaming strm = new Streaming();
+                strm.path = "/service/action";
+                strm.tag = tag;
+                strm.action = payload.command;
+                strm.data = payload;
+                string jstrm = JsonConvert.SerializeObject(strm,JSON_SETTING);
+                return await _gwc.Send(jstrm);
+            }catch(Exception ex){
+                _liveWc = false;
+                OnException?.Invoke(ex);
+                return _liveWc;
+            } 
+        }
+        public async Task<bool> SendOnUDP<T>(OutboundMessage<T> msg){
+            try{
+                //do receive loop
+                if(!_liveUc){
+                    return false;
+                }
+                string json = JsonConvert.SerializeObject(msg.payload,JSON_SETTING);
+                string mex = msg.label+"#"+msg.instanceId+"?"+msg.query+json;
+                return  await _guc.Send(mex);
             }catch(Exception ex){
                 _liveUc = false;
                 OnException?.Invoke(ex);
@@ -282,7 +309,7 @@ namespace Tarantula.Networking{
         }
         private void ParseInboundMessage(string msg){
             //format [label]#[instanceId]?[query]{json payload}
-            Message im = new Message();
+            InboundMessage im = new InboundMessage();
             int idx1 = msg.IndexOf('#');
             if(idx1>0){
                 im.label = msg.Substring(0,idx1);
@@ -299,10 +326,9 @@ namespace Tarantula.Networking{
                 im.instanceId = msg.Substring(idx,idx3-idx);
             }
             im.payload = msg.Substring(idx3);
-            OnMessage?.Invoke(im);   
+            OnInboundMessage?.Invoke(im);   
         }
         private async Task<bool> ParseGameObject(string json,Descriptor game,Action<JObject> callback){
-            Debug.Log(">>>>>"+json);
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
             if(!suc){
@@ -313,6 +339,7 @@ namespace Tarantula.Networking{
             string ixx = (string)jo.SelectToken("index");
             string ticket = (string)jo.SelectToken("ticket");
             game.instanceId = tid;
+            game.gameId = ixx;
             if(jo.ContainsKey("connection")){
                 //streaming on udp game session 
                 Connection conn = jo.SelectToken("connection").ToObject<Connection>();
@@ -534,11 +561,17 @@ namespace Tarantula.Networking{
             return true;
         }
     }
-    public class Message{
+    public class InboundMessage{
         public string label;
         public string instanceId;
         public string query;
         public string payload;
+    }
+    public class OutboundMessage<T>{
+        public string label;
+        public string instanceId;
+        public string query;
+        public T payload;
     }
     public class Header{
         public string name { get; set; }
@@ -559,6 +592,7 @@ namespace Tarantula.Networking{
         public string command;
         public Header[] headers;
     }
+    
     public class Streaming{
         public string path;
         public string action;
@@ -594,6 +628,7 @@ namespace Tarantula.Networking{
         public string icon { get; set; }
         public string viewId { get; set; }
         public string responseLabel { get; set; }
+        public string gameId { get; set; }
     }
 
     public class Lobby{

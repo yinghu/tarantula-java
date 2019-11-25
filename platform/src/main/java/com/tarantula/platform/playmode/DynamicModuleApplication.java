@@ -91,12 +91,6 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             this.context.onRegistry().onLeave(session);
         }
         this._onStream.remove(session.systemId());
-        if(onConnection!=null){
-            //send leave message on udp to removed udp entry
-            //SessionIdle timeout = new SessionIdle("timeout",session.systemId(),session.stub(),this.context.onRegistry().distributionKey());
-            //this.context.postOffice().onConnection(onConnection.serverId()).send(timeout.label(),this.builder.create().toJson(timeout).getBytes());
-        }
-
     }
 
     @Override
@@ -104,7 +98,6 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         if(!this.descriptor.singleton()){
             this.module.onIdle(session,(uid,delta)->{
                 pushEvent(uid,delta);
-                //SessionIdle sessionIdle = new SessionIdle(module.label(),session.systemId(),session.stub());
                 Session pending = _onStream.get(session.systemId());
                 if(pending!=null){
                     pending.write(delta,module.label()+"#"+uid);
