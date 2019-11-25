@@ -38,6 +38,7 @@ namespace Tarantula.Networking{
         
         public Presence presence {set;get;}
         public Profile profile {set;get;}
+        public Level level {set;get;}
         public string message {set;get;}
         
         public Lobby lobby(string typeId){ return _lobbyList[typeId];}  
@@ -121,7 +122,41 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        //level/XP and leader board query 
+        //level/XP and leader board query
+        public  async Task<bool> Level(MonoBehaviour caller){
+            try{
+                Header[] headers = new Header[]{
+                    new Header("Tarantula-tag","level/xp"),
+                    new Header("Tarantula-token",presence.token),
+                    new Header("Tarantula-action","onLevel")
+                };
+                string jstr = await _ghc.GetJson(caller,"/service/action",headers);
+                Debug.Log(jstr);
+                return ParseLevel(jstr);
+            }catch(Exception ex){
+                OnException?.Invoke(ex);
+                return false;
+            }
+        }
+        public  async Task<bool> XP(MonoBehaviour caller){
+            try{
+                Header[] headers = new Header[]{
+                    new Header("Tarantula-tag","level/xp"),
+                    new Header("Tarantula-token",presence.token),
+                    new Header("Tarantula-action","onXP")
+                };
+                Payload cmd = new Payload();
+                cmd.command = "onXP";
+                cmd.headers = new Header[]{new Header("header","presence"),new Header("category","LoginCount")};
+                string json = JsonConvert.SerializeObject(cmd,JSON_SETTING);
+                string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
+                Debug.Log(jstr);
+                return ParseXP(jstr);
+            }catch(Exception ex){
+                OnException?.Invoke(ex);
+                return false;
+            }
+        }
         public  async Task<bool> Device(MonoBehaviour caller,Device device){
             try{
                 Header[] headers = new Header[]{
@@ -452,6 +487,28 @@ namespace Tarantula.Networking{
             profile = tk.ToObject<Profile>();
             return true;
         }
+        private bool ParseLevel(string json){
+            JObject jo = JObject.Parse(json);
+            bool suc = (bool)jo.SelectToken("successful");
+            if(!suc){
+                message = (string)jo.SelectToken("message");
+                return suc;
+            }
+            JToken tk = jo.SelectToken("level");
+            level = tk.ToObject<Level>();
+            return true;
+        }
+        private bool ParseXP(string json){
+            JObject jo = JObject.Parse(json);
+            bool suc = (bool)jo.SelectToken("successful");
+            if(!suc){
+                message = (string)jo.SelectToken("message");
+                return suc;
+            }
+            //JToken tk = jo.SelectToken("level");
+            //level = tk.ToObject<Level>();
+            return true;
+        }
    } 
    public class GecUdpSocket{
        private UdpClient _udpClient;
@@ -666,6 +723,20 @@ namespace Tarantula.Networking{
     public class Profile{
         public string nickname { get; set; }
         public string avatar { get; set; }
+    }
+    public class Level{
+        public int level { get; set; }
+        public double levelXP { get; set; }
+    }
+    public class Statistic{
+        public string category { get; set; }
+        public double value { get; set; }
+    }
+
+    public class Xp{
+        public string header { get; set; }
+        public string name { get; set; }
+        public List<Statistic> statistics { get; set; }
     }
     public class Connection{
         public string command { get; set; }

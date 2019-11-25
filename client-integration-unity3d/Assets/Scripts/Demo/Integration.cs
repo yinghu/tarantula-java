@@ -133,6 +133,8 @@ public class Integration : MonoBehaviour{
     public async void profile(){
         bool suc = await gec.Profile(this,gec.presence.systemId);
         Debug.Log(gec.profile.nickname);
+        await gec.Level(this);
+        await gec.XP(this);
         User u = new User();
         u.login = "abc";
         u.nickname = "nvnv";
