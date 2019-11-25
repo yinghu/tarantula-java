@@ -51,15 +51,15 @@ public class UDPServer implements Runnable {
                                     JsonObject jt = parser.parse(m.data).getAsJsonObject();
                                     sg.sessions.remove(new Session(jt.get("systemId").getAsString()));
                                 }
+                                outBuffer.clear();
+                                outBuffer.put(m.label.getBytes());
+                                outBuffer.put((byte)'#');
+                                outBuffer.put(m.instanceId.getBytes());
+                                outBuffer.put((byte)'?');
+                                outBuffer.put(m.query.getBytes());
+                                outBuffer.put(m.data.getBytes());
+                                outBuffer.flip();
                                 sg.sessions.forEach(s->{
-                                    outBuffer.clear();
-                                    outBuffer.put(m.label.getBytes());
-                                    outBuffer.put((byte)'#');
-                                    outBuffer.put(m.instanceId.getBytes());
-                                    outBuffer.put((byte)'?');
-                                    outBuffer.put(m.query.getBytes());
-                                    outBuffer.put(m.data.getBytes());
-                                    outBuffer.flip();
                                     try{uchannel.send(outBuffer,s.endpoint);}catch (Exception iexc){iexc.printStackTrace();}
                                 });
                             }

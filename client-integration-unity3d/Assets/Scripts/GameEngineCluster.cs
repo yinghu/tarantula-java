@@ -222,6 +222,33 @@ namespace Tarantula.Networking{
                 return _liveWc;
             }   
         }
+        public async Task<bool> SendOnWebSocket(){
+            try{
+                //do receive loop
+                if(_liveWc){
+                    await _gwc.Send("");
+                }
+                return false;
+            }catch(Exception ex){
+                _liveWc = false;
+                OnException?.Invoke(ex);
+                return _liveWc;
+            } 
+        }
+        public async Task<bool> SendOnUDP(Message msg){
+            try{
+                //do receive loop
+                if(_liveUc){
+                    
+                    await _guc.Send("");
+                }
+                return false;
+            }catch(Exception ex){
+                _liveUc = false;
+                OnException?.Invoke(ex);
+                return _liveUc;
+            }
+        }
         public async Task<bool> OnUDPSocketMessage(){
             try{
                 //do receive loop
@@ -275,7 +302,7 @@ namespace Tarantula.Networking{
             OnMessage?.Invoke(im);   
         }
         private async Task<bool> ParseGameObject(string json,Descriptor game,Action<JObject> callback){
-            Debug.Log(json);
+            Debug.Log(">>>>>"+json);
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
             if(!suc){

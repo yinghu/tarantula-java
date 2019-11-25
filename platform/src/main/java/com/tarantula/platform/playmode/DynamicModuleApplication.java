@@ -2,7 +2,6 @@ package com.tarantula.platform.playmode;
 
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.platform.SessionIdle;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.service.DeploymentServiceProvider;
@@ -30,22 +29,32 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         session.joined(true);
         module.onJoin(session,onConnection,(uid,delta)->{
             pushEvent(uid,delta);
+            session.index(parseUid(uid));
+            _onStream.put(session.systemId(),session);
             //broadcasting to all streaming session if no udp publisher
             this._onStream.forEach((k,v)->{
-                v.write(delta,this.module.label()+"#"+uid);
+                if(v.streaming()&&v.index().equals(parseUid(uid))){
+                    v.write(delta,this.module.label()+"#"+uid);
+                }
             });
         });
     }
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         if(session.streaming()){
+            Session ex = _onStream.remove(session.systemId());
+            if(ex!=null){
+                session.index(ex.index());
+            }
             this._onStream.put(session.systemId(),session);
         }
         if(this.module.onRequest(session,payload,((uid,delta) -> {
             pushEvent(uid,delta);
             //broadcasting to all streaming session if no udp publisher
             this._onStream.forEach((k,v)->{
-                v.write(delta,this.module.label()+"#"+uid);
+                if(v.streaming()&&parseUid(uid).equals(v.index())){
+                    v.write(delta,this.module.label()+"#"+uid);
+                }
             });
             //server push
         }))){
@@ -125,9 +134,11 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             if(pendingTimer<=0){
                 this.module.onTimer(((uid,delta) ->{
                         pushEvent(uid,delta);
-                        _onStream.forEach((k,v)->
-                            v.write(delta,module.label()+"#"+uid)
-                        );
+                        _onStream.forEach((k,v)-> {
+                            if(v.streaming()&&v.index().equals(parseUid(uid))){
+                                v.write(delta, module.label() + "#" + uid);
+                            }
+                        });
                     }
                 ));
                 pendingTimer = descriptor.timerOnModule();//reset
@@ -169,6 +180,15 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     private void pushEvent(String uid,byte[] delta){
         if(onConnection!=null&&this.context.onRegistry().count(0)>0){
             this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label()+"#"+uid,delta);
+        }
+    }
+    private String parseUid(String uid){
+        int ix = uid.indexOf('?');
+        if(ix>0){
+            return uid.substring(0,ix);
+        }
+        else{
+            return uid;
         }
     }
 }
