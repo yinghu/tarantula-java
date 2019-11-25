@@ -50,7 +50,7 @@ public class Integration : MonoBehaviour{
          gec.OnWebSocket += _OnWebSocketMessage;
          gec.OnUDPSocket += _OnUDPSocketMessage;
          gec.OnInboundMessage += (msg)=>{
-             if(msg.label!=null&&msg.label.Equals("connection")){
+             if(msg.label!=null){
                 Debug.Log(msg.label);
                 Debug.Log(msg.instanceId);
                 Debug.Log(msg.query);
@@ -131,8 +131,8 @@ public class Integration : MonoBehaviour{
     }
     
     public async void profile(){
-        //bool suc = await gec.Profile(this);
-        //Debug.Log(gec.profile.nickname);
+        bool suc = await gec.Profile(this,gec.presence.systemId);
+        Debug.Log(gec.profile.nickname);
         User u = new User();
         u.login = "abc";
         u.nickname = "nvnv";
@@ -144,8 +144,8 @@ public class Integration : MonoBehaviour{
         await gec.SendOnUDP(om);
     }
     public async void notification(){
-        //onNotification = !onNotification;
-        //bool suc = await gec.OnNotification("perfect-notification",onNotification);
+        onNotification = !onNotification;
+        bool suc = await gec.OnNotification("perfect-notification",onNotification);
         //Debug.Log(gec.profile.nickname);
         Payload cmd = new Payload();
         cmd.command = "abc";

@@ -103,6 +103,25 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
+        public  async Task<bool> Profile(MonoBehaviour caller,string systemId){
+            try{
+                Header[] headers = new Header[]{
+                    new Header("Tarantula-tag","presence/profile"),
+                    new Header("Tarantula-token",presence.token),
+                    new Header("Tarantula-action","onProfile")
+                };
+                Payload cmd = new Payload();
+                cmd.command = "onProfile";
+                cmd.headers = new Header[]{new Header("systemId",systemId)};
+                string json = JsonConvert.SerializeObject(cmd,JSON_SETTING);
+                string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
+                return ParseProfile(jstr);
+            }catch(Exception ex){
+                OnException?.Invoke(ex);
+                return false;
+            }
+        }
+        //level/XP and leader board query 
         public  async Task<bool> Device(MonoBehaviour caller,Device device){
             try{
                 Header[] headers = new Header[]{
@@ -118,11 +137,11 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public async Task<bool> OnNotification(string label,bool streaming){
+        public async Task<bool> OnNotification(string topic,bool enabled){
             try{
                 Streaming strm = new Streaming();
-                strm.action = streaming?"onStart":"onStop";
-                strm.label = label;
+                strm.action = enabled?"onStart":"onStop";
+                strm.label = topic;
                 strm.streaming = true;
                 Payload p = new Payload();
                 p.command = strm.action;
