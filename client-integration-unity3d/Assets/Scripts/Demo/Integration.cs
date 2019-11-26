@@ -134,7 +134,8 @@ public class Integration : MonoBehaviour{
         bool suc = await gec.Profile(this,gec.presence.systemId);
         Debug.Log(gec.profile.nickname);
         await gec.Level(this);
-        await gec.XP(this);
+        await gec.XP(this,"presence","LoginCount");
+        await gec.LeaderBoard(this,"presence","LoginCount","T");
         User u = new User();
         u.login = "abc";
         u.nickname = "nvnv";

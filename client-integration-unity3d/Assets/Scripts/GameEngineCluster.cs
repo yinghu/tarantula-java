@@ -39,6 +39,8 @@ namespace Tarantula.Networking{
         public Presence presence {set;get;}
         public Profile profile {set;get;}
         public Level level {set;get;}
+        public Xp xp {set;get;}
+        public LeaderBoard leaderBoard {set;get;} 
         public string message {set;get;}
         
         public Lobby lobby(string typeId){ return _lobbyList[typeId];}  
@@ -138,7 +140,7 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> XP(MonoBehaviour caller){
+        public  async Task<bool> XP(MonoBehaviour caller,string header,string category){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-tag","level/xp"),
@@ -147,11 +149,30 @@ namespace Tarantula.Networking{
                 };
                 Payload cmd = new Payload();
                 cmd.command = "onXP";
-                cmd.headers = new Header[]{new Header("header","presence"),new Header("category","LoginCount")};
+                cmd.headers = new Header[]{new Header("header",header),new Header("category",category)};
                 string json = JsonConvert.SerializeObject(cmd,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
                 Debug.Log(jstr);
                 return ParseXP(jstr);
+            }catch(Exception ex){
+                OnException?.Invoke(ex);
+                return false;
+            }
+        }
+        public  async Task<bool> LeaderBoard(MonoBehaviour caller,string header,string category,string classifier){
+            try{
+                Header[] headers = new Header[]{
+                    new Header("Tarantula-tag","leaderboard/top10"),
+                    new Header("Tarantula-token",presence.token),
+                    new Header("Tarantula-action","onLeaderBoard")
+                };
+                Payload cmd = new Payload();
+                cmd.command = "onLeaderBoard";
+                cmd.headers = new Header[]{new Header("header",header),new Header("category",category),new Header("classifier",classifier)};
+                string json = JsonConvert.SerializeObject(cmd,JSON_SETTING);
+                string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
+                Debug.Log(jstr);
+                return ParseLeaderBoard(jstr);
             }catch(Exception ex){
                 OnException?.Invoke(ex);
                 return false;
@@ -505,8 +526,19 @@ namespace Tarantula.Networking{
                 message = (string)jo.SelectToken("message");
                 return suc;
             }
-            //JToken tk = jo.SelectToken("level");
-            //level = tk.ToObject<Level>();
+            JToken tk = jo.SelectToken("xp");
+            xp = tk.ToObject<Xp>();
+            return true;
+        }
+        private bool ParseLeaderBoard(string json){
+            JObject jo = JObject.Parse(json);
+            bool suc = (bool)jo.SelectToken("successful");
+            if(!suc){
+                message = (string)jo.SelectToken("message");
+                return suc;
+            }
+            JToken tk = jo.SelectToken("leaderBoard");
+            leaderBoard = tk.ToObject<LeaderBoard>();
             return true;
         }
    } 
@@ -737,6 +769,20 @@ namespace Tarantula.Networking{
         public string header { get; set; }
         public string name { get; set; }
         public List<Statistic> statistics { get; set; }
+    }
+    public class Board{
+        public string systemId { get; set; }
+        public double value { get; set; }
+        public DateTime lastUpdated { get; set; }
+    }
+
+    public class LeaderBoard{
+        public string header { get; set; }
+        public string name { get; set; }
+        public string classifier { get; set; }
+        public string category { get; set; }
+        public int size { get; set; }
+        public List<Board> board { get; set; }
     }
     public class Connection{
         public string command { get; set; }
