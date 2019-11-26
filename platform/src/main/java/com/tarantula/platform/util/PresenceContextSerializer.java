@@ -41,12 +41,10 @@ public class PresenceContextSerializer implements JsonSerializer<PresenceContext
             pc.add("level",new XPLevelSerializer().serialize(presenceContext.level,type,jsonSerializationContext));
         }
         if(presenceContext.xp!=null){
-            JsonArray xlist = new JsonArray();
-            XPGainSerializer xs = new XPGainSerializer();
-            for(XP x : presenceContext.xp){
-                xlist.add(xs.serialize(x,type,jsonSerializationContext));
-            }
-            pc.add("xp",xlist);
+            pc.add("xp",new XPGainSerializer().serialize(presenceContext.xp,type,jsonSerializationContext));
+        }
+        if(presenceContext.leaderBoard!=null){
+            pc.add("leaderBoard",new LeaderBoardSerializer().serialize(presenceContext.leaderBoard,type,jsonSerializationContext));
         }
         if(presenceContext.view!=null){
             pc.add("view",new OnViewSerializer().serialize(presenceContext.view,type,jsonSerializationContext));

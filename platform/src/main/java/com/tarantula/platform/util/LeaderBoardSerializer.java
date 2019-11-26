@@ -13,7 +13,7 @@ public class LeaderBoardSerializer implements JsonSerializer<LeaderBoard> {
 
 
     public JsonElement serialize(LeaderBoard leaderBoard, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject jo = (JsonObject)new ResponseSerializer().serialize(leaderBoard,type,jsonSerializationContext);
+        JsonObject jo = new JsonObject();//new ResponseSerializer().serialize(leaderBoard,type,jsonSerializationContext);
         //jo.addProperty("label",leaderBoard.label());
         jo.addProperty("header",leaderBoard.header());
         jo.addProperty("name",leaderBoard.name());

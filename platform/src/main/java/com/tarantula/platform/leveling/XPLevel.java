@@ -136,15 +136,16 @@ public class XPLevel extends RecoverableObject implements Level {
         String qk = new StringBuffer(xp.header()).append("_").append(xp.category()).toString();
         xpMapping.put(qk,xp);
     }
-    public List<XP> list(String header,String category){
+    public XP list(String header,String category){
         String qk = new StringBuffer(header).append("_").append(category).toString();
+        /**
         ArrayList<XP> _gxp = new ArrayList<>();
         xpMapping.forEach((String k,XP xp)->{
             if(k.equals(qk)){
                 _gxp.add(xp);
             }
-        });
-        return _gxp;
+        });**/
+        return xpMapping.get(qk);
     }
     public List<XP> list(){
         ArrayList<XP> _gxp = new ArrayList<>();

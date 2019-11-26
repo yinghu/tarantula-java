@@ -16,7 +16,7 @@ public interface Level extends Recoverable{
     double levelXP(double levelXP);
 
     void xp(XP xp);
-    List<XP> list(String header,String category);
+    XP list(String header,String category);
     List<XP> list();
     boolean onDailyGainReset();
     boolean onWeeklyGainReset();

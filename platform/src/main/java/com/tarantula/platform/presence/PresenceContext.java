@@ -15,11 +15,12 @@ public class PresenceContext extends ResponseHeader {
 
     public List<Lobby> lobbyList;
     public XPLevel level;
-    public List<XP> xp;
+    public XP xp;
+    public LeaderBoard leaderBoard;
     public OnSession presence;
     public OnView view;
     public Connection connection;
-    //public Connection udp;
+
     public Profile profile;
     public PresenceContext(){
         this.code = 200;
