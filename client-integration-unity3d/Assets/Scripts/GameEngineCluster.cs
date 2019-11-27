@@ -93,6 +93,26 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
+       public  async Task<bool> Logout(MonoBehaviour caller){
+            try{
+                Header[] headers = new Header[]{
+                    new Header("Tarantula-tag","presence/lobby"),
+                    new Header("Tarantula-token",presence.token),
+                    new Header("Tarantula-action","onAbsence")
+                };
+                //string json = JsonConvert.SerializeObject(user,JSON_SETTING);
+                string jstr = await _ghc.GetJson(caller,"/service/action",headers);
+                if(ParseLogout(jstr)){
+                    await Close();
+                    return true;
+                }else{
+                    return false;
+                }           
+            }catch(Exception ex){
+                OnException?.Invoke(ex);
+                return false;
+            }
+        }
         public  async Task<bool> Profile(MonoBehaviour caller){
             try{
                 Header[] headers = new Header[]{
@@ -496,6 +516,17 @@ namespace Tarantula.Networking{
                 OnWebSocket?.Invoke(suc);
             }
             return suc;
+        }
+       private bool ParseLogout(string json){
+            JObject jo = JObject.Parse(json);
+            bool suc = (bool)jo.SelectToken("successful");
+            if(!suc){
+                message = (string)jo.SelectToken("message");
+                return suc;
+            }
+            //JToken tk = jo.SelectToken("profile");
+            //profile = tk.ToObject<Profile>();
+            return true;
         }
         private bool ParseProfile(string json){
             JObject jo = JObject.Parse(json);
