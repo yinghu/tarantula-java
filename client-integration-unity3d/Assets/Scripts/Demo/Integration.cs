@@ -111,6 +111,9 @@ public class Integration : MonoBehaviour{
                         //await gec.OnStreaming();  
                         
                     }
+                    else{
+                        Debug.Log("ops->"+gec.message);    
+                    }
                 }
                 else{
                     Debug.Log("ops->"+gec.message);

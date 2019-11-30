@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 using Tarantula.Networking;
 public class Spin : MonoBehaviour
 {
-    public float speed = 3.0f;
+    public float speed = 5.0f;
    
     bool _active;
     void Start(){
@@ -16,7 +16,8 @@ public class Spin : MonoBehaviour
    
     void Update(){
         if(_active){
-            transform.Rotate(10,speed,10);
+            transform.Rotate(speed/2,speed,speed/3);
+            //transform.Translate();
         }    
     }
     
