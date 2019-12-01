@@ -405,7 +405,7 @@ namespace Tarantula.Networking{
         }
         private void ParseInboundMessage(string msg){
             //format [label]#[instanceId]?[query]{json payload}
-            Debug.Log(msg);
+            //Debug.Log(msg);
             InboundMessage im = new InboundMessage();
             int idx1 = msg.IndexOf('#');
             if(idx1>0){

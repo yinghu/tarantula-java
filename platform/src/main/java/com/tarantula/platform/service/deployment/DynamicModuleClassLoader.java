@@ -14,6 +14,7 @@ public class DynamicModuleClassLoader extends ClassLoader{
 
     private HashMap<String,Class> _cached = new HashMap<>();
     private String codeUrl;
+    private boolean loaded;
     CopyOnWriteArrayList<PlatformDeploymentServiceProvider.ModuleProxy> proxies = new CopyOnWriteArrayList();
     public DynamicModuleClassLoader(Descriptor descriptor){
         this.codeUrl = "jar:"+descriptor.codebase()+"/"+descriptor.moduleArtifact()+"-"+descriptor.moduleVersion()+".jar!/";
@@ -33,11 +34,14 @@ public class DynamicModuleClassLoader extends ClassLoader{
                         InputStream in = jf.getInputStream(c);
                         byte[] cdata = new byte[in.available()];
                         in.read(cdata);
-                        Class result = defineClass(cn, cdata, 0, cdata.length);
-                        super.resolveClass(result);
-                        _cached.put(cn,result);
+                        if(!_cached.containsKey(cn)){//skip preloaded static classes
+                            Class result = defineClass(cn, cdata, 0, cdata.length);
+                            super.resolveClass(result);
+                            _cached.put(cn,result);
+                        }
                     }catch (Exception ex){
-                        ex.printStackTrace();
+                        //ex.printStackTrace();
+                        throw new RuntimeException(ex);
                     }
                 }
             });
@@ -48,14 +52,12 @@ public class DynamicModuleClassLoader extends ClassLoader{
             if(_jar!=null){
                 try{_jar.close();}catch (Exception ex){}
             }
+            loaded = true;
         }
     }
 
     synchronized void _clear(){
         proxies.clear();
-        //_cached.forEach((k,v)->{
-            //System.out.println(k+" removed");
-        //});
         _cached.clear();
     }
     @Override
@@ -128,7 +130,7 @@ public class DynamicModuleClassLoader extends ClassLoader{
                 throw new ClassNotFoundException(name,iex);
             }
             finally {
-                if(jar!=null){jar.close();}
+                if(loaded&&jar!=null){jar.close();}
             }
         }
         catch (Exception ex){

@@ -78,19 +78,19 @@ public class Integration : MonoBehaviour{
         gec.Close();            
     }
    
-    void Update()
-    {
-        //if(started){
-            //profile();
-        //}        
+    void Update(){
+        if (Input.GetMouseButtonDown(0)){
+            Vector3 mouse = Input.mousePosition;
+            spin.OnMove(mouse);
+        }
     }
     public async Task<bool> StartDemo(){
         if(!started){
             bool suc = await gec.Index(this);
             User device = new User();
-            device.login = "xbbbbb";
+            device.login = "root";
             device.nickname = "xnbbbv";
-            device.password = "abc123";
+            device.password = "root";
             suc = await gec.Login(this,device);
             if(!suc){
                 Debug.Log(gec.message);
