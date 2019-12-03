@@ -71,7 +71,13 @@ public class Integration : MonoBehaviour{
     async void OnDestroy(){
        await gec.Close();           
     }
-   
+    public async void Logout(){
+        await OnLogout();
+    }
+    public async void Play(){
+        await OnProfile();
+        Debug.Log(gec.profile.nickname);
+    }
     void Update(){
         //if (Input.GetMouseButtonDown(0)){
             //Vector3 mouse = Input.mousePosition;
