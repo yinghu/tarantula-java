@@ -5,10 +5,10 @@ using UnityEngine.SceneManagement;
 
 public class ObjectCreator : MonoBehaviour
 {
-    // Start is called before the first frame update
+    private Integration INS;
     void Start()
     {
-        
+        INS = Integration.Instance;
     }
 
     // Update is called once per frame
@@ -17,7 +17,10 @@ public class ObjectCreator : MonoBehaviour
         
     }
     
-    public void Back(){
-        SceneManager.LoadScene("Integration",LoadSceneMode.Additive);     
+    public async void Back(){
+        bool suc = await INS.OnLogout(this); 
+        if(suc){
+            SceneManager.LoadScene("Integration");
+        }     
     }
 }

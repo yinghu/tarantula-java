@@ -13,29 +13,20 @@ public class Integration : ScriptableObject{
     public string GEC_HOST;
     public string deviceId;
     
-    private GameEngineCluster gec;
+    private static GameEngineCluster gec;
     private static Integration instance;
     
-	public static Integration Instance
-	{
-		get
-		{
-			if (instance != null){ 
-                return instance;
-            }
-            return Resources.Load<Integration>("Integration");
-		}
-	}
-    void OnEnable(){
-        Debug.Log("enabled gec");
+    private static string _HOST;
+    
+    public Integration(){
+        Debug.Log("CALLING CONSTRUCTOR");
     }
-    async void OnDisable(){
-        Debug.Log("disabled gec");
-        await gec.Close();
-    }
-    void Awake(){
-         Debug.Log("starting gec");
-         gec = new GameEngineCluster(GEC_HOST);
+    
+    [RuntimeInitializeOnLoadMethod]
+    private static void _Init(){
+        Debug.Log("Initializing Integration");
+        instance = Resources.Load<Integration>("Integration");
+        gec = new GameEngineCluster(_HOST);
          gec.OnException += (ex)=>{
              Debug.Log(ex);
          };
@@ -53,22 +44,35 @@ public class Integration : ScriptableObject{
              }
          };
     }
-    async void _OnWebSocketMessage(bool suc){
+	public static Integration Instance{
+		get{return instance;}
+	}
+    void OnEnable(){
+        _HOST = GEC_HOST;
+        Debug.Log("GEC HOST->"+_HOST);
+    }
+    async void OnDisable(){
+        Debug.Log("Closing GEC->"+_HOST);
+        await gec.Close();
+    }
+    void Awake(){
+        //_HOST = GEC_HOST;
+        //Debug.Log("GEC HOST->"+_HOST);
+    }
+    static async void _OnWebSocketMessage(bool suc){
         Debug.Log("web socket->"+suc);
         await gec.OnWebSocketMessage();
     }
-    async void _OnUDPSocketMessage(bool suc){
+    static async void _OnUDPSocketMessage(bool suc){
         Debug.Log("udp socket->"+suc);
         await gec.OnUDPSocketMessage();
     }
    
-    void OnDestroy(){
-       Debug.Log("gec closed");
-       gec.Close();           
-    }
    
     //async local wrappers    
-    public async Task<bool> OnDevice(MonoBehaviour caller, Device device){
+    public async Task<bool> OnDevice(MonoBehaviour caller){
+        Device device = new Device();
+        device.deviceId = deviceId;
         return await gec.Device(caller,device);
     }
     public async Task<bool> OnLogin(MonoBehaviour caller, User user){

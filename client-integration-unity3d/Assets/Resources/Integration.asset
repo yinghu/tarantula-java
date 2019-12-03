@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Integration
   m_EditorClassIdentifier: 
   GEC_HOST: http://10.0.0.234:8090
-  deviceId: doo_joo
+  deviceId: doo_foo

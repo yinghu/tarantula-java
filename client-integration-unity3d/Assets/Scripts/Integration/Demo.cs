@@ -7,18 +7,28 @@ using Tarantula.Networking;
 using TMPro;
 public class Demo : MonoBehaviour{
     
-    private Integration integration;
+    private Integration INS;
     void Start(){
-        integration = Integration.Instance;  
-        //integration = Integration.Instance;  
-        //integration = Integration.Instance;  
-        //integration = Integration.Instance;  
+        INS = Integration.Instance;
     }
-    
     
     void Update()
     {
         
     }
+    
+    public async void Play(){
+        bool suc = await INS.OnDevice(this); 
+        if(suc){
+           SceneManager.LoadScene("Simulator");     
+        }
+    }
+    public async void Logout(){
+        bool suc = await INS.OnLogout(this); 
+        if(suc){
+           //SceneManager.LoadScene("Simulator");     
+        }
+    }
+    
     
 }
