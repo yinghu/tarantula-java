@@ -202,7 +202,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 810866842}
+      - m_Target: {fileID: 0}
         m_MethodName: Play
         m_Mode: 1
         m_Arguments:
@@ -436,8 +436,8 @@ Camera:
   m_GameObject: {fileID: 519420028}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.26454425, g: 0.18422925, b: 0.33962262, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.29344466, g: 0.18431373, b: 0.34117648, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -657,7 +657,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 810866842}
+      - m_Target: {fileID: 0}
         m_MethodName: Logout
         m_Mode: 1
         m_Arguments:
@@ -734,11 +734,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 810866841}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fc3a51c580c45448aff5acbed9c20bc, type: 3}
+  m_Script: {fileID: 11500000, guid: 8f1cecfa1da5bba448077c868c7eed76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GEC_HOST: http://10.0.0.234:8090
-  deviceId: abc123455566
+  integration: {fileID: 11400000, guid: 60b780b425be4064b85f278db8f813c4, type: 2}
 --- !u!4 &810866843
 Transform:
   m_ObjectHideFlags: 0
@@ -749,8 +748,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 602.24133, y: 545.37195, z: -6.2815075}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1412077374}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -943,8 +941,8 @@ RectTransform:
   m_Children:
   - {fileID: 644982649}
   - {fileID: 112108890}
-  m_Father: {fileID: 810866843}
-  m_RootOrder: 0
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1075,5 +1073,5 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

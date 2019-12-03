@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ObjectCreator : MonoBehaviour
 {
@@ -14,5 +15,9 @@ public class ObjectCreator : MonoBehaviour
     void Update()
     {
         
+    }
+    
+    public void Back(){
+        SceneManager.LoadScene("Integration",LoadSceneMode.Additive);     
     }
 }

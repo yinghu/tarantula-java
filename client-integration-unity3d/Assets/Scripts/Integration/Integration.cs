@@ -3,39 +3,38 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Tarantula.Networking;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
-public class Integration : MonoBehaviour{
+[CreateAssetMenu(fileName = "Integration", menuName = "Scripts/Integration", order = 1)]
+public class Integration : ScriptableObject{
     
     public string GEC_HOST;
     public string deviceId;
     
     private GameEngineCluster gec;
     private static Integration instance;
-
-	public static Integration Instance{
+    
+	public static Integration Instance
+	{
 		get
 		{
-			if (instance == null)
-			{
-				instance = FindObjectOfType<Integration>();
-				if (instance == null)
-				{
-					GameObject obj = new GameObject
-					{
-						name = typeof(Integration).Name
-					};
-					instance = obj.AddComponent<Integration>();
-				}
-			}
-
-			return instance;
+			if (instance != null){ 
+                return instance;
+            }
+            return Resources.Load<Integration>("Integration");
 		}
 	}
-    
+    void OnEnable(){
+        Debug.Log("enabled gec");
+    }
+    async void OnDisable(){
+        Debug.Log("disabled gec");
+        await gec.Close();
+    }
     void Awake(){
+         Debug.Log("starting gec");
          gec = new GameEngineCluster(GEC_HOST);
          gec.OnException += (ex)=>{
              Debug.Log(ex);
@@ -53,7 +52,6 @@ public class Integration : MonoBehaviour{
                  Debug.Log(msg.payload);
              }
          };
-         DontDestroyOnLoad(this.gameObject);
     }
     async void _OnWebSocketMessage(bool suc){
         Debug.Log("web socket->"+suc);
@@ -63,45 +61,29 @@ public class Integration : MonoBehaviour{
         Debug.Log("udp socket->"+suc);
         await gec.OnUDPSocketMessage();
     }
-    async void Start(){
-        Device dev = new Device();
-        dev.deviceId = deviceId;
-        await OnDevice(dev);    
+   
+    void OnDestroy(){
+       Debug.Log("gec closed");
+       gec.Close();           
     }
-    async void OnDestroy(){
-       await gec.Close();           
+   
+    //async local wrappers    
+    public async Task<bool> OnDevice(MonoBehaviour caller, Device device){
+        return await gec.Device(caller,device);
     }
-    public async void Logout(){
-        await OnLogout();
+    public async Task<bool> OnLogin(MonoBehaviour caller, User user){
+        return await gec.Login(caller,user);
     }
-    public async void Play(){
-        await OnProfile();
-        Debug.Log(gec.profile.nickname);
+    public async Task<bool> OnLogout(MonoBehaviour caller){
+        return await gec.Logout(caller);
     }
-    void Update(){
-        //if (Input.GetMouseButtonDown(0)){
-            //Vector3 mouse = Input.mousePosition;
-            //spin.OnMove(mouse);
-        //}
+    public async Task<bool> OnRegister(MonoBehaviour caller, User user){
+        return await gec.Register(caller,user);
     }
-    //async local wrappers 
-    public async Task<bool> OnDevice(Device device){
-        return await gec.Device(this,device);
+    public async Task<bool> OnProfile(MonoBehaviour caller){
+        return await gec.Profile(caller);
     }
-    public async Task<bool> OnLogin(User user){
-        return await gec.Login(this,user);
+    public async Task<bool> OnLevel(MonoBehaviour caller){
+        return await gec.Level(caller);
     }
-    public async Task<bool> OnLogout(){
-        return await gec.Logout(this);
-    }
-    public async Task<bool> OnRegister(User user){
-        return await gec.Register(this,user);
-    }
-    public async Task<bool> OnProfile(){
-        return await gec.Profile(this);
-    }
-    public async Task<bool> OnLevel(){
-        return await gec.Level(this);
-    }
-
 }

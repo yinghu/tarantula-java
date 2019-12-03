@@ -5,13 +5,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Tarantula.Networking;
 using TMPro;
-public class Demo : MonoBehaviour
-{
-    public TextMeshProUGUI  mText;
+public class Demo : MonoBehaviour{
+    
+    private Integration integration;
     void Start(){
-        
+        integration = Integration.Instance;  
+        //integration = Integration.Instance;  
+        //integration = Integration.Instance;  
+        //integration = Integration.Instance;  
     }
-
+    
     
     void Update()
     {
