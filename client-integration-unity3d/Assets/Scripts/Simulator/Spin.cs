@@ -29,6 +29,6 @@ public class Spin : MonoBehaviour
         Vector3 target = Camera.main.ScreenToWorldPoint(dest);
         target.z = 0;
         transform.position = Vector3.Lerp(started, target, speed);
-        Debug.Log(target);
+        //Debug.Log(target);
     }
 }

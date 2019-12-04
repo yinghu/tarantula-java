@@ -12,7 +12,7 @@ public class Simulator : MonoBehaviour
         INS = Integration.Instance;
         Integration.OnMessage +=(msg)=>{
             if(msg.instanceId!=null&&msg.instanceId.Equals(INS.game.gameId)){
-                Debug.Log(msg.payload);
+                //Debug.Log(msg.payload);
             }
         };
     }
@@ -22,6 +22,14 @@ public class Simulator : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0)) {
              Vector3 target = Input.mousePosition;
+             Debug.Log(target);
+             GameObject go = GameObject.Find("/View/Spin1");
+             if(go!=null){
+                go.name = "popo";
+                Spin spin = go.GetComponent<Spin>();
+                spin.OnSpin(false);
+                Debug.Log(go.name);
+             }
              spin.OnMove(target);
         }   
     }
