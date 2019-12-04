@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Tarantula.Networking;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 [CreateAssetMenu(fileName = "Integration", menuName = "Scripts/Integration", order = 1)]
 public class Integration : ScriptableObject{
     
@@ -17,10 +19,9 @@ public class Integration : ScriptableObject{
     private static Integration instance;
     
     private static string _HOST;
-    
-    public Integration(){
-        Debug.Log("CALLING CONSTRUCTOR");
-    }
+    public Descriptor game{get;set;}
+    public bool online{get;set;}
+    public static event InboundMessageHandler OnMessage;
     
     [RuntimeInitializeOnLoadMethod]
     private static void _Init(){
@@ -33,15 +34,7 @@ public class Integration : ScriptableObject{
          gec.OnWebSocket += _OnWebSocketMessage;
          gec.OnUDPSocket += _OnUDPSocketMessage;
          gec.OnInboundMessage += (msg)=>{
-             if(msg.label!=null){
-                Debug.Log(msg.label);
-                Debug.Log(msg.instanceId);
-                Debug.Log(msg.query);
-                Debug.Log(msg.payload);
-             }
-             else{
-                 Debug.Log(msg.payload);
-             }
+            OnMessage?.Invoke(msg);
          };
     }
 	public static Integration Instance{
@@ -52,42 +45,43 @@ public class Integration : ScriptableObject{
         Debug.Log("GEC HOST->"+_HOST);
     }
     async void OnDisable(){
-        Debug.Log("Closing GEC->"+_HOST);
+        online = false;
         await gec.Close();
     }
     void Awake(){
-        //_HOST = GEC_HOST;
-        //Debug.Log("GEC HOST->"+_HOST);
+        online = false;
     }
     static async void _OnWebSocketMessage(bool suc){
-        Debug.Log("web socket->"+suc);
         await gec.OnWebSocketMessage();
     }
     static async void _OnUDPSocketMessage(bool suc){
-        Debug.Log("udp socket->"+suc);
         await gec.OnUDPSocketMessage();
     }
    
-   
+    
     //async local wrappers    
+    public async Task<bool> OnJoin(MonoBehaviour caller,Action<JObject> jo){
+        bool suc = await gec.OnLobby(caller,"robotquest");
+        if(!suc){
+            return suc;
+        }
+        List<Descriptor> glist = gec.gameList();
+        game = glist[0];
+        return await gec.OnPlay(caller,"robotquest-service/live",game,jo);
+    }
+    public async Task<bool> OnLeave(MonoBehaviour caller){
+        Payload payload = new Payload();
+        payload.command = "onLeave";
+        return await  gec.OnInstance(caller,game,payload,(ps)=>{
+            Debug.Log(ps);
+        });
+    }
+    public async Task<bool> OnIndex(MonoBehaviour caller){
+        return await gec.Index(caller);
+    }
     public async Task<bool> OnDevice(MonoBehaviour caller){
         Device device = new Device();
         device.deviceId = deviceId;
         return await gec.Device(caller,device);
-    }
-    public async Task<bool> OnLogin(MonoBehaviour caller, User user){
-        return await gec.Login(caller,user);
-    }
-    public async Task<bool> OnLogout(MonoBehaviour caller){
-        return await gec.Logout(caller);
-    }
-    public async Task<bool> OnRegister(MonoBehaviour caller, User user){
-        return await gec.Register(caller,user);
-    }
-    public async Task<bool> OnProfile(MonoBehaviour caller){
-        return await gec.Profile(caller);
-    }
-    public async Task<bool> OnLevel(MonoBehaviour caller){
-        return await gec.Level(caller);
     }
 }

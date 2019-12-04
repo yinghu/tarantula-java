@@ -463,6 +463,7 @@ namespace Tarantula.Networking{
             return suc;
         } 
         private bool ParseLobby(string json){
+            //Debug.Log(json);
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
             if(!suc){

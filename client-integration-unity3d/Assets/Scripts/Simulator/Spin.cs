@@ -11,7 +11,7 @@ public class Spin : MonoBehaviour
     bool _active;
     private Vector3 started;
     void Start(){
-        _active = false;
+        _active = true;
         started = transform.position;
     }
 
