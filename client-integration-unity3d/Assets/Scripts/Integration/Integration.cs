@@ -60,6 +60,9 @@ public class Integration : ScriptableObject{
    
     
     //async local wrappers    
+    public async Task<bool> OnAction(Payload payload){
+        return await gec.SendOnInstance(game.applicationId,game.instanceId,payload);
+    }
     public async Task<bool> OnJoin(MonoBehaviour caller,Action<JObject> jo){
         bool suc = await gec.OnLobby(caller,"robotquest");
         if(!suc){

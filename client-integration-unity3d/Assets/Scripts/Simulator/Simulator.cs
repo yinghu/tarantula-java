@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+using Tarantula.Networking;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 public class Simulator : MonoBehaviour
 {
     private Integration INS;
@@ -12,17 +14,31 @@ public class Simulator : MonoBehaviour
         INS = Integration.Instance;
         Integration.OnMessage +=(msg)=>{
             if(msg.instanceId!=null&&msg.instanceId.Equals(INS.game.gameId)){
-                //Debug.Log(msg.payload);
+                if(msg.query!=null&&msg.query.Equals("onMove")){
+                    Debug.Log(msg.payload);
+                    Debug.Log(msg.query);
+                    JObject jo = JObject.Parse(msg.payload);
+                    Payload pv = jo.ToObject<Payload>();
+                    Vector3 mp = new Vector3();
+                    mp.x = float.Parse(pv.headers[0].value);
+                    mp.y = float.Parse(pv.headers[1].value);
+                    mp.z = float.Parse(pv.headers[2].value);
+                    spin.OnMove(mp);
+                }
             }
         };
     }
 
     // Update is called once per frame
-    void Update()
+    async void Update()
     {
         if (Input.GetMouseButtonDown(0)) {
              Vector3 target = Input.mousePosition;
              Debug.Log(target);
+             Payload payload = new Payload();
+             payload.command = "onMove";
+             payload.headers = new Header[]{new Header("x",target.x.ToString()),new Header("y",target.y.ToString()),new Header("z",target.z.ToString())};
+             await INS.OnAction(payload);//publish move destination
              GameObject go = GameObject.Find("/View/Spin1");
              if(go!=null){
                 go.name = "popo";
@@ -30,7 +46,7 @@ public class Simulator : MonoBehaviour
                 spin.OnSpin(false);
                 Debug.Log(go.name);
              }
-             spin.OnMove(target);
+             //spin.OnMove(target);
         }   
     }
     
