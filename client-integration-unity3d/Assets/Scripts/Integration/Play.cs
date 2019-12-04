@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 public class Play : MonoBehaviour{
     
     private Integration INS;
+    
    
     async void Start(){
         INS = Integration.Instance;
@@ -19,7 +20,7 @@ public class Play : MonoBehaviour{
     }
     
     void Update(){
-        
+             
     }
     public async void Join(){
         if(INS.online){

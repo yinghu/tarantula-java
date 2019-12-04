@@ -12,23 +12,28 @@ public class Simulator : MonoBehaviour
     void Start()
     {
         INS = Integration.Instance;
-        Integration.OnMessage +=(msg)=>{
-            if(msg.instanceId!=null&&msg.instanceId.Equals(INS.game.gameId)){
-                if(msg.query!=null&&msg.query.Equals("onMove")){
-                    Debug.Log(msg.payload);
-                    Debug.Log(msg.query);
-                    JObject jo = JObject.Parse(msg.payload);
-                    Payload pv = jo.ToObject<Payload>();
-                    Vector3 mp = new Vector3();
-                    mp.x = float.Parse(pv.headers[0].value);
-                    mp.y = float.Parse(pv.headers[1].value);
-                    mp.z = float.Parse(pv.headers[2].value);
-                    spin.OnMove(mp);
-                }
-            }
-        };
+        Integration.OnMessage += _OnMessage;
+        //Camera.main.transform.Rotate(0,0,180);
     }
-
+    void _OnMessage(InboundMessage msg){
+        if(msg.instanceId!=null&&msg.instanceId.Equals(INS.game.gameId)){
+            if(msg.query!=null&&msg.query.Equals("onMove")){
+                Debug.Log(msg.payload);
+                Debug.Log(msg.query);
+                JObject jo = JObject.Parse(msg.payload);
+                Payload pv = jo.ToObject<Payload>();
+                Vector3 mp = new Vector3();
+                mp.x = float.Parse(pv.headers[0].value);
+                mp.y = float.Parse(pv.headers[1].value);
+                mp.z = float.Parse(pv.headers[2].value);
+                spin.OnMove(mp);
+            }    
+        }
+    }
+    void OnDestroy(){
+        Integration.OnMessage -= _OnMessage;
+        Debug.Log("removed message handler");
+    }
     // Update is called once per frame
     async void Update()
     {
@@ -43,7 +48,7 @@ public class Simulator : MonoBehaviour
              if(go!=null){
                 go.name = "popo";
                 Spin spin = go.GetComponent<Spin>();
-                spin.OnSpin(false);
+                //spin.OnSpin(false);
                 Debug.Log(go.name);
              }
              //spin.OnMove(target);
@@ -55,5 +60,14 @@ public class Simulator : MonoBehaviour
         if(suc){
             SceneManager.LoadScene("Integration");
         }     
+    }
+    public void OnSeat1(){
+        Camera.main.transform.Rotate(0,0,180,Space.Self);
+    }
+    public void OnSeat2(){
+        Camera.main.transform.Rotate(0,0,180,Space.World);
+    }
+     public void OnSeat3(){
+        Camera.main.transform.Rotate(0,0,180);
     }
 }
