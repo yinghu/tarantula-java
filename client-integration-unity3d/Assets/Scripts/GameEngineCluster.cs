@@ -37,6 +37,7 @@ namespace Tarantula.Networking{
         private static JsonSerializerSettings JSON_SETTING = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
         
         public Presence presence {set;get;}
+        public bool online {set;get; }
         public Profile profile {set;get;}
         public Level level {set;get;}
         public Xp xp {set;get;}
@@ -52,6 +53,7 @@ namespace Tarantula.Networking{
             _gameList = new List<Descriptor>();
             _liveWc = false;
             _liveUc = false;
+            Debug.Log("starting GEC cluster");
         }  
       
         public  async Task<bool> Index(MonoBehaviour caller){
@@ -385,6 +387,13 @@ namespace Tarantula.Networking{
                 return _liveUc;
             }   
         }
+        public void CloseUDP(){
+            if(_liveUc){
+                _liveUc = false;
+                _guc.Close();
+                Debug.Log("UDP CLOSED");
+            }
+        }
         public async Task<bool> Close(){
             try{
                 bool suc = false;
@@ -396,6 +405,7 @@ namespace Tarantula.Networking{
                     _liveUc = false;
                     _guc.Close();
                 }
+                online = false;
                 return suc;
             }catch(Exception ex){
                 OnException?.Invoke(ex);
@@ -517,6 +527,7 @@ namespace Tarantula.Networking{
                 _liveWc = suc;
                 OnWebSocket?.Invoke(suc);
             }
+            online = suc;
             return suc;
         }
        private bool ParseLogout(string json){

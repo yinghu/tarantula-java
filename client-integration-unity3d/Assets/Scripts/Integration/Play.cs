@@ -16,11 +16,11 @@ public class Play : MonoBehaviour{
         INS = Integration.Instance;
         if(!INS.online){
             await INS.OnIndex(this);
-            INS.online = await INS.OnDevice(this); 
+            await INS.OnDevice(this); 
             pending.SetText("CLICK TO PLAY");
         }
         else{
-            pending.SetText("Sorry try again!");
+            pending.SetText("PLAY AGAIN");
         }
     }
     

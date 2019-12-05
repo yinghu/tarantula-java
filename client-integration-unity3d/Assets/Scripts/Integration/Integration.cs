@@ -20,7 +20,7 @@ public class Integration : ScriptableObject{
     
     private static string _HOST;
     public Descriptor game{get;set;}
-    public bool online{get;set;}
+    public bool online{get=>gec.online;}
     public static event InboundMessageHandler OnMessage;
     
     [RuntimeInitializeOnLoadMethod]
@@ -42,14 +42,13 @@ public class Integration : ScriptableObject{
 	}
     void OnEnable(){
         _HOST = GEC_HOST;
-        Debug.Log("GEC HOST->"+_HOST);
+        Debug.Log("GEC OPEN->"+_HOST);
     }
-    async void OnDisable(){
-        online = false;
+    async void OnDestroy(){
+        Debug.Log("GEC CLOSE->"+_HOST);
         await gec.Close();
     }
     void Awake(){
-        online = false;
     }
     static async void _OnWebSocketMessage(bool suc){
         await gec.OnWebSocketMessage();
@@ -76,7 +75,8 @@ public class Integration : ScriptableObject{
         Payload payload = new Payload();
         payload.command = "onLeave";
         return await  gec.OnInstance(caller,game,payload,(ps)=>{
-            Debug.Log(ps);
+            //Debug.Log();
+            gec.CloseUDP();
         });
     }
     public async Task<bool> OnIndex(MonoBehaviour caller){
