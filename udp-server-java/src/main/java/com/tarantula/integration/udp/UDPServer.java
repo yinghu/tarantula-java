@@ -58,8 +58,9 @@ public class UDPServer implements Runnable {
                                 outBuffer.put((byte)'?');
                                 outBuffer.put(m.query.getBytes());
                                 outBuffer.put(m.data.getBytes());
-                                outBuffer.flip();
+                                //outBuffer.flip();
                                 sg.sessions.forEach(s->{
+                                    outBuffer.flip();
                                     try{uchannel.send(outBuffer,s.endpoint);}catch (Exception iexc){iexc.printStackTrace();}
                                 });
                             }
