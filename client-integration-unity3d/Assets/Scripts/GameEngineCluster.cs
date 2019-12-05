@@ -606,7 +606,12 @@ namespace Tarantula.Networking{
        }
        public async Task<string> Receive(){
            UdpReceiveResult ret = await _udpClient.ReceiveAsync();
-           return Encoding.UTF8.GetString(ret.Buffer);
+           if(ret.Buffer.Length>0){
+                return Encoding.UTF8.GetString(ret.Buffer);
+           }
+           else{
+               return "error{'successful':false,'message':'no data received'}";
+           }
        }
    }    
    public class GecWebSocket{

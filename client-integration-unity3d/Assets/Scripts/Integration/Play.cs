@@ -15,7 +15,7 @@ public class Play : MonoBehaviour{
         if(!INS.online){
             await INS.OnIndex(this);
             INS.online = await INS.OnDevice(this); 
-            Debug.Log("JOINED->"+INS.online);
+            Debug.Log(INS.deviceId+"<>JOINED->"+INS.online);
         }
     }
     
