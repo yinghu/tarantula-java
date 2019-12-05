@@ -16,10 +16,10 @@ using Newtonsoft.Json.Linq;
 
 namespace Tarantula.Networking{
    
-   public delegate void ExceptionHandler(Exception ex);
+   public delegate void ExceptionHandler(Exception ex,int errorCode);
    public delegate void InboundMessageHandler(InboundMessage message);
-   public delegate void WebSocketHandler(bool connected);    
-   public delegate void UDPSocketHandler(bool connected);    
+   public delegate void WebSocketHandler();    
+   public delegate void UDPSocketHandler();    
    public class GameEngineCluster{
       
         public event ExceptionHandler OnException;
@@ -61,7 +61,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.GetJson(caller,"/user/index",new Header[]{new Header("Tarantula-tag","index/lobby")});
                 return ParseIndex(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }
         }
@@ -76,7 +76,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.PostJson(caller,"/user/action",headers,json);
                 return ParseRegister(jstr);            
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }
         }
@@ -91,7 +91,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.PostJson(caller,"/user/action",headers,json);
                 return await ParseLogin(jstr);           
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }
         }
@@ -111,7 +111,7 @@ namespace Tarantula.Networking{
                     return false;
                 }           
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }
         }
@@ -124,7 +124,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
                 return ParseProfile(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }
         }
@@ -142,7 +142,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
                 return ParseProfile(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }
         }
@@ -158,7 +158,7 @@ namespace Tarantula.Networking{
                 Debug.Log(jstr);
                 return ParseLevel(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }
         }
@@ -177,7 +177,7 @@ namespace Tarantula.Networking{
                 Debug.Log(jstr);
                 return ParseXP(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }
         }
@@ -196,7 +196,7 @@ namespace Tarantula.Networking{
                 Debug.Log(jstr);
                 return ParseLeaderBoard(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }
         }
@@ -211,7 +211,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.PostJson(caller,"/user/action",headers,json);
                 return await ParseLogin(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }
         }
@@ -227,7 +227,7 @@ namespace Tarantula.Networking{
                 string json = JsonConvert.SerializeObject(strm,JSON_SETTING);
                 return await _gwc.Send(json);
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }
         }
@@ -249,7 +249,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
                 return ParseLobby(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }   
         }
@@ -268,7 +268,7 @@ namespace Tarantula.Networking{
                 //Processing join response 
                 return await ParseGameObject(jstr,game,callback);
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }
         }
@@ -284,7 +284,7 @@ namespace Tarantula.Networking{
                 callback(jstr);
                 return true;
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }        
         }
@@ -301,7 +301,7 @@ namespace Tarantula.Networking{
                 callback(jstr);
                 return true;
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return false;
             }        
         }
@@ -315,7 +315,7 @@ namespace Tarantula.Networking{
                 return false;
             }catch(Exception ex){
                 _liveWc = false;
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return _liveWc;
             }   
         }
@@ -335,7 +335,7 @@ namespace Tarantula.Networking{
                 return await _gwc.Send(jstrm);
             }catch(Exception ex){
                 _liveWc = false;
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return _liveWc;
             } 
         }
@@ -354,7 +354,7 @@ namespace Tarantula.Networking{
                 return await _gwc.Send(jstrm);
             }catch(Exception ex){
                 _liveWc = false;
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return _liveWc;
             } 
         }
@@ -369,7 +369,7 @@ namespace Tarantula.Networking{
                 return  await _guc.Send(mex);
             }catch(Exception ex){
                 _liveUc = false;
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
                 return _liveUc;
             }
         }
@@ -383,7 +383,7 @@ namespace Tarantula.Networking{
                 return false;
             }catch(Exception ex){
                 _liveUc = false;
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,10);
                 return _liveUc;
             }   
         }
@@ -408,7 +408,8 @@ namespace Tarantula.Networking{
                 online = false;
                 return suc;
             }catch(Exception ex){
-                OnException?.Invoke(ex);
+                OnException?.Invoke(ex,0);
+                online = false;
                 return false;
             }
         }
@@ -452,7 +453,7 @@ namespace Tarantula.Networking{
                 _guc = new GecUdpSocket();
                 _guc.Connect(conn.host,conn.port);
                 _liveUc = true;
-                OnUDPSocket?.Invoke(_liveUc);
+                OnUDPSocket?.Invoke();
                 suc = await _guc.Init(presence,ixx,ticket);
             }
             else{
@@ -525,7 +526,7 @@ namespace Tarantula.Networking{
                 _gwc = new GecWebSocket(connection,presence);
                 suc = await _gwc.Connect();
                 _liveWc = suc;
-                OnWebSocket?.Invoke(suc);
+                OnWebSocket?.Invoke();
             }
             online = suc;
             return suc;

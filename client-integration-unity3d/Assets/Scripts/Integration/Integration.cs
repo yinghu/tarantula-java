@@ -28,8 +28,8 @@ public class Integration : ScriptableObject{
         Debug.Log("Initializing Integration");
         instance = Resources.Load<Integration>("Integration");
         gec = new GameEngineCluster(_HOST);
-         gec.OnException += (ex)=>{
-             Debug.Log(ex);
+         gec.OnException += (ex,code)=>{
+             Debug.Log(ex.Message+"<<CODE>>"+code);
          };
          gec.OnWebSocket += _OnWebSocketMessage;
          gec.OnUDPSocket += _OnUDPSocketMessage;
@@ -50,10 +50,12 @@ public class Integration : ScriptableObject{
     }
     void Awake(){
     }
-    static async void _OnWebSocketMessage(bool suc){
+    static async void _OnWebSocketMessage(){
+        Debug.Log("Listen on WEB SOCKET");
         await gec.OnWebSocketMessage();
     }
-    static async void _OnUDPSocketMessage(bool suc){
+    static async void _OnUDPSocketMessage(){
+        Debug.Log("Listen on UDP");
         await gec.OnUDPSocketMessage();
     }
    
@@ -75,12 +77,14 @@ public class Integration : ScriptableObject{
         Payload payload = new Payload();
         payload.command = "onLeave";
         return await  gec.OnInstance(caller,game,payload,(ps)=>{
-            //Debug.Log();
             gec.CloseUDP();
         });
     }
     public async Task<bool> OnIndex(MonoBehaviour caller){
         return await gec.Index(caller);
+    }
+    public async Task<bool> OnExit(MonoBehaviour caller){
+        return await gec.Logout(caller);
     }
     public async Task<bool> OnDevice(MonoBehaviour caller){
         Device device = new Device();

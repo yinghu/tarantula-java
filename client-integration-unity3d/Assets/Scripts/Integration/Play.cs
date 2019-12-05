@@ -27,6 +27,10 @@ public class Play : MonoBehaviour{
     void Update(){
              
     }
+    public async void Exit(){
+        await INS.OnExit(this);
+        pending.SetText("Exited Session,Please Open Again");
+    }
     public async void Join(){
         if(INS.online){
             pending.SetText("Please Waiting ...");
@@ -37,6 +41,9 @@ public class Play : MonoBehaviour{
                 Debug.Log(INS.game.gameId);
                 SceneManager.LoadScene("Simulator");
             }     
+        }
+        else{
+            pending.SetText("Invalid Session! Please Open Again");
         }
     }
     
