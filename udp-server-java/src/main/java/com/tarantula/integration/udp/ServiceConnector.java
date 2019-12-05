@@ -123,7 +123,7 @@ public class ServiceConnector implements Runnable {
                                     outboundMessage.query = pending.toString();
                                 }
                                 else{
-                                    outboundMessage.query ="onMessage";
+                                    outboundMessage.query ="onUnknown";
                                     outboundMessage.instanceId = pending.toString();
                                 }
                                 pending.setLength(0);

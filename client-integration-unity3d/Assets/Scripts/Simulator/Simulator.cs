@@ -17,9 +17,7 @@ public class Simulator : MonoBehaviour
     }
     void _OnMessage(InboundMessage msg){
         if(msg.instanceId!=null&&msg.instanceId.Equals(INS.game.gameId)){
-            if(msg.query!=null&&msg.query.Equals("onMove")){
-                Debug.Log(msg.payload);
-                Debug.Log(msg.query);
+            if(msg.query!=null&&msg.query.Equals("onMessage")){
                 JObject jo = JObject.Parse(msg.payload);
                 Payload pv = jo.ToObject<Payload>();
                 Vector3 mp = new Vector3();
@@ -41,9 +39,9 @@ public class Simulator : MonoBehaviour
              Vector3 target = Input.mousePosition;
              float x = (target.x/Screen.width);
              float y = (target.y/Screen.height);
-             Debug.Log(target);
+             //Debug.Log(target);
              Payload payload = new Payload();
-             payload.command = "onMove";
+             payload.command = "onMessage";
              payload.headers = new Header[]{new Header("x",x.ToString()),new Header("y",y.ToString()),new Header("z",target.z.ToString())};
              await INS.OnAction(payload);//publish move destination
              
