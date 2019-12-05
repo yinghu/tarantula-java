@@ -17,7 +17,7 @@ public class Play : MonoBehaviour{
         if(!INS.online){
             await INS.OnIndex(this);
             await INS.OnDevice(this); 
-            pending.SetText("CLICK TO PLAY");
+            pending.SetText("CLICK TO PLAY ["+INS.deviceId+"]");
         }
         else{
             pending.SetText("PLAY AGAIN");

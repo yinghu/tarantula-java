@@ -25,7 +25,7 @@ public class Integration : ScriptableObject{
     
     [RuntimeInitializeOnLoadMethod]
     private static void _Init(){
-        Debug.Log("Initializing Integration");
+        Debug.Log("Initializing Integration on ["+SystemInfo.deviceUniqueIdentifier+"]");
         instance = Resources.Load<Integration>("Integration");
         gec = new GameEngineCluster(_HOST);
          gec.OnException += (ex,code)=>{
@@ -42,6 +42,7 @@ public class Integration : ScriptableObject{
 	}
     void OnEnable(){
         _HOST = GEC_HOST;
+        deviceId = SystemInfo.deviceUniqueIdentifier;
         Debug.Log("GEC OPEN->"+_HOST);
     }
     async void OnDestroy(){
