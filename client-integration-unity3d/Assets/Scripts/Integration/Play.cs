@@ -4,18 +4,23 @@ using System.Threading.Tasks;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+using TMPro;
 public class Play : MonoBehaviour{
     
     private Integration INS;
-    
+    private TextMeshProUGUI pending;
    
     async void Start(){
+        GameObject gp = GameObject.Find("/UI/Waiting"); 
+        pending = gp.GetComponent<TextMeshProUGUI>();    
         INS = Integration.Instance;
         if(!INS.online){
             await INS.OnIndex(this);
             INS.online = await INS.OnDevice(this); 
-            Debug.Log(INS.deviceId+"<>JOINED->"+INS.online);
+            pending.SetText("CLICK TO PLAY");
+        }
+        else{
+            pending.SetText("Sorry try again!");
         }
     }
     
@@ -24,6 +29,7 @@ public class Play : MonoBehaviour{
     }
     public async void Join(){
         if(INS.online){
+            pending.SetText("Please Waiting ...");
             bool suc = await INS.OnJoin(this,(jo)=>{
                 Debug.Log(">>"+(string)jo.SelectToken("index"));
             });

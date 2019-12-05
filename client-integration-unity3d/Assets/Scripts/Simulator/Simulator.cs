@@ -23,8 +23,8 @@ public class Simulator : MonoBehaviour
                 JObject jo = JObject.Parse(msg.payload);
                 Payload pv = jo.ToObject<Payload>();
                 Vector3 mp = new Vector3();
-                mp.x = float.Parse(pv.headers[0].value);
-                mp.y = float.Parse(pv.headers[1].value);
+                mp.x = float.Parse(pv.headers[0].value)*Screen.width;
+                mp.y = float.Parse(pv.headers[1].value)*Screen.height;
                 mp.z = float.Parse(pv.headers[2].value);
                 spin.OnMove(mp);
             }    
@@ -39,18 +39,21 @@ public class Simulator : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0)) {
              Vector3 target = Input.mousePosition;
+             float x = (target.x/Screen.width);
+             float y = (target.y/Screen.height);
              Debug.Log(target);
              Payload payload = new Payload();
              payload.command = "onMove";
-             payload.headers = new Header[]{new Header("x",target.x.ToString()),new Header("y",target.y.ToString()),new Header("z",target.z.ToString())};
+             payload.headers = new Header[]{new Header("x",x.ToString()),new Header("y",y.ToString()),new Header("z",target.z.ToString())};
              await INS.OnAction(payload);//publish move destination
-             GameObject go = GameObject.Find("/View/Spin1");
-             if(go!=null){
-                go.name = "popo";
-                Spin spin = go.GetComponent<Spin>();
+             
+             //GameObject go = GameObject.Find("/View/Spin1");
+             //if(go!=null){
+                //go.name = "popo";
+                //Spin spin = go.GetComponent<Spin>();
                 //spin.OnSpin(false);
-                Debug.Log(go.name);
-             }
+                //Debug.Log(go.name);
+             //}
              //spin.OnMove(target);
         }   
     }
