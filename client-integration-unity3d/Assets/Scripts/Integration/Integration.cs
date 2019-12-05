@@ -13,7 +13,7 @@ using Newtonsoft.Json.Linq;
 public class Integration : ScriptableObject{
     
     public string GEC_HOST;
-    public string deviceId;
+    public static string deviceId;
     
     private static GameEngineCluster gec;
     private static Integration instance;
