@@ -43,7 +43,7 @@ public class Simulator : MonoBehaviour
              Payload payload = new Payload();
              payload.command = "onMessage";
              payload.headers = new Header[]{new Header("x",x.ToString()),new Header("y",y.ToString()),new Header("z",target.z.ToString())};
-             await INS.OnAction(payload);//publish move destination
+             await INS.OnMove(payload);//publish move destination
              
              //GameObject go = GameObject.Find("/View/Spin1");
              //if(go!=null){
