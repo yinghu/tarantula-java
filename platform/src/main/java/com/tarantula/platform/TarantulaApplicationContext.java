@@ -70,6 +70,8 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
             if(oi!=null){
                 oi.systemId(event.systemId());
                 oi.stub(event.stub());
+                oi.roomIndex(-1);
+                oi.seatIndex(-1);
                 oi.routingNumber(event.routingNumber());
                 oi.reset(this.application.descriptor().entryCost());
                 oi.accessMode(event.accessMode());
