@@ -5,14 +5,19 @@ using UnityEngine.SceneManagement;
 using Tarantula.Networking;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using TMPro;
 public class Simulator : MonoBehaviour
 {
     private Integration INS;
     public Spin spin;
+    private TextMeshProUGUI timer;
     void Start()
     {
         INS = Integration.Instance;
         Integration.OnMessage += _OnMessage;
+        GameObject gp = GameObject.Find("/UI/BackTimer"); 
+        timer = gp.GetComponentInChildren<TextMeshProUGUI>();
+        timer.SetText("00:00");
         //Camera.main.transform.Rotate(0,0,180);
     }
     void _OnMessage(InboundMessage msg){
@@ -25,7 +30,16 @@ public class Simulator : MonoBehaviour
                 mp.y = float.Parse(pv.headers[1].value)*Screen.height;
                 mp.z = float.Parse(pv.headers[2].value);
                 spin.OnMove(mp);
-            }    
+            }
+            else if(msg.query!=null&&msg.query.Equals("onTimer")){
+                JObject jo = JObject.Parse(msg.payload);
+                int m = (int)jo.SelectToken("m");
+                int s = (int)jo.SelectToken("s");
+                timer.SetText(m+":"+s);
+            }
+            else if(msg.query!=null&&msg.query.Equals("onEnd")){
+                SceneManager.LoadScene("Integration");
+            }
         }
     }
     void OnDestroy(){
