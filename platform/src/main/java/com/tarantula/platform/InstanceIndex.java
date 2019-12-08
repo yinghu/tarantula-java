@@ -6,6 +6,7 @@ import com.tarantula.platform.service.deployment.InstanceManager;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * updated by yinghu on 3/6/2019.
@@ -22,7 +23,7 @@ public class InstanceIndex  extends OnApplicationHeader implements InstanceRegis
 
     public InstanceManager application;
 
-    public OnInstance.Listener onInstanceListener;
+    public List<OnInstance.Listener> onInstanceListener = new CopyOnWriteArrayList<>();
 
     public InstanceIndex(){
         this.vertex = "InstanceRegistry";
@@ -101,9 +102,9 @@ public class InstanceIndex  extends OnApplicationHeader implements InstanceRegis
     }
     public synchronized void onLeave(Session session){
         this.count -= this.applicationContext.onLeave(session);
-        if(onInstanceListener!=null){
-            this.onInstanceListener.onUpdated(new OnInstanceTrack(session.systemId(),session.stub(),this.applicationId,this.distributionKey(),false));
-        }
+        this.onInstanceListener.forEach((l)->{
+            l.onUpdated(new OnInstanceTrack(session.systemId(),session.stub(),this.applicationId,this.distributionKey(),false));
+        });
 
     }
 
@@ -129,7 +130,7 @@ public class InstanceIndex  extends OnApplicationHeader implements InstanceRegis
     }
 
     public void registerOnInstanceListener(OnInstance.Listener listener){
-        this.onInstanceListener = listener;
+        this.onInstanceListener.add(listener);
     }
 
     @Override

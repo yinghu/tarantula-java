@@ -182,7 +182,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                         _instance.count(1);
                         a.idle(true);
                         this.onInstances.put(a.systemId(),a);
-                        _instance.onInstanceListener.onUpdated(new OnInstanceTrack(a.systemId(),a.stub(),this.applicationId,_instance.distributionKey(),true));
+                        _instance.onInstanceListener.forEach((l)->{
+                            l.onUpdated(new OnInstanceTrack(a.systemId(),a.stub(),this.applicationId,_instance.distributionKey(),true));
+                        });
                     }
                     else{
                         this.waitingList.offer(a);

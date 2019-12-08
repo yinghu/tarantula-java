@@ -12,7 +12,7 @@ import java.util.concurrent.ScheduledFuture;
 /**
  * Created by yinghu lu on 7/20/2019.
  */
-public class DynamicModuleApplication extends TarantulaApplicationHeader implements Session.TimeoutListener, SchedulingTask {
+public class DynamicModuleApplication extends TarantulaApplicationHeader implements Session.TimeoutListener, SchedulingTask,OnInstance.Listener {
 
     private ConcurrentHashMap<String,Session> _onStream = new ConcurrentHashMap<>();
 
@@ -67,6 +67,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        this.context.onRegistry().registerOnInstanceListener(this);
         try{
             module = this.serviceProvider.module(this.descriptor);
             this.pendingTimer = descriptor.timerOnModule();
@@ -90,7 +91,6 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             });
             this.context.onRegistry().onLeave(session);
         }
-        this._onStream.remove(session.systemId());
     }
 
     @Override
@@ -182,6 +182,13 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         }
         else{
             return uid;
+        }
+    }
+
+    @Override
+    public void onUpdated(OnInstance onInstance) {
+        if(!onInstance.joined()){
+            this._onStream.remove(onInstance.systemId());
         }
     }
 }

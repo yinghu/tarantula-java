@@ -11,6 +11,7 @@ import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.RingBuffer;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -147,7 +148,7 @@ public class InstanceManager implements Instance, Connection.Listener {
         tc._instance.application = this;
         instancesOnPartition.incrementAndGet();
     }
-    public int onJoin(Event event,OnInstance.Listener onInstanceListener){
+    public int onJoin(Event event, List<OnInstance.Listener> onInstanceListener){
         TarantulaApplicationContext tcx = this.tarantulaApplicationContext(event);
         if(tcx==null){
             log.warn("Instance ["+event.instanceId()+"] not available on join and try again");
@@ -158,7 +159,9 @@ public class InstanceManager implements Instance, Connection.Listener {
         if(onInstance!=null){//check applicationId on event with deployment id
             ret = onInstance.joined()?InstanceRegistry.ALREADY_ON_INSTANCE:InstanceRegistry.ON_INSTANCE;
             if(tcx.initializeOnInstance(event,onInstance)){
-                onInstanceListener.onUpdated(new OnInstanceTrack(event.systemId(),event.stub(),applicationManager.deploymentDescriptor.distributionKey(),onInstance.instanceId(),true));
+                onInstanceListener.forEach((l)->{
+                    l.onUpdated(new OnInstanceTrack(event.systemId(),event.stub(),applicationManager.deploymentDescriptor.distributionKey(),onInstance.instanceId(),true));
+                });
             }
         }
         else{
