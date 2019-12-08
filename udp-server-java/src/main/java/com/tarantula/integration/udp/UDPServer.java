@@ -63,6 +63,9 @@ public class UDPServer implements Runnable {
                                     outBuffer.flip();
                                     try{uchannel.send(outBuffer,s.endpoint);}catch (Exception iexc){iexc.printStackTrace();}
                                 });
+                                if(m.query.equals("onEnd")){//removed
+                                    cMap.remove(m.instanceId);
+                                }
                             }
                         }catch (Exception iex){
                             iex.printStackTrace();

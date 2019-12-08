@@ -146,11 +146,15 @@ public class RecoverableObject implements Recoverable {
             return null;
         }
     }
-
+    @Override
     public void distributionKey(String distributionKey){
-        String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
-        this.bucket = klist[0];
-        this.oid = klist[1];
+        try{
+            String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
+            this.bucket = klist[0];
+            this.oid = klist[1];
+        }catch (Exception ex){
+            //ignore wrong format key
+        }
     }
     public int scope(){
         return Distributable.DATA_SCOPE;
@@ -161,7 +165,7 @@ public class RecoverableObject implements Recoverable {
     public void onEdge(boolean onEdge){
         this.onEdge = onEdge;
     }
-
+    @Override
     public Key key(){
         return new DistributionKey(this.bucket,this.oid);
     }

@@ -7,13 +7,15 @@ import com.tarantula.Event;
 import java.io.IOException;
 
 /**
- * Updated by yinghu on 4/8/2018.
+ * Updated by yinghu on 12/7/2019.
  */
 public class TimeoutEvent extends Data implements Event {
     public TimeoutEvent(String systemId,int stub,int routingNumber){
         this.systemId = systemId;
         this.stub = stub;
         this.routingNumber =routingNumber;
+    }
+    public TimeoutEvent(){
     }
     @Override
     public String toString(){
