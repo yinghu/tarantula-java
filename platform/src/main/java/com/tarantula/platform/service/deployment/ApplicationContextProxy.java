@@ -5,6 +5,7 @@ import com.tarantula.Module;
 import com.tarantula.platform.TarantulaApplicationContext;
 import com.tarantula.platform.service.ServiceProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
@@ -82,7 +83,9 @@ public class ApplicationContextProxy implements ApplicationContext {
     public RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener) {
         return this.tarantulaApplicationContext.registerRecoverableListener(recoverableListener);
     }
-
+    public void unregisterRecoverableListener(int factoryId){
+        this.tarantulaApplicationContext.unregisterRecoverableListener(factoryId);
+    }
     @Override
     public void log(String message, int level) {
         this.tarantulaApplicationContext.log(message,level);
@@ -107,4 +110,12 @@ public class ApplicationContextProxy implements ApplicationContext {
     public PostOffice postOffice() {
         return this.tarantulaApplicationContext.postOffice();
     }
+
+    public OnInstance onInstance(String systemId){
+        return this.tarantulaApplicationContext.onInstance(systemId);
+    }
+    public List<OnInstance> onInstance(){
+        return this.tarantulaApplicationContext.onInstance();
+    }
+
 }

@@ -30,7 +30,7 @@ public interface ApplicationContext{
     DataStore dataStore(String name);
 
     RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener);
-
+    void unregisterRecoverableListener(int factoryId);
     void log(String message,int level);
     void log(String message,Exception error,int level);
 

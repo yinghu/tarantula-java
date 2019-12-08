@@ -261,6 +261,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     }
     private int _onLeave(String systemId){
         OnInstance on = this.onInstances.remove(systemId);
+        if(on==null){
+            return 0;
+        }
         on.joined(false);
         on.update();
         if((!on.tournamentEnabled())&&on.balance()>0){//move remaining balance to presence on non-tournament mode
@@ -320,6 +323,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     public RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener){
         return rMap.computeIfAbsent(recoverableListener.registryId(),(rid)-> recoverableListener);
+    }
+    public void unregisterRecoverableListener(int factoryId){
+        this.rMap.remove(factoryId);
     }
     public Statistics statistics(){
         return this.singleton?this.onStatistics:this._instance.statistics();
