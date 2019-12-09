@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using Tarantula.Networking;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 public class Play : MonoBehaviour{
     
     
@@ -55,7 +57,7 @@ public class Play : MonoBehaviour{
             }
             joined = await INS.OnJoin(this,"RobotQuestPVP");
             if(joined){
-                pending.SetText("PENDING ON ["+INS.game.gameId+"]");
+                pending.SetText("PENDING ON ["+INS.arenaZone+"]");
             }
             else{
                 pending.SetText("OPPS SOMETHING WRONG");
@@ -76,7 +78,7 @@ public class Play : MonoBehaviour{
             }
             joined = await INS.OnJoin(this,"RobotQuestPVE");
             if(joined){
-                pending.SetText("PENDING ON ["+INS.game.gameId+"]");
+                pending.SetText("PENDING ON ["+INS.arenaZone+"]");
             }
             else{
                 pending.SetText("OPPS SOMETHING WRONG");
@@ -89,6 +91,8 @@ public class Play : MonoBehaviour{
     void _OnStart(InboundMessage msg){
         if(msg.query!=null&&msg.query.Equals("onStart")){
             Debug.Log("START=>>>"+msg.payload);
+            JObject jo = JObject.Parse(msg.payload);
+            INS.arena = (string)jo.SelectToken("arena");
             matched = true;
         }            
     }

@@ -24,6 +24,9 @@ public class Simulator : MonoBehaviour
         if(INS.seatIndex==1){
             Camera.main.transform.Rotate(0,0,180);
         }
+        GameObject ap = GameObject.Find("/UI/Arena"); 
+        TextMeshProUGUI azt = ap.GetComponentInChildren<TextMeshProUGUI>();
+        azt.SetText(INS.arena);
     }
     void _OnMessage(InboundMessage msg){
         if(msg.instanceId!=null&&msg.instanceId.Equals(INS.game.gameId)){

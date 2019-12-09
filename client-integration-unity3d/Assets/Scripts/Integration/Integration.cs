@@ -22,7 +22,8 @@ public class Integration : ScriptableObject{
     public Descriptor game{get;set;}
     public bool online{get=>gec.online;}
     public int seatIndex{get;set;}
-    
+    public string arenaZone{get;set;}
+    public string arena{get;set;}
     public static event InboundMessageHandler OnMessage;
     
     [RuntimeInitializeOnLoadMethod]
@@ -93,6 +94,7 @@ public class Integration : ScriptableObject{
         return await gec.OnPlay(caller,"robotquest-service/live",game,(jo)=>{
             JToken occ = jo.SelectToken("gameObject.occupation");
             seatIndex = (int)occ.SelectToken("seatIndex");
+            arenaZone = (string)jo.SelectToken("gameObject.arenaZone");
         });
     }
     public async Task<bool> OnLeave(MonoBehaviour caller){
