@@ -21,6 +21,7 @@ public class Integration : ScriptableObject{
     private static string _HOST;
     public Descriptor game{get;set;}
     public bool online{get=>gec.online;}
+    
     public static event InboundMessageHandler OnMessage;
     
     [RuntimeInitializeOnLoadMethod]
@@ -74,13 +75,20 @@ public class Integration : ScriptableObject{
         }
         return suc;
     }
-    public async Task<bool> OnJoin(MonoBehaviour caller,Action<JObject> jo){
+    public async Task<bool> OnJoin(MonoBehaviour caller,Action<JObject> jo,string gname){
         bool suc = await gec.OnLobby(caller,"robotquest");
         if(!suc){
             return suc;
         }
         List<Descriptor> glist = gec.gameList();
-        game = glist[0];
+        foreach(Descriptor desc in glist){
+            //Debug.Log(desc.name+"<><><>"+gname);
+            if(desc.name.Equals(gname)){
+                game = desc;
+                break;
+            }    
+        }
+        //Debug.Log("PLAYING ON ["+game.name+"]");
         return await gec.OnPlay(caller,"robotquest-service/live",game,jo);
     }
     public async Task<bool> OnLeave(MonoBehaviour caller){
