@@ -415,7 +415,7 @@ namespace Tarantula.Networking{
         }
         private void ParseInboundMessage(string msg){
             //format [label]#[instanceId]?[query]{json payload}
-            Debug.Log(msg);
+            //Debug.Log(msg);
             InboundMessage im = new InboundMessage();
             int idx1 = msg.IndexOf('#');
             if(idx1>0){
@@ -436,6 +436,7 @@ namespace Tarantula.Networking{
             OnInboundMessage?.Invoke(im);   
         }
         private async Task<bool> ParseGameObject(string json,Descriptor game,Action<JObject> callback){
+            Debug.Log(json);
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
             if(!suc){

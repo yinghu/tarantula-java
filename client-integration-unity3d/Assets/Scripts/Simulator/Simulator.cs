@@ -11,14 +11,19 @@ public class Simulator : MonoBehaviour
     private Integration INS;
     public Spin spin;
     private TextMeshProUGUI timer;
-    void Start()
-    {
+    
+    void Awake(){
+        Integration.OnMessage += _OnMessage; 
+    }
+    
+    void Start(){
         INS = Integration.Instance;
-        Integration.OnMessage += _OnMessage;
         GameObject gp = GameObject.Find("/UI/BackTimer"); 
         timer = gp.GetComponentInChildren<TextMeshProUGUI>();
         timer.SetText("00:00");
-        //Camera.main.transform.Rotate(0,0,180);
+        if(INS.seatIndex==1){
+            Camera.main.transform.Rotate(0,0,180);
+        }
     }
     void _OnMessage(InboundMessage msg){
         if(msg.instanceId!=null&&msg.instanceId.Equals(INS.game.gameId)){
@@ -77,12 +82,12 @@ public class Simulator : MonoBehaviour
         }     
     }
     public void OnSeat1(){
-        Camera.main.transform.Rotate(0,0,180,Space.Self);
+        //Camera.main.transform.Rotate(0,0,180,Space.Self);
     }
     public void OnSeat2(){
-        Camera.main.transform.Rotate(0,0,180,Space.World);
+        //Camera.main.transform.Rotate(0,0,180,Space.World);
     }
      public void OnSeat3(){
-        Camera.main.transform.Rotate(0,0,180);
+        //Camera.main.transform.Rotate(0,0,180);
     }
 }

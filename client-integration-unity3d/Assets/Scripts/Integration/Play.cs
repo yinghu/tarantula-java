@@ -53,10 +53,13 @@ public class Play : MonoBehaviour{
                 pending.SetText("PLAY AGAIN");
                 return;
             }
-            joined = await INS.OnJoin(this,(jo)=>{
-                pending.SetText("Pending on ["+(string)jo.SelectToken("index")+"]");
-                
-            },"RobotQuestPVP");   
+            joined = await INS.OnJoin(this,"RobotQuestPVP");
+            if(joined){
+                pending.SetText("PENDING ON ["+INS.game.gameId+"]");
+            }
+            else{
+                pending.SetText("OPPS SOMETHING WRONG");
+            }
         }
         else{
             pending.SetText("Invalid Session! Please Open Again");
@@ -71,10 +74,13 @@ public class Play : MonoBehaviour{
                 pending.SetText("PLAY AGAIN");
                 return;
             }
-            joined = await INS.OnJoin(this,(jo)=>{
-                pending.SetText("Pending on ["+(string)jo.SelectToken("index")+"]");
-                
-            },"RobotQuestPVE");   
+            joined = await INS.OnJoin(this,"RobotQuestPVE");
+            if(joined){
+                pending.SetText("PENDING ON ["+INS.game.gameId+"]");
+            }
+            else{
+                pending.SetText("OPPS SOMETHING WRONG");
+            }
         }
         else{
             pending.SetText("Invalid Session! Please Open Again");

@@ -21,6 +21,7 @@ public class Integration : ScriptableObject{
     private static string _HOST;
     public Descriptor game{get;set;}
     public bool online{get=>gec.online;}
+    public int seatIndex{get;set;}
     
     public static event InboundMessageHandler OnMessage;
     
@@ -75,7 +76,7 @@ public class Integration : ScriptableObject{
         }
         return suc;
     }
-    public async Task<bool> OnJoin(MonoBehaviour caller,Action<JObject> jo,string gname){
+    public async Task<bool> OnJoin(MonoBehaviour caller,string gname){
         bool suc = await gec.OnLobby(caller,"robotquest");
         if(!suc){
             return suc;
@@ -89,7 +90,10 @@ public class Integration : ScriptableObject{
             }    
         }
         //Debug.Log("PLAYING ON ["+game.name+"]");
-        return await gec.OnPlay(caller,"robotquest-service/live",game,jo);
+        return await gec.OnPlay(caller,"robotquest-service/live",game,(jo)=>{
+            JToken occ = jo.SelectToken("gameObject.occupation");
+            seatIndex = (int)occ.SelectToken("seatIndex");
+        });
     }
     public async Task<bool> OnLeave(MonoBehaviour caller){
         Payload payload = new Payload();
