@@ -39,8 +39,10 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public void offSession(String systemId){
         Presence presence = pMap.remove(systemId);
-        presence.disabled(true);
-        presence.update();
+        if(presence!=null){
+            presence.disabled(true);
+            presence.update();
+        }
     }
     public void timeout(int minutes,int seconds){
         this.timeoutInMinutes = minutes;
