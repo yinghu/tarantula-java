@@ -21,9 +21,9 @@ public class Simulator : MonoBehaviour
         GameObject gp = GameObject.Find("/UI/BackTimer"); 
         timer = gp.GetComponentInChildren<TextMeshProUGUI>();
         timer.SetText("00:00");
-        if(INS.seatIndex==1){
-            Camera.main.transform.Rotate(0,0,180);
-        }
+        //if(INS.seatIndex==1){
+            //Camera.main.transform.Rotate(0,0,180);
+        //}
         GameObject ap = GameObject.Find("/UI/Arena"); 
         TextMeshProUGUI azt = ap.GetComponentInChildren<TextMeshProUGUI>();
         azt.SetText(INS.arena);
@@ -37,7 +37,7 @@ public class Simulator : MonoBehaviour
                 mp.x = float.Parse(pv.headers[0].value)*Screen.width;
                 mp.y = float.Parse(pv.headers[1].value)*Screen.height;
                 mp.z = float.Parse(pv.headers[2].value);
-                spin.OnMove(mp);
+                spin.OnMove(mp,float.Parse(pv.headers[3].value));
             }
             else if(msg.query!=null&&msg.query.Equals("onTimer")){
                 JObject jo = JObject.Parse(msg.payload);
@@ -48,6 +48,12 @@ public class Simulator : MonoBehaviour
             else if(msg.query!=null&&msg.query.Equals("onEnd")){
                 SceneManager.LoadScene("Integration");
             }
+            else if(msg.query!=null&&msg.query.Equals("onQuest")){
+                OnQuest(msg.payload);    
+            }
+        }
+        else{
+            Debug.Log("REV>"+msg.payload);
         }
     }
     void OnDestroy(){
@@ -64,7 +70,7 @@ public class Simulator : MonoBehaviour
              //Debug.Log(target);
              Payload payload = new Payload();
              payload.command = "onMessage";
-             payload.headers = new Header[]{new Header("x",x.ToString()),new Header("y",y.ToString()),new Header("z",target.z.ToString())};
+             payload.headers = new Header[]{new Header("x",x.ToString()),new Header("y",y.ToString()),new Header("z",target.z.ToString()),new Header("f","1.5")};
              await INS.OnMove(payload);//publish move destination
              
              //GameObject go = GameObject.Find("/View/Spin1");
@@ -77,7 +83,12 @@ public class Simulator : MonoBehaviour
              //spin.OnMove(target);
         }   
     }
-    
+    public void OnQuest(string json){
+        GameObject _view = GameObject.Find("/View");
+        View view = _view.GetComponent<View>();
+        view.OnView();
+        Debug.Log(json);
+    }
     public async void Back(){
         bool suc = await INS.OnLeave(this); 
         if(suc){
@@ -85,12 +96,15 @@ public class Simulator : MonoBehaviour
         }     
     }
     public void OnSeat1(){
+        Payload payload = new Payload();
+        payload.headers = new Header[]{new Header("x","abc")};
+        INS.OnQuest(payload);     
         //Camera.main.transform.Rotate(0,0,180,Space.Self);
     }
     public void OnSeat2(){
         //Camera.main.transform.Rotate(0,0,180,Space.World);
     }
-     public void OnSeat3(){
+    public void OnSeat3(){
         //Camera.main.transform.Rotate(0,0,180);
     }
 }

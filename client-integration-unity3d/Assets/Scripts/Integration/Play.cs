@@ -18,6 +18,7 @@ public class Play : MonoBehaviour{
     
     void Awake(){
         Integration.OnMessage += _OnStart; 
+        Debug.Log("Start Message Listener Added");
     }
     async void Start(){
         GameObject gp = GameObject.Find("/UI/Waiting"); 
@@ -40,7 +41,7 @@ public class Play : MonoBehaviour{
     }
      void OnDestroy(){
         Integration.OnMessage -= _OnStart;
-        Debug.Log("removed START handler");
+        Debug.Log("Removed Start handler");
     }
     public async void Exit(){
         await INS.OnExit(this);
@@ -94,7 +95,13 @@ public class Play : MonoBehaviour{
             JObject jo = JObject.Parse(msg.payload);
             INS.arena = (string)jo.SelectToken("arena");
             matched = true;
-        }            
+        }
+        else if(msg.query!=null&&msg.query.Equals("onTimer")){
+            JObject jo = JObject.Parse(msg.payload);
+            int m = (int)jo.SelectToken("m");
+            int s = (int)jo.SelectToken("s");
+            pending.SetText("Starting ["+s+"]");
+        }
     }
     
 }

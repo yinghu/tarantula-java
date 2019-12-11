@@ -77,6 +77,10 @@ public class Integration : ScriptableObject{
         }
         return suc;
     }
+    public async Task<bool> OnQuest(Payload payload){
+        payload.command = "onQuest";
+        return await gec.SendOnInstance(game.applicationId,game.instanceId,payload);
+    }
     public async Task<bool> OnJoin(MonoBehaviour caller,string gname){
         bool suc = await gec.OnLobby(caller,"robotquest");
         if(!suc){
