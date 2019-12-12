@@ -107,10 +107,10 @@ public class Simulator : MonoBehaviour
             SceneManager.LoadScene("Integration");
         }     
     }
-    public void OnSeat1(){
+    public async void OnSeat1(){
         Payload payload = new Payload();
         payload.headers = new Header[]{new Header("x","abc")};
-        INS.OnQuest(payload);     
+        await INS.OnQuest(payload);     
         //Camera.main.transform.Rotate(0,0,180,Space.Self);
     }
     public void OnSeat2(){
