@@ -51,6 +51,9 @@ public class Simulator : MonoBehaviour
             else if(msg.query!=null&&msg.query.Equals("onQuest")){
                 OnQuest(msg.payload);    
             }
+            else if(msg.query!=null&&msg.query.Equals("offQuest")){
+                OffQuest(msg.payload);    
+            }
         }
         else{
             Debug.Log("REV>"+msg.payload);
@@ -86,7 +89,16 @@ public class Simulator : MonoBehaviour
     public void OnQuest(string json){
         GameObject _view = GameObject.Find("/View");
         View view = _view.GetComponent<View>();
-        view.OnView();
+        Debug.Log(json);
+        JObject jo = JObject.Parse(json);
+        Vector3 mp = new Vector3();
+        mp.x = ((float)jo.SelectToken("x"))*Screen.width;
+        mp.y = ((float)jo.SelectToken("y"))*Screen.height;
+        mp.z = 0;//float.Parse(pv.headers[2].value);
+        string _name = (string)jo.SelectToken("n");
+        view.OnView(_name,mp);
+    }
+    public void OffQuest(string json){
         Debug.Log(json);
     }
     public async void Back(){

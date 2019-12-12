@@ -17,8 +17,10 @@ public class View : MonoBehaviour{
         
     }
     
-    public void OnView(){
-        Debug.Log(">>>>> on view");
-        Instantiate(prefab, new Vector3(0, 0, 0), Quaternion.identity,transform);
+    public void OnView(string name,Vector3 v){
+        Vector3 vc = Camera.main.ScreenToWorldPoint(v);
+        vc.z = 0;
+        GameObject clone = Instantiate(prefab,vc, Quaternion.identity,transform);
+        clone.name = name;
     }
 }

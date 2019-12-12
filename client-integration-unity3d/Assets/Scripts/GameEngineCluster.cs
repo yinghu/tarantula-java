@@ -436,7 +436,7 @@ namespace Tarantula.Networking{
             OnInboundMessage?.Invoke(im);   
         }
         private async Task<bool> ParseGameObject(string json,Descriptor game,Action<JObject> callback){
-            Debug.Log(json);
+            //Debug.Log(json);
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
             if(!suc){

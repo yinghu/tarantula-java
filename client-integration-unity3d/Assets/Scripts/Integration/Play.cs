@@ -90,6 +90,7 @@ public class Play : MonoBehaviour{
         }
     }
     void _OnStart(InboundMessage msg){
+        //Debug.Log(msg.payload);
         if(msg.query!=null&&msg.query.Equals("onStart")){
             Debug.Log("START=>>>"+msg.payload);
             JObject jo = JObject.Parse(msg.payload);
