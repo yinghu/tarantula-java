@@ -17,6 +17,9 @@ public class Spin : MonoBehaviour
     void Start(){
         _active = true;
         started = transform.position;
+        gameObject.GetComponent<Collider>().isTrigger = true;
+        gameObject.GetComponent<Rigidbody>().collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+        gameObject.GetComponent<Rigidbody>().isKinematic = true;
     }
 
    
@@ -37,5 +40,18 @@ public class Spin : MonoBehaviour
         target.z = 0;
         speed = f;
         _moving = true;
+    }
+    
+    
+    private void OnTriggerEnter(Collider hit){
+        Debug.Log("Collisding with enter" + hit.gameObject.name);
+        speed =2*speed;
+    }
+    private void OnTriggerStay(Collider hit){
+       //Debug.Log("Collisding with stay" + hit.gameObject.name); 
+    }
+
+    private void OnTriggerExit(Collider hit){
+       Debug.Log("Collisding with exit" + hit.gameObject.name);
     }
 }

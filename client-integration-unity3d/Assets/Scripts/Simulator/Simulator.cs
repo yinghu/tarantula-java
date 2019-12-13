@@ -34,7 +34,7 @@ public class Simulator : MonoBehaviour
     void _OnMessage(InboundMessage msg){
         if(msg.instanceId!=null&&msg.instanceId.Equals(INS.game.gameId)){
             if(msg.query!=null&&msg.query.Equals("onMessage")){
-                Debug.Log(msg.payload);
+                //Debug.Log(msg.payload);
                 JObject jo = JObject.Parse(msg.payload);
                 Payload pv = jo.ToObject<Payload>();
                 view.OnMove(pv);
@@ -46,7 +46,7 @@ public class Simulator : MonoBehaviour
                 timer.SetText(m+":"+s);
             }
             if(msg.query!=null&&msg.query.Equals("onMove")){
-                Debug.Log(msg.payload);
+                //Debug.Log(msg.payload);
                 JObject jo = JObject.Parse(msg.payload);
                 Vector3 pv = new Vector3();
                 pv.x=(float)jo.SelectToken("x")*Screen.width;
@@ -89,19 +89,20 @@ public class Simulator : MonoBehaviour
              payload.headers[2]=new Header("z",target.z.ToString());
              payload.headers[3]=new Header("f","1.5");
              payload.headers[4]=new Header("n",(string)INS.robotList[INS.seatIndex].SelectToken("questId"));
-             bool suc = await INS.OnMove(payload);//publish move destination
-             Debug.Log("SEND ["+suc+"]");
+             await INS.OnMove(payload);//publish move destination
+             //Debug.Log("SEND ["+suc+"]");
         }   
     }
     public void OnQuest(string json){
-        Debug.Log(json);
+        //Debug.Log(json);
         JObject jo = JObject.Parse(json);
         Vector3 mp = new Vector3();
         mp.x = ((float)jo.SelectToken("x"))*Screen.width;
         mp.y = ((float)jo.SelectToken("y"))*Screen.height;
         mp.z = 0;//float.Parse(pv.headers[2].value);
         string _name = (string)jo.SelectToken("n");
-        view.OnView(_name,mp);
+        int _ix = (int)jo.SelectToken("i");
+        view.OnView(_name,mp,_ix);
     }
     public void OffQuest(string json){
         Debug.Log(json);

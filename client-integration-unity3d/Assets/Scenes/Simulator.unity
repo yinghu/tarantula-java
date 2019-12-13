@@ -1854,7 +1854,17 @@ MonoBehaviour:
   blueSpin: {fileID: 1437772693197598503, guid: 4a41dfde04415404d969442b53f418fd,
     type: 3}
   redSpin: {fileID: 5516397711554535341, guid: 51d594152b8adff409056c8676f68584, type: 3}
-  shot: {fileID: 4070919008366395576, guid: 05c611e160ae0bc48a11fd381d7a8d2f, type: 3}
+  shots:
+  - {fileID: 6368809221398492348, guid: 54155be7b090e3149a2ba8cd46eb703b, type: 3}
+  - {fileID: 1919180432239722342, guid: 60772a5bcddc5c34391aae6a3927ccb8, type: 3}
+  - {fileID: 6961432792370248518, guid: dee04888aa36dfb41be345ab2bb9ec7c, type: 3}
+  - {fileID: 4070919008366395576, guid: 05c611e160ae0bc48a11fd381d7a8d2f, type: 3}
+  - {fileID: 511014035073525611, guid: 391d1f000115c5944a0bc4c8a5560676, type: 3}
+  - {fileID: 5338907245536477678, guid: 538dc5a138e663647ba5852730432060, type: 3}
+  - {fileID: 7084120979968277285, guid: 0eb6d2bbad6dab144b942efc677eafea, type: 3}
+  - {fileID: 905707204909916384, guid: 31780b500afbc09409ee502670bedeb4, type: 3}
+  - {fileID: 6213264431092613019, guid: 3b8e57c03fd71b14b94cc787f1d07730, type: 3}
+  - {fileID: 1611432039048944152, guid: 5a56a06e259e1004a8c2d9cefb65ca22, type: 3}
 --- !u!1 &2052723283
 GameObject:
   m_ObjectHideFlags: 0

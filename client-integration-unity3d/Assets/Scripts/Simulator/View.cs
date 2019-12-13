@@ -8,14 +8,13 @@ public class View : MonoBehaviour{
     
     public GameObject blueSpin;
     public GameObject redSpin;
-    public GameObject shot;
+    public GameObject[] shots;
     
     void Start()
     {
         
     }
 
-    // Update is called once per frame
     void Update()
     {
         
@@ -42,8 +41,8 @@ public class View : MonoBehaviour{
         string questId = pv.headers[4].value;
         _OnMove(questId,mp,speed);
     }
-    public void OnView(string name,Vector3 v){
-        _OnView(name,v,shot);
+    public void OnView(string name,Vector3 v,int ix){
+        _OnView(name,v,shots[ix]);
     }
     private void _OnMove(string questId,Vector3 v,float speed){
         GameObject mg = GameObject.Find("/View/"+questId);
