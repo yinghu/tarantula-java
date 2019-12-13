@@ -45,6 +45,17 @@ public class Simulator : MonoBehaviour
                 int s = (int)jo.SelectToken("s");
                 timer.SetText(m+":"+s);
             }
+            if(msg.query!=null&&msg.query.Equals("onMove")){
+                Debug.Log(msg.payload);
+                JObject jo = JObject.Parse(msg.payload);
+                Vector3 pv = new Vector3();
+                pv.x=(float)jo.SelectToken("x")*Screen.width;
+                pv.y=(float)jo.SelectToken("y")*Screen.height;
+                pv.z=0;
+                float speed = (float)jo.SelectToken("f");
+                string questId = (string)jo.SelectToken("n");
+                view.OnMove(questId,pv,speed);
+            }
             else if(msg.query!=null&&msg.query.Equals("onEnd")){
                 SceneManager.LoadScene("Integration");
             }
