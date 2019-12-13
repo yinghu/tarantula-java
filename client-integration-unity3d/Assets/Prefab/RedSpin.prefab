@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5516397711554535339}
   - component: {fileID: 5516397711554535340}
   m_Layer: 0
-  m_Name: Spin2
+  m_Name: RedSpin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -95,6 +95,7 @@ public class Play : MonoBehaviour{
             Debug.Log("START=>>>"+msg.payload);
             JObject jo = JObject.Parse(msg.payload);
             INS.arena = (string)jo.SelectToken("arena");
+            INS.robotList = (JArray)jo.SelectToken("robotList");
             matched = true;
         }
         else if(msg.query!=null&&msg.query.Equals("onTimer")){

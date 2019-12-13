@@ -24,6 +24,7 @@ public class Integration : ScriptableObject{
     public int seatIndex{get;set;}
     public string arenaZone{get;set;}
     public string arena{get;set;}
+    public JArray robotList{get;set;}
     public static event InboundMessageHandler OnMessage;
     
     [RuntimeInitializeOnLoadMethod]
@@ -88,13 +89,11 @@ public class Integration : ScriptableObject{
         }
         List<Descriptor> glist = gec.gameList();
         foreach(Descriptor desc in glist){
-            //Debug.Log(desc.name+"<><><>"+gname);
             if(desc.name.Equals(gname)){
                 game = desc;
                 break;
             }    
         }
-        //Debug.Log("PLAYING ON ["+game.name+"]");
         return await gec.OnPlay(caller,"robotquest-service/live",game,(jo)=>{
             JToken occ = jo.SelectToken("gameObject.occupation");
             seatIndex = (int)occ.SelectToken("seatIndex");

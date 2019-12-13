@@ -9,7 +9,7 @@ using TMPro;
 public class Simulator : MonoBehaviour
 {
     private Integration INS;
-    public Spin spin;
+    public View view;
     private TextMeshProUGUI timer;
     
     void Awake(){
@@ -27,17 +27,17 @@ public class Simulator : MonoBehaviour
         GameObject ap = GameObject.Find("/UI/Arena"); 
         TextMeshProUGUI azt = ap.GetComponentInChildren<TextMeshProUGUI>();
         azt.SetText(INS.arena);
+        
+        //setup robot
+        view.OnBoard(INS.robotList);
     }
     void _OnMessage(InboundMessage msg){
         if(msg.instanceId!=null&&msg.instanceId.Equals(INS.game.gameId)){
             if(msg.query!=null&&msg.query.Equals("onMessage")){
+                Debug.Log(msg.payload);
                 JObject jo = JObject.Parse(msg.payload);
                 Payload pv = jo.ToObject<Payload>();
-                Vector3 mp = new Vector3();
-                mp.x = float.Parse(pv.headers[0].value)*Screen.width;
-                mp.y = float.Parse(pv.headers[1].value)*Screen.height;
-                mp.z = float.Parse(pv.headers[2].value);
-                spin.OnMove(mp,float.Parse(pv.headers[3].value));
+                view.OnMove(pv);
             }
             else if(msg.query!=null&&msg.query.Equals("onTimer")){
                 JObject jo = JObject.Parse(msg.payload);
@@ -70,25 +70,19 @@ public class Simulator : MonoBehaviour
              Vector3 target = Input.mousePosition;
              float x = (target.x/Screen.width);
              float y = (target.y/Screen.height);
-             //Debug.Log(target);
              Payload payload = new Payload();
              payload.command = "onMessage";
-             payload.headers = new Header[]{new Header("x",x.ToString()),new Header("y",y.ToString()),new Header("z",target.z.ToString()),new Header("f","1.5")};
-             await INS.OnMove(payload);//publish move destination
-             
-             //GameObject go = GameObject.Find("/View/Spin1");
-             //if(go!=null){
-                //go.name = "popo";
-                //Spin spin = go.GetComponent<Spin>();
-                //spin.OnSpin(false);
-                //Debug.Log(go.name);
-             //}
-             //spin.OnMove(target);
+             payload.headers = new Header[5];
+             payload.headers[0]=new Header("x",x.ToString());
+             payload.headers[1]=new Header("y",y.ToString());
+             payload.headers[2]=new Header("z",target.z.ToString());
+             payload.headers[3]=new Header("f","1.5");
+             payload.headers[4]=new Header("n",(string)INS.robotList[INS.seatIndex].SelectToken("questId"));
+             bool suc = await INS.OnMove(payload);//publish move destination
+             Debug.Log("SEND ["+suc+"]");
         }   
     }
     public void OnQuest(string json){
-        GameObject _view = GameObject.Find("/View");
-        View view = _view.GetComponent<View>();
         Debug.Log(json);
         JObject jo = JObject.Parse(json);
         Vector3 mp = new Vector3();
