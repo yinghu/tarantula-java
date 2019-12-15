@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 5516397711554535338}
   - component: {fileID: 5516397711554535339}
   - component: {fileID: 5516397711554535340}
-  - component: {fileID: 302048397}
   m_Layer: 0
   m_Name: RedSpin
   m_TagString: Untagged
@@ -108,19 +107,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 3
---- !u!54 &302048397
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5516397711554535341}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 126
-  m_CollisionDetection: 1

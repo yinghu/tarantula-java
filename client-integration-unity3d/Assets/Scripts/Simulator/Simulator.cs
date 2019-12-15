@@ -21,13 +21,9 @@ public class Simulator : MonoBehaviour
         GameObject gp = GameObject.Find("/UI/BackTimer"); 
         timer = gp.GetComponentInChildren<TextMeshProUGUI>();
         timer.SetText("00:00");
-        //if(INS.seatIndex==1){
-            //Camera.main.transform.Rotate(0,0,180);
-        //}
         GameObject ap = GameObject.Find("/UI/Arena"); 
         TextMeshProUGUI azt = ap.GetComponentInChildren<TextMeshProUGUI>();
         azt.SetText(INS.arena);
-        
         //setup robot
         view.OnBoard(INS.robotList);
     }
@@ -87,7 +83,7 @@ public class Simulator : MonoBehaviour
              payload.headers[0]=new Header("x",x.ToString());
              payload.headers[1]=new Header("y",y.ToString());
              payload.headers[2]=new Header("z",target.z.ToString());
-             payload.headers[3]=new Header("f","1.5");
+             payload.headers[3]=new Header("f","3.5");
              payload.headers[4]=new Header("n",(string)INS.robotList[INS.seatIndex].SelectToken("questId"));
              await INS.OnMove(payload);//publish move destination
              //Debug.Log("SEND ["+suc+"]");
@@ -115,14 +111,17 @@ public class Simulator : MonoBehaviour
     }
     public async void OnSeat1(){
         Payload payload = new Payload();
-        payload.headers = new Header[]{new Header("x","abc")};
-        await INS.OnQuest(payload);     
-        //Camera.main.transform.Rotate(0,0,180,Space.Self);
+        payload.headers = new Header[]{new Header("accessId","a"),new Header("c","5")};
+        await INS.OnQuest(payload);       
     }
-    public void OnSeat2(){
-        //Camera.main.transform.Rotate(0,0,180,Space.World);
+    public async void OnSeat2(){
+        Payload payload = new Payload();
+        payload.headers = new Header[]{new Header("accessId","b"),new Header("f","10")};
+        await INS.OnQuest(payload);
     }
-    public void OnSeat3(){
-        //Camera.main.transform.Rotate(0,0,180);
+    public async void OnSeat3(){
+        Payload payload = new Payload();
+        payload.headers = new Header[]{new Header("accessId","c"),new Header("f","0")};
+        await INS.OnQuest(payload);
     }
 }
