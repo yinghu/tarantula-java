@@ -378,6 +378,7 @@ namespace Tarantula.Networking{
                 //do receive loop
                 while(_liveUc){
                     string msg = await _guc.Receive();
+                    //Debug.Log(msg);
                     ParseInboundMessage(msg);
                 }    
                 return false;

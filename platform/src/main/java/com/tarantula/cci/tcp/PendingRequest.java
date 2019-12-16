@@ -15,8 +15,8 @@ import java.util.List;
  */
 public class PendingRequest {
 
-    private ArrayDeque<String> inboundQueue = new ArrayDeque<>(16);
-    private ArrayDeque<ByteBuffer> outboundQueue = new ArrayDeque<>(16);
+    private ArrayDeque<String> inboundQueue = new ArrayDeque<>(100);
+    private ArrayDeque<ByteBuffer> outboundQueue = new ArrayDeque<>(100);
     private StringBuffer pendingBuffer;
 
     private SelectionKey key;
@@ -28,14 +28,14 @@ public class PendingRequest {
     public void serverId(String serverId){ this.serverId = serverId;}
     public String serverId(){return this.serverId;}
     public synchronized void writeBuffer(ByteBuffer outbound){
-        outboundQueue.offerLast(outbound);
+        outboundQueue.offer(outbound);
         this.key.interestOps(SelectionKey.OP_WRITE);
         this.key.selector().wakeup();
     }
     public synchronized void writeIO(SocketChannel socketChannel) throws IOException{
         ByteBuffer buffer;
         do{
-            buffer = outboundQueue.pollFirst();
+            buffer = outboundQueue.poll();
             if(buffer!=null){
                 socketChannel.write(buffer);
             }

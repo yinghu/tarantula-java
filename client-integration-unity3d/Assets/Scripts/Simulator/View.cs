@@ -55,7 +55,7 @@ public class View : MonoBehaviour{
             spin.OnMove(v,speed);
         }
         else{
-            Debug.Log("no move->"+questId);
+            Debug.Log("missed game object->"+questId);
         }
     }
     private void _OnView(string name,Vector3 v,GameObject src){

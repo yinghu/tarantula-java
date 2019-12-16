@@ -81,17 +81,17 @@ public class PushEventHandler implements RequestHandler {
         this.eventService = eventService;
         this.bucket = bucket;
     }
-    public boolean onEvent(Event event){
-       OnExchange hx = this._hex.get(event.sessionId());
-       if(hx!=null){
+    public  boolean onEvent(Event event){
+        OnExchange hx = this._hex.get(event.sessionId());
+        if(hx!=null){
            if(hx.onEvent(event)){ //remove on true marked as closed connect or session
                _hex.remove(event.sessionId());
            }
-       }
-       else{
-           //log.warn(event.toString()+" unexpected removed");
-       }
-       return true;
+        }
+        else{
+           log.warn(event.toString()+" unexpected removed on server push");
+        }
+        return true;
     }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");

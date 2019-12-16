@@ -67,6 +67,9 @@ public class Simulator : MonoBehaviour
             else if(msg.query!=null&&msg.query.Equals("offQuest")){
                 OffQuest(msg.payload);    
             }
+            else{
+                Debug.Log("Unknow query->"+msg.query);
+            }
         }
         else{
             Debug.Log("REV>"+msg.payload);

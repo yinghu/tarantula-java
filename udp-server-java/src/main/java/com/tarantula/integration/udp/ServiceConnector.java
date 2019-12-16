@@ -130,22 +130,16 @@ public class ServiceConnector implements Runnable {
                                 outboundMessage.onHeader = false;
                             }
                             if(c=='|'){
-                                outboundMessage.ended = true;
-                                break;
+                                outboundMessage.data = pending.toString();
+                                outboundQueue.offer(outboundMessage);
+                                pending.setLength(0);
+                                outboundMessage = new OutboundMessage();
+                                continue;
                             }
                             if((outboundMessage.onHeader&&(c==','||c=='#'))||c==UDPServer.MSG_HEADER_DELIMITER){
                                 continue;
                             }
                             pending.append(c);
-                    }
-                    if(outboundMessage.ended){
-                        outboundMessage.data = pending.toString();
-                        outboundQueue.offer(outboundMessage);
-                        pending.setLength(0);
-                        outboundMessage = new OutboundMessage();
-                    }
-                    else{
-                        log.warning("Oversize pending data->"+outboundMessage.toString()+"//"+pending.toString());
                     }
                 }
                 else{

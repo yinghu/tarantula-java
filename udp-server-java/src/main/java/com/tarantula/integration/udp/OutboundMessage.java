@@ -10,9 +10,6 @@ public class OutboundMessage {
 
     public boolean onHeader = true;
     public boolean onQuery = false;
-    public boolean ended = false;
-
-
 
     public String toString(){
         return clientId+"<<>>"+query+"<<>>"+label+"<<>>"+instanceId+"<<>>"+data;
