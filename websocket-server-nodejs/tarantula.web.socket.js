@@ -13,6 +13,9 @@ else{
     console.log("using default configuration");
 }
 var secured = cfg.front.secured;
+if(fs.existsSync('ip.txt')){
+    cfg.front.host = fs.readFileSync('ip.txt','utf-8');//replace ip from ip.txt
+}
 const https = secured?require('https'):require('http');
 const http = require('http');
 const net = require('net');
