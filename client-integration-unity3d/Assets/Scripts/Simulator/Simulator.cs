@@ -41,7 +41,7 @@ public class Simulator : MonoBehaviour
                 int s = (int)jo.SelectToken("s");
                 timer.SetText(m+":"+s);
             }
-            if(msg.query!=null&&msg.query.Equals("onMove")){
+            else if(msg.query!=null&&msg.query.Equals("onMove")){
                 //Debug.Log(msg.payload);
                 JObject jo = JObject.Parse(msg.payload);
                 Vector3 pv = new Vector3();
@@ -51,6 +51,12 @@ public class Simulator : MonoBehaviour
                 float speed = (float)jo.SelectToken("f");
                 string questId = (string)jo.SelectToken("n");
                 view.OnMove(questId,pv,speed);
+            }
+            else if(msg.query!=null&&msg.query.Equals("onRemove")){
+                //Debug.Log(msg.payload);
+                JObject jo = JObject.Parse(msg.payload);
+                string questId = (string)jo.SelectToken("n");
+                view.OnRemove(questId);
             }
             else if(msg.query!=null&&msg.query.Equals("onEnd")){
                 SceneManager.LoadScene("Integration");
@@ -121,7 +127,12 @@ public class Simulator : MonoBehaviour
     }
     public async void OnSeat3(){
         Payload payload = new Payload();
-        payload.headers = new Header[]{new Header("accessId","c"),new Header("f","0")};
+        payload.headers = new Header[]{new Header("accessId","c"),new Header("f","2")};
+        await INS.OnQuest(payload);
+    }
+     public async void OnSeat4(){
+        Payload payload = new Payload();
+        payload.headers = new Header[]{new Header("accessId","d")};
         await INS.OnQuest(payload);
     }
 }

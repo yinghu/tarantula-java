@@ -22,6 +22,7 @@ public class Integration : ScriptableObject{
     public Descriptor game{get;set;}
     public bool online{get=>gec.online;}
     public int seatIndex{get;set;}
+    public int state{get;set;}
     public string arenaZone{get;set;}
     public string arena{get;set;}
     public JArray robotList{get;set;}
@@ -97,6 +98,7 @@ public class Integration : ScriptableObject{
         return await gec.OnPlay(caller,"robotquest-service/live",game,(jo)=>{
             JToken occ = jo.SelectToken("gameObject.occupation");
             seatIndex = (int)occ.SelectToken("seatIndex");
+            state = (int)occ.SelectToken("state");
             arenaZone = (string)jo.SelectToken("gameObject.arenaZone");
         });
     }

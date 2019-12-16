@@ -45,7 +45,7 @@ public class Spin : MonoBehaviour
     
     
     private void OnTriggerEnter(Collider hit){
-        Debug.Log("Collisding with enter" + hit.gameObject.name);
+        //Debug.Log("Collisding with enter" + hit.gameObject.name);
         //speed =2*speed;
     }
     private void OnTriggerStay(Collider hit){
@@ -53,6 +53,6 @@ public class Spin : MonoBehaviour
     }
 
     private void OnTriggerExit(Collider hit){
-       Debug.Log("Collisding with exit" + hit.gameObject.name);
+       //Debug.Log("Collisding with exit" + hit.gameObject.name);
     }
 }

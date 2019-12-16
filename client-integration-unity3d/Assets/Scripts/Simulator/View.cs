@@ -32,6 +32,10 @@ public class View : MonoBehaviour{
     public void OnMove(string questId,Vector3 dest,float speed){
         _OnMove(questId,dest,speed);
     }
+    public void OnRemove(string questId){
+       GameObject mg = GameObject.Find("/View/"+questId);
+       Destroy(mg,2);    
+    }
     public void OnMove(Payload pv){
         Vector3 mp = new Vector3();
         mp.x = float.Parse(pv.headers[0].value)*Screen.width;
