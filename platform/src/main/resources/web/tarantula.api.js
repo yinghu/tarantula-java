@@ -5,7 +5,7 @@ var TARA_API = (function(){
   const cMap = new Map();    
   let presence = {};    
   let qdata ={};
-  let wsWorker ;
+  //let wsWorker ;
     
   let _parse = function(data,cb){
       data.lobbyList.forEach(function(v){
@@ -40,7 +40,7 @@ var TARA_API = (function(){
       cMap.set(label,callback);
   };  
   let _sendMessage = function(msg){
-      wsWorker.postMessage({cmd:'send',data:msg});
+      //wsWorker.postMessage({cmd:'send',data:msg});
   };
 
   let _descriptor = function(dk){
@@ -175,9 +175,9 @@ var TARA_API = (function(){
                 qdata.stub = presence.stub;
                 qdata.login = presence.login;
                 qdata.connection = p.connection;
-                wsWorker = new Worker('/resource/tarantula.web.socket.source.js');//move to login
-                wsWorker.onmessage = _onmessage;
-                wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});
+                //wsWorker = new Worker('/resource/tarantula.web.socket.source.js');//move to login
+                //wsWorker.onmessage = _onmessage;
+                //wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});
                 _parse(p,function(v){});
                 callback({successful:true});
             }else{
@@ -212,7 +212,7 @@ var TARA_API = (function(){
     let payload = {serviceTag:'presence/lobby',command:'onTicket'};
     _service(payload,function(resp){
         qdata.ticket = resp.presence.ticket;
-        wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});
+        //wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});
     });
   };
   let _profile = function(playerId,callback){
@@ -267,7 +267,7 @@ var TARA_API = (function(){
         //amap.clear();
         presence = null;
         qdata ={};
-        wsWorker.postMessage({cmd:'close'});
+        //wsWorker.postMessage({cmd:'close'});
         callback(resp);
     });              
   };
