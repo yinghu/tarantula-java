@@ -44,11 +44,11 @@ public class ServiceConnector implements Runnable {
         if(ipf.exists()){
             //REPLACE UDP FRONT BINDING
             BufferedReader r = new BufferedReader(new FileReader(ipf));
-            config.getAsJsonObject("front").remove("binding");
+            config.getAsJsonObject("front").remove("host");
             String ip = r.readLine();
             r.close();
             log.warning("Front binding replaced with ip ["+ip+"]");
-            config.getAsJsonObject("front").addProperty("binding",ip);
+            config.getAsJsonObject("front").addProperty("host",ip);
         }
         this.outboundQueue = new ConcurrentLinkedDeque<>();
         this.readBuffer = ByteBuffer.allocate(READ_BUFFER_SIZE);
