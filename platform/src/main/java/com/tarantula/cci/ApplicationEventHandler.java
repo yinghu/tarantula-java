@@ -38,9 +38,10 @@ public class ApplicationEventHandler  implements RequestHandler {
             String tag = exchange.header(Session.TARANTULA_TAG);
             String action = exchange.header(Session.TARANTULA_ACTION);
             byte[]  _payload = exchange.payload();
-            //String clientId = exchange.header(Session.X_REAL_IP)!=null?exchange.header(Session.X_REAL_IP):exchange.remoteAddress();
             String sid = exchange.id();
-            this._hex.put(sid,exchange);
+            if(!exchange.oneWay()){//excluding one way message
+                this._hex.put(sid,exchange);
+            }
             OnSession id = auth.validateToken(token);
             if(path.startsWith("/application/instance")){
                 ApplicationActionEvent magic = new ApplicationActionEvent(this.serverTopic,sid,id.systemId(),applicationId,instanceId,_payload);

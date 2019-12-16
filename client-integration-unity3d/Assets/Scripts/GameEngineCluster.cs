@@ -319,7 +319,7 @@ namespace Tarantula.Networking{
                 return _liveWc;
             }   
         }
-        public async Task<bool> SendOnInstance(string applicationId,string instanceId,Payload payload){
+        public async Task<bool> SendOnInstance(string applicationId,string instanceId,Payload payload,bool oneWay){
             try{
                 //do receive loop
                 if(!_liveWc){
@@ -330,6 +330,7 @@ namespace Tarantula.Networking{
                 strm.applicationId = applicationId;
                 strm.instanceId = instanceId;
                 strm.action = payload.command;
+                strm.oneWay = oneWay;
                 strm.data = payload;
                 string jstrm = JsonConvert.SerializeObject(strm,JSON_SETTING);
                 return await _gwc.Send(jstrm);
@@ -761,7 +762,7 @@ namespace Tarantula.Networking{
         public string instanceId;
         public string tag;
         public bool streaming;
-        
+        public bool oneWay;
         public Payload data;
     }
     public class Descriptor{

@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by yinghu lu on 10/24/2018.
+ * Updated by yinghu lu on 12/16/2019.
  */
 public class PendingDataDeserializer implements JsonDeserializer<PendingData> {
 
@@ -28,6 +28,9 @@ public class PendingDataDeserializer implements JsonDeserializer<PendingData> {
             }
             else if(k.equals("streaming")){
                 pendingData.streaming = kv.getValue().getAsJsonPrimitive().getAsBoolean();
+            }
+            else if(k.equals("oneWay")){
+                pendingData.oneWay =kv.getValue().getAsJsonPrimitive().getAsBoolean();
             }
             else if(k.equals("path")){
                 pendingData.path = kv.getValue().getAsJsonPrimitive().getAsString();

@@ -2,14 +2,12 @@ package com.tarantula.cci.tcp;
 
 import com.tarantula.Event;
 import com.tarantula.cci.OnExchange;
-import com.tarantula.platform.event.ResponsiveEvent;
-
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.UUID;
 
 /**
- * Created by yinghu lu on 10/23/2018.
+ * Updated by yinghu lu on 12/16/2019.
  */
 public class SocketSession implements OnExchange {
 
@@ -20,15 +18,22 @@ public class SocketSession implements OnExchange {
     private final Map<String,Object> headers;
     private final byte[] payload;
     private final boolean streaming;
+    private final boolean oneWay;
 
     public SocketSession(PendingRequest pendingRequest,PendingData pendingData){
-        this.id = UUID.randomUUID().toString();
+        if(!pendingData.oneWay){
+            this.id = UUID.randomUUID().toString();
+        }
+        else{
+            id="";
+        }
         this.clientId = pendingData.clientId;
         this.pendingRequest = pendingRequest;
         this.path = pendingData.path;
         this.headers = pendingData.headers;
         this.payload = pendingData.payload;
         this.streaming = pendingData.streaming;
+        this.oneWay = pendingData.oneWay;
     }
 
     @Override
@@ -57,25 +62,13 @@ public class SocketSession implements OnExchange {
     }
 
     @Override
-    public String query() {
-        return null;
-    }
-
-    @Override
-    public String remoteAddress() {
-        return "0.0.0.0";
-    }
-
-    @Override
     public boolean streaming() {
         return this.streaming;
     }
-
     @Override
-    public void onError(Exception ex, String message) {
-
+    public boolean oneWay(){
+        return this.oneWay;
     }
-
     @Override
     public boolean onEvent(Event event) {
         event.clientId(this.clientId);

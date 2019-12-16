@@ -91,9 +91,7 @@ public class HttpBatchSession extends RequestParser implements OnExchange{
     public String query() {
         return hex.getRequestURI().getQuery();
     }
-    public boolean streaming(){
-        return false;
-    }
+
     public String remoteAddress(){
         return this.hex.getRemoteAddress().getAddress().toString();
     }

@@ -5,7 +5,7 @@ import com.tarantula.EventListener;
 import java.io.InputStream;
 
 /**
- * Created by yinghu lu on 4/29/2018.
+ * Updated by yinghu lu on 12/16/2019.
  */
 public interface OnExchange extends EventListener{
     String id();
@@ -14,11 +14,20 @@ public interface OnExchange extends EventListener{
     String header(String name);
 
     byte[] payload();
-    String query();
-    String remoteAddress();
+    default String query(){
+        return null;
+    }
+    default String remoteAddress(){
+        return "0.0.0.0";
+    }
 
-    boolean streaming();
-    void onError(Exception ex,String message);
+    default boolean streaming(){
+        return false;
+    }
+    default boolean oneWay(){
+        return false;
+    }
+    default void onError(Exception ex,String message){}
 
     default InputStream onStream(){ return null;}
 }

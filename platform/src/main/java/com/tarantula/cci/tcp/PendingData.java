@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by yinghu lu on 10/24/2018.
+ * Updated by yinghu lu on 12/16/2019.
  */
 public class PendingData {
     public String clientId;
@@ -14,6 +14,7 @@ public class PendingData {
     public Map<String,Object> headers;
     public byte[] payload;
     public boolean streaming;
+    public boolean oneWay;
     public String serverId;
     public PendingData(){}
     public PendingData(String path,String tag,String action,byte[] payload){
