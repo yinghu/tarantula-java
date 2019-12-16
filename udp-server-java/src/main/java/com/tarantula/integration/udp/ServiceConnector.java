@@ -2,9 +2,7 @@ package com.tarantula.integration.udp;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -41,6 +39,16 @@ public class ServiceConnector implements Runnable {
         }
         else{
             config = jsonParser.parse(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("udp.conf"))).getAsJsonObject();
+        }
+        File ipf = new File("ip.txt");
+        if(ipf.exists()){
+            //REPLACE UDP FRONT BINDING
+            BufferedReader r = new BufferedReader(new FileReader(ipf));
+            config.getAsJsonObject("front").remove("binding");
+            String ip = r.readLine();
+            r.close();
+            log.warning("Front binding replaced with ip ["+ip+"]");
+            config.getAsJsonObject("front").addProperty("binding",ip);
         }
         this.outboundQueue = new ConcurrentLinkedDeque<>();
         this.readBuffer = ByteBuffer.allocate(READ_BUFFER_SIZE);
