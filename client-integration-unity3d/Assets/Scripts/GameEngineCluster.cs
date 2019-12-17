@@ -102,7 +102,6 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-token",presence.token),
                     new Header("Tarantula-action","onAbsence")
                 };
-                //string json = JsonConvert.SerializeObject(user,JSON_SETTING);
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
                 if(ParseLogout(jstr)){
                     await Close();
@@ -155,7 +154,6 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-action","onLevel")
                 };
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
-                Debug.Log(jstr);
                 return ParseLevel(jstr);
             }catch(Exception ex){
                 OnException?.Invoke(ex,0);
@@ -174,7 +172,6 @@ namespace Tarantula.Networking{
                 cmd.headers = new Header[]{new Header("header",header),new Header("category",category)};
                 string json = JsonConvert.SerializeObject(cmd,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
-                Debug.Log(jstr);
                 return ParseXP(jstr);
             }catch(Exception ex){
                 OnException?.Invoke(ex,0);
@@ -193,7 +190,6 @@ namespace Tarantula.Networking{
                 cmd.headers = new Header[]{new Header("header",header),new Header("category",category),new Header("classifier",classifier)};
                 string json = JsonConvert.SerializeObject(cmd,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
-                Debug.Log(jstr);
                 return ParseLeaderBoard(jstr);
             }catch(Exception ex){
                 OnException?.Invoke(ex,0);
@@ -417,7 +413,6 @@ namespace Tarantula.Networking{
         }
         private void ParseInboundMessage(string msg){
             //format [label]#[instanceId]?[query]{json payload}
-            //Debug.Log(msg);
             InboundMessage im = new InboundMessage();
             int idx1 = msg.IndexOf('#');
             if(idx1>0){
@@ -541,8 +536,6 @@ namespace Tarantula.Networking{
                 message = (string)jo.SelectToken("message");
                 return suc;
             }
-            //JToken tk = jo.SelectToken("profile");
-            //profile = tk.ToObject<Profile>();
             return true;
         }
         private bool ParseProfile(string json){
@@ -588,7 +581,7 @@ namespace Tarantula.Networking{
             JToken tk = jo.SelectToken("leaderBoard");
             leaderBoard = tk.ToObject<LeaderBoard>();
             return true;
-        }
+        }   
    } 
    public class GecUdpSocket{
        private UdpClient _udpClient;
@@ -791,7 +784,6 @@ namespace Tarantula.Networking{
         public string responseLabel { get; set; }
         public string gameId { get; set; }
     }
-
     public class Lobby{
         public Descriptor descriptor { get; set; }
         public List<Descriptor> applications { get; set; }
@@ -817,7 +809,6 @@ namespace Tarantula.Networking{
         public string category { get; set; }
         public double value { get; set; }
     }
-
     public class Xp{
         public string header { get; set; }
         public string name { get; set; }
@@ -828,7 +819,6 @@ namespace Tarantula.Networking{
         public double value { get; set; }
         public DateTime lastUpdated { get; set; }
     }
-
     public class LeaderBoard{
         public string header { get; set; }
         public string name { get; set; }
@@ -838,11 +828,6 @@ namespace Tarantula.Networking{
         public List<Board> board { get; set; }
     }
     public class Connection{
-        public string command { get; set; }
-        public int code { get; set; }
-        public int timestamp { get; set; }
-        public int sequence { get; set; }
-        public bool successful { get; set; }
         public string path { get; set; }
         public string protocol { get; set; }
         public string subProtocol { get; set; }
@@ -853,7 +838,6 @@ namespace Tarantula.Networking{
         public int port { get; set; }
     }
     public class Presence{
-        public bool successful { get; set; }
         public string systemId { get; set; }
         public int stub { get; set; }
         public string token { get; set; }
