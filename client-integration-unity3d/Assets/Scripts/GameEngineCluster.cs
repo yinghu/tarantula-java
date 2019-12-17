@@ -632,7 +632,7 @@ namespace Tarantula.Networking{
    public class GecWebSocket{
         private ClientWebSocket _websocket;
         private string _url;
-
+        
         public GecWebSocket(Connection connection,Presence presence){
             _url = connection.protocol+"://"+connection.host+":"+connection.port+"/"+connection.path+"?accessKey="+presence.ticket+"&stub="+presence.stub+"&systemId="+presence.login;
             _websocket = new ClientWebSocket();
@@ -648,9 +648,9 @@ namespace Tarantula.Networking{
             return _websocket.State == WebSocketState.Closed;
         }
         public async Task<bool> Send(string json){
-           ArraySegment<Byte> om = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(json.ToString()));     
-           await _websocket.SendAsync(om, WebSocketMessageType.Text, true, CancellationToken.None);
-           return true;
+            ArraySegment<Byte> om = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(json.ToString()));     
+            await _websocket.SendAsync(om, WebSocketMessageType.Text, true, CancellationToken.None); 
+            return true;
         }
         public async Task<string> Receive(){
             ArraySegment<Byte> rbuff = new ArraySegment<Byte>(new byte[4096]);
@@ -658,7 +658,7 @@ namespace Tarantula.Networking{
             //check erro here 
             if(wrs.CloseStatus!=null){
                 return "error{'successful':false,'message':'"+wrs.CloseStatus+"'}";
-            }
+            }    
             return Encoding.UTF8.GetString(rbuff.Array,0,wrs.Count);
         }
    } 

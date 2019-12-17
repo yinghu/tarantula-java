@@ -28,6 +28,8 @@ public class Integration : ScriptableObject{
     public JArray robotList{get;set;}
     public static event InboundMessageHandler OnMessage;
     
+    private Queue<Payload> oQueue = new Queue<Payload>();
+    
     [RuntimeInitializeOnLoadMethod]
     private static void _Init(){
         Debug.Log("Initializing Integration on ["+SystemInfo.deviceUniqueIdentifier+"]");
@@ -79,9 +81,21 @@ public class Integration : ScriptableObject{
         }
         return suc;
     }
-    public async Task<bool> OnQuest(Payload payload){
-        payload.command = "onQuest";
-        return await gec.SendOnInstance(game.applicationId,game.instanceId,payload,true);
+    public void OnQuest(Payload payload){
+        oQueue.Enqueue(payload);
+    }
+    public async Task<bool> OnQuest(){
+        while(online){
+            if(oQueue.Count>0){
+                Payload _pending = oQueue.Dequeue();
+                _pending.command = "onQuest";
+                await gec.SendOnInstance(game.applicationId,game.instanceId,_pending,true);
+            }else{
+                await Task.Delay(100);
+            }
+        }
+        Debug.Log("Exit On Quest");
+        return true;
     }
     public async Task<bool> OnJoin(MonoBehaviour caller,string gname){
         bool suc = await gec.OnLobby(caller,"robotquest");

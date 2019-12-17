@@ -118,24 +118,24 @@ public class Simulator : MonoBehaviour
             SceneManager.LoadScene("Integration");
         }     
     }
-    public async void OnSeat1(){
+    public  void OnSeat1(){
         Payload payload = new Payload();
         payload.headers = new Header[]{new Header("accessId","a"),new Header("c","5")};
-        await INS.OnQuest(payload);       
+        INS.OnQuest(payload);       
     }
-    public async void OnSeat2(){
+    public  void OnSeat2(){
         Payload payload = new Payload();
         payload.headers = new Header[]{new Header("accessId","b"),new Header("f","10")};
-        await INS.OnQuest(payload);
+        INS.OnQuest(payload);
     }
-    public async void OnSeat3(){
+    public  void OnSeat3(){
         Payload payload = new Payload();
         payload.headers = new Header[]{new Header("accessId","c"),new Header("f","2")};
-        await INS.OnQuest(payload);
+        INS.OnQuest(payload);
     }
-    public async void OnSeat4(){
+    public  void OnSeat4(){
         Payload payload = new Payload();
         payload.headers = new Header[]{new Header("accessId","d")};
-        await INS.OnQuest(payload);
+        INS.OnQuest(payload);
     }
 }
