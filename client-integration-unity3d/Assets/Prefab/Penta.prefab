@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -2396249041479168436}
   m_Layer: 0
   m_Name: Penta
-  m_TagString: Untagged
+  m_TagString: gig
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -8,13 +8,14 @@ public class Spin : MonoBehaviour
 {
     public float speed = 3.0f;
    
-    bool _active;
-    bool _moving;
-    
+    private bool _active;
+    private bool _moving;
+    private Integration INS; 
     private Vector3 started;
     private Vector3 target;
     
     void Start(){
+        INS = Integration.Instance;
         _active = true;
         started = transform.position;
         gameObject.GetComponent<Collider>().isTrigger = true;
@@ -44,9 +45,13 @@ public class Spin : MonoBehaviour
     }
     
     
-    private void OnTriggerEnter(Collider hit){
-        //Debug.Log("Collisding with enter" + hit.gameObject.name);
-        //speed =2*speed;
+    private async void OnTriggerEnter(Collider hit){
+        if(hit.gameObject.tag =="gig" && gameObject.tag == "robot"){
+            //Debug.Log("KILLING IT->" + hit.gameObject.name+"/"+hit.gameObject.tag);   
+            Payload payload = new Payload();
+            payload.headers = new Header[]{new Header("accessId","e"),new Header("accessKey",hit.gameObject.name)};
+            await INS.OnQuest(payload);
+        }
     }
     private void OnTriggerStay(Collider hit){
        //Debug.Log("Collisding with stay" + hit.gameObject.name); 

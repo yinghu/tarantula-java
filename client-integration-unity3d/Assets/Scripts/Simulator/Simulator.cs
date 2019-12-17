@@ -133,7 +133,7 @@ public class Simulator : MonoBehaviour
         payload.headers = new Header[]{new Header("accessId","c"),new Header("f","2")};
         await INS.OnQuest(payload);
     }
-     public async void OnSeat4(){
+    public async void OnSeat4(){
         Payload payload = new Payload();
         payload.headers = new Header[]{new Header("accessId","d")};
         await INS.OnQuest(payload);
