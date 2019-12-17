@@ -34,7 +34,7 @@ public class View : MonoBehaviour{
     }
     public void OnRemove(string questId){
        GameObject mg = GameObject.Find("/View/"+questId);
-       Destroy(mg,2);    
+       Destroy(mg);    
     }
     public void OnMove(Payload pv){
         Vector3 mp = new Vector3();
