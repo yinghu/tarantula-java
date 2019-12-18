@@ -97,7 +97,22 @@ public class UDPServer implements Runnable {
                 SocketAddress remoteAdd = uchannel.receive(buffer);//from udp client
                 buffer.flip();
                 parse(buffer,(outboundMessage) -> {
-                    if(outboundMessage.query.equals("onJoin")){
+                     if(outboundMessage.query.equals("onMessage")){
+                        //handle
+                        buffer.clear();
+                        buffer.put(outboundMessage.label.getBytes());
+                        buffer.put((byte)'#');
+                        buffer.put(outboundMessage.instanceId.getBytes());
+                        buffer.put((byte)'?');
+                        buffer.put(outboundMessage.query.getBytes());
+                        buffer.put(outboundMessage.data.getBytes());
+                        SessionGroup sg = cMap.computeIfAbsent(outboundMessage.instanceId,k->new SessionGroup(k));
+                        sg.sessions.forEach(s->{
+                            buffer.flip();
+                            try{uchannel.send(buffer,s.endpoint);}catch (Exception iex){iex.printStackTrace();}
+                        });
+                    }
+                    else if(outboundMessage.query.equals("onJoin")){
                         JsonObject jsonObject = parser.parse(outboundMessage.data).getAsJsonObject();
                         String insId = jsonObject.get("instanceId").getAsString();
                         String systemId = jsonObject.get("systemId").getAsString();
@@ -123,21 +138,10 @@ public class UDPServer implements Runnable {
                             try{uchannel.send(buffer,remoteAdd);}catch (Exception iex){iex.printStackTrace();}
                         });
                     }
-                    else if(outboundMessage.query.equals("onMessage")){
-                        //handle
-                        buffer.clear();
-                        buffer.put(outboundMessage.label.getBytes());
-                        buffer.put((byte)'#');
-                        buffer.put(outboundMessage.instanceId.getBytes());
-                        buffer.put((byte)'?');
-                        buffer.put(outboundMessage.query.getBytes());
-                        buffer.put(outboundMessage.data.getBytes());
-                        SessionGroup sg = cMap.computeIfAbsent(outboundMessage.instanceId,k->new SessionGroup(k));
-                        sg.sessions.forEach(s->{
-                            buffer.flip();
-                            try{uchannel.send(buffer,s.endpoint);}catch (Exception iex){iex.printStackTrace();}
-                        });
+                    else{
+                        log.warning("query>>>"+outboundMessage.query);
                     }
+
                 });
             }catch (Exception ex){
                 //ignore
@@ -169,7 +173,7 @@ public class UDPServer implements Runnable {
                         pendingData.query = sb.toString();
                     }else{
                         pendingData.instanceId = sb.toString();
-                        pendingData.query ="onMessage";
+                        pendingData.query ="onUnknown";
                     }
                     sb.setLength(0);
                     p = true;

@@ -14,6 +14,8 @@ public class Spin : MonoBehaviour
     private Vector3 started;
     private Vector3 target;
     
+    private float trackInterval = 0.05f;//500ms
+    
     void Start(){
         INS = Integration.Instance;
         _active = true;
@@ -25,15 +27,30 @@ public class Spin : MonoBehaviour
     }
 
    
-    void Update(){
+    async void FixedUpdate(){//20ms per frame
         if(_active){
             transform.Rotate(speed/2,speed,speed/3);
         }
         if(_moving){
             transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);        
         }
+        trackInterval -= Time.deltaTime;
+        if(trackInterval<=0){
+            Payload payload = new Payload();
+            payload.command = "onTrack";
+            payload.headers = new Header[]{new Header("accessId","f"),new Header("accessKey",gameObject.name),new Header("typeId",gameObject.tag)};
+            INS.OnMove(payload);
+            trackInterval = 0.6f;
+        }else{
+            //Debug.Log("1>>"+Time.deltaTime);
+        }
     }
-    
+    void Update(){
+        //Debug.Log("2>>"+Time.deltaTime);
+    }
+    void LateUpdate(){
+        //Debug.Log("3>>"+Time.deltaTime);
+    }
     public void OnSpin(bool active){
         _active = active;
     }
