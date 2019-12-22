@@ -21,7 +21,7 @@ public class Movement : MonoBehaviour
         if (Input.GetMouseButtonDown(0)) {
             RaycastHit hit;
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit)) {
-                Debug.Log(transform.position+"<><><>"+hit.point);
+                Debug.Log(transform.position+"<><><>"+hit.point+"<><><>"+Input.mousePosition);
                 Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.white);
                 target = hit.point;
                 float dx = (hit.point.x - transform.position.x);
