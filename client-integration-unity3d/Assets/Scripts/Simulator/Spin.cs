@@ -39,7 +39,7 @@ public class Spin : MonoBehaviour
             Payload payload = new Payload();
             payload.command = "onTrack";
             payload.headers = new Header[]{new Header("accessId","f"),new Header("accessKey",gameObject.name),new Header("typeId",gameObject.tag)};
-            INS.OnMove(payload);
+            await INS.OnTrack(payload);
             trackInterval = 0.6f;
         }else{
             //Debug.Log("1>>"+Time.deltaTime);

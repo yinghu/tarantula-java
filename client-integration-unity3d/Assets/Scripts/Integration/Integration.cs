@@ -35,8 +35,10 @@ public class Integration : ScriptableObject{
         Debug.Log("Initializing Integration on ["+SystemInfo.deviceUniqueIdentifier+"]");
         instance = Resources.Load<Integration>("Integration");
         gec = new GameEngineCluster(_HOST);
-         gec.OnException += (ex,code)=>{
-             Debug.Log(ex.Message+"<<CODE>>"+code);
+         gec.OnException += (ex,msg,code)=>{
+             if(code == ErrorCode.EC_WS_RECEIVE){
+                Debug.Log(ex.Message+"<<CODE>>"+code);
+             }
          };
          gec.OnWebSocket += _OnWebSocketMessage;
          gec.OnUDPSocket += _OnUDPSocketMessage;
@@ -81,6 +83,14 @@ public class Integration : ScriptableObject{
         }
         return suc;
     }
+    public async Task<bool> OnTrack(Payload payload){
+        OutboundMessage<Payload> om = new OutboundMessage<Payload>();
+        om.label = "rq";
+        om.query = payload.command;
+        om.instanceId = game.gameId;
+        om.payload = payload;
+        return await gec.SendOnUDP(om);
+    }
     public void OnQuest(Payload payload){
         oQueue.Enqueue(payload);
     }
@@ -104,10 +114,11 @@ public class Integration : ScriptableObject{
         }
         List<Descriptor> glist = gec.gameList();
         foreach(Descriptor desc in glist){
+            Debug.Log("category->"+desc.category);
             if(desc.name.Equals(gname)){
                 game = desc;
                 break;
-            }    
+            }
         }
         return await gec.OnPlay(caller,"robotquest-service/live",game,(jo)=>{
             JToken occ = jo.SelectToken("gameObject.occupation");

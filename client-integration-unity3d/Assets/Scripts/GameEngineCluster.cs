@@ -16,10 +16,34 @@ using Newtonsoft.Json.Linq;
 
 namespace Tarantula.Networking{
    
-   public delegate void ExceptionHandler(Exception ex,int errorCode);
+   public delegate void ExceptionHandler(Exception ex,string message,ErrorCode errorCode);
    public delegate void InboundMessageHandler(InboundMessage message);
    public delegate void WebSocketHandler();    
-   public delegate void UDPSocketHandler();    
+   public delegate void UDPSocketHandler();   
+
+   public enum ErrorCode{
+       EC_INDEX=0,
+       EC_REGISTER=1,
+       EC_LOGIN=2,
+       EC_DEVICE=3,
+       EC_LOGOUT,
+       EC_PROFILE,
+       EC_LEVEL,
+       EC_XP,
+       EC_LEADERBOARD,
+       EC_NOTIFICATION,
+       EC_LOBBY,
+       EC_ONPLAY,
+       EC_SERVICE,
+       EC_INSTANCE,
+       EC_WS_RECEIVE,
+       EC_WS_SEND_INSTANCE,
+       EC_WS_SEND_SERVICE,
+       EC_UDP_RECEIVE,
+       EC_SEND_UDP,
+       EC_CLOSE,
+       EC_WARN
+   }    
    public class GameEngineCluster{
       
         public event ExceptionHandler OnException;
@@ -61,7 +85,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.GetJson(caller,"/user/index",new Header[]{new Header("Tarantula-tag","index/lobby")});
                 return ParseIndex(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_INDEX);
                 return false;
             }
         }
@@ -76,7 +100,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.PostJson(caller,"/user/action",headers,json);
                 return ParseRegister(jstr);            
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_REGISTER);
                 return false;
             }
         }
@@ -91,7 +115,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.PostJson(caller,"/user/action",headers,json);
                 return await ParseLogin(jstr);           
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_LOGIN);
                 return false;
             }
         }
@@ -110,7 +134,7 @@ namespace Tarantula.Networking{
                     return false;
                 }           
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_LOGOUT);
                 return false;
             }
         }
@@ -123,7 +147,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
                 return ParseProfile(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_PROFILE);
                 return false;
             }
         }
@@ -141,7 +165,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
                 return ParseProfile(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_PROFILE);
                 return false;
             }
         }
@@ -156,7 +180,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
                 return ParseLevel(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_LEVEL);
                 return false;
             }
         }
@@ -174,7 +198,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
                 return ParseXP(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_XP);
                 return false;
             }
         }
@@ -192,7 +216,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
                 return ParseLeaderBoard(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_LEADERBOARD);
                 return false;
             }
         }
@@ -207,7 +231,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.PostJson(caller,"/user/action",headers,json);
                 return await ParseLogin(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_DEVICE);
                 return false;
             }
         }
@@ -223,7 +247,7 @@ namespace Tarantula.Networking{
                 string json = JsonConvert.SerializeObject(strm,JSON_SETTING);
                 return await _gwc.Send(json);
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_NOTIFICATION);
                 return false;
             }
         }
@@ -245,7 +269,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
                 return ParseLobby(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_LOBBY);
                 return false;
             }   
         }
@@ -258,13 +282,13 @@ namespace Tarantula.Networking{
                 };
                 Payload p = new Payload();
                 p.command = "onPlay";
-                p.headers = new Header[]{new Header("applicationId",game.applicationId),new Header("accessMode","2")};
+                p.headers = new Header[]{new Header("applicationId",game.applicationId),new Header("accessMode","2"),new Header("category",game.category)};
                 string json = JsonConvert.SerializeObject(p,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
                 //Processing join response 
                 return await ParseGameObject(jstr,game,callback);
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_ONPLAY);
                 return false;
             }
         }
@@ -280,7 +304,7 @@ namespace Tarantula.Networking{
                 callback(jstr);
                 return true;
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_SERVICE);
                 return false;
             }        
         }
@@ -297,7 +321,7 @@ namespace Tarantula.Networking{
                 callback(jstr);
                 return true;
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_INSTANCE);
                 return false;
             }        
         }
@@ -311,7 +335,7 @@ namespace Tarantula.Networking{
                 return false;
             }catch(Exception ex){
                 _liveWc = false;
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_WS_RECEIVE);
                 return _liveWc;
             }   
         }
@@ -332,7 +356,7 @@ namespace Tarantula.Networking{
                 return await _gwc.Send(jstrm);
             }catch(Exception ex){
                 _liveWc = false;
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_WS_SEND_INSTANCE);
                 return _liveWc;
             } 
         }
@@ -351,7 +375,7 @@ namespace Tarantula.Networking{
                 return await _gwc.Send(jstrm);
             }catch(Exception ex){
                 _liveWc = false;
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_WS_SEND_SERVICE);
                 return _liveWc;
             } 
         }
@@ -366,7 +390,7 @@ namespace Tarantula.Networking{
                 return  await _guc.Send(mex);
             }catch(Exception ex){
                 _liveUc = false;
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_SEND_UDP);
                 return _liveUc;
             }
         }
@@ -375,13 +399,12 @@ namespace Tarantula.Networking{
                 //do receive loop
                 while(_liveUc){
                     string msg = await _guc.Receive();
-                    //Debug.Log(msg);
                     ParseInboundMessage(msg);
                 }    
                 return false;
             }catch(Exception ex){
                 _liveUc = false;
-                OnException?.Invoke(ex,10);
+                OnException?.Invoke(ex,"",ErrorCode.EC_UDP_RECEIVE);
                 return _liveUc;
             }   
         }
@@ -406,7 +429,7 @@ namespace Tarantula.Networking{
                 online = false;
                 return suc;
             }catch(Exception ex){
-                OnException?.Invoke(ex,0);
+                OnException?.Invoke(ex,"",ErrorCode.EC_CLOSE);
                 online = false;
                 return false;
             }
