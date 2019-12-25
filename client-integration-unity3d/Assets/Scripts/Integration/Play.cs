@@ -37,7 +37,7 @@ public class Play : MonoBehaviour{
     
     void Update(){
         if(matched){  
-            SceneManager.LoadScene("Simulator");
+            SceneManager.LoadScene("Board");
         }             
     }
      void OnDestroy(){

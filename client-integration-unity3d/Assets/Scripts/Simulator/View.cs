@@ -22,11 +22,11 @@ public class View : MonoBehaviour{
     public void OnBoard(JArray robotList){
         Vector3  v = new Vector3();
         v.x = Screen.width/2;
-        v.y = 100;
+        v.y = Screen.width/2;
         _OnView((string)robotList[0].SelectToken("questId"),v,blueSpin);
         Vector3  v1 = new Vector3();
         v1.x = Screen.width/2;
-        v1.y = Screen.height-100;
+        v1.y = Screen.height/2;
         _OnView((string)robotList[1].SelectToken("questId"),v1,redSpin);
     }
     public void OnMove(string questId,Vector3 dest,float speed){
@@ -50,8 +50,8 @@ public class View : MonoBehaviour{
     }
     private void _OnMove(string questId,Vector3 v,float speed){
         GameObject mg = GameObject.Find("/View/"+questId);
-        if(mg!=null){
-            Spin spin = mg.GetComponent<Spin>();    
+        if(mg!=null&&mg.tag=="robot"){
+            Movement spin = mg.GetComponent<Movement>();    
             spin.OnMove(v,speed);
         }
         else{
@@ -60,7 +60,7 @@ public class View : MonoBehaviour{
     }
     private void _OnView(string name,Vector3 v,GameObject src){
         Vector3 vc = Camera.main.ScreenToWorldPoint(v);
-        vc.z = 0;
+        //vc.z = 0;
         GameObject clone = Instantiate(src,vc, Quaternion.identity,transform);
         clone.name = name;
     }
