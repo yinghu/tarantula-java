@@ -4,19 +4,23 @@ import com.tarantula.*;
 import com.tarantula.Response;
 import com.tarantula.platform.*;
 
+import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.*;
 /**
  * Developer: YINGHU LU
- * Date: updated 9/8/2019.
+ * Date: updated 12/25/2019.
  */
 public class PresenceApplication extends TarantulaApplicationHeader {
 
-
+    private RingBuffer<Connection> cBuffer;
+    private DeploymentServiceProvider deploymentServiceProvider;
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
+        this.cBuffer = new RingBuffer<>(new Connection[5]);
+        deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        deploymentServiceProvider.registerOnConnectionListener(this);
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
             Presence presence = this.context.presence(t.owner());
             OnBalance ob = (OnBalance)t;
@@ -37,10 +41,11 @@ public class PresenceApplication extends TarantulaApplicationHeader {
                 session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
          }
         else if(session.action().equals("onTicket")){
-            //request new ticket
+            //request new ticket and connection
             PresenceContext ptc = new PresenceContext(session.action());
             ptc.presence = new OnSessionTrack(session.systemId(),session.stub());
             ptc.presence.ticket(this.context.validator().ticket(session.systemId(),session.stub()));
+            ptc.connection = cBuffer.pop();
             session.write(this.builder.create().toJson(ptc).getBytes(),this.descriptor.responseLabel());
         }
 
@@ -84,5 +89,38 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes(),this.descriptor.responseLabel());
         }
 
+    }
+    @Override
+    public void onState(Connection c) {
+        if(c.type().equals(Connection.WEB_SOCKET)){
+            this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on presence service application",OnLog.WARN);
+            onWebSocket(c);
+        }
+    }
+    private void onWebSocket(Connection c) {
+        if(!c.disabled()){
+            if(!cBuffer.push(c)){
+                cBuffer.reset(((ca,limit)->{
+                    Connection[] cn = new Connection[ca.length*2];
+                    for(int i=0;i<limit;i++){
+                        cn[i]=ca[i];
+                    }
+                    cn[limit]=c;
+                    return cn;
+                }));
+            }
+        }
+        else{
+            cBuffer.reset((ca,limit)->{
+                Connection[] cn = new Connection[ca.length];
+                int r=0;
+                for(int i=0;i<limit;i++){
+                    if(!(ca[i].serverId().equals(c.serverId()))){
+                        cn[r++]=ca[i];
+                    }
+                }
+                return cn;
+            });
+        }
     }
 }

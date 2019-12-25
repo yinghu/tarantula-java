@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Updated 8/27/2019
+ * Updated 12/25/2019
  */
 public class UserManagementApplication extends TarantulaApplicationHeader{
 
@@ -51,8 +51,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             createLogin(onAccess, rootId,"root");
         }
         this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ON_ACCESS_CID,(a)->{
-            //this.context.log(a.distributionKey(),OnLog.INFO);
-            //this.context.log(a.toString(),OnLog.INFO);
             createLogin((OnAccess)a,a.distributionKey(),role);
         });
         this.context.log("User management application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
@@ -63,26 +61,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         if(session.action().equals("onLogin")){
             OnSession access = this.login(session.systemId(),acc.property("password"),session);
             onSession(access,session);
-            /**
-            if(access.successful()){
-                PresenceContext ptx = new PresenceContext("onLogin");
-                ptx.presence= access;
-                List<Lobby> lobbyList = new ArrayList();
-                lobbyList.add(this.context.lobby(this.lobbyId));
-                ptx.lobbyList=(lobbyList);
-                session.write(this.builder.create().toJson(ptx).getBytes(),this.descriptor.responseLabel());
-                session.systemId(access.systemId());
-                session.stub(access.stub());
-                session.ticket(access.ticket());
-                OnStatistics delta = this.context.statistics().value("Login",1);
-                delta.xpDelta(1);
-                delta.owner(session.systemId());
-                delta.onEntry("LoginCount",1);
-                this.postOffice.onTag(Level.LEVEL_TAG).send(delta.owner(),delta);
-            }
-            else{
-                session.write(this.builder.create().toJson(new ResponseHeader("login", access.message(), false)).getBytes(),this.descriptor.responseLabel());
-            }**/
         }
         else if(session.action().equals("onTicket")){
             if(this.context.validator().validateTicket(session.systemId(),acc.stub(),acc.accessKey())){
@@ -164,8 +142,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             access.routingNumber(session.routingNumber());
             _onSession=this.context.validator().validatePassword(access,password);
             _onSession.systemId(systemId);
-            //ResponseHeader resp = new ResponseHeader(session.action(), "User [" + access.login() + "] signed in",true);
-            //postOffice.onTopic().send("presence/notice?login",this.builder.create().toJson(resp).getBytes());
         }
         return _onSession;
     }

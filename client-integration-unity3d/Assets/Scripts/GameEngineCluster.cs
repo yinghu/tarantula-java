@@ -119,6 +119,21 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
+       public  async Task<bool> Ticket(MonoBehaviour caller){
+            try{
+                Header[] headers = new Header[]{
+                    new Header("Tarantula-tag","presence/lobby"),
+                    new Header("Tarantula-token",presence.token),
+                    new Header("Tarantula-action","onTicket")
+                };
+                string jstr = await _ghc.GetJson(caller,"/service/action",headers);
+                Debug.Log(jstr);
+                return true;           
+            }catch(Exception ex){
+                OnException?.Invoke(ex,"",ErrorCode.EC_LOGOUT);
+                return false;
+            }
+        }
        public  async Task<bool> Logout(MonoBehaviour caller){
             try{
                 Header[] headers = new Header[]{
@@ -335,7 +350,7 @@ namespace Tarantula.Networking{
                 return false;
             }catch(Exception ex){
                 _liveWc = false;
-                OnException?.Invoke(ex,"",ErrorCode.EC_WS_RECEIVE);
+                OnException?.Invoke(ex,"error on ws receive",ErrorCode.EC_WS_RECEIVE);
                 return _liveWc;
             }   
         }
@@ -356,7 +371,7 @@ namespace Tarantula.Networking{
                 return await _gwc.Send(jstrm);
             }catch(Exception ex){
                 _liveWc = false;
-                OnException?.Invoke(ex,"",ErrorCode.EC_WS_SEND_INSTANCE);
+                OnException?.Invoke(ex,"error on ws send",ErrorCode.EC_WS_SEND_INSTANCE);
                 return _liveWc;
             } 
         }
