@@ -97,37 +97,6 @@ public class Simulator : MonoBehaviour
              //Debug.Log("SEND ["+suc+"]");
         }   
     }
-    /**
-    void Update(){
-        if (Input.GetMouseButtonDown(0)) {
-            RaycastHit hit;
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit)) {
-                Debug.Log(transform.position+"<><><>"+hit.point+"<><><>"+Input.mousePosition);
-                Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.white);
-                target = hit.point;
-                float dx = (hit.point.x - transform.position.x);
-                float dz = (hit.point.z - transform.position.z);
-                float ab = Math.Abs(dx)-Math.Abs(dz);
-                if(ab>=0){//x measure 
-                    float _dz = STEP*Math.Abs(dz/dx);
-                    dx = dx>0?(STEP):(-1*(STEP));
-                    dz = dz>0?(_dz):(_dz*(-1f)); 
-                }
-                else{//z mesure
-                    float _dx = 0.5f*Math.Abs(dx/dz);
-                    dz = dz>0?(STEP):(-1*(STEP));
-                    dx = dx>0?(_dx):(_dx*(-1f));
-                }
-                move = new Vector3(dx*speed,0,dz*speed);
-                move = Vector3.ClampMagnitude(move,speed);
-                move.y = -9.8f;
-                move *= Time.deltaTime;
-                move = transform.TransformDirection(move);
-                xMoving = true;
-                zMoving = true;
-            }
-        }
-    }**/
     public void OnQuest(string json){
         //Debug.Log(json);
         JObject jo = JObject.Parse(json);

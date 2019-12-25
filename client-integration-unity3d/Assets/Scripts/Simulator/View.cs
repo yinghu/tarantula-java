@@ -6,8 +6,7 @@ using Newtonsoft.Json.Linq;
 using Tarantula.Networking;
 public class View : MonoBehaviour{
     
-    public GameObject blueSpin;
-    public GameObject redSpin;
+    public GameObject[] players;
     public GameObject[] shots;
     
     void Start()
@@ -23,11 +22,11 @@ public class View : MonoBehaviour{
         Vector3  v = new Vector3();
         v.x = Screen.width/2;
         v.y = Screen.width/2;
-        _OnView((string)robotList[0].SelectToken("questId"),v,blueSpin);
+        _OnView((string)robotList[0].SelectToken("questId"),v,players[0]);
         Vector3  v1 = new Vector3();
         v1.x = Screen.width/2;
         v1.y = Screen.height/2;
-        _OnView((string)robotList[1].SelectToken("questId"),v1,redSpin);
+        _OnView((string)robotList[1].SelectToken("questId"),v1,players[1]);
     }
     public void OnMove(string questId,Vector3 dest,float speed){
         _OnMove(questId,dest,speed);

@@ -1524,9 +1524,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4a3cfac4df457546bab6a7685e4ef37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blueSpin: {fileID: 6601083912958975550, guid: 919c67a0fc8f1364fb7be896ba3b049d,
-    type: 3}
-  redSpin: {fileID: 1243568577324900414, guid: 35519f18c8689a9439d0e6ee52830ed0, type: 3}
+  players:
+  - {fileID: 6601083912958975550, guid: 919c67a0fc8f1364fb7be896ba3b049d, type: 3}
+  - {fileID: 1243568577324900414, guid: 35519f18c8689a9439d0e6ee52830ed0, type: 3}
   shots:
   - {fileID: 1442598337655223697, guid: 6fa776f63009a284da0716c50362bf97, type: 3}
   - {fileID: 8005356832994574734, guid: 189610959a519bf4aa62665dcfc0b4e8, type: 3}
@@ -2219,7 +2219,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1686091771}
   m_LocalRotation: {x: 0.29480606, y: 0.0006674486, z: -0.0055828914, w: 0.9555406}
-  m_LocalPosition: {x: 0.02, y: 6.79, z: 4.63}
+  m_LocalPosition: {x: 1, y: 7.6, z: 2.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
