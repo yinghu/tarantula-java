@@ -51,17 +51,22 @@ public class View : MonoBehaviour{
     private void _OnMove(string questId,Vector3 v,float speed){
         GameObject mg = GameObject.Find("/View/"+questId);
         if(mg!=null&&mg.tag=="robot"){
-            Movement spin = mg.GetComponent<Movement>();    
-            spin.OnMove(v,speed);
+            Movement mov = mg.GetComponent<Movement>();    
+            mov.OnMove(v,speed);
         }
         else{
             Debug.Log("missed game object->"+questId);
         }
     }
     private void _OnView(string name,Vector3 v,GameObject src){
-        Vector3 vc = Camera.main.ScreenToWorldPoint(v);
-        //vc.z = 0;
-        GameObject clone = Instantiate(src,vc, Quaternion.identity,transform);
-        clone.name = name;
+        RaycastHit hit;
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(v),out hit)) {
+            Vector3 vc = hit.point;
+            vc.y = 9.8f;
+            GameObject clone = Instantiate(src,vc, Quaternion.identity,transform);
+            clone.name = name;
+            Setup _setup = clone.GetComponent<Setup>();
+            _setup._Setup();
+        }
     }
 }

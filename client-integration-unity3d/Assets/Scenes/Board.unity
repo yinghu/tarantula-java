@@ -1282,10 +1282,10 @@ MeshCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 910001071}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Convex: 1
+  m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &910001074
@@ -1528,16 +1528,16 @@ MonoBehaviour:
     type: 3}
   redSpin: {fileID: 1243568577324900414, guid: 35519f18c8689a9439d0e6ee52830ed0, type: 3}
   shots:
+  - {fileID: 1442598337655223697, guid: 6fa776f63009a284da0716c50362bf97, type: 3}
   - {fileID: 8005356832994574734, guid: 189610959a519bf4aa62665dcfc0b4e8, type: 3}
   - {fileID: 3835077691192316855, guid: 6ffd060039a704449be93cde5484f408, type: 3}
   - {fileID: 6616648756758486581, guid: f973b5e0aefd919429db9ab081f9b20f, type: 3}
-  - {fileID: 8005356832994574734, guid: 189610959a519bf4aa62665dcfc0b4e8, type: 3}
-  - {fileID: 8005356832994574734, guid: 189610959a519bf4aa62665dcfc0b4e8, type: 3}
-  - {fileID: 3835077691192316855, guid: 6ffd060039a704449be93cde5484f408, type: 3}
-  - {fileID: 6616648756758486581, guid: f973b5e0aefd919429db9ab081f9b20f, type: 3}
-  - {fileID: 8005356832994574734, guid: 189610959a519bf4aa62665dcfc0b4e8, type: 3}
-  - {fileID: 3835077691192316855, guid: 6ffd060039a704449be93cde5484f408, type: 3}
-  - {fileID: 6616648756758486581, guid: f973b5e0aefd919429db9ab081f9b20f, type: 3}
+  - {fileID: 5581959996621793718, guid: e5d43b29a47f2674eba0245331c5a7b0, type: 3}
+  - {fileID: 5539277378492243284, guid: a8352107fa626e1438674c9db8531275, type: 3}
+  - {fileID: 5096356514168426279, guid: 68376f4ca8dd1b840bac20084b25f168, type: 3}
+  - {fileID: 9153621026546762739, guid: c8380b8cbab52944a85f39a53235b7c1, type: 3}
+  - {fileID: 2628937954390023409, guid: e983ec6e3db67b343bd294e1fdface4c, type: 3}
+  - {fileID: 6427778122782407249, guid: f1b8206ff63fcfe46950ac80ce52f4cd, type: 3}
 --- !u!1 &1349240350
 GameObject:
   m_ObjectHideFlags: 0
