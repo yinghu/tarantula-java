@@ -59,7 +59,7 @@ namespace Tarantula.Networking{
         private Dictionary<string,Lobby> _lobbyList;
         private List<Descriptor> _gameList;
         private static JsonSerializerSettings JSON_SETTING = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
-        
+        private Queue<string> sQueue = new Queue<string>();
         public Presence presence {set;get;}
         public bool online {set;get; }
         public Profile profile {set;get;}
@@ -121,6 +121,9 @@ namespace Tarantula.Networking{
         }
        public  async Task<bool> Ticket(MonoBehaviour caller){
             try{
+                if(_liveWc){
+                    return false;
+                }
                 Header[] headers = new Header[]{
                     new Header("Tarantula-tag","presence/lobby"),
                     new Header("Tarantula-token",presence.token),
@@ -128,7 +131,7 @@ namespace Tarantula.Networking{
                 };
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
                 Debug.Log(jstr);
-                return true;           
+                return await ParseTicket(jstr);            
             }catch(Exception ex){
                 OnException?.Invoke(ex,"",ErrorCode.EC_LOGOUT);
                 return false;
@@ -344,6 +347,10 @@ namespace Tarantula.Networking{
             try{
                 //do receive loop
                 while(_liveWc){
+                    while(sQueue.Count>0){
+                        string _pending = sQueue.Dequeue();
+                        await _gwc.Send(_pending);
+                    }
                     string msg = await _gwc.Receive();
                     ParseInboundMessage(msg);
                 }
@@ -354,7 +361,7 @@ namespace Tarantula.Networking{
                 return _liveWc;
             }   
         }
-        public async Task<bool> SendOnInstance(string applicationId,string instanceId,Payload payload,bool oneWay){
+        public async Task<bool> SendOnInstance(string applicationId,string instanceId,Payload payload,bool oneWay,bool streaming){
             try{
                 //do receive loop
                 if(!_liveWc){
@@ -368,6 +375,10 @@ namespace Tarantula.Networking{
                 strm.oneWay = oneWay;
                 strm.data = payload;
                 string jstrm = JsonConvert.SerializeObject(strm,JSON_SETTING);
+                if(streaming){
+                    sQueue.Enqueue(jstrm);
+                    return true;
+                }
                 return await _gwc.Send(jstrm);
             }catch(Exception ex){
                 _liveWc = false;
@@ -547,6 +558,28 @@ namespace Tarantula.Networking{
                 return suc;
             }
             return true;
+        }
+        private async Task<bool> ParseTicket(string json){
+            JObject jo = JObject.Parse(json);
+            bool suc = (bool)jo.SelectToken("successful");
+            if(!suc){
+                message = (string)jo.SelectToken("message");
+                return suc;
+            }
+            JToken tk = jo.SelectToken("presence");
+            Presence _presence = tk.ToObject<Presence>();
+            _presence.login = presence.login;
+            if(jo.ContainsKey("connection")){//login sesseion websocket
+                Connection connection = jo.SelectToken("connection").ToObject<Connection>();
+                _gwc = new GecWebSocket(connection,_presence);
+                suc = await _gwc.Connect();
+                _liveWc = suc;
+                OnWebSocket?.Invoke();
+            }
+            else{
+                suc = false; //retry on caller again
+            }
+            return suc;
         }
         private async Task<bool> ParseLogin(string json){
             JObject jo = JObject.Parse(json);

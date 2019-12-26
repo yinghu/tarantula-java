@@ -24,6 +24,13 @@ public class Simulator : MonoBehaviour
         GameObject ap = GameObject.Find("/UI/Arena"); 
         TextMeshProUGUI azt = ap.GetComponentInChildren<TextMeshProUGUI>();
         azt.SetText(INS.arena);
+        Integration.OnException += (ex,msg,code)=>{
+            Debug.Log(ex);
+            Debug.Log(msg);
+            Debug.Log(code);
+            azt.SetText(msg);
+            //INS.OnTicket(this);    
+        };
         //setup robot
         view.OnBoard(INS.robotList);
     }
@@ -117,24 +124,24 @@ public class Simulator : MonoBehaviour
             SceneManager.LoadScene("Integration");
         }     
     }
-    public  void OnSeat1(){
+    public  async void OnSeat1(){
         Payload payload = new Payload();
         payload.headers = new Header[]{new Header("accessId","a"),new Header("c","5")};
-        INS.OnQuest(payload);       
+        await INS.OnQuest(payload);       
     }
-    public  void OnSeat2(){
+    public  async void OnSeat2(){
         Payload payload = new Payload();
         payload.headers = new Header[]{new Header("accessId","b"),new Header("f","10")};
-        INS.OnQuest(payload);
+        await INS.OnQuest(payload);
     }
-    public  void OnSeat3(){
+    public  async void OnSeat3(){
         Payload payload = new Payload();
         payload.headers = new Header[]{new Header("accessId","c"),new Header("f","2")};
-        INS.OnQuest(payload);
+        await INS.OnQuest(payload);
     }
-    public  void OnSeat4(){
+    public async  void OnSeat4(){
         Payload payload = new Payload();
         payload.headers = new Header[]{new Header("accessId","d")};
-        INS.OnQuest(payload);
+        await INS.OnQuest(payload);
     }
 }

@@ -27,24 +27,22 @@ public class Integration : ScriptableObject{
     public string arena{get;set;}
     public JArray robotList{get;set;}
     public static event InboundMessageHandler OnMessage;
+    public static event ExceptionHandler OnException;
     
-    private Queue<Payload> oQueue = new Queue<Payload>();
     
     [RuntimeInitializeOnLoadMethod]
     private static void _Init(){
         Debug.Log("Initializing Integration on ["+SystemInfo.deviceUniqueIdentifier+"]");
         instance = Resources.Load<Integration>("Integration");
         gec = new GameEngineCluster(_HOST);
-         gec.OnException += (ex,msg,code)=>{
-             if(code == ErrorCode.EC_WS_RECEIVE){
-                Debug.Log(ex.Message+"<<CODE>>"+code);
-             }
-         };
-         gec.OnWebSocket += _OnWebSocketMessage;
-         gec.OnUDPSocket += _OnUDPSocketMessage;
-         gec.OnInboundMessage += (msg)=>{
+        gec.OnException += (ex,msg,code)=>{
+             OnException?.Invoke(ex,msg,code);
+        };
+        gec.OnWebSocket += _OnWebSocketMessage;
+        gec.OnUDPSocket += _OnUDPSocketMessage;
+        gec.OnInboundMessage += (msg)=>{
             OnMessage?.Invoke(msg);
-         };
+        };
     }
 	public static Integration Instance{
 		get{return instance;}
@@ -79,7 +77,7 @@ public class Integration : ScriptableObject{
         om.payload = payload;
         bool suc = await gec.SendOnUDP(om);
         if(!suc){
-            suc = await gec.SendOnInstance(game.applicationId,game.instanceId,payload,true);
+            suc = await gec.SendOnInstance(game.applicationId,game.instanceId,payload,true,true);
         }
         return suc;
     }
@@ -91,21 +89,10 @@ public class Integration : ScriptableObject{
         om.payload = payload;
         return await gec.SendOnUDP(om);
     }
-    public void OnQuest(Payload payload){
-        oQueue.Enqueue(payload);
-    }
-    public async Task<bool> OnQuest(){
-        while(online){
-            if(oQueue.Count>0){
-                Payload _pending = oQueue.Dequeue();
-                _pending.command = "onQuest";
-                await gec.SendOnInstance(game.applicationId,game.instanceId,_pending,true);
-            }else{
-                await Task.Delay(100);
-            }
-        }
-        Debug.Log("Exit On Quest");
-        return true;
+   
+    public async Task<bool> OnQuest(Payload payload){   
+        payload.command = "onQuest";
+        return await gec.SendOnInstance(game.applicationId,game.instanceId,payload,true,true);
     }
     public async Task<bool> OnJoin(MonoBehaviour caller,string gname){
         bool suc = await gec.OnLobby(caller,"robotquest");
@@ -139,6 +126,9 @@ public class Integration : ScriptableObject{
     }
     public async Task<bool> OnExit(MonoBehaviour caller){
         return await gec.Logout(caller);
+    }
+    public async Task<bool> OnTicket(MonoBehaviour caller){
+        return await gec.Ticket(caller);
     }
     public async Task<bool> OnDevice(MonoBehaviour caller){
         Device device = new Device();

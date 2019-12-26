@@ -62,12 +62,12 @@ public class Spin : MonoBehaviour
     }
     
     
-    private  void OnTriggerEnter(Collider hit){
+    private  async void OnTriggerEnter(Collider hit){
         if(hit.gameObject.tag =="gig" && gameObject.tag == "robot"){
             //Debug.Log("KILLING IT->" + hit.gameObject.name+"/"+hit.gameObject.tag);   
             Payload payload = new Payload();
             payload.headers = new Header[]{new Header("accessId","e"),new Header("accessKey",hit.gameObject.name)};
-            INS.OnQuest(payload);
+            await INS.OnQuest(payload);
         }
     }
     private void OnTriggerStay(Collider hit){

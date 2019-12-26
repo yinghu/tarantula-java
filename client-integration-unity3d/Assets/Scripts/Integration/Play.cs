@@ -28,7 +28,6 @@ public class Play : MonoBehaviour{
             await INS.OnIndex(this);
             await INS.OnDevice(this); 
             pending.SetText("CLICK TO PLAY ["+Integration.deviceId+"]");
-            await INS.OnQuest();
         }
         else{
             pending.SetText("PLAY AGAIN");
