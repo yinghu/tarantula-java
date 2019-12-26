@@ -357,7 +357,7 @@ namespace Tarantula.Networking{
                 return false;
             }catch(Exception ex){
                 _liveWc = false;
-                OnException?.Invoke(ex,"error on ws receive",ErrorCode.EC_WS_RECEIVE);
+                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_WS_RECEIVE);
                 return _liveWc;
             }   
         }
