@@ -344,6 +344,7 @@ namespace Tarantula.Networking{
             }        
         }
         public async Task<bool> OnWebSocketMessage(){
+            string msg ="{}";
             try{
                 //do receive loop
                 while(_liveWc){
@@ -351,17 +352,17 @@ namespace Tarantula.Networking{
                         string _pending = sQueue.Dequeue();
                         await _gwc.Send(_pending);
                     }
-                    string msg = await _gwc.Receive();
+                    msg = await _gwc.Receive();
                     ParseInboundMessage(msg);
                 }
                 return false;
             }catch(Exception ex){
                 _liveWc = false;
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_WS_RECEIVE);
+                OnException?.Invoke(ex,msg,ErrorCode.EC_WS_RECEIVE);
                 return _liveWc;
             }   
         }
-        public async Task<bool> SendOnInstance(string applicationId,string instanceId,Payload payload,bool oneWay,bool streaming){
+        public async Task<bool> SendOnInstance(string applicationId,string instanceId,Payload payload,bool oneWay){
             try{
                 //do receive loop
                 if(!_liveWc){
@@ -375,7 +376,7 @@ namespace Tarantula.Networking{
                 strm.oneWay = oneWay;
                 strm.data = payload;
                 string jstrm = JsonConvert.SerializeObject(strm,JSON_SETTING);
-                if(streaming){
+                if(!_liveUc){
                     sQueue.Enqueue(jstrm);
                     return true;
                 }
@@ -717,13 +718,19 @@ namespace Tarantula.Networking{
             return true;
         }
         public async Task<string> Receive(){
-            ArraySegment<Byte> rbuff = new ArraySegment<Byte>(new byte[4096]);
-            WebSocketReceiveResult wrs = await _websocket.ReceiveAsync(rbuff,CancellationToken.None);
-            //check erro here 
-            if(wrs.CloseStatus!=null){
-                return "error{'successful':false,'message':'"+wrs.CloseStatus+"'}";
-            }    
-            return Encoding.UTF8.GetString(rbuff.Array,0,wrs.Count);
+            StringBuilder sb = new StringBuilder();
+            WebSocketReceiveResult wrs;
+            do{
+                ArraySegment<Byte> rbuff = new ArraySegment<Byte>(new byte[1024]);
+                wrs = await _websocket.ReceiveAsync(rbuff,CancellationToken.None);
+                //check erro here 
+                if(wrs.CloseStatus!=null){
+                    sb.Append("error{'successful':false,'message':'"+wrs.CloseStatus+"'}");
+                    break;
+                }
+                sb.Append(Encoding.UTF8.GetString(rbuff.Array,0,wrs.Count));
+            }while(!wrs.EndOfMessage);    
+            return sb.ToString();
         }
    } 
    public class GecHttpClient{

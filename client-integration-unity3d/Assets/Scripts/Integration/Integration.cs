@@ -77,7 +77,7 @@ public class Integration : ScriptableObject{
         om.payload = payload;
         bool suc = await gec.SendOnUDP(om);
         if(!suc){
-            suc = await gec.SendOnInstance(game.applicationId,game.instanceId,payload,true,true);
+            suc = await gec.SendOnInstance(game.applicationId,game.instanceId,payload,true);
         }
         return suc;
     }
@@ -92,7 +92,7 @@ public class Integration : ScriptableObject{
    
     public async Task<bool> OnQuest(Payload payload){   
         payload.command = "onQuest";
-        return await gec.SendOnInstance(game.applicationId,game.instanceId,payload,true,true);
+        return await gec.SendOnInstance(game.applicationId,game.instanceId,payload,true);
     }
     public async Task<bool> OnJoin(MonoBehaviour caller,string gname){
         bool suc = await gec.OnLobby(caller,"robotquest");
