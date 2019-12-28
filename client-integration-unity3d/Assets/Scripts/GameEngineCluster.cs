@@ -697,7 +697,8 @@ namespace Tarantula.Networking{
    public class GecWebSocket{
         private ClientWebSocket _websocket;
         private string _url;
-        
+        private StringBuilder sb = new StringBuilder(4096);
+        private byte[] data = new byte[1024];
         public GecWebSocket(Connection connection,Presence presence){
             _url = connection.protocol+"://"+connection.host+":"+connection.port+"/"+connection.path+"?accessKey="+presence.ticket+"&stub="+presence.stub+"&systemId="+presence.login;
             _websocket = new ClientWebSocket();
@@ -718,10 +719,10 @@ namespace Tarantula.Networking{
             return true;
         }
         public async Task<string> Receive(){
-            StringBuilder sb = new StringBuilder();
+            sb.Clear();
             WebSocketReceiveResult wrs;
             do{
-                ArraySegment<Byte> rbuff = new ArraySegment<Byte>(new byte[1024]);
+                ArraySegment<Byte> rbuff = new ArraySegment<Byte>(data);  
                 wrs = await _websocket.ReceiveAsync(rbuff,CancellationToken.None);
                 //check erro here 
                 if(wrs.CloseStatus!=null){

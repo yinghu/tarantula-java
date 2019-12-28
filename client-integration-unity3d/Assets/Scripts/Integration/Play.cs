@@ -80,7 +80,7 @@ public class Play : MonoBehaviour{
             joined = await INS.OnJoin(this,"RobotQuestPVE");
             if(joined){
                 if(INS.state==2){
-                    //do recovery join         
+                    //do recovery join   
                 }
                 pending.SetText("PENDING ON ["+INS.arenaZone+"]");
             }

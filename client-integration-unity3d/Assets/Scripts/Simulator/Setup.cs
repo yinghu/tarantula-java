@@ -7,12 +7,10 @@ public class Setup : MonoBehaviour{
     private Rigidbody _rig;
     
     void Start() {
-        //_rig = gameObject.GetComponent<Rigidbody>();   
-        //Debug.Log("starting setup object");
+    
     }
 
-    void Update()
-    {
+    void Update(){
         
     }
     public void _Setup(){

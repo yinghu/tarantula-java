@@ -2,17 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
-public class Movement : MonoBehaviour
-{
+//Move forward the Character Controller to Mouse Click Point
+public class Movement : MonoBehaviour{
     private float speed = 5.0f;
     private Vector3 target;
     private float targetBuffer = 1.5f;
     private float rotationSpeed = 15.0f;
     private float deceleration = 10.0f;
     private CharacterController _controller;
-    
-   
+       
     void Start(){
         _controller = GetComponent<CharacterController>();
         target = Vector3.one;
@@ -47,7 +45,5 @@ public class Movement : MonoBehaviour
             }
             _controller.Move(movement);
         }
-    }
-    
-
+    } 
 }

@@ -9,13 +9,11 @@ public class View : MonoBehaviour{
     public GameObject[] players;
     public GameObject[] shots;
     
-    void Start()
-    {
+    void Start(){
         
     }
 
-    void Update()
-    {
+    void Update(){
         
     }
     public void OnBoard(JArray robotList){
