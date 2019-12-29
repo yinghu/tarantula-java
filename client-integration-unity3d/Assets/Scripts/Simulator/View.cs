@@ -33,14 +33,11 @@ public class View : MonoBehaviour{
        GameObject mg = GameObject.Find("/View/"+questId);
        Destroy(mg);    
     }
-    public void OnMove(Payload pv){
-        Vector3 mp = new Vector3();
-        mp.x = float.Parse(pv.headers[0].value)*Screen.width;
-        mp.y = float.Parse(pv.headers[1].value)*Screen.height;
-        mp.z = float.Parse(pv.headers[2].value);
-        float speed = float.Parse(pv.headers[3].value);
-        string questId = pv.headers[4].value;
-        _OnMove(questId,mp,speed);
+    public void OnShoot(string questId,Vector3 dest,float speed){
+        Debug.Log("OnPush->"+questId);
+        //GameObject mg = GameObject.Find("/View/"+questId);
+        //Setup setup = mg.GetComponent<Setup>();
+        //setup.OnPush();
     }
     public void OnView(string name,Vector3 v,int ix){
         _OnView(name,v,shots[ix]);
@@ -52,7 +49,7 @@ public class View : MonoBehaviour{
             mov.OnMove(v,speed);
         }
         else{
-            //Debug.Log("missed game object->"+questId);
+            Debug.Log("missed game object->"+questId);
         }
     }
     private void _OnView(string name,Vector3 v,GameObject src){

@@ -40,7 +40,13 @@ public class Simulator : MonoBehaviour
                 //Debug.Log(msg.payload);
                 JObject jo = JObject.Parse(msg.payload);
                 Payload pv = jo.ToObject<Payload>();
-                view.OnMove(pv);
+                Vector3 mp = new Vector3();
+                mp.x = float.Parse(pv.headers[0].value)*Screen.width;
+                mp.y = float.Parse(pv.headers[1].value)*Screen.height;
+                mp.z = float.Parse(pv.headers[2].value);
+                float speed = float.Parse(pv.headers[3].value);
+                string questId = pv.headers[4].value;
+                view.OnMove(questId,mp,speed);
             }
             else if(msg.query!=null&&msg.query.Equals("onTimer")){
                 JObject jo = JObject.Parse(msg.payload);
@@ -58,6 +64,17 @@ public class Simulator : MonoBehaviour
                 float speed = (float)jo.SelectToken("f");
                 string questId = (string)jo.SelectToken("n");
                 view.OnMove(questId,pv,speed);
+            }
+            else if(msg.query!=null&&msg.query.Equals("onShoot")){
+                Debug.Log(msg.payload);
+                JObject jo = JObject.Parse(msg.payload);
+                //Vector3 pv = new Vector3();
+                //pv.x=(float)jo.SelectToken("x")*Screen.width;
+                //pv.y=(float)jo.SelectToken("y")*Screen.height;
+                //pv.z=0;
+                //float speed = (float)jo.SelectToken("f");
+                //string questId = (string)jo.SelectToken("n");
+                //view.OnShoot(questId,pv,speed);
             }
             else if(msg.query!=null&&msg.query.Equals("onRemove")){
                 //Debug.Log(msg.payload);
@@ -131,7 +148,7 @@ public class Simulator : MonoBehaviour
     }
     public  async void OnSeat2(){
         Payload payload = new Payload();
-        payload.headers = new Header[]{new Header("accessId","b"),new Header("f","10")};
+        payload.headers = new Header[]{new Header("accessId","b"),new Header("c","5")};
         await INS.OnQuest(payload);
     }
     public  async void OnSeat3(){

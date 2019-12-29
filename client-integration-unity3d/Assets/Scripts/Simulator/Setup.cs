@@ -5,17 +5,19 @@ using UnityEngine;
 public class Setup : MonoBehaviour{
     
     private Rigidbody _rig;
-    
     void Start() {
     
     }
 
     void Update(){
-        
+            
     }
     public void _Setup(){
         Debug.Log("Setup ["+gameObject.name+"]");
         _rig = gameObject.GetComponent<Rigidbody>();
+    }
+    public void OnPush(){
+        Debug.Log("Push game object");
     }
     private  void OnTriggerEnter(Collider hit){
         if(gameObject.tag == "gig" && hit.gameObject.tag == "robot"){
