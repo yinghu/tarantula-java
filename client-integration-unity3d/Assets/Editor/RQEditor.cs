@@ -69,16 +69,19 @@ namespace Tarantula.Editor{
                 p.pending = EditorGUILayout.Toggle(p.update.name,p.pending);
             }
             if(GUILayout.Button("UPDATE")){
-                header = "Updating ...";
-                Sync(JsonConvert.SerializeObject(plist[0].update,JSON_SETTING));
-                Sync(JsonConvert.SerializeObject(plist[1].update,JSON_SETTING));
+                foreach(PendingUpdate u in plist){
+                    if(u.pending){
+                        header = "Updating ["+u.update.name+"] ....";
+                        Sync(JsonConvert.SerializeObject(u.update,JSON_SETTING));
+                    }
+                }
             }  
         }
         private bool Sync(string json){
             Header[] headers = new Header[]{
                 new Header("Tarantula-tag","robot-quest/admin"),
                 new Header("Tarantula-token",presence.token),
-                new Header("Tarantula-action","onLogin")
+                new Header("Tarantula-action","on"+configs)
             };
             string jstr =  PostJson("/service/action",headers,json);
             Debug.Log(jstr);
