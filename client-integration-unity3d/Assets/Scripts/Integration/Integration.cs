@@ -95,7 +95,7 @@ public class Integration : ScriptableObject{
         return await gec.SendOnInstance(game.applicationId,game.instanceId,payload,true);
     }
     public async Task<bool> OnJoin(MonoBehaviour caller,string gname){
-        bool suc = await gec.OnLobby(caller,"robotquest");
+        bool suc = await gec.OnLobby(caller,"robot-quest");
         if(!suc){
             return suc;
         }
@@ -107,7 +107,7 @@ public class Integration : ScriptableObject{
                 break;
             }
         }
-        return await gec.OnPlay(caller,"robotquest-service/live",game,(jo)=>{
+        return await gec.OnPlay(caller,"robot-quest/live",game,(jo)=>{
             JToken occ = jo.SelectToken("gameObject.occupation");
             seatIndex = (int)occ.SelectToken("seatIndex");
             state = (int)occ.SelectToken("state");

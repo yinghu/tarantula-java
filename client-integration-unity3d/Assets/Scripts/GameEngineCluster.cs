@@ -553,6 +553,7 @@ namespace Tarantula.Networking{
             for(int i=0;i<tk.Count;i++){
                 Lobby lb = tk[i].ToObject<Lobby>();
                 _lobbyList.Add(lb.descriptor.typeId,lb);
+                Debug.Log(lb.descriptor.typeId);
             }
             return true;
         }

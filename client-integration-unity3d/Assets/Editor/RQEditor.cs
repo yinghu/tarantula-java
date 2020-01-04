@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -60,7 +59,7 @@ namespace Tarantula.Editor{
                 }
                 return;
             }
-            header=("Check out to synchronize on ["+platforms+"]");
+            header=("Check out to synchronize ["+configs+"] on ["+platforms+"]");
             configs = (CONFIGS)EditorGUILayout.EnumPopup("Configuration",configs);
             EditorGUILayout.Space();
             if(configs!=lastConfigs){
@@ -78,7 +77,9 @@ namespace Tarantula.Editor{
                 foreach(PendingUpdate u in plist){
                     if(u.pending){
                         header = "Updating ["+u.update.name+"] ....";
-                        Sync(JsonConvert.SerializeObject(u.update,JSON_SETTING));
+                        if(Sync(JsonConvert.SerializeObject(u.update,JSON_SETTING))){
+                            header = "["+u.update.name+"] synchronized on ["+platforms+"]";
+                        }
                     }
                 }
             }  
@@ -90,8 +91,13 @@ namespace Tarantula.Editor{
                 new Header("Tarantula-action","on"+configs)
             };
             string jstr =  PostJson("/service/action",headers,json);
-            Debug.Log(jstr);
-            return true;
+            JObject jo = JObject.Parse(jstr);
+            bool suc = (bool)jo.SelectToken("successful");
+            if(!suc){
+                header = (string)jo.SelectToken("message");
+                return suc;
+            }
+            return suc;
         }
         private bool Login(User u){
             Header[] headers = new Header[]{
