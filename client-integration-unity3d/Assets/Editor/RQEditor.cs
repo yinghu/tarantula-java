@@ -28,16 +28,19 @@ namespace Tarantula.Editor{
         private string login="root";
         private string password="root";
         private PLATFORMS platforms;
+        private CONFIGS lastConfigs;
         private CONFIGS configs;
         private PendingUpdate[] plist;
         
-        [MenuItem ("RQ/UpdateAbilities")] 
+        [MenuItem ("RQ/Configurations")] 
         public static void  ShowWindow () {
             EditorWindow.GetWindow(typeof(RQEditor)).Show();
         }
         void Awake(){
             presence = null;
             plist = new PendingUpdate[0];
+            configs = CONFIGS.Abilities;
+            lastConfigs = CONFIGS.Arenas;
         }
         void OnGUI(){
             EditorGUILayout.Space();
@@ -45,7 +48,6 @@ namespace Tarantula.Editor{
             EditorGUILayout.Space();
             if(presence==null){   
                 platforms = (PLATFORMS)EditorGUILayout.EnumPopup("Platform", platforms);
-                configs = (CONFIGS)EditorGUILayout.EnumPopup("Configuration", configs);
                 EditorGUILayout.Space();
                 login = EditorGUILayout.TextField("User Name : ",login);
                 password = EditorGUILayout.PasswordField("Password : ",password);
@@ -54,17 +56,22 @@ namespace Tarantula.Editor{
                     u.login = login;
                     u.password = password;
                     if(Login(u)){
-                        Object[] melee = Resources.LoadAll(configs.ToString());
-                        plist = new PendingUpdate[melee.Length];
-                        for(int i=0;i<melee.Length;i++){
-                            plist[i] = new PendingUpdate(melee[i]);
-                        }
-                        header = platforms+"/"+configs;
+                        header = platforms.ToString();
                     }    
                 }
                 return;
             }
-            EditorGUILayout.LabelField("Check out to synchronize on ["+platforms+"]", EditorStyles.boldLabel);
+            header=("Check out to synchronize on ["+platforms+"]");
+            configs = (CONFIGS)EditorGUILayout.EnumPopup("Configuration",configs);
+            EditorGUILayout.Space();
+            if(configs!=lastConfigs){
+                Object[] melee = Resources.LoadAll(configs.ToString());
+                plist = new PendingUpdate[melee.Length];
+                for(int i=0;i<melee.Length;i++){
+                    plist[i] = new PendingUpdate(melee[i]);
+                }
+                lastConfigs = configs;
+            }
             foreach(PendingUpdate p in plist){
                 p.pending = EditorGUILayout.Toggle(p.update.name,p.pending);
             }
