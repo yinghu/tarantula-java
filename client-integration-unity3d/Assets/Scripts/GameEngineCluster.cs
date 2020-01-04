@@ -605,7 +605,7 @@ namespace Tarantula.Networking{
             }
             online = suc;
             return suc;
-        }
+       }
        private bool ParseLogout(string json){
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
