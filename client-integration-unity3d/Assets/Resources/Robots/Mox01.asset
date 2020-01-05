@@ -10,8 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 34b322cb63ae7bc4c9d5e02319a4d730, type: 3}
-  m_Name: Robot
+  m_Name: Mox01
   m_EditorClassIdentifier: 
   level: 0
-  viewId: 
-  abilities: []
+  viewId: mox01
+  abilities:
+  - {fileID: 11400000, guid: b81f254f1e3504f44825781320230423, type: 2}
+  - {fileID: 11400000, guid: 6d27b6968f1ceab46ae643254ed76852, type: 2}
