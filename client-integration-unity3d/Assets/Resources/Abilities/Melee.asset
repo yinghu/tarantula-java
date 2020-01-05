@@ -15,4 +15,5 @@ MonoBehaviour:
   x: 1000
   y: 10
   z: 10
+  rarity: 2
   CardImage: {fileID: 21300000, guid: cac25177d3514c849b921cc359f64284, type: 3}
