@@ -16,7 +16,7 @@ namespace Tarantula.Editor{
             pending = false;
         }
     }
-    public enum PLATFORMS{Develop=0,Staging=1,Production=2}
+    public enum PLATFORMS{Local=0,Develop=1,Staging=2,Production=3}
     public enum CONFIGS{Abilities=0,Arenas=1,Robots=2}
     
     public class RQEditor : EditorWindow{
