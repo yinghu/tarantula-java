@@ -30,7 +30,16 @@ public class RequestParser{
             if(onJson){
                 InputStream in = httpExchange.getRequestBody();
                 byte[] buffer = new byte[pz>0?pz:in.available()];
-                in.read(buffer);
+                int i = 0;
+                int c;
+                do{
+                    c = in.read();
+                    if(c!=-1){
+                        buffer[i++]=(byte)c;
+                    }
+                }while(c!=-1);
+                //System.out.println("PZ->"+pz+"<><><>"+in.available());
+                //in.read(buffer);
                 requestMapping.put(Session.TARANTULA_PAYLOAD,buffer);
             }
             else{

@@ -118,7 +118,7 @@ namespace Tarantula.Editor{
             return true;
         }
         private string PostJson(string path,Header[] headers,string json){
-            string host ="http://10.0.0.234:8090";
+            string host ="http://localhost:8090";
             switch(platforms){
                 case PLATFORMS.Develop:
                     host ="http://10.0.0.234:8090";
