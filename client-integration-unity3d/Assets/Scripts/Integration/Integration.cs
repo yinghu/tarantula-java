@@ -114,6 +114,33 @@ public class Integration : ScriptableObject{
             arenaZone = (string)jo.SelectToken("gameObject.arenaZone");
         });
     }
+    public async Task<bool> OnRobotList(MonoBehaviour caller){
+        Descriptor desc = new Descriptor();
+        desc.tag = "robot-quest/live";
+        Payload p = new Payload();
+        p.command = "robotList";
+        return await gec.OnService(caller,desc,p,(msg)=>{
+            Debug.Log(msg);    
+        });
+    }
+    public async Task<bool> OnAbilitiesList(MonoBehaviour caller){
+        Descriptor desc = new Descriptor();
+        desc.tag = "robot-quest/live";
+        Payload p = new Payload();
+        p.command = "abilitiesList";
+        return await gec.OnService(caller,desc,p,(msg)=>{
+            Debug.Log(msg);    
+        });
+    }
+    public async Task<bool> OnRating(MonoBehaviour caller){
+        Descriptor desc = new Descriptor();
+        desc.tag = "robot-quest/live";
+        Payload p = new Payload();
+        p.command = "rating";
+        return await gec.OnService(caller,desc,p,(msg)=>{
+            Debug.Log(msg);    
+        });
+    }
     public async Task<bool> OnLeave(MonoBehaviour caller){
         Payload payload = new Payload();
         payload.command = "onLeave";

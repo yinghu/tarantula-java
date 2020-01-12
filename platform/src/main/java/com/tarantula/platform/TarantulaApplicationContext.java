@@ -333,7 +333,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     public DataStore dataStore(String name){
         if(resetEnabled){
-            return this.tarantulaContext.dataStore(dataStore);
+            return this.tarantulaContext.dataStore(name);
         }
         return this.tarantulaContext.dataStore(name,this.tarantulaContext.partitionNumber());
     }

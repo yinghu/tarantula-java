@@ -39,13 +39,22 @@ public class Play : MonoBehaviour{
             SceneManager.LoadScene("Board");
         }             
     }
-     void OnDestroy(){
+    void OnDestroy(){
         Integration.OnMessage -= _OnStart;
         Debug.Log("Removed Start handler");
     }
     public async void Exit(){
         await INS.OnExit(this);
         pending.SetText("Exited Session,Please Open Again");
+    }
+    public async void RobotList(){
+        await INS.OnRobotList(this);
+    }
+    public async void AbilitiesList(){
+        await INS.OnAbilitiesList(this);
+    }
+     public async void Rating(){
+        await INS.OnRating(this);
     }
     public async void JoinPVP(){
         if(INS.online){
