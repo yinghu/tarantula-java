@@ -136,7 +136,7 @@ public class Integration : ScriptableObject{
         Descriptor desc = new Descriptor();
         desc.tag = "robot-quest/live";
         Payload p = new Payload();
-        p.command = "rating";
+        p.command = "quest";
         return await gec.OnService(caller,desc,p,(msg)=>{
             Debug.Log(msg);    
         });
