@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 public class Integration : ScriptableObject{
     
     public string GEC_HOST;
+    
     public static string deviceId;
     
     private static GameEngineCluster gec;
@@ -38,8 +39,6 @@ public class Integration : ScriptableObject{
         gec.OnException += (ex,msg,code)=>{
              OnException?.Invoke(ex,msg,code);
         };
-        gec.OnWebSocket += _OnWebSocketMessage;
-        gec.OnUDPSocket += _OnUDPSocketMessage;
         gec.OnInboundMessage += (msg)=>{
             OnMessage?.Invoke(msg);
         };
@@ -58,14 +57,7 @@ public class Integration : ScriptableObject{
     }
     void Awake(){
     }
-    static async void _OnWebSocketMessage(){
-        Debug.Log("Listen on WEB SOCKET");
-        await gec.OnWebSocketMessage();
-    }
-    static async void _OnUDPSocketMessage(){
-        Debug.Log("Listen on UDP");
-        await gec.OnUDPSocketMessage();
-    }
+    
    
     
     //async local wrappers    

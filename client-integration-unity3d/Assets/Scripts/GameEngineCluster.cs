@@ -78,9 +78,18 @@ namespace Tarantula.Networking{
             _gameList = new List<Descriptor>();
             _liveWc = false;
             _liveUc = false;
-            Debug.Log("starting GEC cluster");
+            OnWebSocket += _OnWebSocketMessage;
+            OnUDPSocket += _OnUDPSocketMessage;
+            Debug.Log("starting GameEngineCluster cluster on ["+host+"]");
         }  
-      
+        private async void _OnWebSocketMessage(){
+            Debug.Log("Listen on WEB SOCKET");
+            await OnWebSocketMessage();
+        }
+        private async void _OnUDPSocketMessage(){
+            Debug.Log("Listen on UDP");
+            await OnUDPSocketMessage();
+        }
         public  async Task<bool> Index(MonoBehaviour caller){
             try{
                 string jstr = await _ghc.GetJson(caller,"/user/index",new Header[]{new Header("Tarantula-tag","index/lobby")});
