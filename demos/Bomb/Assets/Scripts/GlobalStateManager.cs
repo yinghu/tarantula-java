@@ -76,8 +76,8 @@ public class GlobalStateManager : MonoBehaviour{
     }
     void Update (){
         login.SetActive(!integration.online);  
-        pve.SetActive(!joined);  
-        pvp.SetActive(!joined);
+        pve.SetActive(!joined&&integration.online);  
+        pvp.SetActive(!joined&&integration.online);
     }
     public void PlayerDied (int playerNumber)
     {
