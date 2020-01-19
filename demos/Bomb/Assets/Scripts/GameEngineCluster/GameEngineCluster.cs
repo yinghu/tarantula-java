@@ -44,13 +44,17 @@ namespace Tarantula.Networking{
        EC_INBOUND_MSG_PARSE,
        EC_CLOSE,
        EC_WARN
-   }    
-   public class GameEngineCluster{
+   } 
+   [CreateAssetMenu(fileName = "GameEngineCluster", menuName = "Scripts/GameEngineCluster", order = 1)]    
+   public class GameEngineCluster : ScriptableObject{
       
         public event ExceptionHandler OnException;
         public event InboundMessageHandler OnInboundMessage;
         public event WebSocketHandler OnWebSocket;
         public event UDPSocketHandler OnUDPSocket;
+       
+        public string host;
+        public bool deviceIdEnabled;
         
         private GecHttpClient _ghc;
         private GecWebSocket _gwc;
@@ -71,8 +75,30 @@ namespace Tarantula.Networking{
         
         public Lobby lobby(string typeId){ return _lobbyList[typeId];}  
         public List<Descriptor> gameList(){ return _gameList;}
+       
+        private static GameEngineCluster _INSTANCE;
+        private string deviceId;
         
-        public  GameEngineCluster(string host){
+        [RuntimeInitializeOnLoadMethod]
+        private static void _Init(){
+            _INSTANCE = Resources.Load<GameEngineCluster>("GameEngineCluster");
+            _INSTANCE.Bootstrap();    
+        }
+        public static GameEngineCluster Instance{
+            get{return _INSTANCE;}
+        }
+        void OnEnable(){
+            //_HOST = GEC_HOST;
+            if(deviceIdEnabled){
+                deviceId = SystemInfo.deviceUniqueIdentifier;
+            }
+            Debug.Log("GEC OPEN->"+host);
+        }
+        async void OnDestroy(){
+            Debug.Log("GEC CLOSE->"+host);
+            await _INSTANCE.Close();
+        }
+        private void Bootstrap(){
             _ghc = new GecHttpClient(host);  
             _lobbyList = new Dictionary<string,Lobby>();
             _gameList = new List<Descriptor>();
@@ -80,7 +106,7 @@ namespace Tarantula.Networking{
             _liveUc = false;
             OnWebSocket += _OnWebSocketMessage;
             OnUDPSocket += _OnUDPSocketMessage;
-            Debug.Log("starting GameEngineCluster cluster on ["+host+"]");
+            Debug.Log("Starting GameEngineCluster cluster on ["+host+"]");
         }  
         private async void _OnWebSocketMessage(){
             Debug.Log("Listen on WEB SOCKET");
@@ -248,11 +274,17 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> Device(MonoBehaviour caller,Device device){
+        public  async Task<bool> Device(MonoBehaviour caller){
+            if(!deviceIdEnabled){
+                message = "deviceId not enabled";
+                return false;
+            }
             try{
+                Device device = new Device();
+                device.deviceId = deviceId;
                 Header[] headers = new Header[]{
                     new Header("Tarantula-tag","index/user"),
-                    new Header("Tarantula-magic-key",device.deviceId),
+                    new Header("Tarantula-magic-key",deviceId),
                     new Header("Tarantula-action","onReset")
                 };
                 string json = JsonConvert.SerializeObject(device,JSON_SETTING);
