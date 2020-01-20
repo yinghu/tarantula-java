@@ -157,6 +157,9 @@ public class GlobalStateManager : MonoBehaviour{
         else if(msg.query!=null&&msg.query.Equals("onTimer")){
             gameStage.OnTimer(msg.payload);
         }
+        else if(msg.query!=null&&msg.query.Equals("onMove")){
+            gameStage.OnMove(msg.payload);
+        }
         else if(msg.query!=null&&msg.query.Equals("onEnd")){
             gameStage.OnEnd();
             await integration.Logout(this);

@@ -94,6 +94,17 @@ namespace Tarantula.Networking{
             this.waited = false;
             Debug.Log(msg);           
         }
+        public void OnMove(string msg){
+            Debug.Log(msg);
+            JObject jo = JObject.Parse(msg);
+            Vector3 mp = new Vector3();
+            mp.x = ((float)jo.SelectToken("x"))*Screen.width;
+            mp.y = ((float)jo.SelectToken("y"))*Screen.height;
+            mp.z = 0;
+            float speed = (float)jo.SelectToken("f");
+            int sx = (int)jo.SelectToken("i");
+            movements[sx].OnMove(mp,speed);
+        }
         public void OnTimer(string msg){
             JObject jo = JObject.Parse(msg);
             int m = (int)jo.SelectToken("m");
