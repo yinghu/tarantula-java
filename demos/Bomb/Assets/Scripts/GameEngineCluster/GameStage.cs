@@ -28,7 +28,7 @@ namespace Tarantula.Networking{
         private int seatIndex;
         public Transform[] transforms;
         public Movement[] movements;
-        private float dur = 0.2f;
+        private float dur = 0.05f;
         
         void Start(){
             tm = GameObject.Find("/UI/Timer");
@@ -83,6 +83,9 @@ namespace Tarantula.Networking{
                 payload.headers[1]=new Header("y",y.ToString());
                 payload.headers[2]=new Header("z",target.z.ToString());
                 payload.headers[3]=new Header("f","2");
+                //payload.headers[4]=new Header("rx",transforms[seatIndex].rotation.x+"");
+                //payload.headers[5]=new Header("ry",transforms[seatIndex].rotation.y+"");
+                //payload.headers[6]=new Header("rz",transforms[seatIndex].rotation.z+"");
                 payload.headers[4]=new Header("n",seatIndex+"");
                 await OnMove(payload); 
             }
@@ -174,6 +177,11 @@ namespace Tarantula.Networking{
                 float speed = float.Parse(pv.headers[3].value);
                 int sx = int.Parse(pv.headers[4].value);
                 if(sx!=seatIndex){
+                    //RaycastHit hit;
+                    //if (Physics.Raycast(Camera.main.ScreenPointToRay(mp), out hit)) {
+                        //transforms[sx].position = hit.point;
+                        //transforms[sx].Rotate(float.Parse(pv.headers[4].value),float.Parse(pv.headers[5].value),float.Parse(pv.headers[6].value));
+                    //}
                     movements[sx].OnMove(mp,speed);
                 }
             }
