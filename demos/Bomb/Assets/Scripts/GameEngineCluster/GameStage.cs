@@ -28,7 +28,7 @@ namespace Tarantula.Networking{
         private int seatIndex;
         public Transform[] transforms;
         public Movement[] movements;
-        private float dur = 0.05f;
+        //private float dur = 0.05f;
         
         void Start(){
             tm = GameObject.Find("/UI/Timer");
@@ -53,41 +53,20 @@ namespace Tarantula.Networking{
             x.SetActive(joined);
             if (started&&Input.GetMouseButtonDown(0)) {
                  Vector3 target = Input.mousePosition;
-                 movements[seatIndex].OnMove(target,2);
-                 //float x = (target.x/Screen.width);
-                 //float y = (target.y/Screen.height);
-                 //Payload payload = new Payload();
-                 //payload.command = "onMessage";
-                 //payload.headers = new Header[5];
-                 //payload.headers[0]=new Header("x",x.ToString());
-                 //payload.headers[1]=new Header("y",y.ToString());
-                 //payload.headers[2]=new Header("z",target.z.ToString());
-                 //payload.headers[3]=new Header("f","2");
-                 //payload.headers[4]=new Header("n",seatIndex+"");
+                 //movements[seatIndex].OnMove(target,2);
+                 float x = (target.x/Screen.width);
+                 float y = (target.y/Screen.height);
+                 Payload payload = new Payload();
+                 payload.command = "onMessage";
+                 payload.headers = new Header[5];
+                 payload.headers[0]=new Header("x",x.ToString());
+                 payload.headers[1]=new Header("y",y.ToString());
+                 payload.headers[2]=new Header("z",target.z.ToString());
+                 payload.headers[3]=new Header("f","2");
+                 payload.headers[4]=new Header("n",seatIndex+"");
                  //payload.headers[4]=new Header("n",(string)INS.robotList[INS.seatIndex].SelectToken("questId"));
-                 //await OnMove(payload);//publish move destination
+                 await OnMove(payload);//publish move destination
                  //Debug.Log("SEND ["+suc+"]");
-            }
-            dur -= Time.deltaTime;
-            //Debug.Log("Sync->"+dur);
-            if(started&&dur<=0){
-                //Debug.Log("Sync->"+dur);
-                dur = 0.2f;
-                Vector3 target = Camera.main.WorldToScreenPoint(transforms[seatIndex].position);
-                float x = (target.x/Screen.width);
-                float y = (target.y/Screen.height);
-                Payload payload = new Payload();
-                payload.command = "onMessage";
-                payload.headers = new Header[5];
-                payload.headers[0]=new Header("x",x.ToString());
-                payload.headers[1]=new Header("y",y.ToString());
-                payload.headers[2]=new Header("z",target.z.ToString());
-                payload.headers[3]=new Header("f","2");
-                //payload.headers[4]=new Header("rx",transforms[seatIndex].rotation.x+"");
-                //payload.headers[5]=new Header("ry",transforms[seatIndex].rotation.y+"");
-                //payload.headers[6]=new Header("rz",transforms[seatIndex].rotation.z+"");
-                payload.headers[4]=new Header("n",seatIndex+"");
-                await OnMove(payload); 
             }
         }
         public async Task<bool> OnMove(Payload payload){
@@ -146,7 +125,6 @@ namespace Tarantula.Networking{
             timer.SetText("00:00");
         }
         public void OnQuest(string msg){
-            Debug.Log(msg);
             JObject jo = JObject.Parse(msg);
             Vector3 mp = new Vector3();
             mp.x = ((float)jo.SelectToken("x"))*Screen.width;
@@ -165,8 +143,6 @@ namespace Tarantula.Networking{
             }
         }
         public void OnMessage(InboundMessage ibm){
-            //Debug.Log(ibm.query);
-            //Debug.Log(ibm.payload);
             if(ibm.query!=null&&ibm.query.Equals("onMessage")){
                 JObject jo = JObject.Parse(ibm.payload);
                 Payload pv = jo.ToObject<Payload>();
@@ -176,14 +152,7 @@ namespace Tarantula.Networking{
                 mp.z = 0;//float.Parse(pv.headers[2].value);
                 float speed = float.Parse(pv.headers[3].value);
                 int sx = int.Parse(pv.headers[4].value);
-                if(sx!=seatIndex){
-                    //RaycastHit hit;
-                    //if (Physics.Raycast(Camera.main.ScreenPointToRay(mp), out hit)) {
-                        //transforms[sx].position = hit.point;
-                        //transforms[sx].Rotate(float.Parse(pv.headers[4].value),float.Parse(pv.headers[5].value),float.Parse(pv.headers[6].value));
-                    //}
-                    movements[sx].OnMove(mp,speed);
-                }
+                movements[sx].OnMove(mp,speed);   
             }
         }
         private void _OnView(string name,Vector3 v,GameObject src){
