@@ -102,8 +102,10 @@ namespace Tarantula.Networking{
             mp.y = ((float)jo.SelectToken("y"))*Screen.height;
             mp.z = 0;
             float speed = (float)jo.SelectToken("f");
-            int sx = (int)jo.SelectToken("i");
-            movements[sx].OnMove(mp,speed);
+            if(jo.ContainsKey("i")){
+                int sx = (int)jo.SelectToken("i");
+                movements[sx].OnMove(mp,speed);
+            }
         }
         public void OnTimer(string msg){
             JObject jo = JObject.Parse(msg);
