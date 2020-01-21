@@ -33,9 +33,9 @@ namespace Tarantula.Networking{
         void FixedUpdate(){   
             Vector3 movement = Vector3.zero;
             if(target != Vector3.one){
-                Vector3 tpos = new Vector3(target.x,transform.position.y,target.z);
-                Quaternion trot = Quaternion.LookRotation(tpos-transform.position);
-                transform.rotation = Quaternion.Slerp(transform.rotation,trot,rotationSpeed*Time.deltaTime);
+                //Vector3 tpos = new Vector3(target.x,transform.position.y,target.z);
+                //Quaternion trot = Quaternion.LookRotation(tpos-transform.position);
+                //transform.rotation = Quaternion.Slerp(transform.rotation,trot,rotationSpeed*Time.fixedDeltaTime);
                 movement = speed*Vector3.forward;
                 movement = Vector3.ClampMagnitude(movement,speed);
                 movement.y = -9.8f;
@@ -46,6 +46,11 @@ namespace Tarantula.Networking{
                     if(speed<=0){
                         target = Vector3.one;
                     }
+                }
+                else{
+                    Vector3 tpos = new Vector3(target.x,transform.position.y,target.z);
+                    Quaternion trot = Quaternion.LookRotation(tpos-transform.position);
+                    transform.rotation = Quaternion.Slerp(transform.rotation,trot,rotationSpeed*Time.fixedDeltaTime);
                 }
                 if(useController){
                     _controller.Move(movement);
