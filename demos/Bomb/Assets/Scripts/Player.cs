@@ -56,11 +56,12 @@ public class Player : MonoBehaviour
     private Rigidbody rigidBody;
     private Transform myTransform;
     private Animator animator;
-
+    private Camera cam;
     // Use this for initialization
     void Start ()
     {
         //Cache the attached components for better performance and less typing
+        cam = Camera.main;
         rigidBody = GetComponent<Rigidbody> ();
         myTransform = transform;
         animator = myTransform.Find ("PlayerModel").GetComponent<Animator> ();
@@ -70,7 +71,8 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-        //UpdateMovement ();
+        //Vector3 v = cam.WorldToScreenPoint(transform.position);    
+        //Debug.Log(transform.rotation);
     }
 
     private void UpdateMovement ()

@@ -26,7 +26,9 @@ namespace Tarantula.Networking{
         private GameObject x;
         
         private int seatIndex;
+        public Transform[] transforms;
         public Movement[] movements;
+        private float dur = 0.2f;
         
         void Start(){
             tm = GameObject.Find("/UI/Timer");
@@ -51,20 +53,39 @@ namespace Tarantula.Networking{
             x.SetActive(joined);
             if (started&&Input.GetMouseButtonDown(0)) {
                  Vector3 target = Input.mousePosition;
-                 float x = (target.x/Screen.width);
-                 float y = (target.y/Screen.height);
-                 Payload payload = new Payload();
-                 payload.command = "onMessage";
-                 payload.headers = new Header[5];
-                 payload.headers[0]=new Header("x",x.ToString());
-                 payload.headers[1]=new Header("y",y.ToString());
-                 payload.headers[2]=new Header("z",target.z.ToString());
-                 payload.headers[3]=new Header("f","2");
-                 payload.headers[4]=new Header("n",seatIndex+"");
+                 movements[seatIndex].OnMove(target,2);
+                 //float x = (target.x/Screen.width);
+                 //float y = (target.y/Screen.height);
+                 //Payload payload = new Payload();
+                 //payload.command = "onMessage";
+                 //payload.headers = new Header[5];
+                 //payload.headers[0]=new Header("x",x.ToString());
+                 //payload.headers[1]=new Header("y",y.ToString());
+                 //payload.headers[2]=new Header("z",target.z.ToString());
+                 //payload.headers[3]=new Header("f","2");
+                 //payload.headers[4]=new Header("n",seatIndex+"");
                  //payload.headers[4]=new Header("n",(string)INS.robotList[INS.seatIndex].SelectToken("questId"));
-                 await OnMove(payload);//publish move destination
+                 //await OnMove(payload);//publish move destination
                  //Debug.Log("SEND ["+suc+"]");
-            }   
+            }
+            dur -= Time.deltaTime;
+            //Debug.Log("Sync->"+dur);
+            if(started&&dur<=0){
+                //Debug.Log("Sync->"+dur);
+                dur = 0.2f;
+                Vector3 target = Camera.main.WorldToScreenPoint(transforms[seatIndex].position);
+                float x = (target.x/Screen.width);
+                float y = (target.y/Screen.height);
+                Payload payload = new Payload();
+                payload.command = "onMessage";
+                payload.headers = new Header[5];
+                payload.headers[0]=new Header("x",x.ToString());
+                payload.headers[1]=new Header("y",y.ToString());
+                payload.headers[2]=new Header("z",target.z.ToString());
+                payload.headers[3]=new Header("f","2");
+                payload.headers[4]=new Header("n",seatIndex+"");
+                await OnMove(payload); 
+            }
         }
         public async Task<bool> OnMove(Payload payload){
             OutboundMessage<Payload> om = new OutboundMessage<Payload>();
@@ -95,7 +116,7 @@ namespace Tarantula.Networking{
             Debug.Log(msg);           
         }
         public void OnMove(string msg){
-            Debug.Log(msg);
+            //Debug.Log(msg);
             JObject jo = JObject.Parse(msg);
             Vector3 mp = new Vector3();
             mp.x = ((float)jo.SelectToken("x"))*Screen.width;
@@ -104,7 +125,9 @@ namespace Tarantula.Networking{
             float speed = (float)jo.SelectToken("f");
             if(jo.ContainsKey("i")){
                 int sx = (int)jo.SelectToken("i");
-                movements[sx].OnMove(mp,speed);
+                if(sx!=seatIndex){
+                    movements[sx].OnMove(mp,speed);
+                }
             }
         }
         public void OnTimer(string msg){
@@ -150,7 +173,9 @@ namespace Tarantula.Networking{
                 mp.z = 0;//float.Parse(pv.headers[2].value);
                 float speed = float.Parse(pv.headers[3].value);
                 int sx = int.Parse(pv.headers[4].value);
-                movements[sx].OnMove(mp,speed);
+                if(sx!=seatIndex){
+                    movements[sx].OnMove(mp,speed);
+                }
             }
         }
         private void _OnView(string name,Vector3 v,GameObject src){

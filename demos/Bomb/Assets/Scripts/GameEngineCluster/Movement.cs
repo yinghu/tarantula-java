@@ -12,6 +12,7 @@ namespace Tarantula.Networking{
         private CharacterController _controller;
         private Rigidbody rigidBody;
         private bool useController;
+        
         void Start(){
             _controller = GetComponent<CharacterController>();
             useController = _controller!=null;
@@ -30,6 +31,7 @@ namespace Tarantula.Networking{
               targetBuffer = 1.5f*(_speed/5.0f);
             }
         }
+        
         void FixedUpdate(){   
             Vector3 movement = Vector3.zero;
             if(target != Vector3.one){
@@ -51,6 +53,7 @@ namespace Tarantula.Networking{
                     Vector3 tpos = new Vector3(target.x,transform.position.y,target.z);
                     Quaternion trot = Quaternion.LookRotation(tpos-transform.position);
                     transform.rotation = Quaternion.Slerp(transform.rotation,trot,rotationSpeed*Time.fixedDeltaTime);
+                    //Debug.Log(transform.rotation);
                 }
                 if(useController){
                     _controller.Move(movement);
