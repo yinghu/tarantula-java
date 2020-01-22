@@ -26,9 +26,7 @@ namespace Tarantula.Networking{
         private GameObject x;
         
         private int seatIndex;
-        public Transform[] transforms;
         public Movement[] movements;
-        //private float dur = 0.05f;
         
         void Start(){
             tm = GameObject.Find("/UI/Timer");
@@ -62,7 +60,7 @@ namespace Tarantula.Networking{
                  payload.headers[0]=new Header("x",x.ToString());
                  payload.headers[1]=new Header("y",y.ToString());
                  payload.headers[2]=new Header("z",target.z.ToString());
-                 payload.headers[3]=new Header("f","2");
+                 payload.headers[3]=new Header("f","5");
                  payload.headers[4]=new Header("n",seatIndex+"");
                  //payload.headers[4]=new Header("n",(string)INS.robotList[INS.seatIndex].SelectToken("questId"));
                  await OnMove(payload);//publish move destination

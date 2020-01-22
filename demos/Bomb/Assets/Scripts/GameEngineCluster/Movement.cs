@@ -28,16 +28,12 @@ namespace Tarantula.Networking{
               target = hit.point;
               speed = _speed;
               deceleration = 2*_speed;
-              targetBuffer = 1.5f*(_speed/5.0f);
+              targetBuffer = 1.5f*(_speed/speed);
             }
         }
-        
         void FixedUpdate(){   
             Vector3 movement = Vector3.zero;
             if(target != Vector3.one){
-                //Vector3 tpos = new Vector3(target.x,transform.position.y,target.z);
-                //Quaternion trot = Quaternion.LookRotation(tpos-transform.position);
-                //transform.rotation = Quaternion.Slerp(transform.rotation,trot,rotationSpeed*Time.fixedDeltaTime);
                 movement = speed*Vector3.forward;
                 movement = Vector3.ClampMagnitude(movement,speed);
                 movement.y = -9.8f;

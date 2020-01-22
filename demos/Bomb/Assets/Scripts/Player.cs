@@ -188,12 +188,28 @@ public class Player : MonoBehaviour
  
         }
     }
-
+    void OnCollisionEnter(Collision collision){
+        //if(collision.gameObject.tag == "")
+        Debug.Log ("Entering->"+collision.gameObject.tag+"//"+gameObject.name);
+        Debug.Log(transform.position);
+        Debug.Log(transform.rotation);
+        Debug.Log(cam.WorldToScreenPoint(transform.position));
+    }
+    void OnCollisionStay(Collision collision){
+        //if(collision.gameObject.tag == "")
+        //Debug.Log ("Staying->"+collision.gameObject.tag+"//"+gameObject.name);
+    }
+    void OnCollisionExit(Collision collision){
+        //if(collision.gameObject.tag == "")
+        Debug.Log ("Exiting->"+collision.gameObject.tag+"//"+gameObject.name);
+        Debug.Log(transform.position);
+        Debug.Log(transform.rotation);
+    }
     public void OnTriggerEnter (Collider other)
     {
-        if (other.CompareTag ("Explosion"))
-        {
-            //Debug.Log ("P" + playerNumber + " hit by explosion!");
-        }
+        //if (other.CompareTag ("Explosion"))
+        //{
+        Debug.Log ("P->" + other.gameObject.tag + " hit on ["+gameObject.name+"]");
+        //}
     }
 }
