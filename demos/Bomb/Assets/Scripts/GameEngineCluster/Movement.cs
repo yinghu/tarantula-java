@@ -1,8 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using BeardedManStudios.Forge.Networking.Generated;
+using BeardedManStudios.Forge.Networking;
+using BeardedManStudios.Forge.Networking.Unity;
 namespace Tarantula.Networking{
-    public class Movement : MonoBehaviour
+    public class Movement : MovementBehavior
     {
         private float speed = 5.0f;
         private Vector3 target;
@@ -31,6 +34,9 @@ namespace Tarantula.Networking{
               targetBuffer = 1.5f*(_speed/speed);
             }
         }
+        public override void OnMove(RpcArgs args){
+        
+        } 
         void FixedUpdate(){   
             Vector3 movement = Vector3.zero;
             if(target != Vector3.one){
@@ -49,7 +55,6 @@ namespace Tarantula.Networking{
                     Vector3 tpos = new Vector3(target.x,transform.position.y,target.z);
                     Quaternion trot = Quaternion.LookRotation(tpos-transform.position);
                     transform.rotation = Quaternion.Slerp(transform.rotation,trot,rotationSpeed*Time.fixedDeltaTime);
-                    //Debug.Log(transform.rotation);
                 }
                 if(useController){
                     _controller.Move(movement);

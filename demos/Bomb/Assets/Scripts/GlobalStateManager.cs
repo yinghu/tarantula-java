@@ -38,7 +38,6 @@ using System.Threading;
 using Tarantula.Networking;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
 public class GlobalStateManager : MonoBehaviour{
     
     public GameEngineCluster integration;
@@ -59,7 +58,6 @@ public class GlobalStateManager : MonoBehaviour{
         login = GameObject.Find("/UI/LOGIN");
         pve = GameObject.Find("/UI/PVE");
         pvp = GameObject.Find("/UI/PVP");
-        
         integration.OnInboundMessage += _OnStart; 
         integration.OnException += (ex,msg,code)=>{
             Debug.Log(msg);
