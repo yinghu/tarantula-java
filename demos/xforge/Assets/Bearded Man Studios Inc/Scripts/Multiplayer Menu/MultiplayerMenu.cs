@@ -207,7 +207,7 @@ public class MultiplayerMenu : MonoBehaviour
 
 			masterServerData = mgr.MasterServerRegisterData(networker, serverId, serverName, type, mode, comment, useElo, eloRequired);
 		}
-
+        Debug.Log("IS SERVER->"+networker.IsServer);
 		mgr.Initialize(networker, masterServerHost, masterServerPort, masterServerData);
 
 		if (useInlineChat && networker.IsServer)

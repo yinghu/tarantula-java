@@ -93,11 +93,11 @@ public class SmokeRun : SmokeBehavior
                 rigidBody.MovePosition(rigidBody.position + movement);
             }
         }
-    } 
+    }
+    
     public override void Move(RpcArgs args){
         MainThreadManager.Run(() =>
 		{
-            Debug.Log("move");
 			target = args.GetNext<Vector3>();
             speed = 5.0f;
 		});
@@ -105,7 +105,7 @@ public class SmokeRun : SmokeBehavior
     public override void MoveUp(RpcArgs args){
         MainThreadManager.Run(() =>
 		{
-            Debug.Log("move up");
+            //Debug.Log("move up");
             //index, position, rotation, repli
             NetworkManager.Instance.InstantiateSmoke(0,Vector3.zero,Quaternion.Euler(15,0,0),true);
 			//transform.position += Vector3.forward;
@@ -114,9 +114,10 @@ public class SmokeRun : SmokeBehavior
     public override void MoveDown(RpcArgs args){
         MainThreadManager.Run(() =>
 		{
-            Debug.Log("move down");
+            //Debug.Log("move down");
 			//transform.position += Vector3.back;
-            NetworkManager.Instance.InstantiateSmoke();
-		});
+            BulletRun brun = (BulletRun)NetworkManager.Instance.InstantiateSmoke(1,transform.position,Quaternion.Euler(0,0,0),true);        
+            brun.OnRun();
+        });
     }
 }

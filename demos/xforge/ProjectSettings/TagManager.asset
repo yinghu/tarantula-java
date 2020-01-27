@@ -3,7 +3,11 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - bump
+  - robot
+  - floor
+  - bullet
   layers:
   - Default
   - TransparentFX

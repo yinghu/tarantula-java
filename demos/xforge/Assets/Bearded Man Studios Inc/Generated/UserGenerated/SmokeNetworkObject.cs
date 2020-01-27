@@ -194,5 +194,12 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		public SmokeNetworkObject(NetWorker networker, uint serverId, FrameStream frame) : base(networker, serverId, frame) { Initialize(); }
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
+        
+        /**
+        protected override bool ServerAllowRpc(byte methodId, Receivers receivers, RpcArgs args){
+            Debug.Log("RPC->"+methodId);
+            return true;
+        }
+        **/
 	}
 }

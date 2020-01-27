@@ -52,5 +52,6 @@ MonoBehaviour:
   - {fileID: 139536, guid: 661f29f0c0c86fa47b6015bd602d0ac6, type: 3}
   SmokeNetworkObject:
   - {fileID: 1844416668278158208, guid: c959db8cb2af755449c89c0eba6464a6, type: 3}
+  - {fileID: 4639112251757195096, guid: 2b1fe87ef0023164d8e955584d092926, type: 3}
   TestNetworkObject: []
   automaticScenes: 1

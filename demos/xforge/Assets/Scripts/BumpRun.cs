@@ -7,9 +7,9 @@ using BeardedManStudios.Forge.Networking.Unity;
 public class BumpRun : SmokeBehavior
 {
     // Start is called before the first frame update
-    void Start()
-    {
-        
+    void Start(){
+        //Debug.Log("nid->"+networkObject.NetworkId);//
+        //Debug.Log("uid->"+networkObject.UniqueIdentity);//type id
     }
     private void Update()
 	{
@@ -40,16 +40,14 @@ public class BumpRun : SmokeBehavior
     public override void MoveDown(RpcArgs args){}
     public override void Move(RpcArgs args){}
     void OnCollisionEnter(Collision collision){
-        //if(collision.gameObject.tag == "")
-        Debug.Log ("Entering->"+collision.gameObject.tag+"//"+gameObject.name);
-       
+        if(collision.gameObject.tag=="robot"&&gameObject.tag == "bump"&&networkObject.IsOwner){
+            networkObject.Destroy(); 
+        } 
     }
     void OnCollisionStay(Collision collision){
-        //if(collision.gameObject.tag == "")
-        //Debug.Log ("Staying->"+collision.gameObject.tag+"//"+gameObject.name);
+        
     }
     void OnCollisionExit(Collision collision){
-        //if(collision.gameObject.tag == "")
-        Debug.Log ("Exiting->"+collision.gameObject.tag+"//"+gameObject.name);
+        
     }
 }
