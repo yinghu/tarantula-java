@@ -41,7 +41,7 @@ public class BumpRun : SmokeBehavior
     public override void Move(RpcArgs args){}
     void OnCollisionEnter(Collision collision){
         if(collision.gameObject.tag=="robot"&&gameObject.tag == "bump"&&networkObject.IsOwner){
-            networkObject.Destroy(); 
+            //networkObject.Destroy(); 
         } 
     }
     void OnCollisionStay(Collision collision){
