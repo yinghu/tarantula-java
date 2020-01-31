@@ -61,6 +61,7 @@ public class MultiplayerMenu : MonoBehaviour
 			NetWorker.localServerLocated += LocalServerLocated;
 			NetWorker.RefreshLocalUdpListings(ushort.Parse(portNumber.text));
 		}
+        Connect();
 	}
 
 	private void LocalServerLocated(NetWorker.BroadcastEndpoints endpoint, NetWorker sender)
