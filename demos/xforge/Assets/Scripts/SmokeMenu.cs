@@ -1,6 +1,8 @@
 ﻿using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
+using BeardedManStudios;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -26,18 +28,27 @@ public class SmokeMenu : MonoBehaviour
         }
 	}
 	public void Connect(){
-		NetWorker client = new UDPClient();
-        ((UDPClient)client).Connect(ipAddress,portNumber);
+		UDPClient client = new UDPClient();
+        client.Connect(ipAddress,portNumber);
+        client.serverAccepted += (sender) =>{
+			Debug.Log("accepted from server");
+		};
+        client.connectAttemptFailed += (sender) =>{
+			Debug.Log("failed from server");
+		};
 		Connected(client);
 	}
 	public void Host(){	
         server = new UDPServer(64);			
         ((UDPServer)server).Connect(ipAddress,portNumber);
-		server.playerTimeout += (player, sender) =>{
-			Debug.Log("Player " + player.NetworkId + " timed out");
+		server.playerAccepted += (player, sender) =>{
+			Debug.Log("Player " + player.NetworkId + " Accepted");
 		};
         server.playerConnected += (player, sender) =>{
 			Debug.Log("Player " + player.NetworkId + " connected");
+		};
+        server.playerAuthenticated += (player, sender) =>{
+			Debug.Log("Player " + player.NetworkId + " Authenticated");
 		};
         server.playerDisconnected += (player, sender) =>{
 			Debug.Log("Player " + player.NetworkId + " disconnected");
@@ -67,14 +78,4 @@ public class SmokeMenu : MonoBehaviour
         Debug.Log("server closed");
 		if (server != null) server.Disconnect(true);
 	}
-    /**
-    public void IssueChallenge(NetWorker networker, NetworkingPlayer player, Action<NetworkingPlayer, BMSByte> issueChallengeAction, Action<NetworkingPlayer>   skipAuthAction){
-    
-    }
-    public void AcceptChallenge(NetWorker networker, BMSByte challenge, Action<BMSByte> authServerAction, Action rejectServerAction){
-    
-    }
-    public void VerifyResponse(NetWorker networker, NetworkingPlayer player, BMSByte response, Action<NetworkingPlayer> authUserAction, Action<NetworkingPlayer> rejectUserAction){
-    
-    }**/
 }

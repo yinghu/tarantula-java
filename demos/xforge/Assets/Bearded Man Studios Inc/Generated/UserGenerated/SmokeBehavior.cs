@@ -4,13 +4,14 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[][][\"Vector3\"]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[][][\"target\"]]")]
+	[GeneratedRPC("{\"types\":[[][][\"Vector3\"][\"string\"]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[][][\"target\"][\"ticket\"]]")]
 	public abstract partial class SmokeBehavior : NetworkBehavior
 	{
 		public const byte RPC_MOVE_DOWN = 0 + 5;
 		public const byte RPC_MOVE_UP = 1 + 5;
 		public const byte RPC_MOVE = 2 + 5;
+		public const byte RPC_VALIDATE = 3 + 5;
 		
 		public SmokeNetworkObject networkObject = null;
 
@@ -27,6 +28,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			networkObject.RegisterRpc("MoveDown", MoveDown);
 			networkObject.RegisterRpc("MoveUp", MoveUp);
 			networkObject.RegisterRpc("Move", Move, typeof(Vector3));
+			networkObject.RegisterRpc("Validate", Validate, typeof(string));
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -115,6 +117,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// Arguments:
 		/// </summary>
 		public abstract void Move(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// </summary>
+		public abstract void Validate(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

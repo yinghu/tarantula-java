@@ -28,4 +28,5 @@ public class MonoSmoke : SmokeBehavior{
     public override void MoveUp(RpcArgs args){}
     public override void MoveDown(RpcArgs args){}
     public override void Move(RpcArgs args){}
+    public override void Validate(RpcArgs args){}
 }
