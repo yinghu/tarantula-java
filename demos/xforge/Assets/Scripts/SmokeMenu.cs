@@ -73,8 +73,7 @@ public class SmokeMenu : MonoBehaviour
 		if (networker is IServer){
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
 		}
-	}
-    void OnApplicationQuit(){
+	}    void OnApplicationQuit(){
         Debug.Log("server closed");
 		if (server != null) server.Disconnect(true);
 	}

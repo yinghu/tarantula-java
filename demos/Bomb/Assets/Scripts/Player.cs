@@ -189,11 +189,13 @@ public class Player : MonoBehaviour
         }
     }
     void OnCollisionEnter(Collision collision){
-        //if(collision.gameObject.tag == "")
-        Debug.Log ("Entering->"+collision.gameObject.tag+"//"+gameObject.name);
-        Debug.Log(transform.position);
-        Debug.Log(transform.rotation);
-        Debug.Log(cam.WorldToScreenPoint(transform.position));
+        if(gameObject.tag == "bump"){
+           //networkObject.Destroy(); 
+        }
+        //Debug.Log ("Entering->"+collision.gameObject.tag+"//"+collision.gameObject.tag+"->>"+gameObject.name);
+        //Debug.Log(transform.position);
+        //Debug.Log(transform.rotation);
+        //Debug.Log(cam.WorldToScreenPoint(transform.position));
     }
     void OnCollisionStay(Collision collision){
         //if(collision.gameObject.tag == "")
@@ -201,9 +203,9 @@ public class Player : MonoBehaviour
     }
     void OnCollisionExit(Collision collision){
         //if(collision.gameObject.tag == "")
-        Debug.Log ("Exiting->"+collision.gameObject.tag+"//"+gameObject.name);
-        Debug.Log(transform.position);
-        Debug.Log(transform.rotation);
+        //Debug.Log ("Exiting->"+collision.gameObject.tag+"//"+gameObject.name);
+        //Debug.Log(transform.position);
+        //Debug.Log(transform.rotation);
     }
     public void OnTriggerEnter (Collider other)
     {
