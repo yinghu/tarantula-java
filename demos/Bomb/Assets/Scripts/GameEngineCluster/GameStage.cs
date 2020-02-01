@@ -18,25 +18,20 @@ namespace Tarantula.Networking{
         private bool waited;
         private GameObject tm;
         private TextMeshProUGUI timer;
-        private GameObject wt;
-        private TextMeshProUGUI waiting;
-        
+       
         private GameObject a;
         private GameObject d;
         private GameObject x;
         
         private int seatIndex;
-        public Movement[] movements;
+        public BumpRun[] movements;
         
         void Start(){
             tm = GameObject.Find("/UI/Timer");
-            wt = GameObject.Find("/UI/Waiting");
             a = GameObject.Find("/UI/A"); 
             d = GameObject.Find("/UI/D"); 
             x = GameObject.Find("/UI/EXIT"); 
             timer = tm.GetComponent<TextMeshProUGUI>();
-            waiting = wt.GetComponent<TextMeshProUGUI>();
-            waiting.SetText("Waiting ...");
             timer.SetText("00:00");
             started = false;  
             joined = false;
@@ -44,11 +39,16 @@ namespace Tarantula.Networking{
         }
 
         async void Update(){
-            tm.SetActive(joined);
-            wt.SetActive(waited);
+            //tm.SetActive(joined);
             a.SetActive(started);
             d.SetActive(started);
-            x.SetActive(joined);
+            if (started&&Input.GetMouseButtonDown(0)) {
+                RaycastHit hit;
+                if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit)) {
+                    movements[seatIndex].OnRun(hit.point);
+                }   
+            }
+            /**
             if (started&&Input.GetMouseButtonDown(0)) {
                  Vector3 target = Input.mousePosition;
                  //movements[seatIndex].OnMove(target,2);
@@ -65,7 +65,7 @@ namespace Tarantula.Networking{
                  //payload.headers[4]=new Header("n",(string)INS.robotList[INS.seatIndex].SelectToken("questId"));
                  await OnMove(payload);//publish move destination
                  //Debug.Log("SEND ["+suc+"]");
-            }
+            }**/
         }
         public async Task<bool> OnMove(Payload payload){
             OutboundMessage<Payload> om = new OutboundMessage<Payload>();
@@ -84,7 +84,6 @@ namespace Tarantula.Networking{
             seatIndex = (int)occ.SelectToken("seatIndex");
             int state = (int)occ.SelectToken("state");
             string arenaZone = (string)jo.SelectToken("gameObject.arenaZone");
-            waiting.SetText(arenaZone);
             this.game = desc;
             this.joined = true;
             this.waited = true;
@@ -106,7 +105,7 @@ namespace Tarantula.Networking{
             if(jo.ContainsKey("i")){
                 int sx = (int)jo.SelectToken("i");
                 if(sx!=seatIndex){
-                    movements[sx].OnMove(mp,speed);
+                    //movements[sx].OnMove(mp,speed);
                 }
             }
         }
@@ -150,7 +149,7 @@ namespace Tarantula.Networking{
                 mp.z = 0;//float.Parse(pv.headers[2].value);
                 float speed = float.Parse(pv.headers[3].value);
                 int sx = int.Parse(pv.headers[4].value);
-                movements[sx].OnMove(mp,speed);   
+                //movements[sx].OnMove(mp,speed);   
             }
         }
         private void _OnView(string name,Vector3 v,GameObject src){

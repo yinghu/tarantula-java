@@ -38,106 +38,48 @@ using System.Threading;
 using Tarantula.Networking;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine.SceneManagement;
+using BeardedManStudios.Forge.Networking.Unity;
 public class GlobalStateManager : MonoBehaviour{
     
-    public GameEngineCluster integration;
+    private GameEngineCluster integration;
    
-    private bool pendingClick;
-    private bool joined;
-    
     private Descriptor game;
     
     public GameStage gameStage;
     
-    private GameObject login;
-    private GameObject pve;
-    private GameObject pvp;
-
+   
     
-    async void Start(){
-        login = GameObject.Find("/UI/LOGIN");
-        pve = GameObject.Find("/UI/PVE");
-        pvp = GameObject.Find("/UI/PVP");
+    void Start(){
+        integration = GameEngineCluster.Instance; 
+        game = integration.game;
         integration.OnInboundMessage += _OnStart; 
         integration.OnException += (ex,msg,code)=>{
             Debug.Log(msg);
             Debug.Log(ex);
             Debug.Log(code);
         };
-        pendingClick = false;    
-        if(!integration.online){
-            await integration.Index(this);
-            await integration.Device(this); 
-            Debug.Log("Online->"+integration.online);
-        }
-        
     }
     void Update (){
-        login.SetActive(!integration.online);  
-        pve.SetActive(!joined&&integration.online);  
-        pvp.SetActive(!joined&&integration.online);
+       
     }
     public void PlayerDied (int playerNumber)
     {
 
     }
-    public async void OnLogin(){
-        if(!integration.online){
-            await integration.Index(this);
-            await integration.Device(this); 
-            Debug.Log("Online->"+integration.online);
-        }
-    }
-    public async void OnPVE(){
-        if(pendingClick){
-            return;
-        }
-        pendingClick = true;
-        joined = await OnJoin(this,"RobotQuestPVE");     
-    }
-    public async void OnPVP(){
-        if(pendingClick){
-            return;
-        }
-        pendingClick = true;
-        joined = await OnJoin(this,"RobotQuestPVP");
-    }
-    public async void OnLeave(){
-        if(joined){
-            gameStage.OnEnd();
-            await OnLeave(this);
-            await integration.Logout(this);
-            joined = false;
-            pendingClick = false;
-            Debug.Log(integration.online);
-        }    
+    public async void OnLeave(){   
+        gameStage.OnEnd();
+        await OnLeave(this);   
     }
     private async Task<bool> OnLeave(MonoBehaviour caller){
         Payload payload = new Payload();
         payload.command = "onLeave";
+        integration.OnInboundMessage -= _OnStart;
         return await  integration.OnInstance(caller,game,payload,(ps)=>{
+            //forgeMenu.Disconnect();
+            NetworkManager.Instance.Disconnect();
             integration.CloseUDP();
-        });
-    }
-     private async Task<bool> OnJoin(MonoBehaviour caller,string gname){
-        bool suc = await integration.OnLobby(caller,"robot-quest");
-        if(!suc){
-            return suc;
-        }
-        List<Descriptor> glist = integration.gameList();
-        foreach(Descriptor desc in glist){
-            Debug.Log("category->"+desc.category);
-            if(desc.name.Equals(gname)){
-                game = desc;
-                break;
-            }
-        }
-        return await integration.OnPlay(caller,"robot-quest/live",game,(jo)=>{
-            //JToken occ = jo.SelectToken("gameObject.occupation");
-            //int seatIndex = (int)occ.SelectToken("seatIndex");
-            //int state = (int)occ.SelectToken("state");
-            //arenaZone = (string)jo.SelectToken("gameObject.arenaZone");
-            gameStage.OnJoin(jo,game);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex-1);
         });
     }
     async void _OnStart(InboundMessage msg){
@@ -161,8 +103,6 @@ public class GlobalStateManager : MonoBehaviour{
         else if(msg.query!=null&&msg.query.Equals("onEnd")){
             gameStage.OnEnd();
             await integration.Logout(this);
-            pendingClick = false;
-            joined = false;
         }
         else if(msg.query!=null&&msg.query.Equals("onQuest")){
             gameStage.OnQuest(msg.payload);

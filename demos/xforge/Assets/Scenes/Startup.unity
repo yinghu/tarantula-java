@@ -234,7 +234,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ipAddress: 10.0.0.234
   portNumber: 15937
-  asServer: 1
+  asServer: 0
   networkManager: {fileID: 186558, guid: 79adc0da5b6caf74990d862696696ecd, type: 3}
 --- !u!4 &959463249
 Transform:

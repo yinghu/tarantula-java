@@ -5,7 +5,7 @@ using BeardedManStudios.Forge.Networking.Generated;
 using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 namespace Tarantula.Networking{
-    public class Movement : MovementBehavior
+    public class Movement : MonoBehaviour
     {
         private float speed = 5.0f;
         private Vector3 target;
@@ -34,9 +34,9 @@ namespace Tarantula.Networking{
               targetBuffer = 1.5f*(_speed/speed);
             }
         }
-        public override void OnMove(RpcArgs args){
+        //public override void OnMove(RpcArgs args){
         
-        } 
+        //} 
         void FixedUpdate(){   
             Vector3 movement = Vector3.zero;
             if(target != Vector3.one){
