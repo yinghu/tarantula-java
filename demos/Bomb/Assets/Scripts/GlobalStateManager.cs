@@ -76,7 +76,6 @@ public class GlobalStateManager : MonoBehaviour{
         payload.command = "onLeave";
         integration.OnInboundMessage -= _OnStart;
         return await  integration.OnInstance(caller,game,payload,(ps)=>{
-            //forgeMenu.Disconnect();
             NetworkManager.Instance.Disconnect();
             integration.CloseUDP();
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex-1);
@@ -101,8 +100,9 @@ public class GlobalStateManager : MonoBehaviour{
             gameStage.OnMove(msg.payload);
         }
         else if(msg.query!=null&&msg.query.Equals("onEnd")){
+            Debug.Log(msg.payload);
             gameStage.OnEnd();
-            await integration.Logout(this);
+            await OnLeave(this);
         }
         else if(msg.query!=null&&msg.query.Equals("onQuest")){
             gameStage.OnQuest(msg.payload);

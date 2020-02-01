@@ -9,40 +9,25 @@ using TMPro;
 namespace Tarantula.Networking{
     public class GameStage : MonoBehaviour{
 
-        public GameEngineCluster integration;
+        private GameEngineCluster integration;
         public GameObject explosion;
         public GameObject[] itemList;
         private Descriptor game;
-        private bool started;
-        private bool joined;
-        private bool waited;
-        private GameObject tm;
+        
         private TextMeshProUGUI timer;
        
-        private GameObject a;
-        private GameObject d;
-        private GameObject x;
-        
         private int seatIndex;
         public BumpRun[] movements;
         
         void Start(){
-            tm = GameObject.Find("/UI/Timer");
-            a = GameObject.Find("/UI/A"); 
-            d = GameObject.Find("/UI/D"); 
-            x = GameObject.Find("/UI/EXIT"); 
+            integration = GameEngineCluster.Instance;
+            GameObject tm = GameObject.Find("/UI/Timer");
             timer = tm.GetComponent<TextMeshProUGUI>();
             timer.SetText("00:00");
-            started = false;  
-            joined = false;
-            waited = false;
         }
 
         async void Update(){
-            //tm.SetActive(joined);
-            a.SetActive(started);
-            d.SetActive(started);
-            if (started&&Input.GetMouseButtonDown(0)) {
+            if (Input.GetMouseButtonDown(0)) {
                 RaycastHit hit;
                 if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit)) {
                     movements[seatIndex].OnRun(hit.point);
@@ -85,13 +70,9 @@ namespace Tarantula.Networking{
             int state = (int)occ.SelectToken("state");
             string arenaZone = (string)jo.SelectToken("gameObject.arenaZone");
             this.game = desc;
-            this.joined = true;
-            this.waited = true;
         }
         
         public void OnStart(string msg){
-            this.started = true;
-            this.waited = false;
             Debug.Log(msg);           
         }
         public void OnMove(string msg){
@@ -116,9 +97,6 @@ namespace Tarantula.Networking{
             timer.SetText(m+":"+s);       
         }
         public void OnEnd(){ 
-            started = false;
-            waited = false;
-            joined = false;
             timer.SetText("00:00");
         }
         public void OnQuest(string msg){

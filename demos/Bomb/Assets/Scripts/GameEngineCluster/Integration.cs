@@ -13,7 +13,7 @@ public class Integration : MonoBehaviour{
     public GameEngineCluster integration;
    
     private bool pendingClick;
-    
+    private bool matched;
     
     private Descriptor game;
      
@@ -38,7 +38,8 @@ public class Integration : MonoBehaviour{
             Debug.Log(ex);
             Debug.Log(code);
         };
-        pendingClick = false;    
+        pendingClick = false;
+        matched = false;
         if(!integration.online){
             await integration.Index(this);
             await integration.Device(this); 
@@ -48,8 +49,12 @@ public class Integration : MonoBehaviour{
     }
     void Update (){
         login.SetActive(!integration.online);  
-        pve.SetActive(integration.online);  
-        pvp.SetActive(integration.online);
+        pve.SetActive(!pendingClick&&integration.online);  
+        pvp.SetActive(!pendingClick&&integration.online);
+        if(matched){
+            integration.OnInboundMessage -= _OnStart;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
+        }
     }
     
     public async void OnLogin(){
@@ -67,8 +72,8 @@ public class Integration : MonoBehaviour{
         bool joined = await OnJoin(this,"RobotQuestPVE");     
         if(joined){
             //go to game play
-            integration.OnInboundMessage -= _OnStart;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
+            //integration.OnInboundMessage -= _OnStart;
+            //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
         }
     }
     public async void OnPVP(){
@@ -85,6 +90,7 @@ public class Integration : MonoBehaviour{
         if(integration.online){
             await integration.Logout(this);
             pendingClick = false;
+            matched = false;
         }
         Debug.Log(integration.online);     
     }
@@ -121,37 +127,19 @@ public class Integration : MonoBehaviour{
         });
     }
     async void _OnStart(InboundMessage msg){
-        Debug.Log(msg.payload);
-        //Debug.Log(msg.instanceId);        
-        //Debug.Log(msg.payload);
         if(msg.query!=null&&msg.query.Equals("onStart")){
             //gameStage.OnStart(msg.payload);
             //Debug.Log("START=>>>"+msg.payload);
             //JObject jo = JObject.Parse(msg.payload);
             //integration.arena = (string)jo.SelectToken("arena");
             //integration.robotList = (JArray)jo.SelectToken("robotList");
-            //matched = true;
+            matched = true;
         }
         else if(msg.query!=null&&msg.query.Equals("onTimer")){
-            //gameStage.OnTimer(msg.payload);
-        }
-        else if(msg.query!=null&&msg.query.Equals("onMove")){
-            //gameStage.OnMove(msg.payload);
-        }
-        else if(msg.query!=null&&msg.query.Equals("onEnd")){
-            //gameStage.OnEnd();
-            await integration.Logout(this);
-            pendingClick = false;
-            
-        }
-        else if(msg.query!=null&&msg.query.Equals("onQuest")){
-            //gameStage.OnQuest(msg.payload);
-        }
-        else if(msg.query!=null&&msg.query.Equals("onRemove")){
-            //gameStage.OnRemove(msg.payload);
-        }
-        else{
-            //gameStage.OnMessage(msg);
+            JObject jo = JObject.Parse(msg.payload);
+            int m = (int)jo.SelectToken("m");
+            int s = (int)jo.SelectToken("s");
+            timer.SetText(m+":"+s);
         }
     } 
 }
