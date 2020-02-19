@@ -4,11 +4,13 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[\"Vector3\"]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[\"destination\"]]")]
+	[GeneratedRPC("{\"types\":[[\"Vector3\"][\"int\"][\"float\"]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[\"destination\"][\"int\"][\"foo\"]]")]
 	public abstract partial class BumpBehavior : NetworkBehavior
 	{
 		public const byte RPC_ON_MOVE = 0 + 5;
+		public const byte RPC_ON_LIVE = 1 + 5;
+		public const byte RPC_ON_DAMAGE = 2 + 5;
 		
 		public BumpNetworkObject networkObject = null;
 
@@ -23,6 +25,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 			base.SetupHelperRpcs(networkObject);
 			networkObject.RegisterRpc("OnMove", OnMove, typeof(Vector3));
+			networkObject.RegisterRpc("OnLive", OnLive, typeof(int));
+			networkObject.RegisterRpc("OnDamage", OnDamage, typeof(float));
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -104,6 +108,16 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// Vector3 destination
 		/// </summary>
 		public abstract void OnMove(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// int int
+		/// </summary>
+		public abstract void OnLive(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// float foo
+		/// </summary>
+		public abstract void OnDamage(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

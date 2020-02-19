@@ -6,6 +6,9 @@ using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TMPro;
+using BeardedManStudios.Forge.Networking.Generated;
+using BeardedManStudios.Forge.Networking;
+using BeardedManStudios.Forge.Networking.Unity;
 namespace Tarantula.Networking{
     public class GameStage : MonoBehaviour{
 
@@ -26,31 +29,13 @@ namespace Tarantula.Networking{
             timer.SetText("00:00");
         }
 
-        async void Update(){
+        void Update(){
             if (Input.GetMouseButtonDown(0)) {
                 RaycastHit hit;
                 if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit)) {
                     movements[seatIndex].OnRun(hit.point);
                 }   
             }
-            /**
-            if (started&&Input.GetMouseButtonDown(0)) {
-                 Vector3 target = Input.mousePosition;
-                 //movements[seatIndex].OnMove(target,2);
-                 float x = (target.x/Screen.width);
-                 float y = (target.y/Screen.height);
-                 Payload payload = new Payload();
-                 payload.command = "onMessage";
-                 payload.headers = new Header[5];
-                 payload.headers[0]=new Header("x",x.ToString());
-                 payload.headers[1]=new Header("y",y.ToString());
-                 payload.headers[2]=new Header("z",target.z.ToString());
-                 payload.headers[3]=new Header("f","5");
-                 payload.headers[4]=new Header("n",seatIndex+"");
-                 //payload.headers[4]=new Header("n",(string)INS.robotList[INS.seatIndex].SelectToken("questId"));
-                 await OnMove(payload);//publish move destination
-                 //Debug.Log("SEND ["+suc+"]");
-            }**/
         }
         public async Task<bool> OnMove(Payload payload){
             OutboundMessage<Payload> om = new OutboundMessage<Payload>();
@@ -76,7 +61,7 @@ namespace Tarantula.Networking{
             Debug.Log(msg);           
         }
         public void OnMove(string msg){
-            //Debug.Log(msg);
+            Debug.Log(msg);
             JObject jo = JObject.Parse(msg);
             Vector3 mp = new Vector3();
             mp.x = ((float)jo.SelectToken("x"))*Screen.width;
@@ -86,7 +71,10 @@ namespace Tarantula.Networking{
             if(jo.ContainsKey("i")){
                 int sx = (int)jo.SelectToken("i");
                 if(sx!=seatIndex){
-                    //movements[sx].OnMove(mp,speed);
+                    RaycastHit hit;
+                    if (Physics.Raycast(Camera.main.ScreenPointToRay(mp), out hit)) {
+                        movements[sx].OnRun(hit.point);
+                    }
                 }
             }
         }
@@ -135,10 +123,9 @@ namespace Tarantula.Networking{
             if (Physics.Raycast(Camera.main.ScreenPointToRay(v),out hit)) {
                 Vector3 vc = hit.point;
                 vc.y = 9.8f;
-                GameObject clone = Instantiate(src,vc, Quaternion.identity,transform);
-                clone.name = name;
-                Bomb bm = clone.GetComponent<Bomb>();
-                //bm.Explode();
+                Bomb bm = (Bomb)NetworkManager.Instance.InstantiateBump(2,vc,Quaternion.identity,true);
+                bm.gameObject.name = name;
+                bm.transform.SetParent(transform);
             }
         }
     }

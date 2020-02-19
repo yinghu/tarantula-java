@@ -31,7 +31,8 @@
 using UnityEngine;
 using System.Collections;
 using System;
-
+using BeardedManStudios.Forge.Networking;
+//using BeardedManStudios.Forge.Networking.Unity;
 public class Player : MonoBehaviour
 {
 
@@ -58,8 +59,14 @@ public class Player : MonoBehaviour
     private Animator animator;
     private Camera cam;
     // Use this for initialization
+    
+    private BumpRun bumpRun;
+    
     void Start ()
     {
+        bumpRun = gameObject.GetComponent<BumpRun>();
+        bumpRun.OnLiveRPC += OnLive;
+        bumpRun.OnDamageRPC += OnDamage;
         //Cache the attached components for better performance and less typing
         cam = Camera.main;
         rigidBody = GetComponent<Rigidbody> ();
@@ -174,7 +181,12 @@ public class Player : MonoBehaviour
             DropBomb ();
         }
     }
-
+    public void OnLive(RpcArgs args){
+        Debug.Log("Live->"+args.GetNext<int>());
+    }
+    public void OnDamage(RpcArgs args){
+        Debug.Log("Damage->"+args.GetNext<float>());
+    }
     /// <summary>
     /// Drops a bomb beneath the player
     /// </summary>

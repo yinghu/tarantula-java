@@ -7,9 +7,9 @@ using BeardedManStudios.Forge.Networking.Unity;
 
 public class MonoBump : BumpBehavior{
     
-    void Start(){
-        
-    }
+    public delegate void OnRPCEvent(RpcArgs args);
+    
+    
     void Update(){
         if (networkObject == null){
 			return;
@@ -26,7 +26,7 @@ public class MonoBump : BumpBehavior{
         Debug.Log("Killing->"+gameObject.name);    
     }
     public override void OnMove(RpcArgs args){}
-    //public override void MoveDown(RpcArgs args){}
-    //public override void Move(RpcArgs args){}
+    public override void OnLive(RpcArgs args){}
+    public override void OnDamage(RpcArgs args){}
     //public override void Validate(RpcArgs args){}
 }

@@ -3,18 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bomb : MonoBehaviour
+public class Bomb : MonoBump
 {
     public GameObject explosion;
+    
     void Start()
     {
         
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+    void OnEnable(){
+        Debug.Log("enable bomb");
     }
     public void Explode(){
         Instantiate(explosion, transform.position, Quaternion.identity); //1

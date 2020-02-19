@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 public class Integration : MonoBehaviour{
     
     public GameEngineCluster integration;
-   
+    public bool headless;
     private bool pendingClick;
     private bool matched;
     
@@ -27,6 +27,11 @@ public class Integration : MonoBehaviour{
     
     async void Start(){
         forgeMenu = GetComponent<ForgeMenu>();
+        if(headless){
+            forgeMenu.Host("10.0.0.234",15937);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
+            return;
+        }
         login = GameObject.Find("/UI/LOGIN");
         pve = GameObject.Find("/UI/PVE");
         pvp = GameObject.Find("/UI/PVP");
@@ -48,6 +53,9 @@ public class Integration : MonoBehaviour{
         
     }
     void Update (){
+        if(headless){
+            return;
+        }
         login.SetActive(!integration.online);  
         pve.SetActive(!pendingClick&&integration.online);  
         pvp.SetActive(!pendingClick&&integration.online);
@@ -126,7 +134,7 @@ public class Integration : MonoBehaviour{
             }
         });
     }
-    async void _OnStart(InboundMessage msg){
+    void _OnStart(InboundMessage msg){
         if(msg.query!=null&&msg.query.Equals("onStart")){
             //gameStage.OnStart(msg.payload);
             //Debug.Log("START=>>>"+msg.payload);

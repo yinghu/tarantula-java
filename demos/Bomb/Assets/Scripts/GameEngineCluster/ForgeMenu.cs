@@ -69,11 +69,6 @@ public class ForgeMenu : MonoBehaviour
         }
         Debug.Log("IS SERVER->"+networker.IsServer);
 		mgr.Initialize(networker);
-        //NetworkObject.Flush(networker); 
-		//if (networker is IServer){
-            //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
-		//}
-	
     }   
     void OnApplicationQuit(){
         Debug.Log("server closed");

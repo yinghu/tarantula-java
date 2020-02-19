@@ -16,8 +16,15 @@ public class BumpRun : MonoBump
     private Rigidbody rigidBody;
     private bool useController;
     
+    public event OnRPCEvent OnLiveRPC; 
+    public event OnRPCEvent OnDamageRPC;
     
-    void Start(){
+    protected override void NetworkStart(){
+		base.NetworkStart();
+        _Start();
+    }
+
+    void _Start(){
         _controller = GetComponent<CharacterController>();
         useController = _controller!=null;
         if(!useController){
@@ -27,6 +34,8 @@ public class BumpRun : MonoBump
     }
     public void OnRun(Vector3 dest){
         networkObject.SendRpc(RPC_ON_MOVE, Receivers.Owner,dest);
+        networkObject.SendRpc(RPC_ON_LIVE, Receivers.Owner,10);
+        networkObject.SendRpc(RPC_ON_DAMAGE, Receivers.Owner,12.5f);
     }
 	
     void FixedUpdate(){   
@@ -64,5 +73,18 @@ public class BumpRun : MonoBump
             speed = 5.0f;
 		});
     }
+    public override void OnLive(RpcArgs args){
+        MainThreadManager.Run(() =>
+		{
+            OnLiveRPC?.Invoke(args);    
+        });   
+    }
+    public override void OnDamage(RpcArgs args){
+        MainThreadManager.Run(() =>
+		{
+            OnDamageRPC?.Invoke(args);    
+        });   
+    }
+    
 }
 
