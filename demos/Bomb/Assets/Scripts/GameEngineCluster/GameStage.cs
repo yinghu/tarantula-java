@@ -20,20 +20,31 @@ namespace Tarantula.Networking{
         private TextMeshProUGUI timer;
        
         private int seatIndex;
-        public BumpRun[] movements;
+        public BumpRun[] bumpRuns;
+        public Movement[] movements;
         
         void Start(){
             integration = GameEngineCluster.Instance;
             GameObject tm = GameObject.Find("/UI/Timer");
             timer = tm.GetComponent<TextMeshProUGUI>();
             timer.SetText("00:00");
+            bumpRuns[0].OnQuestRPC += OnLive;
+            bumpRuns[1].OnQuestRPC += OnLive;
+            bumpRuns[0].OnMoveRPC += OnMove;
+            bumpRuns[1].OnMoveRPC += OnMove;
+            bumpRuns[0].OnRemoveRPC += OnDead;
+            bumpRuns[1].OnRemoveRPC += OnDead;
+            if(integration.room!=null){
+                seatIndex = integration.room.seatIndex;
+                game = integration.game;
+            }
         }
-
+        
         void Update(){
             if (Input.GetMouseButtonDown(0)) {
                 RaycastHit hit;
                 if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit)) {
-                    movements[seatIndex].OnRun(hit.point);
+                    bumpRuns[seatIndex].OnRun(hit.point,seatIndex);
                 }   
             }
         }
@@ -49,17 +60,6 @@ namespace Tarantula.Networking{
             }
             return suc;
         }
-        public void OnJoin(JObject jo,Descriptor desc){
-            JToken occ = jo.SelectToken("gameObject.occupation");
-            seatIndex = (int)occ.SelectToken("seatIndex");
-            int state = (int)occ.SelectToken("state");
-            string arenaZone = (string)jo.SelectToken("gameObject.arenaZone");
-            this.game = desc;
-        }
-        
-        public void OnStart(string msg){
-            Debug.Log(msg);           
-        }
         public void OnMove(string msg){
             Debug.Log(msg);
             JObject jo = JObject.Parse(msg);
@@ -73,7 +73,7 @@ namespace Tarantula.Networking{
                 if(sx!=seatIndex){
                     RaycastHit hit;
                     if (Physics.Raycast(Camera.main.ScreenPointToRay(mp), out hit)) {
-                        movements[sx].OnRun(hit.point);
+                        bumpRuns[sx].OnRun(hit.point,sx);
                     }
                 }
             }
@@ -100,10 +100,7 @@ namespace Tarantula.Networking{
         public void OnRemove(string msg){
             JObject jo = JObject.Parse(msg);
             string questId = (string)jo.SelectToken("n");  
-            GameObject obj = GameObject.Find("/Stage/"+questId);
-            if(obj!=null){
-                obj.GetComponent<Bomb>().Explode();
-            }
+            bumpRuns[seatIndex].OnRemove(questId);
         }
         public void OnMessage(InboundMessage ibm){
             if(ibm.query!=null&&ibm.query.Equals("onMessage")){
@@ -123,10 +120,25 @@ namespace Tarantula.Networking{
             if (Physics.Raycast(Camera.main.ScreenPointToRay(v),out hit)) {
                 Vector3 vc = hit.point;
                 vc.y = 9.8f;
-                Bomb bm = (Bomb)NetworkManager.Instance.InstantiateBump(2,vc,Quaternion.identity,true);
-                bm.gameObject.name = name;
-                bm.transform.SetParent(transform);
+                bumpRuns[seatIndex].OnQuest(hit.point,name);
             }
+        }
+        public void OnLive(RpcArgs args){
+            Bomb bm = (Bomb)NetworkManager.Instance.InstantiateBump(2,args.GetNext<Vector3>(),Quaternion.identity,true);
+            bm.gameObject.name = args.GetNext<string>();
+            bm.transform.SetParent(transform);
+        }
+        public void OnMove(RpcArgs args){
+            Vector3 p = args.GetNext<Vector3>();
+            int sx = args.GetNext<int>();
+            movements[sx].OnMove(p); 
+        }
+        public void OnDead(RpcArgs args){
+            string p = args.GetNext<string>();
+            GameObject obj = GameObject.Find("/Stage/"+p);
+            if(obj!=null){
+                obj.GetComponent<Bomb>().Explode();
+            } 
         }
     }
 }

@@ -27,14 +27,6 @@ namespace BeardedManStudios.Forge.Networking.Generated
 						availableCallback = true;
 						obj = new BumpNetworkObject(networker, id, frame);
 						break;
-					case ChatManagerNetworkObject.IDENTITY:
-						availableCallback = true;
-						obj = new ChatManagerNetworkObject(networker, id, frame);
-						break;
-					case NetworkCameraNetworkObject.IDENTITY:
-						availableCallback = true;
-						obj = new NetworkCameraNetworkObject(networker, id, frame);
-						break;
 				}
 
 				if (!availableCallback)

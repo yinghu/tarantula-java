@@ -22,21 +22,12 @@ namespace Tarantula.Networking{
             if(!useController){
                 rigidBody = GetComponent<Rigidbody>();
             }
-            target = Vector3.one;
-        }
-        public void OnMove(Vector3 mousePosition,float _speed){
-            RaycastHit hit;
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePosition), out hit)) {
-              //Debug.Log(transform.position+"<1><1><1>"+hit.point+"<><><>"+mousePosition+"<><><>"+_speed);
-              target = hit.point;
-              speed = _speed;
-              deceleration = 2*_speed;
-              targetBuffer = 1.5f*(_speed/speed);
+                target = Vector3.one;
             }
-        }
-        //public override void OnMove(RpcArgs args){
-        
-        //} 
+        public void OnMove(Vector3 destination){
+            target = destination;
+            speed = 5.0f;
+        } 
         void FixedUpdate(){   
             Vector3 movement = Vector3.zero;
             if(target != Vector3.one){
@@ -49,6 +40,7 @@ namespace Tarantula.Networking{
                     speed -= deceleration* Time.deltaTime;
                     if(speed<=0){
                         target = Vector3.one;
+                        speed = 5.0f;
                     }
                 }
                 else{
@@ -59,7 +51,7 @@ namespace Tarantula.Networking{
                 if(useController){
                     _controller.Move(movement);
                 }else{
-                    rigidBody.MovePosition(rigidBody.position + movement);
+                    rigidBody.MovePosition(rigidBody.position+movement);
                 }
             }
         } 

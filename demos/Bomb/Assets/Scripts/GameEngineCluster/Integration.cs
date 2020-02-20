@@ -8,6 +8,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TMPro;
 using UnityEngine.SceneManagement;
+using BeardedManStudios.Forge.Networking.Generated;
+using BeardedManStudios.Forge.Networking;
+using BeardedManStudios.Forge.Networking.Unity;
 public class Integration : MonoBehaviour{
     
     public GameEngineCluster integration;
@@ -22,9 +25,9 @@ public class Integration : MonoBehaviour{
     private GameObject pvp;
 
     private TextMeshProUGUI timer;
-    
+    private TextMeshProUGUI message;
     private ForgeMenu forgeMenu;
-    
+    private bool inGame;
     async void Start(){
         forgeMenu = GetComponent<ForgeMenu>();
         if(headless){
@@ -37,6 +40,9 @@ public class Integration : MonoBehaviour{
         pvp = GameObject.Find("/UI/PVP");
         GameObject tm = GameObject.Find("/UI/Timer");
         timer = tm.GetComponent<TextMeshProUGUI>();
+        GameObject tms = GameObject.Find("/UI/Message");
+        message = tms.GetComponent<TextMeshProUGUI>();
+        
         integration.OnInboundMessage += _OnStart; 
         integration.OnException += (ex,msg,code)=>{
             Debug.Log(msg);
@@ -60,6 +66,7 @@ public class Integration : MonoBehaviour{
         pve.SetActive(!pendingClick&&integration.online);  
         pvp.SetActive(!pendingClick&&integration.online);
         if(matched){
+            Debug.Log("Going to arena->"+integration.room.arena);
             integration.OnInboundMessage -= _OnStart;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
         }
@@ -96,9 +103,21 @@ public class Integration : MonoBehaviour{
     }
     public async void OnLogout(){
         if(integration.online){
+            if(inGame){
+                Payload payload = new Payload();
+                payload.command = "onLeave";
+                integration.OnInboundMessage -= _OnStart;
+                await  integration.OnInstance(this,integration.game,payload,(ps)=>{
+                    NetworkManager.Instance.Disconnect();
+                    integration.CloseUDP();
+                    //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex-1);
+                });
+            }
             await integration.Logout(this);
             pendingClick = false;
             matched = false;
+            inGame = false;
+            message.SetText("Play Again");
         }
         Debug.Log(integration.online);     
     }
@@ -116,30 +135,44 @@ public class Integration : MonoBehaviour{
             }
         }
         return await integration.OnPlay(caller,"robot-quest/live",game,(jo)=>{
-            //JToken occ = jo.SelectToken("gameObject.occupation");
-            //int seatIndex = (int)occ.SelectToken("seatIndex");
-            //int state = (int)occ.SelectToken("state");
-            //arenaZone = (string)jo.SelectToken("gameObject.arenaZone");
+            Occupation occ = jo.SelectToken("gameObject.occupation").ToObject<Occupation>();
+            string arenaZone = (string)jo.SelectToken("gameObject.arenaZone");
+            Room room = new Room((int)jo.SelectToken("gameObject.capacity"),arenaZone);
+            room.connection = new Connection();
+            room.occupations[occ.seatIndex]=occ;
+            room.state = occ.state;
+            room.seatIndex = occ.seatIndex;
+            room.totalJoined = occ.totalJoined;
             integration.game = game;
             if(!integration.udpEnabled&&jo.ContainsKey("connection")){
                 Connection conn = jo.SelectToken("connection").ToObject<Connection>();
                 Debug.Log(conn.host+"///"+conn.port);
-                //forgeMenu.Host(conn.host,(ushort)conn.port);
-            }
-            if(forgeMenu.asServer){
-                forgeMenu.Host("10.0.0.234",15937);
+                room.connection = conn;
             }
             else{
-                forgeMenu.Connect("10.0.0.234",15937);
+                room.connection.host = "10.0.0.234";
+                room.connection.port = 15937;
             }
+            integration.room = room;
+            if(room.state==2){
+                Connection xconn = integration.room.connection;
+                if(forgeMenu.asServer){
+                    forgeMenu.Host(xconn.host,(ushort)xconn.port);
+                }
+                else{
+                    forgeMenu.Connect(xconn.host,(ushort)xconn.port);
+                }
+            }
+            message.SetText("Players["+room.totalJoined+"/"+room.capacity+"]");
+            inGame = true;
         });
     }
     void _OnStart(InboundMessage msg){
         if(msg.query!=null&&msg.query.Equals("onStart")){
             //gameStage.OnStart(msg.payload);
-            //Debug.Log("START=>>>"+msg.payload);
-            //JObject jo = JObject.Parse(msg.payload);
-            //integration.arena = (string)jo.SelectToken("arena");
+            Debug.Log("START=>>>"+msg.payload);
+            JObject jo = JObject.Parse(msg.payload);
+            integration.room.arena = (string)jo.SelectToken("arena");
             //integration.robotList = (JArray)jo.SelectToken("robotList");
             matched = true;
         }

@@ -4,13 +4,16 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[\"Vector3\"][\"int\"][\"float\"]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[\"destination\"][\"int\"][\"foo\"]]")]
+	[GeneratedRPC("{\"types\":[[\"Vector3\", \"int\"][\"int\"][\"float\"][\"Vector3\", \"string\"][\"string\"][]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[\"destination\", \"index\"][\"int\"][\"foo\"][\"position\", \"string\"][\"oid\"][]]")]
 	public abstract partial class BumpBehavior : NetworkBehavior
 	{
 		public const byte RPC_ON_MOVE = 0 + 5;
 		public const byte RPC_ON_LIVE = 1 + 5;
 		public const byte RPC_ON_DAMAGE = 2 + 5;
+		public const byte RPC_ON_QUEST = 3 + 5;
+		public const byte RPC_ON_REMOVE = 4 + 5;
+		public const byte RPC_ON_EXPLODE = 5 + 5;
 		
 		public BumpNetworkObject networkObject = null;
 
@@ -24,9 +27,12 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			networkObject.AttachedBehavior = this;
 
 			base.SetupHelperRpcs(networkObject);
-			networkObject.RegisterRpc("OnMove", OnMove, typeof(Vector3));
+			networkObject.RegisterRpc("OnMove", OnMove, typeof(Vector3), typeof(int));
 			networkObject.RegisterRpc("OnLive", OnLive, typeof(int));
 			networkObject.RegisterRpc("OnDamage", OnDamage, typeof(float));
+			networkObject.RegisterRpc("OnQuest", OnQuest, typeof(Vector3), typeof(string));
+			networkObject.RegisterRpc("OnRemove", OnRemove, typeof(string));
+			networkObject.RegisterRpc("OnExplode", OnExplode);
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -106,6 +112,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// <summary>
 		/// Arguments:
 		/// Vector3 destination
+		/// int index
 		/// </summary>
 		public abstract void OnMove(RpcArgs args);
 		/// <summary>
@@ -118,6 +125,21 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// float foo
 		/// </summary>
 		public abstract void OnDamage(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// Vector3 position
+		/// string string
+		/// </summary>
+		public abstract void OnQuest(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// string oid
+		/// </summary>
+		public abstract void OnRemove(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// </summary>
+		public abstract void OnExplode(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

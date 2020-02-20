@@ -15,6 +15,7 @@ public class ForgeMenu : MonoBehaviour
     private NetworkManager mgr = null;
 	private NetWorker server;
     private UDPClient client;
+   
 	private void Start(){
 		Rpc.MainThreadRunner = MainThreadManager.Instance; 
 	}

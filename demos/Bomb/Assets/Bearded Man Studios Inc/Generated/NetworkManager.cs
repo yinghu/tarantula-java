@@ -11,8 +11,6 @@ namespace BeardedManStudios.Forge.Networking.Unity
 		protected BMSByte metadata = new BMSByte();
 
 		public GameObject[] BumpNetworkObject = null;
-		public GameObject[] ChatManagerNetworkObject = null;
-		public GameObject[] NetworkCameraNetworkObject = null;
 
 		protected virtual void SetupObjectCreatedEvent()
 		{
@@ -53,52 +51,6 @@ namespace BeardedManStudios.Forge.Networking.Unity
 						objectInitialized(newObj, obj);
 				});
 			}
-			else if (obj is ChatManagerNetworkObject)
-			{
-				MainThreadManager.Run(() =>
-				{
-					NetworkBehavior newObj = null;
-					if (!NetworkBehavior.skipAttachIds.TryGetValue(obj.NetworkId, out newObj))
-					{
-						if (ChatManagerNetworkObject.Length > 0 && ChatManagerNetworkObject[obj.CreateCode] != null)
-						{
-							var go = Instantiate(ChatManagerNetworkObject[obj.CreateCode]);
-							newObj = go.GetComponent<ChatManagerBehavior>();
-						}
-					}
-
-					if (newObj == null)
-						return;
-						
-					newObj.Initialize(obj);
-
-					if (objectInitialized != null)
-						objectInitialized(newObj, obj);
-				});
-			}
-			else if (obj is NetworkCameraNetworkObject)
-			{
-				MainThreadManager.Run(() =>
-				{
-					NetworkBehavior newObj = null;
-					if (!NetworkBehavior.skipAttachIds.TryGetValue(obj.NetworkId, out newObj))
-					{
-						if (NetworkCameraNetworkObject.Length > 0 && NetworkCameraNetworkObject[obj.CreateCode] != null)
-						{
-							var go = Instantiate(NetworkCameraNetworkObject[obj.CreateCode]);
-							newObj = go.GetComponent<NetworkCameraBehavior>();
-						}
-					}
-
-					if (newObj == null)
-						return;
-						
-					newObj.Initialize(obj);
-
-					if (objectInitialized != null)
-						objectInitialized(newObj, obj);
-				});
-			}
 		}
 
 		protected virtual void InitializedObject(INetworkBehavior behavior, NetworkObject obj)
@@ -116,30 +68,6 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			var netBehavior = go.GetComponent<BumpBehavior>();
 			var obj = netBehavior.CreateNetworkObject(Networker, index);
 			go.GetComponent<BumpBehavior>().networkObject = (BumpNetworkObject)obj;
-
-			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
-			
-			return netBehavior;
-		}
-		[Obsolete("Use InstantiateChatManager instead, its shorter and easier to type out ;)")]
-		public ChatManagerBehavior InstantiateChatManagerNetworkObject(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
-		{
-			var go = Instantiate(ChatManagerNetworkObject[index]);
-			var netBehavior = go.GetComponent<ChatManagerBehavior>();
-			var obj = netBehavior.CreateNetworkObject(Networker, index);
-			go.GetComponent<ChatManagerBehavior>().networkObject = (ChatManagerNetworkObject)obj;
-
-			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
-			
-			return netBehavior;
-		}
-		[Obsolete("Use InstantiateNetworkCamera instead, its shorter and easier to type out ;)")]
-		public NetworkCameraBehavior InstantiateNetworkCameraNetworkObject(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
-		{
-			var go = Instantiate(NetworkCameraNetworkObject[index]);
-			var netBehavior = go.GetComponent<NetworkCameraBehavior>();
-			var obj = netBehavior.CreateNetworkObject(Networker, index);
-			go.GetComponent<NetworkCameraBehavior>().networkObject = (NetworkCameraNetworkObject)obj;
 
 			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
 			
@@ -198,120 +126,6 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			}
 
 			go.GetComponent<BumpBehavior>().networkObject = (BumpNetworkObject)obj;
-
-			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
-			
-			return netBehavior;
-		}
-		/// <summary>
-		/// Instantiate an instance of ChatManager
-		/// </summary>
-		/// <returns>
-		/// A local instance of ChatManagerBehavior
-		/// </returns>
-		/// <param name="index">The index of the ChatManager prefab in the NetworkManager to Instantiate</param>
-		/// <param name="position">Optional parameter which defines the position of the created GameObject</param>
-		/// <param name="rotation">Optional parameter which defines the rotation of the created GameObject</param>
-		/// <param name="sendTransform">Optional Parameter to send transform data to other connected clients on Instantiation</param>
-		public ChatManagerBehavior InstantiateChatManager(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
-		{
-			if (ChatManagerNetworkObject.Length <= index)
-			{
-				Debug.Log("Prefab(s) missing for: ChatManager. Add them at the NetworkManager prefab.");
-				return null;
-			}
-			
-			var go = Instantiate(ChatManagerNetworkObject[index]);
-			var netBehavior = go.GetComponent<ChatManagerBehavior>();
-
-			NetworkObject obj = null;
-			if (!sendTransform && position == null && rotation == null)
-				obj = netBehavior.CreateNetworkObject(Networker, index);
-			else
-			{
-				metadata.Clear();
-
-				if (position == null && rotation == null)
-				{
-					byte transformFlags = 0x1 | 0x2;
-					ObjectMapper.Instance.MapBytes(metadata, transformFlags);
-					ObjectMapper.Instance.MapBytes(metadata, go.transform.position, go.transform.rotation);
-				}
-				else
-				{
-					byte transformFlags = 0x0;
-					transformFlags |= (byte)(position != null ? 0x1 : 0x0);
-					transformFlags |= (byte)(rotation != null ? 0x2 : 0x0);
-					ObjectMapper.Instance.MapBytes(metadata, transformFlags);
-
-					if (position != null)
-						ObjectMapper.Instance.MapBytes(metadata, position.Value);
-
-					if (rotation != null)
-						ObjectMapper.Instance.MapBytes(metadata, rotation.Value);
-				}
-
-				obj = netBehavior.CreateNetworkObject(Networker, index, metadata.CompressBytes());
-			}
-
-			go.GetComponent<ChatManagerBehavior>().networkObject = (ChatManagerNetworkObject)obj;
-
-			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
-			
-			return netBehavior;
-		}
-		/// <summary>
-		/// Instantiate an instance of NetworkCamera
-		/// </summary>
-		/// <returns>
-		/// A local instance of NetworkCameraBehavior
-		/// </returns>
-		/// <param name="index">The index of the NetworkCamera prefab in the NetworkManager to Instantiate</param>
-		/// <param name="position">Optional parameter which defines the position of the created GameObject</param>
-		/// <param name="rotation">Optional parameter which defines the rotation of the created GameObject</param>
-		/// <param name="sendTransform">Optional Parameter to send transform data to other connected clients on Instantiation</param>
-		public NetworkCameraBehavior InstantiateNetworkCamera(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
-		{
-			if (NetworkCameraNetworkObject.Length <= index)
-			{
-				Debug.Log("Prefab(s) missing for: NetworkCamera. Add them at the NetworkManager prefab.");
-				return null;
-			}
-			
-			var go = Instantiate(NetworkCameraNetworkObject[index]);
-			var netBehavior = go.GetComponent<NetworkCameraBehavior>();
-
-			NetworkObject obj = null;
-			if (!sendTransform && position == null && rotation == null)
-				obj = netBehavior.CreateNetworkObject(Networker, index);
-			else
-			{
-				metadata.Clear();
-
-				if (position == null && rotation == null)
-				{
-					byte transformFlags = 0x1 | 0x2;
-					ObjectMapper.Instance.MapBytes(metadata, transformFlags);
-					ObjectMapper.Instance.MapBytes(metadata, go.transform.position, go.transform.rotation);
-				}
-				else
-				{
-					byte transformFlags = 0x0;
-					transformFlags |= (byte)(position != null ? 0x1 : 0x0);
-					transformFlags |= (byte)(rotation != null ? 0x2 : 0x0);
-					ObjectMapper.Instance.MapBytes(metadata, transformFlags);
-
-					if (position != null)
-						ObjectMapper.Instance.MapBytes(metadata, position.Value);
-
-					if (rotation != null)
-						ObjectMapper.Instance.MapBytes(metadata, rotation.Value);
-				}
-
-				obj = netBehavior.CreateNetworkObject(Networker, index, metadata.CompressBytes());
-			}
-
-			go.GetComponent<NetworkCameraBehavior>().networkObject = (NetworkCameraNetworkObject)obj;
 
 			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
 			

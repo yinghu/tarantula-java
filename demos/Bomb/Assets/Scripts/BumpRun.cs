@@ -7,70 +7,30 @@ using BeardedManStudios.Forge.Networking.Unity;
 public class BumpRun : MonoBump
 {
     
-    private float speed = 5.0f;
-    private Vector3 target;
-    private float targetBuffer = 1.5f;
-    private float rotationSpeed = 15.0f;
-    private float deceleration = 10.0f;
-    private CharacterController _controller;
-    private Rigidbody rigidBody;
-    private bool useController;
-    
+    public event OnRPCEvent OnMoveRPC; 
     public event OnRPCEvent OnLiveRPC; 
     public event OnRPCEvent OnDamageRPC;
+    public event OnRPCEvent OnQuestRPC;
+    public event OnRPCEvent OnRemoveRPC;
     
     protected override void NetworkStart(){
 		base.NetworkStart();
-        _Start();
+        Debug.Log("network started");
     }
-
-    void _Start(){
-        _controller = GetComponent<CharacterController>();
-        useController = _controller!=null;
-        if(!useController){
-            rigidBody = GetComponent<Rigidbody>();
-        }
-        target = Vector3.one;
+    public void OnRun(Vector3 dest,int index){
+        networkObject.SendRpc(RPC_ON_MOVE, Receivers.Owner,dest,index);
     }
-    public void OnRun(Vector3 dest){
-        networkObject.SendRpc(RPC_ON_MOVE, Receivers.Owner,dest);
-        networkObject.SendRpc(RPC_ON_LIVE, Receivers.Owner,10);
-        networkObject.SendRpc(RPC_ON_DAMAGE, Receivers.Owner,12.5f);
+	public void OnQuest(Vector3 position,string oid){
+       networkObject.SendRpc(RPC_ON_QUEST, Receivers.Owner,position,oid); 
     }
-	
-    void FixedUpdate(){   
-        Vector3 movement = Vector3.zero;
-        if(target != Vector3.one){
-            movement = speed*Vector3.forward;
-            movement = Vector3.ClampMagnitude(movement,speed);
-            movement.y = -9.8f;
-            movement = transform.TransformDirection(movement);
-            movement *=Time.fixedDeltaTime;
-            if(Vector3.Distance(target,transform.position)< targetBuffer){
-                speed -= deceleration* Time.deltaTime;
-                if(speed<=0){
-                    target = Vector3.one;
-                    speed = 5.0f;
-                }
-            }
-            else{
-                Vector3 tpos = new Vector3(target.x,transform.position.y,target.z);
-                Quaternion trot = Quaternion.LookRotation(tpos-transform.position);
-                transform.rotation = Quaternion.Slerp(transform.rotation,trot,rotationSpeed*Time.fixedDeltaTime);
-            }
-            if(useController){
-                _controller.Move(movement);
-            }else{
-                rigidBody.MovePosition(rigidBody.position+movement);
-            }
-        }
+    public void OnRemove(string oid){
+       networkObject.SendRpc(RPC_ON_REMOVE, Receivers.Owner,oid); 
     }
     //RPC Callbacks 
     public override void OnMove(RpcArgs args){
         MainThreadManager.Run(() =>
 		{
-			target = args.GetNext<Vector3>();
-            speed = 5.0f;
+			OnMoveRPC?.Invoke(args);  
 		});
     }
     public override void OnLive(RpcArgs args){
@@ -85,6 +45,17 @@ public class BumpRun : MonoBump
             OnDamageRPC?.Invoke(args);    
         });   
     }
-    
+    public override void OnQuest(RpcArgs args){
+        MainThreadManager.Run(() =>
+		{
+            OnQuestRPC?.Invoke(args);   
+        });   
+    }
+    public override void OnRemove(RpcArgs args){
+        MainThreadManager.Run(() =>
+		{
+            OnRemoveRPC?.Invoke(args);   
+        });   
+    }
 }
 

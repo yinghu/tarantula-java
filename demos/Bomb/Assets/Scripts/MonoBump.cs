@@ -28,5 +28,7 @@ public class MonoBump : BumpBehavior{
     public override void OnMove(RpcArgs args){}
     public override void OnLive(RpcArgs args){}
     public override void OnDamage(RpcArgs args){}
-    //public override void Validate(RpcArgs args){}
+    public override void OnQuest(RpcArgs args){}
+    public override void OnRemove(RpcArgs args){}
+    public override void OnExplode(RpcArgs args){}
 }

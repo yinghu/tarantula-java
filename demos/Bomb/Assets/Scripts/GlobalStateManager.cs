@@ -85,15 +85,15 @@ public class GlobalStateManager : MonoBehaviour{
         //Debug.Log(msg.query);
         //Debug.Log(msg.instanceId);        
         //Debug.Log(msg.payload);
-        if(msg.query!=null&&msg.query.Equals("onStart")){
-            gameStage.OnStart(msg.payload);
+        //if(msg.query!=null&&msg.query.Equals("onStart")){
+            //gameStage.OnStart(msg.payload);
             //Debug.Log("START=>>>"+msg.payload);
             //JObject jo = JObject.Parse(msg.payload);
             //integration.arena = (string)jo.SelectToken("arena");
             //integration.robotList = (JArray)jo.SelectToken("robotList");
             //matched = true;
-        }
-        else if(msg.query!=null&&msg.query.Equals("onTimer")){
+        //}
+        if(msg.query!=null&&msg.query.Equals("onTimer")){
             gameStage.OnTimer(msg.payload);
         }
         else if(msg.query!=null&&msg.query.Equals("onMove")){

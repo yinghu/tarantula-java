@@ -77,6 +77,7 @@ namespace Tarantula.Networking{
         public Lobby lobby(string typeId){ return _lobbyList[typeId];}  
         public List<Descriptor> gameList(){ return _gameList;}
         public Descriptor game{set;get;}
+        public Room room{set;get;}
         private static GameEngineCluster _INSTANCE;
         private string deviceId;
         
@@ -967,6 +968,27 @@ namespace Tarantula.Networking{
         public string serverId { get; set; }
         public bool secured { get; set; }
         public int port { get; set; }
+    }
+    public class Occupation{
+        public string systemId{get;set;}
+        public int seatIndex{get;set;}
+        public int state{get;set;}
+        public int totalJoined{set;get;}
+    }
+    public class Room{
+        public Room(int _capacity,string _zone){
+            capacity = _capacity;
+            zone = _zone;
+            occupations = new Occupation[_capacity];
+        }
+        public int state{set;get;}
+        public int totalJoined{set;get;}
+        public int seatIndex{get;set;}
+        public Connection connection{get;set;}
+        public string zone{get;private set;}
+        public string arena{get;set;}
+        public int capacity{get;private set;}
+        public Occupation[] occupations{get;private set;}
     }
     public class Presence{
         public string systemId { get; set; }
