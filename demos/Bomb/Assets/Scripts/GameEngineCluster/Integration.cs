@@ -28,10 +28,13 @@ public class Integration : MonoBehaviour{
     private TextMeshProUGUI message;
     private ForgeMenu forgeMenu;
     private bool inGame;
+    private bool connected;
     async void Start(){
         forgeMenu = GetComponent<ForgeMenu>();
         if(headless){
+            Rpc.MainThreadRunner = MainThreadManager.Instance; 
             forgeMenu.Host("10.0.0.234",15937);
+            Debug.Log("Running headless mode");
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
             return;
         }
@@ -42,7 +45,6 @@ public class Integration : MonoBehaviour{
         timer = tm.GetComponent<TextMeshProUGUI>();
         GameObject tms = GameObject.Find("/UI/Message");
         message = tms.GetComponent<TextMeshProUGUI>();
-        
         integration.OnInboundMessage += _OnStart; 
         integration.OnException += (ex,msg,code)=>{
             Debug.Log(msg);
@@ -51,12 +53,24 @@ public class Integration : MonoBehaviour{
         };
         pendingClick = false;
         matched = false;
+        connected = false;
         if(!integration.online){
             await integration.Index(this);
             await integration.Device(this); 
             Debug.Log("Online->"+integration.online);
         }
         
+    }
+    void _Forge(){
+        Rpc.MainThreadRunner = MainThreadManager.Instance; 
+        Connection xconn = integration.room.connection;
+        if(forgeMenu.asServer){
+            forgeMenu.Host(xconn.host,(ushort)xconn.port);
+        }
+        else{
+            forgeMenu.Connect(xconn.host,(ushort)xconn.port);
+        }
+        connected = true;
     }
     void Update (){
         if(headless){
@@ -65,7 +79,7 @@ public class Integration : MonoBehaviour{
         login.SetActive(!integration.online);  
         pve.SetActive(!pendingClick&&integration.online);  
         pvp.SetActive(!pendingClick&&integration.online);
-        if(matched){
+        if(matched){    
             Debug.Log("Going to arena->"+integration.room.arena);
             integration.OnInboundMessage -= _OnStart;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
@@ -85,7 +99,8 @@ public class Integration : MonoBehaviour{
         }
         pendingClick = true;
         bool joined = await OnJoin(this,"RobotQuestPVE");     
-        if(joined){
+        if(!joined){
+            message.SetText(integration.message);
             //go to game play
             //integration.OnInboundMessage -= _OnStart;
             //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
@@ -97,8 +112,8 @@ public class Integration : MonoBehaviour{
         }
         pendingClick = true;
         bool joined = await OnJoin(this,"RobotQuestPVP");
-        if(joined){
-            //go to game play
+        if(!joined){
+            message.SetText(integration.message);
         }
     }
     public async void OnLogout(){
@@ -106,17 +121,21 @@ public class Integration : MonoBehaviour{
             if(inGame){
                 Payload payload = new Payload();
                 payload.command = "onLeave";
-                integration.OnInboundMessage -= _OnStart;
+                //integration.OnInboundMessage -= _OnStart;
                 await  integration.OnInstance(this,integration.game,payload,(ps)=>{
-                    NetworkManager.Instance.Disconnect();
+                    Debug.Log(ps);
+                    if(connected){
+                        NetworkManager.Instance.Disconnect();
+                    }
                     integration.CloseUDP();
-                    //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex-1);
                 });
             }
             await integration.Logout(this);
             pendingClick = false;
             matched = false;
             inGame = false;
+            connected = false;
+            timer.SetText("00:00");
             message.SetText("Play Again");
         }
         Debug.Log(integration.online);     
@@ -154,15 +173,7 @@ public class Integration : MonoBehaviour{
                 room.connection.port = 15937;
             }
             integration.room = room;
-            if(room.state==2){
-                Connection xconn = integration.room.connection;
-                if(forgeMenu.asServer){
-                    forgeMenu.Host(xconn.host,(ushort)xconn.port);
-                }
-                else{
-                    forgeMenu.Connect(xconn.host,(ushort)xconn.port);
-                }
-            }
+            _Forge();
             message.SetText("Players["+room.totalJoined+"/"+room.capacity+"]");
             inGame = true;
         });

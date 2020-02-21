@@ -9,7 +9,11 @@ public class MonoBump : BumpBehavior{
     
     public delegate void OnRPCEvent(RpcArgs args);
     
-    
+    protected override void NetworkStart(){
+		base.NetworkStart();
+        networkObject.onDestroy += _OnDestroy;
+        Debug.Log("network started");
+    }
     void Update(){
         if (networkObject == null){
 			return;
@@ -21,6 +25,9 @@ public class MonoBump : BumpBehavior{
 		}
         networkObject.position = transform.position;
 		networkObject.rotation = transform.rotation;    
+    }
+    void _OnDestroy(NetWorker sender){
+        Debug.Log("network Killing->"+sender);    
     }
     void OnDestroy(){
         Debug.Log("Killing->"+gameObject.name);    

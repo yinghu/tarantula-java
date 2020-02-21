@@ -17,13 +17,14 @@ public class ForgeMenu : MonoBehaviour
     private UDPClient client;
    
 	private void Start(){
-		Rpc.MainThreadRunner = MainThreadManager.Instance; 
+		//Rpc.MainThreadRunner = MainThreadManager.Instance; 
 	}
 	public void Connect(string ipAddress,ushort portNumber){
         client = new UDPClient();
         client.Connect(ipAddress,portNumber);
         client.serverAccepted += (sender) =>{
 			Debug.Log("accepted from server");
+            //NetworkObject.Flush(sender);
 		};
         client.connectAttemptFailed += (sender) =>{
 			Debug.Log("failed from server");
@@ -60,16 +61,20 @@ public class ForgeMenu : MonoBehaviour
 			Debug.LogError("NetWorker failed to bind");
 			return;
 		}
-		if (mgr == null && networkManager == null){
-			Debug.LogWarning("A network manager was not provided, generating a new one instead");
-			networkManager = new GameObject("Network Manager");
-			mgr = networkManager.AddComponent<NetworkManager>();
-		}
-		else if (mgr == null){
-			mgr = Instantiate(networkManager).GetComponent<NetworkManager>();
+		//if (mgr == null && networkManager == null){
+			//Debug.LogWarning("A network manager was not provided, generating a new one instead");
+			//networkManager = new GameObject("Network Manager");
+			//mgr = networkManager.AddComponent<NetworkManager>();
+		//}
+		if (mgr == null){
+			Debug.Log("Created new network manager");
+            mgr = Instantiate(networkManager).GetComponent<NetworkManager>();
         }
         Debug.Log("IS SERVER->"+networker.IsServer);
 		mgr.Initialize(networker);
+        if (networker is IServer){
+            NetworkObject.Flush(networker);
+        }
     }   
     void OnApplicationQuit(){
         Debug.Log("server closed");
