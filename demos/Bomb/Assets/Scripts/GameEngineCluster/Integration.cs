@@ -23,6 +23,7 @@ public class Integration : MonoBehaviour{
     private GameObject login;
     private GameObject pve;
     private GameObject pvp;
+    private GameObject go;
 
     private TextMeshProUGUI timer;
     private TextMeshProUGUI message;
@@ -41,6 +42,7 @@ public class Integration : MonoBehaviour{
         login = GameObject.Find("/UI/LOGIN");
         pve = GameObject.Find("/UI/PVE");
         pvp = GameObject.Find("/UI/PVP");
+        go = GameObject.Find("/UI/GO");
         GameObject tm = GameObject.Find("/UI/Timer");
         timer = tm.GetComponent<TextMeshProUGUI>();
         GameObject tms = GameObject.Find("/UI/Message");
@@ -61,10 +63,11 @@ public class Integration : MonoBehaviour{
         }
         
     }
-    void _Forge(){
+    public void _Forge(){
         if(connected){
             return;
         }
+        integration.OnInboundMessage -= _OnStart;
         connected = true;
         Rpc.MainThreadRunner = MainThreadManager.Instance; 
         Connection xconn = integration.room.connection;
@@ -74,7 +77,7 @@ public class Integration : MonoBehaviour{
         else{
             forgeMenu.Connect(xconn.host,(ushort)xconn.port);
         }
-        //SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex+1);
+        SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex+1);
     }
     void Update (){
         if(headless){
@@ -83,11 +86,12 @@ public class Integration : MonoBehaviour{
         login.SetActive(!integration.online);  
         pve.SetActive(!pendingClick&&integration.online);  
         pvp.SetActive(!pendingClick&&integration.online);
-        if(matched){        
-            Debug.Log("Going to arena->"+integration.room.arena);
-            integration.OnInboundMessage -= _OnStart;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
-        }
+        go.SetActive(matched);
+        //if(matched){        
+            //Debug.Log("Going to arena->"+integration.room.arena);
+            //integration.OnInboundMessage -= _OnStart;
+            //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
+        //}
     }
     
     public async void OnLogin(){
@@ -177,7 +181,7 @@ public class Integration : MonoBehaviour{
                 room.connection.port = 15937;
             }
             integration.room = room;
-            _Forge();
+            //_Forge();
             message.SetText("Players["+room.totalJoined+"/"+room.capacity+"]");
             inGame = true;
         });
