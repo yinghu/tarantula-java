@@ -24,7 +24,6 @@ public class ForgeMenu : MonoBehaviour
         client.Connect(ipAddress,portNumber);
         client.serverAccepted += (sender) =>{
 			Debug.Log("accepted from server");
-            //NetworkObject.Flush(sender);
 		};
         client.connectAttemptFailed += (sender) =>{
 			Debug.Log("failed from server");
