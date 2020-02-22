@@ -10,6 +10,7 @@ namespace BeardedManStudios.Forge.Networking.Unity
 		public event InstantiateEvent objectInitialized;
 		protected BMSByte metadata = new BMSByte();
 
+		public GameObject[] BombNetworkObject = null;
 		public GameObject[] BumpNetworkObject = null;
 
 		protected virtual void SetupObjectCreatedEvent()
@@ -28,7 +29,30 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			if (obj.CreateCode < 0)
 				return;
 				
-			if (obj is BumpNetworkObject)
+			if (obj is BombNetworkObject)
+			{
+				MainThreadManager.Run(() =>
+				{
+					NetworkBehavior newObj = null;
+					if (!NetworkBehavior.skipAttachIds.TryGetValue(obj.NetworkId, out newObj))
+					{
+						if (BombNetworkObject.Length > 0 && BombNetworkObject[obj.CreateCode] != null)
+						{
+							var go = Instantiate(BombNetworkObject[obj.CreateCode]);
+							newObj = go.GetComponent<BombBehavior>();
+						}
+					}
+
+					if (newObj == null)
+						return;
+						
+					newObj.Initialize(obj);
+
+					if (objectInitialized != null)
+						objectInitialized(newObj, obj);
+				});
+			}
+			else if (obj is BumpNetworkObject)
 			{
 				MainThreadManager.Run(() =>
 				{
@@ -61,6 +85,18 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			obj.pendingInitialized -= InitializedObject;
 		}
 
+		[Obsolete("Use InstantiateBomb instead, its shorter and easier to type out ;)")]
+		public BombBehavior InstantiateBombNetworkObject(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
+		{
+			var go = Instantiate(BombNetworkObject[index]);
+			var netBehavior = go.GetComponent<BombBehavior>();
+			var obj = netBehavior.CreateNetworkObject(Networker, index);
+			go.GetComponent<BombBehavior>().networkObject = (BombNetworkObject)obj;
+
+			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
+			
+			return netBehavior;
+		}
 		[Obsolete("Use InstantiateBump instead, its shorter and easier to type out ;)")]
 		public BumpBehavior InstantiateBumpNetworkObject(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
 		{
@@ -74,6 +110,63 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			return netBehavior;
 		}
 
+		/// <summary>
+		/// Instantiate an instance of Bomb
+		/// </summary>
+		/// <returns>
+		/// A local instance of BombBehavior
+		/// </returns>
+		/// <param name="index">The index of the Bomb prefab in the NetworkManager to Instantiate</param>
+		/// <param name="position">Optional parameter which defines the position of the created GameObject</param>
+		/// <param name="rotation">Optional parameter which defines the rotation of the created GameObject</param>
+		/// <param name="sendTransform">Optional Parameter to send transform data to other connected clients on Instantiation</param>
+		public BombBehavior InstantiateBomb(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
+		{
+			if (BombNetworkObject.Length <= index)
+			{
+				Debug.Log("Prefab(s) missing for: Bomb. Add them at the NetworkManager prefab.");
+				return null;
+			}
+			
+			var go = Instantiate(BombNetworkObject[index]);
+			var netBehavior = go.GetComponent<BombBehavior>();
+
+			NetworkObject obj = null;
+			if (!sendTransform && position == null && rotation == null)
+				obj = netBehavior.CreateNetworkObject(Networker, index);
+			else
+			{
+				metadata.Clear();
+
+				if (position == null && rotation == null)
+				{
+					byte transformFlags = 0x1 | 0x2;
+					ObjectMapper.Instance.MapBytes(metadata, transformFlags);
+					ObjectMapper.Instance.MapBytes(metadata, go.transform.position, go.transform.rotation);
+				}
+				else
+				{
+					byte transformFlags = 0x0;
+					transformFlags |= (byte)(position != null ? 0x1 : 0x0);
+					transformFlags |= (byte)(rotation != null ? 0x2 : 0x0);
+					ObjectMapper.Instance.MapBytes(metadata, transformFlags);
+
+					if (position != null)
+						ObjectMapper.Instance.MapBytes(metadata, position.Value);
+
+					if (rotation != null)
+						ObjectMapper.Instance.MapBytes(metadata, rotation.Value);
+				}
+
+				obj = netBehavior.CreateNetworkObject(Networker, index, metadata.CompressBytes());
+			}
+
+			go.GetComponent<BombBehavior>().networkObject = (BombNetworkObject)obj;
+
+			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
+			
+			return netBehavior;
+		}
 		/// <summary>
 		/// Instantiate an instance of Bump
 		/// </summary>

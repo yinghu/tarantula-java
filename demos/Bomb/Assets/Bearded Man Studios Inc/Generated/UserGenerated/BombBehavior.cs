@@ -4,17 +4,13 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[\"Vector3\", \"int\"][\"int\"][\"float\"][\"Vector3\", \"string\"][\"string\"]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[\"destination\", \"index\"][\"int\"][\"foo\"][\"position\", \"string\"][\"oid\"]]")]
-	public abstract partial class BumpBehavior : NetworkBehavior
+	[GeneratedRPC("{\"types\":[[]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[]]")]
+	public abstract partial class BombBehavior : NetworkBehavior
 	{
-		public const byte RPC_ON_MOVE = 0 + 5;
-		public const byte RPC_ON_LIVE = 1 + 5;
-		public const byte RPC_ON_DAMAGE = 2 + 5;
-		public const byte RPC_ON_QUEST = 3 + 5;
-		public const byte RPC_ON_REMOVE = 4 + 5;
+		public const byte RPC_ON_EXPLODE = 0 + 5;
 		
-		public BumpNetworkObject networkObject = null;
+		public BombNetworkObject networkObject = null;
 
 		public override void Initialize(NetworkObject obj)
 		{
@@ -22,15 +18,11 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			if (networkObject != null && networkObject.AttachedBehavior != null)
 				return;
 			
-			networkObject = (BumpNetworkObject)obj;
+			networkObject = (BombNetworkObject)obj;
 			networkObject.AttachedBehavior = this;
 
 			base.SetupHelperRpcs(networkObject);
-			networkObject.RegisterRpc("OnMove", OnMove, typeof(Vector3), typeof(int));
-			networkObject.RegisterRpc("OnLive", OnLive, typeof(int));
-			networkObject.RegisterRpc("OnDamage", OnDamage, typeof(float));
-			networkObject.RegisterRpc("OnQuest", OnQuest, typeof(Vector3), typeof(string));
-			networkObject.RegisterRpc("OnRemove", OnRemove, typeof(string));
+			networkObject.RegisterRpc("OnExplode", OnExplode);
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -88,7 +80,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 		public override void Initialize(NetWorker networker, byte[] metadata = null)
 		{
-			Initialize(new BumpNetworkObject(networker, createCode: TempAttachCode, metadata: metadata));
+			Initialize(new BombNetworkObject(networker, createCode: TempAttachCode, metadata: metadata));
 		}
 
 		private void DestroyGameObject(NetWorker sender)
@@ -99,7 +91,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 		public override NetworkObject CreateNetworkObject(NetWorker networker, int createCode, byte[] metadata = null)
 		{
-			return new BumpNetworkObject(networker, this, createCode, metadata);
+			return new BombNetworkObject(networker, this, createCode, metadata);
 		}
 
 		protected override void InitializedTransform()
@@ -109,31 +101,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 		/// <summary>
 		/// Arguments:
-		/// Vector3 destination
-		/// int index
 		/// </summary>
-		public abstract void OnMove(RpcArgs args);
-		/// <summary>
-		/// Arguments:
-		/// int int
-		/// </summary>
-		public abstract void OnLive(RpcArgs args);
-		/// <summary>
-		/// Arguments:
-		/// float foo
-		/// </summary>
-		public abstract void OnDamage(RpcArgs args);
-		/// <summary>
-		/// Arguments:
-		/// Vector3 position
-		/// string string
-		/// </summary>
-		public abstract void OnQuest(RpcArgs args);
-		/// <summary>
-		/// Arguments:
-		/// string oid
-		/// </summary>
-		public abstract void OnRemove(RpcArgs args);
+		public abstract void OnExplode(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

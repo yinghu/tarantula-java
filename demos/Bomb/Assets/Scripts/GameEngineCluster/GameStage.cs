@@ -38,6 +38,10 @@ namespace Tarantula.Networking{
                 seatIndex = integration.room.seatIndex;
                 game = integration.game;
             }
+            NetworkManager.Instance.objectInitialized +=(INetworkBehavior unityGameObject, NetworkObject obj)=>{
+                //GameObject go = ((MonoBehaviour)unityGameObject).gameObject;
+                Debug.Log(((MonoBehaviour)unityGameObject).gameObject.name+" Created");    
+            };
         }
         
         void Update(){
@@ -124,9 +128,11 @@ namespace Tarantula.Networking{
             }
         }
         public void OnLive(RpcArgs args){
-            Bomb bm = (Bomb)NetworkManager.Instance.InstantiateBump(2,args.GetNext<Vector3>(),Quaternion.identity,true);
+            GameObject gb = NetworkManager.Instance.BombNetworkObject[0];
+            //gb.SetActive(false);
+            BombRun bm = (BombRun)NetworkManager.Instance.InstantiateBomb(0,args.GetNext<Vector3>(),Quaternion.identity,true);
             bm.gameObject.name = args.GetNext<string>();
-            bm.transform.SetParent(transform);
+            //bm.transform.SetParent(transform);
         }
         public void OnMove(RpcArgs args){
             Vector3 p = args.GetNext<Vector3>();
@@ -137,7 +143,7 @@ namespace Tarantula.Networking{
             string p = args.GetNext<string>();
             GameObject obj = GameObject.Find("/Stage/"+p);
             if(obj!=null){
-                obj.GetComponent<Bomb>().Explode();
+                obj.GetComponent<BombRun>().Explode();
             } 
         }
     }

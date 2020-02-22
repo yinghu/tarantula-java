@@ -5,14 +5,14 @@ using BeardedManStudios.Forge.Networking.Generated;
 using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 
-public class MonoBump : BumpBehavior{
+public class MonoBomb : BombBehavior{
     
     public delegate void OnRPCEvent(RpcArgs args);
     
     protected override void NetworkStart(){
 		base.NetworkStart();
         networkObject.onDestroy += _OnDestroy;
-        Debug.Log("network started");
+        Debug.Log("network started bomb");
     }
     void Update(){
         if (networkObject == null){
@@ -21,20 +21,19 @@ public class MonoBump : BumpBehavior{
 		if(!networkObject.IsOwner){
 			transform.position = networkObject.position;
 			transform.rotation = networkObject.rotation;
+            transform.localScale = networkObject.scale;
 			return;
 		}
         networkObject.position = transform.position;
-		networkObject.rotation = transform.rotation;    
+		networkObject.rotation = transform.rotation;  
+        networkObject.scale = transform.localScale;
     }
     void _OnDestroy(NetWorker sender){
-        Debug.Log("network Killing->"+sender);    
+        Debug.Log("network Killing from ->"+sender);    
     }
     void OnDestroy(){
         Debug.Log("Killing->"+gameObject.name);    
     }
-    public override void OnMove(RpcArgs args){}
-    public override void OnLive(RpcArgs args){}
-    public override void OnDamage(RpcArgs args){}
-    public override void OnQuest(RpcArgs args){}
-    public override void OnRemove(RpcArgs args){}
+   
+    public override void OnExplode(RpcArgs args){}
 }

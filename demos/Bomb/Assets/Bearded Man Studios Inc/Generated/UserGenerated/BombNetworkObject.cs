@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedInterpol("{\"inter\":[0.15,0.15]")]
-	public partial class BumpNetworkObject : NetworkObject
+	[GeneratedInterpol("{\"inter\":[0.15,0.15,0.15]")]
+	public partial class BombNetworkObject : NetworkObject
 	{
-		public const int IDENTITY = 3;
+		public const int IDENTITY = 1;
 
 		private byte[] _dirtyFields = new byte[1];
 
@@ -77,6 +77,37 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			if (rotationChanged != null) rotationChanged(_rotation, timestep);
 			if (fieldAltered != null) fieldAltered("rotation", _rotation, timestep);
 		}
+		[ForgeGeneratedField]
+		private Vector3 _scale;
+		public event FieldEvent<Vector3> scaleChanged;
+		public InterpolateVector3 scaleInterpolation = new InterpolateVector3() { LerpT = 0.15f, Enabled = true };
+		public Vector3 scale
+		{
+			get { return _scale; }
+			set
+			{
+				// Don't do anything if the value is the same
+				if (_scale == value)
+					return;
+
+				// Mark the field as dirty for the network to transmit
+				_dirtyFields[0] |= 0x4;
+				_scale = value;
+				hasDirtyFields = true;
+			}
+		}
+
+		public void SetscaleDirty()
+		{
+			_dirtyFields[0] |= 0x4;
+			hasDirtyFields = true;
+		}
+
+		private void RunChange_scale(ulong timestep)
+		{
+			if (scaleChanged != null) scaleChanged(_scale, timestep);
+			if (fieldAltered != null) fieldAltered("scale", _scale, timestep);
+		}
 
 		protected override void OwnershipChanged()
 		{
@@ -88,6 +119,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		{
 			positionInterpolation.current = positionInterpolation.target;
 			rotationInterpolation.current = rotationInterpolation.target;
+			scaleInterpolation.current = scaleInterpolation.target;
 		}
 
 		public override int UniqueIdentity { get { return IDENTITY; } }
@@ -96,6 +128,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		{
 			UnityObjectMapper.Instance.MapBytes(data, _position);
 			UnityObjectMapper.Instance.MapBytes(data, _rotation);
+			UnityObjectMapper.Instance.MapBytes(data, _scale);
 
 			return data;
 		}
@@ -110,6 +143,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			rotationInterpolation.current = _rotation;
 			rotationInterpolation.target = _rotation;
 			RunChange_rotation(timestep);
+			_scale = UnityObjectMapper.Instance.Map<Vector3>(payload);
+			scaleInterpolation.current = _scale;
+			scaleInterpolation.target = _scale;
+			RunChange_scale(timestep);
 		}
 
 		protected override BMSByte SerializeDirtyFields()
@@ -121,6 +158,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _position);
 			if ((0x2 & _dirtyFields[0]) != 0)
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _rotation);
+			if ((0x4 & _dirtyFields[0]) != 0)
+				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _scale);
 
 			// Reset all the dirty fields
 			for (int i = 0; i < _dirtyFields.Length; i++)
@@ -163,6 +202,19 @@ namespace BeardedManStudios.Forge.Networking.Generated
 					RunChange_rotation(timestep);
 				}
 			}
+			if ((0x4 & readDirtyFlags[0]) != 0)
+			{
+				if (scaleInterpolation.Enabled)
+				{
+					scaleInterpolation.target = UnityObjectMapper.Instance.Map<Vector3>(data);
+					scaleInterpolation.Timestep = timestep;
+				}
+				else
+				{
+					_scale = UnityObjectMapper.Instance.Map<Vector3>(data);
+					RunChange_scale(timestep);
+				}
+			}
 		}
 
 		public override void InterpolateUpdate()
@@ -180,6 +232,11 @@ namespace BeardedManStudios.Forge.Networking.Generated
 				_rotation = (Quaternion)rotationInterpolation.Interpolate();
 				//RunChange_rotation(rotationInterpolation.Timestep);
 			}
+			if (scaleInterpolation.Enabled && !scaleInterpolation.current.UnityNear(scaleInterpolation.target, 0.0015f))
+			{
+				_scale = (Vector3)scaleInterpolation.Interpolate();
+				//RunChange_scale(scaleInterpolation.Timestep);
+			}
 		}
 
 		private void Initialize()
@@ -189,9 +246,9 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 		}
 
-		public BumpNetworkObject() : base() { Initialize(); }
-		public BumpNetworkObject(NetWorker networker, INetworkBehavior networkBehavior = null, int createCode = 0, byte[] metadata = null) : base(networker, networkBehavior, createCode, metadata) { Initialize(); }
-		public BumpNetworkObject(NetWorker networker, uint serverId, FrameStream frame) : base(networker, serverId, frame) { Initialize(); }
+		public BombNetworkObject() : base() { Initialize(); }
+		public BombNetworkObject(NetWorker networker, INetworkBehavior networkBehavior = null, int createCode = 0, byte[] metadata = null) : base(networker, networkBehavior, createCode, metadata) { Initialize(); }
+		public BombNetworkObject(NetWorker networker, uint serverId, FrameStream frame) : base(networker, serverId, frame) { Initialize(); }
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}
