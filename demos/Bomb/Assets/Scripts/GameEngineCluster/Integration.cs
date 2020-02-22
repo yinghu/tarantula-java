@@ -16,15 +16,13 @@ public class Integration : MonoBehaviour{
     public GameEngineCluster integration;
     public bool headless;
     private bool pendingClick;
-    private bool matched;
     
     private Descriptor game;
      
     private GameObject login;
     private GameObject pve;
     private GameObject pvp;
-    private GameObject go;
-
+    
     private TextMeshProUGUI timer;
     private TextMeshProUGUI message;
     private ForgeMenu forgeMenu;
@@ -42,7 +40,6 @@ public class Integration : MonoBehaviour{
         login = GameObject.Find("/UI/LOGIN");
         pve = GameObject.Find("/UI/PVE");
         pvp = GameObject.Find("/UI/PVP");
-        go = GameObject.Find("/UI/GO");
         GameObject tm = GameObject.Find("/UI/Timer");
         timer = tm.GetComponent<TextMeshProUGUI>();
         GameObject tms = GameObject.Find("/UI/Message");
@@ -54,21 +51,22 @@ public class Integration : MonoBehaviour{
             Debug.Log(code);
         };
         pendingClick = false;
-        matched = false;
         connected = false;
         if(!integration.online){
             await integration.Index(this);
             await integration.Device(this); 
             Debug.Log("Online->"+integration.online);
         }
-        
     }
-    public void _Forge(){
+    public void OnGo(){
         if(connected){
             return;
         }
-        integration.OnInboundMessage -= _OnStart;
+        _Forge();
+    }
+    private void _Forge(){
         connected = true;
+        integration.OnInboundMessage -= _OnStart;
         Rpc.MainThreadRunner = MainThreadManager.Instance; 
         Connection xconn = integration.room.connection;
         if(forgeMenu.asServer){
@@ -77,7 +75,11 @@ public class Integration : MonoBehaviour{
         else{
             forgeMenu.Connect(xconn.host,(ushort)xconn.port);
         }
-        SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex+1);
+        StartCoroutine(WaitAndLoad());
+    }
+    private IEnumerator WaitAndLoad(){
+        yield return new WaitForSeconds(2);
+        SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex+1); 
     }
     void Update (){
         if(headless){
@@ -86,12 +88,6 @@ public class Integration : MonoBehaviour{
         login.SetActive(!integration.online);  
         pve.SetActive(!pendingClick&&integration.online);  
         pvp.SetActive(!pendingClick&&integration.online);
-        go.SetActive(matched);
-        //if(matched){        
-            //Debug.Log("Going to arena->"+integration.room.arena);
-            //integration.OnInboundMessage -= _OnStart;
-            //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
-        //}
     }
     
     public async void OnLogin(){
@@ -109,9 +105,6 @@ public class Integration : MonoBehaviour{
         bool joined = await OnJoin(this,"RobotQuestPVE");     
         if(!joined){
             message.SetText(integration.message);
-            //go to game play
-            //integration.OnInboundMessage -= _OnStart;
-            //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
         }
     }
     public async void OnPVP(){
@@ -129,7 +122,6 @@ public class Integration : MonoBehaviour{
             if(inGame){
                 Payload payload = new Payload();
                 payload.command = "onLeave";
-                //integration.OnInboundMessage -= _OnStart;
                 await  integration.OnInstance(this,integration.game,payload,(ps)=>{
                     Debug.Log(ps);
                     if(connected){
@@ -140,7 +132,6 @@ public class Integration : MonoBehaviour{
             }
             await integration.Logout(this);
             pendingClick = false;
-            matched = false;
             inGame = false;
             connected = false;
             timer.SetText("00:00");
@@ -181,7 +172,6 @@ public class Integration : MonoBehaviour{
                 room.connection.port = 15937;
             }
             integration.room = room;
-            //_Forge();
             message.SetText("Players["+room.totalJoined+"/"+room.capacity+"]");
             inGame = true;
         });
@@ -193,8 +183,7 @@ public class Integration : MonoBehaviour{
             JObject jo = JObject.Parse(msg.payload);
             integration.room.arena = (string)jo.SelectToken("arena");
             //integration.robotList = (JArray)jo.SelectToken("robotList");
-            //_Forge();
-            matched = true;
+            OnGo();
         }
         else if(msg.query!=null&&msg.query.Equals("onTimer")){
             JObject jo = JObject.Parse(msg.payload);
