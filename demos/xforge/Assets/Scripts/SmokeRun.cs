@@ -7,7 +7,7 @@ using BeardedManStudios.Forge.Networking.Unity;
 public class SmokeRun : MonoSmoke
 {
     
-    private float speed = 5.0f;
+    private float speed = 2.0f;
     private Vector3 target;
     private float targetBuffer = 1.5f;
     private float rotationSpeed = 15.0f;
@@ -48,7 +48,7 @@ public class SmokeRun : MonoSmoke
                 speed -= deceleration* Time.deltaTime;
                 if(speed<=0){
                     target = Vector3.one;
-                    speed = 5.0f;
+                    speed = 2.0f;
                 }
             }
             else{
@@ -67,9 +67,15 @@ public class SmokeRun : MonoSmoke
     public override void Move(RpcArgs args){
         MainThreadManager.Run(() =>
 		{
-			target = args.GetNext<Vector3>();
-            speed = 5.0f;
-		});
+            target = args.GetNext<Vector3>();
+            speed = 2.0f;
+		    //rigidBody.constraints = RigidbodyConstraints.FreezeAll;
+            //rigidBody.detectCollisions = false;
+            BulletRun brun = (BulletRun)NetworkManager.Instance.InstantiateSmoke(1,transform.position,Quaternion.Euler(0,0,0),true);        
+            brun.OnRun(target);
+            //rigidBody.isKinematic = false;
+            //rigidBody.enable = true;
+        });
     }
     public override void MoveUp(RpcArgs args){
         MainThreadManager.Run(() =>
@@ -81,7 +87,7 @@ public class SmokeRun : MonoSmoke
         MainThreadManager.Run(() =>
 		{
             BulletRun brun = (BulletRun)NetworkManager.Instance.InstantiateSmoke(1,transform.position,Quaternion.Euler(0,0,0),true);        
-            brun.OnRun();
+            brun.OnRun(target);
         });
     }
 }

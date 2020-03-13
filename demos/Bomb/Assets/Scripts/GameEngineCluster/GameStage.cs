@@ -86,7 +86,8 @@ namespace Tarantula.Networking{
             JObject jo = JObject.Parse(msg);
             int m = (int)jo.SelectToken("m");
             int s = (int)jo.SelectToken("s");
-            timer.SetText(m+":"+s);       
+            timer.SetText(m+":"+s); 
+            
         }
         public void OnEnd(){ 
             timer.SetText("00:00");
@@ -126,13 +127,18 @@ namespace Tarantula.Networking{
                 vc.y = 9.8f;
                 bumpRuns[seatIndex].OnQuest(hit.point,name);
             }
+            foreach(KeyValuePair<uint,NetworkObject> kv in NetworkManager.Instance.Networker.NetworkObjects){
+                Debug.Log(">>>>>>>>>>KEY->"+kv.Key);
+                Debug.Log(">>>>>>>>>>vALUE->"+((MonoBehaviour)kv.Value.AttachedBehavior).gameObject.name);
+            }
         }
         public void OnLive(RpcArgs args){
-            GameObject gb = NetworkManager.Instance.BombNetworkObject[0];
-            //gb.SetActive(false);
             BombRun bm = (BombRun)NetworkManager.Instance.InstantiateBomb(0,args.GetNext<Vector3>(),Quaternion.identity,true);
-            bm.gameObject.name = args.GetNext<string>();
-            //bm.transform.SetParent(transform);
+            string nm = args.GetNext<string>();
+            bm.networkStarted +=(noj)=>{
+                bm.Setup(1,nm);
+            };
+            bm.gameObject.name = nm;
         }
         public void OnMove(RpcArgs args){
             Vector3 p = args.GetNext<Vector3>();

@@ -1,10 +1,14 @@
 package com.tarantula.cci;
 
+import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,7 +24,7 @@ public class PushEventHandler implements RequestHandler {
 
     private String serverTopic;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
-
+    private GsonBuilder builder;
     public PushEventHandler(){
 
     }
@@ -58,6 +62,10 @@ public class PushEventHandler implements RequestHandler {
                     }
                 });
             }
+            else if(action.equals("OnDedicated")){ //dedicated server register on cluster
+                byte[] eb = this.builder.create().toJson(new ResponseHeader("OnDedicated","ok",true)).getBytes();
+                exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
+            }
         }catch (Exception ex){
             ex.printStackTrace();
             _hex.remove(exchange.id()); //removed cache on any errors
@@ -67,6 +75,8 @@ public class PushEventHandler implements RequestHandler {
 
     @Override
     public void start() throws Exception {
+        this.builder = new GsonBuilder();
+        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
         log.info("Push event handler started");

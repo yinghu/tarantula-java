@@ -7,7 +7,7 @@ using BeardedManStudios.Forge.Networking.Unity;
 public class BombRun : MonoBomb
 {
     public GameObject explosion;
-
+   
     void Awake(){
         GameObject stg = GameObject.Find("Stage");
         transform.SetParent(stg.transform);
@@ -17,7 +17,7 @@ public class BombRun : MonoBomb
         Debug.Log("Bomb Run Enabled");
     }
     public void Explode(){
-        networkObject.SendRpc(RPC_ON_EXPLODE,Receivers.Others);
+        networkObject.SendRpc(RPC_ON_EXPLODE,Receivers.All);
         StartCoroutine(WaitAndKill());
     }
     private IEnumerator WaitAndKill(){

@@ -4,11 +4,12 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[]]")]
+	[GeneratedRPC("{\"types\":[[][\"int\", \"string\"]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[][\"zone\", \"pid\"]]")]
 	public abstract partial class BombBehavior : NetworkBehavior
 	{
 		public const byte RPC_ON_EXPLODE = 0 + 5;
+		public const byte RPC_ON_START = 1 + 5;
 		
 		public BombNetworkObject networkObject = null;
 
@@ -23,6 +24,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 			base.SetupHelperRpcs(networkObject);
 			networkObject.RegisterRpc("OnExplode", OnExplode);
+			networkObject.RegisterRpc("OnStart", OnStart, typeof(int), typeof(string));
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -103,6 +105,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// Arguments:
 		/// </summary>
 		public abstract void OnExplode(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// </summary>
+		public abstract void OnStart(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

@@ -5,13 +5,20 @@ using BeardedManStudios.Forge.Networking.Generated;
 using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 public class BulletRun : MonoSmoke{
-   
-    public void OnRun(){
-        Debug.Log("running");
-        Rigidbody rigidBody = GetComponent<Rigidbody>();
-        rigidBody.velocity = transform.TransformDirection(new Vector3(0, 0,20f));
+    private Rigidbody rigidBody;
+    
+    void Start(){
+        rigidBody = GetComponent<Rigidbody>();     
     }
-   
+    
+    public void OnRun(Vector3 target){
+        Debug.Log("running");
+        //rigidBody.velocity = transform.TransformDirection(target);
+        
+    }
+    void FixedUpdate(){
+        rigidBody.AddForce(Vector3.forward * Time.fixedDeltaTime * 100f);
+    }
     void OnCollisionEnter(Collision collision){
         if(collision.gameObject.tag=="bullet"&&gameObject.tag=="bump"&&networkObject.IsOwner){
             networkObject.Destroy(); 

@@ -35,6 +35,7 @@ public class Integration : MonoBehaviour{
             forgeMenu.Host("10.0.0.234",15937);
             Debug.Log("Running headless mode");
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
+            //register
             return;
         }
         login = GameObject.Find("/UI/LOGIN");
@@ -55,6 +56,7 @@ public class Integration : MonoBehaviour{
         if(!integration.online){
             await integration.Index(this);
             await integration.Device(this); 
+            await integration.Dedicated(this);
             Debug.Log("Online->"+integration.online);
         }
     }

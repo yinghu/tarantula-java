@@ -27,6 +27,10 @@ namespace Tarantula.Networking{
         public void OnMove(Vector3 destination){
             target = destination;
             speed = 5.0f;
+            BumpRun brn = GetComponent<BumpRun>();
+            Debug.Log(brn.networkObject.NetworkId);
+            Transform trf = brn.transform;
+            Debug.Log(trf.GetComponent<BumpRun>().networkObject.NetworkId);
         } 
         void FixedUpdate(){   
             Vector3 movement = Vector3.zero;

@@ -66,9 +66,8 @@ public class EndpointService implements Serviceable,EndPoint.Resource,Scheduling
         //PushEventHandler pushEventHandler = new PushEventHandler(this.endPointListenerList);
         pushEventHandler.setup(this.tarantulaContext.tokenValidatorProvider().tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup,dis);
         pushEventHandler.start();
-
-
         rMap.put(pushEventHandler.name(),pushEventHandler);
+
         for(EndPoint endPoint : endPointList){
             endPoint.resource(this);
             endPoint.start();

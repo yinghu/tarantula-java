@@ -129,6 +129,22 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
+        public  async Task<bool> Dedicated(MonoBehaviour caller){
+            try{
+                Header[] headers = new Header[]{
+                    //new Header("Tarantula-tag","index/user"),
+                    //new Header("Tarantula-magic-key",user.login),
+                    new Header("Tarantula-action","OnDedicated")
+                };
+                //string json = JsonConvert.SerializeObject(user,JSON_SETTING);
+                string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,"{}");
+                Debug.Log(jstr);
+                return ParseRegister(jstr);            
+            }catch(Exception ex){
+                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_REGISTER);
+                return false;
+            }
+        }
         public  async Task<bool> Register(MonoBehaviour caller,User user){
             try{
                 Header[] headers = new Header[]{

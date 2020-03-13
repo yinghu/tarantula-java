@@ -20,6 +20,7 @@ const https = secured?require('https'):require('http');
 const http = require('http');
 const net = require('net');
 const querystring = require('querystring');
+//import { v1 as uuidv1 } from 'uuid';
 const uuidv1 = require('uuid/v1');
 const cMap = new Map(); //web socket client mapping clientId => connection
 const pMap = new Map(); //server push event mapping label ==> updated payload
