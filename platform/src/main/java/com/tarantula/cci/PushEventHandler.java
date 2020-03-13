@@ -62,8 +62,8 @@ public class PushEventHandler implements RequestHandler {
                     }
                 });
             }
-            else if(action.equals("OnDedicated")){ //dedicated server register on cluster
-                byte[] eb = this.builder.create().toJson(new ResponseHeader("OnDedicated","ok",true)).getBytes();
+            else if(action.equals("onDedicated")){ //dedicated server register on cluster
+                byte[] eb = this.builder.create().toJson(new ResponseHeader("onDedicated","ok",true)).getBytes();
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
         }catch (Exception ex){

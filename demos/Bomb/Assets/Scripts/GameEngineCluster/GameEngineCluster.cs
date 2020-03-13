@@ -134,7 +134,7 @@ namespace Tarantula.Networking{
                 Header[] headers = new Header[]{
                     //new Header("Tarantula-tag","index/user"),
                     //new Header("Tarantula-magic-key",user.login),
-                    new Header("Tarantula-action","OnDedicated")
+                    new Header("Tarantula-action","onDedicated")
                 };
                 //string json = JsonConvert.SerializeObject(user,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,"{}");
