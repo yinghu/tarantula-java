@@ -98,5 +98,10 @@ public class SystemValidator implements Serviceable{
         public void offSession(String systemId, int stub) {
             systemValidatorProvider.offSession(systemId);
         }
+
+        @Override
+        public boolean validateAccessKey(String accessKey){
+            return true;
+        }
     }
 }

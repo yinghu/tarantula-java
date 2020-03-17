@@ -15,6 +15,7 @@ public class Integration : MonoBehaviour{
     
     public GameEngineCluster integration;
     public bool headless;
+    public string typeId;
     private bool pendingClick;
     
     private Descriptor game;
@@ -56,7 +57,13 @@ public class Integration : MonoBehaviour{
         if(!integration.online){
             await integration.Index(this);
             await integration.Device(this); 
-            await integration.Dedicated(this);
+            Connection conn = new Connection();
+            conn.host="10.0.0.234";
+            conn.port = 15937;
+            conn.serverId = "serverId";
+            conn.type="dedicated";
+            await integration.Dedicated(this,conn);
+            //await integration.GameStarted(this,conn.serverId);
             Debug.Log("Online->"+integration.online);
         }
     }
@@ -142,7 +149,7 @@ public class Integration : MonoBehaviour{
         Debug.Log(integration.online);     
     }
      private async Task<bool> OnJoin(MonoBehaviour caller,string gname){
-        bool suc = await integration.OnLobby(caller,"robot-quest");
+        bool suc = await integration.OnLobby(caller,typeId);
         if(!suc){
             return suc;
         }
@@ -178,9 +185,10 @@ public class Integration : MonoBehaviour{
             inGame = true;
         });
     }
-    void _OnStart(InboundMessage msg){
+    async void _OnStart(InboundMessage msg){
         if(msg.query!=null&&msg.query.Equals("onStart")){
             //gameStage.OnStart(msg.payload);
+            await integration.GameStarted(this,"serverId");
             Debug.Log("START=>>>"+msg.payload);
             JObject jo = JObject.Parse(msg.payload);
             integration.room.arena = (string)jo.SelectToken("arena");

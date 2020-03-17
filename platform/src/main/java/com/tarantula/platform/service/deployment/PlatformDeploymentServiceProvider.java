@@ -351,7 +351,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     @Override
     public boolean onEvent(Event event) {
-        if(event instanceof MapStoreSyncEvent){
+       if(event instanceof MapStoreSyncEvent){
             //log.warn("Map Sync EVENT->"+event.source()+"/"+event.destination()+"/"+event.trackId());
             MapStoreSyncEvent mse = (MapStoreSyncEvent)event;
             Metadata mt = mse.metadata;
@@ -501,6 +501,28 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         this.cListeners.add(listener);
     }
+
+    //dedicated server methods
+    public void onDedicatedConnection(String typeId,Connection connection){
+        this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));
+    }
+    public Connection onDedicatedConnection(String typeId){
+        byte[] ret = this.tarantulaContext.integrationCluster().firstIndex(typeId);
+        if(ret==null){
+            return null;
+        }
+        Connection connection = new DedicatedConnection();
+        connection.fromMap(SystemUtil.toMap(ret));
+        return connection;
+    }
+    public void onStartedConnection(String serverId,byte[] started){
+        this.tarantulaContext.integrationCluster().set(serverId.getBytes(),started);
+    }
+    public byte[] onStartedConnection(String serverId){
+        return this.tarantulaContext.integrationCluster().remove(serverId.getBytes());
+    }
+    //end of dedicated server methods
+
     public PostOffice registerPostOffice(){
         return new PostOfficeSession();
     }

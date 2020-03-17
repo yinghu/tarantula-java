@@ -3,6 +3,8 @@ package com.tarantula.cci;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.ConnectionInfo;
+import com.tarantula.platform.DedicatedConnection;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
@@ -20,7 +22,8 @@ public class PushEventHandler implements RequestHandler {
 
     private String bucket;
     private EventService eventService;
-
+    private TokenValidator tokenValidator;
+    private DeploymentServiceProvider deploymentServiceProvider;
 
     private String serverTopic;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
@@ -63,7 +66,21 @@ public class PushEventHandler implements RequestHandler {
                 });
             }
             else if(action.equals("onDedicated")){ //dedicated server register on cluster
+                String typeId = exchange.header("Tarantula-type-id");
+                String host = exchange.header("Tarantula-host");
+                int port = Integer.parseInt(exchange.header("Tarantula-port"));
+                String serverId = exchange.header("Tarantula-server-id");
+                String accessKey = exchange.header("Tarantula-access-key");
+                if(tokenValidator.validateAccessKey(accessKey)){
+                    Connection connection = new DedicatedConnection(serverId,host,port);
+                    this.deploymentServiceProvider.onDedicatedConnection(typeId,connection);
+                }
                 byte[] eb = this.builder.create().toJson(new ResponseHeader("onDedicated","ok",true)).getBytes();
+                exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
+            }
+            else if(action.equals("onStarted")){
+                String serverId = exchange.header("Tarantula-server-id");
+                byte[] eb = this.deploymentServiceProvider.onStartedConnection(serverId);//this.builder.create().toJson(new ResponseHeader("onStarted","ok",true)).getBytes();
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
         }catch (Exception ex){
@@ -90,6 +107,8 @@ public class PushEventHandler implements RequestHandler {
     public void setup(TokenValidator tokenValidator, EventService eventService, AccessIndexService accessIndexService, String bucket, DeploymentServiceProvider deploymentServiceProvider) {
         this.eventService = eventService;
         this.bucket = bucket;
+        this.tokenValidator = tokenValidator;
+        this.deploymentServiceProvider = deploymentServiceProvider;
     }
     public  boolean onEvent(Event event){
         OnExchange hx = this._hex.get(event.sessionId());

@@ -34,6 +34,11 @@ public interface ClusterProvider extends Serviceable{
     byte[] get(byte[] key);
     <T extends Recoverable> boolean load(T t);
 
+    void set(byte[] key,byte[] value);
+    void index(String index,byte[] key);
+    byte[] firstIndex(String index);
+    byte[] remove(byte[] key);
+
     RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener);
     void unregisterRecoverableListener(int factoryId);
 

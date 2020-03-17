@@ -27,5 +27,7 @@ public interface TokenValidator{
 
     void offSession(String systemId,int stub);
 
+    boolean validateAccessKey(String accessKey);
+
 
 }

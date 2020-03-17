@@ -129,17 +129,36 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> Dedicated(MonoBehaviour caller){
+        public  async Task<bool> Dedicated(MonoBehaviour caller,Connection conn){
             try{
                 Header[] headers = new Header[]{
-                    //new Header("Tarantula-tag","index/user"),
-                    //new Header("Tarantula-magic-key",user.login),
+                    new Header("Tarantula-host",conn.host),
+                    new Header("Tarantula-port",""+conn.port),
+                    new Header("Tarantula-server-id",conn.serverId),
+                    new Header("Tarantula-access-key","accessKey123"),
+                    new Header("Tarantula-type-id","robot-quest"),
                     new Header("Tarantula-action","onDedicated")
                 };
-                //string json = JsonConvert.SerializeObject(user,JSON_SETTING);
+                //string json = JsonConvert.SerializeObject(conn,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,"{}");
                 Debug.Log(jstr);
                 return ParseRegister(jstr);            
+            }catch(Exception ex){
+                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_REGISTER);
+                return false;
+            }
+        }
+        public  async Task<bool> GameStarted(MonoBehaviour caller,string serverId){
+            try{
+                Header[] headers = new Header[]{
+                    new Header("Tarantula-server-id",serverId),
+                    new Header("Tarantula-access-key","accessKey123"),
+                    new Header("Tarantula-action","onStarted")
+                };
+                //string json = JsonConvert.SerializeObject(conn,JSON_SETTING);
+                string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,"{}");
+                Debug.Log(jstr);
+                return true;//ParseRegister(jstr);            
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_REGISTER);
                 return false;

@@ -163,6 +163,19 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
             return false;
         }
     }
+    public void set(byte[] key,byte[] value){
+
+    }
+    public void index(String index,byte[] key){
+
+    }
+    public byte[] firstIndex(String index){
+        return null;
+    }
+    public byte[] remove(byte[] key){
+        return null;
+    }
+
     public RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener){
         return rMap.computeIfAbsent(recoverableListener.registryId(),(rid)->recoverableListener);
     }

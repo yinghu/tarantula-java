@@ -18,7 +18,12 @@ public interface DeploymentServiceProvider extends ServiceProvider {
 
     void clusterUpdated(int scope,String nodeId,boolean state);
 
-
+    //DEDICATED SERVER APIs
+    void onDedicatedConnection(String typeId,Connection connection);
+    Connection onDedicatedConnection(String typeId);
+    void onStartedConnection(String serverId,byte[] started);
+    byte[] onStartedConnection(String serverId);
+    //END OF DEDICATED SERVER APIs
 
     /**
      * Deploys the service provider on service pool
@@ -30,7 +35,6 @@ public interface DeploymentServiceProvider extends ServiceProvider {
     void deploy(InstanceRegistry registry);
 
     void registerOnConnectionListener(Connection.Listener listener);
-
     //deploy and callback configuration
     void deploy(Configuration configuration);
     void registerConfigurationListener(Configuration.Listener listener);

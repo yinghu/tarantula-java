@@ -220,6 +220,31 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             return false;
         }
     }
+    public void set(byte[] key,byte[] value){
+        this.vMap.put(key,value);
+    }
+    public void index(String index,byte[] key){
+        mIndex.lock(index);
+        mIndex.put(index,key);
+        mIndex.unlock(index);
+        //log.warn("Index->1"+index+"/"+mIndex.get(index).isEmpty());
+    }
+    public byte[] firstIndex(String index){
+        byte[] ret = null;
+        mIndex.lock(index);
+        //log.warn("Index->2"+index+"/"+mIndex.get(index).isEmpty());
+        Iterator<byte[]> it = mIndex.get(index).iterator();
+        if(it.hasNext()){
+            ret = it.next();
+            mIndex.remove(index,ret);
+        }
+        //log.warn("Index->3"+index+"/"+mIndex.get(index).isEmpty());
+        mIndex.unlock(index);
+        return ret;
+    }
+    public byte[] remove(byte[] key){
+        return vMap.remove(key);
+    }
     public RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener){
         return rMap.computeIfAbsent(recoverableListener.registryId(),(rid)->recoverableListener);
     }
