@@ -36,7 +36,13 @@ public class Integration : MonoBehaviour{
             forgeMenu.Host("10.0.0.234",15937);
             Debug.Log("Running headless mode");
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
-            //register
+            Connection conn = new Connection();
+            conn.host="10.0.0.234";
+            conn.port = 15937;
+            conn.serverId = "serverId";
+            conn.type="dedicated";
+            await integration.Dedicated(this,conn);
+            //register dedicated connection
             return;
         }
         login = GameObject.Find("/UI/LOGIN");
@@ -63,7 +69,6 @@ public class Integration : MonoBehaviour{
             conn.serverId = "serverId";
             conn.type="dedicated";
             await integration.Dedicated(this,conn);
-            //await integration.GameStarted(this,conn.serverId);
             Debug.Log("Online->"+integration.online);
         }
     }

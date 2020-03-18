@@ -47,7 +47,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private CopyOnWriteArraySet<Event> topicPushSet = new CopyOnWriteArraySet<>();
     private ConcurrentHashMap<String,DynamicModuleClassLoader> cMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,byte[]> rMap = new ConcurrentHashMap<>();
-
+    //private ConcurrentHashMap<String,Descriptor> dMap = new ConcurrentHashMap<>();
     private TarantulaContext tarantulaContext;
     private GsonBuilder builder;
     @Override
@@ -403,7 +403,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         else if(event instanceof ServerPushEvent){
             Connection occ = this.builder.create().fromJson(new String(event.payload()), Connection.class);
-            log.warn("Connection->"+occ.toString());
             occ.disabled(event.disabled());
             if(!event.disabled()){
                 pushRegistry.put(event.sessionId(),event);

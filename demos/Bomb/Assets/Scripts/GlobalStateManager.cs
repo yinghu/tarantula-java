@@ -59,6 +59,7 @@ public class GlobalStateManager : MonoBehaviour{
             Debug.Log(ex);
             Debug.Log(code);
         };
+        SceneManager.LoadSceneAsync("Map",LoadSceneMode.Additive);
     }
     void Update (){
        

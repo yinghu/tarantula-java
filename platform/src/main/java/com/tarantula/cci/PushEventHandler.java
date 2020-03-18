@@ -71,6 +71,7 @@ public class PushEventHandler implements RequestHandler {
                 int port = Integer.parseInt(exchange.header("Tarantula-port"));
                 String serverId = exchange.header("Tarantula-server-id");
                 String accessKey = exchange.header("Tarantula-access-key");
+
                 if(tokenValidator.validateAccessKey(accessKey)){
                     Connection connection = new DedicatedConnection(serverId,host,port);
                     this.deploymentServiceProvider.onDedicatedConnection(typeId,connection);
