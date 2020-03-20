@@ -14,7 +14,7 @@ using BeardedManStudios.Forge.Networking.Unity;
 public class Integration : MonoBehaviour{
     
     public GameEngineCluster integration;
-    public bool headless;
+    //public bool headless;
     public string typeId;
     private bool pendingClick;
     
@@ -30,18 +30,19 @@ public class Integration : MonoBehaviour{
     private bool inGame;
     private bool connected;
     async void Start(){
+        integration.room = new Room();
         forgeMenu = GetComponent<ForgeMenu>();
-        if(headless){
+        if(integration.dedicated){
             Rpc.MainThreadRunner = MainThreadManager.Instance; 
             forgeMenu.Host("10.0.0.234",15937);
             Debug.Log("Running headless mode");
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
             Connection conn = new Connection();
             conn.host="10.0.0.234";
             conn.port = 15937;
             conn.serverId = "serverId";
             conn.type="dedicated";
             await integration.Dedicated(this,conn);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
             //register dedicated connection
             return;
         }
@@ -63,12 +64,6 @@ public class Integration : MonoBehaviour{
         if(!integration.online){
             await integration.Index(this);
             await integration.Device(this); 
-            Connection conn = new Connection();
-            conn.host="10.0.0.234";
-            conn.port = 15937;
-            conn.serverId = "serverId";
-            conn.type="dedicated";
-            await integration.Dedicated(this,conn);
             Debug.Log("Online->"+integration.online);
         }
     }
@@ -83,7 +78,7 @@ public class Integration : MonoBehaviour{
         integration.OnInboundMessage -= _OnStart;
         Rpc.MainThreadRunner = MainThreadManager.Instance; 
         Connection xconn = integration.room.connection;
-        if(forgeMenu.asServer){
+        if(xconn.offline){
             forgeMenu.Host(xconn.host,(ushort)xconn.port);
         }
         else{
@@ -96,7 +91,7 @@ public class Integration : MonoBehaviour{
         SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex+1); 
     }
     void Update (){
-        if(headless){
+        if(integration.dedicated){
             return;
         }
         login.SetActive(!integration.online);  
@@ -168,36 +163,34 @@ public class Integration : MonoBehaviour{
         }
         return await integration.OnPlay(caller,"robot-quest/live",game,(jo)=>{
             Occupation occ = jo.SelectToken("gameObject.occupation").ToObject<Occupation>();
-            string arenaZone = (string)jo.SelectToken("gameObject.arenaZone");
-            Room room = new Room((int)jo.SelectToken("gameObject.capacity"),arenaZone);
-            room.connection = new Connection();
+            Room room = integration.room;
+            room.capacity = (int)jo.SelectToken("gameObject.capacity");
+            room.occupations = new Occupation[room.capacity];
+            room.zone = (string)jo.SelectToken("gameObject.arenaZone"); 
             room.occupations[occ.seatIndex]=occ;
-            room.state = occ.state;
             room.seatIndex = occ.seatIndex;
             room.totalJoined = occ.totalJoined;
             integration.game = game;
-            if(!integration.udpEnabled&&jo.ContainsKey("connection")){
-                Connection conn = jo.SelectToken("connection").ToObject<Connection>();
-                Debug.Log(conn.host+"///"+conn.port);
-                room.connection = conn;
-            }
-            else{
-                room.connection.host = "10.0.0.234";
-                room.connection.port = 15937;
-            }
-            integration.room = room;
             message.SetText("Players["+room.totalJoined+"/"+room.capacity+"]");
             inGame = true;
         });
     }
     async void _OnStart(InboundMessage msg){
         if(msg.query!=null&&msg.query.Equals("onStart")){
-            //gameStage.OnStart(msg.payload);
-            await integration.GameStarted(this,"serverId");
             Debug.Log("START=>>>"+msg.payload);
             JObject jo = JObject.Parse(msg.payload);
             integration.room.arena = (string)jo.SelectToken("arena");
-            //integration.robotList = (JArray)jo.SelectToken("robotList");
+            if(jo.ContainsKey("connection")){
+                Connection conn = jo.SelectToken("connection").ToObject<Connection>();
+                integration.room.connection = conn;
+            }
+            else{
+                Connection conn = new Connection();
+                conn.offline = true;
+                conn.host = "127.0.0.1";
+                conn.port = 15937;
+                integration.room.connection = conn;
+            }
             OnGo();
         }
         else if(msg.query!=null&&msg.query.Equals("onTimer")){

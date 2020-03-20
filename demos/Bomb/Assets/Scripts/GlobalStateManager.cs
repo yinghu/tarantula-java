@@ -48,7 +48,7 @@ public class GlobalStateManager : MonoBehaviour{
     
     public GameStage gameStage;
     
-   
+    
     
     void Start(){
         integration = GameEngineCluster.Instance; 
@@ -59,14 +59,26 @@ public class GlobalStateManager : MonoBehaviour{
             Debug.Log(ex);
             Debug.Log(code);
         };
-        SceneManager.LoadSceneAsync("Map",LoadSceneMode.Additive);
+        if(integration.room.connection.offline){
+            SceneManager.LoadSceneAsync("Map",LoadSceneMode.Additive);
+        }
     }
-    void Update (){
-       
+    async void Update (){
+        if(integration.dedicated&&integration.room.started&&integration.room.totalJoined==0){
+            Application.Quit();
+            //Debug.Log("shut down =>");
+        }
+        if(integration.dedicated&&(!integration.room.started)&&integration.room.totalJoined>0){
+            integration.room.started = true;
+            await integration.GameStarted(this,"serverId",(ms)=>{
+                Debug.Log("ready to play=>"+ms);
+                SceneManager.LoadSceneAsync("Map",LoadSceneMode.Additive);
+            });                    
+        }           
     }
     public void PlayerDied (int playerNumber)
     {
-
+            
     }
     public async void OnLeave(){   
         gameStage.OnEnd();

@@ -12,7 +12,7 @@ public class MonoBump : BumpBehavior{
     protected override void NetworkStart(){
 		base.NetworkStart();
         networkObject.onDestroy += _OnDestroy;
-        Debug.Log("network started");
+        Debug.Log("network started=>MonoBump");
     }
     void Update(){
         if (networkObject == null){

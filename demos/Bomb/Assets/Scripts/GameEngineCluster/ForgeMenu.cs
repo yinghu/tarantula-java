@@ -6,19 +6,21 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
+using Tarantula.Networking;
 public class ForgeMenu : MonoBehaviour
 {
-	public bool asServer;
+	
+    //public bool asServer;
 	public GameObject networkManager = null;
 	
     private NetworkManager mgr = null;
 	private NetWorker server;
     private UDPClient client;
    
-	private void Start(){
+    private void Start(){
 		//Rpc.MainThreadRunner = MainThreadManager.Instance; 
-	}
+    }
+   
 	public void Connect(string ipAddress,ushort portNumber){
         client = new UDPClient();
         client.Connect(ipAddress,portNumber);
@@ -35,6 +37,7 @@ public class ForgeMenu : MonoBehaviour
         ((UDPServer)server).Connect(ipAddress,portNumber);
 		server.playerAccepted += (player, sender) =>{
 			Debug.Log("Player " + player.NetworkId + " Accepted");
+            GameEngineCluster.Instance.room.totalJoined++;
 		};
         server.playerConnected += (player, sender) =>{
 			Debug.Log("Player " + player.NetworkId + " connected");
@@ -44,9 +47,12 @@ public class ForgeMenu : MonoBehaviour
 		};
         server.playerDisconnected += (player, sender) =>{
 			Debug.Log("Player " + player.NetworkId + " disconnected");
+            GameEngineCluster.Instance.room.totalJoined--;
+            //Application.Quit();
 		};
 		Connected(server);
 	}
+    /**
     public void Disconnect(){
         if(asServer){
             server.Disconnect(true);    
@@ -54,7 +60,7 @@ public class ForgeMenu : MonoBehaviour
         else{
             client.Disconnect(true);
         }
-    }
+    }**/
 	private void Connected(NetWorker networker){
 		if (!networker.IsBound){
 			Debug.LogError("NetWorker failed to bind");

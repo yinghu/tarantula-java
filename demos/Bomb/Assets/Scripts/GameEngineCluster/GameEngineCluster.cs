@@ -55,7 +55,8 @@ namespace Tarantula.Networking{
        
         public string host;
         public bool deviceIdEnabled;
-        public bool udpEnabled;
+        //public bool udpEnabled;
+        public bool dedicated;
         public string accessKey;
         private GecHttpClient _ghc;
         private GecWebSocket _gwc;
@@ -107,7 +108,7 @@ namespace Tarantula.Networking{
             _liveWc = false;
             _liveUc = false;
             OnWebSocket += _OnWebSocketMessage;
-            if(udpEnabled){
+            if(!dedicated){
                 OnUDPSocket += _OnUDPSocketMessage;
             }
             Debug.Log("Starting GameEngineCluster cluster on ["+host+"]");
@@ -141,14 +142,14 @@ namespace Tarantula.Networking{
                 };
                 //string json = JsonConvert.SerializeObject(conn,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,"{}");
-                //Debug.Log(jstr);
+                Debug.Log(jstr);
                 return ParseRegister(jstr);            
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_REGISTER);
                 return false;
             }
         }
-        public  async Task<bool> GameStarted(MonoBehaviour caller,string serverId){
+        public  async Task<bool> GameStarted(MonoBehaviour caller,string serverId,Action<string> callback){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-server-id",serverId),
@@ -157,7 +158,7 @@ namespace Tarantula.Networking{
                 };
                 //string json = JsonConvert.SerializeObject(conn,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,"{}");
-                Debug.Log(jstr);
+                callback(jstr);
                 return true;//
                 //ParseRegister(jstr);            
             }catch(Exception ex){
@@ -581,7 +582,7 @@ namespace Tarantula.Networking{
             string ticket = (string)jo.SelectToken("ticket");
             game.instanceId = tid;
             game.gameId = ixx;
-            if(udpEnabled&&jo.ContainsKey("connection")){ //use external UDP provider with the connection info 
+            if((!dedicated)&&jo.ContainsKey("connection")){ //use external UDP provider with the connection info 
                 //streaming on udp game session 
                 Connection conn = jo.SelectToken("connection").ToObject<Connection>();
                 _guc = new GecUdpSocket();
@@ -996,6 +997,7 @@ namespace Tarantula.Networking{
         public List<Board> board { get; set; }
     }
     public class Connection{
+        public bool offline{get;set;}
         public string path { get; set; }
         public string protocol { get; set; }
         public string subProtocol { get; set; }
@@ -1012,19 +1014,14 @@ namespace Tarantula.Networking{
         public int totalJoined{set;get;}
     }
     public class Room{
-        public Room(int _capacity,string _zone){
-            capacity = _capacity;
-            zone = _zone;
-            occupations = new Occupation[_capacity];
-        }
-        public int state{set;get;}
+        public bool started{set;get;}
         public int totalJoined{set;get;}
         public int seatIndex{get;set;}
         public Connection connection{get;set;}
-        public string zone{get;private set;}
+        public string zone{get;set;}
         public string arena{get;set;}
-        public int capacity{get;private set;}
-        public Occupation[] occupations{get;private set;}
+        public int capacity{get;set;}
+        public Occupation[] occupations{get;set;}
     }
     public class Presence{
         public string systemId { get; set; }
