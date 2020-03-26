@@ -3,7 +3,7 @@ package com.tarantula.platform.util;
 import com.google.gson.*;
 
 import com.tarantula.Connection;
-import com.tarantula.platform.ConnectionInfo;
+import com.tarantula.platform.WebSocketConnection;
 
 import java.lang.reflect.Type;
 
@@ -12,7 +12,7 @@ public class ConnectionDeserializer implements JsonDeserializer<Connection> {
     @Override
     public Connection deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jo = jsonElement.getAsJsonObject();
-        Connection desc = new ConnectionInfo();
+        Connection desc = new WebSocketConnection();
         if(jo.has("type")){
             desc.type(jo.get("type").getAsString());
         }

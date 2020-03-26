@@ -3,8 +3,7 @@ package com.tarantula.cci;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
-import com.tarantula.platform.ConnectionInfo;
-import com.tarantula.platform.DedicatedConnection;
+import com.tarantula.platform.UDPConnection;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
@@ -71,17 +70,16 @@ public class PushEventHandler implements RequestHandler {
                 int port = Integer.parseInt(exchange.header("Tarantula-port"));
                 String serverId = exchange.header("Tarantula-server-id");
                 String accessKey = exchange.header("Tarantula-access-key");
-
                 if(tokenValidator.validateAccessKey(accessKey)){
-                    Connection connection = new DedicatedConnection(serverId,host,port);
-                    this.deploymentServiceProvider.onDedicatedConnection(typeId,connection);
+                    Connection connection = new UDPConnection(serverId,host,port);
+                    this.deploymentServiceProvider.onUDPConnection(typeId,connection);
                 }
                 byte[] eb = this.builder.create().toJson(new ResponseHeader("onDedicated","ok",true)).getBytes();
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
             else if(action.equals("onStarted")){
                 String serverId = exchange.header("Tarantula-server-id");
-                byte[] eb = this.deploymentServiceProvider.onStartedConnection(serverId);//this.builder.create().toJson(new ResponseHeader("onStarted","ok",true)).getBytes();
+                byte[] eb = this.deploymentServiceProvider.onStartedUDPConnection(serverId);//this.builder.create().toJson(new ResponseHeader("onStarted","ok",true)).getBytes();
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
         }catch (Exception ex){

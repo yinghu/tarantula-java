@@ -6,16 +6,18 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.util.Map;
 
-public class ConnectionInfo extends ResponseHeader implements Connection {
+public class WebSocketConnection extends ResponseHeader implements Connection {
 
-    private String type;
-    private String serverId;
-    private boolean secured;
-    private String protocol;
-    private String host;
-    private int port;
-    private String path;
-    private int maxConnections;
+    protected String type;
+    protected String serverId;
+    protected boolean secured;
+    protected String protocol;
+    protected String host;
+    protected int port;
+    protected String path;
+    protected int maxConnections;
+    //protected boolean dedicated;
+
     @Override
     public String type() {
         return this.type;

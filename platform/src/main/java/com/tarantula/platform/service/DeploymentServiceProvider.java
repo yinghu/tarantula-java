@@ -18,11 +18,11 @@ public interface DeploymentServiceProvider extends ServiceProvider {
 
     void clusterUpdated(int scope,String nodeId,boolean state);
 
-    //DEDICATED SERVER APIs
-    void onDedicatedConnection(String typeId,Connection connection);
-    Connection onDedicatedConnection(String typeId);
-    void onStartedConnection(String serverId,byte[] started);
-    byte[] onStartedConnection(String serverId);
+    //UDP SERVER APIs
+    void onUDPConnection(String typeId,Connection connection);
+    Connection onUDPConnection(String typeId);
+    void onStartedUDPConnection(String serverId,byte[] started);
+    byte[] onStartedUDPConnection(String serverId);
     //END OF DEDICATED SERVER APIs
 
     /**

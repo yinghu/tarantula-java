@@ -82,7 +82,7 @@ public class ForgeMenu : MonoBehaviour
         }
     }   
     void OnApplicationQuit(){
-        Debug.Log("server closed");
-		if (server != null) server.Disconnect(true);
+        //Debug.Log("server closed");
+		//if (server != null) server.Disconnect(true);
 	}
 }

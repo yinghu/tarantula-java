@@ -5,6 +5,9 @@ public interface Connection extends Response {
     String WEB_SOCKET = "websocket";
     String UDP = "udp";
 
+    //boolean dedicated();
+    //void dedicated(boolean dedicated);
+
     String type();
     void type(String type);
 

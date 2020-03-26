@@ -72,7 +72,10 @@ public class SmokeRun : MonoSmoke
 		    //rigidBody.constraints = RigidbodyConstraints.FreezeAll;
             //rigidBody.detectCollisions = false;
             BulletRun brun = (BulletRun)NetworkManager.Instance.InstantiateSmoke(1,transform.position,Quaternion.Euler(0,0,0),true);        
-            brun.OnRun(target);
+            brun.networkStarted +=(b)=>{
+                Debug.Log("nopp=>>");
+                brun.OnRun(target);
+            };
             //rigidBody.isKinematic = false;
             //rigidBody.enable = true;
         });

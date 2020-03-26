@@ -502,22 +502,22 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     //dedicated server methods
-    public void onDedicatedConnection(String typeId,Connection connection){
+    public void onUDPConnection(String typeId,Connection connection){
         this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));
     }
-    public Connection onDedicatedConnection(String typeId){
+    public Connection onUDPConnection(String typeId){
         byte[] ret = this.tarantulaContext.integrationCluster().firstIndex(typeId);
         if(ret==null){
             return null;
         }
-        Connection connection = new DedicatedConnection();
+        Connection connection = new UDPConnection();
         connection.fromMap(SystemUtil.toMap(ret));
         return connection;
     }
-    public void onStartedConnection(String serverId,byte[] started){
+    public void onStartedUDPConnection(String serverId,byte[] started){
         this.tarantulaContext.integrationCluster().set(serverId.getBytes(),started);
     }
-    public byte[] onStartedConnection(String serverId){
+    public byte[] onStartedUDPConnection(String serverId){
         return this.tarantulaContext.integrationCluster().remove(serverId.getBytes());
     }
     //end of dedicated server methods
