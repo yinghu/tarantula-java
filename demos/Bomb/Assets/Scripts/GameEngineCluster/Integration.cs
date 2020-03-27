@@ -39,8 +39,8 @@ public class Integration : MonoBehaviour{
             Connection conn = new Connection();
             conn.host="10.0.0.234";
             conn.port = 15937;
-            conn.serverId = "serverId";
             conn.type="dedicated";
+            integration.room.connection = conn;
             await integration.Dedicated(this,conn);
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
             //register dedicated connection

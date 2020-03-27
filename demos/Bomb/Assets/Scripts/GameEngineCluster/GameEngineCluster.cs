@@ -135,7 +135,7 @@ namespace Tarantula.Networking{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-host",conn.host),
                     new Header("Tarantula-port",""+conn.port),
-                    new Header("Tarantula-server-id",conn.serverId),
+                    new Header("Tarantula-server-id",deviceId),
                     new Header("Tarantula-access-key",accessKey),
                     new Header("Tarantula-type-id","robot-quest"),
                     new Header("Tarantula-action","onDedicated")
@@ -149,10 +149,10 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> GameStarted(MonoBehaviour caller,string serverId,Action<string> callback){
+        public  async Task<bool> GameStarted(MonoBehaviour caller,Action<string> callback){
             try{
                 Header[] headers = new Header[]{
-                    new Header("Tarantula-server-id",serverId),
+                    new Header("Tarantula-server-id",deviceId),
                     new Header("Tarantula-access-key",accessKey),
                     new Header("Tarantula-action","onStarted")
                 };

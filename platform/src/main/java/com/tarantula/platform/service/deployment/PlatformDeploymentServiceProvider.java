@@ -47,7 +47,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private CopyOnWriteArraySet<Event> topicPushSet = new CopyOnWriteArraySet<>();
     private ConcurrentHashMap<String,DynamicModuleClassLoader> cMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,byte[]> rMap = new ConcurrentHashMap<>();
-    //private ConcurrentHashMap<String,Descriptor> dMap = new ConcurrentHashMap<>();
     private TarantulaContext tarantulaContext;
     private GsonBuilder builder;
     @Override
@@ -570,8 +569,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.descriptor = descriptor;
         }
         @Override
-        public void onJoin(Session session, Connection onConnection,OnUpdate onUpdate) throws Exception {
-            this.module.onJoin(session,onConnection,onUpdate);
+        public void onJoin(Session session,OnUpdate onUpdate) throws Exception {
+            this.module.onJoin(session,onUpdate);
         }
 
         @Override

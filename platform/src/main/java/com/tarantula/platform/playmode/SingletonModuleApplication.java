@@ -88,7 +88,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     public boolean onEvent(Event event){
         try{
             if(event instanceof FastPlayEvent){
-                this.module.onJoin(event,null,(uid,delta)->{
+                this.module.onJoin(event,(uid,delta)->{
                     this._onStream.forEach((k,v)->{
                         v.write(delta,this.module.label());
                     });

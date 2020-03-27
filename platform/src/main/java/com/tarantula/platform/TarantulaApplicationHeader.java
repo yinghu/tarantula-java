@@ -12,13 +12,13 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
     protected Descriptor descriptor;
     protected ApplicationContext context;
     protected GsonBuilder builder;
-    protected Connection onConnection;
+    //protected Connection onConnection;
     public void callback(Session session, byte[] payload) throws Exception {
 
     }
 
     public void onError(Session session, Exception ex) {
-        this.context.log(session.toString(),ex,OnLog.ERROR);
+        //this.context.log(session.toString(),ex,OnLog.ERROR);
         String msg = ex.getMessage()!=null?ex.getMessage():"Unexpected error";
         session.write(this.builder.create().toJson(new ResponseHeader("onError",false,400,msg,"error")).getBytes(),this.descriptor.responseLabel());
     }
@@ -60,7 +60,7 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
 
     }
     public void onState(Connection onConnection){
-        this.onConnection = onConnection;
+        //this.onConnection = onConnection;
     }
     public void refund(String systemId,String applicationId){
         Descriptor desc = this.context.descriptor(applicationId);

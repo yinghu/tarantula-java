@@ -15,7 +15,7 @@ public class AdminUserModule implements Module {
     private AccessIndexService accessIndexService;
     private DataStore user;
     @Override
-    public void onJoin(Session session, Connection onConnection,OnUpdate onUpdate) throws Exception{
+    public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
         session.write(this.builder.create().toJson(_onMessage("joined")).getBytes(),label());
     }
 

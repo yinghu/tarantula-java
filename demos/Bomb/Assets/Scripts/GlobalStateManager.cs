@@ -70,7 +70,7 @@ public class GlobalStateManager : MonoBehaviour{
         }
         if(integration.dedicated&&(!integration.room.started)&&integration.room.totalJoined>0){
             integration.room.started = true;
-            await integration.GameStarted(this,"serverId",(ms)=>{
+            await integration.GameStarted(this,(ms)=>{
                 Debug.Log("ready to play=>"+ms);
                 SceneManager.LoadSceneAsync("Map",LoadSceneMode.Additive);
             });                    

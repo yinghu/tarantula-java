@@ -27,8 +27,8 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     @Override
     public void initialize(Session session) throws Exception {
         session.joined(true);
-        module.onJoin(session,onConnection,(uid,delta)->{
-            pushEvent(uid,delta);
+        module.onJoin(session,(uid,delta)->{
+            //pushEvent(uid,delta);
             session.index(parseUid(uid));
             _onStream.put(session.systemId(),session);
             //broadcasting to all streaming session if no udp publisher
@@ -49,7 +49,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             this._onStream.put(session.systemId(),session);
         }
         if(this.module.onRequest(session,payload,((uid,delta) -> {
-            pushEvent(uid,delta);
+            //pushEvent(uid,delta);
             //broadcasting to all streaming session if no udp publisher
             this._onStream.forEach((k,v)->{
                 if(v.streaming()&&parseUid(uid).equals(v.index())){
@@ -87,7 +87,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     public void onTimeout(Session session) {
         if(!this.descriptor.singleton()){
             this.module.onTimeout(session,(uid,delta)->{
-                pushEvent(uid,delta);
+                //pushEvent(uid,delta);
             });
             this.context.onRegistry().onLeave(session);
         }
@@ -97,7 +97,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     public void onIdle(Session session){
         if(!this.descriptor.singleton()){
             this.module.onIdle(session,(uid,delta)->{
-                pushEvent(uid,delta);
+                //pushEvent(uid,delta);
                 Session pending = _onStream.get(session.systemId());
                 if(pending!=null){
                     pending.write(delta,module.label()+"#"+uid);
@@ -126,7 +126,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             pendingTimer = pendingTimer-SERVER_PUSH_INTERVAL;
             if(pendingTimer<=0){
                 this.module.onTimer(((uid,delta) ->{
-                        pushEvent(uid,delta);
+                        //pushEvent(uid,delta);
                         _onStream.forEach((k,v)-> {
                             if(v.streaming()&&v.index().equals(parseUid(uid))){
                                 v.write(delta, module.label() + "#" + uid);
@@ -157,24 +157,25 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     }
     @Override
     public void onError(Session session, Exception ex) {
-        this.context.log(session.toString(),ex,OnLog.ERROR);
+        //this.context.log(session.toString(),ex,OnLog.ERROR);
         String msg = ex.getMessage()!=null?ex.getMessage():"Unexpected error";
         session.write(this.builder.create().toJson(new ResponseHeader("onError",false,400,msg,"error")).getBytes(),this.module.label());
     }
     @Override
     public void onState(Connection onConnection){
         if(onConnection.disabled()){
-            this.onConnection = null;
+            //this.onConnection = null;
         }
         else{
             super.onState(onConnection);
         }
     }
+    /**
     private void pushEvent(String uid,byte[] delta){
         if(onConnection!=null&&this.context.onRegistry().count(0)>0){
             this.context.postOffice().onConnection(onConnection.serverId()).send(this.module.label()+"#"+uid,delta);
         }
-    }
+    }**/
     private String parseUid(String uid){
         int ix = uid.indexOf('?');
         if(ix>0){
