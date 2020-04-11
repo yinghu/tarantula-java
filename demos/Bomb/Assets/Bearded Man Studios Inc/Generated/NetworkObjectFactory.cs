@@ -31,6 +31,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 						availableCallback = true;
 						obj = new BumpNetworkObject(networker, id, frame);
 						break;
+					case AdminNetworkObject.IDENTITY:
+						availableCallback = true;
+						obj = new AdminNetworkObject(networker, id, frame);
+						break;
 				}
 
 				if (!availableCallback)

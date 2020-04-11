@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using BeardedManStudios.Forge.Networking.Generated;
@@ -28,7 +29,7 @@ public class BombRun : MonoBomb
         Debug.Log("Exploding ...222");
         MainThreadManager.Run(() =>
 		{
-            GameObject ex = Instantiate(explosion, transform.position, Quaternion.identity); //1
+            GameObject ex = Instantiate(explosion,transform.position, Quaternion.identity); //1
             ex.transform.SetParent(transform);
             GetComponent<MeshRenderer>().enabled = false;       
         }); 

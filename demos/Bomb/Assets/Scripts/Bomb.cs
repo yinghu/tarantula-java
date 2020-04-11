@@ -12,7 +12,7 @@ public class Bomb : MonoBehaviour
         brun.OnSetupEvent += OnStart2;
     }
     void FixedUpdate(){
-        transform.localScale = transform.localScale*(1+Time.fixedDeltaTime/100);  
+        //transform.localScale = transform.localScale*(1+Time.fixedDeltaTime/100);  
     }
     private void OnStart1(){
         Debug.Log("starting 111");

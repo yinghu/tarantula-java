@@ -64,30 +64,32 @@ namespace Tarantula.Networking{
             }
             return suc;
         }
-        public void OnMove(string msg){
-            Debug.Log(msg);
-            JObject jo = JObject.Parse(msg);
-            Vector3 mp = new Vector3();
-            mp.x = ((float)jo.SelectToken("x"))*Screen.width;
-            mp.y = ((float)jo.SelectToken("y"))*Screen.height;
-            mp.z = 0;
-            float speed = (float)jo.SelectToken("f");
-            if(jo.ContainsKey("i")){
-                int sx = (int)jo.SelectToken("i");
-                if(sx!=seatIndex){
-                    RaycastHit hit;
-                    if (Physics.Raycast(Camera.main.ScreenPointToRay(mp), out hit)) {
-                        bumpRuns[sx].OnRun(hit.point,sx);
-                    }
-                }
-            }
+        public void OnMove(int sx){
+            float x = Random.Range(0,1080f);
+            float y = Random.Range(0,1920f);
+            Vector3 mp = new Vector3(x,y,0);
+            RaycastHit hit;
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(mp), out hit)) {
+                movements[sx].OnMove(hit.point); 
+            }    
         }
-        public void OnTimer(string msg){
-            JObject jo = JObject.Parse(msg);
-            int m = (int)jo.SelectToken("m");
-            int s = (int)jo.SelectToken("s");
+        public void OnLive(){
+            float x = Random.Range(0,1080f);
+            float y = Random.Range(0,1920f);
+            Vector3 mp = new Vector3(x,y,0);
+            RaycastHit hit;
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(mp), out hit)) {
+                BombRun bm = (BombRun)NetworkManager.Instance.InstantiateBomb(0,hit.point,Quaternion.identity,true);
+                bm.networkStarted +=(noj)=>{
+                    bm.Setup(1,"nm");
+                };
+            }
+            //bm.gameObject.name = nm;
+        }
+        public void OnTimer(int tx){
+            int m = tx/60;
+            int s = (tx%60);
             timer.SetText(m+":"+s); 
-            
         }
         public void OnEnd(){ 
             timer.SetText("00:00");
@@ -127,10 +129,10 @@ namespace Tarantula.Networking{
                 vc.y = 9.8f;
                 bumpRuns[seatIndex].OnQuest(hit.point,name);
             }
-            foreach(KeyValuePair<uint,NetworkObject> kv in NetworkManager.Instance.Networker.NetworkObjects){
-                Debug.Log(">>>>>>>>>>KEY->"+kv.Key);
-                Debug.Log(">>>>>>>>>>vALUE->"+((MonoBehaviour)kv.Value.AttachedBehavior).gameObject.name);
-            }
+            //foreach(KeyValuePair<uint,NetworkObject> kv in NetworkManager.Instance.Networker.NetworkObjects){
+                //Debug.Log(">>>>>>>>>>KEY->"+kv.Key);
+                //Debug.Log(">>>>>>>>>>vALUE->"+((MonoBehaviour)kv.Value.AttachedBehavior).gameObject.name);
+            //}
         }
         public void OnLive(RpcArgs args){
             BombRun bm = (BombRun)NetworkManager.Instance.InstantiateBomb(0,args.GetNext<Vector3>(),Quaternion.identity,true);

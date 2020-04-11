@@ -42,7 +42,7 @@ public class MonoBomb : BombBehavior{
     }
     public void Setup(int zone,string playerId){
         if(networkObject.IsOwner){
-            networkObject.SendRpc(RPC_ON_START, Receivers.All,zone,playerId); 
+            networkObject.SendRpc(RPC_ON_START, Receivers.Others,zone,playerId); 
         }
     }
     public override void OnExplode(RpcArgs args){}

@@ -39,18 +39,26 @@ using Tarantula.Networking;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine.SceneManagement;
+using BeardedManStudios.Forge.Networking.Generated;
+using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
-public class GlobalStateManager : MonoBehaviour{
+
+public class GlobalStateManager : AdminBehavior{
     
     private GameEngineCluster integration;
    
     private Descriptor game;
     
     public GameStage gameStage;
+    private bool _started;
+    protected override void NetworkStart(){
+		base.NetworkStart();
+        Debug.Log("network started admin");
+        _Start();
+        _started = true;
+    }
     
-    
-    
-    void Start(){
+    void _Start(){
         integration = GameEngineCluster.Instance; 
         game = integration.game;
         integration.OnInboundMessage += _OnStart; 
@@ -64,15 +72,24 @@ public class GlobalStateManager : MonoBehaviour{
         }
     }
     async void Update (){
+        if(!_started){
+            return;
+        }
         if(integration.dedicated&&integration.room.started&&integration.room.totalJoined==0){
             Application.Quit();
-            //Debug.Log("shut down =>");
         }
         if(integration.dedicated&&(!integration.room.started)&&integration.room.totalJoined>0){
             integration.room.started = true;
             await integration.GameStarted(this,(ms)=>{
                 Debug.Log("ready to play=>"+ms);
-                SceneManager.LoadSceneAsync("Map",LoadSceneMode.Additive);
+                Room jo = JObject.Parse(ms).Root.ToObject<Room>();
+                //Debug.Log("Room=>"+jo.arena);
+                integration.room.arena = jo.arena;
+                integration.room.duration = jo.duration;
+                integration.room.overtime = jo.overtime;
+                //Debug.Log("Room=>"+jo.duration);
+                SceneManager.LoadSceneAsync(jo.arena,LoadSceneMode.Additive);
+                StartCoroutine(StartCountdown());
             });                    
         }           
     }
@@ -107,10 +124,10 @@ public class GlobalStateManager : MonoBehaviour{
             //matched = true;
         //}
         if(msg.query!=null&&msg.query.Equals("onTimer")){
-            gameStage.OnTimer(msg.payload);
+            //gameStage.OnTimer(msg.payload);
         }
         else if(msg.query!=null&&msg.query.Equals("onMove")){
-            gameStage.OnMove(msg.payload);
+            //gameStage.OnMove(msg.payload);
         }
         else if(msg.query!=null&&msg.query.Equals("onEnd")){
             Debug.Log(msg.payload);
@@ -118,13 +135,13 @@ public class GlobalStateManager : MonoBehaviour{
             await OnLeave(this);
         }
         else if(msg.query!=null&&msg.query.Equals("onQuest")){
-            gameStage.OnQuest(msg.payload);
+            //gameStage.OnQuest(msg.payload);
         }
         else if(msg.query!=null&&msg.query.Equals("onRemove")){
-            gameStage.OnRemove(msg.payload);
+            ///gameStage.OnRemove(msg.payload);
         }
         else{
-            gameStage.OnMessage(msg);
+            //gameStage.OnMessage(msg);
         }
     }
     public async Task<bool> OnQuest(Payload payload){   
@@ -151,4 +168,21 @@ public class GlobalStateManager : MonoBehaviour{
         payload.headers = new Header[]{new Header("accessId","d")};
         await OnQuest(payload);
     }
+    private IEnumerator StartCountdown(){
+        while (integration.room.duration>0){
+             //Debug.Log("Countdown: " + integration.room.duration);
+             yield return new WaitForSeconds(1.0f);
+             integration.room.duration--;
+             gameStage.OnLive();
+             if(networkObject.IsOwner){
+                networkObject.SendRpc(RPC_ON_TIMER, Receivers.Others,integration.room.duration); 
+             }
+         }        
+    }
+    public override void OnTimer(RpcArgs args){
+        int timer = args.GetNext<int>();
+        //Debug.Log("TIMER->"+timer);
+        gameStage.OnTimer(timer);
+    }
+
 }

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula>
+    <lobby-context>
+        <type-id>game</type-id>
+        <type>lobby</type>
+        <category>service</category>
+        <tag>game/lobby</tag>
+        <icon>assets/gear.png</icon>
+        <view-id>game.lobby</view-id>
+        <name>Game</name>
+        <access-mode>12</access-mode>
+        <deploy-code>1</deploy-code>
+        <description>Tarantula Game Service</description>
+        <application-list>
+            <application>
+                <type-id>game</type-id>
+                <subtype-id>game-lobby</subtype-id>
+                <name>Game</name>
+                <type>application</type>
+                <category>game</category>
+                <singleton>true</singleton>
+                <tag>game</tag>
+                <description>Tarantula Game Service</description>
+                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <module-name>com.tarantula.game.GameZoneModule</module-name>
+                <entry-cost>0</entry-cost>
+                <capacity>100</capacity>
+            </application>
+            <application>
+                <type-id>game</type-id>
+                <subtype-id>game-lobby</subtype-id>
+                <name>MatchMaking</name>
+                <type>application</type>
+                <category>game</category>
+                <singleton>true</singleton>
+                <tag>match</tag>
+                <description>Tarantula Game Service</description>
+                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <module-name>com.tarantula.game.MatchMakingModule</module-name>
+                <entry-cost>0</entry-cost>
+            </application>
+        </application-list>
+    </lobby-context>
+</tarantula>

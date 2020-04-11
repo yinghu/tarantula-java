@@ -54,7 +54,7 @@ namespace Tarantula.Networking{
         public event UDPSocketHandler OnUDPSocket;
        
         public string host;
-        public bool deviceIdEnabled;
+        //public bool deviceIdEnabled;
         //public bool udpEnabled;
         public bool dedicated;
         public string accessKey;
@@ -92,9 +92,7 @@ namespace Tarantula.Networking{
         }
         void OnEnable(){
             //_HOST = GEC_HOST;
-            if(deviceIdEnabled){
-                deviceId = SystemInfo.deviceUniqueIdentifier;
-            }
+            deviceId = SystemInfo.deviceUniqueIdentifier;
             Debug.Log("GEC OPEN->"+host);
         }
         async void OnDestroy(){
@@ -246,6 +244,21 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
+        public  async Task<bool> Pick(MonoBehaviour caller){
+            try{
+                Header[] headers = new Header[]{
+                    new Header("Tarantula-tag","game"),
+                    new Header("Tarantula-token",presence.token),
+                };
+                string jstr = await _ghc.PostJson(caller,"/service/action",headers,"{}");
+                Debug.Log(jstr);
+                return true;
+                //return ParseProfile(jstr);
+            }catch(Exception ex){
+                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_PROFILE);
+                return false;
+            }
+        }
         public  async Task<bool> Profile(MonoBehaviour caller,string systemId){
             try{
                 Header[] headers = new Header[]{
@@ -316,10 +329,10 @@ namespace Tarantula.Networking{
             }
         }
         public  async Task<bool> Device(MonoBehaviour caller){
-            if(!deviceIdEnabled){
-                message = "deviceId not enabled";
-                return false;
-            }
+            //if(!deviceIdEnabled){
+                //message = "deviceId not enabled";
+                //return false;
+            //}
             try{
                 Device device = new Device();
                 device.deviceId = deviceId;
@@ -570,7 +583,7 @@ namespace Tarantula.Networking{
             }   
         }
         private async Task<bool> ParseGameObject(string json,Descriptor game,Action<JObject> callback){
-            //Debug.Log(json);
+            Debug.Log(json);
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
             if(!suc){
@@ -579,19 +592,19 @@ namespace Tarantula.Networking{
             }
             string tid = (string)jo.SelectToken("instanceId");
             string ixx = (string)jo.SelectToken("index");
-            string ticket = (string)jo.SelectToken("ticket");
+            //string ticket = (string)jo.SelectToken("ticket");
             game.instanceId = tid;
             game.gameId = ixx;
-            if((!dedicated)&&jo.ContainsKey("connection")){ //use external UDP provider with the connection info 
+            //if((!dedicated)&&jo.ContainsKey("connection")){ //use external UDP provider with the connection info 
                 //streaming on udp game session 
-                Connection conn = jo.SelectToken("connection").ToObject<Connection>();
-                _guc = new GecUdpSocket();
-                _guc.Connect(conn.host,conn.port);
-                _liveUc = true;
-                OnUDPSocket?.Invoke();
-                suc = await _guc.Init(presence,ixx,ticket);
-            }
-            else{
+                //Connection conn = jo.SelectToken("connection").ToObject<Connection>();
+                //_guc = new GecUdpSocket();
+                //_guc.Connect(conn.host,conn.port);
+                //_liveUc = true;
+                //OnUDPSocket?.Invoke();
+                //suc = await _guc.Init(presence,ixx,ticket);
+            //}
+            //else{
                 //streaming on websocket
                 Streaming strm = new Streaming();
                 strm.action = "onStream";
@@ -604,7 +617,7 @@ namespace Tarantula.Networking{
                 strm.data = p;
                 string jstrm = JsonConvert.SerializeObject(strm,JSON_SETTING);
                 suc = await _gwc.Send(jstrm);
-            }
+            //}
             if(suc){
                 callback(jo);
             }
@@ -1021,6 +1034,8 @@ namespace Tarantula.Networking{
         public string zone{get;set;}
         public string arena{get;set;}
         public int capacity{get;set;}
+        public int duration{get;set;}
+        public int overtime{get;set;}
         public Occupation[] occupations{get;set;}
     }
     public class Presence{

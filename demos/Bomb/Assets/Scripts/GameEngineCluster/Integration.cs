@@ -14,7 +14,7 @@ using BeardedManStudios.Forge.Networking.Unity;
 public class Integration : MonoBehaviour{
     
     public GameEngineCluster integration;
-    //public bool headless;
+    
     public string typeId;
     private bool pendingClick;
     
@@ -29,16 +29,18 @@ public class Integration : MonoBehaviour{
     private ForgeMenu forgeMenu;
     private bool inGame;
     private bool connected;
+    private ushort port =15937;
     async void Start(){
         integration.room = new Room();
         forgeMenu = GetComponent<ForgeMenu>();
         if(integration.dedicated){
             Rpc.MainThreadRunner = MainThreadManager.Instance; 
-            forgeMenu.Host("10.0.0.234",15937);
+            string ip = System.IO.File.ReadAllText(@"C:\mnt\ip.txt");
+            forgeMenu.Host(ip,port);
             Debug.Log("Running headless mode");
             Connection conn = new Connection();
-            conn.host="10.0.0.234";
-            conn.port = 15937;
+            conn.host= ip;
+            conn.port = port;
             conn.type="dedicated";
             integration.room.connection = conn;
             await integration.Dedicated(this,conn);
@@ -103,6 +105,7 @@ public class Integration : MonoBehaviour{
         if(!integration.online){
             await integration.Index(this);
             await integration.Device(this); 
+            await integration.Pick(this);
             Debug.Log("Online->"+integration.online);
         }
     }
@@ -188,12 +191,13 @@ public class Integration : MonoBehaviour{
                 Connection conn = new Connection();
                 conn.offline = true;
                 conn.host = "127.0.0.1";
-                conn.port = 15937;
+                conn.port = port;
                 integration.room.connection = conn;
             }
             OnGo();
         }
         else if(msg.query!=null&&msg.query.Equals("onTimer")){
+            Debug.Log("START=>>>"+msg.payload);
             JObject jo = JObject.Parse(msg.payload);
             int m = (int)jo.SelectToken("m");
             int s = (int)jo.SelectToken("s");

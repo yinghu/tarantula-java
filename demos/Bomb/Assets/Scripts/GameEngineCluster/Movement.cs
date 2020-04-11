@@ -7,7 +7,7 @@ using BeardedManStudios.Forge.Networking.Unity;
 namespace Tarantula.Networking{
     public class Movement : MonoBehaviour
     {
-        private float speed = 5.0f;
+        private float speed = 3.0f;
         private Vector3 target;
         private float targetBuffer = 1.5f;
         private float rotationSpeed = 15.0f;
@@ -26,11 +26,7 @@ namespace Tarantula.Networking{
             }
         public void OnMove(Vector3 destination){
             target = destination;
-            speed = 5.0f;
-            BumpRun brn = GetComponent<BumpRun>();
-            Debug.Log(brn.networkObject.NetworkId);
-            Transform trf = brn.transform;
-            Debug.Log(trf.GetComponent<BumpRun>().networkObject.NetworkId);
+            speed = 3.0f;
         } 
         void FixedUpdate(){   
             Vector3 movement = Vector3.zero;
@@ -44,7 +40,7 @@ namespace Tarantula.Networking{
                     speed -= deceleration* Time.deltaTime;
                     if(speed<=0){
                         target = Vector3.one;
-                        speed = 5.0f;
+                        speed = 3.0f;
                     }
                 }
                 else{

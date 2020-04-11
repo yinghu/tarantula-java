@@ -10,7 +10,6 @@ using Tarantula.Networking;
 public class ForgeMenu : MonoBehaviour
 {
 	
-    //public bool asServer;
 	public GameObject networkManager = null;
 	
     private NetworkManager mgr = null;
@@ -36,31 +35,21 @@ public class ForgeMenu : MonoBehaviour
         server = new UDPServer(64);			
         ((UDPServer)server).Connect(ipAddress,portNumber);
 		server.playerAccepted += (player, sender) =>{
-			Debug.Log("Player " + player.NetworkId + " Accepted");
+			//Debug.Log("Player " + player.NetworkId + " Accepted");
             GameEngineCluster.Instance.room.totalJoined++;
 		};
         server.playerConnected += (player, sender) =>{
-			Debug.Log("Player " + player.NetworkId + " connected");
+			//Debug.Log("Player " + player.NetworkId + " connected");
 		};
         server.playerAuthenticated += (player, sender) =>{
-			Debug.Log("Player " + player.NetworkId + " Authenticated");
+			//Debug.Log("Player " + player.NetworkId + " Authenticated");
 		};
         server.playerDisconnected += (player, sender) =>{
-			Debug.Log("Player " + player.NetworkId + " disconnected");
+			//Debug.Log("Player " + player.NetworkId + " disconnected");
             GameEngineCluster.Instance.room.totalJoined--;
-            //Application.Quit();
 		};
 		Connected(server);
 	}
-    /**
-    public void Disconnect(){
-        if(asServer){
-            server.Disconnect(true);    
-        }
-        else{
-            client.Disconnect(true);
-        }
-    }**/
 	private void Connected(NetWorker networker){
 		if (!networker.IsBound){
 			Debug.LogError("NetWorker failed to bind");
@@ -80,9 +69,5 @@ public class ForgeMenu : MonoBehaviour
         if (networker is IServer){
             NetworkObject.Flush(networker);
         }
-    }   
-    void OnApplicationQuit(){
-        //Debug.Log("server closed");
-		//if (server != null) server.Disconnect(true);
-	}
+    }  
 }
