@@ -62,7 +62,7 @@ public interface Descriptor extends Recoverable{
 
     int accessMode();
     int accessControl(); // 0 - 10
-
+    int accessRank();
     String tag(); //service deploy tag
     double entryCost();
 
@@ -83,6 +83,7 @@ public interface Descriptor extends Recoverable{
 
     void accessControl(int accessControl);
     void accessMode(int accessMode);
+    void accessRank(int accessRank);
     void tag(String tag);
     void entryCost(double entryCost);
 
@@ -116,11 +117,12 @@ public interface Descriptor extends Recoverable{
     long runtimeDurationOnInstance(); //the instance duration time in minutes
     void runtimeDurationOnInstance(long runtimeDuration);
 
-
     boolean tournamentEnabled();
     void tournamentEnabled(boolean tournamentEnabled);
 
     boolean resetEnabled();
     void resetEnabled(boolean resetEnabled);
+
+
 
 }

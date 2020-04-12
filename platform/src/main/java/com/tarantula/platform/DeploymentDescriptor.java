@@ -60,6 +60,7 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         ins.capacity(this.capacity);
         ins.accessControl(this.accessControl);
         ins.accessMode(this.accessMode);
+        ins.accessRank(this.accessRank);
         ins.entryCost(this.entryCost);
         ins.tag(this.tag);
         ins.singleton(this.singleton);

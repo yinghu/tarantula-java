@@ -18,7 +18,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor{
 
     protected int accessControl;
     protected int accessMode;
-
+    protected int accessRank;
     protected String tag;
     protected double entryCost;
 
@@ -219,6 +219,13 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor{
         this.accessMode = accessMode;
     }
 
+    public int accessRank(){
+        return this.accessRank;
+    }
+    public void accessRank(int accessRank){
+        this.accessRank = accessRank;
+    }
+
     public String tag(){
         return this.tag;
     }
@@ -263,6 +270,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor{
         _props.put("disabled",this.disabled);
         _props.put("accessControl",this.accessControl);
         _props.put("accessMode",this.accessMode);
+        _props.put("accessRank",this.accessRank);
         _props.put("deployCode",this.deployCode);
         _props.put("deployPriority",this.deployPriority);
         _props.put("codebase",this.codebase);
@@ -303,6 +311,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor{
         this.disabled = properties.get("disabled")!=null?(boolean)properties.get("disabled"):false;
         this.accessControl  = properties.get("accessControl")!=null?((Number)properties.get("accessControl")).intValue():0;
         this.accessMode  = properties.get("accessMode")!=null?((Number)properties.get("accessMode")).intValue():12;
+        this.accessRank = properties.get("accessRank")!=null?((Number)properties.get("accessRank")).intValue():0;
         this.moduleArtifact  = properties.get("moduleArtifact")!=null?(String) properties.get("moduleArtifact"):null;
         this.moduleVersion  = properties.get("moduleVersion")!=null?(String) properties.get("moduleVersion"):null;
         this.deployCode = properties.get("deployCode")!=null?((Number)properties.get("deployCode")).intValue():0;

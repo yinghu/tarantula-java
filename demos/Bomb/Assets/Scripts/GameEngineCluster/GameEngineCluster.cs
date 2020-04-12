@@ -247,8 +247,9 @@ namespace Tarantula.Networking{
         public  async Task<bool> Pick(MonoBehaviour caller){
             try{
                 Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","game"),
+                    new Header("Tarantula-tag","game/matchmaking"),
                     new Header("Tarantula-token",presence.token),
+                    new Header("Tarantula-action","onPlay")
                 };
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,"{}");
                 Debug.Log(jstr);

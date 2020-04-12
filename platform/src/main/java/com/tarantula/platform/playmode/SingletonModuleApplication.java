@@ -28,7 +28,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
             this._onStream.put(session.systemId(),session);
         }
         if(this.module.onRequest(session,payload,((uid,delta) ->{
-            this._onStream.forEach((k,v)->{
+            this._onStream.forEach((k,v)->{//need to check session.index equals uid
                 v.write(delta,this.module.label());
             });
         }))){
@@ -52,7 +52,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
             this.context.schedule(this);
         }
         module.setup(context);
-        this.context.log("Dynamic Module Started On ["+descriptor.moduleName()+"]", OnLog.INFO);
+        this.context.log("Singleton Dynamic Module Started On ["+descriptor.moduleName()+"]", OnLog.INFO);
     }
     @Override
     public boolean oneTime() {

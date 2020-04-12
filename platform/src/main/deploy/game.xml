@@ -1,43 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tarantula>
     <lobby-context>
-        <type-id>game</type-id>
+        <type-id>game-zone</type-id>
         <type>lobby</type>
-        <category>service</category>
-        <tag>game/lobby</tag>
-        <icon>assets/gear.png</icon>
-        <view-id>game.lobby</view-id>
-        <name>Game</name>
+        <category>game</category>
+        <name>GameZone</name>
         <access-mode>12</access-mode>
         <deploy-code>1</deploy-code>
-        <description>Tarantula Game Service</description>
+        <deploy-priority>15</deploy-priority>
+        <description>Tarantula Game Zone Service</description>
         <application-list>
             <application>
-                <type-id>game</type-id>
-                <subtype-id>game-lobby</subtype-id>
-                <name>Game</name>
+                <type-id>game-zone</type-id>
+                <subtype-id>game-zone-module</subtype-id>
+                <name>GameZone1</name>
                 <type>application</type>
                 <category>game</category>
                 <singleton>true</singleton>
-                <tag>game</tag>
-                <description>Tarantula Game Service</description>
+                <tag>game/zone1</tag>
                 <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.GameZoneModule</module-name>
-                <entry-cost>0</entry-cost>
                 <capacity>100</capacity>
+                <access-rank>1</access-rank>
+                <timer-on-module>100</timer-on-module>
             </application>
             <application>
-                <type-id>game</type-id>
-                <subtype-id>game-lobby</subtype-id>
-                <name>MatchMaking</name>
+                <type-id>game-zone</type-id>
+                <subtype-id>game-zone-module</subtype-id>
+                <name>GameZone2</name>
                 <type>application</type>
                 <category>game</category>
                 <singleton>true</singleton>
-                <tag>match</tag>
-                <description>Tarantula Game Service</description>
+                <tag>game/zone2</tag>
+                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <module-name>com.tarantula.game.GameZoneModule</module-name>
+                <capacity>100</capacity>
+                <access-rank>2</access-rank>
+                <timer-on-module>100</timer-on-module>
+            </application>
+        </application-list>
+    </lobby-context>
+    <lobby-context>
+        <type-id>match-making</type-id>
+        <type>lobby</type>
+        <category>service</category>
+        <name>MatchMaking</name>
+        <access-mode>12</access-mode>
+        <deploy-code>1</deploy-code>
+        <deploy-priority>10</deploy-priority>
+        <description>Tarantula Match Making Service</description>
+        <application-list>
+            <application>
+                <type-id>match-making</type-id>
+                <subtype-id>match-making-module</subtype-id>
+                <name>MatchMaking</name>
+                <type>application</type>
+                <category>service</category>
+                <singleton>true</singleton>
+                <tag>game/matchmaking</tag>
                 <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.MatchMakingModule</module-name>
-                <entry-cost>0</entry-cost>
             </application>
         </application-list>
     </lobby-context>

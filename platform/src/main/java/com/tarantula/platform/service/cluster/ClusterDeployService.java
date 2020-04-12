@@ -404,7 +404,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         descriptor.onEdge(true);
         descriptor.resetEnabled(true);
         ds.create(descriptor);
-        if(descriptor.deployCode()<=0){
+        if(descriptor.deployCode()<=0||descriptor.tag()==null){
             resp.successful(true);
             resp.message("lobby created with deployCode ->"+descriptor.deployCode());
             return this.builder.create().toJson(resp);
@@ -414,7 +414,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         lobby.subtypeId(descriptor.typeId()+"-lobby");
         lobby.type("application");
         lobby.category("lobby");
-        lobby.tag(descriptor.tag());
+        lobby.tag(descriptor.tag());//will ignore if the lobby tag is not provided
         lobby.singleton(true);
         lobby.deployPriority(15);
         lobby.applicationClassName("com.tarantula.platform.playmode.GameLobbyApplication");

@@ -189,6 +189,9 @@ public class XMLParser extends DefaultHandler{
             else if(tblock.equals("application-list")&&qname.equals("access-control")){
                 this.applicationDescriptor.accessControl(Integer.parseInt(value));
             }
+            else if(tblock.equals("application-list")&&qname.equals("access-rank")){
+                this.applicationDescriptor.accessRank(Integer.parseInt(value));
+            }
 			else if(tblock.equals("application-list")&&qname.equals("description")){
 				this.applicationDescriptor.description(value);
 			}
