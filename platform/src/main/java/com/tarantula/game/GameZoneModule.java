@@ -19,7 +19,8 @@ public class GameZoneModule implements Module {
         rating.fromMap(SystemUtil.toMap(session.payload()));
         context.log("join on ["+this.context.descriptor().accessRank()+"/"+rating.level+"]",OnLog.WARN);
         Arena arena = mArena.get(rating.level);
-        session.write(SystemUtil.toJson(arena.toMap()),label());
+        Room room = arena.join(session.systemId());
+        session.write(SystemUtil.toJson(room.toMap()),label());
     }
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
