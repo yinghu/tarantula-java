@@ -33,6 +33,7 @@ public class ServiceEventHandler implements RequestHandler {
                 String token = exchange.header(Session.TARANTULA_TOKEN);//authenticated token
                 String action = exchange.header(Session.TARANTULA_ACTION);
                 String tag = exchange.header(Session.TARANTULA_TAG);
+                String instanceId = exchange.header(Session.TARANTULA_INSTANCE_ID);//instance Id
                 byte[]  _payload = exchange.payload();
                 String sid = exchange.id();
                 this._hex.put(sid,exchange);
@@ -52,6 +53,7 @@ public class ServiceEventHandler implements RequestHandler {
                     actionEvent.routingNumber(routingKey.routingNumber());
                     actionEvent.destination(routingKey.route());
                     actionEvent.streaming(exchange.streaming());
+                    actionEvent.instanceId(instanceId);
                     this.eventService.publish(actionEvent);
                 }
                 else{

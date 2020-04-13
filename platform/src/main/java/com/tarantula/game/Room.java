@@ -3,6 +3,7 @@ package com.tarantula.game;
 import com.tarantula.platform.RecoverableObject;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class Room extends RecoverableObject {
 
@@ -10,16 +11,19 @@ public class Room extends RecoverableObject {
     private int totalJoined;
     private boolean dedicated;
 
+    public Room(){
+        this.oid = UUID.randomUUID().toString();
+    }
 
 
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("totalJoined",3);
+        this.properties.put("totalJoined",totalJoined);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        //this.level =((Number)properties.get("level")).intValue();
+        this.totalJoined =((Number)properties.get("totalJoined")).intValue();
         //this.xp = ((Number)properties.get("xp")).doubleValue();
     }
     @Override

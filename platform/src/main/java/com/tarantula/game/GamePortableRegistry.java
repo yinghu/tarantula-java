@@ -11,6 +11,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
     public static final int RATING_CID = 1;
     public static final int ARENA_CID = 2;
     public static final int ROOM_CID = 3;
+    public static final int STUB_CID = 4;
     @Override
     public int registryId() {
         return OID;
@@ -28,6 +29,9 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
                 break;
             case ROOM_CID:
                 pt = new Room();
+                break;
+            case STUB_CID:
+                pt = new Stub();
                 break;
             default:
         }

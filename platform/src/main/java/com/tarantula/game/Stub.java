@@ -1,8 +1,11 @@
 package com.tarantula.game;
 
 import com.google.gson.JsonObject;
+import com.tarantula.platform.RecoverableObject;
 
-public class Stub {
+import java.util.Map;
+
+public class Stub extends RecoverableObject {
     public String roomId;
     public int seat;
     public String tag;
@@ -13,5 +16,24 @@ public class Stub {
         jo.addProperty("roomId",roomId);
         jo.addProperty("tag",tag);
         return jo;
+    }
+
+    @Override
+    public Map<String,Object> toMap(){
+        //this.properties.put("totalJoined",totalJoined);
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        //this.totalJoined =((Number)properties.get("totalJoined")).intValue();
+        //this.xp = ((Number)properties.get("xp")).doubleValue();
+    }
+    @Override
+    public int getFactoryId() {
+        return GamePortableRegistry.OID;
+    }
+    @Override
+    public int getClassId() {
+        return GamePortableRegistry.STUB_CID;
     }
 }
