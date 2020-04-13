@@ -6,9 +6,14 @@ import java.util.Map;
 
 public class Room extends RecoverableObject {
 
+    public int capacity;
+    private int totalJoined;
+    private boolean dedicated;
+
+
+
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("oid","roomId");
         this.properties.put("totalJoined",3);
         return this.properties;
     }

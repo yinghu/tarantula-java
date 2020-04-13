@@ -105,7 +105,9 @@ public class Integration : MonoBehaviour{
         if(!integration.online){
             await integration.Index(this);
             await integration.Device(this); 
-            await integration.Pick(this);
+            await integration.OnPlay(this,(a)=>{
+                Debug.Log("joined");
+            });
             Debug.Log("Online->"+integration.online);
         }
     }

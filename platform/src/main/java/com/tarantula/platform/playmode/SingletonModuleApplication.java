@@ -8,6 +8,7 @@ import com.tarantula.platform.event.FastPlayEvent;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by yinghu lu on 7/31/2019.
@@ -15,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SingletonModuleApplication extends TarantulaApplicationHeader implements SchedulingTask {
 
     private ConcurrentHashMap<String,Session> _onStream = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,CopyOnWriteArrayList<String>> _onIndex = new ConcurrentHashMap<>();
 
     private long SERVER_PUSH_INTERVAL = 50;
 
@@ -25,6 +27,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         if(session.streaming()){
+            context.log("STREAMING->"+session.systemId(),OnLog.WARN);
             this._onStream.put(session.systemId(),session);
         }
         if(this.module.onRequest(session,payload,((uid,delta) ->{
@@ -89,6 +92,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         try{
             if(event instanceof FastPlayEvent){
                 this.module.onJoin(event,(uid,delta)->{
+                    context.log("track index->"+uid,OnLog.WARN);
                     this._onStream.forEach((k,v)->{
                         v.write(delta,this.module.label());
                     });

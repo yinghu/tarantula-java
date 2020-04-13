@@ -244,7 +244,7 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> Pick(MonoBehaviour caller){
+        public  async Task<bool> OnPlay(MonoBehaviour caller,Action<JObject> callback){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-tag","game/matchmaking"),
@@ -252,8 +252,8 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-action","onPlay")
                 };
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,"{}");
-                Debug.Log(jstr);
-                return true;
+                //Debug.Log(jstr);
+                return await ParseGameObject(jstr,callback);
                 //return ParseProfile(jstr);
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_PROFILE);
@@ -583,6 +583,36 @@ namespace Tarantula.Networking{
                 OnException?.Invoke(ex,msg,ErrorCode.EC_INBOUND_MSG_PARSE);    
             }   
         }
+        private async Task<bool> ParseGameObject(string json,Action<JObject> callback){
+            Debug.Log(json);
+            JObject jo = JObject.Parse(json);
+            bool suc = (bool)jo.SelectToken("successful");
+            if(!suc){
+                message = (string)jo.SelectToken("message");
+                return suc;
+            }
+            Stub stub = jo.SelectToken("stub").ToObject<Stub>();
+            //string ticket = (string)jo.SelectToken("ticket");
+            //game.instanceId = tid;
+            //game.gameId = ixx;
+            //streaming on websocket
+            Streaming strm = new Streaming();
+            strm.action = "onStream";
+            strm.path = "/service/action";
+            strm.streaming = true;
+            strm.tag = stub.tag;
+            //strm.instanceId = game.instanceId;
+            Payload p = new Payload();
+            p.command = strm.action;
+            strm.data = p;
+            string jstrm = JsonConvert.SerializeObject(strm,JSON_SETTING);
+            suc = await _gwc.Send(jstrm);
+            
+            if(suc){
+                callback(jo);
+            }
+            return suc;
+        } 
         private async Task<bool> ParseGameObject(string json,Descriptor game,Action<JObject> callback){
             Debug.Log(json);
             JObject jo = JObject.Parse(json);
@@ -596,29 +626,19 @@ namespace Tarantula.Networking{
             //string ticket = (string)jo.SelectToken("ticket");
             game.instanceId = tid;
             game.gameId = ixx;
-            //if((!dedicated)&&jo.ContainsKey("connection")){ //use external UDP provider with the connection info 
-                //streaming on udp game session 
-                //Connection conn = jo.SelectToken("connection").ToObject<Connection>();
-                //_guc = new GecUdpSocket();
-                //_guc.Connect(conn.host,conn.port);
-                //_liveUc = true;
-                //OnUDPSocket?.Invoke();
-                //suc = await _guc.Init(presence,ixx,ticket);
-            //}
-            //else{
-                //streaming on websocket
-                Streaming strm = new Streaming();
-                strm.action = "onStream";
-                strm.path = "/application/instance";
-                strm.streaming = true;
-                strm.applicationId = game.applicationId;
-                strm.instanceId = game.instanceId;
-                Payload p = new Payload();
-                p.command = strm.action;
-                strm.data = p;
-                string jstrm = JsonConvert.SerializeObject(strm,JSON_SETTING);
-                suc = await _gwc.Send(jstrm);
-            //}
+            //streaming on websocket
+            Streaming strm = new Streaming();
+            strm.action = "onStream";
+            strm.path = "/application/instance";
+            strm.streaming = true;
+            strm.applicationId = game.applicationId;
+            strm.instanceId = game.instanceId;
+            Payload p = new Payload();
+            p.command = strm.action;
+            strm.data = p;
+            string jstrm = JsonConvert.SerializeObject(strm,JSON_SETTING);
+            suc = await _gwc.Send(jstrm);
+            
             if(suc){
                 callback(jo);
             }
@@ -1038,6 +1058,11 @@ namespace Tarantula.Networking{
         public int duration{get;set;}
         public int overtime{get;set;}
         public Occupation[] occupations{get;set;}
+    }
+    public class Stub{
+        public int seat{set;get;}
+        public string roomId{set;get;}
+        public string tag{set;get;}
     }
     public class Presence{
         public string systemId { get; set; }
