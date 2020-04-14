@@ -3,7 +3,9 @@ package com.tarantula.game;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 
-
+/**
+ * Created by yinghu lu on 4/14/2020.
+ */
 public class GamePortableRegistry  extends AbstractRecoverableListener {
 
     public static final int OID = 10;

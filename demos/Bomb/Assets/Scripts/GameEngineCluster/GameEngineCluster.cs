@@ -78,6 +78,7 @@ namespace Tarantula.Networking{
         public Lobby lobby(string typeId){ return _lobbyList[typeId];}  
         public List<Descriptor> gameList(){ return _gameList;}
         public Descriptor game{set;get;}
+        public Stub stub{set;get;}
         public Room room{set;get;}
         private static GameEngineCluster _INSTANCE;
         private string deviceId;
@@ -407,10 +408,10 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-       public async Task<bool> OnService(MonoBehaviour caller,Descriptor service,Payload payload,Action<string> callback){
+       public async Task<bool> OnService(MonoBehaviour caller,string tag,Payload payload,Action<string> callback){
             try{
                 Header[] headers = new Header[]{
-                    new Header("Tarantula-tag",service.tag),
+                    new Header("Tarantula-tag",tag),
                     new Header("Tarantula-token",presence.token),
                     new Header("Tarantula-action",payload.command)
                 };
@@ -591,7 +592,8 @@ namespace Tarantula.Networking{
                 message = (string)jo.SelectToken("message");
                 return suc;
             }
-            Stub stub = jo.SelectToken("stub").ToObject<Stub>();
+            stub = jo.SelectToken("stub").ToObject<Stub>();
+            Debug.Log(stub.roomId);
             //string ticket = (string)jo.SelectToken("ticket");
             //game.instanceId = tid;
             //game.gameId = ixx;
@@ -601,7 +603,7 @@ namespace Tarantula.Networking{
             strm.path = "/service/action";
             strm.streaming = true;
             strm.tag = stub.tag;
-            //strm.instanceId = game.instanceId;
+            strm.instanceId = stub.roomId;
             Payload p = new Payload();
             p.command = strm.action;
             strm.data = p;

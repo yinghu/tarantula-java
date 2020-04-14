@@ -2,11 +2,12 @@ package com.tarantula.game;
 
 import com.tarantula.Module;
 import com.tarantula.platform.RecoverableObject;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.Map;
 
-
+/**
+ * Created by yinghu lu on 4/14/2020.
+ */
 public class Arena extends RecoverableObject {
 
     public int level =1;
@@ -17,10 +18,7 @@ public class Arena extends RecoverableObject {
 
 
     public synchronized Stub join(String systemId){
-        Stub stub = new Stub();
-        stub.seat = 2;
-        stub.roomId = rooms[0].oid();
-        return stub;
+       return rooms[0].stub(systemId);
     }
 
     public synchronized void leave(String systemId,Stub stub){
@@ -28,7 +26,7 @@ public class Arena extends RecoverableObject {
     }
 
     public synchronized void onTimer(Module.OnUpdate update){
-        update.on(rooms[0].oid()+"?onTimer",SystemUtil.toJson(toMap()));
+        rooms[0].onTimer(update);
     }
     @Override
     public Map<String,Object> toMap(){

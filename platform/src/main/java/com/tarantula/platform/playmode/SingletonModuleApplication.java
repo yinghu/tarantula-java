@@ -2,21 +2,19 @@ package com.tarantula.platform.playmode;
 
 import com.tarantula.*;
 import com.tarantula.Module;
-
+import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.event.FastPlayEvent;
 import com.tarantula.platform.service.DeploymentServiceProvider;
-
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Created by yinghu lu on 7/31/2019.
+ * Updated by yinghu lu on 4/14/2020.
  */
 public class SingletonModuleApplication extends TarantulaApplicationHeader implements SchedulingTask {
 
     //private ConcurrentHashMap<String,Session> _onStream = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String,CopyOnWriteArrayList<Session>> _onIndex = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,ConcurrentHashMap<String,Session>> _onIndex = new ConcurrentHashMap<>();
 
     private long SERVER_PUSH_INTERVAL = 50;
 
@@ -27,21 +25,20 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         if(session.streaming()){
-            this.context.log("Session->"+session.instanceId(),OnLog.INFO);
-            this._onIndex.getOrDefault(session.instanceId(),new CopyOnWriteArrayList<>()).add(session);
+            this._onIndex.putIfAbsent(session.instanceId(),new ConcurrentHashMap<>()).put(session.systemId(),session);
         }
         else if(this.module.onRequest(session,payload,((uid,delta) ->{
-            _onIndex.getOrDefault(parseUid(uid),new CopyOnWriteArrayList<>()).forEach((v)->{
+            _onIndex.putIfAbsent(parseUid(uid),new ConcurrentHashMap<>()).forEach((k,v)->{
                 v.write(delta,this.module.label()+"#"+uid);
             });
         }))){
             //clean up on leave
-            //this.context.log("Session->"+session.systemId(),OnLog.INFO);
-            //Session rm = this._onStream.remove(session.systemId());
-            //if(rm!=null){
-                //ResponseHeader resp = new ResponseHeader(session.action(),"close session");
-                //rm.write(this.builder.create().toJson(resp).getBytes(),module.label(),true);
-            //}
+            //this.context.log("Session->"+session.systemId()+"//"+session.instanceId(),OnLog.INFO);
+            Session rm = this._onIndex.get(session.instanceId()).remove(session.systemId());
+            if(rm!=null){
+                ResponseHeader resp = new ResponseHeader(session.action(),"close session");
+                rm.write(this.builder.create().toJson(resp).getBytes(),module.label()+"#"+session.instanceId()+"?"+session.action(),true);
+            }
         }
     }
 
@@ -79,11 +76,13 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
             if(pendingTimer<=0){
                 this.module.onTimer(((uid,delta) -> {
                         if(delta==null){
-                            _onIndex.remove(parseUid(uid));
+                            _onIndex.remove(parseUid(uid)).forEach((k,v)->{
+                                ResponseHeader resp = new ResponseHeader("onLeave","close session");
+                                v.write(this.builder.create().toJson(resp).getBytes(),module.label()+"#"+uid,true);
+                            });
                             return;
                         }
-                        _onIndex.getOrDefault(parseUid(uid),new CopyOnWriteArrayList<>()).forEach((v)->{
-                            this.context.log("Game id->"+uid,OnLog.INFO);
+                        _onIndex.putIfAbsent(parseUid(uid),new ConcurrentHashMap<>()).forEach((k,v)->{
                             v.write(delta,this.module.label()+"#"+uid);
                         });
                     }
@@ -98,7 +97,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         try{
             if(event instanceof FastPlayEvent){
                 this.module.onJoin(event,(uid,delta)->{
-                    _onIndex.getOrDefault(parseUid(uid),new CopyOnWriteArrayList<>()).forEach((v)->{
+                    _onIndex.putIfAbsent(parseUid(uid),new ConcurrentHashMap<>()).forEach((k,v)->{
                         v.write(delta,this.module.label()+"#"+uid);
                     });
                 });

@@ -98,16 +98,16 @@ public class Integration : MonoBehaviour{
         }
         login.SetActive(!integration.online);  
         pve.SetActive(!pendingClick&&integration.online);  
-        pvp.SetActive(!pendingClick&&integration.online);
+        //pvp.SetActive(!pendingClick&&integration.online);
     }
     
     public async void OnLogin(){
         if(!integration.online){
             await integration.Index(this);
             await integration.Device(this); 
-            await integration.OnPlay(this,(a)=>{
-                Debug.Log("joined");
-            });
+            //await integration.OnPlay(this,(a)=>{
+                //Debug.Log("joined");
+            //});
             Debug.Log("Online->"+integration.online);
         }
     }
@@ -116,20 +116,27 @@ public class Integration : MonoBehaviour{
             return;
         }
         pendingClick = true;
-        bool joined = await OnJoin(this,"RobotQuestPVE");     
+        bool joined = await integration.OnPlay(this,(a)=>{
+            Debug.Log("joined");
+        });     
         if(!joined){
             message.SetText(integration.message);
         }
     }
     public async void OnPVP(){
-        if(pendingClick){
-            return;
-        }
+        //if(pendingClick){
+            //return;
+        //}
         pendingClick = true;
-        bool joined = await OnJoin(this,"RobotQuestPVP");
-        if(!joined){
-            message.SetText(integration.message);
-        }
+        Payload payload = new Payload();
+        payload.command = "onLeave";
+        await integration.OnService(this,integration.stub.tag,payload,(ps)=>{
+            Debug.Log(ps);        
+        });
+        //bool joined = await OnJoin(this,"RobotQuestPVP");
+        //if(!joined){
+            //message.SetText(integration.message);
+        //}
     }
     public async void OnLogout(){
         if(integration.online){
@@ -204,6 +211,10 @@ public class Integration : MonoBehaviour{
             int m = (int)jo.SelectToken("m");
             int s = (int)jo.SelectToken("s");
             timer.SetText(m+":"+s);
+        }
+        else{
+            Debug.Log("end=>>>"+msg.payload);
+            Debug.Log("end=>>>"+msg.query);
         }
     } 
 }

@@ -5,7 +5,9 @@ import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
 
 import java.util.Map;
-
+/**
+ * Created by yinghu lu on 4/14/2020.
+ */
 public class Rating extends RecoverableObject {
 
     public int rank =1; //rank of zone

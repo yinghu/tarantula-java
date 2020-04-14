@@ -4,7 +4,9 @@ import com.google.gson.JsonObject;
 import com.tarantula.platform.RecoverableObject;
 
 import java.util.Map;
-
+/**
+ * Created by yinghu lu on 4/14/2020.
+ */
 public class Stub extends RecoverableObject {
     public String roomId;
     public int seat;
