@@ -28,7 +28,6 @@ public class GameZoneModule implements Module{
         rating.fromMap(SystemUtil.toMap(session.payload()));
         Arena arena = mArena.get(rating.level);
         Stub stub = arena.room().join();
-        context.log("join on ["+this.context.descriptor().accessRank()+"/"+stub.roomId+"]",OnLog.WARN);
         stub.tag = this.context.descriptor().tag();
         stub.owner(session.systemId());
         GameObject gameObject = new GameObject();

@@ -37,11 +37,12 @@ public class Integration : MonoBehaviour{
             Rpc.MainThreadRunner = MainThreadManager.Instance; 
             string ip = System.IO.File.ReadAllText(@"C:\mnt\ip.txt");
             forgeMenu.Host(ip,port);
-            Debug.Log("Running headless mode");
+            Debug.Log("Running headless mode with type id->"+typeId);
             Connection conn = new Connection();
             conn.host= ip;
             conn.port = port;
-            conn.type="dedicated";
+            conn.type = typeId;
+            //conn.type="dedicated";
             integration.room.connection = conn;
             await integration.Dedicated(this,conn);
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);

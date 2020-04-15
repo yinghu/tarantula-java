@@ -96,6 +96,9 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
                     });
                 });
             }
+            else{
+                context.log("event->"+event.toString(),OnLog.WARN);
+            }
         }catch (Exception ex){
             //write error to client
             this.onError(event,ex);

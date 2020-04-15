@@ -20,9 +20,9 @@ public class Arena extends RecoverableObject implements RoomListener {
     public int level =1;
     public double xp =100;
     public int capacity =1;
-    public long roundDuration =10*1000;
+    public long roundDuration =60;
 
-    public boolean dedicated = false;
+    public boolean dedicated = true;
     public ConcurrentHashMap<String,Room> roomIndex;
     public ConcurrentHashMap<String,Stub> stubIndex;
     public DeploymentServiceProvider deploymentServiceProvider;
@@ -44,7 +44,7 @@ public class Arena extends RecoverableObject implements RoomListener {
     public void start(){
         for(int i=0;i<3;i++){
             Room room = new Room();
-            room.start(capacity,roundDuration,dedicated,this);
+            room.start(capacity,roundDuration*1000,dedicated,this);
             rQueue.offer(room);
             rList.add(room);
             roomIndex.put(room.oid(),room);
@@ -87,7 +87,7 @@ public class Arena extends RecoverableObject implements RoomListener {
     }
     @Override
     public void onConnecting(Room room){
-        this.deploymentServiceProvider.onStartedUDPConnection(room.connection().serverId(),roomSetting());
+        this.deploymentServiceProvider.onStartedUDPConnection(room.connection().serverId(),roomSetting(room));
     }
     @Override
     public byte[] onStarting(Room room){
@@ -111,8 +111,13 @@ public class Arena extends RecoverableObject implements RoomListener {
         room.start(capacity,roundDuration,dedicated,this);
         rQueue.addLast(room);
     }
-    private byte[] roomSetting(){
+    private byte[] roomSetting(Room room){
         JsonObject jo = new JsonObject();
+        jo.addProperty("arena","Map");
+        jo.addProperty("duration",roundDuration);
+        jo.addProperty("overtime",5);
+        jo.addProperty("tag",descriptor.tag());
+        jo.addProperty("roomId",room.oid());
         return jo.toString().getBytes();
     }
 

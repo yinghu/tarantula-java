@@ -22,10 +22,12 @@ public class Room extends RecoverableObject {
 
     static final long PENDING_TIME = 5000;//5 SECONDS
     static final long TIMER_DELTA = 1000; //1 SECOND
+    static final int CONNECTION_RETRIES = 3; //1 SECOND
     private int capacity;
     private int totalJoined;
     private boolean dedicated;
     private Connection connection;
+    private int retries;
     private long initialTime;
     private long duration;
     private long overtime;
@@ -70,6 +72,7 @@ public class Room extends RecoverableObject {
         this.initialTime = PENDING_TIME;
         this.overtime = PENDING_TIME;
         this.round++;
+        this.retries = CONNECTION_RETRIES;
         this.totalJoined=0;
         this.pQueue = new ArrayDeque<>(this.capacity);
         this.stubs = new Stub[this.capacity];
@@ -79,6 +82,7 @@ public class Room extends RecoverableObject {
             this.stubs[i] = stub;
         }
         this.state = WAITING;
+        this.connection = null;
         this.roomListener = roomListener;
     }
     public Stub[] end(){
@@ -136,7 +140,12 @@ public class Room extends RecoverableObject {
                             update.on(oid+"?onStart",this.roomListener.onStarting(this));
                         }
                         else{
-                            initialTime = TIMER_DELTA;
+                            retries--;
+                            if(retries<=0){
+                                state = ENDING;
+                            }else{
+                                initialTime = PENDING_TIME;
+                            }
                         }
                     }
                 }

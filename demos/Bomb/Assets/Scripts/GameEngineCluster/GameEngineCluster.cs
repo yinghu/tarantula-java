@@ -136,7 +136,7 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-port",""+conn.port),
                     new Header("Tarantula-server-id",deviceId),
                     new Header("Tarantula-access-key",accessKey),
-                    new Header("Tarantula-type-id","robot-quest"),
+                    new Header("Tarantula-type-id",conn.type),
                     new Header("Tarantula-action","onDedicated")
                 };
                 //string json = JsonConvert.SerializeObject(conn,JSON_SETTING);
@@ -154,6 +154,23 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-server-id",deviceId),
                     new Header("Tarantula-access-key",accessKey),
                     new Header("Tarantula-action","onStarted")
+                };
+                //string json = JsonConvert.SerializeObject(conn,JSON_SETTING);
+                string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,"{}");
+                callback(jstr);
+                return true;//
+                //ParseRegister(jstr);            
+            }catch(Exception ex){
+                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_REGISTER);
+                return false;
+            }
+        }
+        public  async Task<bool> GameScored(MonoBehaviour caller,Action<string> callback){
+            try{
+                Header[] headers = new Header[]{
+                    new Header("Tarantula-server-id",deviceId),
+                    new Header("Tarantula-access-key",accessKey),
+                    new Header("Tarantula-action","onScored")
                 };
                 //string json = JsonConvert.SerializeObject(conn,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,"{}");

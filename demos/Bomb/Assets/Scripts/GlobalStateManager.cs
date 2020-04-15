@@ -76,7 +76,11 @@ public class GlobalStateManager : AdminBehavior{
             return;
         }
         if(integration.dedicated&&integration.room.started&&integration.room.totalJoined==0){
-            Application.Quit();
+            integration.room.started = false;
+            await integration.GameScored(this,(s)=>{
+                Debug.Log(s);
+                Application.Quit();
+            });
         }
         if(integration.dedicated&&(!integration.room.started)&&integration.room.totalJoined>0){
             integration.room.started = true;
@@ -131,8 +135,13 @@ public class GlobalStateManager : AdminBehavior{
         }
         else if(msg.query!=null&&msg.query.Equals("onEnd")){
             Debug.Log(msg.payload);
+            integration.OnInboundMessage -= _OnStart;
             gameStage.OnEnd();
-            await OnLeave(this);
+            NetworkManager.Instance.Disconnect();
+            integration.CloseUDP();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex-1);
+            
+            //await OnLeave(this);
         }
         else if(msg.query!=null&&msg.query.Equals("onQuest")){
             //gameStage.OnQuest(msg.payload);
