@@ -1,7 +1,11 @@
 package com.tarantula.game;
 
+import com.google.gson.JsonObject;
+import com.tarantula.Connection;
+import com.tarantula.Descriptor;
 import com.tarantula.Module;
 import com.tarantula.platform.RecoverableObject;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,11 +19,14 @@ public class Arena extends RecoverableObject implements RoomListener {
 
     public int level =1;
     public double xp =100;
-    public int capacity =2;
-    public long roundDuration =60*1000;
+    public int capacity =1;
+    public long roundDuration =10*1000;
+
     public boolean dedicated = false;
     public ConcurrentHashMap<String,Room> roomIndex;
-
+    public ConcurrentHashMap<String,Stub> stubIndex;
+    public DeploymentServiceProvider deploymentServiceProvider;
+    public Descriptor descriptor;
     private CopyOnWriteArrayList<Room> rList = new CopyOnWriteArrayList<>();
     private ConcurrentLinkedDeque<Room> rQueue = new ConcurrentLinkedDeque<>();
 
@@ -70,4 +77,43 @@ public class Arena extends RecoverableObject implements RoomListener {
     public void onWaiting(Room room) {
         rQueue.addFirst(room);
     }
+    @Override
+    public void onLeaving(Stub stub){
+        stubIndex.remove(stub.owner());
+    }
+    @Override
+    public Connection onConnection(){
+        return deploymentServiceProvider.onUDPConnection(descriptor.typeId());
+    }
+    @Override
+    public void onConnecting(Room room){
+        this.deploymentServiceProvider.onStartedUDPConnection(room.connection().serverId(),roomSetting());
+    }
+    @Override
+    public byte[] onStarting(Room room){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("arena","Map");
+        if(room.connection()!= null) {
+            Connection connection = room.connection();
+            JsonObject jcc = new JsonObject();
+            jcc.addProperty("serverId", connection.serverId());
+            jcc.addProperty("host",connection.host());
+            jcc.addProperty("port",connection.port());
+            jsonObject.add("connection", jcc);
+        }
+        return jsonObject.toString().getBytes();
+    }
+    @Override
+    public void onEnding(Room room) {
+        for(Stub sb : room.end()){
+            stubIndex.remove(sb.owner());
+        }
+        room.start(capacity,roundDuration,dedicated,this);
+        rQueue.addLast(room);
+    }
+    private byte[] roomSetting(){
+        JsonObject jo = new JsonObject();
+        return jo.toString().getBytes();
+    }
+
 }

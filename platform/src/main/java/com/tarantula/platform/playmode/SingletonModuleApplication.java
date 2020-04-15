@@ -73,7 +73,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
             this.module.onTimer(((uid,delta) -> {
                     if(delta==null){
                         _onIndex.remove(parseUid(uid)).forEach((k,v)->{
-                            ResponseHeader resp = new ResponseHeader("onLeave","close session");
+                            ResponseHeader resp = new ResponseHeader("onEnd","close session");
                             v.write(this.builder.create().toJson(resp).getBytes(),module.label()+"#"+uid,true);
                         });
                         return;
