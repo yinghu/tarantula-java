@@ -15,7 +15,8 @@ public class GameZoneModule implements Module {
     private ApplicationContext context;
     private ConcurrentHashMap<Integer,Arena> mArena = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Stub> mStub = new ConcurrentHashMap<>();
-    private long delta =1000;
+    private ConcurrentHashMap<String,Room> mRoom = new ConcurrentHashMap<>();
+
     @Override
     public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
         //match arena with rating rank/xp
@@ -23,8 +24,9 @@ public class GameZoneModule implements Module {
         rating.fromMap(SystemUtil.toMap(session.payload()));
         context.log("join on ["+this.context.descriptor().accessRank()+"/"+rating.level+"]",OnLog.WARN);
         Arena arena = mArena.get(rating.level);
-        Stub stub = arena.join(session.systemId());
+        Stub stub = arena.room().join();
         stub.tag = this.context.descriptor().tag();
+        stub.owner(session.systemId());
         GameObject gameObject = new GameObject();
         gameObject.successful(true);
         gameObject.stub = stub;
@@ -36,6 +38,8 @@ public class GameZoneModule implements Module {
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         if(session.action().equals("onLeave")){
             Stub stub = mStub.remove(session.systemId());
+            Room room = mRoom.get(stub.roomId);
+            room.leave(stub);
             session.instanceId(stub.roomId);
             session.write(payload,label());
             return true;
@@ -46,19 +50,17 @@ public class GameZoneModule implements Module {
     @Override
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
-        //delta = this.context.descriptor().timerOnModule();
-        mArena.put(1,new Arena());
+        Arena arena = new Arena();
+        arena.roomIndex = this.mRoom;
+        arena.start();
+        mArena.put(arena.level,arena);
         context.log(this.context.descriptor().tag()+"/"+this.context.descriptor().accessRank(),OnLog.WARN);
     }
     @Override
     public void onTimer(OnUpdate update){
-        delta = delta-this.context.descriptor().timerOnModule();
-        if(delta<=0){
-            mArena.forEach((k,v)->{
-                v.onTimer(update);
-            });
-            delta = 1000;
-        }
+        mArena.forEach((k,v)->{
+            v.onTimer(update);
+        });
     }
     @Override
     public String label() {

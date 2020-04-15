@@ -22,7 +22,7 @@
                 <module-name>com.tarantula.game.GameZoneModule</module-name>
                 <capacity>100</capacity>
                 <access-rank>1</access-rank>
-                <timer-on-module>100</timer-on-module>
+                <timer-on-module>1000</timer-on-module>
             </application>
             <application>
                 <type-id>game-zone</type-id>
@@ -36,7 +36,7 @@
                 <module-name>com.tarantula.game.GameZoneModule</module-name>
                 <capacity>100</capacity>
                 <access-rank>2</access-rank>
-                <timer-on-module>100</timer-on-module>
+                <timer-on-module>1000</timer-on-module>
             </application>
         </application-list>
     </lobby-context>

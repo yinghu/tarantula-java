@@ -13,14 +13,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SingletonModuleApplication extends TarantulaApplicationHeader implements SchedulingTask {
 
-    //private ConcurrentHashMap<String,Session> _onStream = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,ConcurrentHashMap<String,Session>> _onIndex = new ConcurrentHashMap<>();
 
     private long SERVER_PUSH_INTERVAL = 50;
 
     private Module module;
     private DeploymentServiceProvider serviceProvider;
-    private long pendingTimer;
 
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
@@ -47,8 +45,8 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         super.setup(context);
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         module = this.serviceProvider.module(this.descriptor);
-        pendingTimer = descriptor.timerOnModule();
-        if(descriptor.timerOnModule()>0){
+        SERVER_PUSH_INTERVAL = descriptor.timerOnModule();
+        if(SERVER_PUSH_INTERVAL>0){
             this.context.schedule(this);
         }
         module.setup(context);
@@ -72,23 +70,19 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     @Override
     public void run() {
         try{
-            pendingTimer = pendingTimer-SERVER_PUSH_INTERVAL;
-            if(pendingTimer<=0){
-                this.module.onTimer(((uid,delta) -> {
-                        if(delta==null){
-                            _onIndex.remove(parseUid(uid)).forEach((k,v)->{
-                                ResponseHeader resp = new ResponseHeader("onLeave","close session");
-                                v.write(this.builder.create().toJson(resp).getBytes(),module.label()+"#"+uid,true);
-                            });
-                            return;
-                        }
-                        _onIndex.putIfAbsent(parseUid(uid),new ConcurrentHashMap<>()).forEach((k,v)->{
-                            v.write(delta,this.module.label()+"#"+uid);
+            this.module.onTimer(((uid,delta) -> {
+                    if(delta==null){
+                        _onIndex.remove(parseUid(uid)).forEach((k,v)->{
+                            ResponseHeader resp = new ResponseHeader("onLeave","close session");
+                            v.write(this.builder.create().toJson(resp).getBytes(),module.label()+"#"+uid,true);
                         });
+                        return;
                     }
-                ));
-                pendingTimer = descriptor.timerOnModule();
-            }
+                    _onIndex.putIfAbsent(parseUid(uid),new ConcurrentHashMap<>()).forEach((k,v)->{
+                        v.write(delta,this.module.label()+"#"+uid);
+                    });
+                }
+            ));
         }catch (Exception ex){
             //ignore it
         }

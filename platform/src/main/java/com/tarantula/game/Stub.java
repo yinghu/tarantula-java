@@ -8,12 +8,20 @@ import java.util.Map;
  * Created by yinghu lu on 4/14/2020.
  */
 public class Stub extends RecoverableObject {
+
     public String roomId;
     public int seat;
     public String tag;
 
+
+    public Stub(){}
+    public Stub(int seat,String roomId){
+        this.seat = seat;
+        this.roomId = roomId;
+    }
     public JsonObject toJson(){
         JsonObject jo = new JsonObject();
+        jo.addProperty("owner",owner);
         jo.addProperty("seat",seat);
         jo.addProperty("roomId",roomId);
         jo.addProperty("tag",tag);

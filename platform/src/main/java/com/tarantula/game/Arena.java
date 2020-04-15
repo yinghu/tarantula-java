@@ -4,29 +4,47 @@ import com.tarantula.Module;
 import com.tarantula.platform.RecoverableObject;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by yinghu lu on 4/14/2020.
  */
-public class Arena extends RecoverableObject {
+public class Arena extends RecoverableObject implements RoomListener {
 
     public int level =1;
     public double xp =100;
+    public int capacity =2;
+    public long roundDuration =60*1000;
+    public boolean dedicated = false;
+    public ConcurrentHashMap<String,Room> roomIndex;
 
-    private Room[] rooms = new Room[]{new Room()};
+    private CopyOnWriteArrayList<Room> rList = new CopyOnWriteArrayList<>();
+    private ConcurrentLinkedDeque<Room> rQueue = new ConcurrentLinkedDeque<>();
 
-
-
-    public synchronized Stub join(String systemId){
-       return rooms[0].stub(systemId);
+    public Room room(){
+        Room room = rQueue.poll();
+        if(room==null){
+            room = new Room();
+            room.start(capacity,roundDuration,dedicated,this);
+            rList.add(room);
+            roomIndex.put(room.oid(),room);
+        }
+        return room;
     }
 
-    public synchronized void leave(String systemId,Stub stub){
-
+    public void start(){
+        for(int i=0;i<3;i++){
+            Room room = new Room();
+            room.start(capacity,roundDuration,dedicated,this);
+            rQueue.offer(room);
+            rList.add(room);
+            roomIndex.put(room.oid(),room);
+        }
     }
-
-    public synchronized void onTimer(Module.OnUpdate update){
-        rooms[0].onTimer(update);
+    public void onTimer(Module.OnUpdate update){
+        rList.forEach((r)->r.onTimer(update));
     }
     @Override
     public Map<String,Object> toMap(){
@@ -48,4 +66,8 @@ public class Arena extends RecoverableObject {
         return GamePortableRegistry.ARENA_CID;
     }
 
+    @Override
+    public void onWaiting(Room room) {
+        rQueue.addFirst(room);
+    }
 }
