@@ -20,8 +20,9 @@ public interface DeploymentServiceProvider extends ServiceProvider {
 
     //UDP SERVER APIs
     void onUDPConnection(String typeId,Connection connection);
-    Connection onUDPConnection(String typeId);
+    Connection onUDPConnection(String typeId, Connection.Listener listener);
     void onStartedUDPConnection(String serverId,byte[] started);
+    void onEndedUDPConnection(String serverId);
     byte[] onStartedUDPConnection(String serverId);
     //END OF DEDICATED SERVER APIs
 

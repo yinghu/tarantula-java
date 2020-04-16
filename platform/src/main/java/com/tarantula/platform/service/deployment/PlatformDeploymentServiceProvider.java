@@ -504,13 +504,19 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void onUDPConnection(String typeId,Connection connection){
         this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));
     }
-    public Connection onUDPConnection(String typeId){
+    public Connection onUDPConnection(String typeId,Connection.Listener listener){
         byte[] ret = this.tarantulaContext.integrationCluster().firstIndex(typeId);
         if(ret==null){
             return null;
         }
         Connection connection = new UDPConnection();
         connection.fromMap(SystemUtil.toMap(ret));
+        log.warn("connection server id->"+connection.serverId());
+        this.tarantulaContext.integrationCluster().addEventListener(connection.serverId(),(e)->{
+            log.warn("end room->"+e.toString());
+            listener.onState(connection);
+            return true;//removed on callback
+        });
         return connection;
     }
     public void onStartedUDPConnection(String serverId,byte[] started){
@@ -518,6 +524,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public byte[] onStartedUDPConnection(String serverId){
         return this.tarantulaContext.integrationCluster().remove(serverId.getBytes());
+    }
+    public void onEndedUDPConnection(String serverId){
+        ConnectionStateEvent  connectionStateEvent = new ConnectionStateEvent(this.tarantulaContext.integrationCluster().subscription(),serverId,false);
+        this.tarantulaContext.integrationCluster().publish(connectionStateEvent);
     }
     //end of dedicated server methods
 

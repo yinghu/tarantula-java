@@ -16,12 +16,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Created by yinghu lu on 4/14/2020.
  */
 public class Arena extends RecoverableObject implements RoomListener {
-
+    public String name ="Map";
     public int level =1;
     public double xp =100;
     public int capacity =1;
-    public long roundDuration =60;
-
+    public long roundDuration =60000;
+    public long overtime = Room.PENDING_TIME;
     public boolean dedicated = true;
     public ConcurrentHashMap<String,Room> roomIndex;
     public ConcurrentHashMap<String,Stub> stubIndex;
@@ -44,7 +44,7 @@ public class Arena extends RecoverableObject implements RoomListener {
     public void start(){
         for(int i=0;i<3;i++){
             Room room = new Room();
-            room.start(capacity,roundDuration*1000,dedicated,this);
+            room.start(capacity,roundDuration,dedicated,this);
             rQueue.offer(room);
             rList.add(room);
             roomIndex.put(room.oid(),room);
@@ -82,8 +82,10 @@ public class Arena extends RecoverableObject implements RoomListener {
         stubIndex.remove(stub.owner());
     }
     @Override
-    public Connection onConnection(){
-        return deploymentServiceProvider.onUDPConnection(descriptor.typeId());
+    public Connection onConnection(Room room){
+        return deploymentServiceProvider.onUDPConnection(descriptor.typeId(),(c)->{
+            System.out.println(">>>>>>>>>>>>>>>>>>>"+room.oid());
+        });
     }
     @Override
     public void onConnecting(Room room){
@@ -92,7 +94,7 @@ public class Arena extends RecoverableObject implements RoomListener {
     @Override
     public byte[] onStarting(Room room){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("arena","Map");
+        jsonObject.addProperty("arena",name);
         if(room.connection()!= null) {
             Connection connection = room.connection();
             JsonObject jcc = new JsonObject();
@@ -105,7 +107,7 @@ public class Arena extends RecoverableObject implements RoomListener {
     }
     @Override
     public void onEnding(Room room) {
-        for(Stub sb : room.end()){
+        for(Stub sb : room.playerList()){
             stubIndex.remove(sb.owner());
         }
         room.start(capacity,roundDuration,dedicated,this);
@@ -113,11 +115,11 @@ public class Arena extends RecoverableObject implements RoomListener {
     }
     private byte[] roomSetting(Room room){
         JsonObject jo = new JsonObject();
-        jo.addProperty("arena","Map");
-        jo.addProperty("duration",roundDuration);
-        jo.addProperty("overtime",5);
-        jo.addProperty("tag",descriptor.tag());
+        jo.addProperty("arena",name);
+        jo.addProperty("duration",roundDuration/1000);
+        jo.addProperty("overtime",overtime/1000);
         jo.addProperty("roomId",room.oid());
+        jo.addProperty("key",room.playerList()[0].owner());
         return jo.toString().getBytes();
     }
 

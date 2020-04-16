@@ -77,7 +77,7 @@ public class GlobalStateManager : AdminBehavior{
         }
         if(integration.dedicated&&integration.room.started&&integration.room.totalJoined==0){
             integration.room.started = false;
-            await integration.GameScored(this,(s)=>{
+            await integration.GameEnded(this,(s)=>{
                 Debug.Log(s);
                 Application.Quit();
             });

@@ -47,6 +47,8 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int LEADER_BOARD_GLOBAL_EVENT_CID = 20;
 
+    public static final int CONNECTION_STATE_EVENT_CID = 21;
+
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
 
@@ -56,6 +58,7 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int APPLICATION_DESCRIPTOR_CID =103;
 
     public static final int BATCH_CID = 104;
+
 
 
     public Portable create(int cid) {
@@ -128,6 +131,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case LEADER_BOARD_GLOBAL_EVENT_CID:
                 _ins = new LeaderBoardGlobalEvent();
+                break;
+            case CONNECTION_STATE_EVENT_CID:
+                _ins = new ConnectionStateEvent();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");

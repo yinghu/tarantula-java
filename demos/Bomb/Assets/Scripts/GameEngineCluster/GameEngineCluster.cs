@@ -165,12 +165,12 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> GameScored(MonoBehaviour caller,Action<string> callback){
+        public  async Task<bool> GameEnded(MonoBehaviour caller,Action<string> callback){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-server-id",deviceId),
                     new Header("Tarantula-access-key",accessKey),
-                    new Header("Tarantula-action","onScored")
+                    new Header("Tarantula-action","onEnded")
                 };
                 //string json = JsonConvert.SerializeObject(conn,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,"{}");

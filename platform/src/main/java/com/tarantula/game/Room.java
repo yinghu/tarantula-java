@@ -85,7 +85,7 @@ public class Room extends RecoverableObject {
         this.connection = null;
         this.roomListener = roomListener;
     }
-    public Stub[] end(){
+    public Stub[] playerList(){
         return this.stubs;
     }
     public Connection connection(){
@@ -124,7 +124,7 @@ public class Room extends RecoverableObject {
                 if(initialTime>=0){
                     update.on(oid+"?onTimer",new Countdown(initialTime,state).toJson().toString().getBytes());
                     if(dedicated&&this.connection==null){//fetch connection per timer loop
-                        this.connection = this.roomListener.onConnection();
+                        this.connection = this.roomListener.onConnection(this);
                         if(this.connection!=null){
                             this.roomListener.onConnecting(this);
                         }
