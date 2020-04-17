@@ -63,4 +63,27 @@
             </application>
         </application-list>
     </lobby-context>
+    <lobby-context>
+        <type-id>game-data</type-id>
+        <type>lobby</type>
+        <category>service</category>
+        <name>GameData</name>
+        <access-mode>12</access-mode>
+        <deploy-code>1</deploy-code>
+        <deploy-priority>10</deploy-priority>
+        <description>Tarantula Game Data Service</description>
+        <application-list>
+            <application>
+                <type-id>game-data</type-id>
+                <subtype-id>game-data-module</subtype-id>
+                <name>GameData</name>
+                <type>application</type>
+                <category>service</category>
+                <singleton>true</singleton>
+                <tag>game/data</tag>
+                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <module-name>com.tarantula.platform.module.KeyValueDataStoreModule</module-name>
+            </application>
+        </application-list>
+    </lobby-context>
 </tarantula>

@@ -19,6 +19,7 @@ public interface Session extends OnApplication{
     String TARANTULA_ACTION ="Tarantula-action";
     String TARANTULA_MAGIC_KEY ="Tarantula-magic-key"; //the routing key
     String TARANTULA_TAG ="Tarantula-tag";
+    String TARANTULA_NAME ="Tarantula-name";
     String TARANTULA_PAYLOAD = "Tarantula-payload";
 
 
@@ -35,9 +36,6 @@ public interface Session extends OnApplication{
 
     boolean joined();
     void joined(boolean joined);
-
-    //String ticket();
-    //void ticket(String ticket);
 
     //write back on http batch
     void write(byte[] delta,int batch,String contentType,String label);
