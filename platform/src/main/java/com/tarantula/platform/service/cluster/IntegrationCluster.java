@@ -148,7 +148,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
     @Override
     public boolean onEvent(Event event) {
-        log.warn("EVET->"+event.toString());
         EventListener e = eMap.get(event.trackId());
         if(e!=null){
             if(e.onEvent(event)){

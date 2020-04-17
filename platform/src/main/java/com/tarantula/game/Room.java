@@ -65,6 +65,11 @@ public class Room extends RecoverableObject {
         roomListener.onWaiting(this);
         return true;
     }
+    public synchronized void end(){
+        if(state==GAMING||state==OVERTIME){
+            state = ENDING;
+        }
+    }
     public void start(int capacity,long duration,boolean dedicated,RoomListener roomListener){
         this.capacity = capacity;
         this.duration = duration;

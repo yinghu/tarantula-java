@@ -2,25 +2,24 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.EventOnAction;
+import com.tarantula.Event;
 
 import java.io.IOException;
 
 /**
  * Created by yinghu on 7/15//2019.
  */
-public class ConnectionStateEvent extends Data implements EventOnAction {
+public class ConnectionCloseEvent extends Data implements Event {
 
 
 
-    public ConnectionStateEvent(){
+    public ConnectionCloseEvent(){
 
     }
 
-    public ConnectionStateEvent(String destination, String serverId, boolean disabled){
+    public ConnectionCloseEvent(String destination, String serverId){
         this.destination = destination;
         this.trackId = serverId;
-        this.disabled = disabled;
     }
     @Override
     public int getFactoryId(){
@@ -28,27 +27,25 @@ public class ConnectionStateEvent extends Data implements EventOnAction {
     }
     @Override
     public int getClassId(){
-        return PortableEventRegistry.CONNECTION_STATE_EVENT_CID;
+        return PortableEventRegistry.CONNECTION_CLOSE_EVENT_CID;
     }
     @Override
     public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("1",this.destination);
         out.writeUTF("2",this.trackId);
-        out.writeUTF("3",this.owner);//node Id
-        out.writeBoolean("4",this.disabled);
+        out.writeUTF("3",this.destination);
+
 
     }
     @Override
     public void readPortable(PortableReader in) throws IOException {
-        this.destination = in.readUTF("1");
         this.trackId = in.readUTF("2");
-        this.owner = in.readUTF("3");
-        this.disabled = in.readBoolean("4");
+        this.destination = in.readUTF("3");
+
     }
 
     @Override
     public String toString(){
-        return "Connection State Event ["+this.trackId+"/"+disabled+"/"+owner;
+        return "Connection Close Event ["+this.trackId+"]";
     }
     @Override
     public int hashCode(){
@@ -56,7 +53,7 @@ public class ConnectionStateEvent extends Data implements EventOnAction {
     }
     @Override
     public boolean equals(Object obj){
-        ConnectionStateEvent ix = (ConnectionStateEvent)obj;
+        ConnectionCloseEvent ix = (ConnectionCloseEvent)obj;
         return this.trackId.equals(ix.trackId());
     }
 }

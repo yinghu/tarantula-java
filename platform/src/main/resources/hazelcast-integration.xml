@@ -59,11 +59,7 @@
     </services>
     <partition-group enabled="true" group-type="HOST_AWARE" />
     <map name="integration.recoverable.data.Value">
-        <backup-count>0</backup-count>
         <async-backup-count>1</async-backup-count>
-        <read-backup-data>true</read-backup-data>
-        <time-to-live-seconds>0</time-to-live-seconds>
-        <max-idle-seconds>0</max-idle-seconds>
         <eviction-policy>NONE</eviction-policy>
         <max-size policy="PER_NODE">100000</max-size>
 

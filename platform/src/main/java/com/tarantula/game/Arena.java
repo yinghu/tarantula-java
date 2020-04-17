@@ -1,5 +1,6 @@
 package com.tarantula.game;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tarantula.Connection;
 import com.tarantula.Descriptor;
@@ -84,7 +85,7 @@ public class Arena extends RecoverableObject implements RoomListener {
     @Override
     public Connection onConnection(Room room){
         return deploymentServiceProvider.onUDPConnection(descriptor.typeId(),(c)->{
-            System.out.println(">>>>>>>>>>>>>>>>>>>"+room.oid());
+            room.end();
         });
     }
     @Override
@@ -118,8 +119,11 @@ public class Arena extends RecoverableObject implements RoomListener {
         jo.addProperty("arena",name);
         jo.addProperty("duration",roundDuration/1000);
         jo.addProperty("overtime",overtime/1000);
-        jo.addProperty("roomId",room.oid());
-        jo.addProperty("key",room.playerList()[0].owner());
+        JsonArray ja = new JsonArray();
+        for(Stub p : room.playerList()){
+            ja.add(p.toJson());
+        }
+        jo.add("playerList",ja);
         return jo.toString().getBytes();
     }
 

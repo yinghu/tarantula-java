@@ -505,29 +505,38 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));
     }
     public Connection onUDPConnection(String typeId,Connection.Listener listener){
-        byte[] ret = this.tarantulaContext.integrationCluster().firstIndex(typeId);
+        ClusterProvider icp = this.tarantulaContext.integrationCluster();
+        byte[] ret = icp.firstIndex(typeId);
         if(ret==null){
             return null;
         }
         Connection connection = new UDPConnection();
         connection.fromMap(SystemUtil.toMap(ret));
-        log.warn("connection server id->"+connection.serverId());
-        this.tarantulaContext.integrationCluster().addEventListener(connection.serverId(),(e)->{
-            log.warn("end room->"+e.toString());
+        icp.set(connection.serverId().getBytes(),icp.subscription().getBytes());
+        icp.addEventListener(connection.serverId(),(e)->{
             listener.onState(connection);
             return true;//removed on callback
         });
         return connection;
     }
     public void onStartedUDPConnection(String serverId,byte[] started){
-        this.tarantulaContext.integrationCluster().set(serverId.getBytes(),started);
+        String _serverId = serverId+"_v";
+        this.tarantulaContext.integrationCluster().set(_serverId.getBytes(),started);
     }
     public byte[] onStartedUDPConnection(String serverId){
-        return this.tarantulaContext.integrationCluster().remove(serverId.getBytes());
+        String _serverId = serverId+"_v";
+        return this.tarantulaContext.integrationCluster().remove(_serverId.getBytes());
     }
-    public void onEndedUDPConnection(String serverId){
-        ConnectionStateEvent  connectionStateEvent = new ConnectionStateEvent(this.tarantulaContext.integrationCluster().subscription(),serverId,false);
-        this.tarantulaContext.integrationCluster().publish(connectionStateEvent);
+    public void onEndedUDPConnection(String serverId) {
+        ClusterProvider icp = this.tarantulaContext.integrationCluster();
+        byte[] sub = icp.remove(serverId.getBytes());
+        if (sub != null) {
+            ConnectionCloseEvent connectionStateEvent = new ConnectionCloseEvent(new String(sub),serverId);
+            integrationEventService.publish(connectionStateEvent);
+        }
+        else{
+            log.warn("Server connection not existed ->"+serverId);
+        }
     }
     //end of dedicated server methods
 

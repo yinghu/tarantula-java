@@ -185,6 +185,9 @@ public class GlobalStateManager : AdminBehavior{
              gameStage.OnLive();
              if(networkObject.IsOwner){
                 networkObject.SendRpc(RPC_ON_TIMER, Receivers.Others,integration.room.duration); 
+                if(integration.room.duration<=30){
+                    integration.room.totalJoined=0;    
+                }; 
              }
          }        
     }
