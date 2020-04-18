@@ -9,6 +9,7 @@ import java.util.Map;
  */
 public class Stub extends RecoverableObject {
 
+    public int rank;
     public String roomId;
     public int seat;
     public String tag;
@@ -21,6 +22,7 @@ public class Stub extends RecoverableObject {
     }
     public JsonObject toJson(){
         JsonObject jo = new JsonObject();
+        jo.addProperty("rank",rank);
         jo.addProperty("owner",owner);
         jo.addProperty("seat",seat);
         jo.addProperty("roomId",roomId);

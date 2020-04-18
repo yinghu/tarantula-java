@@ -13,7 +13,6 @@ using UnityEngine.Networking;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-
 namespace Tarantula.Networking{
    
    public delegate void ExceptionHandler(Exception ex,string message,ErrorCode errorCode);
@@ -22,28 +21,19 @@ namespace Tarantula.Networking{
    public delegate void UDPSocketHandler();   
 
    public enum ErrorCode{
-       EC_INDEX=0,
-       EC_REGISTER=1,
-       EC_LOGIN=2,
-       EC_DEVICE=3,
+       EC_INDEX,
+       EC_REGISTER,
+       EC_LOGIN,
+       EC_DEVICE,
        EC_LOGOUT,
-       EC_PROFILE,
-       EC_LEVEL,
-       EC_XP,
-       EC_LEADERBOARD,
-       EC_NOTIFICATION,
        EC_LOBBY,
        EC_ONPLAY,
-       EC_SERVICE,
-       EC_INSTANCE,
        EC_WS_RECEIVE,
-       EC_WS_SEND_INSTANCE,
-       EC_WS_SEND_SERVICE,
-       EC_UDP_RECEIVE,
-       EC_SEND_UDP,
        EC_INBOUND_MSG_PARSE,
        EC_CLOSE,
-       EC_WARN
+       EC_WARN,
+       EC_WEB_GET,
+       EC_WEB_SET
    } 
    [CreateAssetMenu(fileName = "GameEngineCluster", menuName = "Scripts/GameEngineCluster", order = 1)]    
    public class GameEngineCluster : ScriptableObject{
@@ -51,35 +41,29 @@ namespace Tarantula.Networking{
         public event ExceptionHandler OnException;
         public event InboundMessageHandler OnInboundMessage;
         public event WebSocketHandler OnWebSocket;
-        public event UDPSocketHandler OnUDPSocket;
        
         public string host;
-        //public bool deviceIdEnabled;
-        //public bool udpEnabled;
         public bool dedicated;
         public string accessKey;
+        
         private GecHttpClient _ghc;
         private GecWebSocket _gwc;
-        private GecUdpSocket _guc;
+        
         private bool _liveWc;
-        private bool _liveUc;
+       
         private Dictionary<string,Lobby> _lobbyList;
-        private List<Descriptor> _gameList;
         private static JsonSerializerSettings JSON_SETTING = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
-        private Queue<string> sQueue = new Queue<string>();
+        
         public Presence presence {set;get;}
         public bool online {set;get; }
-        public Profile profile {set;get;}
-        public Level level {set;get;}
-        public Xp xp {set;get;}
-        public LeaderBoard leaderBoard {set;get;} 
+      
         public string message {set;get;}
         
         public Lobby lobby(string typeId){ return _lobbyList[typeId];}  
-        public List<Descriptor> gameList(){ return _gameList;}
-        public Descriptor game{set;get;}
+        
         public Stub stub{set;get;}
         public Room room{set;get;}
+        
         private static GameEngineCluster _INSTANCE;
         private string deviceId;
         
@@ -103,23 +87,15 @@ namespace Tarantula.Networking{
         private void Bootstrap(){
             _ghc = new GecHttpClient(host);  
             _lobbyList = new Dictionary<string,Lobby>();
-            _gameList = new List<Descriptor>();
             _liveWc = false;
-            _liveUc = false;
             OnWebSocket += _OnWebSocketMessage;
-            if(!dedicated){
-                OnUDPSocket += _OnUDPSocketMessage;
-            }
             Debug.Log("Starting GameEngineCluster cluster on ["+host+"]");
         }  
         private async void _OnWebSocketMessage(){
             Debug.Log("Listen on WEB SOCKET");
             await OnWebSocketMessage();
         }
-        private async void _OnUDPSocketMessage(){
-            Debug.Log("Listen on UDP");
-            await OnUDPSocketMessage();
-        }
+      
         public  async Task<bool> Index(MonoBehaviour caller){
             try{
                 string jstr = await _ghc.GetJson(caller,"/user/index",new Header[]{new Header("Tarantula-tag","index/lobby")});
@@ -139,8 +115,7 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-type-id",conn.type),
                     new Header("Tarantula-action","onDedicated")
                 };
-                //string json = JsonConvert.SerializeObject(conn,JSON_SETTING);
-                string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,"{}");
+                string jstr = await _ghc.GetJson(caller,"/dedicated/action",headers);
                 Debug.Log(jstr);
                 return ParseRegister(jstr);            
             }catch(Exception ex){
@@ -156,10 +131,9 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-action","onStarted")
                 };
                 //string json = JsonConvert.SerializeObject(conn,JSON_SETTING);
-                string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,"{}");
+                string jstr = await _ghc.GetJson(caller,"/dedicated/action",headers);
                 callback(jstr);
-                return true;//
-                //ParseRegister(jstr);            
+                return true;//           
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_REGISTER);
                 return false;
@@ -175,8 +149,7 @@ namespace Tarantula.Networking{
                 //string json = JsonConvert.SerializeObject(conn,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,"{}");
                 callback(jstr);
-                return true;//
-                //ParseRegister(jstr);            
+                return true;//           
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_REGISTER);
                 return false;
@@ -249,109 +222,68 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> Profile(MonoBehaviour caller){
-            try{
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","presence/profile"),
-                    new Header("Tarantula-token",presence.token),
-                };
-                string jstr = await _ghc.GetJson(caller,"/service/action",headers);
-                return ParseProfile(jstr);
-            }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_PROFILE);
-                return false;
-            }
-        }
-        public  async Task<bool> OnPlay(MonoBehaviour caller,Action<JObject> callback){
+       
+        public  async Task<bool> OnPlay(MonoBehaviour caller){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-tag","game/matchmaking"),
                     new Header("Tarantula-token",presence.token),
                     new Header("Tarantula-action","onPlay")
                 };
-                string jstr = await _ghc.PostJson(caller,"/service/action",headers,"{}");
-                //Debug.Log(jstr);
-                return await ParseGameObject(jstr,callback);
-                //return ParseProfile(jstr);
+                string jstr = await _ghc.GetJson(caller,"/service/action",headers);
+                return await ParseGameObject(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_PROFILE);
+                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_ONPLAY);
                 return false;
             }
         }
-        public  async Task<bool> Profile(MonoBehaviour caller,string systemId){
+        public  async Task<bool> OnLeave(MonoBehaviour caller){
             try{
                 Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","presence/profile"),
+                    new Header("Tarantula-tag",stub.tag),
                     new Header("Tarantula-token",presence.token),
-                    new Header("Tarantula-action","onProfile")
-                };
-                Payload cmd = new Payload();
-                cmd.command = "onProfile";
-                cmd.headers = new Header[]{new Header("systemId",systemId)};
-                string json = JsonConvert.SerializeObject(cmd,JSON_SETTING);
-                string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
-                return ParseProfile(jstr);
-            }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_PROFILE);
-                return false;
-            }
-        }
-        //level/XP and leader board query
-        public  async Task<bool> Level(MonoBehaviour caller){
-            try{
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","level/xp"),
-                    new Header("Tarantula-token",presence.token),
-                    new Header("Tarantula-action","onLevel")
+                    new Header("Tarantula-action","onLeave")
                 };
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
-                return ParseLevel(jstr);
+                return ParseRegister(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_LEVEL);
+                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_ONPLAY);
                 return false;
             }
         }
-        public  async Task<bool> XP(MonoBehaviour caller,string header,string category){
+        public  async Task<bool> OnSet<T>(MonoBehaviour caller,string key,T jo){
             try{
                 Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","level/xp"),
+                    new Header("Tarantula-tag","game/data"),
                     new Header("Tarantula-token",presence.token),
-                    new Header("Tarantula-action","onXP")
+                    new Header("Tarantula-action","onSet"),
+                    new Header("Tarantula-name",key),
                 };
-                Payload cmd = new Payload();
-                cmd.command = "onXP";
-                cmd.headers = new Header[]{new Header("header",header),new Header("category",category)};
-                string json = JsonConvert.SerializeObject(cmd,JSON_SETTING);
+                string json = JsonConvert.SerializeObject(jo,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
-                return ParseXP(jstr);
+                return ParseRegister(jstr);
             }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_XP);
+                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_WEB_SET);
                 return false;
             }
         }
-        public  async Task<bool> LeaderBoard(MonoBehaviour caller,string header,string category,string classifier){
+        public  async Task<bool> OnGet(MonoBehaviour caller,string key,Action<string> callback){
             try{
                 Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","leaderboard/top10"),
+                    new Header("Tarantula-tag","game/data"),
                     new Header("Tarantula-token",presence.token),
-                    new Header("Tarantula-action","onLeaderBoard")
+                    new Header("Tarantula-action","onGet"),
+                    new Header("Tarantula-name",key),
                 };
-                Payload cmd = new Payload();
-                cmd.command = "onLeaderBoard";
-                cmd.headers = new Header[]{new Header("header",header),new Header("category",category),new Header("classifier",classifier)};
-                string json = JsonConvert.SerializeObject(cmd,JSON_SETTING);
-                string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
-                return ParseLeaderBoard(jstr);
+                string jstr = await _ghc.GetJson(caller,"/service/action",headers);
+                callback(jstr);
+                return true;
             }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_LEADERBOARD);
+                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_WEB_GET);
                 return false;
             }
         }
         public  async Task<bool> Device(MonoBehaviour caller){
-            //if(!deviceIdEnabled){
-                //message = "deviceId not enabled";
-                //return false;
-            //}
             try{
                 Device device = new Device();
                 device.deviceId = deviceId;
@@ -368,105 +300,11 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public async Task<bool> OnNotification(string topic,bool enabled){
-            try{
-                Streaming strm = new Streaming();
-                strm.action = enabled?"onStart":"onStop";
-                strm.label = topic;
-                strm.streaming = true;
-                Payload p = new Payload();
-                p.command = strm.action;
-                strm.data = p;
-                string json = JsonConvert.SerializeObject(strm,JSON_SETTING);
-                return await _gwc.Send(json);
-            }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_NOTIFICATION);
-                return false;
-            }
-        }
-        public async Task<bool> OnLobby(MonoBehaviour caller,string typeId){
-            try{
-                if(!_lobbyList.ContainsKey(typeId)){
-                    return false;
-                }
-                Lobby lb = _lobbyList[typeId];
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-tag",lb.descriptor.tag),
-                    new Header("Tarantula-token",presence.token),
-                    new Header("Tarantula-action","onLobby")
-                };
-                Payload p = new Payload();
-                p.command = "onLobby";
-                p.headers = new Header[]{new Header("typeId",typeId)};
-                string json = JsonConvert.SerializeObject(p,JSON_SETTING);
-                string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
-                return ParseLobby(jstr);
-            }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_LOBBY);
-                return false;
-            }   
-        }
-        public async Task<bool> OnPlay(MonoBehaviour caller,string joinTag,Descriptor game,Action<JObject> callback){
-            try{
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-tag",joinTag),
-                    new Header("Tarantula-token",presence.token),
-                    new Header("Tarantula-action","onPlay")
-                };
-                Payload p = new Payload();
-                p.command = "onPlay";
-                p.headers = new Header[]{new Header("applicationId",game.applicationId),new Header("accessMode","2"),new Header("category",game.category)};
-                string json = JsonConvert.SerializeObject(p,JSON_SETTING);
-                string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
-                //Processing join response 
-                return await ParseGameObject(jstr,game,callback);
-            }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_ONPLAY);
-                return false;
-            }
-        }
-       public async Task<bool> OnService(MonoBehaviour caller,string tag,Payload payload,Action<string> callback){
-            try{
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-tag",tag),
-                    new Header("Tarantula-token",presence.token),
-                    new Header("Tarantula-action",payload.command)
-                };
-                string json = JsonConvert.SerializeObject(payload,JSON_SETTING);
-                string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
-                callback(jstr);
-                return true;
-            }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_SERVICE);
-                return false;
-            }        
-        }
-        public async Task<bool> OnInstance(MonoBehaviour caller,Descriptor instance,Payload payload,Action<string> callback){
-            try{
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-token",presence.token),
-                    new Header("Tarantula-action",payload.command),
-                    new Header("Tarantula-application-id",instance.applicationId),
-                    new Header("Tarantula-instance-id",instance.instanceId)
-                };
-                string json = JsonConvert.SerializeObject(payload,JSON_SETTING);
-                string jstr = await _ghc.PostJson(caller,"/application/instance",headers,json);
-                callback(jstr);
-                return true;
-            }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_INSTANCE);
-                return false;
-            }        
-        }
         public async Task<bool> OnWebSocketMessage(){
             string msg ="{}";
             try{
                 //do receive loop
                 while(_liveWc){
-                    while(sQueue.Count>0){
-                        string _pending = sQueue.Dequeue();
-                        await _gwc.Send(_pending);
-                    }
                     msg = await _gwc.Receive();
                     ParseInboundMessage(msg);
                 }
@@ -477,96 +315,12 @@ namespace Tarantula.Networking{
                 return _liveWc;
             }   
         }
-        public async Task<bool> SendOnInstance(string applicationId,string instanceId,Payload payload,bool oneWay){
-            try{
-                //do receive loop
-                if(!_liveWc){
-                    return false;
-                }
-                Streaming strm = new Streaming();
-                strm.path = "/application/instance";
-                strm.applicationId = applicationId;
-                strm.instanceId = instanceId;
-                strm.action = payload.command;
-                strm.oneWay = oneWay;
-                strm.data = payload;
-                string jstrm = JsonConvert.SerializeObject(strm,JSON_SETTING);
-                if(!_liveUc){
-                    sQueue.Enqueue(jstrm);
-                    return true;
-                }
-                return await _gwc.Send(jstrm);
-            }catch(Exception ex){
-                _liveWc = false;
-                OnException?.Invoke(ex,"error on ws send",ErrorCode.EC_WS_SEND_INSTANCE);
-                return _liveWc;
-            } 
-        }
-        public async Task<bool> SendOnService(string tag,Payload payload){
-            try{
-                //do receive loop
-                if(!_liveWc){
-                    return false;
-                }
-                Streaming strm = new Streaming();
-                strm.path = "/service/action";
-                strm.tag = tag;
-                strm.action = payload.command;
-                strm.data = payload;
-                string jstrm = JsonConvert.SerializeObject(strm,JSON_SETTING);
-                return await _gwc.Send(jstrm);
-            }catch(Exception ex){
-                _liveWc = false;
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_WS_SEND_SERVICE);
-                return _liveWc;
-            } 
-        }
-        public async Task<bool> SendOnUDP<T>(OutboundMessage<T> msg){
-            try{
-                //do receive loop
-                if(!_liveUc){
-                    return false;
-                }
-                string json = JsonConvert.SerializeObject(msg.payload,JSON_SETTING);
-                string mex = msg.label+"#"+msg.instanceId+"?"+msg.query+json;
-                return  await _guc.Send(mex);
-            }catch(Exception ex){
-                _liveUc = false;
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_SEND_UDP);
-                return _liveUc;
-            }
-        }
-        public async Task<bool> OnUDPSocketMessage(){
-            try{
-                //do receive loop
-                while(_liveUc){
-                    string msg = await _guc.Receive();
-                    ParseInboundMessage(msg);
-                }    
-                return false;
-            }catch(Exception ex){
-                _liveUc = false;
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_UDP_RECEIVE);
-                return _liveUc;
-            }   
-        }
-        public void CloseUDP(){
-            if(_liveUc){
-                _liveUc = false;
-                _guc.Close();
-                Debug.Log("UDP CLOSED");
-            }
-        }
         public async Task<bool> Close(){
             try{
                 bool suc = false;
                 if(_liveWc){
                     _liveWc = false;
                     suc = await _gwc.Close();
-                }
-                if(_liveUc){
-                    _liveUc = false;
-                    _guc.Close();
                 }
                 online = false;
                 return suc;
@@ -601,7 +355,7 @@ namespace Tarantula.Networking{
                 OnException?.Invoke(ex,msg,ErrorCode.EC_INBOUND_MSG_PARSE);    
             }   
         }
-        private async Task<bool> ParseGameObject(string json,Action<JObject> callback){
+        private async Task<bool> ParseGameObject(string json){
             Debug.Log(json);
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
@@ -610,10 +364,6 @@ namespace Tarantula.Networking{
                 return suc;
             }
             stub = jo.SelectToken("stub").ToObject<Stub>();
-            Debug.Log(stub.roomId);
-            //string ticket = (string)jo.SelectToken("ticket");
-            //game.instanceId = tid;
-            //game.gameId = ixx;
             //streaming on websocket
             Streaming strm = new Streaming();
             strm.action = "onStream";
@@ -626,58 +376,8 @@ namespace Tarantula.Networking{
             strm.data = p;
             string jstrm = JsonConvert.SerializeObject(strm,JSON_SETTING);
             suc = await _gwc.Send(jstrm);
-            
-            if(suc){
-                callback(jo);
-            }
             return suc;
-        } 
-        private async Task<bool> ParseGameObject(string json,Descriptor game,Action<JObject> callback){
-            Debug.Log(json);
-            JObject jo = JObject.Parse(json);
-            bool suc = (bool)jo.SelectToken("successful");
-            if(!suc){
-                message = (string)jo.SelectToken("message");
-                return suc;
-            }
-            string tid = (string)jo.SelectToken("instanceId");
-            string ixx = (string)jo.SelectToken("index");
-            //string ticket = (string)jo.SelectToken("ticket");
-            game.instanceId = tid;
-            game.gameId = ixx;
-            //streaming on websocket
-            Streaming strm = new Streaming();
-            strm.action = "onStream";
-            strm.path = "/application/instance";
-            strm.streaming = true;
-            strm.applicationId = game.applicationId;
-            strm.instanceId = game.instanceId;
-            Payload p = new Payload();
-            p.command = strm.action;
-            strm.data = p;
-            string jstrm = JsonConvert.SerializeObject(strm,JSON_SETTING);
-            suc = await _gwc.Send(jstrm);
-            
-            if(suc){
-                callback(jo);
-            }
-            return suc;
-        } 
-        private bool ParseLobby(string json){
-            //Debug.Log(json);
-            JObject jo = JObject.Parse(json);
-            bool suc = (bool)jo.SelectToken("successful");
-            if(!suc){
-                message = (string)jo.SelectToken("message");
-                return suc;
-            }
-            JArray tk = (JArray)jo.SelectToken("gameList");
-            for(int i=0;i<tk.Count;i++){
-                Descriptor gm = tk[i].ToObject<Descriptor>();
-                _gameList.Add(gm);
-            }
-            return true;
-        } 
+        }  
         private bool ParseIndex(string json){
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
@@ -752,91 +452,8 @@ namespace Tarantula.Networking{
                 return suc;
             }
             return true;
-        }
-        private bool ParseProfile(string json){
-            JObject jo = JObject.Parse(json);
-            bool suc = (bool)jo.SelectToken("successful");
-            if(!suc){
-                message = (string)jo.SelectToken("message");
-                return suc;
-            }
-            JToken tk = jo.SelectToken("profile");
-            profile = tk.ToObject<Profile>();
-            return true;
-        }
-        private bool ParseLevel(string json){
-            JObject jo = JObject.Parse(json);
-            bool suc = (bool)jo.SelectToken("successful");
-            if(!suc){
-                message = (string)jo.SelectToken("message");
-                return suc;
-            }
-            JToken tk = jo.SelectToken("level");
-            level = tk.ToObject<Level>();
-            return true;
-        }
-        private bool ParseXP(string json){
-            JObject jo = JObject.Parse(json);
-            bool suc = (bool)jo.SelectToken("successful");
-            if(!suc){
-                message = (string)jo.SelectToken("message");
-                return suc;
-            }
-            JToken tk = jo.SelectToken("xp");
-            xp = tk.ToObject<Xp>();
-            return true;
-        }
-        private bool ParseLeaderBoard(string json){
-            JObject jo = JObject.Parse(json);
-            bool suc = (bool)jo.SelectToken("successful");
-            if(!suc){
-                message = (string)jo.SelectToken("message");
-                return suc;
-            }
-            JToken tk = jo.SelectToken("leaderBoard");
-            leaderBoard = tk.ToObject<LeaderBoard>();
-            return true;
-        }   
+        }  
    } 
-   public class GecUdpSocket{
-       private UdpClient _udpClient;
-       public GecUdpSocket(){}
-       
-       public void Connect(string host,int port){
-           _udpClient = new UdpClient(host,port);
-       } 
-       public async Task<bool> Init(Presence presence,string instanceId,string ticket){
-            OnJoin payload = new OnJoin();
-            payload.command= "onJoin";
-            payload.systemId= presence.login;
-            payload.instanceId= instanceId;
-            payload.stub= presence.stub;
-            payload.ticket= ticket;
-            string json = JsonConvert.SerializeObject(payload);
-            string mex = "connection#"+instanceId+"?onJoin"+json;
-            byte[] onjoin = Encoding.UTF8.GetBytes(mex);
-            int bst = await _udpClient.SendAsync(onjoin,onjoin.Length);
-            return bst==onjoin.Length;
-       }
-       public void Close(){
-           _udpClient.Close();
-           _udpClient.Dispose();
-       }
-       public async Task<bool> Send(string json){
-           byte[] payload = Encoding.UTF8.GetBytes(json.ToString());
-           int bytes = await _udpClient.SendAsync(payload,payload.Length); 
-           return bytes>0;    
-       }
-       public async Task<string> Receive(){
-           UdpReceiveResult ret = await _udpClient.ReceiveAsync();
-           if(ret.Buffer.Length>0){
-                return Encoding.UTF8.GetString(ret.Buffer);
-           }
-           else{
-               return "error{'successful':false,'message':'no data received'}";
-           }
-       }
-   }    
    public class GecWebSocket{
         private ClientWebSocket _websocket;
         private string _url;
@@ -943,12 +560,6 @@ namespace Tarantula.Networking{
         public string query;
         public string payload;
     }
-    public class OutboundMessage<T>{
-        public string label;
-        public string instanceId;
-        public string query;
-        public T payload;
-    }
     public class Header{
         public string name { get; set; }
         public string value { get; set; }
@@ -956,13 +567,6 @@ namespace Tarantula.Networking{
             this.name = name;
             this.value = value;
         }
-    }
-    public class OnJoin{
-        public string command;
-        public string systemId;
-        public string ticket;
-        public string instanceId;
-        public int stub;
     }
     public class Payload{
         public string command;
@@ -1004,7 +608,6 @@ namespace Tarantula.Networking{
         public string icon { get; set; }
         public string viewId { get; set; }
         public string responseLabel { get; set; }
-        public string gameId { get; set; }
     }
     public class Lobby{
         public Descriptor descriptor { get; set; }
@@ -1019,36 +622,6 @@ namespace Tarantula.Networking{
         public string emailAddress { get; set; }
         public string password { get; set; }
     }
-    public class Profile{
-        public string nickname { get; set; }
-        public string avatar { get; set; }
-    }
-    public class Level{
-        public int level { get; set; }
-        public double levelXP { get; set; }
-    }
-    public class Statistic{
-        public string category { get; set; }
-        public double value { get; set; }
-    }
-    public class Xp{
-        public string header { get; set; }
-        public string name { get; set; }
-        public List<Statistic> statistics { get; set; }
-    }
-    public class Board{
-        public string systemId { get; set; }
-        public double value { get; set; }
-        public DateTime lastUpdated { get; set; }
-    }
-    public class LeaderBoard{
-        public string header { get; set; }
-        public string name { get; set; }
-        public string classifier { get; set; }
-        public string category { get; set; }
-        public int size { get; set; }
-        public List<Board> board { get; set; }
-    }
     public class Connection{
         public bool offline{get;set;}
         public string path { get; set; }
@@ -1060,12 +633,6 @@ namespace Tarantula.Networking{
         public bool secured { get; set; }
         public int port { get; set; }
     }
-    public class Occupation{
-        public string systemId{get;set;}
-        public int seatIndex{get;set;}
-        public int state{get;set;}
-        public int totalJoined{set;get;}
-    }
     public class Room{
         public bool started{set;get;}
         public int totalJoined{set;get;}
@@ -1076,9 +643,10 @@ namespace Tarantula.Networking{
         public int capacity{get;set;}
         public int duration{get;set;}
         public int overtime{get;set;}
-        public Occupation[] occupations{get;set;}
+        public Stub[] playerList{get;set;}
     }
     public class Stub{
+        public int rank{set;get;}
         public int seat{set;get;}
         public string roomId{set;get;}
         public string tag{set;get;}

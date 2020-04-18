@@ -42,11 +42,9 @@ public class Integration : MonoBehaviour{
             conn.host= ip;
             conn.port = port;
             conn.type = typeId;
-            //conn.type="dedicated";
             integration.room.connection = conn;
             await integration.Dedicated(this,conn);
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
-            //register dedicated connection
             return;
         }
         login = GameObject.Find("/UI/LOGIN");
@@ -106,9 +104,6 @@ public class Integration : MonoBehaviour{
         if(!integration.online){
             await integration.Index(this);
             await integration.Device(this); 
-            //await integration.OnPlay(this,(a)=>{
-                //Debug.Log("joined");
-            //});
             Debug.Log("Online->"+integration.online);
         }
     }
@@ -117,9 +112,7 @@ public class Integration : MonoBehaviour{
             return;
         }
         pendingClick = true;
-        bool joined = await integration.OnPlay(this,(a)=>{
-            Debug.Log("joined");
-        });     
+        bool joined = await integration.OnPlay(this);     
         if(!joined){
             message.SetText(integration.message);
         }
@@ -129,11 +122,8 @@ public class Integration : MonoBehaviour{
             //return;
         //}
         pendingClick = true;
-        Payload payload = new Payload();
-        payload.command = "onLeave";
-        await integration.OnService(this,integration.stub.tag,payload,(ps)=>{
-            Debug.Log(ps);        
-        });
+        bool suc = await integration.OnLeave(this);
+        Debug.Log("leave->"+suc);
         //bool joined = await OnJoin(this,"RobotQuestPVP");
         //if(!joined){
             //message.SetText(integration.message);
@@ -142,15 +132,7 @@ public class Integration : MonoBehaviour{
     public async void OnLogout(){
         if(integration.online){
             if(inGame){
-                Payload payload = new Payload();
-                payload.command = "onLeave";
-                await  integration.OnInstance(this,integration.game,payload,(ps)=>{
-                    Debug.Log(ps);
-                    if(connected){
-                        NetworkManager.Instance.Disconnect();
-                    }
-                    integration.CloseUDP();
-                });
+                await integration.OnLeave(this);
             }
             await integration.Logout(this);
             pendingClick = false;
@@ -161,34 +143,7 @@ public class Integration : MonoBehaviour{
         }
         Debug.Log(integration.online);     
     }
-     private async Task<bool> OnJoin(MonoBehaviour caller,string gname){
-        bool suc = await integration.OnLobby(caller,typeId);
-        if(!suc){
-            return suc;
-        }
-        List<Descriptor> glist = integration.gameList();
-        foreach(Descriptor desc in glist){
-            Debug.Log("category->"+desc.category);
-            if(desc.name.Equals(gname)){
-                game = desc;
-                break;
-            }
-        }
-        return await integration.OnPlay(caller,"robot-quest/live",game,(jo)=>{
-            Occupation occ = jo.SelectToken("gameObject.occupation").ToObject<Occupation>();
-            Room room = integration.room;
-            room.capacity = (int)jo.SelectToken("gameObject.capacity");
-            room.occupations = new Occupation[room.capacity];
-            room.zone = (string)jo.SelectToken("gameObject.arenaZone"); 
-            room.occupations[occ.seatIndex]=occ;
-            room.seatIndex = occ.seatIndex;
-            room.totalJoined = occ.totalJoined;
-            integration.game = game;
-            message.SetText("Players["+room.totalJoined+"/"+room.capacity+"]");
-            inGame = true;
-        });
-    }
-    async void _OnStart(InboundMessage msg){
+    void _OnStart(InboundMessage msg){
         if(msg.query!=null&&msg.query.Equals("onStart")){
             Debug.Log("START=>>>"+msg.payload);
             JObject jo = JObject.Parse(msg.payload);

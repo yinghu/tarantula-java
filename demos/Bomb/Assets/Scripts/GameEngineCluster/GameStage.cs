@@ -15,7 +15,6 @@ namespace Tarantula.Networking{
         private GameEngineCluster integration;
         public GameObject explosion;
         public GameObject[] itemList;
-        private Descriptor game;
         
         private TextMeshProUGUI timer;
        
@@ -36,7 +35,6 @@ namespace Tarantula.Networking{
             bumpRuns[1].OnRemoveRPC += OnDead;
             if(integration.room!=null){
                 seatIndex = integration.room.seatIndex;
-                game = integration.game;
             }
             NetworkManager.Instance.objectInitialized +=(INetworkBehavior unityGameObject, NetworkObject obj)=>{
                 //GameObject go = ((MonoBehaviour)unityGameObject).gameObject;
@@ -52,18 +50,7 @@ namespace Tarantula.Networking{
                 }   
             }
         }
-        public async Task<bool> OnMove(Payload payload){
-            OutboundMessage<Payload> om = new OutboundMessage<Payload>();
-            om.label = "rq";
-            om.query = payload.command;
-            om.instanceId = game.gameId;
-            om.payload = payload;
-            bool suc = await integration.SendOnUDP(om);
-            if(!suc){
-                suc = await integration.SendOnInstance(game.applicationId,game.instanceId,payload,true);
-            }
-            return suc;
-        }
+        
         public void OnMove(int sx){
             float x = Random.Range(0,1080f);
             float y = Random.Range(0,1920f);

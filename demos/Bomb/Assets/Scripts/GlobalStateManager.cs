@@ -47,7 +47,7 @@ public class GlobalStateManager : AdminBehavior{
     
     private GameEngineCluster integration;
    
-    private Descriptor game;
+    //private Descriptor game;
     
     public GameStage gameStage;
     private bool _started;
@@ -60,7 +60,7 @@ public class GlobalStateManager : AdminBehavior{
     
     void _Start(){
         integration = GameEngineCluster.Instance; 
-        game = integration.game;
+        //game = integration.game;
         integration.OnInboundMessage += _OnStart; 
         integration.OnException += (ex,msg,code)=>{
             Debug.Log(msg);
@@ -101,21 +101,12 @@ public class GlobalStateManager : AdminBehavior{
     {
             
     }
-    public async void OnLeave(){   
-        gameStage.OnEnd();
-        await OnLeave(this);   
-    }
-    private async Task<bool> OnLeave(MonoBehaviour caller){
-        Payload payload = new Payload();
-        payload.command = "onLeave";
-        integration.OnInboundMessage -= _OnStart;
-        return await  integration.OnInstance(caller,game,payload,(ps)=>{
-            NetworkManager.Instance.Disconnect();
-            integration.CloseUDP();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex-1);
-        });
-    }
-    async void _OnStart(InboundMessage msg){
+    //public async void OnLeave(){   
+        //gameStage.OnEnd();
+        //await OnLeave(this);   
+    //}
+   
+    void _OnStart(InboundMessage msg){
         //Debug.Log(msg.query);
         //Debug.Log(msg.instanceId);        
         //Debug.Log(msg.payload);
@@ -138,10 +129,7 @@ public class GlobalStateManager : AdminBehavior{
             integration.OnInboundMessage -= _OnStart;
             gameStage.OnEnd();
             NetworkManager.Instance.Disconnect();
-            integration.CloseUDP();
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex-1);
-            
-            //await OnLeave(this);
         }
         else if(msg.query!=null&&msg.query.Equals("onQuest")){
             //gameStage.OnQuest(msg.payload);
@@ -152,30 +140,6 @@ public class GlobalStateManager : AdminBehavior{
         else{
             //gameStage.OnMessage(msg);
         }
-    }
-    public async Task<bool> OnQuest(Payload payload){   
-        payload.command = "onQuest";
-        return await integration.SendOnInstance(game.applicationId,game.instanceId,payload,true);
-    }
-    public  async void OnSeat1(){
-        Payload payload = new Payload();
-        payload.headers = new Header[]{new Header("accessId","a"),new Header("c","5")};
-        await OnQuest(payload);       
-    }
-    public  async void OnSeat2(){
-        Payload payload = new Payload();
-        payload.headers = new Header[]{new Header("accessId","b"),new Header("c","5")};
-        await OnQuest(payload);
-    }
-    public  async void OnSeat3(){
-        Payload payload = new Payload();
-        payload.headers = new Header[]{new Header("accessId","c"),new Header("f","2")};
-        await OnQuest(payload);
-    }
-    public async  void OnSeat4(){
-        Payload payload = new Payload();
-        payload.headers = new Header[]{new Header("accessId","d")};
-        await OnQuest(payload);
     }
     private IEnumerator StartCountdown(){
         while (integration.room.duration>0){
