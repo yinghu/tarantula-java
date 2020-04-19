@@ -141,14 +141,14 @@ public class Integration : MonoBehaviour{
         }
         Debug.Log(integration.online);     
     }
-    void _OnUpdating(int st){
-        if(st==1){
+    void _OnUpdating(RoomState st){
+        if(st==RoomState.STARTING){
             OnGo();
         }
-        else if(st==2){
+        else if(st==RoomState.INITIALIZING){
             timer.SetText(integration.timer.m+":"+integration.timer.s);        
         }
-        else if(st==3){
+        else if(st==RoomState.ENDING){
             pendingClick = false;
             inGame = false;
             connected = false;

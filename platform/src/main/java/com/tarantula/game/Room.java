@@ -93,6 +93,7 @@ public class Room extends RecoverableObject {
     public Stub[] playerList(){
         return this.stubs;
     }
+    public int state(){ return this.state;}
     public Connection connection(){
         return this.connection;
     }
@@ -157,11 +158,9 @@ public class Room extends RecoverableObject {
                 break;
             case GAMING:
                 duration -=TIMER_DELTA;
-                if(duration<=0){
+                if(duration<=0){//goes to overtime
                     state = OVERTIME;
-                }
-                else{
-                    update.on(oid+"?onGame",new Countdown(duration,state).toJson().toString().getBytes());
+                    update.on(oid+"?onOvertime",new Countdown(overtime,state).toJson().toString().getBytes());
                 }
                 break;
             case OVERTIME:
@@ -169,16 +168,14 @@ public class Room extends RecoverableObject {
                 if(overtime<=0){
                     state = ENDING;
                 }
-                else{
-                    update.on(oid+"?onOvertime",new Countdown(overtime,state).toJson().toString().getBytes());
-                }
                 break;
             case ENDING:
-                state = PENDING_END;
-                //could be delay 5 seconds to wait for game server result
                 update.on(oid+"?onEnd",null);
-                roomListener.onEnding(this);
+                state = PENDING_END;
                 break;
+            case PENDING_END:
+                //could be delay few seconds to wait for game server result
+                roomListener.onEnding(this);
         }
     }
 }

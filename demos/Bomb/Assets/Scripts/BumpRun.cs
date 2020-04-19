@@ -15,7 +15,6 @@ public class BumpRun : MonoBump
     
     public void OnRun(Vector3 dest,int index){
         if(networkObject==null){
-            //Debug.Log("no network object");
             return;
         }
         networkObject.SendRpc(RPC_ON_MOVE, Receivers.Owner,dest,index);

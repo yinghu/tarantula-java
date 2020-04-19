@@ -19,7 +19,7 @@ namespace Tarantula.Networking{
   
    public delegate void WebSocketHandler();    
    public delegate void UDPSocketHandler();   
-   public delegate void OnRoomEvent(int state);    
+   public delegate void OnRoomEvent(RoomState state);    
    public enum ErrorCode{
        EC_INDEX,
        EC_DEDICATED,
@@ -31,7 +31,15 @@ namespace Tarantula.Networking{
        EC_CLOSE,
        EC_WEB_GET,
        EC_WEB_SET
-   } 
+   }
+   public enum RoomState{
+       WAITING= 0,
+       PENDING_JOIN=1,
+       INITIALIZING=2,
+       STARTING=3,
+       OVERTIME=4,
+       ENDING=5
+   }     
    [CreateAssetMenu(fileName = "GameEngineCluster", menuName = "Scripts/GameEngineCluster", order = 1)]    
    public class GameEngineCluster : ScriptableObject{
       
@@ -326,6 +334,7 @@ namespace Tarantula.Networking{
                     Debug.Log("START=>>>"+im.payload);
                     JObject jo = JObject.Parse(im.payload);
                     room.arena = (string)jo.SelectToken("arena");
+                    room.state = (RoomState)((int)jo.SelectToken("state"));
                     if(jo.ContainsKey("connection")){
                         Connection conn = jo.SelectToken("connection").ToObject<Connection>();
                         room.connection = conn;
@@ -337,22 +346,30 @@ namespace Tarantula.Networking{
                         conn.port = 15937;
                         room.connection = conn;
                     }
-                    OnUpdating?.Invoke(1);
+                    OnUpdating?.Invoke(room.state);
                 }
                 else if(im.query!=null&&im.query.Equals("onTimer")){
                     Debug.Log("Timer=>>>"+im.payload);
                     JObject jo = JObject.Parse(im.payload);
                     timer.m = (int)jo.SelectToken("m");
                     timer.s = (int)jo.SelectToken("s");
-                    int state = (int)jo.SelectToken("state");
-                    if(state==2){
+                    room.state = (RoomState)((int)jo.SelectToken("state"));
+                    if(room.state==RoomState.INITIALIZING){
                         room.started=true;    
                     }
-                    OnUpdating?.Invoke(2);
+                    OnUpdating?.Invoke(room.state);
+                }
+                else if(im.query!=null&&im.query.Equals("onOvertime")){
+                    Debug.Log("Overtime=>>>"+im.payload);
+                    JObject jo = JObject.Parse(im.payload);
+                    timer.m = (int)jo.SelectToken("m");
+                    timer.s = (int)jo.SelectToken("s");
+                    room.state = (RoomState)((int)jo.SelectToken("state"));
+                    OnUpdating?.Invoke(room.state);
                 }
                 else if(im.query!=null&&im.query.Equals("onEnd")){
                     Debug.Log("END=>>>"+im.payload);
-                    OnUpdating?.Invoke(3);
+                    OnUpdating?.Invoke(RoomState.ENDING);
                 }
             }catch(Exception ex){
                 OnException?.Invoke(ex,msg,ErrorCode.EC_INBOUND_MSG_PARSE);    
@@ -552,7 +569,6 @@ namespace Tarantula.Networking{
             //put key validation here
             /** uncomment this block to valid the certificate
             X509Certificate2 cert = new X509Certificate2(certificateData);
-            
             **/
             return true;
         }
@@ -623,6 +639,7 @@ namespace Tarantula.Networking{
     }
     public class Room{
         public bool started{set;get;}
+        public RoomState state{set;get;}
         public int totalJoined{set;get;}
         public Connection connection{get;set;}
         public string zone{get;set;}

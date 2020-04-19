@@ -9,13 +9,13 @@ import com.tarantula.platform.service.DeploymentServiceProvider;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Updated by yinghu lu on 4/14/2020.
+ * Updated by yinghu lu on 4/19/2020.
  */
 public class SingletonModuleApplication extends TarantulaApplicationHeader implements SchedulingTask {
 
     private ConcurrentHashMap<String,ConcurrentHashMap<String,Session>> _onIndex = new ConcurrentHashMap<>();
 
-    private long SERVER_PUSH_INTERVAL = 50;
+    private long SERVER_PUSH_INTERVAL;
 
     private Module module;
     private DeploymentServiceProvider serviceProvider;
@@ -44,7 +44,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        module = this.serviceProvider.module(this.descriptor);
+        this.module = this.serviceProvider.module(this.descriptor);
         SERVER_PUSH_INTERVAL = descriptor.timerOnModule();
         if(SERVER_PUSH_INTERVAL>0){
             this.context.schedule(this);

@@ -99,8 +99,11 @@ public class GlobalStateManager : AdminBehavior{
     {
             
     }
-    void _OnUpdating(int st){
-        if(st==3){
+    void _OnUpdating(RoomState st){
+        if(st==RoomState.OVERTIME){
+            Debug.Log("Overtime run");
+        }
+        else if(st==RoomState.ENDING){
             integration.OnUpdating -= _OnUpdating;
             gameStage.OnEnd();
             NetworkManager.Instance.Disconnect();

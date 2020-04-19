@@ -97,6 +97,7 @@ public class Arena extends RecoverableObject implements RoomListener {
     public byte[] onStarting(Room room){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("arena",name);
+        jsonObject.addProperty("state",room.state());
         if(room.connection()!= null) {
             Connection connection = room.connection();
             JsonObject jcc = new JsonObject();
