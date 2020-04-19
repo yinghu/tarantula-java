@@ -15,9 +15,9 @@ public class Bomb : MonoBehaviour
         //transform.localScale = transform.localScale*(1+Time.fixedDeltaTime/100);  
     }
     private void OnStart1(){
-        Debug.Log("starting 111");
+        //Debug.Log("starting 111");
     }
     private void OnStart2(){
-        Debug.Log("starting 222");
+        //Debug.Log("starting 222");
     }
 }

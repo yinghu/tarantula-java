@@ -12,7 +12,7 @@ public class MonoBump : BumpBehavior{
     protected override void NetworkStart(){
 		base.NetworkStart();
         networkObject.onDestroy += _OnDestroy;
-        Debug.Log("network started=>MonoBump");
+        //Debug.Log("network started=>MonoBump");
     }
     void Update(){
         if (networkObject == null){
@@ -27,10 +27,10 @@ public class MonoBump : BumpBehavior{
 		networkObject.rotation = transform.rotation;    
     }
     void _OnDestroy(NetWorker sender){
-        Debug.Log("network Killing->"+sender);    
+        //Debug.Log("network Killing->"+sender);    
     }
     void OnDestroy(){
-        Debug.Log("Killing->"+gameObject.name);    
+        //Debug.Log("Killing->"+gameObject.name);    
     }
     public override void OnMove(RpcArgs args){}
     public override void OnLive(RpcArgs args){}

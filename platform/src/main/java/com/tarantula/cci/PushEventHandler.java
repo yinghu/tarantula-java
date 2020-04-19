@@ -64,7 +64,7 @@ public class PushEventHandler implements RequestHandler {
                     }
                 });
             }
-            else if(action.equals("onDedicated")){ //dedicated server register on cluster
+            else if(action.equals("onRegistered")){ //dedicated server register on cluster
                 String typeId = exchange.header("Tarantula-type-id");
                 String host = exchange.header("Tarantula-host");
                 int port = Integer.parseInt(exchange.header("Tarantula-port"));
@@ -74,13 +74,13 @@ public class PushEventHandler implements RequestHandler {
                     Connection connection = new UDPConnection(serverId,host,port);
                     this.deploymentServiceProvider.onUDPConnection(typeId,connection);
                 }
-                byte[] eb = this.builder.create().toJson(new ResponseHeader("onDedicated","ok",true)).getBytes();
+                byte[] eb = this.builder.create().toJson(new ResponseHeader("onRegistered","ok",true)).getBytes();
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
             else if(action.equals("onStarted")){
                 String serverId = exchange.header("Tarantula-server-id");
                 String accessKey = exchange.header("Tarantula-access-key");
-                byte[] eb = new byte[0];
+                byte[] eb = "{}".getBytes();
                 if(tokenValidator.validateAccessKey(accessKey)) {
                     eb = this.deploymentServiceProvider.onStartedUDPConnection(serverId);
                 }
@@ -92,7 +92,8 @@ public class PushEventHandler implements RequestHandler {
                 if(tokenValidator.validateAccessKey(accessKey)){
                     this.deploymentServiceProvider.onEndedUDPConnection(serverId,_payload);
                 }
-                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"dedicated",true));
+                byte[] eb = this.builder.create().toJson(new ResponseHeader("onEnded","ok",true)).getBytes();
+                exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
         }catch (Exception ex){
             ex.printStackTrace();

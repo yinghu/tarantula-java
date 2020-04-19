@@ -175,6 +175,7 @@ public class Room extends RecoverableObject {
                 break;
             case ENDING:
                 state = PENDING_END;
+                //could be delay 5 seconds to wait for game server result
                 update.on(oid+"?onEnd",null);
                 roomListener.onEnding(this);
                 break;

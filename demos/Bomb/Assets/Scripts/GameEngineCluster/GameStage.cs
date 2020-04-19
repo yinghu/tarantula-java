@@ -33,12 +33,12 @@ namespace Tarantula.Networking{
             bumpRuns[1].OnMoveRPC += OnMove;
             bumpRuns[0].OnRemoveRPC += OnDead;
             bumpRuns[1].OnRemoveRPC += OnDead;
-            if(integration.room!=null){
-                seatIndex = integration.room.seatIndex;
+            if(integration.stub!=null){
+                seatIndex = integration.stub.seat;
             }
             NetworkManager.Instance.objectInitialized +=(INetworkBehavior unityGameObject, NetworkObject obj)=>{
                 //GameObject go = ((MonoBehaviour)unityGameObject).gameObject;
-                Debug.Log(((MonoBehaviour)unityGameObject).gameObject.name+" Created");    
+                //Debug.Log(((MonoBehaviour)unityGameObject).gameObject.name+" Created");    
             };
         }
         
@@ -80,46 +80,6 @@ namespace Tarantula.Networking{
         }
         public void OnEnd(){ 
             timer.SetText("00:00");
-        }
-        public void OnQuest(string msg){
-            JObject jo = JObject.Parse(msg);
-            Vector3 mp = new Vector3();
-            mp.x = ((float)jo.SelectToken("x"))*Screen.width;
-            mp.y = ((float)jo.SelectToken("y"))*Screen.height;
-            mp.z = 0;//float.Parse(pv.headers[2].value);
-            string _name = (string)jo.SelectToken("n");
-            int _ix = (int)jo.SelectToken("i");
-            _OnView(_name,mp,itemList[_ix]);
-        }
-        public void OnRemove(string msg){
-            JObject jo = JObject.Parse(msg);
-            string questId = (string)jo.SelectToken("n");  
-            bumpRuns[seatIndex].OnRemove(questId);
-        }
-        public void OnMessage(InboundMessage ibm){
-            if(ibm.query!=null&&ibm.query.Equals("onMessage")){
-                JObject jo = JObject.Parse(ibm.payload);
-                Payload pv = jo.ToObject<Payload>();
-                Vector3 mp = new Vector3();
-                mp.x = float.Parse(pv.headers[0].value)*Screen.width;
-                mp.y = float.Parse(pv.headers[1].value)*Screen.height;
-                mp.z = 0;//float.Parse(pv.headers[2].value);
-                float speed = float.Parse(pv.headers[3].value);
-                int sx = int.Parse(pv.headers[4].value);
-                //movements[sx].OnMove(mp,speed);   
-            }
-        }
-        private void _OnView(string name,Vector3 v,GameObject src){
-            RaycastHit hit;
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(v),out hit)) {
-                Vector3 vc = hit.point;
-                vc.y = 9.8f;
-                bumpRuns[seatIndex].OnQuest(hit.point,name);
-            }
-            //foreach(KeyValuePair<uint,NetworkObject> kv in NetworkManager.Instance.Networker.NetworkObjects){
-                //Debug.Log(">>>>>>>>>>KEY->"+kv.Key);
-                //Debug.Log(">>>>>>>>>>vALUE->"+((MonoBehaviour)kv.Value.AttachedBehavior).gameObject.name);
-            //}
         }
         public void OnLive(RpcArgs args){
             BombRun bm = (BombRun)NetworkManager.Instance.InstantiateBomb(0,args.GetNext<Vector3>(),Quaternion.identity,true);

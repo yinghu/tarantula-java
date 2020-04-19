@@ -15,7 +15,7 @@ public class BombRun : MonoBomb
     }
 
     void OnEnable(){
-        Debug.Log("Bomb Run Enabled");
+        //Debug.Log("Bomb Run Enabled");
     }
     public void Explode(){
         networkObject.SendRpc(RPC_ON_EXPLODE,Receivers.All);
@@ -26,7 +26,7 @@ public class BombRun : MonoBomb
         networkObject.Destroy();
     }
     public override void OnExplode(RpcArgs args){
-        Debug.Log("Exploding ...222");
+        //Debug.Log("Exploding ...222");
         MainThreadManager.Run(() =>
 		{
             GameObject ex = Instantiate(explosion,transform.position, Quaternion.identity); //1

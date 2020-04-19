@@ -16,22 +16,19 @@ using Newtonsoft.Json.Linq;
 namespace Tarantula.Networking{
    
    public delegate void ExceptionHandler(Exception ex,string message,ErrorCode errorCode);
-   public delegate void InboundMessageHandler(InboundMessage message);
+  
    public delegate void WebSocketHandler();    
    public delegate void UDPSocketHandler();   
-
+   public delegate void OnRoomEvent(int state);    
    public enum ErrorCode{
        EC_INDEX,
-       EC_REGISTER,
-       EC_LOGIN,
+       EC_DEDICATED,
        EC_DEVICE,
        EC_LOGOUT,
-       EC_LOBBY,
        EC_ONPLAY,
        EC_WS_RECEIVE,
        EC_INBOUND_MSG_PARSE,
        EC_CLOSE,
-       EC_WARN,
        EC_WEB_GET,
        EC_WEB_SET
    } 
@@ -39,8 +36,10 @@ namespace Tarantula.Networking{
    public class GameEngineCluster : ScriptableObject{
       
         public event ExceptionHandler OnException;
-        public event InboundMessageHandler OnInboundMessage;
         public event WebSocketHandler OnWebSocket;
+        
+        public event OnRoomEvent OnUpdating;
+       
        
         public string host;
         public bool dedicated;
@@ -63,6 +62,7 @@ namespace Tarantula.Networking{
         
         public Stub stub{set;get;}
         public Room room{set;get;}
+        public Timer timer{set;get;}
         
         private static GameEngineCluster _INSTANCE;
         private string deviceId;
@@ -88,6 +88,8 @@ namespace Tarantula.Networking{
             _ghc = new GecHttpClient(host);  
             _lobbyList = new Dictionary<string,Lobby>();
             _liveWc = false;
+            room = new Room();
+            timer = new Timer();
             OnWebSocket += _OnWebSocketMessage;
             Debug.Log("Starting GameEngineCluster cluster on ["+host+"]");
         }  
@@ -105,7 +107,7 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> Dedicated(MonoBehaviour caller,Connection conn){
+        public  async Task<bool> GameRegistered(MonoBehaviour caller,Connection conn){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-host",conn.host),
@@ -113,13 +115,13 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-server-id",deviceId),
                     new Header("Tarantula-access-key",accessKey),
                     new Header("Tarantula-type-id",conn.type),
-                    new Header("Tarantula-action","onDedicated")
+                    new Header("Tarantula-action","onRegistered")
                 };
                 string jstr = await _ghc.GetJson(caller,"/dedicated/action",headers);
                 Debug.Log(jstr);
                 return ParseHeader(jstr);            
             }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_REGISTER);
+                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_DEDICATED);
                 return false;
             }
         }
@@ -135,7 +137,7 @@ namespace Tarantula.Networking{
                 callback(jstr);
                 return true;//           
             }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_REGISTER);
+                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_DEDICATED);
                 return false;
             }
         }
@@ -151,7 +153,7 @@ namespace Tarantula.Networking{
                 callback(jstr);
                 return true;//           
             }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_REGISTER);
+                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_DEDICATED);
                 return false;
             }
         }
@@ -320,7 +322,38 @@ namespace Tarantula.Networking{
                     im.instanceId = msg.Substring(idx,idx3-idx);
                 }
                 im.payload = msg.Substring(idx3);
-                OnInboundMessage?.Invoke(im);
+                if(im.query!=null&&im.query.Equals("onStart")){
+                    Debug.Log("START=>>>"+im.payload);
+                    JObject jo = JObject.Parse(im.payload);
+                    room.arena = (string)jo.SelectToken("arena");
+                    if(jo.ContainsKey("connection")){
+                        Connection conn = jo.SelectToken("connection").ToObject<Connection>();
+                        room.connection = conn;
+                    }
+                    else{
+                        Connection conn = new Connection();
+                        conn.offline = true;
+                        conn.host = "127.0.0.1";
+                        conn.port = 15937;
+                        room.connection = conn;
+                    }
+                    OnUpdating?.Invoke(1);
+                }
+                else if(im.query!=null&&im.query.Equals("onTimer")){
+                    Debug.Log("Timer=>>>"+im.payload);
+                    JObject jo = JObject.Parse(im.payload);
+                    timer.m = (int)jo.SelectToken("m");
+                    timer.s = (int)jo.SelectToken("s");
+                    int state = (int)jo.SelectToken("state");
+                    if(state==2){
+                        room.started=true;    
+                    }
+                    OnUpdating?.Invoke(2);
+                }
+                else if(im.query!=null&&im.query.Equals("onEnd")){
+                    Debug.Log("END=>>>"+im.payload);
+                    OnUpdating?.Invoke(3);
+                }
             }catch(Exception ex){
                 OnException?.Invoke(ex,msg,ErrorCode.EC_INBOUND_MSG_PARSE);    
             }   
@@ -556,7 +589,6 @@ namespace Tarantula.Networking{
     }
     public class Descriptor{
         public bool singleton { get; set; }
-        public int deployCode { get; set; }
         public string type { get; set; }
         public string typeId { get; set; }
         public string category { get; set; }
@@ -567,16 +599,8 @@ namespace Tarantula.Networking{
         public string instanceId { get; set; }
         public int accessMode { get; set; }
         public double entryCost { get; set; }
-        public string entryCostAsString { get; set; }
         public bool tournamentEnabled { get; set; }
-        public bool disabled { get; set; }
-        public bool resetEnabled { get; set; }
-        public int timerOnModule { get; set; }
-        public int runtimeDuration { get; set; }
-        public int runtimeDurationOnInstance { get; set; }
         public string tag { get; set; }
-        public string icon { get; set; }
-        public string viewId { get; set; }
         public string responseLabel { get; set; }
     }
     public class Lobby{
@@ -600,7 +624,6 @@ namespace Tarantula.Networking{
     public class Room{
         public bool started{set;get;}
         public int totalJoined{set;get;}
-        public int seatIndex{get;set;}
         public Connection connection{get;set;}
         public string zone{get;set;}
         public string arena{get;set;}
@@ -609,9 +632,14 @@ namespace Tarantula.Networking{
         public int overtime{get;set;}
         public Stub[] playerList{get;set;}
     }
+    public class Timer{
+        public int m{set;get;}
+        public int s{set;get;}
+    }
     public class Stub{
         public int rank{set;get;}
         public int seat{set;get;}
+        public string owner{set;get;}
         public string roomId{set;get;}
         public string tag{set;get;}
     }

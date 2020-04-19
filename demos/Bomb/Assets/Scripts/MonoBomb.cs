@@ -17,7 +17,7 @@ public class MonoBomb : BombBehavior{
     protected override void NetworkStart(){
 		base.NetworkStart();
         networkObject.onDestroy += _OnDestroy;
-        Debug.Log("network started bomb");
+        //Debug.Log("network started bomb");
         OnSetupEvent?.Invoke();
     }
     void Update(){
@@ -35,10 +35,10 @@ public class MonoBomb : BombBehavior{
         networkObject.scale = transform.localScale;
     }
     void _OnDestroy(NetWorker sender){
-        Debug.Log("network Killing from ->"+sender);    
+        //Debug.Log("network Killing from ->"+sender);    
     }
     void OnDestroy(){
-        Debug.Log("Killing->"+zone+"///"+playerId);    
+        //Debug.Log("Killing->"+zone+"///"+playerId);    
     }
     public void Setup(int zone,string playerId){
         if(networkObject.IsOwner){

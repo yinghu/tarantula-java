@@ -47,8 +47,6 @@ public class GlobalStateManager : AdminBehavior{
     
     private GameEngineCluster integration;
    
-    //private Descriptor game;
-    
     public GameStage gameStage;
     private bool _started;
     protected override void NetworkStart(){
@@ -60,8 +58,7 @@ public class GlobalStateManager : AdminBehavior{
     
     void _Start(){
         integration = GameEngineCluster.Instance; 
-        //game = integration.game;
-        integration.OnInboundMessage += _OnStart; 
+        integration.OnUpdating += _OnUpdating; 
         integration.OnException += (ex,msg,code)=>{
             Debug.Log(msg);
             Debug.Log(ex);
@@ -91,6 +88,7 @@ public class GlobalStateManager : AdminBehavior{
                 integration.room.arena = jo.arena;
                 integration.room.duration = jo.duration;
                 integration.room.overtime = jo.overtime;
+                integration.room.playerList = jo.playerList;
                 //Debug.Log("Room=>"+jo.duration);
                 SceneManager.LoadSceneAsync(jo.arena,LoadSceneMode.Additive);
                 StartCoroutine(StartCountdown());
@@ -101,44 +99,12 @@ public class GlobalStateManager : AdminBehavior{
     {
             
     }
-    //public async void OnLeave(){   
-        //gameStage.OnEnd();
-        //await OnLeave(this);   
-    //}
-   
-    void _OnStart(InboundMessage msg){
-        //Debug.Log(msg.query);
-        //Debug.Log(msg.instanceId);        
-        //Debug.Log(msg.payload);
-        //if(msg.query!=null&&msg.query.Equals("onStart")){
-            //gameStage.OnStart(msg.payload);
-            //Debug.Log("START=>>>"+msg.payload);
-            //JObject jo = JObject.Parse(msg.payload);
-            //integration.arena = (string)jo.SelectToken("arena");
-            //integration.robotList = (JArray)jo.SelectToken("robotList");
-            //matched = true;
-        //}
-        if(msg.query!=null&&msg.query.Equals("onTimer")){
-            //gameStage.OnTimer(msg.payload);
-        }
-        else if(msg.query!=null&&msg.query.Equals("onMove")){
-            //gameStage.OnMove(msg.payload);
-        }
-        else if(msg.query!=null&&msg.query.Equals("onEnd")){
-            Debug.Log(msg.payload);
-            integration.OnInboundMessage -= _OnStart;
+    void _OnUpdating(int st){
+        if(st==3){
+            integration.OnUpdating -= _OnUpdating;
             gameStage.OnEnd();
             NetworkManager.Instance.Disconnect();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex-1);
-        }
-        else if(msg.query!=null&&msg.query.Equals("onQuest")){
-            //gameStage.OnQuest(msg.payload);
-        }
-        else if(msg.query!=null&&msg.query.Equals("onRemove")){
-            ///gameStage.OnRemove(msg.payload);
-        }
-        else{
-            //gameStage.OnMessage(msg);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex-1);    
         }
     }
     private IEnumerator StartCountdown(){

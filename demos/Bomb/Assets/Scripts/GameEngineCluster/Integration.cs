@@ -23,7 +23,7 @@ public class Integration : MonoBehaviour{
     private GameObject login;
     private GameObject pve;
     private GameObject pvp;
-    
+    private GameObject ext;
     private TextMeshProUGUI timer;
     private TextMeshProUGUI message;
     private ForgeMenu forgeMenu;
@@ -31,7 +31,6 @@ public class Integration : MonoBehaviour{
     private bool connected;
     private ushort port =15937;
     async void Start(){
-        integration.room = new Room();
         forgeMenu = GetComponent<ForgeMenu>();
         if(integration.dedicated){
             Rpc.MainThreadRunner = MainThreadManager.Instance; 
@@ -43,18 +42,19 @@ public class Integration : MonoBehaviour{
             conn.port = port;
             conn.type = typeId;
             integration.room.connection = conn;
-            await integration.Dedicated(this,conn);
+            await integration.GameRegistered(this,conn);
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
             return;
         }
         login = GameObject.Find("/UI/LOGIN");
         pve = GameObject.Find("/UI/PVE");
         pvp = GameObject.Find("/UI/PVP");
+        ext = GameObject.Find("/UI/EXIT");
         GameObject tm = GameObject.Find("/UI/Timer");
         timer = tm.GetComponent<TextMeshProUGUI>();
         GameObject tms = GameObject.Find("/UI/Message");
         message = tms.GetComponent<TextMeshProUGUI>();
-        integration.OnInboundMessage += _OnStart; 
+        integration.OnUpdating += _OnUpdating; 
         integration.OnException += (ex,msg,code)=>{
             Debug.Log(msg);
             Debug.Log(ex);
@@ -76,7 +76,7 @@ public class Integration : MonoBehaviour{
     }
     private void _Forge(){
         connected = true;
-        integration.OnInboundMessage -= _OnStart;
+        integration.OnUpdating -= _OnUpdating;
         Rpc.MainThreadRunner = MainThreadManager.Instance; 
         Connection xconn = integration.room.connection;
         if(xconn.offline){
@@ -95,6 +95,7 @@ public class Integration : MonoBehaviour{
         if(integration.dedicated){
             return;
         }
+        ext.SetActive(integration.online&&(!inGame));
         login.SetActive(!integration.online);  
         pve.SetActive(!pendingClick&&integration.online);  
         pvp.SetActive(inGame&&(!integration.room.started));
@@ -113,7 +114,10 @@ public class Integration : MonoBehaviour{
         }
         pendingClick = true;
         inGame = await integration.OnPlay(this);     
-        if(!inGame){
+        if(inGame){
+            message.SetText("Pending ...");
+        }
+        else{
             message.SetText(integration.message);
         }
     }
@@ -137,47 +141,20 @@ public class Integration : MonoBehaviour{
         }
         Debug.Log(integration.online);     
     }
-    void _OnStart(InboundMessage msg){
-        if(msg.query!=null&&msg.query.Equals("onStart")){
-            Debug.Log("START=>>>"+msg.payload);
-            JObject jo = JObject.Parse(msg.payload);
-            integration.room.arena = (string)jo.SelectToken("arena");
-            if(jo.ContainsKey("connection")){
-                Connection conn = jo.SelectToken("connection").ToObject<Connection>();
-                integration.room.connection = conn;
-            }
-            else{
-                Connection conn = new Connection();
-                conn.offline = true;
-                conn.host = "127.0.0.1";
-                conn.port = port;
-                integration.room.connection = conn;
-            }
+    void _OnUpdating(int st){
+        if(st==1){
             OnGo();
         }
-        else if(msg.query!=null&&msg.query.Equals("onTimer")){
-            Debug.Log("START=>>>"+msg.payload);
-            JObject jo = JObject.Parse(msg.payload);
-            int m = (int)jo.SelectToken("m");
-            int s = (int)jo.SelectToken("s");
-            int state = (int)jo.SelectToken("state");
-            if(state==2){
-                integration.room.started=true;    
-            }
-            timer.SetText(m+":"+s);
+        else if(st==2){
+            timer.SetText(integration.timer.m+":"+integration.timer.s);        
         }
-        else if(msg.query!=null&&msg.query.Equals("onEnd")){
-            Debug.Log(msg.payload);
+        else if(st==3){
             pendingClick = false;
             inGame = false;
             connected = false;
             timer.SetText("00:00");
-            message.SetText("Play Again");
+            message.SetText("Play Again");  
         }
-        else{
-            Debug.Log("end=>>>"+msg.payload);
-            Debug.Log("end=>>>"+msg.query);
-        }
-    } 
+    }
 }
 
