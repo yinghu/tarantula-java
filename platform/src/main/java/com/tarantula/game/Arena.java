@@ -85,6 +85,7 @@ public class Arena extends RecoverableObject implements RoomListener {
     @Override
     public Connection onConnection(Room room){
         return deploymentServiceProvider.onUDPConnection(descriptor.typeId(),(c)->{
+            System.out.println(new String(c));
             room.end();
         });
     }

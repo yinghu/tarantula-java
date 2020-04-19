@@ -117,7 +117,7 @@ namespace Tarantula.Networking{
                 };
                 string jstr = await _ghc.GetJson(caller,"/dedicated/action",headers);
                 Debug.Log(jstr);
-                return ParseRegister(jstr);            
+                return ParseHeader(jstr);            
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_REGISTER);
                 return false;
@@ -146,42 +146,12 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-access-key",accessKey),
                     new Header("Tarantula-action","onEnded")
                 };
-                //string json = JsonConvert.SerializeObject(conn,JSON_SETTING);
-                string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,"{}");
+                string json = JsonConvert.SerializeObject(room,JSON_SETTING);
+                string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,json);
                 callback(jstr);
                 return true;//           
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_REGISTER);
-                return false;
-            }
-        }
-        public  async Task<bool> Register(MonoBehaviour caller,User user){
-            try{
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","index/user"),
-                    new Header("Tarantula-magic-key",user.login),
-                    new Header("Tarantula-action","onRegister")
-                };
-                string json = JsonConvert.SerializeObject(user,JSON_SETTING);
-                string jstr = await _ghc.PostJson(caller,"/user/action",headers,json);
-                return ParseRegister(jstr);            
-            }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_REGISTER);
-                return false;
-            }
-        }
-        public  async Task<bool> Login(MonoBehaviour caller,User user){
-            try{
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","index/user"),
-                    new Header("Tarantula-magic-key",user.login),
-                    new Header("Tarantula-action","onLogin")
-                };
-                string json = JsonConvert.SerializeObject(user,JSON_SETTING);
-                string jstr = await _ghc.PostJson(caller,"/user/action",headers,json);
-                return await ParseLogin(jstr);           
-            }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_LOGIN);
                 return false;
             }
         }
@@ -245,7 +215,7 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-action","onLeave")
                 };
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
-                return ParseRegister(jstr);
+                return ParseHeader(jstr);
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_ONPLAY);
                 return false;
@@ -261,7 +231,7 @@ namespace Tarantula.Networking{
                 };
                 string json = JsonConvert.SerializeObject(jo,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/service/action",headers,json);
-                return ParseRegister(jstr);
+                return ParseHeader(jstr);
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_WEB_SET);
                 return false;
@@ -390,11 +360,11 @@ namespace Tarantula.Networking{
             for(int i=0;i<tk.Count;i++){
                 Lobby lb = tk[i].ToObject<Lobby>();
                 _lobbyList.Add(lb.descriptor.typeId,lb);
-                //Debug.Log(lb.descriptor.typeId);
+                Debug.Log(lb.descriptor.typeId);
             }
             return true;
         }
-        private bool ParseRegister(string json){
+        private bool ParseHeader(string json){
             JObject jo = JObject.Parse(json);
             bool suc = (bool)jo.SelectToken("successful");
             if(!suc){
@@ -615,12 +585,6 @@ namespace Tarantula.Networking{
     }
     public class Device{
         public string deviceId { get; set; }
-    }
-    public class User{
-        public string login { get; set; }
-        public string nickname { get; set; }
-        public string emailAddress { get; set; }
-        public string password { get; set; }
     }
     public class Connection{
         public bool offline{get;set;}

@@ -23,10 +23,10 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         if(session.streaming()){
-            this._onIndex.putIfAbsent(session.instanceId(),new ConcurrentHashMap<>()).put(session.systemId(),session);
+            this._onIndex.computeIfAbsent(session.instanceId(),(k)->new ConcurrentHashMap<>()).put(session.systemId(),session);
         }
         else if(this.module.onRequest(session,payload,((uid,delta) ->{
-            _onIndex.putIfAbsent(parseUid(uid),new ConcurrentHashMap<>()).forEach((k,v)->{
+            _onIndex.computeIfAbsent(parseUid(uid),(k)->new ConcurrentHashMap<>()).forEach((k,v)->{
                 v.write(delta,this.module.label()+"#"+uid);
             });
         }))){
@@ -78,7 +78,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
                         });
                         return;
                     }
-                    _onIndex.putIfAbsent(parseUid(uid),new ConcurrentHashMap<>()).forEach((k,v)->{
+                    _onIndex.computeIfAbsent(parseUid(uid),(k)->new ConcurrentHashMap<>()).forEach((k,v)->{
                         v.write(delta,this.module.label()+"#"+uid);
                     });
                 }
@@ -91,7 +91,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         try{
             if(event instanceof FastPlayEvent){
                 this.module.onJoin(event,(uid,delta)->{
-                    _onIndex.putIfAbsent(parseUid(uid),new ConcurrentHashMap<>()).forEach((k,v)->{
+                    _onIndex.computeIfAbsent(parseUid(uid),(k)->new ConcurrentHashMap<>()).forEach((k,v)->{
                         v.write(delta,this.module.label()+"#"+uid);
                     });
                 });

@@ -31,16 +31,15 @@ public class ConnectionCloseEvent extends Data implements Event {
     }
     @Override
     public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("2",this.trackId);
-        out.writeUTF("3",this.destination);
-
-
+        out.writeUTF("1",this.trackId);
+        out.writeUTF("2",this.destination);
+        out.writeByteArray("3",this.payload);
     }
     @Override
     public void readPortable(PortableReader in) throws IOException {
-        this.trackId = in.readUTF("2");
-        this.destination = in.readUTF("3");
-
+        this.trackId = in.readUTF("1");
+        this.destination = in.readUTF("2");
+        this.payload = in.readByteArray("3");
     }
 
     @Override

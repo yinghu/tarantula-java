@@ -90,7 +90,7 @@ public class PushEventHandler implements RequestHandler {
                 String accessKey = exchange.header("Tarantula-access-key");
                 String serverId = exchange.header("Tarantula-server-id");
                 if(tokenValidator.validateAccessKey(accessKey)){
-                    this.deploymentServiceProvider.onEndedUDPConnection(serverId);
+                    this.deploymentServiceProvider.onEndedUDPConnection(serverId,_payload);
                 }
                 exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"dedicated",true));
             }

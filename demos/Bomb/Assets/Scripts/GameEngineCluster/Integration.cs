@@ -97,7 +97,7 @@ public class Integration : MonoBehaviour{
         }
         login.SetActive(!integration.online);  
         pve.SetActive(!pendingClick&&integration.online);  
-        //pvp.SetActive(!pendingClick&&integration.online);
+        pvp.SetActive(inGame&&(!integration.room.started));
     }
     
     public async void OnLogin(){
@@ -112,22 +112,16 @@ public class Integration : MonoBehaviour{
             return;
         }
         pendingClick = true;
-        bool joined = await integration.OnPlay(this);     
-        if(!joined){
+        inGame = await integration.OnPlay(this);     
+        if(!inGame){
             message.SetText(integration.message);
         }
     }
     public async void OnPVP(){
-        //if(pendingClick){
-            //return;
-        //}
-        pendingClick = true;
         bool suc = await integration.OnLeave(this);
         Debug.Log("leave->"+suc);
-        //bool joined = await OnJoin(this,"RobotQuestPVP");
-        //if(!joined){
-            //message.SetText(integration.message);
-        //}
+        inGame = false;
+        pendingClick = false;
     }
     public async void OnLogout(){
         if(integration.online){
@@ -166,7 +160,19 @@ public class Integration : MonoBehaviour{
             JObject jo = JObject.Parse(msg.payload);
             int m = (int)jo.SelectToken("m");
             int s = (int)jo.SelectToken("s");
+            int state = (int)jo.SelectToken("state");
+            if(state==2){
+                integration.room.started=true;    
+            }
             timer.SetText(m+":"+s);
+        }
+        else if(msg.query!=null&&msg.query.Equals("onEnd")){
+            Debug.Log(msg.payload);
+            pendingClick = false;
+            inGame = false;
+            connected = false;
+            timer.SetText("00:00");
+            message.SetText("Play Again");
         }
         else{
             Debug.Log("end=>>>"+msg.payload);

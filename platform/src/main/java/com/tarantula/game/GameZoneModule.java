@@ -35,7 +35,7 @@ public class GameZoneModule implements Module{
         gameObject.stub = stub;
         mStub.put(session.systemId(),stub);
         session.write(gameObject.toJson().toString().getBytes(),label());
-        onUpdate.on(stub.roomId,"{}".getBytes());
+        //onUpdate.on(stub.roomId,"{}".getBytes());
     }
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
