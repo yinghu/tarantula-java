@@ -73,6 +73,9 @@ namespace Tarantula.Networking{
             }
             //bm.gameObject.name = nm;
         }
+        public void OnTimer(int m,int s){
+            timer.SetText(m+":"+s); 
+        }
         public void OnTimer(int tx){
             int m = tx/60;
             int s = (tx%60);

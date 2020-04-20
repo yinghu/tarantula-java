@@ -90,7 +90,7 @@ namespace Tarantula.Networking{
         }
         async void OnDestroy(){
             Debug.Log("GEC CLOSE->"+host);
-            await _INSTANCE.Close();
+            await _INSTANCE.OnClose();
         }
         private void Bootstrap(){
             _ghc = new GecHttpClient(host);  
@@ -165,7 +165,7 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-       public  async Task<bool> Ticket(MonoBehaviour caller){
+       public  async Task<bool> OnTicket(MonoBehaviour caller){
             try{
                 if(_liveWc){
                     return false;
@@ -192,7 +192,7 @@ namespace Tarantula.Networking{
                 };
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
                 if(ParseLogout(jstr)){
-                    await Close();
+                    await OnClose();
                     return true;
                 }else{
                     return false;
@@ -295,7 +295,7 @@ namespace Tarantula.Networking{
                 return _liveWc;
             }   
         }
-        public async Task<bool> Close(){
+        private async Task<bool> OnClose(){
             try{
                 bool suc = false;
                 if(_liveWc){

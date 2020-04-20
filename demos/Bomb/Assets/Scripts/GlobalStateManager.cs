@@ -65,7 +65,7 @@ public class GlobalStateManager : AdminBehavior{
             Debug.Log(code);
         };
         if(integration.room.connection.offline){
-            SceneManager.LoadSceneAsync("Map",LoadSceneMode.Additive);
+            SceneManager.LoadSceneAsync(integration.room.arena,LoadSceneMode.Additive);
         }
     }
     async void Update (){
@@ -100,8 +100,12 @@ public class GlobalStateManager : AdminBehavior{
             
     }
     void _OnUpdating(RoomState st){
-        if(st==RoomState.OVERTIME){
-            Debug.Log("Overtime run");
+        if(st==RoomState.STARTING){
+            gameStage.OnTimer(integration.timer.m,integration.timer.s);    
+        }
+        else if(st==RoomState.OVERTIME){
+            //Debug.Log("Overtime run");
+            gameStage.OnTimer(integration.timer.m,integration.timer.s);
         }
         else if(st==RoomState.ENDING){
             integration.OnUpdating -= _OnUpdating;
