@@ -20,8 +20,7 @@ const https = secured?require('https'):require('http');
 const http = require('http');
 const net = require('net');
 const querystring = require('querystring');
-//import { v1 as uuidv1 } from 'uuid';
-const uuidv1 = require('uuid/v1');
+const {v1: uuidv1} = require('uuid');
 const cMap = new Map(); //web socket client mapping clientId => connection
 const pMap = new Map(); //server push event mapping label ==> updated payload
 var mresult = {payload:[],cid:[],lbl:[],pos:0};
@@ -54,7 +53,7 @@ var wsServer = new WebSocketServer({
     autoAcceptConnections: false
 });
 function validateOrigin(origin) {
-    console.log("Origin->"+origin);
+    //console.log("Origin->"+origin);
     return true;
 }
 
@@ -84,14 +83,14 @@ wsServer.on('request', function(request) {
                         if(_pr.streaming){
                             //register callback if streaming required otherwise send back per request
                             if(_pr.action === 'onStart'){
-                                console.log('register on ['+_pr.label+'] from ['+connection.clientId+']');
+                                //console.log('register on ['+_pr.label+'] from ['+connection.clientId+']');
                                 pse.listeners.push(connection.clientId);
                                 connection.sendUTF(pse.payload);
                             }
                             else if(_pr.action ==='onStop'){
                                 let ix = pse.listeners.indexOf(connection.clientId);
                                 if(ix>=0){
-                                    console.log('unregister on ['+_pr.label+'] from ['+connection.clientId+'/'+ix+']');
+                                    //console.log('unregister on ['+_pr.label+'] from ['+connection.clientId+'/'+ix+']');
                                     pse.listeners.splice(ix,1);
                                 }
                             }
@@ -107,16 +106,16 @@ wsServer.on('request', function(request) {
                 
             });**/
             connection.on('error',function(err){
-                console.log('Error on web socket connection');
+                //console.log('Error on web socket connection');
                 cMap.delete(connection.clientId);
             });
             connection.on('close', function(reasonCode, description) {
                 cMap.delete(connection.clientId);
-                console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.clientId);
+                //console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.clientId);
             });
         }
         else{
-            console.log('ticket failed to validate');
+            //console.log('ticket failed to validate');
             request.reject();//failure on ticket validation
         }
     });
@@ -210,7 +209,7 @@ function connectOnTarantula(){
        connected = false;
     });
     soc.on('close',()=>{
-      console.log('trying to connect on server');
+      //console.log('trying to connect on server');
       if(!connected){
           setTimeout(()=>{
               mlistener = connectOnTarantula();

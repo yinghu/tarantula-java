@@ -15,7 +15,7 @@ public class Room extends RecoverableObject {
     static final int WAITING = 0; //waiting for first join
     static final int PENDING_JOIN = 1; //waiting after first join
     static final int INITIALIZING = 2; //starting game on full join
-    static final int GAMING = 3; //battling
+    static final int STARTING = 3; //battling
     static final int OVERTIME = 4; //waiting for ending
     static final int ENDING = 5; //ending game
     static final int PENDING_END = 6;
@@ -66,7 +66,7 @@ public class Room extends RecoverableObject {
         return true;
     }
     public synchronized void end(){
-        if(state==GAMING||state==OVERTIME){
+        if(state==STARTING||state==OVERTIME){
             state = ENDING;
         }
     }
@@ -138,11 +138,11 @@ public class Room extends RecoverableObject {
                 }
                 else{
                     if(!dedicated){//offline mode
-                        state = GAMING;
+                        state = STARTING;
                         update.on(oid+"?onStart",this.roomListener.onStarting(this));
                     }else{
                         if(this.connection!=null){//go to
-                            state = GAMING;
+                            state = STARTING;
                             update.on(oid+"?onStart",this.roomListener.onStarting(this));
                         }
                         else{
@@ -156,7 +156,7 @@ public class Room extends RecoverableObject {
                     }
                 }
                 break;
-            case GAMING:
+            case STARTING:
                 duration -=TIMER_DELTA;
                 if(duration<=0){//goes to overtime
                     state = OVERTIME;
@@ -172,10 +172,13 @@ public class Room extends RecoverableObject {
             case ENDING:
                 update.on(oid+"?onEnd",null);
                 state = PENDING_END;
+                initialTime = PENDING_TIME;
                 break;
             case PENDING_END:
-                //could be delay few seconds to wait for game server result
-                roomListener.onEnding(this);
+                initialTime -=TIMER_DELTA;
+                if(initialTime<=0){//delay 5 seconds to wait for game server result
+                    roomListener.onEnding(this);
+                }
         }
     }
 }

@@ -97,6 +97,9 @@ public class Arena extends RecoverableObject implements RoomListener {
     public byte[] onStarting(Room room){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("arena",name);
+        jsonObject.addProperty("capacity",capacity);
+        jsonObject.addProperty("duration",roundDuration/1000);
+        jsonObject.addProperty("overtime",overtime/1000);
         jsonObject.addProperty("state",room.state());
         if(room.connection()!= null) {
             Connection connection = room.connection();
@@ -119,6 +122,7 @@ public class Arena extends RecoverableObject implements RoomListener {
     private byte[] roomSetting(Room room){
         JsonObject jo = new JsonObject();
         jo.addProperty("arena",name);
+        jo.addProperty("capacity",capacity);
         jo.addProperty("duration",roundDuration/1000);
         jo.addProperty("overtime",overtime/1000);
         jo.addProperty("roomId",room.oid());

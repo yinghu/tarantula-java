@@ -335,6 +335,7 @@ namespace Tarantula.Networking{
                     JObject jo = JObject.Parse(im.payload);
                     room.arena = (string)jo.SelectToken("arena");
                     room.state = (RoomState)((int)jo.SelectToken("state"));
+                    
                     if(jo.ContainsKey("connection")){
                         Connection conn = jo.SelectToken("connection").ToObject<Connection>();
                         room.connection = conn;
