@@ -94,6 +94,7 @@ public class Room extends RecoverableObject {
         return this.stubs;
     }
     public int state(){ return this.state;}
+    public int totalJoined(){return this.totalJoined;}
     public Connection connection(){
         return this.connection;
     }
@@ -123,12 +124,12 @@ public class Room extends RecoverableObject {
                 if(initialTime<=0){
                     initialTime = PENDING_TIME;
                 }
-                update.on(oid+"?onTimer",new Countdown(initialTime,state).toJson().toString().getBytes());
+                update.on(oid+"?onTimer",new Countdown(initialTime,state,totalJoined).toJson().toString().getBytes());
                 break;
             case INITIALIZING:
                 initialTime -=TIMER_DELTA;
                 if(initialTime>=0){
-                    update.on(oid+"?onTimer",new Countdown(initialTime,state).toJson().toString().getBytes());
+                    update.on(oid+"?onTimer",new Countdown(initialTime,state,totalJoined).toJson().toString().getBytes());
                     if(dedicated&&this.connection==null){//fetch connection per timer loop
                         this.connection = this.roomListener.onConnection(this);
                         if(this.connection!=null){
@@ -160,7 +161,7 @@ public class Room extends RecoverableObject {
                 duration -=TIMER_DELTA;
                 if(duration<=0){//goes to overtime
                     state = OVERTIME;
-                    update.on(oid+"?onOvertime",new Countdown(overtime,state).toJson().toString().getBytes());
+                    update.on(oid+"?onOvertime",new Countdown(overtime,state,totalJoined).toJson().toString().getBytes());
                 }
                 break;
             case OVERTIME:

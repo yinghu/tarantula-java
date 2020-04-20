@@ -81,7 +81,7 @@ public class UserEventHandler implements RequestHandler {
                     event.routingNumber(_routingKey.routingNumber());
                     this.eventService.publish(event);
                 }
-                else if(action.equals("onReset")){//to server topic
+                else if(action.equals("onDevice")){//to server topic
                     AccessIndex acc = accessIndexService.get(magicKey);
                     if(acc!=null){
                         event.systemId(acc.distributionKey());

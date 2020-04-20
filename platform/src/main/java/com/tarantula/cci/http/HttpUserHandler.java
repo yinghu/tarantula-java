@@ -16,13 +16,6 @@ public class HttpUserHandler implements HttpHandler {
         this.userEventHandler = userEventHandler;
     }
     public void handle(HttpExchange httpExchange) throws IOException {
-        /**
-        if(httpExchange.getRequestMethod().equalsIgnoreCase("OPTIONS")){
-            httpExchange.getResponseHeaders().set("Access-Control-Allow-Headers","Tarantula-token,Tarantula-application-id,Tarantula-instance-id,Tarantula-action,Tarantula-magic-key,Tarantula-payload-size,Forwarding-application-id,Forwarding-magic-key");
-            httpExchange.sendResponseHeaders(200,0);
-            httpExchange.close();
-            return;
-        }**/
         String id = httpExchange.getRequestHeaders().getFirst("Session-id");
         if(id==null){
             id = UUID.randomUUID().toString();

@@ -35,7 +35,6 @@ public class KeyValueDataStoreModule implements Module {
         this.dataStore = this.context.dataStore(this.context.descriptor().typeId());
         this.context.log("Data store ["+this.context.descriptor().name()+" started ]", OnLog.WARN);
     }
-
     @Override
     public String label() {
         return "game-data";

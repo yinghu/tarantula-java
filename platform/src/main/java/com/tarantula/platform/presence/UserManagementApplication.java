@@ -87,7 +87,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 session.write(builder.create().toJson(resp).getBytes(),this.descriptor.responseLabel());
             }
         }
-        else if(session.action().equals("onReset")){
+        else if(session.action().equals("onDevice")){
             String deviceId = acc.property("deviceId");
             if(session.systemId()!=null){//registered
                 OnSession access = this.login(session.systemId(),"password",session);
@@ -104,7 +104,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                     onSession(access,session);
                 }
                 else{
-                    session.write(this.builder.create().toJson(new ResponseHeader("reset","wrong device id", false)).getBytes(),this.descriptor.responseLabel());
+                    session.write(this.builder.create().toJson(new ResponseHeader("onDevice","wrong device id", false)).getBytes(),this.descriptor.responseLabel());
                 }
             }
         }
