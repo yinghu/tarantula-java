@@ -74,14 +74,14 @@ public class GlobalStateManager : AdminBehavior{
         }
         if(integration.dedicated&&integration.room.started&&integration.room.totalJoined==0){
             integration.room.started = false;
-            await integration.GameEnded(this,(s)=>{
+            await integration.OnGameEnded(this,(s)=>{
                 Debug.Log(s);
                 Application.Quit();
             });
         }
         if(integration.dedicated&&(!integration.room.started)&&integration.room.totalJoined>0){
             integration.room.started = true;
-            await integration.GameStarted(this,(ms)=>{
+            await integration.OnGameStarted(this,(ms)=>{
                 Debug.Log("ready to play=>"+ms);
                 Room jo = JObject.Parse(ms).Root.ToObject<Room>();
                 //Debug.Log("Room=>"+jo.arena);

@@ -42,7 +42,7 @@ public class Integration : MonoBehaviour{
             conn.port = port;
             conn.type = typeId;
             integration.room.connection = conn;
-            await integration.GameRegistered(this,conn);
+            await integration.OnGameRegistered(this,conn);
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
             return;
         }
@@ -63,8 +63,8 @@ public class Integration : MonoBehaviour{
         pendingClick = false;
         connected = false;
         if(!integration.online){
-            await integration.Index(this);
-            await integration.Device(this); 
+            await integration.OnIndex(this);
+            await integration.OnDevice(this); 
             Debug.Log("Online->"+integration.online);
         }
     }
@@ -103,8 +103,8 @@ public class Integration : MonoBehaviour{
     
     public async void OnLogin(){
         if(!integration.online){
-            await integration.Index(this);
-            await integration.Device(this); 
+            await integration.OnIndex(this);
+            await integration.OnDevice(this); 
             Debug.Log("Online->"+integration.online);
         }
     }

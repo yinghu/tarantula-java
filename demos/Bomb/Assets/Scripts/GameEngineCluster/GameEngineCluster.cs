@@ -18,7 +18,7 @@ namespace Tarantula.Networking{
    public delegate void ExceptionHandler(Exception ex,string message,ErrorCode errorCode);
   
    public delegate void WebSocketHandler();    
-   public delegate void UDPSocketHandler();   
+   //public delegate void UDPSocketHandler();   
    public delegate void OnRoomEvent(RoomState state);    
    public enum ErrorCode{
        EC_INDEX,
@@ -106,7 +106,7 @@ namespace Tarantula.Networking{
             await OnWebSocketMessage();
         }
       
-        public  async Task<bool> Index(MonoBehaviour caller){
+        public  async Task<bool> OnIndex(MonoBehaviour caller){
             try{
                 string jstr = await _ghc.GetJson(caller,"/user/index",new Header[]{new Header("Tarantula-tag","index/lobby")});
                 return ParseIndex(jstr);
@@ -115,7 +115,7 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> GameRegistered(MonoBehaviour caller,Connection conn){
+        public  async Task<bool> OnGameRegistered(MonoBehaviour caller,Connection conn){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-host",conn.host),
@@ -133,7 +133,7 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> GameStarted(MonoBehaviour caller,Action<string> callback){
+        public  async Task<bool> OnGameStarted(MonoBehaviour caller,Action<string> callback){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-server-id",deviceId),
@@ -149,7 +149,7 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> GameEnded(MonoBehaviour caller,Action<string> callback){
+        public  async Task<bool> OnGameEnded(MonoBehaviour caller,Action<string> callback){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-server-id",deviceId),
@@ -263,14 +263,14 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> Device(MonoBehaviour caller){
+        public  async Task<bool> OnDevice(MonoBehaviour caller){
             try{
                 Device device = new Device();
                 device.deviceId = deviceId;
                 Header[] headers = new Header[]{
                     new Header("Tarantula-tag","index/user"),
                     new Header("Tarantula-magic-key",deviceId),
-                    new Header("Tarantula-action","onReset")
+                    new Header("Tarantula-action","onDevice")
                 };
                 string json = JsonConvert.SerializeObject(device,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/user/action",headers,json);
@@ -280,7 +280,7 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public async Task<bool> OnWebSocketMessage(){
+        private async Task<bool> OnWebSocketMessage(){
             string msg ="{}";
             try{
                 //do receive loop
@@ -335,7 +335,7 @@ namespace Tarantula.Networking{
                     JObject jo = JObject.Parse(im.payload);
                     room.arena = (string)jo.SelectToken("arena");
                     room.state = (RoomState)((int)jo.SelectToken("state"));
-                    
+                    room.totalJoined = (int)jo.SelectToken("totalJoined");
                     if(jo.ContainsKey("connection")){
                         Connection conn = jo.SelectToken("connection").ToObject<Connection>();
                         room.connection = conn;
@@ -355,6 +355,7 @@ namespace Tarantula.Networking{
                     timer.m = (int)jo.SelectToken("m");
                     timer.s = (int)jo.SelectToken("s");
                     room.state = (RoomState)((int)jo.SelectToken("state"));
+                    room.totalJoined = (int)jo.SelectToken("totalJoined");
                     if(room.state==RoomState.INITIALIZING){
                         room.started=true;    
                     }
