@@ -163,11 +163,17 @@ public class Room extends RecoverableObject {
                     state = OVERTIME;
                     update.on(oid+"?onOvertime",new Countdown(overtime,state,totalJoined).toJson().toString().getBytes());
                 }
+                else if(!dedicated){
+                    update.on(oid+"?onTimer",new Countdown(duration,state,totalJoined).toJson().toString().getBytes());
+                }
                 break;
             case OVERTIME:
                 overtime -=TIMER_DELTA;
                 if(overtime<=0){
                     state = ENDING;
+                }
+                else if(!dedicated){
+                    update.on(oid+"?onTimer",new Countdown(overtime,state,totalJoined).toJson().toString().getBytes());
                 }
                 break;
             case ENDING:
