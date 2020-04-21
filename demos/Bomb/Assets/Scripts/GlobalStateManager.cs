@@ -66,6 +66,7 @@ public class GlobalStateManager : AdminBehavior{
         };
         if(integration.room.connection.offline){
             SceneManager.LoadSceneAsync(integration.room.arena,LoadSceneMode.Additive);
+            StartCoroutine(StartCountdown());
         }
     }
     async void Update (){
@@ -119,9 +120,9 @@ public class GlobalStateManager : AdminBehavior{
              //Debug.Log("Countdown: " + integration.room.duration);
              yield return new WaitForSeconds(1.0f);
              integration.room.duration--;
-             gameStage.OnLive();
+             //gameStage.OnLive();
              if(networkObject.IsOwner){
-                networkObject.SendRpc(RPC_ON_TIMER, Receivers.Others,integration.room.duration); 
+                networkObject.SendRpc(RPC_ON_TIMER, Receivers.All,integration.room.duration); 
                 if(integration.room.duration<=30){
                     integration.room.totalJoined=0;    
                 }; 

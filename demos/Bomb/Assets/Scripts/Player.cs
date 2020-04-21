@@ -65,8 +65,8 @@ public class Player : MonoBehaviour
     void Start ()
     {
         bumpRun = gameObject.GetComponent<BumpRun>();
-        bumpRun.OnLiveRPC += OnLive;
-        bumpRun.OnDamageRPC += OnDamage;
+        //bumpRun.OnLiveRPC += OnLive;
+        //bumpRun.OnDamageRPC += OnDamage;
         //Cache the attached components for better performance and less typing
         cam = Camera.main;
         rigidBody = GetComponent<Rigidbody> ();

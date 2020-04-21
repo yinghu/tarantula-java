@@ -27,12 +27,16 @@ namespace Tarantula.Networking{
             GameObject tm = GameObject.Find("/UI/Timer");
             timer = tm.GetComponent<TextMeshProUGUI>();
             timer.SetText("00:00");
-            bumpRuns[0].OnQuestRPC += OnLive;
-            bumpRuns[1].OnQuestRPC += OnLive;
-            bumpRuns[0].OnMoveRPC += OnMove;
-            bumpRuns[1].OnMoveRPC += OnMove;
-            bumpRuns[0].OnRemoveRPC += OnDead;
-            bumpRuns[1].OnRemoveRPC += OnDead;
+            bumpRuns[0].RegisterRpcCallback(BumpRun.RPC_ON_MOVE,(args)=>{
+                OnMove(args);    
+            });
+            bumpRuns[1].RegisterRpcCallback(BumpRun.RPC_ON_MOVE,(args)=>{
+                OnMove(args);
+            });
+            //bumpRuns[0].OnQuestRPC += OnLive;
+            //bumpRuns[1].OnQuestRPC += OnLive;
+            //bumpRuns[0].OnRemoveRPC += OnDead;
+            //bumpRuns[1].OnRemoveRPC += OnDead;
             if(integration.stub!=null){
                 seatIndex = integration.stub.seat;
             }
@@ -46,8 +50,9 @@ namespace Tarantula.Networking{
             if (Input.GetMouseButtonDown(0)) {
                 RaycastHit hit;
                 if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit)) {
-                    bumpRuns[seatIndex].OnRun(hit.point,seatIndex);
-                }   
+                    bumpRuns[seatIndex].OnRun(BumpRun.RPC_ON_MOVE,hit.point,seatIndex);
+                }
+                OnLive();
             }
         }
         
@@ -71,7 +76,9 @@ namespace Tarantula.Networking{
                     bm.Setup(1,"nm");
                 };
             }
-            //bm.gameObject.name = nm;
+            else{
+                Debug.Log("Missing->"+x+"///"+y);
+            }
         }
         public void OnTimer(int m,int s){
             timer.SetText(m+":"+s); 

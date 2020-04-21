@@ -16,10 +16,9 @@ using Newtonsoft.Json.Linq;
 namespace Tarantula.Networking{
    
    public delegate void ExceptionHandler(Exception ex,string message,ErrorCode errorCode);
-  
    public delegate void WebSocketHandler();    
-   //public delegate void UDPSocketHandler();   
-   public delegate void OnRoomEvent(RoomState state);    
+   public delegate void OnRoomEvent(RoomState state);  
+    
    public enum ErrorCode{
        EC_INDEX,
        EC_DEDICATED,
@@ -335,6 +334,8 @@ namespace Tarantula.Networking{
                     JObject jo = JObject.Parse(im.payload);
                     room.arena = (string)jo.SelectToken("arena");
                     room.state = (RoomState)((int)jo.SelectToken("state"));
+                    room.duration = (int)jo.SelectToken("duration");
+                    room.overtime = (int)jo.SelectToken("overtime");
                     room.totalJoined = (int)jo.SelectToken("totalJoined");
                     if(jo.ContainsKey("connection")){
                         Connection conn = jo.SelectToken("connection").ToObject<Connection>();
@@ -350,7 +351,7 @@ namespace Tarantula.Networking{
                     OnUpdating?.Invoke(room.state);
                 }
                 else if(im.query!=null&&im.query.Equals("onTimer")){
-                    Debug.Log("Timer=>>>"+im.payload);
+                    //Debug.Log("Timer=>>>"+im.payload);
                     JObject jo = JObject.Parse(im.payload);
                     timer.m = (int)jo.SelectToken("m");
                     timer.s = (int)jo.SelectToken("s");

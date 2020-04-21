@@ -20,10 +20,10 @@ public class Arena extends RecoverableObject implements RoomListener {
     public String name ="Map";
     public int level =1;
     public double xp =100;
-    public int capacity =1;
+    public int capacity =2;
     public long roundDuration =60000;
     public long overtime = Room.PENDING_TIME;
-    public boolean dedicated = false;
+    public boolean dedicated = true;
     public ConcurrentHashMap<String,Room> roomIndex;
     public ConcurrentHashMap<String,Stub> stubIndex;
     public DeploymentServiceProvider deploymentServiceProvider;
