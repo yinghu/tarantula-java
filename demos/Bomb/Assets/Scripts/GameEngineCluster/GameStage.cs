@@ -73,13 +73,7 @@ namespace Tarantula.Networking{
             Vector3 mp = new Vector3(x,y,0);
             RaycastHit hit;
             if (Physics.Raycast(Camera.main.ScreenPointToRay(mp), out hit)) {
-                bumpRuns[seatIndex].networkObject.SendRpc(BumpRun.RPC_ON_BOMB,Receivers.Owner,hit.point);
-                /**
-                BombRun bm = (BombRun)NetworkManager.Instance.InstantiateBomb(0,hit.point,Quaternion.identity,true);
-                bm.networkStarted +=(noj)=>{
-                    bm.Setup(100,"mmm");
-                    bm.Explode();
-                };**/
+                bumpRuns[seatIndex].networkObject.SendRpc(BumpRun.RPC_ON_BOMB,Receivers.Owner,hit.point,seatIndex,integration.presence.systemId);
             }
         }
         public void OnTimer(int m,int s){
@@ -96,11 +90,13 @@ namespace Tarantula.Networking{
         
         private void OnLive(RpcArgs args){
             BombRun bm = (BombRun)NetworkManager.Instance.InstantiateBomb(0,args.GetNext<Vector3>(),Quaternion.identity,true);
-            //string nm = args.GetNext<string>();
+            int id = args.GetNext<int>();
+            string nm = args.GetNext<string>();
             bm.networkStarted +=(noj)=>{
-                bm.Setup(1,"name");
+                bm.Setup(id,nm);
+                bm.Explode();
             };
-            //bm.gameObject.name = nm;
+            
         }
         private void OnMove(RpcArgs args){
             Vector3 p = args.GetNext<Vector3>();

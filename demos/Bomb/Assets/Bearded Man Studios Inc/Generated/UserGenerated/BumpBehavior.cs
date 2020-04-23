@@ -7,8 +7,8 @@ using System.Collections.Generic;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-    [GeneratedRPC("{\"types\":[[\"Vector3\", \"int\"][\"Vector3\"]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[\"destination\", \"index\"][\"position\"]]")]
+    [GeneratedRPC("{\"types\":[[\"Vector3\", \"int\"][\"Vector3\", \"int\", \"string\"]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[\"destination\", \"index\"][\"position\", \"id\", \"key\"]]")]
 	public abstract partial class BumpBehavior : NetworkBehavior
 	{
 		public const byte RPC_ON_MOVE = 0 + 5;
@@ -28,7 +28,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 			base.SetupHelperRpcs(networkObject);
 			networkObject.RegisterRpc("OnMove", OnMove, typeof(Vector3), typeof(int));
-			networkObject.RegisterRpc("OnBomb", OnBomb, typeof(Vector3));
+			networkObject.RegisterRpc("OnBomb", OnBomb, typeof(Vector3), typeof(int), typeof(string));
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -122,6 +122,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// <summary>
 		/// Arguments:
 		/// Vector3 position
+		/// int id
+		/// string key
 		/// </summary>
 		public virtual void OnBomb(RpcArgs args){
             MainThreadManager.Run(() =>{

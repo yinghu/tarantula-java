@@ -20,18 +20,18 @@ public class BombRun : MonoBomb
     }
     public void Explode(){
         if(networkObject.IsOwner){
-            Debug.Log("Let explode");
-            networkObject.SendRpc(RPC_ON_EXPLODE,Receivers.All);
+            networkObject.SendRpc(RPC_ON_EXPLODE,Receivers.Others);
+            StartCoroutine(WaitAndKill());
         }
     }
     private IEnumerator WaitAndKill(){
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(2);
         networkObject.Destroy();
     }
     public void _OnExplode(RpcArgs args){
         GameObject ex = Instantiate(explosion,transform.position, Quaternion.identity); //1
         ex.transform.SetParent(transform);
         GetComponent<MeshRenderer>().enabled = false;       
-        StartCoroutine(WaitAndKill());
+        //StartCoroutine(WaitAndKill());
     }
 }
