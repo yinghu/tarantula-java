@@ -23,6 +23,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			{
 				switch (identity)
 				{
+					case AdminNetworkObject.IDENTITY:
+						availableCallback = true;
+						obj = new AdminNetworkObject(networker, id, frame);
+						break;
 					case BombNetworkObject.IDENTITY:
 						availableCallback = true;
 						obj = new BombNetworkObject(networker, id, frame);
@@ -30,10 +34,6 @@ namespace BeardedManStudios.Forge.Networking.Generated
 					case BumpNetworkObject.IDENTITY:
 						availableCallback = true;
 						obj = new BumpNetworkObject(networker, id, frame);
-						break;
-					case AdminNetworkObject.IDENTITY:
-						availableCallback = true;
-						obj = new AdminNetworkObject(networker, id, frame);
 						break;
 				}
 

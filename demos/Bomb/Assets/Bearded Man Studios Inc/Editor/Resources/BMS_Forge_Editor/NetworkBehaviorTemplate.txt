@@ -1,10 +1,13 @@
 using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[>:generatedTypes:<]")]
+    [GeneratedRPC("{\"types\":[>:generatedTypes:<]")]
 	[GeneratedRPCVariableNames("{\"types\":[>:generatedHelperTypes:<]")]
 	public abstract partial class >:className:< : NetworkBehavior
 	{
@@ -13,7 +16,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		>:ENDFOREACH:<
 		
 		public >:networkObject:< networkObject = null;
-
+        public Dictionary<byte,Action<RpcArgs>> _rpc = new Dictionary<byte,Action<RpcArgs>>();
+	
 		public override void Initialize(NetworkObject obj)
 		{
 			// We have already initialized this object
@@ -102,13 +106,21 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		{
 			networkObject.SnapInterpolations();
 		}
-
+        public void RegisterRpcCallback(byte mid,Action<RpcArgs> callback){
+            _rpc.Add(mid,callback);
+        }
 		>:FOREVERY rpcs:<
 		/// <summary>
 		/// Arguments:
 >:[2]:<
 		/// </summary>
-		public abstract void >:[0]:<(RpcArgs args);
+		public virtual void >:[0]:<(RpcArgs args){
+            MainThreadManager.Run(() =>{
+                if(_rpc.ContainsKey(args.Id)){
+                    _rpc[args.Id].Invoke(args);
+                }
+            });
+        }
 		>:ENDFOREVERY:<
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS

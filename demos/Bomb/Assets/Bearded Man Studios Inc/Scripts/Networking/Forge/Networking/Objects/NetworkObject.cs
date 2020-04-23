@@ -939,7 +939,7 @@ namespace BeardedManStudios.Forge.Networking
 
 			object[] args = Rpcs[methodId].ReadArgs(data);
 
-			RpcArgs rpcArgs = new RpcArgs(args, new RPCInfo { SendingPlayer = sender, TimeStep = timestep });
+			RpcArgs rpcArgs = new RpcArgs(args, new RPCInfo { SendingPlayer = sender, TimeStep = timestep },methodId);
 
 			// If we are the server we need to determine if this RPC is okay to replicate
 			if (Networker is IServer && receivers != Receivers.Target)
@@ -1304,7 +1304,7 @@ namespace BeardedManStudios.Forge.Networking
 
 		private void InvokeRpcOnSelfServer(byte methodId, NetworkingPlayer sender, ulong timestep, object[] args)
 		{
-			Rpcs[methodId].Invoke(new RpcArgs(args, new RPCInfo { SendingPlayer = sender, TimeStep = timestep }), sender == Networker.Me);
+			Rpcs[methodId].Invoke(new RpcArgs(args, new RPCInfo { SendingPlayer = sender, TimeStep = timestep },methodId), sender == Networker.Me);
 		}
 
 		private void FinalizeSendRpc(BMSByte data, Receivers receivers, byte methodId, ulong timestep, bool reliable, NetworkingPlayer targetPlayer = null, NetworkingPlayer sender = null)

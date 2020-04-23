@@ -7,18 +7,16 @@ using BeardedManStudios.Forge.Networking.Unity;
 
 public class MonoBomb : BombBehavior{
     
-    public delegate void OnRPCEvent(RpcArgs args);
-    public delegate void OnSetup();
-    public event OnSetup OnSetupEvent;
-    
-    
     private int zone;
     private string playerId;
+   
     protected override void NetworkStart(){
 		base.NetworkStart();
+        RegisterRpcCallback(RPC_ON_START,(args)=>{
+            zone = args.GetNext<int>();
+            playerId = args.GetNext<string>();
+        });
         networkObject.onDestroy += _OnDestroy;
-        //Debug.Log("network started bomb");
-        OnSetupEvent?.Invoke();
     }
     void Update(){
         if (networkObject == null){
@@ -35,21 +33,14 @@ public class MonoBomb : BombBehavior{
         networkObject.scale = transform.localScale;
     }
     void _OnDestroy(NetWorker sender){
-        //Debug.Log("network Killing from ->"+sender);    
+        Debug.Log("network Killing from ->"+sender);    
     }
     void OnDestroy(){
-        //Debug.Log("Killing->"+zone+"///"+playerId);    
+        Debug.Log("Killing->"+zone+"///"+playerId);    
     }
     public void Setup(int zone,string playerId){
         if(networkObject.IsOwner){
-            networkObject.SendRpc(RPC_ON_START, Receivers.Others,zone,playerId); 
+            networkObject.SendRpc(RPC_ON_START, Receivers.All,zone,playerId); 
         }
-    }
-    public override void OnExplode(RpcArgs args){}
-    
-    public override void OnStart(RpcArgs args){
-        zone = args.GetNext<int>();
-        playerId = args.GetNext<string>();
-    }
-    
+    } 
 }

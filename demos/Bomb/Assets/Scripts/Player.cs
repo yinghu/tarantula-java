@@ -224,6 +224,7 @@ public class Player : MonoBehaviour
         //if (other.CompareTag ("Explosion"))
         //{
         Debug.Log ("P->" + other.gameObject.tag + " hit on ["+gameObject.name+"]");
+        bumpRun.OnDamage();
         //}
     }
 }

@@ -1,21 +1,22 @@
 using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[\"Vector3\", \"int\"][\"int\"][\"float\"][\"Vector3\", \"string\"][\"string\"]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[\"destination\", \"index\"][\"int\"][\"foo\"][\"position\", \"string\"][\"oid\"]]")]
+    [GeneratedRPC("{\"types\":[[\"Vector3\", \"int\"][\"Vector3\"]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[\"destination\", \"index\"][\"position\"]]")]
 	public abstract partial class BumpBehavior : NetworkBehavior
 	{
 		public const byte RPC_ON_MOVE = 0 + 5;
-		public const byte RPC_ON_LIVE = 1 + 5;
-		public const byte RPC_ON_DAMAGE = 2 + 5;
-		public const byte RPC_ON_QUEST = 3 + 5;
-		public const byte RPC_ON_REMOVE = 4 + 5;
+		public const byte RPC_ON_BOMB = 1 + 5;
 		
 		public BumpNetworkObject networkObject = null;
-
+        public Dictionary<byte,Action<RpcArgs>> _rpc = new Dictionary<byte,Action<RpcArgs>>();
+	
 		public override void Initialize(NetworkObject obj)
 		{
 			// We have already initialized this object
@@ -27,10 +28,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 			base.SetupHelperRpcs(networkObject);
 			networkObject.RegisterRpc("OnMove", OnMove, typeof(Vector3), typeof(int));
-			networkObject.RegisterRpc("OnLive", OnLive, typeof(int));
-			networkObject.RegisterRpc("OnDamage", OnDamage, typeof(float));
-			networkObject.RegisterRpc("OnQuest", OnQuest, typeof(Vector3), typeof(string));
-			networkObject.RegisterRpc("OnRemove", OnRemove, typeof(string));
+			networkObject.RegisterRpc("OnBomb", OnBomb, typeof(Vector3));
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -106,34 +104,32 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		{
 			networkObject.SnapInterpolations();
 		}
-
+        public void RegisterRpcCallback(byte mid,Action<RpcArgs> callback){
+            _rpc.Add(mid,callback);
+        }
 		/// <summary>
 		/// Arguments:
 		/// Vector3 destination
 		/// int index
 		/// </summary>
-		public abstract void OnMove(RpcArgs args);
-		/// <summary>
-		/// Arguments:
-		/// int int
-		/// </summary>
-		public abstract void OnLive(RpcArgs args);
-		/// <summary>
-		/// Arguments:
-		/// float foo
-		/// </summary>
-		public abstract void OnDamage(RpcArgs args);
+		public virtual void OnMove(RpcArgs args){
+            MainThreadManager.Run(() =>{
+                if(_rpc.ContainsKey(args.Id)){
+                    _rpc[args.Id].Invoke(args);
+                }
+            });
+        }
 		/// <summary>
 		/// Arguments:
 		/// Vector3 position
-		/// string string
 		/// </summary>
-		public abstract void OnQuest(RpcArgs args);
-		/// <summary>
-		/// Arguments:
-		/// string oid
-		/// </summary>
-		public abstract void OnRemove(RpcArgs args);
+		public virtual void OnBomb(RpcArgs args){
+            MainThreadManager.Run(() =>{
+                if(_rpc.ContainsKey(args.Id)){
+                    _rpc[args.Id].Invoke(args);
+                }
+            });
+        }
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

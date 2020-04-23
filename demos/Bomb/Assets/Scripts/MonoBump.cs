@@ -6,9 +6,7 @@ using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 
 public class MonoBump : BumpBehavior{
-    
-    public delegate void OnRPCEvent(RpcArgs args);
-    
+     
     protected override void NetworkStart(){
 		base.NetworkStart();
         networkObject.onDestroy += _OnDestroy;
@@ -32,9 +30,4 @@ public class MonoBump : BumpBehavior{
     void OnDestroy(){
         //Debug.Log("Killing->"+gameObject.name);    
     }
-    public override void OnMove(RpcArgs args){}
-    public override void OnLive(RpcArgs args){}
-    public override void OnDamage(RpcArgs args){}
-    public override void OnQuest(RpcArgs args){}
-    public override void OnRemove(RpcArgs args){}
 }

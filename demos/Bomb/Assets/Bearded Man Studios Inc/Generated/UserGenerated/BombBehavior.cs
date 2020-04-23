@@ -1,10 +1,13 @@
 using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[][\"int\", \"string\"]]")]
+    [GeneratedRPC("{\"types\":[[][\"int\", \"string\"]]")]
 	[GeneratedRPCVariableNames("{\"types\":[[][\"zone\", \"pid\"]]")]
 	public abstract partial class BombBehavior : NetworkBehavior
 	{
@@ -12,7 +15,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		public const byte RPC_ON_START = 1 + 5;
 		
 		public BombNetworkObject networkObject = null;
-
+        public Dictionary<byte,Action<RpcArgs>> _rpc = new Dictionary<byte,Action<RpcArgs>>();
+	
 		public override void Initialize(NetworkObject obj)
 		{
 			// We have already initialized this object
@@ -100,15 +104,29 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		{
 			networkObject.SnapInterpolations();
 		}
-
+        public void RegisterRpcCallback(byte mid,Action<RpcArgs> callback){
+            _rpc.Add(mid,callback);
+        }
 		/// <summary>
 		/// Arguments:
 		/// </summary>
-		public abstract void OnExplode(RpcArgs args);
+		public virtual void OnExplode(RpcArgs args){
+            MainThreadManager.Run(() =>{
+                if(_rpc.ContainsKey(args.Id)){
+                    _rpc[args.Id].Invoke(args);
+                }
+            });
+        }
 		/// <summary>
 		/// Arguments:
 		/// </summary>
-		public abstract void OnStart(RpcArgs args);
+		public virtual void OnStart(RpcArgs args){
+            MainThreadManager.Run(() =>{
+                if(_rpc.ContainsKey(args.Id)){
+                    _rpc[args.Id].Invoke(args);
+                }
+            });
+        }
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

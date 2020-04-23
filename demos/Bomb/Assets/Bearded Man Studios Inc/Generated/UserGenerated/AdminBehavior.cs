@@ -1,17 +1,21 @@
 using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[\"int\"]]")]
+    [GeneratedRPC("{\"types\":[[\"int\"]]")]
 	[GeneratedRPCVariableNames("{\"types\":[[\"countdown\"]]")]
 	public abstract partial class AdminBehavior : NetworkBehavior
 	{
 		public const byte RPC_ON_TIMER = 0 + 5;
 		
 		public AdminNetworkObject networkObject = null;
-
+        public Dictionary<byte,Action<RpcArgs>> _rpc = new Dictionary<byte,Action<RpcArgs>>();
+	
 		public override void Initialize(NetworkObject obj)
 		{
 			// We have already initialized this object
@@ -98,12 +102,20 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		{
 			networkObject.SnapInterpolations();
 		}
-
+        public void RegisterRpcCallback(byte mid,Action<RpcArgs> callback){
+            _rpc.Add(mid,callback);
+        }
 		/// <summary>
 		/// Arguments:
 		/// int countdown
 		/// </summary>
-		public abstract void OnTimer(RpcArgs args);
+		public virtual void OnTimer(RpcArgs args){
+            MainThreadManager.Run(() =>{
+                if(_rpc.ContainsKey(args.Id)){
+                    _rpc[args.Id].Invoke(args);
+                }
+            });
+        }
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

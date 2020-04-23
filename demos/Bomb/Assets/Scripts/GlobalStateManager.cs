@@ -57,6 +57,7 @@ public class GlobalStateManager : AdminBehavior{
     }
     
     void _Start(){
+        RegisterRpcCallback(RPC_ON_TIMER,_OnTimer);
         integration = GameEngineCluster.Instance; 
         integration.OnUpdating += _OnUpdating; 
         integration.OnException += (ex,msg,code)=>{
@@ -129,7 +130,7 @@ public class GlobalStateManager : AdminBehavior{
              }
          }        
     }
-    public override void OnTimer(RpcArgs args){
+    private void _OnTimer(RpcArgs args){
         int timer = args.GetNext<int>();
         //Debug.Log("TIMER->"+timer);
         gameStage.OnTimer(timer);

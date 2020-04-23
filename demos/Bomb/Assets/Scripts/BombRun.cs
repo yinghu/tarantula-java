@@ -12,26 +12,26 @@ public class BombRun : MonoBomb
     void Awake(){
         GameObject stg = GameObject.Find("Stage");
         transform.SetParent(stg.transform);
+        RegisterRpcCallback(RPC_ON_EXPLODE,_OnExplode);
     }
-
+    
     void OnEnable(){
         //Debug.Log("Bomb Run Enabled");
     }
     public void Explode(){
-        networkObject.SendRpc(RPC_ON_EXPLODE,Receivers.All);
-        StartCoroutine(WaitAndKill());
+        if(networkObject.IsOwner){
+            Debug.Log("Let explode");
+            networkObject.SendRpc(RPC_ON_EXPLODE,Receivers.All);
+        }
     }
     private IEnumerator WaitAndKill(){
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(1);
         networkObject.Destroy();
     }
-    public override void OnExplode(RpcArgs args){
-        //Debug.Log("Exploding ...222");
-        MainThreadManager.Run(() =>
-		{
-            GameObject ex = Instantiate(explosion,transform.position, Quaternion.identity); //1
-            ex.transform.SetParent(transform);
-            GetComponent<MeshRenderer>().enabled = false;       
-        }); 
+    public void _OnExplode(RpcArgs args){
+        GameObject ex = Instantiate(explosion,transform.position, Quaternion.identity); //1
+        ex.transform.SetParent(transform);
+        GetComponent<MeshRenderer>().enabled = false;       
+        StartCoroutine(WaitAndKill());
     }
 }

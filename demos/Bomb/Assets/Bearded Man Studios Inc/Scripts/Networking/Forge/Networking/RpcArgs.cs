@@ -24,12 +24,13 @@ namespace BeardedManStudios.Forge.Networking
 		public object[] Args { get; set; }
 		public RPCInfo Info { get; private set; }
 		public int ReadIndex { get; set; }
-
-		public RpcArgs(object[] args, RPCInfo info) : this()
+        public byte Id {get;set;}
+		public RpcArgs(object[] args, RPCInfo info,byte id) : this()
 		{
 			this.Args = args;
 			this.Info = info;
 			this.ReadIndex = 0;
+            this.Id = id;
 		}
 
 		public T GetNext<T>()
