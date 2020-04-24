@@ -31,11 +31,12 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
             });
         }))){
             //clean up on leave
-            //this.context.log("Session->"+session.systemId()+"//"+session.instanceId(),OnLog.INFO);
-            Session rm = this._onIndex.get(session.instanceId()).remove(session.systemId());
-            if(rm!=null){
-                ResponseHeader resp = new ResponseHeader(session.action(),"close session");
-                rm.write(this.builder.create().toJson(resp).getBytes(),module.label()+"#"+session.instanceId()+"?"+session.action(),true);
+            if(session.instanceId()!=null&&_onIndex.containsKey(session.instanceId())){
+                Session rm = this._onIndex.get(session.instanceId()).remove(session.systemId());
+                if(rm!=null){
+                    ResponseHeader resp = new ResponseHeader(session.action(),"close session");
+                    rm.write(this.builder.create().toJson(resp).getBytes(),module.label()+"#"+session.instanceId()+"?"+session.action(),true);
+                }
             }
         }
     }

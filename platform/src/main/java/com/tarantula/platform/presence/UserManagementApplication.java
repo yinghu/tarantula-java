@@ -21,7 +21,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     private String role = "player";
     private double initialBalance;
     private AccessIndexService accessIndexService;
-    private PostOffice postOffice;
+    //private PostOffice postOffice;
     private RingBuffer<Connection> cBuffer;
     private DeploymentServiceProvider deploymentServiceProvider;
     @Override
@@ -37,13 +37,13 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.registerOnConnectionListener(this);
-        postOffice = this.context.postOffice();
+        //postOffice = this.context.postOffice();
         String root = configuration.property("root");
         String pwd = configuration.property("password");
         OnAccess onAccess = new OnAccessTrack();
         onAccess.property("login",root);
         onAccess.property("password",pwd);
-        onAccess.property("nickname","super user");
+        //onAccess.property("nickname","super user");
         DataStore ds = this.context.dataStore("user");
         String rootId = ds.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid();
         AccessIndex accessIndex = accessIndexService.set(onAccess.property("login"),rootId);
@@ -98,7 +98,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 if(accessIndex!=null){
                     acc.property("login",deviceId);
                     acc.property("password","password");
-                    acc.property("nickname","Player");
+                    //acc.property("nickname","Player");
                     this.createLogin(acc,session.trackId(),role);
                     OnSession access = this.login(session.trackId(),acc.property("password"),session);
                     onSession(access,session);
@@ -124,11 +124,11 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             session.systemId(access.systemId());
             session.stub(access.stub());
             session.ticket(access.ticket());
-            OnStatistics delta = this.context.statistics().value("Login",1);
-            delta.xpDelta(1);
-            delta.owner(session.systemId());
-            delta.onEntry("LoginCount",1);
-            this.postOffice.onTag(Level.LEVEL_TAG).send(delta.owner(),delta);
+            //OnStatistics delta = this.context.statistics().value("Login",1);
+            //delta.xpDelta(1);
+            //delta.owner(session.systemId());
+            //delta.onEntry("LoginCount",1);
+            //this.postOffice.onTag(Level.LEVEL_TAG).send(delta.owner(),delta);
         }
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("reset","wrong user/password", false)).getBytes(),this.descriptor.responseLabel());
@@ -157,11 +157,11 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             PresenceIndex px = new PresenceIndex(initialBalance);
             px.distributionKey(acc.distributionKey());
             this.context.dataStore("presence").create(px);
-            ProfileTrack _p = new ProfileTrack(acc.bucket(),acc.oid());
-            _p.nickname(payload.property("nickname")!=null?payload.property("nickname"):acc.login());
-            _p.emailAddress("n/a");
-            _p.avatar("content/avatar/"+acc.distributionKey());
-            this.context.dataStore("profile").create(_p);
+            //ProfileTrack _p = new ProfileTrack(acc.bucket(),acc.oid());
+            //_p.nickname(payload.property("nickname")!=null?payload.property("nickname"):acc.login());
+            //_p.emailAddress("n/a");
+            //_p.avatar("content/avatar/"+acc.distributionKey());
+            //this.context.dataStore("profile").create(_p);
         }
         return acc;
     }

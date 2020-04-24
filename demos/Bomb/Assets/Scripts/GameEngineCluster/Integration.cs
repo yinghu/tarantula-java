@@ -145,7 +145,7 @@ public class Integration : MonoBehaviour{
         if(st==RoomState.STARTING){
             OnGo();
         }
-        else if(st==RoomState.INITIALIZING){
+        else if(st==RoomState.INITIALIZING||st==RoomState.PENDING_JOIN){
             timer.SetText(integration.timer.m+":"+integration.timer.s);        
         }
         else if(st==RoomState.ENDING){
