@@ -52,9 +52,6 @@ public class PresenceContextSerializer implements JsonSerializer<PresenceContext
         if(presenceContext.connection!=null){
             pc.add("connection",new ConnectionSerializer().serialize(presenceContext.connection,type,jsonSerializationContext));
         }
-        if(presenceContext.profile!=null){
-            pc.add("profile",new ProfileSerializer().serialize(presenceContext.profile,type,jsonSerializationContext));
-        }
         return pc;
     }
 }

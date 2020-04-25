@@ -11,26 +11,19 @@ public class UserPortableRegistry extends AbstractRecoverableListener {
 
     public static final int OID = 3;
 
-    public static final int ACCESS_CID = 1;
-    public static final int PROFILE_CID = 2;
-    public static final int AVATAR_CID = 3;
+    public static final int USER_CID = 1;
+
     public static final int ON_ACCESS_CID = 5;
 
 
     public Recoverable create(int i) {
         Recoverable pt = null;
         switch (i){
-            case ACCESS_CID:
-                pt = new AccessTrack();
-                break;
-            case PROFILE_CID:
-                pt = new ProfileTrack();
+            case USER_CID:
+                pt = new User();
                 break;
             case ON_ACCESS_CID:
                 pt = new OnAccessTrack();
-                break;
-            case AVATAR_CID:
-                pt = new Avatar();
                 break;
             default:
         }

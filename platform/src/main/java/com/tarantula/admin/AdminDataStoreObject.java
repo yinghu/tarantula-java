@@ -30,8 +30,6 @@ public class AdminDataStoreObject extends AdminObject {
         total += this.kv.get("Tarantula");
         this.kv.put("User",context.dataStore("user").count());
         total += this.kv.get("User");
-        this.kv.put("Profile",context.dataStore("profile").count());
-        total += this.kv.get("Profile");
         this.kv.put("Presence",context.dataStore("presence").count());
         total += this.kv.get("Presence");
         this.kv.put("Level",context.dataStore("level").count());

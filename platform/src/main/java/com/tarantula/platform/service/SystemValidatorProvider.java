@@ -5,7 +5,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.SystemValidator;
-import com.tarantula.platform.presence.AccessTrack;
+import com.tarantula.platform.presence.User;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,7 +52,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         if(systemId==null){
             return rMap.get("player");
         }
-        Access acc = new AccessTrack();
+        Access acc = new User();
         acc.distributionKey(systemId);
         if(udataStore.load(acc)){
             return rMap.get(acc.role());

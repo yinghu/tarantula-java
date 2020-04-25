@@ -106,10 +106,11 @@
         tx_application(wz);
     };
     pView.container.addChild(aright.container);
+    /**
     TARA_API.onProfile(TARA_API.query().systemId,function(resp){
             mp.avatar.icon.texture = PIXI.Texture.from(resp.profile.avatar+'?token='+TARA_API.query().token);
             mp.name(resp.profile.nickname);
-    });
+    });**/
     TARA_API.onService({serviceTag:"presence/lobby",command:"onBalance"},function(resp){
         mp.balance(resp.presence.balance);
     });    

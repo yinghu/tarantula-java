@@ -10,18 +10,18 @@ import java.util.Map;
 /**
  * Updated by yinghu on 8/26/19
  */
-public class AccessTrack extends RecoverableObject implements Access {
+public class User extends RecoverableObject implements Access {
 
     private String login;
     private String password;//hash of the password
     private boolean active;
     private String role;
-    public AccessTrack(){
-        this.vertex = "Access";
+    public User(){
+        this.vertex = "User";
         this.label = "VA";
         this.binary = false;
     }
-    public AccessTrack(String login){
+    public User(String login){
         this();
         this.login = login;
     }
@@ -56,7 +56,7 @@ public class AccessTrack extends RecoverableObject implements Access {
 
 
     public int getClassId() {
-        return UserPortableRegistry.ACCESS_CID;
+        return UserPortableRegistry.USER_CID;
     }
     public Map<String,Object> toMap(){
         properties.put("1",login);

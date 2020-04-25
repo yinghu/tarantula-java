@@ -21,7 +21,6 @@ public class PresenceContext extends ResponseHeader {
     public OnView view;
     public Connection connection;
 
-    public Profile profile;
     public PresenceContext(){
         this.code = 200;
         this.successful=true;

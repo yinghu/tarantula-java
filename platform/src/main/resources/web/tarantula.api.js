@@ -156,7 +156,7 @@ var TARA_API = (function(){
       aj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
       aj.setRequestHeader('Tarantula-tag','index/user');
       aj.setRequestHeader('Tarantula-magic-key',payload.email);
-      aj.setRequestHeader('Tarantula-action','onReset');
+      aj.setRequestHeader('Tarantula-action','onDevice');
       aj.setRequestHeader('Tarantula-payload-size',_ps.length);
       aj.send(_ps);
   };
@@ -215,12 +215,7 @@ var TARA_API = (function(){
         //wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});
     });
   };
-  let _profile = function(playerId,callback){
-    let payload = {serviceTag:'presence/profile',command:'onProfile',headers:[{name:'systemId',value:playerId}]};
-    _service(payload,function(resp){
-        callback(resp);
-    });
-  };
+
   let _service = function(payload,callback){
     let _jp = JSON.stringify(payload);
     let aj = new XMLHttpRequest();   
@@ -283,7 +278,6 @@ var TARA_API = (function(){
       onLogin : _login,
       onReset : _reset,
       onPresence : _presence,
-      onProfile : _profile,
       onService : _service,
       onInstance : _instance,
       onLogout : _logout,

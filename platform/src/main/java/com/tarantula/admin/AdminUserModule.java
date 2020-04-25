@@ -3,7 +3,7 @@ package com.tarantula.admin;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.platform.presence.AccessTrack;
+import com.tarantula.platform.presence.User;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
@@ -33,7 +33,7 @@ public class AdminUserModule implements Module {
             }
         }
         else if(session.action().equals("resetPassword")){
-            Access acc = new AccessTrack();
+            Access acc = new User();
             acc.distributionKey(onAccess.systemId());
             String p1 = onAccess.property("password1");
             String p2 = onAccess.property("password2");
@@ -47,7 +47,7 @@ public class AdminUserModule implements Module {
             }
         }
         else if(session.action().equals("changeRole")){
-            Access acc = new AccessTrack();
+            Access acc = new User();
             acc.distributionKey(onAccess.systemId());
             String r1 = onAccess.property("role1");
             String r2 = onAccess.property("role2");
