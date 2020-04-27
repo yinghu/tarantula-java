@@ -7,6 +7,7 @@ import com.tarantula.platform.RecoverableObject;
 import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.UUID;
+
 /**
  * Created by yinghu lu on 4/14/2020.
  */
@@ -42,6 +43,7 @@ public class Room extends RecoverableObject {
     public Room(){
         this.oid = UUID.randomUUID().toString();
     }
+
     public synchronized Stub join(){
         totalJoined++;
         if(totalJoined==capacity){
@@ -79,7 +81,10 @@ public class Room extends RecoverableObject {
         this.round++;
         this.retries = CONNECTION_RETRIES;
         this.totalJoined=0;
-        this.pQueue = new ArrayDeque<>(this.capacity);
+        if(this.pQueue==null){
+            this.pQueue = new ArrayDeque<>(this.capacity);
+        }
+        this.pQueue.clear();
         this.stubs = new Stub[this.capacity];
         for(int i=0;i<this.capacity;i++){
             Stub stub = new Stub(i,oid);

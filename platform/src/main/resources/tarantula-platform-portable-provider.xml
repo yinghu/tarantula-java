@@ -2,7 +2,6 @@
 <tarantula-platform-portable-provider>
     <portable-registry registry-id="1">com.tarantula.platform.service.cluster.PortableRegistry</portable-registry>
     <portable-registry registry-id="3">com.tarantula.platform.presence.UserPortableRegistry</portable-registry>
-    <portable-registry registry-id="4">com.tarantula.platform.leveling.LevelingPortableRegistry</portable-registry>
     <portable-registry registry-id="5">com.tarantula.platform.presence.PresencePortableRegistry</portable-registry>
     <portable-registry registry-id="6">com.tarantula.platform.leaderboard.LeaderBoardPortableRegistry</portable-registry>
     <portable-registry registry-id="10">com.tarantula.game.GamePortableRegistry</portable-registry>

@@ -25,17 +25,21 @@ public class ForgeMenu : MonoBehaviour
         client.Connect(ipAddress,portNumber);
         client.serverAccepted += (sender) =>{
 			Debug.Log("accepted from server");
+            
 		};
         client.connectAttemptFailed += (sender) =>{
 			Debug.Log("failed from server");
 		};
 		Connected(client);
+        mgr.networkSceneLoaded += (scene,mode)=>{
+            Debug.Log("Scene loaded from server");
+        };
 	}
 	public void Host(string ipAddress,ushort portNumber){	
         server = new UDPServer(64);			
         ((UDPServer)server).Connect(ipAddress,portNumber);
 		server.playerAccepted += (player, sender) =>{
-			//Debug.Log("Player " + player.NetworkId + " Accepted");
+			Debug.Log("Player " + player.NetworkId + " Accepted");
             GameEngineCluster.Instance.room.totalJoined++;
 		};
         server.playerConnected += (player, sender) =>{

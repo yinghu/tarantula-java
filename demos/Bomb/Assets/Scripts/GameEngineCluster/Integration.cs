@@ -81,11 +81,12 @@ public class Integration : MonoBehaviour{
         Connection xconn = integration.room.connection;
         if(xconn.offline){
             forgeMenu.Host(xconn.host,(ushort)xconn.port);
+            StartCoroutine(WaitAndLoad());
         }
         else{
             forgeMenu.Connect(xconn.host,(ushort)xconn.port);
         }
-        StartCoroutine(WaitAndLoad());
+        
     }
     private IEnumerator WaitAndLoad(){
         yield return new WaitForSeconds(2);

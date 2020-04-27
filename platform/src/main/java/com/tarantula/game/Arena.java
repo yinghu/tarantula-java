@@ -5,8 +5,10 @@ import com.google.gson.JsonObject;
 import com.tarantula.Connection;
 import com.tarantula.Descriptor;
 import com.tarantula.Module;
+import com.tarantula.RNG;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.util.JvmRNG;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Created by yinghu lu on 4/14/2020.
  */
 public class Arena extends RecoverableObject implements RoomListener {
-    public String name ="Map";
+    public String[] name = {"Amber 1","Amber 2","Amber 3","Amber 4","Amber 5"};
     public int level =1;
     public double xp =100;
     public int capacity =1;
@@ -30,7 +32,7 @@ public class Arena extends RecoverableObject implements RoomListener {
     public Descriptor descriptor;
     private CopyOnWriteArrayList<Room> rList = new CopyOnWriteArrayList<>();
     private ConcurrentLinkedDeque<Room> rQueue = new ConcurrentLinkedDeque<>();
-
+    private RNG rng = new JvmRNG();
     public Room room(){
         Room room = rQueue.poll();
         if(room==null){
@@ -96,7 +98,7 @@ public class Arena extends RecoverableObject implements RoomListener {
     @Override
     public byte[] onStarting(Room room){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("arena",name);
+        jsonObject.addProperty("arena",name[rng.onNext(5)]);
         jsonObject.addProperty("capacity",capacity);
         jsonObject.addProperty("duration",roundDuration/1000);
         jsonObject.addProperty("overtime",overtime/1000);
@@ -122,7 +124,7 @@ public class Arena extends RecoverableObject implements RoomListener {
     }
     private byte[] roomSetting(Room room){
         JsonObject jo = new JsonObject();
-        jo.addProperty("arena",name);
+        jo.addProperty("arena",name[rng.onNext(5)]);
         jo.addProperty("capacity",capacity);
         jo.addProperty("duration",roundDuration/1000);
         jo.addProperty("overtime",overtime/1000);

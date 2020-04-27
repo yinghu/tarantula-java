@@ -4,7 +4,6 @@ import com.google.gson.*;
 import com.tarantula.Access;
 import com.tarantula.Descriptor;
 import com.tarantula.Lobby;
-import com.tarantula.XP;
 import com.tarantula.platform.presence.PresenceContext;
 
 import java.lang.reflect.Type;
@@ -36,12 +35,6 @@ public class PresenceContextSerializer implements JsonSerializer<PresenceContext
                 blist.add(jlobby);
             }
             pc.add("lobbyList",blist);
-        }
-        if(presenceContext.level!=null){
-            pc.add("level",new XPLevelSerializer().serialize(presenceContext.level,type,jsonSerializationContext));
-        }
-        if(presenceContext.xp!=null){
-            pc.add("xp",new XPGainSerializer().serialize(presenceContext.xp,type,jsonSerializationContext));
         }
         if(presenceContext.leaderBoard!=null){
             pc.add("leaderBoard",new LeaderBoardSerializer().serialize(presenceContext.leaderBoard,type,jsonSerializationContext));

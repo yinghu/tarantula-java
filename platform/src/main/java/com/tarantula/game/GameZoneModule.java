@@ -6,6 +6,7 @@ import com.tarantula.Module;
 import com.tarantula.OnLog;
 import com.tarantula.Session;
 import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.service.rating.Rating;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
@@ -39,7 +40,13 @@ public class GameZoneModule implements Module{
     }
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
-        if(session.action().equals("onLeave")){
+        if(session.action().equals("onMessage")){
+            Stub stub = mStub.get(session.systemId());
+            Room room = mRoom.get(stub.roomId);
+            session.write("{}".getBytes(),label());
+            update.on(room.oid()+"?onMessage",payload);
+        }
+        else if(session.action().equals("onLeave")){
             Stub stub = mStub.get(session.systemId());
             Room room = mRoom.get(stub.roomId);
             boolean left = room.leave(stub);
@@ -49,7 +56,7 @@ public class GameZoneModule implements Module{
             session.write(builder.create().toJson(resp).getBytes(),label());
             return left;
         }
-        return false;
+        return session.action().equals("onLeave");
     }
 
     @Override

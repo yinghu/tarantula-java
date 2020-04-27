@@ -52,7 +52,7 @@ namespace Tarantula.Networking{
             if (Input.GetMouseButtonDown(0)) {
                 RaycastHit hit;
                 if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit)) {
-                    bumpRuns[seatIndex].networkObject.SendRpc(BumpRun.RPC_ON_MOVE,Receivers.Owner,hit.point,seatIndex);
+                    bumpRuns[seatIndex].networkObject.SendRpc(BumpRun.RPC_ON_MOVE,Receivers.Server,hit.point,seatIndex);
                 }
                 OnLive();
             }

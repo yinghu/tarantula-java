@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tarantula>
+    <!--
+        Game Lobby Name Rule
+        game name : system level unique
+        game zone type id : [game name]-zone , tag : [game name]/zone[sequence]
+        match-making type id : [game name]-mmk, tag : [game name]/mmk
+        game data type id : [game name]-data, tag : [game name]/data
+        game rating service name : [game name]-rating
+        game rating service data store : [game name]-rating
+    -->
     <lobby-context>
         <type-id>game-zone</type-id>
         <type>lobby</type>
@@ -41,7 +50,7 @@
         </application-list>
     </lobby-context>
     <lobby-context>
-        <type-id>match-making</type-id>
+        <type-id>game-mmk</type-id>
         <type>lobby</type>
         <category>service</category>
         <name>MatchMaking</name>
@@ -57,7 +66,7 @@
                 <type>application</type>
                 <category>service</category>
                 <singleton>true</singleton>
-                <tag>game/matchmaking</tag>
+                <tag>game/mmk</tag>
                 <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.MatchMakingModule</module-name>
             </application>

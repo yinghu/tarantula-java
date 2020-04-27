@@ -3,7 +3,7 @@ package com.tarantula.platform;
 
 import com.tarantula.OnStatistics;
 import com.tarantula.Statistics;
-import com.tarantula.platform.leveling.LevelingPortableRegistry;
+import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,12 +73,12 @@ public class OnStatisticsTrack extends OnApplicationHeader implements OnStatisti
 
     @Override
     public int getFactoryId() {
-        return LevelingPortableRegistry.OID;
+        return PresencePortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return LevelingPortableRegistry.ON_STATS_CID;
+        return PresencePortableRegistry.ON_STATISTICS_CID;
     }
     @Override
     public String toString(){

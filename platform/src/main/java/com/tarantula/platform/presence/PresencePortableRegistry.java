@@ -3,6 +3,7 @@ package com.tarantula.platform.presence;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 import com.tarantula.platform.OnBalanceTrack;
+import com.tarantula.platform.OnStatisticsTrack;
 import com.tarantula.platform.PresenceIndex;
 
 /**
@@ -14,7 +15,7 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
 
     public static final int PRESENCE_CID = 1;
     public static final int ON_BALANCE_CID = 2;
-
+    public static final int ON_STATISTICS_CID = 3;
     public Recoverable create(int i) {
         Recoverable pt = null;
         switch (i){
@@ -23,6 +24,9 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 break;
             case ON_BALANCE_CID:
                 pt = new OnBalanceTrack();
+                break;
+            case ON_STATISTICS_CID:
+                pt = new OnStatisticsTrack();
                 break;
             default:
         }

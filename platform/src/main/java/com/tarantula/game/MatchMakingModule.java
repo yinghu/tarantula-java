@@ -3,6 +3,9 @@ package com.tarantula.game;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.OnAccessTrack;
+import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.rating.Rating;
+import com.tarantula.platform.service.rating.RatingServiceProvider;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.concurrent.ConcurrentHashMap;

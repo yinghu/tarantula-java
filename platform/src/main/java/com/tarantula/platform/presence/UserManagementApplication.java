@@ -124,11 +124,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             session.systemId(access.systemId());
             session.stub(access.stub());
             session.ticket(access.ticket());
-            //OnStatistics delta = this.context.statistics().value("Login",1);
-            //delta.xpDelta(1);
-            //delta.owner(session.systemId());
-            //delta.onEntry("LoginCount",1);
-            //this.postOffice.onTag(Level.LEVEL_TAG).send(delta.owner(),delta);
         }
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("reset","wrong user/password", false)).getBytes(),this.descriptor.responseLabel());
@@ -157,11 +152,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             PresenceIndex px = new PresenceIndex(initialBalance);
             px.distributionKey(acc.distributionKey());
             this.context.dataStore("presence").create(px);
-            //ProfileTrack _p = new ProfileTrack(acc.bucket(),acc.oid());
-            //_p.nickname(payload.property("nickname")!=null?payload.property("nickname"):acc.login());
-            //_p.emailAddress("n/a");
-            //_p.avatar("content/avatar/"+acc.distributionKey());
-            //this.context.dataStore("profile").create(_p);
         }
         return acc;
     }

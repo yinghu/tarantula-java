@@ -4,6 +4,8 @@ import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.rating.RatingServiceProvider;
 import com.tarantula.platform.util.ResponseSerializer;
 
 public class KeyValueDataStoreModule implements Module {
@@ -33,6 +35,9 @@ public class KeyValueDataStoreModule implements Module {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.dataStore = this.context.dataStore(this.context.descriptor().typeId());
+        RatingServiceProvider ratingServiceProvider = new RatingServiceProvider(this.context.descriptor().typeId()+"-rating");
+        DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        deploymentServiceProvider.deploy(ratingServiceProvider);
         this.context.log("Data store ["+this.context.descriptor().name()+" started ]", OnLog.WARN);
     }
     @Override
