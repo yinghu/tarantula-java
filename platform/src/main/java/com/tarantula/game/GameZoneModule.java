@@ -6,7 +6,7 @@ import com.tarantula.Module;
 import com.tarantula.OnLog;
 import com.tarantula.Session;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.service.rating.Rating;
+import com.tarantula.game.rating.Rating;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;

@@ -1,5 +1,6 @@
-package com.tarantula.platform.service.rating;
+package com.tarantula.game.rating;
 
+import com.tarantula.DataStore;
 import com.tarantula.game.Stub;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.service.ServiceContext;
@@ -18,6 +19,7 @@ public class RatingServiceProvider implements ServiceProvider {
     private final String NAME;
     private static double BASE_POINTS = 100;
     private static int ELO_K = 30;
+    private DataStore dataStore;
     public RatingServiceProvider(String name){
         NAME = name;
     }
@@ -29,7 +31,10 @@ public class RatingServiceProvider implements ServiceProvider {
         return rating;
     }
     public Rating rating(String systemId){
-        return new Rating();
+        Rating rating = new Rating();
+        rating.distributionKey(systemId);
+        this.dataStore.createIfAbsent(rating,true);
+        return rating;
     }
     public void elo(Rating rating1,Rating rating2){
 
@@ -43,7 +48,7 @@ public class RatingServiceProvider implements ServiceProvider {
     @Override
     public void setup(ServiceContext serviceContext) {
         logger.warn("set up rating service->"+NAME);
-        serviceContext.dataStore(NAME,serviceContext.partitionNumber());
+        this.dataStore = serviceContext.dataStore(NAME,serviceContext.partitionNumber());
     }
 
     @Override
@@ -60,16 +65,10 @@ public class RatingServiceProvider implements ServiceProvider {
     public void shutdown() throws Exception {
 
     }
-    static double Probability(double rating1,
-                             double rating2)
-    {
-        return 1.0d * 1.0d / (1 + 1.0d *
-                (Math.pow(10, 1.0d *
-                        (rating1 - rating2) / 400)));
+    private double Probability(double rating1,double rating2) {
+        return 1.0 * 1.0 / (1 + 1.0 * (Math.pow(10, 1.0 * (rating1 - rating2) / 400)));
     }
-    static void EloRating(double Ra, double Rb,
-                          int K, boolean d)
-    {
+    private void EloRating(double Ra, double Rb, int K, boolean d) {
 
         // To calculate the Winning
         // Probability of Player B
@@ -93,11 +92,7 @@ public class RatingServiceProvider implements ServiceProvider {
             Rb = Rb + K * (1 - Pb);
         }
 
-        System.out.print("Updated Ratings:-\n");
-
-        System.out.print("Ra = " + (Math.round(
-                Ra * 1000000.0) / 1000000.0)
-                + " Rb = " + Math.round(Rb
-                * 1000000.0) / 1000000.0);
+        //System.out.print("Updated Ratings:-\n");
+        //System.out.print("Ra = " + (Math.round(Ra * 1000000.0) / 1000000.0) + " Rb = " + Math.round(Rb * 1000000.0) / 1000000.0);
     }
 }

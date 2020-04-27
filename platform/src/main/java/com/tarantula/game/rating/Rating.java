@@ -1,4 +1,4 @@
-package com.tarantula.platform.service.rating;
+package com.tarantula.game.rating;
 
 import com.tarantula.Recoverable;
 import com.tarantula.game.GamePortableRegistry;

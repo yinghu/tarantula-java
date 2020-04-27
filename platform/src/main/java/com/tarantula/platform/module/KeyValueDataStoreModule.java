@@ -5,7 +5,7 @@ import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.service.DeploymentServiceProvider;
-import com.tarantula.platform.service.rating.RatingServiceProvider;
+import com.tarantula.game.rating.RatingServiceProvider;
 import com.tarantula.platform.util.ResponseSerializer;
 
 public class KeyValueDataStoreModule implements Module {

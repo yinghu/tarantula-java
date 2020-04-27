@@ -79,7 +79,7 @@
         <name>GameData</name>
         <access-mode>12</access-mode>
         <deploy-code>1</deploy-code>
-        <deploy-priority>10</deploy-priority>
+        <deploy-priority>20</deploy-priority>
         <description>Tarantula Game Data Service</description>
         <application-list>
             <application>

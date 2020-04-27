@@ -13,8 +13,8 @@ public class Stub extends RecoverableObject {
     public int seat;
     public String tag;
 
-    public int rank;
-    public double pxp;
+    public int rank; //rank of game 1 basis
+    public double pxp; //percentage of game xp 100 basis
 
     /**
      * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
@@ -35,8 +35,8 @@ public class Stub extends RecoverableObject {
         jo.addProperty("seat",seat);
         jo.addProperty("roomId",roomId);
         jo.addProperty("tag",tag);
-        jo.addProperty("rank",rank);
-        jo.addProperty("pxp",pxp);
+        //jo.addProperty("rank",rank);
+        //jo.addProperty("pxp",pxp);
         return jo;
     }
 
