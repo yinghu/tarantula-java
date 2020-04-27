@@ -17,7 +17,7 @@ public class Rating extends RecoverableObject {
     public double zxp=10;  //xp of zone
     public double xp=100; //total xp
     public double elo = 1200; //elo rating
-
+    public int csw = 0; //consecutive winnings
     public Rating(){
         this.vertex = "Rating";
     }
@@ -29,6 +29,7 @@ public class Rating extends RecoverableObject {
         this.properties.put("zxp",zxp);
         this.properties.put("xp",xp);
         this.properties.put("elo",elo);
+        this.properties.put("csw",csw);
         return this.properties;
     }
     @Override
@@ -38,6 +39,7 @@ public class Rating extends RecoverableObject {
         this.zxp = ((Number)properties.get("zxp")).doubleValue();
         this.xp = ((Number)properties.get("xp")).doubleValue();
         this.elo = ((Number)properties.get("elo")).doubleValue();
+        this.csw =((Number)properties.get("csw")).intValue();
     }
     @Override
     public int getFactoryId() {

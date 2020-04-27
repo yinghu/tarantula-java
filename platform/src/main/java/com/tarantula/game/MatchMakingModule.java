@@ -3,11 +3,8 @@ package com.tarantula.game;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.OnAccessTrack;
-import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.rating.Rating;
-import com.tarantula.platform.service.rating.RatingServiceProvider;
 import com.tarantula.platform.util.SystemUtil;
-
 import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by yinghu lu on 4/14/2020.
@@ -24,7 +21,7 @@ public class MatchMakingModule implements Module {
             Rating rating = new Rating();
             access.payload(SystemUtil.toJson(rating.toMap()));
             access.accessMode(Session.FAST_PLAY_MODE);
-            context.presence(session.systemId()).onPlay(session,access,mZone.get(1));
+            context.presence(session.systemId()).onPlay(session,access,mZone.get(rating.rank));
         }
         return false;
     }
@@ -32,12 +29,13 @@ public class MatchMakingModule implements Module {
     @Override
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
-        Lobby lobby = this.context.lobby("game-zone");
+        String gz = this.context.descriptor().typeId().replace("mmk","zone");
+        Lobby lobby = this.context.lobby(gz);
         lobby.entryList().forEach((d)->{
             context.log("Add zone ->"+d.tag()+" ->rank ["+d.accessRank()+"]",OnLog.WARN);
             mZone.put(d.accessRank(),d);
         });
-        context.log("Started match making module", OnLog.WARN);
+        context.log("Started match making module on ->"+gz, OnLog.WARN);
     }
 
     @Override

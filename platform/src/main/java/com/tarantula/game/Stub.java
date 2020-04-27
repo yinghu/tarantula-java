@@ -9,11 +9,20 @@ import java.util.Map;
  */
 public class Stub extends RecoverableObject {
 
-    public int rank;
     public String roomId;
     public int seat;
     public String tag;
 
+    public int rank;
+    public double pxp;
+
+    /**
+     * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
+     * rank - final result 1,2 rank xp = (1/rank)*100  1 - 100 2 50 ..
+     * xp-delta = (1/rank)*(100)+pxp*(100)+csw*(100); //cws only if last is cws
+     * zxp = zxp +xp-delta
+     * xp = xp + xp-delta
+      */
 
     public Stub(){}
     public Stub(int seat,String roomId){
@@ -22,11 +31,12 @@ public class Stub extends RecoverableObject {
     }
     public JsonObject toJson(){
         JsonObject jo = new JsonObject();
-        jo.addProperty("rank",rank);
         jo.addProperty("owner",owner);
         jo.addProperty("seat",seat);
         jo.addProperty("roomId",roomId);
         jo.addProperty("tag",tag);
+        jo.addProperty("rank",rank);
+        jo.addProperty("pxp",pxp);
         return jo;
     }
 

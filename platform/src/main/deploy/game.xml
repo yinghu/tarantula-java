@@ -60,7 +60,7 @@
         <description>Tarantula Match Making Service</description>
         <application-list>
             <application>
-                <type-id>match-making</type-id>
+                <type-id>game-mmk</type-id>
                 <subtype-id>match-making-module</subtype-id>
                 <name>MatchMaking</name>
                 <type>application</type>
