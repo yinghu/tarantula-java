@@ -6,8 +6,8 @@
         game zone type id : [game name]-zone , tag : [game name]/zone[sequence]
         match-making type id : [game name]-mmk, tag : [game name]/mmk
         game data type id : [game name]-data, tag : [game name]/data
-        game rating service name : [game name]-rating
-        game rating service data store : [game name]-rating
+        game service service name : [game name]-service
+        game service service data store : [game name]-service
     -->
     <lobby-context>
         <type-id>game-zone</type-id>
@@ -28,7 +28,7 @@
                 <singleton>true</singleton>
                 <tag>game/zone1</tag>
                 <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
-                <module-name>com.tarantula.game.GameZoneModule</module-name>
+                <module-name>com.tarantula.game.module.GameZoneModule</module-name>
                 <capacity>100</capacity>
                 <access-rank>1</access-rank>
                 <timer-on-module>1000</timer-on-module>
@@ -42,7 +42,7 @@
                 <singleton>true</singleton>
                 <tag>game/zone2</tag>
                 <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
-                <module-name>com.tarantula.game.GameZoneModule</module-name>
+                <module-name>com.tarantula.game.module.GameZoneModule</module-name>
                 <capacity>100</capacity>
                 <access-rank>2</access-rank>
                 <timer-on-module>1000</timer-on-module>
@@ -68,7 +68,7 @@
                 <singleton>true</singleton>
                 <tag>game/mmk</tag>
                 <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
-                <module-name>com.tarantula.game.MatchMakingModule</module-name>
+                <module-name>com.tarantula.game.module.MatchMakingModule</module-name>
             </application>
         </application-list>
     </lobby-context>
@@ -91,7 +91,7 @@
                 <singleton>true</singleton>
                 <tag>game/data</tag>
                 <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
-                <module-name>com.tarantula.platform.module.KeyValueDataStoreModule</module-name>
+                <module-name>com.tarantula.game.module.KeyValueDataStoreModule</module-name>
             </application>
         </application-list>
     </lobby-context>

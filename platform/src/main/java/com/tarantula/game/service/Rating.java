@@ -1,4 +1,4 @@
-package com.tarantula.game.rating;
+package com.tarantula.game.service;
 
 import com.tarantula.Recoverable;
 import com.tarantula.game.GamePortableRegistry;
@@ -16,7 +16,7 @@ public class Rating extends RecoverableObject {
     public int level=1; //level of arena
     public double zxp=10;  //xp of zone
     public double xp=100; //total xp
-    public double elo = 1200; //elo rating
+    public double elo = 1200; //elo service
     public int csw = 0; //consecutive winnings
     public Rating(){
         this.vertex = "Rating";

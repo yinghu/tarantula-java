@@ -205,7 +205,7 @@ namespace Tarantula.Networking{
         public  async Task<bool> OnPlay(MonoBehaviour caller){
             try{
                 Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","game/matchmaking"),
+                    new Header("Tarantula-tag","game/mmk"),
                     new Header("Tarantula-token",presence.token),
                     new Header("Tarantula-action","onPlay")
                 };

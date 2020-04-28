@@ -1,4 +1,4 @@
-package com.tarantula.game.rating;
+package com.tarantula.game.service;
 
 import com.tarantula.DataStore;
 import com.tarantula.game.Stub;
@@ -23,7 +23,7 @@ public class RatingServiceProvider implements ServiceProvider {
     public RatingServiceProvider(String name){
         NAME = name;
     }
-    public Rating rating(Stub stub){
+    public Rating xp(Stub stub){
         Rating rating = new Rating();
         double dxp = (1/stub.rank+stub.pxp)*BASE_POINTS;
         rating.zxp += dxp;
@@ -47,7 +47,7 @@ public class RatingServiceProvider implements ServiceProvider {
 
     @Override
     public void setup(ServiceContext serviceContext) {
-        logger.warn("set up rating service->"+NAME);
+        logger.warn("set up service service->"+NAME);
         this.dataStore = serviceContext.dataStore(NAME,serviceContext.partitionNumber());
     }
 

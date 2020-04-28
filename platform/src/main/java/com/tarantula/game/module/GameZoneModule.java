@@ -1,12 +1,16 @@
-package com.tarantula.game;
+package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
 import com.tarantula.ApplicationContext;
 import com.tarantula.Module;
 import com.tarantula.OnLog;
 import com.tarantula.Session;
+import com.tarantula.game.Arena;
+import com.tarantula.game.GameObject;
+import com.tarantula.game.Room;
+import com.tarantula.game.Stub;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.game.rating.Rating;
+import com.tarantula.game.service.Rating;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
@@ -18,13 +22,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameZoneModule implements Module{
 
     private ApplicationContext context;
-    private ConcurrentHashMap<Integer,Arena> mArena = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String,Stub> mStub = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String,Room> mRoom = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, Arena> mArena = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Stub> mStub = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Room> mRoom = new ConcurrentHashMap<>();
     private GsonBuilder builder;
     @Override
     public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
-        //match arena with rating rank/xp
+        //match arena with service rank/xp
         Rating rating = new Rating();
         rating.fromMap(SystemUtil.toMap(session.payload()));
         Arena arena = mArena.get(rating.level);

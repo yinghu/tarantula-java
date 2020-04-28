@@ -2,7 +2,7 @@ package com.tarantula.game;
 
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
-import com.tarantula.game.rating.Rating;
+import com.tarantula.game.service.Rating;
 
 /**
  * Created by yinghu lu on 4/14/2020.

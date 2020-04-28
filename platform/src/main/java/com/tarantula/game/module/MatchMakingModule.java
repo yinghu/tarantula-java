@@ -1,10 +1,10 @@
-package com.tarantula.game;
+package com.tarantula.game.module;
 
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.game.rating.RatingServiceProvider;
+import com.tarantula.game.service.RatingServiceProvider;
 import com.tarantula.platform.OnAccessTrack;
-import com.tarantula.game.rating.Rating;
+import com.tarantula.game.service.Rating;
 import com.tarantula.platform.util.SystemUtil;
 import java.util.concurrent.ConcurrentHashMap;
 /**
@@ -38,7 +38,7 @@ public class MatchMakingModule implements Module {
             context.log("Add zone ->"+d.tag()+" ->rank ["+d.accessRank()+"]",OnLog.WARN);
             mZone.put(d.accessRank(),d);
         });
-        ratingServiceProvider = this.context.serviceProvider("game-data-rating");
+        ratingServiceProvider = this.context.serviceProvider("game-data-service");
         context.log("Started match making module on ->"+gz, OnLog.WARN);
     }
 
