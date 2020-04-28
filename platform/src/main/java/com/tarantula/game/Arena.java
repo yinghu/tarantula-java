@@ -104,6 +104,14 @@ public class Arena extends RecoverableObject implements RoomListener {
         jsonObject.addProperty("overtime",overtime/1000);
         jsonObject.addProperty("totalJoined",room.totalJoined());
         jsonObject.addProperty("state",room.state());
+        JsonArray ja = new JsonArray();
+        for(Stub p : room.playerList()){
+            JsonObject jb = new JsonObject();
+            jb.addProperty("owner",p.owner());
+            jb.addProperty("seat",p.seat);
+            ja.add(jb);
+        }
+        jsonObject.add("playerList",ja);
         if(room.connection()!= null) {
             Connection connection = room.connection();
             JsonObject jcc = new JsonObject();

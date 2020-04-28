@@ -21,7 +21,6 @@ public class MatchMakingModule implements Module {
         if(session.action().equals("onPlay")){
             OnAccess access = new OnAccessTrack();
             Rating rating = this.ratingServiceProvider.rating(session.systemId());
-            this.context.log("on play",OnLog.WARN);
             access.payload(SystemUtil.toJson(rating.toMap()));
             access.accessMode(Session.FAST_PLAY_MODE);
             context.presence(session.systemId()).onPlay(session,access,mZone.get(rating.rank));
