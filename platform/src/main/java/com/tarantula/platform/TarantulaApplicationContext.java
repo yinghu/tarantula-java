@@ -48,7 +48,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public long duration;
     private boolean timed;
     private final boolean resetEnabled;
-    private final String dataStore;
+    //private final String dataStore;
 
     public TarantulaApplicationContext(TarantulaContext tarantulaContext,Descriptor descriptor,TarantulaApplication application,InstanceIndex index,HashMap<String,Configuration> configurations){
         this.tarantulaContext = tarantulaContext;
@@ -57,7 +57,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         this._instance = index; //null on singleton instance
         this.configurations = configurations;
         this.resetEnabled = descriptor.resetEnabled();
-        this.dataStore = descriptor.typeId();
+        //this.dataStore = descriptor.typeId();
     }
     public synchronized void onState(Connection onConnection){
         this.application.onState(onConnection);
@@ -304,9 +304,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         }
         return this.tarantulaContext.dataStore(name,this.tarantulaContext.partitionNumber());
     }
-    private DataStore dataStore(){
-        return this.tarantulaContext.masterDataStore();
-    }
+    //private DataStore dataStore(){
+        //return this.tarantulaContext.masterDataStore();
+    //}
 
     public void log(String message,int level){
         if(this.logEnabled){

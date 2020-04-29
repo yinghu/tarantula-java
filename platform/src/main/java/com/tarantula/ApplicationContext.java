@@ -25,8 +25,6 @@ public interface ApplicationContext{
     Descriptor descriptor();
     Descriptor descriptor(String applicationId);
 
-    //Statistics statistics();
-
     DataStore dataStore(String name);
 
     RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener);
