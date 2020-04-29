@@ -1,8 +1,10 @@
 package com.tarantula.game.service;
 
 import com.tarantula.DataStore;
+import com.tarantula.Statistics;
 import com.tarantula.game.Stub;
 import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.DeltaStatistics;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.ServiceProvider;
 
@@ -57,7 +59,13 @@ public class GameServiceProvider implements ServiceProvider {
         this.dataStore.update(rating1);
         this.dataStore.update(rating2);
     }
+    public Statistics statistics(String systemId){
+        DeltaStatistics deltaStatistics = new DeltaStatistics();
+        deltaStatistics.distributionKey(systemId);
+        deltaStatistics.dataStore(dataStore);
 
+        return deltaStatistics;
+    }
     @Override
     public String name() {
         return NAME;
