@@ -2,7 +2,7 @@ package com.tarantula.game.module;
 
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.game.service.RatingServiceProvider;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.game.service.Rating;
 import com.tarantula.platform.util.SystemUtil;
@@ -14,13 +14,13 @@ public class MatchMakingModule implements Module {
 
     private ApplicationContext context;
     private ConcurrentHashMap<Integer,Descriptor> mZone = new ConcurrentHashMap<>();
-    private RatingServiceProvider ratingServiceProvider;
+    private GameServiceProvider gameServiceProvider;
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         //check Rating to match the game zone to join 
         if(session.action().equals("onPlay")){
             OnAccess access = new OnAccessTrack();
-            Rating rating = this.ratingServiceProvider.rating(session.systemId());
+            Rating rating = this.gameServiceProvider.rating(session.systemId());
             access.payload(SystemUtil.toJson(rating.toMap()));
             access.accessMode(Session.FAST_PLAY_MODE);
             context.presence(session.systemId()).onPlay(session,access,mZone.get(rating.rank));
@@ -37,7 +37,7 @@ public class MatchMakingModule implements Module {
             context.log("Add zone ->"+d.tag()+" ->rank ["+d.accessRank()+"]",OnLog.WARN);
             mZone.put(d.accessRank(),d);
         });
-        ratingServiceProvider = this.context.serviceProvider("game-data-service");
+        gameServiceProvider = this.context.serviceProvider("game-data-service");
         context.log("Started match making module on ->"+gz, OnLog.WARN);
     }
 

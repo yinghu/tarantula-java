@@ -13,21 +13,26 @@ import com.tarantula.platform.service.ServiceProvider;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class RatingServiceProvider implements ServiceProvider {
+public class GameServiceProvider implements ServiceProvider {
 
-    private JDKLogger logger = JDKLogger.getLogger(RatingServiceProvider.class);
+    private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
     private static double BASE_POINTS = 100;
     private static int ELO_K = 30;
     private DataStore dataStore;
-    public RatingServiceProvider(String name){
+    public GameServiceProvider(String name){
         NAME = name;
     }
     public Rating xp(Stub stub){
-        Rating rating = new Rating();
+        Rating rating = this.rating(stub.owner());
         double dxp = (1/stub.rank+stub.pxp)*BASE_POINTS;
+        if(rating.csw>0){
+            dxp = dxp+(rating.csw+1)*BASE_POINTS;
+            rating.csw++;
+        }
         rating.zxp += dxp;
         rating.xp += dxp;
+        this.dataStore.update(rating);
         return rating;
     }
     public Rating rating(String systemId){
@@ -36,8 +41,21 @@ public class RatingServiceProvider implements ServiceProvider {
         this.dataStore.createIfAbsent(rating,true);
         return rating;
     }
-    public void elo(Rating rating1,Rating rating2){
-
+    public void elo(Stub stub1,Stub stub2){
+        Rating rating1 = this.rating(stub1.owner());
+        Rating rating2 = this.rating(stub2.owner());
+        double p1 = probability(rating2.elo,rating1.elo);
+        double p2 = probability(rating1.elo,rating2.elo);
+        if (stub1.rank-stub2.rank>0) {//1 win
+            rating1.elo = rating1.elo + ELO_K * (1 - p1);
+            rating2.elo = rating2.elo + ELO_K * (0 - p2);
+        }
+        else {//2 win
+            rating1.elo = rating1.elo + ELO_K * (0 - p1);
+            rating2.elo = rating2.elo + ELO_K * (1 - p2);
+        }
+        this.dataStore.update(rating1);
+        this.dataStore.update(rating2);
     }
 
     @Override
@@ -65,34 +83,7 @@ public class RatingServiceProvider implements ServiceProvider {
     public void shutdown() throws Exception {
 
     }
-    private double Probability(double rating1,double rating2) {
+    private double probability(double rating1,double rating2) {
         return 1.0 * 1.0 / (1 + 1.0 * (Math.pow(10, 1.0 * (rating1 - rating2) / 400)));
-    }
-    private void EloRating(double Ra, double Rb, int K, boolean d) {
-
-        // To calculate the Winning
-        // Probability of Player B
-        double Pb = Probability(Ra, Rb);
-
-        // To calculate the Winning
-        // Probability of Player A
-        double Pa = Probability(Rb, Ra);
-
-        // Case -1 When Player A wins
-        // Updating the Elo Ratings
-        if (d == true) {
-            Ra = Ra + K * (1 - Pa);
-            Rb = Rb + K * (0 - Pb);
-        }
-
-        // Case -2 When Player B wins
-        // Updating the Elo Ratings
-        else {
-            Ra = Ra + K * (0 - Pa);
-            Rb = Rb + K * (1 - Pb);
-        }
-
-        //System.out.print("Updated Ratings:-\n");
-        //System.out.print("Ra = " + (Math.round(Ra * 1000000.0) / 1000000.0) + " Rb = " + Math.round(Rb * 1000000.0) / 1000000.0);
     }
 }
