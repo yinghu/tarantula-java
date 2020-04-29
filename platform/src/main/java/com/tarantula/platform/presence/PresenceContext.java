@@ -13,7 +13,6 @@ import java.util.List;
 public class PresenceContext extends ResponseHeader {
 
     public List<Lobby> lobbyList;
-    public LeaderBoard leaderBoard;
     public OnSession presence;
     public OnView view;
     public Connection connection;

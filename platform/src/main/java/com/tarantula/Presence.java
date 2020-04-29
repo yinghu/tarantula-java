@@ -7,7 +7,6 @@ package com.tarantula;
 public interface Presence extends Balance,Updatable,Countable{
 
     String LOBBY_TAG = "presence/lobby";
-    String PROFILE_TAG = "presence/profile";
 
     int NOT_ENOUGH_BALANCE = 3;
     int IN_TOURNAMENT_MODE = 4;

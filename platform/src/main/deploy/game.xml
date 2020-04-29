@@ -27,7 +27,7 @@
                 <category>game</category>
                 <singleton>true</singleton>
                 <tag>game/zone1</tag>
-                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.GameZoneModule</module-name>
                 <capacity>100</capacity>
                 <access-rank>1</access-rank>
@@ -41,7 +41,7 @@
                 <category>game</category>
                 <singleton>true</singleton>
                 <tag>game/zone2</tag>
-                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.GameZoneModule</module-name>
                 <capacity>100</capacity>
                 <access-rank>2</access-rank>
@@ -67,7 +67,7 @@
                 <category>service</category>
                 <singleton>true</singleton>
                 <tag>game/mmk</tag>
-                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.MatchMakingModule</module-name>
             </application>
             <application><!-- Match making app-->
@@ -78,7 +78,7 @@
                 <category>service</category>
                 <singleton>true</singleton>
                 <tag>game/stats</tag>
-                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.StatisticsModule</module-name>
             </application>
         </application-list>
@@ -101,7 +101,7 @@
                 <category>service</category>
                 <singleton>true</singleton>
                 <tag>game/data</tag>
-                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.KeyValueDataStoreModule</module-name>
             </application>
         </application-list>

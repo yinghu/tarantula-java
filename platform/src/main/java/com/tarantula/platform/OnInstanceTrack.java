@@ -15,8 +15,7 @@ public class OnInstanceTrack extends OnApplicationHeader implements OnInstance {
 
     private boolean joined;
     private int idle;
-    private int roomIndex;
-    private int seatIndex;
+
     public OnInstanceTrack(){
         this.vertex="OnInstance";
         this.label = "IOI";
@@ -52,8 +51,6 @@ public class OnInstanceTrack extends OnApplicationHeader implements OnInstance {
         this.properties.put("1", systemId);
         this.properties.put("2",stub);
         this.properties.put("3",joined);
-        this.properties.put("4",roomIndex);
-        this.properties.put("5",seatIndex);
         this.properties.put("6",balance);
         return this.properties;
     }
@@ -62,8 +59,6 @@ public class OnInstanceTrack extends OnApplicationHeader implements OnInstance {
         this.systemId = (String)properties.get("1");
         this.stub = ((Number)properties.get("2")).intValue();
         this.joined = (Boolean)properties.get("3");
-        this.roomIndex = ((Number)properties.get("4")).intValue();
-        this.seatIndex = ((Number)properties.get("5")).intValue();
         this.balance = ((Number)properties.get("6")).doubleValue();
     }
     public  boolean joined(){
@@ -93,20 +88,6 @@ public class OnInstanceTrack extends OnApplicationHeader implements OnInstance {
         this.idle = reset?0:(this.idle+1);
         return this.idle;
     }
-    public int roomIndex(){
-        return this.roomIndex;
-    }
-    public void roomIndex(int roomIndex){
-        this.roomIndex = roomIndex;
-    }
-    public int seatIndex(){
-        return this.seatIndex;
-    }
-    public void seatIndex(int seatIndex){
-        this.seatIndex = seatIndex;
-    }
-
-
 
     public void dataStore(DataStore dataStore){
         this.dataStore = dataStore;

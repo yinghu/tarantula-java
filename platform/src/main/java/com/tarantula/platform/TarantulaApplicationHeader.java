@@ -67,8 +67,4 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
         OnBalanceTrack onBalanceTrack = new OnBalanceTrack(systemId,desc.entryCost());
         this.context.postOffice().onTag(Presence.LOBBY_TAG).send(systemId,onBalanceTrack);
     }
-    public void refund(String systemId,double balance){
-        OnBalanceTrack onBalanceTrack = new OnBalanceTrack(systemId,balance);
-        this.context.postOffice().onTag(Presence.LOBBY_TAG).send(systemId,onBalanceTrack);
-    }
 }

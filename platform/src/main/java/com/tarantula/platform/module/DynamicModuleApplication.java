@@ -1,4 +1,4 @@
-package com.tarantula.platform.playmode;
+package com.tarantula.platform.module;
 
 import com.tarantula.*;
 import com.tarantula.Module;

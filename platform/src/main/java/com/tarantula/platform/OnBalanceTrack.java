@@ -11,8 +11,6 @@ import java.util.Map;
  */
 public class OnBalanceTrack extends OnApplicationHeader implements OnBalance {
 
-
-
     public OnBalanceTrack(){
         this.vertex = "OnBalance";
     }

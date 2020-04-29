@@ -43,11 +43,6 @@ public class EndpointService implements Serviceable,EndPoint.Resource,Scheduling
         resourceEventHandler.start();
         rMap.put(resourceEventHandler.name(),resourceEventHandler);
 
-        ContentEventHandler contentHandler = new ContentEventHandler();
-        contentHandler.setup(this.tarantulaContext.tokenValidatorProvider().tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup,dis);
-        contentHandler.start();
-        rMap.put(contentHandler.name(),contentHandler);
-
         UserEventHandler userHandler = new UserEventHandler();
         userHandler.setup(this.tarantulaContext.tokenValidatorProvider().tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup,dis);
         userHandler.start();

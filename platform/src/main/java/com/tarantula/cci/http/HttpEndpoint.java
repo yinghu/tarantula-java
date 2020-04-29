@@ -49,9 +49,6 @@ public class HttpEndpoint implements EndPoint {
 		HttpHealthCheckHandler healthCheckHandler = new HttpHealthCheckHandler();
 		this.hserver.createContext("/health",healthCheckHandler);
 
-		HttpContentHandler httpContentHandler = new HttpContentHandler(this.resource.requestHandler("/content"));
-		this.hserver.createContext("/content",httpContentHandler);
-
 		HttpUserHandler httpUserHandler = new HttpUserHandler(this.resource.requestHandler("/user"));
 		this.hserver.createContext("/user", httpUserHandler);
 

@@ -21,6 +21,7 @@ public class PresenceApplication extends TarantulaApplicationHeader {
         this.cBuffer = new RingBuffer<>(new Connection[5]);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.registerOnConnectionListener(this);
+
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
             Presence presence = this.context.presence(t.owner());
             OnBalance ob = (OnBalance)t;
@@ -63,6 +64,7 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
         }
+        /**
         else if (session.action().equals("onTransfer")) {
             Presence presence = this.context.presence(session.systemId());
             OnAccess ex = this.builder.create().fromJson(new String(payload).trim(), OnAccess.class);
@@ -80,7 +82,7 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             }
             pb.presence= new OnSessionTrack(session.systemId(),presence.balance());
             session.write(this.builder.create().toJson(pb).getBytes(),this.descriptor.responseLabel());
-        }
+        }**/
         else if (session.action().equals("onAbsence")) {
             this.context.absence(session);
             session.write(this.builder.create().toJson(new ResponseHeader("onAbsence", "off session [" + session.stub() + "]", true)).getBytes(),this.descriptor.responseLabel());

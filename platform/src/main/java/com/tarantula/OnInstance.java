@@ -8,12 +8,6 @@ package com.tarantula;
  */
 public interface OnInstance extends OnBalance,Updatable{
 
-    int roomIndex();
-    void roomIndex(int roomIndex);
-
-    int seatIndex();
-    void seatIndex(int seatIndex);
-
     boolean joined();
 
     void joined(boolean joined);

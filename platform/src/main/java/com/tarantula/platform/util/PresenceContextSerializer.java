@@ -36,9 +36,6 @@ public class PresenceContextSerializer implements JsonSerializer<PresenceContext
             }
             pc.add("lobbyList",blist);
         }
-        if(presenceContext.leaderBoard!=null){
-            pc.add("leaderBoard",new LeaderBoardSerializer().serialize(presenceContext.leaderBoard,type,jsonSerializationContext));
-        }
         if(presenceContext.view!=null){
             pc.add("view",new OnViewSerializer().serialize(presenceContext.view,type,jsonSerializationContext));
         }

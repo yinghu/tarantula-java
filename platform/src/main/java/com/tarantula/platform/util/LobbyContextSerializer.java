@@ -1,26 +1,25 @@
 package com.tarantula.platform.util;
 
 import com.google.gson.*;
+import com.tarantula.Descriptor;
 import com.tarantula.InstanceRegistry;
-
-import com.tarantula.platform.playmode.GameDescriptor;
-import com.tarantula.platform.playmode.GameLobbyContext;
+import com.tarantula.platform.module.LobbyContext;
 
 import java.lang.reflect.Type;
 
 /**
  * Updated by yinghu on 5/22/2018.
  */
-public class GameLobbyContextSerializer implements JsonSerializer<GameLobbyContext> {
+public class LobbyContextSerializer implements JsonSerializer<LobbyContext> {
 
-    public JsonElement serialize(GameLobbyContext gameContext, Type type, JsonSerializationContext jsonSerializationContext) {
+    public JsonElement serialize(LobbyContext gameContext, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = (JsonObject)new ResponseSerializer().serialize(gameContext,type,jsonSerializationContext);
         //jo.addProperty("successful",gameContext.successful());
         //jo.addProperty("command",gameContext.command());
         if(gameContext.gameList!=null){
-            GameDescriptorSerializer ser = new GameDescriptorSerializer();
+            DescriptorSerializer ser = new DescriptorSerializer();
             JsonArray glist = new JsonArray();
-            for(GameDescriptor game : gameContext.gameList){
+            for(Descriptor game : gameContext.gameList){
                 glist.add(ser.serialize(game,type,jsonSerializationContext));
             }
             jo.add("gameList",glist);

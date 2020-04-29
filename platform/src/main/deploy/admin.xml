@@ -21,7 +21,7 @@
                 <singleton>true</singleton>
                 <tag>admin/lobby</tag>
                 <description>Tarantula Admin Service</description>
-                <class-name>com.tarantula.platform.playmode.GameLobbyApplication</class-name>
+                <class-name>com.tarantula.platform.module.LobbyApplication</class-name>
                 <deploy-priority>15</deploy-priority>
                 <response-label>admin</response-label>
             </application>
@@ -35,7 +35,7 @@
                 <singleton>true</singleton>
                 <tag>admin/user</tag>
                 <description>Tarantula User Service</description>
-                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.admin.AdminUserModule</module-name>
                 <entry-cost>0</entry-cost>
                 <capacity>10</capacity>
@@ -53,7 +53,7 @@
                 <singleton>true</singleton>
                 <tag>admin/setup</tag>
                 <description>Tarantula Admin Tool Service</description>
-                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.admin.AdminSetupModule</module-name>
                 <entry-cost>0</entry-cost>
                 <capacity>10</capacity>
@@ -71,7 +71,7 @@
                 <singleton>true</singleton>
                 <tag>admin/datastore</tag>
                 <description>Tarantula Customer Service</description>
-                <class-name>com.tarantula.platform.playmode.SingletonModuleApplication</class-name>
+                <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.admin.AdminDataStoreModule</module-name>
                 <entry-cost>0</entry-cost>
                 <capacity>10</capacity>

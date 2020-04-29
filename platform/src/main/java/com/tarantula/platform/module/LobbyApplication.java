@@ -1,4 +1,4 @@
-package com.tarantula.platform.playmode;
+package com.tarantula.platform.module;
 
 import com.tarantula.*;
 import com.tarantula.platform.CompositeKey;
@@ -7,7 +7,7 @@ import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.event.FastPlayEvent;
 import com.tarantula.platform.event.InstancePlayEvent;
 import com.tarantula.platform.service.DeploymentServiceProvider;
-import com.tarantula.platform.util.GameLobbyContextSerializer;
+import com.tarantula.platform.util.LobbyContextSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.concurrent.ScheduledFuture;
 /**
  * Updated by yinghu lu on 9/3/2019.
  */
-public class GameLobbyApplication extends TarantulaApplicationHeader implements OnInstance.Listener,SchedulingTask{
+public class LobbyApplication extends TarantulaApplicationHeader implements OnInstance.Listener,SchedulingTask{
 
     private ConcurrentHashMap<String, ConcurrentLinkedDeque<InstanceRegistry>> rQueue = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,InstanceRegistry> rMap = new ConcurrentHashMap<>();
@@ -37,16 +37,11 @@ public class GameLobbyApplication extends TarantulaApplicationHeader implements 
         OnAccess ex = this.builder.create().fromJson(new String(payload).trim(), OnAccess.class);
         if(session.action().equals("onLobby")){ //return available app list
             Lobby _lobby = this.context.lobby(ex.typeId());
-            GameLobbyContext pc = new GameLobbyContext(session.action());
-            List<GameDescriptor> gameList = new ArrayList();
+            LobbyContext pc = new LobbyContext(session.action());
+            List<Descriptor> gameList = new ArrayList();
             _lobby.entryList().forEach((d)->{
                 if((!d.category().equals("lobby"))&&(!(d.category().equals("service")))){//excludes lobby and service category apps
-                    GameDescriptor c = new GameDescriptor();
-                    if(d.configurationType()!=null){
-                        c.configuration = cMap.get(d.configurationType());
-                    }
-                    c.descriptor = d;
-                    gameList.add(c);
+                    gameList.add(d);
                 }
             });
             pc.gameList = gameList;
@@ -54,7 +49,7 @@ public class GameLobbyApplication extends TarantulaApplicationHeader implements 
         }
         else if(session.action().equals("onList")){ //return available instance list
             int sz = Integer.parseInt(ex.property("size"));
-            GameLobbyContext ic = new GameLobbyContext(session.action());
+            LobbyContext ic = new LobbyContext(session.action());
             ArrayList<InstanceRegistry> alist = new ArrayList<>();
             rMap.forEach((k,v)->{
                 if(v.applicationId().equals(ex.applicationId())&&alist.size()<sz){
@@ -162,7 +157,7 @@ public class GameLobbyApplication extends TarantulaApplicationHeader implements 
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        this.builder.registerTypeAdapter(GameLobbyContext.class,new GameLobbyContextSerializer());
+        this.builder.registerTypeAdapter(LobbyContext.class,new LobbyContextSerializer());
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.deploymentServiceProvider.registerInstanceRegistryListener(this);
         this.context.configuration().forEach((c)->{

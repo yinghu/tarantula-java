@@ -1,17 +1,18 @@
-package com.tarantula.platform.playmode;
+package com.tarantula.platform.module;
 
+import com.tarantula.Descriptor;
 import com.tarantula.InstanceRegistry;
 import com.tarantula.platform.ResponseHeader;
 
 import java.util.List;
 
-public class GameLobbyContext extends ResponseHeader {
+public class LobbyContext extends ResponseHeader {
 
-    public GameLobbyContext(String cmd){
+    public LobbyContext(String cmd){
         this.command = cmd;
         this.successful = true;
     }
 
-    public List<GameDescriptor> gameList;
+    public List<Descriptor> gameList;
     public List<InstanceRegistry> onList;
 }
