@@ -31,10 +31,10 @@ public class MatchMakingModule implements Module {
     @Override
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
-        String gz = this.context.descriptor().typeId().replace("mmk","zone");
+        String gz = this.context.descriptor().typeId().replace("service","lobby");
         Lobby lobby = this.context.lobby(gz);
         lobby.entryList().forEach((d)->{
-            context.log("Add zone ->"+d.tag()+" ->rank ["+d.accessRank()+"]",OnLog.WARN);
+            context.log("Add lobby ->"+d.tag()+" ->rank ["+d.accessRank()+"]",OnLog.WARN);
             mZone.put(d.accessRank(),d);
         });
         gameServiceProvider = this.context.serviceProvider("game-data-service");

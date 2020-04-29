@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
+import com.tarantula.platform.event.EventOnAction;
 import com.tarantula.platform.event.OnDeployEvent;
 import com.tarantula.platform.service.BucketReceiver;
 import com.tarantula.platform.service.Instance;

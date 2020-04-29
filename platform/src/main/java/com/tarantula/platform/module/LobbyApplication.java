@@ -26,8 +26,6 @@ public class LobbyApplication extends TarantulaApplicationHeader implements OnIn
 
     private ConcurrentLinkedDeque<Event> eQueue = new ConcurrentLinkedDeque<>();
 
-
-    private ConcurrentHashMap<String, Configuration> cMap = new ConcurrentHashMap<>();
     private int maxRetries = 3;
     private DeploymentServiceProvider deploymentServiceProvider;
 
@@ -160,9 +158,7 @@ public class LobbyApplication extends TarantulaApplicationHeader implements OnIn
         this.builder.registerTypeAdapter(LobbyContext.class,new LobbyContextSerializer());
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.deploymentServiceProvider.registerInstanceRegistryListener(this);
-        this.context.configuration().forEach((c)->{
-            cMap.put(c.type(),c);
-        });
+
         this.timerSchedule = this.context.schedule(this);
         this.context.log("Lobby application is started on ["+this.onLobby()+"]",OnLog.INFO);
     }
@@ -211,7 +207,6 @@ public class LobbyApplication extends TarantulaApplicationHeader implements OnIn
         this.rMap.clear();
         this.eQueue.clear();
         this.oMap.clear();
-        this.cMap.clear();
         this.rQueue.clear();
         this.context.log("Lobby ["+this.onLobby()+"/"+this.descriptor.distributionKey()+"] closed",OnLog.WARN);
     }

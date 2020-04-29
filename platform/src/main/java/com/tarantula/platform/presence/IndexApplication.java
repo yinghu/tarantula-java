@@ -4,6 +4,7 @@ import com.tarantula.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.IndexEvent;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.OnLobby;
 import com.tarantula.platform.util.PresenceContextSerializer;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 /**
  * Updated by yinghu on 8/24/19
  */
-public class IndexApplication extends TarantulaApplicationHeader implements OnView.Listener,OnLobby.Listener {
+public class IndexApplication extends TarantulaApplicationHeader implements OnView.Listener, OnLobby.Listener {
 
     private ConcurrentHashMap<String,OnView> _viewList = new ConcurrentHashMap<>();
     private CopyOnWriteArraySet<String> _lobbyList = new CopyOnWriteArraySet<>();

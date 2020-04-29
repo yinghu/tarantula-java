@@ -74,7 +74,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                 oi.reset(this.application.descriptor().entryCost());
                 oi.accessMode(event.accessMode());
                 oi.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
-                oi.tournamentEnabled(_instance.tournamentEnabled);
                 oi.idle(true);
             }
         }
@@ -234,7 +233,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         }
         on.joined(false);
         on.update();
-        if((!on.tournamentEnabled())&&on.balance()>0){//move remaining balance to presence on non-tournament mode
+        if(on.balance()>0){//move remaining balance to presence on non-tournament mode
             this.postOffice().onTag(Presence.LOBBY_TAG).send(systemId,new OnBalanceTrack(systemId,on.balance()));
         }
         this.waitingList.offer(on);

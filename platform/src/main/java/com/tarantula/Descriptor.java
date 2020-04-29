@@ -105,9 +105,6 @@ public interface Descriptor extends Recoverable{
     String configurationName();
     void configurationName(String configurationName);
 
-    String leaderBoardHeader();
-    void leaderBoardHeader(String leaderBoardHeader);
-
     String configurationType();
     void configurationType(String configurationType);
 
@@ -116,9 +113,6 @@ public interface Descriptor extends Recoverable{
 
     long runtimeDurationOnInstance(); //the instance duration time in minutes
     void runtimeDurationOnInstance(long runtimeDuration);
-
-    boolean tournamentEnabled();
-    void tournamentEnabled(boolean tournamentEnabled);
 
     boolean resetEnabled();
     void resetEnabled(boolean resetEnabled);

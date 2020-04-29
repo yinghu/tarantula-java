@@ -19,7 +19,6 @@
                 <description>Tarantula User Management</description>
                 <class-name>com.tarantula.platform.presence.UserManagementApplication</class-name>
                 <configuration-name>user</configuration-name>
-                <leader-board-header>presence</leader-board-header>
                 <response-label>user</response-label>
             </application>
             <application>

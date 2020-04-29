@@ -3,7 +3,6 @@ package com.tarantula.platform.event;
 import java.io.IOException;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.EventOnAction;
 
 
 public class ApplicationActionEvent extends Data implements EventOnAction {

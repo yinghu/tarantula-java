@@ -16,7 +16,6 @@ public class StatisticsSerializer implements JsonSerializer<Statistics> {
         JsonObject jo  = new JsonObject();
         jo.addProperty("applicationId",statistics.applicationId());
         jo.addProperty("instanceId",statistics.instanceId());
-        jo.addProperty("header",statistics.leaderBoardHeader());
         jo.addProperty("name",statistics.name());
         JsonArray ja = new JsonArray();
         for(Map.Entry<String,Double> kv : statistics.summary().entrySet()){

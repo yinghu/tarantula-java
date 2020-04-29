@@ -140,9 +140,6 @@ public class XMLParser extends DefaultHandler{
 			//application-list
             else if(tblock.equals("application-list")&&qname.equals("type-id")){
                 this.applicationDescriptor.typeId(value);
-                if(this.applicationDescriptor.leaderBoardHeader()==null){
-                    this.applicationDescriptor.leaderBoardHeader(value);
-                }
             }
             else if(tblock.equals("application-list")&&qname.equals("subtype-id")){
 				this.applicationDescriptor.subtypeId(value);
@@ -170,9 +167,6 @@ public class XMLParser extends DefaultHandler{
             }
             else if(tblock.equals("application-list")&&qname.equals("entry-cost")){
                 this.applicationDescriptor.entryCost(Long.parseLong(value));
-            }
-            else if (tblock.equals("application-list")&&qname.equals("tournament-enabled")){
-                this.applicationDescriptor.tournamentEnabled(Boolean.parseBoolean(value));
             }
             else if(tblock.equals("application-list")&&qname.equals("tag")){
                 this.applicationDescriptor.tag(value);
@@ -224,9 +218,6 @@ public class XMLParser extends DefaultHandler{
             }
             else if(tblock.equals("application-list")&&qname.equals("configuration-type")){
                 this.applicationDescriptor.configurationType(value);
-            }
-            else if(tblock.equals("application-list")&&qname.equals("leader-board-header")){
-                this.applicationDescriptor.leaderBoardHeader(value);
             }
             else if(tblock.equals("application-list")&&qname.equals("instances-on-startup-per-partition")){
                 this.applicationDescriptor.instancesOnStartupPerPartition(Integer.parseInt(value));

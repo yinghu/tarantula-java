@@ -272,7 +272,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                         instanceRegistry.routingNumber(p);
                         instanceRegistry.bucket(dataStore.bucket());
                         instanceRegistry.oid(SystemUtil.oid());
-                        instanceRegistry.tournamentEnabled(deploymentDescriptor.tournamentEnabled());
                         if(dataStore.create(instanceRegistry)){
                             ilist.add(instanceRegistry);
                         }
@@ -467,7 +466,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         else{
             descriptor.applicationClassName("com.tarantula.platform.playmode.SingletonModuleApplication");
         }
-        descriptor.leaderBoardHeader(descriptor.typeId());
         descriptor.resetEnabled(true);
         descriptor.runtimeDuration(descriptor.runtimeDuration()*60*1000);
         descriptor.runtimeDurationOnInstance(descriptor.runtimeDurationOnInstance()*60*1000);

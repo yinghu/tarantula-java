@@ -10,7 +10,6 @@ public class OnApplicationHeader extends ResponseHeader{
     protected String applicationId;
     protected String instanceId;
     protected double entryCost;
-    protected boolean tournamentEnabled;
 
     protected String systemId;
     protected String name;
@@ -41,13 +40,6 @@ public class OnApplicationHeader extends ResponseHeader{
     }
     public boolean redeemed(){
         return this.redeemed;
-    }
-
-    public boolean tournamentEnabled(){
-        return this.tournamentEnabled;
-    }
-    public void tournamentEnabled(boolean tournamentEnabled){
-        this.tournamentEnabled = tournamentEnabled;
     }
 
 

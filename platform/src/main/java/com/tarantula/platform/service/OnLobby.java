@@ -1,6 +1,7 @@
-package com.tarantula;
+package com.tarantula.platform.service;
 
 
+import com.tarantula.Recoverable;
 
 /**
  * Updated by yinghu lu on 7/20/19

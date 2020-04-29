@@ -7,9 +7,8 @@ import java.util.Map;
  */
 public interface Statistics extends OnApplication{
 
-    String leaderBoardHeader();
 
-    OnStatistics value(String key,double value);
+    void value(String key,double value);
 
     Map<String,Double> summary();
 

@@ -1,7 +1,7 @@
 package com.tarantula.platform;
 
 
-import com.tarantula.OnLobby;
+import com.tarantula.platform.service.OnLobby;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 

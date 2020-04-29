@@ -46,9 +46,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor{
     protected  int instancesOnStartupPerPartition =1;
     protected  String configurationName;
     protected  String configurationType;
-    protected String leaderBoardHeader;
 
-    protected boolean tournamentEnabled;
     protected int maxIdlesOnInstance;
     protected long runtimeDuration;
     protected long runtimeDurationOnInstance;
@@ -284,8 +282,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor{
         _props.put("instancesOnStartupPerPartition",this.instancesOnStartupPerPartition);
         _props.put("configurationName",this.configurationName);
         _props.put("configurationType",this.configurationType);
-        _props.put("leaderBoardHeader",this.leaderBoardHeader);
-        _props.put("tournamentEnabled",this.tournamentEnabled);
         _props.put("maxIdlesOnInstance",this.maxIdlesOnInstance);
         _props.put("responseLabel",this.responseLabel);
         _props.put("runtimeDuration",this.runtimeDuration);
@@ -325,8 +321,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor{
         this.instancesOnStartupPerPartition = properties.get("instancesOnStartupPerPartition")!=null?((Number)properties.get("instancesOnStartupPerPartition")).intValue():10;
         this.configurationName =properties.get("configurationName")!=null? (String)properties.get("configurationName"):null;
         this.configurationType =properties.get("configurationType")!=null? (String)properties.get("configurationType"):null;
-        this.leaderBoardHeader =properties.get("leaderBoardHeader")!=null? (String)properties.get("leaderBoardHeader"):null;
-        this.tournamentEnabled = properties.get("tournamentEnabled")!=null?(boolean)properties.get("tournamentEnabled"):false;
         this.maxIdlesOnInstance =properties.get("maxIdlesOnInstance")!=null?((Number)properties.get("maxIdlesOnInstance")).intValue():0;
         this.responseLabel =properties.get("responseLabel")!=null? (String)properties.get("responseLabel"):null;
         this.runtimeDuration = properties.get("runtimeDuration")!=null?((Number)properties.get("runtimeDuration")).longValue():0;
@@ -360,19 +354,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor{
     }
     public void configurationType(String configurationType){
         this.configurationType = configurationType;
-    }
-    public String leaderBoardHeader(){
-        return this.leaderBoardHeader;
-    }
-    public void leaderBoardHeader(String leaderBoardHeader){
-        this.leaderBoardHeader = leaderBoardHeader;
-    }
-
-    public boolean tournamentEnabled(){
-        return this.tournamentEnabled;
-    }
-    public void tournamentEnabled(boolean tournamentEnabled){
-        this.tournamentEnabled = tournamentEnabled;
     }
     public long runtimeDuration(){
         return this.runtimeDuration;

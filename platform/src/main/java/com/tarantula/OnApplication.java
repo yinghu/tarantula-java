@@ -40,9 +40,6 @@ public interface OnApplication extends Recoverable{
     String subtypeId();
     void subtypeId(String subtypeId);
 
-    boolean tournamentEnabled();
-    void tournamentEnabled(boolean tournamentEnabled);
-
     Connection connection();
     void connection(Connection connection);
 

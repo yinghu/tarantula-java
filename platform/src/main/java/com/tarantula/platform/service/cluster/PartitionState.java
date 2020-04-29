@@ -1,6 +1,6 @@
 package com.tarantula.platform.service.cluster;
 
-import com.tarantula.OnPartition;
+import com.tarantula.platform.service.OnPartition;
 
 public class PartitionState implements OnPartition {
     public final int partition;

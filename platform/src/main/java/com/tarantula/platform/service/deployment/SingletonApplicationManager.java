@@ -4,6 +4,7 @@ import com.tarantula.*;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.TarantulaApplicationContext;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.event.EventOnAction;
 import com.tarantula.platform.service.BucketReceiver;
 import com.tarantula.platform.service.BucketReceiverListener;
 import com.tarantula.platform.service.cluster.ApplicationBucketReceiver;

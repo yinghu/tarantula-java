@@ -20,7 +20,6 @@ public class OnApplicationSerializer implements JsonSerializer<OnApplicationHead
         jo.addProperty("applicationId",onApplication.applicationId());
         jo.addProperty("instanceId",onApplication.instanceId());
         jo.addProperty("balance",onApplication.accessMode());
-        jo.addProperty("tournamentEnabled",onApplication.tournamentEnabled());
         jo.addProperty("ticket",onApplication.ticket());
         jo.addProperty("index",onApplication.index());
         if(onApplication.connection()!=null){

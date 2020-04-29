@@ -34,7 +34,6 @@ public class ApplicationRegistry implements ApplicationAllocator{
     }
     public InstanceRegistry allocate(int partition) {
         InstanceIndex instanceRegistry = new InstanceIndex();
-        //instanceRegistry.bank(true);
         instanceRegistry.capacity(deploymentDescriptor.capacity());
         instanceRegistry.applicationId(deploymentDescriptor.distributionKey());
         instanceRegistry.owner(deploymentDescriptor.distributionKey());
@@ -42,7 +41,6 @@ public class ApplicationRegistry implements ApplicationAllocator{
         instanceRegistry.routingNumber(partition);
         instanceRegistry.bucket(dataStore.bucket());
         instanceRegistry.oid(SystemUtil.oid());
-        instanceRegistry.tournamentEnabled(deploymentDescriptor.tournamentEnabled());
         if(this.tarantulaContext.masterDataStore().create(instanceRegistry)){
             this.eventDispatcher.onAvailable.put(instanceRegistry.distributionKey(),instanceRegistry);
             return instanceRegistry;

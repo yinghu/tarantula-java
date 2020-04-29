@@ -13,7 +13,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class InstanceIndex  extends OnApplicationHeader implements InstanceRegistry{
 
-    //private boolean bank;
     private int capacity;
     private int count;
 
@@ -51,28 +50,23 @@ public class InstanceIndex  extends OnApplicationHeader implements InstanceRegis
 
     @Override
     public Map<String,Object> toMap(){
-        //this.properties.put("applicationId",applicationId);
         this.properties.put("capacity",capacity);
-        //this.properties.put("bank",this.bank);
         this.properties.put("owner",owner!=null?owner:"n/a");
         this.properties.put("disabled",disabled);
         this.properties.put("accessMode",this.accessMode);
-        this.properties.put("tournamentEnabled",this.tournamentEnabled);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        //this.applicationId = (String)properties.get("applicationId");
         this.capacity = ((Number)properties.get("capacity")).intValue();
-        //this.bank = (Boolean)properties.get("bank");
         this.owner =(String)properties.get("owner");
         this.disabled =(Boolean)properties.get("disabled");
         this.accessMode = ((Number)properties.get("accessMode")).intValue();
-        this.tournamentEnabled =(Boolean)properties.get("tournamentEnabled");
+
     }
     @Override
     public String toString(){
-        return "Instance Registry ["+this.owner+","+","+this.distributionKey()+","+this.accessMode+"] with capacity/count ["+this.capacity+","+this.count+"]tournament ["+tournamentEnabled+"]";
+        return "Instance Registry ["+this.owner+","+","+this.distributionKey()+","+this.accessMode+"] with capacity/count ["+this.capacity+","+this.count+"]";
     }
     public synchronized int onJoin(Event event){
         int ret = application.onJoin(event,this.onInstanceListener);

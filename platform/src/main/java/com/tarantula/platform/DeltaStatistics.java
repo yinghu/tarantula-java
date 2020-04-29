@@ -10,9 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DeltaStatistics extends OnApplicationHeader implements Statistics {
 
-
-    private String leaderBoardHeader ;
-
     private Map<String,Entry> mappings = new ConcurrentHashMap<>();
 
     public DeltaStatistics(){
@@ -20,19 +17,10 @@ public class DeltaStatistics extends OnApplicationHeader implements Statistics {
         this.label = "STAT";
     }
 
-    public String leaderBoardHeader() {
-        return leaderBoardHeader;
-    }
-
-
-    public void leaderBoardHeader(String header) {
-        this.leaderBoardHeader = header;
-    }
-
     public void entry(Entry entry){
         this.mappings.put(entry.name(),entry);
     }
-    public OnStatistics value(String key, double value) {
+    public void value(String key, double value) {
         this.mappings.compute(key,(k,v)->{
             if(v==null){
                 v = new StatisticsEntry(key);
@@ -45,7 +33,6 @@ public class DeltaStatistics extends OnApplicationHeader implements Statistics {
             }
             return v;
         });
-        return new OnStatisticsTrack(this.leaderBoardHeader);
     }
     public Map<String,Double> summary(){
         Map<String,Double> _mv = new HashMap<>();
@@ -66,12 +53,12 @@ public class DeltaStatistics extends OnApplicationHeader implements Statistics {
 
     @Override
     public Map<String,Object> toMap(){
-        properties.put("leaderBoardHeader",this.leaderBoardHeader);
+
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.leaderBoardHeader = (String)properties.get("leaderBoardHeader");
+
     }
     @Override
     public Key key(){
