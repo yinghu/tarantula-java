@@ -13,11 +13,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class InstanceIndex  extends OnApplicationHeader implements InstanceRegistry{
 
-    private boolean bank;
+    //private boolean bank;
     private int capacity;
     private int count;
-    private transient House house;
-    private transient Statistics statistics;
 
     public TarantulaApplicationContext applicationContext;
 
@@ -35,30 +33,13 @@ public class InstanceIndex  extends OnApplicationHeader implements InstanceRegis
         return this.count=this.count+(delta);
     }
 
-    public House house(){
-        return this.house;
-    }
-    public void house(House house){
-        this.house = house;
-    }
-    public Statistics statistics(){
-        return this.statistics;
-    }
-    public void statistics(Statistics statistics){
-        this.statistics = statistics;
-    }
     public int capacity(){
         return this.capacity;
     }
     public void capacity(int capacity){
         this.capacity = capacity;
     }
-    public void  bank(boolean bank){
-        this.bank = bank;
-    }
-    public boolean  bank(){
-        return this.bank;
-    }
+
     @Override
     public int getFactoryId() {
         return PortableRegistry.OID;
@@ -72,7 +53,7 @@ public class InstanceIndex  extends OnApplicationHeader implements InstanceRegis
     public Map<String,Object> toMap(){
         //this.properties.put("applicationId",applicationId);
         this.properties.put("capacity",capacity);
-        this.properties.put("bank",this.bank);
+        //this.properties.put("bank",this.bank);
         this.properties.put("owner",owner!=null?owner:"n/a");
         this.properties.put("disabled",disabled);
         this.properties.put("accessMode",this.accessMode);
@@ -83,7 +64,7 @@ public class InstanceIndex  extends OnApplicationHeader implements InstanceRegis
     public void fromMap(Map<String,Object> properties){
         //this.applicationId = (String)properties.get("applicationId");
         this.capacity = ((Number)properties.get("capacity")).intValue();
-        this.bank = (Boolean)properties.get("bank");
+        //this.bank = (Boolean)properties.get("bank");
         this.owner =(String)properties.get("owner");
         this.disabled =(Boolean)properties.get("disabled");
         this.accessMode = ((Number)properties.get("accessMode")).intValue();

@@ -11,18 +11,8 @@ public interface InstanceRegistry extends OnApplication,Countable{
     int ALREADY_ON_INSTANCE =1;
     int INSTANCE_FULL = 4;
 
-    void  bank(boolean bank);
-    boolean  bank();
-
     int capacity();
     void capacity(int capacity);
-
-    House house();
-    void house(House house);
-
-    Statistics statistics();
-    void statistics(Statistics statistics);
-
 
     int onJoin(Event event);
     void onLeave(Session session);

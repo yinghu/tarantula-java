@@ -34,7 +34,7 @@ public class ApplicationRegistry implements ApplicationAllocator{
     }
     public InstanceRegistry allocate(int partition) {
         InstanceIndex instanceRegistry = new InstanceIndex();
-        instanceRegistry.bank(true);
+        //instanceRegistry.bank(true);
         instanceRegistry.capacity(deploymentDescriptor.capacity());
         instanceRegistry.applicationId(deploymentDescriptor.distributionKey());
         instanceRegistry.owner(deploymentDescriptor.distributionKey());
@@ -44,20 +44,6 @@ public class ApplicationRegistry implements ApplicationAllocator{
         instanceRegistry.oid(SystemUtil.oid());
         instanceRegistry.tournamentEnabled(deploymentDescriptor.tournamentEnabled());
         if(this.tarantulaContext.masterDataStore().create(instanceRegistry)){
-            String cts = this.deploymentDescriptor.leaderBoardHeader();
-            DeltaStatistics deltaStatistics = new DeltaStatistics();
-            deltaStatistics.distributionKey(instanceRegistry.distributionKey());
-            deltaStatistics.leaderBoardHeader(cts);
-            if(this.tarantulaContext.masterDataStore().create(deltaStatistics)){
-                instanceRegistry.statistics(deltaStatistics);
-            }
-            House house = new HouseTrack();
-            house.bank(true);
-            house.distributionKey(instanceRegistry.distributionKey());
-            house.owner(instanceRegistry.distributionKey());
-            if(this.tarantulaContext.masterDataStore().create(house)){
-                instanceRegistry.house(house);
-            }
             this.eventDispatcher.onAvailable.put(instanceRegistry.distributionKey(),instanceRegistry);
             return instanceRegistry;
         }

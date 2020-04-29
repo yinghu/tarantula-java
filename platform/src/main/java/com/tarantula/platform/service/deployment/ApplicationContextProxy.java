@@ -69,10 +69,10 @@ public class ApplicationContextProxy implements ApplicationContext {
         return this.tarantulaApplicationContext.descriptor(applicationId);
     }
 
-    @Override
-    public Statistics statistics() {
-        return this.tarantulaApplicationContext.statistics();
-    }
+    //@Override
+    //public Statistics statistics() {
+        //return this.tarantulaApplicationContext.statistics();
+    //}
 
     @Override
     public DataStore dataStore(String name) {

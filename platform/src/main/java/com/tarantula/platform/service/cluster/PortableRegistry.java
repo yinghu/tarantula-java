@@ -15,8 +15,6 @@ public class PortableRegistry extends AbstractRecoverableListener{
     public static final int PROPERTY_CID = 3;
     public static final int DELTA_STAT_CID = 4;
 
-    public static final int HOUSE_CID = 6;
-
     public static final int ACCESS_INDEX_CID = 10;
     public static final int APPLICATION_CONFIGURATION_CID = 11; //DEPLOY OBJECT
     public static final int ON_LOBBY_CID = 12;
@@ -57,9 +55,6 @@ public class PortableRegistry extends AbstractRecoverableListener{
                 break;
             case DELTA_STAT_CID:
                 _ins = new DeltaStatistics();
-                break;
-            case HOUSE_CID:
-                _ins = new HouseTrack();
                 break;
             case ACCESS_INDEX_CID:
                 _ins = new AccessIndexTrack();

@@ -25,7 +25,7 @@ public interface ApplicationContext{
     Descriptor descriptor();
     Descriptor descriptor(String applicationId);
 
-    Statistics statistics();
+    //Statistics statistics();
 
     DataStore dataStore(String name);
 

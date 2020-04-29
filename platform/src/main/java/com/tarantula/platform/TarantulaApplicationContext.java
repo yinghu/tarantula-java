@@ -38,7 +38,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     public InstanceIndex _instance;
 
-    private DeltaStatistics onStatistics;
+    //private DeltaStatistics onStatistics;
     private boolean logEnabled;
     private TarantulaLogger log;
 
@@ -131,30 +131,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         if(logEnabled){
             this.log = this.tarantulaContext.logger(this.application.getClass());
         }
-        if(_descriptor.singleton()){ //per header per singleton
-            DataStore ds = this.tarantulaContext.masterDataStore();
-            this.onStatistics = new DeltaStatistics(); //LOCAL NODE ONLY
-            this.onStatistics.vertex(SystemUtil.toString(new String[]{this.onStatistics.vertex(),ds.node()}));
-            this.onStatistics.distributionKey(_descriptor.distributionKey());
-            this.onStatistics.leaderBoardHeader(_descriptor.leaderBoardHeader());
-            //this.onStatistics.distributable(true);
-            if(this.tarantulaContext.tarantulaCluster().load(this.onStatistics)||ds.load(this.onStatistics)){
-                ds.createIfAbsent(this.onStatistics,false);
-                ds.list(new StatisticsEntryQuery(this.onStatistics.key().asString()),(e)->{
-                    this.onStatistics.entry(e);
-                    ds.createIfAbsent(e,false);
-                    return true;
-                });
-                this.onStatistics.dataStore(this.dataStore());
-            }
-            else{
-                ds.create(this.onStatistics);
-                this.onStatistics.dataStore(this.dataStore());
-            }
-            if(this.tarantulaContext.tarantulaCluster().load(this.onStatistics)){
-                //logger.warn("Node only statistics ->"+this.onStatistics.key().asString());
-            }
-        }
+
         this._setup( _descriptor.distributionKey(), _descriptor.singleton());
     }
     private void _setup(String applicationId,boolean singleton) throws Exception {
@@ -192,23 +169,16 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                     a.dataStore(this.tarantulaContext.masterDataStore());
                     a.owner(this._instance.distributionKey());
                 });
-                House house = this.tarantulaContext.query(_instance.distributionKey(),new HouseTrack());
-                _instance.house(house);
-                _instance.house().dataStore(this.tarantulaContext.masterDataStore());
-                DeltaStatistics statistics = this.tarantulaContext.query(_instance.distributionKey(),new DeltaStatistics());
-                List<StatisticsEntry> elist = this.tarantulaContext.query(new String[]{statistics.key().asString()},new StatisticsEntryQuery(statistics.key().asString()));
-                elist.forEach((e)->statistics.entry(e));
-                _instance.statistics(statistics);
-                _instance.statistics().dataStore(this.tarantulaContext.masterDataStore());
-                this.application.setup(new ApplicationContextProxy(this));
+
+                 this.application.setup(new ApplicationContextProxy(this));
             }catch (Exception ex){
                 throw new RuntimeException(ex);
             }
         }
     }
     public void releaseOnInstanceRegistry(){//call on bucket closed
-        this._instance.house().update();
-        this._instance.statistics().update();
+        //this._instance.house().update();
+        //this._instance.statistics().update();
         onInstances.forEach((k,v)->{
             v.update();
         });
@@ -327,9 +297,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public void unregisterRecoverableListener(int factoryId){
         this.rMap.remove(factoryId);
     }
-    public Statistics statistics(){
-        return this.singleton?this.onStatistics:this._instance.statistics();
-    }
 
     public DataStore dataStore(String name){
         if(resetEnabled){
@@ -380,10 +347,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                 this.application.clear();
             }
         }
-        else{
-            this.onStatistics.distributable(state==BucketReceiver.CLOSE);
-            this.onStatistics.update();
-        }
+
         this.application.onBucket(bucket,state);
     }
     public void resource(String name,Module.OnResource onResource){

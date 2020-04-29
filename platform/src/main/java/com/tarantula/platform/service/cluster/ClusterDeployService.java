@@ -264,7 +264,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 for(int i=0;i<deploymentDescriptor.instancesOnStartupPerPartition();i++){
                     for(int p = 0;p<tarantulaContext.platformRoutingNumber;p++){
                         InstanceIndex instanceRegistry = new InstanceIndex();
-                        instanceRegistry.bank(true);
+                        //instanceRegistry.bank(true);
                         instanceRegistry.capacity(deploymentDescriptor.capacity());
                         instanceRegistry.applicationId(deploymentDescriptor.distributionKey());
                         instanceRegistry.owner(deploymentDescriptor.distributionKey());
@@ -275,22 +275,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                         instanceRegistry.tournamentEnabled(deploymentDescriptor.tournamentEnabled());
                         if(dataStore.create(instanceRegistry)){
                             ilist.add(instanceRegistry);
-                            String cts = deploymentDescriptor.leaderBoardHeader();
-                            DeltaStatistics deltaStatistics = new DeltaStatistics();
-                            deltaStatistics.distributionKey(instanceRegistry.distributionKey());
-                            deltaStatistics.leaderBoardHeader(cts);
-                            //deltaStatistics.distributable(true);
-                            if(dataStore.create(deltaStatistics)){
-                                instanceRegistry.statistics(deltaStatistics);
-                            }
-                            House house = new HouseTrack();
-                            house.bank(true);
-                            house.distributionKey(instanceRegistry.distributionKey());
-                            house.owner(instanceRegistry.distributionKey());
-                            //house.distributable(true);
-                            if(dataStore.create(house)){
-                                instanceRegistry.house(house);
-                            }
                         }
                     }
                 }
@@ -316,14 +300,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             }
             batchCache = new BatchCache(UUID.randomUUID().toString(),olist);
         }
-        else if(registryId==PortableRegistry.HOUSE_CID){
-            List hList = new ArrayList();
-            House h = new HouseTrack();
-            h.distributionKey(params[0]);
-            dataStore.load(h);
-            hList.add(h);
-            batchCache = new BatchCache(UUID.randomUUID().toString(),hList);
-        }
+
         else if(registryId==PortableRegistry.DELTA_STAT_CID){
             List hList = new ArrayList();
             DeltaStatistics h = new DeltaStatistics();
