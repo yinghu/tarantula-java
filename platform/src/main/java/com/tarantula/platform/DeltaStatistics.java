@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DeltaStatistics extends RecoverableObject implements Statistics {
 
     private Map<String,Entry> mappings = new ConcurrentHashMap<>();
-    private DataStore dataStore;
+
     public DeltaStatistics(){
         this.vertex = "Statistics";
     }

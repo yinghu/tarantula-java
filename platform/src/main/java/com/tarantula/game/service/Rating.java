@@ -24,7 +24,7 @@ public class Rating extends RecoverableObject implements Updatable {
     public double elo = 1200; //elo service
     public int csw = 0; //consecutive winnings
 
-    private DataStore dataStore;
+
     public Rating(){
         this.vertex = "Rating";
     }

@@ -3,6 +3,7 @@ package com.tarantula.game.service;
 import com.tarantula.DataStore;
 import com.tarantula.Statistics;
 import com.tarantula.game.Stub;
+import com.tarantula.game.Zone;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.DeltaStatistics;
 import com.tarantula.platform.service.ServiceContext;
@@ -50,6 +51,15 @@ public class GameServiceProvider implements ServiceProvider {
         this.dataStore.createIfAbsent(deltaStatistics,true);
         deltaStatistics.dataStore(this.dataStore);
         return deltaStatistics;
+    }
+
+    public Zone zone(String zoneId){
+        Zone zone = new Zone();
+        zone.distributionKey(zoneId);
+        this.dataStore.createIfAbsent(zone,true);
+        zone.dataStore(this.dataStore);
+        logger.warn(zone.toString());
+        return zone;
     }
     @Override
     public String name() {

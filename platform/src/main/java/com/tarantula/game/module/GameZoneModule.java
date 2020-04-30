@@ -5,10 +5,7 @@ import com.tarantula.ApplicationContext;
 import com.tarantula.Module;
 import com.tarantula.OnLog;
 import com.tarantula.Session;
-import com.tarantula.game.Zone;
-import com.tarantula.game.GameObject;
-import com.tarantula.game.Room;
-import com.tarantula.game.Stub;
+import com.tarantula.game.*;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.game.service.Rating;
@@ -69,9 +66,17 @@ public class GameZoneModule implements Module{
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        //this.gameServiceProvider = this.context.serviceProvider()
-        mZone = new Zone();
-        mZone.distributionKey(this.context.descriptor().distributionKey());
+        this.gameServiceProvider = this.context.serviceProvider("game-data-service");
+        mZone = this.gameServiceProvider.zone(this.context.descriptor().distributionKey());
+        if(mZone.arenas.length==0) {
+            mZone.arenas = new Arena[]{
+                    new Arena(1, 100, "Amber 1"),
+                    new Arena(2, 200, "Amber 2"),
+                    new Arena(3, 300, "Amber 3"),
+                    new Arena(4, 400, "Amber 4"),
+                    new Arena(5, 500, "Amber 5")};
+            mZone.update();
+        }
         mZone.roomIndex = this.mRoom;
         mZone.stubIndex = this.mStub;
         mZone.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);

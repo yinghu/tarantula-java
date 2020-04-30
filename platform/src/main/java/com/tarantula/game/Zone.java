@@ -18,14 +18,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Created by yinghu lu on 4/14/2020.
  */
-public class Zone extends RecoverableObject implements RoomListener {
-    public Arena[] arenas = {
+public class Zone extends RecoverableObject implements RoomListener,Updatable {
+    public Arena[] arenas = new  Arena[0];
+    /**{
             new Arena(1,100,"Amber 1"),
             new Arena(2,200,"Amber 2"),
             new Arena(3,300,"Amber 3"),
             new Arena(4,400,"Amber 4"),
             new Arena(5,500,"Amber 5")};
-
+    **/
     public int capacity =1;
     public long roundDuration =60000;
     public long overtime = Room.PENDING_TIME;
@@ -164,9 +165,21 @@ public class Zone extends RecoverableObject implements RoomListener {
             arena.xp = Double.parseDouble(lx[1]);
             alist.add(arena);
         });
+        arenas = new Arena[alist.size()];
+        arenas = alist.toArray(arenas);
     }
     @Override
     public Recoverable.Key key(){
         return new AssociateKey(this.bucket,this.oid,this.vertex);
+    }
+
+    @Override
+    public void dataStore(DataStore dataStore) {
+        this.dataStore = dataStore;
+    }
+
+    @Override
+    public void update() {
+        this.dataStore.update(this);
     }
 }
