@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 /**
  * Created by yinghu lu on 6/15/2018.
  */
-public class MonthlyReset implements LeaderBoard.Reset {
+public class MonthlyReset {
 
-    @Override
+
     public boolean reset(LeaderBoard leaderBoard) {
         boolean reset =  LocalDateTime.now().getDayOfMonth()==1;
         if(reset){

@@ -10,6 +10,7 @@ import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.JvmRNG;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -20,13 +21,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class Zone extends RecoverableObject implements RoomListener,Updatable {
     public Arena[] arenas = new  Arena[0];
-    /**{
-            new Arena(1,100,"Amber 1"),
-            new Arena(2,200,"Amber 2"),
-            new Arena(3,300,"Amber 3"),
-            new Arena(4,400,"Amber 4"),
-            new Arena(5,500,"Amber 5")};
-    **/
     public int capacity =1;
     public long roundDuration =60000;
     public long overtime = Room.PENDING_TIME;
@@ -167,6 +161,7 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable {
         });
         arenas = new Arena[alist.size()];
         arenas = alist.toArray(arenas);
+        Arrays.sort(arenas,new ArenaComparator());
     }
     @Override
     public Recoverable.Key key(){

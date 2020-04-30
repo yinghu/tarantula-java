@@ -17,8 +17,6 @@ public interface LeaderBoard extends Recoverable{
     String category(); //The category of statistics eg WonCount, LostCount
     String classifier(); // ONE OF TOTAL, DAILY, WEEKLY, MONTHLY, YEARLY
 
-    void registerReset(Reset reset);
-
     boolean onBoard(String systemId,LeaderBoard.Entry entry);
 
     void reset();
@@ -26,16 +24,10 @@ public interface LeaderBoard extends Recoverable{
 
 
     interface Entry extends Recoverable{
-        String header();
-        String category();
-        String classifier();
+
         String systemId();
         double value();
         void update(String systemId,double replace,long timestamp);
-    }
-
-    interface Reset{
-        boolean reset(LeaderBoard leaderBoard);
     }
 
 }

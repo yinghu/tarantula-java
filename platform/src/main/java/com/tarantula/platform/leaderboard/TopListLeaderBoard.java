@@ -27,7 +27,7 @@ public class TopListLeaderBoard extends RecoverableObject implements LeaderBoard
 
     private EntryComparator comparator = new EntryComparator();
 
-    private Reset reset;
+
     private DataStore dataStore;
     private boolean updating;
 
@@ -116,19 +116,9 @@ public class TopListLeaderBoard extends RecoverableObject implements LeaderBoard
         }
         entryList[index]=entry;
     }
-    public void registerReset(Reset reset){
-        this.reset = reset;
-    }
+
     public void reset(){
-        if(reset.reset(this)){
-            for(Entry e : entryList){
-                e.update("--",0,0);
-                if(updating){
-                    this.dataStore.update(e);
-                }
-            }
-            entryIndex.clear();
-        }
+
     }
     @Override
     public int getFactoryId() {

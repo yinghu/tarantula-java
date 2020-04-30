@@ -34,14 +34,14 @@ public class KeyValueDataStoreModule implements Module {
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        this.dataStore = this.context.dataStore(this.context.descriptor().typeId());
         GameServiceProvider gameServiceProvider = new GameServiceProvider(this.context.descriptor().typeId()+"-service");
         DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.deploy(gameServiceProvider);
+        this.dataStore = gameServiceProvider.dataStore();
         this.context.log("Data store ["+this.context.descriptor().name()+" started ]", OnLog.WARN);
     }
     @Override
     public String label() {
-        return "game-data";
+        return this.context.descriptor().typeId();
     }
 }

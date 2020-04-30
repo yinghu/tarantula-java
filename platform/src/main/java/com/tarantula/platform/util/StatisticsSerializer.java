@@ -20,6 +20,7 @@ public class StatisticsSerializer implements JsonSerializer<Statistics> {
             xv.addProperty("value",kv.getValue());
             ja.add(xv);
         }
+        jo.addProperty("successful",true);
         jo.add("statistics",ja);
         return jo;
     }

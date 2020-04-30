@@ -44,13 +44,15 @@ public class MatchMakingModule implements Module {
     @Override
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
-        String gz = this.context.descriptor().typeId().replace("service","lobby");
-        Lobby lobby = this.context.lobby(gz);
+        String lb = this.context.descriptor().typeId().replace("service","lobby");
+        Lobby lobby = this.context.lobby(lb);
         lobby.entryList().forEach((d)->{
             context.log("Add lobby ->"+d.tag()+" ->rank ["+d.accessRank()+"]",OnLog.WARN);
             mZone.put(d.accessRank(),d);
         });
-        gameServiceProvider = this.context.serviceProvider("game-data-service");
+        String gz = this.context.descriptor().typeId().replace("-service","-data-service");
+        this.gameServiceProvider = this.context.serviceProvider(gz);
+        this.context.log("Statistics started on game service provider ["+gz+"]", OnLog.WARN);
         context.log("Started match making module on ->"+gz, OnLog.WARN);
     }
 

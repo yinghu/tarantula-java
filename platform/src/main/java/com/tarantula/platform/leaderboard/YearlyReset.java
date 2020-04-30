@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 /**
  * Created by yinghu lu on 6/15/2018.
  */
-public class YearlyReset implements LeaderBoard.Reset {
+public class YearlyReset {
 
-    @Override
+
     public boolean reset(LeaderBoard leaderBoard) {
         boolean reset =  LocalDateTime.now().getDayOfYear()==1;
         if(reset){

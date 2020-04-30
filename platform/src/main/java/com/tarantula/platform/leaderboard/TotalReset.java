@@ -5,9 +5,9 @@ import com.tarantula.LeaderBoard;
 /**
  * Created by yinghu lu on 6/15/2018.
  */
-public class TotalReset implements LeaderBoard.Reset {
+public class TotalReset  {
 
-    @Override
+
     public boolean reset(LeaderBoard leaderBoard) {
         return false;
     }

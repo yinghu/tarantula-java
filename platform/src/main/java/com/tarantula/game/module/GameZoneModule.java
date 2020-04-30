@@ -66,7 +66,8 @@ public class GameZoneModule implements Module{
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        this.gameServiceProvider = this.context.serviceProvider("game-data-service");
+        String gz = this.context.descriptor().typeId().replace("-lobby","-data-service");
+        this.gameServiceProvider = this.context.serviceProvider(gz);
         mZone = this.gameServiceProvider.zone(this.context.descriptor().distributionKey());
         if(mZone.arenas.length==0) {
             mZone.arenas = new Arena[]{
