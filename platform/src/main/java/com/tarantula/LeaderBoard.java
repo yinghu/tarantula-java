@@ -1,7 +1,7 @@
 package com.tarantula;
 
 /**
- * Updated by yinghu on 8/24/19
+ * Updated by yinghu on 4/30/20
  */
 public interface LeaderBoard extends Recoverable{
 
@@ -11,8 +11,8 @@ public interface LeaderBoard extends Recoverable{
     String MONTHLY = "M";
     String YEARLY = "Y";
 
-    String name(); //Board name eg top10, top100
     int size();
+    String name(); //Board name eg top10, top100
     String header();//The statistics group name eg a game name blackjack
     String category(); //The category of statistics eg WonCount, LostCount
     String classifier(); // ONE OF TOTAL, DAILY, WEEKLY, MONTHLY, YEARLY
@@ -29,5 +29,7 @@ public interface LeaderBoard extends Recoverable{
         double value();
         void update(String systemId,double replace,long timestamp);
     }
-
+    interface Reset{
+        boolean reset();
+    }
 }
