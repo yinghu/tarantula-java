@@ -2,14 +2,11 @@ package com.tarantula.game.service;
 
 import com.tarantula.DataStore;
 import com.tarantula.Statistics;
-import com.tarantula.game.Stub;
 import com.tarantula.game.Zone;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.DeltaStatistics;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.ServiceProvider;
-
-import javax.print.attribute.standard.MediaSize;
 
 /**
  * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
@@ -27,9 +24,7 @@ public class GameServiceProvider implements ServiceProvider {
     public GameServiceProvider(String name){
         NAME = name;
     }
-    public DataStore dataStore(){
-        return this.dataStore;
-    }
+
     public Rating rating(String systemId){
         Rating rating = new Rating();
         rating.distributionKey(systemId);

@@ -8,10 +8,8 @@ import com.tarantula.Session;
 import com.tarantula.game.*;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.game.service.Rating;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.ResponseSerializer;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
 /**
@@ -28,8 +26,6 @@ public class GameZoneModule implements Module{
     @Override
     public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp
-        Rating rating = new Rating();
-        rating.fromMap(SystemUtil.toMap(session.payload()));
         Stub stub = mZone.room().join();
         stub.tag = this.context.descriptor().tag();
         stub.owner(session.systemId());
@@ -66,7 +62,7 @@ public class GameZoneModule implements Module{
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        String gz = this.context.descriptor().typeId().replace("-lobby","-data-service");
+        String gz = this.context.descriptor().typeId().replace("-lobby","-service");
         this.gameServiceProvider = this.context.serviceProvider(gz);
         mZone = this.gameServiceProvider.zone(this.context.descriptor().distributionKey());
         if(mZone.arenas.length==0) {
@@ -77,6 +73,9 @@ public class GameZoneModule implements Module{
                     new Arena(4, 400, "Amber 4"),
                     new Arena(5, 500, "Amber 5")};
             mZone.update();
+        }
+        for(Arena a : mZone.arenas){
+            context.log(a.toString(),OnLog.WARN);
         }
         mZone.roomIndex = this.mRoom;
         mZone.stubIndex = this.mStub;

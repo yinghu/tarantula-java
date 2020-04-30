@@ -3,7 +3,9 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
+import com.tarantula.game.RatingSerializer;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.Rating;
 import com.tarantula.platform.DeltaStatistics;
 import com.tarantula.platform.util.StatisticsSerializer;
 
@@ -14,7 +16,15 @@ public class StatisticsModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         //fetch statistics from systemId
-        if(session.action().equals("OnStatistics")){
+        if(session.action().equals("onRating")){
+            Rating rating = this.gameServiceProvider.rating(session.systemId());
+            session.write(this.builder.create().toJson(rating).getBytes(),label());
+        }
+        else if(session.action().equals("OnStatistics")){
+            Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
+            session.write(this.builder.create().toJson(statistics).getBytes(),label());
+        }
+        else if(session.action().equals("OnLeaderBoard")){
             Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
             session.write(this.builder.create().toJson(statistics).getBytes(),label());
         }
@@ -29,7 +39,8 @@ public class StatisticsModule implements Module {
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(DeltaStatistics.class,new StatisticsSerializer());
-        String gz = this.context.descriptor().typeId().replace("-statistics","-data-service");
+        this.builder.registerTypeAdapter(Rating.class,new RatingSerializer());
+        String gz = this.context.descriptor().typeId().replace("-statistics","-service");
         this.gameServiceProvider = this.context.serviceProvider(gz);
         this.context.log("Statistics started on game service provider ["+gz+"]", OnLog.WARN);
     }

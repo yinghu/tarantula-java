@@ -5,7 +5,7 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;
 import java.nio.ByteBuffer;
 /**
- * Updated by yinghu on 6/17/19.
+ * Updated by yinghu on 4/30/2020
  */
 public class PresenceIndex extends RecoverableObject implements Presence {
     private double balance;
@@ -36,25 +36,38 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public void registerEventService(EventService eventService){
         this.eventService = eventService;
     }
+    public Response onPlay(Session session,Descriptor desc){
+        Response resp = null;
+        if(this.transact(desc.entryCost()*(-1))){
+            fastJoin(session,desc,new byte[0]);
+        }
+        else{
+            resp = new ResponseHeader("onPlay",false,Response.INSUFFICIENT_BALANCE,"not enough balance","error");
+        }
+        return resp;
+    }
+    private void fastJoin(Session session,Descriptor desc,byte[] payload){
+        SessionForward fd = new SessionForward(session.source(),session.sessionId());
+        FastPlayEvent fe = new FastPlayEvent(desc.distributionKey(),fd);
+        fe.systemId(session.systemId());
+        fe.stub(session.stub());
+        fe.routingNumber(session.routingNumber());
+        fe.accessMode(Session.FAST_PLAY_MODE);
+        fe.balance(desc.entryCost());
+        fe.ticket(session.ticket());
+        fe.forwarding(true);
+        fe.payload(payload);
+        RoutingKey rk = this.eventService.routingKey(session.systemId(),desc.tag());//route to player node
+        fe.destination(rk.route());
+        this.eventService.publish(fe);
+    }
     public Response onPlay(Session session,OnAccess onAccess,Descriptor desc){
         Response resp = null;
         if(this.transact(desc.entryCost() * (-1))){
             switch (onAccess.accessMode()){
                 case Session.FAST_PLAY_MODE:
                     //distributed on application Id
-                    SessionForward fd = new SessionForward(session.source(),session.sessionId());
-                    FastPlayEvent fe = new FastPlayEvent(desc.distributionKey(),fd);
-                    fe.systemId(session.systemId());
-                    fe.stub(session.stub());
-                    fe.routingNumber(session.routingNumber());
-                    fe.accessMode(Session.FAST_PLAY_MODE);
-                    fe.balance(desc.entryCost());
-                    fe.ticket(session.ticket());
-                    fe.forwarding(true);
-                    fe.payload(onAccess.payload());
-                    RoutingKey rk = this.eventService.routingKey(session.systemId(),desc.tag());//route to player node
-                    fe.destination(rk.route());
-                    this.eventService.publish(fe);
+                    fastJoin(session,desc,onAccess.payload());
                     break;
                 case Session.INSTANCE_PLAY_MODE:
                     SessionForward fxd = new SessionForward(session.source(),session.sessionId());
