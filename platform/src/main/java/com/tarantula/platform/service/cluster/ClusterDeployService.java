@@ -308,10 +308,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             hList.add(h);
             batchCache = new BatchCache(UUID.randomUUID().toString(),hList);
         }
-        else if(registryId==PortableRegistry.STATISTICS_ENTRY_CID){
-            List vlist = dataStore.list(new StatisticsEntryQuery(params[0]));
-            batchCache = new BatchCache(UUID.randomUUID().toString(),vlist);
-        }
         else if(registryId==PortableRegistry.ON_VIEW_OID){
             List vlist = dataStore.list(new OnViewQuery(params[0]));
             batchCache = new BatchCache(UUID.randomUUID().toString(),vlist);

@@ -1,38 +1,24 @@
 package com.tarantula.platform;
 import com.tarantula.*;
 import com.tarantula.platform.service.cluster.PortableRegistry;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Updated by yinghu on 8/23/19.
+ * Updated by yinghu on 4/29/2020
  */
-public class DeltaStatistics extends OnApplicationHeader implements Statistics {
+public class DeltaStatistics extends RecoverableObject implements Statistics {
 
     private Map<String,Entry> mappings = new ConcurrentHashMap<>();
-
+    private DataStore dataStore;
     public DeltaStatistics(){
         this.vertex = "Statistics";
-        this.label = "STAT";
     }
 
-    public void entry(Entry entry){
-        this.mappings.put(entry.name(),entry);
-    }
-    public void value(String key, double value) {
-        this.mappings.compute(key,(k,v)->{
-            if(v==null){
-                v = new StatisticsEntry(key);
-                v.owner(this.key().asString());
-                dataStore.create(v);
-            }
-            if(value>0){//skip query value with 0 value
-                v.value(value);
-                dataStore.update(v);
-            }
-            return v;
-        });
+    public Entry entry(String key) {
+        return this.mappings.computeIfAbsent(key,(k)->new StatisticsEntry(k));
     }
     public Map<String,Double> summary(){
         Map<String,Double> _mv = new HashMap<>();
@@ -53,30 +39,30 @@ public class DeltaStatistics extends OnApplicationHeader implements Statistics {
 
     @Override
     public Map<String,Object> toMap(){
-
+        this.mappings.forEach((k,v)->{
+            this.properties.put(v.name(),v.value());
+        });
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-
+        properties.forEach((k,v)->{
+            double vo = ((Number)v).doubleValue();
+            mappings.put(k,new StatisticsEntry(k,vo));
+        });
     }
     @Override
     public Key key(){
         return new AssociateKey(this.bucket,this.oid,this.vertex);
     }
-    @Override
-    public String toString(){
-        return "On Statistics ["+this.vertex+"]";
-    }
 
-    public void dataStore(DataStore dataStore){
+    @Override
+    public void dataStore(DataStore dataStore) {
         this.dataStore = dataStore;
     }
-    public void update(){
-        this.dataStore.update(this);
-        mappings.forEach((k,v)->{
-            dataStore.update(v);
-        });
-    }
 
+    @Override
+    public void update() {
+        this.dataStore.update(this);
+    }
 }

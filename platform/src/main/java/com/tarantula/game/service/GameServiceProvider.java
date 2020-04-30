@@ -19,36 +19,23 @@ public class GameServiceProvider implements ServiceProvider {
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
-    private static double BASE_POINTS = 100;
     private static int ELO_K = 30;
     private DataStore dataStore;
     public GameServiceProvider(String name){
         NAME = name;
     }
-    public Rating xp(Stub stub){
-        Rating rating = this.rating(stub.owner());
-        double dxp = (1/stub.rank+stub.pxp)*BASE_POINTS;
-        if(rating.csw>0){
-            dxp = dxp+(rating.csw+1)*BASE_POINTS;
-            rating.csw++;
-        }
-        rating.zxp += dxp;
-        rating.xp += dxp;
-        this.dataStore.update(rating);
-        return rating;
-    }
+
     public Rating rating(String systemId){
         Rating rating = new Rating();
         rating.distributionKey(systemId);
         this.dataStore.createIfAbsent(rating,true);
+        rating.dataStore(this.dataStore);
         return rating;
     }
-    public void elo(Stub stub1,Stub stub2){
-        Rating rating1 = this.rating(stub1.owner());
-        Rating rating2 = this.rating(stub2.owner());
+    public void elo(Rating rating1,Rating rating2){
         double p1 = probability(rating2.elo,rating1.elo);
         double p2 = probability(rating1.elo,rating2.elo);
-        if (stub1.rank-stub2.rank>0) {//1 win
+        if (rating1.rank-rating1.rank>0) {//1 win
             rating1.elo = rating1.elo + ELO_K * (1 - p1);
             rating2.elo = rating2.elo + ELO_K * (0 - p2);
         }
@@ -56,14 +43,12 @@ public class GameServiceProvider implements ServiceProvider {
             rating1.elo = rating1.elo + ELO_K * (0 - p1);
             rating2.elo = rating2.elo + ELO_K * (1 - p2);
         }
-        this.dataStore.update(rating1);
-        this.dataStore.update(rating2);
     }
     public Statistics statistics(String systemId){
         DeltaStatistics deltaStatistics = new DeltaStatistics();
         deltaStatistics.distributionKey(systemId);
-        deltaStatistics.dataStore(dataStore);
-
+        this.dataStore.createIfAbsent(deltaStatistics,true);
+        deltaStatistics.dataStore(this.dataStore);
         return deltaStatistics;
     }
     @Override

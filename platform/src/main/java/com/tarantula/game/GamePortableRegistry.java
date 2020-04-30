@@ -12,7 +12,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
     public static final int OID = 10;
 
     public static final int RATING_CID = 1;
-    public static final int ARENA_CID = 2;
+    public static final int ZONE_CID = 2;
     public static final int ROOM_CID = 3;
     public static final int STUB_CID = 4;
     @Override
@@ -27,8 +27,8 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
             case RATING_CID:
                 pt = new Rating();
                 break;
-            case ARENA_CID:
-                pt = new Arena();
+            case ZONE_CID:
+                pt = new Zone();
                 break;
             case ROOM_CID:
                 pt = new Room();

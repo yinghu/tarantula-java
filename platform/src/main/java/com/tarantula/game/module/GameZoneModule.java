@@ -5,10 +5,11 @@ import com.tarantula.ApplicationContext;
 import com.tarantula.Module;
 import com.tarantula.OnLog;
 import com.tarantula.Session;
-import com.tarantula.game.Arena;
+import com.tarantula.game.Zone;
 import com.tarantula.game.GameObject;
 import com.tarantula.game.Room;
 import com.tarantula.game.Stub;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.game.service.Rating;
 import com.tarantula.platform.service.DeploymentServiceProvider;
@@ -22,17 +23,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameZoneModule implements Module{
 
     private ApplicationContext context;
-    private ConcurrentHashMap<Integer, Arena> mArena = new ConcurrentHashMap<>();
+    private Zone mZone;
     private ConcurrentHashMap<String, Stub> mStub = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Room> mRoom = new ConcurrentHashMap<>();
     private GsonBuilder builder;
+    private GameServiceProvider gameServiceProvider;
     @Override
     public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp
         Rating rating = new Rating();
         rating.fromMap(SystemUtil.toMap(session.payload()));
-        Arena arena = mArena.get(rating.level);
-        Stub stub = arena.room().join();
+        Stub stub = mZone.room().join();
         stub.tag = this.context.descriptor().tag();
         stub.owner(session.systemId());
         GameObject gameObject = new GameObject();
@@ -68,20 +69,19 @@ public class GameZoneModule implements Module{
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        Arena arena = new Arena();
-        arena.roomIndex = this.mRoom;
-        arena.stubIndex = this.mStub;
-        arena.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        arena.descriptor = this.context.descriptor();
-        arena.start();
-        mArena.put(arena.level,arena);
-        context.log(this.context.descriptor().tag()+"/"+this.context.descriptor().accessRank(),OnLog.WARN);
+        //this.gameServiceProvider = this.context.serviceProvider()
+        mZone = new Zone();
+        mZone.distributionKey(this.context.descriptor().distributionKey());
+        mZone.roomIndex = this.mRoom;
+        mZone.stubIndex = this.mStub;
+        mZone.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        mZone.descriptor = this.context.descriptor();
+        mZone.start();
+        context.log(this.mZone.descriptor.tag()+"/"+this.mZone.descriptor.accessRank()+"/"+this.mZone.descriptor.distributionKey(),OnLog.WARN);
     }
     @Override
     public void onTimer(OnUpdate update){
-        mArena.forEach((k,v)->{
-            v.onTimer(update);
-        });
+        mZone.onTimer(update);
     }
     @Override
     public String label() {

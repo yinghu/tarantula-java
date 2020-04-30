@@ -2,6 +2,7 @@ package com.tarantula.game.module;
 
 import com.tarantula.*;
 import com.tarantula.Module;
+import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.game.service.Rating;
@@ -24,6 +25,18 @@ public class MatchMakingModule implements Module {
             access.payload(SystemUtil.toJson(rating.toMap()));
             access.accessMode(Session.FAST_PLAY_MODE);
             context.presence(session.systemId()).onPlay(session,access,mZone.get(rating.rank));
+
+            rating.update(new Stub());
+            rating.update();
+            context.log(rating.toString(),OnLog.WARN);
+            Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
+            context.log(statistics.toString(),OnLog.WARN);
+            statistics.entry("jc").value(1);
+            statistics.entry("kc").value(1);
+            statistics.entry("wc").value(1);
+            statistics.update();
+            context.log(statistics.toString(),OnLog.WARN);
+
         }
         return false;
     }

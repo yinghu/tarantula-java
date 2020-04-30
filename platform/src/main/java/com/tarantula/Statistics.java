@@ -5,14 +5,14 @@ import java.util.Map;
 /**
  * Updated by yinghu on 8/23/2019.
  */
-public interface Statistics extends OnApplication{
+public interface Statistics extends Recoverable,Updatable{
 
 
-    void value(String key,double value);
+    Entry entry(String key);
 
     Map<String,Double> summary();
 
-    interface Entry extends Recoverable{
+    interface Entry{
         String name();
         double value();
         void value(double value);

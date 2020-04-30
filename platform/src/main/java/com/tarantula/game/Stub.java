@@ -13,8 +13,8 @@ public class Stub extends RecoverableObject {
     public int seat;
     public String tag;
 
-    public int rank; //rank of game 1 basis
-    public double pxp; //percentage of game xp 100 basis
+    public int rank = 2; //rank of game 1 basis
+    public double pxp = 30; //percentage of game xp 100 basis
 
     /**
      * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30

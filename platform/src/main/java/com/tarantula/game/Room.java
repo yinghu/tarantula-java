@@ -24,9 +24,14 @@ public class Room extends RecoverableObject {
     static final long PENDING_TIME = 5000;//5 SECONDS
     static final long TIMER_DELTA = 1000; //1 SECOND
     static final int CONNECTION_RETRIES = 3; //1 SECOND
+
+    static final int DEDICATED_MODE = 2;
+    static final int INTEGRATED_MODE = 1;
+    static final int OFF_LINE_MODE = 0;
+
     private int capacity;
     private int totalJoined;
-    private boolean dedicated;
+    private boolean online;
     private Connection connection;
     private int retries;
     private long initialTime;
@@ -73,10 +78,10 @@ public class Room extends RecoverableObject {
         }
         return true;
     }
-    public void start(int capacity,long duration,boolean dedicated,RoomListener roomListener){
+    public void start(int capacity,long duration,boolean online,RoomListener roomListener){
         this.capacity = capacity;
         this.duration = duration;
-        this.dedicated = dedicated;
+        this.online = online;
         this.initialTime = PENDING_TIME;
         this.overtime = PENDING_TIME;
         this.round++;
@@ -136,7 +141,7 @@ public class Room extends RecoverableObject {
                 initialTime -=TIMER_DELTA;
                 if(initialTime>=0){
                     update.on(oid+"?onTimer",new Countdown(initialTime,state,totalJoined).toJson().toString().getBytes());
-                    if(dedicated&&this.connection==null){//fetch connection per timer loop
+                    if(online&&this.connection==null){//fetch connection per timer loop
                         this.connection = this.roomListener.onConnection(this);
                         if(this.connection!=null){
                             this.roomListener.onConnecting(this);
@@ -144,7 +149,7 @@ public class Room extends RecoverableObject {
                     }
                 }
                 else{
-                    if(!dedicated){//offline mode
+                    if(!online){//offline mode
                         state = STARTING;
                         update.on(oid+"?onStart",this.roomListener.onStarting(this));
                     }else{

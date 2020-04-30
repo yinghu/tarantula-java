@@ -12,11 +12,7 @@ import java.util.Map;
 public class StatisticsSerializer implements JsonSerializer<Statistics> {
 
     public JsonElement serialize(Statistics statistics, Type type, JsonSerializationContext jsonSerializationContext) {
-
         JsonObject jo  = new JsonObject();
-        jo.addProperty("applicationId",statistics.applicationId());
-        jo.addProperty("instanceId",statistics.instanceId());
-        jo.addProperty("name",statistics.name());
         JsonArray ja = new JsonArray();
         for(Map.Entry<String,Double> kv : statistics.summary().entrySet()){
             JsonObject xv = new JsonObject();
@@ -24,7 +20,7 @@ public class StatisticsSerializer implements JsonSerializer<Statistics> {
             xv.addProperty("value",kv.getValue());
             ja.add(xv);
         }
-        jo.add("summary",ja);
+        jo.add("statistics",ja);
         return jo;
     }
 }

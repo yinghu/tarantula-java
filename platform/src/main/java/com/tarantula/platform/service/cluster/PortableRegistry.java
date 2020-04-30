@@ -19,7 +19,7 @@ public class PortableRegistry extends AbstractRecoverableListener{
     public static final int APPLICATION_CONFIGURATION_CID = 11; //DEPLOY OBJECT
     public static final int ON_LOBBY_CID = 12;
     public static final int ON_VIEW_OID = 13; //DEPLOY OBJECT
-    public static final int STATISTICS_ENTRY_CID = 14; //DEPLOY OBJECT
+
     public static final int NODE_CID = 15;
 
     public static final int SERVICE_CONFIGURATION_CID = 20;//DEPLOY OBJECT
@@ -67,9 +67,6 @@ public class PortableRegistry extends AbstractRecoverableListener{
                 break;
             case ON_VIEW_OID:
                 _ins = new OnViewTrack();
-                break;
-            case STATISTICS_ENTRY_CID:
-                _ins = new StatisticsEntry();
                 break;
             case NODE_CID:
                 _ins = new Node();
