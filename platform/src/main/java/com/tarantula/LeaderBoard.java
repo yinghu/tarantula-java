@@ -30,6 +30,6 @@ public interface LeaderBoard extends Recoverable{
         void update(String systemId,double replace,long timestamp);
     }
     interface Reset{
-        boolean reset();
+        boolean reset(LeaderBoard leaderBoard);
     }
 }
