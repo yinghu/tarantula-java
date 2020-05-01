@@ -43,7 +43,7 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
             room = new Room();
             room.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
             rList.add(room);
-            roomIndex.put(room.oid(),room);
+            roomIndex.put(room.roomId,room);
         }
         return room;
     }
@@ -54,7 +54,7 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
             room.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
             rQueue.offer(room);
             rList.add(room);
-            roomIndex.put(room.oid(),room);
+            roomIndex.put(room.roomId,room);
         }
     }
     public void onTimer(Module.OnUpdate update){
@@ -145,7 +145,7 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
         jo.addProperty("duration",roundDuration/1000);
         jo.addProperty("overtime",overtime/1000);
         jo.addProperty("totalJoined",room.totalJoined());
-        jo.addProperty("roomId",room.oid());
+        jo.addProperty("roomId",room.roomId);
         JsonArray ja = new JsonArray();
         for(Stub p : room.playerList()){
             JsonObject jb = new JsonObject();
@@ -159,7 +159,7 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
     @Override
     public Map<String,Object> toMap(){
         for(Arena a : arenas){
-            this.properties.put(a.name,a.level+","+a.xp);
+            this.properties.put(a.name,a.level+","+a.xp+","+a.capacity+","+a.duration+","+a.playMode);
         }
         return this.properties;
     }
@@ -172,6 +172,9 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
             String[] lx = ((String)v).split(",");
             arena.level = Integer.parseInt(lx[0]);
             arena.xp = Double.parseDouble(lx[1]);
+            arena.capacity = Integer.parseInt(lx[2]);
+            arena.duration = Integer.parseInt(lx[3]);
+            arena.playMode = Integer.parseInt(lx[4]);
             alist.add(arena);
         });
         arenas = new Arena[alist.size()];

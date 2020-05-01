@@ -42,7 +42,7 @@ public class GameZoneModule implements Module{
             Stub stub = mStub.get(session.systemId());
             Room room = mRoom.get(stub.roomId);
             session.write("{}".getBytes(),label());
-            update.on(room.oid()+"?onMessage",payload);
+            update.on(room.roomId+"?onMessage",payload);
         }
         else if(session.action().equals("onLeave")){
             Stub stub = mStub.get(session.systemId());

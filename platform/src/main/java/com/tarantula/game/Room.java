@@ -35,7 +35,7 @@ public class Room{
     private long initialTime;
     private long duration;
     private long overtime;
-    private String oid;
+    public String roomId;
     private int round;
     private int state;
     private Stub[] stubs;
@@ -44,7 +44,7 @@ public class Room{
     private RoomListener roomListener;
 
     public Room(){
-        this.oid = UUID.randomUUID().toString();
+        this.roomId = UUID.randomUUID().toString();
     }
 
     public synchronized Stub join(){
@@ -94,7 +94,7 @@ public class Room{
         this.pQueue.clear();
         this.stubs = new Stub[this.capacity];
         for(int i=0;i<this.capacity;i++){
-            Stub stub = new Stub(i,oid);
+            Stub stub = new Stub(i,roomId);
             this.pQueue.offer(stub);
             this.stubs[i] = stub;
         }
@@ -119,12 +119,12 @@ public class Room{
                 if(initialTime<=0){
                     initialTime = PENDING_TIME;
                 }
-                update.on(oid+"?onTimer",new Countdown(initialTime,state,totalJoined).toJson().toString().getBytes());
+                update.on(roomId+"?onTimer",new Countdown(initialTime,state,totalJoined).toJson().toString().getBytes());
                 break;
             case INITIALIZING:
                 initialTime -=TIMER_DELTA;
                 if(initialTime>=0){
-                    update.on(oid+"?onTimer",new Countdown(initialTime,state,totalJoined).toJson().toString().getBytes());
+                    update.on(roomId+"?onTimer",new Countdown(initialTime,state,totalJoined).toJson().toString().getBytes());
                     if(online&&this.connection==null){//fetch connection per timer loop
                         this.connection = this.roomListener.onConnection(this);
                         if(this.connection!=null){
@@ -135,11 +135,11 @@ public class Room{
                 else{
                     if(!online){//offline mode
                         state = STARTING;
-                        update.on(oid+"?onStart",this.roomListener.onStarting(this));
+                        update.on(roomId+"?onStart",this.roomListener.onStarting(this));
                     }else{
                         if(this.connection!=null){//go to
                             state = STARTING;
-                            update.on(oid+"?onStart",this.roomListener.onStarting(this));
+                            update.on(roomId+"?onStart",this.roomListener.onStarting(this));
                         }
                         else{
                             retries--;
@@ -156,7 +156,7 @@ public class Room{
                 duration -=TIMER_DELTA;
                 if(duration<=0){//goes to overtime
                     state = OVERTIME;
-                    update.on(oid+"?onOvertime",new Countdown(overtime,state,totalJoined).toJson().toString().getBytes());
+                    update.on(roomId+"?onOvertime",new Countdown(overtime,state,totalJoined).toJson().toString().getBytes());
                 }
                 //else if(!dedicated){
                     //update.on(oid+"?onTimer",new Countdown(duration,state,totalJoined).toJson().toString().getBytes());
@@ -172,7 +172,7 @@ public class Room{
                 //}
                 break;
             case ENDING:
-                update.on(oid+"?onEnd",null);
+                update.on(roomId+"?onEnd",null);
                 state = PENDING_END;
                 initialTime = PENDING_TIME;
                 break;
