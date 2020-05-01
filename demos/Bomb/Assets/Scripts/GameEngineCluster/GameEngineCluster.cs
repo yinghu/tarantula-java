@@ -108,7 +108,11 @@ namespace Tarantula.Networking{
       
         public  async Task<bool> OnIndex(MonoBehaviour caller){
             try{
-                string jstr = await _ghc.GetJson(caller,"/user/index",new Header[]{new Header("Tarantula-tag","index/lobby")});
+                Header[] headers = new Header[]{
+                    new Header("Tarantula-tag","index/lobby"),
+                    new Header("Tarantula-type-id","game-lobby")
+                };
+                string jstr = await _ghc.GetJson(caller,"/user/index",headers);
                 return ParseIndex(jstr);
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_INDEX);
@@ -149,33 +153,37 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> OnGameUpdated(MonoBehaviour caller,Action<string> callback){
+        public  async Task<bool> OnGameUpdated(MonoBehaviour caller,Stat[] stats){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-server-id",deviceId),
                     new Header("Tarantula-access-key",accessKey),
                     new Header("Tarantula-action","onUpdated")
                 };
-                string json = JsonConvert.SerializeObject(room,JSON_SETTING);
+                Payload p = new Payload();
+                p.stats = stats;
+                string json = JsonConvert.SerializeObject(p,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,json);
-                callback(jstr);
-                return true;//           
+                return true;         
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_DEDICATED);
                 return false;
             }
         }
-        public  async Task<bool> OnGameEnded(MonoBehaviour caller,Action<string> callback){
+        public  async Task<bool> OnGameEnded(MonoBehaviour caller,Stat[] stats,Rating[] ratings,Action<string> callback){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-server-id",deviceId),
                     new Header("Tarantula-access-key",accessKey),
                     new Header("Tarantula-action","onEnded")
                 };
-                string json = JsonConvert.SerializeObject(room,JSON_SETTING);
+                Payload p = new Payload();
+                p.stats = stats;
+                p.ratings = ratings;
+                string json = JsonConvert.SerializeObject(p,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,json);
                 callback(jstr);
-                return true;//           
+                return true;           
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_DEDICATED);
                 return false;
@@ -199,7 +207,7 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-       public  async Task<bool> Logout(MonoBehaviour caller){
+       public  async Task<bool> OnLogout(MonoBehaviour caller){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-tag","presence/lobby"),
@@ -610,8 +618,29 @@ namespace Tarantula.Networking{
     public class Payload{
         public string command;
         public Header[] headers;
+        public Stat[] stats;
+        public Rating[] ratings;
     }
-    
+    public class Stat{
+        public int seat {get; set; }
+        public string name { get; set; }
+        public double value { get; set; }
+        public Stat(int seat,string name,double value){
+            this.seat = seat;
+            this.name = name;
+            this.value = value;
+        }
+    }
+    public class Rating{
+        public int seat{ set; get; }
+        public int rank { set; get; }
+        public double xp {set; get; }
+        public Rating(int seat, int rank,double xp){
+            this.seat = seat;
+            this.rank = rank;
+            this.xp = xp;        
+        }
+    }
     public class Streaming{
         public string path;
         public string action;
@@ -674,7 +703,6 @@ namespace Tarantula.Networking{
         public int s{set;get;}
     }
     public class Stub{
-        public int rank{set;get;}
         public int seat{set;get;}
         public string owner{set;get;}
         public string roomId{set;get;}

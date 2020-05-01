@@ -81,7 +81,7 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
     @Override
     public Connection onConnection(Room room){
         String cType = playMode==Room.INTEGRATED_MODE?"tarantula":descriptor.typeId();
-        return deploymentServiceProvider.onUDPConnection(cType,new RoomStateListener(room));
+        return deploymentServiceProvider.onUDPConnection(cType,new RoomStateListener(room,gameServiceProvider));
     }
     @Override
     public void onConnecting(Room room){

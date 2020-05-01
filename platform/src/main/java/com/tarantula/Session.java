@@ -13,6 +13,7 @@ public interface Session extends OnApplication{
     //tarantula headers
     String TARANTULA_APPLICATION_ID ="Tarantula-application-id";
     String TARANTULA_INSTANCE_ID ="Tarantula-instance-id";
+    String TARANTULA_TYPE_ID ="Tarantula-type-id";
     String TARANTULA_VIEW_ID ="View-id";
     String TARANTULA_TOKEN ="Tarantula-token";
     String TARANTULA_PAYLOAD_SIZE ="Tarantula-payload-size";

@@ -37,6 +37,7 @@ public class UserEventHandler implements RequestHandler {
             String magicKey = onExchange.header(Session.TARANTULA_MAGIC_KEY);
             String tag = onExchange.header(Session.TARANTULA_TAG);
             String action = onExchange.header(Session.TARANTULA_ACTION);
+            String typeId = onExchange.header(Session.TARANTULA_TYPE_ID);
             String  sid = onExchange.id();
             this._hex.put(sid,onExchange);
             if(path.equals("/user/action")){
@@ -110,6 +111,7 @@ public class UserEventHandler implements RequestHandler {
                 IndexEvent indexEvent = new IndexEvent(this.serverTopic,sid);
                 indexEvent.destination(routingKey.route());
                 indexEvent.action("index");
+                indexEvent.trackId(typeId);
                 this.eventService.publish(indexEvent);
             }
             else if(path.equals("/user/view")){

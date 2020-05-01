@@ -13,8 +13,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
 
     public static final int RATING_CID = 1;
     public static final int ZONE_CID = 2;
-    public static final int ROOM_CID = 3;
-    public static final int STUB_CID = 4;
+    public static final int STUB_CID = 3;
     @Override
     public int registryId() {
         return OID;
@@ -29,9 +28,6 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
                 break;
             case ZONE_CID:
                 pt = new Zone();
-                break;
-            case ROOM_CID:
-                pt = new Room();
                 break;
             case STUB_CID:
                 pt = new Stub();

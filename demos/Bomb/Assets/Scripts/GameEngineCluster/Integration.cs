@@ -133,7 +133,7 @@ public class Integration : MonoBehaviour{
             if(inGame){
                 await integration.OnLeave(this);
             }
-            await integration.Logout(this);
+            await integration.OnLogout(this);
             pendingClick = false;
             inGame = false;
             connected = false;

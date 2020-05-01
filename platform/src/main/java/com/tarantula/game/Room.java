@@ -2,16 +2,14 @@ package com.tarantula.game;
 
 import com.tarantula.Connection;
 import com.tarantula.Module;
-import com.tarantula.platform.RecoverableObject;
 
 import java.util.ArrayDeque;
-import java.util.Map;
 import java.util.UUID;
 
 /**
  * Created by yinghu lu on 4/14/2020.
  */
-public class Room extends RecoverableObject {
+public class Room{
 
     static final int WAITING = 0; //waiting for first join
     static final int PENDING_JOIN = 1; //waiting after first join
@@ -37,7 +35,7 @@ public class Room extends RecoverableObject {
     private long initialTime;
     private long duration;
     private long overtime;
-
+    private String oid;
     private int round;
     private int state;
     private Stub[] stubs;
@@ -71,6 +69,9 @@ public class Room extends RecoverableObject {
         pQueue.offer(stub);
         roomListener.onWaiting(this);
         return true;
+    }
+    public synchronized void update(Stub stub){
+        Stub _onb = stubs[stub.seat];
     }
     public synchronized boolean end(){
         if(state==STARTING||state==OVERTIME){
@@ -109,25 +110,8 @@ public class Room extends RecoverableObject {
     public Connection connection(){
         return this.connection;
     }
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("totalJoined",totalJoined);
-        this.properties.put("round",this.round);
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.totalJoined =((Number)properties.get("totalJoined")).intValue();
-        this.round = ((Number)properties.get("round")).intValue();
-    }
-    @Override
-    public int getFactoryId() {
-        return GamePortableRegistry.OID;
-    }
-    @Override
-    public int getClassId() {
-        return GamePortableRegistry.ROOM_CID;
-    }
+
+
     public synchronized void onTimer(Module.OnUpdate update){
         switch (state){
             case PENDING_JOIN:

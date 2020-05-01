@@ -29,10 +29,16 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
         }
         else if(session.action().equals("index")){
             PresenceContext ic = new PresenceContext("index");
+            String typeId = session.trackId();
             OnView view = this._viewList.get("index");
             ic.lobbyList = this.context.index();
             _lobbyList.forEach((n)->{
-                ic.lobbyList.add(this.context.lobby(n));
+                if(typeId!=null&&typeId.equals(n)){
+                    ic.lobbyList.add(this.context.lobby(n));
+                }
+                else if(typeId==null){
+                    ic.lobbyList.add(this.context.lobby(n));
+                }
             });
             ic.view = view;
             session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
