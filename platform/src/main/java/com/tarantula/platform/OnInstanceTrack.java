@@ -89,12 +89,4 @@ public class OnInstanceTrack extends OnApplicationHeader implements OnInstance {
         return this.idle;
     }
 
-    public void dataStore(DataStore dataStore){
-        this.dataStore = dataStore;
-    }
-    @Override
-    public void update(){
-        this.dataStore.update(this);
-    }
-
 }

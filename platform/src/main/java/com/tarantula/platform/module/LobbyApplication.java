@@ -163,7 +163,7 @@ public class LobbyApplication extends TarantulaApplicationHeader implements OnIn
         this.context.log("Lobby application is started on ["+this.onLobby()+"]",OnLog.INFO);
     }
     public void onBucket(int bucket,int state) {
-        this.context.log(bucket+"/"+state,OnLog.INFO);
+        //this.context.log(bucket+"/"+state,OnLog.INFO);
     }
     @Override
     public void onUpdated(OnInstance onInstance) {

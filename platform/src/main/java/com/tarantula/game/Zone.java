@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.Module;
+import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.Rating;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.service.DeploymentServiceProvider;
@@ -19,7 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Created by yinghu lu on 4/14/2020.
  */
-public class Zone extends RecoverableObject implements RoomListener,Updatable {
+public class Zone extends RecoverableObject implements RoomListener,Updatable{
     public Arena[] arenas = new  Arena[0];
     public int capacity =1;
     public long roundDuration =60000;
@@ -28,10 +30,10 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable {
     public ConcurrentHashMap<String,Room> roomIndex;
     public ConcurrentHashMap<String,Stub> stubIndex;
     public DeploymentServiceProvider deploymentServiceProvider;
+    public GameServiceProvider gameServiceProvider;
     public Descriptor descriptor;
     private CopyOnWriteArrayList<Room> rList = new CopyOnWriteArrayList<>();
     private ConcurrentLinkedDeque<Room> rQueue = new ConcurrentLinkedDeque<>();
-    private RNG rng = new JvmRNG();
     public Zone(){
         this.vertex = "Zone";
     }
@@ -79,10 +81,7 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable {
     @Override
     public Connection onConnection(Room room){
         String cType = playMode==Room.INTEGRATED_MODE?"tarantula":descriptor.typeId();
-        return deploymentServiceProvider.onUDPConnection(cType,(c)->{
-            System.out.println(new String(c));
-            room.end();
-        });
+        return deploymentServiceProvider.onUDPConnection(cType,new RoomStateListener(room));
     }
     @Override
     public void onConnecting(Room room){
@@ -91,7 +90,14 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable {
     @Override
     public byte[] onStarting(Room room){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("arena",arenas[rng.onNext(5)].name);
+        int mLevel = 10;
+        for(Stub stub : room.playerList()){
+            Rating rating = gameServiceProvider.rating(stub.owner());
+            if(rating.level<mLevel){
+                mLevel = rating.level;
+            }
+        }
+        jsonObject.addProperty("arena",arenas[mLevel].name);
         jsonObject.addProperty("capacity",capacity);
         jsonObject.addProperty("duration",roundDuration/1000);
         jsonObject.addProperty("overtime",overtime/1000);
@@ -123,9 +129,18 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable {
         room.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
         rQueue.addLast(room);
     }
+    //room setting on online play mode
     private byte[] roomSetting(Room room){
         JsonObject jo = new JsonObject();
-        jo.addProperty("arena",arenas[rng.onNext(5)].name);
+        //match lower arena on player rating level
+        int mLevel = 10;
+        for(Stub stub : room.playerList()){
+            Rating rating = gameServiceProvider.rating(stub.owner());
+            if(rating.level<mLevel){
+                mLevel = rating.level;
+            }
+        }
+        jo.addProperty("arena",arenas[mLevel].name);
         jo.addProperty("capacity",capacity);
         jo.addProperty("duration",roundDuration/1000);
         jo.addProperty("overtime",overtime/1000);
@@ -166,15 +181,5 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable {
     @Override
     public Recoverable.Key key(){
         return new AssociateKey(this.bucket,this.oid,this.vertex);
-    }
-
-    @Override
-    public void dataStore(DataStore dataStore) {
-        this.dataStore = dataStore;
-    }
-
-    @Override
-    public void update() {
-        this.dataStore.update(this);
     }
 }

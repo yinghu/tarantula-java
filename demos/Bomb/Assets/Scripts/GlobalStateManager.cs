@@ -49,6 +49,7 @@ public class GlobalStateManager : AdminBehavior{
    
     public GameStage gameStage;
     private bool _started;
+    private bool _updated;
     protected override void NetworkStart(){
 		base.NetworkStart();
         Debug.Log("network started admin");
@@ -74,6 +75,12 @@ public class GlobalStateManager : AdminBehavior{
         if(!_started){
             return;
         }
+        if(integration.dedicated&&_updated){
+            _updated = false;
+            await integration.OnGameUpdated(this,(s)=>{
+                Debug.Log(s);
+            });
+        }
         if(integration.dedicated&&integration.room.started&&integration.room.totalJoined==0){
             integration.room.started = false;
             await integration.OnGameEnded(this,(s)=>{
@@ -92,7 +99,7 @@ public class GlobalStateManager : AdminBehavior{
                 integration.room.overtime = jo.overtime;
                 integration.room.playerList = jo.playerList;
                 //Debug.Log("Room=>"+jo.duration);
-                SceneManager.LoadSceneAsync(jo.arena,LoadSceneMode.Additive);
+                SceneManager.LoadSceneAsync("Map",LoadSceneMode.Additive);
                 StartCoroutine(StartCountdown());
             });                    
         }           
@@ -122,6 +129,7 @@ public class GlobalStateManager : AdminBehavior{
              yield return new WaitForSeconds(1.0f);
              integration.room.duration--;
              //gameStage.OnLive();
+             _updated = true;
              if(networkObject.IsOwner){
                 networkObject.SendRpc(RPC_ON_TIMER, Receivers.All,integration.room.duration); 
                 if(integration.room.duration<=30){

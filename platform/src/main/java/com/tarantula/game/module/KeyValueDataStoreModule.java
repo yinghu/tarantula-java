@@ -26,6 +26,9 @@ public class KeyValueDataStoreModule implements Module {
             byte[] v = dataStore.get(key.getBytes());
             session.write(v!=null?v:"{}".getBytes(),label());
         }
+        else{
+            throw new UnsupportedOperationException(session.action());
+        }
         return false;
     }
 

@@ -39,6 +39,12 @@ public class RecoverableObject implements Recoverable {
 
     protected DataStore dataStore;
 
+    public void dataStore(DataStore dataStore) {
+        this.dataStore = dataStore;
+    }
+    public void update() {
+        this.dataStore.update(this);
+    }
     public long timestamp(){
         return this.timestamp;
     }

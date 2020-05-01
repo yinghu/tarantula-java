@@ -86,6 +86,15 @@ public class PushEventHandler implements RequestHandler {
                 }
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
+            else if(action.equals("onUpdated")){
+                String accessKey = exchange.header("Tarantula-access-key");
+                String serverId = exchange.header("Tarantula-server-id");
+                if(tokenValidator.validateAccessKey(accessKey)){
+                    this.deploymentServiceProvider.onUpdatedUDPConnection(serverId,_payload);
+                }
+                byte[] eb = this.builder.create().toJson(new ResponseHeader("onUpdated","ok",true)).getBytes();
+                exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
+            }
             else if(action.equals("onEnded")){
                 String accessKey = exchange.header("Tarantula-access-key");
                 String serverId = exchange.header("Tarantula-server-id");

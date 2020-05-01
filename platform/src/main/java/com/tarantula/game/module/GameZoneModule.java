@@ -54,6 +54,9 @@ public class GameZoneModule implements Module{
             session.write(builder.create().toJson(resp).getBytes(),label());
             return left;
         }
+        else{
+            throw new UnsupportedOperationException(session.action());
+        }
         return session.action().equals("onLeave");
     }
 
@@ -80,6 +83,7 @@ public class GameZoneModule implements Module{
         mZone.roomIndex = this.mRoom;
         mZone.stubIndex = this.mStub;
         mZone.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        mZone.gameServiceProvider = this.gameServiceProvider;
         mZone.descriptor = this.context.descriptor();
         mZone.start();
         context.log(this.mZone.descriptor.tag()+"/"+this.mZone.descriptor.accessRank()+"/"+this.mZone.descriptor.distributionKey(),OnLog.WARN);

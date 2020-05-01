@@ -28,6 +28,9 @@ public class MatchMakingModule implements Module {
                 session.write(this.builder.create().toJson(response).getBytes(),label());
             }
         }
+        else{
+            throw new UnsupportedOperationException(session.action());
+        }
         return false;
     }
 

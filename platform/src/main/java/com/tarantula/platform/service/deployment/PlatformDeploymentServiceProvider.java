@@ -60,7 +60,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     @Override
     public void shutdown() throws Exception {
-        log.info("deployment provider shut down");
+        log.info("Platform deployment service provider shut down");
     }
     @Override
     public String name() {
@@ -204,7 +204,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 //add view to app
                 v.owner(a.descriptor.typeId());
                 ResponseHeader xv = this.builder.create().fromJson(deployService.addView(v),ResponseHeader.class);
-                log.warn(xv.message());
+                //log.warn(xv.message());
                 if(!xv.successful()){
                     log.warn("Failed to add view ->"+v.toString());
                 }
@@ -364,7 +364,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             if(ot instanceof OnView){
                 OnView ov = (OnView)ot;
-                log.warn(ov.toString());
+                //log.warn(ov.toString());
                 this.vListeners.forEach((cl)->{
                     cl.onView(ov);
                 });
@@ -504,7 +504,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void onUDPConnection(String typeId,Connection connection){
         this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));
     }
-    public Connection onUDPConnection(String typeId,Connection.ConnectionEndedListener listener){
+    public Connection onUDPConnection(String typeId,Connection.StateListener listener){
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         byte[] ret = icp.firstIndex(typeId);
         if(ret==null){
@@ -514,14 +514,31 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         connection.fromMap(SystemUtil.toMap(ret));
         icp.set(connection.serverId().getBytes(),icp.subscription().getBytes());
         icp.addEventListener(connection.serverId(),(e)->{
-            listener.onEnded(e.payload());
-            return true;//removed on callback
+            if(!e.closed()){
+                listener.onUpdated(e.payload());
+            }
+            else{
+                listener.onEnded(e.payload());
+            }
+            return e.closed();//removed on closed
         });
         return connection;
     }
     public void onStartedUDPConnection(String serverId,byte[] started){
         String _serverId = serverId+"_v";
         this.tarantulaContext.integrationCluster().set(_serverId.getBytes(),started);
+    }
+    public void onUpdatedUDPConnection(String serverId,byte[] updated){
+        ClusterProvider icp = this.tarantulaContext.integrationCluster();
+        byte[] sub = icp.get(serverId.getBytes());
+        if (sub != null) {
+            ConnectionStateEvent connectionStateEvent = new ConnectionStateEvent(new String(sub),serverId,false);
+            connectionStateEvent.payload(updated);
+            integrationEventService.publish(connectionStateEvent);
+        }
+        else{
+            log.warn("Server connection not existed ->"+serverId);
+        }
     }
     public byte[] onStartedUDPConnection(String serverId){
         String _serverId = serverId+"_v";
@@ -531,7 +548,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         byte[] sub = icp.remove(serverId.getBytes());
         if (sub != null) {
-            ConnectionCloseEvent connectionStateEvent = new ConnectionCloseEvent(new String(sub),serverId);
+            ConnectionStateEvent connectionStateEvent = new ConnectionStateEvent(new String(sub),serverId,true);
             connectionStateEvent.payload(ended);
             integrationEventService.publish(connectionStateEvent);
         }

@@ -65,7 +65,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
     }
     @Override
     public void onView(OnView onView) {
-        this.context.log("View Update-->>"+onView.toString(),OnLog.WARN);
+        //this.context.log("View Update-->>"+onView.toString(),OnLog.WARN);
         if(!onView.disabled()){
             this._viewList.put(onView.viewId(),onView);
         }
@@ -76,7 +76,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
 
     @Override
     public void onLobby(OnLobby onLobby) {
-        context.log("Lobby Updated--->>"+onLobby.toString(),OnLog.WARN);
+        //context.log("Lobby Updated--->>"+onLobby.toString(),OnLog.WARN);
         if(!onLobby.closed()){
             this._lobbyList.add(onLobby.typeId());
         }

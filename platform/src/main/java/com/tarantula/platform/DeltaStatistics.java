@@ -55,14 +55,4 @@ public class DeltaStatistics extends RecoverableObject implements Statistics {
     public Key key(){
         return new AssociateKey(this.bucket,this.oid,this.vertex);
     }
-
-    @Override
-    public void dataStore(DataStore dataStore) {
-        this.dataStore = dataStore;
-    }
-
-    @Override
-    public void update() {
-        this.dataStore.update(this);
-    }
 }

@@ -35,7 +35,8 @@ public interface Connection extends Response {
     interface Listener{
         void onState(Connection connection);
     }
-    interface ConnectionEndedListener{
-        void onEnded(byte[] result);
+    interface StateListener{
+        void onUpdated(byte[] updated);
+        void onEnded(byte[] ended);
     }
 }

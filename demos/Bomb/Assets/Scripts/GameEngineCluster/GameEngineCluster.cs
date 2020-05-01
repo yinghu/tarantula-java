@@ -149,6 +149,22 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
+        public  async Task<bool> OnGameUpdated(MonoBehaviour caller,Action<string> callback){
+            try{
+                Header[] headers = new Header[]{
+                    new Header("Tarantula-server-id",deviceId),
+                    new Header("Tarantula-access-key",accessKey),
+                    new Header("Tarantula-action","onUpdated")
+                };
+                string json = JsonConvert.SerializeObject(room,JSON_SETTING);
+                string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,json);
+                callback(jstr);
+                return true;//           
+            }catch(Exception ex){
+                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_DEDICATED);
+                return false;
+            }
+        }
         public  async Task<bool> OnGameEnded(MonoBehaviour caller,Action<string> callback){
             try{
                 Header[] headers = new Header[]{

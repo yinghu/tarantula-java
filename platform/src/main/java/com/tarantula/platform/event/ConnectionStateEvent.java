@@ -7,19 +7,20 @@ import com.tarantula.Event;
 import java.io.IOException;
 
 /**
- * Created by yinghu on 7/15//2019.
+ * Updated by yinghu on 4/30/2020.
  */
-public class ConnectionCloseEvent extends Data implements Event {
+public class ConnectionStateEvent extends Data implements Event {
 
 
 
-    public ConnectionCloseEvent(){
+    public ConnectionStateEvent(){
 
     }
 
-    public ConnectionCloseEvent(String destination, String serverId){
+    public ConnectionStateEvent(String destination, String serverId,boolean closed){
         this.destination = destination;
         this.trackId = serverId;
+        this.closed = closed;
     }
     @Override
     public int getFactoryId(){
@@ -27,24 +28,26 @@ public class ConnectionCloseEvent extends Data implements Event {
     }
     @Override
     public int getClassId(){
-        return PortableEventRegistry.CONNECTION_CLOSE_EVENT_CID;
+        return PortableEventRegistry.CONNECTION_STATE_EVENT_CID;
     }
     @Override
     public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("1",this.trackId);
-        out.writeUTF("2",this.destination);
-        out.writeByteArray("3",this.payload);
+        out.writeBoolean("1",this.closed);
+        out.writeUTF("2",this.trackId);
+        out.writeUTF("3",this.destination);
+        out.writeByteArray("4",this.payload);
     }
     @Override
     public void readPortable(PortableReader in) throws IOException {
-        this.trackId = in.readUTF("1");
-        this.destination = in.readUTF("2");
-        this.payload = in.readByteArray("3");
+        this.closed = in.readBoolean("1");
+        this.trackId = in.readUTF("2");
+        this.destination = in.readUTF("3");
+        this.payload = in.readByteArray("4");
     }
 
     @Override
     public String toString(){
-        return "Connection Close Event ["+this.trackId+"]";
+        return "Connection State Event ["+this.trackId+"]["+closed+"]";
     }
     @Override
     public int hashCode(){
@@ -52,7 +55,7 @@ public class ConnectionCloseEvent extends Data implements Event {
     }
     @Override
     public boolean equals(Object obj){
-        ConnectionCloseEvent ix = (ConnectionCloseEvent)obj;
+        ConnectionStateEvent ix = (ConnectionStateEvent)obj;
         return this.trackId.equals(ix.trackId());
     }
 }
