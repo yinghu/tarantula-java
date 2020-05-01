@@ -1,12 +1,12 @@
 package com.tarantula.platform.leaderboard;
 
+import com.tarantula.DataStore;
 import com.tarantula.LeaderBoard;
-import com.tarantula.platform.RecoverableObject;
 
 /**
  * Updated 8/24/19
  */
-public class TopListLeaderBoard extends RecoverableObject implements LeaderBoard {
+public class TopListLeaderBoard implements LeaderBoard {
 
 
     private String category;
@@ -16,10 +16,9 @@ public class TopListLeaderBoard extends RecoverableObject implements LeaderBoard
 
     private EntryComparator comparator = new EntryComparator();
 
-    private Reset reset;
 
     private Listener listener;
-
+    private DataStore dataStore;
     public TopListLeaderBoard(String category,int size){
         this.category = category;
         this.size = size;
@@ -66,12 +65,16 @@ public class TopListLeaderBoard extends RecoverableObject implements LeaderBoard
     }
 
     public void reset(){
-        reset.reset(this);
+
     }
 
-    public String toString(){
-        return this.key().asString()+"["+size+"]";
+    @Override
+    public void dataStore(DataStore dataStore) {
+        this.dataStore = dataStore;
     }
 
+    @Override
+    public void update() {
 
+    }
 }

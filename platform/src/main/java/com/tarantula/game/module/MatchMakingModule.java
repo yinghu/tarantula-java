@@ -29,10 +29,10 @@ public class MatchMakingModule implements Module {
             }
             else{
                 Statistics statistics = gameServiceProvider.statistics(session.systemId());
-                statistics.entry("pc").value(1);
+                statistics.entry("wc").value(1);
                 statistics.update();
-                LeaderBoard leaderBoard = gameServiceProvider.leaderBoard("pc");
-                leaderBoard.onBoard(session.systemId(),statistics.entry("pc").value());
+                LeaderBoard leaderBoard = gameServiceProvider.leaderBoard("wc");
+                leaderBoard.onBoard(session.systemId(),statistics.entry("wc").value());
             }
         }
         else{

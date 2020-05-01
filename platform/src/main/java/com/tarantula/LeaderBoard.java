@@ -12,6 +12,7 @@ public interface LeaderBoard extends Updatable{
 
     void reset();
     void registerListener(Listener listener);
+
     default Board daily(){
         return null;
     }

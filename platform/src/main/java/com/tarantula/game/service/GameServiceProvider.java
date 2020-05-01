@@ -13,6 +13,8 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.ServiceProvider;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
  * rank - final result 1,2 rank xp = (1/rank)*100  1 - 100 2 50 ..
@@ -27,6 +29,9 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     private static int ELO_K = 30;
     private static int LDB_SIZE = 10;
     private DataStore dataStore;
+
+    private ConcurrentHashMap<String,TopListLeaderBoard> tMap = new ConcurrentHashMap<>();
+
     public GameServiceProvider(String name){
         NAME = name;
     }
@@ -67,11 +72,13 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         return zone;
     }
     public LeaderBoard leaderBoard(String category){
-        TopListLeaderBoard ldb = new TopListLeaderBoard(category,LDB_SIZE);
-        ldb.dataStore(this.dataStore);
-        ldb.registerListener(this);
-        ldb.load();
-        return ldb;
+        return tMap.computeIfAbsent(category,(s)->{
+            TopListLeaderBoard ldb = new TopListLeaderBoard(category,LDB_SIZE);
+            ldb.dataStore(this.dataStore);
+            ldb.registerListener(this);
+            ldb.load();
+            return ldb;
+        });
     }
     @Override
     public String name() {
@@ -111,7 +118,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
 
     @Override
     public void onUpdated(LeaderBoard.Entry entry) {
-        logger.warn(entry.toString());
+        //TopListLeaderBoard ldb = tMap.computeIfAbsent()
         logger.warn(entry.key().asString());
         //publish entry
     }
