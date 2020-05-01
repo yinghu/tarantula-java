@@ -135,6 +135,10 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
             Rating rating = gameServiceProvider.rating(sb.owner());
             rating.update(sb);
             rating.update();
+            if(sb.rank==1){
+                LeaderBoard leaderBoard = gameServiceProvider.leaderBoard("wc");
+                leaderBoard.onBoard(sb.owner(),rating.csw);
+            }
         }
         room.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
         rQueue.addLast(room);

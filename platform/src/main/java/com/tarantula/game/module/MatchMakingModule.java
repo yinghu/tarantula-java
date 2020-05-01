@@ -27,6 +27,13 @@ public class MatchMakingModule implements Module {
             if(response!=null){
                 session.write(this.builder.create().toJson(response).getBytes(),label());
             }
+            else{
+                Statistics statistics = gameServiceProvider.statistics(session.systemId());
+                statistics.entry("pc").value(1);
+                statistics.update();
+                LeaderBoard leaderBoard = gameServiceProvider.leaderBoard("pc");
+                leaderBoard.onBoard(session.systemId(),statistics.entry("pc").value());
+            }
         }
         else{
             throw new UnsupportedOperationException(session.action());

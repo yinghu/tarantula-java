@@ -5,7 +5,7 @@ import com.tarantula.RecoverableFactory;
 /**
  * Updated by yinghu lu on 8/24/19
  */
-public class LeaderBoardEntryQuery implements RecoverableFactory<LeaderBoardEntry>{
+public class LeaderBoardEntryQuery implements RecoverableFactory<EntryImpl>{
 
     private  String leaderBoardId;
 
@@ -13,8 +13,8 @@ public class LeaderBoardEntryQuery implements RecoverableFactory<LeaderBoardEntr
         this.leaderBoardId = leaderBoardId;
     }
 
-    public LeaderBoardEntry create() {
-        return new LeaderBoardEntry();
+    public EntryImpl create() {
+        return new EntryImpl();
     }
 
     public int registryId() {

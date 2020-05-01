@@ -1,12 +1,14 @@
 package com.tarantula.game.service;
 
 import com.tarantula.DataStore;
+import com.tarantula.LeaderBoard;
 import com.tarantula.RecoverableListener;
 import com.tarantula.Statistics;
 import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.Zone;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.DeltaStatistics;
+import com.tarantula.platform.leaderboard.TopListLeaderBoard;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.ServiceProvider;
@@ -18,11 +20,12 @@ import com.tarantula.platform.service.ServiceProvider;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider {
+public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener{
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
     private static int ELO_K = 30;
+    private static int LDB_SIZE = 10;
     private DataStore dataStore;
     public GameServiceProvider(String name){
         NAME = name;
@@ -63,6 +66,13 @@ public class GameServiceProvider implements ServiceProvider {
         logger.warn(zone.toString());
         return zone;
     }
+    public LeaderBoard leaderBoard(String category){
+        TopListLeaderBoard ldb = new TopListLeaderBoard(category,LDB_SIZE);
+        ldb.dataStore(this.dataStore);
+        ldb.registerListener(this);
+        ldb.load();
+        return ldb;
+    }
     @Override
     public String name() {
         return NAME;
@@ -75,7 +85,7 @@ public class GameServiceProvider implements ServiceProvider {
         this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.RATING_CID,(r)->{
             logger.warn(r.toString());
         });
-        this.dataStore.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.STATISTICS_CID,(r)->{
+        this.dataStore.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.LEADER_BOARD_ENTRY_CID,(r)->{
             logger.warn(r.toString());
         });**/
         logger.info("Game service provider ["+ NAME+"] started");
@@ -97,5 +107,12 @@ public class GameServiceProvider implements ServiceProvider {
     }
     private double probability(double rating1,double rating2) {
         return 1.0 * 1.0 / (1 + 1.0 * (Math.pow(10, 1.0 * (rating1 - rating2) / 400)));
+    }
+
+    @Override
+    public void onUpdated(LeaderBoard.Entry entry) {
+        logger.warn(entry.toString());
+        logger.warn(entry.key().asString());
+        //publish entry
     }
 }

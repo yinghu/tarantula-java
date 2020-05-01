@@ -15,7 +15,7 @@ public class WeeklyReset  {
     public boolean reset(LeaderBoard leaderBoard) {
         boolean reset = LocalDateTime.now().getDayOfWeek().equals(DayOfWeek.SATURDAY);
         if(reset){
-            leaderBoard.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
+            //leaderBoard.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
         }
         return reset;
     }

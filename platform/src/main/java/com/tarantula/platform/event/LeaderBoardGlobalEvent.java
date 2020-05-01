@@ -18,7 +18,7 @@ public class LeaderBoardGlobalEvent extends Data implements Event {
         //this.applicationId = entry.header();
         //this.instanceId = entry.category();
         //this.clientId = entry.classifier();
-        this.systemId = entry.systemId();
+        this.systemId = entry.owner();
         this.balance = entry.value();
         this.timestamp = entry.timestamp();
     }

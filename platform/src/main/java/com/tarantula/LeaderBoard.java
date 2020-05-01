@@ -3,33 +3,36 @@ package com.tarantula;
 /**
  * Updated by yinghu on 4/30/20
  */
-public interface LeaderBoard extends Recoverable{
-
-    String TOTAL = "T";
-    String DAILY = "D";
-    String WEEKLY = "W";
-    String MONTHLY = "M";
-    String YEARLY = "Y";
+public interface LeaderBoard extends Updatable{
 
     int size();
-    String name(); //Board name eg top10, top100
-    String header();//The statistics group name eg a game name blackjack
     String category(); //The category of statistics eg WonCount, LostCount
-    String classifier(); // ONE OF TOTAL, DAILY, WEEKLY, MONTHLY, YEARLY
 
-    boolean onBoard(String systemId,LeaderBoard.Entry entry);
+    void onBoard(String systemId,double value);
 
     void reset();
-    Entry[] onBoard();
-
-
-    interface Entry extends Recoverable{
-
-        String systemId();
+    void registerListener(Listener listener);
+    default Board daily(){
+        return null;
+    }
+    default Board weekly(){
+        return null;
+    }
+    default Board total(){
+        return null;
+    }
+    interface  Board extends Updatable{
+        Entry[] list();
+    }
+    interface Entry extends Recoverable,Updatable{
+        int rank();
         double value();
-        void update(String systemId,double replace,long timestamp);
+        Entry update(Entry entry);
     }
     interface Reset{
         boolean reset(LeaderBoard leaderBoard);
+    }
+    interface Listener{
+        void onUpdated(Entry entry);
     }
 }
