@@ -1,10 +1,13 @@
 package com.tarantula.game.service;
 
 import com.tarantula.DataStore;
+import com.tarantula.RecoverableListener;
 import com.tarantula.Statistics;
+import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.Zone;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.DeltaStatistics;
+import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.ServiceProvider;
 
@@ -68,6 +71,13 @@ public class GameServiceProvider implements ServiceProvider {
     @Override
     public void setup(ServiceContext serviceContext) {
         this.dataStore = serviceContext.dataStore(NAME,serviceContext.partitionNumber());
+        /**
+        this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.RATING_CID,(r)->{
+            logger.warn(r.toString());
+        });
+        this.dataStore.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.STATISTICS_CID,(r)->{
+            logger.warn(r.toString());
+        });**/
         logger.info("Game service provider ["+ NAME+"] started");
     }
 

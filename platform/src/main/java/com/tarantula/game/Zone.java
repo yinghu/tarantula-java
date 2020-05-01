@@ -81,7 +81,7 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
     @Override
     public Connection onConnection(Room room){
         String cType = playMode==Room.INTEGRATED_MODE?"tarantula":descriptor.typeId();
-        return deploymentServiceProvider.onUDPConnection(cType,new RoomStateListener(room,gameServiceProvider));
+        return deploymentServiceProvider.onUDPConnection(cType,room);
     }
     @Override
     public void onConnecting(Room room){
@@ -122,9 +122,19 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
         return jsonObject.toString().getBytes();
     }
     @Override
+    public void onUpdating(Stub stub){
+        Statistics statistics = this.gameServiceProvider.statistics(stub.owner());
+        statistics.entry(stub.stat.name()).value(stub.stat.value());
+        statistics.update();
+    }
+    @Override
     public void onEnding(Room room) {
+        this.deploymentServiceProvider.onEndedUDPConnection(room.connection().serverId());
         for(Stub sb : room.playerList()){
             stubIndex.remove(sb.owner());
+            Rating rating = gameServiceProvider.rating(sb.owner());
+            rating.update(sb);
+            rating.update();
         }
         room.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
         rQueue.addLast(room);

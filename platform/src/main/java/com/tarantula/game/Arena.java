@@ -8,10 +8,13 @@ public class Arena {
     public int duration; //minutes
     public int playMode; //0,1,2
     public Arena(){}
-    public Arena(int level,double xp,String name){
+    public Arena(int level,double xp,String name,int capacity,int duration,int playMode){
         this.level = level;
         this.xp = xp;
         this.name = name;
+        this.capacity = capacity;
+        this.duration = duration;
+        this.playMode = playMode;
     }
     @Override
     public String toString(){

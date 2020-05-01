@@ -78,20 +78,19 @@ public class GlobalStateManager : AdminBehavior{
         if(integration.dedicated&&_updated){
             _updated = false;
             Stat[] stats = new Stat[]{
-                new Stat(1,"kc",10),
-                new Stat(2,"wc",2)
+                new Stat(0,"mc",10),
+                new Stat(0,"fc",2)
             };
             await integration.OnGameUpdated(this,stats);
         }
         if(integration.dedicated&&integration.room.started&&integration.room.totalJoined==0){
             integration.room.started = false;
             Stat[] stats = new Stat[]{
-                new Stat(1,"kc",10),
-                new Stat(2,"wc",2)
+                new Stat(0,"mc",10),
+                new Stat(0,"pc",2)
             };
             Rating[] ratings = new Rating[]{
-                new Rating(1,1,70),
-                new Rating(2,2,30)
+                new Rating(0,1,70),
             };
             await integration.OnGameEnded(this,stats,ratings,(s)=>{
                 Debug.Log(s);

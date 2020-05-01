@@ -70,11 +70,11 @@ public class GameZoneModule implements Module{
         mZone = this.gameServiceProvider.zone(this.context.descriptor().distributionKey());
         if(mZone.arenas.length==0) {
             mZone.arenas = new Arena[]{
-                    new Arena(1, 100, "Amber 1"),
-                    new Arena(2, 200, "Amber 2"),
-                    new Arena(3, 300, "Amber 3"),
-                    new Arena(4, 400, "Amber 4"),
-                    new Arena(5, 500, "Amber 5")};
+                    new Arena(1, 100, "Amber 1",1,1,Room.DEDICATED_MODE),
+                    new Arena(2, 200, "Amber 2",1,1,Room.DEDICATED_MODE),
+                    new Arena(3, 300, "Amber 3",1,1,Room.DEDICATED_MODE),
+                    new Arena(4, 400, "Amber 4",1,1,Room.DEDICATED_MODE),
+                    new Arena(5, 500, "Amber 5",1,1,Room.DEDICATED_MODE)};
             mZone.update();
         }
         for(Arena a : mZone.arenas){

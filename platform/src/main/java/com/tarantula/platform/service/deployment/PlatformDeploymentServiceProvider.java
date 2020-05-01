@@ -556,6 +556,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             log.warn("Server connection not existed ->"+serverId);
         }
     }
+    public void onEndedUDPConnection(String serverId){
+        ClusterProvider icp = this.tarantulaContext.integrationCluster();
+        icp.remove(serverId.getBytes());
+    }
     //end of dedicated server methods
 
     public PostOffice registerPostOffice(){

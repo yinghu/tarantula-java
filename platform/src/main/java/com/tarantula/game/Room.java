@@ -1,15 +1,20 @@
 package com.tarantula.game;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.tarantula.Connection;
 import com.tarantula.Module;
+import com.tarantula.platform.StatisticsEntry;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.UUID;
 
 /**
  * Created by yinghu lu on 4/14/2020.
  */
-public class Room{
+public class Room implements Connection.StateListener{
 
     static final int WAITING = 0; //waiting for first join
     static final int PENDING_JOIN = 1; //waiting after first join
@@ -23,9 +28,9 @@ public class Room{
     static final long TIMER_DELTA = 1000; //1 SECOND
     static final int CONNECTION_RETRIES = 3; //1 SECOND
 
-    static final int DEDICATED_MODE = 2;
-    static final int INTEGRATED_MODE = 1;
-    static final int OFF_LINE_MODE = 0;
+    public static final int DEDICATED_MODE = 2;
+    public static final int INTEGRATED_MODE = 1;
+    public static final int OFF_LINE_MODE = 0;
 
     private int capacity;
     private int totalJoined;
@@ -182,5 +187,48 @@ public class Room{
                     roomListener.onEnding(this);
                 }
         }
+    }
+
+    @Override
+    public void onUpdated(byte[] updated) {
+        JsonParser jp = new JsonParser();
+        InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(updated));
+        JsonObject j = jp.parse(inr).getAsJsonObject();
+        j.entrySet().forEach((e)->{
+            if(e.getKey().equals("stats")){
+                e.getValue().getAsJsonArray().forEach((st)->{
+                    JsonObject jo = st.getAsJsonObject();
+                    Stub stub = stubs[jo.get("seat").getAsInt()];
+                    stub.stat = new StatisticsEntry(jo.get("name").getAsString(),jo.get("value").getAsDouble());
+                    this.roomListener.onUpdating(stub);
+                });
+            }
+        });
+    }
+
+    @Override
+    public void onEnded(byte[] ended) {
+        this.end();
+        JsonParser jp = new JsonParser();
+        InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(ended));
+        JsonObject j = jp.parse(inr).getAsJsonObject();
+        j.entrySet().forEach((e)->{
+            if(e.getKey().equals("stats")){
+                e.getValue().getAsJsonArray().forEach((st)->{
+                    JsonObject jo = st.getAsJsonObject();
+                    Stub stub = stubs[jo.get("seat").getAsInt()];
+                    stub.stat = new StatisticsEntry(jo.get("name").getAsString(),jo.get("value").getAsDouble());
+                    this.roomListener.onUpdating(stub);
+                });
+            }
+            if(e.getKey().equals("ratings")){
+                e.getValue().getAsJsonArray().forEach((st)->{
+                    JsonObject jo = st.getAsJsonObject();
+                    Stub stub = stubs[jo.get("seat").getAsInt()];
+                    stub.rank = jo.get("rank").getAsInt();
+                    stub.pxp = jo.get("xp").getAsDouble();
+                });
+            }
+        });
     }
 }

@@ -1,5 +1,6 @@
 package com.tarantula.platform;
 import com.tarantula.*;
+import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.util.HashMap;
@@ -29,12 +30,12 @@ public class DeltaStatistics extends RecoverableObject implements Statistics {
     }
     @Override
     public int getFactoryId() {
-        return PortableRegistry.OID;
+        return PresencePortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PortableRegistry.DELTA_STAT_CID;
+        return PresencePortableRegistry.STATISTICS_CID;
     }
 
     @Override

@@ -85,8 +85,13 @@ namespace Tarantula.Networking{
         }
         void OnEnable(){
             //_HOST = GEC_HOST;
-            deviceId = SystemInfo.deviceUniqueIdentifier;
-            Debug.Log("GEC OPEN->"+host);
+            if(dedicated){
+                deviceId = Guid.NewGuid().ToString();        
+            }
+            else{
+                deviceId = SystemInfo.deviceUniqueIdentifier;
+            }
+            Debug.Log("GEC OPEN->"+host+"/"+dedicated+"/"+deviceId);
         }
         async void OnDestroy(){
             Debug.Log("GEC CLOSE->"+host);

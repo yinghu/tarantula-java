@@ -24,6 +24,7 @@ public interface DeploymentServiceProvider extends ServiceProvider {
     void onStartedUDPConnection(String serverId,byte[] started);
     void onUpdatedUDPConnection(String serverId,byte[] updated);
     void onEndedUDPConnection(String serverId,byte[] ended);
+    void onEndedUDPConnection(String serverId);
     byte[] onStartedUDPConnection(String serverId);
     //END OF DEDICATED SERVER APIs
 

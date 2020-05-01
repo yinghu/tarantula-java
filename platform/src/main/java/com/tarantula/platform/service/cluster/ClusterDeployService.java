@@ -299,15 +299,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             }
             batchCache = new BatchCache(UUID.randomUUID().toString(),olist);
         }
-
-        else if(registryId==PortableRegistry.DELTA_STAT_CID){
-            List hList = new ArrayList();
-            DeltaStatistics h = new DeltaStatistics();
-            h.distributionKey(params[0]);
-            dataStore.load(h);
-            hList.add(h);
-            batchCache = new BatchCache(UUID.randomUUID().toString(),hList);
-        }
         else if(registryId==PortableRegistry.ON_VIEW_OID){
             List vlist = dataStore.list(new OnViewQuery(params[0]));
             batchCache = new BatchCache(UUID.randomUUID().toString(),vlist);
