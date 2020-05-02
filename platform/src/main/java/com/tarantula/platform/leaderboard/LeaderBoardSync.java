@@ -6,7 +6,7 @@ import com.tarantula.LeaderBoard;
 /**
  * Updated 8/24/19
  */
-public class TopListLeaderBoard implements LeaderBoard {
+public class LeaderBoardSync implements LeaderBoard {
 
 
     private String category;
@@ -19,22 +19,22 @@ public class TopListLeaderBoard implements LeaderBoard {
 
     private Listener listener;
     private DataStore dataStore;
-    public TopListLeaderBoard(String category,int size){
+    public LeaderBoardSync(String category, int size){
         this.category = category;
         this.size = size;
     }
     public void load(){
         BoardImpl d = new BoardImpl("daily",category,size,this.comparator);
         d.dataStore(this.dataStore);
-        d.load();
+        d.load(listener);
         boards[0]=d;
         BoardImpl w =new BoardImpl("weekly",category,size,this.comparator);
         w.dataStore(this.dataStore);
-        w.load();
+        w.load(listener);
         boards[1]=w;
         BoardImpl t =new BoardImpl("total",category,size,this.comparator);
         t.dataStore(this.dataStore);
-        t.load();
+        t.load(listener);
         boards[2]=t;
     }
     @Override
@@ -60,6 +60,7 @@ public class TopListLeaderBoard implements LeaderBoard {
     public void onBoard(String systemId,double value) {
         for(int i=0;i<3;i++){
             boards[i].onBoard(new EntryImpl(systemId,value,System.currentTimeMillis()),listener);
+            boards[i].list();
         }
     }
     public void registerListener(Listener listener){

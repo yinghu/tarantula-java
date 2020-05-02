@@ -9,5 +9,6 @@ public interface RoomListener {
     Connection onConnection(Room room);
     void onConnecting(Room room);
     void onEnding(Room room);
+    void onTimeout(Room room);
     byte[] onStarting(Room room);
 }

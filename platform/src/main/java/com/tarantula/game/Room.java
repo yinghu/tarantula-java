@@ -22,7 +22,8 @@ public class Room implements Connection.StateListener{
     static final int STARTING = 3; //battling
     static final int OVERTIME = 4; //waiting for ending
     static final int ENDING = 5; //ending game
-    static final int PENDING_END = 6;
+    static final int TIMEOUT = 6; //end without connection
+    static final int PENDING_END = 7;
 
     static final long PENDING_TIME = 5000;//5 SECONDS
     static final long TIMER_DELTA = 1000; //1 SECOND
@@ -149,7 +150,7 @@ public class Room implements Connection.StateListener{
                         else{
                             retries--;
                             if(retries<=0){
-                                state = ENDING;
+                                state = TIMEOUT; //timeout without available connection
                             }else{
                                 initialTime = PENDING_TIME;
                             }
@@ -180,6 +181,10 @@ public class Room implements Connection.StateListener{
                 update.on(roomId+"?onEnd",null);
                 state = PENDING_END;
                 initialTime = PENDING_TIME;
+                break;
+            case TIMEOUT:
+                update.on(roomId+"?onEnd",null);
+                roomListener.onTimeout(this);
                 break;
             case PENDING_END:
                 initialTime -=TIMER_DELTA;

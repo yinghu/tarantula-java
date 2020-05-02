@@ -1,19 +1,16 @@
 package com.tarantula.game.service;
 
 import com.tarantula.*;
-import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.Zone;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.DeltaStatistics;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.EntryImpl;
-import com.tarantula.platform.leaderboard.TopListLeaderBoard;
+import com.tarantula.platform.leaderboard.LeaderBoardSync;
 import com.tarantula.platform.presence.PresencePortableRegistry;
-import com.tarantula.platform.service.ClusterProvider;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.ServiceProvider;
 
-import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -31,7 +28,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     private static int LDB_SIZE = 10;
     private DataStore dataStore;
 
-    private ConcurrentHashMap<String,TopListLeaderBoard> tMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
     private EventService publisher;
     private String dest;
     public GameServiceProvider(String name){
@@ -76,9 +73,9 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     public LeaderBoard leaderBoard(String category){
         return _leaderBoard(category);
     }
-    private TopListLeaderBoard _leaderBoard(String category){
+    private LeaderBoardSync _leaderBoard(String category){
         return tMap.computeIfAbsent(category,(s)->{
-            TopListLeaderBoard ldb = new TopListLeaderBoard(category,LDB_SIZE);
+            LeaderBoardSync ldb = new LeaderBoardSync(category,LDB_SIZE);
             ldb.dataStore(this.dataStore);
             ldb.registerListener(this);
             ldb.load();
@@ -97,8 +94,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         this.dest = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).subscription();
         serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).addEventListener(NAME,(e)->{
             EntryImpl update = new EntryImpl(e.index(),e.name(),e.owner(),e.balance(),e.timestamp());
-            logger.warn(update.toString());
-            TopListLeaderBoard ldb = this._leaderBoard(update.category());
+            LeaderBoardSync ldb = this._leaderBoard(update.category());
             ldb.onBoard(update);
             return false;
         });
@@ -107,7 +103,8 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
             logger.warn(r.toString());
         });
         this.dataStore.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.LEADER_BOARD_ENTRY_CID,(r)->{
-            logger.warn(r.toString());
+            logger.warn("DS->"+r.key().asString());
+            logger.warn("DS->"+r.toString());
         });**/
         logger.info("Game service provider ["+ NAME+"] started");
     }

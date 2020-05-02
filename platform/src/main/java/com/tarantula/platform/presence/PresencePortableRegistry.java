@@ -18,6 +18,7 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
     public static final int ON_BALANCE_CID = 2;
     public static final int STATISTICS_CID = 3;
     public static final int LEADER_BOARD_ENTRY_CID = 4;
+
     public Recoverable create(int i) {
         Recoverable pt = null;
         switch (i){

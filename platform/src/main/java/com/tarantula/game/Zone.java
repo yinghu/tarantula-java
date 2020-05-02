@@ -128,8 +128,15 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
         statistics.update();
     }
     @Override
+    public void onTimeout(Room room){
+        room.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
+        rQueue.addLast(room);
+    }
+    @Override
     public void onEnding(Room room) {
-        this.deploymentServiceProvider.onEndedUDPConnection(room.connection().serverId());
+        if(playMode!=Room.OFF_LINE_MODE){
+            this.deploymentServiceProvider.onEndedUDPConnection(room.connection().serverId());
+        }
         for(Stub sb : room.playerList()){
             stubIndex.remove(sb.owner());
             Rating rating = gameServiceProvider.rating(sb.owner());

@@ -37,7 +37,9 @@ public class EntryImpl extends RecoverableObject implements LeaderBoard.Entry {
     }
     //value entry
     public EntryImpl(String classifier,String category,String systemId,double value,long timestamp){
-        this(classifier,category,0);
+        this();
+        this.classifier = classifier;
+        this.category = category;
         this.owner = systemId;
         this.value = value;
         this.timestamp = timestamp;
@@ -89,7 +91,11 @@ public class EntryImpl extends RecoverableObject implements LeaderBoard.Entry {
         this.timestamp = ((Number)properties.get("3")).longValue();
     }
     public void distributionKey(String distributionKey){
-        //skip the natural key
+        //parse key
+        String[] k = distributionKey.split(Recoverable.PATH_SEPARATOR);
+        classifier = k[0];
+        category = k[1];
+        version = Integer.parseInt(k[2]);
     }
     public Key key(){
         return new NaturalKey(this.classifier+ Recoverable.PATH_SEPARATOR+category+Recoverable.PATH_SEPARATOR+version);
