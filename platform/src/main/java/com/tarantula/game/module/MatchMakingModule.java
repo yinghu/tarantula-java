@@ -24,15 +24,15 @@ public class MatchMakingModule implements Module {
         if(session.action().equals("onPlay")){
             Rating rating = this.gameServiceProvider.rating(session.systemId());
             Response response = context.presence(session.systemId()).onPlay(session,mZone.get(rating.rank));
-            if(response!=null){
-                session.write(this.builder.create().toJson(response).getBytes(),label());
-            }
-            else{
+            if(response==null){
                 Statistics statistics = gameServiceProvider.statistics(session.systemId());
                 statistics.entry("wc").value(1);
                 statistics.update();
                 LeaderBoard leaderBoard = gameServiceProvider.leaderBoard("wc");
                 leaderBoard.onBoard(session.systemId(),statistics.entry("wc").value());
+            }
+            else{
+                session.write(this.builder.create().toJson(response).getBytes(),label());
             }
         }
         else{

@@ -41,7 +41,12 @@ public class EntryImpl extends RecoverableObject implements LeaderBoard.Entry {
         this.timestamp = entry.timestamp();
         return this;
     }
-
+    public String category(){
+        return this.category;
+    }
+    public String classifier(){
+        return this.classifier;
+    }
     public int rank(){
         return this.version;
     }

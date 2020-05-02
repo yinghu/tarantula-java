@@ -27,6 +27,8 @@ public interface LeaderBoard extends Updatable{
     }
     interface Entry extends Recoverable,Updatable{
         int rank();
+        String category();
+        String classifier();
         double value();
         Entry update(Entry entry);
     }

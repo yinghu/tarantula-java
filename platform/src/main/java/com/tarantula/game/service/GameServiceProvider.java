@@ -1,18 +1,18 @@
 package com.tarantula.game.service;
 
-import com.tarantula.DataStore;
-import com.tarantula.LeaderBoard;
-import com.tarantula.RecoverableListener;
-import com.tarantula.Statistics;
+import com.tarantula.*;
 import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.Zone;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.DeltaStatistics;
+import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.TopListLeaderBoard;
 import com.tarantula.platform.presence.PresencePortableRegistry;
+import com.tarantula.platform.service.ClusterProvider;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.ServiceProvider;
 
+import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -31,7 +31,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     private DataStore dataStore;
 
     private ConcurrentHashMap<String,TopListLeaderBoard> tMap = new ConcurrentHashMap<>();
-
+    private EventService publisher;
     public GameServiceProvider(String name){
         NAME = name;
     }
@@ -72,6 +72,9 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         return zone;
     }
     public LeaderBoard leaderBoard(String category){
+        return _leaderBoard(category);
+    }
+    private TopListLeaderBoard _leaderBoard(String category){
         return tMap.computeIfAbsent(category,(s)->{
             TopListLeaderBoard ldb = new TopListLeaderBoard(category,LDB_SIZE);
             ldb.dataStore(this.dataStore);
@@ -88,6 +91,11 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     @Override
     public void setup(ServiceContext serviceContext) {
         this.dataStore = serviceContext.dataStore(NAME,serviceContext.partitionNumber());
+        this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
+        serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).addEventListener(NAME,(e)->{
+            logger.warn(e.toString());
+            return false;
+        });
         /**
         this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.RATING_CID,(r)->{
             logger.warn(r.toString());
@@ -118,8 +126,9 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
 
     @Override
     public void onUpdated(LeaderBoard.Entry entry) {
-        //TopListLeaderBoard ldb = tMap.computeIfAbsent()
-        logger.warn(entry.key().asString());
+        //TopListLeaderBoard ldb = this._leaderBoard(entry.category());
+        publisher.publish(new LeaderBoardGlobalEvent(NAME,entry));
+        //logger.warn(entry.key().asString());
         //publish entry
     }
 }
