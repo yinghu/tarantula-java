@@ -36,10 +36,11 @@ public class EntryImpl extends RecoverableObject implements LeaderBoard.Entry {
         this.timestamp = timestamp;
     }
     //value entry
-    public EntryImpl(String classifier,String category,String systemId,double value,long timestamp){
+    public EntryImpl(String classifier,String category,int version,String systemId,double value,long timestamp){
         this();
         this.classifier = classifier;
         this.category = category;
+        this.version = version;
         this.owner = systemId;
         this.value = value;
         this.timestamp = timestamp;

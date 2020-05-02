@@ -49,7 +49,7 @@ public class LeaderBoardSync implements LeaderBoard {
     }
 
     public void onBoard(Entry entry){//build global list
-        System.out.println(entry.toString());
+        System.out.println(entry.key().asString()+"<><><><>"+entry.toString());
         if(entry.classifier().equals("daily")){
 
         }

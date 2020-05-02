@@ -19,6 +19,7 @@ public class LeaderBoardGlobalEvent extends Data implements Event {
 
         this.name = entry.category();
         this.index = entry.classifier();
+        this.version = entry.version();
         this.owner = entry.owner();
         this.balance = entry.value();
         this.timestamp = entry.timestamp();
@@ -29,9 +30,10 @@ public class LeaderBoardGlobalEvent extends Data implements Event {
         out.writeUTF("2",this.trackId);
         out.writeUTF("3",this.name);//category
         out.writeUTF("4",this.index);//classifier
-        out.writeUTF("5",this.owner);
-        out.writeDouble("6",this.balance);
-        out.writeLong("7",this.timestamp);
+        out.writeInt("5",this.version);
+        out.writeUTF("6",this.owner);
+        out.writeDouble("7",this.balance);
+        out.writeLong("8",this.timestamp);
     }
 
     @Override
@@ -40,9 +42,10 @@ public class LeaderBoardGlobalEvent extends Data implements Event {
         this.trackId = in.readUTF("2");
         this.name = in.readUTF("3");
         this.index = in.readUTF("4");
-        this.owner = in.readUTF("5");
-        this.balance = in.readDouble("6");
-        this.timestamp = in.readLong("7");
+        this.version = in.readInt("5");
+        this.owner = in.readUTF("6");
+        this.balance = in.readDouble("7");
+        this.timestamp = in.readLong("8");
     }
     @Override
     public int getFactoryId(){

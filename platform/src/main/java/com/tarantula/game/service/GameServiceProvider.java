@@ -93,7 +93,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
         this.dest = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).subscription();
         serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).addEventListener(NAME,(e)->{
-            EntryImpl update = new EntryImpl(e.index(),e.name(),e.owner(),e.balance(),e.timestamp());
+            EntryImpl update = new EntryImpl(e.index(),e.name(),e.version(),e.owner(),e.balance(),e.timestamp());
             LeaderBoardSync ldb = this._leaderBoard(update.category());
             ldb.onBoard(update);
             return false;
