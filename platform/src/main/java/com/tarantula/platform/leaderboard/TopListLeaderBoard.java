@@ -24,15 +24,15 @@ public class TopListLeaderBoard implements LeaderBoard {
         this.size = size;
     }
     public void load(){
-        BoardImpl d = new BoardImpl("daily",category,size);
+        BoardImpl d = new BoardImpl("daily",category,size,this.comparator);
         d.dataStore(this.dataStore);
         d.load();
         boards[0]=d;
-        BoardImpl w =new BoardImpl("weekly",category,size);
+        BoardImpl w =new BoardImpl("weekly",category,size,this.comparator);
         w.dataStore(this.dataStore);
         w.load();
         boards[1]=w;
-        BoardImpl t =new BoardImpl("total",category,size);
+        BoardImpl t =new BoardImpl("total",category,size,this.comparator);
         t.dataStore(this.dataStore);
         t.load();
         boards[2]=t;
@@ -46,9 +46,20 @@ public class TopListLeaderBoard implements LeaderBoard {
         return category;
     }
 
+    public void onBoard(Entry entry){
+        if(entry.classifier().equals("daily")){
+
+        }
+        else if(entry.classifier().equals("weekly")){
+
+        }
+        else if(entry.classifier().equals("total")){
+
+        }
+    }
     public void onBoard(String systemId,double value) {
         for(int i=0;i<3;i++){
-            boards[i].onBoard(new EntryImpl(systemId,value),listener);
+            boards[i].onBoard(new EntryImpl(systemId,value,System.currentTimeMillis()),listener);
         }
     }
     public void registerListener(Listener listener){

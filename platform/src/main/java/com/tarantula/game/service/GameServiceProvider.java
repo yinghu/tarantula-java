@@ -6,6 +6,7 @@ import com.tarantula.game.Zone;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.DeltaStatistics;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
+import com.tarantula.platform.leaderboard.EntryImpl;
 import com.tarantula.platform.leaderboard.TopListLeaderBoard;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.service.ClusterProvider;
@@ -32,6 +33,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
 
     private ConcurrentHashMap<String,TopListLeaderBoard> tMap = new ConcurrentHashMap<>();
     private EventService publisher;
+    private String dest;
     public GameServiceProvider(String name){
         NAME = name;
     }
@@ -92,8 +94,12 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     public void setup(ServiceContext serviceContext) {
         this.dataStore = serviceContext.dataStore(NAME,serviceContext.partitionNumber());
         this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
+        this.dest = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).subscription();
         serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).addEventListener(NAME,(e)->{
-            logger.warn(e.toString());
+            EntryImpl update = new EntryImpl(e.index(),e.name(),e.owner(),e.balance(),e.timestamp());
+            logger.warn(update.toString());
+            TopListLeaderBoard ldb = this._leaderBoard(update.category());
+            ldb.onBoard(update);
             return false;
         });
         /**
@@ -126,9 +132,6 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
 
     @Override
     public void onUpdated(LeaderBoard.Entry entry) {
-        //TopListLeaderBoard ldb = this._leaderBoard(entry.category());
-        publisher.publish(new LeaderBoardGlobalEvent(NAME,entry));
-        //logger.warn(entry.key().asString());
-        //publish entry
+        publisher.publish(new LeaderBoardGlobalEvent(dest,NAME,entry));
     }
 }

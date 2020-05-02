@@ -13,20 +13,23 @@ public class LeaderBoardGlobalEvent extends Data implements Event {
     public LeaderBoardGlobalEvent(){
 
     }
-    public LeaderBoardGlobalEvent(String destination, LeaderBoard.Entry entry){
+    public LeaderBoardGlobalEvent(String destination,String trackId, LeaderBoard.Entry entry){
         this.destination = destination;
-        this.instanceId = entry.category();
-        this.clientId = entry.classifier();
-        this.systemId = entry.owner();
+        this.trackId = trackId;
+
+        this.name = entry.category();
+        this.index = entry.classifier();
+        this.owner = entry.owner();
         this.balance = entry.value();
         this.timestamp = entry.timestamp();
     }
     @Override
     public void writePortable(PortableWriter out) throws IOException {
         out.writeUTF("1",this.destination);
-        out.writeUTF("3",this.instanceId);
-        out.writeUTF("4",this.clientId);
-        out.writeUTF("5",this.systemId);
+        out.writeUTF("2",this.trackId);
+        out.writeUTF("3",this.name);//category
+        out.writeUTF("4",this.index);//classifier
+        out.writeUTF("5",this.owner);
         out.writeDouble("6",this.balance);
         out.writeLong("7",this.timestamp);
     }
@@ -34,9 +37,10 @@ public class LeaderBoardGlobalEvent extends Data implements Event {
     @Override
     public void readPortable(PortableReader in) throws IOException {
         this.destination = in.readUTF("1");
-        this.instanceId = in.readUTF("3");
-        this.clientId = in.readUTF("4");
-        this.systemId = in.readUTF("5");
+        this.trackId = in.readUTF("2");
+        this.name = in.readUTF("3");
+        this.index = in.readUTF("4");
+        this.owner = in.readUTF("5");
         this.balance = in.readDouble("6");
         this.timestamp = in.readLong("7");
     }

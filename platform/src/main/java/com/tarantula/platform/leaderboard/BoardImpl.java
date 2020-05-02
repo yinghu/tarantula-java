@@ -10,10 +10,13 @@ public class BoardImpl extends RecoverableObject implements LeaderBoard.Board {
     private String category;
     private int size;
     private EntryImpl[] board;
-    public BoardImpl(String classifier,String category,int size){
+    private EntryComparator entryComparator;
+
+    public BoardImpl(String classifier,String category,int size,EntryComparator entryComparator){
         this.classifier = classifier;
         this.category = category;
         this.size = size;
+        this.entryComparator = entryComparator;
     }
     public void load(){
         board = new EntryImpl[size];

@@ -80,6 +80,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
                         return;
                     }
                     _onIndex.computeIfAbsent(parseUid(uid),(k)->new ConcurrentHashMap<>()).forEach((k,v)->{
+                        context.log(new String(delta),OnLog.WARN);
                         v.write(delta,this.module.label()+"#"+uid);
                     });
                 }

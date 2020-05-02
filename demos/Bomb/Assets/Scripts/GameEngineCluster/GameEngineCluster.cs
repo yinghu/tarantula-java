@@ -381,7 +381,7 @@ namespace Tarantula.Networking{
                     OnUpdating?.Invoke(room.state);
                 }
                 else if(im.query!=null&&im.query.Equals("onTimer")){
-                    //Debug.Log("Timer=>>>"+im.payload);
+                    Debug.Log("Timer=>>>"+im.payload);
                     JObject jo = JObject.Parse(im.payload);
                     timer.m = (int)jo.SelectToken("m");
                     timer.s = (int)jo.SelectToken("s");

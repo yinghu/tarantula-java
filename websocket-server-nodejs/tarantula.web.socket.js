@@ -53,7 +53,7 @@ var wsServer = new WebSocketServer({
     autoAcceptConnections: false
 });
 function validateOrigin(origin) {
-    //console.log("Origin->"+origin);
+    console.log("Origin->"+origin);
     return true;
 }
 
@@ -106,16 +106,16 @@ wsServer.on('request', function(request) {
                 
             });**/
             connection.on('error',function(err){
-                //console.log('Error on web socket connection');
+                console.log('Error on web socket connection');
                 cMap.delete(connection.clientId);
             });
             connection.on('close', function(reasonCode, description) {
                 cMap.delete(connection.clientId);
-                //console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.clientId);
+                console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.clientId);
             });
         }
         else{
-            //console.log('ticket failed to validate');
+            console.log('ticket failed to validate');
             request.reject();//failure on ticket validation
         }
     });

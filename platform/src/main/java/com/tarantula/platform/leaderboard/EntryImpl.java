@@ -29,11 +29,18 @@ public class EntryImpl extends RecoverableObject implements LeaderBoard.Entry {
         this.category = category;
         this.version = version;
     }
-    //value entry
-    public EntryImpl(String systemId,double value){
+    public EntryImpl(String systemId,double value,long timestamp){
+        this();
         this.owner = systemId;
         this.value = value;
-        this.timestamp = System.currentTimeMillis();
+        this.timestamp = timestamp;
+    }
+    //value entry
+    public EntryImpl(String classifier,String category,String systemId,double value,long timestamp){
+        this(classifier,category,0);
+        this.owner = systemId;
+        this.value = value;
+        this.timestamp = timestamp;
     }
     public LeaderBoard.Entry update(LeaderBoard.Entry entry){
         this.owner = entry.owner();
@@ -65,7 +72,7 @@ public class EntryImpl extends RecoverableObject implements LeaderBoard.Entry {
     }
     @Override
     public String toString(){
-        return this.owner+","+value+","+timestamp;
+        return classifier+"/"+category+"/"+this.owner+"/"+value+"/"+timestamp;
     }
 
     @Override
