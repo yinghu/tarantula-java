@@ -28,8 +28,12 @@ public class MatchMakingModule implements Module {
                 Statistics statistics = gameServiceProvider.statistics(session.systemId());
                 statistics.entry("wc").value(1);
                 statistics.update();
-                LeaderBoard leaderBoard = gameServiceProvider.leaderBoard("wc");
+                LeaderBoard.Board leaderBoard = gameServiceProvider.leaderBoard("wc").total();
                 leaderBoard.onBoard(session.systemId(),statistics.entry("wc").value());
+                LeaderBoard.Board leaderBoard1 = gameServiceProvider.leaderBoard("wc").daily();
+                leaderBoard1.onBoard(session.systemId(),statistics.entry("wc").value());
+                LeaderBoard.Board leaderBoard2 = gameServiceProvider.leaderBoard("wc").weekly();
+                leaderBoard2.onBoard(session.systemId(),statistics.entry("wc").value());
             }
             else{
                 session.write(this.builder.create().toJson(response).getBytes(),label());

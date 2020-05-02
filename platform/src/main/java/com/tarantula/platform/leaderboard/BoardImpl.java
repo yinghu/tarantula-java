@@ -6,6 +6,7 @@ import com.tarantula.platform.RecoverableObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class BoardImpl extends RecoverableObject implements LeaderBoard.Board {
@@ -38,6 +39,9 @@ public class BoardImpl extends RecoverableObject implements LeaderBoard.Board {
         }
         Arrays.sort(board,entryComparator);
     }
+    public void onBoard(String systemId,double value){
+
+    }
     public synchronized void onBoard(LeaderBoard.Entry entry,LeaderBoard.Listener listener){
         EntryImpl e = eIndex.get(entry.owner());
         if(e==null&&(e=board[size-1]).value()<entry.value()){
@@ -54,10 +58,7 @@ public class BoardImpl extends RecoverableObject implements LeaderBoard.Board {
         }
     }
     @Override
-    public synchronized LeaderBoard.Entry[] list() {
-        for(EntryImpl e: board){
-            System.out.println(e.toString());
-        }
-        return board;
+    public List<LeaderBoard.Entry> list() {
+        return new ArrayList<>();
     }
 }

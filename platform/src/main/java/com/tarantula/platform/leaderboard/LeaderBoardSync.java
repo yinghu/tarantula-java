@@ -3,6 +3,8 @@ package com.tarantula.platform.leaderboard;
 import com.tarantula.DataStore;
 import com.tarantula.LeaderBoard;
 
+import java.util.List;
+
 /**
  * Updated 8/24/19
  */
@@ -14,11 +16,11 @@ public class LeaderBoardSync implements LeaderBoard {
 
     private BoardImpl[] boards = new BoardImpl[3];
 
+
     private EntryComparator comparator = new EntryComparator();
-
-
     private Listener listener;
     private DataStore dataStore;
+
     public LeaderBoardSync(String category, int size){
         this.category = category;
         this.size = size;
@@ -46,7 +48,8 @@ public class LeaderBoardSync implements LeaderBoard {
         return category;
     }
 
-    public void onBoard(Entry entry){
+    public void onBoard(Entry entry){//build global list
+        System.out.println(entry.toString());
         if(entry.classifier().equals("daily")){
 
         }
@@ -57,23 +60,17 @@ public class LeaderBoardSync implements LeaderBoard {
 
         }
     }
-    public void onBoard(String systemId,double value) {
-        for(int i=0;i<3;i++){
-            boards[i].onBoard(new EntryImpl(systemId,value,System.currentTimeMillis()),listener);
-            boards[i].list();
-        }
-    }
     public void registerListener(Listener listener){
         this.listener = listener;
     }
     public Board daily(){
-        return boards[0];
+        return new _Board(boards[0],listener);
     }
     public Board weekly(){
-        return boards[1];
+        return new _Board(boards[1],listener);
     }
     public Board total(){
-        return boards[2];
+        return new _Board(boards[2],listener);
     }
 
     public void reset(){
@@ -88,5 +85,33 @@ public class LeaderBoardSync implements LeaderBoard {
     @Override
     public void update() {
 
+    }
+    static class _Board implements Board{
+        private final BoardImpl impl;
+        private final Listener listener;
+        public _Board(BoardImpl board,Listener listener){
+            this.impl = board;
+            this.listener = listener;
+        }
+        @Override
+        public void onBoard(String systemId, double value) {
+            impl.onBoard(new EntryImpl(systemId,value,System.currentTimeMillis()),listener);
+        }
+
+        @Override
+        public List<Entry> list() {
+            //return global list from listener
+            return impl.list();
+        }
+
+        @Override
+        public void dataStore(DataStore dataStore) {
+
+        }
+
+        @Override
+        public void update() {
+
+        }
     }
 }

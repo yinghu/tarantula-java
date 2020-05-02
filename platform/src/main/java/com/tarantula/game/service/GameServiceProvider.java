@@ -98,14 +98,14 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
             ldb.onBoard(update);
             return false;
         });
-        /**
-        this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.RATING_CID,(r)->{
-            logger.warn(r.toString());
-        });
-        this.dataStore.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.LEADER_BOARD_ENTRY_CID,(r)->{
-            logger.warn("DS->"+r.key().asString());
-            logger.warn("DS->"+r.toString());
-        });**/
+
+        //this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.RATING_CID,(r)->{
+            //logger.warn(r.toString());
+        //});
+        //this.dataStore.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.LEADER_BOARD_ENTRY_CID,(r)->{
+            //logger.warn("DS->"+r.key().asString());
+            //logger.warn("DS->"+r.toString());
+        //});
         logger.info("Game service provider ["+ NAME+"] started");
     }
 
