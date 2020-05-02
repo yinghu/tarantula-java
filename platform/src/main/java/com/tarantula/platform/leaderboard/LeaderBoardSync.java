@@ -2,7 +2,6 @@ package com.tarantula.platform.leaderboard;
 
 import com.tarantula.DataStore;
 import com.tarantula.LeaderBoard;
-import com.tarantula.Updatable;
 
 /**
  * Updated 8/24/19
@@ -81,5 +80,7 @@ public class LeaderBoardSync implements LeaderBoard{
     public void dataStore(DataStore dataStore) {
         this.dataStore = dataStore;
     }
-
+    public void reset(){
+        //reset daily, weekly 
+    }
 }

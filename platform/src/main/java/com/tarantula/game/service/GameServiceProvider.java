@@ -111,6 +111,9 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     @Override
     public void atMidnight(){
         logger.warn("Running midnight check...");
+        tMap.forEach((k,v)->{
+            v.reset();
+        });
     }
     @Override
     public void start() throws Exception {
