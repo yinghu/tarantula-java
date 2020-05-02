@@ -3,7 +3,7 @@ package com.tarantula.platform.service;
 import com.tarantula.Serviceable;
 
 /**
- * Updated by yinghu lu on 4/17/2018.
+ * Updated by yinghu lu on 5/2/2020
  * ServiceProvider provides the API to hook the business logic to application context
  */
 public interface ServiceProvider extends Serviceable {
@@ -12,6 +12,8 @@ public interface ServiceProvider extends Serviceable {
 
     void setup(ServiceContext serviceContext);
 
-    void waitForData();
+    default void waitForData(){}
 
+    //midnight check
+    default void atMidnight(){}
 }

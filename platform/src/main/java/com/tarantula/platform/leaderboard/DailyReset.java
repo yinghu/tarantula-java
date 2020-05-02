@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 /**
  * Created by yinghu lu on 6/15/2018.
  */
-public class DailyReset implements LeaderBoard.Reset{
+public class DailyReset{
 
     int updated;
 

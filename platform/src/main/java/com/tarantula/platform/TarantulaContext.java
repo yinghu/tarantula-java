@@ -18,7 +18,7 @@ import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationXMLParser;
 import com.tarantula.platform.util.SystemUtil;
 
-public class TarantulaContext implements Serviceable,ServiceContext{
+public class TarantulaContext implements Serviceable,ServiceContext,SchedulingTask{
 
 
     private static TarantulaLogger log = JDKLogger.getLogger(TarantulaContext.class);
@@ -186,6 +186,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         this.deploymentServiceProvider.start();
         this.serviceProviders.put(DeploymentServiceProvider.NAME,this.deploymentServiceProvider);
         new ServiceBootstrap(_tarantulaApplicationStarted,null,this.endpointService,"endPointService",true).start();
+        this.schedule(this);
 	}
 	public void shutdown() throws Exception {
 	    this.scheduledExecutorService.shutdown();
@@ -527,5 +528,31 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     public static MemberDiscovery memberDiscovery(int scope){
  	    memberDiscovery.scope(scope);
  	    return memberDiscovery;
+    }
+
+    @Override
+    public boolean oneTime() {
+        return true;
+    }
+
+    @Override
+    public long initialDelay() {
+        return 0;
+    }
+
+    @Override
+    public long delay() {
+ 	    return SystemUtil.toMidnight();
+    }
+
+    @Override
+    public void run() {
+ 	    serviceProviders.forEach((k,v)->{
+ 	        v.atMidnight();
+        });
+        dataStoreProviders.forEach((k,v)->{
+            v.atMidnight();
+        });
+        this.schedule(this);
     }
 }

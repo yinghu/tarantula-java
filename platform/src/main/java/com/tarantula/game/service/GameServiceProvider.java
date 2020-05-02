@@ -95,7 +95,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).addEventListener(NAME,(e)->{
             EntryImpl update = new EntryImpl(e.index(),e.name(),e.version(),e.owner(),e.balance(),e.timestamp());
             LeaderBoardSync ldb = this._leaderBoard(update.category());
-            ldb.onBoard(update);
+            ldb.onView(update);
             return false;
         });
 
@@ -108,12 +108,10 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         //});
         logger.info("Game service provider ["+ NAME+"] started");
     }
-
     @Override
-    public void waitForData() {
-
+    public void atMidnight(){
+        logger.warn("Running midnight check...");
     }
-
     @Override
     public void start() throws Exception {
 

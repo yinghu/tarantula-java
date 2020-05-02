@@ -1,38 +1,32 @@
 package com.tarantula;
 
-import java.util.List;
-
 /**
  * Updated by yinghu on 4/30/20
  */
-public interface LeaderBoard extends Updatable{
+public interface LeaderBoard{
 
     int size();
     String category(); //The category of statistics eg WonCount, LostCount
-    void reset();
     void registerListener(Listener listener);
 
-    default Board daily(){ return null;}
-    default Board weekly(){
-        return null;
-    }
-    default Board total(){
-        return null;
-    }
+    Board daily();
+    Board weekly();
+    //Board monthly();
+    //Board yearly();
+    Board total();
 
     interface  Board extends Updatable{
         void onBoard(String systemId,double value);
-        List<Entry> list();
+        default void rank(Ranking ranking){}
+    }
+    interface Ranking{
+        boolean on(int rank,Entry entry);
     }
     interface Entry extends Recoverable,Updatable{
-        int rank();
         String category();
         String classifier();//board name daily, weekly, total
         double value();
         Entry update(Entry entry);
-    }
-    interface Reset{
-        boolean reset(LeaderBoard leaderBoard);
     }
     interface Listener{
         void onUpdated(Entry entry);

@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Updated by yinghu lu on 6/28/2019.
  */
-public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,SchedulingTask,EventListener{
+public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,EventListener{
 
     private static JDKLogger log = JDKLogger.getLogger(BerkeleyJEProvider.class);
 
@@ -226,9 +226,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Sc
         log.info("Total active entries ["+tc.get()+"] from cluster nodes and Berkeley JAVA Edition data store is ready");
         this.dataCluster.subscribe(this.replicationTopic,this);
         this.integrationCluster.subscribe(this.backupTopic,this);
-        if(dailyBackup){
-            this.serviceContext.schedule(this);
-        }
+        //if(dailyBackup){
+            //this.serviceContext.schedule(this);
+        //}
 
     }
     @Override
@@ -564,27 +564,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Sc
         }
     }
     @Override
-    public boolean oneTime() {
-        return true;
+    public void atMidnight() {
+        if(dailyBackup){
+            backup(Distributable.DATA_SCOPE);//daily incremental backup
+            backup(Distributable.INTEGRATION_SCOPE);
+        }
     }
-
-    @Override
-    public long initialDelay() {
-        return 0;
-    }
-
-    @Override
-    public long delay() {
-        return SystemUtil.toMidnight();
-    }
-
-    @Override
-    public void run() {
-        backup(Distributable.DATA_SCOPE);//daily incremental backup
-        backup(Distributable.INTEGRATION_SCOPE);
-        this.serviceContext.schedule(this);
-    }
-
     @Override
     public boolean onEvent(Event event) {
         if(event instanceof MapStoreSyncEvent){

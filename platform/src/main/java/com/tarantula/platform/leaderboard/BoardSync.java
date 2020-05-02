@@ -2,14 +2,11 @@ package com.tarantula.platform.leaderboard;
 
 import com.tarantula.LeaderBoard;
 import com.tarantula.platform.RecoverableObject;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 
-public class BoardImpl extends RecoverableObject implements LeaderBoard.Board {
+public class BoardSync extends RecoverableObject{
 
     private String classifier;
     private String category;
@@ -18,13 +15,13 @@ public class BoardImpl extends RecoverableObject implements LeaderBoard.Board {
     private HashMap<String,EntryImpl> eIndex;
     private EntryComparator entryComparator;
 
-    public BoardImpl(String classifier,String category,int size,EntryComparator entryComparator){
+    public BoardSync(String classifier, String category, int size, EntryComparator entryComparator){
         this.classifier = classifier;
         this.category = category;
         this.size = size;
         this.entryComparator = entryComparator;
     }
-    public void load(LeaderBoard.Listener listener){
+    public synchronized void load(LeaderBoard.Listener listener){
         board = new EntryImpl[size];
         eIndex = new HashMap<>();
         for(int i=0;i<size;i++){
@@ -39,10 +36,7 @@ public class BoardImpl extends RecoverableObject implements LeaderBoard.Board {
         }
         Arrays.sort(board,entryComparator);
     }
-    public void onBoard(String systemId,double value){
-
-    }
-    public synchronized void onBoard(LeaderBoard.Entry entry,LeaderBoard.Listener listener){
+    synchronized void onBoard(LeaderBoard.Entry entry,LeaderBoard.Listener listener){
         EntryImpl e = eIndex.get(entry.owner());
         if(e==null&&(e=board[size-1]).value()<entry.value()){
             eIndex.remove(e.owner());
@@ -56,13 +50,5 @@ public class BoardImpl extends RecoverableObject implements LeaderBoard.Board {
             Arrays.sort(board,entryComparator);
             listener.onUpdated(e);
         }
-    }
-    @Override
-    public List<LeaderBoard.Entry> list() {
-        //for(EntryImpl e: board){
-            //System.out.println("K=>"+e.key().asString());
-            //System.out.println("V=>"+e.toString());
-        //}
-        return new ArrayList<>();
     }
 }

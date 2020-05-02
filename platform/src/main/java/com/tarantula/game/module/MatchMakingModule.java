@@ -30,13 +30,10 @@ public class MatchMakingModule implements Module {
                 statistics.update();
                 LeaderBoard.Board leaderBoard = gameServiceProvider.leaderBoard("wc").total();
                 leaderBoard.onBoard(session.systemId(),statistics.entry("wc").value());
-                LeaderBoard.Board leaderBoard1 = gameServiceProvider.leaderBoard("wc").daily();
-                leaderBoard1.onBoard(session.systemId(),statistics.entry("wc").value());
-                LeaderBoard.Board leaderBoard2 = gameServiceProvider.leaderBoard("wc").weekly();
-                leaderBoard2.onBoard(session.systemId(),statistics.entry("wc").value());
-                leaderBoard.list();
-                leaderBoard1.list();
-                leaderBoard2.list();
+                leaderBoard.rank((r,e)->{
+                    context.log("Rank->"+r+"<><>"+e.toString(),OnLog.WARN);
+                    return true;
+                });
 
             }
             else{

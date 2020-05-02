@@ -57,9 +57,7 @@ public class EntryImpl extends RecoverableObject implements LeaderBoard.Entry {
     public String classifier(){
         return this.classifier;
     }
-    public int rank(){
-        return this.version;
-    }
+
     public double value() {
         return value;
     }
