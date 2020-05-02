@@ -34,6 +34,9 @@ public class MatchMakingModule implements Module {
                 leaderBoard1.onBoard(session.systemId(),statistics.entry("wc").value());
                 LeaderBoard.Board leaderBoard2 = gameServiceProvider.leaderBoard("wc").weekly();
                 leaderBoard2.onBoard(session.systemId(),statistics.entry("wc").value());
+                leaderBoard.list();
+                leaderBoard1.list();
+                leaderBoard2.list();
 
             }
             else{

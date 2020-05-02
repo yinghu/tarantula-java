@@ -3,7 +3,10 @@ package com.tarantula.platform.leaderboard;
 import com.tarantula.DataStore;
 import com.tarantula.LeaderBoard;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Updated 8/24/19
@@ -16,10 +19,14 @@ public class LeaderBoardSync implements LeaderBoard {
 
     private BoardImpl[] boards = new BoardImpl[3];
 
-
     private EntryComparator comparator = new EntryComparator();
     private Listener listener;
     private DataStore dataStore;
+
+    private SortedSet<Entry> daily = new TreeSet<>(comparator);
+    private SortedSet<Entry> weekly = new TreeSet<>(comparator);
+    private SortedSet<Entry> total = new TreeSet<>(comparator);
+
 
     public LeaderBoardSync(String category, int size){
         this.category = category;
@@ -49,28 +56,28 @@ public class LeaderBoardSync implements LeaderBoard {
     }
 
     public void onBoard(Entry entry){//build global list
-        System.out.println(entry.key().asString()+"<><><><>"+entry.toString());
+        //System.out.println(entry.key().asString()+"<><><><>"+entry.toString());
         if(entry.classifier().equals("daily")){
-
+            daily.add(entry);
         }
         else if(entry.classifier().equals("weekly")){
-
+            weekly.add(entry);
         }
         else if(entry.classifier().equals("total")){
-
+            total.add(entry);
         }
     }
     public void registerListener(Listener listener){
         this.listener = listener;
     }
     public Board daily(){
-        return new _Board(boards[0],listener);
+        return new _Board(boards[0],listener,daily);
     }
     public Board weekly(){
-        return new _Board(boards[1],listener);
+        return new _Board(boards[1],listener,weekly);
     }
     public Board total(){
-        return new _Board(boards[2],listener);
+        return new _Board(boards[2],listener,total);
     }
 
     public void reset(){
@@ -89,9 +96,11 @@ public class LeaderBoardSync implements LeaderBoard {
     static class _Board implements Board{
         private final BoardImpl impl;
         private final Listener listener;
-        public _Board(BoardImpl board,Listener listener){
+        private final SortedSet<Entry> list;
+        public _Board(BoardImpl board,Listener listener,SortedSet list){
             this.impl = board;
             this.listener = listener;
+            this.list = list;
         }
         @Override
         public void onBoard(String systemId, double value) {
@@ -101,7 +110,10 @@ public class LeaderBoardSync implements LeaderBoard {
         @Override
         public List<Entry> list() {
             //return global list from listener
-            return impl.list();
+            list.forEach((e)->{
+                System.out.println(e.toString());
+            });
+            return new ArrayList<>();
         }
 
         @Override

@@ -59,10 +59,10 @@ public class BoardImpl extends RecoverableObject implements LeaderBoard.Board {
     }
     @Override
     public List<LeaderBoard.Entry> list() {
-        for(EntryImpl e: board){
-            System.out.println("K=>"+e.key().asString());
-            System.out.println("V=>"+e.toString());
-        }
+        //for(EntryImpl e: board){
+            //System.out.println("K=>"+e.key().asString());
+            //System.out.println("V=>"+e.toString());
+        //}
         return new ArrayList<>();
     }
 }
