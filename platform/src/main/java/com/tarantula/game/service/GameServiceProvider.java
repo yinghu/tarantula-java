@@ -3,6 +3,7 @@ package com.tarantula.game.service;
 import com.tarantula.*;
 import com.tarantula.game.Zone;
 import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.LeaderBoardEntry;
@@ -101,11 +102,12 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         //this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.RATING_CID,(r)->{
             //logger.warn(r.toString());
         //});
-        /**
+
         this.dataStore.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.LEADER_BOARD_ENTRY_CID,(r)->{
             //logger.warn("DS->"+r.key().asString());
             logger.warn("LD->"+r.toString());
         });
+         /**
         RecoverableListener c = this.dataStore.registerRecoverableListener(new PresencePortableRegistry());
         c.addRecoverableFilter(PresencePortableRegistry.STATISTICS_CID,(r)->{
             //logger.warn("DS->"+r.key().asString());

@@ -25,15 +25,13 @@ public class MatchMakingModule implements Module {
             Rating rating = this.gameServiceProvider.rating(session.systemId());
             Response response = context.presence(session.systemId()).onPlay(session,mZone.get(rating.rank));
             if(response==null){
-                //Statistics.Entry statistics = gameServiceProvider.statistics(session.systemId()).entry("kc");
-                //statistics.update(1).update();
-                LeaderBoard.Board leaderBoard = gameServiceProvider.leaderBoard("kc").daily();
-                //leaderBoard.onBoard(session.systemId(),statistics.daily());
-                leaderBoard.rank((r,e)->{
-                    context.log("Rank->"+r+"<><>"+e.toString(),OnLog.WARN);
-                    return true;
-                });
-
+                Statistics.Entry statistics = gameServiceProvider.statistics(session.systemId()).entry("kc");
+                statistics.update(1).update();
+                gameServiceProvider.leaderBoard("kc").total().onBoard(session.systemId(),statistics.total());
+                gameServiceProvider.leaderBoard("kc").daily().onBoard(session.systemId(),statistics.daily());
+                gameServiceProvider.leaderBoard("kc").weekly().onBoard(session.systemId(),statistics.weekly());
+                gameServiceProvider.leaderBoard("kc").monthly().onBoard(session.systemId(),statistics.monthly());
+                gameServiceProvider.leaderBoard("kc").yearly().onBoard(session.systemId(),statistics.yearly());
             }
             else{
                 session.write(this.builder.create().toJson(response).getBytes(),label());
