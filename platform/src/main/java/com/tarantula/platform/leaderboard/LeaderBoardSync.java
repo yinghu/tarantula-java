@@ -76,14 +76,21 @@ public class LeaderBoardSync implements LeaderBoard{
     }
 
     public void onView(Entry entry){//build global list
+        //System.out.println(">>>>>>>>>>>>"+entry.classifier());
         if(entry.classifier().equals("daily")){
             views[0].onView(entry);
         }
         else if(entry.classifier().equals("weekly")){
             views[1].onView(entry);
         }
-        else if(entry.classifier().equals("total")){
+        else if(entry.classifier().equals("monthly")){
             views[2].onView(entry);
+        }
+        else if(entry.classifier().equals("yearly")){
+            views[3].onView(entry);
+        }
+        else if(entry.classifier().equals("total")){
+            views[4].onView(entry);
         }
         this.listeners.forEach((l)->l.onUpdated(entry));
     }

@@ -1,6 +1,6 @@
 package com.tarantula.platform.statistics;
 
-
+import com.tarantula.Recoverable;
 import com.tarantula.Statistics;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.ResourceKey;
@@ -8,6 +8,7 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
+import java.time.temporal.IsoFields;
 import java.util.Map;
 
 
@@ -65,21 +66,28 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
 
     @Override
     public Statistics.Entry update(double delta) {
-        total += delta;
         LocalDateTime lastUpdated = SystemUtil.fromUTCMilliseconds(timestamp);
         LocalDateTime _now = LocalDateTime.now();
-        if(_now.getYear()==lastUpdated.getYear()){
-            boolean _reset = _now.getDayOfYear()!=lastUpdated.getDayOfYear();
-            daily = _reset?delta : (daily+delta);
-            //_reset = _now.getDayOfWeek()
-            weekly = _reset?delta : (weekly+delta);
-            _reset = _now.getMonth()!=lastUpdated.getMonth();
-            monthly = _reset?delta : (monthly+delta);
+        if(_now.getYear()==lastUpdated.getYear()){//check in same year
+            if(_now.getDayOfYear()==lastUpdated.getDayOfYear()){//same day update
+                daily +=delta;
+                weekly +=delta;
+                monthly +=delta;
+            }//another day
+            else{
+                daily = delta;
+                weekly = (_now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)==lastUpdated.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR))?(weekly+delta):delta;
+                monthly = (_now.getMonth().getValue()==lastUpdated.getMonth().getValue())?(monthly+delta):delta;
+            }
             yearly +=delta;
         }
-        else{
-            yearly=delta;
+        else{//reset on another year include week
+            daily = delta;
+            weekly = delta;
+            monthly = delta;
+            yearly = delta;
         }
+        total += delta;
         timestamp = SystemUtil.toUTCMilliseconds(_now);
         return this;
     }
@@ -111,6 +119,13 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         this.monthly =((Number)properties.get("monthly")).doubleValue();
         this.yearly = ((Number)properties.get("yearly")).doubleValue();
         this.timestamp =((Number)properties.get("timestamp")).longValue();
+    }
+    public void distributionKey(String distributionKey){
+        //parse key
+        String[] k = distributionKey.split(Recoverable.PATH_SEPARATOR);
+        bucket = k[0];
+        oid = k[1];
+        name = k[3];
     }
     @Override
     public Key key(){
