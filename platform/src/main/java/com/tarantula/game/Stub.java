@@ -1,7 +1,6 @@
 package com.tarantula.game;
 
 import com.google.gson.JsonObject;
-import com.tarantula.Statistics;
 import com.tarantula.platform.RecoverableObject;
 
 import java.util.Map;
@@ -16,7 +15,7 @@ public class Stub extends RecoverableObject {
 
     public int rank; //rank of game 1 basis
     public double pxp; //percentage of game xp 100 basis
-    public Statistics.Entry stat;
+    public StatsDelta stats;
     /**
      * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
      * rank - final result 1,2 rank xp = (1/rank)*100  1 - 100 2 50 ..
