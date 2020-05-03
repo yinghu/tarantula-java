@@ -11,6 +11,7 @@ import com.tarantula.platform.leaderboard.LeaderBoardSync;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.ServiceProvider;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -121,7 +122,6 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     }
     @Override
     public void atMidnight(){
-        logger.warn("Running midnight check...");
         tMap.forEach((k,v)->{
             v.reset();
         });

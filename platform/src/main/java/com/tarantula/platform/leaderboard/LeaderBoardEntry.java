@@ -51,6 +51,12 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
         this.timestamp = entry.timestamp();
         return this;
     }
+    LeaderBoard.Entry reset(){
+        this.owner="--";
+        this.value=0;
+        this.timestamp=0;
+        return this;
+    }
     public String category(){
         return this.category;
     }

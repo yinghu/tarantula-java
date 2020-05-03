@@ -51,4 +51,11 @@ public class BoardSync extends RecoverableObject{
             listener.onUpdated(e);
         }
     }
+    synchronized  void reset(){
+        //reset board entry with --,0
+        eIndex.clear();
+        for(LeaderBoardEntry e : board){
+            e.reset().update();
+        }
+    }
 }

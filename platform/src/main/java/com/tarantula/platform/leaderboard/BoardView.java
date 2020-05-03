@@ -49,6 +49,11 @@ public class BoardView implements LeaderBoard.Board {
             }
         }
     }
+    void reset(){
+        vIndex.clear();
+        vList.clear();
+        this.sync.reset();
+    }
     @Override
     public void dataStore(DataStore dataStore) {
 

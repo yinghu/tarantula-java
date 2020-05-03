@@ -2,7 +2,10 @@ package com.tarantula.platform.leaderboard;
 
 import com.tarantula.DataStore;
 import com.tarantula.LeaderBoard;
+import com.tarantula.Statistics;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -74,7 +77,14 @@ public class LeaderBoardSync implements LeaderBoard{
     public String category() {
         return category;
     }
-
+    @Override
+    public void onAllBoard(Statistics.Entry entry){
+        boards[0].onBoard(new LeaderBoardEntry(entry.distributionKey(),entry.daily(),System.currentTimeMillis()),this.listener);
+        boards[1].onBoard(new LeaderBoardEntry(entry.distributionKey(),entry.weekly(),System.currentTimeMillis()),this.listener);
+        boards[2].onBoard(new LeaderBoardEntry(entry.distributionKey(),entry.monthly(),System.currentTimeMillis()),this.listener);
+        boards[3].onBoard(new LeaderBoardEntry(entry.distributionKey(),entry.yearly(),System.currentTimeMillis()),this.listener);
+        boards[4].onBoard(new LeaderBoardEntry(entry.distributionKey(),entry.total(),System.currentTimeMillis()),this.listener);
+    }
     public void onView(Entry entry){//build global list
         //System.out.println(">>>>>>>>>>>>"+entry.classifier());
         if(entry.classifier().equals("daily")){
@@ -122,6 +132,16 @@ public class LeaderBoardSync implements LeaderBoard{
         this.dataStore = dataStore;
     }
     public void reset(){
-        //reset daily, weekly 
+        LocalDate localDate = LocalDate.now();
+        views[0].reset();
+        if (localDate.getDayOfWeek().getValue()==1){
+            views[1].reset();
+        }
+        if(localDate.getDayOfMonth()==1){
+            views[2].reset();
+        }
+        if(localDate.getDayOfYear()==1){
+            views[3].reset();
+        }
     }
 }
