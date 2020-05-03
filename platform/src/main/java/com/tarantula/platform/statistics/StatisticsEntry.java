@@ -2,7 +2,6 @@ package com.tarantula.platform.statistics;
 
 
 import com.tarantula.Statistics;
-import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.ResourceKey;
 import com.tarantula.platform.presence.PresencePortableRegistry;
@@ -17,20 +16,22 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
 
     private String name;
     private double total=0;
-    private double daily;
-    private double weekly;
+    private double daily=0;
+    private double weekly=0;
+    private double monthly=0;
+    private double yearly=0;
 
+    private boolean loaded;
     public StatisticsEntry(){
         this.vertex = "Stats";
     }
-    public StatisticsEntry(String name){
+    public StatisticsEntry(String bucket,String oid,String name){
         this();
+        this.bucket = bucket;
+        this.oid = oid;
         this.name = name;
     }
-    public StatisticsEntry(String name,double value){
-        this(name);
-        this.total = value;
-    }
+
     @Override
     public String name() {
         return name;
@@ -51,7 +52,23 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     }
 
     @Override
-    public Statistics.Entry update(double value) {
+    public double monthly() {
+        return monthly;
+    }
+
+    @Override
+    public double yearly() {
+        return yearly;
+    }
+
+    @Override
+    public Statistics.Entry update(double delta) {
+        total += delta;
+        daily +=delta;
+        weekly+=delta;
+        monthly +=delta;
+        yearly +=delta;
+        timestamp = System.currentTimeMillis();
         return this;
     }
     @Override
@@ -69,16 +86,29 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         this.properties.put("total",total);
         this.properties.put("daily",daily);
         this.properties.put("weekly",weekly);
+        this.properties.put("monthly",monthly);
+        this.properties.put("yearly",yearly);
         this.properties.put("timestamp",this.timestamp);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        
+        this.total = ((Number)properties.get("total")).doubleValue();
+        this.daily =((Number)properties.get("daily")).doubleValue();
+        this.weekly = ((Number)properties.get("weekly")).doubleValue();
+        this.monthly =((Number)properties.get("monthly")).doubleValue();
+        this.yearly = ((Number)properties.get("yearly")).doubleValue();
+        this.timestamp =((Number)properties.get("timestamp")).longValue();
     }
     @Override
     public Key key(){
         return new ResourceKey(this.bucket,this.oid,new String[]{vertex,name});
     }
-
+    synchronized boolean load(){
+        if(loaded){
+            return false;
+        }
+        loaded = true;
+        return this.dataStore.createIfAbsent(this,true);
+    }
 }

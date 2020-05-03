@@ -3,6 +3,8 @@ package com.tarantula.platform.leaderboard;
 import com.tarantula.DataStore;
 import com.tarantula.LeaderBoard;
 
+import java.util.concurrent.CopyOnWriteArraySet;
+
 /**
  * Updated 8/24/19
  */
@@ -20,10 +22,12 @@ public class LeaderBoardSync implements LeaderBoard{
 
     private BoardView[] views = new BoardView[3];
 
+    private CopyOnWriteArraySet<Listener> listeners;
 
     public LeaderBoardSync(String category, int size){
         this.category = category;
         this.size = size;
+        listeners = new CopyOnWriteArraySet<>();
     }
     public void load(){
         BoardSync d = new BoardSync("daily",category,size,this.comparator);
@@ -64,9 +68,16 @@ public class LeaderBoardSync implements LeaderBoard{
         else if(entry.classifier().equals("total")){
             views[2].onView(entry);
         }
+        this.listeners.forEach((l)->l.onUpdated(entry));
     }
-    public void registerListener(Listener listener){
+    public void masterListener(Listener listener){
         this.listener = listener;
+    }
+    public void addListener(Listener listener){
+        this.listeners.add(listener);
+    }
+    public void removeListener(Listener listener){
+        this.listeners.remove(listener);
     }
     public Board daily(){
         return views[0];
@@ -75,6 +86,12 @@ public class LeaderBoardSync implements LeaderBoard{
         return views[1];
     }
     public Board total(){
+        return views[2];
+    }
+    public Board monthly(){
+        return views[1];
+    }
+    public Board yearly(){
         return views[2];
     }
     public void dataStore(DataStore dataStore) {

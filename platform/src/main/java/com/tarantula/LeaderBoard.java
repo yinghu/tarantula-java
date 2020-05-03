@@ -7,12 +7,13 @@ public interface LeaderBoard{
 
     int size();
     String category(); //The category of statistics eg WonCount, LostCount
-    void registerListener(Listener listener);
+    void addListener(Listener listener);
+    void removeListener(Listener listener);
 
     Board daily();
     Board weekly();
-    //Board monthly();
-    //Board yearly();
+    Board monthly();
+    Board yearly();
     Board total();
 
     interface  Board extends Updatable{

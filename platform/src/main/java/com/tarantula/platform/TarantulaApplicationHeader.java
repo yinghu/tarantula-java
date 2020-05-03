@@ -2,7 +2,8 @@ package com.tarantula.platform;
 
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
-import com.tarantula.platform.statistics.DeltaStatistics;
+import com.tarantula.platform.statistics.StatisticsIndex;
+import com.tarantula.platform.statistics.StatisticsSerializer;
 import com.tarantula.platform.util.*;
 
 /**
@@ -31,7 +32,7 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.builder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
-        this.builder.registerTypeAdapter(DeltaStatistics.class,new StatisticsSerializer());
+        this.builder.registerTypeAdapter(StatisticsIndex.class,new StatisticsSerializer());
         this.builder.registerTypeAdapter(SessionIdle.class,new SessionIdleSerializer());
     }
 

@@ -1,4 +1,4 @@
-package com.tarantula.platform.util;
+package com.tarantula.platform.statistics;
 
 import com.google.gson.*;
 import com.tarantula.Statistics;
@@ -14,12 +14,13 @@ public class StatisticsSerializer implements JsonSerializer<Statistics> {
     public JsonElement serialize(Statistics statistics, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo  = new JsonObject();
         JsonArray ja = new JsonArray();
+        /**
         for(Map.Entry<String,Double> kv : statistics.summary().entrySet()){
             JsonObject xv = new JsonObject();
             xv.addProperty("name",kv.getKey());
             xv.addProperty("value",kv.getValue());
             ja.add(xv);
-        }
+        }**/
         jo.addProperty("successful",true);
         jo.add("statistics",ja);
         return jo;

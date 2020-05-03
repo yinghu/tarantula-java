@@ -6,8 +6,8 @@ import com.tarantula.Module;
 import com.tarantula.game.RatingSerializer;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.service.Rating;
-import com.tarantula.platform.statistics.DeltaStatistics;
-import com.tarantula.platform.util.StatisticsSerializer;
+import com.tarantula.platform.statistics.StatisticsIndex;
+import com.tarantula.platform.statistics.StatisticsSerializer;
 
 public class StatisticsModule implements Module {
     private ApplicationContext context;
@@ -38,7 +38,7 @@ public class StatisticsModule implements Module {
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(DeltaStatistics.class,new StatisticsSerializer());
+        this.builder.registerTypeAdapter(StatisticsIndex.class,new StatisticsSerializer());
         this.builder.registerTypeAdapter(Rating.class,new RatingSerializer());
         String gz = this.context.descriptor().typeId().replace("-statistics","-service");
         this.gameServiceProvider = this.context.serviceProvider(gz);

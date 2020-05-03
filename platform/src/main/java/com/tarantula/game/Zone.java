@@ -124,8 +124,7 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
     @Override
     public void onUpdating(Stub stub){
         Statistics statistics = this.gameServiceProvider.statistics(stub.owner());
-        statistics.entry(stub.stat.name()).update(stub.stat.total());
-        statistics.update();
+        statistics.entry(stub.stat.name()).update(stub.stat.total()).update();
     }
     @Override
     public void onTimeout(Room room){

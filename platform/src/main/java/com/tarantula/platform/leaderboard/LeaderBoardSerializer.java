@@ -1,4 +1,4 @@
-package com.tarantula.platform.util;
+package com.tarantula.platform.leaderboard;
 
 import com.google.gson.*;
 import com.tarantula.LeaderBoard;

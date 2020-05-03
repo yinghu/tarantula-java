@@ -3,7 +3,8 @@ package com.tarantula.game.service;
 import com.tarantula.*;
 import com.tarantula.game.Zone;
 import com.tarantula.logging.JDKLogger;
-import com.tarantula.platform.statistics.DeltaStatistics;
+import com.tarantula.platform.presence.PresencePortableRegistry;
+import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.EntryImpl;
 import com.tarantula.platform.leaderboard.LeaderBoardSync;
@@ -54,7 +55,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         }
     }
     public Statistics statistics(String systemId){
-        DeltaStatistics deltaStatistics = new DeltaStatistics();
+        StatisticsIndex deltaStatistics = new StatisticsIndex();
         deltaStatistics.distributionKey(systemId);
         this.dataStore.createIfAbsent(deltaStatistics,true);
         deltaStatistics.dataStore(this.dataStore);
@@ -76,7 +77,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         return tMap.computeIfAbsent(category,(s)->{
             LeaderBoardSync ldb = new LeaderBoardSync(category,LDB_SIZE);
             ldb.dataStore(this.dataStore);
-            ldb.registerListener(this);
+            ldb.masterListener(this);
             ldb.load();
             return ldb;
         });
@@ -105,6 +106,10 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
             //logger.warn("DS->"+r.key().asString());
             //logger.warn("DS->"+r.toString());
         //});
+        this.dataStore.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.STATISTICS_CID,(r)->{
+            logger.warn("DS->"+r.key().asString());
+            logger.warn("DS->"+r.toString());
+        });
         logger.info("Game service provider ["+ NAME+"] started");
     }
     @Override

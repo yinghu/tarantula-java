@@ -204,7 +204,7 @@ public class Room implements Connection.StateListener{
                 e.getValue().getAsJsonArray().forEach((st)->{
                     JsonObject jo = st.getAsJsonObject();
                     Stub stub = stubs[jo.get("seat").getAsInt()];
-                    stub.stat = new StatisticsEntry(jo.get("name").getAsString(),jo.get("value").getAsDouble());
+                    //stub.stat = new StatisticsEntry(jo.get("name").getAsString(),jo.get("value").getAsDouble());
                     this.roomListener.onUpdating(stub);
                 });
             }
@@ -222,7 +222,7 @@ public class Room implements Connection.StateListener{
                 e.getValue().getAsJsonArray().forEach((st)->{
                     JsonObject jo = st.getAsJsonObject();
                     Stub stub = stubs[jo.get("seat").getAsInt()];
-                    stub.stat = new StatisticsEntry(jo.get("name").getAsString(),jo.get("value").getAsDouble());
+                    //stub.stat = new StatisticsEntry(jo.get("name").getAsString(),jo.get("value").getAsDouble());
                     this.roomListener.onUpdating(stub);
                 });
             }
