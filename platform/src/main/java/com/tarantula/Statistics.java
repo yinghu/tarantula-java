@@ -3,18 +3,20 @@ package com.tarantula;
 import java.util.Map;
 
 /**
- * Updated by yinghu on 8/23/2019.
+ * Updated by yinghu on 5/2/2020
  */
-public interface Statistics extends Recoverable,Updatable{
+public interface Statistics{
 
 
     Entry entry(String key);
 
     Map<String,Double> summary();
 
-    interface Entry{
+    interface Entry extends Recoverable,Updatable{
         String name();
-        double value();
-        void value(double value);
+        double total();
+        double daily();
+        double weekly();
+        Entry update(double delta);
     }
 }

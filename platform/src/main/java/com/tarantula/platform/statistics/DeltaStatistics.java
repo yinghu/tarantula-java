@@ -1,7 +1,8 @@
-package com.tarantula.platform;
+package com.tarantula.platform.statistics;
 import com.tarantula.*;
+import com.tarantula.platform.AssociateKey;
+import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
-import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class DeltaStatistics extends RecoverableObject implements Statistics {
     public Map<String,Double> summary(){
         Map<String,Double> _mv = new HashMap<>();
         this.mappings.forEach((k,v)->{
-            _mv.put(k,v.value());
+            _mv.put(k,v.total());
         });
         return _mv;
     }
@@ -41,7 +42,7 @@ public class DeltaStatistics extends RecoverableObject implements Statistics {
     @Override
     public Map<String,Object> toMap(){
         this.mappings.forEach((k,v)->{
-            this.properties.put(v.name(),v.value());
+            this.properties.put(v.name(),v.total());
         });
         return this.properties;
     }

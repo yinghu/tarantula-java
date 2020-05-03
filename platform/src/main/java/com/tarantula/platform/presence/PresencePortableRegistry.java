@@ -2,10 +2,11 @@ package com.tarantula.platform.presence;
 
 import com.tarantula.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
-import com.tarantula.platform.DeltaStatistics;
+import com.tarantula.platform.statistics.DeltaStatistics;
 import com.tarantula.platform.OnBalanceTrack;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.leaderboard.EntryImpl;
+import com.tarantula.platform.statistics.StatisticsEntry;
 
 /**
  * updated by yinghu lu on 5/1/2020.
@@ -18,6 +19,7 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
     public static final int ON_BALANCE_CID = 2;
     public static final int STATISTICS_CID = 3;
     public static final int LEADER_BOARD_ENTRY_CID = 4;
+    public static final int STATISTICS_ENTRY_CID = 5;
 
     public Recoverable create(int i) {
         Recoverable pt = null;
@@ -33,6 +35,9 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 break;
             case LEADER_BOARD_ENTRY_CID:
                 pt = new EntryImpl();
+                break;
+            case STATISTICS_ENTRY_CID:
+                pt = new StatisticsEntry();
                 break;
             default:
         }

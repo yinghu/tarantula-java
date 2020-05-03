@@ -2,6 +2,7 @@ package com.tarantula.platform;
 
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
+import com.tarantula.platform.statistics.DeltaStatistics;
 import com.tarantula.platform.util.*;
 
 /**

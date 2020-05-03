@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.tarantula.Connection;
 import com.tarantula.Module;
-import com.tarantula.platform.StatisticsEntry;
+import com.tarantula.platform.statistics.StatisticsEntry;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;

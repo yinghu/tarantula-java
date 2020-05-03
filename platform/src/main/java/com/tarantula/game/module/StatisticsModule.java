@@ -6,7 +6,7 @@ import com.tarantula.Module;
 import com.tarantula.game.RatingSerializer;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.service.Rating;
-import com.tarantula.platform.DeltaStatistics;
+import com.tarantula.platform.statistics.DeltaStatistics;
 import com.tarantula.platform.util.StatisticsSerializer;
 
 public class StatisticsModule implements Module {

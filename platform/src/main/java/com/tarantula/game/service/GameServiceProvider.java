@@ -3,11 +3,10 @@ package com.tarantula.game.service;
 import com.tarantula.*;
 import com.tarantula.game.Zone;
 import com.tarantula.logging.JDKLogger;
-import com.tarantula.platform.DeltaStatistics;
+import com.tarantula.platform.statistics.DeltaStatistics;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.EntryImpl;
 import com.tarantula.platform.leaderboard.LeaderBoardSync;
-import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.ServiceProvider;
 
