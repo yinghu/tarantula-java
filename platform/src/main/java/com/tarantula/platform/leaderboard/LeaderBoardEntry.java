@@ -11,32 +11,32 @@ import java.util.Map;
 /**
  * Updated by yinghu on 5/1/2020
  */
-public class EntryImpl extends RecoverableObject implements LeaderBoard.Entry {
+public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.Entry {
 
     private double value=0;
     private String classifier;
     private String category;
-    public EntryImpl(){
+    public LeaderBoardEntry(){
         this.vertex ="Entry";
         this.owner="--";
         this.value=0;
         this.timestamp=0;
     }
     //query entry
-    public EntryImpl(String classifier,String category,int version){
+    public LeaderBoardEntry(String classifier, String category, int version){
         this();
         this.classifier = classifier;
         this.category = category;
         this.version = version;
     }
-    public EntryImpl(String systemId,double value,long timestamp){
+    public LeaderBoardEntry(String systemId, double value, long timestamp){
         this();
         this.owner = systemId;
         this.value = value;
         this.timestamp = timestamp;
     }
     //value entry
-    public EntryImpl(String classifier,String category,int version,String systemId,double value,long timestamp){
+    public LeaderBoardEntry(String classifier, String category, int version, String systemId, double value, long timestamp){
         this();
         this.classifier = classifier;
         this.category = category;
@@ -102,7 +102,7 @@ public class EntryImpl extends RecoverableObject implements LeaderBoard.Entry {
 
     @Override
     public boolean equals(Object obj){
-        EntryImpl lde = (EntryImpl)obj;
+        LeaderBoardEntry lde = (LeaderBoardEntry)obj;
         return this.owner.equals(lde.owner());
     }
     @Override

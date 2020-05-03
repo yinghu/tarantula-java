@@ -3,10 +3,9 @@ package com.tarantula.game.service;
 import com.tarantula.*;
 import com.tarantula.game.Zone;
 import com.tarantula.logging.JDKLogger;
-import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
-import com.tarantula.platform.leaderboard.EntryImpl;
+import com.tarantula.platform.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.leaderboard.LeaderBoardSync;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.ServiceProvider;
@@ -93,7 +92,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
         this.dest = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).subscription();
         serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).addEventListener(NAME,(e)->{
-            EntryImpl update = new EntryImpl(e.index(),e.name(),e.version(),e.owner(),e.balance(),e.timestamp());
+            LeaderBoardEntry update = new LeaderBoardEntry(e.index(),e.name(),e.version(),e.owner(),e.balance(),e.timestamp());
             LeaderBoardSync ldb = this._leaderBoard(update.category());
             ldb.onView(update);
             return false;

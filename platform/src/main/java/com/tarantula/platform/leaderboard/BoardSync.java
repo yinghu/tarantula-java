@@ -11,8 +11,8 @@ public class BoardSync extends RecoverableObject{
     private String classifier;
     private String category;
     private int size;
-    private EntryImpl[] board;
-    private HashMap<String,EntryImpl> eIndex;
+    private LeaderBoardEntry[] board;
+    private HashMap<String, LeaderBoardEntry> eIndex;
     private EntryComparator entryComparator;
 
     public BoardSync(String classifier, String category, int size, EntryComparator entryComparator){
@@ -22,10 +22,10 @@ public class BoardSync extends RecoverableObject{
         this.entryComparator = entryComparator;
     }
     public synchronized void load(LeaderBoard.Listener listener){
-        board = new EntryImpl[size];
+        board = new LeaderBoardEntry[size];
         eIndex = new HashMap<>();
         for(int i=0;i<size;i++){
-            EntryImpl entry = new EntryImpl(classifier,category,i);
+            LeaderBoardEntry entry = new LeaderBoardEntry(classifier,category,i);
             this.dataStore.createIfAbsent(entry,true);
             entry.dataStore(dataStore);
             board[i]=entry;
@@ -37,7 +37,7 @@ public class BoardSync extends RecoverableObject{
         Arrays.sort(board,entryComparator);
     }
     synchronized void onBoard(LeaderBoard.Entry entry,LeaderBoard.Listener listener){
-        EntryImpl e = eIndex.get(entry.owner());
+        LeaderBoardEntry e = eIndex.get(entry.owner());
         if(e==null&&(e=board[size-1]).value()<entry.value()){
             eIndex.remove(e.owner());
             e.update(entry).update();

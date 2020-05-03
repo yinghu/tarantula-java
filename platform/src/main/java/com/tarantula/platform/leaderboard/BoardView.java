@@ -27,7 +27,7 @@ public class BoardView implements LeaderBoard.Board {
     }
     @Override
     public void onBoard(String systemId, double value) {
-        sync.onBoard(new EntryImpl(systemId,value,System.currentTimeMillis()),listener);
+        sync.onBoard(new LeaderBoardEntry(systemId,value,System.currentTimeMillis()),listener);
     }
     //check global list
     synchronized void onView(LeaderBoard.Entry entry){

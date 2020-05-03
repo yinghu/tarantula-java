@@ -5,7 +5,7 @@ import com.tarantula.platform.AbstractRecoverableListener;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.OnBalanceTrack;
 import com.tarantula.platform.PresenceIndex;
-import com.tarantula.platform.leaderboard.EntryImpl;
+import com.tarantula.platform.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.statistics.StatisticsEntry;
 
 /**
@@ -34,7 +34,7 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 pt = new StatisticsIndex();
                 break;
             case LEADER_BOARD_ENTRY_CID:
-                pt = new EntryImpl();
+                pt = new LeaderBoardEntry();
                 break;
             case STATISTICS_ENTRY_CID:
                 pt = new StatisticsEntry();
