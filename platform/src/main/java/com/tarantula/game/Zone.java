@@ -123,8 +123,9 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
     }
     @Override
     public void onUpdating(Stub stub){
-        Statistics statistics = this.gameServiceProvider.statistics(stub.owner());
-        statistics.entry(stub.stats.name).update(stub.stats.value).update();
+        Statistics.Entry statistics = this.gameServiceProvider.statistics(stub.owner()).entry(stub.stats.name);
+        statistics.update(stub.stats.value).update();
+        this.gameServiceProvider.leaderBoard(statistics.name()).onAllBoard(statistics);
     }
     @Override
     public void onTimeout(Room room){
@@ -142,8 +143,9 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
             rating.update(sb);
             rating.update();
             if(sb.rank==1){
-                LeaderBoard.Board leaderBoard = gameServiceProvider.leaderBoard("wc").total();
-                leaderBoard.onBoard(sb.owner(),rating.csw);
+                Statistics.Entry stat = this.gameServiceProvider.statistics(sb.owner()).entry("wc");
+                stat.update(1);
+                gameServiceProvider.leaderBoard("wc").onAllBoard(stat);
             }
         }
         room.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
