@@ -5,7 +5,9 @@ import com.tarantula.Statistics;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.ResourceKey;
 import com.tarantula.platform.presence.PresencePortableRegistry;
+import com.tarantula.platform.util.SystemUtil;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 
@@ -64,11 +66,21 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     @Override
     public Statistics.Entry update(double delta) {
         total += delta;
-        daily +=delta;
-        weekly+=delta;
-        monthly +=delta;
-        yearly +=delta;
-        timestamp = System.currentTimeMillis();
+        LocalDateTime lastUpdated = SystemUtil.fromUTCMilliseconds(timestamp);
+        LocalDateTime _now = LocalDateTime.now();
+        if(_now.getYear()==lastUpdated.getYear()){
+            boolean _reset = _now.getDayOfYear()!=lastUpdated.getDayOfYear();
+            daily = _reset?delta : (daily+delta);
+            //_reset = _now.getDayOfWeek()
+            weekly = _reset?delta : (weekly+delta);
+            _reset = _now.getMonth()!=lastUpdated.getMonth();
+            monthly = _reset?delta : (monthly+delta);
+            yearly +=delta;
+        }
+        else{
+            yearly=delta;
+        }
+        timestamp = SystemUtil.toUTCMilliseconds(_now);
         return this;
     }
     @Override

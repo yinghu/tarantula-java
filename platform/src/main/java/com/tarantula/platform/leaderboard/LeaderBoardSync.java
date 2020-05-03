@@ -14,13 +14,13 @@ public class LeaderBoardSync implements LeaderBoard{
     private String category;
     private int size;
 
-    private BoardSync[] boards = new BoardSync[3];
+    private BoardSync[] boards = new BoardSync[5];
 
     private EntryComparator comparator = new EntryComparator();
     private Listener listener;
     private DataStore dataStore;
 
-    private BoardView[] views = new BoardView[3];
+    private BoardView[] views = new BoardView[5];
 
     private CopyOnWriteArraySet<Listener> listeners;
 
@@ -30,24 +30,41 @@ public class LeaderBoardSync implements LeaderBoard{
         listeners = new CopyOnWriteArraySet<>();
     }
     public void load(){
+        //daily
         BoardSync d = new BoardSync("daily",category,size,this.comparator);
         d.dataStore(this.dataStore);
         BoardView dv = new BoardView(d,listener,this.comparator);
         views[0]=dv;
         d.load(listener);
         boards[0]=d;
+        //weekly
         BoardSync w =new BoardSync("weekly",category,size,this.comparator);
         w.dataStore(this.dataStore);
         BoardView wv = new BoardView(w,listener,this.comparator);
         views[1]=wv;
         w.load(listener);
         boards[1]=w;
+        //monthly
+        BoardSync m =new BoardSync("monthly",category,size,this.comparator);
+        m.dataStore(this.dataStore);
+        BoardView mv = new BoardView(m,listener,this.comparator);
+        views[2]=mv;
+        m.load(listener);
+        boards[2]=m;
+        //yearly
+        BoardSync y =new BoardSync("yearly",category,size,this.comparator);
+        y.dataStore(this.dataStore);
+        BoardView yv = new BoardView(y,listener,this.comparator);
+        views[3]=yv;
+        y.load(listener);
+        boards[3]=y;
+        //total
         BoardSync t =new BoardSync("total",category,size,this.comparator);
         t.dataStore(this.dataStore);
         BoardView tv = new BoardView(t,listener,this.comparator);
-        views[2]=tv;
+        views[4]=tv;
         t.load(listener);
-        boards[2]=t;
+        boards[4]=t;
     }
     @Override
     public int size() {
@@ -85,14 +102,14 @@ public class LeaderBoardSync implements LeaderBoard{
     public Board weekly(){
         return views[1];
     }
-    public Board total(){
-        return views[2];
-    }
     public Board monthly(){
-        return views[1];
+        return views[2];
     }
     public Board yearly(){
-        return views[2];
+        return views[3];
+    }
+    public Board total(){
+        return views[4];
     }
     public void dataStore(DataStore dataStore) {
         this.dataStore = dataStore;
