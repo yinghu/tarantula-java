@@ -15,6 +15,7 @@ public interface LeaderBoard{
     Board monthly();
     Board yearly();
     Board total();
+
     void onAllBoard(Statistics.Entry entry);
     interface  Board extends Updatable{
         void onBoard(String systemId,double value);

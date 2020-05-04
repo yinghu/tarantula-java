@@ -26,7 +26,7 @@ public class StatisticsModule implements Module {
             session.write(this.builder.create().toJson(statistics).getBytes(),label());
         }
         else if(session.action().equals("OnLeaderBoard")){
-            LeaderBoard ldb = this.gameServiceProvider.leaderBoard(session.systemId());
+            LeaderBoard ldb = this.gameServiceProvider.leaderBoard("kc");
             session.write(this.builder.create().toJson(ldb).getBytes(),label());
         }
         else{

@@ -34,7 +34,14 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         this.oid = oid;
         this.name = name;
     }
-
+    public StatisticsEntry(Statistics.Entry entry){
+        this.name = entry.name();
+        this.daily = entry.daily();
+        this.weekly = entry.weekly();
+        this.monthly = entry.monthly();
+        this.yearly = entry.yearly();
+        this.total = entry.total();
+    }
     @Override
     public String name() {
         return name;
@@ -130,6 +137,9 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     @Override
     public Key key(){
         return new ResourceKey(this.bucket,this.oid,new String[]{vertex,name});
+    }
+    Statistics.Entry duplicate(){
+        return new StatisticsEntry(this);
     }
     synchronized boolean load(){
         if(loaded){

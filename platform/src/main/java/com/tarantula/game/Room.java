@@ -107,6 +107,9 @@ public class Room implements Connection.StateListener{
         this.connection = null;
         this.roomListener = roomListener;
     }
+    public int round(){
+        return round;
+    }
     public Stub[] playerList(){
         return this.stubs;
     }
@@ -199,7 +202,7 @@ public class Room implements Connection.StateListener{
         InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(updated));
         JsonObject j = jp.parse(inr).getAsJsonObject();
         j.entrySet().forEach((e)->{
-            if(e.getKey().equals("stats")){
+            if(e.getKey().equals("gains")){
                 e.getValue().getAsJsonArray().forEach((st)->{
                     JsonObject jo = st.getAsJsonObject();
                     Stub stub = stubs[jo.get("seat").getAsInt()];
@@ -217,7 +220,7 @@ public class Room implements Connection.StateListener{
         InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(ended));
         JsonObject j = jp.parse(inr).getAsJsonObject();
         j.entrySet().forEach((e)->{
-            if(e.getKey().equals("stats")){
+            if(e.getKey().equals("gains")){
                 e.getValue().getAsJsonArray().forEach((st)->{
                     JsonObject jo = st.getAsJsonObject();
                     Stub stub = stubs[jo.get("seat").getAsInt()];

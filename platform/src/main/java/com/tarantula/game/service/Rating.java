@@ -1,6 +1,5 @@
 package com.tarantula.game.service;
 
-import com.tarantula.DataStore;
 import com.tarantula.Recoverable;
 import com.tarantula.Updatable;
 import com.tarantula.game.GamePortableRegistry;

@@ -12,6 +12,7 @@ public interface Statistics{
 
     //heavy operation!
     List<Entry> summary();
+    void summary(Stream query);
 
     interface Entry extends Recoverable,Updatable{
         String name();
@@ -22,4 +23,8 @@ public interface Statistics{
         double yearly();
         Entry update(double delta);
     }
+    interface Stream{
+        void onEntry(Entry entry);
+    }
+
 }

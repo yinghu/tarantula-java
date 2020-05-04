@@ -32,14 +32,21 @@ public class StatisticsIndex extends RecoverableObject implements Statistics {
         }//load as request
         return entry;
     }
-    //heavy operations should be avoided
+    //memory copy list
     public List<Entry> summary(){
         ArrayList<Entry> elist = new ArrayList<>();
         mappings.forEach((k,v)->{
             v.load();
-            elist.add(v);
+            elist.add(v.duplicate());
         });
         return elist;
+    }
+    //original streaming
+    public void summary(Stream query){
+        mappings.forEach((k,v)->{
+            v.load();
+            query.onEntry(v);
+        });
     }
     @Override
     public int getFactoryId() {
