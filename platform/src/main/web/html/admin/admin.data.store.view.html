@@ -45,7 +45,7 @@
     }; 
     cm.button.icon.texture = PIXI.Texture.from('assets/table.png');
     
-    let statBoard = UI.statisticsBoard(7);
+    let statBoard = UI.statisticsBoard(6);
     statBoard.command = ()=>{};
     statBoard.lines[0].set('##','DataStore','Total Records');
     
@@ -61,9 +61,8 @@
             statBoard.lines[2].set(2,'Presence',jx.Presence);
             statBoard.lines[3].set(3,'User',jx.User);
             statBoard.lines[4].set(4,'Game',jx.Game);
-            statBoard.lines[5].set(5,'LeaderBoard',jx.LeaderBoard);
-            statBoard.lines[6].set(6,'AccessIndex',jx.AccessIndex);
-            statBoard.lines[7].set(7,"Total Records",jx.Total);
+            statBoard.lines[6].set(5,'AccessIndex',jx.AccessIndex);
+            statBoard.lines[7].set(6,"Total Records",jx.Total);
         });
     };
     commandList.list[1].title('Backup');

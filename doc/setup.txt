@@ -80,8 +80,8 @@ ufw allow 80
 
 #######################################################
 TLS setup
-keytool -genkeypair -alias gec-cert -keyalg RSA -keysize 2048 -keystore tarantula.jks -dname CN=realnumber.net
-keytool -certreq -alias gec-cert -keystore tarantula.jks -file gec-cert.csr -ext san=dns:realnumber.net
+keytool -genkeypair -alias gec-cert -keyalg RSA -keysize 2048 -keystore tarantula.jks -dname CN=gameenginecluster.com
+keytool -certreq -alias gec-cert -keystore tarantula.jks -file gec-cert.csr -ext san=dns:gameenginecluster.com
 certbot certonly --manual --csr gec-cert.csr --preferred-challenges dns
 keytool -importcert -alias gec-cert -keystore tarantula.jks -file 0001_chain.pem
 

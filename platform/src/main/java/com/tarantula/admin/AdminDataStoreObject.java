@@ -35,8 +35,8 @@ public class AdminDataStoreObject extends AdminObject {
         this.kv.put("Game",context.dataStore("game-service").count());
         //this.kv.put("Game",context.dataStore("game-data").count());
         total += this.kv.get("Game");
-        this.kv.put("LeaderBoard",context.dataStore("leaderBoard").count());
-        total += this.kv.get("LeaderBoard");
+        //this.kv.put("LeaderBoard",context.dataStore("leaderBoard").count());
+        //total += this.kv.get("LeaderBoard");
         long ai = 0;
         for(int i=0;i<271;i++){
             ai += context.dataStore("p"+i).count();//only works on cache
