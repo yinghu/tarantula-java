@@ -143,8 +143,10 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
             rating.update(sb);
             rating.update();
             if(sb.rank==1){
+
                 Statistics.Entry stat = this.gameServiceProvider.statistics(sb.owner()).entry("wc");
-                stat.update(1);
+                stat.update(1).update();
+                System.out.println(">>>"+stat.toString());
                 gameServiceProvider.leaderBoard("wc").onAllBoard(stat);
             }
         }

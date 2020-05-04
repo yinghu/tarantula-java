@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * Updated 8/24/19
+ * Updated 5/4/2020
  */
 public class LeaderBoardSync implements LeaderBoard{
 
@@ -33,35 +33,35 @@ public class LeaderBoardSync implements LeaderBoard{
     }
     public void load(){
         //daily
-        BoardSync d = new BoardSync("daily",category,size,this.comparator);
+        BoardSync d = new BoardSync(DAILY,category,size,this.comparator);
         d.dataStore(this.dataStore);
         BoardView dv = new BoardView(d,listener,this.comparator);
         views[0]=dv;
         d.load(listener);
         boards[0]=d;
         //weekly
-        BoardSync w =new BoardSync("weekly",category,size,this.comparator);
+        BoardSync w =new BoardSync(WEEKLY,category,size,this.comparator);
         w.dataStore(this.dataStore);
         BoardView wv = new BoardView(w,listener,this.comparator);
         views[1]=wv;
         w.load(listener);
         boards[1]=w;
         //monthly
-        BoardSync m =new BoardSync("monthly",category,size,this.comparator);
+        BoardSync m =new BoardSync(MONTHLY,category,size,this.comparator);
         m.dataStore(this.dataStore);
         BoardView mv = new BoardView(m,listener,this.comparator);
         views[2]=mv;
         m.load(listener);
         boards[2]=m;
         //yearly
-        BoardSync y =new BoardSync("yearly",category,size,this.comparator);
+        BoardSync y =new BoardSync(YEARLY,category,size,this.comparator);
         y.dataStore(this.dataStore);
         BoardView yv = new BoardView(y,listener,this.comparator);
         views[3]=yv;
         y.load(listener);
         boards[3]=y;
         //total
-        BoardSync t =new BoardSync("total",category,size,this.comparator);
+        BoardSync t =new BoardSync(TOTAL,category,size,this.comparator);
         t.dataStore(this.dataStore);
         BoardView tv = new BoardView(t,listener,this.comparator);
         views[4]=tv;
@@ -85,32 +85,31 @@ public class LeaderBoardSync implements LeaderBoard{
         boards[4].onBoard(new LeaderBoardEntry(entry.distributionKey(),entry.total(),System.currentTimeMillis()),this.listener);
     }
     public void onView(Entry entry){//build global list
-        //System.out.println(">>>>>>>>>>>>"+entry.classifier());
-        if(entry.classifier().equals("daily")){
-            views[0].onView(entry);
+        boolean _boarding = false;
+        if(entry.classifier().equals(DAILY)){
+            _boarding = views[0].onView(entry);
         }
-        else if(entry.classifier().equals("weekly")){
-            views[1].onView(entry);
+        else if(entry.classifier().equals(WEEKLY)){
+            _boarding = views[1].onView(entry);
         }
-        else if(entry.classifier().equals("monthly")){
-            views[2].onView(entry);
+        else if(entry.classifier().equals(MONTHLY)){
+            _boarding = views[2].onView(entry);
         }
-        else if(entry.classifier().equals("yearly")){
-            views[3].onView(entry);
+        else if(entry.classifier().equals(YEARLY)){
+            _boarding = views[3].onView(entry);
         }
-        else if(entry.classifier().equals("total")){
-            views[4].onView(entry);
+        else if(entry.classifier().equals(TOTAL)){
+            _boarding = views[4].onView(entry);
         }
-        this.listeners.forEach((l)->l.onUpdated(entry));
+        if(_boarding){
+            this.listeners.forEach((l)->l.onUpdated(entry));
+        }
     }
     public void masterListener(Listener listener){
         this.listener = listener;
     }
     public void addListener(Listener listener){
         this.listeners.add(listener);
-    }
-    public void removeListener(Listener listener){
-        this.listeners.remove(listener);
     }
     public Board daily(){
         return views[0];

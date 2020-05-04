@@ -30,7 +30,7 @@ public class BoardView implements LeaderBoard.Board {
         sync.onBoard(new LeaderBoardEntry(systemId,value,System.currentTimeMillis()),listener);
     }
     //check global list
-    synchronized void onView(LeaderBoard.Entry entry){
+    synchronized boolean onView(LeaderBoard.Entry entry){
         LeaderBoard.Entry e;
         if((e=vIndex.get(entry.owner()))==null){
             vIndex.put(entry.owner(),entry);
@@ -40,13 +40,12 @@ public class BoardView implements LeaderBoard.Board {
             e.update(entry);
         }
         Collections.sort(vList,comparator);
+        return true;
     }
-    public void rank(LeaderBoard.Ranking ranking){
+    public void rank(LeaderBoard.Stream ranking){
         int rank = 1;
         for(LeaderBoard.Entry e: vList){
-            if(!ranking.on(rank++,e)){
-                break;
-            }
+            ranking.onRank(rank++,e);
         }
     }
     void reset(){

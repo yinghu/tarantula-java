@@ -27,16 +27,15 @@ public class MatchMakingModule implements Module {
             if(response==null){
                 Statistics statistics = gameServiceProvider.statistics(session.systemId());
                 statistics.entry("kc").update(1).update();
-                statistics.summary((e)->{
-                    this.context.log("Entry->"+e.name()+"<>"+e.toString(),OnLog.WARN);
-                });
+                //statistics.summary((e)->{
+                    //this.context.log("Entry->"+e.name()+"<>"+e.toString(),OnLog.WARN);
+                //});
                 LeaderBoard ldb = gameServiceProvider.leaderBoard("kc");
                 ldb.onAllBoard(statistics.entry("kc"));
-                ldb.total().rank((r,e)->{
-                    this.context.log("Rank->"+r,OnLog.WARN);
-                    this.context.log("Entry->"+e.toString(),OnLog.WARN);
-                    return true;
-                });
+                //ldb.total().rank((r,e)->{
+                    //this.context.log("Rank->"+r,OnLog.WARN);
+                    //this.context.log("Entry->"+e.toString(),OnLog.WARN);
+                //});
             }
             else{
                 session.write(this.builder.create().toJson(response).getBytes(),label());

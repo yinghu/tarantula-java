@@ -158,7 +158,7 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> OnGameUpdated(MonoBehaviour caller,Stat[] stats){
+        public  async Task<bool> OnGameUpdated(MonoBehaviour caller,Gain[] gains){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-server-id",deviceId),
@@ -166,7 +166,7 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-action","onUpdated")
                 };
                 Payload p = new Payload();
-                p.stats = stats;
+                p.gains = gains;
                 string json = JsonConvert.SerializeObject(p,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,json);
                 return true;         
@@ -175,7 +175,7 @@ namespace Tarantula.Networking{
                 return false;
             }
         }
-        public  async Task<bool> OnGameEnded(MonoBehaviour caller,Stat[] stats,Rating[] ratings,Action<string> callback){
+        public  async Task<bool> OnGameEnded(MonoBehaviour caller,Gain[] gains,Rating[] ratings,Action<string> callback){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-server-id",deviceId),
@@ -183,7 +183,7 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-action","onEnded")
                 };
                 Payload p = new Payload();
-                p.stats = stats;
+                p.gains = gains;
                 p.ratings = ratings;
                 string json = JsonConvert.SerializeObject(p,JSON_SETTING);
                 string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,json);
@@ -623,14 +623,14 @@ namespace Tarantula.Networking{
     public class Payload{
         public string command;
         public Header[] headers;
-        public Stat[] stats;
+        public Gain[] gains;
         public Rating[] ratings;
     }
-    public class Stat{
+    public class Gain{
         public int seat {get; set; }
         public string name { get; set; }
         public double value { get; set; }
-        public Stat(int seat,string name,double value){
+        public Gain(int seat,string name,double value){
             this.seat = seat;
             this.name = name;
             this.value = value;

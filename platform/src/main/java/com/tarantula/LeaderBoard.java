@@ -5,10 +5,15 @@ package com.tarantula;
  */
 public interface LeaderBoard{
 
+    String DAILY = "daily";
+    String WEEKLY = "weekly";
+    String MONTHLY = "monthly";
+    String YEARLY = "yearly";
+    String TOTAL = "total";
+
     int size();
     String category(); //The category of statistics eg WonCount, LostCount
     void addListener(Listener listener);
-    void removeListener(Listener listener);
 
     Board daily();
     Board weekly();
@@ -19,10 +24,10 @@ public interface LeaderBoard{
     void onAllBoard(Statistics.Entry entry);
     interface  Board extends Updatable{
         void onBoard(String systemId,double value);
-        default void rank(Ranking ranking){}
+        default void rank(Stream ranking){}
     }
-    interface Ranking{
-        boolean on(int rank,Entry entry);
+    interface Stream{
+        void onRank(int rank,Entry entry);
     }
     interface Entry extends Recoverable,Updatable{
         String category();

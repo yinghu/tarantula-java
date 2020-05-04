@@ -6,9 +6,12 @@ import com.tarantula.Module;
 import com.tarantula.game.RatingSerializer;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.service.Rating;
-import com.tarantula.platform.leaderboard.LeaderBoardSerializer;
+import com.tarantula.platform.leaderboard.LeaderBoardView;
+import com.tarantula.platform.leaderboard.LeaderBoardViewSerializer;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.statistics.StatisticsSerializer;
+
+import java.util.ArrayList;
 
 public class StatisticsModule implements Module {
     private ApplicationContext context;
@@ -25,9 +28,22 @@ public class StatisticsModule implements Module {
             Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
             session.write(this.builder.create().toJson(statistics).getBytes(),label());
         }
-        else if(session.action().equals("OnLeaderBoard")){
-            LeaderBoard ldb = this.gameServiceProvider.leaderBoard("kc");
-            session.write(this.builder.create().toJson(ldb).getBytes(),label());
+        else if(session.action().startsWith("OnLeaderBoard")){ //use query OnLeaderBoard/{category}/{classifier}
+            String[] query = session.action().split(Recoverable.PATH_SEPARATOR);
+            if(query.length==3){
+                LeaderBoard ldb = this.gameServiceProvider.leaderBoard(query[1]);
+                LeaderBoardView view = new LeaderBoardView();
+                view.category = ldb.category();
+                view.classifier = query[2];
+                view.board = new ArrayList<>();
+                ldb.total().rank((r,e)->{
+                    view.board.add(new LeaderBoardView.EntryView(r,e.owner(),e.value(),e.timestamp()));
+                });
+                session.write(this.builder.create().toJson(ldb).getBytes(),label());
+            }
+            else{
+                throw new UnsupportedOperationException(session.action());
+            }
         }
         else{
             throw new UnsupportedOperationException(session.action());
@@ -41,10 +57,12 @@ public class StatisticsModule implements Module {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(StatisticsIndex.class,new StatisticsSerializer());
         this.builder.registerTypeAdapter(Rating.class,new RatingSerializer());
-        this.builder.registerTypeAdapter(LeaderBoard.class,new LeaderBoardSerializer());
-        String gz = this.context.descriptor().typeId().replace("-statistics","-service");
-        this.gameServiceProvider = this.context.serviceProvider(gz);
-        this.context.log("Statistics started on game service provider ["+gz+"]", OnLog.WARN);
+        this.builder.registerTypeAdapter(LeaderBoardView.class,new LeaderBoardViewSerializer());
+        this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
+        this.gameServiceProvider.leaderBoard("wc").addListener((e)->{
+            this.context.log("OnBoard->"+e.toString(),OnLog.WARN);
+        });
+        this.context.log("Statistics started on game service provider ["+this.context.descriptor().typeId()+"]", OnLog.WARN);
     }
 
     @Override
