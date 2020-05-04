@@ -9,7 +9,6 @@ import com.tarantula.game.service.Rating;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.service.DeploymentServiceProvider;
-import com.tarantula.platform.util.JvmRNG;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -143,10 +142,8 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
             rating.update(sb);
             rating.update();
             if(sb.rank==1){
-
                 Statistics.Entry stat = this.gameServiceProvider.statistics(sb.owner()).entry("wc");
                 stat.update(1).update();
-                System.out.println(">>>"+stat.toString());
                 gameServiceProvider.leaderBoard("wc").onAllBoard(stat);
             }
         }
