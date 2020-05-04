@@ -53,7 +53,7 @@ var wsServer = new WebSocketServer({
     autoAcceptConnections: false
 });
 function validateOrigin(origin) {
-    console.log("Origin->"+origin);
+    //console.log("Origin->"+origin);
     return true;
 }
 
@@ -111,7 +111,7 @@ wsServer.on('request', function(request) {
             });
             connection.on('close', function(reasonCode, description) {
                 cMap.delete(connection.clientId);
-                console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.clientId);
+                //console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.clientId);
             });
         }
         else{

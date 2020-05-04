@@ -5,7 +5,6 @@ import com.tarantula.LeaderBoard;
 import com.tarantula.Statistics;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**

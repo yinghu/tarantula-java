@@ -324,7 +324,7 @@ namespace Tarantula.Networking{
                 return _liveWc;
             }   
         }
-        private async Task<bool> OnClose(){
+        public async Task<bool> OnClose(){
             try{
                 bool suc = false;
                 if(_liveWc){

@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.tarantula.Connection;
 import com.tarantula.Module;
-import com.tarantula.platform.statistics.StatisticsEntry;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
@@ -79,7 +78,7 @@ public class Room implements Connection.StateListener{
     public synchronized void update(Stub stub){
         Stub _onb = stubs[stub.seat];
     }
-    public synchronized boolean end(){
+    private synchronized boolean end(){
         if(state==STARTING||state==OVERTIME){
             state = ENDING;
         }

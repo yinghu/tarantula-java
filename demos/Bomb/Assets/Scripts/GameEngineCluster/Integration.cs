@@ -18,7 +18,7 @@ public class Integration : MonoBehaviour{
     public string typeId;
     private bool pendingClick;
     
-    private Descriptor game;
+    //private Descriptor game;
      
     private GameObject login;
     private GameObject pve;
@@ -156,6 +156,16 @@ public class Integration : MonoBehaviour{
             timer.SetText("00:00");
             message.SetText("Play Again");  
         }
+    }
+    async void OnDestroy(){
+        if(Application.isPlaying){
+            return;
+        }
+        Debug.Log("SHUT DOWN");
+        pendingClick = false;
+        inGame = false;
+        connected = false;
+        await integration.OnClose();
     }
 }
 
