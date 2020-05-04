@@ -113,7 +113,7 @@ public class TarantulaContext implements Serviceable,ServiceContext,SchedulingTa
     public long timeoutOnInstance;
 
     public String clusterNamePrefix;
-
+    public String deploymentMode ="ALL";
     public String platformVersion;
     public int platformRoutingNumber;
 

@@ -49,6 +49,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ConcurrentHashMap<String,byte[]> rMap = new ConcurrentHashMap<>();
     private TarantulaContext tarantulaContext;
     private GsonBuilder builder;
+
+    private Mode deploymentMode = Mode.ALL;
+
+    public Mode deploymentMode(){
+        return deploymentMode;
+    }
+
     @Override
     public void start() throws Exception {
         this.builder = new GsonBuilder();
@@ -321,6 +328,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public void setup(ServiceContext serviceContext){
         this.tarantulaContext = (TarantulaContext)serviceContext;
+        this.deploymentMode = Mode.valueOf(this.tarantulaContext.deploymentMode);
         ClusterProvider ics = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.integrationEventService = ics.subscribe(eventTopic,this);
         localTopic = ics.subscription();
