@@ -15,7 +15,7 @@ public class DescriptorSerializer implements JsonSerializer<Descriptor> {
     public JsonElement serialize(Descriptor descriptor, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = new JsonObject();
         jo.addProperty("singleton",descriptor.singleton());
-        jo.addProperty("deployCode",descriptor.deployCode());
+        //jo.addProperty("deployCode",descriptor.deployCode());
         jo.addProperty("tag",descriptor.tag());
         jo.addProperty("type",descriptor.type());
         jo.addProperty("typeId",descriptor.typeId());
@@ -29,17 +29,17 @@ public class DescriptorSerializer implements JsonSerializer<Descriptor> {
         jo.addProperty("applicationId",descriptor.distributionKey());
         jo.addProperty("accessMode",descriptor.accessMode());
         jo.addProperty("entryCost",descriptor.entryCost());
-        jo.addProperty("entryCostAsString",SystemUtil.toCreditsString(descriptor.entryCost()));
+        //jo.addProperty("entryCostAsString",SystemUtil.toCreditsString(descriptor.entryCost()));
         jo.addProperty("responseLabel",descriptor.responseLabel());
-        jo.addProperty("disabled",descriptor.disabled());
-        jo.addProperty("codebase",descriptor.codebase());
-        jo.addProperty("moduleArtifact",descriptor.moduleArtifact());
-        jo.addProperty("moduleVersion",descriptor.moduleVersion());
-        jo.addProperty("moduleName",descriptor.moduleName());
-        jo.addProperty("resetEnabled",descriptor.resetEnabled());
-        jo.addProperty("timerOnModule",descriptor.timerOnModule());
-        jo.addProperty("runtimeDuration",descriptor.runtimeDuration());
-        jo.addProperty("runtimeDurationOnInstance",descriptor.runtimeDurationOnInstance());
+        //jo.addProperty("disabled",descriptor.disabled());
+        //jo.addProperty("codebase",descriptor.codebase());
+        //jo.addProperty("moduleArtifact",descriptor.moduleArtifact());
+        //jo.addProperty("moduleVersion",descriptor.moduleVersion());
+        //jo.addProperty("moduleName",descriptor.moduleName());
+        //jo.addProperty("resetEnabled",descriptor.resetEnabled());
+        //jo.addProperty("timerOnModule",descriptor.timerOnModule());
+        //jo.addProperty("runtimeDuration",descriptor.runtimeDuration());
+        //jo.addProperty("runtimeDurationOnInstance",descriptor.runtimeDurationOnInstance());
         return jo;
     }
 }

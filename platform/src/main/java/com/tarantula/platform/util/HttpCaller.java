@@ -23,7 +23,6 @@ public class HttpCaller {
         System.out.println(caller.get());
         System.out.println(caller.get());
     }
-
     private HttpClient client;
     private HttpRequest request;
     public HttpCaller(){
@@ -50,22 +49,25 @@ public class HttpCaller {
     }
 
     private class _X509TrustManager implements X509TrustManager{
-    @Override
-    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        //run on server
-    }
-
-    @Override
-    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        //run on client to check if certificate is valid
-        if(!chain[0].getSubjectDN().getName().equals("CN=gameenginecluster.com")){
-            throw new CertificateException("Invalid certificate");
+        private X509Certificate[] certificate;
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            //run on server
         }
-    }
 
-    @Override
-    public X509Certificate[] getAcceptedIssuers() {
-        return new X509Certificate[0];
-    }
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            //run on client to check if certificate is valid
+            if(!chain[0].getSubjectDN().getName().equals("CN=gameenginecluster.com")){
+                throw new CertificateException("Invalid certificate");
+            }
+            certificate = chain;
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return this.certificate;
+        }
+
     }
 }

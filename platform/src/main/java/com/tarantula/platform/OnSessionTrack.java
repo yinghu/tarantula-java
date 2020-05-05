@@ -1,6 +1,5 @@
 package com.tarantula.platform;
 
-
 import com.tarantula.OnSession;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
@@ -70,8 +69,6 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     @Override
     public byte[] toByteArray(){
         ByteBuffer buffer = ByteBuffer.allocate(20);
-        //buffer.putInt(totalSessions);
-        //buffer.putInt(activeSessions);
         buffer.putInt(stub);
         buffer.putLong(timestamp);
         return buffer.array();
@@ -79,8 +76,6 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     @Override
     public void fromByteArray(byte[] data){
         ByteBuffer buffer = ByteBuffer.wrap(data);
-        //this.totalSessions = buffer.getInt();
-        //this.activeSessions = buffer.getInt();
         this.stub = buffer.getInt();
         this.timestamp = buffer.getLong();
     }
