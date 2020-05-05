@@ -99,10 +99,6 @@ public class UserEventHandler implements RequestHandler {
                     }
                     this.eventService.publish(event);
                 }
-                /**
-                else if(action.equals("onReset")){
-                    this.eventService.publish(event);
-                }**/
                 else{
                     throw new RuntimeException("["+action+"] not supported");
                 }
