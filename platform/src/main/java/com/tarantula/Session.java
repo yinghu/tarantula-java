@@ -22,6 +22,7 @@ public interface Session extends OnApplication{
     String TARANTULA_MAGIC_KEY ="Tarantula-magic-key"; //the routing key
     String TARANTULA_TAG ="Tarantula-tag";
     String TARANTULA_NAME ="Tarantula-name";
+    String TARANTULA_PASSWORD ="Tarantula-password";
     String TARANTULA_PAYLOAD = "Tarantula-payload";
 
 

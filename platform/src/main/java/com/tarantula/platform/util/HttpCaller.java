@@ -12,9 +12,8 @@ import java.net.http.HttpResponse;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.util.ArrayList;
 
-public class HttpCaller implements X509TrustManager {
+public class HttpCaller {
 
     public static void main(String[] args) throws Exception{
         HttpCaller caller = new HttpCaller();
@@ -32,15 +31,16 @@ public class HttpCaller implements X509TrustManager {
     }
     public void _init() throws Exception{
         SSLContext sct = SSLContext.getInstance("TLS");
-        sct.init(null,new TrustManager[]{new HttpCaller()},null);
+        sct.init(null,new TrustManager[]{new _X509TrustManager()},null);
         client = HttpClient.newBuilder().sslContext(sct).build();
         request = HttpRequest.newBuilder()
                 .uri(URI.create("http://10.0.0.234:8090/admin"))
                 .timeout(Duration.ofSeconds(5))
                 .header("Accept", "application/json")
                 .header(Session.TARANTULA_ACTION,"onAdmin")
-                .header(Session.TARANTULA_NAME,"user")
                 .header(Session.TARANTULA_ACCESS_KEY,"accessKey")
+                .header(Session.TARANTULA_NAME,"root")
+                .header(Session.TARANTULA_PASSWORD,"root")
                 .GET()
                 .build();
     }
@@ -49,7 +49,7 @@ public class HttpCaller implements X509TrustManager {
         return (response.body());
     }
 
-
+    private class _X509TrustManager implements X509TrustManager{
     @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         //run on server
@@ -66,5 +66,6 @@ public class HttpCaller implements X509TrustManager {
     @Override
     public X509Certificate[] getAcceptedIssuers() {
         return new X509Certificate[0];
+    }
     }
 }

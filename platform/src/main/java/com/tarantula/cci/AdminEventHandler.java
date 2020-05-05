@@ -3,10 +3,13 @@ package com.tarantula.cci;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.UDPConnection;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
+import com.tarantula.platform.event.ServiceActionEvent;
+import com.tarantula.platform.presence.User;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -23,7 +26,7 @@ public class AdminEventHandler implements RequestHandler {
     private EventService eventService;
     private TokenValidator tokenValidator;
     private DeploymentServiceProvider deploymentServiceProvider;
-
+    private AccessIndexService accessIndexService;
     private String serverTopic;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
     private GsonBuilder builder;
@@ -39,11 +42,30 @@ public class AdminEventHandler implements RequestHandler {
             if(action.equals("onAdmin")){
                 String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
                 String name = exchange.header(Session.TARANTULA_NAME);
+                String password = exchange.header(Session.TARANTULA_PASSWORD);
+                byte[] eb= "{}".getBytes();
                 if(tokenValidator.validateAccessKey(accessKey)){
                     //this.deploymentServiceProvider.onEndedUDPConnection(serverId,_payload);
+                    AccessIndex accessIndex = accessIndexService.get(name);
+                    if(accessIndex!=null){
+                        _hex.put(exchange.id(),exchange);
+                        OnAccess onAccess = new OnAccessTrack();
+
+                        ServiceActionEvent event = new ServiceActionEvent(this.serverTopic,exchange.id(),new byte[0]);
+                        event.action("onLogin");
+                        event.systemId(accessIndex.distributionKey());
+                        RoutingKey _routingKey = eventService.routingKey(accessIndex.distributionKey(),"index/user");
+                        event.destination(_routingKey.route());
+                        event.routingNumber(_routingKey.routingNumber());
+                        this.eventService.publish(event);
+                        //eb = this.builder.create().toJson(new ResponseHeader("onAdmin",accessIndex.distributionKey(),true)).getBytes();
+                    }else{
+                        exchange.onEvent(new ResponsiveEvent("","",eb,"admin",true));
+                    }
                 }
-                byte[] eb = this.builder.create().toJson(new ResponseHeader("onEnded",name,true)).getBytes();
-                exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
+                else{
+                    exchange.onEvent(new ResponsiveEvent("","",eb,"admin",true));
+                }
             }
         }catch (Exception ex){
             ex.printStackTrace();
@@ -68,6 +90,7 @@ public class AdminEventHandler implements RequestHandler {
     @Override
     public void setup(TokenValidator tokenValidator, EventService eventService, AccessIndexService accessIndexService, String bucket, DeploymentServiceProvider deploymentServiceProvider) {
         this.eventService = eventService;
+        this.accessIndexService = accessIndexService;
         this.bucket = bucket;
         this.tokenValidator = tokenValidator;
         this.deploymentServiceProvider = deploymentServiceProvider;
