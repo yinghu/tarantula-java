@@ -24,6 +24,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     //private PostOffice postOffice;
     private RingBuffer<Connection> cBuffer;
     private DeploymentServiceProvider deploymentServiceProvider;
+    private boolean onApplication;
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
@@ -36,6 +37,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        this.onApplication = this.deploymentServiceProvider.deploymentMode()== DeploymentServiceProvider.Mode.APPLICATION;
         deploymentServiceProvider.registerOnConnectionListener(this);
         //postOffice = this.context.postOffice();
         String root = configuration.property("root");
@@ -53,7 +55,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ON_ACCESS_CID,(a)->{
             createLogin((OnAccess)a,a.distributionKey(),role);
         });
-        this.context.log("User management application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
+        this.context.log("User management application started on tag ["+descriptor.tag()+"] with application mode ["+onApplication+"]",OnLog.INFO);
     }
     @Override
     public void callback(Session session,byte[] payload) throws Exception {
