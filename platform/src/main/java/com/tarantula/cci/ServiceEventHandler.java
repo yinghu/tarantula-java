@@ -6,6 +6,8 @@ import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.event.ServiceActionEvent;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.ServiceContext;
+import com.tarantula.platform.service.TokenValidatorProvider;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -92,11 +94,11 @@ public class ServiceEventHandler implements RequestHandler {
         }
         return true;
     }
-    @Override
-    public void setup(TokenValidator tokenValidator, EventService eventService, AccessIndexService accessIndexService, String bucket, DeploymentServiceProvider deploymentServiceProvider) {
-        this.auth = tokenValidator;
-        this.eventService = eventService;
-        this.bucket = bucket;
+    public void setup(ServiceContext tcx){
+        this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
+        TokenValidatorProvider tp = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
+        this.auth = tp.tokenValidator();
+        this.bucket = tcx.bucket();
     }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");

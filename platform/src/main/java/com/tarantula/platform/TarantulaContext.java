@@ -182,6 +182,7 @@ public class TarantulaContext implements Serviceable,ServiceContext,SchedulingTa
         this.tokenValidatorProvider = (TokenValidatorProvider)Class.forName(this.tarantulaServerValidator).getConstructor().newInstance();
         this.tokenValidatorProvider.timeout(this.tokenTimeout,this.ticketTimeout);
         this.tokenValidatorProvider.start();
+        this.serviceProviders.put(TokenValidatorProvider.NAME,tokenValidatorProvider);
         this.deploymentServiceProvider = (DeploymentServiceProvider) Class.forName(this.tarantulaDeploymentProvider).getConstructor().newInstance();
         this.deploymentServiceProvider.start();
         this.serviceProviders.put(DeploymentServiceProvider.NAME,this.deploymentServiceProvider);
@@ -524,7 +525,9 @@ public class TarantulaContext implements Serviceable,ServiceContext,SchedulingTa
     public TarantulaLogger logger(Class target){
         return JDKLogger.getLogger(target);
     }
-
+    public String bucket(){
+ 	    return this.dataBucketGroup;
+    }
     public static MemberDiscovery memberDiscovery(int scope){
  	    memberDiscovery.scope(scope);
  	    return memberDiscovery;

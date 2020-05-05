@@ -12,6 +12,8 @@ import com.tarantula.platform.event.ServiceActionEvent;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.ServiceContext;
+import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.OnAccessSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
@@ -46,7 +48,6 @@ public class AdminEventHandler implements RequestHandler {
                 String password = exchange.header(Session.TARANTULA_PASSWORD);
                 byte[] eb= "{}".getBytes();
                 if(tokenValidator.validateAccessKey(accessKey)){
-                    //this.deploymentServiceProvider.onEndedUDPConnection(serverId,_payload);
                     AccessIndex accessIndex = accessIndexService.get(name);
                     if(accessIndex!=null){
                         _hex.put(exchange.id(),exchange);
@@ -88,13 +89,13 @@ public class AdminEventHandler implements RequestHandler {
     public void shutdown() throws Exception {
 
     }
-    @Override
-    public void setup(TokenValidator tokenValidator, EventService eventService, AccessIndexService accessIndexService, String bucket, DeploymentServiceProvider deploymentServiceProvider) {
-        this.eventService = eventService;
-        this.accessIndexService = accessIndexService;
-        this.bucket = bucket;
-        this.tokenValidator = tokenValidator;
-        this.deploymentServiceProvider = deploymentServiceProvider;
+    public void setup(ServiceContext tcx){
+        this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
+        this.accessIndexService = tcx.accessIndexService();
+        this.bucket = tcx.bucket();
+        TokenValidatorProvider tp = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
+        this.tokenValidator = tp.tokenValidator();
+        this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }
     public  boolean onEvent(Event event){
         OnExchange hx = this._hex.get(event.sessionId());

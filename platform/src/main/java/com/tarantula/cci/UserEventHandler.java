@@ -8,6 +8,7 @@ import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServiceActionEvent;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -151,13 +152,10 @@ public class UserEventHandler implements RequestHandler {
         }
         return true;
     }
-
-    @Override
-    public void setup(TokenValidator tokenValidator, EventService eventService, AccessIndexService accessIndexService, String bucket, DeploymentServiceProvider deploymentServiceProvider) {
-        //this.auth = tokenValidator;
-        this.eventService = eventService;
-        this.accessIndexService = accessIndexService;
-        this.bucket = bucket;
+    public void setup(ServiceContext tcx){
+        this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
+        this.accessIndexService = tcx.accessIndexService();
+        this.bucket = tcx.bucket();
     }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");

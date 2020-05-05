@@ -19,5 +19,6 @@ public interface ServiceContext {
     TarantulaLogger logger(Class c);
     OnPartition[] partitions();
     int partitionNumber();
+    String bucket();
     RecoverableRegistry recoverableRegistry(int registryId);
 }

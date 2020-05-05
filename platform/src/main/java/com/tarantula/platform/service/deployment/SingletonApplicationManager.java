@@ -15,8 +15,6 @@ public class SingletonApplicationManager extends DefaultApplication implements B
 
     private TarantulaApplicationContext singleton;
 
-    //private static TarantulaLogger log = JDKLogger.getLogger(SingletonApplicationManager.class);
-
     public SingletonApplicationManager(TarantulaContext tarantulaContext, DeploymentDescriptor deploymentDescriptor){
         super(tarantulaContext,deploymentDescriptor);
     }
@@ -39,7 +37,6 @@ public class SingletonApplicationManager extends DefaultApplication implements B
     }
     @Override
     public boolean checkAccessControl(Event event){
-        //log.info(this.tarantulaContext.tokenValidatorProvider.role(event.systemId()).toString());
         if(this.deploymentDescriptor.accessControl()>0){ //check if caller role has enough access control
             return super.checkAccessControl(event)&&checkRole(event);
         }

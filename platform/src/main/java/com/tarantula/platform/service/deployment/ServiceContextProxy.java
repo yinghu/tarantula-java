@@ -65,6 +65,11 @@ public class ServiceContextProxy implements ServiceContext {
     }
 
     @Override
+    public String bucket() {
+        return this.tarantulaContext.bucket();
+    }
+
+    @Override
     public RecoverableRegistry recoverableRegistry(int registryId) {
         return this.tarantulaContext.recoverableRegistry(registryId);
     }
