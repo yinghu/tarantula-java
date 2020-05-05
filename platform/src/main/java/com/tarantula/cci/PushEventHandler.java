@@ -69,7 +69,7 @@ public class PushEventHandler implements RequestHandler {
                 String host = exchange.header("Tarantula-host");
                 int port = Integer.parseInt(exchange.header("Tarantula-port"));
                 String serverId = exchange.header("Tarantula-server-id");
-                String accessKey = exchange.header("Tarantula-access-key");
+                String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
                 if(tokenValidator.validateAccessKey(accessKey)){
                     Connection connection = new UDPConnection(serverId,host,port);
                     this.deploymentServiceProvider.onUDPConnection(typeId,connection);
@@ -79,7 +79,7 @@ public class PushEventHandler implements RequestHandler {
             }
             else if(action.equals("onStarted")){
                 String serverId = exchange.header("Tarantula-server-id");
-                String accessKey = exchange.header("Tarantula-access-key");
+                String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
                 byte[] eb = "{}".getBytes();
                 if(tokenValidator.validateAccessKey(accessKey)) {
                     eb = this.deploymentServiceProvider.onStartedUDPConnection(serverId);
@@ -87,7 +87,7 @@ public class PushEventHandler implements RequestHandler {
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
             else if(action.equals("onUpdated")){
-                String accessKey = exchange.header("Tarantula-access-key");
+                String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
                 String serverId = exchange.header("Tarantula-server-id");
                 if(tokenValidator.validateAccessKey(accessKey)){
                     this.deploymentServiceProvider.onUpdatedUDPConnection(serverId,_payload);
@@ -96,7 +96,7 @@ public class PushEventHandler implements RequestHandler {
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
             else if(action.equals("onEnded")){
-                String accessKey = exchange.header("Tarantula-access-key");
+                String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
                 String serverId = exchange.header("Tarantula-server-id");
                 if(tokenValidator.validateAccessKey(accessKey)){
                     this.deploymentServiceProvider.onEndedUDPConnection(serverId,_payload);
