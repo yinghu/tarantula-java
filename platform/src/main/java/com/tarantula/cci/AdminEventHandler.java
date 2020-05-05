@@ -12,6 +12,7 @@ import com.tarantula.platform.event.ServiceActionEvent;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.util.OnAccessSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.UUID;
@@ -50,15 +51,14 @@ public class AdminEventHandler implements RequestHandler {
                     if(accessIndex!=null){
                         _hex.put(exchange.id(),exchange);
                         OnAccess onAccess = new OnAccessTrack();
-
-                        ServiceActionEvent event = new ServiceActionEvent(this.serverTopic,exchange.id(),new byte[0]);
+                        onAccess.property("password",password);
+                        ServiceActionEvent event = new ServiceActionEvent(this.serverTopic,exchange.id(),this.builder.create().toJson(onAccess).getBytes());
                         event.action("onLogin");
                         event.systemId(accessIndex.distributionKey());
                         RoutingKey _routingKey = eventService.routingKey(accessIndex.distributionKey(),"index/user");
                         event.destination(_routingKey.route());
                         event.routingNumber(_routingKey.routingNumber());
                         this.eventService.publish(event);
-                        //eb = this.builder.create().toJson(new ResponseHeader("onAdmin",accessIndex.distributionKey(),true)).getBytes();
                     }else{
                         exchange.onEvent(new ResponsiveEvent("","",eb,"admin",true));
                     }
@@ -78,6 +78,7 @@ public class AdminEventHandler implements RequestHandler {
     public void start() throws Exception {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
+        this.builder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
         log.info("Admin event handler started");
