@@ -12,5 +12,5 @@ public interface TokenValidatorProvider extends ServiceProvider {
 
     Presence presence(String systemId);
 
-    Access.Role role(String systemId,int stub);
+    Access.Role role(String systemId);
 }

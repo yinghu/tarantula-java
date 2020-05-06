@@ -86,6 +86,11 @@ public class SystemValidator implements Serviceable{
         }
         @Override
         public boolean validateTicket(String systemId, int stub, String ticket) {
+            Presence ptx = systemValidatorProvider.presence(systemId);
+            //System.out.println("PIX->"+ptx.count(0)+"<><><>"+stub);
+            if(stub!=ptx.count(0)){
+                return false;
+            }
             return SystemUtil.validTicket(messageDigest(),systemId,stub,ticket);
         }
         @Override
