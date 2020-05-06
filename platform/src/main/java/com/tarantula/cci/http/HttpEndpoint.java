@@ -37,32 +37,41 @@ public class HttpEndpoint implements EndPoint {
 		hserver = HttpServer.create(ip,this.backlog);
 		hserver.setExecutor(this.tpool);
 		log.info("Initializing web context ...");
-		HttpRootHandler root = new HttpRootHandler(this.resource.requestHandler("/"));
-		this.hserver.createContext("/",root);
+		HttpRootHandler root = new HttpRootHandler();
+		root.resource(this.resource);
+		this.hserver.createContext(root.path(),root);
 
-		HttpUploadHandler upload = new HttpUploadHandler(this.resource.requestHandler("/upload"));
-		this.hserver.createContext("/upload",upload);
+		HttpUploadHandler upload = new HttpUploadHandler();
+		upload.resource(this.resource);
+		this.hserver.createContext(upload.path(),upload);
 
-		HttpResourceHandler resource = new HttpResourceHandler(this.resource.requestHandler("/resource"));
-		this.hserver.createContext("/resource",resource);
+		HttpResourceHandler httpResourceHandler = new HttpResourceHandler();
+		httpResourceHandler.resource(this.resource);
+		this.hserver.createContext(httpResourceHandler.path(),httpResourceHandler);
 
 		HttpHealthCheckHandler healthCheckHandler = new HttpHealthCheckHandler();
-		this.hserver.createContext("/health",healthCheckHandler);
+		healthCheckHandler.resource(this.resource);
+		this.hserver.createContext(healthCheckHandler.path(),healthCheckHandler);
 
-		HttpUserHandler httpUserHandler = new HttpUserHandler(this.resource.requestHandler("/user"));
-		this.hserver.createContext("/user", httpUserHandler);
+		HttpUserHandler httpUserHandler = new HttpUserHandler();
+		httpUserHandler.resource(this.resource);
+		this.hserver.createContext(httpUserHandler.path(), httpUserHandler);
 
-		HttpServiceHandler httpServiceHandler = new HttpServiceHandler(this.resource.requestHandler("/service"));
-		this.hserver.createContext("/service",httpServiceHandler);
+		HttpServiceHandler httpServiceHandler = new HttpServiceHandler();
+		httpServiceHandler.resource(this.resource);
+		this.hserver.createContext(httpServiceHandler.path(),httpServiceHandler);
 
-		HttpApplicationHandler httpApplicationHandler = new HttpApplicationHandler(this.resource.requestHandler("/application"));
-		this.hserver.createContext("/application", httpApplicationHandler);
+		HttpApplicationHandler httpApplicationHandler = new HttpApplicationHandler();
+		httpApplicationHandler.resource(this.resource);
+		this.hserver.createContext(httpApplicationHandler.path(), httpApplicationHandler);
 
-		HttpDedicatedServerHandler httpDedicatedHandler = new HttpDedicatedServerHandler(this.resource.requestHandler("/push"));
-		this.hserver.createContext("/dedicated", httpDedicatedHandler);
+		HttpDedicatedServerHandler httpDedicatedHandler = new HttpDedicatedServerHandler();
+		httpDedicatedHandler.resource(this.resource);
+		this.hserver.createContext(httpDedicatedHandler.path(), httpDedicatedHandler);
 
-		HttpAdminHandler httpAdminHandler = new HttpAdminHandler(this.resource.requestHandler("/admin"));
-		this.hserver.createContext("/admin",httpAdminHandler);
+		HttpAdminHandler httpAdminHandler = new HttpAdminHandler();
+		httpAdminHandler.resource(this.resource);
+		this.hserver.createContext(httpAdminHandler.path(),httpAdminHandler);
 
 		hserver.start();
         started = true;
@@ -113,6 +122,7 @@ public class HttpEndpoint implements EndPoint {
 	}
 
 	public void setup(ServiceContext serviceContext){
+
 	}
 	public void waitForData(){
 

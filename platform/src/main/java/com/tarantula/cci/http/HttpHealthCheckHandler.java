@@ -3,15 +3,27 @@ package com.tarantula.cci.http;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.tarantula.Session;
+import com.tarantula.cci.HttpDispatcher;
+import com.tarantula.platform.service.EndPoint;
 
 import java.io.IOException;
 
 /**
  * Created by yinghu lu on 6/22/2018.
  */
-public class HttpHealthCheckHandler implements HttpHandler {
+public class HttpHealthCheckHandler extends HttpDispatcher {
 
     private byte[] hc = "hc".getBytes();
+
+    @Override
+    public void resource(EndPoint.Resource resource) {
+
+    }
+
+    @Override
+    public String path() {
+        return "/health";
+    }
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {

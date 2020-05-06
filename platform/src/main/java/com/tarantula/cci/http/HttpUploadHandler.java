@@ -1,24 +1,29 @@
 package com.tarantula.cci.http;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.tarantula.cci.RequestHandler;
+import com.tarantula.cci.HttpDispatcher;
+import com.tarantula.platform.service.EndPoint;
+
 import java.io.IOException;
 
 /**
  * Created by yinghu lu on 11/9/19.
  */
-public class HttpUploadHandler implements HttpHandler {
+public class HttpUploadHandler extends HttpDispatcher {
 
-    private RequestHandler uploadEventHandler;
+    @Override
+    public void resource(EndPoint.Resource resource) {
+        requestHandler = resource.requestHandler(path());
+    }
 
-    public HttpUploadHandler(RequestHandler uploadEventHandler){
-        this.uploadEventHandler = uploadEventHandler;
+    @Override
+    public String path() {
+        return "/upload";
     }
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         HttpUploadSession httpUploadSession = new HttpUploadSession(httpExchange);
-        uploadEventHandler.onRequest(httpUploadSession);
+        requestHandler.onRequest(httpUploadSession);
     }
 }

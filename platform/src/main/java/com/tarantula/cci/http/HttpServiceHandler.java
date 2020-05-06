@@ -1,27 +1,19 @@
 package com.tarantula.cci.http;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.tarantula.cci.RequestHandler;
-
-import java.io.IOException;
-import java.util.UUID;
+import com.tarantula.cci.HttpDispatcher;
+import com.tarantula.platform.service.EndPoint;
 
 
-public class HttpServiceHandler implements HttpHandler {
+public class HttpServiceHandler extends HttpDispatcher {
 
-    private RequestHandler applicationEventHandler;
 
-    public HttpServiceHandler(RequestHandler serviceEventHandler){
-        this.applicationEventHandler = serviceEventHandler;
-	}
-	public void handle(HttpExchange hex) throws IOException {
-        String id = hex.getRequestHeaders().getFirst("Session-id");
-        if(id==null){
-            id = UUID.randomUUID().toString();
-        }
-        HttpSession httpSession = new HttpSession(id,hex);
-        httpSession.parse();
-        this.applicationEventHandler.onRequest(httpSession);
+    @Override
+    public void resource(EndPoint.Resource resource) {
+        requestHandler = resource.requestHandler(path());
+    }
+
+    @Override
+    public String path() {
+        return "/service";
     }
 }

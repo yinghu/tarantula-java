@@ -2,19 +2,26 @@ package com.tarantula.cci.http;
 
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.tarantula.cci.RequestHandler;
+import com.tarantula.cci.HttpDispatcher;
+import com.tarantula.platform.service.EndPoint;
+
 import java.io.IOException;
 
-public class HttpRootHandler extends RequestParser implements HttpHandler {
-    private final RequestHandler resourceEventHandler;
-
-    public HttpRootHandler(RequestHandler eventHandler){
-        this.resourceEventHandler = eventHandler;
+public class HttpRootHandler extends HttpDispatcher {
+    @Override
+    public void resource(EndPoint.Resource resource) {
+        requestHandler = resource.requestHandler(path());
     }
+
+    @Override
+    public String path() {
+        return "/";
+    }
+
     public void handle(HttpExchange hex) throws IOException {
         HttpSession hs = new HttpSession("id",hex);
-        this.resourceEventHandler.onRequest(hs);
+        hs.parse();
+        this.requestHandler.onRequest(hs);
     }
 
 }
