@@ -76,7 +76,7 @@ wsServer.on('request', function(request) {
                         actionOnTarantula(connection,_pr);
                     }
                     else{//register server push event such as notification
-                        if(!pMap.has(_pr.label)){
+                        if(!pMap.has(_pr.label)){//register gameId as server push event
                            pMap.set(_pr.label,{payload:'{}',listeners:[]});
                         }
                         let pse = pMap.get(_pr.label);
@@ -150,14 +150,15 @@ function connectOnTarantula(){
                var cid = mresult.cid.join('');
                var lbl = mresult.lbl.join('');
                var mx = mresult.payload.join('');
-               //console.log(cid);
-               //console.log(lbl);
-               //console.log(mx);
+               console.log(cid);
+               console.log(lbl);
+               console.log(mx);
                var conn = cMap.get(cid);
                if(conn){
                   conn.sendUTF(mx);
                }
                else{//server push event
+                    //label format {gameId}#{command}
                     //console.log(mx);
                     if(!pMap.has(lbl)){
                         pMap.set(lbl,{payload:'{}',listeners:[]});

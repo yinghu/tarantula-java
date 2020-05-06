@@ -417,7 +417,7 @@ namespace Tarantula.Networking{
                 return suc;
             }
             stub = jo.SelectToken("stub").ToObject<Stub>();
-            //streaming on websocket
+            //streaming on websocket on connection available
             Streaming strm = new Streaming();
             strm.action = "onStream";
             strm.path = "/service/action";

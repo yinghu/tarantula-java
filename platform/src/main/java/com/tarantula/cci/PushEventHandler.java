@@ -87,7 +87,6 @@ public class PushEventHandler implements RequestHandler {
 
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
-        //this.accessIndexService = tcx.accessIndexService();
         this.bucket = tcx.bucket();
         TokenValidatorProvider tp = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.tokenValidator = tp.tokenValidator();
