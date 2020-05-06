@@ -48,10 +48,13 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.timeoutInMinutes = minutes;
         this.timeoutInSeconds = seconds;
     }
-    public Access.Role role(String systemId){
+    public Access.Role role(String systemId,int stub){
         if(systemId==null){
             return rMap.get("player");
         }
+        Presence px = this.presence(systemId);
+        System.out.println("PIX->"+px.count(0)+"<><><>"+stub);
+        //check if same session stub
         Access acc = new User();
         acc.distributionKey(systemId);
         if(udataStore.load(acc)){

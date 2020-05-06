@@ -123,9 +123,15 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this.disabled = buffer.getInt()==1;
     }
     public int count(int delta){
+        if(delta<=0){
+            return this.counter;
+        }
+        //new login session
         this.disabled = false;
         this.timestamp = System.currentTimeMillis();
-        return (counter = counter + delta);
+        counter +=delta;
+        this.dataStore.update(this);
+        return (counter);
     }
     public boolean online(){
         this.timestamp = System.currentTimeMillis();
