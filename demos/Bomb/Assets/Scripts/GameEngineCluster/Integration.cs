@@ -142,7 +142,7 @@ public class Integration : MonoBehaviour{
         }
         Debug.Log(integration.online);     
     }
-    void _OnUpdating(RoomState st){
+    async void _OnUpdating(RoomState st){
         if(st==RoomState.STARTING){
             OnGo();
         }
@@ -150,6 +150,7 @@ public class Integration : MonoBehaviour{
             timer.SetText(integration.timer.m+":"+integration.timer.s);        
         }
         else if(st==RoomState.ENDING){
+            await integration.OnClose();
             pendingClick = false;
             inGame = false;
             connected = false;
