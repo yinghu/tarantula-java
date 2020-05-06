@@ -122,17 +122,19 @@ public class Room implements Connection.StateListener{
 
     public synchronized void onTimer(Module.OnUpdate update){
         switch (state){
+            case WAITING:
+                break;
             case PENDING_JOIN:
                 initialTime -=TIMER_DELTA;
                 if(initialTime<=0){
                     initialTime = PENDING_TIME;
                 }
-                update.on(roomId+"?onTimer",new Countdown(initialTime,state,totalJoined).toJson().toString().getBytes());
+                update.on("",roomId+"?onTimer",new Countdown(initialTime,state,totalJoined).toJson().toString().getBytes());
                 break;
             case INITIALIZING:
                 initialTime -=TIMER_DELTA;
                 if(initialTime>=0){
-                    update.on(roomId+"?onTimer",new Countdown(initialTime,state,totalJoined).toJson().toString().getBytes());
+                    update.on("",roomId+"?onTimer",new Countdown(initialTime,state,totalJoined).toJson().toString().getBytes());
                     if(online&&this.connection==null){//fetch connection per timer loop
                         this.connection = this.roomListener.onConnection(this);
                         if(this.connection!=null){
@@ -143,11 +145,11 @@ public class Room implements Connection.StateListener{
                 else{
                     if(!online){//offline mode
                         state = STARTING;
-                        update.on(roomId+"?onStart",this.roomListener.onStarting(this));
+                        update.on("",roomId+"?onStart",this.roomListener.onStarting(this));
                     }else{
                         if(this.connection!=null){//go to
                             state = STARTING;
-                            update.on(roomId+"?onStart",this.roomListener.onStarting(this));
+                            update.on("",roomId+"?onStart",this.roomListener.onStarting(this));
                         }
                         else{
                             retries--;
@@ -164,7 +166,7 @@ public class Room implements Connection.StateListener{
                 duration -=TIMER_DELTA;
                 if(duration<=0){//goes to overtime
                     state = OVERTIME;
-                    update.on(roomId+"?onOvertime",new Countdown(overtime,state,totalJoined).toJson().toString().getBytes());
+                    update.on("",roomId+"?onOvertime",new Countdown(overtime,state,totalJoined).toJson().toString().getBytes());
                 }
                 //else if(!dedicated){
                     //update.on(oid+"?onTimer",new Countdown(duration,state,totalJoined).toJson().toString().getBytes());
@@ -180,12 +182,13 @@ public class Room implements Connection.StateListener{
                 //}
                 break;
             case ENDING:
-                update.on(roomId+"?onEnd",null);
+                update.on("",roomId+"?onEnd",new Countdown(overtime,state,totalJoined).toJson().toString().getBytes());
                 state = PENDING_END;
                 initialTime = PENDING_TIME;
                 break;
             case TIMEOUT:
-                update.on(roomId+"?onEnd",null);
+                state = WAITING;
+                update.on("",roomId+"?onEnd",new Countdown(overtime,state,totalJoined).toJson().toString().getBytes());
                 roomListener.onTimeout(this);
                 break;
             case PENDING_END:

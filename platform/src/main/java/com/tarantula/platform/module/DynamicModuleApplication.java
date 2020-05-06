@@ -27,7 +27,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     @Override
     public void initialize(Session session) throws Exception {
         session.joined(true);
-        module.onJoin(session,(uid,delta)->{
+        module.onJoin(session,(cid,uid,delta)->{
             //pushEvent(uid,delta);
             session.index(parseUid(uid));
             _onStream.put(session.systemId(),session);
@@ -48,7 +48,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             }
             this._onStream.put(session.systemId(),session);
         }
-        if(this.module.onRequest(session,payload,((uid,delta) -> {
+        if(this.module.onRequest(session,payload,((cid,uid,delta) -> {
             //pushEvent(uid,delta);
             //broadcasting to all streaming session if no udp publisher
             this._onStream.forEach((k,v)->{
@@ -86,7 +86,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     @Override
     public void onTimeout(Session session) {
         if(!this.descriptor.singleton()){
-            this.module.onTimeout(session,(uid,delta)->{
+            this.module.onTimeout(session,(cid,uid,delta)->{
                 //pushEvent(uid,delta);
             });
             this.context.onRegistry().onLeave(session);
@@ -96,7 +96,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     @Override
     public void onIdle(Session session){
         if(!this.descriptor.singleton()){
-            this.module.onIdle(session,(uid,delta)->{
+            this.module.onIdle(session,(cid,uid,delta)->{
                 //pushEvent(uid,delta);
                 Session pending = _onStream.get(session.systemId());
                 if(pending!=null){
@@ -125,7 +125,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         try{
             pendingTimer = pendingTimer-SERVER_PUSH_INTERVAL;
             if(pendingTimer<=0){
-                this.module.onTimer(((uid,delta) ->{
+                this.module.onTimer(((cid,uid,delta) ->{
                         //pushEvent(uid,delta);
                         _onStream.forEach((k,v)-> {
                             if(v.streaming()&&v.index().equals(parseUid(uid))){

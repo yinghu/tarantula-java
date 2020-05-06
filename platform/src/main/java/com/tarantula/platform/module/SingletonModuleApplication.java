@@ -2,7 +2,6 @@ package com.tarantula.platform.module;
 
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.event.FastPlayEvent;
 import com.tarantula.platform.service.DeploymentServiceProvider;
@@ -15,8 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SingletonModuleApplication extends TarantulaApplicationHeader implements SchedulingTask {
 
-    private ConcurrentHashMap<String,ConcurrentHashMap<String,Session>> _onIndex = new ConcurrentHashMap<>();
-
     private long SERVER_PUSH_INTERVAL;
 
     private Module module;
@@ -25,22 +22,10 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     private Connection current;
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
-        if(session.streaming()){
-            this._onIndex.computeIfAbsent(session.instanceId(),(k)->new ConcurrentHashMap<>()).put(session.systemId(),session);
-        }
-        else if(this.module.onRequest(session,payload,((uid,delta) ->{
-            _onIndex.computeIfAbsent(parseUid(uid),(k)->new ConcurrentHashMap<>()).forEach((k,v)->{
-                v.write(delta,this.module.label()+"#"+uid);
-            });
+        if(this.module.onRequest(session,payload,((cid,uid,delta) ->{
+            this.serviceProvider.registerPostOffice().onConnection(cid).send(this.module.label()+"#"+uid,delta);
         }))){
-            //clean up on leave
-            if(session.instanceId()!=null&&_onIndex.containsKey(session.instanceId())){
-                Session rm = this._onIndex.get(session.instanceId()).remove(session.systemId());
-                if(rm!=null){
-                    ResponseHeader resp = new ResponseHeader(session.action(),"close session");
-                    rm.write(this.builder.create().toJson(resp).getBytes(),module.label()+"#"+session.instanceId()+"?"+session.action(),true);
-                }
-            }
+            //clean up on leave if any
         }
     }
 
@@ -76,19 +61,8 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     @Override
     public void run() {
         try{
-            this.module.onTimer(((uid,delta) -> {
-                    if(delta==null){
-                        _onIndex.remove(parseUid(uid)).forEach((k,v)->{
-                            ResponseHeader resp = new ResponseHeader("onEnd","close session");
-                            v.write(this.builder.create().toJson(resp).getBytes(),module.label()+"#"+uid,true);
-                        });
-                        return;
-                    }
-                    _onIndex.computeIfAbsent(parseUid(uid),(k)->new ConcurrentHashMap<>()).forEach((k,v)->{
-                        v.write(delta,this.module.label()+"#"+uid);
-                    });
-                    //this.serviceProvider.registerPostOffice().onConnection("serverId").send();
-                }
+            this.module.onTimer(((cid,uid,delta) ->
+                    this.serviceProvider.registerPostOffice().onConnection(cid).send(this.module.label()+"#"+uid,delta)
             ));
         }catch (Exception ex){
             //ignore it
@@ -98,11 +72,9 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     public boolean onEvent(Event event){
         try{
             if(event instanceof FastPlayEvent){
-                this.module.onJoin(event,(uid,delta)->{
-                    _onIndex.computeIfAbsent(parseUid(uid),(k)->new ConcurrentHashMap<>()).forEach((k,v)->{
-                        v.write(delta,this.module.label()+"#"+uid);
-                    });
-                });
+                this.module.onJoin(event,(cid,uid,delta)->
+                    this.serviceProvider.registerPostOffice().onConnection(cid).send(this.module.label()+"#"+uid,delta)
+                );
             }
             else{
                 context.log("event->"+event.toString(),OnLog.WARN);
@@ -112,15 +84,6 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
             this.onError(event,ex);
         }
         return false;
-    }
-    private String parseUid(String uid){
-        int ix = uid.indexOf('?');
-        if(ix>0){
-            return uid.substring(0,ix);
-        }
-        else{
-            return uid;
-        }
     }
     @Override
     public void onState(Connection c) {

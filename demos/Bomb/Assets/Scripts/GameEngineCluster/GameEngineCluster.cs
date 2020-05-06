@@ -222,6 +222,7 @@ namespace Tarantula.Networking{
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
                 if(ParseLogout(jstr)){
                     await OnClose();
+                    //online = false;
                     return true;
                 }else{
                     return false;
@@ -254,6 +255,7 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-action","onLeave")
                 };
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
+                await OnClose();
                 return ParseHeader(jstr);
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_ONPLAY);
@@ -331,11 +333,11 @@ namespace Tarantula.Networking{
                     _liveWc = false;
                     suc = await _gwc.Close();
                 }
-                online = false;
+                //online = false;
                 return suc;
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_CLOSE);
-                online = false;
+                //online = false;
                 return false;
             }
         }
@@ -418,12 +420,18 @@ namespace Tarantula.Networking{
             }
             stub = jo.SelectToken("stub").ToObject<Stub>();
             //streaming on websocket on connection available
+            if(jo.ContainsKey("connection")){//login sesseion websocket
+                Connection connection = jo.SelectToken("connection").ToObject<Connection>();
+                presence.ticket = (string)jo.SelectToken("ticket");
+                _gwc = new GecWebSocket(connection,presence);
+                suc = await _gwc.Connect();
+                _liveWc = suc;
+                OnWebSocket?.Invoke();
+            }
             Streaming strm = new Streaming();
-            strm.action = "onStream";
-            strm.path = "/service/action";
+            strm.action = "onStart";
             strm.streaming = true;
-            strm.tag = stub.tag;
-            strm.instanceId = stub.roomId;
+            strm.label = stub.roomId;
             Payload p = new Payload();
             p.command = strm.action;
             strm.data = p;
@@ -504,6 +512,7 @@ namespace Tarantula.Networking{
                 message = (string)jo.SelectToken("message");
                 return suc;
             }
+            online = false;
             return true;
         }  
    } 

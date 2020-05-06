@@ -77,15 +77,16 @@ wsServer.on('request', function(request) {
                     }
                     else{//register server push event such as notification
                         if(!pMap.has(_pr.label)){//register gameId as server push event
-                           pMap.set(_pr.label,{payload:'{}',listeners:[]});
+                           pMap.set(_pr.label,{listeners:[]});
                         }
                         let pse = pMap.get(_pr.label);
                         if(_pr.streaming){
                             //register callback if streaming required otherwise send back per request
                             if(_pr.action === 'onStart'){
-                                //console.log('register on ['+_pr.label+'] from ['+connection.clientId+']');
+                                connection.gameId = _pr.label;
+                                console.log('register on ['+_pr.label+'] from ['+connection.clientId+']');
                                 pse.listeners.push(connection.clientId);
-                                connection.sendUTF(pse.payload);
+                                //connection.sendUTF(pse.payload);
                             }
                             else if(_pr.action ==='onStop'){
                                 let ix = pse.listeners.indexOf(connection.clientId);
@@ -108,10 +109,22 @@ wsServer.on('request', function(request) {
             connection.on('error',function(err){
                 console.log('Error on web socket connection');
                 cMap.delete(connection.clientId);
+                let pse = pMap.get(connection.gameId);
+                let ix = pse.listeners.indexOf(connection.clientId);
+                if(ix>=0){
+                    console.log('unregister on ['+connection.gameId+'] from ['+connection.clientId+'/'+ix+']');
+                    pse.listeners.splice(ix,1);
+                }
             });
             connection.on('close', function(reasonCode, description) {
                 cMap.delete(connection.clientId);
-                //console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.clientId);
+                let pse = pMap.get(connection.gameId);
+                let ix = pse.listeners.indexOf(connection.clientId);
+                if(ix>=0){
+                    console.log('unregister on ['+connection.gameId+'] from ['+connection.clientId+'/'+ix+']');
+                    pse.listeners.splice(ix,1);
+                }
+                console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.gameId);
             });
         }
         else{
@@ -148,23 +161,25 @@ function connectOnTarantula(){
             var c = String.fromCharCode(data[i]);
             if(c==='|'){
                var cid = mresult.cid.join('');
-               var lbl = mresult.lbl.join('');
+               var lbl = mresult.lbl.join('');//{label}#{gameid}?{command}
                var mx = mresult.payload.join('');
-               console.log(cid);
-               console.log(lbl);
-               console.log(mx);
+               //console.log(cid);
+               //console.log(lbl);
+               //console.log(mx);
                var conn = cMap.get(cid);
                if(conn){
                   conn.sendUTF(mx);
                }
                else{//server push event
-                    //label format {gameId}#{command}
+                    //label format {label}#{gameId}?{command}
                     //console.log(mx);
-                    if(!pMap.has(lbl)){
-                        pMap.set(lbl,{payload:'{}',listeners:[]});
+                    var _gameId = lbl.substring(lbl.indexOf("#")+1,lbl.indexOf("?"));
+                    //console.log(_gameId);
+                    if(!pMap.has(_gameId)){
+                        pMap.set(_gameId,{listeners:[]});
                     }
-                    let pse = pMap.get(lbl);
-                    pse.payload = mx;
+                    let pse = pMap.get(_gameId);
+                    //pse.payload = mx;
                     pse.listeners.forEach((c,ix)=>{
                         //synchronize client
                         let _sc = cMap.get(c);

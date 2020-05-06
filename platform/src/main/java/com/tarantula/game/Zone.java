@@ -57,7 +57,9 @@ public class Zone extends RecoverableObject implements RoomListener,Updatable{
         }
     }
     public void onTimer(Module.OnUpdate update){
-        rList.forEach((r)->r.onTimer(update));
+        rList.forEach((r)->{
+            r.onTimer(update);
+        });
     }
 
     @Override

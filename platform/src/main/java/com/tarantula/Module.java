@@ -17,7 +17,7 @@ public interface Module {
     default void onIdle(Session session,OnUpdate onUpdate){}
     default void onTimer(OnUpdate update){}
     interface OnUpdate{
-        void on(String updateId,byte[] delta);
+        void on(String connectionId,String updateId,byte[] delta);
     }
     interface OnResource{
         void on(InputStream in);

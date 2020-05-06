@@ -43,7 +43,7 @@ public class GameZoneModule implements Module{
             Stub stub = mStub.get(session.systemId());
             Room room = mRoom.get(stub.roomId);
             session.write("{}".getBytes(),label());
-            update.on(room.roomId+"?onMessage",payload);
+            update.on(connection.serverId(),room.roomId+"?onMessage",payload);
         }
         else if(session.action().equals("onLeave")){
             Stub stub = mStub.get(session.systemId());
@@ -94,7 +94,9 @@ public class GameZoneModule implements Module{
     }
     @Override
     public void onTimer(OnUpdate update){
-        mZone.onTimer(update);
+        mZone.onTimer((c,u,d)->{
+            update.on(connection.serverId(),u,d);
+        });
     }
     @Override
     public String label() {
