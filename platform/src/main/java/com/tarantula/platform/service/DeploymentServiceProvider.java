@@ -33,7 +33,6 @@ public interface DeploymentServiceProvider extends ServiceProvider {
     byte[] onStartedUDPConnection(String serverId);
     //END OF DEDICATED SERVER APIs
 
-    Connection onPushConnection();
     /**
      * Deploys the service provider on service pool
      * */
