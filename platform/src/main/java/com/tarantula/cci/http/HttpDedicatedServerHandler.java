@@ -9,7 +9,7 @@ public class HttpDedicatedServerHandler extends HttpDispatcher {
 
     @Override
     public void resource(EndPoint.Resource resource) {
-        requestHandler = resource.requestHandler("/push");
+        requestHandler = resource.requestHandler(path());
     }
 
     @Override

@@ -28,9 +28,7 @@ public class PushEventHandler implements RequestHandler {
     private String serverTopic;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
     private GsonBuilder builder;
-    public PushEventHandler(){
 
-    }
     public String name(){
         return "/push";
     }
@@ -39,7 +37,7 @@ public class PushEventHandler implements RequestHandler {
             String action = exchange.header(Session.TARANTULA_ACTION);
             byte[] _payload = exchange.payload();
             if(action.equals("onConnect")){
-                //log.warn("push->"+exchange.path()+"/"+exchange.header("serverId")+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
+                log.warn("push->"+exchange.path()+"/"+exchange.header("serverId")+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
                 String sid = exchange.id();
                 _hex.put(sid,exchange);
                 ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,false);
@@ -52,6 +50,7 @@ public class PushEventHandler implements RequestHandler {
             }
             else if(action.equals("onDisconnect")){
                 String serverId = exchange.header("serverId");
+                log.warn("push->"+exchange.path()+"/"+exchange.header("serverId")+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
                 _hex.forEach((k,v)->{
                     if(v.header("serverId").equals(serverId)){
                         _hex.remove(k);
@@ -64,46 +63,6 @@ public class PushEventHandler implements RequestHandler {
                         eventService.publish(pushEvent);
                     }
                 });
-            }
-            else if(action.equals("onRegistered")){ //dedicated server register on cluster
-                String typeId = exchange.header("Tarantula-type-id");
-                String host = exchange.header("Tarantula-host");
-                int port = Integer.parseInt(exchange.header("Tarantula-port"));
-                String serverId = exchange.header("Tarantula-server-id");
-                String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
-                if(tokenValidator.validateAccessKey(accessKey)){
-                    Connection connection = new UDPConnection(serverId,host,port);
-                    this.deploymentServiceProvider.onUDPConnection(typeId,connection);
-                }
-                byte[] eb = this.builder.create().toJson(new ResponseHeader("onRegistered","ok",true)).getBytes();
-                exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
-            }
-            else if(action.equals("onStarted")){
-                String serverId = exchange.header("Tarantula-server-id");
-                String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
-                byte[] eb = "{}".getBytes();
-                if(tokenValidator.validateAccessKey(accessKey)) {
-                    eb = this.deploymentServiceProvider.onStartedUDPConnection(serverId);
-                }
-                exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
-            }
-            else if(action.equals("onUpdated")){
-                String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
-                String serverId = exchange.header("Tarantula-server-id");
-                if(tokenValidator.validateAccessKey(accessKey)){
-                    this.deploymentServiceProvider.onUpdatedUDPConnection(serverId,_payload);
-                }
-                byte[] eb = this.builder.create().toJson(new ResponseHeader("onUpdated","ok",true)).getBytes();
-                exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
-            }
-            else if(action.equals("onEnded")){
-                String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
-                String serverId = exchange.header("Tarantula-server-id");
-                if(tokenValidator.validateAccessKey(accessKey)){
-                    this.deploymentServiceProvider.onEndedUDPConnection(serverId,_payload);
-                }
-                byte[] eb = this.builder.create().toJson(new ResponseHeader("onEnded","ok",true)).getBytes();
-                exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
         }catch (Exception ex){
             ex.printStackTrace();
