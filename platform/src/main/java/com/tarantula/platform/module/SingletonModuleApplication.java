@@ -45,6 +45,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        this.serviceProvider.registerOnConnectionListener(this);
         this.module = this.serviceProvider.module(this.descriptor);
         SERVER_PUSH_INTERVAL = descriptor.timerOnModule();
         if(SERVER_PUSH_INTERVAL>0){
@@ -82,6 +83,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
                     _onIndex.computeIfAbsent(parseUid(uid),(k)->new ConcurrentHashMap<>()).forEach((k,v)->{
                         v.write(delta,this.module.label()+"#"+uid);
                     });
+                    //this.serviceProvider.registerPostOffice().onConnection("serverId").send();
                 }
             ));
         }catch (Exception ex){
@@ -115,5 +117,9 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         else{
             return uid;
         }
+    }
+    @Override
+    public void onState(Connection c) {
+        this.context.log(c.toString(),OnLog.WARN);
     }
 }
