@@ -64,7 +64,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             OnSession access = this.login(session.systemId(),acc.property("password"),session);
             onSession(access,session);
         }
-        else if(session.action().equals("onTicket")){
+        else if(session.action().equals("onTicket")){//validate
             if(this.context.validator().validateTicket(session.systemId(),acc.stub(),acc.accessKey())){
                 OnSession onSession = this.context.validator().token(session.systemId(),acc.stub());//web socket request
                 onSession.successful(true);

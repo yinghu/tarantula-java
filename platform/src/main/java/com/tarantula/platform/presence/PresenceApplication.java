@@ -41,7 +41,7 @@ public class PresenceApplication extends TarantulaApplicationHeader {
                 pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
                 session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
          }
-        else if(session.action().equals("onTicket")){
+        else if(session.action().equals("onConnection")){//get web socket connection with a join ticket
             //request new ticket and connection
             PresenceContext ptc = new PresenceContext(session.action());
             ptc.presence = new OnSessionTrack(session.systemId(),session.stub());
@@ -49,7 +49,6 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             ptc.connection = cBuffer.pop();
             session.write(this.builder.create().toJson(ptc).getBytes(),this.descriptor.responseLabel());
         }
-
         else if(session.action().equals("onPlay")){
               OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
               Presence presence = this.context.presence(session.systemId());
@@ -64,25 +63,6 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
         }
-        /**
-        else if (session.action().equals("onTransfer")) {
-            Presence presence = this.context.presence(session.systemId());
-            OnAccess ex = this.builder.create().fromJson(new String(payload).trim(), OnAccess.class);
-            PresenceContext pb = new PresenceContext(session.action());
-            Descriptor desc = this.context.descriptor(ex.applicationId());
-            if ((!desc.tournamentEnabled())&&presence.transact(ex.entryCost()* (-1))) {
-                OnBalance onBalance = new OnBalanceTrack(session.systemId(),ex.entryCost());
-                onBalance.applicationId(ex.applicationId());
-                onBalance.instanceId(ex.instanceId());
-                this.context.postOffice().onApplication(ex.applicationId()).send(ex.instanceId(),onBalance);
-            }else {
-                pb.successful(false);
-                pb.code(desc.tournamentEnabled()?Presence.IN_TOURNAMENT_MODE:Presence.NOT_ENOUGH_BALANCE);
-                pb.message(desc.tournamentEnabled()?"in tournament mode":"not enough balance");
-            }
-            pb.presence= new OnSessionTrack(session.systemId(),presence.balance());
-            session.write(this.builder.create().toJson(pb).getBytes(),this.descriptor.responseLabel());
-        }**/
         else if (session.action().equals("onAbsence")) {
             this.context.absence(session);
             session.write(this.builder.create().toJson(new ResponseHeader("onAbsence", "off session [" + session.stub() + "]", true)).getBytes(),this.descriptor.responseLabel());
