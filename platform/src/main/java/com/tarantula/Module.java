@@ -12,7 +12,7 @@ public interface Module {
 
     String label();
     default void clear(){}
-
+    default void onConnection(Connection connection){}
     default void onTimeout(Session session,OnUpdate onUpdate){}
     default void onIdle(Session session,OnUpdate onUpdate){}
     default void onTimer(OnUpdate update){}

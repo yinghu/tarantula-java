@@ -6,6 +6,8 @@ import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.event.FastPlayEvent;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.util.RingBuffer;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -19,7 +21,8 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
 
     private Module module;
     private DeploymentServiceProvider serviceProvider;
-
+    private RingBuffer<Connection> cBuffer;
+    private Connection current;
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         if(session.streaming()){
@@ -44,11 +47,12 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
+        this.cBuffer = new RingBuffer<>(new Connection[5]);
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        this.serviceProvider.registerOnConnectionListener(this);
         this.module = this.serviceProvider.module(this.descriptor);
         SERVER_PUSH_INTERVAL = descriptor.timerOnModule();
         if(SERVER_PUSH_INTERVAL>0){
+            this.serviceProvider.registerOnConnectionListener(this);
             this.context.schedule(this);
         }
         module.setup(context);
@@ -120,6 +124,43 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     }
     @Override
     public void onState(Connection c) {
-        this.context.log(c.toString(),OnLog.WARN);
+        if(c.type().equals(Connection.WEB_SOCKET)){
+            this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on application ["+descriptor.name()+"]",OnLog.WARN);
+            onWebSocket(c);
+        }
+    }
+    private void onWebSocket(Connection c) {
+        if(!c.disabled()){
+            if(!cBuffer.push(c)){
+                cBuffer.reset(((ca,limit)->{
+                    Connection[] cn = new Connection[ca.length*2];
+                    for(int i=0;i<limit;i++){
+                        cn[i]=ca[i];
+                    }
+                    cn[limit]=c;
+                    return cn;
+                }));
+            }
+            if(current==null){
+                current = cBuffer.pop();
+                module.onConnection(current);
+            }
+        }
+        else{
+            cBuffer.reset((ca,limit)->{
+                Connection[] cn = new Connection[ca.length];
+                int r=0;
+                for(int i=0;i<limit;i++){
+                    if(!(ca[i].serverId().equals(c.serverId()))){
+                        cn[r++]=ca[i];
+                    }
+                }
+                return cn;
+            });
+            if(current!=null&&current.serverId().equals(c.serverId())){
+                current = cBuffer.pop();
+                module.onConnection(current);
+            }
+        }
     }
 }

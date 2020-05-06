@@ -1,10 +1,8 @@
 package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
-import com.tarantula.ApplicationContext;
+import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.OnLog;
-import com.tarantula.Session;
 import com.tarantula.game.*;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.ResponseHeader;
@@ -23,6 +21,7 @@ public class GameZoneModule implements Module{
     private ConcurrentHashMap<String, Room> mRoom = new ConcurrentHashMap<>();
     private GsonBuilder builder;
     private GameServiceProvider gameServiceProvider;
+    private Connection connection;
     @Override
     public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp
@@ -31,7 +30,9 @@ public class GameZoneModule implements Module{
         stub.owner(session.systemId());
         GameObject gameObject = new GameObject();
         gameObject.successful(true);
+        gameObject.ticket = this.context.validator().ticket(session.systemId(),session.stub());
         gameObject.stub = stub;
+        gameObject.connection = connection;
         mStub.put(session.systemId(),stub);
         session.write(gameObject.toJson().toString().getBytes(),label());
         //onUpdate.on(stub.roomId,"{}".getBytes());
@@ -87,6 +88,9 @@ public class GameZoneModule implements Module{
         mZone.descriptor = this.context.descriptor();
         mZone.start();
         context.log(this.mZone.descriptor.tag()+"/"+this.mZone.descriptor.accessRank()+"/"+this.mZone.descriptor.distributionKey(),OnLog.WARN);
+    }
+    public void onConnection(Connection connection){
+        this.connection = connection;
     }
     @Override
     public void onTimer(OnUpdate update){

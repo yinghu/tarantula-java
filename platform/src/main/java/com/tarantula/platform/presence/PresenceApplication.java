@@ -20,7 +20,7 @@ public class PresenceApplication extends TarantulaApplicationHeader {
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         this.cBuffer = new RingBuffer<>(new Connection[5]);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        deploymentServiceProvider.registerOnConnectionListener(this);
+        //deploymentServiceProvider.registerOnConnectionListener(this);
 
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
             Presence presence = this.context.presence(t.owner());

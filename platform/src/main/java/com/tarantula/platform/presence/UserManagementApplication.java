@@ -38,7 +38,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.onApplication = this.deploymentServiceProvider.deploymentMode()== DeploymentServiceProvider.Mode.APPLICATION;
-        deploymentServiceProvider.registerOnConnectionListener(this);
+        //deploymentServiceProvider.registerOnConnectionListener(this);
         //postOffice = this.context.postOffice();
         String root = configuration.property("root");
         String pwd = configuration.property("password");
