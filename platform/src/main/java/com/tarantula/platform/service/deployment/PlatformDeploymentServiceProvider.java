@@ -570,6 +570,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     //end of dedicated server methods
 
+    //server push connection websocket, or raw socket
+    public void onPushConnection(Connection connection){
+
+    }
+    public Connection onPushConnection(){
+        return null;
+    }
     public PostOffice registerPostOffice(){
         return new PostOfficeSession();
     }
