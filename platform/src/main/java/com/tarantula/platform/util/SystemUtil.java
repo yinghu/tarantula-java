@@ -92,6 +92,23 @@ public class SystemUtil {
         token.append("-").append(hash); //3
         return token.toString();
     }
+    public static  String accessKey(MessageDigest messageDigest,String typeId,int stub,int timeoutMinutes) {
+        //{typeId}-{routing}-{stub}-{cid}-{start}-{hash}
+        //ticket=> {tarantula} {stub} {end} {hash}
+        StringBuffer token = new StringBuffer(typeId);
+        messageDigest.reset();
+        messageDigest.update(typeId.getBytes());
+        messageDigest.update(Integer.toHexString(stub).getBytes());
+        long start = SystemUtil.toUTCMilliseconds(LocalDateTime.now());
+        messageDigest.update(Long.toHexString(start).getBytes());
+        String hash = SystemUtil.toHexString(messageDigest.digest());
+        String ticket = SystemUtil.ticket(messageDigest,typeId,stub,timeoutMinutes*60);//assign a ticket
+        token.append(" ").append(ticket);//0 embedded to token
+        token.append("-").append(stub);//1
+        token.append("-").append(start); //2
+        token.append("-").append(hash); //3
+        return token.toString();
+    }
     public  static OnSession validToken(MessageDigest messageDigest,String token) {
         //System.out.println(token);
         int sp = token.indexOf(" ");
