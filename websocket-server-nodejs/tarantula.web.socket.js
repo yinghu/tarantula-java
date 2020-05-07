@@ -152,7 +152,8 @@ function connectOnTarantula(){
     var soc = net.createConnection(cfg.server.connection.port,cfg.server.connection.host,()=>{
         console.log("message listener connected to ["+cfg.server.connection.host+":"+cfg.server.connection.port+"]");
         //write one way protocol register to server
-        let req = {action:'onConnect',clientId:'push/streaming',path:'/push/action',streaming:true,serverId:serverId,data:{command:'onConnect',type:cfg.front.type,secured:cfg.front.secured,protocol:secured?'wss':'ws',host:cfg.front.host,port:cfg.front.port,path:cfg.front.path,serverId:serverId,maxConnections:cfg.front.maxConnections}};
+        let req = {action:'onConnect',clientId:'push/streaming',path:'/push/action',streaming:true,serverId:serverId,accessKey:'access-Key',
+        data:{command:'onConnect',type:cfg.front.type,secured:cfg.front.secured,protocol:secured?'wss':'ws',host:cfg.front.host,port:cfg.front.port,path:cfg.front.path,serverId:serverId,maxConnections:cfg.front.maxConnections}};
         soc.write(toJSONString(req));
     });
     soc.on('data',(data)=>{

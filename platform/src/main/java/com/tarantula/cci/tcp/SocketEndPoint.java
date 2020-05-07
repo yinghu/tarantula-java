@@ -1,6 +1,7 @@
 package com.tarantula.cci.tcp;
 
 import com.google.gson.GsonBuilder;
+import com.tarantula.Session;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.cci.RequestHandler;
 import com.tarantula.logging.JDKLogger;
@@ -19,7 +20,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 
 /**
- * Created by yinghu lu on 10/19/2018.
+ * updated by yinghu lu on 5/7/2020.
  */
 public class SocketEndPoint implements EndPoint{
 
@@ -119,7 +120,7 @@ public class SocketEndPoint implements EndPoint{
                             StringBuffer sp = new StringBuffer("{serverId:");
                             sp.append("\"").append(pr.serverId()).append("\"}");
                             PendingData pendingData = new PendingData("/push/streaming","index/user","onDisconnect",sp.toString().getBytes());
-                            pendingData.headers.put("serverId",pr.serverId());
+                            pendingData.headers.put(Session.TARANTULA_SERVER_ID,pr.serverId());
                             SocketSession send = new SocketSession(pr,pendingData);
                             resource.requestHandler("/push").onRequest(send);
                             log.warn("Connection from ["+pr.serverId()+"] closed with ["+ioException.getMessage()+"]");

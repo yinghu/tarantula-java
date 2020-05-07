@@ -24,7 +24,7 @@ public class PendingDataDeserializer implements JsonDeserializer<PendingData> {
             }
             else if(k.equals("serverId")){
                 pendingData.serverId = kv.getValue().getAsJsonPrimitive().getAsString();
-                pendingData.headers.put("serverId",pendingData.serverId);
+                pendingData.headers.put(Session.TARANTULA_SERVER_ID,pendingData.serverId);
             }
             else if(k.equals("streaming")){
                 pendingData.streaming = kv.getValue().getAsJsonPrimitive().getAsBoolean();
@@ -55,6 +55,9 @@ public class PendingDataDeserializer implements JsonDeserializer<PendingData> {
             }
             else if(k.equals("viewId")){
                 pendingData.headers.put(Session.TARANTULA_VIEW_ID,kv.getValue().getAsJsonPrimitive().getAsString());
+            }
+            else if(k.equals("accessKey")){
+                pendingData.headers.put(Session.TARANTULA_ACCESS_KEY,kv.getValue().getAsJsonPrimitive().getAsString());
             }
             else if(k.equals("data")){
                 pendingData.payload = kv.getValue().getAsJsonObject().toString().getBytes();

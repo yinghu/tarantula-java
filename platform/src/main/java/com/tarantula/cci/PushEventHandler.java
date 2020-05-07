@@ -3,7 +3,6 @@ package com.tarantula.cci;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
-import com.tarantula.platform.UDPConnection;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
@@ -38,6 +37,8 @@ public class PushEventHandler implements RequestHandler {
             String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
             String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
             //if(tokenValidator.validateAccessKey(accessKey)){
+            log.warn("access key->"+accessKey);
+            log.warn("server id->"+serverId);
             log.warn("action->"+action);
             //}
             byte[] _payload = exchange.payload();
@@ -56,10 +57,10 @@ public class PushEventHandler implements RequestHandler {
                 pushEvent.payload(_payload);
                 eventService.publish(pushEvent);
             }
-            else if(action.equals("onDisconnect")){
+            else if(action.equals("onDisconnect")){//no more access key check event from server socket
                 log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
                 _hex.forEach((k,v)->{
-                    if(v.header("serverId").equals(serverId)){
+                    if(v.header(Session.TARANTULA_SERVER_ID).equals(serverId)){
                         _hex.remove(k);
                         ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,k,true);
                         pushEvent.bucket(this.bucket);
