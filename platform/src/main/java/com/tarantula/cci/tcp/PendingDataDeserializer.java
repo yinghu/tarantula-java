@@ -59,6 +59,9 @@ public class PendingDataDeserializer implements JsonDeserializer<PendingData> {
             else if(k.equals("accessKey")){
                 pendingData.headers.put(Session.TARANTULA_ACCESS_KEY,kv.getValue().getAsJsonPrimitive().getAsString());
             }
+            else if(k.equals("ticket")){
+                pendingData.headers.put(Session.TARANTULA_ACCESS_KEY,kv.getValue().getAsJsonPrimitive().getAsString());
+            }
             else if(k.equals("data")){
                 pendingData.payload = kv.getValue().getAsJsonObject().toString().getBytes();
             }

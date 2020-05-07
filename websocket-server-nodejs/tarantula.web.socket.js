@@ -152,7 +152,7 @@ function connectOnTarantula(){
     var soc = net.createConnection(cfg.server.connection.port,cfg.server.connection.host,()=>{
         console.log("message listener connected to ["+cfg.server.connection.host+":"+cfg.server.connection.port+"]");
         //write one way protocol register to server
-        let req = {action:'onConnect',clientId:'push/streaming',path:'/push/action',streaming:true,serverId:serverId,accessKey:'access-Key',
+        let req = {action:'onConnect',clientId:'push/streaming',path:'/push/action',streaming:true,serverId:serverId,ticket:'access-ticket',
         data:{command:'onConnect',type:cfg.front.type,secured:cfg.front.secured,protocol:secured?'wss':'ws',host:cfg.front.host,port:cfg.front.port,path:cfg.front.path,serverId:serverId,maxConnections:cfg.front.maxConnections}};
         soc.write(toJSONString(req));
     });
@@ -217,10 +217,11 @@ function connectOnTarantula(){
     });
     soc.on('error',(err)=>{
        console.log(err);
+       console.log('trying to connect on server on error');
        connectOnTarantula();
     });
     soc.on('close',()=>{
-      console.log('trying to connect on server on close');
+      console.log('socket connection closed');
     });
     return soc;
     });
@@ -236,7 +237,11 @@ function registerOnTarantula(callback){
             }
         });
         res.on('end', () => {
-            console.log(fromString(resp.join('')));
+            var ret = JSON.parse(resp.join(''));
+            if(!ret.successful){
+                console.log("Illegal access server");
+                process.exit(1);
+            }
             mlistener = callback();
         });    
     });

@@ -1,6 +1,7 @@
 package com.tarantula.cci;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
@@ -43,9 +44,15 @@ public class PushEventHandler implements RequestHandler {
             //}
             byte[] _payload = exchange.payload();
             if(action.equals("onTicket")){
-                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"push",true));
+                JsonObject jo = new JsonObject();
+                jo.addProperty("ticket","ticket");
+                jo.addProperty("host","10.0.0.234");
+                jo.addProperty("port","6393");
+                jo.addProperty("successful",true);
+                exchange.onEvent(new ResponsiveEvent("","",jo.toString().getBytes(),"push",true));
+                //return ticket, server socket ip/port
             }
-            else if(action.equals("onConnect")){
+            else if(action.equals("onConnect")){//access key
                 log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
                 String sid = exchange.id();
                 _hex.put(sid,exchange);
