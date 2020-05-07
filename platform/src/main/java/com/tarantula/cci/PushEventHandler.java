@@ -35,9 +35,17 @@ public class PushEventHandler implements RequestHandler {
     public void onRequest(OnExchange exchange){
         try{
             String action = exchange.header(Session.TARANTULA_ACTION);
+            String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
+            String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
+            //if(tokenValidator.validateAccessKey(accessKey)){
+            log.warn("action->"+action);
+            //}
             byte[] _payload = exchange.payload();
-            if(action.equals("onConnect")){
-                log.warn("push->"+exchange.path()+"/"+exchange.header("serverId")+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
+            if(action.equals("onTicket")){
+                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"push",true));
+            }
+            else if(action.equals("onConnect")){
+                log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
                 String sid = exchange.id();
                 _hex.put(sid,exchange);
                 ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,false);
@@ -49,8 +57,7 @@ public class PushEventHandler implements RequestHandler {
                 eventService.publish(pushEvent);
             }
             else if(action.equals("onDisconnect")){
-                String serverId = exchange.header("serverId");
-                log.warn("push->"+exchange.path()+"/"+exchange.header("serverId")+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
+                log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
                 _hex.forEach((k,v)->{
                     if(v.header("serverId").equals(serverId)){
                         _hex.remove(k);

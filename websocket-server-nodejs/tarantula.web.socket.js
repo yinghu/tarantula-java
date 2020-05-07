@@ -17,17 +17,15 @@ if(fs.existsSync('ip.txt')){
     cfg.front.host = fs.readFileSync('ip.txt','utf-8');//replace ip from ip.txt
 }
 const https = secured?require('https'):require('http');
-const http = require('https');
+const http = require('http');
 const net = require('net');
 const querystring = require('querystring');
 const {v1: uuidv1} = require('uuid');
 const cMap = new Map(); //web socket client mapping clientId => connection
 const pMap = new Map(); //server push event mapping label ==> updated payload
 var mresult = {payload:[],cid:[],lbl:[],pos:0};
-var mlistener = connectOnTarantula();
-var connected = false;
+var mlistener;
 var web;
-var lastMessage;
 var serverId = uuidv1();
 if(secured){
     const options = {
@@ -148,24 +146,22 @@ exports.stop=()=>{
         console.log("web socket is closed");
     });
 };
+connectOnTarantula();
 function connectOnTarantula(){
+    return registerOnTarantula(()=>{
     var soc = net.createConnection(cfg.server.connection.port,cfg.server.connection.host,()=>{
         console.log("message listener connected to ["+cfg.server.connection.host+":"+cfg.server.connection.port+"]");
         //write one way protocol register to server
         let req = {action:'onConnect',clientId:'push/streaming',path:'/push/action',streaming:true,serverId:serverId,data:{command:'onConnect',type:cfg.front.type,secured:cfg.front.secured,protocol:secured?'wss':'ws',host:cfg.front.host,port:cfg.front.port,path:cfg.front.path,serverId:serverId,maxConnections:cfg.front.maxConnections}};
         soc.write(toJSONString(req));
-        connected = true;
     });
     soc.on('data',(data)=>{
         for(var i = 0; i < data.length; ++i){
             var c = String.fromCharCode(data[i]);
             if(c==='|'){
                var cid = mresult.cid.join('');
-               var lbl = mresult.lbl.join('');//{label}#{gameid}?{command}
+               var lbl = mresult.lbl.join('');
                var mx = mresult.payload.join('');
-               //console.log(cid);
-               //console.log(lbl);
-               //console.log(mx);
                var conn = cMap.get(cid);
                if(conn){
                   conn.sendUTF(mx);
@@ -174,12 +170,10 @@ function connectOnTarantula(){
                     //label format {label}#{gameId}?{command}
                     //console.log(mx);
                     var _gameId = lbl.substring(lbl.indexOf("#")+1,lbl.indexOf("?"));
-                    //console.log(_gameId);
                     if(!pMap.has(_gameId)){
                         pMap.set(_gameId,{listeners:[]});
                     }
                     let pse = pMap.get(_gameId);
-                    //pse.payload = mx;
                     pse.listeners.forEach((c,ix)=>{
                         //synchronize client
                         let _sc = cMap.get(c);
@@ -222,17 +216,34 @@ function connectOnTarantula(){
     });
     soc.on('error',(err)=>{
        console.log(err);
-       connected = false;
+       connectOnTarantula();
     });
     soc.on('close',()=>{
-      //console.log('trying to connect on server');
-      if(!connected){
-          setTimeout(()=>{
-              mlistener = connectOnTarantula();
-          },5000);
-      }
+      console.log('trying to connect on server on close');
     });
     return soc;
+    });
+}
+function registerOnTarantula(callback){
+    const headers = {Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Tarantula-access-key':'accesskey','Tarantula-server-id':serverId,'Tarantula-action':'onTicket'};
+    const optsx ={rejectUnauthorized: false,hostname:cfg.server.web.host,port:cfg.server.web.port,path:'/push',method:'GET',headers:headers};
+    const req = http.request(optsx,(res)=>{
+        var resp=[];
+        res.on('data', (data) => {
+            for(var i = 0; i < data.length; ++i){
+                resp.push(String.fromCharCode(data[i]));
+            }
+        });
+        res.on('end', () => {
+            console.log(fromString(resp.join('')));
+            mlistener = callback();
+        });    
+    });
+    req.on('error', (e) => {
+        console.log("Retrying->"+e.message);
+        connectOnTarantula();
+    });
+    req.end();
 }
 function actionOnTarantula(conn,_payload){
     _payload.token = conn.precence.token;
@@ -241,13 +252,13 @@ function actionOnTarantula(conn,_payload){
     mlistener.write(toJSONString(_payload));
 }
 function validateOnTarantula(url,callback){
-    //callback({successful:true}); 
     var _payload = querystring.parse(url.substring(url.indexOf('?')+1));
     const data = JSON.stringify(_payload);
+    const headers = {Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Content-length':data.length,'Tarantula-magic-key':_payload.systemId,'Tarantula-tag':'index/user','Tarantula-action':'onTicket'};
     const optsx ={rejectUnauthorized: false,secureProtocol: "TLSv1_2_method",
         hostname:cfg.server.web.host,port:cfg.server.web.port,
         path:'/user/action',method:'POST',
-        headers:{Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Content-length':data.length,'Tarantula-magic-key':_payload.systemId,'Tarantula-tag':'index/user','Tarantula-action':'onTicket'}};
+        headers:headers};
     const req = http.request(optsx,(res)=>{
         var resp=[];
         res.on('data', (data) => {
