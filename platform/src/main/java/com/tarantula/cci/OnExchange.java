@@ -1,13 +1,14 @@
 package com.tarantula.cci;
 
 import com.tarantula.EventListener;
+import com.tarantula.platform.service.Closable;
 
 import java.io.InputStream;
 
 /**
  * Updated by yinghu lu on 12/16/2019.
  */
-public interface OnExchange extends EventListener{
+public interface OnExchange extends EventListener {
     String id();
     String path();
     String method();
@@ -30,4 +31,6 @@ public interface OnExchange extends EventListener{
     default void onError(Exception ex,String message){}
 
     default InputStream onStream(){ return null;}
+
+    default void close(){}
 }

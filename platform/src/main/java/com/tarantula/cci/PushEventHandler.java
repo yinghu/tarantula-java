@@ -22,13 +22,12 @@ public class PushEventHandler implements RequestHandler {
 
     private String bucket;
     private EventService eventService;
-    private TokenValidator tokenValidator;
-    private DeploymentServiceProvider deploymentServiceProvider;
+    private TokenValidatorProvider tokenValidatorProvider;
 
     private String serverTopic;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
     private GsonBuilder builder;
-
+    private Connection endpoint;
     public String name(){
         return "/push";
     }
@@ -37,32 +36,43 @@ public class PushEventHandler implements RequestHandler {
             String action = exchange.header(Session.TARANTULA_ACTION);
             String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
             String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
-            //if(tokenValidator.validateAccessKey(accessKey)){
-            log.warn("access key->"+accessKey);
-            log.warn("server id->"+serverId);
-            log.warn("action->"+action);
-            //}
+            //log.warn("access key->"+accessKey);
+            //log.warn("server id->"+serverId);
+            //log.warn("action->"+action);
             byte[] _payload = exchange.payload();
             if(action.equals("onTicket")){
-                JsonObject jo = new JsonObject();
-                jo.addProperty("ticket","ticket");
-                jo.addProperty("host","10.0.0.234");
-                jo.addProperty("port","6393");
-                jo.addProperty("successful",true);
-                exchange.onEvent(new ResponsiveEvent("","",jo.toString().getBytes(),"push",true));
-                //return ticket, server socket ip/port
+                byte[] et;
+                if(this.tokenValidatorProvider.validateAccessKey(accessKey)){
+                    JsonObject jo = new JsonObject();
+                    jo.addProperty("ticket", tokenValidatorProvider.ticket(serverId,1,5));
+                    jo.addProperty("host",endpoint.host());
+                    jo.addProperty("port",endpoint.port());
+                    jo.addProperty("successful",true);
+                    et = jo.toString().getBytes();
+                }
+                else{
+                    ResponseHeader err = new ResponseHeader("onTicket","invalid access key",false);
+                    et = builder.create().toJson(err).getBytes();
+                }
+                exchange.onEvent(new ResponsiveEvent("","",et,"push",true));
             }
             else if(action.equals("onConnect")){//access key
-                log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
-                String sid = exchange.id();
-                _hex.put(sid,exchange);
-                ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,false);
-                pushEvent.bucket(this.bucket);
-                pushEvent.clientId(exchange.header("serverId"));
-                pushEvent.owner(this.eventService.subscription());
-                pushEvent.destination(DeploymentServiceProvider.DEPLOY_TOPIC);
-                pushEvent.payload(_payload);
-                eventService.publish(pushEvent);
+                if(tokenValidatorProvider.validateTicket(serverId,1,accessKey)){
+                    log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
+                    String sid = exchange.id();
+                    _hex.put(sid,exchange);
+                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,false);
+                    pushEvent.bucket(this.bucket);
+                    pushEvent.clientId(exchange.header("serverId"));
+                    pushEvent.owner(this.eventService.subscription());
+                    pushEvent.destination(DeploymentServiceProvider.DEPLOY_TOPIC);
+                    pushEvent.payload(_payload);
+                    eventService.publish(pushEvent);
+                }
+                else{
+                    log.warn("Invalid ticket");
+                    exchange.close();
+                }
             }
             else if(action.equals("onDisconnect")){//no more access key check event from server socket
                 log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
@@ -103,9 +113,8 @@ public class PushEventHandler implements RequestHandler {
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
         this.bucket = tcx.bucket();
-        TokenValidatorProvider tp = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
-        this.tokenValidator = tp.tokenValidator();
-        this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
+        this.endpoint = tcx.endpoint();
+        tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
     }
     public  boolean onEvent(Event event){
         OnExchange hx = this._hex.get(event.sessionId());

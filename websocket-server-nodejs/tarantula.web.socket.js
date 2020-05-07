@@ -13,11 +13,12 @@ else{
     console.log("using default configuration");
 }
 var secured = cfg.front.secured;
-if(fs.existsSync('ip.txt')){
-    cfg.front.host = fs.readFileSync('ip.txt','utf-8');//replace ip from ip.txt
+if(fs.existsSync('/etc/tarantula/ip.txt')){
+    cfg.front.host = fs.readFileSync('/etc/tarantula/ip.txt','utf-8');//replace ip from ip.txt
+    console.log("replacing ip with ["+cfg.front.host+"]");
 }
 const https = secured?require('https'):require('http');
-const http = require('http');
+const http = require(cfg.server.web.type);//use http or https
 const net = require('net');
 const querystring = require('querystring');
 const {v1: uuidv1} = require('uuid');
@@ -152,7 +153,7 @@ function connectOnTarantula(){
     var soc = net.createConnection(cfg.server.connection.port,cfg.server.connection.host,()=>{
         console.log("message listener connected to ["+cfg.server.connection.host+":"+cfg.server.connection.port+"]");
         //write one way protocol register to server
-        let req = {action:'onConnect',clientId:'push/streaming',path:'/push/action',streaming:true,serverId:serverId,ticket:'access-ticket',
+        let req = {action:'onConnect',clientId:'push/streaming',path:'/push/action',streaming:true,serverId:serverId,ticket:cfg.server.connection.ticket,
         data:{command:'onConnect',type:cfg.front.type,secured:cfg.front.secured,protocol:secured?'wss':'ws',host:cfg.front.host,port:cfg.front.port,path:cfg.front.path,serverId:serverId,maxConnections:cfg.front.maxConnections}};
         soc.write(toJSONString(req));
     });
@@ -242,6 +243,10 @@ function registerOnTarantula(callback){
                 console.log("Illegal access server");
                 process.exit(1);
             }
+            console.log(ret.host+":"+ret.port+"//"+ret.ticket);
+            cfg.server.connection.port=ret.port;
+            cfg.server.connection.host=ret.host;
+            cfg.server.connection.ticket = ret.ticket;
             mlistener = callback();
         });    
     });

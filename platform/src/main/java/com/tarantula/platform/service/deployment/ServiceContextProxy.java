@@ -63,7 +63,10 @@ public class ServiceContextProxy implements ServiceContext {
     public int partitionNumber() {
         return this.tarantulaContext.partitionNumber();
     }
-
+    @Override
+    public Connection endpoint(){
+        return this.tarantulaContext.endpoint();
+    }
     @Override
     public String bucket() {
         return this.tarantulaContext.bucket();

@@ -2,6 +2,7 @@ package com.tarantula.platform;
 
 import com.tarantula.*;
 import com.tarantula.platform.service.SystemValidatorProvider;
+import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.SystemUtil;
 import java.security.MessageDigest;
 
@@ -14,7 +15,7 @@ public class SystemValidator implements Serviceable{
 
     private SystemValidatorProvider systemValidatorProvider;
 
-    private MessageDigest messageDigest(){
+    public MessageDigest messageDigest(){
         try{
             return (MessageDigest)this._messageDigest.clone();
         }catch (Exception ex){
@@ -23,7 +24,7 @@ public class SystemValidator implements Serviceable{
     }
 
     public void start() throws Exception{
-        this._messageDigest = MessageDigest.getInstance(TokenValidator.MDA);
+        this._messageDigest = MessageDigest.getInstance(TokenValidatorProvider.MDA);
     }
 
     @Override
@@ -47,6 +48,7 @@ public class SystemValidator implements Serviceable{
     private class _TokenValidator implements TokenValidator{
 
         private final SystemValidator _singleton;
+
 
         public _TokenValidator(SystemValidator _singleton){
             this._singleton = _singleton;
@@ -87,7 +89,6 @@ public class SystemValidator implements Serviceable{
         @Override
         public boolean validateTicket(String systemId, int stub, String ticket) {
             Presence ptx = systemValidatorProvider.presence(systemId);
-            //System.out.println("PIX->"+ptx.count(0)+"<><><>"+stub);
             if(stub!=ptx.count(0)){
                 return false;
             }
@@ -104,9 +105,5 @@ public class SystemValidator implements Serviceable{
             systemValidatorProvider.offSession(systemId);
         }
 
-        @Override
-        public boolean validateAccessKey(String accessKey){
-            return true;
-        }
     }
 }

@@ -72,7 +72,6 @@ public class SocketEndPoint implements EndPoint{
                                 if(pendingData.serverId!=null){
                                     pendingRequest.serverId(pendingData.serverId);
                                 }
-                                //log.warn(">>>>>>"+pendingData.path);
                                 RequestHandler requestHandler = resource.requestHandler("/"+pendingData.path.split("/")[1]);
                                 SocketSession socketSession = new SocketSession(pendingRequest,pendingData);
                                 requestHandler.onRequest(socketSession);
@@ -188,11 +187,6 @@ public class SocketEndPoint implements EndPoint{
 
     @Override
     public void secured(boolean secured) {
-
-    }
-
-    @Override
-    public void password(String password) {
 
     }
 

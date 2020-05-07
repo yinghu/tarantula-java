@@ -2,6 +2,7 @@ package com.tarantula.licensing;
 
 import com.tarantula.TokenValidator;
 import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.io.BufferedReader;
@@ -20,7 +21,7 @@ public class Validator {
                 BufferedReader reader = new BufferedReader(new FileReader(sf));
                 String key = reader.readLine();
                 log.info("Validating tarantula license key ["+key+"]");
-                return key.equals(SystemUtil.hashPassword(MessageDigest.getInstance(TokenValidator.MDA),"tarantula"));
+                return key.equals(SystemUtil.hashPassword(MessageDigest.getInstance(TokenValidatorProvider.MDA),"tarantula"));
             }
             else{
                 throw new IllegalArgumentException("License key not found");

@@ -26,15 +26,13 @@ public class EndpointService implements Serviceable,EndPoint.Resource,Scheduling
     }
 
     public void start() throws Exception {
-        //AccessIndexService ais = (AccessIndexService)this.tarantulaContext.serviceProvider(AccessIndexService.NAME);
-        //DeploymentServiceProvider dis = this.tarantulaContext.deploymentService();
         RootContentHandler rootContentHandler = new RootContentHandler();
         rootContentHandler.setup(this.tarantulaContext);
         rootContentHandler.start();
         rMap.put(rootContentHandler.name(),rootContentHandler);
 
         UploadEventHandler uploadEventHandler = new UploadEventHandler();
-       uploadEventHandler.setup(this.tarantulaContext);
+        uploadEventHandler.setup(this.tarantulaContext);
         uploadEventHandler.start();
         rMap.put(uploadEventHandler.name(),uploadEventHandler);
 
@@ -58,8 +56,6 @@ public class EndpointService implements Serviceable,EndPoint.Resource,Scheduling
         applicationHandler.start();
         rMap.put(applicationHandler.name(),applicationHandler);
 
-        //PushEventHandler pushEventHandler = new PushEventHandler(this.endPointListenerList);
-        //pushEventHandler.setup(this.tarantulaContext.tokenValidatorProvider().tokenValidator(),this.tarantulaContext.eventService(Distributable.INTEGRATION_SCOPE),ais,this.tarantulaContext.dataBucketGroup,dis);
         pushEventHandler.setup(this.tarantulaContext);
         pushEventHandler.start();
         rMap.put(pushEventHandler.name(),pushEventHandler);

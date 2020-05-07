@@ -27,7 +27,7 @@ public class AdminEventHandler implements RequestHandler {
 
     private String bucket;
     private EventService eventService;
-    private TokenValidator tokenValidator;
+    private TokenValidatorProvider tokenValidator;
     private DeploymentServiceProvider deploymentServiceProvider;
     private AccessIndexService accessIndexService;
     private String serverTopic;
@@ -93,8 +93,7 @@ public class AdminEventHandler implements RequestHandler {
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
         this.accessIndexService = tcx.accessIndexService();
         this.bucket = tcx.bucket();
-        TokenValidatorProvider tp = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
-        this.tokenValidator = tp.tokenValidator();
+        tokenValidator  = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }
     public  boolean onEvent(Event event){

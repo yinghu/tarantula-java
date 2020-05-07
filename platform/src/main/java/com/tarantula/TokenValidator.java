@@ -1,18 +1,15 @@
 package com.tarantula;
-
 /**
  * Updated by yinghu 8/27/19
  */
 public interface TokenValidator{
 
-    String MDA = "SHA-1";
 
     //validate and parse the token, call before dispatching event
     OnSession validateToken(String token);
 
     //hash password to avoid direct password persistence
     String hashPassword(String password);
-
 
     OnSession validatePassword(Access hash,String password);
 
@@ -27,7 +24,6 @@ public interface TokenValidator{
 
     void offSession(String systemId,int stub);
 
-    boolean validateAccessKey(String accessKey);
 
 
 }

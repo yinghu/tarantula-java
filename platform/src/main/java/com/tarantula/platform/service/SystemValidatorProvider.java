@@ -6,6 +6,7 @@ import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.SystemValidator;
 import com.tarantula.platform.presence.User;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,6 +48,15 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void timeout(int minutes,int seconds){
         this.timeoutInMinutes = minutes;
         this.timeoutInSeconds = seconds;
+    }
+    public boolean validateAccessKey(String accessKey){
+        return true;
+    }
+    public String ticket(String key,int stub,int duration){
+        return SystemUtil.ticket(systemValidator.messageDigest(),key,stub,duration);
+    }
+    public boolean validateTicket(String key,int stub,String ticket){
+        return SystemUtil.validTicket(systemValidator.messageDigest(),key,stub,ticket);
     }
     public Access.Role role(String systemId){
         if(systemId==null){

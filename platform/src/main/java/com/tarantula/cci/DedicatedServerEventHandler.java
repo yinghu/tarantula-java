@@ -18,7 +18,7 @@ public class DedicatedServerEventHandler implements RequestHandler {
 
     //private String bucket;
     //private EventService eventService;
-    private TokenValidator tokenValidator;
+    private TokenValidatorProvider tokenValidator;
     private DeploymentServiceProvider deploymentServiceProvider;
 
     //private String serverTopic;
@@ -77,8 +77,6 @@ public class DedicatedServerEventHandler implements RequestHandler {
     public void start() throws Exception {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        //this.serverTopic = UUID.randomUUID().toString();
-        //this.eventService.registerEventListener(this.serverTopic,this);
         log.info("Dedicated server event handler started");
     }
 
@@ -88,11 +86,7 @@ public class DedicatedServerEventHandler implements RequestHandler {
     }
 
     public void setup(ServiceContext tcx){
-        //this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
-        //this.accessIndexService = tcx.accessIndexService();
-        //this.bucket = tcx.bucket();
-        TokenValidatorProvider tp = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
-        this.tokenValidator = tp.tokenValidator();
+        this.tokenValidator = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }
     public  boolean onEvent(Event event){

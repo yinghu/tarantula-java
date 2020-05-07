@@ -420,6 +420,10 @@ public class TarantulaContext implements Serviceable,ServiceContext,SchedulingTa
     public int partitionNumber(){
  	    return this.platformRoutingNumber;
     }
+
+    public Connection endpoint(){
+ 	    return new PushEndpoint("10.0.0.234",6393);
+    }
     //list the database list on deploy service
     public DataStoreProvider dataStoreProvider(){
  	    return (DataStoreProvider) this.dataStoreProviders.get(this.dataStoreMaster);

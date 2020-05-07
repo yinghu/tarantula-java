@@ -92,4 +92,12 @@ public class PendingRequest {
         buffer.flip();
         return buffer;
     }
+    public void close(){
+        try{
+            this.key.cancel();
+            this.key.channel().close();
+        }catch (Exception ex){
+
+        }
+    }
 }

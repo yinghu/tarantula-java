@@ -109,9 +109,6 @@ public class HttpEndpoint implements EndPoint {
 	public void secured(boolean secured){
 
 	}
-	public void password(String password){
-
-	}
 
 	public void inboundThreadPoolSetting(String inboundThreadPoolSetting){
 		this.inboundThreadPoolSetting = inboundThreadPoolSetting;

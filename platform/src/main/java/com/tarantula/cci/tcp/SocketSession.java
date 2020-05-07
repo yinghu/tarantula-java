@@ -79,4 +79,7 @@ public class SocketSession implements OnExchange {
         }
         return !streaming;
     }
+    public void close(){
+        pendingRequest.close();
+    }
 }

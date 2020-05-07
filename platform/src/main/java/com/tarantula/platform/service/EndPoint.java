@@ -13,7 +13,6 @@ public interface EndPoint extends ServiceProvider {
     void backlog(int backlog);
     void port(int port);
     void secured(boolean secured);
-    void password(String password);
     void inboundThreadPoolSetting(String inboundThreadPoolSetting);
 
     void resource(Resource resource);
