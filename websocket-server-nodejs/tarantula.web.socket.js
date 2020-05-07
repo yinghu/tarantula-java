@@ -17,7 +17,7 @@ if(fs.existsSync('ip.txt')){
     cfg.front.host = fs.readFileSync('ip.txt','utf-8');//replace ip from ip.txt
 }
 const https = secured?require('https'):require('http');
-const http = require('http');
+const http = require('https');
 const net = require('net');
 const querystring = require('querystring');
 const {v1: uuidv1} = require('uuid');
@@ -241,10 +241,13 @@ function actionOnTarantula(conn,_payload){
     mlistener.write(toJSONString(_payload));
 }
 function validateOnTarantula(url,callback){
+    //callback({successful:true}); 
     var _payload = querystring.parse(url.substring(url.indexOf('?')+1));
     const data = JSON.stringify(_payload);
-    //const opts ={hostname:'realnumber.net',path:'/user/action',method:'POST',headers:{Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Content-length':data.length,'Tarantula-magic-key':_payload.systemId,'Tarantula-tag':'user','Tarantula-action':'onTicket'}};
-    const optsx ={hostname:cfg.server.web.host,port:cfg.server.web.port,path:'/user/action',method:'POST',headers:{Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Content-length':data.length,'Tarantula-magic-key':_payload.systemId,'Tarantula-tag':'index/user','Tarantula-action':'onTicket'}};
+    const optsx ={rejectUnauthorized: false,secureProtocol: "TLSv1_2_method",
+        hostname:cfg.server.web.host,port:cfg.server.web.port,
+        path:'/user/action',method:'POST',
+        headers:{Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Content-length':data.length,'Tarantula-magic-key':_payload.systemId,'Tarantula-tag':'index/user','Tarantula-action':'onTicket'}};
     const req = http.request(optsx,(res)=>{
         var resp=[];
         res.on('data', (data) => {
