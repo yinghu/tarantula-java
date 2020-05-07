@@ -6,19 +6,17 @@ import com.tarantula.platform.TarantulaContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.ScheduledFuture;
-
 /**
  * Developer: YINGHU LU
  * Date updated 5/5/2020
  */
-public class EndpointService implements Serviceable,EndPoint.Resource,SchedulingTask{
+public class EndpointService implements Serviceable,EndPoint.Resource{
 
     TarantulaContext tarantulaContext;
     private HashMap<String,RequestHandler> rMap = new HashMap<>();
     private final ArrayList<EndPoint> endPointList;
     private final PushEventHandler pushEventHandler;
-    private ScheduledFuture scheduledFuture;
+
     public EndpointService(TarantulaContext tarantulaContext){
         this.tarantulaContext = tarantulaContext;
         this.endPointList = new ArrayList<>();
@@ -78,13 +76,9 @@ public class EndpointService implements Serviceable,EndPoint.Resource,Scheduling
             endPoint.waitForData();
             this.tarantulaContext.node_started.set(true);
         }
-        this.scheduledFuture = this.tarantulaContext.schedule(this);
     }
 
     public void shutdown() throws Exception {
-        if(scheduledFuture!=null){
-            this.scheduledFuture.cancel(true);
-        }
         for(EndPoint endpoint : endPointList){
             endpoint.shutdown();
         }
@@ -98,24 +92,10 @@ public class EndpointService implements Serviceable,EndPoint.Resource,Scheduling
         return rMap.get(name);
     }
 
-    @Override
-    public boolean oneTime() {
-        return false;
-    }
 
-    @Override
-    public long initialDelay() {
-        return 0;
-    }
-
-    @Override
-    public long delay() {
-        return EndPoint.CHECK_POINT_DELTA;
-    }
-
-    @Override
-    public void run() {
+    public void atMidnight() {
         rMap.forEach((k,v)->{
+            System.out.println("midnight check->"+k);
             v.onCheck();
         });
     }

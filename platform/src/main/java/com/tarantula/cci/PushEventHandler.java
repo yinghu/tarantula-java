@@ -36,9 +36,6 @@ public class PushEventHandler implements RequestHandler {
             String action = exchange.header(Session.TARANTULA_ACTION);
             String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
             String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
-            //log.warn("access key->"+accessKey);
-            //log.warn("server id->"+serverId);
-            //log.warn("action->"+action);
             byte[] _payload = exchange.payload();
             if(action.equals("onTicket")){
                 byte[] et;
