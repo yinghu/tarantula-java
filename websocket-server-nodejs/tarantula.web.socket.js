@@ -141,11 +141,14 @@ exports.start=()=>{
 
 exports.stop=()=>{
     console.log("closing web socket and service connection");
+    wsServer.closeAllConnections();
     wsServer.shutDown();
     mlistener.end();
-    web.close(()=>{
-        console.log("web socket is closed");
-    });
+    process.exit(1);
+    //web.close(()=>{
+        //console.log("web socket is closed");
+        //process.exit(1);
+    //});
 };
 connectOnTarantula();
 function connectOnTarantula(){
@@ -222,7 +225,7 @@ function connectOnTarantula(){
        connectOnTarantula();
     });
     soc.on('close',()=>{
-      console.log('socket connection closed');
+        console.log('socket connection closed');
     });
     return soc;
     });

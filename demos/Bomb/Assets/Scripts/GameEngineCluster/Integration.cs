@@ -56,9 +56,11 @@ public class Integration : MonoBehaviour{
         message = tms.GetComponent<TextMeshProUGUI>();
         integration.OnUpdating += _OnUpdating; 
         integration.OnException += (ex,msg,code)=>{
-            Debug.Log(msg);
-            Debug.Log(ex);
-            Debug.Log(code);
+            if(code==ErrorCode.EC_WS_RECEIVE){
+                Debug.Log(msg);
+                //Debug.Log(ex);
+                //Debug.Log(code);
+            }
         };
         pendingClick = false;
         connected = false;

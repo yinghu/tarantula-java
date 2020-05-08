@@ -2,7 +2,6 @@ package com.tarantula.platform.module;
 
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.RingBuffer;
@@ -27,15 +26,12 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     public void initialize(Session session) throws Exception {
         session.joined(true);
         module.onJoin(session,(cid,uid,delta)->{
-            //pushEvent(uid,delta);
-            session.index(parseUid(uid));
             this.serviceProvider.registerPostOffice().onConnection(cid).send(module.label()+"#"+uid,delta);
         });
     }
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         if(this.module.onRequest(session,payload,((cid,uid,delta) -> {
-            //pushEvent(uid,delta);
             this.serviceProvider.registerPostOffice().onConnection(cid).send(module.label()+"#"+uid,delta);
             //server push
         }))){
@@ -70,7 +66,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     public void onTimeout(Session session) {
         if(!this.descriptor.singleton()){
             this.module.onTimeout(session,(cid,uid,delta)->{
-                //pushEvent(uid,delta);
+                this.serviceProvider.registerPostOffice().onConnection(cid).send(module.label()+"#"+uid,delta);
             });
             this.context.onRegistry().onLeave(session);
         }
@@ -80,7 +76,6 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     public void onIdle(Session session){
         if(!this.descriptor.singleton()){
             this.module.onIdle(session,(cid,uid,delta)->{
-                //pushEvent(uid,delta);
                 this.serviceProvider.registerPostOffice().onConnection(cid).send(module.label()+"#"+uid,delta);
             });
         }
@@ -121,22 +116,6 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             timerSchedule.cancel(true);
         }
         this.context.log("Instance ["+descriptor.moduleName()+"/"+this.context.onRegistry().distributionKey()+"] closed",OnLog.WARN);
-    }
-    @Override
-    public void onError(Session session, Exception ex) {
-        //this.context.log(session.toString(),ex,OnLog.ERROR);
-        String msg = ex.getMessage()!=null?ex.getMessage():"Unexpected error";
-        session.write(this.builder.create().toJson(new ResponseHeader("onError",false,400,msg,"error")).getBytes(),this.module.label());
-    }
-
-    private String parseUid(String uid){
-        int ix = uid.indexOf('?');
-        if(ix>0){
-            return uid.substring(0,ix);
-        }
-        else{
-            return uid;
-        }
     }
 
     @Override
@@ -181,8 +160,12 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
                 return cn;
             });
             if(current!=null&&current.serverId().equals(c.serverId())){
-                current = cBuffer.pop();
+                current.disabled(true);
                 module.onConnection(current);
+                current = cBuffer.pop();
+                if(current!=null){
+                    module.onConnection(current);
+                }
             }
         }
     }
