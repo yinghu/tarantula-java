@@ -7,7 +7,7 @@ import com.hazelcast.core.ITopic;
 import com.hazelcast.core.Member;
 import com.tarantula.Distributable;
 import com.tarantula.Event;
-import com.tarantula.Serviceable;
+import com.tarantula.platform.service.Serviceable;
 import com.tarantula.TarantulaLogger;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.event.MapStoreVotingEvent;

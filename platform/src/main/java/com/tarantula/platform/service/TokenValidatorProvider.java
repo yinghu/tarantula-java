@@ -2,6 +2,8 @@ package com.tarantula.platform.service;
 
 import com.tarantula.*;
 
+import java.util.List;
+
 public interface TokenValidatorProvider extends ServiceProvider {
 
     String NAME = "TokenValidatorProvider";
@@ -17,4 +19,6 @@ public interface TokenValidatorProvider extends ServiceProvider {
     Presence presence(String systemId);
 
     Access.Role role(String systemId);
+
+    List<ApplicationCluster> list(String systemId);
 }

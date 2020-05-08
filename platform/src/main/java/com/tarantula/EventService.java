@@ -1,6 +1,8 @@
 package com.tarantula;
 
-public interface EventService extends EventListener,Serviceable{
+import com.tarantula.platform.service.Serviceable;
+
+public interface EventService extends EventListener, Serviceable {
 
 	void publish(Event out);
 	String subscription();

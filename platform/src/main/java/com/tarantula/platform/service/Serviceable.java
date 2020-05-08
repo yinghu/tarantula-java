@@ -1,4 +1,4 @@
-package com.tarantula;
+package com.tarantula.platform.service;
 
 public interface Serviceable {
 	

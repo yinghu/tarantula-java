@@ -1,6 +1,5 @@
 package com.tarantula.platform.service;
 
-import com.tarantula.*;
 import com.tarantula.cci.*;
 import com.tarantula.platform.TarantulaContext;
 

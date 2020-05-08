@@ -5,7 +5,7 @@ import java.util.concurrent.*;
 
 import com.sun.net.httpserver.HttpServer;
 import com.tarantula.platform.service.ServiceContext;
-import com.tarantula.Serviceable;
+import com.tarantula.platform.service.Serviceable;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
 import com.tarantula.platform.service.EndPoint;

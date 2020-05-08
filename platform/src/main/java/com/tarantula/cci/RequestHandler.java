@@ -1,16 +1,15 @@
 package com.tarantula.cci;
 
 import com.tarantula.*;
-import com.tarantula.platform.service.AccessIndexService;
-import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.ServiceContext;
+import com.tarantula.platform.service.Serviceable;
 
 /**
  * Created by yinghu lu on 4/27/2018.
  * RequestHandler provides the asynchronous way to exchange data between server and clients
  * Each client handler such as http , web socket, or raw socket should be using event service to exchange data
  */
-public interface RequestHandler extends EventListener,Serviceable{
+public interface RequestHandler extends EventListener, Serviceable {
     String name();
     void onRequest(OnExchange exchange);
     void setup(ServiceContext tcx);

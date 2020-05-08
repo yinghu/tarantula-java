@@ -21,7 +21,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     private String role = "player";
     private double initialBalance;
     private AccessIndexService accessIndexService;
-    //private PostOffice postOffice;
     private RingBuffer<Connection> cBuffer;
     private DeploymentServiceProvider deploymentServiceProvider;
     private boolean onApplication;
@@ -38,14 +37,11 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.onApplication = this.deploymentServiceProvider.deploymentMode()== DeploymentServiceProvider.Mode.APPLICATION;
-        //deploymentServiceProvider.registerOnConnectionListener(this);
-        //postOffice = this.context.postOffice();
         String root = configuration.property("root");
         String pwd = configuration.property("password");
         OnAccess onAccess = new OnAccessTrack();
         onAccess.property("login",root);
         onAccess.property("password",pwd);
-        //onAccess.property("nickname","super user");
         DataStore ds = this.context.dataStore("user");
         String rootId = ds.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid();
         AccessIndex accessIndex = accessIndexService.set(onAccess.property("login"),rootId);

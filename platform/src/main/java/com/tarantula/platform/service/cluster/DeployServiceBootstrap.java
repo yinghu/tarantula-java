@@ -1,6 +1,6 @@
 package com.tarantula.platform.service.cluster;
 
-import com.tarantula.Serviceable;
+import com.tarantula.platform.service.Serviceable;
 
 /**
  * Created by yinghu lu on 8/17/2018.

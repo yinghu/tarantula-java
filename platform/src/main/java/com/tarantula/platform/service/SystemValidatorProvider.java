@@ -9,7 +9,9 @@ import com.tarantula.platform.presence.User;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SystemValidatorProvider implements TokenValidatorProvider {
@@ -68,6 +70,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public boolean validateTicket(String key,int stub,String ticket){
         return SystemUtil.validTicket(messageDigest(),key,stub,ticket);
+    }
+    public List<ApplicationCluster> list(String systemId){
+        return new ArrayList<>();
     }
     public Access.Role role(String systemId){
         if(systemId==null){

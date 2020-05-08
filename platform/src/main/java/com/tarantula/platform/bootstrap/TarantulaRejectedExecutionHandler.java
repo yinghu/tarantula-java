@@ -3,7 +3,7 @@ package com.tarantula.platform.bootstrap;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import com.tarantula.Serviceable;
+import com.tarantula.platform.service.Serviceable;
 import com.tarantula.logging.JDKLogger;
 
 

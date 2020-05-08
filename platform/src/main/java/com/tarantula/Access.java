@@ -5,15 +5,15 @@ package com.tarantula;
  */
 public interface Access extends Recoverable {
 
+    //application access level control
     int PUBLIC_ACCESS_MODE = 10;
     int PROTECT_ACCESS_MODE = 12;
     int PRIVATE_ACCESS_MODE = 13;
 
     //LOWEST O - HIGHEST 100
-    int PLAYER_ACCESS_CONTROL = 0;
-    int ADMIN_ACCESS_CONTROL = 10;
-
-    int ROOT_ACCESS_CONTROL = 100;//MAX ACCESS CONTROL
+    int PLAYER_ACCESS_CONTROL = 0;//manage own assets on app
+    int ADMIN_ACCESS_CONTROL = 10;//manage own assets on admin app
+    int ROOT_ACCESS_CONTROL = 100;//manage all assets with super permission
 
     String login();
     void login(String login);

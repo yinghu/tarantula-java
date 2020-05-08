@@ -7,6 +7,7 @@ import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.LobbyDescriptor;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.service.deployment.ApplicationQuery;
 import com.tarantula.platform.service.deployment.LobbyQuery;
 import com.tarantula.platform.util.OnAccessDeserializer;
@@ -16,6 +17,7 @@ public class AdminSetupModule implements Module {
 
     private ApplicationContext context;
     private DeploymentServiceProvider serviceProvider;
+    private TokenValidatorProvider tokenValidatorProvider;
     private DataStore dataStore;
     private GsonBuilder builder;
 
@@ -98,6 +100,7 @@ public class AdminSetupModule implements Module {
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.dataStore = this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());

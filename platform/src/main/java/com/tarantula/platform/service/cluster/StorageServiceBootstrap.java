@@ -1,6 +1,6 @@
 package com.tarantula.platform.service.cluster;
 
-import com.tarantula.Serviceable;
+import com.tarantula.platform.service.Serviceable;
 import com.tarantula.platform.TarantulaContext;
 
 public class StorageServiceBootstrap implements Serviceable {

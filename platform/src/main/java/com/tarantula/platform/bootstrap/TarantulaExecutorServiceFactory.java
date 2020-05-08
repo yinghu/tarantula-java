@@ -1,6 +1,6 @@
 package com.tarantula.platform.bootstrap;
 
-import com.tarantula.Serviceable;
+import com.tarantula.platform.service.Serviceable;
 
 import java.util.concurrent.*;
 
