@@ -173,8 +173,9 @@ function connectOnTarantula(){
                }
                else{//server push event
                     //label format {label}#{gameId}?{command}
-                    //console.log(mx);
+                    //console.log(lbl);
                     var _gameId = (lbl.indexOf("?")!=-1)?lbl.substring(lbl.indexOf("#")+1,lbl.indexOf("?")):lbl.substring(lbl.indexOf("#")+1);
+                    //console.log(_gameId);
                     if(!pMap.has(_gameId)){
                         pMap.set(_gameId,{listeners:[]});
                     }

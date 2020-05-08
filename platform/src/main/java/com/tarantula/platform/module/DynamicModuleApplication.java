@@ -17,7 +17,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
 
     private Module module;
     private DeploymentServiceProvider serviceProvider;
-    private long pendingTimer;
+    //private long pendingTimer;
 
     private ScheduledFuture timerSchedule;
     private RingBuffer<Connection> cBuffer;
@@ -48,8 +48,8 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         this.context.onRegistry().registerOnInstanceListener(this);
         try{
             module = this.serviceProvider.module(this.descriptor);
-            this.pendingTimer = descriptor.timerOnModule();
-            if(descriptor.timerOnModule()>0){
+            this.SERVER_PUSH_INTERVAL = descriptor.timerOnModule();
+            if(this.SERVER_PUSH_INTERVAL>0){
                 this.serviceProvider.registerOnConnectionListener(this);
                 this.timerSchedule = this.context.schedule(this);
             }
@@ -98,15 +98,13 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     @Override
     public void run() {
         try{
-            pendingTimer = pendingTimer-SERVER_PUSH_INTERVAL;
-            if(pendingTimer<=0){
-                this.module.onTimer(((cid,uid,delta) ->
-                    this.serviceProvider.registerPostOffice().onConnection(cid).send(module.label()+"#"+uid,delta)
-                ));
-                pendingTimer = descriptor.timerOnModule();//reset
-            }
+            this.module.onTimer(((cid,uid,delta) ->
+                this.serviceProvider.registerPostOffice().onConnection(cid).send(module.label()+"#"+uid,delta)
+            ));
+
         }catch (Exception ex){
             //ignore it
+            this.context.log("error",ex,OnLog.ERROR);
         }
     }
     @Override
