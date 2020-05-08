@@ -7,15 +7,12 @@ import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.RingBuffer;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * Created by yinghu lu on 7/20/2019.
+ * Update by yinghu lu on 5/7/2020.
  */
 public class DynamicModuleApplication extends TarantulaApplicationHeader implements Session.TimeoutListener, SchedulingTask,OnInstance.Listener {
-
-    private ConcurrentHashMap<String,Session> _onStream = new ConcurrentHashMap<>();
 
     private long SERVER_PUSH_INTERVAL = 50;
 
@@ -32,32 +29,14 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         module.onJoin(session,(cid,uid,delta)->{
             //pushEvent(uid,delta);
             session.index(parseUid(uid));
-            _onStream.put(session.systemId(),session);
-            //broadcasting to all streaming session if no udp publisher
-            this._onStream.forEach((k,v)->{
-                if(v.streaming()&&v.index().equals(parseUid(uid))){
-                    v.write(delta,this.module.label()+"#"+uid);
-                }
-            });
+            this.serviceProvider.registerPostOffice().onConnection(cid).send(module.label()+"#"+uid,delta);
         });
     }
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
-        if(session.streaming()){
-            Session ex = _onStream.remove(session.systemId());
-            if(ex!=null){
-                session.index(ex.index());
-            }
-            this._onStream.put(session.systemId(),session);
-        }
         if(this.module.onRequest(session,payload,((cid,uid,delta) -> {
             //pushEvent(uid,delta);
-            //broadcasting to all streaming session if no udp publisher
-            this._onStream.forEach((k,v)->{
-                if(v.streaming()&&parseUid(uid).equals(v.index())){
-                    v.write(delta,this.module.label()+"#"+uid);
-                }
-            });
+            this.serviceProvider.registerPostOffice().onConnection(cid).send(module.label()+"#"+uid,delta);
             //server push
         }))){
             //clean up on leave
@@ -75,6 +54,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             module = this.serviceProvider.module(this.descriptor);
             this.pendingTimer = descriptor.timerOnModule();
             if(descriptor.timerOnModule()>0){
+                this.serviceProvider.registerOnConnectionListener(this);
                 this.timerSchedule = this.context.schedule(this);
             }
             module.setup(context);
@@ -101,10 +81,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         if(!this.descriptor.singleton()){
             this.module.onIdle(session,(cid,uid,delta)->{
                 //pushEvent(uid,delta);
-                Session pending = _onStream.get(session.systemId());
-                if(pending!=null){
-                    pending.write(delta,module.label()+"#"+uid);
-                }
+                this.serviceProvider.registerPostOffice().onConnection(cid).send(module.label()+"#"+uid,delta);
             });
         }
     }
@@ -128,14 +105,8 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
         try{
             pendingTimer = pendingTimer-SERVER_PUSH_INTERVAL;
             if(pendingTimer<=0){
-                this.module.onTimer(((cid,uid,delta) ->{
-                        //pushEvent(uid,delta);
-                        _onStream.forEach((k,v)-> {
-                            if(v.streaming()&&v.index().equals(parseUid(uid))){
-                                v.write(delta, module.label() + "#" + uid);
-                            }
-                        });
-                    }
+                this.module.onTimer(((cid,uid,delta) ->
+                    this.serviceProvider.registerPostOffice().onConnection(cid).send(module.label()+"#"+uid,delta)
                 ));
                 pendingTimer = descriptor.timerOnModule();//reset
             }
@@ -145,14 +116,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     }
     @Override
     public void clear(){
-        ResponseHeader rend = new ResponseHeader("onEnd","instance ended");
-        rend.label("error");
-        byte[] resp = this.builder.create().toJson(rend).getBytes();
-        _onStream.forEach((c,s)->{
-            s.write(resp,module.label(),true);
-        });
-        _onStream.clear();
-        this.module.clear();
+       this.module.clear();
         if(timerSchedule!=null){
             timerSchedule.cancel(true);
         }
@@ -178,7 +142,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     @Override
     public void onUpdated(OnInstance onInstance) {
         if(!onInstance.joined()){
-            this._onStream.remove(onInstance.systemId());
+
         }
     }
     @Override
