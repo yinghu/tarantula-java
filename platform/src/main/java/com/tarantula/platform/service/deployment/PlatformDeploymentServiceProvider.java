@@ -19,7 +19,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 
 /**
@@ -44,7 +43,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private ConcurrentHashMap<String,Recoverable> vMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Event> pushRegistry = new ConcurrentHashMap<>();
-    private CopyOnWriteArraySet<Event> topicPushSet = new CopyOnWriteArraySet<>();
+
     private ConcurrentHashMap<String,DynamicModuleClassLoader> cMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,byte[]> rMap = new ConcurrentHashMap<>();
     private TarantulaContext tarantulaContext;
@@ -359,7 +358,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public boolean onEvent(Event event) {
        if(event instanceof MapStoreSyncEvent){
-            //log.warn("Map Sync EVENT->"+event.source()+"/"+event.destination()+"/"+event.trackId());
+            log.warn("Map Sync EVENT->"+event.source()+"/"+event.destination()+"/"+event.trackId());
             MapStoreSyncEvent mse = (MapStoreSyncEvent)event;
             Metadata mt = mse.metadata;
             RecoverableRegistry r = tarantulaContext.recoverableRegistry(mt.factoryId());
@@ -377,11 +376,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     cl.onView(ov);
                 });
             }
-            else if(ot instanceof Connection){
-                this.wListeners.forEach((cl)->{
-                    cl.onState((Connection)ot);
-                });
-            }
             if(!ot.disabled()){
                 vMap.put(new String(mse.key),ot);
                 //log.warn(new String(mse.key)+" added");
@@ -393,7 +387,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         else if(event instanceof MapStoreVotingEvent){
             if(!event.trackId().equals(registerKey)){
-                //log.warn("VOTING EVENT->"+event.source()+"/"+event.trackId());
+                log.warn("VOTING EVENT->"+event.source()+"/"+event.trackId());
                 vMap.forEach((ks,v)->{
                     RecoverableMetadata mt = new RecoverableMetadata(v.getFactoryId(),v.getClassId());
                     byte[] k = ks.getBytes();//v.key().asString()!=null?v.key().asString().getBytes():"".getBytes();
@@ -410,22 +404,21 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         else if(event instanceof ServerPushEvent){
             Connection occ = this.builder.create().fromJson(new String(event.payload()), Connection.class);
-            occ.disabled(event.disabled());
-            if(!event.disabled()){
-                pushRegistry.put(event.sessionId(),event);
-                if(occ.type().equals(Connection.WEB_SOCKET)){topicPushSet.add(event);}
-                pushRegistry.put(occ.key().asString(),event);
-                vMap.putIfAbsent(occ.key().asString(),occ);
-            }else{
-                pushRegistry.remove(event.sessionId());
-                topicPushSet.remove(event);
-                pushRegistry.remove(occ.key().asString());
-                Connection ref = (Connection) vMap.remove(occ.key().asString());
-                occ.type(ref.type());//recover type from original connect
-            }
+            occ.disabled(false);
+            pushRegistry.put(occ.key().asString(),event);//serverId cache
             this.wListeners.forEach((l)->{
                 l.onState(occ);
             });
+        }
+        else if(event instanceof DisableServerPushEvent){
+            Event pes = pushRegistry.remove(event.clientId());
+            if(pes!=null){
+                Connection occ = this.builder.create().fromJson(new String(pes.payload()), Connection.class);
+                occ.disabled(true);
+                this.wListeners.forEach((l)->{
+                    l.onState(occ);
+                });
+            }
         }
         else if(event instanceof ModuleApplicationEvent){
             if(!event.disabled()){
@@ -586,8 +579,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
 
         public OnTopic onTopic(){
-            return (label,data)-> topicPushSet.forEach((v)-> v.write(data,label));
+            return (label,data)-> pushRegistry.forEach((k,v)-> v.write(data,label));
         }
+
         public OnTag onTag(String tag){
            return (dkey,t)->{
                String key = t.key().asString();

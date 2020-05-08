@@ -90,12 +90,18 @@ public class GameZoneModule implements Module{
         context.log(this.mZone.descriptor.tag()+"/"+this.mZone.descriptor.accessRank()+"/"+this.mZone.descriptor.distributionKey(),OnLog.WARN);
     }
     public void onConnection(Connection connection){
-        this.connection = connection;
+        if(this.connection==null){
+            this.connection = connection.copy();
+            return;
+        }
+        this.connection.reset(connection);
     }
     @Override
     public void onTimer(OnUpdate update){
         mZone.onTimer((c,u,d)->{
-            update.on(connection.serverId(),u,d);
+            if(connection!=null&&!connection.disabled()){
+                update.on(connection.serverId(),u,d);
+            }
         });
     }
     @Override

@@ -31,6 +31,8 @@ public interface Connection extends Response {
     int maxConnections();
     void maxConnections(int maxConnections);
 
+    default Connection copy(){return null;}
+    default void reset(Connection connection){}
 
     interface Listener{
         void onState(Connection connection);

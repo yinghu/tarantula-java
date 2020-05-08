@@ -48,7 +48,7 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int LEADER_BOARD_GLOBAL_EVENT_CID = 20;
 
     public static final int CONNECTION_STATE_EVENT_CID = 21;
-
+    public static final int DISABLE_SERVER_PUSH_EVENT_CID = 22;
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
 
@@ -104,6 +104,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case SERVER_PUSH_EVENT_CID:
                 _ins = new ServerPushEvent();
+                break;
+            case DISABLE_SERVER_PUSH_EVENT_CID:
+                _ins = new DisableServerPushEvent();
                 break;
             case MODULE_RESET_EVENT_CID:
                 _ins = new ModuleResetEvent();

@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.event.DisableServerPushEvent;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
 import com.tarantula.platform.service.DeploymentServiceProvider;
@@ -55,12 +56,12 @@ public class PushEventHandler implements RequestHandler {
             }
             else if(action.equals("onConnect")){//access key
                 if(tokenValidatorProvider.validateTicket(serverId,1,accessKey)){
-                    log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
+                    //log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
                     String sid = exchange.id();
                     _hex.put(sid,exchange);
-                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,false);
+                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid);
                     pushEvent.bucket(this.bucket);
-                    pushEvent.clientId(exchange.header("serverId"));
+                    pushEvent.clientId(serverId);
                     pushEvent.owner(this.eventService.subscription());
                     pushEvent.destination(DeploymentServiceProvider.DEPLOY_TOPIC);
                     pushEvent.payload(_payload);
@@ -72,16 +73,15 @@ public class PushEventHandler implements RequestHandler {
                 }
             }
             else if(action.equals("onDisconnect")){//no more access key check event from server socket
-                log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
+                //log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
                 _hex.forEach((k,v)->{
                     if(v.header(Session.TARANTULA_SERVER_ID).equals(serverId)){
                         _hex.remove(k);
-                        ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,k,true);
+                        DisableServerPushEvent pushEvent = new DisableServerPushEvent(this.serverTopic,k);
                         pushEvent.bucket(this.bucket);
-                        pushEvent.clientId(exchange.header("serverId"));
+                        pushEvent.clientId(serverId);
                         pushEvent.owner(this.eventService.subscription());
                         pushEvent.destination(DeploymentServiceProvider.DEPLOY_TOPIC);
-                        pushEvent.payload(_payload);
                         eventService.publish(pushEvent);
                     }
                 });

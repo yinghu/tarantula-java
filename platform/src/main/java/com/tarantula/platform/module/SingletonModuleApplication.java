@@ -123,8 +123,12 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
                 return cn;
             });
             if(current!=null&&current.serverId().equals(c.serverId())){
-                current = cBuffer.pop();
+                current.disabled(true);
                 module.onConnection(current);
+                current = cBuffer.pop();
+                if(current!=null){
+                    module.onConnection(current);
+                }
             }
         }
     }

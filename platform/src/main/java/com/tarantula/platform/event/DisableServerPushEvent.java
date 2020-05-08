@@ -6,17 +6,17 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import java.io.IOException;
 
 /**
- * Created by yinghu on 7/15//2019.
+ * Created by yinghu on 5/8/2020
  */
-public class ServerPushEvent extends Data implements EventOnAction {
+public class DisableServerPushEvent extends Data implements EventOnAction {
 
 
 
-    public ServerPushEvent(){
+    public DisableServerPushEvent(){
 
     }
 
-    public ServerPushEvent(String source, String sessionId){
+    public DisableServerPushEvent(String source, String sessionId){
         this.source = source;
         this.sessionId = sessionId;
     }
@@ -26,7 +26,7 @@ public class ServerPushEvent extends Data implements EventOnAction {
     }
     @Override
     public int getClassId(){
-        return PortableEventRegistry.SERVER_PUSH_EVENT_CID;
+        return PortableEventRegistry.DISABLE_SERVER_PUSH_EVENT_CID;
     }
     @Override
     public void writePortable(PortableWriter out) throws IOException {
@@ -37,7 +37,6 @@ public class ServerPushEvent extends Data implements EventOnAction {
         //out.writeUTF("5",this.trackId);
         out.writeUTF("6",this.clientId);//serverId
         out.writeUTF("7",this.owner);//node Id
-        out.writeByteArray("9",this.payload);
     }
     @Override
     public void readPortable(PortableReader in) throws IOException {
@@ -48,12 +47,11 @@ public class ServerPushEvent extends Data implements EventOnAction {
         //this.trackId = in.readUTF("5");
         this.clientId = in.readUTF("6");
         this.owner = in.readUTF("7");
-        this.payload = in.readByteArray("9");
     }
 
     @Override
     public String toString(){
-        return "Server Push Event ["+this.sessionId+"/"+disabled+"/"+owner;
+        return "Disable Server Push Event ["+this.sessionId+"/"+disabled+"/"+owner;
     }
     @Override
     public int hashCode(){
@@ -61,7 +59,7 @@ public class ServerPushEvent extends Data implements EventOnAction {
     }
     @Override
     public boolean equals(Object obj){
-        ServerPushEvent ix = (ServerPushEvent)obj;
+        DisableServerPushEvent ix = (DisableServerPushEvent)obj;
         return this.sessionId.equals(ix.sessionId());
     }
 }

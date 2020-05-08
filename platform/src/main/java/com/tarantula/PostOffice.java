@@ -2,8 +2,10 @@ package com.tarantula;
 
 public interface PostOffice{
 
+    //app to client
     OnTopic onTopic();
     OnConnection onConnection(String serverId);
+    //app to app
     OnTag onTag(String tag);
     OnApplication onApplication(String applicationId);
 
@@ -17,7 +19,7 @@ public interface PostOffice{
         void send(String label,byte[] data);
     }
 
-    
+    //app to app messaging
     interface OnTag{
        void send(String distributionKey,Recoverable data);
     }
