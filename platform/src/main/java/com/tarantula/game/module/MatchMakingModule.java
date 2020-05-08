@@ -36,6 +36,7 @@ public class MatchMakingModule implements Module {
                     //this.context.log("Rank->"+r,OnLog.WARN);
                     //this.context.log("Entry->"+e.toString(),OnLog.WARN);
                 //});
+                this.context.postOffice().onTopic().send(label()+"#topic","{}".getBytes());
             }
             else{
                 session.write(this.builder.create().toJson(response).getBytes(),label());
