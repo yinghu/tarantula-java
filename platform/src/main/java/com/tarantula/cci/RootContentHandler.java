@@ -18,7 +18,7 @@ public class RootContentHandler implements RequestHandler {
         try{
             String path = exchange.path();
             if(path.equals("/")){
-                path = "/tarantula.html";
+                path = "/index.html";
             }
             String contentType = "text/html";
             byte[] _load = this.deploymentServiceProvider.resource(path.substring(1),exchange.query());
