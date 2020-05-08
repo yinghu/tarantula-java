@@ -1,9 +1,6 @@
 package com.tarantula.platform.bootstrap;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 import com.tarantula.TarantulaLogger;
@@ -45,6 +42,7 @@ public class TarantulaMain {
 			Properties _config = new Properties();
 			_config.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("tarantula-default.properties"));
 			Properties _user = new Properties();
+			String endpointIp ="localhost";
 			boolean overriding = true;
 			try{
 				log.info("Loading user configuration from /etc/tarantula/tarantula.properties");
@@ -60,6 +58,18 @@ public class TarantulaMain {
 			}catch (Exception ex){
 				log.warn("No user configurations used to override system configurations");
 				overriding = false;
+			}
+			try{
+				File f = new File("/etc/tarantula/ip.txt");
+				if(f.exists()){
+					//read line
+					BufferedReader reader = new BufferedReader(new FileReader(f));
+					endpointIp = reader.readLine();
+					reader.close();
+					log.warn("Endpoint IP ->"+endpointIp);
+				}
+			}catch (Exception ex){
+				log.warn("No endpoint id found from /etc/tarantula/ip.txt");
 			}
 			TarantulaContext btx = TarantulaContext.getInstance();
 			TarantulaContext.memberDiscovery = (ScopedMemberDiscovery) Class.forName(override(overriding,"tarantula.member.discovery.name",_user,_config)).getConstructor().newInstance();
@@ -97,7 +107,10 @@ public class TarantulaMain {
 			if(tcpEnabled){
 				EndPoint se = (EndPoint)Class.forName(override(overriding,"tarantula.endpoint.socket",_user,_config)).getConstructor().newInstance();
 				se.address(override(overriding,"tarantula.endpoint.socket.address",_user,_config));
-				se.port(Integer.parseInt(override(overriding,"tarantula.endpoint.socket.port",_user,_config)));
+				int port = Integer.parseInt(override(overriding,"tarantula.endpoint.socket.port",_user,_config));
+				btx.endpointIp = endpointIp;
+				btx.endpointPort = port;
+				se.port(port);
 				se.backlog(Integer.parseInt(override(overriding,"tarantula.endpoint.socket.backlog",_user,_config)));
 				se.inboundThreadPoolSetting(override(overriding,"tarantula.endpoint.socket.pool.in.setting",_user,_config));
 				btx.endpointService().addEndPoint(se);

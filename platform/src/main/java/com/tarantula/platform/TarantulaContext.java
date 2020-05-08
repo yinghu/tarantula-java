@@ -116,7 +116,8 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     public String deploymentMode ="ALL";
     public String platformVersion;
     public int platformRoutingNumber;
-
+    public String endpointIp ="localhost";
+    public int endpointPort = 6393;
     public static ScopedMemberDiscovery memberDiscovery;
 
     public String authContext = "localhost";
@@ -422,7 +423,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     }
 
     public Connection endpoint(){
- 	    return new PushEndpoint("10.0.0.234",6393);
+ 	    return new PushEndpoint(endpointIp,endpointPort);
     }
     //list the database list on deploy service
     public DataStoreProvider dataStoreProvider(){
