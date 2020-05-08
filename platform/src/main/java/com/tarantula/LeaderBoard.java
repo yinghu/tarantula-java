@@ -1,5 +1,7 @@
 package com.tarantula;
 
+import javax.xml.crypto.Data;
+
 /**
  * Updated by yinghu on 4/30/20
  */
@@ -22,14 +24,14 @@ public interface LeaderBoard{
     Board total();
 
     void onAllBoard(Statistics.Entry entry);
-    interface  Board extends Updatable{
+    interface  Board extends DataStore.Updatable{
         void onBoard(String systemId,double value);
         default void rank(Stream ranking){}
     }
     interface Stream{
         void onRank(int rank,Entry entry);
     }
-    interface Entry extends Recoverable,Updatable{
+    interface Entry extends Recoverable, DataStore.Updatable{
         String category();
         String classifier();//board name daily, weekly, total
         double value();

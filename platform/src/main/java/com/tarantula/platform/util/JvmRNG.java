@@ -1,6 +1,6 @@
 package com.tarantula.platform.util;
 
-import com.tarantula.RNG;
+import com.tarantula.platform.service.RNG;
 
 import java.security.SecureRandom;
 

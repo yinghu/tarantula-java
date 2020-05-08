@@ -14,7 +14,7 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
     protected Descriptor descriptor;
     protected ApplicationContext context;
     protected GsonBuilder builder;
-    //protected Connection onConnection;
+
     public void callback(Session session, byte[] payload) throws Exception {
 
     }
@@ -62,7 +62,7 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
 
     }
     public void onState(Connection onConnection){
-        //this.onConnection = onConnection;
+
     }
     public void refund(String systemId,String applicationId){
         Descriptor desc = this.context.descriptor(applicationId);

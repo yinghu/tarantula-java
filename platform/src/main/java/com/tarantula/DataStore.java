@@ -43,4 +43,8 @@ public interface DataStore{
     interface Overflow{
         boolean on(String ds,int partition,byte[] key,byte[] value);
     }
+    interface Updatable{
+        void dataStore(DataStore dataStore);
+        void update();
+    }
 }

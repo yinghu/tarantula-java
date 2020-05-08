@@ -1,7 +1,7 @@
 package com.tarantula.game.service;
 
+import com.tarantula.DataStore;
 import com.tarantula.Recoverable;
-import com.tarantula.Updatable;
 import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.Stub;
 import com.tarantula.platform.AssociateKey;
@@ -12,7 +12,7 @@ import java.util.Map;
  * Created by yinghu lu on 4/14/2020.
  * Key form [systemId]/Rating
  */
-public class Rating extends RecoverableObject implements Updatable {
+public class Rating extends RecoverableObject implements DataStore.Updatable {
 
     public static double BASE_POINTS = 100;
 

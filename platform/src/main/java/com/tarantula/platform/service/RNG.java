@@ -1,4 +1,4 @@
-package com.tarantula;
+package com.tarantula.platform.service;
 
 /**
  * Updated by yinghu lu on 10/7/2018.

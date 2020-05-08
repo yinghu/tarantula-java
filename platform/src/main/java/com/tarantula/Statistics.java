@@ -14,7 +14,7 @@ public interface Statistics{
     List<Entry> summary();
     void summary(Stream query);
 
-    interface Entry extends Recoverable,Updatable{
+    interface Entry extends Recoverable,DataStore.Updatable{
         String name();
         double total();
         double daily();

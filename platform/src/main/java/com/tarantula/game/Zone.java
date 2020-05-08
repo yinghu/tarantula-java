@@ -20,7 +20,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Created by yinghu lu on 4/14/2020.
  */
-public class Zone extends RecoverableObject implements RoomListener,Updatable{
+public class Zone extends RecoverableObject implements RoomListener,DataStore.Updatable{
     public Arena[] arenas = new  Arena[0];
     public int capacity =1;
     public long roundDuration =60000;

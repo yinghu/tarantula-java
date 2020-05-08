@@ -84,6 +84,10 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         return false;
     }
     @Override
+    public void onBucket(int bucket,int state){
+        this.context.log("Bucket->"+bucket+"/"+state,OnLog.WARN);
+    }
+    @Override
     public void onState(Connection c) {
         if(c.type().equals(Connection.WEB_SOCKET)){
             this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on application ["+descriptor.name()+"]",OnLog.WARN);

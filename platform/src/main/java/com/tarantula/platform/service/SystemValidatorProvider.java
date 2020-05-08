@@ -8,6 +8,7 @@ import com.tarantula.platform.SystemValidator;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,6 +25,16 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private HashMap<String,Access.Role> rMap;
     private DataStore pdataStore;
     private DataStore udataStore;
+
+    private MessageDigest _messageDigest;
+
+    public MessageDigest messageDigest(){
+        try{
+            return (MessageDigest)this._messageDigest.clone();
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
 
     public TokenValidator tokenValidator(){
         return systemValidator.tokenValidator();
@@ -53,10 +64,10 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return true;
     }
     public String ticket(String key,int stub,int duration){
-        return SystemUtil.ticket(systemValidator.messageDigest(),key,stub,duration);
+        return SystemUtil.ticket(messageDigest(),key,stub,duration);
     }
     public boolean validateTicket(String key,int stub,String ticket){
-        return SystemUtil.validTicket(systemValidator.messageDigest(),key,stub,ticket);
+        return SystemUtil.validTicket(messageDigest(),key,stub,ticket);
     }
     public Access.Role role(String systemId){
         if(systemId==null){
@@ -98,14 +109,14 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         rMap.put(root.name(),root);
         rMap.put(admin.name(),admin);
         rMap.put(player.name(),player);
+        _messageDigest = MessageDigest.getInstance(MDA);
         this.systemValidator = new SystemValidator();
         this.systemValidator.systemValidatorProvider(this);
         this.systemValidator.timeout(this.timeoutInMinutes,this.timeoutInSeconds);
-        this.systemValidator.start();
     }
 
     @Override
     public void shutdown() throws Exception {
-        this.systemValidator.shutdown();
+        //this.systemValidator.shutdown();
     }
 }
