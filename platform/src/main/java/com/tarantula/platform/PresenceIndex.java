@@ -36,6 +36,9 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public void registerEventService(EventService eventService){
         this.eventService = eventService;
     }
+    public Response onPlay(Session session,Descriptor descriptor,RoutingKey routingKey){
+        return onPlay(session,descriptor);
+    }
     public Response onPlay(Session session,Descriptor desc){
         Response resp = null;
         if(this.transact(desc.entryCost()*(-1))){

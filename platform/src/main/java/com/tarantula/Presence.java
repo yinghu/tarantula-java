@@ -12,5 +12,7 @@ public interface Presence extends Balance,DataStore.Updatable,Countable{
 
     Response onPlay(Session session,Descriptor descriptor);
 
+    Response onPlay(Session session,Descriptor descriptor,RoutingKey routingKey);
+    
     boolean online();
 }
