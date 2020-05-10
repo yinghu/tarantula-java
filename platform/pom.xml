@@ -31,6 +31,11 @@
 		  <version>3.12.6</version>
 	  </dependency>
 	  <dependency>
+		  <groupId>com.sun.mail</groupId>
+		  <artifactId>javax.mail</artifactId>
+		  <version>1.6.2</version>
+	  </dependency>
+	  <dependency>
 		  <groupId>com.je</groupId>
 		  <artifactId>je</artifactId>
 		  <version>7.5.11</version>
