@@ -1,9 +1,11 @@
 package com.tarantula.platform;
 
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.google.gson.GsonBuilder;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
@@ -550,5 +552,21 @@ public class TarantulaContext implements Serviceable,ServiceContext{
  	        ex.printStackTrace();
  	    }
         this.schedule(new MidnightCheck(this));
+    }
+
+    public void loadOAthVendorConfig() throws Exception{
+        AuthObject oa = loadGoogleCredentials();
+        //oVendors.put(oa.name(),oa);
+        //OAuthObject sp = loadStripeCredentials();
+        //oVendors.put(sp.name(),sp);
+    }
+    private AuthObject loadGoogleCredentials() throws Exception{
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(this.authContext+"-google-auth.json");
+        byte[] data = new byte[in.available()];
+        in.read(data);
+        in.close();
+        GsonBuilder gb = new GsonBuilder();
+        //gb.registerTypeAdapter(AuthObject.class,new GoogleAuthCredentialsDeserializer());
+        return gb.create().fromJson(new String(data),AuthObject.class);
     }
 }

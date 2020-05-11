@@ -1,6 +1,6 @@
 package com.tarantula;
 /**
- * Updated by yinghu lu 5/7/20200
+ * Updated by yinghu lu 5/7/2020
  */
 //user application authentication utility API
 public interface TokenValidator{

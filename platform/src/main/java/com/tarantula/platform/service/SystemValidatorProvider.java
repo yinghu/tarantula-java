@@ -91,7 +91,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public String name() {
         return TokenValidatorProvider.NAME;
     }
-
+    public AuthVendor authVendor(String name){
+        return null;
+    }
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;

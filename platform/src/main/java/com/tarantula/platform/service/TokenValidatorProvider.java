@@ -3,6 +3,7 @@ package com.tarantula.platform.service;
 import com.tarantula.*;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TokenValidatorProvider extends ServiceProvider {
 
@@ -21,4 +22,18 @@ public interface TokenValidatorProvider extends ServiceProvider {
     Access.Role role(String systemId);
 
     List<ApplicationCluster> list(String systemId);
+
+    AuthVendor authVendor(String name);
+
+    interface AuthVendor{
+        String name();
+        String clientId();
+        String secureKey();
+        String authUri();
+        String tokenUri();
+        String certUri();
+        String[] origins();
+
+        boolean validate(Map<String,Object> params);
+    }
 }
