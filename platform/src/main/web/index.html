@@ -212,14 +212,6 @@
         
     </div>
     <script>
-        var currentModule;
-        
-        document.querySelector('#tx-menu-open').onclick = ()=>{
-            document.querySelector("#m1").style.display="block";
-        }
-        document.querySelector('#tx-menu-close').onclick = ()=>{
-            document.querySelector("#m1").style.display="none";
-        }
         function _ready(){
             WebFont.load({
               google: {
@@ -233,21 +225,21 @@
               }
             });
             TARA_API.onIndex(function(vb){
-                let lb = vb.descriptor;
-                let ix = document.querySelector('#'+lb.typeId);
-                if(ix){
+                //let lb = vb.descriptor;
+                //let ix = document.querySelector('#'+lb.typeId);
+                //if(ix){
                     //ix.setAttribute('view-id',lb.viewId);
                     //ix.querySelector('#'+lb.typeId+'-name').innerHTML = lb.name;
                     //ix.querySelector('#'+lb.typeId+'-icon').src = lb.icon;
                     //ix.querySelector('#'+lb.typeId+'-desc').src = lb.description;
-                }
-            }); 
-            if(window.orientation){
-                window.addEventListener('orientationchange',_resize,false);
-                //window.addEventListener('deviceorientation',_resize,false);
-            }else{
-                window.addEventListener('resize',_resize,false);
+                //}
+            });
+            document.querySelector('#tx-menu-open').onclick = ()=>{
+                document.querySelector("#m1").style.display="block";
             }
+            document.querySelector('#tx-menu-close').onclick = ()=>{
+                document.querySelector("#m1").style.display="none";
+            }    
         }
         function _view(setup){
             TARA_API.onView(setup.viewId,function(v){
@@ -283,13 +275,7 @@
             new Function(exe.textContent).call();
             callback(exe);
         }
-        function _resize(e){
-            try{
-                if(currentModule){
-                    window[currentModule]['swap']();
-                }
-            }catch(err){}//ignore errors
-        }
+        /**
         function _open_lobby(){
             let vid = this.getAttribute('view-id');
             let typeId = this.getAttribute('id');
@@ -302,6 +288,7 @@
                 _view({viewId:'authentication',containerId:'#m3'});
             }
         }
+
         function _open_buy(){
             if(TARA_API.query().systemId){
                 _view({viewId:'shopping',containerId:'#m3'});
@@ -310,24 +297,7 @@
                 TARA_API.query().target = {viewId:'shopping',containerId:'#m3'};
                 _view({viewId:'authentication',containerId:'#m3'});
             }
-        }
-        function wsize(){
-            let _portrait = (window.innerWidth<window.innerHeight); 
-            if(window.orientation){
-                _portrait = window.orientation == 0 || window.orientation == 180;
-            }
-            let ws = {portrait:_portrait};
-            if( window.navigator.standalone && (!_portrait)){
-                ws.height =  screen.width;            
-                ws.width = screen.height;
-            }
-            else{
-                ws.width = window.innerWidth;
-                ws.height = window.innerHeight;
-            }
-            ws.scale = screen.width<800?screen.width/800:1;
-            return ws;
-        }
+        }**/
         /**
         function google_sign_out() {
             let auth2 = gapi.auth2.getAuthInstance();
