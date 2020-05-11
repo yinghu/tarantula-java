@@ -213,23 +213,20 @@
                     //console.log("loaded");  
               }
             });
-            TARA_API.onIndex(function(vb){
-                
-                let lb = vb.descriptor;
-                console.log(lb.typeId);
-                //let ix = document.querySelector('#'+lb.typeId);
-                //if(ix){
-                    //ix.setAttribute('view-id',lb.viewId);
-                    //ix.querySelector('#'+lb.typeId+'-name').innerHTML = lb.name;
-                    //ix.querySelector('#'+lb.typeId+'-icon').src = lb.icon;
-                    //ix.querySelector('#'+lb.typeId+'-desc').src = lb.description;
-                //}
-            });
+            TARA_API.onIndex(function(vb){});
             document.querySelector('#tx-menu-open').onclick = ()=>{
+                TARA_API.query().context="#m1";
                 _view({viewId:'dashboard',containerId:'#m1'});
             }
             document.querySelector('#tx-sign-up').onclick = ()=>{
-                _view({viewId:'sign.in',containerId:'#m3'});
+                if(TARA_API.query().systemId){
+                    TARA_API.onLogout((resp)=>{
+                        document.querySelector('#tx-sign-up').innerHTML="SIGN ON"; 
+                    });        
+                }
+                else{
+                    _view({viewId:'sign.up',containerId:'#m3'});
+                }
             }
         }
         function _view(setup){//set up format {viewId:"viewID",containerId:"#m1"}
@@ -265,29 +262,6 @@
             new Function(exe.textContent).call();
             callback(exe);
         }
-        /**
-        function _open_lobby(){
-            let vid = this.getAttribute('view-id');
-            let typeId = this.getAttribute('id');
-            if(TARA_API.query().systemId){
-                //fullscreen();
-                _view({viewId:vid,containerId:'#m1',typeId:typeId});
-            }
-            else{
-                TARA_API.query().target = {viewId:vid,containerId:'#m1',typeId:typeId};
-                _view({viewId:'authentication',containerId:'#m3'});
-            }
-        }
-
-        function _open_buy(){
-            if(TARA_API.query().systemId){
-                _view({viewId:'shopping',containerId:'#m3'});
-            }
-            else{
-                TARA_API.query().target = {viewId:'shopping',containerId:'#m3'};
-                _view({viewId:'authentication',containerId:'#m3'});
-            }
-        }**/
         /**
         function google_sign_out() {
             let auth2 = gapi.auth2.getAuthInstance();
