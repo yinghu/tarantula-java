@@ -1,0 +1,23 @@
+<div class="tx-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-100">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-menu-close"><i class="fa fa-window-close-o" style="font-size:24px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Game Cluster Admin</span>
+        </div>
+        <div class="w3-display-bottomleft w3-padding"><span class='tx-text-16'>Innovative Game Integration Platform</span></div>
+    </div>
+</div>
+<script>
+    if(!TARA_API.query().systemId){
+        _view({viewId:'sign.in',containerId:'#m3'});
+    }
+    else{//show dash board
+
+    }
+    document.querySelector('#tx-menu-close').onclick = ()=>{
+        document.querySelector("#m1").style.display="none";
+    } 
+</script>

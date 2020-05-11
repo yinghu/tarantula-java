@@ -14,7 +14,7 @@ public class RootContentHandler implements RequestHandler {
     public String name(){
         return "/";
     }
-    public void onRequest(OnExchange exchange){
+    public void onRequest(OnExchange exchange){//load from web folder including sub folders
         try{
             String path = exchange.path();
             if(path.equals("/")){

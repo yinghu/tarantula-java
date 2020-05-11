@@ -14,6 +14,12 @@
             <property name="moduleName">GameLobby</property>
             <property name="moduleResourceFile">html/game.lobby.view.html</property>
         </index>
+        <index type="dashboard">
+            <property name="moduleResourceFile">views/dashboard.view.html</property>
+        </index>
+        <index type="sign.in">
+            <property name="moduleResourceFile">views/sign.in.view.html</property>
+        </index>
     </configuration>
 
 </service-configuration>

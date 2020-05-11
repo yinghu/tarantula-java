@@ -1,0 +1,32 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-sign-in-close" class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12">CLOSE</span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">SIGN IN</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-white tx-content-8"></div> 
+    <div class="w3-container w3-text-teal w3-border-bottom w3-border-orange">
+        <div class="w3-panel" id="tx-user-input">
+            <input id ="rname" class="w3-input w3-round w3-border" type="text" placeholder='user name'/>
+        </div>
+        <div class="w3-panel" id="tx-password-input">    
+             <input id ="rpwd" class="w3-input w3-round w3-border" type="password" placeholder='password'/>
+        </div>
+        <div class="w3-panel">
+            <span id="tx-forget-password" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-margin-top-8 tx-margin-bottom-8">Forget Password</span>  
+            <span id="tx-sign-in" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-margin-top-8 tx-margin-bottom-8">Sign In</span>     
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector('#tx-sign-in-close').onclick=()=>{
+        let m3 = document.querySelector('#m3');
+        m3.innerHTML="";
+        m3.style.display = 'none';       
+    };
+</script>
