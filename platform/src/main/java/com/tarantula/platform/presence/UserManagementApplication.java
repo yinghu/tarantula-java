@@ -106,6 +106,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 }
             }
         }
+        else if(session.action().equals("onAccount")){
+
+        }
         else{
             throw new UnsupportedOperationException(session.action());
         }

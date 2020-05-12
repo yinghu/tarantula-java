@@ -62,6 +62,22 @@ public class UserEventHandler implements RequestHandler {
                         _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
                     }
                 }
+                else if(action.equals("onToken")){//to server topic
+                    AccessIndex acc = accessIndexService.get(magicKey);
+                    if(acc!=null){
+                        event.systemId(acc.distributionKey());
+                        RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
+                        event.destination(_routingKey.route());
+                        event.routingNumber(_routingKey.routingNumber());
+                    }else{
+                        String trackId = this.bucket+Recoverable.PATH_SEPARATOR+ SystemUtil.oid();
+                        event.trackId(trackId);
+                        RoutingKey _routingKey = eventService.routingKey(trackId,tag);
+                        event.destination(_routingKey.route());
+                        event.routingNumber(_routingKey.routingNumber());
+                    }
+                    this.eventService.publish(event);
+                }
                 else if(action.equals("onTicket")){
                     AccessIndex acc = accessIndexService.get(magicKey);
                     if(acc!=null){
