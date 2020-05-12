@@ -2,8 +2,10 @@ package com.tarantula.platform;
 
 import com.tarantula.*;
 import com.tarantula.platform.service.SystemValidatorProvider;
+import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.SystemUtil;
 import java.security.MessageDigest;
+import java.util.Map;
 
 //hook system validator provider and token validator
 public class SystemValidator{
@@ -37,7 +39,7 @@ public class SystemValidator{
         }
         @Override
         public OnSession validatePassword(Access access, String password) {
-            if((SystemUtil.hashPassword(systemValidatorProvider.messageDigest(),password)).equals(access.password())){
+            if(access.validated()||(SystemUtil.hashPassword(systemValidatorProvider.messageDigest(),password).equals(access.password()))){
                 Presence presence = systemValidatorProvider.presence(access.distributionKey());
                 OnSession _ox = new OnSessionTrack();
                 _ox.systemId(access.distributionKey());
@@ -75,6 +77,15 @@ public class SystemValidator{
         @Override
         public void offSession(String systemId, int stub) {
             systemValidatorProvider.offSession(systemId);
+        }
+        @Override
+        public boolean validateToken(Map<String,Object> params){
+            String _vname = (String)params.get("name");
+            if(_vname==null||(!_vname.contains(_vname))){
+                return false;
+            }
+            TokenValidatorProvider.AuthVendor authVendor = systemValidatorProvider.authVendor(_vname);
+            return authVendor.validate(params);
         }
 
     }

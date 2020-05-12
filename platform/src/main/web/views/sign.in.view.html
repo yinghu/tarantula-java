@@ -89,23 +89,15 @@
     function onSignIn(googleUser) {
         let uid = googleUser.getBasicProfile().getEmail();
         console.log(uid);
-        console.log(googleUser.getBasicProfile().getId());
-        tx_on_login();
-        /**
+        console.log(googleUser.getBasicProfile().getId());       
         let id_token = googleUser.getAuthResponse().id_token;
-        TARA_API.onToken({name:'google',accessKey:id_token,command:'onToken',login:uid},function(resp){
+        TARA_API.onToken({name:'google',"token":id_token,command:'onToken',login:uid},function(resp){
+            console.log(resp);
             if(resp.successful){
-                TARA_API.onPresence(function(pdx){
-                    if(pdx.successful){
-                        m1 = document.querySelector('#m3');
-                        m1.innerHTML='';
-                        m1.style.display = 'none';
-                        _view(TARA_API.query().target);                    
-                    }        
-                });    
+                tx_on_login();    
             }else{
-                document.querySelector('#tx-auth-message-output').innerHTML = resp.message;
+                document.querySelector('#tx-sign-in-message').innerHTML = resp.message;
             }
-        });**/  
+        }); 
     }
 </script>

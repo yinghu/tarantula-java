@@ -141,22 +141,33 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-payload-size',_ps.length);  
     aj.send(_ps);               
   };
-  let _reset = function(payload,callback){
+  let _token = function(payload,callback){
       let _ps = JSON.stringify(payload);
       let aj = new XMLHttpRequest();
       aj.responseType = 'text';
       aj.onreadystatechange = function(){
           if(aj.status === 200 && aj.readyState === 4){
               let jsn = JSON.parse(aj.responseText);
-              callback(jsn);
+              if(jsn.successful){
+                presence = jsn.presence;
+                qdata.systemId = presence.systemId;
+                qdata.token = presence.token;
+                qdata.stub = presence.stub;
+                qdata.login = presence.login;
+                _parse(jsn,function(v){});
+                callback({successful:true});                          
+              }
+              else{
+                callback(jsn);
+              }
           }
       };
       aj.open("POST","/user/action",true);
       aj.setRequestHeader('Accept','application/json');
       aj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
       aj.setRequestHeader('Tarantula-tag','index/user');
-      aj.setRequestHeader('Tarantula-magic-key',payload.email);
-      aj.setRequestHeader('Tarantula-action','onDevice');
+      aj.setRequestHeader('Tarantula-magic-key',payload.login);
+      aj.setRequestHeader('Tarantula-action','onToken');
       aj.setRequestHeader('Tarantula-payload-size',_ps.length);
       aj.send(_ps);
   };
@@ -274,7 +285,7 @@ var TARA_API = (function(){
       onUpload : _upload,
       onRegister : _subscribe,
       onLogin : _login,
-      onReset : _reset,
+      onToken : _token,
       onPresence : _presence,
       onService : _service,
       onInstance : _instance,

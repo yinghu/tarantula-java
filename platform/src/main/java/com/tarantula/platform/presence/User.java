@@ -15,15 +15,16 @@ public class User extends RecoverableObject implements Access {
     private String login;
     private String password;//hash of the password
     private boolean active;
+    private boolean validated;
     private String role;
     public User(){
         this.vertex = "User";
         this.label = "VA";
-        this.binary = false;
     }
-    public User(String login){
+    public User(String login,boolean validated){
         this();
         this.login = login;
+        this.validated = validated;
     }
     public String login(){
         return this.login;
@@ -43,7 +44,9 @@ public class User extends RecoverableObject implements Access {
     public void active(boolean active){
         this.active = active;
     }
-
+    public boolean validated(){
+        return this.validated;
+    }
     public String role(){
         return this.role;
     }
@@ -64,6 +67,7 @@ public class User extends RecoverableObject implements Access {
         properties.put("3",role);
         properties.put("4",active);
         properties.put("5",routingNumber);
+        properties.put("6",validated);
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
@@ -72,8 +76,9 @@ public class User extends RecoverableObject implements Access {
         this.role = (String) properties.get("3");
         this.active = (boolean) properties.get("4");
         this.routingNumber = ((Number) properties.get("5")).intValue();
+        this.validated = (boolean) properties.get("6");
     }
-
+    /**
     public byte[] toByteArray(){
         byte[] _login = login.getBytes(Charset.forName("UTF-8"));
         byte[] _pwd = password.getBytes(Charset.forName("UTF-8"));
@@ -103,9 +108,9 @@ public class User extends RecoverableObject implements Access {
         }
         this.password = sb.toString();
 
-    }
-    @Override
-    public String toString(){
-        return "Access ["+bucket+"]["+oid+"]["+active+"/"+login+"/"+role+"/"+routingNumber+"]";
-    }
+    }**/
+    //@Override
+    //public String toString(){
+        //return "Access ["+bucket+"]["+oid+"]["+active+"/"+login+"/"+role+"/"+routingNumber+"/"+validated+"]";
+    //}
 }

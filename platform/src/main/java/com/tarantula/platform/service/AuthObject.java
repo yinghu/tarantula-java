@@ -1,5 +1,8 @@
 package com.tarantula.platform.service;
 
+import com.tarantula.OnSession;
+import com.tarantula.platform.OnSessionTrack;
+
 import java.util.Map;
 
 /**
@@ -7,14 +10,15 @@ import java.util.Map;
  */
 public class AuthObject implements TokenValidatorProvider.AuthVendor {
 
-    private final String name;
-    private final String clientId;
-    private final String secureKey;
-    private final String authUri;
-    private final String tokenUri;
-    private final String certUri;
-    private final String[] origins;
+    private  String name;
+    private  String clientId;
+    private  String secureKey;
+    private  String authUri;
+    private  String tokenUri;
+    private  String certUri;
+    private  String[] origins;
 
+    public AuthObject(){}
     public AuthObject(String name,String clientId,String secureKey,String authUri,String tokenUri,String certUri,String[] origins){
         this.name = name;
         this.clientId = clientId;

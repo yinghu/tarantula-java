@@ -17,6 +17,7 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     private String ticket;
 
     public static final OnSession PASSWORD_NOT_MATCHED = new OnSessionTrack("PASSWORD NOT MATCHED");
+    public static final OnSession TOKEN_NOT_VALID = new OnSessionTrack("TOKEN NOT VALID");
 
     public OnSessionTrack(){
         this.binary = true;

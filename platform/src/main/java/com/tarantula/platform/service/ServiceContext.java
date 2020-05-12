@@ -22,4 +22,5 @@ public interface ServiceContext {
     Connection endpoint();
     String bucket();
     RecoverableRegistry recoverableRegistry(int registryId);
+    TokenValidatorProvider.AuthVendor authVendor(String name);
 }

@@ -64,14 +64,15 @@ public class UserEventHandler implements RequestHandler {
                 }
                 else if(action.equals("onToken")){//to server topic
                     AccessIndex acc = accessIndexService.get(magicKey);
-                    if(acc!=null){
+                    if(acc!=null){//existing entry
                         event.systemId(acc.distributionKey());
                         RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
                         event.destination(_routingKey.route());
                         event.routingNumber(_routingKey.routingNumber());
-                    }else{
-                        String trackId = this.bucket+Recoverable.PATH_SEPARATOR+ SystemUtil.oid();
-                        event.trackId(trackId);
+                    }else{//new exchange
+                        event.action("onTokenRegister");
+                        String trackId = this.bucket+Recoverable.PATH_SEPARATOR+SystemUtil.oid();
+                        event.systemId(trackId);
                         RoutingKey _routingKey = eventService.routingKey(trackId,tag);
                         event.destination(_routingKey.route());
                         event.routingNumber(_routingKey.routingNumber());

@@ -3,6 +3,7 @@ package com.tarantula.platform.service;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessControl;
+import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.SystemValidator;
 import com.tarantula.platform.presence.User;
@@ -12,6 +13,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SystemValidatorProvider implements TokenValidatorProvider {
@@ -25,6 +27,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private ServiceContext serviceContext;
     private ConcurrentHashMap<String,Presence> pMap;
     private HashMap<String,Access.Role> rMap;
+    private HashMap<String,AuthVendor> aMap;
     private DataStore pdataStore;
     private DataStore udataStore;
 
@@ -92,13 +95,17 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return TokenValidatorProvider.NAME;
     }
     public AuthVendor authVendor(String name){
-        return null;
+        return aMap.get(name);
     }
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.pdataStore =  this.serviceContext.dataStore("presence",this.serviceContext.partitionNumber());
         this.udataStore =  this.serviceContext.dataStore("user",this.serviceContext.partitionNumber());
+        AuthVendor google = this.serviceContext.authVendor("google");
+        if(google!=null){
+            aMap.put("google",(google));
+        }
     }
 
     @Override
@@ -110,6 +117,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void start() throws Exception {
         this.pMap = new ConcurrentHashMap<>();
         this.rMap = new HashMap<>();
+        this.aMap = new HashMap<>();
         Access.Role root = new AccessControl("root",Access.ROOT_ACCESS_CONTROL);
         Access.Role owner = new AccessControl("owner",Access.OWNER_ACCESS_CONTROL);
         Access.Role admin = new AccessControl("admin",Access.ADMIN_ACCESS_CONTROL);
@@ -123,7 +131,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.systemValidator.systemValidatorProvider(this);
         this.systemValidator.timeout(this.timeoutInMinutes,this.timeoutInSeconds);
     }
-
     @Override
     public void shutdown() throws Exception {
         //this.systemValidator.shutdown();

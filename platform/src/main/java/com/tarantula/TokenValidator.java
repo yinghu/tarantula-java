@@ -1,4 +1,7 @@
 package com.tarantula;
+
+import java.util.Map;
+
 /**
  * Updated by yinghu lu 5/7/2020
  */
@@ -23,5 +26,6 @@ public interface TokenValidator{
     void offSession(String systemId,int stub);
 
 
+    boolean validateToken(Map<String,Object> params);
 
 }

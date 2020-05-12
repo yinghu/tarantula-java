@@ -76,4 +76,7 @@ public class ServiceContextProxy implements ServiceContext {
     public RecoverableRegistry recoverableRegistry(int registryId) {
         return this.tarantulaContext.recoverableRegistry(registryId);
     }
+    public TokenValidatorProvider.AuthVendor authVendor(String name){
+        return this.tarantulaContext.authVendor(name);
+    }
 }

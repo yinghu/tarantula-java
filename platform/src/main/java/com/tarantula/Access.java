@@ -23,7 +23,7 @@ public interface Access extends Recoverable {
     void password(String password);
     boolean active();
     void active(boolean active);
-
+    boolean validated();//validated to skip check password if user login from third party login token
     String role();
     void role(String role);
 

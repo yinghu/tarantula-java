@@ -220,6 +220,7 @@
             }
             document.querySelector('#tx-sign-up').onclick = ()=>{
                 if(TARA_API.query().systemId){
+                    oauth_sign_out();
                     TARA_API.onLogout((resp)=>{
                         document.querySelector('#tx-sign-up').innerHTML="SIGN ON"; 
                     });        
@@ -262,13 +263,16 @@
             new Function(exe.textContent).call();
             callback(exe);
         }
-        /**
-        function google_sign_out() {
+        
+        function oauth_sign_out() {
             let auth2 = gapi.auth2.getAuthInstance();
-            auth2.signOut().then(function () {
-                //console.log('User signed out.');
-            });
-        }**/
+            console.log(auth2.isSignedIn.get());
+            if(auth2.isSignedIn.get() == true){
+                auth2.signOut().then(function () {
+                    console.log('User signed out.');
+                });
+            }
+        }
 
     </script>
 </body>
