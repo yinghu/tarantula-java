@@ -3,8 +3,6 @@ package com.tarantula.platform.presence;
 
 import com.tarantula.Access;
 import com.tarantula.platform.RecoverableObject;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -78,39 +76,4 @@ public class User extends RecoverableObject implements Access {
         this.routingNumber = ((Number) properties.get("5")).intValue();
         this.validated = (boolean) properties.get("6");
     }
-    /**
-    public byte[] toByteArray(){
-        byte[] _login = login.getBytes(Charset.forName("UTF-8"));
-        byte[] _pwd = password.getBytes(Charset.forName("UTF-8"));
-        ByteBuffer buffer = ByteBuffer.allocate(_login.length+_pwd.length+16);
-        buffer.putInt(this.active?(byte)1:0);
-        buffer.putInt(this.routingNumber);
-        buffer.putInt(_login.length);
-        buffer.put(_login);
-        buffer.putInt(_pwd.length);
-        buffer.put(_pwd);
-        return buffer.array();
-    }
-    public void fromByteArray(byte[] data){
-        ByteBuffer buffer = ByteBuffer.wrap(data);
-        this.active = buffer.getInt()==1?true:false;
-        this.routingNumber = buffer.getInt();
-        int len = buffer.getInt();
-        StringBuffer sb = new StringBuffer();
-        for(int i=0;i<len;i++){
-            sb.append((char) buffer.get());
-        }
-        this.login = sb.toString();
-        len = buffer.getInt();
-        sb.setLength(0);
-        for(int i=0;i<len;i++){
-            sb.append((char) buffer.get());
-        }
-        this.password = sb.toString();
-
-    }**/
-    //@Override
-    //public String toString(){
-        //return "Access ["+bucket+"]["+oid+"]["+active+"/"+login+"/"+role+"/"+routingNumber+"/"+validated+"]";
-    //}
 }

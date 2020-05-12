@@ -42,62 +42,13 @@
         });            
     };
     document.querySelector('#tx-sign-in-close').onclick=()=>{
-        if(TARA_API.query().context){
-            let mx = document.querySelector(TARA_API.query().context);
-            mx.innerHTML="";
-            mx.style.display = 'none';    
-        }
+        //if(TARA_API.query().context){
+            //let mx = document.querySelector(TARA_API.query().context);
+            //mx.innerHTML="";
+            //mx.style.display = 'none';    
+        //}
         let m3 = document.querySelector('#m3');
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
-    function tx_on_login(){
-        let m3 = document.querySelector('#m3');
-        m3.innerHTML="";
-        m3.style.display = 'none'; 
-        document.querySelector("#tx-sign-up").innerHTML="SIGN OUT";
-    }
-    function tx_on_google_auth(){
-        let m = document.getElementsByTagName('head')[0];
-        let m1 = document.createElement('meta');
-        m1.name = 'google-signin-scope';
-        m1.content = 'profile email';
-        m.parentNode.insertBefore(m1,m);
-        let m2 = document.createElement('meta');
-        m2.name = 'google-signin-client_id';
-        m2.content = '325699289998-8nfdbuao6kcn5a0kqtikkelpfu7qnv9n.apps.googleusercontent.com';//TARA_API.query().google.clientId;
-        m.parentNode.insertBefore(m2,m);    
-        let glib = document.createElement('script');
-        glib.type = 'text/javascript';
-        glib.async = true;
-        glib.defer = true;
-        glib.src = 'https://apis.google.com/js/platform.js';
-        glib.onload = renderButton;
-        let t = document.getElementsByTagName("script")[0];
-        t.parentNode.insertBefore(glib,t); 
-    }
-    function renderButton() {
-        gapi.signin2.render('tx-google-button', {
-            'width': '240px',
-            'height': '48px',
-            'longtitle': true,
-            'theme': 'dark',
-            'onsuccess': onSignIn,
-            'onfailure': function(err){console.log(err);},
-        });
-    }
-    function onSignIn(googleUser) {
-        let uid = googleUser.getBasicProfile().getEmail();
-        console.log(uid);
-        console.log(googleUser.getBasicProfile().getId());       
-        let id_token = googleUser.getAuthResponse().id_token;
-        TARA_API.onToken({name:'google',"token":id_token,command:'onToken',login:uid},function(resp){
-            console.log(resp);
-            if(resp.successful){
-                tx_on_login();    
-            }else{
-                document.querySelector('#tx-sign-in-message').innerHTML = resp.message;
-            }
-        }); 
-    }
 </script>

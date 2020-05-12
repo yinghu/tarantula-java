@@ -65,6 +65,7 @@ public class UserEventHandler implements RequestHandler {
                 else if(action.equals("onToken")){//to server topic
                     AccessIndex acc = accessIndexService.get(magicKey);
                     if(acc!=null){//existing entry
+
                         event.systemId(acc.distributionKey());
                         RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
                         event.destination(_routingKey.route());

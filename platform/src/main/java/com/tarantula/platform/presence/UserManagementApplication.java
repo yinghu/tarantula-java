@@ -105,8 +105,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             else{
                 Access access = this.createLogin(acc,session.systemId(),role,false);
                 session.systemId(access.distributionKey());
-                ResponseHeader resp = new ResponseHeader(session.action(),"User [" + access.login() + "] registered",true);
-                session.write(builder.create().toJson(resp).getBytes(),this.descriptor.responseLabel());
+                OnSession _onSession = this.login(session.systemId(),acc.property("password"),session);
+                this.onSession(_onSession,session);
             }
         }
         else if(session.action().equals("onDevice")){

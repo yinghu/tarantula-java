@@ -129,7 +129,18 @@ var TARA_API = (function(){
     aj.onreadystatechange = function(){
         if(aj.status === 200 && aj.readyState === 4){
             let jsn = JSON.parse(aj.responseText);
-            callback(jsn);
+            if(jsn.successful){
+                presence = jsn.presence;
+                qdata.systemId = presence.systemId;
+                qdata.token = presence.token;
+                qdata.stub = presence.stub;
+                qdata.login = presence.login;
+                _parse(jsn,function(v){});
+                callback({successful:true});                          
+            }
+            else{
+                callback(jsn);
+            }
         }
     };
     aj.open("POST","/user/action",true);

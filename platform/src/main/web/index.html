@@ -9,15 +9,9 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="tarantula.css"/>
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.8.6/pixi.min.js"></script>-->
-    <!--script src="https://pixijs.download/v5.0.0/pixi.min.js"></script>-->
     <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
     <script src="https://js.stripe.com/v3/"></script>
-    <!--<script src="https://cdn.jsdelivr.net/npm/pixi-filters@2.6.1/dist/pixi-filters.js"></script>-->
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/screenfull.js/4.2.0/screenfull.min.js"></script>-->
     <script src="resource/tarantula.api.js"></script>
-    <!--<script src="resource/tarantula.webgl.js"></script>-->
-    <!--<script src="resource/tarantula.ui.js"></script>-->
     <title>iCodeSoftware</title>
 </head>
 <body class='w3-white' onload="_ready()"> 
@@ -182,45 +176,32 @@
         </div>               
     </div>
     
-    <!-- POPUP MENU  CONTENT -->
-    <div id="m1" class="tx-modal w3-animate-zoom">
-        
-    </div>
-    
-    <!-- POPUP GAME FULL SCREEN CONTENT -->
-    <div id="m2" class="tx-modal w3-animate-zoom">
-        
-    </div>
-   
+    <!-- POPUP DASHBOARD CONTENT -->
+    <div id="m1" class="tx-modal w3-animate-zoom"></div>
     <!-- POPUP HTML CONTENT POPUP-->
-    <div id="m3" class="w3-modal w3-animate-zoom" style="z-index: 10">
-        
-    </div>
+    <div id="m3" class="w3-modal w3-animate-zoom" style="z-index: 10"></div>
     <!-- Privacy and terms HTML CONTENT POPUP-->
-    <div id="m4" class="w3-modal w3-animate-zoom" style="z-index: 11">
-        
-    </div>
+    <div id="m4" class="w3-modal w3-animate-zoom" style="z-index: 11"></div>
     <script>
         function _ready(){
             WebFont.load({
               google: {
                 families: ['Oswald'],
               },
-              fontloading : function(){
-                    //console.log("loading");     
-              },    
-              active: function() {
-                    //console.log("loaded");  
-              }
+              fontloading : function(){},    
+              active: function() {}
             });
             TARA_API.onIndex(function(vb){});
             document.querySelector('#tx-menu-open').onclick = ()=>{
-                TARA_API.query().context="#m1";
-                _view({viewId:'dashboard',containerId:'#m1'});
+                if(!TARA_API.query().systemId){
+                    _view({viewId:'sign.in',containerId:'#m3'});
+                }else{
+                    _view({viewId:'dashboard',containerId:'#m1'});
+                }
             }
             document.querySelector('#tx-sign-up').onclick = ()=>{
                 if(TARA_API.query().systemId){
-                    oauth_sign_out();
+                    tx_oauth_sign_out();
                     TARA_API.onLogout((resp)=>{
                         document.querySelector('#tx-sign-up').innerHTML="SIGN ON"; 
                     });        
@@ -263,13 +244,60 @@
             new Function(exe.textContent).call();
             callback(exe);
         }
-        
-        function oauth_sign_out() {
+        function tx_on_login(){
+            let m3 = document.querySelector('#m3');
+            m3.innerHTML="";
+            m3.style.display = 'none'; 
+            document.querySelector("#tx-sign-up").innerHTML="SIGN OUT";
+            _view({viewId:'dashboard',containerId:'#m1'});
+        }
+        function tx_on_google_auth(){
+            let m = document.getElementsByTagName('head')[0];
+            let m1 = document.createElement('meta');
+            m1.name = 'google-signin-scope';
+            m1.content = 'profile email';
+            m.parentNode.insertBefore(m1,m);
+            let m2 = document.createElement('meta');
+            m2.name = 'google-signin-client_id';
+            m2.content = '325699289998-8nfdbuao6kcn5a0kqtikkelpfu7qnv9n.apps.googleusercontent.com';//TARA_API.query().google.clientId;
+            m.parentNode.insertBefore(m2,m);    
+            let glib = document.createElement('script');
+            glib.type = 'text/javascript';
+            glib.async = true;
+            glib.defer = true;
+            glib.src = 'https://apis.google.com/js/platform.js';
+            glib.onload = render_button;
+            let t = document.getElementsByTagName("script")[0];
+            t.parentNode.insertBefore(glib,t); 
+        }
+        function render_button() {
+            gapi.signin2.render('tx-google-button', {
+                'width': '240px',
+                'height': '48px',
+                'longtitle': true,
+                'theme': 'dark',
+                'onsuccess': on_sign_in,
+                'onfailure': function(err){console.log(err);},
+            });
+        }
+        function on_sign_in(googleUser) {
+            let uid = googleUser.getBasicProfile().getEmail();
+            //console.log(googleUser.getBasicProfile().getId());       
+            let id_token = googleUser.getAuthResponse().id_token;
+            TARA_API.onToken({name:'google',"token":id_token,command:'onToken',login:uid},function(resp){
+                //console.log(resp);
+                if(resp.successful){
+                    tx_on_login();    
+                }else{
+                    document.querySelector('#tx-sign-in-message').innerHTML = resp.message;
+                }
+            }); 
+        }
+        function tx_oauth_sign_out() {
             let auth2 = gapi.auth2.getAuthInstance();
-            console.log(auth2.isSignedIn.get());
             if(auth2.isSignedIn.get() == true){
                 auth2.signOut().then(function () {
-                    console.log('User signed out.');
+                    console.log('Google user signed out.');
                 });
             }
         }
