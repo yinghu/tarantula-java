@@ -12,7 +12,9 @@ public interface Access extends Recoverable {
 
     //LOWEST O - HIGHEST 100
     int PLAYER_ACCESS_CONTROL = 0;//manage own assets on app
-    int ADMIN_ACCESS_CONTROL = 10;//manage own assets on admin app
+    int ADMIN_ACCESS_CONTROL = 10;//manage own assets on admin
+    int OWNER_ACCESS_CONTROL = 20;//manage own assets on admin app
+
     int ROOT_ACCESS_CONTROL = 100;//manage all assets with super permission
 
     String login();

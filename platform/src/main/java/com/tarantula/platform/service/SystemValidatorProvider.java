@@ -111,9 +111,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.pMap = new ConcurrentHashMap<>();
         this.rMap = new HashMap<>();
         Access.Role root = new AccessControl("root",Access.ROOT_ACCESS_CONTROL);
+        Access.Role owner = new AccessControl("owner",Access.OWNER_ACCESS_CONTROL);
         Access.Role admin = new AccessControl("admin",Access.ADMIN_ACCESS_CONTROL);
         Access.Role player = new AccessControl("player",Access.PLAYER_ACCESS_CONTROL);
         rMap.put(root.name(),root);
+        rMap.put(owner.name(),owner);
         rMap.put(admin.name(),admin);
         rMap.put(player.name(),player);
         _messageDigest = MessageDigest.getInstance(MDA);
