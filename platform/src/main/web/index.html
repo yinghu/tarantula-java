@@ -259,7 +259,7 @@
             m.parentNode.insertBefore(m1,m);
             let m2 = document.createElement('meta');
             m2.name = 'google-signin-client_id';
-            m2.content = '325699289998-8nfdbuao6kcn5a0kqtikkelpfu7qnv9n.apps.googleusercontent.com';//TARA_API.query().google.clientId;
+            m2.content = TARA_API.query().googleClientId;
             m.parentNode.insertBefore(m2,m);    
             let glib = document.createElement('script');
             glib.type = 'text/javascript';

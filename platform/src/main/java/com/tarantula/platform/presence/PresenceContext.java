@@ -16,7 +16,7 @@ public class PresenceContext extends ResponseHeader {
     public OnSession presence;
     public OnView view;
     public Connection connection;
-
+    public String googleClientId;
     public PresenceContext(){
         this.code = 200;
         this.successful=true;

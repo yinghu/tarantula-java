@@ -5,6 +5,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.event.IndexEvent;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.OnLobby;
+import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.PresenceContextSerializer;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +18,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
 
     private ConcurrentHashMap<String,OnView> _viewList = new ConcurrentHashMap<>();
     private CopyOnWriteArraySet<String> _lobbyList = new CopyOnWriteArraySet<>();
-
+    private TokenValidatorProvider tokenValidatorProvider;
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         if(session.action().equals("view")){
@@ -29,6 +30,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
         }
         else if(session.action().equals("index")){
             PresenceContext ic = new PresenceContext("index");
+            ic.googleClientId = this.tokenValidatorProvider.authVendor("google").clientId();
             String typeId = session.trackId();
             OnView view = this._viewList.get("index");
             ic.lobbyList = this.context.index();
@@ -67,6 +69,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
             v.moduleResourceFile(c.property("moduleResourceFile"));
             _viewList.put(v.viewId(),v);
         });
+        this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.context.log("Index application started on tag ["+this.descriptor.tag()+"]",OnLog.INFO);
     }
     @Override

@@ -8,18 +8,19 @@ var TARA_API = (function(){
   //let wsWorker ;
     
   let _parse = function(data,cb){
-      data.lobbyList.forEach(function(v){
-          amap.set(v.descriptor.typeId,v);
-          v.applications.forEach(function(b){
-            if(b.singleton){
-                amap.set(b.tag,b);
-            }
-            else{
-                amap.set(b.applicationId,b);
-            }
-           });
-           cb(v);
-      });
+    qdata.googleClientId = data.googleClientId;
+    data.lobbyList.forEach(function(v){
+        amap.set(v.descriptor.typeId,v);
+        v.applications.forEach(function(b){
+        if(b.singleton){
+            amap.set(b.tag,b);
+        }
+        else{
+            amap.set(b.applicationId,b);
+        }
+        });
+        cb(v);
+    });
   };            
   let _toWebSocketUrl = function(){       
       //use server connection config for web socket
