@@ -9,11 +9,14 @@
         </div>
         <div class="w3-display-bottomleft w3-padding"><span class='tx-text-16'>Innovative Game Integration Platform</span></div>
     </div>
-    <div class="w3-container"><!-- Dash board content-->
-        <div class="w3-bar w3-black">
-            <button class="w3-bar-item w3-button" onclick="openCity('London')">London</button>
-            <button class="w3-bar-item w3-button" onclick="openCity('Paris')">Paris</button>
-            <button class="w3-bar-item w3-button" onclick="openCity('Tokyo')">Tokyo</button>
+    <div><!-- Dash board content-->
+        <div class="w3-bar w3-green">
+            <span class="w3-bar-item w3-green w3-tag w3-border-white tx-text-12 tx-opt">London</span>
+            <span class="w3-bar-item w3-green w3-tag w3-border-white tx-text-12 tx-opt">Paris</span>
+            <span class="w3-bar-item w3-green w3-tag w3-border-white tx-text-12 tx-opt">Tokyo</span>
+            <span class="w3-bar-item w3-green w3-tag w3-border-white tx-text-12 tx-opt">London1</span>
+            <span class="w3-bar-item w3-green w3-tag w3-border-white tx-text-12 tx-opt">Paris2</span>
+            <span class="w3-bar-item w3-green w3-tag w3-border-white tx-text-12 tx-opt">Tokyo3</span>
           </div>
           
           <div id="London" class="w3-container city">
@@ -30,16 +33,22 @@
             <h2>Tokyo</h2>
             <p>Tokyo is the capital of Japan.</p>
           </div>
-          
     </div>
 </div>
 <script>
     //load view based role
     //tx_view({viewId:'admin.account',containerId:'#tx-content-ds'});
+    console.log("load content");
     document.querySelector('#tx-menu-close').onclick = ()=>{
         document.querySelector("#tx-dash-board").style.display="none";
         document.querySelector("#tx-dash-board").innerHTML="";
-    } 
+    }; 
+    document.querySelectorAll(".tx-opt").forEach((a)=>{
+        console.log(a.innerHTML);
+        a.onclick = ()=>{
+            openCity(a.innerHTML);
+        }; 
+    });
     function openCity(cityName) {
         var i;
         var x = document.getElementsByClassName("city");
