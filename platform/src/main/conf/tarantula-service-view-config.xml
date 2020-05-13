@@ -24,6 +24,9 @@
         <index type="sign.up">
             <property name="moduleResourceFile">sign.up.view.html</property>
         </index>
+        <index type="password.reset">
+            <property name="moduleResourceFile">password.reset.view.html</property>
+        </index>
     </configuration>
 
 </service-configuration>

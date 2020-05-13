@@ -241,8 +241,10 @@
         }
         function _api_script(p,callback) {
             let exe = p.querySelector('script');
-            new Function(exe.textContent).call();
-            callback(exe);
+            if(exe){
+                new Function(exe.textContent).call();
+                callback(exe);
+            }
         }
         function tx_on_login(){
             let m3 = document.querySelector('#tx-popup');

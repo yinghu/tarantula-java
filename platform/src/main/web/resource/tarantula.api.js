@@ -87,7 +87,9 @@ var TARA_API = (function(){
         aj.open("GET","/"+resource.name+'?flag='+resource.flag,true);
     }
     aj.setRequestHeader('Accept',resource.type);
-    aj.setRequestHeader('Tarantula-token',presence.token);
+    if(presence.token){
+        aj.setRequestHeader('Tarantula-token',presence.token);
+    }
     aj.send();    
   };    
     
@@ -282,7 +284,7 @@ var TARA_API = (function(){
     let payload = {serviceTag:'presence/lobby',command:'onAbsence'};
     _service(payload,function(resp){
         //amap.clear();
-        presence = null;
+        presence ={};
         qdata ={};
         //wsWorker.postMessage({cmd:'close'});
         callback(resp);

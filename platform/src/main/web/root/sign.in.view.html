@@ -22,7 +22,7 @@
              <input id ="tx-password" class="w3-input w3-round w3-border" type="password" placeholder='password'/>
         </div>
         <div class="w3-panel">
-            <span id="tx-forget-password" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-margin-top-8 tx-margin-bottom-8">Forget Password</span>  
+            <span id="tx-forget-password" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-margin-top-8 tx-margin-bottom-8">Forget Password ?</span>  
             <span id="tx-sign-in" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-margin-top-8 tx-margin-bottom-8">Sign In</span>     
         </div>
     </div>
@@ -40,6 +40,12 @@
                 document.querySelector("#tx-sign-in-message").innerHTML=resp.message;
             }
         });            
+    };
+    document.querySelector('#tx-forget-password').onclick=()=>{
+        let m3 = document.querySelector('#tx-popup');
+        m3.innerHTML="";
+        m3.style.display = 'none';
+        tx_view({viewId:'password.reset',containerId:'#tx-popup'});
     };
     document.querySelector('#tx-sign-in-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');

@@ -42,8 +42,7 @@ public class AdminEventHandler implements RequestHandler {
     public void onRequest(OnExchange exchange){
         try{
             String token = exchange.header(Session.TARANTULA_TOKEN);
-            log.warn("TOKEN->"+token);
-            OnSession onSession = tokenValidator.tokenValidator().validateToken(token+1);
+            OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
             String contentType = exchange.path().endsWith(".html")?"text/html":"text/javascript";
             byte[] ret = this.deploymentServiceProvider.resource(exchange.path().substring(1),null);
             exchange.onEvent(new ResponsiveEvent("","",ret,0,contentType,"",true));
