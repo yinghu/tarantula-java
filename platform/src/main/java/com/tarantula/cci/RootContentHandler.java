@@ -21,7 +21,7 @@ public class RootContentHandler implements RequestHandler {
                 path = "/index.html";
             }
             String contentType = "text/html";
-            byte[] _load = this.deploymentServiceProvider.resource(path.substring(1),exchange.query());
+            byte[] _load = this.deploymentServiceProvider.resource("root"+path,exchange.query());
             if(path.endsWith(".css")){
                 contentType = "text/css";
             }

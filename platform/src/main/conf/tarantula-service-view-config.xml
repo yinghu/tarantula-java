@@ -16,13 +16,13 @@
         </index>
         <!-- new pages -->
         <index type="dashboard">
-            <property name="moduleResourceFile">views/dashboard.view.html</property>
+            <property name="moduleResourceFile">dashboard.view.html</property>
         </index>
         <index type="sign.in">
-            <property name="moduleResourceFile">views/sign.in.view.html</property>
+            <property name="moduleResourceFile">sign.in.view.html</property>
         </index>
         <index type="sign.up">
-            <property name="moduleResourceFile">views/sign.up.view.html</property>
+            <property name="moduleResourceFile">sign.up.view.html</property>
         </index>
     </configuration>
 

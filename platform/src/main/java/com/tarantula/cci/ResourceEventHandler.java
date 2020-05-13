@@ -22,7 +22,7 @@ public class ResourceEventHandler implements RequestHandler {
     public void onRequest(OnExchange exchange){
         String path = exchange.path();
         //load js API in resources/web, public access
-        byte[] _load = this.deploymentServiceProvider.resource(path.substring(1).replace("resource","web"),null);
+        byte[] _load = this.deploymentServiceProvider.resource(path.substring(1),null);
         exchange.onEvent(new ResponsiveEvent("","",_load,0,"text/javascript","",true));
     }
     @Override
