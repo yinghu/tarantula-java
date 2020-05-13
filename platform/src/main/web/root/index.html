@@ -194,9 +194,9 @@
             TARA_API.onIndex(function(vb){});
             document.querySelector('#tx-menu-open').onclick = ()=>{
                 if(!TARA_API.query().systemId){
-                    _view({viewId:'sign.in',containerId:'#tx-popup'});
+                    tx_view({viewId:'sign.in',containerId:'#tx-popup'});
                 }else{
-                    _view({viewId:'dashboard',containerId:'#tx-dash-board'});
+                    tx_view({viewId:'dashboard',containerId:'#tx-dash-board'});
                 }
             }
             document.querySelector('#tx-sign-up').onclick = ()=>{
@@ -207,11 +207,11 @@
                     });        
                 }
                 else{
-                    _view({viewId:'sign.up',containerId:'#tx-popup'});
+                    tx_view({viewId:'sign.up',containerId:'#tx-popup'});
                 }
             }
         }
-        function _view(setup){//set up format {viewId:"viewID",containerId:"#m1"}
+        function tx_view(setup){//set up format {viewId:"viewID",containerId:"#m1"}
             TARA_API.onView(setup.viewId,function(v){
                 //load js module if v.moduleFile 
                 if(v.moduleFile){
@@ -249,7 +249,7 @@
             m3.innerHTML="";
             m3.style.display = 'none'; 
             document.querySelector("#tx-sign-up").innerHTML="SIGN OUT";
-            _view({viewId:'dashboard',containerId:'#tx-dash-board'});
+            tx_view({viewId:'dashboard',containerId:'#tx-dash-board'});
         }
         function tx_on_google_auth(){
             let m = document.getElementsByTagName('head')[0];

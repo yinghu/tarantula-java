@@ -9,12 +9,13 @@
         </div>
         <div class="w3-display-bottomleft w3-padding"><span class='tx-text-16'>Innovative Game Integration Platform</span></div>
     </div>
-    <div><!-- Dash board content-->
+    <div id='tx-content-ds'><!-- Dash board content-->
 
     </div>
 </div>
 <script>
     //load view based role
+    tx_view({viewId:'admin.account',containerId:'#tx-content-ds'});
     document.querySelector('#tx-menu-close').onclick = ()=>{
         document.querySelector("#tx-dash-board").style.display="none";
         document.querySelector("#tx-dash-board").innerHTML="";

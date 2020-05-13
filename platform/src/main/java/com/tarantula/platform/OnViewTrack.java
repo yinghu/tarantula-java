@@ -78,12 +78,12 @@ public class OnViewTrack extends RecoverableObject implements OnView {
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",viewId);
-        this.properties.put("2",flag!=null?flag:"n/a");
-        this.properties.put("3",contentBaseUrl!=null?contentBaseUrl:"n/a");
-        this.properties.put("4",icon!=null?icon:"n/a");
-        this.properties.put("5",moduleFile!=null?moduleFile:"n/a");
-        this.properties.put("6",moduleName!=null?moduleName:"n/a");
-        this.properties.put("7",moduleResourceFile!=null?moduleResourceFile:"n/a");
+        this.properties.put("2",flag);
+        this.properties.put("3",contentBaseUrl);
+        this.properties.put("4",icon);
+        this.properties.put("5",moduleFile);
+        this.properties.put("6",moduleName);
+        this.properties.put("7",moduleResourceFile);
         return this.properties;
     }
     @Override

@@ -87,6 +87,7 @@ var TARA_API = (function(){
         aj.open("GET","/"+resource.name+'?flag='+resource.flag,true);
     }
     aj.setRequestHeader('Accept',resource.type);
+    aj.setRequestHeader('Tarantula-token',presence.token);
     aj.send();    
   };    
     

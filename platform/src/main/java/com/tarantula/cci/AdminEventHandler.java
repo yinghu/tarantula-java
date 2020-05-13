@@ -41,7 +41,11 @@ public class AdminEventHandler implements RequestHandler {
     }
     public void onRequest(OnExchange exchange){
         try{
-            String action = exchange.header(Session.TARANTULA_ACTION);
+            String token = exchange.header(Session.TARANTULA_TOKEN);
+            log.warn("TOKEN->"+token);
+            byte[] ret = this.deploymentServiceProvider.resource(exchange.path().substring(1),null);
+            exchange.onEvent(new ResponsiveEvent("","",ret,0,"text/html","",true));
+            /**
             if(action.equals("onAdmin")){
                 String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
                 String name = exchange.header(Session.TARANTULA_NAME);
@@ -66,8 +70,8 @@ public class AdminEventHandler implements RequestHandler {
                 }
                 else{
                     exchange.onEvent(new ResponsiveEvent("","",eb,"admin",true));
-                }
-            }
+                }**/
+
         }catch (Exception ex){
             ex.printStackTrace();
             _hex.remove(exchange.id()); //removed cache on any errors
