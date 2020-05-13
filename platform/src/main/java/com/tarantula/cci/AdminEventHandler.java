@@ -43,8 +43,10 @@ public class AdminEventHandler implements RequestHandler {
         try{
             String token = exchange.header(Session.TARANTULA_TOKEN);
             log.warn("TOKEN->"+token);
+            OnSession onSession = tokenValidator.tokenValidator().validateToken(token+1);
+            String contentType = exchange.path().endsWith(".html")?"text/html":"text/javascript";
             byte[] ret = this.deploymentServiceProvider.resource(exchange.path().substring(1),null);
-            exchange.onEvent(new ResponsiveEvent("","",ret,0,"text/html","",true));
+            exchange.onEvent(new ResponsiveEvent("","",ret,0,contentType,"",true));
             /**
             if(action.equals("onAdmin")){
                 String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);

@@ -282,7 +282,7 @@
         }
         function on_sign_in(googleUser) {
             let uid = googleUser.getBasicProfile().getEmail();
-            //console.log(googleUser.getBasicProfile().getId());       
+            console.log(googleUser.getBasicProfile().getId());       
             let id_token = googleUser.getAuthResponse().id_token;
             TARA_API.onToken({name:'google',"token":id_token,command:'onToken',login:uid},function(resp){
                 //console.log(resp);
