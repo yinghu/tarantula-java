@@ -8,11 +8,6 @@ var TARA_API = (function(){
   //let wsWorker ;
     
   let _parse = function(data,cb){
-    qdata.googleClientId = data.googleClientId;
-    qdata.roleList = data.roleList;
-    qdata.roleList.forEach((r)=>{
-        console.log(r.name);
-    });
     data.lobbyList.forEach(function(v){
         amap.set(v.descriptor.typeId,v);
         v.applications.forEach(function(b){
@@ -103,6 +98,12 @@ var TARA_API = (function(){
     aj.onreadystatechange = function(){
         if(aj.status === 200 && aj.readyState === 4){
             let jsb = JSON.parse(aj.responseText);
+            qdata.googleClientId = jsb.googleClientId;
+            qdata.stripeClientId = jsb.stripeClientId;
+            qdata.roleList = jsb.roleList;
+            qdata.roleList.forEach((r)=>{
+                console.log(r.name);
+            });
             _parse(jsb,callback);
         }
     };

@@ -6,7 +6,7 @@ import com.tarantula.platform.RecoverableObject;
 import java.util.Map;
 
 /**
- * Updated by yinghu on 8/26/19
+ * Updated by yinghu on 5/14/2020
  */
 public class User extends RecoverableObject implements Access {
 
@@ -80,6 +80,7 @@ public class User extends RecoverableObject implements Access {
         properties.put("6",validated);
         properties.put("7",emailAddress);
         properties.put("8",validator);
+        properties.put("9",this.owner);
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
@@ -91,5 +92,6 @@ public class User extends RecoverableObject implements Access {
         this.validated = (boolean) properties.get("6");
         this.emailAddress = (String)properties.get("7");
         this.validator = (String)properties.get("8");
+        this.owner = (String)properties.get("9");
     }
 }

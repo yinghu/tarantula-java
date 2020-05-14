@@ -115,6 +115,10 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         if(google!=null){
             aMap.put("google",(google));
         }
+        AuthVendor stripe = this.serviceContext.authVendor("stripe");
+        if(stripe!=null){
+            aMap.put("stripe",(stripe));
+        }
     }
 
     @Override

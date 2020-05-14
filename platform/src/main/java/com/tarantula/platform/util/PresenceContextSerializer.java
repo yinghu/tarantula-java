@@ -53,6 +53,9 @@ public class PresenceContextSerializer implements JsonSerializer<PresenceContext
         if(presenceContext.googleClientId!=null){
             pc.addProperty("googleClientId",presenceContext.googleClientId);
         }
+        if(presenceContext.stripeClientId!=null){
+            pc.addProperty("stripeClientId",presenceContext.stripeClientId);
+        }
         if(presenceContext.access!=null){
             pc.add("access",new AccessSerializer().serialize(presenceContext.access,type,jsonSerializationContext));
         }

@@ -33,6 +33,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
         else if(session.action().equals("index")){
             PresenceContext ic = new PresenceContext("index");
             ic.googleClientId = this.tokenValidatorProvider.authVendor("google").clientId();
+            ic.stripeClientId = this.tokenValidatorProvider.authVendor("stripe").clientId();
             String typeId = session.trackId();
             OnView view = this._viewList.get("index");
             ic.lobbyList = this.context.index();

@@ -25,7 +25,7 @@ public class IndexKey extends RecoverableObject implements Recoverable.Key {
     }
     @Override
     public boolean equals(Object obj){
-        NaturalKey r = (NaturalKey)obj;
+        IndexKey r = (IndexKey)obj;
         return this.asString().equals(r.asString());
     }
 }
