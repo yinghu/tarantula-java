@@ -27,6 +27,12 @@
         <index type="password.reset">
             <property name="moduleResourceFile">password.reset.view.html</property>
         </index>
+        <index type="pending.request">
+            <property name="moduleResourceFile">pending.request.view.html</property>
+        </index>
+        <index type="invalid.request">
+            <property name="moduleResourceFile">invalid.request.view.html</property>
+        </index>
     </configuration>
 
 </service-configuration>

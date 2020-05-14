@@ -5,14 +5,13 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.PresenceContextSerializer;
-import com.tarantula.platform.util.RingBuffer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Updated 12/25/2019
+ * Updated 5/14/2020
  */
 public class UserManagementApplication extends TarantulaApplicationHeader{
 
@@ -21,13 +20,12 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     private String role = "player";
     private double initialBalance;
     private AccessIndexService accessIndexService;
-    private RingBuffer<Connection> cBuffer;
     private DeploymentServiceProvider deploymentServiceProvider;
     private boolean onApplication;
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        this.cBuffer = new RingBuffer<>(new Connection[5]);
+        //this.cBuffer = new RingBuffer<>(new Connection[5]);
         Configuration configuration = this.context.configuration("setup");
         this.lobbyId = configuration.property("lobbyId");
         this.activated = Boolean.parseBoolean(configuration.property("activated"));
@@ -158,7 +156,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             List<Lobby> lobbyList = new ArrayList();
             lobbyList.add(this.context.lobby(this.lobbyId));
             ptx.lobbyList=(lobbyList);
-            ptx.connection = cBuffer.pop();
             session.write(this.builder.create().toJson(ptx).getBytes(),this.descriptor.responseLabel());
             session.systemId(access.systemId());
             session.stub(access.stub());
@@ -193,38 +190,5 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             this.context.dataStore("presence").create(px);
         }
         return acc;
-    }
-    @Override
-    public void onState(Connection c) {
-        if(c.type().equals(Connection.WEB_SOCKET)){
-            this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on user management service application",OnLog.WARN);
-            onWebSocket(c);
-        }
-    }
-    private void onWebSocket(Connection c) {
-        if(!c.disabled()){
-            if(!cBuffer.push(c)){
-                cBuffer.reset(((ca,limit)->{
-                    Connection[] cn = new Connection[ca.length*2];
-                    for(int i=0;i<limit;i++){
-                        cn[i]=ca[i];
-                    }
-                    cn[limit]=c;
-                    return cn;
-                }));
-            }
-        }
-        else{
-            cBuffer.reset((ca,limit)->{
-                Connection[] cn = new Connection[ca.length];
-                int r=0;
-                for(int i=0;i<limit;i++){
-                    if(!(ca[i].serverId().equals(c.serverId()))){
-                        cn[r++]=ca[i];
-                    }
-                }
-                return cn;
-            });
-        }
     }
 }

@@ -35,7 +35,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
             ic.googleClientId = this.tokenValidatorProvider.authVendor("google").clientId();
             ic.stripeClientId = this.tokenValidatorProvider.authVendor("stripe").clientId();
             String typeId = session.trackId();
-            OnView view = this._viewList.get("index");
+            //OnView view = this._viewList.get("index");
             ic.lobbyList = this.context.index();
             _lobbyList.forEach((n)->{
                 if(typeId!=null&&typeId.equals(n)){
@@ -45,7 +45,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
                     ic.lobbyList.add(this.context.lobby(n));
                 }
             });
-            ic.view = view;
+            //ic.view = view;
             ic.roleList = roleList;
             session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }
@@ -71,7 +71,9 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
             v.moduleFile(c.property("moduleFile"));
             v.moduleName(c.property("moduleName"));
             v.moduleResourceFile(c.property("moduleResourceFile"));
+            //this.context.log("View Update-->>"+v.viewId(),OnLog.WARN);
             _viewList.put(v.viewId(),v);
+            deploymentServiceProvider.deploy(v);
         });
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.roleList = this.tokenValidatorProvider.list();
@@ -79,7 +81,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
     }
     @Override
     public void onView(OnView onView) {
-        //this.context.log("View Update-->>"+onView.toString(),OnLog.WARN);
+        //this.context.log("View Update-->>"+onView.viewId(),OnLog.WARN);
         if(!onView.disabled()){
             this._viewList.put(onView.viewId(),onView);
         }

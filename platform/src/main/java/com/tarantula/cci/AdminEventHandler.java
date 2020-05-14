@@ -16,7 +16,8 @@ import com.tarantula.platform.util.ResponseSerializer;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AdminEventHandler implements RequestHandler {
+public class
+AdminEventHandler implements RequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(AdminEventHandler.class);
 

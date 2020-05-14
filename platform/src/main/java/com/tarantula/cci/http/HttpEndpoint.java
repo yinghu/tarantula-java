@@ -77,6 +77,10 @@ public class HttpEndpoint implements EndPoint {
 		httpAdminHandler.resource(this.resource);
 		this.hserver.createContext(httpAdminHandler.path(),httpAdminHandler);
 
+		HttpViewHandler httpViewHandler = new HttpViewHandler();
+		httpViewHandler.resource(this.resource);
+		this.hserver.createContext(httpViewHandler.path(),httpViewHandler);
+
 		hserver.start();
         started = true;
         log.info("Tarantula HTTP Endpoint is listening on ["+ip.toString()+"]");

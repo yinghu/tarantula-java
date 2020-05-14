@@ -372,18 +372,18 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             if(ot instanceof OnView){
                 OnView ov = (OnView)ot;
-                //log.warn(ov.toString());
+                log.warn(ov.toString());
                 this.vListeners.forEach((cl)->{
                     cl.onView(ov);
                 });
             }
             if(!ot.disabled()){
                 vMap.put(new String(mse.key),ot);
-                //log.warn(new String(mse.key)+" added");
+                log.warn(new String(mse.key)+" added");
             }
             else{
                 vMap.remove(new String(mse.key));
-                //log.warn(new String(mse.key)+" removed");
+                log.warn(new String(mse.key)+" removed");
             }
         }
         else if(event instanceof MapStoreVotingEvent){

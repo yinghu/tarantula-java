@@ -67,6 +67,10 @@ public class EndpointService implements Serviceable,EndPoint.Resource{
         adminEventHandler.start();
         rMap.put(adminEventHandler.name(),adminEventHandler);
 
+        ViewEventHandler viewEventHandler = new ViewEventHandler();
+        viewEventHandler.setup(this.tarantulaContext);
+        viewEventHandler.start();
+        rMap.put(viewEventHandler.name(),viewEventHandler);
 
         for(EndPoint endPoint : endPointList){
             endPoint.resource(this);
