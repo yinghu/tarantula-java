@@ -46,10 +46,10 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         String rootId = ds.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid();
         AccessIndex accessIndex = accessIndexService.set(onAccess.property("login"),rootId);
         if(accessIndex!=null){
-            createLogin(onAccess, rootId,"root",false);
+            createLogin(onAccess, rootId,"root",false,"password");
         }
         this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ON_ACCESS_CID,(a)->{
-            createLogin((OnAccess)a,a.distributionKey(),role,false);
+            createLogin((OnAccess)a,a.distributionKey(),role,false,"password");
         });
         this.context.log("User management application started on tag ["+descriptor.tag()+"] with application mode ["+onApplication+"]",OnLog.INFO);
     }
@@ -86,7 +86,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             if(this.context.validator().validateToken(acc.toMap())){
                 AccessIndex _query = accessIndexService.set(acc.property("login"),session.systemId());
                 if(_query!=null){
-                    createLogin(acc,session.systemId(),role,true);
+                    createLogin(acc,session.systemId(),role,true,"token");
                     OnSession onSession = login(session.systemId(),"",session);
                     onSession(onSession,session);
                 }
@@ -103,7 +103,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 session.write(builder.create().toJson(new ResponseHeader(session.action(),false,0,"login [" + acc.property("login") + "] cannot be registered","error")).getBytes(),this.descriptor.responseLabel());
             }
             else{
-                Access access = this.createLogin(acc,session.systemId(),role,false);
+                Access access = this.createLogin(acc,session.systemId(),role,false,"password");
                 session.systemId(access.distributionKey());
                 OnSession _onSession = this.login(session.systemId(),acc.property("password"),session);
                 this.onSession(_onSession,session);
@@ -120,7 +120,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 if(accessIndex!=null){
                     acc.property("login",deviceId);
                     acc.property("password","password");
-                    this.createLogin(acc,session.trackId(),role,true);
+                    this.createLogin(acc,session.trackId(),role,true,"device");
                     OnSession access = this.login(session.trackId(),acc.property("password"),session);
                     onSession(access,session);
                 }
@@ -179,10 +179,10 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         }
         return _onSession;
     }
-    private Access createLogin(OnAccess payload,String systemId,String roleName,boolean validated){
+    private Access createLogin(OnAccess payload,String systemId,String roleName,boolean validated,String validator){
         DataStore ds = this.context.dataStore("user");
         //this.context.log("User Create->"+payload.header("login")+"<>"+systemId,OnLog.INFO);
-        Access acc = new User(payload.property("login"),validated);
+        Access acc = new User(payload.property("login"),validated,validator);
         acc.distributionKey(systemId);
         acc.password(validated?"":this.context.validator().hashPassword(payload.property("password")));
         acc.active(this.activated);//if false do email validation

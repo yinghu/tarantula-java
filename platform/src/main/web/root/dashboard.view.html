@@ -11,7 +11,7 @@
     </div>
     <div><!-- Dash board content-->
         <div class="w3-bar w3-green">
-            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Account</span>
+            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Player</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Game</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">API</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">DataStore</span>
@@ -20,29 +20,55 @@
         </div>
         <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
         <div class="w3-display-container w3-white tx-content-8"></div>  
-        <div id="Account" class="w3-container tx-pane">
-            <h2>Account Pane</h2>
+        <div id="tx-Player" class="w3-container tx-pane">
+            <div class='w3-panel'>
+                <span class='w3-left'><i class="fa fa-user w3-text-orange" style="font-size:24px"></i></span>
+                <span class='w3-right tx-text-14'>Player</span>
+            </div>
+            <div class='w3-panel'>
+                <span class='w3-left tx-text-16'>Virtual Balance</span>
+                <span class='w3-right tx-text-14'>10000</span>
+            </div>
+            <div class='w3-panel'>
+                <span class='w3-left tx-text-16'>Email Address</span>
+                <span class='w3-right tx-text-14'>yinghu.lu@gmail.com</span>
+            </div>
+            <div class='w3-panel'>
+                <span class='w3-left tx-text-16'>System Role</span>
+                <span class='w3-right tx-text-14'>root</span>
+            </div>
+            <div class='w3-panel'>
+                <span class='w3-left tx-text-16'>Validation</span>
+                <span class='w3-right tx-text-14'>password</span>
+            </div>
+            <div class="w3-panel"><span>Add recovery email address</span></div>
+            <div class="w3-panel"><span>Change password</span></div>
+            <div class="w3-panel"><span>Upgrade role</span></div>
+            <div class="w3-panel"><span>Add new user</span></div>
+            <div class="w3-panel"><span>Find user</span></div>
         </div> 
-        <div id="Game" class="w3-container tx-pane" style="display:none">
+        <div id="tx-Game" class="w3-container tx-pane" style="display:none">
             <h2>Game Pane</h2>
         </div>  
-        <div id="API" class="w3-container tx-pane" style="display:none">
+        <div id="tx-API" class="w3-container tx-pane" style="display:none">
             <h2>API Pane</h2>
         </div>
-        <div id="DataStore" class="w3-container tx-pane" style="display:none">
+        <div id="tx-DataStore" class="w3-container tx-pane" style="display:none">
             <h2>Data Store Pane</h2>
         </div>
-        <div id="Cluster" class="w3-container tx-pane" style="display:none">
+        <div id="tx-Cluster" class="w3-container tx-pane" style="display:none">
             <h2>Cluster Pane</h2>
         </div>
-        <div id="Extension" class="w3-container tx-pane" style="display:none">
+        <div id="tx-Extension" class="w3-container tx-pane" style="display:none">
             <h2>Extension Pane</h2>
         </div>
     </div>
 </div>
 <script>
     //load view based role
-    //tx_view({viewId:'admin.account',containerId:'#tx-content-ds'});
+    TARA_API.onService(false,{serviceTag:'presence/lobby',command:'onPresence'},(resp)=>{
+        console.log(resp);    
+    });
     document.querySelector('#tx-menu-close').onclick = ()=>{
         if(TARA_API.query().systemId){
             tx_oauth_sign_out();
@@ -58,7 +84,7 @@
                     a.style.display = 'none';
                 }
             );
-            document.querySelector('#'+a.innerHTML).style.display='block'; 
+            document.querySelector('#tx-'+a.innerHTML).style.display='block'; 
         }; 
     });
 </script>

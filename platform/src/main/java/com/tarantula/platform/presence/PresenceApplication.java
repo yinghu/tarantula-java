@@ -14,12 +14,14 @@ public class PresenceApplication extends TarantulaApplicationHeader {
 
     private RingBuffer<Connection> cBuffer;
     private DeploymentServiceProvider deploymentServiceProvider;
+    private DataStore userDs;
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         this.cBuffer = new RingBuffer<>(new Connection[5]);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        userDs = this.context.dataStore("user");
         //deploymentServiceProvider.registerOnConnectionListener(this);
 
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
@@ -35,12 +37,17 @@ public class PresenceApplication extends TarantulaApplicationHeader {
 
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
-         if (session.action().equals("onPresence")) {
-                Presence presence = this.context.presence(session.systemId());
-                PresenceContext pc = new PresenceContext(session.action());
-                pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
-                session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
-         }
+        if (session.action().equals("onPresence")) {
+            Presence presence = this.context.presence(session.systemId());
+            PresenceContext pc = new PresenceContext(session.action());
+            pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
+            User auser = new User();
+            auser.distributionKey(session.systemId());
+            if(userDs.load(auser)){
+                pc.access = auser;
+            }
+            session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
+        }
         else if(session.action().equals("onConnection")){//get web socket connection with a join ticket
             //request new ticket and connection
             PresenceContext ptc = new PresenceContext(session.action());

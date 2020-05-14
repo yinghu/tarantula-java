@@ -5,11 +5,7 @@ import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.UDPConnection;
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.event.ServerPushEvent;
-import com.tarantula.platform.event.ServiceActionEvent;
-import com.tarantula.platform.presence.User;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.ServiceContext;
@@ -19,7 +15,6 @@ import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
 
 public class AdminEventHandler implements RequestHandler {
 

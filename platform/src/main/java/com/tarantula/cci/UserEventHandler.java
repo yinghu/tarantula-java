@@ -121,7 +121,7 @@ public class UserEventHandler implements RequestHandler {
                 else if(action.equals("onResetCode")){
                     String code = this.deploymentServiceProvider.resetCode(name);
                     boolean suc = this.deploymentServiceProvider.registerPostOffice().onEmail().send(magicKey,code);
-                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onResetCode","check email",suc)).getBytes();
+                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onResetCode",suc?"check email":"failed to send mail",suc)).getBytes();
                     _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"onResetCode",true));
                 }
                 else if(action.equals("onResetPassword")){

@@ -12,17 +12,20 @@ public class User extends RecoverableObject implements Access {
 
     private String login;
     private String password;//hash of the password
+    private String emailAddress="n/a"; //reset validation email address
     private boolean active;
     private boolean validated;
+    private String validator;
     private String role;
     public User(){
         this.vertex = "User";
         this.label = "VA";
     }
-    public User(String login,boolean validated){
+    public User(String login,boolean validated,String validator){
         this();
         this.login = login;
         this.validated = validated;
+        this.validator = validator;
     }
     public String login(){
         return this.login;
@@ -35,6 +38,15 @@ public class User extends RecoverableObject implements Access {
     }
     public void password(String password){
         this.password = password;
+    }
+    public String emailAddress(){
+        return this.emailAddress;
+    }
+    public void emailAddress(String emailAddress){
+        this.emailAddress = emailAddress;
+    }
+    public String validator(){
+        return this.validator;
     }
     public boolean active(){
         return this.active;
@@ -66,6 +78,8 @@ public class User extends RecoverableObject implements Access {
         properties.put("4",active);
         properties.put("5",routingNumber);
         properties.put("6",validated);
+        properties.put("7",emailAddress);
+        properties.put("8",validator);
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
@@ -75,5 +89,7 @@ public class User extends RecoverableObject implements Access {
         this.active = (boolean) properties.get("4");
         this.routingNumber = ((Number) properties.get("5")).intValue();
         this.validated = (boolean) properties.get("6");
+        this.emailAddress = (String)properties.get("7");
+        this.validator = (String)properties.get("8");
     }
 }

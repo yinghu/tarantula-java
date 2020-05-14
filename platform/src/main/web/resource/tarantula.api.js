@@ -275,7 +275,7 @@ var TARA_API = (function(){
     });
   };
 
-  let _service = function(payload,callback){
+  let _service = function(post,payload,callback){
     let _jp = JSON.stringify(payload);
     let aj = new XMLHttpRequest();   
     aj.responseType = 'text';
@@ -285,14 +285,16 @@ var TARA_API = (function(){
             callback(jsn);
         }
     };
-    aj.open("POST","/service/action",true);
+    aj.open(post?"POST":"GET","/service/action",true);
     aj.setRequestHeader('Accept','application/json');
     aj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     aj.setRequestHeader('Tarantula-tag',payload.serviceTag);
     aj.setRequestHeader('Tarantula-token',presence.token);
     aj.setRequestHeader('Tarantula-action',payload.command);
-    aj.setRequestHeader('Tarantula-payload-size',_jp.length);  
-    aj.send(_jp);
+    if(post){
+        aj.setRequestHeader('Tarantula-payload-size',_jp.length);
+    }  
+    post?aj.send(_jp):aj.send();
   };
   let _instance = function(payload,callback){
     let _jp = JSON.stringify(payload);
@@ -316,8 +318,8 @@ var TARA_API = (function(){
     aj.send(_jp);
   };     
   let _logout = function(callback){   
-    let payload = {serviceTag:'presence/lobby',command:'onAbsence'};
-    _service(payload,function(resp){
+    let payload = {serviceTag:'presence/lobby',command:'onAbsence',post:false};
+    _service(false,payload,function(resp){
         //amap.clear();
         presence ={};
         qdata ={};

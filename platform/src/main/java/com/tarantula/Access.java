@@ -21,9 +21,16 @@ public interface Access extends Recoverable {
     void login(String login);
     String password();
     void password(String password);
+
+    String emailAddress();
+    void emailAddress(String emailAddress);
+
     boolean active();
     void active(boolean active);
     boolean validated();//validated to skip check password if user login from third party login token
+
+    String validator();
+
     String role();
     void role(String role);
 
