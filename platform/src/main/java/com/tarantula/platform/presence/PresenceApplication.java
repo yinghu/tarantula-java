@@ -5,7 +5,11 @@ import com.tarantula.Response;
 import com.tarantula.platform.*;
 
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.*;
+
+import java.util.List;
+
 /**
  * Developer: YINGHU LU
  * Date: updated 12/25/2019.
@@ -15,6 +19,7 @@ public class PresenceApplication extends TarantulaApplicationHeader {
     private RingBuffer<Connection> cBuffer;
     private DeploymentServiceProvider deploymentServiceProvider;
     private DataStore userDs;
+    private List<Access.Role> roleList;
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
@@ -22,6 +27,7 @@ public class PresenceApplication extends TarantulaApplicationHeader {
         this.cBuffer = new RingBuffer<>(new Connection[5]);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         userDs = this.context.dataStore("user");
+        roleList = ((TokenValidatorProvider)this.context.serviceProvider(TokenValidatorProvider.NAME)).list();
         //deploymentServiceProvider.registerOnConnectionListener(this);
 
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
@@ -46,6 +52,7 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             if(userDs.load(auser)){
                 pc.access = auser;
             }
+            pc.roleList = roleList;
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onConnection")){//get web socket connection with a join ticket

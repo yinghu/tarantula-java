@@ -21,31 +21,34 @@
         <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
         <div class="w3-display-container w3-white tx-content-8"></div>  
         <div id="tx-Player" class="w3-container tx-pane">
+            <div class='w3-bar w3-white'>
+                <span class='w3-bar-item w3-left tx-margin-bottom-8'><i class="fa fa-user w3-text-orange" style="font-size:24px"></i></span>
+                <span class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Upgrade Role</span>
+                <span class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>User Update</span>
+                <span class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Add User</span>
+                <span class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Find User</span>
+                <span class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Add Recovery Email</span>
+            </div>
             <div class='w3-panel'>
-                <span class='w3-left'><i class="fa fa-user w3-text-orange" style="font-size:24px"></i></span>
-                <span class='w3-right tx-text-14'>Player</span>
+                <span class='w3-left tx-text-16'>Player Name</span>
+                <span id='tx-player-1' class='w3-right tx-text-14'>root</span>
             </div>
             <div class='w3-panel'>
                 <span class='w3-left tx-text-16'>Virtual Balance</span>
-                <span class='w3-right tx-text-14'>10000</span>
+                <span id='tx-player-2' class='w3-right tx-text-14'>10000</span>
             </div>
             <div class='w3-panel'>
                 <span class='w3-left tx-text-16'>Email Address</span>
-                <span class='w3-right tx-text-14'>yinghu.lu@gmail.com</span>
+                <span id='tx-player-3' class='w3-right tx-text-14'>yinghu.lu@gmail.com</span>
             </div>
             <div class='w3-panel'>
                 <span class='w3-left tx-text-16'>System Role</span>
-                <span class='w3-right tx-text-14'>root</span>
+                <span id='tx-player-4' class='w3-right tx-text-14'>root</span>
             </div>
             <div class='w3-panel'>
                 <span class='w3-left tx-text-16'>Validation</span>
-                <span class='w3-right tx-text-14'>password</span>
+                <span id='tx-player-5' class='w3-right tx-text-14'>password</span>
             </div>
-            <div class="w3-panel"><span>Add recovery email address</span></div>
-            <div class="w3-panel"><span>Change password</span></div>
-            <div class="w3-panel"><span>Upgrade role</span></div>
-            <div class="w3-panel"><span>Add new user</span></div>
-            <div class="w3-panel"><span>Find user</span></div>
         </div> 
         <div id="tx-Game" class="w3-container tx-pane" style="display:none">
             <h2>Game Pane</h2>
@@ -67,7 +70,13 @@
 <script>
     //load view based role
     TARA_API.onService(false,{serviceTag:'presence/lobby',command:'onPresence'},(resp)=>{
-        console.log(resp);    
+        if(resp.successful){
+            document.querySelector('#tx-player-1').innerHTML=resp.access.login;
+            document.querySelector('#tx-player-2').innerHTML=resp.presence.balance;
+            document.querySelector('#tx-player-3').innerHTML=resp.access.emailAddress;
+            document.querySelector('#tx-player-4').innerHTML=resp.access.role;
+            document.querySelector('#tx-player-5').innerHTML=resp.access.validator;
+        }    
     });
     document.querySelector('#tx-menu-close').onclick = ()=>{
         if(TARA_API.query().systemId){

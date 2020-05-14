@@ -22,7 +22,7 @@ public interface TokenValidatorProvider extends ServiceProvider {
     Access.Role role(String systemId);
 
     List<ApplicationCluster> list(String systemId);
-
+    List<Access.Role> list();
     AuthVendor authVendor(String name);
 
     interface AuthVendor{

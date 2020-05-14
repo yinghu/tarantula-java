@@ -86,7 +86,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             if(this.context.validator().validateToken(acc.toMap())){
                 AccessIndex _query = accessIndexService.set(acc.property("login"),session.systemId());
                 if(_query!=null){
-                    createLogin(acc,session.systemId(),role,true,"token");
+                    createLogin(acc,session.systemId(),role,true,acc.name());
                     OnSession onSession = login(session.systemId(),"",session);
                     onSession(onSession,session);
                 }

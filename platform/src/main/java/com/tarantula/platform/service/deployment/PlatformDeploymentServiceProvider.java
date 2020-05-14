@@ -106,7 +106,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     public byte[] resource(String name,String flag){
-        log.warn("load resource ["+name+"] from ["+flag+"]");
+        //log.warn("load resource ["+name+"] from ["+flag+"]");
         if(flag!=null){
             //log.warn("load resource ["+name+"] from ["+flag+"]");
             String rid = flag.split("=")[1].trim();

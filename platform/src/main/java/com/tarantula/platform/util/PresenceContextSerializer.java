@@ -36,6 +36,14 @@ public class PresenceContextSerializer implements JsonSerializer<PresenceContext
             }
             pc.add("lobbyList",blist);
         }
+        if(presenceContext.roleList!=null){
+            JsonArray rlist = new JsonArray();
+            RoleSerializer roleSerializer = new RoleSerializer();
+            presenceContext.roleList.forEach((r)->{
+                rlist.add(roleSerializer.serialize(r,type,jsonSerializationContext));
+            });
+            pc.add("roleList",rlist);
+        }
         if(presenceContext.view!=null){
             pc.add("view",new OnViewSerializer().serialize(presenceContext.view,type,jsonSerializationContext));
         }

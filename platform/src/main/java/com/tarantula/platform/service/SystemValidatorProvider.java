@@ -77,6 +77,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public List<ApplicationCluster> list(String systemId){
         return new ArrayList<>();
     }
+    public List<Access.Role> list(){
+        ArrayList<Access.Role> rlist = new ArrayList<>();
+        rMap.forEach((k,v)->rlist.add(v));
+        return rlist;
+    }
     public Access.Role role(String systemId){
         if(systemId==null){
             return rMap.get("player");
