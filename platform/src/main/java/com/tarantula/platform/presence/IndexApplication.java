@@ -8,6 +8,7 @@ import com.tarantula.platform.service.OnLobby;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.PresenceContextSerializer;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -18,6 +19,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
 
     private ConcurrentHashMap<String,OnView> _viewList = new ConcurrentHashMap<>();
     private CopyOnWriteArraySet<String> _lobbyList = new CopyOnWriteArraySet<>();
+    private List<Access.Role> roleList;
     private TokenValidatorProvider tokenValidatorProvider;
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
@@ -43,6 +45,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
                 }
             });
             ic.view = view;
+            ic.roleList = roleList;
             session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }
         else{
@@ -70,6 +73,7 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
             _viewList.put(v.viewId(),v);
         });
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
+        this.roleList = this.tokenValidatorProvider.list();
         this.context.log("Index application started on tag ["+this.descriptor.tag()+"]",OnLog.INFO);
     }
     @Override

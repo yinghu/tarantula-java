@@ -5,18 +5,14 @@ import com.tarantula.Account;
 import java.util.Map;
 
 public class UserAccount extends User implements Account {
-    private String emailAddress;
+
     private String name;
     private boolean trial;
-    @Override
-    public String emailAddress() {
-        return this.emailAddress;
+
+    public UserAccount(){
+        this.vertex = "Account";
     }
 
-    @Override
-    public void emailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
-    }
     public int getFactoryId() {
         return UserPortableRegistry.OID;
     }

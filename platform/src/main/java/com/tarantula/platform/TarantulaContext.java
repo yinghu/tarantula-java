@@ -19,6 +19,7 @@ import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationXMLParser;
 import com.tarantula.platform.util.GoogleAuthCredentialsDeserializer;
+import com.tarantula.platform.util.StripePaymentCredentialsDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
 public class TarantulaContext implements Serviceable,ServiceContext{
@@ -559,7 +560,15 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         this.schedule(new MidnightCheck(this));
     }
     public TokenValidatorProvider.AuthVendor authVendor(String name){
- 	    return loadGoogleCredentials();
+ 	    if(name.equals("google")){
+ 	        return loadGoogleCredentials();
+ 	    }
+ 	    else if(name.equals("stripe")){
+ 	        return loadStripeCredentials();
+        }
+        else{
+            return null;
+        }
     }
     private AuthObject loadGoogleCredentials(){
  	    try{
@@ -572,6 +581,19 @@ public class TarantulaContext implements Serviceable,ServiceContext{
             return gb.create().fromJson(new String(data),AuthObject.class);
  	    }catch (Exception ex){
  	        return null;
+        }
+    }
+    private AuthObject loadStripeCredentials(){
+        try{
+            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("stripe-credentials.json");
+            byte[] data = new byte[in.available()];
+            in.read(data);
+            in.close();
+            GsonBuilder gb = new GsonBuilder();
+            gb.registerTypeAdapter(AuthObject.class,new StripePaymentCredentialsDeserializer());
+            return gb.create().fromJson(new String(data),AuthObject.class);
+        }catch (Exception ex){
+            return null;
         }
     }
 }

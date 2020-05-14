@@ -79,7 +79,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public List<Access.Role> list(){
         ArrayList<Access.Role> rlist = new ArrayList<>();
-        rMap.forEach((k,v)->rlist.add(v));
+        rMap.forEach((k,v)->{
+            if(!v.name().equals("root")){
+                rlist.add(v);
+            }
+        });
         return rlist;
     }
     public Access.Role role(String systemId){
@@ -124,8 +128,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.rMap = new HashMap<>();
         this.aMap = new HashMap<>();
         Access.Role root = new AccessControl("root",Access.ROOT_ACCESS_CONTROL);
-        Access.Role owner = new AccessControl("owner",Access.OWNER_ACCESS_CONTROL);
-        Access.Role admin = new AccessControl("admin",Access.ADMIN_ACCESS_CONTROL);
+        Access.Role admin = new AccessControl("admin",Access.OWNER_ADMIN_CONTROL);
+        Access.Role owner = new AccessControl("owner",Access.OWNER_PLAYER_CONTROL);
         Access.Role player = new AccessControl("player",Access.PLAYER_ACCESS_CONTROL);
         rMap.put(root.name(),root);
         rMap.put(owner.name(),owner);

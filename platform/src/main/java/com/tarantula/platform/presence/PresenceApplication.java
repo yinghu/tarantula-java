@@ -5,10 +5,11 @@ import com.tarantula.Response;
 import com.tarantula.platform.*;
 
 import com.tarantula.platform.service.DeploymentServiceProvider;
-import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.*;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * Developer: YINGHU LU
@@ -16,20 +17,16 @@ import java.util.List;
  */
 public class PresenceApplication extends TarantulaApplicationHeader {
 
-    private RingBuffer<Connection> cBuffer;
+
     private DeploymentServiceProvider deploymentServiceProvider;
     private DataStore userDs;
-    private List<Access.Role> roleList;
+
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
-        this.cBuffer = new RingBuffer<>(new Connection[5]);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         userDs = this.context.dataStore("user");
-        roleList = ((TokenValidatorProvider)this.context.serviceProvider(TokenValidatorProvider.NAME)).list();
-        //deploymentServiceProvider.registerOnConnectionListener(this);
-
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
             Presence presence = this.context.presence(t.owner());
             OnBalance ob = (OnBalance)t;
@@ -52,16 +49,7 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             if(userDs.load(auser)){
                 pc.access = auser;
             }
-            pc.roleList = roleList;
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
-        }
-        else if(session.action().equals("onConnection")){//get web socket connection with a join ticket
-            //request new ticket and connection
-            PresenceContext ptc = new PresenceContext(session.action());
-            ptc.presence = new OnSessionTrack(session.systemId(),session.stub());
-            ptc.presence.ticket(this.context.validator().ticket(session.systemId(),session.stub()));
-            ptc.connection = cBuffer.pop();
-            session.write(this.builder.create().toJson(ptc).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onPlay")){
               OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -81,42 +69,21 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             this.context.absence(session);
             session.write(this.builder.create().toJson(new ResponseHeader("onAbsence", "off session [" + session.stub() + "]", true)).getBytes(),this.descriptor.responseLabel());
         }
+        /**
+        Map<String, Object> chargeParams = new HashMap<>();
+        chargeParams.put("amount",Double.valueOf(co.price).intValue());//pass penney number as integer
+        chargeParams.put("currency", "usd");
+        chargeParams.put("description", "Charge for ["+co.distributionKey()+"]");
+        chargeParams.put("source",ex.header("orderId")); //orderId from client stripe call
+        if(strip.validate(chargeParams)){
+            //charge successfully
+            OnBalanceTrack onBalanceTrack = new OnBalanceTrack(session.systemId(),co.credits);
+            this.context.publish(this.context.routingKey(session.systemId(),"presence"),onBalanceTrack);
+            suc = true;
+        }**/
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes(),this.descriptor.responseLabel());
         }
 
-    }
-    @Override
-    public void onState(Connection c) {
-        if(c.type().equals(Connection.WEB_SOCKET)){
-            this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on presence service application",OnLog.WARN);
-            onWebSocket(c);
-        }
-    }
-    private void onWebSocket(Connection c) {
-        if(!c.disabled()){
-            if(!cBuffer.push(c)){
-                cBuffer.reset(((ca,limit)->{
-                    Connection[] cn = new Connection[ca.length*2];
-                    for(int i=0;i<limit;i++){
-                        cn[i]=ca[i];
-                    }
-                    cn[limit]=c;
-                    return cn;
-                }));
-            }
-        }
-        else{
-            cBuffer.reset((ca,limit)->{
-                Connection[] cn = new Connection[ca.length];
-                int r=0;
-                for(int i=0;i<limit;i++){
-                    if(!(ca[i].serverId().equals(c.serverId()))){
-                        cn[r++]=ca[i];
-                    }
-                }
-                return cn;
-            });
-        }
     }
 }

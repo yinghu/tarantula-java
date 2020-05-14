@@ -9,6 +9,10 @@ var TARA_API = (function(){
     
   let _parse = function(data,cb){
     qdata.googleClientId = data.googleClientId;
+    qdata.roleList = data.roleList;
+    qdata.roleList.forEach((r)=>{
+        console.log(r.name);
+    });
     data.lobbyList.forEach(function(v){
         amap.set(v.descriptor.typeId,v);
         v.applications.forEach(function(b){
