@@ -15,6 +15,7 @@ public interface ServiceContext {
     EventService eventService(int scope);
     ClusterProvider clusterProvider(int scope);
     ServiceProvider serviceProvider(String name);
+    DeploymentServiceProvider deploymentServiceProvider();
     AccessIndexService accessIndexService();
     TarantulaLogger logger(Class c);
     OnPartition[] partitions();

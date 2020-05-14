@@ -29,6 +29,6 @@
 input[type="file"] {display: none;}
 textarea {width:100%; height: 240px; border:1px solid blue}
 .tx-text-12{font-family: "Oswald";font-size: 12px;}
+.tx-text-14{font-family: "Oswald";font-size: 14px;}
 .tx-text-24{font-family: "Oswald";font-size: 24px;}
 .tx-text-16{font-family: "Oswald";font-size: 16px;}
-.tx-v-bar {border-left: 2px solid white;height: 24px;}

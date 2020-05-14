@@ -129,8 +129,23 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 }
             }
         }
-        else if(session.action().equals("onAccount")){
-
+        else if(session.action().equals("onResetPassword")){
+            if(this.deploymentServiceProvider.checkCode(acc.accessKey()).equals(acc.property("login"))){
+                Access user = new User();
+                user.distributionKey(session.systemId());
+                if(this.context.dataStore("user").load(user)){
+                    user.password(this.context.validator().hashPassword(acc.property("password")));
+                    this.context.dataStore("user").update(user);
+                    OnSession onSession = this.login(session.systemId(),acc.property("password"),session);
+                    onSession(onSession,session);
+                }
+                else{
+                    session.write(this.builder.create().toJson(new ResponseHeader("onResetPassword", "invalid user name", false)).getBytes(),this.descriptor.responseLabel());
+                }
+            }
+            else{
+                session.write(this.builder.create().toJson(new ResponseHeader("onResetPassword", "invalid token", false)).getBytes(),this.descriptor.responseLabel());
+            }
         }
         else{
             throw new UnsupportedOperationException(session.action());

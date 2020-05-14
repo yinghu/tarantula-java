@@ -444,6 +444,10 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     public AccessIndexService accessIndexService(){
         return (AccessIndexService)this.serviceProviders.get(AccessIndexService.NAME);
     }
+    @Override
+    public DeploymentServiceProvider deploymentServiceProvider(){
+ 	    return this.deploymentServiceProvider;
+    }
     public ConcurrentHashMap<String,ServiceProvider> _dataStoreProviderMap(){
  	    return this.dataStoreProviders;
     }

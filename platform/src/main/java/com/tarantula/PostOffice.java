@@ -5,9 +5,12 @@ public interface PostOffice{
     //app to client
     OnTopic onTopic();
     OnConnection onConnection(String serverId);
+    OnEmail onEmail();
+    OnSMS onSMS();
     //app to app
     OnTag onTag(String tag);
     OnApplication onApplication(String applicationId);
+
 
     //send data to client on the notification topic
     interface OnTopic{
@@ -19,6 +22,14 @@ public interface PostOffice{
         void send(String label,byte[] data);
     }
 
+    interface OnEmail{
+        boolean send(String emailAddress,String text);
+    }
+
+    interface OnSMS{
+        void send(String phoneNumber,String text);
+    }
+
     //app to app messaging
     interface OnTag{
        void send(String distributionKey,Recoverable data);
@@ -26,4 +37,5 @@ public interface PostOffice{
     interface OnApplication{
         void send(String distributionKey,Recoverable data);
     }
+
 }

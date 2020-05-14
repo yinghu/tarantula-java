@@ -218,20 +218,55 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-payload-size',_ps.length);  
     aj.send(_ps);                
   };
-  let _presence = function(callback){   
-    let payload = {serviceTag:'presence/lobby',command:'onPresence'};
-    _service(payload,function(resp){
-        qdata.balance = resp.presence.balance;
-        //qdata.ticket = resp.presence.ticket;
-        //console.log(resp.connection);
-        //qdata.connection = resp.connection;
-        //_parse(resp,function(v){});
-        //wsWorker = new Worker('/resource/tarantula.web.socket.source.js');//move to login
-        //wsWorker.onmessage = _onmessage;
-        //wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});
-        callback({successful:true});
-    });               
+  let _resetCode = function(userName,emailAddress,callback){
+    let aj = new XMLHttpRequest();   
+    aj.responseType = 'text';
+    aj.onreadystatechange = function(){
+        if(aj.status === 200 && aj.readyState === 4){
+            let jsb = JSON.parse(aj.responseText);
+            callback(jsb);
+        }
+    };
+    aj.open("GET","/user/action",true);
+    aj.setRequestHeader('Accept','application/json');
+    aj.setRequestHeader('Tarantula-tag','index/user');
+    aj.setRequestHeader('Tarantula-action','onResetCode');
+    aj.setRequestHeader('Tarantula-name',userName);
+    aj.setRequestHeader('Tarantula-magic-key',emailAddress);
+    aj.send();               
   }; 
+  let _resetPassword = function(payload,callback){
+    let _ps = JSON.stringify(payload);
+    let aj = new XMLHttpRequest();   
+    aj.responseType = 'text';
+    aj.onreadystatechange = function(){
+        if(aj.status === 200 && aj.readyState === 4){
+            let p = JSON.parse(aj.responseText);
+            if(p.successful){
+                presence = p.presence;
+                qdata.systemId = presence.systemId;
+                qdata.token = presence.token;
+                qdata.stub = presence.stub;
+                qdata.login = presence.login;
+                //wsWorker = new Worker('/resource/tarantula.web.socket.source.js');//move to login
+                //wsWorker.onmessage = _onmessage;
+                //wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});
+                _parse(p,function(v){});
+                callback({successful:true});
+            }else{
+                callback(p);
+            }
+        }
+    };
+    aj.open("POST","/user/action",true);
+    aj.setRequestHeader('Accept','application/json');
+    aj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    aj.setRequestHeader('Tarantula-tag','index/user');
+    aj.setRequestHeader('Tarantula-magic-key',payload.login);
+    aj.setRequestHeader('Tarantula-action','onResetPassword');
+    aj.setRequestHeader('Tarantula-payload-size',_ps.length);  
+    aj.send(_ps);                
+  };
   let _connect = function(){
     let payload = {serviceTag:'presence/lobby',command:'onTicket'};
     _service(payload,function(resp){
@@ -300,11 +335,12 @@ var TARA_API = (function(){
       onUpload : _upload,
       onRegister : _subscribe,
       onLogin : _login,
+      onResetCode : _resetCode,
       onToken : _token,
-      onPresence : _presence,
+      onResetPassword : _resetPassword,
+      onLogout : _logout,
       onService : _service,
       onInstance : _instance,
-      onLogout : _logout,
       onMessage: _addMessageListener,
       send: _sendMessage,
       connect :_connect,

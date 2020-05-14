@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -562,7 +563,17 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         icp.remove(serverId.getBytes());
     }
     //end of dedicated server methods
-
+    public String resetCode(String key){
+        ClusterProvider icp = this.tarantulaContext.integrationCluster();
+        String code = UUID.randomUUID().toString();
+        icp.set(code.getBytes(),key.getBytes());
+        return code;
+    }
+    public String checkCode(String resetCode){
+        ClusterProvider icp = this.tarantulaContext.integrationCluster();
+        byte[] ret = icp.remove(resetCode.getBytes());
+        return (ret!=null?new String(ret):"");
+    }
     public PostOffice registerPostOffice(){
         return new PostOfficeSession();
     }
@@ -580,6 +591,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
         public OnTopic onTopic(){
             return (label,data)-> pushRegistry.forEach((k,v)-> v.write(data,label));
+        }
+        public OnSMS onSMS(){
+            return ((emailAddress, data) ->Email.send(emailAddress,data));
+        }
+        public OnEmail onEmail(){
+            return ((emailAddress, data) ->Email.send(emailAddress,data));
         }
 
         public OnTag onTag(String tag){

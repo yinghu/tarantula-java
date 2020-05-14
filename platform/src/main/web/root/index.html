@@ -18,7 +18,7 @@
     <div>
         <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-100">
             <div class="w3-display-topright w3-padding">
-                <span id="tx-menu-open"><i class="fa fa-bars" style="font-size:24px"></i></span>
+                <span id="tx-menu-open"><i class="fa fa-sign-in" style="font-size:24px"></i></span>
                 <!-- TO DO popup menu 100% width-->            
             </div>
             <div class="w3-display-topleft w3-padding">
@@ -199,16 +199,8 @@
                     tx_view({viewId:'dashboard',containerId:'#tx-dash-board'});
                 }
             }
-            document.querySelector('#tx-sign-up').onclick = ()=>{
-                if(TARA_API.query().systemId){
-                    tx_oauth_sign_out();
-                    TARA_API.onLogout((resp)=>{
-                        document.querySelector('#tx-sign-up').innerHTML="SIGN ON"; 
-                    });        
-                }
-                else{
-                    tx_view({viewId:'sign.up',containerId:'#tx-popup'});
-                }
+            document.querySelector('#tx-sign-up').onclick = ()=>{    
+                tx_view({viewId:'sign.up',containerId:'#tx-popup'});  
             }
         }
         function tx_view(setup){//set up format {viewId:"viewID",containerId:"#m1"}
@@ -250,7 +242,7 @@
             let m3 = document.querySelector('#tx-popup');
             m3.innerHTML="";
             m3.style.display = 'none'; 
-            document.querySelector("#tx-sign-up").innerHTML="SIGN OUT";
+            //document.querySelector("#tx-sign-up").innerHTML="SIGN OUT";
             tx_view({viewId:'dashboard',containerId:'#tx-dash-board'});
         }
         function tx_on_google_auth(){

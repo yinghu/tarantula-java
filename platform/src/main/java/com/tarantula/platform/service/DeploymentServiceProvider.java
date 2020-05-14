@@ -60,6 +60,8 @@ public interface DeploymentServiceProvider extends ServiceProvider {
 
     //message publisher
     PostOffice registerPostOffice();
+    String resetCode(String key);
+    String checkCode(String resetCode);
 
     //Module application operation API
     String upload(InputStream inputStream,String fname) throws Exception;

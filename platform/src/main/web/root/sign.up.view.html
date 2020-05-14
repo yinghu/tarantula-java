@@ -1,10 +1,10 @@
 <div class="w3-modal-content">
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
         <div class="w3-display-topright w3-padding">
-            <span id="tx-sign-on-close" class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12">CLOSE</span>            
+            <span id="tx-sign-on-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
         </div>
         <div class="w3-display-topleft w3-padding">
-            <span><i class="fa fa-cubes" style="font-size:24px"></i></span>
+            <span><i class="fa fa-user" style="font-size:24px"></i></span>
             <span class="tx-margin-left-8 tx-text-24">SIGN ON</span>
         </div>
     </div>
@@ -16,7 +16,7 @@
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-sign-on-message"></div> 
     <div class="w3-container w3-border-bottom w3-border-red">
         <div class="w3-panel">
-            <input id ="tx-email-address" class="w3-input w3-round w3-border" type="email" placeholder='email address'/>
+            <input id ="tx-user-name" class="w3-input w3-round w3-border" type="email" placeholder='user name'/>
         </div>
         <div class="w3-panel">    
              <input id ="tx-password" class="w3-input w3-round w3-border" type="password" placeholder='password'/>
@@ -30,7 +30,7 @@
 <script>
     tx_on_google_auth();
     document.querySelector("#tx-sign-on").onclick=()=>{
-        let _n = document.querySelector('#tx-email-address').value;
+        let _n = document.querySelector('#tx-user-name').value;
         let _p = document.querySelector('#tx-password').value;
         TARA_API.onRegister({login:_n,password:_p},function(resp){
             if(resp.successful){

@@ -5,10 +5,10 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 
-public class EMailer {
+public class Email {
 
     public static void main(String[] args){
-        EMailer.send("yinghu_lu@hotmail.com","validation code: 4567");
+        Email.send("yinghu_lu@hotmail.com","validation code: 4567");
     }
     public static boolean send(String to,String text){
 

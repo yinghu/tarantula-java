@@ -25,7 +25,7 @@ public class UserEventHandler implements RequestHandler {
     private String bucket;
     private GsonBuilder builder;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
-
+    private DeploymentServiceProvider deploymentServiceProvider;
     public UserEventHandler(){
 
     }
@@ -36,6 +36,7 @@ public class UserEventHandler implements RequestHandler {
         try{
             String path = onExchange.path();
             String magicKey = onExchange.header(Session.TARANTULA_MAGIC_KEY);
+            String name = onExchange.header(Session.TARANTULA_NAME);
             String tag = onExchange.header(Session.TARANTULA_TAG);
             String action = onExchange.header(Session.TARANTULA_ACTION);
             String typeId = onExchange.header(Session.TARANTULA_TYPE_ID);
@@ -117,6 +118,26 @@ public class UserEventHandler implements RequestHandler {
                     }
                     this.eventService.publish(event);
                 }
+                else if(action.equals("onResetCode")){
+                    String code = this.deploymentServiceProvider.resetCode(name);
+                    boolean suc = this.deploymentServiceProvider.registerPostOffice().onEmail().send(magicKey,code);
+                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onResetCode","check email",suc)).getBytes();
+                    _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"onResetCode",true));
+                }
+                else if(action.equals("onResetPassword")){
+                    AccessIndex acc = accessIndexService.get(magicKey);
+                    if(acc!=null){
+                        event.systemId(acc.distributionKey());
+                        RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
+                        event.destination(_routingKey.route());
+                        event.routingNumber(_routingKey.routingNumber());
+                        this.eventService.publish(event);
+                    }else{
+                        //send login failed back
+                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onResetPassword","wrong login/password combination",false)).getBytes();
+                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                    }
+                }
                 else{
                     throw new RuntimeException("["+action+"] not supported");
                 }
@@ -168,6 +189,7 @@ public class UserEventHandler implements RequestHandler {
     }
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
+        this.deploymentServiceProvider = tcx.deploymentServiceProvider();
         this.accessIndexService = tcx.accessIndexService();
         this.bucket = tcx.bucket();
     }
