@@ -21,19 +21,7 @@
                 <configuration-name>user</configuration-name>
                 <response-label>user</response-label>
             </application>
-            <application>
-                <type-id>index</type-id>
-                <subtype-id>index-lobby</subtype-id>
-                <name>Index</name>
-                <type>application</type>
-                <category>index</category>
-                <singleton>true</singleton>
-                <tag>index/lobby</tag>
-                <description>Index Service</description>
-                <configuration-name>index</configuration-name>
-                <class-name>com.tarantula.platform.presence.IndexApplication</class-name>
-                <response-label>index</response-label>
-            </application>
+
         </application-list>
         <configuration-list>
             <configuration tag="user" priority="10">
@@ -47,5 +35,25 @@
                 </user>
             </configuration>
         </configuration-list>
+        <view-list>
+            <view type="dashboard">
+                <property name="moduleResourceFile">dashboard.view.html</property>
+            </view>
+            <view type="sign.in">
+                <property name="moduleResourceFile">sign.in.view.html</property>
+            </view>
+            <view type="sign.up">
+                <property name="moduleResourceFile">sign.up.view.html</property>
+            </view>
+            <view type="password.reset">
+                <property name="moduleResourceFile">password.reset.view.html</property>
+            </view>
+            <view type="pending.request">
+                <property name="moduleResourceFile">pending.request.view.html</property>
+            </view>
+            <view type="invalid.request">
+                <property name="moduleResourceFile">invalid.request.view.html</property>
+            </view>
+        </view-list>
     </lobby-context>
 </tarantula>
