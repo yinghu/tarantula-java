@@ -59,58 +59,57 @@
             },
     };
     function _tx_load(){
-       
-            document.querySelector("#tx-shopping-commit").onclick = function(e){
-                TARA_API.query().packId = this.getAttribute('oid');
-                TARA_API.query().amount = parseInt(this.getAttribute('amount'));
-                TARA_API.query().name =   this.getAttribute('pname');
-                TARA_API.query().credits = this.getAttribute('pcredits'); 
-                TARA_API.query().price = this.getAttribute('pprice');
-                document.querySelector("#tx_checkout_error").innerHTML = "";
-                document.querySelector("#tx_checkout_error").style.display = "none";
-                document.querySelector("#tx_checkout_message").innerHTML = "";
-                document.querySelector("#tx_checkout_message").style.display = "none";
-                _tx_checkout();
-            };
+        document.querySelector("#tx-shopping-commit").onclick = function(e){
+            //TARA_API.query().packId = this.getAttribute('oid');
+            //TARA_API.query().amount = parseInt(this.getAttribute('amount'));
+            //TARA_API.query().name =   this.getAttribute('pname');
+            //TARA_API.query().credits = this.getAttribute('pcredits'); 
+            //TARA_API.query().price = this.getAttribute('pprice');
+            document.querySelector("#tx_checkout_error").innerHTML = "";
+            document.querySelector("#tx_checkout_error").style.display = "none";
+            document.querySelector("#tx_checkout_message").innerHTML = "";
+            document.querySelector("#tx_checkout_message").style.display = "none";
+            _tx_checkout();
+        };
         document.querySelector('#tx_checkout_cancel').onclick = function(){document.querySelector('#tx_checkout').style.display='none';};
     }
     function _tx_checkout(){
-        document.querySelector("#tx_checkout_name").innerHTML = TARA_API.query().name; 
-        document.querySelector("#tx_checkout_price").innerHTML = TARA_API.query().price; 
+        document.querySelector("#tx_checkout_name").innerHTML = 'membership';//TARA_API.query().name; 
+        document.querySelector("#tx_checkout_price").innerHTML = '$120.00';//TARA_API.query().price; 
         document.querySelector("#tx_checkout_message").innerHTML = 'pay via stripe.com'; 
         document.querySelector("#tx_checkout_message").style.display = "block";
         document.querySelector("#tx_checkout").style.display = 'block';    
         try{
-        var stripe = Stripe(TARA_API.query().stripeClientId);
-        var elements = stripe.elements();
-        var card = elements.create('cardNumber',{style:elementStyles,placeholder:'card number'});
-        var expiry = elements.create('cardExpiry',{style:elementStyles,placeholder:'expiry month/year'});
-        var cvc = elements.create('cardCvc',{style:elementStyles,placeholder:'verification code'});
-        card.mount('#tx_card_number');
-        expiry.mount('#tx_card_expiry');
-        cvc.mount('#tx_card_cvc');
-        document.querySelector('#tx_checkout_pay').onclick = function(){
-            stripe.createToken(card).then(function(ret){
-                console.log(ret);
-                if(ret.token){
-                    document.querySelector("#tx_checkout_message").innerHTML = "You card validated via stripe.com"; 
-                    document.querySelector("#tx_checkout_message").style.display = "block";
-                    document.querySelector("#tx_checkout_error").style.display = "none";
-                    tx_shopping_commit(ret.token);
-                }
-                else if(ret.error){
-                    //display error to player
-                    document.querySelector("#tx_checkout_error").innerHTML = ret.error.message; 
-                    document.querySelector("#tx_checkout_error").style.display = "block";
-                    document.querySelector("#tx_checkout_message").style.display = "none";
-                }
-                else{
-                    document.querySelector("#tx_checkout_error").innerHTML = "unknown error, please try later";
-                    document.querySelector("#tx_checkout_error").style.display = "block";
-                    document.querySelector("#tx_checkout_message").style.display = "none";
-                }
-            });    
-        };
+            var stripe = Stripe(TARA_API.query().stripeClientId);
+            var elements = stripe.elements();
+            var card = elements.create('cardNumber',{style:elementStyles,placeholder:'card number'});
+            var expiry = elements.create('cardExpiry',{style:elementStyles,placeholder:'expiry month/year'});
+            var cvc = elements.create('cardCvc',{style:elementStyles,placeholder:'verification code'});
+            card.mount('#tx_card_number');
+            expiry.mount('#tx_card_expiry');
+            cvc.mount('#tx_card_cvc');
+            document.querySelector('#tx_checkout_pay').onclick = function(){
+                stripe.createToken(card).then(function(ret){
+                    //console.log(ret);
+                    if(ret.token){
+                        document.querySelector("#tx_checkout_message").innerHTML = "You card validated via stripe.com"; 
+                        document.querySelector("#tx_checkout_message").style.display = "block";
+                        document.querySelector("#tx_checkout_error").style.display = "none";
+                        tx_shopping_commit(ret.token);
+                    }
+                    else if(ret.error){
+                        //display error to player
+                        document.querySelector("#tx_checkout_error").innerHTML = ret.error.message; 
+                        document.querySelector("#tx_checkout_error").style.display = "block";
+                        document.querySelector("#tx_checkout_message").style.display = "none";
+                    }
+                    else{
+                        document.querySelector("#tx_checkout_error").innerHTML = "unknown error, please try later";
+                        document.querySelector("#tx_checkout_error").style.display = "block";
+                        document.querySelector("#tx_checkout_message").style.display = "none";
+                    }
+                });    
+            };
         }catch(err){
            document.querySelector("#tx_checkout_error").innerHTML = err;
            document.querySelector("#tx_checkout_error").style.display = "block"; 
@@ -118,14 +117,14 @@
     }
     function tx_shopping_commit(token){
         let _mcommit ={serviceTag:'marketplace',command:'onCommit',checkoutId:TARA_API.query().packId,orderId:token.id};  
-        TARA_API.onService(_mcommit,function(resp){
+        //TARA_API.onService(_mcommit,function(resp){
             //popup web payment integration page    
-            console.log(resp);
-            if(resp.successful){
-                document.querySelector("#tx_checkout_message").innerHTML = "You purchase item added to your account."; 
-                setTimeout(function(){document.querySelector("#tx_checkout").style.display = 'none'},2000);
-            }
-        });
+            console.log(token);
+            //if(resp.successful){
+                //document.querySelector("#tx_checkout_message").innerHTML = "You purchase item added to your account."; 
+                //setTimeout(function(){document.querySelector("#tx_checkout").style.display = 'none'},2000);
+            //}
+        //});
     }
     
     function tx_close_shopping(){
