@@ -50,6 +50,9 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int CONNECTION_STATE_EVENT_CID = 21;
     public static final int DISABLE_SERVER_PUSH_EVENT_CID = 22;
+
+    public static final int ON_VIEW_EVENT_CID = 23;
+
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
 
@@ -138,6 +141,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case CONNECTION_STATE_EVENT_CID:
                 _ins = new ConnectionStateEvent();
+                break;
+            case ON_VIEW_EVENT_CID:
+                _ins = new OnViewEvent();
                 break;
             case ON_VIEW_CID:
                 _ins = new OnViewTrack();

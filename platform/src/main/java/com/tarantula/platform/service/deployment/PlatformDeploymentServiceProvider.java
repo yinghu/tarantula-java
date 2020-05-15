@@ -372,19 +372,23 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             if(ot instanceof OnView){
                 OnView ov = (OnView)ot;
-                log.warn(ov.toString());
                 this.vListeners.forEach((cl)->{
                     cl.onView(ov);
                 });
             }
             if(!ot.disabled()){
                 vMap.put(new String(mse.key),ot);
-                log.warn(new String(mse.key)+" added");
             }
             else{
                 vMap.remove(new String(mse.key));
-                log.warn(new String(mse.key)+" removed");
             }
+        }
+        else if(event instanceof OnViewEvent){
+           OnView onView = (OnView)((OnViewEvent) event).portable();
+           vMap.put(onView.viewId(),onView);
+           this.vListeners.forEach((cl)->{
+               cl.onView(onView);
+           });
         }
         else if(event instanceof MapStoreVotingEvent){
             if(!event.trackId().equals(registerKey)){
@@ -448,7 +452,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         RecoverableMetadata mt = new RecoverableMetadata(onView.getFactoryId(),onView.getClassId());
         byte[] k = onView.key().asString()!=null?onView.key().asString().getBytes():"".getBytes();
         MapStoreSyncEvent mse = new MapStoreSyncEvent(this.eventTopic,this.localTopic,k,SystemUtil.toJson(onView.toMap()),mt);
-        this.integrationEventService.publish(mse);
+        OnViewEvent onViewEvent = new OnViewEvent(this.eventTopic,this.localTopic,onView);
+        this.integrationEventService.publish(onViewEvent);
     }
     public void registerOnViewListener(OnView.Listener onViewListener){
         vMap.forEach((k,v)->{
