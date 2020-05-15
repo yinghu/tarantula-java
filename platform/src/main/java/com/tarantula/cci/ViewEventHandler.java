@@ -1,12 +1,17 @@
 package com.tarantula.cci;
 
+import com.google.gson.GsonBuilder;
 import com.tarantula.Event;
 import com.tarantula.OnView;
+import com.tarantula.Session;
 import com.tarantula.TarantulaLogger;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.ServiceContext;
+import com.tarantula.platform.util.OnViewSerializer;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ViewEventHandler implements RequestHandler, OnView.Listener {
@@ -16,20 +21,26 @@ public class ViewEventHandler implements RequestHandler, OnView.Listener {
 
     private DeploymentServiceProvider deploymentServiceProvider;
 
+    private ConcurrentHashMap<String,OnView> _vMap;
+    private GsonBuilder builder;
     public ViewEventHandler(){
     }
     public String name(){
         return "/view";
     }
     public void onRequest(OnExchange exchange){
-        String path = exchange.path();
-        //load js API in resources/web, public access
-        byte[] _load = this.deploymentServiceProvider.resource(path.substring(1),null);
-        exchange.onEvent(new ResponsiveEvent("","",_load,0,"text/javascript","",true));
+        String viewId = exchange.header(Session.TARANTULA_VIEW_ID);
+        log.warn("FIND->"+viewId);
+        OnView onView = _vMap.get(viewId);
+        byte[] ret = this.builder.create().toJson(onView).getBytes();
+        exchange.onEvent(new ResponsiveEvent("","",ret,0,"application/json","",true));
     }
     @Override
     public void start() throws Exception {
-        log.info("Resource content handler started");
+        log.info("View content handler started");
+        this.builder = new GsonBuilder();
+        this.builder.registerTypeAdapter(OnView.class,new OnViewSerializer());
+        this._vMap = new ConcurrentHashMap<>();
         this.deploymentServiceProvider.registerOnViewListener(this);
     }
 
@@ -51,5 +62,6 @@ public class ViewEventHandler implements RequestHandler, OnView.Listener {
     @Override
     public void onView(OnView onView) {
         log.warn(onView.viewId()+">>"+onView.toString());
+        _vMap.put(onView.viewId(),onView);
     }
 }

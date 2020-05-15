@@ -57,14 +57,14 @@ var TARA_API = (function(){
         aj.onreadystatechange = function(){
             if(aj.status === 200 && aj.readyState === 4){
                 let vp = JSON.parse(aj.responseText);
-                vmap.set(viewId,vp.view);
-                callback(vp.view);
+                vmap.set(viewId,vp);
+                callback(vp);
             }
         };
-        aj.open("GET","/user/view",true);
+        aj.open("GET","/view",true);
         aj.setRequestHeader('Accept','application/json');
-        aj.setRequestHeader('View-id',viewId);
-        aj.setRequestHeader('Tarantula-tag','index/lobby');
+        aj.setRequestHeader('Tarantula-view-id',viewId);
+        //aj.setRequestHeader('Tarantula-tag','index/lobby');
         aj.send();
     }
     else{

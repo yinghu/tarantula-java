@@ -17,7 +17,6 @@ public class PortableRegistry extends AbstractRecoverableListener{
     public static final int ACCESS_INDEX_CID = 10;
     public static final int APPLICATION_CONFIGURATION_CID = 11; //DEPLOY OBJECT
     public static final int ON_LOBBY_CID = 12;
-    public static final int ON_VIEW_OID = 13; //DEPLOY OBJECT
 
     public static final int NODE_CID = 15;
 
@@ -44,6 +43,7 @@ public class PortableRegistry extends AbstractRecoverableListener{
 
     public static final int BATCH_CID = PortableEventRegistry.BATCH_CID;
 
+    public static final int ON_VIEW_OID = PortableEventRegistry.ON_VIEW_CID;
 
 
     public Recoverable create(int cid) {
