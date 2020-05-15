@@ -9,7 +9,7 @@
         <description>Tarantula Presence Service</description>
         <deploy-priority>400</deploy-priority>
         <application-list>
-            <application><!--could be exposing on login successful -->
+            <application>
                 <type-id>presence</type-id>
                 <subtype-id>presence-lobby</subtype-id>
                 <name>Presence</name>
@@ -20,7 +20,11 @@
                 <class-name>com.tarantula.platform.presence.PresenceApplication</class-name>
                 <response-label>presence</response-label>
             </application>
-
         </application-list>
+        <view-list>
+            <view type="add.email">
+                <property name="moduleResourceFile">admin/add.email.view.html</property>
+            </view>
+        </view-list>
     </lobby-context>
 </tarantula>
