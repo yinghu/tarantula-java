@@ -1,10 +1,6 @@
 package com.tarantula.platform;
 
-import com.tarantula.Property;
 import com.tarantula.Response;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Updated by yinghu on 9/6/2019
@@ -74,22 +70,11 @@ public class ResponseHeader extends RecoverableObject implements Response {
         this.successful = successful;
     }
 
-    public void property(String header,String value){
+    public void property(String header,Object value){
         this.properties.put(header,value);
     }
-    public String property(String header){
-        return (String)this.properties.get(header);
-    }
-
-
-    public List<Property> list() {
-        List<Property> hm = new ArrayList<>();
-        this.properties.forEach((String s,Object o)->{
-            if(o instanceof String){
-                hm.add(new DistributedProperty(s,(String)o));
-            }
-        });
-        return hm;
+    public Object property(String header){
+        return this.properties.get(header);
     }
 
 }

@@ -26,60 +26,57 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
                 JsonPrimitive jo = ve.getAsJsonPrimitive();
                 if(k.equals("systemId")){
                     access.systemId(jo.getAsString());
-                    access.toMap().put(k,jo.getAsString());
+                    access.property(k,jo.getAsString());
                 }
                 else if(k.equals("stub")){
                     access.stub(jo.getAsInt());
-                    access.toMap().put(k,jo.getAsInt());
+                    access.property(k,jo.getAsInt());
                 }
                 else if(k.equals("applicationId")){
                     access.applicationId(jo.getAsString());
-                    access.toMap().put(k,jo.getAsString());
+                    access.property(k,jo.getAsString());
                 }
                 else if(k.equals("name")){
                     access.name(jo.getAsString());
-                    access.toMap().put(k,jo.getAsString());
+                    access.property(k,jo.getAsString());
                 }
                 else if(k.equals("accessMode")){
                     access.accessMode(jo.getAsInt());
-                    access.toMap().put(k,jo.getAsInt());
+                    access.property(k,jo.getAsInt());
                 }
                 else if(k.equals("instanceId")){
                     access.instanceId(jo.getAsString());
-                    access.toMap().put(k,jo.getAsString());
+                    access.property(k,jo.getAsString());
                 }
                 else if(k.equals("accessKey")){
                     access.accessKey(jo.getAsString());
-                    access.toMap().put(k,jo.getAsString());
+                    access.property(k,jo.getAsString());
                 }
                 else if(k.equals("accessId")){
                     access.accessId(jo.getAsString());
-                    access.toMap().put(k,jo.getAsString());
+                    access.property(k,jo.getAsString());
                 }
                 else if(k.equals("typeId")){
                     access.typeId(jo.getAsString());
-                    access.toMap().put(k,jo.getAsString());
+                    access.property(k,jo.getAsString());
                 }
                 else if(k.equals("subtypeId")){
                     access.subtypeId(jo.getAsString());
-                    access.toMap().put(k,jo.getAsString());
+                    access.property(k,jo.getAsString());
                 }
                 else if(k.equals("oid")){
                     access.oid(jo.getAsString());
-                    access.toMap().put(k,jo.getAsString());
+                    access.property(k,jo.getAsString());
                 }
                 else if(k.equals("balance")){
                     access.entryCost(jo.getAsDouble());
-                    access.toMap().put(k,jo.getAsDouble());
                 }
                 else if(k.equals("timestamp")){
                     access.timestamp(jo.getAsLong());
-                    access.toMap().put(k,jo.getAsLong());
                 }
                 else{
                     if(!jo.getAsString().trim().equals("")){
                         access.property(k,jo.getAsString());
-                        access.toMap().put(k,jo.getAsString());
                     }
                 }
             }
@@ -90,7 +87,6 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
                     String hk = jo.get("name").getAsString();
                     String hv = jo.get("value").getAsString();
                     access.property(hk,hv);
-                    access.toMap().put(hk,hv);
                     _setProperty(access,hk,hv);
                 });
             }

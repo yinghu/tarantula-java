@@ -38,13 +38,6 @@ public class ResponseDeserializer implements JsonDeserializer<Response> {
         if(jo.has("disabled")){
             response.disabled(jo.get("disabled").getAsBoolean());
         }
-        if(jo.has("typeId")){
-            response.property("typeId",jo.get("typeId").getAsString());
-        }
-        if(jo.has("applicationId")){
-            response.property("applicationId",jo.get("applicationId").getAsString());
-        }
-
         return this.response;
     }
 }

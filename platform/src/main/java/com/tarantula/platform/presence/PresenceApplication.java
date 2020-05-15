@@ -47,6 +47,18 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             }
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
         }
+        else if(session.action().equals("onAddEmail")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            User auser = new User();
+            auser.distributionKey(session.systemId());
+            if(userDs.load(auser)){
+                auser.emailAddress((String)onAccess.property("emailAddress"));
+                userDs.update(auser);
+                session.write(this.builder.create().toJson(new ResponseHeader("","successful",true)).getBytes(),descriptor.responseLabel());
+            }else{
+                session.write(this.builder.create().toJson(new ResponseHeader("","failed",false)).getBytes(),descriptor.responseLabel());
+            }
+        }
         else if(session.action().equals("onPlay")){
               OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
               Presence presence = this.context.presence(session.systemId());

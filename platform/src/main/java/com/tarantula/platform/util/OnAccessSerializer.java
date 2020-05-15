@@ -9,7 +9,7 @@ import com.tarantula.OnAccess;
 import java.lang.reflect.Type;
 
 /**
- * Updated by yinghu lu on 9/2/2019
+ * Updated by yinghu lu on 5/15/2020
  */
 public class OnAccessSerializer implements JsonSerializer<OnAccess> {
 
@@ -21,7 +21,6 @@ public class OnAccessSerializer implements JsonSerializer<OnAccess> {
         jo.addProperty("oid",access.oid());
         jo.addProperty("applicationId",access.applicationId());
         jo.addProperty("accessMode",access.accessMode());
-        access.list().forEach(p-> jo.addProperty(p.name(),p.value()));
         return jo;
     }
 }

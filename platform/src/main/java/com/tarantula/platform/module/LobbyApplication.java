@@ -46,7 +46,7 @@ public class LobbyApplication extends TarantulaApplicationHeader implements OnIn
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onList")){ //return available instance list
-            int sz = Integer.parseInt(ex.property("size"));
+            int sz = Integer.parseInt((String)ex.property("size"));
             LobbyContext ic = new LobbyContext(session.action());
             ArrayList<InstanceRegistry> alist = new ArrayList<>();
             rMap.forEach((k,v)->{

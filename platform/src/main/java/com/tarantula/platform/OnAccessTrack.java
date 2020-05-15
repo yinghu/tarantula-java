@@ -1,14 +1,12 @@
 package com.tarantula.platform;
 
 import com.tarantula.OnAccess;
-import com.tarantula.Property;
 import com.tarantula.platform.presence.UserPortableRegistry;
 import com.tarantula.platform.util.SystemUtil;
-import java.util.ArrayList;
-import java.util.List;
+
 
 /**
- * Updated by yinghu on 8/23/19.
+ * Updated by yinghu on 5/15/2020
  */
 public class OnAccessTrack extends OnApplicationHeader implements OnAccess {
 
@@ -29,12 +27,6 @@ public class OnAccessTrack extends OnApplicationHeader implements OnAccess {
         this.accessId = accessId;
     }
 
-    public void property(String header,String value){
-        this.properties.put(header,value);
-    }
-    public String property(String header){
-        return (String)this.properties.get(header);
-    }
     public byte[] payload() {
         return this.payload;
     }
@@ -43,15 +35,7 @@ public class OnAccessTrack extends OnApplicationHeader implements OnAccess {
         this.payload = payload;
     }
 
-    public List<Property> list() {
-        List<Property> hm = new ArrayList<>();
-        this.properties.forEach((String s,Object o)->{
-            if(o instanceof String){
-                hm.add(new DistributedProperty(s,(String)o));
-            }
-        });
-        return hm;
-    }
+
     public int getFactoryId() {
         return UserPortableRegistry.OID;
     }

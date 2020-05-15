@@ -18,13 +18,7 @@ public class ResponseSerializer implements JsonSerializer<Response> {
         jo.addProperty("command",response.command());
         jo.addProperty("label",response.label());
         jo.addProperty("message",response.message());
-        jo.addProperty("code",response.code());
-        //jo.addProperty("timestamp",response.timestamp());//round trip stamp from client
-        //jo.addProperty("sequence",response.sequence());
         jo.addProperty("successful",response.successful());
-        response.list().forEach(p->{
-            jo.addProperty(p.name(),p.value());
-        });
         return jo;
     }
 }

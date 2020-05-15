@@ -1,9 +1,9 @@
 package com.tarantula;
 
 /**
- * Updated by yinghu on 7/3/2018.
+ * Updated by yinghu on 5/15/2020
  */
-public interface OnAccess extends OnApplication, OnProperty {
+public interface OnAccess extends OnApplication {
 
     String accessKey();
     void accessKey(String accessKey);
@@ -12,4 +12,7 @@ public interface OnAccess extends OnApplication, OnProperty {
 
     byte[] payload();
     void payload(byte[] payload);
+
+    Object property(String name);
+    void property(String name,Object value);
 }
