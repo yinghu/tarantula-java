@@ -138,25 +138,18 @@ public class UserEventHandler implements RequestHandler {
                         _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
                     }
                 }
+                else if(action.equals("onIndex")){
+                    //RoutingKey routingKey = eventService.routingKey((this.bucket+"/"+sid),tag);
+                    //IndexEvent indexEvent = new IndexEvent(this.serverTopic,sid);
+                    //indexEvent.destination(routingKey.route());
+                    //indexEvent.action("onIndex");
+                    //indexEvent.trackId(typeId);
+                    event.trackId(typeId);
+                    this.eventService.publish(event);
+                }
                 else{
                     throw new RuntimeException("["+action+"] not supported");
                 }
-            }
-            else if(path.equals("/user/index")){
-                RoutingKey routingKey = eventService.routingKey((this.bucket+"/"+sid),tag);
-                IndexEvent indexEvent = new IndexEvent(this.serverTopic,sid);
-                indexEvent.destination(routingKey.route());
-                indexEvent.action("index");
-                indexEvent.trackId(typeId);
-                this.eventService.publish(indexEvent);
-            }
-            else if(path.equals("/user/view")){
-                RoutingKey routingKey = eventService.routingKey((this.bucket+"/"+sid),tag);
-                IndexEvent indexEvent = new IndexEvent(this.serverTopic,sid);
-                indexEvent.destination(routingKey.route());
-                indexEvent.action("view");
-                indexEvent.trackId(onExchange.header(Session.TARANTULA_VIEW_ID));
-                this.eventService.publish(indexEvent);
             }
         }catch (Exception ex){
             ex.printStackTrace();

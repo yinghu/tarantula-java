@@ -2,7 +2,6 @@ package com.tarantula.platform.presence;
 
 import com.tarantula.*;
 import com.tarantula.platform.*;
-import com.tarantula.platform.event.IndexEvent;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.OnLobby;
 import com.tarantula.platform.service.TokenValidatorProvider;
@@ -15,27 +14,18 @@ import java.util.concurrent.CopyOnWriteArraySet;
 /**
  * Updated by yinghu on 8/24/19
  */
-public class IndexApplication extends TarantulaApplicationHeader implements OnView.Listener, OnLobby.Listener {
+public class IndexApplication extends TarantulaApplicationHeader implements OnLobby.Listener {
 
-    private ConcurrentHashMap<String,OnView> _viewList = new ConcurrentHashMap<>();
     private CopyOnWriteArraySet<String> _lobbyList = new CopyOnWriteArraySet<>();
     private List<Access.Role> roleList;
     private TokenValidatorProvider tokenValidatorProvider;
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
-        if(session.action().equals("view")){
-            IndexEvent ie = (IndexEvent)session;
-            PresenceContext ic = new PresenceContext("view");
-            OnView view = this._viewList.get(ie.trackId());
-            ic.view = view;
-            session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
-        }
-        else if(session.action().equals("index")){
+       if(session.action().equals("index")){
             PresenceContext ic = new PresenceContext("index");
             ic.googleClientId = this.tokenValidatorProvider.authVendor("google").clientId();
             ic.stripeClientId = this.tokenValidatorProvider.authVendor("stripe").clientId();
             String typeId = session.trackId();
-            //OnView view = this._viewList.get("index");
             ic.lobbyList = this.context.index();
             _lobbyList.forEach((n)->{
                 if(typeId!=null&&typeId.equals(n)){
@@ -45,7 +35,6 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
                     ic.lobbyList.add(this.context.lobby(n));
                 }
             });
-            //ic.view = view;
             ic.roleList = roleList;
             session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }
@@ -59,7 +48,6 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
         super.setup(context);
         builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        deploymentServiceProvider.registerOnViewListener(this);
         deploymentServiceProvider.registerOnLobbyListener(this);
         this.context.configuration().forEach((Configuration c)->{
             OnView v = new OnViewTrack();
@@ -71,25 +59,12 @@ public class IndexApplication extends TarantulaApplicationHeader implements OnVi
             v.moduleFile(c.property("moduleFile"));
             v.moduleName(c.property("moduleName"));
             v.moduleResourceFile(c.property("moduleResourceFile"));
-            //this.context.log("View Update-->>"+v.viewId(),OnLog.WARN);
-            _viewList.put(v.viewId(),v);
             deploymentServiceProvider.deploy(v);
         });
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.roleList = this.tokenValidatorProvider.list();
         this.context.log("Index application started on tag ["+this.descriptor.tag()+"]",OnLog.INFO);
     }
-    @Override
-    public void onView(OnView onView) {
-        //this.context.log("View Update-->>"+onView.viewId(),OnLog.WARN);
-        if(!onView.disabled()){
-            this._viewList.put(onView.viewId(),onView);
-        }
-        else{
-            this._lobbyList.remove(onView.viewId());
-        }
-    }
-
     @Override
     public void onLobby(OnLobby onLobby) {
         //context.log("Lobby Updated--->>"+onLobby.toString(),OnLog.WARN);

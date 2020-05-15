@@ -16,7 +16,6 @@ public class PresenceContext extends ResponseHeader {
     public List<Access.Role> roleList;
     public List<Lobby> lobbyList;
     public OnSession presence;
-    public OnView view;
     public String googleClientId;
     public String stripeClientId;
     public PresenceContext(){

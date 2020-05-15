@@ -4,16 +4,19 @@ import com.tarantula.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.OnLobby;
+import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Updated 5/14/2020
  */
-public class UserManagementApplication extends TarantulaApplicationHeader{
+public class UserManagementApplication extends TarantulaApplicationHeader  implements OnLobby.Listener{
 
     private String lobbyId;
     private boolean activated;
@@ -21,11 +24,16 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     private double initialBalance;
     private AccessIndexService accessIndexService;
     private DeploymentServiceProvider deploymentServiceProvider;
+
+    private CopyOnWriteArraySet<String> _lobbyList = new CopyOnWriteArraySet<>();
+    private List<Access.Role> roleList;
+    private TokenValidatorProvider tokenValidatorProvider;
+
+
     private boolean onApplication;
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        //this.cBuffer = new RingBuffer<>(new Connection[5]);
         Configuration configuration = this.context.configuration("setup");
         this.lobbyId = configuration.property("lobbyId");
         this.activated = Boolean.parseBoolean(configuration.property("activated"));
@@ -34,6 +42,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        deploymentServiceProvider.registerOnLobbyListener(this);
+        this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
+        this.roleList = this.tokenValidatorProvider.list();
         this.onApplication = this.deploymentServiceProvider.deploymentMode()== DeploymentServiceProvider.Mode.APPLICATION;
         String root = configuration.property("root");
         String pwd = configuration.property("password");
@@ -54,7 +65,24 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     @Override
     public void callback(Session session,byte[] payload) throws Exception {
         OnAccess acc = builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-        if(session.action().equals("onLogin")){
+        if(session.action().equals("onIndex")){
+            PresenceContext ic = new PresenceContext("onIndex");
+            ic.googleClientId = this.tokenValidatorProvider.authVendor("google").clientId();
+            ic.stripeClientId = this.tokenValidatorProvider.authVendor("stripe").clientId();
+            String typeId = session.trackId();
+            ic.lobbyList = this.context.index();
+            _lobbyList.forEach((n)->{
+                if(typeId!=null&&typeId.equals(n)){
+                    ic.lobbyList.add(this.context.lobby(n));
+                }
+                else if(typeId==null){
+                    ic.lobbyList.add(this.context.lobby(n));
+                }
+            });
+            ic.roleList = roleList;
+            session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
+        }
+        else if(session.action().equals("onLogin")){
             OnSession access = this.login(session.systemId(),acc.property("password"),session);
             onSession(access,session);
         }
@@ -178,7 +206,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     }
     private Access createLogin(OnAccess payload,String systemId,String roleName,boolean validated,String validator){
         DataStore ds = this.context.dataStore("user");
-        //this.context.log("User Create->"+payload.header("login")+"<>"+systemId,OnLog.INFO);
         Access acc = new User(payload.property("login"),validated,validator);
         acc.distributionKey(systemId);
         acc.password(validated?"":this.context.validator().hashPassword(payload.property("password")));
@@ -190,5 +217,15 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             this.context.dataStore("presence").create(px);
         }
         return acc;
+    }
+    @Override
+    public void onLobby(OnLobby onLobby) {
+        context.log("Lobby Updated--->>"+onLobby.toString(),OnLog.WARN);
+        if(!onLobby.closed()){
+            this._lobbyList.add(onLobby.typeId());
+        }
+        else{
+            this._lobbyList.remove(onLobby.typeId());
+        }
     }
 }

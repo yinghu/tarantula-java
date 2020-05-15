@@ -44,9 +44,6 @@ public class PresenceContextSerializer implements JsonSerializer<PresenceContext
             });
             pc.add("roleList",rlist);
         }
-        if(presenceContext.view!=null){
-            pc.add("view",new OnViewSerializer().serialize(presenceContext.view,type,jsonSerializationContext));
-        }
         if(presenceContext.googleClientId!=null){
             pc.addProperty("googleClientId",presenceContext.googleClientId);
         }
