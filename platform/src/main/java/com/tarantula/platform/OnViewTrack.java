@@ -1,13 +1,17 @@
 package com.tarantula.platform;
 
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.OnView;
-import com.tarantula.platform.service.cluster.PortableRegistry;
+import com.tarantula.platform.event.PortableEventRegistry;
+import java.io.IOException;
 import java.util.Map;
 
 /**
  * Updated by yinghu lu on 8/23/19.
  */
-public class OnViewTrack extends RecoverableObject implements OnView {
+public class OnViewTrack extends RecoverableObject implements OnView, Portable {
 
     protected String contentBaseUrl;
     protected String moduleFile;
@@ -98,12 +102,34 @@ public class OnViewTrack extends RecoverableObject implements OnView {
     }
     @Override
     public int getFactoryId() {
-        return PortableRegistry.OID;
+        return PortableEventRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PortableRegistry.ON_VIEW_OID;
+        return PortableEventRegistry.ON_VIEW_CID;
+    }
+
+    @Override
+    public void writePortable(PortableWriter portableWriter) throws IOException {
+        portableWriter.writeUTF("1",viewId);
+        portableWriter.writeUTF("2",flag);
+        portableWriter.writeUTF("3",this.contentBaseUrl);
+        portableWriter.writeUTF("4",this.icon);
+        portableWriter.writeUTF("5",this.moduleFile);
+        portableWriter.writeUTF("6",this.moduleName);
+        portableWriter.writeUTF("7",moduleResourceFile);
+    }
+
+    @Override
+    public void readPortable(PortableReader portableReader) throws IOException {
+        viewId = portableReader.readUTF("1");
+        flag = portableReader.readUTF("2");
+        contentBaseUrl = portableReader.readUTF("3");
+        icon = portableReader.readUTF("4");
+        moduleFile = portableReader.readUTF("5");
+        moduleName = portableReader.readUTF("6");
+        moduleResourceFile= portableReader.readUTF("7");
     }
 
     public String toString(){

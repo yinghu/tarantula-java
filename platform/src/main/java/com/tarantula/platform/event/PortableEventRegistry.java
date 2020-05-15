@@ -3,6 +3,7 @@ package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
 import com.tarantula.platform.DeploymentDescriptor;
+import com.tarantula.platform.OnViewTrack;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 
@@ -59,7 +60,7 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int BATCH_CID = 104;
 
-
+    public static final int ON_VIEW_CID = 105;
 
     public Portable create(int cid) {
         Portable _ins;
@@ -137,6 +138,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case CONNECTION_STATE_EVENT_CID:
                 _ins = new ConnectionStateEvent();
+                break;
+            case ON_VIEW_CID:
+                _ins = new OnViewTrack();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");
