@@ -6,6 +6,8 @@ public interface Account extends Access{
     void name(String name);
     int userCount();
     void userCount(int userCount);
+    int gameClusterCount();
+    void gameClusterCount(int userCount);
     boolean trial();
     void trial(boolean trial);
 

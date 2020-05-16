@@ -3,7 +3,7 @@ package com.tarantula.platform;
 import com.tarantula.Connection;
 
 /**
- * Updated by yinghu on 8/23/19.
+ * Updated by yinghu on 5/15/2020
  */
 public class OnApplicationHeader extends ResponseHeader{
 
@@ -24,7 +24,6 @@ public class OnApplicationHeader extends ResponseHeader{
     protected int stub;
 
     protected String ticket;
-    protected Connection connection;
 
     public double balance() {
         return this.balance;
@@ -118,12 +117,6 @@ public class OnApplicationHeader extends ResponseHeader{
 
     public int stub(){return this.stub;}
     public void stub(int stub){ this.stub = stub;}
-    public Connection connection(){
-        return this.connection;
-    }
-    public void connection(Connection connection){
-        this.connection = connection;
-    }
 
     public String ticket(){
         return this.ticket;

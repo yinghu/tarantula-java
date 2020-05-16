@@ -3,7 +3,7 @@ package com.tarantula;
 
 /**
  * Developer: YINGHU LU
- * Updated 8/14/19
+ * Updated 5/15/2020
  *
  * On Application represents an application state of the player
  */
@@ -39,9 +39,6 @@ public interface OnApplication extends Recoverable{
 
     String subtypeId();
     void subtypeId(String subtypeId);
-
-    Connection connection();
-    void connection(Connection connection);
 
     String ticket();
     void ticket(String ticket);

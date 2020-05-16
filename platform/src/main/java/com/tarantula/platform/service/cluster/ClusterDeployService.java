@@ -9,6 +9,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.event.MapStoreRecoveryEvent;
+import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.DeploymentServiceProvider;
@@ -568,7 +569,23 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
 
     public String createGameCluster(Descriptor gameCluster){
-        return "";
+        ResponseHeader responseHeader = new ResponseHeader();
+        try {
+            XMLParser parser = new XMLParser();
+            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-singleton.xml"));
+            for (LobbyConfiguration configuration : parser.configurations) {
+                log.warn(configuration.descriptor.typeId());
+                configuration.applications.forEach((a)->{
+                    log.warn(a.tag());
+                });
+            }
+            responseHeader.successful(true);
+            responseHeader.message(gameCluster.typeId()+" has created");
+        }catch (Exception ex){
+            responseHeader.successful(false);
+            responseHeader.message(ex.getMessage());
+        }
+        return this.builder.create().toJson(responseHeader);
     }
 
 }
