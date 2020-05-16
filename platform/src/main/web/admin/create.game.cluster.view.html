@@ -1,21 +1,35 @@
 <div class="w3-modal-content">
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
         <div class="w3-display-topright w3-padding">
-            <span id="tx-pending-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+            <span id="tx-create-game-cluster-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-sign-in" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">PENDING REQUEST</span>
+            <span class="tx-margin-left-8 tx-text-24">CREATE GAME CLUSTER</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-invalid-message">
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-create-game-cluster-message">
         <p>Your request is on pending implementation. It will be available soon</p>
+    </div>
+    <div class="w3-container w3-border-bottom w3-border-red">
+        <div class="w3-panel">
+            <input id ="tx-game-cluster-name" class="w3-input w3-round w3-border" type="text" placeholder='game cluster name'/>
+        </div>
+        <div class="w3-panel">
+            <span id="tx-create-game-cluster" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Create Game Cluster</span>     
+        </div>
     </div> 
 </div>
 <script>
-    document.querySelector('#tx-pending-close').onclick=()=>{
+    document.querySelector('#tx-create-game-cluster').onclick=()=>{
+        let _n = document.querySelector('#tx-game-cluster-name').value;
+        TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onCreateGameCluster',name:_n},(resp)=>{
+            document.querySelector('#tx-create-game-cluster-message').innerHTML = resp.message;
+        });       
+    };
+    document.querySelector('#tx-create-game-cluster-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       

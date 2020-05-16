@@ -83,7 +83,9 @@ public class PresenceApplication extends TarantulaApplicationHeader {
         }
         else if(session.action().equals("onCreateGameCluster")){
             //this.deploymentServiceProvider.createGameCluster()
-            session.write(payload,descriptor.responseLabel());
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            ResponseHeader resp = new ResponseHeader(session.action(),onAccess.name(),true);
+            session.write(this.builder.create().toJson(resp).getBytes(),descriptor.responseLabel());
         }
         /**
         Map<String, Object> chargeParams = new HashMap<>();
