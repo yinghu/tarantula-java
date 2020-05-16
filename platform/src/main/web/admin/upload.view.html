@@ -1,0 +1,63 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-upload-view-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-sign-in" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">UPLOAD VIEW</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-upload-view-message"></div> 
+    <div class="w3-container w3-text-teal w3-border-bottom w3-border-orange">
+        <div class="w3-panel">
+            <label for="tx-view-file" class="tx-file-upload w3-round">
+                <i class="fa fa-cloud-upload tx-margin-right-8"></i>View File
+            </label>
+            <input id ="tx-view-file" type="file"/>
+        </div>
+        <div class="w3-panel" id="tx-upload-view-form">  
+            <div id="tx-upload-view-cancel" class="w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Cancel</div>
+            <div id="tx-upload-view" class="w3-right w3-button w3-round w3-teal tx-margin-top-8 tx-margin-bottom-8">Upload View File</div>     
+        </div>
+    </div>
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector("#tx-upload-view-form").style.display = "none";   
+    document.querySelector("#tx-upload-view-message").innerHTML= 'Choose file to upload';
+    let _data;
+    let _fd;    
+    document.querySelector("#tx-view-file").onchange = function(e){
+        _fd = e.target.files[0];
+        document.querySelector("#tx-upload-view-message").innerHTML = _fd.name;
+        var reader = new FileReader();
+        reader.onload = (fe)=>{
+            _data = reader.result; 
+        };
+        reader.onloadend = (fe)=>{
+            console.log(_fd);
+            document.querySelector("#tx-upload-view-form").style.display = "block";
+        };
+        reader.readAsArrayBuffer(_fd); 
+    };    
+    document.querySelector("#tx-upload-view").onclick = function(){
+        TARA_API.onUpload(_data,_fd.name,(resp)=>{
+            document.querySelector("#tx-upload-view-message").innerHTML = resp.message;
+        });  
+    };
+    document.querySelector('#tx-upload-view-close').onclick=()=>{
+        let m3 = document.querySelector('#tx-popup');
+        m3.innerHTML="";
+        m3.style.display = 'none';       
+    };
+</script>

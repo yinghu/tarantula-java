@@ -255,9 +255,10 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
         for(Configuration c : conf.configurationMappings.values()){
             rlist.add(c);
+            this.deploymentServiceProvider.deploy(c);
         }
         configurations.put(conf.tag,rlist);
-    }
+ 	}
     public void configureViews(LobbyConfiguration conf){
  	    conf.views.forEach((v)->{
             this.deploymentServiceProvider.deploy(v);

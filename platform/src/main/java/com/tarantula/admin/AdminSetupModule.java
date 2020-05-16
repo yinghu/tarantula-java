@@ -13,7 +13,7 @@ import com.tarantula.platform.service.deployment.LobbyQuery;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
-public class AdminSetupModule implements Module {
+public class AdminSetupModule implements Module,Configuration.Listener {
 
     private ApplicationContext context;
     private DeploymentServiceProvider serviceProvider;
@@ -90,6 +90,12 @@ public class AdminSetupModule implements Module {
             this.context.log(ret,OnLog.INFO);
             session.write(this.builder.create().toJson(new AdminSetupObject("add module",label())).getBytes(),label());
         }
+        else if(session.action().equals("listViews")){
+
+        }
+        else if(session.action().equals("listConfigs")){
+
+        }
         else{
             session.write(payload,label());
         }
@@ -100,6 +106,7 @@ public class AdminSetupModule implements Module {
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        this.serviceProvider.registerConfigurationListener(this);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.dataStore = this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE);
         this.builder = new GsonBuilder();
@@ -139,5 +146,10 @@ public class AdminSetupModule implements Module {
             return true;
         });
         return ao;
+    }
+
+    @Override
+    public void onConfiguration(Configuration c) {
+        this.context.log(c.type(),OnLog.WARN);
     }
 }
