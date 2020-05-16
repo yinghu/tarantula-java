@@ -86,9 +86,9 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             GameCluster gc = new GameCluster();
             gc.typeId(onAccess.name());
             gc.name(onAccess.name());
-            gc.description(onAccess.name());
-            gc.singleton(true);
-            String ret = this.deploymentServiceProvider.createGameCluster(gc);
+            //gc.description(onAccess.name());
+            //gc.singleton(true);
+            //String ret = this.deploymentServiceProvider.createGameCluster(gc);
             ResponseHeader resp = new ResponseHeader(session.action(),onAccess.name(),true);
             session.write(this.builder.create().toJson(resp).getBytes(),descriptor.responseLabel());
         }
