@@ -63,6 +63,11 @@ public class PresenceApplication extends TarantulaApplicationHeader {
                 session.write(this.builder.create().toJson(new ResponseHeader("","failed",false)).getBytes(),descriptor.responseLabel());
             }
         }
+        else if(session.action().equals("onUpgradeRole")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            ResponseHeader responseHeader = new ResponseHeader(session.action(),"You have upgraded to ["+onAccess.name()+"]",true);
+            session.write(this.builder.create().toJson(responseHeader).getBytes(),descriptor.responseLabel());
+        }
         else if(session.action().equals("onPlay")){
               OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
               Presence presence = this.context.presence(session.systemId());

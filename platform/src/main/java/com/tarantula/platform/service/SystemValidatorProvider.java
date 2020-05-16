@@ -30,7 +30,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private HashMap<String,AuthVendor> aMap;
     private DataStore pdataStore;
     private DataStore udataStore;
-
+    private List<Access.Role> roleList;
     private MessageDigest _messageDigest;
 
     public MessageDigest messageDigest(){
@@ -78,13 +78,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return new ArrayList<>();
     }
     public List<Access.Role> list(){
-        ArrayList<Access.Role> rlist = new ArrayList<>();
-        rMap.forEach((k,v)->{
-            if(!v.name().equals("root")){
-                rlist.add(v);
-            }
-        });
-        return rlist;
+        return roleList;
     }
     public Access.Role role(String systemId){
         if(systemId==null){
@@ -131,14 +125,13 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.pMap = new ConcurrentHashMap<>();
         this.rMap = new HashMap<>();
         this.aMap = new HashMap<>();
-        Access.Role root = new AccessControl("root",Access.ROOT_ACCESS_CONTROL);
-        Access.Role admin = new AccessControl("admin",Access.OWNER_ADMIN_CONTROL);
-        Access.Role owner = new AccessControl("owner",Access.OWNER_PLAYER_CONTROL);
-        Access.Role player = new AccessControl("player",Access.PLAYER_ACCESS_CONTROL);
-        rMap.put(root.name(),root);
-        rMap.put(owner.name(),owner);
-        rMap.put(admin.name(),admin);
-        rMap.put(player.name(),player);
+        this.roleList = new ArrayList<>();
+        rMap.put(AccessControl.root.name(),AccessControl.root);
+        rMap.put(AccessControl.admin.name(),AccessControl.admin);
+        rMap.put(AccessControl.owner.name(),AccessControl.owner);
+        rMap.put(AccessControl.player.name(),AccessControl.player);
+        roleList.add(AccessControl.admin);
+        roleList.add(AccessControl.owner);
         _messageDigest = MessageDigest.getInstance(MDA);
         this.systemValidator = new SystemValidator();
         this.systemValidator.systemValidatorProvider(this);
