@@ -158,4 +158,16 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
+
+    public String createGameCluster(Descriptor gameCluster){
+        NodeEngine nodeEngine = getNodeEngine();
+        CreateGameClusterOperation operation = new CreateGameClusterOperation(gameCluster);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<String> future = builder.invoke();
+            return future.get(); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
 }

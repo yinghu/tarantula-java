@@ -76,6 +76,10 @@ public interface DeploymentServiceProvider extends ServiceProvider {
     String createModule(Descriptor descriptor);
     //END OF MODULE OPERATION API
 
+    //GAME CLUSTER APIs
+    String createGameCluster(Descriptor gameCluster);
+    //END OF CLUSTER
+
     DataStoreProvider dataStoreProvider();
 
 

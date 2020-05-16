@@ -20,4 +20,6 @@ public interface DeployService extends ServiceProvider {
     String addView(OnView view);
     String resetModule(String lobbyId,Descriptor descriptor);
     String enableApplication(String applicationId,boolean enabled);
+
+    String createGameCluster(Descriptor gameCluster);
 }

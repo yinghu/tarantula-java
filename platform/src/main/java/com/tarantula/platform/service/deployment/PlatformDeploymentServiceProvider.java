@@ -568,6 +568,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         icp.remove(serverId.getBytes());
     }
     //end of dedicated server methods
+
+    public String createGameCluster(Descriptor gameCluster){
+        return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(gameCluster);
+    }
     public String resetCode(String key){
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         String code = UUID.randomUUID().toString();

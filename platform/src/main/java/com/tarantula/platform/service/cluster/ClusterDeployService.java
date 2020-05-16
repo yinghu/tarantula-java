@@ -567,4 +567,8 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
     }
 
+    public String createGameCluster(Descriptor gameCluster){
+        return "";
+    }
+
 }
