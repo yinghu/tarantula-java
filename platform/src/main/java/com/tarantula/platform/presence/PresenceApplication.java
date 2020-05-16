@@ -20,6 +20,10 @@ public class PresenceApplication extends TarantulaApplicationHeader {
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
+        Configuration ya = this.context.configuration("yearlyAccess");
+        Configuration ma = this.context.configuration("monthlyAccess");
+        this.context.log(ya.property("price"),OnLog.WARN);
+        this.context.log(ma.property("price"),OnLog.WARN);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         userDs = this.context.dataStore("user");
@@ -76,6 +80,9 @@ public class PresenceApplication extends TarantulaApplicationHeader {
         else if (session.action().equals("onAbsence")) {
             this.context.absence(session);
             session.write(this.builder.create().toJson(new ResponseHeader("onAbsence", "off session [" + session.stub() + "]", true)).getBytes(),this.descriptor.responseLabel());
+        }
+        else if(session.action().equals("onCreateGameCluster")){
+            session.write(payload,descriptor.responseLabel());
         }
         /**
         Map<String, Object> chargeParams = new HashMap<>();

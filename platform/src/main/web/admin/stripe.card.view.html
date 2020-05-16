@@ -12,26 +12,26 @@
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-shopping-card-message"></div>
     <div class="w3-panel">
-        <span id="tx-shopping-commit" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Pay Wuth Card</span>     
+        <span id="tx-shopping-commit" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Pay With Card</span>     
     </div>
-
+    <!-- Stripe check out form -->
     <div class="w3-card-4 w3-border w3-round w3-white tx-checkout" id="tx_checkout">
-        <div class="w3-display-container w3-round w3-light-green tx-content-120">
-            <div class="w3-display-topright tx-margin-left-4 tx-margin-top-4"><i id='tx_checkout_cancel' class='w3-button fa fa-close'></i></div>
+        <div class="w3-display-container w3-padding w3-round w3-light-green tx-content-120">
+            <div class="w3-display-topright w3-padding"><span><i id='tx_checkout_cancel' class='w3-text-white fa fa-close' style="font-size:12px"></span></i></div>
             <div class="w3-display-topmiddle"><img style="margin-top: -40px" src='https://stripe.com/img/documentation/checkout/marketplace.png' width="70" height="70"></div>
             <div class="w3-display-middle tx-pay-amount">Amount : $ <span id="tx_checkout_price"></span></div>
-            <div class="w3-display-bottomleft tx-margin-left-8 tx-margin-bottom-8 w3-text-white tx-pay-no-refund"><span id="tx_checkout_name"></span></div>
-            <div class="w3-display-bottomright tx-margin-right-8 tx-margin-bottom-8 w3-text-white tx-pay-no-refund">No Refund Item</div>
+            <div class="w3-display-bottomleft w3-padding w3-text-white tx-text-12"><span id="tx_checkout_name"></span></div>
         </div>
         <div class="w3-panel">
             <div class="w3-round w3-border w3-border-green w3-padding" id="tx_card_number"></div>
             <div class="w3-round w3-border w3-border-green w3-padding tx-margin-top-4" id="tx_card_expiry"></div>
             <div class="w3-round w3-border w3-border-green w3-padding tx-margin-top-4" id="tx_card_cvc"></div>
             <div class="w3-round w3-button w3-block w3-green tx-margin-top-16 tx-pay-now" id='tx_checkout_pay'>Pay Now</div>
-            <div class="w3-panel w3-round w3-yellow w3-text-red tx-pay-note" id="tx_checkout_error" style="display: none"></div>
-            <div class="w3-panel w3-round w3-yellow w3-text-green tx-pay-note" id="tx_checkout_message" style="display: none"></div>
+            <div class="w3-panel w3-round w3-yellow w3-text-red w3-padding tx-text-12" id="tx_checkout_error" style="display: none"></div>
+            <div class="w3-panel w3-round w3-yellow w3-text-green w3-padding tx-text-12" id="tx_checkout_message" style="display: none"></div>
         </div>
     </div>
+    <!-- END OF stripe checkout form-->
 </div>
 <script>
     document.querySelector("#tx-shopping-card-close").onclick = tx_close_shopping;
@@ -74,9 +74,9 @@
         document.querySelector('#tx_checkout_cancel').onclick = function(){document.querySelector('#tx_checkout').style.display='none';};
     }
     function _tx_checkout(){
-        document.querySelector("#tx_checkout_name").innerHTML = 'membership';//TARA_API.query().name; 
-        document.querySelector("#tx_checkout_price").innerHTML = '$120.00';//TARA_API.query().price; 
-        document.querySelector("#tx_checkout_message").innerHTML = 'pay via stripe.com'; 
+        document.querySelector("#tx_checkout_name").innerHTML = 'yearly membership';//TARA_API.query().name; 
+        document.querySelector("#tx_checkout_price").innerHTML = '120.00';//TARA_API.query().price; 
+        document.querySelector("#tx_checkout_message").innerHTML = 'NOTE: refund is not avilable'; 
         document.querySelector("#tx_checkout_message").style.display = "block";
         document.querySelector("#tx_checkout").style.display = 'block';    
         try{

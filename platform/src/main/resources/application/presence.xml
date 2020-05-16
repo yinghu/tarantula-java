@@ -18,9 +18,22 @@
                 <tag>presence/lobby</tag>
                 <description>Tarantula Presence</description>
                 <class-name>com.tarantula.platform.presence.PresenceApplication</class-name>
+                <configuration-name>presence</configuration-name>
                 <response-label>presence</response-label>
             </application>
         </application-list>
+        <configuration-list>
+            <configuration tag="presence" priority="10">
+                <presence type="yearlyAccess">
+                    <property name="price">1200</property>
+                    <property name="currency">USD</property>
+                </presence>
+                <presence type="monthlyAccess">
+                    <property name="price">120</property>
+                    <property name="currency">USD</property>
+                </presence>
+            </configuration>
+        </configuration-list>
         <view-list>
             <view type="dashboard">
                 <property name="moduleResourceFile">admin/dashboard.view.html</property>
@@ -33,6 +46,9 @@
             </view>
             <view type="add.user">
                 <property name="moduleResourceFile">admin/add.user.view.html</property>
+            </view>
+            <view type="create.game.cluster">
+                <property name="moduleResourceFile">admin/create.game.cluster.view.html</property>
             </view>
             <view type="shopping.card">
                 <property name="moduleResourceFile">admin/stripe.card.view.html</property>
