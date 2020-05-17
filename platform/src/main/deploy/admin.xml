@@ -128,16 +128,16 @@
             </view>
             <!-- new views -->
             <view type="add.user">
-                <property name="moduleResourceFile">admin/add.user.view.html</property>
+                <property name="moduleResourceFile">account/add.user.view.html</property>
             </view>
             <view type="upload.view">
-                <property name="moduleResourceFile">admin/upload.view.html</property>
+                <property name="moduleResourceFile">sudo/upload.view.html</property>
             </view>
             <view type="deploy.view">
-                <property name="moduleResourceFile">admin/deploy.view.html</property>
+                <property name="moduleResourceFile">sudo/deploy.view.html</property>
             </view>
             <view type="deploy.config">
-                <property name="moduleResourceFile">admin/deploy.config.view.html</property>
+                <property name="moduleResourceFile">sudo/deploy.config.view.html</property>
             </view>
             <view type="create.game.cluster">
                 <property name="moduleResourceFile">admin/create.game.cluster.view.html</property>

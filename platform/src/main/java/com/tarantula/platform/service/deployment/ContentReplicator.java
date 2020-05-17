@@ -4,8 +4,10 @@ import com.tarantula.SchedulingTask;
 
 public class ContentReplicator implements SchedulingTask {
     private final String fileName;
-    public ContentReplicator(final String fname){
+    private final PlatformDeploymentServiceProvider platformDeploymentServiceProvider;
+    public ContentReplicator(PlatformDeploymentServiceProvider deploymentServiceProvider,final String fname){
         this.fileName = fname;
+        this.platformDeploymentServiceProvider = deploymentServiceProvider;
     }
 
     @Override
@@ -25,6 +27,6 @@ public class ContentReplicator implements SchedulingTask {
 
     @Override
     public void run() {
-        System.out.println(fileName);
+        this.platformDeploymentServiceProvider._pushContent(fileName);
     }
 }

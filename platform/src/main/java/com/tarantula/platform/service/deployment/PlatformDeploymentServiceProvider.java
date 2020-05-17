@@ -11,9 +11,7 @@ import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.util.*;
 
-import java.io.BufferedInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,7 +49,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private GsonBuilder builder;
 
     private Mode deploymentMode = Mode.ALL;
-
+    private String contentTemDir;
     public Mode deploymentMode(){
         return deploymentMode;
     }
@@ -77,7 +75,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return this.tarantulaContext.dataStoreProvider();
     }
     public String upload(InputStream inputStream,String fname) throws Exception{
-        FileOutputStream fos = new FileOutputStream(this.tarantulaContext.deployDir+"/"+fname);
+        //save to local deploy/tem dir
+        BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(this.contentTemDir+"/"+fname));
         int b;
         do{
             b = inputStream.read();
@@ -87,9 +86,31 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }while (b!=-1);
         fos.flush();
         fos.close();
-        this.tarantulaContext.schedule(new ContentReplicator(fname));
-        ResponseHeader resp = new ResponseHeader("uploadModule",fname+" saved successfully",true);
+        this.tarantulaContext.schedule(new ContentReplicator(this,fname));
+        ResponseHeader resp = new ResponseHeader("upload [",fname+"] saved successfully",true);
         return this.builder.create().toJson(resp);
+    }
+    void _pushContent(String fname){
+        try{
+            BufferedInputStream fin = new BufferedInputStream(new FileInputStream(this.contentTemDir+"/"+fname));
+            byte[] ret = fin.readAllBytes();
+            fin.close();
+            OnUploadEvent onUploadEvent = new OnUploadEvent(this.eventTopic,this.localTopic,fname,ret);
+            this.integrationEventService.publish(onUploadEvent);
+        }catch (Exception ex){
+            log.error("error on content push",ex);
+        }
+    }
+    private void writeContent(OnUploadEvent onUploadEvent){
+        try{
+            //write to local deploy dir to be ready for deployment
+            BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(this.tarantulaContext.deployDir+"/"+onUploadEvent.trackId()));
+            fos.write(onUploadEvent.payload());
+            fos.flush();
+            fos.close();
+        }catch (Exception ex){
+            log.error("error on content write",ex);
+        }
     }
     public Module module(Descriptor descriptor){
         if(descriptor.codebase()!=null){
@@ -335,9 +356,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         localTopic = ics.subscription();
         registerKey = ics.addEventListener(null,this);
         try{
+            contentTemDir = this.tarantulaContext.deployDir+"/tem";
             Path _path = Paths.get(this.tarantulaContext.deployDir);
             if(!Files.exists(_path)){
                 Files.createDirectories(_path);
+            }
+            Path _tem = Paths.get(contentTemDir);
+            if(!Files.exists(_tem)){
+                Files.createDirectories(_tem);
             }
         }catch (Exception ex){
             throw new RuntimeException(ex);
@@ -390,6 +416,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
            this.vListeners.forEach((cl)->{
                cl.onView(onView);
            });
+        }
+        else if(event instanceof OnUploadEvent){
+            this.writeContent((OnUploadEvent)event);
         }
         else if(event instanceof MapStoreVotingEvent){
             if(!event.trackId().equals(registerKey)){

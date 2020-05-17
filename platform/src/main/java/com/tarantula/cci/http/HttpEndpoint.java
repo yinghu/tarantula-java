@@ -81,6 +81,15 @@ public class HttpEndpoint implements EndPoint {
 		httpPresenceHandler.resource(this.resource);
 		this.hserver.createContext(httpPresenceHandler.path(),httpPresenceHandler);
 
+		HttpAccountHandler httpAccountHandler = new HttpAccountHandler();
+		httpAccountHandler.resource(this.resource);
+		this.hserver.createContext(httpAccountHandler.path(),httpAccountHandler);
+
+		HttpSudoHandler httpSudoHandler = new HttpSudoHandler();
+		httpSudoHandler.resource(this.resource);
+		this.hserver.createContext(httpSudoHandler.path(),httpSudoHandler);
+
+
 		HttpViewHandler httpViewHandler = new HttpViewHandler();
 		httpViewHandler.resource(this.resource);
 		this.hserver.createContext(httpViewHandler.path(),httpViewHandler);

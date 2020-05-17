@@ -101,6 +101,7 @@ public class AdminSetupModule implements Module,Configuration.Listener {
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             OnView onView = new OnViewTrack();
             onView.viewId((String)onAccess.property("viewId"));
+            onView.contentBaseUrl((String) onAccess.property("deployUrl"));
             onView.moduleResourceFile((String)onAccess.property("resourceName"));
             //this.serviceProvider.deploy(onView);
             session.write(payload,label());
