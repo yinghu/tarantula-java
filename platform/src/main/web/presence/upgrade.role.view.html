@@ -16,7 +16,7 @@
             <span class="tx-text-14">Become A Super Player</span>            
         </div>
         <div class="w3-display-bottomright w3-padding">
-            <span tx-role="owner" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-action">Upgrade</span>     
+            <span tx-role="owner" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-upgrade-role-action">Upgrade</span>     
         </div>
     </div>
     <div class="w3-display-container w3-white w3-border-bottom w3-border-white tx-content-48">
@@ -24,7 +24,7 @@
             <span class="tx-text-14">Become A Developer</span>            
         </div>
         <div class="w3-display-bottomright w3-padding">
-            <span tx-role="admin" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-action">Upgrade</span>
+            <span tx-role="admin" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-upgrade-role-action">Upgrade</span>
         </div>
     </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -37,7 +37,8 @@
     </div>
 </div>
 <script>
-    document.querySelectorAll('.tx-action').forEach((a)=>{
+    
+    document.querySelectorAll('.tx-upgrade-role-action').forEach((a)=>{
         a.onclick = ()=>{
             TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onUpgradeRole',name:a.getAttribute('tx-role')},(resp)=>{      
                 document.querySelector('#tx-upgrade-role-message').innerHTML = resp.message;        

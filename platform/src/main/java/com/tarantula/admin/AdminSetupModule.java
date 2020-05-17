@@ -3,15 +3,13 @@ package com.tarantula.admin;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.platform.DeploymentDescriptor;
-import com.tarantula.platform.IndexSet;
-import com.tarantula.platform.LobbyDescriptor;
-import com.tarantula.platform.OnViewTrack;
+import com.tarantula.platform.*;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.service.deployment.ApplicationQuery;
 import com.tarantula.platform.service.deployment.LobbyQuery;
 import com.tarantula.platform.util.OnAccessDeserializer;
+import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -94,10 +92,10 @@ public class AdminSetupModule implements Module,Configuration.Listener {
             session.write(this.builder.create().toJson(new AdminSetupObject("add module",label())).getBytes(),label());
         }
         else if(session.action().equals("listViews")){
-            session.write(payload,label());
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"ok",true)).getBytes(),label());
         }
         else if(session.action().equals("listConfigs")){
-            session.write(payload,label());
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"ok",true)).getBytes(),label());
         }
         else if(session.action().equals("deployView")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -124,6 +122,7 @@ public class AdminSetupModule implements Module,Configuration.Listener {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.builder.registerTypeAdapter(AdminSetupObject.class,new AdminObjectSerializer());
+        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.context.log("Admin setup module started", OnLog.INFO);
     }
     @Override

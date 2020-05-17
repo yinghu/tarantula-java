@@ -36,22 +36,16 @@
         </configuration-list>
         <view-list>
             <view type="dashboard">
-                <property name="moduleResourceFile">admin/dashboard.view.html</property>
+                <property name="moduleResourceFile">presence/dashboard.view.html</property>
             </view>
             <view type="add.email">
-                <property name="moduleResourceFile">admin/add.email.view.html</property>
+                <property name="moduleResourceFile">presence/add.email.view.html</property>
             </view>
             <view type="upgrade.role">
-                <property name="moduleResourceFile">admin/upgrade.role.view.html</property>
-            </view>
-            <view type="add.user">
-                <property name="moduleResourceFile">admin/add.user.view.html</property>
-            </view>
-            <view type="create.game.cluster">
-                <property name="moduleResourceFile">admin/create.game.cluster.view.html</property>
+                <property name="moduleResourceFile">presence/upgrade.role.view.html</property>
             </view>
             <view type="shopping.card">
-                <property name="moduleResourceFile">admin/stripe.card.view.html</property>
+                <property name="moduleResourceFile">presence/stripe.card.view.html</property>
             </view>
         </view-list>
     </lobby-context>

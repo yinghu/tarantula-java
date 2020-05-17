@@ -16,9 +16,9 @@ import com.tarantula.platform.util.ResponseSerializer;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AdminEventHandler implements RequestHandler {
+public class PresenceEventHandler implements RequestHandler {
 
-    private static TarantulaLogger log = JDKLogger.getLogger(AdminEventHandler.class);
+    private static TarantulaLogger log = JDKLogger.getLogger(PresenceEventHandler.class);
 
     private String bucket;
     private EventService eventService;
@@ -28,11 +28,11 @@ public class AdminEventHandler implements RequestHandler {
     private String serverTopic;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
     private GsonBuilder builder;
-    public AdminEventHandler(){
+    public PresenceEventHandler(){
 
     }
     public String name(){
-        return "/admin";
+        return "/presence";
     }
     public void onRequest(OnExchange exchange){
         try{
@@ -82,7 +82,7 @@ public class AdminEventHandler implements RequestHandler {
         this.builder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
-        log.info("Admin event handler started");
+        log.info("Presence event handler started");
     }
 
     @Override

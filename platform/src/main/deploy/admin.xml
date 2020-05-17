@@ -126,6 +126,10 @@
             <view type="admin.account">
                 <property name="moduleResourceFile">admin/account.view.html</property>
             </view>
+            <!-- new views -->
+            <view type="add.user">
+                <property name="moduleResourceFile">admin/add.user.view.html</property>
+            </view>
             <view type="upload.view">
                 <property name="moduleResourceFile">admin/upload.view.html</property>
             </view>
@@ -134,6 +138,9 @@
             </view>
             <view type="deploy.config">
                 <property name="moduleResourceFile">admin/deploy.config.view.html</property>
+            </view>
+            <view type="create.game.cluster">
+                <property name="moduleResourceFile">admin/create.game.cluster.view.html</property>
             </view>
         </view-list>
 

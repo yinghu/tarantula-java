@@ -67,6 +67,11 @@ public class EndpointService implements Serviceable,EndPoint.Resource{
         adminEventHandler.start();
         rMap.put(adminEventHandler.name(),adminEventHandler);
 
+        PresenceEventHandler presenceEventHandler = new PresenceEventHandler();
+        presenceEventHandler.setup(this.tarantulaContext);
+        presenceEventHandler.start();
+        rMap.put(presenceEventHandler.name(),presenceEventHandler);
+
         ViewEventHandler viewEventHandler = new ViewEventHandler();
         viewEventHandler.setup(this.tarantulaContext);
         viewEventHandler.start();
