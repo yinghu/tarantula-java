@@ -127,8 +127,43 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return _internalModule(descriptor.moduleName());
         }
     }
+    private byte[] fromModule(String name,String flag){
+        String rid = flag.split("=")[1].trim();
+        DynamicModuleClassLoader dc = cMap.get(rid);
+        byte[][] ret = {new byte[0]};
+        dc.loadResource(name,in -> {
+            try{
+                ret[0] = new byte[in.available()];
+                in.read(ret[0]);
+            }catch (Exception ex){
+                log.warn("Resource ["+name+"] failed to load",ex);
+            }
+        });
+        return ret[0];
+    }
+    private byte[] fromContext(String name){
+        return rMap.computeIfAbsent(name,(rk)->{
+                byte[] ret = new byte[0];
+                BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(name));
+                try{
+                    ret = new byte[in.available()];
+                    in.read(ret);
+                }catch (Exception ex){
+                    log.warn("Resource ["+name+"] not existed",ex);
+                }
+                finally {
+                    if(in!=null){
+                        try{in.close();}catch (Exception ex){}
+                    }
+                }
+                return ret;
+            }
+        );
+    }
     public byte[] resource(String name,String flag){
         //log.warn("load resource ["+name+"] from ["+flag+"]");
+        return flag==null?fromContext(name):fromModule(name,flag);
+        /**
         if(flag!=null){
             //log.warn("load resource ["+name+"] from ["+flag+"]");
             String rid = flag.split("=")[1].trim();
@@ -160,7 +195,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 }
                 return ret;
             }
-        );
+        );**/
     }
     public void resource(Descriptor descriptor, String name, Module.OnResource onResource){
         DynamicModuleClassLoader dyn = cMap.get(descriptor.subtypeId());
@@ -361,10 +396,31 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(!Files.exists(_path)){
                 Files.createDirectories(_path);
             }
+            Path _web_root = Paths.get(this.tarantulaContext.deployDir+"/web/root");
+            if(!Files.exists(_web_root)){
+                Files.createDirectories(_web_root);
+            }
+            Path _web_presence = Paths.get(this.tarantulaContext.deployDir+"/web/presence");
+            if(!Files.exists(_web_presence)){
+                Files.createDirectories(_web_presence);
+            }
+            Path _web_account = Paths.get(this.tarantulaContext.deployDir+"/web/account");
+            if(!Files.exists(_web_account)){
+                Files.createDirectories(_web_account);
+            }
+            Path _web_admin = Paths.get(this.tarantulaContext.deployDir+"/web/admin");
+            if(!Files.exists(_web_admin)){
+                Files.createDirectories(_web_admin);
+            }
+            Path _web_sudo = Paths.get(this.tarantulaContext.deployDir+"/web/sudo");
+            if(!Files.exists(_web_sudo)){
+                Files.createDirectories(_web_sudo);
+            }
             Path _tem = Paths.get(contentTemDir);
             if(!Files.exists(_tem)){
                 Files.createDirectories(_tem);
             }
+
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
