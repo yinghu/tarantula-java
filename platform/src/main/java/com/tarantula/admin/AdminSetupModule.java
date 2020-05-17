@@ -100,11 +100,13 @@ public class AdminSetupModule implements Module,Configuration.Listener {
         else if(session.action().equals("deployView")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             OnView onView = new OnViewTrack();
+            //onView.owner("");
             onView.viewId((String)onAccess.property("viewId"));
+            String rname = onAccess.property("deployUrl")+"/"+onAccess.property("resourceName");
             onView.contentBaseUrl((String) onAccess.property("deployUrl"));
-            onView.moduleResourceFile((String)onAccess.property("resourceName"));
-            //this.serviceProvider.deploy(onView);
-            session.write(payload,label());
+            onView.moduleResourceFile(rname);
+            this.serviceProvider.deploy(onView);
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"view deployed",true)).getBytes(),label());
         }
         else{
             session.write(payload,label());

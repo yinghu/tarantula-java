@@ -479,9 +479,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         rListeners.put(instanceRegistryListener.onLobby(),instanceRegistryListener);
     }
     public void deploy(OnView onView){
-        //RecoverableMetadata mt = new RecoverableMetadata(onView.getFactoryId(),onView.getClassId());
-        //byte[] k = onView.key().asString()!=null?onView.key().asString().getBytes():"".getBytes();
-        //MapStoreSyncEvent mse = new MapStoreSyncEvent(this.eventTopic,this.localTopic,k,SystemUtil.toJson(onView.toMap()),mt);
+        if(onView.distributionKey()==null){
+            String suc = tarantulaContext.integrationCluster().deployService().addView(onView);
+        }
         OnViewEvent onViewEvent = new OnViewEvent(this.eventTopic,this.localTopic,onView);
         this.integrationEventService.publish(onViewEvent);
     }
