@@ -12,19 +12,11 @@
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-deploy-view-message"></div> 
     <div class="w3-panel w3-border-bottom w3-border-white">
-        <div class="w3-panel">  
-            <div class="w3-panel">
-                <input id ="tx-view-name" class="w3-input w3-round w3-border" type="text" placeholder='view name'/>
-            </div>
-            <div class="w3-panel">
-                <input id ="tx-view-context" class="w3-input w3-round w3-border" type="text" placeholder='view context'/>
-            </div>    
-        </div>
         <div class="w3-panel">
             <div class="w3-panel w3-right tx-margin-right-16">
                 <span class="w3-text-green tx-margin-right-8"><i class="fa fa-cloud-upload" style="font-size:24px"></i></span>
                 <label for="tx-view-file" class="tx-file-upload w3-round">
-                    <span class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button">Deploy File</span>
+                    <span class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button">Choose File</span>
                 </label>
                 <input id ="tx-view-file" type="file"/>
             </div>
@@ -41,32 +33,21 @@
 </div>
 <script>
     document.querySelector("#tx-deploy-view-message").innerHTML= 'Choose file to upload';
-    let _data;
     let _fd;    
     document.querySelector("#tx-view-file").onchange = (e)=>{
-        let _cn = document.querySelector('#tx-view-name').value;
-        let _cu = document.querySelector('#tx-view-context').value;
         _fd = e.target.files[0];
         document.querySelector("#tx-deploy-view-message").innerHTML = _fd.name;
         var reader = new FileReader();
-        reader.onload = (fe)=>{
-            _data = reader.result; 
-            TARA_API.onService(true,{serviceTag:'admin/setup',command:'deployView',viewName:_cn,deployContext:_cu,resourceFile:_fd.name},(resp1)=>{
-                if(resp1.successful){
-                    document.querySelector("#tx-deploy-view-message").innerHTML = "View deployed successfully";     
-                }else{
-                    document.querySelector("#tx-deploy-view-message").innerHTML = resp.message; 
-                }
-            });
-        };
         reader.onloadend = (fe)=>{
-            TARA_API.onUpload(_data,_fd.name,'text/html',(resp)=>{
-                document.querySelector("#tx-deploy-view-message").innerHTML = resp.message; 
-                console.log("deploy view->"+_fd.name+"//"+_cn+"///"+_cu);
-            });
+            console.log("onloadend");
+            document.querySelector("#tx-deploy-view-message").innerHTML = "on load end"; 
         };
         reader.readAsArrayBuffer(_fd); 
     }; 
+    //TARA_API.onUpload(reader.result,_fd.name,'text/html',(resp)=>{
+      //          document.querySelector("#tx-deploy-view-message").innerHTML = resp.message; 
+        //        console.log("deploy view->"+_fd.name+"//"+_cn+"///"+_cu);
+          //  });
     document.querySelector('#tx-deploy-view-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";

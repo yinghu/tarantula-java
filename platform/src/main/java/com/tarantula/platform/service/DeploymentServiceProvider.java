@@ -48,6 +48,7 @@ public interface DeploymentServiceProvider extends ServiceProvider {
     void registerConfigurationListener(Configuration.Listener listener);
 
     //deploy and callback on view
+
     void deploy(OnView onView);
     void registerOnViewListener(OnView.Listener onViewListener);
 

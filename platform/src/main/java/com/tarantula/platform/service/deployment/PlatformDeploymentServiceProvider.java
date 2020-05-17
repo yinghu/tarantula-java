@@ -87,6 +87,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }while (b!=-1);
         fos.flush();
         fos.close();
+        this.tarantulaContext.schedule(new ContentReplicator(fname));
         ResponseHeader resp = new ResponseHeader("uploadModule",fname+" saved successfully",true);
         return this.builder.create().toJson(resp);
     }

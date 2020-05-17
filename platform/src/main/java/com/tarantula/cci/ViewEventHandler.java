@@ -30,7 +30,7 @@ public class ViewEventHandler implements RequestHandler, OnView.Listener {
     }
     public void onRequest(OnExchange exchange){
         String viewId = exchange.header(Session.TARANTULA_VIEW_ID);
-        log.warn("FIND->"+viewId);
+        //log.warn("FIND->"+viewId);
         OnView onView = _vMap.get(viewId);
         byte[] ret = this.builder.create().toJson(onView).getBytes();
         exchange.onEvent(new ResponsiveEvent("","",ret,0,"application/json","",true));

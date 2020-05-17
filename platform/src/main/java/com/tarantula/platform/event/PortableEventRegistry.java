@@ -19,13 +19,9 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int INSTANCE_PLAY_EVENT_CID = 3;
 
-    public static final int INDEX_EVENT_CID = 4;
-
     public static final int FAST_PLAY_EVENT_CID = 5;
 
     public static final int ON_DEPLOY_EVENT_CID = 6;
-
-    public static final int PENDING_REQUEST_EVENT_CID = 7;
 
     public static final int SERVICE_ACTION_EVENT_CID = 9;
 
@@ -80,9 +76,7 @@ public class PortableEventRegistry implements PortableFactory {
             case INSTANCE_PLAY_EVENT_CID:
                 _ins = new InstancePlayEvent();
                 break;
-            case INDEX_EVENT_CID:
-                _ins = new IndexEvent();
-                break;
+
             case FAST_PLAY_EVENT_CID:
                 _ins = new FastPlayEvent();
                 break;
@@ -90,9 +84,6 @@ public class PortableEventRegistry implements PortableFactory {
                 _ins = new OnDeployEvent();
                 break;
 
-            case PENDING_REQUEST_EVENT_CID:
-                _ins = new PendingRequestEvent();
-                break;
             case SERVICE_ACTION_EVENT_CID:
                 _ins = new ServiceActionEvent();
                 break;

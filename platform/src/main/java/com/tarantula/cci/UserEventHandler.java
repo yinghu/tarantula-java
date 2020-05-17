@@ -3,7 +3,6 @@ import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.event.IndexEvent;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServiceActionEvent;
 import com.tarantula.platform.service.AccessIndexService;
