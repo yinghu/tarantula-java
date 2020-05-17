@@ -28,5 +28,4 @@ public interface DataStoreProvider extends ServiceProvider {
     interface OnBackup{
         void on(String fName,int fSize,ReadableByteChannel in);
     }
-
 }

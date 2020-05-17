@@ -8,6 +8,8 @@ import java.util.List;
  */
 public interface DataStore{
 
+    int scope();
+
     String bucket();
 
     String node();

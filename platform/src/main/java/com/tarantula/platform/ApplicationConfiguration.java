@@ -85,8 +85,5 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
     public int getClassId() {
         return PortableRegistry.APPLICATION_CONFIGURATION_CID;
     }
-    @Override
-    public String toString(){
-        return "application configuration ["+tag+","+type+"]";
-    }
+
 }

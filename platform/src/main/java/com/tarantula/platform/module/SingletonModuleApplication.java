@@ -85,7 +85,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     }
     @Override
     public void onBucket(int bucket,int state){
-        this.context.log("Bucket->"+bucket+"/"+state,OnLog.WARN);
+        //this.context.log("Bucket->"+bucket+"/"+state,OnLog.WARN);
     }
     @Override
     public void onState(Connection c) {

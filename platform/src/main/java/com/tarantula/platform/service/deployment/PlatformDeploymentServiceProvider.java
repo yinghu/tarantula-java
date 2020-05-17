@@ -370,10 +370,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             else{
                 ot.fromMap(SystemUtil.toMap(event.payload()));
             }
-            if(ot instanceof OnView){
-                OnView ov = (OnView)ot;
-                this.vListeners.forEach((cl)->{
-                    cl.onView(ov);
+            if(ot instanceof Configuration){
+                Configuration ov = (Configuration) ot;
+                this.cListeners.forEach((cl)->{
+                    cl.onConfiguration(ov);
                 });
             }
             if(!ot.disabled()){
@@ -501,12 +501,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerConfigurationListener(Configuration.Listener listener){
         vMap.forEach((k,v)->{
             if(v instanceof Configuration){
+                v.distributionKey(k);
                 listener.onConfiguration((Configuration)v);
             }
         });
         this.cListeners.add(listener);
     }
-
     //dedicated server methods
     public void onUDPConnection(String typeId,Connection connection){
         this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));

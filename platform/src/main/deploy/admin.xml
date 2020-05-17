@@ -126,9 +126,6 @@
             <view type="admin.account">
                 <property name="moduleResourceFile">admin/account.view.html</property>
             </view>
-            <view type="upload.view">
-                <property name="moduleResourceFile">admin/upload.view.html</property>
-            </view>
             <view type="deploy.view">
                 <property name="moduleResourceFile">admin/deploy.view.html</property>
             </view>

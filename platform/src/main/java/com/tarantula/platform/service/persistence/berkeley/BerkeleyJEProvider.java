@@ -105,7 +105,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     }
     private Database createDatabase(String name,int scope){
         try{
-            //log.warn("Create database ["+name+"] on scope ["+scope+"]");
+            log.warn("Create database ["+name+"] on scope ["+scope+"]");
             DatabaseConfig dbConfig = new DatabaseConfig();
             dbConfig.setAllowCreate(true);
             dbConfig.setDeferredWrite(true);

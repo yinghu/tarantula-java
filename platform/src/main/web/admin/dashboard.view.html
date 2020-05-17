@@ -89,7 +89,7 @@
         <div id="tx-Extension" class="w3-container tx-pane" style="display:none">
             <div class='w3-bar w3-white'>
                 <span class='w3-bar-item w3-left tx-margin-bottom-8'><i class="fa fa-code w3-text-orange" style="font-size:24px"></i></span>
-                <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload View</span>
+                <span view-id='deploy.view' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy View</span>
                 <span view-id='upload.module' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload Module</span>
                 <span view-id='reset.module' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Module</span>
                 <span id='tx-list-views' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>List Views</span>
@@ -110,6 +110,16 @@
             document.querySelector('#tx-player-5').innerHTML=resp.access.validator;
         }    
     });
+    document.querySelector('#tx-list-configs').onclick=()=>{
+        TARA_API.onService(false,{serviceTag:"admin/setup",command:'listConfigs'},(resp)=>{
+            console.log(resp);        
+        });
+    };
+    document.querySelector('#tx-list-views').onclick=()=>{
+        TARA_API.onService(false,{serviceTag:"admin/setup",command:'listViews'},(resp)=>{
+            console.log(resp);        
+        });
+    };
     document.querySelector('#tx-menu-close').onclick = ()=>{
         if(TARA_API.query().systemId){
             tx_oauth_sign_out();

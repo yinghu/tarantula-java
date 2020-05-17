@@ -45,7 +45,7 @@
      reader.readAsArrayBuffer(_fd); 
  };    
  document.querySelector("#u_command").onclick = function(){
-    TARA_API.onUpload(_data,_fd.name,(resp)=>{
+    TARA_API.onUpload(_data,_fd.name,'"application/java-archive"',(resp)=>{
         document.querySelector("#u_message").innerHTML = resp.message;
     });  
  };

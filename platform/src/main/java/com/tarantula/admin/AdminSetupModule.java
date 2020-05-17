@@ -6,12 +6,15 @@ import com.tarantula.Module;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.LobbyDescriptor;
+import com.tarantula.platform.OnViewTrack;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.service.deployment.ApplicationQuery;
 import com.tarantula.platform.service.deployment.LobbyQuery;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AdminSetupModule implements Module,Configuration.Listener {
 
@@ -20,7 +23,7 @@ public class AdminSetupModule implements Module,Configuration.Listener {
     private TokenValidatorProvider tokenValidatorProvider;
     private DataStore dataStore;
     private GsonBuilder builder;
-
+    private ConcurrentHashMap<String,Configuration> cMap;
     @Override
     public void onJoin(Session session,OnUpdate onUpdate) throws Exception {
         session.write(this.builder.create().toJson(this._adminObjectOnLobby()).getBytes(),label());
@@ -91,10 +94,18 @@ public class AdminSetupModule implements Module,Configuration.Listener {
             session.write(this.builder.create().toJson(new AdminSetupObject("add module",label())).getBytes(),label());
         }
         else if(session.action().equals("listViews")){
-
+            session.write(payload,label());
         }
         else if(session.action().equals("listConfigs")){
-
+            session.write(payload,label());
+        }
+        else if(session.action().equals("deployView")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            OnView onView = new OnViewTrack();
+            onView.viewId((String)onAccess.property("viewName"));
+            onView.moduleResourceFile((String)onAccess.property("resourceFile"));
+            //this.serviceProvider.deploy(onView);
+            session.write(payload,label());
         }
         else{
             session.write(payload,label());
@@ -105,6 +116,7 @@ public class AdminSetupModule implements Module,Configuration.Listener {
     @Override
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
+        this.cMap = new ConcurrentHashMap<>();
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.serviceProvider.registerConfigurationListener(this);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
@@ -150,6 +162,8 @@ public class AdminSetupModule implements Module,Configuration.Listener {
 
     @Override
     public void onConfiguration(Configuration c) {
-        this.context.log(c.type(),OnLog.WARN);
+        this.context.log(c.distributionKey(),OnLog.WARN);
+        this.context.log(c.toString(),OnLog.WARN);
+        cMap.put(c.distributionKey(),c);
     }
 }
