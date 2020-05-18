@@ -50,6 +50,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private Mode deploymentMode = Mode.ALL;
     private String contentTemDir;
+    private String contentDir;
     public Mode deploymentMode(){
         return deploymentMode;
     }
@@ -144,21 +145,51 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private byte[] fromContext(String name){
         return rMap.computeIfAbsent(name,(rk)->{
                 byte[] ret = new byte[0];
-                BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(name));
-                try{
-                    ret = new byte[in.available()];
-                    in.read(ret);
-                }catch (Exception ex){
-                    log.warn("Resource ["+name+"] not existed",ex);
-                }
-                finally {
-                    if(in!=null){
-                        try{in.close();}catch (Exception ex){}
+                BufferedInputStream cin=null;
+                try {//read from deploy dir
+                    cin = new BufferedInputStream(new FileInputStream(contentDir + "/" + name));
+                    ret = cin.readAllBytes();
+                    cin.close();
+                }catch (Exception ex1){
+                    log.warn("Read resource ["+name+"] from backup");
+                    try {if(cin!=null){cin.close();}}catch (Exception ex2){}
+                    //read from backup
+                    try{
+                        cin = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(name));
+                        ret = cin.readAllBytes();
+                    }catch (Exception ex3){
+                        log.warn("Resource ["+name+"] not existed",ex3);
+                    }
+                    finally {
+                        if(cin!=null){
+                            try{cin.close();}catch (Exception ex4){}
+                        }
                     }
                 }
                 return ret;
             }
         );
+    }
+    private void checkContent(OnView onView){
+        try{
+            log.warn("CHECK VIEW->"+onView.toString());
+            String rn = onView.moduleResourceFile().split("/")[1];
+            File f = new File(contentTemDir+"/"+rn);
+            if(!f.exists()){
+                return;
+            }
+            File fe = new File(contentDir+"/"+onView.moduleResourceFile());
+            if(!fe.exists()||fe.lastModified()<f.lastModified()){
+                BufferedInputStream fin = new BufferedInputStream(new FileInputStream(f));
+                BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(fe));
+                fos.write(fin.readAllBytes());
+                fin.close();
+                fos.flush();
+                fos.close();
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
     public byte[] resource(String name,String flag){
         //log.warn("load resource ["+name+"] from ["+flag+"]");
@@ -392,6 +423,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         registerKey = ics.addEventListener(null,this);
         try{
             contentTemDir = this.tarantulaContext.deployDir+"/tem";
+            contentDir = this.tarantulaContext.deployDir+"/web";
             Path _path = Paths.get(this.tarantulaContext.deployDir);
             if(!Files.exists(_path)){
                 Files.createDirectories(_path);
@@ -455,20 +487,24 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             if(ot instanceof Configuration){
                 Configuration ov = (Configuration) ot;
+                vMap.put(new String(mse.key),ot);
                 this.cListeners.forEach((cl)->{
                     cl.onConfiguration(ov);
                 });
             }
-            if(!ot.disabled()){
-                vMap.put(new String(mse.key),ot);
-            }
             else{
-                vMap.remove(new String(mse.key));
+                log.warn("Not supported type->"+ot.toString());
             }
         }
         else if(event instanceof OnViewEvent){
            OnView onView = (OnView)((OnViewEvent) event).portable();
-           vMap.put(onView.viewId(),onView);
+           checkContent(onView);
+           vMap.putIfAbsent(onView.viewId(),onView);
+           //remove caches
+           rMap.remove(onView.moduleResourceFile());
+           if(onView.moduleFile()!=null){
+               rMap.remove(onView.moduleFile());
+           }
            this.vListeners.forEach((cl)->{
                cl.onView(onView);
            });
@@ -534,12 +570,19 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerInstanceRegistryListener(InstanceRegistry.Listener instanceRegistryListener){
         rListeners.put(instanceRegistryListener.onLobby(),instanceRegistryListener);
     }
-    public void deploy(OnView onView){
-        if(onView.distributionKey()==null){
+    public boolean deploy(OnView onView){
+        if(!vMap.containsKey(onView.viewId())&&onView.distributionKey()==null){
+            //create new entry
             String suc = tarantulaContext.integrationCluster().deployService().addView(onView);
+            ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
+            if(!resp.successful()){
+                return false;
+            }
         }
+        log.warn("VIEW->"+onView.distributionKey()+"<>"+onView.toString());
         OnViewEvent onViewEvent = new OnViewEvent(this.eventTopic,this.localTopic,onView);
         this.integrationEventService.publish(onViewEvent);
+        return true;
     }
     public void registerOnViewListener(OnView.Listener onViewListener){
         vMap.forEach((k,v)->{

@@ -10,10 +10,10 @@ public interface OnView extends Recoverable {
 
     String flag();
     void flag(String flag);
-    String category();
-    void category(String category);
-    String icon();
-    void icon(String icon);
+    //String category();
+    //void category(String category);
+    //String icon();
+    //void icon(String icon);
 
     String contentBaseUrl();
     void contentBaseUrl(String contentBaseUrl);

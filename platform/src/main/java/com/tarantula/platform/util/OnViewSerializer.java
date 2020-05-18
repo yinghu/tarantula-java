@@ -18,12 +18,6 @@ public class OnViewSerializer implements JsonSerializer<OnView> {
         if(descriptor.flag()!=null){
             jo.addProperty("flag",descriptor.flag());
         }
-        if(descriptor.icon()!=null){
-            jo.addProperty("icon",descriptor.icon());
-        }
-        if(descriptor.category()!=null){
-            jo.addProperty("category",descriptor.category());
-        }
         if(descriptor.moduleFile()!=null){
             jo.addProperty("moduleFile",descriptor.moduleFile());
         }

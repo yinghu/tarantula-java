@@ -81,6 +81,7 @@
             </application>
         </application-list>
         <view-list>
+            <!--
             <view type="admin.setup">
                 <property name="moduleFile">html/admin/admin.setup.module.js</property>
                 <property name="moduleName">AdminSetup</property>
@@ -125,7 +126,7 @@
             </view>
             <view type="admin.account">
                 <property name="moduleResourceFile">admin/account.view.html</property>
-            </view>
+            </view>-->
             <!-- new views -->
             <view type="add.user">
                 <property name="moduleResourceFile">account/add.user.view.html</property>

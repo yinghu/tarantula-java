@@ -241,12 +241,6 @@ public class XMLParser extends DefaultHandler{
                 else if(pname.equals("contentBaseUrl")){
                     view.contentBaseUrl(value);
                 }
-                else if(pname.equals("icon")){
-                    view.icon(value);
-                }
-                else if(pname.equals("category")){
-                    view.category(value);
-                }
                 else if(pname.equals("moduleFile")){
                     view.moduleFile(value);
                 }
@@ -264,6 +258,9 @@ public class XMLParser extends DefaultHandler{
                 this.configuration.applications.add(this.applicationDescriptor);
             }
             else  if(tblock.equals("view-list")&&qname.equals("view")){
+                if(view.contentBaseUrl()==null){
+                    view.contentBaseUrl(view.moduleResourceFile().split("/")[0]);
+                }
                 this.configuration.views.add(view);
             }
             else if(tblock.equals("configuration-list")&&qname.equals("configuration")){

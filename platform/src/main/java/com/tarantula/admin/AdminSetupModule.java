@@ -100,7 +100,7 @@ public class AdminSetupModule implements Module,Configuration.Listener {
         else if(session.action().equals("deployView")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             OnView onView = new OnViewTrack();
-            //onView.owner("");
+            onView.owner(onAccess.typeId());//associated with a lobby type Id
             onView.viewId((String)onAccess.property("viewId"));
             String rname = onAccess.property("deployUrl")+"/"+onAccess.property("resourceName");
             onView.contentBaseUrl((String) onAccess.property("deployUrl"));

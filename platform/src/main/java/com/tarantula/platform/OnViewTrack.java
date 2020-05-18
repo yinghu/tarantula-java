@@ -17,8 +17,6 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
     protected String moduleFile;
     protected String moduleName;
     protected String moduleResourceFile;
-    protected String icon;
-    protected String category;
     protected String viewId;
 
     protected String flag;
@@ -38,18 +36,6 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
     }
     public void flag(String flag){
         this.flag = flag;
-    }
-    public void icon(String icon) {
-        this.icon = icon;
-    }
-    public String category() {
-        return this.category;
-    }
-    public void category(String category) {
-        this.category = category;
-    }
-    public String icon() {
-        return this.icon;
     }
 
     public String contentBaseUrl(){
@@ -84,7 +70,6 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
         this.properties.put("1",viewId);
         this.properties.put("2",flag);
         this.properties.put("3",contentBaseUrl);
-        this.properties.put("4",icon);
         this.properties.put("5",moduleFile);
         this.properties.put("6",moduleName);
         this.properties.put("7",moduleResourceFile);
@@ -95,7 +80,6 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
         this.viewId = (String)properties.get("1");
         this.flag = (String)properties.get("2");
         this.contentBaseUrl = (String)properties.get("3");
-        this.icon = (String)properties.get("4");
         this.moduleFile = (String)properties.get("5");
         this.moduleName = (String)properties.get("6");
         this.moduleResourceFile = (String)properties.get("7");
@@ -115,7 +99,6 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
         portableWriter.writeUTF("1",viewId);
         portableWriter.writeUTF("2",flag);
         portableWriter.writeUTF("3",this.contentBaseUrl);
-        portableWriter.writeUTF("4",this.icon);
         portableWriter.writeUTF("5",this.moduleFile);
         portableWriter.writeUTF("6",this.moduleName);
         portableWriter.writeUTF("7",moduleResourceFile);
@@ -126,13 +109,8 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
         viewId = portableReader.readUTF("1");
         flag = portableReader.readUTF("2");
         contentBaseUrl = portableReader.readUTF("3");
-        icon = portableReader.readUTF("4");
         moduleFile = portableReader.readUTF("5");
         moduleName = portableReader.readUTF("6");
         moduleResourceFile= portableReader.readUTF("7");
-    }
-
-    public String toString(){
-        return "OnView->["+viewId+"/"+disabled+"/"+flag+"]";
     }
 }

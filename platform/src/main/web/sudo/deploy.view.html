@@ -13,7 +13,10 @@
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-deploy-view-message"></div> 
     <div class="w3-panel w3-border-bottom w3-border-white">
         <div class="w3-panel">
-            <input id ="tx-view-context" class="w3-input w3-round w3-border" type="text" placeholder='view context'/>
+            <input id ="tx-view-type-id" class="w3-input w3-round w3-border" type="text" placeholder='view type id'/>
+        </div>
+        <div class="w3-panel">
+            <input id ="tx-view-content-url" class="w3-input w3-round w3-border" type="text" placeholder='view content url'/>
         </div>
         <div class="w3-panel">
             <input id ="tx-view-id" class="w3-input w3-round w3-border" type="text" placeholder='view id'/>
@@ -37,10 +40,11 @@
 <script>
     document.querySelector("#tx-deploy-view-message").innerHTML= 'Create view';
     document.querySelector('#tx-deploy-view').onclick=()=>{
-        let _c = document.querySelector('#tx-view-context').value;
+        let _t = document.querySelector('#tx-view-type-id').value;
+        let _c = document.querySelector('#tx-view-content-url').value;
         let _i = document.querySelector('#tx-view-id').value;
         let _n = document.querySelector('#tx-view-resource-name').value;
-        TARA_API.onService(true,{serviceTag:'admin/setup',command:'deployView',deployUrl:_c,viewId:_i,resourceName:_n},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'admin/setup',command:'deployView',typeId:_t,deployUrl:_c,viewId:_i,resourceName:_n},(resp)=>{
             console.log(resp);
             //document.querySelector('#tx-deploy-view-message').innerHTML = resp.message;        
         });        

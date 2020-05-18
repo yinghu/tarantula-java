@@ -49,7 +49,7 @@ public interface DeploymentServiceProvider extends ServiceProvider {
 
     //deploy and callback on view
 
-    void deploy(OnView onView);
+    boolean deploy(OnView onView);
     void registerOnViewListener(OnView.Listener onViewListener);
 
     //deploy and callback on lobby
