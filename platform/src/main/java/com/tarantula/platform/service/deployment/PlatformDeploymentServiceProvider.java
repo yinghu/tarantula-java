@@ -134,8 +134,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         byte[][] ret = {new byte[0]};
         dc.loadResource(name,in -> {
             try{
-                ret[0] = new byte[in.available()];
-                in.read(ret[0]);
+                ret[0] = in.readAllBytes();
             }catch (Exception ex){
                 log.warn("Resource ["+name+"] failed to load",ex);
             }
