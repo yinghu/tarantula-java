@@ -10,13 +10,14 @@ import java.util.Map;
  */
 public class User extends RecoverableObject implements Access {
 
-    private String login;
-    private String password;//hash of the password
-    private String emailAddress="n/a"; //reset validation email address
-    private boolean active;
-    private boolean validated;
-    private String validator;
-    private String role;
+    protected String login;
+    protected String password;//hash of the password
+    protected String emailAddress="n/a"; //reset validation email address
+    protected boolean active;
+    protected boolean validated;
+    protected boolean primary;
+    protected String validator;
+    protected String role;
     public User(){
         this.vertex = "User";
         this.label = "VA";
@@ -63,6 +64,12 @@ public class User extends RecoverableObject implements Access {
     public void role(String role){
         this.role = role;
     }
+    public boolean primary(){
+        return this.primary;
+    }
+    public void primary(boolean primary){
+        this.primary = primary;
+    }
     public int getFactoryId() {
         return UserPortableRegistry.OID;
     }
@@ -81,6 +88,7 @@ public class User extends RecoverableObject implements Access {
         properties.put("7",emailAddress);
         properties.put("8",validator);
         properties.put("9",this.owner);
+        properties.put("10",this.primary);
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
@@ -93,5 +101,6 @@ public class User extends RecoverableObject implements Access {
         this.emailAddress = (String)properties.get("7");
         this.validator = (String)properties.get("8");
         this.owner = (String)properties.get("9");
+        this.primary = (boolean)properties.get("10");
     }
 }

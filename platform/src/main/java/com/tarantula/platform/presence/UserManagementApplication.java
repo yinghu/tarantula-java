@@ -210,6 +210,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
         acc.distributionKey(systemId);
         acc.password(validated?"":this.context.validator().hashPassword((String) payload.property("password")));
         acc.active(this.activated);//if false do email validation
+        acc.primary(true);
         acc.role(roleName);
         if(ds.create(acc)){
             PresenceIndex px = new PresenceIndex(initialBalance);

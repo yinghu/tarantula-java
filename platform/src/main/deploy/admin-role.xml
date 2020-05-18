@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula>
+    <lobby-context>
+        <type-id>admin-role</type-id>
+        <type>lobby</type>
+        <category>service</category>
+        <name>Admin Role</name>
+        <access-mode>12</access-mode>
+        <deploy-code>1</deploy-code>
+        <description>Tarantula Admin Role Service</description>
+        <application-list>
+            <application>
+                <type-id>admin-role</type-id>
+                <subtype-id>admin-role</subtype-id>
+                <name>Admin Role</name>
+                <type>application</type>
+                <category>admin</category>
+                <singleton>true</singleton>
+                <tag>role/admin</tag>
+                <description>Tarantula Admin Role Service</description>
+                <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
+                <module-name>com.tarantula.admin.AdminRoleModule</module-name>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <access-control>30</access-control>
+            </application>
+
+        </application-list>
+        <view-list>
+            <view type="create.game.cluster">
+                <property name="moduleResourceFile">admin/create.game.cluster.view.html</property>
+            </view>
+        </view-list>
+
+    </lobby-context>
+</tarantula>

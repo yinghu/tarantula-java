@@ -87,6 +87,8 @@ public class SystemValidator{
             TokenValidatorProvider.AuthVendor authVendor = systemValidatorProvider.authVendor(_vname);
             return authVendor.validate(params);
         }
-
+        public boolean upgradeRole(Access access,String role){
+            return systemValidatorProvider.upgradeRole(access,role);
+        }
     }
 }

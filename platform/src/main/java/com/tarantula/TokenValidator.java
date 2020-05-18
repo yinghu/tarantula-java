@@ -28,4 +28,6 @@ public interface TokenValidator{
 
     boolean validateToken(Map<String,Object> params);
 
+    boolean upgradeRole(Access access,String role);
+
 }

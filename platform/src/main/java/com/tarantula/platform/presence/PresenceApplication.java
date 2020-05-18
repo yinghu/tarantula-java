@@ -16,17 +16,16 @@ public class PresenceApplication extends TarantulaApplicationHeader {
 
     private DeploymentServiceProvider deploymentServiceProvider;
     private DataStore userDs;
-
+    private DataStore accountDs;
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         Configuration ya = this.context.configuration("yearlyAccess");
         Configuration ma = this.context.configuration("monthlyAccess");
-        //this.context.log(ya.property("price"),OnLog.WARN);
-        //this.context.log(ma.property("price"),OnLog.WARN);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         userDs = this.context.dataStore("user");
+        accountDs = this.context.dataStore("account");
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
             Presence presence = this.context.presence(t.owner());
             OnBalance ob = (OnBalance)t;
@@ -44,18 +43,14 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             Presence presence = this.context.presence(session.systemId());
             PresenceContext pc = new PresenceContext(session.action());
             pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
-            User auser = new User();
-            auser.distributionKey(session.systemId());
-            if(userDs.load(auser)){
-                pc.access = auser;
-            }
+            pc.access = user(session.systemId());
+            pc.account = account(session.systemId());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onAddEmail")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            User auser = new User();
-            auser.distributionKey(session.systemId());
-            if(userDs.load(auser)){
+            User auser = user(session.systemId());
+            if(auser!=null){
                 auser.emailAddress((String)onAccess.property("emailAddress"));
                 userDs.update(auser);
                 session.write(this.builder.create().toJson(new ResponseHeader("","successful",true)).getBytes(),descriptor.responseLabel());
@@ -65,9 +60,12 @@ public class PresenceApplication extends TarantulaApplicationHeader {
         }
         else if(session.action().equals("onUpgradeRole")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            ResponseHeader responseHeader = new ResponseHeader(session.action(),"You have upgraded to ["+onAccess.name()+"]",true);
+            User user = this.user(session.systemId());
+            boolean suc = this.context.validator().upgradeRole(user,onAccess.name());
+            ResponseHeader responseHeader = new ResponseHeader(session.action(),suc?"You have upgraded to ["+onAccess.name()+"]":"Failed to upgrade",suc);
             session.write(this.builder.create().toJson(responseHeader).getBytes(),descriptor.responseLabel());
         }
+        /**
         else if(session.action().equals("onPlay")){
               OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
               Presence presence = this.context.presence(session.systemId());
@@ -81,7 +79,7 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             PresenceContext pc = new PresenceContext(session.action());
             pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
-        }
+        }**/
         else if (session.action().equals("onAbsence")) {
             this.context.absence(session);
             session.write(this.builder.create().toJson(new ResponseHeader("onAbsence", "off session [" + session.stub() + "]", true)).getBytes(),this.descriptor.responseLabel());
@@ -113,5 +111,21 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes(),this.descriptor.responseLabel());
         }
 
+    }
+    private User user(String systemId){
+        User user = new User();
+        user.distributionKey(systemId);
+        if(userDs.load(user)){
+            return user;
+        }
+        return null;
+    }
+    private Account account(String systemId){
+        UserAccount acc = new UserAccount();
+        acc.distributionKey(systemId);
+        if(accountDs.load(acc)){
+            return acc;
+        }
+        return null;
     }
 }

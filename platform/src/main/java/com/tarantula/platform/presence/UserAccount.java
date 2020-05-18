@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class UserAccount extends User implements Account {
 
-    private String name;
+
     private int userCount;
     private int gameClusterCount;
     private boolean trial;
@@ -24,26 +24,17 @@ public class UserAccount extends User implements Account {
         return UserPortableRegistry.USER_ACCOUNT_CID;
     }
     public Map<String,Object> toMap(){
-        properties.put("1",name);
+        properties.put("1",emailAddress);
         properties.put("2",userCount);
         properties.put("3",gameClusterCount);
         properties.put("4",trial);
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
-        this.name = (String)properties.get("1");
+        this.emailAddress = (String)properties.get("1");
         this.userCount = ((Number) properties.get("2")).intValue();
         this.gameClusterCount = ((Number) properties.get("3")).intValue();
         this.trial = (boolean )properties.get("4");
-    }
-    @Override
-    public String name() {
-        return name;
-    }
-
-    @Override
-    public void name(String name) {
-        this.name = name;
     }
     public int userCount(){
         return userCount;

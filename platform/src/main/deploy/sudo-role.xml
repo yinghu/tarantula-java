@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula>
+    <lobby-context>
+        <type-id>sudo-role</type-id>
+        <type>lobby</type>
+        <category>service</category>
+        <name>Sudo Role</name>
+        <access-mode>12</access-mode>
+        <deploy-code>1</deploy-code>
+        <description>Tarantula Sudo Role Service</description>
+        <application-list>
+            <application>
+                <type-id>sudo-role</type-id>
+                <subtype-id>sudo-role</subtype-id>
+                <name>SudoRole</name>
+                <type>application</type>
+                <category>admin</category>
+                <singleton>true</singleton>
+                <tag>role/sudo</tag>
+                <description>Tarantula Sudo Role Service</description>
+                <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
+                <module-name>com.tarantula.admin.SudoRoleModule</module-name>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <access-control>100</access-control>
+            </application>
+        </application-list>
+        <view-list>
+            <view type="upload.view">
+                <property name="moduleResourceFile">sudo/upload.view.html</property>
+            </view>
+            <view type="deploy.view">
+                <property name="moduleResourceFile">sudo/deploy.view.html</property>
+            </view>
+            <view type="deploy.config">
+                <property name="moduleResourceFile">sudo/deploy.config.view.html</property>
+            </view>
+
+        </view-list>
+
+    </lobby-context>
+</tarantula>

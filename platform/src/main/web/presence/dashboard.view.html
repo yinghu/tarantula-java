@@ -48,6 +48,22 @@
                 <span class='w3-left tx-text-16'>Validation</span>
                 <span id='tx-player-5' class='w3-right tx-text-14'>password</span>
             </div>
+            <div class='w3-panel'>
+                <span class='w3-left tx-text-16'>Primary</span>
+                <span id='tx-player-6' class='w3-right tx-text-14'>true</span>
+            </div>
+            <div class='w3-panel'>
+                <span class='w3-left tx-text-16'>User Count</span>
+                <span id='tx-player-7' class='w3-right tx-text-14'>n/a</span>
+            </div>
+            <div class='w3-panel'>
+                <span class='w3-left tx-text-16'>Game Cluster Count</span>
+                <span id='tx-player-8' class='w3-right tx-text-14'>n/a</span>
+            </div>
+            <div class='w3-panel'>
+                <span class='w3-left tx-text-16'>Account Email</span>
+                <span id='tx-player-9' class='w3-right tx-text-14'>n/a</span>
+            </div>
         </div> 
         <div id="tx-Game" class="w3-container tx-pane" style="display:none">
             <div class='w3-bar w3-white'>
@@ -91,6 +107,12 @@
             document.querySelector('#tx-player-3').innerHTML=resp.access.emailAddress;
             document.querySelector('#tx-player-4').innerHTML=resp.access.role;
             document.querySelector('#tx-player-5').innerHTML=resp.access.validator;
+            document.querySelector('#tx-player-6').innerHTML=resp.access.primary;
+            if(resp.account){
+                document.querySelector('#tx-player-7').innerHTML=resp.account.userCount;
+                document.querySelector('#tx-player-8').innerHTML=resp.account.gameClusterCount;
+                document.querySelector('#tx-player-9').innerHTML=resp.account.emailAddress;
+            }
         }    
     });
     document.querySelector('#tx-list-configs').onclick=()=>{

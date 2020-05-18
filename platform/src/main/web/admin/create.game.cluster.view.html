@@ -33,7 +33,7 @@
 <script>
     document.querySelector('#tx-create-game-cluster').onclick=()=>{
         let _n = document.querySelector('#tx-game-cluster-name').value;
-        TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onCreateGameCluster',name:_n},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'role/admin',command:'onCreateGameCluster',name:_n},(resp)=>{
             document.querySelector('#tx-create-game-cluster-message').innerHTML = resp.message;
         });       
     };

@@ -6,7 +6,7 @@ import com.tarantula.Module;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 
-public class AdminDataStoreModule implements Module {
+public class AdminRoleModule implements Module {
 
     private ApplicationContext context;
     private GsonBuilder builder;

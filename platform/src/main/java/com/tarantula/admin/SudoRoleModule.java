@@ -14,7 +14,7 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AdminSetupModule implements Module,Configuration.Listener {
+public class SudoRoleModule implements Module,Configuration.Listener {
 
     private ApplicationContext context;
     private DeploymentServiceProvider serviceProvider;

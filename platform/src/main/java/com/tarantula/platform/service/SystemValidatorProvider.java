@@ -7,6 +7,7 @@ import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.SystemValidator;
 import com.tarantula.platform.presence.User;
+import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.security.MessageDigest;
@@ -28,8 +29,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private ConcurrentHashMap<String,Presence> pMap;
     private HashMap<String,Access.Role> rMap;
     private HashMap<String,AuthVendor> aMap;
-    private DataStore pdataStore;
-    private DataStore udataStore;
+    private DataStore pdataStore;//presence
+    private DataStore udataStore;//user
+    private DataStore adataStore;//account
     private List<Access.Role> roleList;
     private MessageDigest _messageDigest;
 
@@ -105,6 +107,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.serviceContext = serviceContext;
         this.pdataStore =  this.serviceContext.dataStore("presence",this.serviceContext.partitionNumber());
         this.udataStore =  this.serviceContext.dataStore("user",this.serviceContext.partitionNumber());
+        this.adataStore =  this.serviceContext.dataStore("account",this.serviceContext.partitionNumber());
         AuthVendor google = this.serviceContext.authVendor("google");
         if(google!=null){
             aMap.put("google",(google));
@@ -128,10 +131,10 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.roleList = new ArrayList<>();
         rMap.put(AccessControl.root.name(),AccessControl.root);
         rMap.put(AccessControl.admin.name(),AccessControl.admin);
-        rMap.put(AccessControl.owner.name(),AccessControl.owner);
+        rMap.put(AccessControl.account.name(),AccessControl.account);
         rMap.put(AccessControl.player.name(),AccessControl.player);
         roleList.add(AccessControl.admin);
-        roleList.add(AccessControl.owner);
+        roleList.add(AccessControl.account);
         _messageDigest = MessageDigest.getInstance(MDA);
         this.systemValidator = new SystemValidator();
         this.systemValidator.systemValidatorProvider(this);
@@ -140,5 +143,23 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     @Override
     public void shutdown() throws Exception {
         //this.systemValidator.shutdown();
+    }
+    @Override
+    public boolean upgradeRole(Access access,String role){
+        if(!access.primary()||role==null||(!rMap.containsKey(role))){
+            return false;
+        }
+        Access.Role t = rMap.get(role);
+        Access.Role s = rMap.get(access.role());
+        if(t.accessControl()==AccessControl.root.accessControl()||t.accessControl()<=s.accessControl()){//not allow downgrade
+            return false;
+        }
+        UserAccount acc = new UserAccount();
+        acc.distributionKey(access.distributionKey());
+        acc.emailAddress(access.emailAddress());
+        adataStore.createIfAbsent(acc,true);
+        access.role(t.name());
+        udataStore.update(access);
+        return true;
     }
 }

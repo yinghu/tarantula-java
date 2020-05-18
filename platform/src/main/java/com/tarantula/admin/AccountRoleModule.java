@@ -8,7 +8,7 @@ import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
-public class AdminUserModule implements Module {
+public class AccountRoleModule implements Module {
 
     private ApplicationContext context;
     private GsonBuilder builder;

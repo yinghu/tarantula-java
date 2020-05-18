@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula>
+    <lobby-context>
+        <type-id>account-role</type-id>
+        <type>lobby</type>
+        <category>service</category>
+        <name>Account Role</name>
+        <access-mode>12</access-mode>
+        <deploy-code>1</deploy-code>
+        <description>Tarantula Admin Service</description>
+        <application-list>
+            <application>
+                <type-id>account-role</type-id>
+                <subtype-id>account-role</subtype-id>
+                <name>Account Role</name>
+                <type>application</type>
+                <category>admin</category>
+                <singleton>true</singleton>
+                <tag>role/account</tag>
+                <description>Tarantula Account Role Service</description>
+                <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
+                <module-name>com.tarantula.admin.AccountRoleModule</module-name>
+                <deploy-priority>10</deploy-priority>
+                <access-control>20</access-control>
+            </application>
+        </application-list>
+        <view-list>
+            <view type="add.user">
+                <property name="moduleResourceFile">account/add.user.view.html</property>
+            </view>
+        </view-list>
+
+    </lobby-context>
+</tarantula>

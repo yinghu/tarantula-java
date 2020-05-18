@@ -13,10 +13,9 @@ public interface Access extends Recoverable {
     //LOWEST O - HIGHEST 100
     int PLAYER_ACCESS_CONTROL = 0;//manage own assets on app
 
-    int OWNER_PLAYER_CONTROL = 20;//manage own assets by account
+    int ACCOUNT_ACCESS_CONTROL = 20;//manage own assets by account
 
-    int OWNER_ADMIN_CONTROL = 30;//manage own assets by account
-
+    int ADMIN_ACCESS_CONTROL = 30;//manage own assets by account
 
     int ROOT_ACCESS_CONTROL = 100;//manage all assets with super permission
 
@@ -31,7 +30,8 @@ public interface Access extends Recoverable {
     boolean active();
     void active(boolean active);
     boolean validated();//validated to skip check password if user login from third party login token
-
+    boolean primary();
+    void primary(boolean primary);
     String validator();
 
     String role();

@@ -20,6 +20,7 @@ public class AccessSerializer implements JsonSerializer<Access> {
         jo.addProperty("emailAddress",access.emailAddress());
         jo.addProperty("role",access.role());
         jo.addProperty("validator",access.validator());
+        jo.addProperty("primary",access.primary());
         return jo;
     }
 }
