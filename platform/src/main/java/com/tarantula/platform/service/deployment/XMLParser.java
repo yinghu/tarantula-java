@@ -259,7 +259,11 @@ public class XMLParser extends DefaultHandler{
             }
             else  if(tblock.equals("view-list")&&qname.equals("view")){
                 if(view.contentBaseUrl()==null){
-                    view.contentBaseUrl(view.moduleResourceFile().split("/")[0]);
+                    if(view.moduleResourceFile().contains("/")){
+                        view.contentBaseUrl(view.moduleResourceFile().split("/")[0]);
+                    }else{
+                        view.contentBaseUrl("root");
+                    }
                 }
                 this.configuration.views.add(view);
             }

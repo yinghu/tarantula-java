@@ -11,6 +11,7 @@ public class RootContentHandler implements RequestHandler {
 
     private static final JDKLogger log = JDKLogger.getLogger(RootContentHandler.class);
     private DeploymentServiceProvider deploymentServiceProvider;
+    private OnView invalidView;
     public String name(){
         return "/";
     }
@@ -57,6 +58,7 @@ public class RootContentHandler implements RequestHandler {
 
     @Override
     public void start() throws Exception {
+        this.invalidView = this.deploymentServiceProvider.invalidView();
         log.info("Root content event handler started");
     }
 

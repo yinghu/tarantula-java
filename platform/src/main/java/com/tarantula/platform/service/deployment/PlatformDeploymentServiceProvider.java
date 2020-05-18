@@ -150,7 +150,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     ret = cin.readAllBytes();
                     cin.close();
                 }catch (Exception ex1){
-                    log.warn("Read resource ["+name+"] from backup");
+                    //log.warn("Read resource ["+name+"] from backup");
                     try {if(cin!=null){cin.close();}}catch (Exception ex2){}
                     //read from backup
                     try{
@@ -171,13 +171,17 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     private void checkContent(OnView onView){
         try{
-            log.warn("CHECK VIEW->"+onView.toString());
-            String rn = onView.moduleResourceFile().split("/")[1];
-            File f = new File(contentTemDir+"/"+rn);
+            //log.warn("CHECK VIEW->"+onView.toString());
+            boolean isRoot = !onView.moduleResourceFile().contains("/");
+            String rn = isRoot?onView.moduleResourceFile():(onView.moduleResourceFile().split("/")[1]);
+            //log.warn("CHECK 1->"+rn);
+            File f = new File(this.tarantulaContext.deployDir+"/"+rn);
             if(!f.exists()){
                 return;
             }
-            File fe = new File(contentDir+"/"+onView.moduleResourceFile());
+            String x = isRoot?(contentDir+"/"+onView.contentBaseUrl()+"/"+onView.moduleResourceFile()):(contentDir+"/"+onView.moduleResourceFile());
+            //log.warn("CHECK 2->"+x);
+            File fe = new File(x);
             if(!fe.exists()||fe.lastModified()<f.lastModified()){
                 BufferedInputStream fin = new BufferedInputStream(new FileInputStream(f));
                 BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(fe));
@@ -193,39 +197,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public byte[] resource(String name,String flag){
         //log.warn("load resource ["+name+"] from ["+flag+"]");
         return flag==null?fromContext(name):fromModule(name,flag);
-        /**
-        if(flag!=null){
-            //log.warn("load resource ["+name+"] from ["+flag+"]");
-            String rid = flag.split("=")[1].trim();
-            DynamicModuleClassLoader dc = cMap.get(rid);
-            byte[][] ret = {new byte[0]};
-            dc.loadResource(name,in -> {
-                try{
-                    ret[0] = new byte[in.available()];
-                    in.read(ret[0]);
-                }catch (Exception ex){
-                    log.warn("Resource ["+name+"] failed to load",ex);
-                }
-            });
-            return ret[0];
-        }
-        return rMap.computeIfAbsent(name,(rk)->{
-                byte[] ret = new byte[0];
-                BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(name));
-                try{
-                    ret = new byte[in.available()];
-                    in.read(ret);
-                }catch (Exception ex){
-                    log.warn("Resource ["+name+"] not existed",ex);
-                }
-                finally {
-                    if(in!=null){
-                        try{in.close();}catch (Exception ex){}
-                    }
-                }
-                return ret;
-            }
-        );**/
     }
     public void resource(Descriptor descriptor, String name, Module.OnResource onResource){
         DynamicModuleClassLoader dyn = cMap.get(descriptor.subtypeId());
@@ -569,6 +540,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerInstanceRegistryListener(InstanceRegistry.Listener instanceRegistryListener){
         rListeners.put(instanceRegistryListener.onLobby(),instanceRegistryListener);
     }
+    public OnView invalidView(){
+        return (OnView)vMap.get("invalid.request");
+    }
     public boolean deploy(OnView onView){
         if(!vMap.containsKey(onView.viewId())&&onView.distributionKey()==null){
             //create new entry
@@ -578,7 +552,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 return false;
             }
         }
-        log.warn("VIEW->"+onView.distributionKey()+"<>"+onView.toString());
+        //log.warn("VIEW->"+onView.distributionKey()+"<>"+onView.toString());
         OnViewEvent onViewEvent = new OnViewEvent(this.eventTopic,this.localTopic,onView);
         this.integrationEventService.publish(onViewEvent);
         return true;

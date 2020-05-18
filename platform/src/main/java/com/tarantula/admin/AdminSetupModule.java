@@ -102,9 +102,13 @@ public class AdminSetupModule implements Module,Configuration.Listener {
             OnView onView = new OnViewTrack();
             onView.owner(onAccess.typeId());//associated with a lobby type Id
             onView.viewId((String)onAccess.property("viewId"));
-            String rname = onAccess.property("deployUrl")+"/"+onAccess.property("resourceName");
+            if(onAccess.property("deployUrl").equals("root")){
+                onView.moduleResourceFile((String) onAccess.property("resourceName"));
+            }else{
+                String rname = onAccess.property("deployUrl")+"/"+onAccess.property("resourceName");
+                onView.moduleResourceFile(rname);
+            }
             onView.contentBaseUrl((String) onAccess.property("deployUrl"));
-            onView.moduleResourceFile(rname);
             this.serviceProvider.deploy(onView);
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"view deployed",true)).getBytes(),label());
         }
@@ -164,8 +168,8 @@ public class AdminSetupModule implements Module,Configuration.Listener {
 
     @Override
     public void onConfiguration(Configuration c) {
-        this.context.log(c.distributionKey(),OnLog.WARN);
-        this.context.log(c.toString(),OnLog.WARN);
+        //this.context.log(c.distributionKey(),OnLog.WARN);
+        //this.context.log(c.toString(),OnLog.WARN);
         cMap.put(c.distributionKey(),c);
     }
 }

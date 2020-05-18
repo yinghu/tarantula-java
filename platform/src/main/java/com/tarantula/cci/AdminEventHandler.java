@@ -16,7 +16,7 @@ import com.tarantula.platform.util.ResponseSerializer;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AdminEventHandler implements RequestHandler {
+public class AdminEventHandler implements RequestHandler{
 
     private static TarantulaLogger log = JDKLogger.getLogger(AdminEventHandler.class);
 
@@ -28,6 +28,7 @@ public class AdminEventHandler implements RequestHandler {
     private String serverTopic;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
     private GsonBuilder builder;
+    private OnView invalidView;
     public AdminEventHandler(){
 
     }
@@ -40,33 +41,10 @@ public class AdminEventHandler implements RequestHandler {
             OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
             String contentType = exchange.path().endsWith(".html")?"text/html":"text/javascript";
             byte[] ret = this.deploymentServiceProvider.resource(exchange.path().substring(1),null);
+            if(ret.length==0){
+                ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile(),null);
+            }
             exchange.onEvent(new ResponsiveEvent("","",ret,0,contentType,"",true));
-            /**
-            if(action.equals("onAdmin")){
-                String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
-                String name = exchange.header(Session.TARANTULA_NAME);
-                String password = exchange.header(Session.TARANTULA_PASSWORD);
-                byte[] eb= "{}".getBytes();
-                if(tokenValidator.validateAccessKey(accessKey)){
-                    AccessIndex accessIndex = accessIndexService.get(name);
-                    if(accessIndex!=null){
-                        _hex.put(exchange.id(),exchange);
-                        OnAccess onAccess = new OnAccessTrack();
-                        onAccess.property("password",password);
-                        ServiceActionEvent event = new ServiceActionEvent(this.serverTopic,exchange.id(),this.builder.create().toJson(onAccess).getBytes());
-                        event.action("onLogin");
-                        event.systemId(accessIndex.distributionKey());
-                        RoutingKey _routingKey = eventService.routingKey(accessIndex.distributionKey(),"index/user");
-                        event.destination(_routingKey.route());
-                        event.routingNumber(_routingKey.routingNumber());
-                        this.eventService.publish(event);
-                    }else{
-                        exchange.onEvent(new ResponsiveEvent("","",eb,"admin",true));
-                    }
-                }
-                else{
-                    exchange.onEvent(new ResponsiveEvent("","",eb,"admin",true));
-                }**/
 
         }catch (Exception ex){
             ex.printStackTrace();
@@ -82,6 +60,7 @@ public class AdminEventHandler implements RequestHandler {
         this.builder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
+        this.invalidView = this.deploymentServiceProvider.invalidView();
         log.info("Admin event handler started");
     }
 
