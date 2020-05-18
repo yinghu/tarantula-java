@@ -22,8 +22,8 @@ public class PresenceApplication extends TarantulaApplicationHeader {
         super.setup(context);
         Configuration ya = this.context.configuration("yearlyAccess");
         Configuration ma = this.context.configuration("monthlyAccess");
-        this.context.log(ya.property("price"),OnLog.WARN);
-        this.context.log(ma.property("price"),OnLog.WARN);
+        //this.context.log(ya.property("price"),OnLog.WARN);
+        //this.context.log(ma.property("price"),OnLog.WARN);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         userDs = this.context.dataStore("user");
