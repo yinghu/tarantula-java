@@ -13,9 +13,8 @@
         <div class="w3-bar w3-green">
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Player</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Game</span>
+            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Admin</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">API</span>
-            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">DataStore</span>
-            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Cluster</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Extension</span>
         </div>
         <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
@@ -39,7 +38,7 @@
             </div>
             <div class='w3-panel'>
                 <span class='w3-left tx-text-16'>Email Address</span>
-                <span id='tx-player-3' class='w3-right tx-text-14'>yinghu.lu@gmail.com</span>
+                <span id='tx-player-3' class='w3-right tx-text-14'>n/a</span>
             </div>
             <div class='w3-panel'>
                 <span class='w3-left tx-text-16'>System Role</span>
@@ -53,35 +52,21 @@
         <div id="tx-Game" class="w3-container tx-pane" style="display:none">
             <div class='w3-bar w3-white'>
                 <span class='w3-bar-item w3-left tx-margin-bottom-8'><i class="fa fa-bomb w3-text-orange" style="font-size:24px"></i></span>
-                <span view-id='create.game.cluster' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create Game Cluster</span>
+                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>List Game</span>
             </div>
         </div>  
+        <div id="tx-Admin" class="w3-container tx-pane" style="display:none">
+            <div class='w3-bar w3-white'>
+                <span class='w3-bar-item w3-left tx-margin-bottom-8'><i class="fa fa-cogs w3-text-orange" style="font-size:24px"></i></span>
+                <span view-id='create.game.cluster' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create Game Cluster</span>
+            </div>
+        </div>
         <div id="tx-API" class="w3-container tx-pane" style="display:none">
             <div class='w3-bar w3-white'>
                 <span class='w3-bar-item w3-left tx-margin-bottom-8'><i class="fa fa-code-fork w3-text-orange" style="font-size:24px"></i></span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upgrade Role</span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>User Update</span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add User</span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Find User</span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add Recovery Email</span>
-            </div>
-        </div>
-        <div id="tx-DataStore" class="w3-container tx-pane" style="display:none">
-            <div class='w3-bar w3-white'>
-                <span class='w3-bar-item w3-left tx-margin-bottom-8'><i class="fa fa-database w3-text-orange" style="font-size:24px"></i></span>
-                <span view-id='list.datastore' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>List Data Store</span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add Data Store</span>
+                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Login</span>
+                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Register</span>
               
-            </div>
-        </div>
-        <div id="tx-Cluster" class="w3-container tx-pane" style="display:none">
-            <div class='w3-bar w3-white'>
-                <span class='w3-bar-item w3-left tx-margin-bottom-8'><i class="fa fa-cubes w3-text-orange" style="font-size:24px"></i></span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upgrade Role</span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>User Update</span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add User</span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Find User</span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add Recovery Email</span>
             </div>
         </div>
         <div id="tx-Extension" class="w3-container tx-pane" style="display:none">
