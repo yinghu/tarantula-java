@@ -554,6 +554,9 @@ public class TarantulaContext implements Serviceable,ServiceContext{
             dataStoreProviders.forEach((k,v)->{
                 v.atMidnight();
             });
+            availableApplicationManagers.forEach((k,v)->{
+                v.atMidnight();
+            });
             endpointService.atMidnight();
  	    }catch (Exception ex){
  	        ex.printStackTrace();

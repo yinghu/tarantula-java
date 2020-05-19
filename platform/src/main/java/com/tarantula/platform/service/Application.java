@@ -16,4 +16,6 @@ public interface Application extends Serviceable{
     boolean launch(Instance instance);
     boolean checkAccessControl(Event event);
 
+    default void atMidnight(){}
+
 }

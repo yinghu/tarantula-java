@@ -145,4 +145,7 @@ public class DefaultApplication implements Application {
             return false;
         }
     }
+    public void atMidnight(){
+        log.warn("Running midnight check->"+deploymentDescriptor.distributionKey());
+    }
 }
