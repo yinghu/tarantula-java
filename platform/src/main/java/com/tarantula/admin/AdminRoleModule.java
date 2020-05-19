@@ -3,7 +3,7 @@ package com.tarantula.admin;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.platform.OnAccessTrack;
+import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.presence.UserAccount;
@@ -30,7 +30,22 @@ public class AdminRoleModule implements Module {
             if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
                 GameCluster gc = this.deploymentServiceProvider.createGameCluster(onAccess.name());
-                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),gc.name(),true)).getBytes(),label());
+                if(!gc.disabled()){
+                    IndexSet idx = new IndexSet();
+                    idx.distributionKey(acc.distributionKey());
+                    idx.label("games");
+                    idx.keySet.add(gc.distributionKey());
+                    if(!account.createIfAbsent(idx,true)){
+                        idx.keySet.add(gc.distributionKey());//update on existing
+                        account.update(idx);
+                    }
+                    idx.keySet.forEach((k)->{
+                        this.context.log("KEY->"+k,OnLog.WARN);
+                    });
+                    acc.gameClusterCount(1);
+                    account.update(acc);
+                }
+                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),gc.disabled()?"failed":gc.name(),gc.disabled())).getBytes(),label());
             }
             else{
                 //reach max count

@@ -14,12 +14,14 @@ public class GameCluster extends OnAccessTrack implements Portable {
 
     @Override
     public Map<String,Object> toMap(){
-        properties.put("1",accessKey);
+        properties.put("1",name);
+        properties.put("2",accessKey);
         return properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        accessKey = (String) properties.get("1");
+        name = (String) properties.get("1");
+        accessKey = (String) properties.get("2");
     }
 
     @Override
@@ -31,12 +33,16 @@ public class GameCluster extends OnAccessTrack implements Portable {
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeUTF("1",name);
         portableWriter.writeBoolean("2",disabled);
+        portableWriter.writeUTF("3",this.bucket);
+        portableWriter.writeUTF("4",oid);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         name = portableReader.readUTF("1");
         disabled = portableReader.readBoolean("2");
+        bucket = portableReader.readUTF("3");
+        oid = portableReader.readUTF("4");
     }
 
     @Override

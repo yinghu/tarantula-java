@@ -11,78 +11,170 @@
     </div>
     <div><!-- Dash board content-->
         <div class="w3-bar w3-green">
-            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Player</span>
-            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Game</span>
-            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Admin</span>
+            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Account</span>
+            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">GameCluster</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">API</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Extension</span>
         </div>
         <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
         <div class="w3-display-container w3-white tx-content-8"></div>  
-        <div id="tx-Player" class="w3-container tx-pane">
+        <div id="tx-Account" class="w3-container tx-pane">
             <div class='w3-bar w3-white'>
                 <span class='w3-bar-item w3-left tx-margin-bottom-8'><i class="fa fa-user w3-text-orange" style="font-size:24px"></i></span>
-                <span view-id='upgrade.role' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upgrade Role</span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>User Update</span>
-                <span view-id='add.user' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add User</span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Find User</span>
-                <span view-id='add.email' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add Recovery Email</span>
+                <span view-id='upgrade.role' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>UpgradeRole</span>
+                <span view-id='change.password' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>ChangePassword</span>
+                <span view-id='add.user' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>AddUser</span>
+                <span view-id='find.user' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>FindUser</span>
+                <span view-id='add.email' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>AddEmail</span>
             </div>
-            <div class='w3-panel'>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class='w3-left tx-text-16'>Player Name</span>
                 <span id='tx-player-1' class='w3-right tx-text-14'>root</span>
             </div>
-            <div class='w3-panel'>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class='w3-left tx-text-16'>Virtual Balance</span>
                 <span id='tx-player-2' class='w3-right tx-text-14'>10000</span>
             </div>
-            <div class='w3-panel'>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class='w3-left tx-text-16'>Email Address</span>
                 <span id='tx-player-3' class='w3-right tx-text-14'>n/a</span>
             </div>
-            <div class='w3-panel'>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class='w3-left tx-text-16'>System Role</span>
                 <span id='tx-player-4' class='w3-right tx-text-14'>root</span>
             </div>
-            <div class='w3-panel'>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class='w3-left tx-text-16'>Validation</span>
                 <span id='tx-player-5' class='w3-right tx-text-14'>password</span>
             </div>
-            <div class='w3-panel'>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class='w3-left tx-text-16'>Primary</span>
                 <span id='tx-player-6' class='w3-right tx-text-14'>true</span>
             </div>
-            <div class='w3-panel'>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class='w3-left tx-text-16'>User Count</span>
                 <span id='tx-player-7' class='w3-right tx-text-14'>n/a</span>
             </div>
-            <div class='w3-panel'>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class='w3-left tx-text-16'>Game Cluster Count</span>
                 <span id='tx-player-8' class='w3-right tx-text-14'>n/a</span>
             </div>
-            <div class='w3-panel'>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class='w3-left tx-text-16'>Account Email</span>
                 <span id='tx-player-9' class='w3-right tx-text-14'>n/a</span>
             </div>
         </div> 
-        <div id="tx-Game" class="w3-container tx-pane" style="display:none">
-            <div class='w3-bar w3-white'>
-                <span class='w3-bar-item w3-left tx-margin-bottom-8'><i class="fa fa-bomb w3-text-orange" style="font-size:24px"></i></span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>List Game</span>
+        
+        <div id="tx-GameCluster" class="w3-container tx-pane" style="display:none">
+            <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
+                <div class="w3-display-topright w3-padding">
+                    <span view-id='create.game.cluster' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>           
+                </div>
+                <div class="w3-display-topleft w3-padding">
+                    <span><i class="fa fa-cubes w3-text-green" style="font-size:24px"></i></span>
+                    <span class="tx-margin-left-8 tx-text-24">Basic Game Cluster</span>
+                </div>
+                <div class="w3-display-bottomright w3-padding">
+                    
+                </div>
             </div>
-        </div>  
-        <div id="tx-Admin" class="w3-container tx-pane" style="display:none">
-            <div class='w3-bar w3-white'>
-                <span class='w3-bar-item w3-left tx-margin-bottom-8'><i class="fa fa-cogs w3-text-orange" style="font-size:24px"></i></span>
-                <span view-id='create.game.cluster' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create Game Cluster</span>
+            <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
+                <div class="w3-display-topright w3-padding">
+                    <span view-id='create.game.cluster' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>           
+                </div>
+                <div class="w3-display-topleft w3-padding">
+                    <span><i class="fa fa-cubes w3-text-green" style="font-size:24px"></i></span>
+                    <span class="tx-margin-left-8 tx-text-24">Standard Game Cluster</span>
+                </div>
+                <div class="w3-display-bottomright w3-padding">
+                    
+                </div>
+            </div>
+            <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
+                <div class="w3-display-topright w3-padding">
+                    <span view-id='create.game.cluster' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>           
+                </div>
+                <div class="w3-display-topleft w3-padding">
+                    <span><i class="fa fa-cubes w3-text-green" style="font-size:24px"></i></span>
+                    <span class="tx-margin-left-8 tx-text-24">Advanced Game Cluster</span>
+                </div>
+                <div class="w3-display-bottomright w3-padding">
+                    
+                </div>
             </div>
         </div>
         <div id="tx-API" class="w3-container tx-pane" style="display:none">
-            <div class='w3-bar w3-white'>
-                <span class='w3-bar-item w3-left tx-margin-bottom-8'><i class="fa fa-code-fork w3-text-orange" style="font-size:24px"></i></span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Login</span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Register</span>
-              
+            <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
+                <div class="w3-display-topright w3-padding">
+                    <span view-id='register.dedicated.server' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Try</span>           
+                </div>
+                <div class="w3-display-topleft w3-padding">
+                    <span><i class="fa fa-cubes w3-text-green" style="font-size:24px"></i></span>
+                    <span class="tx-margin-left-8 tx-text-24">Dedicated Server Register</span>
+                </div>
+                <div class="w3-display-bottomright w3-padding">
+                    
+                </div>
+            </div>
+            <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
+                <div class="w3-display-topright w3-padding">
+                    <span view-id='register.dedicated.server' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Try</span>           
+                </div>
+                <div class="w3-display-topleft w3-padding">
+                    <span><i class="fa fa-cubes w3-text-green" style="font-size:24px"></i></span>
+                    <span class="tx-margin-left-8 tx-text-24">Dedicated Server Register</span>
+                </div>
+                <div class="w3-display-bottomright w3-padding">
+                    
+                </div>
+            </div>
+            <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
+                <div class="w3-display-topright w3-padding">
+                    <span view-id='register.dedicated.server' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Try</span>           
+                </div>
+                <div class="w3-display-topleft w3-padding">
+                    <span><i class="fa fa-cubes w3-text-green" style="font-size:24px"></i></span>
+                    <span class="tx-margin-left-8 tx-text-24">Set Game Data</span>
+                </div>
+                <div class="w3-display-bottomright w3-padding">
+                    
+                </div>
+            </div>
+            <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
+                <div class="w3-display-topright w3-padding">
+                    <span view-id='register.dedicated.server' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Try</span>           
+                </div>
+                <div class="w3-display-topleft w3-padding">
+                    <span><i class="fa fa-cubes w3-text-green" style="font-size:24px"></i></span>
+                    <span class="tx-margin-left-8 tx-text-24">Get Game Data</span>
+                </div>
+                <div class="w3-display-bottomright w3-padding">
+                    
+                </div>
+            </div>
+            <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
+                <div class="w3-display-topright w3-padding">
+                    <span view-id='register.dedicated.server' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Try</span>           
+                </div>
+                <div class="w3-display-topleft w3-padding">
+                    <span><i class="fa fa-cubes w3-text-green" style="font-size:24px"></i></span>
+                    <span class="tx-margin-left-8 tx-text-24">Join Room</span>
+                </div>
+                <div class="w3-display-bottomright w3-padding">
+                    
+                </div>
+            </div>
+            <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
+                <div class="w3-display-topright w3-padding">
+                    <span view-id='register.dedicated.server' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Try</span>           
+                </div>
+                <div class="w3-display-topleft w3-padding">
+                    <span><i class="fa fa-cubes w3-text-green" style="font-size:24px"></i></span>
+                    <span class="tx-margin-left-8 tx-text-24">Get Statistics</span>
+                </div>
+                <div class="w3-display-bottomright w3-padding">
+                    
+                </div>
             </div>
         </div>
         <div id="tx-Extension" class="w3-container tx-pane" style="display:none">
@@ -93,7 +185,6 @@
                 <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Module</span>
                 <span id='tx-list-views' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>List Views</span>
                 <span id='tx-list-configs' class='w3-bar-item w3-right w3-tag w3-round w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>List Configs</span>
-                
             </div>
         </div>
     </div>
