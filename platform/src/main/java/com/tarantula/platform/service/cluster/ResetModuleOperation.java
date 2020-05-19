@@ -18,7 +18,7 @@ public class ResetModuleOperation extends Operation {
     private String codebase;
     private String artifact;
     private String version;
-    private String result;
+    private boolean result;
 
     public ResetModuleOperation() {
     }

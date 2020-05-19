@@ -226,6 +226,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     c.descriptor.onEdge(true);
                     c.descriptor.owner(query.distributionKey());
                     dataStore.create(c.descriptor);
+                    dataStore.create(new LobbyTypeIdIndex(params[0],c.descriptor.typeId(),c.descriptor.distributionKey()));
                     blist.add(c.descriptor);
                     c.applications.forEach((a)->{
                         a.owner(c.descriptor.distributionKey());
@@ -346,33 +347,22 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
         return arrayList;
     }
-    public String addLobby(Descriptor descriptor){
+    public boolean addLobby(Descriptor descriptor){
         DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyQuery query = new LobbyQuery(ds.bucket());
-        AtomicBoolean duplicated = new AtomicBoolean(false);
-        ResponseHeader resp = new ResponseHeader("addLobby");
-        ds.list(query,(d)->{
-            if(descriptor.typeId().equals(d.typeId())){
-                duplicated.set(true);
-                return false;
-            }
-            return true;
-        });
-        if(duplicated.get()){
-            resp.successful(false);
-            resp.message(descriptor.typeId()+" already existed");
-            return this.builder.create().toJson(resp);
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(ds.bucket(),descriptor.typeId());
+        if(ds.load(lobbyTypeIdIndex)){
+            return false;
         }
+        ds.create(lobbyTypeIdIndex);
         descriptor.owner(ds.bucket());
-        descriptor.label(query.label());
+        descriptor.label(LobbyQuery.LABEL);
         descriptor.onEdge(true);
         descriptor.resetEnabled(true);
         ds.create(descriptor);
         if(descriptor.deployCode()<=0||descriptor.tag()==null){
-            resp.successful(true);
-            resp.message("lobby created with deployCode ->"+descriptor.deployCode());
-            return this.builder.create().toJson(resp);
+            return true;
         }
+        //Add instance registry lobby
         DeploymentDescriptor lobby = new DeploymentDescriptor();
         lobby.typeId(descriptor.typeId());
         lobby.subtypeId(descriptor.typeId()+"-lobby");
@@ -390,63 +380,46 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         lobby.owner(descriptor.distributionKey());
         lobby.onEdge(true);
         if(ds.create(lobby)){
-            resp.message(lobby.distributionKey()+" created on ["+descriptor.typeId()+"]");
+            return true;
         }
         else{
-            resp.successful(false);
-            resp.message("failed to create lobby on ["+descriptor.typeId()+"]");
+            return false;
         }
-        return this.builder.create().toJson(resp);
     }
-    public String enableLobby(String typeId,boolean enabled){
+    public boolean enableLobby(String typeId,boolean enabled){
         DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyQuery query = new LobbyQuery(ds.bucket());
-        ResponseHeader resp = new ResponseHeader("enableLobby");
-        resp.successful(false);
-        ds.list(query,(d)->{
-            if(typeId.equals(d.typeId())){
-                d.disabled(!enabled);
-                resp.successful(true);
-                resp.message(d.distributionKey()+" disabled ["+d.disabled()+"]");
-                ds.update(d);
-                return false;
-            }
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(ds.bucket(),typeId);
+        if(!ds.load(query)){
+            return false;
+        }
+        LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
+        lobbyDescriptor.distributionKey(query.index());
+        if(ds.load(lobbyDescriptor)){
+            lobbyDescriptor.disabled(enabled);
+            ds.update(lobbyDescriptor);
             return true;
-        });
-        return this.builder.create().toJson(resp);
+        }
+        else{
+            return false;
+        }
     }
     public String enableApplication(String applicationId,boolean enabled){
         DataStore ds = this.tarantulaContext.masterDataStore();
         DeploymentDescriptor app = new DeploymentDescriptor();
         app.distributionKey(applicationId);
-        ResponseHeader resp = new ResponseHeader("enableApplication");
-        resp.successful(false);
+        String typeId = null;
         if(ds.load(app)){
             app.disabled(!enabled);
             ds.update(app);
-            resp.message(app.distributionKey()+" disabled ["+app.disabled()+"]");
-            resp.toMap().put("typeId",app.typeId());
-            resp.toMap().put("disabled",app.disabled());
-            resp.successful(true);
+            typeId = app.typeId();
         }
-        return this.builder.create().toJson(resp);
+        return typeId;
     }
     public String addApplication(Descriptor descriptor){
         DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyQuery query = new LobbyQuery(ds.bucket());
-        Descriptor[] lobby={null};
-        ResponseHeader resp = new ResponseHeader("addApplication");
-        ds.list(query,(d)->{
-            if(descriptor.typeId().equals(d.typeId())){
-                lobby[0] = d;
-                return false;
-            }
-            return true;
-        });
-        if(lobby[0]==null){
-            resp.successful(false);
-            resp.message("failed to create application on"+descriptor.typeId()+"]");
-            return this.builder.create().toJson(resp);
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(ds.bucket(),descriptor.typeId());
+        if(!ds.load(query)){
+            return null;
         }
         if(!descriptor.singleton()){
             descriptor.applicationClassName("com.tarantula.platform.playmode.DynamicModuleApplication");
@@ -457,50 +430,33 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         descriptor.resetEnabled(true);
         descriptor.runtimeDuration(descriptor.runtimeDuration()*60*1000);
         descriptor.runtimeDurationOnInstance(descriptor.runtimeDurationOnInstance()*60*1000);
-        descriptor.owner(lobby[0].distributionKey());
+        descriptor.owner(query.index());
         descriptor.label("LDA");
         descriptor.onEdge(true);
         if(ds.create(descriptor)){
-            resp.toMap().put("applicationId",descriptor.distributionKey());
-            resp.message(descriptor.distributionKey()+" created on ["+descriptor.typeId()+"]");
+            return descriptor.distributionKey();
         }
-        else{
-            resp.successful(false);
-            resp.message("failed to create application on ["+descriptor.typeId()+"]");
+        else {
+            return null;
         }
-
-        return this.builder.create().toJson(resp);
     }
-    public String addView(OnView view){
-        ResponseHeader resp = new ResponseHeader("addView");
+    public boolean addView(OnView view){
         DataStore ds = this.tarantulaContext.masterDataStore();
         log.warn("Add view->"+view.owner());
-        LobbyQuery query = new LobbyQuery(ds.bucket());
-        Descriptor[] lobby={null};
-        ds.list(query,(d)->{
-            if(view.owner().equals(d.typeId())){
-                lobby[0] = d;
-                return false;
-            }
-            return true;
-        });
-        if(lobby[0]==null){
-            resp.successful(false);
-            resp.message("["+view.owner()+"] not found");
-            return this.builder.create().toJson(resp);
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(ds.bucket(),view.owner());
+        if(!ds.load(query)){
+            return false;
         }
-        view.owner(lobby[0].distributionKey());
+        view.owner(query.index());
         if(ds.create(view)){
-            resp.message(view.distributionKey());
+            return true;
         }
         else{
-            resp.successful(false);
-            resp.message("failed to create view ["+view.viewId()+"]");
+            return false;
         }
-        return this.builder.create().toJson(resp);
     }
-    public String resetModule(String lobbyId,Descriptor descriptor){
-        ResponseHeader resp = new ResponseHeader("resetModule",descriptor.subtypeId(),false);
+    public boolean resetModule(String lobbyId,Descriptor descriptor){
+        boolean[] suc ={false};
         DataStore dataStore = this.tarantulaContext.masterDataStore();
         dataStore.list(new ApplicationQuery(lobbyId),(a)->{
             if(a.subtypeId().equals(descriptor.subtypeId())){
@@ -508,11 +464,11 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 a.moduleArtifact(descriptor.moduleArtifact());
                 a.moduleVersion(descriptor.moduleVersion());
                 dataStore.update(a);
-                resp.successful(true);
+                suc[0]=true;
             }
             return true;
         });
-        return this.builder.create().toJson(resp);
+        return suc[0];
     }
     @Override
     public void memberAdded(MembershipServiceEvent membershipServiceEvent) {
@@ -568,24 +524,33 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
     }
 
-    public String createGameCluster(Descriptor gameCluster){
-        ResponseHeader responseHeader = new ResponseHeader();
+    public boolean createGameCluster(GameCluster gameCluster){
+        ///ResponseHeader responseHeader = new ResponseHeader();
+        boolean suc = true;
         try {
+            DataStore mds = this.tarantulaContext.masterDataStore();
+            LobbyQuery lq = new LobbyQuery(mds.bucket());
+            mds.list(lq,(b)->{
+                log.warn(b.typeId()+"<><><>"+b.distributionKey());
+                LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(mds.bucket(),b.typeId());
+                mds.load(lobbyTypeIdIndex);
+                log.warn(lobbyTypeIdIndex.key().asString()+"<><><>"+lobbyTypeIdIndex.index());
+                return true;
+            });
             XMLParser parser = new XMLParser();
             parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-singleton.xml"));
             for (LobbyConfiguration configuration : parser.configurations) {
                 log.warn(configuration.descriptor.typeId());
-                configuration.applications.forEach((a)->{
-                    log.warn(a.tag());
-                });
+                log.warn(configuration.descriptor.typeId().replace("game",gameCluster.name()));
             }
-            responseHeader.successful(true);
-            responseHeader.message(gameCluster.typeId()+" has created");
+            //responseHeader.successful(true);
+            //responseHeader.message(gameCluster.typeId()+" has created");
         }catch (Exception ex){
-            responseHeader.successful(false);
-            responseHeader.message(ex.getMessage());
+            //responseHeader.successful(false);
+            //responseHeader.message(ex.getMessage());
+            suc = false;
         }
-        return this.builder.create().toJson(responseHeader);
+        return suc;//this.builder.create().toJson(responseHeader);
     }
 
 }

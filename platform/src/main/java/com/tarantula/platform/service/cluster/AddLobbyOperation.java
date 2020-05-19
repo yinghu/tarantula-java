@@ -17,7 +17,7 @@ public class AddLobbyOperation extends Operation {
 
     private Descriptor descriptor;
 
-    private String result;
+    private boolean result;
 
     public AddLobbyOperation() {
     }

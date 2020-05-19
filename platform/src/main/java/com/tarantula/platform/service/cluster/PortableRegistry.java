@@ -18,6 +18,8 @@ public class PortableRegistry extends AbstractRecoverableListener{
     public static final int APPLICATION_CONFIGURATION_CID = 11; //DEPLOY OBJECT
     public static final int ON_LOBBY_CID = 12;
 
+    public static final int LOBBY_TYPE_ID_INDEX_CID = 13;
+
     public static final int NODE_CID = 15;
 
     public static final int SERVICE_CONFIGURATION_CID = 20;//DEPLOY OBJECT
@@ -28,7 +30,7 @@ public class PortableRegistry extends AbstractRecoverableListener{
 
     public static final int ON_SESSION_CID = 25;//DEPLOY OBJECT
 
-    public static final int KEY_INDEX_CID = 26;
+    public static final int INDEX_SET_CID = 26;
 
     public static final int ON_CONNECTION_CID = 27;
 
@@ -61,6 +63,9 @@ public class PortableRegistry extends AbstractRecoverableListener{
             case ON_LOBBY_CID:
                 _ins = new OnLobbyTrack();
                 break;
+            case LOBBY_TYPE_ID_INDEX_CID:
+                _ins = new LobbyTypeIdIndex();
+                break;
             case ON_VIEW_OID:
                 _ins = new OnViewTrack();
                 break;
@@ -80,7 +85,7 @@ public class PortableRegistry extends AbstractRecoverableListener{
             case ON_SESSION_CID:
                 _ins = new OnSessionTrack();
                 break;
-            case KEY_INDEX_CID:
+            case INDEX_SET_CID:
                 _ins = new IndexSet();
                 break;
 

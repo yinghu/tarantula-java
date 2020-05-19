@@ -17,7 +17,7 @@ public class AddViewOperation extends Operation {
     private String typeId;
     private OnView view;
 
-    private String result;
+    private boolean result;
 
     public AddViewOperation() {
     }

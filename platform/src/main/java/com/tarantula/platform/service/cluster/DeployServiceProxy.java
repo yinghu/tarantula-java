@@ -6,6 +6,7 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
 import com.tarantula.Descriptor;
 import com.tarantula.OnView;
+import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.DeployService;
@@ -92,12 +93,12 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public String addLobby(Descriptor lobby){
+    public boolean addLobby(Descriptor lobby){
         NodeEngine nodeEngine = getNodeEngine();
         AddLobbyOperation operation = new AddLobbyOperation(lobby);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
-            final Future<String> future = builder.invoke();
+            final Future<Boolean> future = builder.invoke();
             return future.get(); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
@@ -114,12 +115,12 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public String enableLobby(String typeId,boolean enabled){
+    public boolean enableLobby(String typeId,boolean enabled){
         NodeEngine nodeEngine = getNodeEngine();
         EnableLobbyOperation operation = new EnableLobbyOperation(typeId,enabled);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
-            final Future<String> future = builder.invoke();
+            final Future<Boolean> future = builder.invoke();
             return future.get(); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
@@ -136,35 +137,35 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public String addView(OnView view){
+    public boolean addView(OnView view){
         NodeEngine nodeEngine = getNodeEngine();
         AddViewOperation operation = new AddViewOperation(view);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
-            final Future<String> future = builder.invoke();
+            final Future<Boolean> future = builder.invoke();
             return future.get(); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public String resetModule(String lobbyId,Descriptor descriptor){
+    public boolean resetModule(String lobbyId,Descriptor descriptor){
         NodeEngine nodeEngine = getNodeEngine();
         ResetModuleOperation operation = new ResetModuleOperation(lobbyId,descriptor);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
-            final Future<String> future = builder.invoke();
+            final Future<Boolean> future = builder.invoke();
             return future.get(); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
     }
 
-    public String createGameCluster(Descriptor gameCluster){
+    public boolean createGameCluster(GameCluster gameCluster){
         NodeEngine nodeEngine = getNodeEngine();
         CreateGameClusterOperation operation = new CreateGameClusterOperation(gameCluster);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
-            final Future<String> future = builder.invoke();
+            final Future<Boolean> future = builder.invoke();
             return future.get(); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);

@@ -14,7 +14,7 @@ public class EnableLobbyOperation extends Operation {
     private String  typeId;
     private boolean enabled;
 
-    private String result;
+    private boolean result;
 
     public EnableLobbyOperation() {
     }

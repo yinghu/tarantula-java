@@ -40,7 +40,8 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             desc.accessMode(Access.PROTECT_ACCESS_MODE);
             desc.deployCode(1);
             desc.tag(desc.typeId()+Recoverable.PATH_SEPARATOR+"lobby");
-            session.write(this.serviceProvider.createLobby(desc).getBytes(),this.label());
+            boolean suc = this.serviceProvider.createLobby(desc);
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
         }
         else if(session.action().equals("addApplication")){
             DeploymentDescriptor desc = new DeploymentDescriptor();
@@ -50,23 +51,28 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             desc.maxIdlesOnInstance(3);
             desc.maxInstancesPerPartition(100);
             desc.instancesOnStartupPerPartition(1);
-            session.write(serviceProvider.createApplication(desc).getBytes(),this.label());
+            boolean suc = this.serviceProvider.createApplication(desc);
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
         }
         else if(session.action().equals("onLaunch")){//typeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            session.write(this.serviceProvider.launch(access.typeId()).getBytes(),label());
+            boolean suc = this.serviceProvider.launch(access.typeId());
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
         }
         else if(session.action().equals("onShutdown")){//typeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            session.write(this.serviceProvider.shutdown(access.typeId()).getBytes(),label());
+            boolean suc = this.serviceProvider.shutdown(access.typeId());
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
         }
         else if(session.action().equals("disableApplication")){//applicationId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            session.write(this.serviceProvider.enableApplication(access.applicationId(),false).getBytes(),label());
+            boolean suc = this.serviceProvider.enableApplication(access.applicationId(),false);
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
         }
         else if(session.action().equals("enableApplication")){//applicationId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            session.write(this.serviceProvider.enableApplication(access.applicationId(),true).getBytes(),label());
+            boolean suc = this.serviceProvider.enableApplication(access.applicationId(),true);
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
         }
         else if(session.action().equals("onReset")){//subtypeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -75,7 +81,8 @@ public class SudoRoleModule implements Module,Configuration.Listener {
                 desc.moduleArtifact((String) access.property("moduleArtifact"));
                 desc.moduleVersion((String)access.property("moduleVersion"));
                 desc.codebase((String)access.property("codebase"));
-                session.write(this.serviceProvider.reset(desc).getBytes(),label());
+                boolean suc  = this.serviceProvider.reset(desc);
+                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
             }
             else{
                 session.write(payload,label());
@@ -84,9 +91,9 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         else if(session.action().equals("addModule")){
             DeploymentDescriptor desc = new DeploymentDescriptor();
             desc.fromMap(SystemUtil.toMap(payload));
-            String ret = this.serviceProvider.createModule(desc);
-            this.context.log(ret,OnLog.INFO);
-            session.write(this.builder.create().toJson(new AdminSetupObject("add module",label())).getBytes(),label());
+            boolean suc = this.serviceProvider.createModule(desc);
+            //this.context.log(ret,OnLog.INFO);
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
         }
         else if(session.action().equals("listViews")){
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"ok",true)).getBytes(),label());

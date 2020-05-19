@@ -67,7 +67,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
         }
         this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ON_ACCESS_CID,(a)->{
             //add player user to the account
-            this.context.log(a.toString(),OnLog.WARN);
             OnAccess uadded = (OnAccess)a;
             if(uadded.property("command").equals("addUser")){
                 Access user = createLogin(uadded,uadded.distributionKey(),role,false,"password",false);

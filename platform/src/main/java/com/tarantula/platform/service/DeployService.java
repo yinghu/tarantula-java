@@ -3,6 +3,7 @@ package com.tarantula.platform.service;
 
 import com.tarantula.Descriptor;
 import com.tarantula.OnView;
+import com.tarantula.platform.presence.GameCluster;
 
 public interface DeployService extends ServiceProvider {
 
@@ -14,12 +15,12 @@ public interface DeployService extends ServiceProvider {
 
     void recover(String destination,String registerId,boolean fullBackup);
 
-    String addLobby(Descriptor lobby);
-    String enableLobby(String typeId,boolean enabled);
+    boolean addLobby(Descriptor lobby);
+    boolean enableLobby(String typeId,boolean enabled);
     String addApplication(Descriptor application);
-    String addView(OnView view);
-    String resetModule(String lobbyId,Descriptor descriptor);
+    boolean addView(OnView view);
+    boolean resetModule(String lobbyId,Descriptor descriptor);
     String enableApplication(String applicationId,boolean enabled);
 
-    String createGameCluster(Descriptor gameCluster);
+    boolean createGameCluster(GameCluster gameCluster);
 }

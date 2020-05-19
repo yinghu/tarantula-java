@@ -3,14 +3,15 @@ package com.tarantula.admin;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
+import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.presence.GameCluster;
-import com.tarantula.platform.service.DataStoreProvider;
-import com.tarantula.platform.service.DeploymentServiceProvider;
-import com.tarantula.platform.service.deployment.LobbyConfiguration;
-import com.tarantula.platform.service.deployment.XMLParser;
+import com.tarantula.platform.presence.UserAccount;
 
-import java.util.List;
+import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.util.OnAccessDeserializer;
+import com.tarantula.platform.util.ResponseSerializer;
+
 
 public class AdminRoleModule implements Module {
 
@@ -19,21 +20,25 @@ public class AdminRoleModule implements Module {
     private DataStore account;
     private DeploymentServiceProvider deploymentServiceProvider;
     private int maxGameClusterCount;
-    private List<LobbyConfiguration> lbs;
+
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         this.context.log(session.action(),OnLog.INFO);
-         if(session.action().equals("onCreateGameCluster")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            GameCluster gc = new GameCluster();
-            gc.typeId(onAccess.name());
-            gc.name(onAccess.name());
-
-            //gc.description(onAccess.name());
-            //gc.singleton(true);
-            //String ret = this.deploymentServiceProvider.createGameCluster(gc);
-            ResponseHeader resp = new ResponseHeader(session.action(),onAccess.name(),true);
-            session.write(this.builder.create().toJson(resp).getBytes(),label());
+        if(session.action().equals("onCreateGameCluster")){
+            Account acc = new UserAccount();
+            acc.distributionKey(session.systemId());
+            if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
+                OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+                GameCluster gc = new GameCluster();
+                gc.typeId(onAccess.name());
+                gc.name(onAccess.name());
+                boolean suc = this.deploymentServiceProvider.createGameCluster(gc);
+                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"created":"failed",suc)).getBytes(),label());
+            }
+            else{
+                //reach max count
+                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"you already have max game clusters",false)).getBytes(),label());
+            }
         }
         /**
         else if(session.action().equals("backup")){
@@ -58,12 +63,11 @@ public class AdminRoleModule implements Module {
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(AdminDataStoreObject.class,new AdminObjectSerializer());
+        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
+        this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.account = this.context.dataStore(Account.DataStore);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.maxGameClusterCount = Integer.parseInt(this.context.configuration("setup").property("maxGameClusterCount"));
-        XMLParser xml = new XMLParser();
-        xml.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-singleton.xml"));
-        this.lbs = xml.configurations;
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
     @Override

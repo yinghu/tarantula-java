@@ -6,6 +6,7 @@ import com.tarantula.Module;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
+import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
@@ -202,12 +203,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         DynamicModuleClassLoader dyn = cMap.get(descriptor.subtypeId());
         dyn.loadResource(name,onResource);
     }
-    public String reset(Descriptor descriptor){
+    public boolean reset(Descriptor descriptor){
         //update app desc via subtypeId
         Lobby lobby = tarantulaContext.lobby(descriptor.typeId());
-        String suc = this.tarantulaContext.tarantulaCluster().deployService().resetModule(lobby.descriptor().distributionKey(),descriptor);
-        ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
-        if(resp.successful()){
+        boolean suc = this.tarantulaContext.tarantulaCluster().deployService().resetModule(lobby.descriptor().distributionKey(),descriptor);
+
+        if(suc){
             this.integrationEventService.publish(new ModuleResetEvent(this.eventTopic,(DeploymentDescriptor) descriptor));
         }
         return suc;
@@ -232,70 +233,69 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             mp.reset();
         });
     }
-    public String createModule(Descriptor descriptor){
+    public boolean createModule(Descriptor descriptor){
         DynamicModuleClassLoader mc = new DynamicModuleClassLoader(descriptor);
         XMLParser xmlParser = new XMLParser();
-        ResponseHeader resp = new ResponseHeader("createModule");
+        //ResponseHeader resp = new ResponseHeader("createModule");
+        boolean[] suc = {true};
         mc.loadResource("descriptor.xml",(in)->{
             try{
                 xmlParser.parse(in);
             }catch (Exception ex){
                 log.warn("failed to parse descriptor.xml",ex);
-                resp.message("failed to parse descriptor.xml");
-                resp.successful(false);
+                suc[0] = false;
             }
         });
-        if(!resp.successful()){
-            return this.builder.create().toJson(resp);
+        if(!suc[0]){
+            return false;
         }
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         xmlParser.configurations.forEach((a)->{
-            ResponseHeader r = this.builder.create().fromJson(deployService.addLobby(a.descriptor),ResponseHeader.class);
-            if(!r.successful()){
-                resp.successful(false);
-                resp.message(r.message());
+            //ResponseHeader r = this.builder.create().fromJson(deployService.addLobby(a.descriptor),ResponseHeader.class);
+            suc[0] = deployService.addLobby(a.descriptor);
+            if(!suc[0]){
                 return;
             }
             a.applications.forEach((b)->{
                 b.codebase(descriptor.codebase());
                 b.moduleArtifact(descriptor.moduleArtifact());
                 b.moduleVersion(descriptor.moduleVersion());
-                ResponseHeader x = this.builder.create().fromJson(deployService.addApplication(b),ResponseHeader.class);
-                if(!x.successful()){
+                String x = deployService.addApplication(b);
+                if(x==null){
                     log.warn("Failed to add application ->"+b.toString());
                 }
             });
             a.views.forEach(v->{
                 //add view to app
                 v.owner(a.descriptor.typeId());
-                ResponseHeader xv = this.builder.create().fromJson(deployService.addView(v),ResponseHeader.class);
+                boolean xv = deployService.addView(v);
                 //log.warn(xv.message());
-                if(!xv.successful()){
+                if(!xv){
                     log.warn("Failed to add view ->"+v.toString());
                 }
             });
         });
-        return this.builder.create().toJson(resp);
+        return suc[0];//this.builder.create().toJson(resp);
     }
-    public String createLobby(Descriptor descriptor){
+    public boolean createLobby(Descriptor descriptor){
         return this.tarantulaContext.tarantulaCluster().deployService().addLobby(descriptor);
     }
-    public String createApplication(Descriptor descriptor){
-        String resp = this.tarantulaContext.tarantulaCluster().deployService().addApplication(descriptor);
-        ResponseHeader suc = this.builder.create().fromJson(resp,ResponseHeader.class);
-        if(suc.successful()){//launch if lobby on line
-            this.integrationEventService.publish(new ModuleApplicationEvent(this.eventTopic,descriptor.typeId(),(String)suc.toMap().get("applicationId"),false));
+    public boolean createApplication(Descriptor descriptor){
+        String  suc = this.tarantulaContext.tarantulaCluster().deployService().addApplication(descriptor);
+        if(suc!=null){//launch if lobby on line
+            this.integrationEventService.publish(new ModuleApplicationEvent(this.eventTopic,descriptor.typeId(),suc,false));
         }
-        return resp;
+        return suc!=null;
     }
     private void _setApplicationOnLobby(String typeId,String applicationId){
         this.tarantulaContext.setApplicationOnLobby(typeId,applicationId);
     }
-    public String enableApplication(String applicationId,boolean enabled){
+    public boolean enableApplication(String applicationId,boolean enabled){
         String suc = this.tarantulaContext.tarantulaCluster().deployService().enableApplication(applicationId,enabled);
-        ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
-        this.integrationEventService.publish(new ModuleApplicationEvent(this.eventTopic,(String)resp.toMap().get("typeId"),applicationId,!enabled));
-        return suc;
+        if(suc!=null){
+            this.integrationEventService.publish(new ModuleApplicationEvent(this.eventTopic,suc,applicationId,!enabled));
+        }
+        return suc!=null;
     }
     private void  _unsetApplicationOnLobby(String typeId,String applicationId){
         this.tarantulaContext.unsetApplication(typeId,applicationId,(d)->{
@@ -315,18 +315,18 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         });
     }
-    public String launch(String typeId){
-        String suc = this.tarantulaContext.tarantulaCluster().deployService().enableLobby(typeId,true);
-        ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
-        if(resp.successful()){
+    public boolean launch(String typeId){
+        boolean suc = this.tarantulaContext.tarantulaCluster().deployService().enableLobby(typeId,true);
+        //ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
+        if(suc){
             this.integrationEventService.publish(new ModuleLaunchEvent(this.eventTopic,typeId));
         }
         return suc;
     }
-    public String shutdown(String typeId){
-        String suc = this.tarantulaContext.tarantulaCluster().deployService().enableLobby(typeId,false);
-        ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
-        if(resp.successful()){
+    public boolean shutdown(String typeId){
+        boolean suc = this.tarantulaContext.tarantulaCluster().deployService().enableLobby(typeId,false);
+        //ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
+        if(suc){
             this.integrationEventService.publish(new ModuleShutdownEvent(this.eventTopic,typeId));
         }
         return suc;
@@ -546,9 +546,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public boolean deploy(OnView onView){
         if(!vMap.containsKey(onView.viewId())&&onView.distributionKey()==null){
             //create new entry
-            String suc = tarantulaContext.tarantulaCluster().deployService().addView(onView);
-            ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
-            if(!resp.successful()){
+            boolean suc = tarantulaContext.tarantulaCluster().deployService().addView(onView);
+            if(!suc){
                 return false;
             }
         }
@@ -671,7 +670,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     //end of dedicated server methods
 
-    public String createGameCluster(Descriptor gameCluster){
+    public boolean createGameCluster(GameCluster gameCluster){
         return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(gameCluster);
     }
     public String resetCode(String key){

@@ -2,6 +2,7 @@ package com.tarantula.platform.service;
 
 import com.tarantula.*;
 import com.tarantula.Module;
+import com.tarantula.platform.presence.GameCluster;
 
 import java.io.InputStream;
 
@@ -67,19 +68,19 @@ public interface DeploymentServiceProvider extends ServiceProvider {
 
     //Module application operation API
     String upload(InputStream inputStream,String fname) throws Exception;
-    String createLobby(Descriptor descriptor);
-    String createApplication(Descriptor descriptor);
-    String enableApplication(String applicationId,boolean enabled);
-    String launch(String typeId);
-    String shutdown(String typeId);
+    boolean createLobby(Descriptor descriptor);
+    boolean createApplication(Descriptor descriptor);
+    boolean enableApplication(String applicationId,boolean enabled);
+    boolean launch(String typeId);
+    boolean shutdown(String typeId);
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
-    String reset(Descriptor descriptor);
-    String createModule(Descriptor descriptor);
+    boolean reset(Descriptor descriptor);
+    boolean createModule(Descriptor descriptor);
     //END OF MODULE OPERATION API
 
     //GAME CLUSTER APIs
-    String createGameCluster(Descriptor gameCluster);
+    boolean createGameCluster(GameCluster gameCluster);
     //END OF CLUSTER
 
     DataStoreProvider dataStoreProvider();

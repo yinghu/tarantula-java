@@ -11,6 +11,8 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
  */
 public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {
 
+    public static String LABEL = "LB";
+
     public  String bucket;
 
     public LobbyQuery(String bucket){
@@ -31,7 +33,7 @@ public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {
 
 
     public String label(){
-        return "LB";
+        return LABEL;
     }
 
 

@@ -34,7 +34,7 @@ public class IndexSet extends RecoverableObject {
 
 
     public int getClassId() {
-        return PortableRegistry.KEY_INDEX_CID;
+        return PortableRegistry.INDEX_SET_CID;
     }
 
 

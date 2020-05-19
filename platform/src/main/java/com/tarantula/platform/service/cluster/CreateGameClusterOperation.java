@@ -3,9 +3,7 @@ package com.tarantula.platform.service.cluster;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
-import com.tarantula.Descriptor;
-import com.tarantula.platform.LobbyDescriptor;
-import com.tarantula.platform.util.SystemUtil;
+import com.tarantula.platform.presence.GameCluster;
 
 import java.io.IOException;
 
@@ -15,15 +13,15 @@ import java.io.IOException;
 public class CreateGameClusterOperation extends Operation {
 
 
-    private Descriptor descriptor;
+    private GameCluster descriptor;
 
-    private String result;
+    private boolean result;
 
     public CreateGameClusterOperation() {
     }
 
 
-    public CreateGameClusterOperation(Descriptor lobby) {
+    public CreateGameClusterOperation(GameCluster lobby) {
         this.descriptor = lobby;
     }
     @Override
@@ -40,13 +38,13 @@ public class CreateGameClusterOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeByteArray(SystemUtil.toJson(this.descriptor.toMap()));
+        out.writeUTF(descriptor.name());
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.descriptor = new LobbyDescriptor();
-        this.descriptor.fromMap(SystemUtil.toMap(in.readByteArray()));
+        this.descriptor = new GameCluster();
+        this.descriptor.name(in.readUTF());
     }
 }
