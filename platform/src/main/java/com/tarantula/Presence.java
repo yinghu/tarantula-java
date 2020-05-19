@@ -6,6 +6,8 @@ package com.tarantula;
  */
 public interface Presence extends Balance,DataStore.Updatable,Countable{
 
+    String DataStore = "presence";
+
     String LOBBY_TAG = "presence/lobby";
 
     Response onPlay(Session session,OnAccess onAccess,Descriptor descriptor);

@@ -6,6 +6,9 @@ package com.tarantula;
 public interface Access extends Recoverable {
 
     //application access level control
+
+    String DataStore = "user";
+
     int PUBLIC_ACCESS_MODE = 10;
     int PROTECT_ACCESS_MODE = 12;
     int PRIVATE_ACCESS_MODE = 13;

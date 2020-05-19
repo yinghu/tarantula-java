@@ -24,8 +24,8 @@ public class PresenceApplication extends TarantulaApplicationHeader {
         Configuration ma = this.context.configuration("monthlyAccess");
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        userDs = this.context.dataStore("user");
-        accountDs = this.context.dataStore("account");
+        userDs = this.context.dataStore(Access.DataStore);
+        accountDs = this.context.dataStore(Account.DataStore);
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
             Presence presence = this.context.presence(t.owner());
             OnBalance ob = (OnBalance)t;
@@ -83,17 +83,6 @@ public class PresenceApplication extends TarantulaApplicationHeader {
         else if (session.action().equals("onAbsence")) {
             this.context.absence(session);
             session.write(this.builder.create().toJson(new ResponseHeader("onAbsence", "off session [" + session.stub() + "]", true)).getBytes(),this.descriptor.responseLabel());
-        }
-        else if(session.action().equals("onCreateGameCluster")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            GameCluster gc = new GameCluster();
-            gc.typeId(onAccess.name());
-            gc.name(onAccess.name());
-            //gc.description(onAccess.name());
-            //gc.singleton(true);
-            //String ret = this.deploymentServiceProvider.createGameCluster(gc);
-            ResponseHeader resp = new ResponseHeader(session.action(),onAccess.name(),true);
-            session.write(this.builder.create().toJson(resp).getBytes(),descriptor.responseLabel());
         }
         /**
         Map<String, Object> chargeParams = new HashMap<>();

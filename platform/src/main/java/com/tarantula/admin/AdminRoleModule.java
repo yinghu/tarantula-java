@@ -3,6 +3,8 @@ package com.tarantula.admin;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
+import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 
@@ -19,7 +21,19 @@ public class AdminRoleModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         this.context.log(session.action(),OnLog.INFO);
-        if(session.action().equals("backup")){
+         if(session.action().equals("onCreateGameCluster")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            GameCluster gc = new GameCluster();
+            gc.typeId(onAccess.name());
+            gc.name(onAccess.name());
+            //gc.description(onAccess.name());
+            //gc.singleton(true);
+            //String ret = this.deploymentServiceProvider.createGameCluster(gc);
+            ResponseHeader resp = new ResponseHeader(session.action(),onAccess.name(),true);
+            session.write(this.builder.create().toJson(resp).getBytes(),label());
+        }
+        /**
+        else if(session.action().equals("backup")){
             DataStoreProvider dp = deploymentServiceProvider.dataStoreProvider();
             dp.backup(Distributable.DATA_SCOPE);
             dp.backup(Distributable.INTEGRATION_SCOPE);
@@ -29,7 +43,7 @@ public class AdminRoleModule implements Module {
             AdminDataStoreObject dao = _message("count of data store list");
             dao.reset(this.context);
             session.write(this.builder.create().toJson(dao).getBytes(),label());
-        }
+        }**/
         else{
             session.write(payload,label());
         }
@@ -46,7 +60,7 @@ public class AdminRoleModule implements Module {
     }
     @Override
     public String label() {
-        return "admin-data-store";
+        return "admin-role";
     }
     private AdminDataStoreObject _message(String message){
         return new AdminDataStoreObject(message,label());

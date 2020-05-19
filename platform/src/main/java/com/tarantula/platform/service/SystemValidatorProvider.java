@@ -3,7 +3,6 @@ package com.tarantula.platform.service;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessControl;
-import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.SystemValidator;
 import com.tarantula.platform.presence.User;
@@ -14,7 +13,6 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SystemValidatorProvider implements TokenValidatorProvider {
@@ -105,9 +103,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.pdataStore =  this.serviceContext.dataStore("presence",this.serviceContext.partitionNumber());
-        this.udataStore =  this.serviceContext.dataStore("user",this.serviceContext.partitionNumber());
-        this.adataStore =  this.serviceContext.dataStore("account",this.serviceContext.partitionNumber());
+        this.pdataStore =  this.serviceContext.dataStore(Presence.DataStore,this.serviceContext.partitionNumber());
+        this.udataStore =  this.serviceContext.dataStore(Access.DataStore,this.serviceContext.partitionNumber());
+        this.adataStore =  this.serviceContext.dataStore(Account.DataStore,this.serviceContext.partitionNumber());
         AuthVendor google = this.serviceContext.authVendor("google");
         if(google!=null){
             aMap.put("google",(google));
