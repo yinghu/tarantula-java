@@ -13,21 +13,21 @@ import java.io.IOException;
 public class CreateGameClusterOperation extends Operation {
 
 
-    private GameCluster descriptor;
+    private GameCluster result;
 
-    private boolean result;
+    private String name;
 
     public CreateGameClusterOperation() {
     }
 
 
-    public CreateGameClusterOperation(GameCluster lobby) {
-        this.descriptor = lobby;
+    public CreateGameClusterOperation(String name) {
+        this.name = name;
     }
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        this.result = cds.createGameCluster(this.descriptor);
+        this.result = cds.createGameCluster(this.name);
     }
 
     @Override
@@ -38,13 +38,12 @@ public class CreateGameClusterOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeUTF(descriptor.name());
+        out.writeUTF(name);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.descriptor = new GameCluster();
-        this.descriptor.name(in.readUTF());
+        this.name=in.readUTF();
     }
 }

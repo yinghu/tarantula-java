@@ -524,33 +524,33 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
     }
 
-    public boolean createGameCluster(GameCluster gameCluster){
-        ///ResponseHeader responseHeader = new ResponseHeader();
-        boolean suc = true;
+    public GameCluster createGameCluster(String name){
+        GameCluster gameCluster = new GameCluster();
         try {
             DataStore mds = this.tarantulaContext.masterDataStore();
-            LobbyQuery lq = new LobbyQuery(mds.bucket());
-            mds.list(lq,(b)->{
-                log.warn(b.typeId()+"<><><>"+b.distributionKey());
-                LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(mds.bucket(),b.typeId());
-                mds.load(lobbyTypeIdIndex);
-                log.warn(lobbyTypeIdIndex.key().asString()+"<><><>"+lobbyTypeIdIndex.index());
-                return true;
-            });
+            //LobbyQuery lq = new LobbyQuery(mds.bucket());
+            //mds.list(lq,(b)->{
+                //log.warn(b.typeId()+"<><><>"+b.distributionKey());
+                //LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(mds.bucket(),b.typeId());
+                //mds.load(lobbyTypeIdIndex);
+                //log.warn(lobbyTypeIdIndex.key().asString()+"<><><>"+lobbyTypeIdIndex.index());
+                //return true;
+            //});
+            //LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(mds.bucket(),name,"");
+            //if(mds.createIfAbsent(lobbyTypeIdIndex,false)){
+                //create a entry
             XMLParser parser = new XMLParser();
             parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-singleton.xml"));
             for (LobbyConfiguration configuration : parser.configurations) {
-                log.warn(configuration.descriptor.typeId());
-                log.warn(configuration.descriptor.typeId().replace("game",gameCluster.name()));
+                configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",name));
+                log.warn("Named type id->"+configuration.descriptor.typeId());
             }
-            //responseHeader.successful(true);
-            //responseHeader.message(gameCluster.typeId()+" has created");
+            //}
         }catch (Exception ex){
-            //responseHeader.successful(false);
-            //responseHeader.message(ex.getMessage());
-            suc = false;
+            gameCluster.disabled(true);
         }
-        return suc;//this.builder.create().toJson(responseHeader);
+        gameCluster.name(name);
+        return gameCluster;
     }
 
 }

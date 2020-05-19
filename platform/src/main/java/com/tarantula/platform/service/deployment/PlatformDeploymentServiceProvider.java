@@ -670,8 +670,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     //end of dedicated server methods
 
-    public boolean createGameCluster(GameCluster gameCluster){
-        return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(gameCluster);
+    public GameCluster createGameCluster(String name){
+        return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(name);
     }
     public String resetCode(String key){
         ClusterProvider icp = this.tarantulaContext.integrationCluster();

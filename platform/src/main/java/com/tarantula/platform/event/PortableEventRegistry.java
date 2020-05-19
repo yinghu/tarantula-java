@@ -65,6 +65,7 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int ON_VIEW_CID = 105;
 
+    public static final int GAME_CLUSTER_CID = 106;
 
     public Portable create(int cid) {
         Portable _ins;
@@ -145,6 +146,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case ON_VIEW_CID:
                 _ins = new OnViewTrack();
+                break;
+            case GAME_CLUSTER_CID:
+                _ins = new GameCluster();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");

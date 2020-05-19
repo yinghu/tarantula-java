@@ -160,12 +160,12 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
     }
 
-    public boolean createGameCluster(GameCluster gameCluster){
+    public GameCluster createGameCluster(String name){
         NodeEngine nodeEngine = getNodeEngine();
-        CreateGameClusterOperation operation = new CreateGameClusterOperation(gameCluster);
+        CreateGameClusterOperation operation = new CreateGameClusterOperation(name);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
-            final Future<Boolean> future = builder.invoke();
+            final Future<GameCluster> future = builder.invoke();
             return future.get(); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);

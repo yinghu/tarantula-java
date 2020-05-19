@@ -29,11 +29,8 @@ public class AdminRoleModule implements Module {
             acc.distributionKey(session.systemId());
             if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-                GameCluster gc = new GameCluster();
-                gc.typeId(onAccess.name());
-                gc.name(onAccess.name());
-                boolean suc = this.deploymentServiceProvider.createGameCluster(gc);
-                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"created":"failed",suc)).getBytes(),label());
+                GameCluster gc = this.deploymentServiceProvider.createGameCluster(onAccess.name());
+                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),gc.name(),true)).getBytes(),label());
             }
             else{
                 //reach max count
