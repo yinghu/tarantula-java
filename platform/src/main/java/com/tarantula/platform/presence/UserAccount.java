@@ -36,17 +36,13 @@ public class UserAccount extends User implements Account {
         this.gameClusterCount = ((Number) properties.get("3")).intValue();
         this.trial = (boolean )properties.get("4");
     }
-    public int userCount(){
-        return userCount;
+    public int userCount(int delta){
+        this.userCount = this.userCount+delta;
+        return this.userCount;
     }
-    public void userCount(int userCount){
-        this.userCount = userCount;
-    }
-    public int gameClusterCount(){
-        return gameClusterCount;
-    }
-    public void gameClusterCount(int gameClusterCount){
-        this.gameClusterCount = gameClusterCount;
+    public int gameClusterCount(int delta){
+        this.gameClusterCount = this.gameClusterCount+delta;
+        return this.gameClusterCount;
     }
     public boolean trial(){
         return this.trial;

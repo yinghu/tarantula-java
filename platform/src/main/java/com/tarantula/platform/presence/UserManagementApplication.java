@@ -20,7 +20,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
 
     private String lobbyId;
     private boolean activated;
-    private String role = "player";
+    private String role = AccessControl.player.name();
     private double initialBalance;
     private AccessIndexService accessIndexService;
     private DeploymentServiceProvider deploymentServiceProvider;
@@ -29,6 +29,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
     private List<Access.Role> roleList;
     private TokenValidatorProvider tokenValidatorProvider;
 
+    private DataStore uDatastore;
+    private DataStore pDatastore;
+    private DataStore aDatastore;
 
     private boolean onApplication;
     @Override
@@ -51,16 +54,40 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
         OnAccess onAccess = new OnAccessTrack();
         onAccess.property("login",root);
         onAccess.property("password",pwd);
-        DataStore ds = this.context.dataStore(Access.DataStore);
-        String rootId = ds.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid();
+        uDatastore = this.context.dataStore(Access.DataStore);
+        pDatastore = this.context.dataStore(Presence.DataStore);
+        aDatastore = this.context.dataStore(Account.DataStore);
+        String rootId = uDatastore.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid();
         AccessIndex accessIndex = accessIndexService.set((String) onAccess.property("login"),rootId);
         if(accessIndex!=null){
-            createLogin(onAccess, rootId,"root",false,"password",true);
+            Access user = createLogin(onAccess, rootId,AccessControl.root.name(),false,"password",true);
+            Account acc = new UserAccount();
+            acc.distributionKey(user.distributionKey());
+            aDatastore.create(acc);
         }
         this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ON_ACCESS_CID,(a)->{
             //add player user to the account
             this.context.log(a.toString(),OnLog.WARN);
-            //createLogin((OnAccess)a,a.distributionKey(),role,false,"password",false);
+            OnAccess uadded = (OnAccess)a;
+            if(uadded.property("command").equals("addUser")){
+                Access user = createLogin(uadded,uadded.distributionKey(),role,false,"password",false);
+                Account account = new UserAccount();
+                account.distributionKey(uadded.owner());
+                aDatastore.load(account);
+                int ix = account.userCount(1);
+                aDatastore.update(account);
+                IndexSet idx = new IndexSet();
+                idx.distributionKey(account.distributionKey());
+                idx.label("users");
+                idx.keySet.add(user.distributionKey());
+                if(!aDatastore.createIfAbsent(idx,true)){
+                    idx.keySet.add(user.distributionKey());//update on existing
+                    aDatastore.update(idx);
+                }
+                idx.keySet.forEach((k)->{
+                    this.context.log("KEY->"+(ix)+k,OnLog.WARN);
+                });
+            }
         });
         this.context.log("User management application started on tag ["+descriptor.tag()+"] with application mode ["+onApplication+"]",OnLog.INFO);
     }
@@ -161,9 +188,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
             if(this.deploymentServiceProvider.checkCode(acc.accessKey()).equals(acc.property("login"))){
                 Access user = new User();
                 user.distributionKey(session.systemId());
-                if(this.context.dataStore(Access.DataStore).load(user)){
+                if(uDatastore.load(user)){
                     user.password(this.context.validator().hashPassword((String) acc.property("password")));
-                    this.context.dataStore(Access.DataStore).update(user);
+                    uDatastore.update(user);
                     OnSession onSession = this.login(session.systemId(),(String) acc.property("password"),session);
                     onSession(onSession,session);
                 }
@@ -199,7 +226,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
         Access access = new User();
         access.distributionKey(systemId);
         OnSession _onSession = OnSessionTrack.PASSWORD_NOT_MATCHED;
-        if(this.context.dataStore(Access.DataStore).load(access)){
+        if(uDatastore.load(access)){
             access.routingNumber(session.routingNumber());
             _onSession=this.context.validator().validatePassword(access,password);
             _onSession.systemId(systemId);
@@ -207,7 +234,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
         return _onSession;
     }
     private Access createLogin(OnAccess payload,String systemId,String roleName,boolean validated,String validator,boolean primary){
-        DataStore ds = this.context.dataStore(Access.DataStore);
         Access acc = new User((String) payload.property("login"),validated,validator);
         acc.distributionKey(systemId);
         acc.password(validated?"":this.context.validator().hashPassword((String) payload.property("password")));
@@ -217,10 +243,10 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
             acc.owner(payload.owner());
         }
         acc.role(roleName);
-        if(ds.create(acc)){
+        if(uDatastore.create(acc)){
             PresenceIndex px = new PresenceIndex(initialBalance);
             px.distributionKey(acc.distributionKey());
-            this.context.dataStore(Presence.DataStore).create(px);
+            pDatastore.create(px);
         }
         return acc;
     }

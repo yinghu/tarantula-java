@@ -4,10 +4,8 @@ public interface Account extends Access{
 
     String DataStore = "account";
 
-    int userCount();
-    void userCount(int userCount);
-    int gameClusterCount();
-    void gameClusterCount(int userCount);
+    int userCount(int delta);
+    int gameClusterCount(int delta);
     boolean trial();
     void trial(boolean trial);
 

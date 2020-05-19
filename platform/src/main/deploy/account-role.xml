@@ -22,8 +22,16 @@
                 <module-name>com.tarantula.admin.AccountRoleModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <access-control>20</access-control>
+                <configuration-name>account</configuration-name>
             </application>
         </application-list>
+        <configuration-list>
+            <configuration tag="account" priority="10">
+                <account type="setup">
+                    <property name="maxUserCount">5</property>
+                </account>
+            </configuration>
+        </configuration-list>
         <view-list>
             <view type="add.user">
                 <property name="moduleResourceFile">account/add.user.view.html</property>

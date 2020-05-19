@@ -7,17 +7,19 @@ import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.deployment.LobbyConfiguration;
+import com.tarantula.platform.service.deployment.XMLParser;
+
+import java.util.List;
 
 public class AdminRoleModule implements Module {
 
     private ApplicationContext context;
     private GsonBuilder builder;
-
+    private DataStore account;
     private DeploymentServiceProvider deploymentServiceProvider;
-    public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
-         session.write(this.builder.create().toJson(_message("joined")).getBytes(),label());
-    }
-
+    private int maxGameClusterCount;
+    private List<LobbyConfiguration> lbs;
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         this.context.log(session.action(),OnLog.INFO);
@@ -26,6 +28,7 @@ public class AdminRoleModule implements Module {
             GameCluster gc = new GameCluster();
             gc.typeId(onAccess.name());
             gc.name(onAccess.name());
+
             //gc.description(onAccess.name());
             //gc.singleton(true);
             //String ret = this.deploymentServiceProvider.createGameCluster(gc);
@@ -55,8 +58,13 @@ public class AdminRoleModule implements Module {
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(AdminDataStoreObject.class,new AdminObjectSerializer());
+        this.account = this.context.dataStore(Account.DataStore);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        this.context.log("Admin data store module started", OnLog.INFO);
+        this.maxGameClusterCount = Integer.parseInt(this.context.configuration("setup").property("maxGameClusterCount"));
+        XMLParser xml = new XMLParser();
+        xml.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-singleton.xml"));
+        this.lbs = xml.configurations;
+        this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
     @Override
     public String label() {

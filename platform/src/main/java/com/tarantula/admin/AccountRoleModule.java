@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.presence.User;
+import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
@@ -14,14 +15,12 @@ public class AccountRoleModule implements Module {
     private GsonBuilder builder;
     private AccessIndexService accessIndexService;
     private DataStore user;
-    @Override
-    public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
-        session.write(this.builder.create().toJson(_onMessage("joined")).getBytes(),label());
-    }
+    private DataStore account;
+    private int maxUserCount;
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
-        this.context.log(session.action()+"=>"+new String(payload),OnLog.INFO);
+        //this.context.log(session.action()+"=>"+new String(payload),OnLog.INFO);
         OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
         if(session.action().equals("findKey")){
             AccessIndex ix = this.accessIndexService.get((String)onAccess.property("login"));
@@ -61,15 +60,23 @@ public class AccountRoleModule implements Module {
             }
         }
         else if(session.action().equals("addUser")){
-            AccessIndex query = accessIndexService.set((String)onAccess.property("login"), user.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid());
-            if(query!=null){
-                onAccess.owner(session.systemId());
-                onAccess.distributionKey(query.distributionKey());
-                this.context.postOffice().onTag("index/user").send(onAccess.distributionKey(),onAccess);
-                session.write(this.builder.create().toJson(_onMessage("user added")).getBytes(),label());
+            Account acc = new UserAccount();
+            acc.distributionKey(session.systemId());
+            account.load(acc);
+            if(acc.userCount(0)<maxUserCount){
+                AccessIndex query = accessIndexService.set((String)onAccess.property("login"), user.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid());
+                if(query!=null){
+                    onAccess.owner(session.systemId());
+                    onAccess.distributionKey(query.distributionKey());
+                    this.context.postOffice().onTag("index/user").send(onAccess.distributionKey(),onAccess);
+                    session.write(this.builder.create().toJson(_onMessage("user added")).getBytes(),label());
+                }
+                else{
+                    session.write(this.builder.create().toJson(_onMessage("user already existed")).getBytes(),label());
+                }
             }
             else{
-                session.write(this.builder.create().toJson(_onMessage("user already existed")).getBytes(),label());
+                session.write(this.builder.create().toJson(_onMessage("you already have max user count")).getBytes(),label());
             }
         }
         else{
@@ -85,12 +92,14 @@ public class AccountRoleModule implements Module {
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.builder.registerTypeAdapter(AdminUserObject.class,new AdminObjectSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
-        this.user = this.context.dataStore("user");
-        this.context.log("Admin user module started", OnLog.INFO);
+        this.user = this.context.dataStore(Access.DataStore);
+        this.account = this.context.dataStore(Account.DataStore);
+        this.maxUserCount = Integer.parseInt(this.context.configuration("setup").property("maxUserCount"));
+        this.context.log("Account role module started with max user count ["+maxUserCount+"]", OnLog.INFO);
     }
     @Override
     public String label() {
-        return "admin-user";
+        return "account-role";
     }
     private AdminUserObject _onMessage(String message){
         return new AdminUserObject(message,label());

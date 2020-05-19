@@ -16,8 +16,8 @@ public class AccountSerializer implements JsonSerializer<Account> {
     public JsonElement serialize(Account access, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = new JsonObject();
         jo.addProperty("emailAddress",access.emailAddress());
-        jo.addProperty("userCount",access.userCount());
-        jo.addProperty("gameClusterCount",access.gameClusterCount());
+        jo.addProperty("userCount",access.userCount(0));
+        jo.addProperty("gameClusterCount",access.gameClusterCount(0));
         jo.addProperty("trial",access.trial());
         return jo;
     }

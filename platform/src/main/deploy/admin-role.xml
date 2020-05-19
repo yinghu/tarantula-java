@@ -23,9 +23,17 @@
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
+                <configuration-name>admin</configuration-name>
             </application>
 
         </application-list>
+        <configuration-list>
+            <configuration tag="admin" priority="10">
+                <admin type="setup">
+                    <property name="maxGameClusterCount">5</property>
+                </admin>
+            </configuration>
+        </configuration-list>
         <view-list>
             <view type="create.game.cluster">
                 <property name="moduleResourceFile">admin/create.game.cluster.view.html</property>

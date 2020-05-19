@@ -546,7 +546,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public boolean deploy(OnView onView){
         if(!vMap.containsKey(onView.viewId())&&onView.distributionKey()==null){
             //create new entry
-            String suc = tarantulaContext.integrationCluster().deployService().addView(onView);
+            String suc = tarantulaContext.tarantulaCluster().deployService().addView(onView);
             ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
             if(!resp.successful()){
                 return false;

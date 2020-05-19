@@ -22,10 +22,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
     private DataStore dataStore;
     private GsonBuilder builder;
     private ConcurrentHashMap<String,Configuration> cMap;
-    @Override
-    public void onJoin(Session session,OnUpdate onUpdate) throws Exception {
-        session.write(this.builder.create().toJson(this._adminObjectOnLobby()).getBytes(),label());
-    }
+
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
@@ -168,8 +165,8 @@ public class SudoRoleModule implements Module,Configuration.Listener {
 
     @Override
     public void onConfiguration(Configuration c) {
-        //this.context.log(c.distributionKey(),OnLog.WARN);
-        //this.context.log(c.toString(),OnLog.WARN);
+        this.context.log(c.distributionKey(),OnLog.WARN);
+        this.context.log(c.toString(),OnLog.WARN);
         cMap.put(c.distributionKey(),c);
     }
 }

@@ -4,6 +4,8 @@ import com.tarantula.OnAccess;
 import com.tarantula.platform.presence.UserPortableRegistry;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.util.Map;
+
 
 /**
  * Updated by yinghu on 5/15/2020
@@ -35,6 +37,17 @@ public class OnAccessTrack extends OnApplicationHeader implements OnAccess {
         this.payload = payload;
     }
 
+    @Override
+    public Map<String,Object> toMap(){
+        super.toMap();
+        this.properties.put("owner",this.owner);
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        super.fromMap(properties);
+        this.owner = (String)properties.get("owner");
+    }
 
     public int getFactoryId() {
         return UserPortableRegistry.OID;
