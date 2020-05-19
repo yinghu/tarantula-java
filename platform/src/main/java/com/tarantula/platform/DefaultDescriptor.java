@@ -287,6 +287,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor{
         _props.put("runtimeDuration",this.runtimeDuration);
         _props.put("runtimeDurationOnInstance",this.runtimeDurationOnInstance);
         _props.put("resetEnabled",this.resetEnabled);
+        _props.put("index",this.index);
         return _props;
     }
 
@@ -326,6 +327,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor{
         this.runtimeDuration = properties.get("runtimeDuration")!=null?((Number)properties.get("runtimeDuration")).longValue():0;
         this.runtimeDurationOnInstance = properties.get("runtimeDurationOnInstance")!=null?((Number)properties.get("runtimeDurationOnInstance")).longValue():0;
         this.resetEnabled = properties.get("resetEnabled")!=null?(boolean)properties.get("resetEnabled"):false;
+        this.index = (String)properties.get("index");
     }
 
     public String applicationClassName() {
