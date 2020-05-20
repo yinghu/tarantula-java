@@ -146,6 +146,10 @@ public class DefaultApplication implements Application {
         }
     }
     public void atMidnight(){
-        log.warn("Running midnight check->"+deploymentDescriptor.distributionKey());
+        if(this.deploymentDescriptor.resetEnabled()){
+            if(this.tarantulaContext.tokenValidatorProvider().validateApplication(this)){
+                //shut down the app
+            }
+        }
     }
 }

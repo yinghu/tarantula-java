@@ -100,6 +100,10 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public AuthVendor authVendor(String name){
         return aMap.get(name);
     }
+    public boolean validateApplication(Application application){
+        
+        return true;
+    }
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;

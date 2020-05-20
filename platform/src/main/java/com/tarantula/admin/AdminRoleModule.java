@@ -24,7 +24,10 @@ public class AdminRoleModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         this.context.log(session.action(),OnLog.INFO);
-        if(session.action().equals("onCreateGameCluster")){
+        if(session.action().equals("onListGameCluster")){
+
+        }
+        else if(session.action().equals("onCreateGameCluster")){
             Account acc = new UserAccount();
             acc.distributionKey(session.systemId());
             if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
