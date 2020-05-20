@@ -16,6 +16,7 @@ public class PresenceApplication extends TarantulaApplicationHeader {
     private DeploymentServiceProvider deploymentServiceProvider;
     private DataStore userDs;
     private DataStore accountDs;
+
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
@@ -70,6 +71,14 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             User user = this.user(session.systemId());
             boolean suc = this.context.validator().upgradeRole(user,onAccess.name());
             ResponseHeader responseHeader = new ResponseHeader(session.action(),suc?"You have upgraded to ["+onAccess.name()+"]":"Failed to upgrade",suc);
+            session.write(this.builder.create().toJson(responseHeader).getBytes(),descriptor.responseLabel());
+        }
+        else if(session.action().equals("onChangePassword")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            User user = this.user(session.systemId());
+            user.password(this.context.validator().hashPassword((String)onAccess.property("password")));
+            boolean suc = userDs.update(user);
+            ResponseHeader responseHeader = new ResponseHeader(session.action(),suc?"You have changed password":"Failed to change password",suc);
             session.write(this.builder.create().toJson(responseHeader).getBytes(),descriptor.responseLabel());
         }
         /**

@@ -63,7 +63,7 @@ public class ViewEventHandler implements RequestHandler, OnView.Listener {
 
     @Override
     public void onView(OnView onView) {
-        //log.warn(onView.viewId()+">>"+onView.toString());
+        log.warn(onView.viewId()+">>"+onView.toString());
         _vMap.put(onView.viewId(),onView);
     }
 }
