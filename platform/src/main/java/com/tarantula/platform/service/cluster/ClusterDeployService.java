@@ -442,13 +442,13 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
     public boolean addView(OnView view){
         DataStore ds = this.tarantulaContext.masterDataStore();
-        log.warn("Add view->"+view.owner());
         LobbyTypeIdIndex query = new LobbyTypeIdIndex(ds.bucket(),view.owner());
         if(!ds.load(query)){
             return false;
         }
         view.owner(query.index());
         if(ds.create(view)){
+            log.warn("Added view->"+view.owner());
             return true;
         }
         else{
