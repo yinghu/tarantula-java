@@ -20,15 +20,13 @@
         <div class="w3-display-container w3-white tx-content-8"></div>  
         <div id="tx-Account" class="w3-container tx-pane">
             <div class='w3-bar w3-white'>
-                <span view-id='upgrade.role' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>UpgradeRole</span>
                 <span view-id='change.password' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>ChangePassword</span>
-                <span view-id='add.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>AddUser</span>
                 <span view-id='find.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>FindUser</span>
-                <span view-id='add.email' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>AddEmail</span>
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-user" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>Player Name</span>
+                <span view-id='add.user' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>
                 <span id='tx-player-1' class='w3-right tx-text-14'>root</span>
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
@@ -38,12 +36,14 @@
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
-                <span class='w3-left tx-text-14'>Email Address</span>
+                <span class='w3-left tx-text-14'>Email</span>
+                <span view-id='add.email' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>
                 <span id='tx-player-3' class='w3-right tx-text-14'>n/a</span>
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>System Role</span>
+                <span view-id='upgrade.role' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>
                 <span id='tx-player-4' class='w3-right tx-text-14'>root</span>
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
@@ -59,17 +59,22 @@
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>User Count</span>
+                <span view-id='list.users' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-folder-open" style="font-size:16px"></i></span>
                 <span id='tx-player-7' class='w3-right tx-text-14'>n/a</span>
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>Game Cluster Count</span>
+                <span view-id='list.game.clusters' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-folder-open" style="font-size:16px"></i></span>
                 <span id='tx-player-8' class='w3-right tx-text-14'>n/a</span>
             </div>
-            <div class='w3-panel w3-border-bottom w3-border-red'>
-                <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
-                <span class='w3-left tx-text-14'>Account Email</span>
-                <span id='tx-player-9' class='w3-right tx-text-14'>n/a</span>
+            <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+                <div class="w3-display-topleft w3-padding">
+                    <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+                </div>
+                <div class="w3-display-bottomright w3-padding">
+                    <span class="tx-text-12">Powered By ICodeSoftware</span>
+                </div>
             </div>
         </div> 
         
@@ -220,6 +225,14 @@
                     
                 </div>
             </div>
+            <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+                <div class="w3-display-topleft w3-padding">
+                    <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+                </div>
+                <div class="w3-display-bottomright w3-padding">
+                    <span class="tx-text-12">Powered By ICodeSoftware</span>
+                </div>
+            </div>
         </div>
         <div id="tx-Extension" class="w3-container tx-pane" style="display:none">
             <div class='w3-bar w3-white'>
@@ -245,7 +258,7 @@
             if(resp.account){
                 document.querySelector('#tx-player-7').innerHTML=resp.account.userCount;
                 document.querySelector('#tx-player-8').innerHTML=resp.account.gameClusterCount;
-                document.querySelector('#tx-player-9').innerHTML=resp.account.emailAddress;
+                //console.log(resp.account.emailAddress);
             }
         }    
     });

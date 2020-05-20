@@ -1,7 +1,6 @@
 package com.tarantula.platform.presence;
 
 import com.tarantula.*;
-import com.tarantula.Response;
 import com.tarantula.platform.*;
 
 import com.tarantula.platform.service.DeploymentServiceProvider;
@@ -53,6 +52,14 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             if(auser!=null){
                 auser.emailAddress((String)onAccess.property("emailAddress"));
                 userDs.update(auser);
+                if(!auser.role().equals(AccessControl.player)&&auser.primary()){
+                    UserAccount userAccount = new UserAccount();
+                    userAccount.distributionKey(session.systemId());
+                    if(accountDs.load(userAccount)){
+                        userAccount.emailAddress(auser.emailAddress());
+                        accountDs.update(userAccount);
+                    }
+                }
                 session.write(this.builder.create().toJson(new ResponseHeader("","successful",true)).getBytes(),descriptor.responseLabel());
             }else{
                 session.write(this.builder.create().toJson(new ResponseHeader("","failed",false)).getBytes(),descriptor.responseLabel());
