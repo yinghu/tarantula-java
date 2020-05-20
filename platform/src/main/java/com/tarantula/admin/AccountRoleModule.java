@@ -3,6 +3,8 @@ package com.tarantula.admin;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
+import com.tarantula.platform.IndexSet;
+import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.service.AccessIndexService;
@@ -21,45 +23,17 @@ public class AccountRoleModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         //this.context.log(session.action()+"=>"+new String(payload),OnLog.INFO);
-        OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-        if(session.action().equals("findKey")){
-            AccessIndex ix = this.accessIndexService.get((String)onAccess.property("login"));
-            if(ix!=null){
-                session.write(this.builder.create().toJson(_onAccessIndex(ix)).getBytes(),label());
+        if(session.action().equals("onListUsers")){
+            IndexSet indexSet = new IndexSet();
+            indexSet.distributionKey(session.systemId());
+            indexSet.label(Account.UserLabel);
+            if(account.load(indexSet)){
+
             }
-            else{
-                session.write(payload,label());
-            }
-        }
-        else if(session.action().equals("resetPassword")){
-            Access acc = new User();
-            acc.distributionKey(onAccess.systemId());
-            String p1 = (String)onAccess.property("password1");
-            String p2 = (String)onAccess.property("password2");
-            if(p1.equals(p2)&&this.user.load(acc)){
-                acc.password(this.context.validator().hashPassword(p1));
-                this.user.update(acc);
-                session.write(this.builder.create().toJson(_onMessage("password changed")).getBytes(),label());
-            }
-            else{
-                session.write(this.builder.create().toJson(_onMessage("no user found or wrong data input")).getBytes(),label());
-            }
-        }
-        else if(session.action().equals("changeRole")){
-            Access acc = new User();
-            acc.distributionKey(onAccess.systemId());
-            String r1 = (String)onAccess.property("role1");
-            String r2 = (String)onAccess.property("role2");
-            if(r1.equals(r2)&&this.user.load(acc)){
-                acc.role(r1);
-                this.user.update(acc);
-                session.write(this.builder.create().toJson(_onMessage("role changed")).getBytes(),label());
-            }
-            else{
-                session.write(this.builder.create().toJson(_onMessage("no user found or wrong data input")).getBytes(),label());
-            }
+            session.write(this.builder.create().toJson(new ResponseHeader("","",true)).getBytes(),label());
         }
         else if(session.action().equals("addUser")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Account acc = new UserAccount();
             acc.distributionKey(session.systemId());
             account.load(acc);

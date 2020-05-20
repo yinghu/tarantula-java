@@ -36,7 +36,7 @@ public class AdminRoleModule implements Module {
                 if(!gc.disabled()){
                     IndexSet idx = new IndexSet();
                     idx.distributionKey(acc.distributionKey());
-                    idx.label("games");
+                    idx.label(Account.GameClusterLabel);
                     idx.keySet.add(gc.distributionKey());
                     if(!account.createIfAbsent(idx,true)){
                         idx.keySet.add(gc.distributionKey());//update on existing

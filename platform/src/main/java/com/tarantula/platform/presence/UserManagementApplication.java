@@ -77,7 +77,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
                 aDatastore.update(account);
                 IndexSet idx = new IndexSet();
                 idx.distributionKey(account.distributionKey());
-                idx.label("users");
+                idx.label(Account.UserLabel);
                 idx.keySet.add(user.distributionKey());
                 if(!aDatastore.createIfAbsent(idx,true)){
                     idx.keySet.add(user.distributionKey());//update on existing
