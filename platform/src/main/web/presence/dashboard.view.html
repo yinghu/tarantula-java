@@ -14,7 +14,6 @@
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Account</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">GameCluster</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">API</span>
-            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Extension</span>
         </div>
         <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
         <div class="w3-display-container w3-white tx-content-8"></div>  
@@ -79,40 +78,86 @@
         </div> 
         
         <div id="tx-GameCluster" class="w3-container tx-pane" style="display:none">
-            <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
-                <div class="w3-display-topright w3-padding">
-                    <span view-id='create.game.cluster' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>           
+            <div class='w3-bar w3-white'>
+                <span view-id='deploy.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy View</span>
+                <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload File</span>
+                <span view-id='reset.module' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Module</span>
+            </div>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
+                <div class="w3-container">
+                    <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
+                    <span class='w3-left tx-text-14'>Basic Plan</span>
+                    <span view-id='create.game.cluster' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>
                 </div>
-                <div class="w3-display-topleft w3-padding">
-                    <span><i class="fa fa-cubes w3-text-green" style="font-size:24px"></i></span>
-                    <span class="tx-margin-left-8 tx-text-24">Basic Game Cluster</span>
+                <div class="w3-container">
+                    <span id='tx-game-cluster-1-n' class='w3-left tx-text-12'>Distributed match making</span>
+                    <span id='tx-game-cluster-1-v' class='w3-right tx-margin-right-16'><i class="fa fa-check w3-text-green" style="font-size:14px"></i></span>   
                 </div>
-                <div class="w3-display-bottomright w3-padding">
-                    
+                <div class="w3-container">
+                    <span id='tx-game-cluster-2-n' class='w3-left tx-text-12'>Dedicated server routing</span>
+                    <span id='tx-game-cluster-2-v' class='w3-right tx-margin-right-16'><i class="fa fa-check w3-text-green" style="font-size:14px"></i></span>   
+                </div>
+                <div class="w3-container">
+                    <span id='tx-game-cluster-3-n' class='w3-left tx-text-12'>Web socket event push</span>
+                    <span id='tx-game-cluster-3-v' class='w3-right tx-margin-right-16'><i class="fa fa-check w3-text-green" style="font-size:14px"></i></span>   
+                </div>
+                <div class="w3-container">
+                    <span id='tx-game-cluster-3-n' class='w3-left tx-text-12'>Persistence data integration</span>
+                    <span id='tx-game-cluster-3-v' class='w3-right tx-margin-right-16'><i class="fa fa-check w3-text-green" style="font-size:14px"></i></span>   
                 </div>
             </div>
-            <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
-                <div class="w3-display-topright w3-padding">
-                    <span view-id='create.game.cluster' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>           
+            <div class='w3-panel w3-border-bottom w3-border-red'>
+                <div class="w3-container">
+                    <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
+                    <span class='w3-left tx-text-14'>Standard Plan</span>
+                    <span view-id='create.game.cluster' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>
                 </div>
-                <div class="w3-display-topleft w3-padding">
-                    <span><i class="fa fa-cubes w3-text-green" style="font-size:24px"></i></span>
-                    <span class="tx-margin-left-8 tx-text-24">Standard Game Cluster</span>
+                <div class="w3-container">
+                    <span id='tx-game-cluster-1-n' class='w3-left tx-text-12'>Distributed match making</span>
+                    <span id='tx-game-cluster-1-v' class='w3-right tx-margin-right-16'><i class="fa fa-check w3-text-green" style="font-size:14px"></i></span>   
                 </div>
-                <div class="w3-display-bottomright w3-padding">
-                    
+                <div class="w3-container">
+                    <span id='tx-game-cluster-2-n' class='w3-left tx-text-12'>Dedicated server routing</span>
+                    <span id='tx-game-cluster-2-v' class='w3-right tx-margin-right-16'><i class="fa fa-check w3-text-green" style="font-size:14px"></i></span>   
+                </div>
+                <div class="w3-container">
+                    <span id='tx-game-cluster-3-n' class='w3-left tx-text-12'>Web socket event push</span>
+                    <span id='tx-game-cluster-3-v' class='w3-right tx-margin-right-16'><i class="fa fa-check w3-text-green" style="font-size:14px"></i></span>   
+                </div>
+                <div class="w3-container">
+                    <span id='tx-game-cluster-3-n' class='w3-left tx-text-12'>Persistence data integration</span>
+                    <span id='tx-game-cluster-3-v' class='w3-right tx-margin-right-16'><i class="fa fa-check w3-text-green" style="font-size:14px"></i></span>   
                 </div>
             </div>
-            <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
-                <div class="w3-display-topright w3-padding">
-                    <span view-id='create.game.cluster' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>           
+            <div class='w3-panel w3-border-bottom w3-border-red'>
+                <div class="w3-container">
+                    <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
+                    <span class='w3-left tx-text-14'>Advanced Plan</span>
+                    <span view-id='create.game.cluster' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>
                 </div>
+                <div class="w3-container">
+                    <span id='tx-game-cluster-1-n' class='w3-left tx-text-12'>Distributed match making</span>
+                    <span id='tx-game-cluster-1-v' class='w3-right tx-margin-right-16'><i class="fa fa-check w3-text-green" style="font-size:14px"></i></span>   
+                </div>
+                <div class="w3-container">
+                    <span id='tx-game-cluster-2-n' class='w3-left tx-text-12'>Dedicated server routing</span>
+                    <span id='tx-game-cluster-2-v' class='w3-right tx-margin-right-16'><i class="fa fa-check w3-text-green" style="font-size:14px"></i></span>   
+                </div>
+                <div class="w3-container">
+                    <span id='tx-game-cluster-3-n' class='w3-left tx-text-12'>Web socket event push</span>
+                    <span id='tx-game-cluster-3-v' class='w3-right tx-margin-right-16'><i class="fa fa-check w3-text-green" style="font-size:14px"></i></span>   
+                </div>
+                <div class="w3-container">
+                    <span id='tx-game-cluster-3-n' class='w3-left tx-text-12'>Persistence data integration</span>
+                    <span id='tx-game-cluster-3-v' class='w3-right tx-margin-right-16'><i class="fa fa-check w3-text-green" style="font-size:14px"></i></span>   
+                </div>
+            </div>
+            <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
                 <div class="w3-display-topleft w3-padding">
-                    <span><i class="fa fa-cubes w3-text-green" style="font-size:24px"></i></span>
-                    <span class="tx-margin-left-8 tx-text-24">Advanced Game Cluster</span>
+                    <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
                 </div>
                 <div class="w3-display-bottomright w3-padding">
-                    
+                    <span class="tx-text-12">Powered By ICodeSoftware</span>
                 </div>
             </div>
         </div>
@@ -234,15 +279,6 @@
                 </div>
             </div>
         </div>
-        <div id="tx-Extension" class="w3-container tx-pane" style="display:none">
-            <div class='w3-bar w3-white'>
-                <span view-id='deploy.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy View</span>
-                <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload File</span>
-                <span view-id='pending.request' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Module</span>
-                <span id='tx-list-views' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>List Views</span>
-                <span id='tx-list-configs' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>List Configs</span>
-            </div>
-        </div>
     </div>
 </div>
 <script>
@@ -262,16 +298,6 @@
             }
         }    
     });
-    document.querySelector('#tx-list-configs').onclick=()=>{
-        TARA_API.onService(false,{serviceTag:"admin/setup",command:'listConfigs'},(resp)=>{
-            console.log(resp);        
-        });
-    };
-    document.querySelector('#tx-list-views').onclick=()=>{
-        TARA_API.onService(false,{serviceTag:"admin/setup",command:'listViews'},(resp)=>{
-            console.log(resp);        
-        });
-    };
     document.querySelector('#tx-menu-close').onclick = ()=>{
         if(TARA_API.query().systemId){
             tx_oauth_sign_out();
