@@ -1,16 +1,16 @@
 <div class="w3-modal-content">
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
         <div class="w3-display-topright w3-padding">
-            <span id="tx-list-users-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+            <span id="tx-user-list-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-group" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">LIST USERS</span>
+            <span class="tx-margin-left-8 tx-text-24">USER LIST</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-list-users-message"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-user-list-message"></div>
     
     <div class='w3-panel w3-border-bottom w3-border-red'>
         <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-user" style="font-size:16px"></i></span>
@@ -53,9 +53,9 @@
 </div>
 <script>
     TARA_API.onService(true,{serviceTag:'role/account',command:'onListUsers'},(resp)=>{
-        document.querySelector('#tx-list-users-message').innerHTML = resp.message;        
+        document.querySelector('#tx-user-list-message').innerHTML = resp.message;        
     });
-    document.querySelector('#tx-list-users-close').onclick=()=>{
+    document.querySelector('#tx-user-list-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       

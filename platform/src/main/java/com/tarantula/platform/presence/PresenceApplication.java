@@ -55,8 +55,8 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             pc.account = account(session.systemId());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
         }
-        else if(session.action().equals("onLobby")){
-            PresenceContext ic = new PresenceContext("onLobby");
+        else if(session.action().equals("onLobbyList")){
+            PresenceContext ic = new PresenceContext("onLobbyList");
             ic.lobbyList = new ArrayList<>();
             _lobbyList.forEach((a)->{
                 ic.lobbyList.add(this.context.lobby(a));

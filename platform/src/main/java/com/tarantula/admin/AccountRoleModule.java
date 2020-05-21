@@ -22,14 +22,14 @@ public class AccountRoleModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         //this.context.log(session.action()+"=>"+new String(payload),OnLog.INFO);
-        if(session.action().equals("onListUsers")){
+        if(session.action().equals("onUserList")){
             IndexSet indexSet = new IndexSet();
             indexSet.distributionKey(session.systemId());
             indexSet.label(Account.UserLabel);
             if(account.load(indexSet)){
 
             }
-            session.write(this.builder.create().toJson(new ResponseHeader("","",true)).getBytes(),label());
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"load user list",true)).getBytes(),label());
         }
         else if(session.action().equals("onAddUser")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);

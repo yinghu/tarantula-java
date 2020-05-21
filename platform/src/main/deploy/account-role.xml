@@ -36,6 +36,9 @@
             <view type="add.user">
                 <property name="moduleResourceFile">account/add.user.view.html</property>
             </view>
+            <view type="user.list">
+                <property name="moduleResourceFile">account/user.list.view.html</property>
+            </view>
         </view-list>
 
     </lobby-context>

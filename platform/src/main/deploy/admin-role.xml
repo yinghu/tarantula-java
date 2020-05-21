@@ -38,6 +38,9 @@
             <view type="create.game.cluster">
                 <property name="moduleResourceFile">admin/create.game.cluster.view.html</property>
             </view>
+            <view type="game.cluster.list">
+                <property name="moduleResourceFile">admin/game.cluster.list.view.html</property>
+            </view>
         </view-list>
 
     </lobby-context>
