@@ -226,7 +226,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     c.descriptor.onEdge(true);
                     c.descriptor.owner(query.distributionKey());
                     dataStore.create(c.descriptor);
-                    dataStore.create(new LobbyTypeIdIndex(params[0],c.descriptor.typeId(),c.descriptor.distributionKey()));
+                    dataStore.create(new LobbyTypeIdIndex(params[0],c.descriptor.typeId(),c.descriptor.distributionKey(),""));
                     blist.add(c.descriptor);
                     c.applications.forEach((a)->{
                         a.owner(c.descriptor.distributionKey());
@@ -528,12 +528,14 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         GameCluster gameCluster = new GameCluster();
         try {
             DataStore mds = this.tarantulaContext.masterDataStore();
+            gameCluster.name(name);
+            mds.create(gameCluster);//create first and discharge if any errors on loop
             XMLParser parser = new XMLParser();
-            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-singleton.xml"));
+            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-basic-plan.xml"));
             for (LobbyConfiguration configuration : parser.configurations) {
                 configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",name));
-                LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(mds.bucket(),configuration.descriptor.typeId(),"");
-                if(!mds.createIfAbsent(lobbyTypeIdIndex,false)){
+                LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(mds.bucket(),configuration.descriptor.typeId());
+                if(mds.load(lobbyTypeIdIndex)){//stop existed
                     gameCluster.disabled(true);
                     break;
                 }
@@ -545,15 +547,24 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 descriptor.resetEnabled(true);
                 mds.create(descriptor);
                 lobbyTypeIdIndex.index(descriptor.distributionKey());
-                mds.update(lobbyTypeIdIndex);
-            }
-            if(!gameCluster.disabled()){
-                mds.create(gameCluster);
+                lobbyTypeIdIndex.owner(gameCluster.distributionKey());
+                mds.create(lobbyTypeIdIndex);
+                configuration.applications.forEach((a)->{
+                    a.owner(descriptor.distributionKey());
+                    a.label("LDA");
+                    a.onEdge(true);
+                    a.typeId(descriptor.typeId());//replaced with named type id
+                    a.subtypeId(a.subtypeId().replace("game",name));
+                    a.tag(a.tag().replace("game",name));
+                    log.warn("Create named application on typeId->"+a.typeId());
+                    log.warn("Create named application on subtypeId->"+a.subtypeId());
+                    log.warn("Create named application on tag->"+a.tag());
+                    mds.create(a);
+                });
             }
         }catch (Exception ex){
             gameCluster.disabled(true);
         }
-        gameCluster.name(name);
         return gameCluster;
     }
 

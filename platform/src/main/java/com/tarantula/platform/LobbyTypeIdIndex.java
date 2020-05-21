@@ -2,6 +2,8 @@ package com.tarantula.platform;
 
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
+import java.util.Map;
+
 public class LobbyTypeIdIndex extends RecoverableObject {
 
     public int getFactoryId() {
@@ -9,26 +11,29 @@ public class LobbyTypeIdIndex extends RecoverableObject {
     }
 
     public LobbyTypeIdIndex(){
-        this.binary = true;
+
     }
     public LobbyTypeIdIndex(String bucket,String typeId){
-        this();
         this.bucket = bucket;
         this.label =  typeId;
     }
-    public LobbyTypeIdIndex(String bucket,String typeId,String index){
+    public LobbyTypeIdIndex(String bucket,String typeId,String index,String owner){
         this();
         this.bucket = bucket;
         this.label =  typeId;
         this.index = index;
+        this.owner = owner;//game cluster id
     }
     @Override
-    public byte[] toByteArray(){
-        return this.index.getBytes();
+    public Map<String,Object> toMap(){
+        this.properties.put("index",index);
+        this.properties.put("owner",owner);
+        return this.properties;
     }
     @Override
-    public void fromByteArray(byte[] data){
-        this.index = new String(data);
+    public void fromMap(Map<String,Object> properties){
+        this.index = (String)properties.get("index");
+        this.owner = (String)properties.get("owner");
     }
 
     public int getClassId() {
