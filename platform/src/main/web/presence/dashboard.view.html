@@ -286,7 +286,24 @@
                 <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload File</span>
                 <span view-id='reset.module' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Module</span>
             </div>
-
+            <div class='w3-panel w3-border-bottom w3-border-red'>
+                <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-user" style="font-size:16px"></i></span>
+                <span id=tx-lobby-type-id-0" class='w3-left tx-text-14'>LobbyName</span>
+                <span view-id='add.user' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>
+                <span id='tx-lobby-name-0' class='w3-right tx-text-14'>root</span>
+            </div>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
+                <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-user" style="font-size:16px"></i></span>
+                <span id=tx-lobby-type-id-1" class='w3-left tx-text-14'>LobbyName</span>
+                <span view-id='add.user' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>
+                <span id='tx-lobby-name-1' class='w3-right tx-text-14'>root</span>
+            </div>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
+                <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-user" style="font-size:16px"></i></span>
+                <span id=tx-lobby-type-id-2" class='w3-left tx-text-14'>LobbyName</span>
+                <span view-id='add.user' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>
+                <span id='tx-lobby-name-2' class='w3-right tx-text-14'>root</span>
+            </div>
             <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
                 <div class="w3-display-topleft w3-padding">
                     <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -315,6 +332,16 @@
                 document.querySelector('#tx-player-9').innerHTML=resp.account.gameClusterCount;
             }
         }    
+    });
+    TARA_API.onLobby().forEach((a,i)=>{
+        console.log('#tx-lobby-type-id-'+i);
+        let vt = document.querySelector('#tx-lobby-type-id-'+i);
+        let vn = document.querySelector('#tx-lobby-name-'+i);
+        console.log(vt);
+        if(vt){
+            vt.innerHTML = a.descriptor.typeId;
+            vn.innerHTML = a.descriptor.name;
+        }
     });
     document.querySelector('#tx-menu-close').onclick = ()=>{
         if(TARA_API.query().systemId){

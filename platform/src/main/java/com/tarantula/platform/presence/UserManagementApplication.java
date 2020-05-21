@@ -166,14 +166,14 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
         else if(session.action().equals("onDevice")){
             String deviceId = (String) acc.property("deviceId");
             if(session.systemId()!=null){//registered
-                OnSession access = this.login(session.systemId(),"password",session);
+                OnSession access = this.login(session.systemId(),deviceId,session);
                 onSession(access,session);
             }
             else{
                 AccessIndex accessIndex = this.accessIndexService.set(deviceId,session.trackId());
                 if(accessIndex!=null){
                     acc.property("login",deviceId);
-                    acc.property("password","password");
+                    acc.property("password",deviceId);
                     this.createLogin(acc,session.trackId(),role,true,"device",true);
                     OnSession access = this.login(session.trackId(),(String) acc.property("password"),session);
                     onSession(access,session);

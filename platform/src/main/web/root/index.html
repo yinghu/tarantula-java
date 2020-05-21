@@ -246,7 +246,7 @@
               fontloading : function(){},    
               active: function() {}
             });
-            TARA_API.onIndex(function(vb){});
+            TARA_API.onIndex();
             document.querySelector('#tx-menu-open').onclick = ()=>{
                 if(!TARA_API.query().systemId){
                     tx_view({viewId:'sign.in',containerId:'#tx-popup'});
