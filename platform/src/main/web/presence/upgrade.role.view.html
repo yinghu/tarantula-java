@@ -41,7 +41,7 @@
     document.querySelectorAll('.tx-upgrade-role-action').forEach((a)=>{
         a.onclick = ()=>{
             TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onUpgradeRole',name:a.getAttribute('tx-role')},(resp)=>{      
-                document.querySelector('#tx-upgrade-role-message').innerHTML = resp.message;        
+                document.querySelector('#tx-upgrade-role-message').innerHTML = resp.message;       
             });        
         };    
     });

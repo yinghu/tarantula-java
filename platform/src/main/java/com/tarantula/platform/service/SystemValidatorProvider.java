@@ -101,7 +101,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return aMap.get(name);
     }
     public boolean validateApplication(Application application){
-        
+
         return true;
     }
     @Override

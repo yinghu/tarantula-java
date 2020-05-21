@@ -36,7 +36,7 @@
         let _n = document.querySelector('#tx-add-user-name').value;
         let _p = document.querySelector('#tx-add-user-password').value;
         TARA_API.onService(true,{serviceTag:'role/account',command:'onAddUser',login:_n,password:_p},(resp)=>{
-            document.querySelector('#tx-add-user-message').innerHTML = resp.message;        
+            document.querySelector('#tx-add-user-message').innerHTML = resp.message;      
         });
     };
     document.querySelector('#tx-add-user-close').onclick=()=>{

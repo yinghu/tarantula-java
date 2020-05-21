@@ -4,14 +4,20 @@ import com.tarantula.*;
 import com.tarantula.platform.*;
 
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.OnLobby;
 import com.tarantula.platform.util.*;
+
+import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Developer: YINGHU LU
  * Date: updated 5/20/2020
  */
-public class PresenceApplication extends TarantulaApplicationHeader {
+public class PresenceApplication extends TarantulaApplicationHeader implements OnLobby.Listener {
 
+
+    private CopyOnWriteArraySet<String> _lobbyList = new CopyOnWriteArraySet<>();
 
     private DeploymentServiceProvider deploymentServiceProvider;
     private DataStore userDs;
@@ -23,7 +29,8 @@ public class PresenceApplication extends TarantulaApplicationHeader {
         Configuration ya = this.context.configuration("yearlyAccess");
         Configuration ma = this.context.configuration("monthlyAccess");
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
-        deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        this.deploymentServiceProvider.registerOnLobbyListener(this);
         userDs = this.context.dataStore(Access.DataStore);
         accountDs = this.context.dataStore(Account.DataStore);
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
@@ -47,6 +54,14 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             pc.access = user(session.systemId());
             pc.account = account(session.systemId());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
+        }
+        else if(session.action().equals("onLobby")){
+            PresenceContext ic = new PresenceContext("onLobby");
+            ic.lobbyList = new ArrayList<>();
+            _lobbyList.forEach((a)->{
+                ic.lobbyList.add(this.context.lobby(a));
+            });
+            session.write(this.builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onAddEmail")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -118,5 +133,15 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             return acc;
         }
         return null;
+    }
+    @Override
+    public void onLobby(OnLobby onLobby) {
+        context.log("Lobby Updated--->>"+onLobby.toString(),OnLog.WARN);
+        if(!onLobby.closed()){
+            this._lobbyList.add(onLobby.typeId());
+        }
+        else{
+            this._lobbyList.remove(onLobby.typeId());
+        }
     }
 }

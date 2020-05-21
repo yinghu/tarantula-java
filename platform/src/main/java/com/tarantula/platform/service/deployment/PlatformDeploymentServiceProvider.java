@@ -458,6 +458,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(ot instanceof Configuration){
                 Configuration ov = (Configuration) ot;
                 vMap.put(new String(mse.key),ot);
+                ov.distributionKey(new String(mse.key));
                 this.cListeners.forEach((cl)->{
                     cl.onConfiguration(ov);
                 });

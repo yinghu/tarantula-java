@@ -93,9 +93,6 @@ var TARA_API = (function(){
             qdata.googleClientId = jsb.googleClientId;
             qdata.stripeClientId = jsb.stripeClientId;
             qdata.roleList = jsb.roleList;
-            //qdata.roleList.forEach((r)=>{
-                //console.log(r.name);
-            //});
             _parse(jsb);
         }
     };

@@ -4,19 +4,16 @@ import com.tarantula.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
-import com.tarantula.platform.service.OnLobby;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Updated 5/14/2020
  */
-public class UserManagementApplication extends TarantulaApplicationHeader  implements OnLobby.Listener{
+public class UserManagementApplication extends TarantulaApplicationHeader{
 
     private String lobbyId;
     private boolean activated;
@@ -25,7 +22,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
     private AccessIndexService accessIndexService;
     private DeploymentServiceProvider deploymentServiceProvider;
 
-    private CopyOnWriteArraySet<String> _lobbyList = new CopyOnWriteArraySet<>();
     private List<Access.Role> roleList;
     private TokenValidatorProvider tokenValidatorProvider;
 
@@ -45,7 +41,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
         builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        deploymentServiceProvider.registerOnLobbyListener(this);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.roleList = this.tokenValidatorProvider.list();
         this.onApplication = this.deploymentServiceProvider.deploymentMode()== DeploymentServiceProvider.Mode.APPLICATION;
@@ -68,7 +63,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
         this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ON_ACCESS_CID,(a)->{
             //add player user to the account
             OnAccess uadded = (OnAccess)a;
-            if(uadded.property("command").equals("addUser")){
+            if(uadded.property("command").equals("onAddUser")){
                 Access user = createLogin(uadded,uadded.distributionKey(),role,false,"password",false);
                 Account account = new UserAccount();
                 account.distributionKey(uadded.owner());
@@ -83,9 +78,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
                     idx.keySet.add(user.distributionKey());//update on existing
                     aDatastore.update(idx);
                 }
-                idx.keySet.forEach((k)->{
-                    this.context.log("KEY->"+(ix)+k,OnLog.WARN);
-                });
+                //idx.keySet.forEach((k)->{
+                    //this.context.log("KEY->"+(ix)+k,OnLog.WARN);
+                //});
             }
         });
         this.context.log("User management application started on tag ["+descriptor.tag()+"] with application mode ["+onApplication+"]",OnLog.INFO);
@@ -97,16 +92,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
             PresenceContext ic = new PresenceContext("onIndex");
             ic.googleClientId = this.tokenValidatorProvider.authVendor("google").clientId();
             ic.stripeClientId = this.tokenValidatorProvider.authVendor("stripe").clientId();
-            String typeId = session.trackId();
             ic.lobbyList = this.context.index();
-            _lobbyList.forEach((n)->{
-                if(typeId!=null&&typeId.equals(n)){
-                    ic.lobbyList.add(this.context.lobby(n));
-                }
-                else if(typeId==null){
-                    ic.lobbyList.add(this.context.lobby(n));
-                }
-            });
             ic.roleList = roleList;
             session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }
@@ -248,15 +234,5 @@ public class UserManagementApplication extends TarantulaApplicationHeader  imple
             pDatastore.create(px);
         }
         return acc;
-    }
-    @Override
-    public void onLobby(OnLobby onLobby) {
-        context.log("Lobby Updated--->>"+onLobby.toString(),OnLog.WARN);
-        if(!onLobby.closed()){
-            this._lobbyList.add(onLobby.typeId());
-        }
-        else{
-            this._lobbyList.remove(onLobby.typeId());
-        }
     }
 }

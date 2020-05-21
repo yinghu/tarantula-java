@@ -32,7 +32,7 @@
     document.querySelector('#tx-add-email').onclick=()=>{
         let _c = document.querySelector('#tx-email-address').value;
         TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onAddEmail',emailAddress:_c},(resp)=>{
-            document.querySelector('#tx-add-email-message').innerHTML = resp.message;        
+            document.querySelector('#tx-add-email-message').innerHTML = resp.message;       
         });
     };
     document.querySelector('#tx-add-email-close').onclick=()=>{

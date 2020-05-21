@@ -42,9 +42,9 @@ public class AdminRoleModule implements Module {
                         idx.keySet.add(gc.distributionKey());//update on existing
                         account.update(idx);
                     }
-                    idx.keySet.forEach((k)->{
-                        this.context.log("KEY->"+k,OnLog.WARN);
-                    });
+                    //idx.keySet.forEach((k)->{
+                       // this.context.log("KEY->"+k,OnLog.WARN);
+                    //});
                     acc.gameClusterCount(1);
                     account.update(acc);
                 }
