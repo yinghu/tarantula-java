@@ -114,10 +114,11 @@ namespace Tarantula.Networking{
         public  async Task<bool> OnIndex(MonoBehaviour caller){
             try{
                 Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","index/lobby"),
-                    new Header("Tarantula-type-id","game-lobby")
+                    new Header("Tarantula-tag","index/user"),
+                    new Header("Tarantula-type-id","game-lobby"),
+                    new Header("Tarantula-action","onIndex")
                 };
-                string jstr = await _ghc.GetJson(caller,"/user/index",headers);
+                string jstr = await _ghc.GetJson(caller,"/user/action",headers);
                 return ParseIndex(jstr);
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_INDEX);
