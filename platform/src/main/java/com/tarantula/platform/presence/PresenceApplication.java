@@ -8,7 +8,7 @@ import com.tarantula.platform.util.*;
 
 /**
  * Developer: YINGHU LU
- * Date: updated 12/25/2019.
+ * Date: updated 5/20/2020
  */
 public class PresenceApplication extends TarantulaApplicationHeader {
 
@@ -43,6 +43,7 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             Presence presence = this.context.presence(session.systemId());
             PresenceContext pc = new PresenceContext(session.action());
             pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
+            pc.presence.version(presence.count(0));
             pc.access = user(session.systemId());
             pc.account = account(session.systemId());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
@@ -81,21 +82,6 @@ public class PresenceApplication extends TarantulaApplicationHeader {
             ResponseHeader responseHeader = new ResponseHeader(session.action(),suc?"You have changed password":"Failed to change password",suc);
             session.write(this.builder.create().toJson(responseHeader).getBytes(),descriptor.responseLabel());
         }
-        /**
-        else if(session.action().equals("onPlay")){
-              OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-              Presence presence = this.context.presence(session.systemId());
-              Response resp = presence.onPlay(session,onAccess,this.context.descriptor(onAccess.applicationId()));
-              if (resp != null) {
-                  session.write(this.builder.create().toJson(resp).getBytes(),this.descriptor.responseLabel());//failure
-              }
-        }
-        else if (session.action().equals("onBalance")) {
-            Presence presence = this.context.presence(session.systemId());
-            PresenceContext pc = new PresenceContext(session.action());
-            pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
-            session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
-        }**/
         else if (session.action().equals("onAbsence")) {
             this.context.absence(session);
             session.write(this.builder.create().toJson(new ResponseHeader("onAbsence", "off session [" + session.stub() + "]", true)).getBytes(),this.descriptor.responseLabel());

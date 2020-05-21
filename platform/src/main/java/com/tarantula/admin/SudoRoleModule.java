@@ -174,6 +174,6 @@ public class SudoRoleModule implements Module,Configuration.Listener {
     public void onConfiguration(Configuration c) {
         this.context.log(c.distributionKey(),OnLog.WARN);
         this.context.log(c.toString(),OnLog.WARN);
-        //cMap.put(c.distributionKey(),c);
+        cMap.put(c.distributionKey(),c);
     }
 }

@@ -5,7 +5,6 @@ import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.util.OnAccessDeserializer;
@@ -32,7 +31,7 @@ public class AccountRoleModule implements Module {
             }
             session.write(this.builder.create().toJson(new ResponseHeader("","",true)).getBytes(),label());
         }
-        else if(session.action().equals("addUser")){
+        else if(session.action().equals("onAddUser")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Account acc = new UserAccount();
             acc.distributionKey(session.systemId());

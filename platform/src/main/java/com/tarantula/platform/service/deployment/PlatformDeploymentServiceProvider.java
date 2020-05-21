@@ -591,11 +591,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         RecoverableMetadata mt = new RecoverableMetadata(configuration.getFactoryId(),configuration.getClassId());
         byte[] k = configuration.key().asString()!=null?configuration.key().asString().getBytes():"".getBytes();
         byte[] v = SystemUtil.toJson(configuration.toMap());
-        if(configuration.disabled()){
-            Configuration r = (Configuration) vMap.get(configuration.key().asString());
-            r.disabled(true);
-            v = SystemUtil.toJson(r.toMap());
-        }
+        //if(configuration.disabled()){
+            //Configuration r = (Configuration) vMap.get(configuration.key().asString());
+            //r.disabled(true);
+            //v = SystemUtil.toJson(r.toMap());
+        //}
         MapStoreSyncEvent mse = new MapStoreSyncEvent(this.eventTopic,localTopic,k, v,mt);
         this.integrationEventService.publish(mse);
     }

@@ -14,6 +14,7 @@
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Account</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">GameCluster</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">API</span>
+            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Extension</span>
         </div>
         <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
         <div class="w3-display-container w3-white tx-content-8"></div>  
@@ -57,15 +58,20 @@
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
+                <span class='w3-left tx-text-14'>Session Count</span>
+                <span id='tx-player-7' class='w3-right tx-text-14'>0</span>
+            </div>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
+                <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>User Count</span>
                 <span view-id='list.users' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-folder-open" style="font-size:16px"></i></span>
-                <span id='tx-player-7' class='w3-right tx-text-14'>n/a</span>
+                <span id='tx-player-8' class='w3-right tx-text-14'>n/a</span>
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>Game Cluster Count</span>
                 <span view-id='list.game.clusters' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-folder-open" style="font-size:16px"></i></span>
-                <span id='tx-player-8' class='w3-right tx-text-14'>n/a</span>
+                <span id='tx-player-9' class='w3-right tx-text-14'>n/a</span>
             </div>
             <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
                 <div class="w3-display-topleft w3-padding">
@@ -78,11 +84,6 @@
         </div> 
         
         <div id="tx-GameCluster" class="w3-container tx-pane" style="display:none">
-            <div class='w3-bar w3-white'>
-                <span view-id='deploy.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy View</span>
-                <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload File</span>
-                <span view-id='reset.module' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Module</span>
-            </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <div class="w3-container">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
@@ -279,6 +280,21 @@
                 </div>
             </div>
         </div>
+        <div id="tx-Extension" class="w3-container tx-pane">
+            <div class='w3-bar w3-white'>
+                <span view-id='deploy.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy View</span>
+                <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload File</span>
+                <span view-id='reset.module' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Module</span>
+            </div>
+            <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+                <div class="w3-display-topleft w3-padding">
+                    <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+                </div>
+                <div class="w3-display-bottomright w3-padding">
+                    <span class="tx-text-12">Powered By ICodeSoftware</span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script>
@@ -291,10 +307,10 @@
             document.querySelector('#tx-player-4').innerHTML=resp.access.role;
             document.querySelector('#tx-player-5').innerHTML=resp.access.validator;
             document.querySelector('#tx-player-6').innerHTML=resp.access.primary;
+            document.querySelector('#tx-player-7').innerHTML=resp.presence.sessionCount;
             if(resp.account){
-                document.querySelector('#tx-player-7').innerHTML=resp.account.userCount;
-                document.querySelector('#tx-player-8').innerHTML=resp.account.gameClusterCount;
-                //console.log(resp.account.emailAddress);
+                document.querySelector('#tx-player-8').innerHTML=resp.account.userCount;
+                document.querySelector('#tx-player-9').innerHTML=resp.account.gameClusterCount;
             }
         }    
     });
