@@ -75,8 +75,10 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
         if(qname.equals("data-source")){
             String name = (attributes.getValue("name"));
             String provider = (attributes.getValue("provider"));
+            String trimming = (attributes.getValue("truncated"));
             this._loaded.put(name.trim(),this.dataStoreProvider(provider.trim()));
             properties.put("name",name.trim());
+            properties.put("truncated",trimming);
             properties.put("bucket",this.dataBucketGroup);
             properties.put("node",this.dataBucketNode);
             properties.put("bucketId",this.dataBucketId);

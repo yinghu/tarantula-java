@@ -47,7 +47,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     private String backupPath;
     private String integrationBackupPath;
     private String database;
-
+    private boolean trimming;
 
     private boolean dailyBackup;
     private boolean dRecovered;
@@ -81,6 +81,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     @Override
     public void configure(Map<String, String> properties) {
         this.database = properties.get("name");
+        this.trimming = Boolean.parseBoolean(properties.get("truncated"));
         //dataPath, integrationPath, activePath, backupPath
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("dataPath");
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
@@ -163,6 +164,13 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         envConfig.setAllowCreate(true);
         envConfig.setSharedCache(true);
         this.environment = new Environment(new File(dataPath),envConfig);
+        if(trimming){
+            log.warn("Database ["+this.database+"] configured as trimming mode");
+            for(int i=0;i<serviceContext.partitionNumber();i++){
+                long ret = this.environment.truncateDatabase(null,this.database+"-"+i,true);
+                log.warn("Records ["+ret+"] truncated from ["+this.database+"-"+i+"]");
+            }
+        }
         this.integrationEnvironment = new Environment(new File(integrationPath),envConfig);
         this.activeEnvironment = new Environment(new File(activePath),envConfig);
         if(!dRecovered){
@@ -188,6 +196,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.activeDataStore = this.createDatabase(activeDataStoreName,Distributable.LOCAL_SCOPE);
         this.activeIntegrationStore = this.createDatabase(activeIntegrationStoreName,Distributable.LOCAL_SCOPE);
         this.create(this.database,this.serviceContext.partitionNumber());
+
         //Pull active entries from data and integration cluster
         AtomicInteger tc = new AtomicInteger(0);
         CountDownLatch activeCount = new CountDownLatch(this.dataCluster.size()+this.integrationCluster.size()-2);
