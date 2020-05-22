@@ -4,7 +4,7 @@ import com.tarantula.ApplicationContext;
 import com.tarantula.Module;
 import com.tarantula.Session;
 
-public class FriendList  implements Module {
+public class FriendListModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         return false;
