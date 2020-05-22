@@ -52,7 +52,7 @@
     </div>
 </div>
 <script>
-    TARA_API.onService(true,{serviceTag:'role/account',command:'onListUsers'},(resp)=>{
+    TARA_API.onService(true,{serviceTag:'role/account',command:'onUserList'},(resp)=>{
         document.querySelector('#tx-user-list-message').innerHTML = resp.message;        
     });
     document.querySelector('#tx-user-list-close').onclick=()=>{

@@ -22,7 +22,9 @@
     </div>
 </div>
 <script>
-    
+    TARA_API.onService(false,{serviceTag:'role/admin',command:'onGameClusterList'},(resp)=>{
+        console.log(resp);        
+    });
     document.querySelector('#tx-game-cluster-list-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
