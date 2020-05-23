@@ -25,8 +25,13 @@ public class AdminRoleModule implements Module {
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         this.context.log(session.action(),OnLog.INFO);
         if(session.action().equals("onGameClusterList")){
-
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"load game cluster list",true)).getBytes(),label());
+        }
+        else if(session.action().equals("onStatistics")){
+            Statistics statistics = this.deploymentServiceProvider.statistics();
+            statistics.summary((e)->{
+            });
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"load statistics",true)).getBytes(),label());
         }
         else if(session.action().equals("onCreateGameCluster")){
             Account acc = new UserAccount();

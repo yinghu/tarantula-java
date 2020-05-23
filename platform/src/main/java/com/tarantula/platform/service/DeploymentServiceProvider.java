@@ -82,8 +82,8 @@ public interface DeploymentServiceProvider extends ServiceProvider {
     //GAME CLUSTER APIs
     GameCluster createGameCluster(String name);
     //END OF CLUSTER
-
-    DataStoreProvider dataStoreProvider();
+    Statistics statistics();
+    //DataStoreProvider dataStoreProvider();
 
 
 }

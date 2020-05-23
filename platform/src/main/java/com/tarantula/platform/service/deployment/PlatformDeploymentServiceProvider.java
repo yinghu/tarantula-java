@@ -10,6 +10,7 @@ import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
+import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.util.*;
 
 import java.io.*;
@@ -52,6 +53,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private Mode deploymentMode = Mode.ALL;
     private String contentTemDir;
     private String contentDir;
+    private StatisticsIndex nodeStats;
     public Mode deploymentMode(){
         return deploymentMode;
     }
@@ -73,8 +75,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public String name() {
         return DeploymentServiceProvider.NAME;
     }
-    public DataStoreProvider dataStoreProvider(){
-        return this.tarantulaContext.dataStoreProvider();
+    //public DataStoreProvider dataStoreProvider(){
+        //return this.tarantulaContext.dataStoreProvider();
+    //}
+    public Statistics statistics(){
+        return this.nodeStats;
     }
     public String upload(InputStream inputStream,String fname) throws Exception{
         //save to local deploy/tem dir
@@ -432,6 +437,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public void waitForData() {
         this.integrationEventService.publish(new MapStoreVotingEvent(this.eventTopic,localTopic,registerKey,Distributable.INTEGRATION_SCOPE));
+        this.nodeStats = new StatisticsIndex();
+        DataStore mds = this.tarantulaContext.masterDataStore();
+        this.nodeStats.bucket(mds.bucket());
+        this.nodeStats.oid(SystemUtil.oid());
+        this.nodeStats.dataStore(mds);
+        mds.createIfAbsent(this.nodeStats,true);
         log.info("Platform deployment service started on ["+localTopic+"/"+registerKey+"]");
     }
 

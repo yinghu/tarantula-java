@@ -7,6 +7,10 @@ import java.util.Map;
 
 public class Metrics extends RecoverableObject {
 
+    public final static String TOTAL_REQUESTS = "1";
+    public final static String TOTAL_EVENTS = "2";
+
+
     public double totalRequests;
     public double totalEvents;
 
