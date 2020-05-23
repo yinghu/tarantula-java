@@ -102,7 +102,26 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-action','onIndex');
     aj.send();               
   };       
+  let _getJson = (path,headers,callback)=>{
+    let aj = new XMLHttpRequest();   
+    aj.responseType = 'text';
+    aj.onreadystatechange = function(){
+        if(aj.status === 200 && aj.readyState === 4){
+            callback(aj.responseText);
+        }
+    };
+    aj.open("GET",path,true);
+    headers.forEach((nv)=>{
+        aj.setRequestHeader(nv.name,nv.value);    
+    });
+    aj.setRequestHeader('Accept','application/json');
+    //aj.setRequestHeader('Tarantula-tag','index/user');
+    //aj.setRequestHeader('Tarantula-action','onIndex');
+    aj.send();
+  };
+  let _postJson =()=>{
 
+  }
   let _upload = function(payload,fname,ctype,callback){
     let aj = new XMLHttpRequest();   
     aj.responseType = 'text';
@@ -325,6 +344,8 @@ var TARA_API = (function(){
   //export APIs     
   return {
       query : _query,
+      onGet : _getJson,
+      onPost : _postJson,
       onIndex : _index, 
       onLobby : _lobbyList, 
       onView : _view,
