@@ -5,6 +5,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.event.SessionForward;
 import com.tarantula.platform.service.Batch;
+import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.deployment.ServiceConfiguration;
 import com.tarantula.platform.service.persistence.*;
 
@@ -13,7 +14,7 @@ public class PortableRegistry extends AbstractRecoverableListener{
 	public static final int OID = 1;
 
     public static final int PROPERTY_CID = 3;
-
+    public static final int METRICS_CID = 4;
     public static final int ACCESS_INDEX_CID = 10;
     public static final int APPLICATION_CONFIGURATION_CID = 11; //DEPLOY OBJECT
     public static final int ON_LOBBY_CID = 12;
@@ -59,6 +60,9 @@ public class PortableRegistry extends AbstractRecoverableListener{
                 break;
             case APPLICATION_CONFIGURATION_CID:
                 _ins = new ApplicationConfiguration();
+                break;
+            case METRICS_CID:
+                _ins = new Metrics();
                 break;
             case ON_LOBBY_CID:
                 _ins = new OnLobbyTrack();
