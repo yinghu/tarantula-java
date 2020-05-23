@@ -12,6 +12,8 @@ import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
+import java.util.ArrayList;
+
 
 public class AdminRoleModule implements Module {
 
@@ -25,7 +27,20 @@ public class AdminRoleModule implements Module {
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         this.context.log(session.action(),OnLog.INFO);
         if(session.action().equals("onGameClusterList")){
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"load game cluster list",true)).getBytes(),label());
+            AdminContext adminContext = new AdminContext();
+            adminContext.gameClusterList = new ArrayList<>();
+            IndexSet idx = new IndexSet();
+            idx.distributionKey(session.systemId());
+            idx.label(Account.GameClusterLabel);
+            if(account.load(idx)){
+                idx.keySet.forEach((k)->{
+                    GameCluster g = this.deploymentServiceProvider.gameCluster(k);
+                    if(g!=null){
+                        adminContext.gameClusterList.add(g);
+                    }
+                });
+            }
+            session.write(adminContext.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onStatistics")){
             Statistics statistics = this.deploymentServiceProvider.statistics();
@@ -38,8 +53,8 @@ public class AdminRoleModule implements Module {
             acc.distributionKey(session.systemId());
             if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-                GameCluster gc = this.deploymentServiceProvider.createGameCluster(onAccess.name());
-                if(!gc.disabled()){
+                GameCluster gc = this.deploymentServiceProvider.createGameCluster(onAccess.name(),"basic");
+                if(gc.successful()){
                     IndexSet idx = new IndexSet();
                     idx.distributionKey(acc.distributionKey());
                     idx.label(Account.GameClusterLabel);
@@ -54,7 +69,7 @@ public class AdminRoleModule implements Module {
                     acc.gameClusterCount(1);
                     account.update(acc);
                 }
-                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),gc.disabled()?"failed":gc.name(),gc.disabled())).getBytes(),label());
+                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),gc.message(),gc.successful())).getBytes(),label());
             }
             else{
                 //reach max count

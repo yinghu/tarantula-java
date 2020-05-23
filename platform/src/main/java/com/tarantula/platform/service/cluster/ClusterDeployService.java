@@ -524,20 +524,30 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
     }
 
-    public GameCluster createGameCluster(String name){
+    public GameCluster createGameCluster(String name,String plan){
         GameCluster gameCluster = new GameCluster();
         try {
             DataStore mds = this.tarantulaContext.masterDataStore();
-            gameCluster.name(name);
+            gameCluster.property(GameCluster.NAME,name);
+            gameCluster.property(GameCluster.PLAN,plan);
             mds.create(gameCluster);//create first and discharge if any errors on loop
+            gameCluster.successful(true);
             XMLParser parser = new XMLParser();
-            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-basic-plan.xml"));
+            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-"+plan+"-plan.xml"));
             for (LobbyConfiguration configuration : parser.configurations) {
                 configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",name));
+                if(configuration.descriptor.typeId().endsWith("-lobby")){
+                    gameCluster.property(GameCluster.GAME_LOBBY,configuration.descriptor.typeId());
+                }
+                else if(configuration.descriptor.typeId().endsWith("-service")){
+                    gameCluster.property(GameCluster.GAME_SERVICE,configuration.descriptor.typeId());
+                }
+                else if(configuration.descriptor.typeId().endsWith("-data")){
+                    gameCluster.property(GameCluster.GAME_DATA,configuration.descriptor.typeId());
+                }
                 LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(mds.bucket(),configuration.descriptor.typeId());
                 if(mds.load(lobbyTypeIdIndex)){//stop existed
-                    gameCluster.disabled(true);
-                    break;
+                    throw new RuntimeException("["+name+"] duplicated");
                 }
                 log.warn("Create named lobby type id->"+configuration.descriptor.typeId());
                 Descriptor descriptor = configuration.descriptor;
@@ -545,6 +555,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 descriptor.label(LobbyQuery.LABEL);
                 descriptor.onEdge(true);
                 descriptor.resetEnabled(true);
+                descriptor.disabled(true);//pending launch
                 mds.create(descriptor);
                 lobbyTypeIdIndex.index(descriptor.distributionKey());
                 lobbyTypeIdIndex.owner(gameCluster.distributionKey());
@@ -562,8 +573,11 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     mds.create(a);
                 });
             }
+            gameCluster.message("["+name+"] game created successfully");
+            mds.update(gameCluster);
         }catch (Exception ex){
-            gameCluster.disabled(true);
+            gameCluster.message(ex.getMessage());
+            gameCluster.successful(false);
         }
         return gameCluster;
     }

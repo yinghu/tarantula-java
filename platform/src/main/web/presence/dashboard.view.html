@@ -400,6 +400,9 @@
     }
     function _tx_game_cluster(){
         console.log("game cluster");
+        TARA_API.onService(false,{serviceTag:'role/admin',command:'onGameClusterList'},(resp)=>{
+            console.log(resp);        
+        });
     }
     function _tx_api(){
         console.log("game API");

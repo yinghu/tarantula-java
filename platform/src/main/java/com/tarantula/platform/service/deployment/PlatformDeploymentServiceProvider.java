@@ -682,8 +682,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     //end of dedicated server methods
 
-    public GameCluster createGameCluster(String name){
-        return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(name);
+    public GameCluster createGameCluster(String name,String plan){
+        return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(name,plan);
+    }
+    public GameCluster gameCluster(String key){
+        GameCluster gc = new GameCluster();
+        gc.distributionKey(key);
+        if(this.tarantulaContext.masterDataStore().load(gc)){
+            return gc;
+        }
+        return null;
     }
     public String resetCode(String key){
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
