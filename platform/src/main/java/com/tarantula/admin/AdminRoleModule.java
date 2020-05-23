@@ -34,6 +34,7 @@ public class AdminRoleModule implements Module {
             idx.label(Account.GameClusterLabel);
             if(account.load(idx)){
                 idx.keySet.forEach((k)->{
+                    this.context.log("KEY->"+k,OnLog.WARN);
                     GameCluster g = this.deploymentServiceProvider.gameCluster(k);
                     if(g!=null){
                         adminContext.gameClusterList.add(g);
@@ -63,9 +64,9 @@ public class AdminRoleModule implements Module {
                         idx.keySet.add(gc.distributionKey());//update on existing
                         account.update(idx);
                     }
-                    //idx.keySet.forEach((k)->{
-                       // this.context.log("KEY->"+k,OnLog.WARN);
-                    //});
+                    idx.keySet.forEach((k)->{
+                       this.context.log("KEY->"+k,OnLog.WARN);
+                    });
                     acc.gameClusterCount(1);
                     account.update(acc);
                 }

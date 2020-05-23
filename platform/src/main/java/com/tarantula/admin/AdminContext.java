@@ -27,6 +27,7 @@ public class AdminContext extends ResponseHeader {
                 jo.addProperty("gameLobby",(String)g.property(GameCluster.GAME_LOBBY));
                 jo.addProperty("gameService",(String)g.property(GameCluster.GAME_SERVICE));
                 jo.addProperty("gameData",(String)g.property(GameCluster.GAME_DATA));
+                glist.add(jo);
             });
             jsonObject.add("gameClusterList",glist);
         }
