@@ -1,0 +1,61 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-api-device-login-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-sign-in" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">API DEVICE</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-center tx-text-12">
+        <textarea id="tx-api-device-login-message">RESPONSE OUTPUT</textarea> 
+    </div>
+    <div class='w3-panel w3-border-bottom w3-border-red'>
+        <div class="w3-panel tx-text-14"><p>This HTTP post request can be used to login with a unique device id</p></div>
+        <div class="w3-panel tx-text-14">HTTP Method : POST /user/action</div>
+        <div class="w3-panel tx-text-14">Header : Accept : application/json</div>
+        <div class="w3-panel tx-text-14">Header : Content-type : application/x-www-form-urlencoded</div>
+        <div class="w3-panel tx-text-14">Header : Tarantula-tag : index/user</div>
+        <div class="w3-panel tx-text-14">Header : Tarantula-action : onDevice</div>
+        <div class="w3-panel tx-text-14">Header : Tarantula-magic-key : the device id</div>
+        <div class="w3-panel tx-text-14">Header : Tarantula-payload-size : the size of payload</div>
+        <div class="w3-panel tx-text-14">JSON Payload : {deviceId:the device id}</div>
+        <div class="w3-panel">
+            <span id="tx-api-device-login" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Request</span>     
+        </div>
+    </div> 
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector('#tx-api-device-login').onclick=()=>{
+        let headers =[];
+        let deviceId = _device_id();
+        headers.push({name:'Tarantula-tag',value:'index/user'});
+        headers.push({name:'Tarantula-action',value:'onDevice'});
+        headers.push({name:'Tarantula-magic-key',value:deviceId});
+        TARA_API.onPost('/user/action',headers,{deviceId:deviceId},(resp)=>{
+            document.querySelector('#tx-api-device-login-message').value = resp;
+        });
+    };
+    document.querySelector('#tx-api-device-login-close').onclick=()=>{
+        let m3 = document.querySelector('#tx-popup');
+        m3.innerHTML="";
+        m3.style.display = 'none';       
+    };
+    function _device_id() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,(c)=>{
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    };
+</script>
