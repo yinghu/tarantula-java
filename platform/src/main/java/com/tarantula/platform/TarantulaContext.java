@@ -314,7 +314,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         if(this._lobbyMapping.containsKey(typeId)){
             return;
         }
-        List<LobbyDescriptor> bList = this.query(new String[]{this.masterDataStore().bucket()},new LobbyQuery(this.masterDataStore().bucket()));
+        List<LobbyDescriptor> bList = this.query(new String[]{this.masterDataStore().bucket(),typeId},new LobbyQuery(this.masterDataStore().bucket()));
         bList.forEach((d)->{
             if(d.typeId().equals(typeId)){
                 this.setLobby(d);//

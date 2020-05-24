@@ -205,49 +205,58 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             batchCache = new BatchCache(UUID.randomUUID().toString(),alist);
         }
         else if(registryId==PortableRegistry.LOBBY_CID){
-            RecoverableFactory query = new LobbyQuery(params[0]);
             List blist = new ArrayList();
-            dataStore.list(query,(b)->{
-                if(!b.disabled()){
-                    blist.add(b);
-                    //log.info(b.toString());
-                }
-                return true;
-            });
-            if(blist.isEmpty()){
-                //load from local config
-                List<String> dxml = loadFromLocal();
-                XMLParser xp = new XMLParser();
-                dxml.forEach((xm)->{
-                    try{xp.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(xm));}catch (Exception ex){ex.printStackTrace();}
+            if(params.length>1){//
+                LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(params[0],params[1]);
+                dataStore.load(lobbyTypeIdIndex);
+                LobbyDescriptor lb = new LobbyDescriptor();
+                lb.distributionKey(lobbyTypeIdIndex.index());
+                dataStore.load(lb);
+                blist.add(lb);
+            }else{
+                RecoverableFactory query = new LobbyQuery(params[0]);
+                dataStore.list(query,(b)->{
+                    if(!b.disabled()){
+                        blist.add(b);
+                        //log.info(b.toString());
+                    }
+                    return true;
                 });
-                xp.configurations.forEach((c)->{
-                    c.descriptor.label(query.label());
-                    c.descriptor.onEdge(true);
-                    c.descriptor.owner(query.distributionKey());
-                    dataStore.create(c.descriptor);
-                    dataStore.create(new LobbyTypeIdIndex(params[0],c.descriptor.typeId(),c.descriptor.distributionKey(),""));
-                    blist.add(c.descriptor);
-                    c.applications.forEach((a)->{
-                        a.owner(c.descriptor.distributionKey());
-                        a.label("LDA");
-                        a.onEdge(true);
-                        dataStore.create(a);
+                if(blist.isEmpty()){
+                    //load from local config
+                    List<String> dxml = loadFromLocal();
+                    XMLParser xp = new XMLParser();
+                    dxml.forEach((xm)->{
+                        try{xp.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(xm));}catch (Exception ex){ex.printStackTrace();}
                     });
-                    c.views.forEach((v)->{
-                        v.owner(c.descriptor.distributionKey());
-                        dataStore.create(v);
-                    });
-                    c.configurations.forEach((s)->{
-                        s.owner(c.descriptor.distributionKey());
-                        dataStore.create(s);
-                        s.configurationMappings.forEach((k,cf)->{
-                            cf.owner(s.distributionKey());
-                            cf.tag(s.tag);
-                            dataStore.create(cf);
+                    xp.configurations.forEach((c)->{
+                        c.descriptor.label(query.label());
+                        c.descriptor.onEdge(true);
+                        c.descriptor.owner(query.distributionKey());
+                        dataStore.create(c.descriptor);
+                        dataStore.create(new LobbyTypeIdIndex(params[0],c.descriptor.typeId(),c.descriptor.distributionKey(),""));
+                        blist.add(c.descriptor);
+                        c.applications.forEach((a)->{
+                            a.owner(c.descriptor.distributionKey());
+                            a.label("LDA");
+                            a.onEdge(true);
+                            dataStore.create(a);
+                        });
+                        c.views.forEach((v)->{
+                            v.owner(c.descriptor.distributionKey());
+                            dataStore.create(v);
+                        });
+                        c.configurations.forEach((s)->{
+                            s.owner(c.descriptor.distributionKey());
+                            dataStore.create(s);
+                            s.configurationMappings.forEach((k,cf)->{
+                                cf.owner(s.distributionKey());
+                                cf.tag(s.tag);
+                                dataStore.create(cf);
+                            });
                         });
                     });
-                });
+                }
             }
             batchCache = new BatchCache(UUID.randomUUID().toString(),blist);
         }

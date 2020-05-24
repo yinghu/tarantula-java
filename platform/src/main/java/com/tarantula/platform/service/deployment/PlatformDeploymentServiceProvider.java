@@ -323,7 +323,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public boolean launch(String typeId){
         boolean suc = this.tarantulaContext.tarantulaCluster().deployService().enableLobby(typeId,true);
-        //ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
         if(suc){
             this.integrationEventService.publish(new ModuleLaunchEvent(this.eventTopic,typeId));
         }
@@ -331,7 +330,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public boolean shutdown(String typeId){
         boolean suc = this.tarantulaContext.tarantulaCluster().deployService().enableLobby(typeId,false);
-        //ResponseHeader resp = this.builder.create().fromJson(suc,ResponseHeader.class);
         if(suc){
             this.integrationEventService.publish(new ModuleShutdownEvent(this.eventTopic,typeId));
         }
@@ -552,6 +550,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         else if(event instanceof GameClusterLaunchEvent){
             log.warn("GAME CLUSTER-->"+event.trackId());
+            GameCluster gameCluster = new GameCluster();
+            gameCluster.distributionKey(event.trackId());
+            this.tarantulaContext.masterDataStore().load(gameCluster);
+            _launch((String)gameCluster.property(GameCluster.GAME_DATA));
+            _launch((String)gameCluster.property(GameCluster.GAME_LOBBY));
+            _launch((String)gameCluster.property(GameCluster.GAME_SERVICE));
        }
         return false;
     }
