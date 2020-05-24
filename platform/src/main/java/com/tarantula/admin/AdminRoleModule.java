@@ -11,7 +11,9 @@ import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
+import com.tarantula.platform.util.SystemUtil;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 
@@ -68,6 +70,7 @@ public class AdminRoleModule implements Module {
                        this.context.log("KEY->"+k,OnLog.WARN);
                     });
                     acc.gameClusterCount(1);
+                    acc.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
                     account.update(acc);
                 }
                 session.write(this.builder.create().toJson(new ResponseHeader(session.action(),gc.message(),gc.successful())).getBytes(),label());

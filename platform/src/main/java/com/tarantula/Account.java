@@ -11,4 +11,11 @@ public interface Account extends Access{
     boolean trial();
     void trial(boolean trial);
 
+    boolean subscribed();
+    void subscribed(boolean subscribed);
+
+    long startTimestamp();
+    long endTimestamp();
+    void startTimestamp(long startTimestamp);
+    void endTimestamp(long endTimestamp);
 }

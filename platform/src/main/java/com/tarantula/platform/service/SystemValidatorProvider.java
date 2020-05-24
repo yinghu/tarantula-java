@@ -10,6 +10,7 @@ import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.security.MessageDigest;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -159,7 +160,17 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         UserAccount acc = new UserAccount();
         acc.distributionKey(access.distributionKey());
         acc.emailAddress(access.emailAddress());
+        LocalDateTime loc = LocalDateTime.now();
+        acc.timestamp(SystemUtil.toUTCMilliseconds(loc));
         adataStore.createIfAbsent(acc,true);
+        if(t.accessControl()==AccessControl.admin.accessControl()){
+            acc.trial(true);
+            acc.subscribed(false);
+            acc.startTimestamp(SystemUtil.toUTCMilliseconds(loc));
+            acc.endTimestamp(SystemUtil.toUTCMilliseconds(loc.plusMonths(1)));
+            acc.timestamp(SystemUtil.toUTCMilliseconds(loc));
+            adataStore.update(acc);//update for admin role
+        }
         access.role(t.name());
         udataStore.update(access);
         return true;

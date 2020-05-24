@@ -7,6 +7,8 @@ import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +60,12 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             Access user = createLogin(onAccess, rootId,AccessControl.root.name(),false,"password",true);
             Account acc = new UserAccount();
             acc.distributionKey(user.distributionKey());
+            acc.trial(true);
+            acc.subscribed(false);
+            LocalDateTime loc = LocalDateTime.now();
+            acc.startTimestamp(SystemUtil.toUTCMilliseconds(loc));
+            acc.endTimestamp(SystemUtil.toUTCMilliseconds(loc.plusMonths(1)));
+            acc.timestamp(SystemUtil.toUTCMilliseconds(loc));
             aDatastore.create(acc);
         }
         this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ON_ACCESS_CID,(a)->{
@@ -68,7 +76,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 Account account = new UserAccount();
                 account.distributionKey(uadded.owner());
                 aDatastore.load(account);
-                int ix = account.userCount(1);
+                account.userCount(1);
+                account.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
                 aDatastore.update(account);
                 IndexSet idx = new IndexSet();
                 idx.distributionKey(account.distributionKey());
