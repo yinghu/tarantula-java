@@ -8,14 +8,5 @@ public interface Account extends Access{
 
     int userCount(int delta);
     int gameClusterCount(int delta);
-    boolean trial();
-    void trial(boolean trial);
 
-    boolean subscribed();
-    void subscribed(boolean subscribed);
-
-    long startTimestamp();
-    long endTimestamp();
-    void startTimestamp(long startTimestamp);
-    void endTimestamp(long endTimestamp);
 }

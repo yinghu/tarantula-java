@@ -5,6 +5,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.SystemValidator;
+import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.util.SystemUtil;
@@ -31,6 +32,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private DataStore pdataStore;//presence
     private DataStore udataStore;//user
     private DataStore adataStore;//account
+    private DataStore mdatastore;//membership
     private List<Access.Role> roleList;
     private MessageDigest _messageDigest;
 
@@ -111,6 +113,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.pdataStore =  this.serviceContext.dataStore(Presence.DataStore,this.serviceContext.partitionNumber());
         this.udataStore =  this.serviceContext.dataStore(Access.DataStore,this.serviceContext.partitionNumber());
         this.adataStore =  this.serviceContext.dataStore(Account.DataStore,this.serviceContext.partitionNumber());
+        this.mdatastore =  this.serviceContext.dataStore(Subscription.DataStore,this.serviceContext.partitionNumber());
+
         AuthVendor google = this.serviceContext.authVendor("google");
         if(google!=null){
             aMap.put("google",(google));
@@ -162,14 +166,19 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         acc.emailAddress(access.emailAddress());
         LocalDateTime loc = LocalDateTime.now();
         acc.timestamp(SystemUtil.toUTCMilliseconds(loc));
-        adataStore.createIfAbsent(acc,true);
-        if(t.accessControl()==AccessControl.admin.accessControl()){
-            acc.trial(true);
-            acc.subscribed(false);
-            acc.startTimestamp(SystemUtil.toUTCMilliseconds(loc));
-            acc.endTimestamp(SystemUtil.toUTCMilliseconds(loc.plusMonths(1)));
+        if(!adataStore.createIfAbsent(acc,true)){
             acc.timestamp(SystemUtil.toUTCMilliseconds(loc));
-            adataStore.update(acc);//update for admin role
+            adataStore.update(acc);
+        }
+        if(t.accessControl()==AccessControl.admin.accessControl()){
+            Membership mcc = new Membership();
+            mcc.distributionKey(access.distributionKey());
+            mcc.trial(true);
+            mcc.subscribed(false);
+            mcc.startTimestamp(SystemUtil.toUTCMilliseconds(loc));
+            mcc.endTimestamp(SystemUtil.toUTCMilliseconds(loc.plusMonths(1)));
+            mcc.timestamp(SystemUtil.toUTCMilliseconds(loc));
+            mdatastore.create(mcc);//create membership for admin role
         }
         access.role(t.name());
         udataStore.update(access);

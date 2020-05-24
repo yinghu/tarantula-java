@@ -15,6 +15,8 @@ public class UserPortableRegistry extends AbstractRecoverableListener {
 
     public static final int USER_ACCOUNT_CID=2;
 
+    public static final int MEMBERSHIP_CID =3;
+
     public static final int ON_ACCESS_CID = 5;
 
 
@@ -26,6 +28,9 @@ public class UserPortableRegistry extends AbstractRecoverableListener {
                 break;
             case USER_ACCOUNT_CID:
                 pt = new UserAccount();
+                break;
+            case MEMBERSHIP_CID:
+                pt = new Membership();
                 break;
             case ON_ACCESS_CID:
                 pt = new OnAccessTrack();

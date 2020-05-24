@@ -54,19 +54,24 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         uDatastore = this.context.dataStore(Access.DataStore);
         pDatastore = this.context.dataStore(Presence.DataStore);
         aDatastore = this.context.dataStore(Account.DataStore);
+        DataStore mDatastore = this.context.dataStore(Subscription.DataStore);
         String rootId = uDatastore.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid();
         AccessIndex accessIndex = accessIndexService.set((String) onAccess.property("login"),rootId);
         if(accessIndex!=null){
             Access user = createLogin(onAccess, rootId,AccessControl.root.name(),false,"password",true);
             Account acc = new UserAccount();
             acc.distributionKey(user.distributionKey());
-            acc.trial(true);
-            acc.subscribed(false);
             LocalDateTime loc = LocalDateTime.now();
-            acc.startTimestamp(SystemUtil.toUTCMilliseconds(loc));
-            acc.endTimestamp(SystemUtil.toUTCMilliseconds(loc.plusMonths(1)));
             acc.timestamp(SystemUtil.toUTCMilliseconds(loc));
             aDatastore.create(acc);
+            Membership membership = new Membership();
+            membership.distributionKey(user.distributionKey());
+            membership.trial(true);
+            membership.subscribed(false);
+            membership.startTimestamp(SystemUtil.toUTCMilliseconds(loc));
+            membership.endTimestamp(SystemUtil.toUTCMilliseconds(loc.plusMonths(1)));
+            membership.timestamp(SystemUtil.toUTCMilliseconds(loc));
+            mDatastore.create(membership);
         }
         this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ON_ACCESS_CID,(a)->{
             //add player user to the account

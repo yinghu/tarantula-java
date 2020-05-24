@@ -22,6 +22,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
     private DeploymentServiceProvider deploymentServiceProvider;
     private DataStore userDs;
     private DataStore accountDs;
+    private DataStore memberDs;
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
@@ -33,6 +34,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         this.deploymentServiceProvider.registerOnLobbyListener(this);
         userDs = this.context.dataStore(Access.DataStore);
         accountDs = this.context.dataStore(Account.DataStore);
+        memberDs = this.context.dataStore(Subscription.DataStore);
         this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
             Presence presence = this.context.presence(t.owner());
             OnBalance ob = (OnBalance)t;
@@ -53,6 +55,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             pc.presence.version(presence.count(0));
             pc.access = user(session.systemId());
             pc.account = account(session.systemId());
+            pc.subscription = membership(session.systemId());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onLobbyList")){
@@ -130,6 +133,14 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         UserAccount acc = new UserAccount();
         acc.distributionKey(systemId);
         if(accountDs.load(acc)){
+            return acc;
+        }
+        return null;
+    }
+    private Subscription membership(String systemId){
+        Membership acc = new Membership();
+        acc.distributionKey(systemId);
+        if(memberDs.load(acc)){
             return acc;
         }
         return null;

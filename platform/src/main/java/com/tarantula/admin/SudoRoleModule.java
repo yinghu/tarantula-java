@@ -26,9 +26,15 @@ public class SudoRoleModule implements Module,Configuration.Listener {
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
-        if(session.action().equals("applicationList")){
-            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            session.write(this.builder.create().toJson(this._adminObjectOnApplication(access.accessId())).getBytes(),label());
+        if(session.action().equals("onSubscriptionList")){
+            DataStore mds = this.context.dataStore(Subscription.DataStore);
+            mds.traverse((d,o,k,v)->{
+                this.context.log(new String(v),OnLog.WARN);
+                return true;
+            });
+            //OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            //session.write(this.builder.create().toJson(this._adminObjectOnApplication(access.accessId())).getBytes(),label());
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"subscription list",true)).getBytes(),this.label());
         }
         else if(session.action().equals("lobbyList")){
             session.write(this.builder.create().toJson(this._adminObjectOnLobby()).getBytes(),label());
