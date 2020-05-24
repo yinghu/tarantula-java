@@ -23,12 +23,15 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
     private DataStore userDs;
     private DataStore accountDs;
     private DataStore memberDs;
-
+    private SubscriptionFee monthly;
+    private SubscriptionFee yearly;
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         Configuration ya = this.context.configuration("yearlyAccess");
         Configuration ma = this.context.configuration("monthlyAccess");
+        monthly = new SubscriptionFee("monthlyAccess",ma.property("description"),ma.property("price"),ma.property("currency"));
+        yearly = new SubscriptionFee("yearlyAccess",ma.property("description"),ya.property("price"),ya.property("currency"));
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.deploymentServiceProvider.registerOnLobbyListener(this);
