@@ -22,5 +22,5 @@ public interface DeployService extends ServiceProvider {
     boolean resetModule(String lobbyId,Descriptor descriptor);
     String enableApplication(String applicationId,boolean enabled);
 
-    GameCluster createGameCluster(String name,String plan);
+    GameCluster createGameCluster(String owner,String name,String plan);
 }

@@ -24,7 +24,6 @@ public class AdminRoleModule implements Module {
     private DataStore account;
     private DeploymentServiceProvider deploymentServiceProvider;
     private int maxGameClusterCount;
-
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         this.context.log(session.action(),OnLog.INFO);
@@ -56,7 +55,7 @@ public class AdminRoleModule implements Module {
             acc.distributionKey(session.systemId());
             if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-                GameCluster gc = this.deploymentServiceProvider.createGameCluster(onAccess.name(),"basic");
+                GameCluster gc = this.deploymentServiceProvider.createGameCluster(session.systemId(),onAccess.name(),"basic");
                 if(gc.successful()){
                     IndexSet idx = new IndexSet();
                     idx.distributionKey(acc.distributionKey());
@@ -72,6 +71,10 @@ public class AdminRoleModule implements Module {
                     acc.gameClusterCount(1);
                     acc.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
                     account.update(acc);
+                    if(acc.trial()||acc.subscribed()){
+                        //launch the game
+                        this.deploymentServiceProvider.launchGameCluster(gc);
+                    }
                 }
                 session.write(this.builder.create().toJson(new ResponseHeader(session.action(),gc.message(),gc.successful())).getBytes(),label());
             }

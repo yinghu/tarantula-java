@@ -17,8 +17,6 @@ public class SubscriptionSerializer implements JsonSerializer<Subscription> {
 
     public JsonElement serialize(Subscription access, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = new JsonObject();
-        jo.addProperty("trial",access.trial());
-        jo.addProperty("subscribed",access.subscribed());
         jo.addProperty("startTime",SystemUtil.fromUTCMilliseconds(access.startTimestamp()).format(DateTimeFormatter.ISO_DATE_TIME));
         jo.addProperty("endTime",SystemUtil.fromUTCMilliseconds(access.endTimestamp()).format(DateTimeFormatter.ISO_DATE_TIME));
         jo.addProperty("lastUpdated",SystemUtil.fromUTCMilliseconds(access.timestamp()).format(DateTimeFormatter.ISO_DATE_TIME));

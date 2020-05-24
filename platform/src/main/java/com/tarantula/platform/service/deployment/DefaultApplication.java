@@ -146,12 +146,6 @@ public class DefaultApplication implements Application {
         }
     }
     public void atMidnight(){
-        
-        //LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex()
-        //if(this.deploymentDescriptor.resetEnabled()){
-            //if(this.tarantulaContext.tokenValidatorProvider().validateApplication(this)){
-                //shut down the app
-            //}
-        //}
+
     }
 }

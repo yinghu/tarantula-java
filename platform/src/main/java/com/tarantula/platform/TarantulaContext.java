@@ -12,6 +12,7 @@ import com.hazelcast.config.Config;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
@@ -266,8 +267,13 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     }
 	public OnLobby configure(LobbyConfiguration conf) throws Exception{
 		DefaultLobby lb = this.setLobby(conf.descriptor);
-		OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),false);
-        Collections.sort(conf.applications, new DeploymentDescriptorComparator());//deploy by priority
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(lb.descriptor().bucket(),lb.descriptor().typeId());
+        masterDataStore().load(lobbyTypeIdIndex);
+        GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionKey(lobbyTypeIdIndex.owner);
+        masterDataStore().load(gameCluster);
+		OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),lb.descriptor().resetEnabled(),false,lobbyTypeIdIndex.owner(),(String) gameCluster.property(GameCluster.OWNER));
+		Collections.sort(conf.applications, new DeploymentDescriptorComparator());//deploy by priority
         for (DeploymentDescriptor c : conf.applications) {
             this.setApplicationManager(c, lb);
         }

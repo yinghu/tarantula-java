@@ -61,15 +61,15 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             Access user = createLogin(onAccess, rootId,AccessControl.root.name(),false,"password",true);
             Account acc = new UserAccount();
             acc.distributionKey(user.distributionKey());
+            acc.trial(false);
+            acc.subscribed(true);
             LocalDateTime loc = LocalDateTime.now();
             acc.timestamp(SystemUtil.toUTCMilliseconds(loc));
             aDatastore.create(acc);
             Membership membership = new Membership();
             membership.distributionKey(user.distributionKey());
-            membership.trial(true);
-            membership.subscribed(false);
             membership.startTimestamp(SystemUtil.toUTCMilliseconds(loc));
-            membership.endTimestamp(SystemUtil.toUTCMilliseconds(loc.plusMonths(1)));
+            membership.endTimestamp(SystemUtil.toUTCMilliseconds(loc.plusMonths(12)));
             membership.timestamp(SystemUtil.toUTCMilliseconds(loc));
             mDatastore.create(membership);
         }

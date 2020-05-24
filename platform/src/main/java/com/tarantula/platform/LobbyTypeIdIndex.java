@@ -26,8 +26,8 @@ public class LobbyTypeIdIndex extends RecoverableObject {
     }
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("index",index);
-        this.properties.put("owner",owner);
+        this.properties.put("index",index);//lobby id
+        this.properties.put("owner",owner);//game cluster id
         return this.properties;
     }
     @Override

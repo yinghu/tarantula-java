@@ -395,7 +395,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
         lobbyDescriptor.distributionKey(query.index());
         if(ds.load(lobbyDescriptor)){
-            lobbyDescriptor.disabled(enabled);
+            lobbyDescriptor.disabled(!enabled);
             ds.update(lobbyDescriptor);
             return true;
         }
@@ -524,12 +524,14 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
     }
 
-    public GameCluster createGameCluster(String name,String plan){
+    public GameCluster createGameCluster(String owner,String name,String plan){
         GameCluster gameCluster = new GameCluster();
         try {
             DataStore mds = this.tarantulaContext.masterDataStore();
             gameCluster.property(GameCluster.NAME,name);
             gameCluster.property(GameCluster.PLAN,plan);
+            gameCluster.property(GameCluster.OWNER,owner);
+            gameCluster.property(GameCluster.DISABLED,true);
             mds.create(gameCluster);//create first and discharge if any errors on loop
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();

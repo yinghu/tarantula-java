@@ -80,7 +80,8 @@ public interface DeploymentServiceProvider extends ServiceProvider {
     //END OF MODULE OPERATION API
 
     //GAME CLUSTER APIs
-    GameCluster createGameCluster(String name,String plan);
+    GameCluster createGameCluster(String owner,String name,String plan);
+    void launchGameCluster(GameCluster gameCluster);
     GameCluster gameCluster(String key);
     //END OF CLUSTER
     Statistics statistics();

@@ -8,9 +8,10 @@ import com.tarantula.Recoverable;
  */
 public interface OnLobby extends Recoverable {
 
-    String typeId();
-    void typeId(String typeId);
-
+    String typeId(); //associated with lobby id
+    String gameClusterId(); //associated with game cluster
+    String subscriptionId(); //associated with membership
+    boolean resetEnabled();
     boolean closed();
     void closed(boolean closed);
 

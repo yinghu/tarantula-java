@@ -112,9 +112,6 @@ public class EndpointService implements Serviceable,EndPoint.Resource{
 
 
     public void atMidnight() {
-        rMap.forEach((k,v)->{
-            System.out.println("midnight check->"+k);
-            v.onCheck();
-        });
+        rMap.forEach((k,v)-> v.onCheck());
     }
 }

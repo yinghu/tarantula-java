@@ -23,6 +23,7 @@ public class MidnightCheck implements SchedulingTask {
 
     @Override
     public long delay() {
+        //return 100*1000;
         return SystemUtil.toMidnight();
     }
 

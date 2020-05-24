@@ -26,7 +26,7 @@ public interface TokenValidatorProvider extends ServiceProvider {
     List<ApplicationCluster> list(String systemId);
     List<Access.Role> list();
     AuthVendor authVendor(String name);
-    boolean validateApplication(Application application);
+    void onCheck(OnLobby onLobby);
     interface AuthVendor{
         String name();
         String clientId();

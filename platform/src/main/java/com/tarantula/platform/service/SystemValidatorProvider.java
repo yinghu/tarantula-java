@@ -103,9 +103,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public AuthVendor authVendor(String name){
         return aMap.get(name);
     }
-    public boolean validateApplication(Application application){
-
-        return true;
+    public void onCheck(OnLobby onLobby){
+        Subscription subscription = new Membership();
+        subscription.distributionKey(onLobby.subscriptionId());
+        mdatastore.load(subscription);
+        log.warn(onLobby.toString()+" has been monitored under ->"+subscription.toString());
     }
     @Override
     public void setup(ServiceContext serviceContext) {
@@ -173,12 +175,13 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         if(t.accessControl()==AccessControl.admin.accessControl()){
             Membership mcc = new Membership();
             mcc.distributionKey(access.distributionKey());
-            mcc.trial(true);
-            mcc.subscribed(false);
             mcc.startTimestamp(SystemUtil.toUTCMilliseconds(loc));
             mcc.endTimestamp(SystemUtil.toUTCMilliseconds(loc.plusMonths(1)));
             mcc.timestamp(SystemUtil.toUTCMilliseconds(loc));
             mdatastore.create(mcc);//create membership for admin role
+            acc.trial(true);
+            acc.subscribed(false);
+            adataStore.update(acc);
         }
         access.role(t.name());
         udataStore.update(access);

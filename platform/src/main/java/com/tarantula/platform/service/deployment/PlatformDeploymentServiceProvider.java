@@ -41,7 +41,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private CopyOnWriteArrayList<Configuration.Listener> cListeners = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<Connection.Listener> wListeners = new CopyOnWriteArrayList<>();
 
-
     private ConcurrentHashMap<String,Recoverable> vMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Event> pushRegistry = new ConcurrentHashMap<>();
 
@@ -306,7 +305,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext.unsetApplication(typeId,applicationId,(d)->{
             if(d.singleton()&&d.category().equals("lobby")){
                 this.oListeners.forEach((ol)->{ //remove lobby entry
-                    ol.onLobby(new OnLobbyTrack(d.typeId(),true));//removed lobby entry
+                    OnLobby onLobby = (OnLobby) vMap.get(d.typeId());
+                    onLobby.closed(true);
+                    ol.onLobby(onLobby);//removed lobby entry
                 });
                 rListeners.remove(d.tag()); //remove instance entry
                 this.tarantulaContext.tarantulaCluster().deployService().enableLobby(d.typeId(),false);
@@ -338,7 +339,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     private void _shutdown(String typeId){
         this.oListeners.forEach((ol)->{
-            ol.onLobby(new OnLobbyTrack(typeId,true));//removed lobby entry
+            OnLobby onLobby =(OnLobby) vMap.get(typeId);
+            onLobby.closed(true);
+            ol.onLobby(onLobby);//removed lobby entry
         });
         this.tarantulaContext.unsetLobby(typeId,(d)->{//clean up from runtime context
             //remove modules
@@ -547,6 +550,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         else if(event instanceof ModuleShutdownEvent){
             _shutdown(event.typeId());
         }
+        else if(event instanceof GameClusterLaunchEvent){
+            log.warn("GAME CLUSTER-->"+event.trackId());
+       }
         return false;
     }
     public void registerInstanceRegistryListener(InstanceRegistry.Listener instanceRegistryListener){
@@ -585,6 +591,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
     }
     public void deploy(OnLobby onLobby){
+        vMap.put(onLobby.typeId(),onLobby);
+        if(onLobby.resetEnabled()){
+            this.tarantulaContext.tokenValidatorProvider().onCheck(onLobby);
+        }
         oListeners.forEach((o)->o.onLobby(onLobby));
     }
     public void registerOnLobbyListener(OnLobby.Listener onLobbyListener){
@@ -681,9 +691,20 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         icp.remove(serverId.getBytes());
     }
     //end of dedicated server methods
-
-    public GameCluster createGameCluster(String name,String plan){
-        return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(name,plan);
+    public void launchGameCluster(GameCluster gameCluster){
+        String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
+        String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
+        String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
+        this.tarantulaContext.tarantulaCluster().deployService().enableLobby(data,true);
+        this.tarantulaContext.tarantulaCluster().deployService().enableLobby(lobby,true);
+        this.tarantulaContext.tarantulaCluster().deployService().enableLobby(service,true);
+        this.tarantulaContext.masterDataStore().load(gameCluster);
+        gameCluster.property(GameCluster.DISABLED,false);
+        this.tarantulaContext.masterDataStore().update(gameCluster);
+        this.integrationEventService.publish(new GameClusterLaunchEvent(eventTopic,gameCluster.distributionKey()));
+    }
+    public GameCluster createGameCluster(String owner,String name,String plan){
+        return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name,plan);
     }
     public GameCluster gameCluster(String key){
         GameCluster gc = new GameCluster();
@@ -703,6 +724,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         byte[] ret = icp.remove(resetCode.getBytes());
         return (ret!=null?new String(ret):"");
+    }
+    public void atMidnight(){
+        //log.warn("MIDNIGHT->");
     }
     public PostOffice registerPostOffice(){
         return new PostOfficeSession();

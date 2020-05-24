@@ -6,7 +6,7 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 
 
 /**
- * Updated by yinghu lu on 7/20/19
+ * Updated by yinghu lu on 5/24/2020
  */
 public class OnLobbyTrack extends RecoverableObject implements OnLobby {
 
@@ -14,21 +14,31 @@ public class OnLobbyTrack extends RecoverableObject implements OnLobby {
 
     private boolean closed;
 
+    private boolean resetEnabled;
+
+    private String gameClusterId;
+
+    private String subscriptionId;
+
     public OnLobbyTrack(){
 
     }
-    public OnLobbyTrack(String typeId,boolean closed){
+    public OnLobbyTrack(String typeId,boolean resetEnabled,boolean closed,String gameClusterId,String subscriptionId){
         this.typeId = typeId;
+        this.resetEnabled = resetEnabled;
         this.closed = closed;
+        this.gameClusterId = gameClusterId;
+        this.subscriptionId = subscriptionId;
     }
-
+    public String gameClusterId(){
+        return this.gameClusterId;
+    }
+    public String subscriptionId(){ return this.subscriptionId;}
     public String typeId() {
         return this.typeId;
     }
-
-
-    public void typeId(String typeId) {
-        this.typeId = typeId;
+    public boolean resetEnabled(){
+        return this.resetEnabled;
     }
     public boolean closed(){
         return this.closed;
@@ -38,7 +48,7 @@ public class OnLobbyTrack extends RecoverableObject implements OnLobby {
     }
     @Override
     public String toString(){
-        return "Lobby["+typeId+"/"+closed+"]";
+        return "Lobby["+typeId+"/"+resetEnabled+"/"+closed+"]["+gameClusterId+"]["+subscriptionId+"]";
     }
 
     @Override
