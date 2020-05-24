@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SystemValidatorProvider implements TokenValidatorProvider {
 
@@ -35,6 +36,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private DataStore mdatastore;//membership
     private List<Access.Role> roleList;
     private MessageDigest _messageDigest;
+
+    private ConcurrentHashMap<String,OnLobby> oMap;
+    private DeploymentServiceProvider deploymentServiceProvider;
 
     public MessageDigest messageDigest(){
         try{
@@ -77,9 +81,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public boolean validateTicket(String key,int stub,String ticket){
         return SystemUtil.validTicket(messageDigest(),key,stub,ticket);
     }
-    public List<ApplicationCluster> list(String systemId){
-        return new ArrayList<>();
-    }
     public List<Access.Role> list(){
         return roleList;
     }
@@ -107,16 +108,39 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         Subscription subscription = new Membership();
         subscription.distributionKey(onLobby.subscriptionId());
         mdatastore.load(subscription);
+        oMap.put(onLobby.typeId(),onLobby);
         log.warn(onLobby.toString()+" has been monitored under ->"+subscription.toString());
+    }
+    public void atMidnight(){
+        ArrayList<String> rlist = new ArrayList<>();
+        LocalDateTime _curr = LocalDateTime.now();
+        oMap.forEach((k,o)->{
+            Subscription subscription = new Membership();
+            subscription.distributionKey(o.subscriptionId());
+            if(this.mdatastore.load(subscription)){
+                LocalDateTime end = SystemUtil.fromUTCMilliseconds(subscription.endTimestamp());
+                if(end.isBefore(_curr)){
+                    deploymentServiceProvider.shutdown(o.typeId());
+                    rlist.add(k);
+                }
+            }else{
+                deploymentServiceProvider.shutdown(o.typeId());
+                rlist.add(k);
+            }
+        });
+        rlist.forEach((k)->{
+            oMap.remove(k);
+        });
     }
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
+        this.deploymentServiceProvider = serviceContext.deploymentServiceProvider();
         this.pdataStore =  this.serviceContext.dataStore(Presence.DataStore,this.serviceContext.partitionNumber());
         this.udataStore =  this.serviceContext.dataStore(Access.DataStore,this.serviceContext.partitionNumber());
         this.adataStore =  this.serviceContext.dataStore(Account.DataStore,this.serviceContext.partitionNumber());
         this.mdatastore =  this.serviceContext.dataStore(Subscription.DataStore,this.serviceContext.partitionNumber());
-
+        oMap = new ConcurrentHashMap<>();
         AuthVendor google = this.serviceContext.authVendor("google");
         if(google!=null){
             aMap.put("google",(google));

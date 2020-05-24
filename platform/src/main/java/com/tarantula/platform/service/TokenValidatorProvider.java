@@ -23,7 +23,6 @@ public interface TokenValidatorProvider extends ServiceProvider {
 
     boolean upgradeRole(Access access,String role);
 
-    List<ApplicationCluster> list(String systemId);
     List<Access.Role> list();
     AuthVendor authVendor(String name);
     void onCheck(OnLobby onLobby);
