@@ -69,6 +69,9 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             });
             session.write(this.builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }
+        else if(session.action().equals("onShoppingList")){
+            session.write(new ShoppingContext(monthly,yearly).toJson().toString().getBytes(),this.descriptor.responseLabel());
+        }
         else if(session.action().equals("onAddEmail")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             User auser = user(session.systemId());

@@ -4,22 +4,43 @@
             <span id="tx-shopping-card-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
         </div>
         <div class="w3-display-topleft w3-padding">
-            <span><i class="fa fa-sign-in" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">SHOPPING</span>
+            <span><i class="fa fa-shopping-cart" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">SUBSCRIPTION</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-shopping-card-message"></div>
-    <div class="w3-panel">
-        <span id="tx-shopping-commit" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Pay With Card</span>     
+    <div class="w3-panel w3-center w3-border-bottom w3-border-red w3-text-yellow tx-text-12" id="tx-shopping-card-message">Processing Via Payment Gateway Stripe</div>
+    <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
+        <div class="w3-display-bottomleft w3-padding">
+            <span class="tx-margin-left-8 tx-text-12">Monthly Subscription Fee</span>          
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes w3-text-green" style="font-size:16px"></i></span>
+            <span class="tx-margin-left-8 tx-text-14">180.00 USD</span>
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-subscription-action'>Pay With Card</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
+        <div class="w3-display-bottomleft w3-padding">
+            <span class="tx-margin-left-8 tx-text-12">Yearly Subscription Fee</span>          
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes w3-text-green" style="font-size:16px"></i></span>
+            <span class="tx-margin-left-8 tx-text-14">1800.00 USD</span>
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-subscription-action'>Pay With Card</span>
+        </div>
     </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
-            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+            <span><i class="fa fa-cc-stripe" style="font-size:24px"></i></span>            
         </div>
         <div class="w3-display-bottomright w3-padding">
-            <span class="tx-text-12">Powered By ICodeSoftware</span>
+            <span class="tx-text-12">Payment Proccessed By Stripe</span>
         </div>
     </div>
     <!-- Stripe check out form -->
@@ -42,6 +63,10 @@
     <!-- END OF stripe checkout form-->
 </div>
 <script>
+    TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onShoppingList'},(resp)=>{
+        console.log(resp);
+        //document.querySelector('#tx-shopping-card-message').innerHTML = resp.message;        
+    });
     document.querySelector("#tx-shopping-card-close").onclick = tx_close_shopping;
     _tx_load();
  
@@ -67,18 +92,20 @@
             },
     };
     function _tx_load(){
-        document.querySelector("#tx-shopping-commit").onclick = function(e){
-            //TARA_API.query().packId = this.getAttribute('oid');
-            //TARA_API.query().amount = parseInt(this.getAttribute('amount'));
-            //TARA_API.query().name =   this.getAttribute('pname');
-            //TARA_API.query().credits = this.getAttribute('pcredits'); 
-            //TARA_API.query().price = this.getAttribute('pprice');
-            document.querySelector("#tx_checkout_error").innerHTML = "";
-            document.querySelector("#tx_checkout_error").style.display = "none";
-            document.querySelector("#tx_checkout_message").innerHTML = "";
-            document.querySelector("#tx_checkout_message").style.display = "none";
-            _tx_checkout();
-        };
+        document.querySelectorAll('.tx-subscription-action').forEach((a)=>{
+            a.onclick = function(e){
+                //TARA_API.query().packId = this.getAttribute('oid');
+                //TARA_API.query().amount = parseInt(this.getAttribute('amount'));
+                //TARA_API.query().name =   this.getAttribute('pname');
+                //TARA_API.query().credits = this.getAttribute('pcredits'); 
+                //TARA_API.query().price = this.getAttribute('pprice');
+                document.querySelector("#tx_checkout_error").innerHTML = "";
+                document.querySelector("#tx_checkout_error").style.display = "none";
+                document.querySelector("#tx_checkout_message").innerHTML = "";
+                document.querySelector("#tx_checkout_message").style.display = "none";
+                _tx_checkout();
+            };
+        });
         document.querySelector('#tx_checkout_cancel').onclick = function(){document.querySelector('#tx_checkout').style.display='none';};
     }
     function _tx_checkout(){
@@ -124,7 +151,7 @@
         }   
     }
     function tx_shopping_commit(token){
-        let _mcommit ={serviceTag:'marketplace',command:'onCommit',checkoutId:TARA_API.query().packId,orderId:token.id};  
+        let _mcommit ={serviceTag:'presence/lobby',command:'onCommit',checkoutId:TARA_API.query().packId,orderId:token.id};  
         //TARA_API.onService(_mcommit,function(resp){
             //popup web payment integration page    
             console.log(token);
