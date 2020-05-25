@@ -120,6 +120,7 @@
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-group" style="font-size:16px"></i></span>
                     <span id='tx-game-cluster-role' class='w3-left tx-text-14'>Role name</span>
                     <span id='tx-game-cluster-role-upgrade' view-id='upgrade.role.admin' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upgrade Role</span>
+                    <span id='tx-shopping-card' view-id='shopping.card' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Subscription</span>
                 </div>
                 <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
@@ -157,7 +158,7 @@
                 </div> 
                 <div class="w3-container w3-padding">
                     <span class='w3-left tx-text-14'>Dedicated Server Access Key</span>
-                    <span id='game-cluster-id-0' tx-game-cluster-id='' view-id='create.access.key' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>   
+                    <span id='game-cluster-id-0' tx-game-cluster-id='' view-id='create.access.key' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-create-key-action'>Create</span>   
                 </div>   
             </div>
             <div id='game-cluster-1' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
@@ -180,7 +181,7 @@
                 </div> 
                 <div class="w3-container w3-padding">
                     <span class='w3-left tx-text-14'>Dedicated Server Access Key</span>
-                    <span id='game-cluster-id-1' tx-game-cluster-id='' view-id='create.access.key' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>   
+                    <span id='game-cluster-id-1' tx-game-cluster-id='' view-id='create.access.key' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-create-key-action'>Create</span>   
                 </div>   
             </div>
             <div id='game-cluster-2' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
@@ -203,7 +204,7 @@
                 </div> 
                 <div class="w3-container w3-padding">
                     <span class='w3-left tx-text-14'>Dedicated Server Access Key</span>
-                    <span id='game-cluster-id-2' tx-game-cluster-id='' view-id='create.access.key' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>   
+                    <span id='game-cluster-id-2' tx-game-cluster-id='' view-id='create.access.key' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-create-key-action'>Create</span>   
                 </div>   
             </div>
             <div id='game-cluster-3' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
@@ -226,7 +227,7 @@
                 </div> 
                 <div class="w3-container w3-padding">
                     <span class='w3-left tx-text-14'>Dedicated Server Access Key</span>
-                    <span id='game-cluster-id-3' tx-game-cluster-id='' view-id='create.access.key' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>   
+                    <span id='game-cluster-id-3' tx-game-cluster-id='' view-id='create.access.key' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-create-key-action'>Create</span>   
                 </div>   
             </div>
             <div id='game-cluster-4' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
@@ -249,7 +250,7 @@
                 </div> 
                 <div class="w3-container w3-padding">
                     <span class='w3-left tx-text-14'>Dedicated Server Access Key</span>
-                    <span id='game-cluster-id-4' tx-game-cluster-id='' view-id='create.access.key' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>   
+                    <span id='game-cluster-id-4' tx-game-cluster-id='' view-id='create.access.key' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-create-key-action'>Create</span>   
                 </div>   
             </div>
             <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -422,10 +423,13 @@
                 document.querySelector('#tx-current-count').innerHTML=resp.currentCount;
                 document.querySelector('#tx-game-cluster-role-upgrade').style.display='none'; 
                 document.querySelector('#tx-game-cluster-create').style.display='block';
+                document.querySelector('#tx-shopping-card').style.display='block';
+
             }
             else{
                 document.querySelector('#tx-game-cluster-role-upgrade').style.display='block'; 
-                document.querySelector('#tx-game-cluster-create').style.display='none'; 
+                document.querySelector('#tx-game-cluster-create').style.display='none';
+                document.querySelector('#tx-shopping-card').style.display='none'; 
             }        
         });
         TARA_API.onService(false,{serviceTag:'role/admin',command:'onGameClusterList'},(resp)=>{
@@ -504,9 +508,15 @@
             document.querySelector('#tx-'+a.innerHTML).style.display='block'; 
         }; 
     });
+    document.querySelectorAll('.tx-create-key-action').forEach((a)=>{
+        a.onclick=()=>{
+            TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
+            let vid = a.getAttribute('view-id');
+            tx_view({viewId:vid,containerId:'#tx-popup'});    
+        }
+    });
     document.querySelectorAll('.tx-action').forEach((a)=>{
         a.onclick=()=>{
-            console.log(a.getAttribute('tx-game-cluster-id'));
             let vid = a.getAttribute('view-id');
             tx_view({viewId:vid,containerId:'#tx-popup'});    
         }

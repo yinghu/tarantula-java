@@ -75,6 +75,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public boolean validateAccessKey(String accessKey){
         return true;
     }
+    public String accessKey(String gameClusterId){
+        return "mock key";
+    }
     public String ticket(String key,int stub,int duration){
         return SystemUtil.ticket(messageDigest(),key,stub,duration);
     }
