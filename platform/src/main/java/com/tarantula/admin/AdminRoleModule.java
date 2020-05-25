@@ -6,6 +6,7 @@ import com.tarantula.Module;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.presence.GameCluster;
+import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.presence.SubscriptionFee;
 import com.tarantula.platform.presence.UserAccount;
 
@@ -33,7 +34,13 @@ public class AdminRoleModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         //this.context.log(session.action(),OnLog.INFO);
-        if(session.action().equals("onGameClusterList")){
+        if(session.action().equals("onCheckPermission")){
+            Account acc = new UserAccount();
+            acc.distributionKey(session.systemId());
+            account.load(acc);
+            session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0)).toJson().toString().getBytes(),label());
+        }
+        else if(session.action().equals("onGameClusterList")){
             AdminContext adminContext = new AdminContext();
             adminContext.gameClusterList = new ArrayList<>();
             IndexSet idx = new IndexSet();

@@ -16,7 +16,7 @@ public class GameCluster extends ResponseHeader implements Portable {
     public final static String GAME_SERVICE = "4";
     public final static String GAME_DATA = "5";
     public final static String OWNER = "6";
-    public final static String DISABLED = "7";
+    public final static String ACCESS_KEY = "7";
 
     @Override
     public int getClassId() {

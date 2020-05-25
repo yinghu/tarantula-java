@@ -86,8 +86,8 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             User user = this.user(session.systemId());
             boolean suc = this.context.validator().upgradeRole(user,onAccess.name());
-            ResponseHeader responseHeader = new ResponseHeader(session.action(),suc?"You have upgraded to ["+onAccess.name()+"]":"Failed to upgrade",suc);
-            session.write(this.builder.create().toJson(responseHeader).getBytes(),descriptor.responseLabel());
+            PermissionContext permissionContext = new PermissionContext(onAccess.name(),suc);
+            session.write(permissionContext.toJson().toString().getBytes(),descriptor.responseLabel());
         }
         else if(session.action().equals("onChangePassword")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);

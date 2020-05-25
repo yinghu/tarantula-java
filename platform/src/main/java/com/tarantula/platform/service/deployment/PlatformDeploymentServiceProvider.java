@@ -702,9 +702,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext.tarantulaCluster().deployService().enableLobby(data,true);
         this.tarantulaContext.tarantulaCluster().deployService().enableLobby(lobby,true);
         this.tarantulaContext.tarantulaCluster().deployService().enableLobby(service,true);
-        this.tarantulaContext.masterDataStore().load(gameCluster);
-        gameCluster.property(GameCluster.DISABLED,false);
-        this.tarantulaContext.masterDataStore().update(gameCluster);
         this.integrationEventService.publish(new GameClusterLaunchEvent(eventTopic,gameCluster.distributionKey()));
     }
     public GameCluster createGameCluster(String owner,String name,String plan){
