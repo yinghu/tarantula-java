@@ -5,9 +5,12 @@ import com.tarantula.platform.*;
 
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.OnLobby;
+import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -31,7 +34,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         Configuration ya = this.context.configuration("yearlyAccess");
         Configuration ma = this.context.configuration("monthlyAccess");
         monthly = new SubscriptionFee("monthlyAccess",ma.property("description"),ma.property("price"),ma.property("currency"));
-        yearly = new SubscriptionFee("yearlyAccess",ma.property("description"),ya.property("price"),ya.property("currency"));
+        yearly = new SubscriptionFee("yearlyAccess",ya.property("description"),ya.property("price"),ya.property("currency"));
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.deploymentServiceProvider.registerOnLobbyListener(this);
@@ -110,18 +113,28 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             this.context.absence(session);
             session.write(this.builder.create().toJson(new ResponseHeader("onAbsence", "off session [" + session.stub() + "]", true)).getBytes(),this.descriptor.responseLabel());
         }
-        /**
-        Map<String, Object> chargeParams = new HashMap<>();
-        chargeParams.put("amount",Double.valueOf(co.price).intValue());//pass penney number as integer
-        chargeParams.put("currency", "usd");
-        chargeParams.put("description", "Charge for ["+co.distributionKey()+"]");
-        chargeParams.put("source",ex.header("orderId")); //orderId from client stripe call
-        if(strip.validate(chargeParams)){
-            //charge successfully
-            OnBalanceTrack onBalanceTrack = new OnBalanceTrack(session.systemId(),co.credits);
-            this.context.publish(this.context.routingKey(session.systemId(),"presence"),onBalanceTrack);
-            suc = true;
-        }**/
+        else if(session.action().equals("onCommit")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String cid = (String)onAccess.property("checkoutId");
+            SubscriptionFee fee = cid.equals("monthlyAccess")?monthly:yearly;
+            Map<String, Object> chargeParams = new HashMap<>();
+            chargeParams.put("amount",Double.valueOf(fee.amount).intValue()*100);//pass penney number as integer
+            chargeParams.put("currency", "usd");
+            chargeParams.put("description", "Charge for ["+fee.name+"]");
+            chargeParams.put("source",onAccess.property("orderId")); //orderId from client stripe call
+            TokenValidatorProvider tp = this.context.serviceProvider(TokenValidatorProvider.NAME);
+            if(tp.authVendor("stripe").validate(chargeParams)){
+                
+                //charge successfully
+                //OnBalanceTrack onBalanceTrack = new OnBalanceTrack(session.systemId(),co.credits);
+                //this.context.publish(this.context.routingKey(session.systemId(),"presence"),onBalanceTrack);
+                //suc = true;
+                session.write(this.builder.create().toJson(new ResponseHeader("onCommit", "your purchase is successful", true)).getBytes(),this.descriptor.responseLabel());
+            }
+            else{
+                session.write(this.builder.create().toJson(new ResponseHeader("onCommit", "failed to commit your purchase", false)).getBytes(),this.descriptor.responseLabel());
+            }
+        }
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes(),this.descriptor.responseLabel());
         }

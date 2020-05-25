@@ -26,12 +26,12 @@
             <configuration tag="presence" priority="10">
                 <presence type="yearlyAccess">
                     <property name="description">Yearly Subscription</property>
-                    <property name="price">1800</property>
+                    <property name="price">1800.00</property>
                     <property name="currency">USD</property>
                 </presence>
                 <presence type="monthlyAccess">
                     <property name="description">Monthly Subscription</property>
-                    <property name="price">180</property>
+                    <property name="price">180.00</property>
                     <property name="currency">USD</property>
                 </presence>
             </configuration>
