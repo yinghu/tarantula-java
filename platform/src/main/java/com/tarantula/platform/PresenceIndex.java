@@ -70,7 +70,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
             switch (onAccess.accessMode()){
                 case Session.FAST_PLAY_MODE:
                     //distributed on application Id
-                    fastJoin(session,desc,onAccess.payload());
+                    fastJoin(session,desc,(byte[])onAccess.property(OnAccess.PAYLOAD));
                     break;
                 case Session.INSTANCE_PLAY_MODE:
                     SessionForward fxd = new SessionForward(session.source(),session.sessionId());
@@ -81,7 +81,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
                     onInstanceEvent.routingNumber(session.routingNumber());
                     onInstanceEvent.accessMode(Session.INSTANCE_PLAY_MODE);
                     onInstanceEvent.ticket(session.ticket());//session presence OID embedded in token
-                    onInstanceEvent.payload(onAccess.payload());
+                    onInstanceEvent.payload((byte[])onAccess.property(OnAccess.PAYLOAD));
                     RoutingKey rk2 = this.eventService.routingKey(onAccess.instanceId(),desc.tag(),partitionFromInstanceId(onAccess.instanceId())); //route to the partition of the instance node
                     onInstanceEvent.destination(rk2.route());
                     this.eventService.publish(onInstanceEvent);

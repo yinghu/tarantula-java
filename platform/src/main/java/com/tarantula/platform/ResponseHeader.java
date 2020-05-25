@@ -70,11 +70,5 @@ public class ResponseHeader extends RecoverableObject implements Response {
         this.successful = successful;
     }
 
-    public void property(String header,Object value){
-        this.properties.put(header,value);
-    }
-    public Object property(String header){
-        return this.properties.get(header);
-    }
 
 }

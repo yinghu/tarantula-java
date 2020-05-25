@@ -80,8 +80,8 @@ public class SystemValidator{
         }
         @Override
         public boolean validateToken(Map<String,Object> params){
-            String _vname = (String)params.get("name");
-            if(_vname==null||(!_vname.contains(_vname))){
+            String _vname = (String)params.remove("name");
+            if(_vname==null){
                 return false;
             }
             TokenValidatorProvider.AuthVendor authVendor = systemValidatorProvider.authVendor(_vname);

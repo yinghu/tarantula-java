@@ -570,10 +570,10 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         this.schedule(new MidnightCheck(this));
     }
     public TokenValidatorProvider.AuthVendor authVendor(String name){
- 	    if(name.equals("google")){
+ 	    if(name.equals(OnAccess.GOOGLE)){
  	        return loadGoogleCredentials();
  	    }
- 	    else if(name.equals("stripe")){
+ 	    else if(name.equals(OnAccess.STRIPE)){
  	        return loadStripeCredentials();
         }
         else{

@@ -82,7 +82,13 @@ public class RecoverableObject implements Recoverable {
     public void label(String label){
         this.label = label;
     }
-
+    //on access API
+    public void property(String header,Object value){
+        this.properties.put(header,value);
+    }
+    public Object property(String header){
+        return this.properties.get(header);
+    }
     public Map<String,Object> toMap(){
         return this.properties;
     }

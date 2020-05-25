@@ -104,14 +104,14 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         OnAccess acc = builder.create().fromJson(new String(payload).trim(),OnAccess.class);
         if(session.action().equals("onIndex")){
             PresenceContext ic = new PresenceContext("onIndex");
-            ic.googleClientId = this.tokenValidatorProvider.authVendor("google").clientId();
-            ic.stripeClientId = this.tokenValidatorProvider.authVendor("stripe").clientId();
+            ic.googleClientId = this.tokenValidatorProvider.authVendor(OnAccess.GOOGLE).clientId();
+            ic.stripeClientId = this.tokenValidatorProvider.authVendor(OnAccess.STRIPE).clientId();
             ic.lobbyList = this.context.index();
             ic.roleList = roleList;
             session.write(builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onLogin")){
-            OnSession access = this.login(session.systemId(),(String) acc.property("password"),session);
+            OnSession access = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
             onSession(access,session);
         }
         else if(session.action().equals("onToken")){//exchange token
@@ -124,7 +124,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             }
         }
         else if(session.action().equals("onTicket")){//validate client web socket connection
-            if(this.context.validator().validateTicket(session.systemId(),acc.stub(),acc.accessKey())){
+            if(this.context.validator().validateTicket(session.systemId(),acc.stub(),(String)acc.property(OnAccess.ACCESS_KEY))){
                 OnSession onSession = this.context.validator().token(session.systemId(),acc.stub());//web socket request
                 onSession.successful(true);
                 PresenceContext ptx = new PresenceContext();
@@ -159,7 +159,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             else{
                 Access access = this.createLogin(acc,session.systemId(),role,false,"password",true);
                 session.systemId(access.distributionKey());
-                OnSession _onSession = this.login(session.systemId(),(String) acc.property("password"),session);
+                OnSession _onSession = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
                 this.onSession(_onSession,session);
             }
         }
@@ -175,7 +175,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                     acc.property("login",deviceId);
                     acc.property("password",deviceId);
                     this.createLogin(acc,session.trackId(),role,true,"device",true);
-                    OnSession access = this.login(session.trackId(),(String) acc.property("password"),session);
+                    OnSession access = this.login(session.trackId(),(String) acc.property(OnAccess.PASSWORD),session);
                     onSession(access,session);
                 }
                 else{
@@ -184,13 +184,13 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             }
         }
         else if(session.action().equals("onResetPassword")){
-            if(this.deploymentServiceProvider.checkCode(acc.accessKey()).equals(acc.property("login"))){
+            if(this.deploymentServiceProvider.checkCode((String)acc.property(OnAccess.ACCESS_KEY)).equals(acc.property("login"))){
                 Access user = new User();
                 user.distributionKey(session.systemId());
                 if(uDatastore.load(user)){
-                    user.password(this.context.validator().hashPassword((String) acc.property("password")));
+                    user.password(this.context.validator().hashPassword((String) acc.property(OnAccess.PASSWORD)));
                     uDatastore.update(user);
-                    OnSession onSession = this.login(session.systemId(),(String) acc.property("password"),session);
+                    OnSession onSession = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
                     onSession(onSession,session);
                 }
                 else{
@@ -235,7 +235,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     private Access createLogin(OnAccess payload,String systemId,String roleName,boolean validated,String validator,boolean primary){
         Access acc = new User((String) payload.property("login"),validated,validator);
         acc.distributionKey(systemId);
-        acc.password(validated?"":this.context.validator().hashPassword((String) payload.property("password")));
+        acc.password(validated?"":this.context.validator().hashPassword((String) payload.property(OnAccess.PASSWORD)));
         acc.active(this.activated);//if false do email validation
         acc.primary(primary);
         if(!primary){

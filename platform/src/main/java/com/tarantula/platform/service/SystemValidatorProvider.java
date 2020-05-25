@@ -153,13 +153,13 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.adataStore =  this.serviceContext.dataStore(Account.DataStore,this.serviceContext.partitionNumber());
         this.mdatastore =  this.serviceContext.dataStore(Subscription.DataStore,this.serviceContext.partitionNumber());
         oMap = new ConcurrentHashMap<>();
-        AuthVendor google = this.serviceContext.authVendor("google");
+        AuthVendor google = this.serviceContext.authVendor(OnAccess.GOOGLE);
         if(google!=null){
-            aMap.put("google",(google));
+            aMap.put(OnAccess.GOOGLE,(google));
         }
-        AuthVendor stripe = this.serviceContext.authVendor("stripe");
+        AuthVendor stripe = this.serviceContext.authVendor(OnAccess.STRIPE);
         if(stripe!=null){
-            aMap.put("stripe",(stripe));
+            aMap.put(OnAccess.STRIPE,(stripe));
         }
     }
 

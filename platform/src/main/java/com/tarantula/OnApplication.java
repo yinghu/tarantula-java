@@ -8,7 +8,7 @@ package com.tarantula;
  * On Application represents an application state of the player
  */
 
-public interface OnApplication extends Recoverable{
+public interface OnApplication extends Response{
 
     int accessMode();
     void accessMode(int mode);

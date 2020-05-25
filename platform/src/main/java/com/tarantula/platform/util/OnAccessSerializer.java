@@ -9,15 +9,15 @@ import com.tarantula.OnAccess;
 import java.lang.reflect.Type;
 
 /**
- * Updated by yinghu lu on 5/15/2020
+ * Updated by yinghu lu on 5/25/2020
  */
 public class OnAccessSerializer implements JsonSerializer<OnAccess> {
 
     public JsonElement serialize(OnAccess access, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = new JsonObject();
         jo.addProperty("timestamp",access.timestamp());
-        jo.addProperty("accessKey",access.accessKey());
-        jo.addProperty("accessId",access.accessId());
+        jo.addProperty("accessKey",(String) access.property(OnAccess.ACCESS_KEY));
+        jo.addProperty("accessId",(String) access.property(OnAccess.ACCESS_ID));
         jo.addProperty("oid",access.oid());
         jo.addProperty("applicationId",access.applicationId());
         jo.addProperty("accessMode",access.accessMode());

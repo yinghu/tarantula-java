@@ -79,7 +79,7 @@ public class AdminRoleModule implements Module {
             acc.distributionKey(session.systemId());
             if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-                GameCluster gc = this.deploymentServiceProvider.createGameCluster(session.systemId(),onAccess.name(),"basic");
+                GameCluster gc = this.deploymentServiceProvider.createGameCluster(session.systemId(),(String)onAccess.property("name"),"basic");
                 if(gc.successful()){
                     IndexSet idx = new IndexSet();
                     idx.distributionKey(acc.distributionKey());
@@ -116,8 +116,8 @@ public class AdminRoleModule implements Module {
             chargeParams.put("currency", "usd");
             chargeParams.put("description", "Charge for ["+fee.name+"]");
             chargeParams.put("source",onAccess.property("orderId")); //orderId from client stripe call
-            TokenValidatorProvider tp = this.context.serviceProvider(TokenValidatorProvider.NAME);
-            if(tp.authVendor("stripe").validate(chargeParams)){
+            chargeParams.put("name",OnAccess.STRIPE);
+            if(this.context.validator().validateToken(chargeParams)){
 
                 //charge successfully
                 //OnBalanceTrack onBalanceTrack = new OnBalanceTrack(session.systemId(),co.credits);

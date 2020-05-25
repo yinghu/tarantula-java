@@ -695,7 +695,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         icp.remove(serverId.getBytes());
     }
     //end of dedicated server methods
-    public void launchGameCluster(GameCluster gameCluster){
+    public <T extends OnAccess> void launchGameCluster(T gameCluster){
         String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
         String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
         String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
@@ -704,15 +704,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext.tarantulaCluster().deployService().enableLobby(service,true);
         this.integrationEventService.publish(new GameClusterLaunchEvent(eventTopic,gameCluster.distributionKey()));
     }
-    public GameCluster createGameCluster(String owner,String name,String plan){
-        return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name,plan);
+    public <T extends OnAccess> T createGameCluster(String owner,String name,String plan){
+        return (T)this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name,plan);
     }
-    public GameCluster gameCluster(String key){
+    public <T extends OnAccess> T gameCluster(String key){
         GameCluster gc = new GameCluster();
         gc.distributionKey(key);
         gc.dataStore(this.tarantulaContext.masterDataStore());
         if(this.tarantulaContext.masterDataStore().load(gc)){
-            return gc;
+            return (T)gc;
         }
         return null;
     }

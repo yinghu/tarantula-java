@@ -8,14 +8,14 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
- * Updated by yinghu on 9/2/2019.
+ * Updated by yinghu on 5/25/2020
  */
 public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
 
 
     public OnAccessDeserializer(){}
 
-
+    //format {{k,v},{k,v},[{k,v},[k,v]]}
     public OnAccess deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         OnAccess   access = new OnAccessTrack();
         JsonObject e = jsonElement.getAsJsonObject();
@@ -24,114 +24,78 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
             JsonElement ve = kv.getValue();
             if(ve.isJsonPrimitive()){
                 JsonPrimitive jo = ve.getAsJsonPrimitive();
-                if(k.equals("systemId")){
-                    access.systemId(jo.getAsString());
+                if(jo.isString()){
                     access.property(k,jo.getAsString());
+                    _setProperty(access,k,jo.getAsString());
                 }
-                else if(k.equals("stub")){
-                    access.stub(jo.getAsInt());
-                    access.property(k,jo.getAsInt());
+                if(jo.isNumber()){
+                    access.property(k,jo.getAsNumber());
+                    _setProperty(access,k,jo.getAsNumber());
                 }
-                else if(k.equals("applicationId")){
-                    access.applicationId(jo.getAsString());
-                    access.property(k,jo.getAsString());
-                }
-                else if(k.equals("name")){
-                    access.name(jo.getAsString());
-                    access.property(k,jo.getAsString());
-                }
-                else if(k.equals("accessMode")){
-                    access.accessMode(jo.getAsInt());
-                    access.property(k,jo.getAsInt());
-                }
-                else if(k.equals("instanceId")){
-                    access.instanceId(jo.getAsString());
-                    access.property(k,jo.getAsString());
-                }
-                else if(k.equals("accessKey")){
-                    access.accessKey(jo.getAsString());
-                    access.property(k,jo.getAsString());
-                }
-                else if(k.equals("accessId")){
-                    access.accessId(jo.getAsString());
-                    access.property(k,jo.getAsString());
-                }
-                else if(k.equals("typeId")){
-                    access.typeId(jo.getAsString());
-                    access.property(k,jo.getAsString());
-                }
-                else if(k.equals("subtypeId")){
-                    access.subtypeId(jo.getAsString());
-                    access.property(k,jo.getAsString());
-                }
-                else if(k.equals("oid")){
-                    access.oid(jo.getAsString());
-                    access.property(k,jo.getAsString());
-                }
-                else if(k.equals("balance")){
-                    access.entryCost(jo.getAsDouble());
-                }
-                else if(k.equals("timestamp")){
-                    access.timestamp(jo.getAsLong());
-                }
-                else{
-                    if(!jo.getAsString().trim().equals("")){
-                        access.property(k,jo.getAsString());
-                    }
+                if(jo.isBoolean()){
+                    access.property(k,jo.getAsBoolean());
+                    _setProperty(access,k,jo.getAsBoolean());
                 }
             }
             else if(ve.isJsonArray()){
                 JsonArray alist = ve.getAsJsonArray();
-                alist.forEach((a)->{
-                    JsonObject jo = a.getAsJsonObject();
-                    String hk = jo.get("name").getAsString();
-                    String hv = jo.get("value").getAsString();
-                    access.property(hk,hv);
-                    _setProperty(access,hk,hv);
+                alist.forEach((a)->{//key value pair
+                    JsonObject nv = a.getAsJsonObject();
+                    String _k = nv.get("name").getAsString();
+                    JsonObject v = a.getAsJsonObject();
+                    if (v.isJsonPrimitive()) {
+                        JsonPrimitive jp = v.getAsJsonPrimitive();
+                        if(jp.isString()){
+                            access.property(_k,jp.getAsString());
+                            _setProperty(access,_k,jp.getAsString());
+                        }
+                        if(jp.isNumber()){
+                            access.property(_k,jp.getAsNumber());
+                            _setProperty(access,_k,jp.getAsNumber());
+                        }
+                        if(jp.isBoolean()){
+                            access.property(_k,jp.getAsBoolean());
+                            _setProperty(access,_k,jp.getAsBoolean());
+                        }
+                    }
                 });
             }
         });
         return access;
     }
-    private void _setProperty(OnAccess access,String k,String v){
+    private void _setProperty(OnAccess access,String k,Object v){
         if(k.equals("systemId")){
-            access.systemId(v);
+            access.systemId((String) v);
         }
         else if(k.equals("stub")){
-            access.stub(Integer.parseInt(v));
+            access.stub(((Number)v).intValue());
         }
         else if(k.equals("applicationId")){
-            access.applicationId(v);
+            access.applicationId((String) v);
         }
         else if(k.equals("name")){
-            access.name(v);
+            access.name((String) v);
         }
         else if(k.equals("accessMode")){
-            access.accessMode(Integer.parseInt(v));
+            access.accessMode(((Number)v).intValue());
         }
         else if(k.equals("instanceId")){
-            access.instanceId(v);
-        }
-        else if(k.equals("accessKey")){
-            access.accessKey(v);
-        }
-        else if(k.equals("accessId")){
-            access.accessId(v);
+            access.instanceId((String) v);
         }
         else if(k.equals("typeId")){
-            access.typeId(v);
+            access.typeId((String) v);
         }
         else if(k.equals("subtypeId")){
-            access.subtypeId(v);
+            access.subtypeId((String) v);
         }
         else if(k.equals("oid")){
-            access.oid(v);
+            access.oid((String) v);
         }
         else if(k.equals("balance")){
-            access.entryCost(Double.parseDouble(v));
+            access.entryCost(((Number)v).doubleValue());
         }
         else if(k.equals("timestamp")){
-            access.timestamp(Long.parseLong(v));
+            access.timestamp(((Number)v).longValue());
         }
     }
 }

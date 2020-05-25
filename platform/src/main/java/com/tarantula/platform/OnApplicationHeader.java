@@ -1,11 +1,11 @@
 package com.tarantula.platform;
 
-import com.tarantula.Connection;
+import com.tarantula.OnAccess;
 
 /**
- * Updated by yinghu on 5/15/2020
+ * Updated by yinghu on 5/25/2020
  */
-public class OnApplicationHeader extends ResponseHeader{
+public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
     protected String applicationId;
     protected String instanceId;
