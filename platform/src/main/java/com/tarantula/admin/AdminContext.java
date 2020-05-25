@@ -33,7 +33,6 @@ public class AdminContext extends ResponseHeader {
             });
             jsonObject.add("gameClusterList",glist);
         }
-
         return jsonObject;
     }
 

@@ -6,15 +6,19 @@ import com.tarantula.Module;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.presence.GameCluster;
+import com.tarantula.platform.presence.SubscriptionFee;
 import com.tarantula.platform.presence.UserAccount;
 
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class AdminRoleModule implements Module {
@@ -24,6 +28,8 @@ public class AdminRoleModule implements Module {
     private DataStore account;
     private DeploymentServiceProvider deploymentServiceProvider;
     private int maxGameClusterCount;
+    private SubscriptionFee monthly;
+    private SubscriptionFee yearly;
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         this.context.log(session.action(),OnLog.INFO);
@@ -43,6 +49,9 @@ public class AdminRoleModule implements Module {
                 });
             }
             session.write(adminContext.toJson().toString().getBytes(),label());
+        }
+        else if(session.action().equals("onShoppingList")){
+            session.write(new ShoppingContext(monthly,yearly).toJson().toString().getBytes(),this.label());
         }
         else if(session.action().equals("onStatistics")){
             Statistics statistics = this.deploymentServiceProvider.statistics();
@@ -83,6 +92,31 @@ public class AdminRoleModule implements Module {
                 session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"you already have max game clusters",false)).getBytes(),label());
             }
         }
+        else if(session.action().equals("onCommit")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String cid = (String)onAccess.property("checkoutId");
+            SubscriptionFee fee = cid.equals("monthlyAccess")?monthly:yearly;
+            Map<String, Object> chargeParams = new HashMap<>();
+            chargeParams.put("amount",Double.valueOf(fee.amount).intValue()*100);//pass penney number as integer
+            chargeParams.put("currency", "usd");
+            chargeParams.put("description", "Charge for ["+fee.name+"]");
+            chargeParams.put("source",onAccess.property("orderId")); //orderId from client stripe call
+            TokenValidatorProvider tp = this.context.serviceProvider(TokenValidatorProvider.NAME);
+            if(tp.authVendor("stripe").validate(chargeParams)){
+
+                //charge successfully
+                //OnBalanceTrack onBalanceTrack = new OnBalanceTrack(session.systemId(),co.credits);
+                //this.context.publish(this.context.routingKey(session.systemId(),"presence"),onBalanceTrack);
+                //suc = true;
+                session.write(this.builder.create().toJson(new ResponseHeader("onCommit", "your purchase is successful", true)).getBytes(),this.label());
+            }
+            else{
+                session.write(this.builder.create().toJson(new ResponseHeader("onCommit", "failed to commit your purchase", false)).getBytes(),this.label());
+            }
+        }
+        else{
+            session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes(),this.label());
+        }
         /**
         else if(session.action().equals("backup")){
             DataStoreProvider dp = deploymentServiceProvider.dataStoreProvider();
@@ -95,15 +129,16 @@ public class AdminRoleModule implements Module {
             dao.reset(this.context);
             session.write(this.builder.create().toJson(dao).getBytes(),label());
         }**/
-        else{
-            session.write(payload,label());
-        }
         return session.action().equals("onLeave");
     }
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
+        Configuration ya = this.context.configuration("yearlyAccess");
+        Configuration ma = this.context.configuration("monthlyAccess");
+        monthly = new SubscriptionFee("monthlyAccess",ma.property("description"),ma.property("price"),ma.property("currency"));
+        yearly = new SubscriptionFee("yearlyAccess",ya.property("description"),ya.property("price"),ya.property("currency"));
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(AdminDataStoreObject.class,new AdminObjectSerializer());
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());

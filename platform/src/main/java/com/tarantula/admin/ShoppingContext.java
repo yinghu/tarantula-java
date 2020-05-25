@@ -1,6 +1,7 @@
-package com.tarantula.platform.presence;
+package com.tarantula.admin;
 
 import com.google.gson.JsonObject;
+import com.tarantula.platform.presence.SubscriptionFee;
 
 public class ShoppingContext {
     public SubscriptionFee monthly;

@@ -17,7 +17,7 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes w3-text-green" style="font-size:16px"></i></span>
-            <span id='tx-monthly-access-tag' class="tx-margin-left-8 tx-text-14">1800.00 USD</span>
+            <span id='tx-monthly-access-tag' class="tx-margin-left-8 tx-text-14">N/A</span>
         </div>
         <div class="w3-display-bottomright w3-padding">
             <span tx-subscription-type='monthly' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-subscription-action'>Pay With Card</span>
@@ -29,7 +29,7 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes w3-text-green" style="font-size:16px"></i></span>
-            <span id='tx-yearly-access-tag' class="tx-margin-left-8 tx-text-14">18000.00 USD</span>
+            <span id='tx-yearly-access-tag' class="tx-margin-left-8 tx-text-14">N/A</span>
         </div>
         <div class="w3-display-bottomright w3-padding">
             <span tx-subscription-type='yearly' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-subscription-action'>Pay With Card</span>
@@ -63,15 +63,21 @@
     <!-- END OF stripe checkout form-->
 </div>
 <script>
-    TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onShoppingList'},(resp)=>{
-        console.log(resp);
-        TARA_API.query().monthly = resp.monthlyFee;
-        TARA_API.query().yearly = resp.yearlyFee;
-        document.querySelector('#tx-monthly-access-tag').innerHTML=resp.monthlyFee.amount+' '+resp.monthlyFee.currency;
-        document.querySelector('#tx-yearly-access-tag').innerHTML=resp.yearlyFee.amount+' '+resp.yearlyFee.currency;
-        //document.querySelector('#tx-shopping-card-message').innerHTML = resp.message;        
+    TARA_API.onService(true,{serviceTag:'role/admin',command:'onShoppingList'},(resp)=>{
+        if(resp.successful){
+            TARA_API.query().monthly = resp.monthlyFee;
+            TARA_API.query().yearly = resp.yearlyFee;
+            document.querySelector('#tx-monthly-access-tag').innerHTML=resp.monthlyFee.amount+' '+resp.monthlyFee.currency;
+            document.querySelector('#tx-yearly-access-tag').innerHTML=resp.yearlyFee.amount+' '+resp.yearlyFee.currency;
+        }else{
+            document.querySelector('#tx-shopping-card-message').innerHTML = resp.message;
+        }        
     });
-    document.querySelector("#tx-shopping-card-close").onclick = tx_close_shopping;
+    document.querySelector("#tx-shopping-card-close").onclick = ()=>{
+        let m1 = document.querySelector('#tx-popup');
+        m1.innerHTML='';
+        m1.style.display = 'none';    
+    };
     _tx_load();
  
     //payment provider stripe integration and check out to commit orderId to server for verification
@@ -107,7 +113,7 @@
                 _tx_checkout(ptag);
             };
         });
-        document.querySelector('#tx_checkout_cancel').onclick = function(){document.querySelector('#tx_checkout').style.display='none';};
+        document.querySelector('#tx_checkout_cancel').onclick = ()=>{document.querySelector('#tx_checkout').style.display='none';};
     }
     function _tx_checkout(ptag){
         document.querySelector("#tx_checkout_name").innerHTML = ptag.name; 
@@ -125,7 +131,7 @@
             expiry.mount('#tx_card_expiry');
             cvc.mount('#tx_card_cvc');
             document.querySelector('#tx_checkout_pay').onclick = function(){
-                stripe.createToken(card).then(function(ret){
+                stripe.createToken(card).then((ret)=>{
                     //console.log(ret);
                     if(ret.token){
                         document.querySelector("#tx_checkout_message").innerHTML = "You card validated via stripe.com"; 
@@ -152,21 +158,13 @@
         }   
     }
     function tx_shopping_commit(token,ptag){
-        TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onCommit',checkoutId:ptag.type,orderId:token.id},function(resp){
+        TARA_API.onService(true,{serviceTag:'role/admin',command:'onCommit',checkoutId:ptag.type,orderId:token.id},(resp)=>{
             //popup web payment integration page  
             document.querySelector("#tx_checkout_message").innerHTML = resp.message;   
             if(resp.successful){
-                //document.querySelector("#tx_checkout_message").innerHTML = "You purchase item added to your account."; 
-                setTimeout(function(){document.querySelector("#tx_checkout").style.display = 'none'},2000);
+                setTimeout(()=>{document.querySelector("#tx_checkout").style.display = 'none'},2000);
             }
         });
-    }
-    
-    function tx_close_shopping(){
-         this.style.display = 'none';
-         let m1 = document.querySelector('#tx-popup');
-         m1.innerHTML='';
-         m1.style.display = 'none';
     }
     
 </script>

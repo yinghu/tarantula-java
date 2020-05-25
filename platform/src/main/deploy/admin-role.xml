@@ -32,6 +32,16 @@
                 <admin type="setup">
                     <property name="maxGameClusterCount">10</property>
                 </admin>
+                <admin type="yearlyAccess">
+                    <property name="description">Yearly Subscription</property>
+                    <property name="price">1800.00</property>
+                    <property name="currency">USD</property>
+                </admin>
+                <admin type="monthlyAccess">
+                    <property name="description">Monthly Subscription</property>
+                    <property name="price">180.00</property>
+                    <property name="currency">USD</property>
+                </admin>
             </configuration>
         </configuration-list>
         <view-list>
@@ -40,6 +50,9 @@
             </view>
             <view type="game.cluster.list">
                 <property name="moduleResourceFile">admin/game.cluster.list.view.html</property>
+            </view>
+            <view type="shopping.card">
+                <property name="moduleResourceFile">admin/stripe.card.view.html</property>
             </view>
         </view-list>
 
