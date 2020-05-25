@@ -28,6 +28,7 @@ public class AdminRoleModule implements Module {
     private GsonBuilder builder;
     private DataStore account;
     private DeploymentServiceProvider deploymentServiceProvider;
+    private TokenValidatorProvider tokenValidatorProvider;
     private int maxGameClusterCount;
     private SubscriptionFee monthly;
     private SubscriptionFee yearly;
@@ -65,6 +66,13 @@ public class AdminRoleModule implements Module {
             statistics.summary((e)->{
             });
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"load statistics",true)).getBytes(),label());
+        }
+        else if(session.action().equals("onCreateAccessKey")){
+            //generate access key from game cluster id
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster((String) onAccess.property("gameClusterId"));
+            gameCluster.property(GameCluster.ACCESS_KEY,tokenValidatorProvider.accessKey(gameCluster.distributionKey()));
+            //update
         }
         else if(session.action().equals("onCreateGameCluster")){
             Account acc = new UserAccount();
@@ -151,6 +159,7 @@ public class AdminRoleModule implements Module {
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.account = this.context.dataStore(Account.DataStore);
+        this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.maxGameClusterCount = Integer.parseInt(this.context.configuration("setup").property("maxGameClusterCount"));
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
