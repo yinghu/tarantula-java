@@ -32,8 +32,11 @@
             <view type="change.password">
                 <property name="moduleResourceFile">presence/change.password.view.html</property>
             </view>
-            <view type="upgrade.role">
-                <property name="moduleResourceFile">presence/upgrade.role.view.html</property>
+            <view type="upgrade.role.account">
+                <property name="moduleResourceFile">presence/upgrade.account.view.html</property>
+            </view>
+            <view type="upgrade.role.admin">
+                <property name="moduleResourceFile">presence/upgrade.admin.view.html</property>
             </view>
             <view type="api.index">
                 <property name="moduleResourceFile">presence/api.index.view.html</property>
