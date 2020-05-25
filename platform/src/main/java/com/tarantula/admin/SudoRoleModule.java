@@ -29,7 +29,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         if(session.action().equals("onSubscriptionList")){
             DataStore mds = this.context.dataStore(Subscription.DataStore);
             mds.traverse((d,o,k,v)->{
-                this.context.log(new String(v),OnLog.WARN);
+                //this.context.log(new String(v),OnLog.WARN);
                 return true;
             });
             //OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);

@@ -32,7 +32,7 @@ public class AdminRoleModule implements Module {
     private SubscriptionFee yearly;
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
-        this.context.log(session.action(),OnLog.INFO);
+        //this.context.log(session.action(),OnLog.INFO);
         if(session.action().equals("onGameClusterList")){
             AdminContext adminContext = new AdminContext();
             adminContext.gameClusterList = new ArrayList<>();

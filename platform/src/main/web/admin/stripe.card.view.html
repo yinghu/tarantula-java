@@ -69,6 +69,7 @@
             TARA_API.query().yearly = resp.yearlyFee;
             document.querySelector('#tx-monthly-access-tag').innerHTML=resp.monthlyFee.amount+' '+resp.monthlyFee.currency;
             document.querySelector('#tx-yearly-access-tag').innerHTML=resp.yearlyFee.amount+' '+resp.yearlyFee.currency;
+            _tx_load();
         }else{
             document.querySelector('#tx-shopping-card-message').innerHTML = resp.message;
         }        
@@ -78,7 +79,6 @@
         m1.innerHTML='';
         m1.style.display = 'none';    
     };
-    _tx_load();
  
     //payment provider stripe integration and check out to commit orderId to server for verification
     var elementStyles = {
