@@ -710,6 +710,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public GameCluster gameCluster(String key){
         GameCluster gc = new GameCluster();
         gc.distributionKey(key);
+        gc.dataStore(this.tarantulaContext.masterDataStore());
         if(this.tarantulaContext.masterDataStore().load(gc)){
             return gc;
         }

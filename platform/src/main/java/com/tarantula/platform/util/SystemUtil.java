@@ -92,22 +92,25 @@ public class SystemUtil {
         token.append("-").append(hash); //3
         return token.toString();
     }
-    public static  String accessKey(MessageDigest messageDigest,String typeId,int stub,int timeoutMinutes) {
-        //{typeId}-{routing}-{stub}-{cid}-{start}-{hash}
-        //ticket=> {tarantula} {stub} {end} {hash}
-        StringBuffer token = new StringBuffer(typeId);
+    public static  String accessKey(MessageDigest messageDigest,String typeId,String gameClusterId,long timestamp) {
+        //{gameClusterId}-{hash}
+        StringBuffer token = new StringBuffer(gameClusterId);
         messageDigest.reset();
         messageDigest.update(typeId.getBytes());
-        messageDigest.update(Integer.toHexString(stub).getBytes());
-        long start = SystemUtil.toUTCMilliseconds(LocalDateTime.now());
-        messageDigest.update(Long.toHexString(start).getBytes());
+        messageDigest.update(gameClusterId.getBytes());
+        messageDigest.update(Long.toHexString(timestamp).getBytes());//saved on game cluster id
         String hash = SystemUtil.toHexString(messageDigest.digest());
-        String ticket = SystemUtil.ticket(messageDigest,typeId,stub,timeoutMinutes*60);//assign a ticket
-        token.append(" ").append(ticket);//0 embedded to token
-        token.append("-").append(stub);//1
-        token.append("-").append(start); //2
-        token.append("-").append(hash); //3
+        token.append("-").append(hash);
         return token.toString();
+    }
+    public static boolean validAccessKey(MessageDigest messageDigest,String accessKey,String typeId,long timestamp){
+        String[] sp = accessKey.split("-");
+        messageDigest.reset();
+        messageDigest.update(typeId.getBytes());
+        messageDigest.update(sp[0].getBytes());
+        messageDigest.update(Long.toHexString(timestamp).getBytes());
+        String hash = SystemUtil.toHexString(messageDigest.digest());
+        return hash.equals(sp[1]);
     }
     public  static OnSession validToken(MessageDigest messageDigest,String token) {
         //System.out.println(token);

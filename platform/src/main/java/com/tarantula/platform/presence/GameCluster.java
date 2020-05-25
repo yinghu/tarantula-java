@@ -3,12 +3,13 @@ package com.tarantula.platform.presence;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.tarantula.DataStore;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 
-public class GameCluster extends ResponseHeader implements Portable {
+public class GameCluster extends ResponseHeader implements Portable, DataStore.Updatable {
 
     public final static String NAME="1";
     public final static String PLAN="2";
@@ -17,6 +18,7 @@ public class GameCluster extends ResponseHeader implements Portable {
     public final static String GAME_DATA = "5";
     public final static String OWNER = "6";
     public final static String ACCESS_KEY = "7";
+    public final static String TIMESTAMP = "8";
 
     @Override
     public int getClassId() {

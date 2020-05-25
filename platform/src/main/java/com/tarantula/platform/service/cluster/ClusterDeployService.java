@@ -541,6 +541,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             gameCluster.property(GameCluster.PLAN,plan);
             gameCluster.property(GameCluster.OWNER,owner);
             gameCluster.property(GameCluster.ACCESS_KEY,"mock access key");
+            gameCluster.property(GameCluster.TIMESTAMP,0);
             mds.create(gameCluster);//create first and discharge if any errors on loop
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();

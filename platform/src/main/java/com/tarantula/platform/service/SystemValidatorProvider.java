@@ -5,6 +5,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.SystemValidator;
+import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
@@ -34,6 +35,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private DataStore udataStore;//user
     private DataStore adataStore;//account
     private DataStore mdatastore;//membership
+
     private List<Access.Role> roleList;
     private MessageDigest _messageDigest;
 
@@ -73,10 +75,17 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.timeoutInSeconds = seconds;
     }
     public boolean validateAccessKey(String accessKey){
-        return true;
+        String[] sp = accessKey.split("-");
+        GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(sp[0]);
+        long stmp = ((Number)gameCluster.property(GameCluster.TIMESTAMP)).longValue();
+        return SystemUtil.validAccessKey(messageDigest(),accessKey,(String)gameCluster.property(GameCluster.GAME_LOBBY),stmp);
     }
     public String accessKey(String gameClusterId){
-        return "mock key";
+        GameCluster gc = this.deploymentServiceProvider.gameCluster(gameClusterId);
+        long stmp =SystemUtil.toUTCMilliseconds(LocalDateTime.now());
+        gc.property(GameCluster.TIMESTAMP,stmp);
+        gc.update();
+        return SystemUtil.accessKey(messageDigest(),(String)gc.property(GameCluster.GAME_LOBBY),gameClusterId,stmp);
     }
     public String ticket(String key,int stub,int duration){
         return SystemUtil.ticket(messageDigest(),key,stub,duration);
