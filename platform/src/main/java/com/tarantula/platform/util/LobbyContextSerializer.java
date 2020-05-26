@@ -8,14 +8,12 @@ import com.tarantula.platform.module.LobbyContext;
 import java.lang.reflect.Type;
 
 /**
- * Updated by yinghu on 5/22/2018.
+ * Updated by yinghu on 5/25/2020
  */
 public class LobbyContextSerializer implements JsonSerializer<LobbyContext> {
 
     public JsonElement serialize(LobbyContext gameContext, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = (JsonObject)new ResponseSerializer().serialize(gameContext,type,jsonSerializationContext);
-        //jo.addProperty("successful",gameContext.successful());
-        //jo.addProperty("command",gameContext.command());
         if(gameContext.gameList!=null){
             DescriptorSerializer ser = new DescriptorSerializer();
             JsonArray glist = new JsonArray();

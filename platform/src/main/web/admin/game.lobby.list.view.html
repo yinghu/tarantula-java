@@ -23,7 +23,7 @@
 </div>
 <script>
     document.querySelector("#tx-game-lobby-list-message").innerHTML = TARA_API.query().gameClusterId;
-    TARA_API.onService(false,{serviceTag:'role/admin',command:'onGameLobbyList'},(resp)=>{
+    TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameLobbyList',accessId:TARA_API.query().gameClusterId,headers:[{name:'score',value:456}]},(resp)=>{
         console.log(resp);        
     });
     document.querySelector('#tx-game-lobby-list-close').onclick=()=>{

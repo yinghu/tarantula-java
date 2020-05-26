@@ -5,14 +5,12 @@ import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.presence.GameCluster;
-import com.tarantula.platform.presence.PermissionContext;
-import com.tarantula.platform.presence.SubscriptionFee;
-import com.tarantula.platform.presence.UserAccount;
+import com.tarantula.platform.presence.*;
 
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
+import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -49,7 +47,6 @@ public class AdminRoleModule implements Module {
             idx.label(Account.GameClusterLabel);
             if(account.load(idx)){
                 idx.keySet.forEach((k)->{
-                    this.context.log("KEY->"+k,OnLog.WARN);
                     GameCluster g = this.deploymentServiceProvider.gameCluster(k);
                     if(g!=null){
                         adminContext.gameClusterList.add(g);
@@ -59,7 +56,14 @@ public class AdminRoleModule implements Module {
             session.write(adminContext.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onGameLobbyList")){
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"load lobby list",true)).getBytes(),label());
+            PresenceContext presenceContext = new PresenceContext();
+            presenceContext.lobbyList = new ArrayList<>();
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
+            presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_LOBBY)));
+            presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_SERVICE)));
+            presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_DATA)));
+            session.write(this.builder.create().toJson(presenceContext).getBytes(),label());
         }
         else if(session.action().equals("onShoppingList")){
             session.write(new ShoppingContext(monthly,yearly).toJson().toString().getBytes(),this.label());
@@ -161,6 +165,7 @@ public class AdminRoleModule implements Module {
         this.builder.registerTypeAdapter(AdminDataStoreObject.class,new AdminObjectSerializer());
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
+        this.builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.account = this.context.dataStore(Account.DataStore);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);

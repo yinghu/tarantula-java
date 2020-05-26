@@ -9,7 +9,7 @@ import com.tarantula.platform.presence.PresenceContext;
 import java.lang.reflect.Type;
 
 /**
- * Updated by yinghu lu on 8/26/19
+ * Updated by yinghu lu on 5/25/2020
  */
 public class PresenceContextSerializer implements JsonSerializer<PresenceContext> {
 
@@ -25,11 +25,9 @@ public class PresenceContextSerializer implements JsonSerializer<PresenceContext
                 JsonObject jlobby = new JsonObject();
                 jlobby.add("descriptor",ser.serialize(lobby.descriptor(),type,jsonSerializationContext));
                 JsonArray jlist = new JsonArray();
-                if(lobby.descriptor().accessMode()== Access.PUBLIC_ACCESS_MODE){
-                    for(Descriptor d : lobby.entryList()){
-                        //add application list
-                        jlist.add(ser.serialize(d,type,jsonSerializationContext));
-                    }
+                for(Descriptor d : lobby.entryList()){
+                    //add application list
+                    jlist.add(ser.serialize(d,type,jsonSerializationContext));
                 }
                 jlobby.add("applications",jlist);
                 blist.add(jlobby);

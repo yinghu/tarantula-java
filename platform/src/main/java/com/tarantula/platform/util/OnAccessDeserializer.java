@@ -42,21 +42,18 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
                 alist.forEach((a)->{//key value pair
                     JsonObject nv = a.getAsJsonObject();
                     String _k = nv.get("name").getAsString();
-                    JsonObject v = a.getAsJsonObject();
-                    if (v.isJsonPrimitive()) {
-                        JsonPrimitive jp = v.getAsJsonPrimitive();
-                        if(jp.isString()){
-                            access.property(_k,jp.getAsString());
-                            _setProperty(access,_k,jp.getAsString());
-                        }
-                        if(jp.isNumber()){
-                            access.property(_k,jp.getAsNumber());
-                            _setProperty(access,_k,jp.getAsNumber());
-                        }
-                        if(jp.isBoolean()){
-                            access.property(_k,jp.getAsBoolean());
-                            _setProperty(access,_k,jp.getAsBoolean());
-                        }
+                    JsonPrimitive jp = nv.get("value").getAsJsonPrimitive();
+                    if(jp.isString()){
+                        access.property(_k,jp.getAsString());
+                        _setProperty(access,_k,jp.getAsString());
+                    }
+                    if(jp.isNumber()){
+                        access.property(_k,jp.getAsNumber());
+                        _setProperty(access,_k,jp.getAsNumber());
+                    }
+                    if(jp.isBoolean()){
+                        access.property(_k,jp.getAsBoolean());
+                        _setProperty(access,_k,jp.getAsBoolean());
                     }
                 });
             }

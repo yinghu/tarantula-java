@@ -13,20 +13,20 @@
         <type-id>game-lobby</type-id>
         <type>lobby</type>
         <category>game</category>
-        <name>GameZone</name>
+        <name>GameLevel</name>
         <access-mode>12</access-mode>
         <deploy-code>1</deploy-code>
         <deploy-priority>15</deploy-priority>
-        <description>Tarantula Game Zone Service</description>
+        <description>Tarantula Game Level Service</description>
         <application-list>
             <application>
                 <type-id>game-lobby</type-id>
-                <subtype-id>game-zone-module</subtype-id>
-                <name>GameZone1</name>
+                <subtype-id>game-level-module</subtype-id>
+                <name>GameLevel 1</name>
                 <type>application</type>
                 <category>game</category>
                 <singleton>true</singleton>
-                <tag>game/zone1</tag>
+                <tag>game/level1</tag>
                 <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.GameZoneModule</module-name>
                 <capacity>100</capacity>
@@ -35,12 +35,12 @@
             </application>
             <application>
                 <type-id>game-lobby</type-id>
-                <subtype-id>game-zone-module</subtype-id>
-                <name>GameZone2</name>
+                <subtype-id>game-level-module</subtype-id>
+                <name>GameLevel 2</name>
                 <type>application</type>
                 <category>game</category>
                 <singleton>true</singleton>
-                <tag>game/zone2</tag>
+                <tag>game/level2</tag>
                 <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.GameZoneModule</module-name>
                 <capacity>100</capacity>

@@ -55,6 +55,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             pc.subscription = membership(session.systemId());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
         }
+        /** use role/admin to request by game cluster id
         else if(session.action().equals("onLobbyList")){
             PresenceContext ic = new PresenceContext("onLobbyList");
             ic.lobbyList = new ArrayList<>();
@@ -62,7 +63,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                 ic.lobbyList.add(this.context.lobby(a));
             });
             session.write(this.builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
-        }
+        }**/
         else if(session.action().equals("onAddEmail")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             User auser = user(session.systemId());
