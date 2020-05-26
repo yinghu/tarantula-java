@@ -40,17 +40,10 @@ INTEGRATION DEVELOPMENT TOOLS : IntelliJ IDE (JAVA), Brackets (JAVASCRIPT)
 ###############################################
 Ubuntu 16.x.x Setup
 
-add-apt-repository ppa:mercurial-ppa/releases
-apt-get update
-apt-get install mercurial
+## GET OPEN JDK 14 AND MAVEN 3
+curl -O https://download.java.net/java/GA/jdk14/076bab302c7b4508975440c56f6cc26a/36/GPL/openjdk-14_linux-x64_bin.tar.gz
+wget http://www-eu.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
 
-hg clone https://heydere@bitbucket.org/ye2/platform
-
-add-apt-repository ppa:linuxuprising/java
-apt-get update
-apt-get install oracle-java12-installer
-
-apt-get install maven
 #####################################################
 
 ####################################################
@@ -80,8 +73,8 @@ ufw allow 80
 
 #######################################################
 TLS setup
-keytool -genkeypair -alias gec-cert -keyalg RSA -keysize 2048 -keystore tarantula.jks -dname CN=gameenginecluster.com
-keytool -certreq -alias gec-cert -keystore tarantula.jks -file gec-cert.csr -ext san=dns:gameenginecluster.com
+keytool -genkeypair -alias gec-cert -keyalg RSA -keysize 2048 -keystore tarantula.jks -dname CN=gameclustering.com
+keytool -certreq -alias gec-cert -keystore tarantula.jks -file gec-cert.csr -ext san=dns:gameclustering.com
 certbot certonly --manual --csr gec-cert.csr --preferred-challenges dns
 keytool -importcert -alias gec-cert -keystore tarantula.jks -file 0001_chain.pem
 
