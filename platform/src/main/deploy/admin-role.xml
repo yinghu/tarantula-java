@@ -51,8 +51,8 @@
             <view type="create.access.key">
                 <property name="moduleResourceFile">admin/create.access.key.view.html</property>
             </view>
-            <view type="game.cluster.list">
-                <property name="moduleResourceFile">admin/game.cluster.list.view.html</property>
+            <view type="game.lobby.list">
+                <property name="moduleResourceFile">admin/game.lobby.list.view.html</property>
             </view>
             <view type="shopping.card">
                 <property name="moduleResourceFile">admin/stripe.card.view.html</property>

@@ -142,7 +142,7 @@
                 <div class="w3-container w3-padding">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
                     <span id='game-name-0' class='w3-left tx-text-16'>GAME TITLE NAME</span>
-                    <span view-id='lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
+                    <span id='game-lobby-list-id-0' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
                 </div>
                 <div class="w3-container w3-padding">
                     <span class='w3-left tx-text-14'>Game Lobby</span>
@@ -165,7 +165,7 @@
                 <div class="w3-container w3-padding">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
                     <span id='game-name-1' class='w3-left tx-text-16'>GAME TITLE NAME</span>
-                    <span view-id='lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
+                    <span id='game-lobby-list-id-1' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
                 </div>
                 <div class="w3-container w3-padding">
                     <span class='w3-left tx-text-14'>Game Lobby</span>
@@ -188,7 +188,7 @@
                 <div class="w3-container w3-padding">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
                     <span id='game-name-2' class='w3-left tx-text-16'>GAME TITLE NAME</span>
-                    <span view-id='lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
+                    <span id='game-lobby-list-id-2' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
                 </div>
                 <div class="w3-container w3-padding">
                     <span class='w3-left tx-text-14'>Game Lobby</span>
@@ -211,7 +211,7 @@
                 <div class="w3-container w3-padding">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
                     <span id='game-name-3' class='w3-left tx-text-16'>GAME TITLE NAME</span>
-                    <span view-id='lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
+                    <span id='game-lobby-list-id-3' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
                 </div>
                 <div class="w3-container w3-padding">
                     <span class='w3-left tx-text-14'>Game Lobby</span>
@@ -234,7 +234,7 @@
                 <div class="w3-container w3-padding">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
                     <span id='game-name-4' class='w3-left tx-text-16'>GAME TITLE NAME</span>
-                    <span view-id='lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
+                    <span id='game-lobby-list-id-4' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
                 </div>
                 <div class="w3-container w3-padding">
                     <span class='w3-left tx-text-14'>Game Lobby</span>
@@ -439,7 +439,8 @@
                     document.querySelector('#game-lobby-'+i).innerHTML = g.gameLobby;
                     document.querySelector('#game-service-'+i).innerHTML = g.gameService;
                     document.querySelector('#game-data-'+i).innerHTML = g.gameData;
-                    document.querySelector('#game-cluster-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);                    
+                    document.querySelector('#game-cluster-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
+                    document.querySelector('#game-lobby-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);                    
                     document.querySelector('#game-cluster-'+i).style.display='block';
                 });        
             }
@@ -508,14 +509,6 @@
             document.querySelector('#tx-'+a.innerHTML).style.display='block'; 
         }; 
     });
-    /**
-    document.querySelectorAll('.tx-create-key-action').forEach((a)=>{
-        a.onclick=()=>{
-            TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
-            let vid = a.getAttribute('view-id');
-            tx_view({viewId:vid,containerId:'#tx-popup'});    
-        }
-    });**/
     document.querySelectorAll('.tx-action').forEach((a)=>{
         a.onclick=()=>{
             TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');

@@ -58,6 +58,9 @@ public class AdminRoleModule implements Module {
             }
             session.write(adminContext.toJson().toString().getBytes(),label());
         }
+        else if(session.action().equals("onGameLobbyList")){
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"load lobby list",true)).getBytes(),label());
+        }
         else if(session.action().equals("onShoppingList")){
             session.write(new ShoppingContext(monthly,yearly).toJson().toString().getBytes(),this.label());
         }
