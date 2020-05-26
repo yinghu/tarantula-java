@@ -84,8 +84,9 @@ public interface DeploymentServiceProvider extends ServiceProvider {
     <T extends OnAccess> void launchGameCluster(T gameCluster);
     <T extends OnAccess> T gameCluster(String key);
     //END OF CLUSTER
-    Statistics statistics();
-    //DataStoreProvider dataStoreProvider();
+
+    //System metrics data
+    <T extends OnAccess> T metrics();
 
 
 }

@@ -52,6 +52,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private String memberId;
     private DeployService deployService;
     private ConcurrentHashMap<String,EventListener> eMap = new ConcurrentHashMap<>();
+
+    private MetricsListener metricsListener;
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
         this.config = config;
         this.bucket = bucket;
@@ -105,6 +107,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.tarantulaContext.tarantulaCluster().subscribe(this.memberId,this);
         new ServiceBootstrap(this.tarantulaContext._deployServiceStarted,this.tarantulaContext._storageStarted,new StorageServiceBootstrap(this.tarantulaContext),"data-store-starter",true).start();
         new ServiceBootstrap(this.tarantulaContext._storageStarted,this.tarantulaContext._systemServiceStarted,new SystemServiceBootstrap(this.tarantulaContext),"system-service-starter",true).start();
+        this.metricsListener = (k,v)->{};
     }
     public void shutdown() throws Exception {
         try{
@@ -127,6 +130,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         if(message.destination()!=null){
             ITopic<Event> _t = this.topicList.computeIfAbsent(message.destination(),(String d)-> this._cluster.getTopic(d));
             _t.publish(message);
+            metricsListener.onUpdated(Metrics.EVENT_OUT_COUNT,1);
         }else{
             log.warn("No destination message ->"+message.toString());
         }
@@ -150,6 +154,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public boolean onEvent(Event event) {
         EventListener e = eMap.get(event.trackId());
         if(e!=null){
+            metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
             if(e.onEvent(event)){
                 eMap.remove(event.trackId());
             }
@@ -278,8 +283,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public DeployService deployService(){
         return this.deployService;
     }
-    public void onDispatch(Event event){
+    private void onDispatch(Event event){
         //dispatch event to registered callback
+        metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
         this.replicationQueue.offer(event);
     }
     public void registerBucketReceiver(BucketReceiver bucketReceiver){
@@ -342,7 +348,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private int routingNumber(String magicKey){
         return SystemUtil.partition(magicKey,this.tarantulaContext.platformRoutingNumber);
     }
-
+    public void registerMetricsListener(MetricsListener metricsListener){
+        this.metricsListener = metricsListener;
+    }
     @Override
     public void stateChanged(LifecycleEvent state) {
      LifecycleEvent.LifecycleState cs = state.getState();

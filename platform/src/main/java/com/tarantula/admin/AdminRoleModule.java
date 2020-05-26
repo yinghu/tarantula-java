@@ -8,6 +8,7 @@ import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.presence.*;
 
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.PresenceContextSerializer;
@@ -15,6 +16,7 @@ import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,9 +70,13 @@ public class AdminRoleModule implements Module {
         else if(session.action().equals("onShoppingList")){
             session.write(new ShoppingContext(monthly,yearly).toJson().toString().getBytes(),this.label());
         }
-        else if(session.action().equals("onStatistics")){
-            Statistics statistics = this.deploymentServiceProvider.statistics();
-            statistics.summary((e)->{
+        else if(session.action().equals("onMetrics")){
+            Metrics  metrics = this.deploymentServiceProvider.metrics();
+            this.context.log(metrics.key().asString(),OnLog.WARN);
+            this.context.log((String) metrics.property(Metrics.STATS_KEY),OnLog.WARN);
+            this.context.log(SystemUtil.fromUTCMilliseconds(((Number)metrics.property(Metrics.START_TIME)).longValue()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),OnLog.WARN);
+            metrics.statistics.summary((e)->{
+                this.context.log(e.name()+">>"+e.toString(),OnLog.WARN);
             });
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"load statistics",true)).getBytes(),label());
         }

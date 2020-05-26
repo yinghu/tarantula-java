@@ -15,10 +15,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
 import com.tarantula.platform.event.PortableEventRegistry;
-import com.tarantula.platform.service.AccessIndexService;
-import com.tarantula.platform.service.Closable;
-import com.tarantula.platform.service.ClusterProvider;
-import com.tarantula.platform.service.DeployService;
+import com.tarantula.platform.service.*;
 import com.tarantula.platform.util.SystemUtil;
 
 
@@ -52,6 +49,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     private String memberId;
     private DeployService deployService;
     private ConcurrentHashMap<String,EventListener> eMap = new ConcurrentHashMap<>();
+    private MetricsListener metricsListener;
     public TarantulaCluster(final Config config,final String bucket,final TarantulaContext tarantulaContext){
 		this.config  = config;
 		this.bucket = bucket;
@@ -202,6 +200,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         this.deployService = this._hazel.getDistributedObject(DeployService.NAME,DeployService.NAME);
         memberId = _hazel.getCluster().getLocalMember().getUuid();
         this.subscribe(memberId,this);
+        metricsListener = (k,v)->{};
     }
 
 	public void shutdown() throws Exception {
@@ -223,6 +222,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     public void publish(Event out) {
         ITopic<Event> _t = this.topicList.computeIfAbsent(out.destination(),(String dest)-> this._hazel.getTopic(dest));
         _t.publish(out);
+        metricsListener.onUpdated(Metrics.EVENT_OUT_COUNT,1);
     }
 
     public void retry(String retryKey) {
@@ -233,6 +233,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     public boolean onEvent(Event event){
          EventListener e = eMap.get(event.trackId());
          if(e!=null){
+             metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
             if(e.onEvent(event)){
                 eMap.remove(event.trackId());
             }
@@ -254,6 +255,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         eMap.remove(registerId);
     }
     public boolean onQueue(Event event) {
+        metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
         this.replicationPendingQueue.offer(event);
         return true;
     }
@@ -269,7 +271,9 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     public int routingNumber(){
         return this._tarantulaContext.platformRoutingNumber;
     }
-
+    public void registerMetricsListener(MetricsListener metricsListener){
+        this.metricsListener = metricsListener;
+    }
     @Override
     public void stateChanged(LifecycleEvent state) {
         LifecycleEvent.LifecycleState cs = state.getState();

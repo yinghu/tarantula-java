@@ -14,7 +14,7 @@
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Account</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">GameCluster</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">API</span>
-            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Statistics</span>
+            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Metrics</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Extension</span>
         </div>
         <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
@@ -499,7 +499,7 @@
                 </div>
             </div>
         </div>
-        <div id="tx-Statistics" class="w3-container tx-pane" style="display:none;">
+        <div id="tx-Metrics" class="w3-container tx-pane" style="display:none;">
             <div class='w3-bar w3-white'>
                 <span view-id='deploy.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy View</span>
                 <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload File</span>
@@ -598,9 +598,9 @@
             //console.log(resp);        
         //});
     }
-    function _tx_statistics(){
-        console.log("game statistics");
-        TARA_API.onService(false,{serviceTag:'role/admin',command:'onStatistics'},(resp)=>{
+    function _tx_metrics(){
+        console.log("game Metrics");
+        TARA_API.onService(false,{serviceTag:'role/admin',command:'onMetrics'},(resp)=>{
             console.log(resp);        
         });
     }
@@ -655,8 +655,8 @@
             else if(a.innerHTML == 'API'){
                 _tx_api();
             }
-            else if(a.innerHTML == 'Statistics'){
-                _tx_statistics();
+            else if(a.innerHTML == 'Metrics'){
+                _tx_metrics();
             }
             document.querySelector('#tx-'+a.innerHTML).style.display='block'; 
         }; 

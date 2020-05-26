@@ -4,10 +4,7 @@ import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.event.ServiceActionEvent;
-import com.tarantula.platform.service.AccessIndexService;
-import com.tarantula.platform.service.DeploymentServiceProvider;
-import com.tarantula.platform.service.ServiceContext;
-import com.tarantula.platform.service.TokenValidatorProvider;
+import com.tarantula.platform.service.*;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +19,6 @@ public class ServiceEventHandler implements RequestHandler {
     private String serverTopic;
     private String bucket;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
-
     public ServiceEventHandler(){
 
 	}

@@ -17,6 +17,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -52,7 +53,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private Mode deploymentMode = Mode.ALL;
     private String contentTemDir;
     private String contentDir;
-    private StatisticsIndex nodeStats;
+    private Metrics metrics;
     public Mode deploymentMode(){
         return deploymentMode;
     }
@@ -74,11 +75,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public String name() {
         return DeploymentServiceProvider.NAME;
     }
-    //public DataStoreProvider dataStoreProvider(){
-        //return this.tarantulaContext.dataStoreProvider();
-    //}
-    public Statistics statistics(){
-        return this.nodeStats;
+
+    public <T extends OnAccess> T metrics(){
+        return (T)metrics;
     }
     public String upload(InputStream inputStream,String fname) throws Exception{
         //save to local deploy/tem dir
@@ -438,12 +437,24 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public void waitForData() {
         this.integrationEventService.publish(new MapStoreVotingEvent(this.eventTopic,localTopic,registerKey,Distributable.INTEGRATION_SCOPE));
-        this.nodeStats = new StatisticsIndex();
         DataStore mds = this.tarantulaContext.masterDataStore();
-        this.nodeStats.bucket(mds.bucket());
-        this.nodeStats.oid(SystemUtil.oid());
-        this.nodeStats.dataStore(mds);
-        mds.createIfAbsent(this.nodeStats,true);
+        this.metrics = new Metrics(this.tarantulaContext.dataBucketNode);
+        this.metrics.property(Metrics.STATS_KEY,mds.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid());
+        metrics.dataStore(mds);
+        mds.createIfAbsent(metrics,true);
+        StatisticsIndex statistics = new StatisticsIndex();
+        statistics.distributionKey((String)metrics.property(Metrics.STATS_KEY));
+        statistics.dataStore(mds);
+        mds.createIfAbsent(statistics,true);
+        this.metrics.statistics = statistics;
+        this.metrics.property(Metrics.START_TIME,SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
+        this.metrics.update();
+        this.tarantulaContext.integrationCluster().registerMetricsListener((k,v)->{
+            this.metrics.statistics.entry(k).update(v);
+        });
+        this.tarantulaContext.tarantulaCluster().registerMetricsListener((k,v)->{
+            this.metrics.statistics.entry(k).update(v);
+        });
         log.info("Platform deployment service started on ["+localTopic+"/"+registerKey+"]");
     }
 
