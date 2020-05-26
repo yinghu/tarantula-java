@@ -263,6 +263,12 @@
             </div>
         </div>
         <div id="tx-API" class="w3-container tx-pane" style="display:none;">
+            <div class='w3-bar w3-white'>
+                <span class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-api-opt'>User</span>
+                <span class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-api-opt'>GamePlay</span>
+                <span class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-api-opt'>DedicatedServer</span>
+            </div>
+            <div id="tx-api-User" class="w3-container tx-api-pane">
             <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-48">
                 <div class="w3-display-topright w3-padding">
                     <span view-id='api.index' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Try It</span>           
@@ -323,7 +329,7 @@
                     
                 </div>
             </div>
-            <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-48">
+            <div class="w3-display-container w3-white tx-content-48">
                 <div class="w3-display-topright w3-padding">
                     <span view-id='api.get.json' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Try It</span>           
                 </div>
@@ -335,16 +341,57 @@
                     
                 </div>
             </div>
-            <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-48">
-                <div class="w3-display-topright w3-padding">
-                    <span view-id='shopping.card' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Try It</span>           
+            </div>
+            <div id="tx-api-GamePlay" class="w3-container tx-api-pane" style="display:none;">
+                <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-48">
+                    <div class="w3-display-topright w3-padding">
+                        <span view-id='api.set.json' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Try It</span>           
+                    </div>
+                    <div class="w3-display-topleft w3-padding">
+                        <span><i class="fa fa-code w3-text-green" style="font-size:16px"></i></span>
+                        <span class="tx-margin-left-8 tx-text-14">Set JSON</span>
+                    </div>
+                    <div class="w3-display-bottomright w3-padding">
+                        
+                    </div>
                 </div>
-                <div class="w3-display-topleft w3-padding">
-                    <span><i class="fa fa-code w3-text-green" style="font-size:16px"></i></span>
-                    <span class="tx-margin-left-8 tx-text-14">More Coming</span>
+                <div class="w3-display-container w3-white tx-content-48">
+                    <div class="w3-display-topright w3-padding">
+                        <span view-id='api.get.json' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Try It</span>           
+                    </div>
+                    <div class="w3-display-topleft w3-padding">
+                        <span><i class="fa fa-code w3-text-green" style="font-size:16px"></i></span>
+                        <span class="tx-margin-left-8 tx-text-14">Get JSON</span>
+                    </div>
+                    <div class="w3-display-bottomright w3-padding">
+                        
+                    </div>
                 </div>
-                <div class="w3-display-bottomright w3-padding">
-                    
+            </div>
+            <div id="tx-api-DedicatedServer" class="w3-container tx-api-pane" style="display:none;">
+                <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-48">
+                    <div class="w3-display-topright w3-padding">
+                        <span view-id='api.set.json' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Try It</span>           
+                    </div>
+                    <div class="w3-display-topleft w3-padding">
+                        <span><i class="fa fa-code w3-text-green" style="font-size:16px"></i></span>
+                        <span class="tx-margin-left-8 tx-text-14">Set JSON</span>
+                    </div>
+                    <div class="w3-display-bottomright w3-padding">
+                        
+                    </div>
+                </div>
+                <div class="w3-display-container w3-white tx-content-48">
+                    <div class="w3-display-topright w3-padding">
+                        <span view-id='api.get.json' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Try It</span>           
+                    </div>
+                    <div class="w3-display-topleft w3-padding">
+                        <span><i class="fa fa-code w3-text-green" style="font-size:16px"></i></span>
+                        <span class="tx-margin-left-8 tx-text-14">Get JSON</span>
+                    </div>
+                    <div class="w3-display-bottomright w3-padding">
+                        
+                    </div>
                 </div>
             </div>
             <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -488,6 +535,15 @@
             });        
         }
     }; 
+    document.querySelectorAll(".tx-api-opt").forEach((a)=>{
+        a.onclick = ()=>{
+            document.querySelectorAll('.tx-api-pane').forEach((a)=>{
+                    a.style.display = 'none';
+                }
+            );
+            document.querySelector('#tx-api-'+a.innerHTML).style.display='block'; 
+        }; 
+    });
     document.querySelectorAll(".tx-opt").forEach((a)=>{
         a.onclick = ()=>{
             document.querySelectorAll('.tx-pane').forEach((a)=>{
