@@ -5,6 +5,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.ServiceContext;
 
 public class RootContentHandler implements RequestHandler {
@@ -42,6 +43,7 @@ public class RootContentHandler implements RequestHandler {
                 contentType = "image/jpeg";
             }
             exchange.onEvent(new ResponsiveEvent("","",_load,0,contentType,"",true));
+            deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
         } catch (Exception exx){
             throw exx;
         }

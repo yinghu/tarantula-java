@@ -1,4 +1,4 @@
-package com.tarantula.game;
+package com.tarantula.platform.statistics;
 
 public class StatsDelta {
     public final String name;

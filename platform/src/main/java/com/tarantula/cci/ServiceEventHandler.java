@@ -19,6 +19,7 @@ public class ServiceEventHandler implements RequestHandler {
     private String serverTopic;
     private String bucket;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
+    private DeploymentServiceProvider deploymentServiceProvider;
     public ServiceEventHandler(){
 
 	}
@@ -60,7 +61,7 @@ public class ServiceEventHandler implements RequestHandler {
                 else{
                     throw new UnsupportedOperationException("HTTP ["+exchange.method()+"] request ["+path+"] not supported");
                 }
-
+                deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
             }catch(Exception ex){
                 ex.printStackTrace();
                 _hex.remove(exchange.id());
@@ -93,6 +94,7 @@ public class ServiceEventHandler implements RequestHandler {
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
         TokenValidatorProvider tp = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
+        this.deploymentServiceProvider = tcx.deploymentServiceProvider();
         this.auth = tp.tokenValidator();
         this.bucket = tcx.bucket();
     }

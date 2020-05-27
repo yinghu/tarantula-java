@@ -7,6 +7,7 @@ import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServiceActionEvent;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
@@ -33,6 +34,7 @@ public class UserEventHandler implements RequestHandler {
     }
     public void onRequest(OnExchange onExchange) {
         try{
+            deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
             String path = onExchange.path();
             String magicKey = onExchange.header(Session.TARANTULA_MAGIC_KEY);
             String name = onExchange.header(Session.TARANTULA_NAME);

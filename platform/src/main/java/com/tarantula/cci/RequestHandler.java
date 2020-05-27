@@ -1,6 +1,7 @@
 package com.tarantula.cci;
 
 import com.tarantula.*;
+import com.tarantula.platform.service.MetricsListener;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.Serviceable;
 

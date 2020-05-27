@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.cluster;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.core.*;
@@ -54,6 +55,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private ConcurrentHashMap<String,EventListener> eMap = new ConcurrentHashMap<>();
 
     private MetricsListener metricsListener;
+
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
         this.config = config;
         this.bucket = bucket;
@@ -154,10 +156,10 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public boolean onEvent(Event event) {
         EventListener e = eMap.get(event.trackId());
         if(e!=null){
-            metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
             if(e.onEvent(event)){
                 eMap.remove(event.trackId());
             }
+            metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
         }
         return false;
     }
@@ -285,8 +287,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
     private void onDispatch(Event event){
         //dispatch event to registered callback
-        metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
         this.replicationQueue.offer(event);
+        metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
     }
     public void registerBucketReceiver(BucketReceiver bucketReceiver){
         //log.warn("["+bucketReceiver.bucket()+"] registered on cluster");

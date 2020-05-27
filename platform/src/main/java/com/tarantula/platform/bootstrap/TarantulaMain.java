@@ -77,6 +77,7 @@ public class TarantulaMain {
 			btx.platformVersion = override(overriding,"tarantula.platform.version",_user,_config);
 			btx.platformRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.routing.number",_user,_config));
 			btx.bootstrapRetries = Integer.parseInt(override(overriding,"tarantula.bootstrap.max.retries",_user,_config));
+			btx.metricsUpdateIntervalMinutes = Integer.parseInt(override(overriding,"tarantula.operation.metrics.interval.m",_user,_config));
 			btx.clusterNamePrefix = override(overriding,"tarantula.cluster.name",_user,_config);
 			btx.dataBucketGroup = override(overriding,"tarantula.data.bucket.group",_user,_config);
 			btx.dataBucketNode = override(overriding,"tarantula.data.bucket.node",_user,_config);

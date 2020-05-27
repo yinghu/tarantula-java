@@ -4,6 +4,7 @@ import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.ServiceContext;
 
 
@@ -24,6 +25,7 @@ public class ResourceEventHandler implements RequestHandler {
         //load js API in resources/web, public access
         byte[] _load = this.deploymentServiceProvider.resource(path.substring(1),null);
         exchange.onEvent(new ResponsiveEvent("","",_load,0,"text/javascript","",true));
+        deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
     }
     @Override
     public void start() throws Exception {

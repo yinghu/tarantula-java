@@ -40,6 +40,7 @@ public class GoogleOAuthProvider extends AuthObject {
             params.put("name",name);
             params.put("pictureUrl",pictureUrl);
             params.put("fullName",givenName+" "+familyName);
+            metricsListener.onUpdated(Metrics.GOOGLE_COUNT,1);
             return email!=null;
         }catch (Exception ex){
             ex.printStackTrace();

@@ -4,10 +4,7 @@ import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.event.ApplicationActionEvent;
 import com.tarantula.platform.event.ApplicationServiceEvent;
-import com.tarantula.platform.service.AccessIndexService;
-import com.tarantula.platform.service.DeploymentServiceProvider;
-import com.tarantula.platform.service.ServiceContext;
-import com.tarantula.platform.service.TokenValidatorProvider;
+import com.tarantula.platform.service.*;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +20,7 @@ public class ApplicationEventHandler  implements RequestHandler {
 
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
 
-
+    private DeploymentServiceProvider deploymentServiceProvider;
     public ApplicationEventHandler(){
 
 	}
@@ -69,6 +66,7 @@ public class ApplicationEventHandler  implements RequestHandler {
             else{
                 throw new UnsupportedOperationException("HTTP ["+exchange.method()+"] request ["+path+"] not supported");
             }
+            deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
 
         }catch(Exception ex){
             ex.printStackTrace();
@@ -101,6 +99,7 @@ public class ApplicationEventHandler  implements RequestHandler {
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
         TokenValidatorProvider tp = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
+        this.deploymentServiceProvider = tcx.deploymentServiceProvider();
         this.auth = tp.tokenValidator();
     }
     public void onCheck(){

@@ -116,7 +116,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
     public int maxIdlesOnInstance;
     public long timeoutOnInstance;
-
+    public int metricsUpdateIntervalMinutes=1;
     public String clusterNamePrefix;
     public String deploymentMode ="ALL";
     public String platformVersion;

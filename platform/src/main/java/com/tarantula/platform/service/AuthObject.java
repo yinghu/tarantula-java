@@ -17,8 +17,7 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     private  String tokenUri;
     private  String certUri;
     private  String[] origins;
-
-    public AuthObject(){}
+    protected MetricsListener metricsListener;
     public AuthObject(String name,String clientId,String secureKey,String authUri,String tokenUri,String certUri,String[] origins){
         this.name = name;
         this.clientId = clientId;
@@ -27,6 +26,7 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
         this.tokenUri = tokenUri;
         this.certUri = certUri;
         this.origins = origins;
+        this.metricsListener = (k,v)->{};
     }
 
     @Override
@@ -62,7 +62,9 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     public String[] origins() {
         return this.origins;
     }
-
+    public void registerMetricsLister(MetricsListener metricsListener){
+        this.metricsListener = metricsListener;
+    }
     @Override
     public boolean validate(Map<String,Object> params){
         return false;

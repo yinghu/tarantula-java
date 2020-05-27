@@ -4,6 +4,7 @@ package com.tarantula.platform.service.cluster;
 import java.util.*;
 import java.util.concurrent.*;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.core.*;
@@ -50,6 +51,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     private DeployService deployService;
     private ConcurrentHashMap<String,EventListener> eMap = new ConcurrentHashMap<>();
     private MetricsListener metricsListener;
+
     public TarantulaCluster(final Config config,final String bucket,final TarantulaContext tarantulaContext){
 		this.config  = config;
 		this.bucket = bucket;
@@ -233,10 +235,10 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     public boolean onEvent(Event event){
          EventListener e = eMap.get(event.trackId());
          if(e!=null){
-             metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
             if(e.onEvent(event)){
                 eMap.remove(event.trackId());
             }
+            metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
          }
          return false;
     }
@@ -255,8 +257,8 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         eMap.remove(registerId);
     }
     public boolean onQueue(Event event) {
-        metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
         this.replicationPendingQueue.offer(event);
+        metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
         return true;
     }
     public RoutingKey routingKey(String magicKey,String tag){

@@ -11,6 +11,7 @@ import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.statistics.StatisticsIndex;
+import com.tarantula.platform.statistics.StatsDelta;
 import com.tarantula.platform.util.*;
 
 import java.io.*;
@@ -20,13 +21,14 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
  * updated by yinghu lu on 9/8/2019.
  */
-public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider,EventListener{
+public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider,EventListener,SchedulingTask{
 
     private TarantulaLogger log = JDKLogger.getLogger(PlatformDeploymentServiceProvider.class);
 
@@ -54,6 +56,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private String contentTemDir;
     private String contentDir;
     private Metrics metrics;
+
     public Mode deploymentMode(){
         return deploymentMode;
     }
@@ -449,12 +452,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.metrics.statistics = statistics;
         this.metrics.property(Metrics.START_TIME,SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
         this.metrics.update();
-        this.tarantulaContext.integrationCluster().registerMetricsListener((k,v)->{
-            this.metrics.statistics.entry(k).update(v);
-        });
-        this.tarantulaContext.tarantulaCluster().registerMetricsListener((k,v)->{
-            this.metrics.statistics.entry(k).update(v);
-        });
+        this.tarantulaContext.integrationCluster().registerMetricsListener((k,v)->metrics.statistics.entry(k).update(v));
+        this.tarantulaContext.tarantulaCluster().registerMetricsListener((k,v)->metrics.statistics.entry(k).update(v));
+        this.tarantulaContext.schedule(this);
         log.info("Platform deployment service started on ["+localTopic+"/"+registerKey+"]");
     }
 
@@ -743,6 +743,30 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public PostOffice registerPostOffice(){
         return new PostOfficeSession();
+    }
+
+    @Override
+    public boolean oneTime() {
+        return false;
+    }
+
+    @Override
+    public long initialDelay() {
+        return this.tarantulaContext.metricsUpdateIntervalMinutes*1000*60;
+    }
+
+    @Override
+    public long delay() {
+        return this.tarantulaContext.metricsUpdateIntervalMinutes*1000*60;
+    }
+
+    @Override
+    public void run() {
+        metrics.update();
+        metrics.statistics.summary((e)->e.update());
+    }
+    public void onUpdated(String key,double value){
+        metrics.statistics.entry(key).update(value);
     }
     private class PostOfficeSession implements PostOffice{
 

@@ -10,7 +10,7 @@ import java.io.InputStream;
  * Updated by yinghu lu on 6/15/2019.
  */
 
-public interface DeploymentServiceProvider extends ServiceProvider {
+public interface DeploymentServiceProvider extends ServiceProvider,MetricsListener {
 
     String DEPLOY_TOPIC = "tarantula-deployment";
     String DEPLOY_DATA_STORE = "tarantula";
@@ -87,6 +87,4 @@ public interface DeploymentServiceProvider extends ServiceProvider {
 
     //System metrics data
     <T extends OnAccess> T metrics();
-
-
 }

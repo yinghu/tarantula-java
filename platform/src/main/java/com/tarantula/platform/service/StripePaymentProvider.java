@@ -19,6 +19,7 @@ public class StripePaymentProvider extends AuthObject {
             Stripe.apiKey = secureKey();
             Charge c = Charge.create(params);
             params.put("stripe_paid",c.getPaid());
+            metricsListener.onUpdated(Metrics.STRIPE_COUNT,1);
             return true;
         }catch (Exception ex){
             ex.printStackTrace();

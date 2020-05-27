@@ -6,10 +6,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.service.AccessIndexService;
-import com.tarantula.platform.service.DeploymentServiceProvider;
-import com.tarantula.platform.service.ServiceContext;
-import com.tarantula.platform.service.TokenValidatorProvider;
+import com.tarantula.platform.service.*;
 import com.tarantula.platform.util.OnAccessSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
@@ -45,6 +42,7 @@ public class AccountEventHandler implements RequestHandler {
                 ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile(),null);
             }
             exchange.onEvent(new ResponsiveEvent("","",ret,0,contentType,"",true));
+            deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
         }catch (Exception ex){
             ex.printStackTrace();
             _hex.remove(exchange.id()); //removed cache on any errors

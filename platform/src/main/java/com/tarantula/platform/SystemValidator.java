@@ -1,6 +1,7 @@
 package com.tarantula.platform;
 
 import com.tarantula.*;
+import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.SystemValidatorProvider;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.SystemUtil;

@@ -122,6 +122,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         oMap.put(onLobby.typeId(),onLobby);
         log.warn(onLobby.toString()+" has been monitored under ->"+subscription.toString());
     }
+
     public void atMidnight(){
         ArrayList<String> rlist = new ArrayList<>();
         LocalDateTime _curr = LocalDateTime.now();
@@ -154,17 +155,19 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         oMap = new ConcurrentHashMap<>();
         AuthVendor google = this.serviceContext.authVendor(OnAccess.GOOGLE);
         if(google!=null){
+            google.registerMetricsLister(this.deploymentServiceProvider);
             aMap.put(OnAccess.GOOGLE,(google));
         }
         AuthVendor stripe = this.serviceContext.authVendor(OnAccess.STRIPE);
         if(stripe!=null){
+            stripe.registerMetricsLister(this.deploymentServiceProvider);
             aMap.put(OnAccess.STRIPE,(stripe));
         }
     }
 
     @Override
     public void waitForData() {
-        log.info(name()+"==>System validator provider started->"+toString());
+        log.info("System validator provider started");
     }
 
     @Override
