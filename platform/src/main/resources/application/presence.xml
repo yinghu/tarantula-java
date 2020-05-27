@@ -56,6 +56,9 @@
             <view type="api.get.json">
                 <property name="moduleResourceFile">presence/api.get.json.view.html</property>
             </view>
+            <view type="game.cluster.price">
+                <property name="moduleResourceFile">presence/game.cluster.price.view.html</property>
+            </view>
         </view-list>
     </lobby-context>
 </tarantula>

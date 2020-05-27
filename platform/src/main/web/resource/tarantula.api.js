@@ -350,6 +350,7 @@ var TARA_API = (function(){
         presence ={};
         qdata ={};
         lobbyList.pop();
+        vmap.clear();
         //wsWorker.postMessage({cmd:'close'});
         callback(resp);
     });              

@@ -10,14 +10,12 @@ import com.tarantula.platform.presence.*;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.TokenValidatorProvider;
-import com.tarantula.platform.statistics.StatisticsSerializer;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +62,27 @@ public class AdminRoleModule implements Module {
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
             presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_LOBBY)));
+            //presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_SERVICE)));
+            //presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_DATA)));
+            session.write(this.builder.create().toJson(presenceContext).getBytes(),label());
+        }
+        else if(session.action().equals("onGameServiceList")){
+            PresenceContext presenceContext = new PresenceContext();
+            presenceContext.lobbyList = new ArrayList<>();
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
+            //presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_LOBBY)));
             presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_SERVICE)));
+            //presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_DATA)));
+            session.write(this.builder.create().toJson(presenceContext).getBytes(),label());
+        }
+        else if(session.action().equals("onGameDataList")){
+            PresenceContext presenceContext = new PresenceContext();
+            presenceContext.lobbyList = new ArrayList<>();
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
+            //presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_LOBBY)));
+            //presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_SERVICE)));
             presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_DATA)));
             session.write(this.builder.create().toJson(presenceContext).getBytes(),label());
         }
@@ -73,12 +91,6 @@ public class AdminRoleModule implements Module {
         }
         else if(session.action().equals("onMetrics")){
             Metrics  metrics = this.deploymentServiceProvider.metrics();
-            //this.context.log(metrics.key().asString(),OnLog.WARN);
-            //this.context.log((String) metrics.property(Metrics.STATS_KEY),OnLog.WARN);
-            //this.context.log(SystemUtil.fromUTCMilliseconds(((Number)metrics.property(Metrics.START_TIME)).longValue()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),OnLog.WARN);
-            //metrics.statistics.summary((e)->{
-                //this.context.log(e.name()+">>"+e.toString(),OnLog.WARN);
-            //});
             AdminContext adminContext = new AdminContext();
             adminContext.metrics = metrics;
             session.write(adminContext.toJson().toString().getBytes(),label());
@@ -171,7 +183,6 @@ public class AdminRoleModule implements Module {
         monthly = new SubscriptionFee("monthlyAccess",ma.property("description"),ma.property("price"),ma.property("currency"));
         yearly = new SubscriptionFee("yearlyAccess",ya.property("description"),ya.property("price"),ya.property("currency"));
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(AdminDataStoreObject.class,new AdminObjectSerializer());
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());

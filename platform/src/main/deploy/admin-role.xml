@@ -54,6 +54,12 @@
             <view type="game.lobby.list">
                 <property name="moduleResourceFile">admin/game.lobby.list.view.html</property>
             </view>
+            <view type="game.service.list">
+                <property name="moduleResourceFile">admin/game.service.list.view.html</property>
+            </view>
+            <view type="game.data.list">
+                <property name="moduleResourceFile">admin/game.data.list.view.html</property>
+            </view>
             <view type="shopping.card">
                 <property name="moduleResourceFile">admin/stripe.card.view.html</property>
             </view>

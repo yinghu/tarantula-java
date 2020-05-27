@@ -547,7 +547,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             XMLParser parser = new XMLParser();
             parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-"+plan+"-plan.xml"));
             for (LobbyConfiguration configuration : parser.configurations) {
-                configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",name));
+                configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",name.toLowerCase()));//lower case only typeId
                 if(configuration.descriptor.typeId().endsWith("-lobby")){
                     gameCluster.property(GameCluster.GAME_LOBBY,configuration.descriptor.typeId());
                 }

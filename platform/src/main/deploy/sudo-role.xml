@@ -35,7 +35,9 @@
             <view type="deploy.config">
                 <property name="moduleResourceFile">sudo/deploy.config.view.html</property>
             </view>
-
+            <view type="find.user">
+                <property name="moduleResourceFile">sudo/find.user.view.html</property>
+            </view>
         </view-list>
 
     </lobby-context>

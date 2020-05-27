@@ -35,6 +35,9 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             uDatastore.load(acc);
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes(),label());
         }
+        else if(session.action().equals("onFindUser")){
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"find user",true)).getBytes(),this.label());
+        }
         else if(session.action().equals("onSubscriptionList")){
             DataStore mds = this.context.dataStore(Subscription.DataStore);
             mds.traverse((d,o,k,v)->{
@@ -148,7 +151,6 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         this.uDatastore = this.context.dataStore(Access.DataStore);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
-        this.builder.registerTypeAdapter(AdminSetupObject.class,new AdminObjectSerializer());
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.context.log("Admin setup module started", OnLog.INFO);
     }

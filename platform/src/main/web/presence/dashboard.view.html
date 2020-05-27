@@ -12,17 +12,16 @@
     <div><!-- Dash board content-->
         <div class="w3-bar w3-green">
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Account</span>
-            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">GameCluster</span>
+            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Developer</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">API</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Metrics</span>
-            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Extension</span>
+            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Sudo</span>
         </div>
         <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
         <div class="w3-display-container w3-white tx-content-8"></div>  
         <div id="tx-Account" class="w3-container tx-pane">
             <div class='w3-bar w3-white'>
                 <span view-id='change.password' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Change Password</span>
-                <span view-id='find.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Find User</span>
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-user" style="font-size:16px"></i></span>
@@ -114,12 +113,13 @@
             </div>
         </div> 
         
-        <div id="tx-GameCluster" class="w3-container tx-pane" style="display:none;">
+        <div id="tx-Developer" class="w3-container tx-pane" style="display:none;">
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <div id='tx-game-cluster-warning' class="w3-container w3-center"><p class="tx-text-12 w3-text-red">You need to upgrade your role to admin role. it is free.</p></div>
                 <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-group" style="font-size:16px"></i></span>
                     <span id='tx-game-cluster-role' class='w3-left tx-text-14'>Role name</span>
+                    <span id='tx-game-cluster-price' view-id='game.cluster.price' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Price</span>
                     <span id='tx-game-cluster-role-upgrade' view-id='upgrade.role.admin' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upgrade Role</span>
                     <span id='tx-shopping-card' view-id='shopping.card' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Subscription</span>
                 </div>
@@ -143,6 +143,8 @@
                 <div class="w3-container w3-padding">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
                     <span id='game-name-0' class='w3-left tx-text-16'>GAME TITLE NAME</span>
+                    <span id='game-data-list-id-0' tx-game-cluster-id='' view-id='game.data.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Data</span>
+                    <span id='game-service-list-id-0' tx-game-cluster-id='' view-id='game.service.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Service</span>
                     <span id='game-lobby-list-id-0' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
                 </div>
                 <div class="w3-container w3-padding">
@@ -166,6 +168,8 @@
                 <div class="w3-container w3-padding">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
                     <span id='game-name-1' class='w3-left tx-text-16'>GAME TITLE NAME</span>
+                    <span id='game-data-list-id-1' tx-game-cluster-id='' view-id='game.data.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Data</span>
+                    <span id='game-service-list-id-1' tx-game-cluster-id='' view-id='game.service.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Service</span>  
                     <span id='game-lobby-list-id-1' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
                 </div>
                 <div class="w3-container w3-padding">
@@ -189,6 +193,8 @@
                 <div class="w3-container w3-padding">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
                     <span id='game-name-2' class='w3-left tx-text-16'>GAME TITLE NAME</span>
+                    <span id='game-data-list-id-2' tx-game-cluster-id='' view-id='game.data.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Data</span>
+                    <span id='game-service-list-id-2' tx-game-cluster-id='' view-id='game.service.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Service</span>
                     <span id='game-lobby-list-id-2' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
                 </div>
                 <div class="w3-container w3-padding">
@@ -212,6 +218,8 @@
                 <div class="w3-container w3-padding">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
                     <span id='game-name-3' class='w3-left tx-text-16'>GAME TITLE NAME</span>
+                    <span id='game-data-list-id-3' tx-game-cluster-id='' view-id='game.data.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Data</span>
+                    <span id='game-service-list-id-3' tx-game-cluster-id='' view-id='game.service.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Service</span>
                     <span id='game-lobby-list-id-3' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
                 </div>
                 <div class="w3-container w3-padding">
@@ -235,6 +243,8 @@
                 <div class="w3-container w3-padding">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
                     <span id='game-name-4' class='w3-left tx-text-16'>GAME TITLE NAME</span>
+                    <span id='game-data-list-id-4' tx-game-cluster-id='' view-id='game.data.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Data</span>
+                    <span id='game-service-list-id-4' tx-game-cluster-id='' view-id='game.service.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Service</span>
                     <span id='game-lobby-list-id-4' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
                 </div>
                 <div class="w3-container w3-padding">
@@ -700,8 +710,9 @@
                 </div>
             </div>
         </div>
-        <div id="tx-Extension" class="w3-container tx-pane" style="display:none;">
+        <div id="tx-Sudo" class="w3-container tx-pane" style="display:none;">
             <div id='tx-extension-open' class='w3-bar w3-white'>
+                <span view-id='find.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Find User</span>
                 <span view-id='deploy.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy View</span>
                 <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload File</span>
                 <span view-id='reset.module' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Module</span>
@@ -772,7 +783,9 @@
                     document.querySelector('#game-service-'+i).innerHTML = g.gameService;
                     document.querySelector('#game-data-'+i).innerHTML = g.gameData;
                     document.querySelector('#game-cluster-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
-                    document.querySelector('#game-lobby-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);                    
+                    document.querySelector('#game-lobby-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
+                    document.querySelector('#game-data-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
+                    document.querySelector('#game-service-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);                    
                     document.querySelector('#game-cluster-'+i).style.display='block';
                 });        
             }
@@ -862,7 +875,7 @@
             if(a.innerHTML == 'Account'){
                 _tx_account();
             }
-            else if(a.innerHTML == 'GameCluster'){
+            else if(a.innerHTML == 'Developer'){
                 _tx_game_cluster();
             }
             else if(a.innerHTML == 'API'){
@@ -871,7 +884,7 @@
             else if(a.innerHTML == 'Metrics'){
                 _tx_metrics();
             }
-            else if(a.innerHTML == 'Extension'){
+            else if(a.innerHTML == 'Sudo'){
                 _tx_extension();
             }
             document.querySelector('#tx-'+a.innerHTML).style.display='block'; 
