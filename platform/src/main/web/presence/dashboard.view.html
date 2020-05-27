@@ -116,6 +116,7 @@
         
         <div id="tx-GameCluster" class="w3-container tx-pane" style="display:none;">
             <div class='w3-panel w3-border-bottom w3-border-red'>
+                <div id='tx-game-cluster-warning' class="w3-container w3-center"><p class="tx-text-12 w3-text-red">You need to upgrade your role to admin role. it is free.</p></div>
                 <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-group" style="font-size:16px"></i></span>
                     <span id='tx-game-cluster-role' class='w3-left tx-text-14'>Role name</span>
@@ -500,10 +501,195 @@
             </div>
         </div>
         <div id="tx-Metrics" class="w3-container tx-pane" style="display:none;">
-            <div class='w3-bar w3-white'>
-                <span view-id='deploy.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy View</span>
-                <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload File</span>
-                <span view-id='create.game.cluster' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Module</span>
+            <div id="tx-game-metrics-role-open" class="w3-container w3-padding w3-border-bottom w3-border-red">
+                <div class="w3-container w3-center"><p class="tx-text-12 w3-text-red">You need to upgrade your role to admin role. it is free.</p></div>
+                <div class="w3-panel">
+                    <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-group" style="font-size:16px"></i></span>
+                    <span id='tx-game-metrics-role' class='w3-left tx-text-14'>Role name</span>
+                    <span id='tx-game-metrics-role-upgrade' view-id='upgrade.role.admin' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upgrade Role</span>
+                </div>    
+            </div>
+            <div id='game-metrics-0' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Name</span>
+                    <span id='tx-metrics-name-0' class='w3-right tx-text-12'>requestCount</span>   
+                </div>
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Total</span>
+                    <span id='tx-metrics-total-0' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Daily Gain</span>
+                    <span id='tx-metrics-daily-0' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Weekly Gain</span>
+                    <span id='tx-metrics-weekly-0' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Monthly Gain</span>
+                    <span id='tx-metrics-monthly-0' class='w3-right tx-text-12'>100</span>   
+                </div> 
+                <div class="w3-container">
+                    <span class='w3-left tx-text-12'>Yearly Gain</span>
+                    <span id='tx-metrics-yearly-0' class='w3-right tx-text-12'>100</span>   
+                </div>
+            </div>
+            <div id='game-metrics-1' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Name</span>
+                    <span id='tx-metrics-name-1' class='w3-right tx-text-12'>requestCount</span>   
+                </div>
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Total</span>
+                    <span id='tx-metrics-total-1' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Daily Gain</span>
+                    <span id='tx-metrics-daily-1' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Weekly Gain</span>
+                    <span id='tx-metrics-weekly-1' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Monthly Gain</span>
+                    <span id='tx-metrics-monthly-1' class='w3-right tx-text-12'>100</span>   
+                </div> 
+                <div class="w3-container">
+                    <span class='w3-left tx-text-12'>Yearly Gain</span>
+                    <span id='tx-metrics-yearly-1' class='w3-right tx-text-12'>100</span>   
+                </div>
+            </div>
+            <div id='game-metrics-2' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Name</span>
+                    <span id='tx-metrics-name-2' class='w3-right tx-text-12'>requestCount</span>   
+                </div>
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Total</span>
+                    <span id='tx-metrics-total-2' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Daily Gain</span>
+                    <span id='tx-metrics-daily-2' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Weekly Gain</span>
+                    <span id='tx-metrics-weekly-2' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Monthly Gain</span>
+                    <span id='tx-metrics-monthly-2' class='w3-right tx-text-12'>100</span>   
+                </div> 
+                <div class="w3-container">
+                    <span class='w3-left tx-text-12'>Yearly Gain</span>
+                    <span id='tx-metrics-yearly-2' class='w3-right tx-text-12'>100</span>   
+                </div>
+            </div>
+            <div id='game-metrics-3' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Name</span>
+                    <span id='tx-metrics-name-3' class='w3-right tx-text-12'>requestCount</span>   
+                </div>
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Total</span>
+                    <span id='tx-metrics-total-3' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Daily Gain</span>
+                    <span id='tx-metrics-daily-3' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Weekly Gain</span>
+                    <span id='tx-metrics-weekly-3' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Monthly Gain</span>
+                    <span id='tx-metrics-monthly-3' class='w3-right tx-text-12'>100</span>   
+                </div> 
+                <div class="w3-container">
+                    <span class='w3-left tx-text-12'>Yearly Gain</span>
+                    <span id='tx-metrics-yearly-3' class='w3-right tx-text-12'>100</span>   
+                </div>
+            </div>
+            <div id='game-metrics-4' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Name</span>
+                    <span id='tx-metrics-name-4' class='w3-right tx-text-12'>requestCount</span>   
+                </div>
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Total</span>
+                    <span id='tx-metrics-total-4' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Daily Gain</span>
+                    <span id='tx-metrics-daily-4' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Weekly Gain</span>
+                    <span id='tx-metrics-weekly-4' class='w3-right tx-text-12'>100</span>   
+                </div>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Monthly Gain</span>
+                    <span id='tx-metrics-monthly-4' class='w3-right tx-text-12'>100</span>   
+                </div> 
+                <div class="w3-container">
+                    <span class='w3-left tx-text-12'>Yearly Gain</span>
+                    <span id='tx-metrics-yearly-4' class='w3-right tx-text-12'>100</span>   
+                </div>
+            </div>
+            <div id='game-metrics-5' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Name</span>
+                    <span id='tx-metrics-name-5' class='w3-right tx-text-12'>requestCount</span>   
+                </div>
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Total</span>
+                    <span id='tx-metrics-total-5' class='w3-right tx-text-12'>0</span>   
+                </div>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Daily Gain</span>
+                    <span id='tx-metrics-daily-5' class='w3-right tx-text-12'>0</span>   
+                </div>
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Weekly Gain</span>
+                    <span id='tx-metrics-weekly-5' class='w3-right tx-text-12'>0</span>   
+                </div>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Monthly Gain</span>
+                    <span id='tx-metrics-monthly-5' class='w3-right tx-text-12'>0</span>   
+                </div> 
+                <div class="w3-container">
+                    <span class='w3-left tx-text-12'>Yearly Gain</span>
+                    <span id='tx-metrics-yearly-5' class='w3-right tx-text-12'>0</span>   
+                </div>
+            </div>
+            <div id='game-metrics-6' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Name</span>
+                    <span id='tx-metrics-name-6' class='w3-right tx-text-12'>name</span>   
+                </div>
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Total</span>
+                    <span id='tx-metrics-total-6' class='w3-right tx-text-12'>0</span>   
+                </div>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Daily Gain</span>
+                    <span id='tx-metrics-daily-6' class='w3-right tx-text-12'>0</span>   
+                </div>
+                <div class="w3-container  w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Weekly Gain</span>
+                    <span id='tx-metrics-weekly-6' class='w3-right tx-text-12'>0</span>   
+                </div>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-12'>Monthly Gain</span>
+                    <span id='tx-metrics-monthly-6' class='w3-right tx-text-12'>0</span>   
+                </div> 
+                <div class="w3-container">
+                    <span class='w3-left tx-text-12'>Yearly Gain</span>
+                    <span id='tx-metrics-yearly-6' class='w3-right tx-text-12'>0</span>   
+                </div>
             </div>
             <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
                 <div class="w3-display-topleft w3-padding">
@@ -515,11 +701,12 @@
             </div>
         </div>
         <div id="tx-Extension" class="w3-container tx-pane" style="display:none;">
-            <div class='w3-bar w3-white'>
+            <div id='tx-extension-open' class='w3-bar w3-white'>
                 <span view-id='deploy.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy View</span>
                 <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload File</span>
                 <span view-id='reset.module' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Module</span>
             </div>
+            <div id='tx-extension-warning' class="w3-container w3-center"><p class="tx-text-12 w3-text-red">Only super user can access sudo permission resources.</p></div>
             <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
                 <div class="w3-display-topleft w3-padding">
                     <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -567,12 +754,14 @@
                 document.querySelector('#tx-game-cluster-role-upgrade').style.display='none'; 
                 document.querySelector('#tx-game-cluster-create').style.display='block';
                 document.querySelector('#tx-shopping-card').style.display='block';
+                document.querySelector('#tx-game-cluster-warning').style.display='none'; 
 
             }
             else{
                 document.querySelector('#tx-game-cluster-role-upgrade').style.display='block'; 
                 document.querySelector('#tx-game-cluster-create').style.display='none';
                 document.querySelector('#tx-shopping-card').style.display='none'; 
+                document.querySelector('#tx-game-cluster-warning').style.display='block'; 
             }        
         });
         TARA_API.onService(false,{serviceTag:'role/admin',command:'onGameClusterList'},(resp)=>{
@@ -593,15 +782,39 @@
         });
     }
     function _tx_api(){
-        //console.log("game API");
-        //TARA_API.onService(false,{serviceTag:'role/sudo',command:'onSubscriptionList'},(resp)=>{
-            //console.log(resp);        
-        //});
+    }
+    function _tx_extension(){
+        TARA_API.onService(false,{serviceTag:'role/sudo',command:'onCheckPermission'},(resp)=>{
+            if(resp.successful){
+                document.querySelector('#tx-extension-warning').style.display='none';
+            }
+            else{
+                document.querySelector('#tx-extension-warning').style.display='block';
+                document.querySelector('#tx-extension-open').style.display='none'
+            }
+        });
     }
     function _tx_metrics(){
-        console.log("game Metrics");
         TARA_API.onService(false,{serviceTag:'role/admin',command:'onMetrics'},(resp)=>{
-            console.log(resp);        
+            if(resp.successful){
+                document.querySelector('#tx-game-metrics-role-open').style.display="none";
+                resp.stats.forEach((a,i)=>{
+                    let hd = document.querySelector("#game-metrics-"+i);
+                    if(hd){
+                        hd.style.display="block";
+                        document.querySelector("#tx-metrics-name-"+i).innerHTML=a.name;
+                        document.querySelector("#tx-metrics-total-"+i).innerHTML=a.total;
+                        document.querySelector("#tx-metrics-daily-"+i).innerHTML=a.daily;
+                        document.querySelector("#tx-metrics-weekly-"+i).innerHTML=a.weekly;
+                        document.querySelector("#tx-metrics-monthly-"+i).innerHTML=a.monthly;
+                        document.querySelector("#tx-metrics-yearly-"+i).innerHTML=a.yearly;
+                    }
+                });        
+            }
+            else{
+                document.querySelector('#tx-game-metrics-role-open').style.display="block";
+                document.querySelector('#tx-game-metrics-role').innerHTML='ROLE: '+TARA_API.query().role;
+            }      
         });
     }
     function _tx_lobby(){   
@@ -657,6 +870,9 @@
             }
             else if(a.innerHTML == 'Metrics'){
                 _tx_metrics();
+            }
+            else if(a.innerHTML == 'Extension'){
+                _tx_extension();
             }
             document.querySelector('#tx-'+a.innerHTML).style.display='block'; 
         }; 

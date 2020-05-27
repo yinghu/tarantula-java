@@ -4,6 +4,7 @@ import com.tarantula.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
@@ -113,6 +114,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         else if(session.action().equals("onLogin")){
             OnSession access = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
             onSession(access,session);
+            this.deploymentServiceProvider.onUpdated(Metrics.PASSWORD_COUNT,1);
         }
         else if(session.action().equals("onToken")){//exchange token
             boolean suc = this.context.validator().validateToken(acc.toMap());
@@ -161,6 +163,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 session.systemId(access.distributionKey());
                 OnSession _onSession = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
                 this.onSession(_onSession,session);
+                this.deploymentServiceProvider.onUpdated(Metrics.PASSWORD_COUNT,1);
             }
         }
         else if(session.action().equals("onDevice")){
@@ -182,6 +185,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                     session.write(this.builder.create().toJson(new ResponseHeader("onDevice","wrong device id", false)).getBytes(),this.descriptor.responseLabel());
                 }
             }
+            this.deploymentServiceProvider.onUpdated(Metrics.DEVICE_COUNT,1);
         }
         else if(session.action().equals("onResetPassword")){
             if(this.deploymentServiceProvider.checkCode((String)acc.property(OnAccess.ACCESS_KEY)).equals(acc.property("login"))){

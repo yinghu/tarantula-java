@@ -10,6 +10,7 @@ import com.tarantula.platform.presence.*;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.TokenValidatorProvider;
+import com.tarantula.platform.statistics.StatisticsSerializer;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -72,13 +73,15 @@ public class AdminRoleModule implements Module {
         }
         else if(session.action().equals("onMetrics")){
             Metrics  metrics = this.deploymentServiceProvider.metrics();
-            this.context.log(metrics.key().asString(),OnLog.WARN);
-            this.context.log((String) metrics.property(Metrics.STATS_KEY),OnLog.WARN);
-            this.context.log(SystemUtil.fromUTCMilliseconds(((Number)metrics.property(Metrics.START_TIME)).longValue()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),OnLog.WARN);
-            metrics.statistics.summary((e)->{
-                this.context.log(e.name()+">>"+e.toString(),OnLog.WARN);
-            });
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"load statistics",true)).getBytes(),label());
+            //this.context.log(metrics.key().asString(),OnLog.WARN);
+            //this.context.log((String) metrics.property(Metrics.STATS_KEY),OnLog.WARN);
+            //this.context.log(SystemUtil.fromUTCMilliseconds(((Number)metrics.property(Metrics.START_TIME)).longValue()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),OnLog.WARN);
+            //metrics.statistics.summary((e)->{
+                //this.context.log(e.name()+">>"+e.toString(),OnLog.WARN);
+            //});
+            AdminContext adminContext = new AdminContext();
+            adminContext.metrics = metrics;
+            session.write(adminContext.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onCreateAccessKey")){
             //generate access key from game cluster id

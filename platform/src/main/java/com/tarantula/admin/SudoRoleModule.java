@@ -4,6 +4,9 @@ import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.*;
+import com.tarantula.platform.presence.PermissionContext;
+import com.tarantula.platform.presence.User;
+import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.service.deployment.ApplicationQuery;
@@ -22,11 +25,17 @@ public class SudoRoleModule implements Module,Configuration.Listener {
     private DataStore dataStore;
     private GsonBuilder builder;
     private ConcurrentHashMap<String,Configuration> cMap;
-
+    private DataStore uDatastore;
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
-        if(session.action().equals("onSubscriptionList")){
+        if(session.action().equals("onCheckPermission")){
+            User acc = new User();
+            acc.distributionKey(session.systemId());
+            uDatastore.load(acc);
+            session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes(),label());
+        }
+        else if(session.action().equals("onSubscriptionList")){
             DataStore mds = this.context.dataStore(Subscription.DataStore);
             mds.traverse((d,o,k,v)->{
                 //this.context.log(new String(v),OnLog.WARN);
@@ -136,6 +145,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         this.serviceProvider.registerConfigurationListener(this);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.dataStore = this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE);
+        this.uDatastore = this.context.dataStore(Access.DataStore);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.builder.registerTypeAdapter(AdminSetupObject.class,new AdminObjectSerializer());
