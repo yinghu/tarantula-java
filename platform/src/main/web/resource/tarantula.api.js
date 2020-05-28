@@ -89,7 +89,7 @@ var TARA_API = (function(){
     aj.onreadystatechange = function(){
         if(aj.status === 200 && aj.readyState === 4){
             let jsb = JSON.parse(aj.responseText);
-            console.log(jsb);
+            //console.log(jsb);
             qdata.googleClientId = jsb.googleClientId;
             qdata.stripeClientId = jsb.stripeClientId;
             qdata.roleList = jsb.roleList;

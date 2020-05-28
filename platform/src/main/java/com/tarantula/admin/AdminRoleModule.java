@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class AdminRoleModule implements Module {
@@ -34,6 +35,7 @@ public class AdminRoleModule implements Module {
     private int maxGameClusterCount;
     private SubscriptionFee monthly;
     private SubscriptionFee yearly;
+
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         //this.context.log(session.action(),OnLog.INFO);
@@ -64,13 +66,15 @@ public class AdminRoleModule implements Module {
             presenceContext.gameLobbyList = new ArrayList<>();
             presenceContext.successful(true);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            int page = ((Number)onAccess.property("page")).intValue();
+            presenceContext.page = page;
             GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
             Lobby lobby = this.context.lobby((String) gc.property(GameCluster.GAME_LOBBY));
             GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gc.property(GameCluster.GAME_SERVICE));
             lobby.entryList().forEach((a)->{
                 GameLobby gameLobby = new GameLobby();
                 gameLobby.lobby =a;
-                gameLobby.arenaList = gameServiceProvider.zone(a.distributionKey()).arenas;
+                gameLobby.zone = gameServiceProvider.zone(a.distributionKey());
                 presenceContext.gameLobbyList.add(gameLobby);
             });
             //presenceContext.gameLobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_LOBBY)));

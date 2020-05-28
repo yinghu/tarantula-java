@@ -181,25 +181,33 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     }
     @Override
     public Map<String,Object> toMap(){
+        this.properties.put("__c",capacity);
+        this.properties.put("__d",roundDuration);
+        this.properties.put("__o",overtime);
+        this.properties.put("__p",playMode);
         for(Arena a : arenas){
-            this.properties.put(a.name(),a.level+","+a.xp+","+a.capacity+","+a.duration+","+a.playMode+","+a.disabled());
+            this.properties.put(a.name(),a.level+","+a.xp+","+a.disabled());
         }
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
+        this.capacity = ((Number)properties.get("__c")).intValue();
+        this.roundDuration = ((Number)properties.get("__d")).longValue();
+        this.overtime = ((Number)properties.get("__o")).longValue();
+        this.playMode = ((Number)properties.get("__p")).intValue();
+
         ArrayList<Arena> alist = new ArrayList<>();
         properties.forEach((k,v)->{
-            Arena arena = new Arena();
-            arena.name(k);
-            String[] lx = ((String)v).split(",");
-            arena.level = Integer.parseInt(lx[0]);
-            arena.xp = Double.parseDouble(lx[1]);
-            arena.capacity = Integer.parseInt(lx[2]);
-            arena.duration = Integer.parseInt(lx[3]);
-            arena.playMode = Integer.parseInt(lx[4]);
-            arena.disabled(Boolean.parseBoolean(lx[5]));
-            alist.add(arena);
+            if(!k.startsWith("__")){
+                Arena arena = new Arena();
+                arena.name(k);
+                String[] lx = ((String)v).split(",");
+                arena.level = Integer.parseInt(lx[0]);
+                arena.xp = Double.parseDouble(lx[1]);
+                arena.disabled(Boolean.parseBoolean(lx[2]));
+                alist.add(arena);
+            }
         });
         arenas = new Arena[alist.size()];
         arenas = alist.toArray(arenas);
@@ -208,5 +216,16 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     @Override
     public Recoverable.Key key(){
         return new AssociateKey(this.bucket,this.oid,this.vertex);
+    }
+    public String toPlayMode(){
+        if(playMode == Room.DEDICATED_MODE){
+            return "Dedicated";
+        }
+        else if(playMode==Room.INTEGRATED_MODE){
+            return "Integrated";
+        }
+        else{
+            return "Offline";
+        }
     }
 }

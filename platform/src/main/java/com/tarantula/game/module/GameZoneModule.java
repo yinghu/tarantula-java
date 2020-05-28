@@ -71,10 +71,14 @@ public class GameZoneModule implements Module{
         mZone = this.gameServiceProvider.zone(this.context.descriptor().distributionKey());
         if(mZone.arenas.length==0) {
             //create arenas using capacity of descriptor
+            mZone.capacity=1;
+            mZone.roundDuration = 60*1000;
+            mZone.overtime = 5000;
+            mZone.playMode = Room.OFF_LINE_MODE;
             int sz = this.context.descriptor().capacity();
             mZone.arenas = new Arena[sz];
             for(int i=1;i<sz+1;i++){
-                mZone.arenas[i-1]=new Arena(i,i*100,"Level "+i,1,1,Room.OFF_LINE_MODE);
+                mZone.arenas[i-1]=new Arena(i,i*100,"Level "+i);
             }
             mZone.update();
         }

@@ -1,6 +1,5 @@
 package com.tarantula.game;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tarantula.platform.ResponseHeader;
 
@@ -8,15 +7,14 @@ import java.util.List;
 
 public class GameLobbyContext extends ResponseHeader {
     public List<GameLobby> gameLobbyList;
-
+    public int page;
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",this.successful);
-        JsonArray jds = new JsonArray();
-        gameLobbyList.forEach((g)->{
-            jds.add(g.toJson());
-        });
-        jsonObject.add("lobbyList",jds);
+        int _inx = page<gameLobbyList.size()?page:0;
+        GameLobby gameLobby = gameLobbyList.get(_inx);
+        jsonObject.addProperty("index",_inx);
+        jsonObject.add("lobby",gameLobby.toJson());
         return jsonObject;
     }
 }
