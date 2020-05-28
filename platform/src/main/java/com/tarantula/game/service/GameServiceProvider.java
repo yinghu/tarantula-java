@@ -5,6 +5,7 @@ import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.Zone;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.presence.PresencePortableRegistry;
+import com.tarantula.platform.service.ClusterProvider;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.LeaderBoardEntry;
@@ -33,6 +34,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
     private EventService publisher;
     private String dest;
+    private ClusterProvider integrationCluster;
     public GameServiceProvider(String name){
         NAME = name;
     }
@@ -100,10 +102,14 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
             ldb.onView(update);
             return false;
         });
-
-        this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.RATING_CID,(r)->{
-            logger.warn(r.toString());
-        });
+        integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
+        //integrationCluster.addEventListener(NAME,(e)->{
+            //logger.warn(e.toString());
+            //return false;//keep
+        //});
+        //this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.RATING_CID,(r)->{
+            //logger.warn(r.toString());
+        //});
 
         //this.dataStore.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.LEADER_BOARD_ENTRY_CID,(r)->{
             //logger.warn("DS->"+r.key().asString());
@@ -134,7 +140,8 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
 
     @Override
     public void shutdown() throws Exception {
-
+        logger.warn("shut down service->"+NAME);
+        integrationCluster.removeEventListener(NAME);
     }
     private double probability(double rating1,double rating2) {
         return 1.0 * 1.0 / (1 + 1.0 * (Math.pow(10, 1.0 * (rating1 - rating2) / 400)));

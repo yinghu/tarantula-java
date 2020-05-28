@@ -541,7 +541,12 @@ public class TarantulaContext implements Serviceable,ServiceContext{
             throw new RuntimeException("Failed to deploy service provider ["+serviceProvider.name()+"]");
         }
     }
-
+    public void releaseServiceProvider(String name){
+ 	    ServiceProvider serviceProvider = this.serviceProviders.remove(name);
+ 	    if(serviceProvider!=null){
+ 	        try{serviceProvider.shutdown();}catch (Exception ex){}//ignore exception
+        }
+    }
     public TarantulaLogger logger(Class target){
         return JDKLogger.getLogger(target);
     }

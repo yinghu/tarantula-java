@@ -38,6 +38,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
      * Deploys the service provider on service pool
      * */
     boolean deploy(ServiceProvider serviceProvider);
+    void release(ServiceProvider serviceProvider);
 
     //deploy and callback instance registry
     void registerInstanceRegistryListener(InstanceRegistry.Listener deploymentListener);
@@ -83,6 +84,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     <T extends OnAccess> T createGameCluster(String owner,String name,String plan);
     <T extends OnAccess> void launchGameCluster(T gameCluster);
     <T extends OnAccess> T gameCluster(String key);
+
     //END OF CLUSTER
 
     //System metrics data

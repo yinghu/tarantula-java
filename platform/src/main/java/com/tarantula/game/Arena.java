@@ -1,6 +1,8 @@
 package com.tarantula.game;
 
-public class Arena {
+import com.tarantula.platform.OnApplicationHeader;
+
+public class Arena extends OnApplicationHeader {
     public int level;
     public double xp;
     public String name;
