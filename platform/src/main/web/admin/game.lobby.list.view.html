@@ -36,9 +36,29 @@
             <span class='w3-left tx-text-14'>Round Overtime (ms)</span>
             <span id='tx-lobby-list-6' class='w3-right tx-text-14'>0</span>   
         </div>
-        <div class="w3-container  w3-border-bottom w3-border-white">
+        <div class="w3-container  w3-border-bottom w3-border-red">
             <span class='w3-left tx-text-14'>Connection Mode</span>
             <span id='tx-lobby-list-7' class='w3-right tx-text-14'>0</span>   
+        </div>
+        <div class="w3-container  w3-border-bottom w3-border-red">
+            <span class='w3-left tx-text-14'>Game Level 1</span>
+            <span id='tx-lobby-level-0' class='w3-right tx-text-14'>{}</span>   
+        </div>
+        <div class="w3-container  w3-border-bottom w3-border-red">
+            <span class='w3-left tx-text-14'>Game Level 2</span>
+            <span id='tx-lobby-level-1' class='w3-right tx-text-14'>{}</span>   
+        </div>
+        <div class="w3-container  w3-border-bottom w3-border-red">
+            <span class='w3-left tx-text-14'>Game Level 3</span>
+            <span id='tx-lobby-level-2' class='w3-right tx-text-14'>{}</span>   
+        </div>
+        <div class="w3-container  w3-border-bottom w3-border-red">
+            <span class='w3-left tx-text-14'>Game Level 4</span>
+            <span id='tx-lobby-level-3' class='w3-right tx-text-14'>{}</span>   
+        </div>
+        <div class="w3-container  w3-border-bottom w3-border-white">
+            <span class='w3-left tx-text-14'>Game Level 5</span>
+            <span id='tx-lobby-level-4' class='w3-right tx-text-14'>{}</span>   
         </div>
     </div>
     
@@ -76,7 +96,10 @@
                 document.querySelector('#tx-lobby-list-5').innerHTML = resp.lobby.duration; 
                 document.querySelector('#tx-lobby-list-6').innerHTML = resp.lobby.overtime; 
                 document.querySelector('#tx-lobby-list-7').innerHTML = resp.lobby.playMode; 
-                _page = resp.index;                    
+                _page = resp.index;
+                resp.lobby.levels.forEach((a,i)=> {
+                    document.querySelector('#tx-lobby-level-'+i).innerHTML = JSON.stringify(a); 
+                });                    
             }
             else{
                 document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;
