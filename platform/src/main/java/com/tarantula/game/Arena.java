@@ -10,6 +10,7 @@ public class Arena extends OnApplicationHeader {
     public int capacity;
     public int duration; //minutes
     public int playMode; //0,1,2
+
     public Arena(){}
     public Arena(int level,double xp,String name,int capacity,int duration,int playMode){
         this.level = level;
@@ -47,5 +48,17 @@ public class Arena extends OnApplicationHeader {
     @Override
     public int getClassId() {
         return GamePortableRegistry.ARENA_CID;
+    }
+
+    public static String toPlayMode(int pmd){
+        if(pmd == Room.DEDICATED_MODE){
+            return "Dedicated";
+        }
+        else if(pmd==Room.INTEGRATED_MODE){
+            return "Integrated";
+        }
+        else{
+            return "Offline";
+        }
     }
 }

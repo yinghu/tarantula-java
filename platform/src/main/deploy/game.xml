@@ -29,7 +29,7 @@
                 <tag>game/lobby1</tag>
                 <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.GameZoneModule</module-name>
-                <capacity>10</capacity>
+                <capacity>3</capacity>
                 <access-rank>1</access-rank>
                 <timer-on-module>1000</timer-on-module>
             </application>
@@ -43,7 +43,7 @@
                 <tag>game/lobby2</tag>
                 <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.GameZoneModule</module-name>
-                <capacity>10</capacity>
+                <capacity>3</capacity>
                 <access-rank>2</access-rank>
                 <timer-on-module>1000</timer-on-module>
             </application>

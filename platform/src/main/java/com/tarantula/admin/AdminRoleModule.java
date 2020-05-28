@@ -3,6 +3,8 @@ package com.tarantula.admin;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
+import com.tarantula.game.GameLobby;
+import com.tarantula.game.GameLobbyContext;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ResponseHeader;
@@ -58,12 +60,22 @@ public class AdminRoleModule implements Module {
             session.write(adminContext.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onGameLobbyList")){
-            PresenceContext presenceContext = new PresenceContext();
-            presenceContext.lobbyList = new ArrayList<>();
+            GameLobbyContext presenceContext = new GameLobbyContext();
+            presenceContext.gameLobbyList = new ArrayList<>();
+            presenceContext.successful(true);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
-            presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_LOBBY)));
-            session.write(this.builder.create().toJson(presenceContext).getBytes(),label());
+            Lobby lobby = this.context.lobby((String) gc.property(GameCluster.GAME_LOBBY));
+            GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gc.property(GameCluster.GAME_SERVICE));
+            lobby.entryList().forEach((a)->{
+                GameLobby gameLobby = new GameLobby();
+                gameLobby.lobby =a;
+                gameLobby.arenaList = gameServiceProvider.zone(a.distributionKey()).arenas;
+                presenceContext.gameLobbyList.add(gameLobby);
+            });
+            //presenceContext.gameLobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_LOBBY)));
+            session.write(presenceContext.toJson().toString().getBytes(),label());
+            //gameServiceProvider.zone()
         }
         else if(session.action().equals("onGameServiceList")){
             PresenceContext presenceContext = new PresenceContext();

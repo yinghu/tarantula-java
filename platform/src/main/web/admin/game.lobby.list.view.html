@@ -10,7 +10,49 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-game-lobby-list-message">
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-game-lobby-list-message"></div>
+    <div id='game-lobby-list-0' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+        <div class="w3-container  w3-border-bottom w3-border-red">
+            <span id='tx-lobby-list-name-0' class='w3-left tx-text-14'>Name</span>
+            <span tx-game-cluster-id='' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-level-action'>Edit</span>   
+        </div>
+        <div class="w3-container  w3-border-bottom w3-border-red">
+            <span class='w3-left tx-text-14'>Rank</span>
+            <span id='tx-lobby-list-rank-0' class='w3-right tx-text-14'>requestCount</span>   
+        </div>
+        <div class="w3-container  w3-border-bottom w3-border-white">
+            <span class='w3-left tx-text-14'>Tag</span>
+            <span id='tx-lobby-list-tag-0' class='w3-right tx-text-14'>requestCount</span>   
+        </div>
+    </div>
+    <div id='game-lobby-list-1' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+        <div class="w3-container  w3-border-bottom w3-border-red">
+            <span id='tx-lobby-list-name-1' class='w3-left tx-text-14'>Name</span>
+            <span tx-game-cluster-id='' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-level-action'>Edit</span>   
+        </div>
+        <div class="w3-container  w3-border-bottom w3-border-red">
+            <span class='w3-left tx-text-14'>Rank</span>
+            <span id='tx-lobby-list-rank-1' class='w3-right tx-text-14'>requestCount</span>   
+        </div>
+        <div class="w3-container  w3-border-bottom w3-border-white">
+            <span class='w3-left tx-text-14'>Tag</span>
+            <span id='tx-lobby-list-tag-1' class='w3-right tx-text-14'>requestCount</span>   
+        </div>
+    </div>
+    <div id='game-lobby-list-2' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+        <div class="w3-container  w3-border-bottom w3-border-red">
+            <span id='tx-lobby-list-name-2' class='w3-left tx-text-14'>Name</span>
+            <span tx-game-cluster-id='' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-level-action'>Edit</span>   
+        </div>
+        <div class="w3-container  w3-border-bottom w3-border-red">
+            <span class='w3-left tx-text-14'>Rank</span>
+            <span id='tx-lobby-list-rank-2' class='w3-right 14'>requestCount</span>   
+        </div>
+        <div class="w3-container  w3-border-bottom w3-border-white">
+            <span class='w3-left tx-text-14'>Tag</span>
+            <span id='tx-lobby-list-tag-2' class='w3-right tx-text-14'>requestCount</span>   
+        </div>
+        
     </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
@@ -25,7 +67,13 @@
     document.querySelector("#tx-game-lobby-list-message").innerHTML = TARA_API.query().gameClusterId;
     TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameLobbyList',accessId:TARA_API.query().gameClusterId,headers:[{name:'score',value:456}]},(resp)=>{
         if(resp.successful){
-            console.log(resp);                   
+            console.log(resp);
+            resp.lobbyList.forEach((a,i)=> {
+                document.querySelector('#tx-lobby-list-name-'+i).innerHTML = a.name;
+                document.querySelector('#tx-lobby-list-rank-'+i).innerHTML = a.rank;
+                document.querySelector('#tx-lobby-list-tag-'+i).innerHTML = a.tag;
+                document.querySelector('#game-lobby-list-'+i).style.display='block';    
+            });                   
         }
         else{
             document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;
