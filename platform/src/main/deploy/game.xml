@@ -13,37 +13,37 @@
         <type-id>game-lobby</type-id>
         <type>lobby</type>
         <category>game</category>
-        <name>GameLevel</name>
+        <name>GameLobby</name>
         <access-mode>12</access-mode>
         <deploy-code>1</deploy-code>
         <deploy-priority>15</deploy-priority>
-        <description>Tarantula Game Zone Service</description>
+        <description>Tarantula Game Lobby Service</description>
         <application-list>
             <application>
                 <type-id>game-lobby</type-id>
-                <subtype-id>game-level-module</subtype-id>
-                <name>GameLevel 1</name>
+                <subtype-id>game-lobby-module</subtype-id>
+                <name>GameLobby 1</name>
                 <type>application</type>
                 <category>game</category>
                 <singleton>true</singleton>
-                <tag>game/level1</tag>
+                <tag>game/lobby1</tag>
                 <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.GameZoneModule</module-name>
-                <capacity>100</capacity>
+                <capacity>10</capacity>
                 <access-rank>1</access-rank>
                 <timer-on-module>1000</timer-on-module>
             </application>
             <application>
                 <type-id>game-lobby</type-id>
-                <subtype-id>game-level-module</subtype-id>
-                <name>GameLevel 2</name>
+                <subtype-id>game-lobby-module</subtype-id>
+                <name>GameLobby 2</name>
                 <type>application</type>
                 <category>game</category>
                 <singleton>true</singleton>
-                <tag>game/level2</tag>
+                <tag>game/lobby2</tag>
                 <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.GameZoneModule</module-name>
-                <capacity>100</capacity>
+                <capacity>10</capacity>
                 <access-rank>2</access-rank>
                 <timer-on-module>1000</timer-on-module>
             </application>
