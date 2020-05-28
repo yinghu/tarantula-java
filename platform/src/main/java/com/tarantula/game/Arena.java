@@ -1,9 +1,12 @@
 package com.tarantula.game;
 
-public class Arena {
+import com.tarantula.platform.OnApplicationHeader;
+
+import java.util.Map;
+
+public class Arena extends OnApplicationHeader {
     public int level;
     public double xp;
-    public String name;
     public int capacity;
     public int duration; //minutes
     public int playMode; //0,1,2
@@ -17,7 +20,32 @@ public class Arena {
         this.playMode = playMode;
     }
     @Override
-    public String toString(){
-        return "["+name+"]["+level+"]["+xp+"]"+"["+capacity+"]["+duration+"]["+playMode+"]";
+    public Map<String,Object> toMap(){
+        this.properties.put("name",name);
+        this.properties.put("level",level);
+        this.properties.put("xp",xp);
+        this.properties.put("capacity",capacity);
+        this.properties.put("duration",duration);
+        this.properties.put("playMode",playMode);
+        this.properties.put("disabled",disabled);
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        this.name =(String)properties.get("name");
+        this.level = ((Number)properties.get("level")).intValue();
+        this.xp = ((Number)properties.get("xp")).doubleValue();
+        this.capacity = ((Number)properties.get("capacity")).intValue();
+        this.duration = ((Number)properties.get("duration")).intValue();
+        this.playMode = ((Number)properties.get("playMode")).intValue();
+        this.disabled = (boolean)properties.get("disabled");
+    }
+    @Override
+    public int getFactoryId() {
+        return GamePortableRegistry.OID;
+    }
+    @Override
+    public int getClassId() {
+        return GamePortableRegistry.ARENA_CID;
     }
 }

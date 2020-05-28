@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Created by yinghu lu on 4/14/2020.
+ * Created by yinghu lu on 5/27/2020.
  */
 public class Zone extends RecoverableObject implements RoomListener,DataStore.Updatable{
     public Arena[] arenas = new  Arena[0];
@@ -98,7 +98,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
                 mLevel = rating.level;
             }
         }
-        jsonObject.addProperty("arena",arenas[mLevel].name);
+        jsonObject.addProperty("arena",arenas[mLevel].name());
         jsonObject.addProperty("capacity",capacity);
         jsonObject.addProperty("duration",roundDuration/1000);
         jsonObject.addProperty("overtime",overtime/1000);
@@ -163,7 +163,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
                 mLevel = rating.level;
             }
         }
-        jo.addProperty("arena",arenas[mLevel].name);
+        jo.addProperty("arena",arenas[mLevel].name());
         jo.addProperty("capacity",capacity);
         jo.addProperty("duration",roundDuration/1000);
         jo.addProperty("overtime",overtime/1000);
@@ -182,7 +182,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     @Override
     public Map<String,Object> toMap(){
         for(Arena a : arenas){
-            this.properties.put(a.name,a.level+","+a.xp+","+a.capacity+","+a.duration+","+a.playMode);
+            this.properties.put(a.name(),a.level+","+a.xp+","+a.capacity+","+a.duration+","+a.playMode+","+a.disabled());
         }
         return this.properties;
     }
@@ -191,13 +191,14 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         ArrayList<Arena> alist = new ArrayList<>();
         properties.forEach((k,v)->{
             Arena arena = new Arena();
-            arena.name = k;
+            arena.name(k);
             String[] lx = ((String)v).split(",");
             arena.level = Integer.parseInt(lx[0]);
             arena.xp = Double.parseDouble(lx[1]);
             arena.capacity = Integer.parseInt(lx[2]);
             arena.duration = Integer.parseInt(lx[3]);
             arena.playMode = Integer.parseInt(lx[4]);
+            arena.disabled(Boolean.parseBoolean(lx[5]));
             alist.add(arena);
         });
         arenas = new Arena[alist.size()];

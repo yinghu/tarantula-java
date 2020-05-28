@@ -63,6 +63,12 @@
             <view type="shopping.card">
                 <property name="moduleResourceFile">admin/stripe.card.view.html</property>
             </view>
+            <view type="game.cluster.launch">
+                <property name="moduleResourceFile">admin/game.cluster.launch.view.html</property>
+            </view>
+            <view type="game.cluster.shutdown">
+                <property name="moduleResourceFile">admin/game.cluster.shutdown.view.html</property>
+            </view>
         </view-list>
 
     </lobby-context>

@@ -463,7 +463,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public boolean deploy(ServiceProvider serviceProvider) {
         return this.tarantulaContext.deployServiceProvider(serviceProvider);
     }
-
+    public void release(ServiceProvider serviceProvider){
+        this.tarantulaContext.releaseServiceProvider(serviceProvider.name());
+    }
     @Override
     public boolean onEvent(Event event) {
        if(event instanceof MapStoreSyncEvent){
