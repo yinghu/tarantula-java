@@ -68,7 +68,7 @@ public class GameZoneModule implements Module{
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         String gz = this.context.descriptor().typeId().replace("-lobby","-service");
         this.gameServiceProvider = this.context.serviceProvider(gz);
-        mZone = this.gameServiceProvider.zone(this.context.descriptor().distributionKey());
+        mZone = this.gameServiceProvider.zone(this.context.descriptor());
         if(mZone.arenas.length==0) {
             //create arenas using capacity of descriptor
             mZone.capacity=1;

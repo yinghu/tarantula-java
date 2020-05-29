@@ -15,11 +15,47 @@
         <div class="w3-panel w3-border-bottom w3-border-red tx-text-12">
             <p>You are creating a service cluster to support your new game title in development and production.</p>
         </div>
-        <div class="w3-panel">
-            <input id ="tx-game-cluster-name" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='game title name'/>
-        </div> 
-        <div class="w3-panel">
-            <span id="tx-create-game-cluster" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Create Game Cluster</span>     
+        <div id="tx-create-game-cluster-form"  class="w3-container w3-border-bottom w3-border-red">
+            <div class="w3-panel">
+                <input id ="tx-game-cluster-name" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='game title name'/>
+            </div> 
+            <div class="w3-panel">
+                <span id="tx-create-game-cluster" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Create Game Cluster</span>
+            </div>
+        </div>
+        <div id='tx-add-game-lobby-form' class="w3-container w3-border-bottom w3-border-red">
+            <div class="w3-row tx-text-12">
+                <div class="w3-third w3-panel">
+                    <input class="w3-radio" type="radio" name="playmode" value="1" checked>
+                    <label>Offline</label>
+                </div>
+                <div class="w3-third w3-panel">
+                    <input class="w3-radio" type="radio" name="playmode" value="2">
+                    <label>Dedicated</label>
+                </div>
+                <div class="w3-third w3-panel">
+                    <input class="w3-radio" type="radio" name="playmode" value="3">
+                    <label>Integrated</label>
+                </div>
+            </div>
+            <div class="w3-panel">
+                <span class=" w3-left tx-text-14">
+                    <select class="w3-select" name="option">
+                        <option value="1">Max Players Per Room</option>
+                        <option value="2">Duration Time Per Round</option>
+                        <option value="3">Graceful Ending Buffer Time</option>
+                      </select>
+                </span>
+            </div>
+            <div class="w3-panel w3-border-bottom w3-border-red">
+                <span class="tx-margin-right-8 w3-text-green" id="tx-capacity-minus"><i class="fa fa-minus" style="font-size:18px"></i></span>
+                <span class="tx-text-12 tx-margin-left-8 tx-margin-right-8" style="width: 20px;">100</span>
+                <span class="tx-margin-left-8 w3-text-green" id="tx-capacity-add"><i class="fa fa-plus" style="font-size:18px"></i></span>
+            </div>
+
+            <div class="w3-panel">
+                <span id="tx-sign-in11" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Add Game Lobby</span>     
+            </div>
         </div>
     </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -32,10 +68,16 @@
     </div>
 </div>
 <script>
+    //document.querySelector('#tx-add-game-lobby-form').style.display='none';
     document.querySelector('#tx-create-game-cluster').onclick=()=>{
         let _n = document.querySelector('#tx-game-cluster-name').value;
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onCreateGameCluster',name:_n},(resp)=>{
             document.querySelector('#tx-create-game-cluster-message').innerHTML = resp.message;
+            if(resp.successful){
+                //do lobby configurations
+                //document.querySelector('#tx-add-game-lobby-form').style.display='block';
+                document.querySelector('#tx-create-game-cluster-form').style.display='none';
+            }
         });       
     };
     document.querySelector('#tx-create-game-cluster-close').onclick=()=>{

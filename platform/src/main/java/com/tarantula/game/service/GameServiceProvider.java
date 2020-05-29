@@ -66,9 +66,9 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         return deltaStatistics;
     }
 
-    public Zone zone(String zoneId){//application id 
+    public Zone zone(Descriptor app){//application id
         Zone zone = new Zone();
-        zone.distributionKey(zoneId);
+        zone.distributionKey(app.distributionKey());
         this.dataStore.createIfAbsent(zone,true);
         zone.dataStore(this.dataStore);
         //logger.warn(zone.toString());

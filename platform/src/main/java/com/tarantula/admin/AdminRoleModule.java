@@ -74,7 +74,7 @@ public class AdminRoleModule implements Module {
             lobby.entryList().forEach((a)->{
                 GameLobby gameLobby = new GameLobby();
                 gameLobby.lobby =a;
-                gameLobby.zone = gameServiceProvider.zone(a.distributionKey());
+                gameLobby.zone = gameServiceProvider.zone(a);
                 presenceContext.gameLobbyList.add(gameLobby);
             });
             //presenceContext.gameLobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_LOBBY)));
@@ -141,10 +141,12 @@ public class AdminRoleModule implements Module {
                     acc.gameClusterCount(1);
                     acc.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
                     account.update(acc);
-                    if(acc.trial()||acc.subscribed()){
+                    //USE -service data store to save lobby configs; do not use -data data store!!!1
+                    DataStore dataStore = this.context.dataStore((String) gc.property(GameCluster.GAME_SERVICE));
+                    //if(acc.trial()||acc.subscribed()){
                         //launch the game
-                        this.deploymentServiceProvider.launchGameCluster(gc);
-                    }
+                        //this.deploymentServiceProvider.launchGameCluster(gc);
+                    //}
                 }
                 session.write(this.builder.create().toJson(new ResponseHeader(session.action(),gc.message(),gc.successful())).getBytes(),label());
             }
