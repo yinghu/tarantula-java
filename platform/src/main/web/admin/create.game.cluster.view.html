@@ -10,45 +10,141 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-create-game-cluster-message"></div>
     <div class="w3-container">
-        <div class="w3-panel w3-border-bottom w3-border-red tx-text-12">
-            <p>You are creating a service cluster to support your new game title in development and production.</p>
-        </div>
-        <div id="tx-create-game-cluster-form"  class="w3-container w3-border-bottom w3-border-red">
-            <div class="w3-panel">
-                <input id ="tx-game-cluster-name" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='game title name'/>
-            </div> 
-            <div class="w3-panel">
-                <span id="tx-create-game-cluster" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Create Game Cluster</span>
+        <div id="tx-create-game-cluster-form">
+            <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-create-game-cluster-message"></div>
+            <div class="w3-panel w3-border-bottom w3-border-red tx-text-12">
+                <div class="w3-container">
+                    <p>You are creating a service cluster to support your new game title in development and production.</p>
+                </div>
+                <ul class="w3-ul tx-text-12">
+                    <li>Two game lobbies with 5 max levels per lobby</li>
+                    <li>Game service including match-making, statistics and leader board</li>
+                    <li>Data service that supports arbitray json format set/get opertions</li>
+                </ul>
+            </div>
+            <div class="w3-container w3-border-bottom w3-border-red">
+                <div class="w3-panel">
+                    <input id ="tx-game-cluster-name" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='game title name'/>
+                </div> 
+                <div class="w3-panel">
+                    <span id="tx-create-game-cluster" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Create Game Cluster</span>
+                </div>
             </div>
         </div>
         <div id='tx-edit-game-lobby-form' class="w3-container" style="display: none;">
-            <div class="w3-panel w3-border-bottom w3-border-red tx-text-16">Game Lobby Configurations</div>
+            <div class="w3-container w3-border-bottom w3-border-red">
+                <span class="w3-left tx-text-16 tx-margin-top-16">Game Lobby Configurations</span>
+                <span id='tx-lobby-settings-edit' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8">Edit</span>  
+            </div>
             <div class="w3-panel w3-border-bottom w3-border-red">
-                <span id='tx-lobby-settings' class="w3-left tx-text-14 tx-margin-top-16"></span>
-                <span id='tx-lobby-settings-edit' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Edit</span>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">Rank</span>
+                    <span id='tx-lobby-v-1' class="w3-right tx-text-12">1</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">Capacity</span>
+                    <span id='tx-lobby-v-2' class="w3-right tx-text-12">1</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">Duration</span>
+                    <span id='tx-lobby-v-3' class="w3-right tx-text-12">1</span>    
+                </div>
+                <div class="w3-container tx-margin-bottom-4">
+                    <span class="w3-left tx-text-12">Play Mode</span>
+                    <span id='tx-lobby-v-4' class="w3-right tx-text-12">1</span>    
+                </div>
             </div>
             <div class="w3-panel w3-border-bottom w3-border-red tx-text-16">Game Level Configurations</div>      
-            <div class="w3-panel">
-                <span class="w3-left tx-text-14 tx-margin-top-16">1:</span><span id='tx-level-1' class="w3-left tx-text-14 tx-margin-top-16"></span>
-                <span tx-level-no="1" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-level-edit">Edit</span>
-            </div>
-            <div class="w3-panel">
-                <span class="w3-left tx-text-14 tx-margin-top-16">2:</span><span id='tx-level-2' class="w3-left tx-text-14 tx-margin-top-16"></span>
-                <span tx-level-no="2" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-level-edit">Edit</span>
-            </div>
-            <div class="w3-panel">
-                <span class="w3-left tx-text-14 tx-margin-top-16">3:</span><span id='tx-level-3' class="w3-left tx-text-14 tx-margin-top-16"></span>
-                <span tx-level-no="3" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-level-edit">Edit</span>
-            </div>
-            <div class="w3-panel">
-                <span class="w3-left tx-text-14 tx-margin-top-16">4:</span><span id='tx-level-4' class="w3-left tx-text-14 tx-margin-top-16"></span>
-                <span tx-level-no="4" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-level-edit">Edit</span>
+            <div class="w3-panel w3-border-bottom w3-border-red">
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span id='tx-level-v-0-1' class="w3-left tx-text-14 tx-margin-top-16">Name</span>
+                    <span tx-level-no="0" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit">Edit</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">Level</span>
+                    <span id='tx-level-v-0-2' class="w3-right tx-text-12">1</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">XP</span>
+                    <span id='tx-level-v-0-3' class="w3-right tx-text-12">1</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">Disabled</span>
+                    <span id='tx-level-v-0-4' class="w3-right tx-text-12">1</span>    
+                </div>
             </div>
             <div class="w3-panel w3-border-bottom w3-border-red">
-                <span class="w3-left tx-text-14 tx-margin-top-16">5:</span><span id='tx-level-5' class="w3-left tx-text-14 tx-margin-top-16"></span>
-                <span tx-level-no="5" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-level-edit">Edit</span>
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span id='tx-level-v-1-1' class="w3-left tx-text-14 tx-margin-top-16">Name</span>
+                    <span tx-level-no="1" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit">Edit</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">Level</span>
+                    <span id='tx-level-v-1-2' class="w3-right tx-text-12">1</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">XP</span>
+                    <span id='tx-level-v-1-3' class="w3-right tx-text-12">1</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">Disabled</span>
+                    <span id='tx-level-v-1-4' class="w3-right tx-text-12">1</span>    
+                </div>
+            </div>
+            <div class="w3-panel w3-border-bottom w3-border-red">
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span id='tx-level-v-2-1' class="w3-left tx-text-14 tx-margin-top-16">Name</span>
+                    <span tx-level-no="2" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit">Edit</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">Level</span>
+                    <span id='tx-level-v-2-2' class="w3-right tx-text-12">1</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">XP</span>
+                    <span id='tx-level-v-2-3' class="w3-right tx-text-12">1</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">Disabled</span>
+                    <span id='tx-level-v-2-4' class="w3-right tx-text-12">1</span>    
+                </div>
+            </div>
+            <div class="w3-panel w3-border-bottom w3-border-red">
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span id='tx-level-v-3-1' class="w3-left tx-text-14 tx-margin-top-16">Name</span>
+                    <span tx-level-no="3" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit">Edit</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">Level</span>
+                    <span id='tx-level-v-3-2' class="w3-right tx-text-12">1</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">XP</span>
+                    <span id='tx-level-v-3-3' class="w3-right tx-text-12">1</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">Disabled</span>
+                    <span id='tx-level-v-3-4' class="w3-right tx-text-12">1</span>    
+                </div>
+            </div>
+            <div class="w3-panel w3-border-bottom w3-border-red">
+                <div class="w3-container w3-border-bottom w3-border-red">
+                    <span id='tx-level-v-4-1' class="w3-left tx-text-14 tx-margin-top-16">Name</span>
+                    <span tx-level-no="4" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit">Edit</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">Level</span>
+                    <span id='tx-level-v-4-2' class="w3-right tx-text-12">1</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">XP</span>
+                    <span id='tx-level-v-4-3' class="w3-right tx-text-12">1</span>    
+                </div>
+                <div class="w3-container">
+                    <span class="w3-left tx-text-12">Disabled</span>
+                    <span id='tx-level-v-4-4' class="w3-right tx-text-12">1</span>    
+                </div>
             </div>
             <div class="w3-panel">
                 <span id="tx-lobby-finish" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Finsh</span>
@@ -65,7 +161,7 @@
         </div>
     </div>
     <!-- level edit popup--> 
-    <div class="w3-card-4 w3-border w3-round w3-white tx-level-checkout" id="tx-level-edit">
+    <div class="w3-card-4 w3-border w3-round w3-white tx-checkout" id="tx-level-edit">
         <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
             <div class="w3-display-topright w3-padding">
                 <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
@@ -84,6 +180,10 @@
         <div class="w3-panel">
             <input id ="tx-level-xp" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='xp'/>
         </div>
+        <div class="w3-panel">
+            <input id='tx-level-disabled' class="w3-check tx-text-12" type="checkbox">
+            <label class="tx-text-12">Disabled</label>
+        </div>    
         <div class="w3-panel">
             <span id="tx-level-edit-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
         
@@ -142,14 +242,12 @@
 </div>
 <script>
     document.querySelector('#tx-edit-game-lobby-form').style.display='none';
-    let lbl ={rank:1,capacity:1,duration:1,playMode:0};
     let pending;
-    document.querySelector('#tx-lobby-settings').innerHTML=JSON.stringify(lbl);
     document.querySelector('#tx-create-game-cluster').onclick=()=>{
         let _n = document.querySelector('#tx-game-cluster-name').value;
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onCreateGameCluster',name:_n},(resp)=>{
             if(resp.successful){
-                //do lobby configurations
+                //goes to do lobby configurations
                 pending = resp;
                 _load_lobby_config();
                 document.querySelector('#tx-edit-game-lobby-form').style.display='block';
@@ -160,28 +258,13 @@
             }
         });       
     };
-    document.querySelectorAll('.tx-lobby-option').forEach((a)=>{
-        a.onchange=()=>{
-            if(a.name=='tx-rank'){
-                lbl.rank = a.value;
-            }
-            else if(a.name =='tx-capacity'){
-                lbl.capacity = a.value;    
-            }
-            else if(a.name =='tx-duration'){
-                lbl.duration = a.value;    
-            }
-            else if(a.name =='tx-play-mode'){
-                lbl.playMode = a.value;
-            }
-            document.querySelector('#tx-lobby-settings').innerHTML=JSON.stringify(lbl);
-        };
-    });
+   
     document.querySelectorAll('.tx-level-edit').forEach((a)=>{
         a.onclick=()=>{
-            let lix = a.getAttribute('tx-level-no');
-            pending.levelIndex = lix-1;
-            document.querySelector('#tx-level-edit-no').innerHTML="Update Level ["+lix+"]";
+            let lix = parseInt(a.getAttribute('tx-level-no'));
+            pending.levelIndex = lix;
+            let ixc = lix+1;
+            document.querySelector('#tx-level-edit-no').innerHTML="Update Level ["+ixc+"]";
             document.querySelector('#tx-level-edit').style.display='block';
         }
     });
@@ -226,13 +309,15 @@
     function _load_lobby_config(){
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onLoadGameLobby',accessId:pending.accessId,stub:pending.stub},(resp)=>{
             console.log(resp);  
-            lbl.rank = resp.rank;
-            lbl.capacity = resp.capacity;
-            lbl.duration = resp.duration;
-            lbl.playMode = resp.playMode;
-            document.querySelector('#tx-lobby-settings').innerHTML=JSON.stringify(lbl);
+            document.querySelector("#tx-lobby-v-1").innerHTML = resp.rank;
+            document.querySelector("#tx-lobby-v-2").innerHTML = resp.capacity;
+            document.querySelector("#tx-lobby-v-3").innerHTML = resp.duration;
+            document.querySelector("#tx-lobby-v-4").innerHTML = resp.playMode;
             resp.levels.forEach((a,i)=>{
-                document.querySelector('#tx-level-'+(i+1)).innerHTML=JSON.stringify(a);    
+                document.querySelector('#tx-level-v-'+i+'-1').innerHTML = a.name;
+                document.querySelector('#tx-level-v-'+i+'-2').innerHTML = a.level;
+                document.querySelector('#tx-level-v-'+i+'-3').innerHTML = a.xp;
+                document.querySelector('#tx-level-v-'+i+'-4').innerHTML = a.disabled; 
             });          
         });    
     }
