@@ -9,10 +9,11 @@ public class Arena extends OnApplicationHeader {
     public double xp;
 
     public Arena(){}
-    public Arena(int level,double xp,String name){
+    public Arena(int level,double xp,String name,boolean disabled){
         this.level = level;
         this.xp = xp;
         this.name = name;
+        this.disabled = disabled;
     }
     @Override
     public Map<String,Object> toMap(){

@@ -22,6 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class Zone extends RecoverableObject implements RoomListener,DataStore.Updatable{
     public Arena[] arenas = new  Arena[0];
+    public int rank=1;
     public int capacity =1;
     public long roundDuration =60000;
     public long overtime = Room.PENDING_TIME;
@@ -181,6 +182,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     }
     @Override
     public Map<String,Object> toMap(){
+        this.properties.put("__r",rank);
         this.properties.put("__c",capacity);
         this.properties.put("__d",roundDuration);
         this.properties.put("__o",overtime);
@@ -192,6 +194,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     }
     @Override
     public void fromMap(Map<String,Object> properties){
+        this.rank = ((Number)properties.get("__r")).intValue();
         this.capacity = ((Number)properties.get("__c")).intValue();
         this.roundDuration = ((Number)properties.get("__d")).longValue();
         this.overtime = ((Number)properties.get("__o")).longValue();
@@ -227,5 +230,25 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         else{
             return "Offline";
         }
+    }
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("successful",true);
+        jsonObject.addProperty("rank",rank);
+        jsonObject.addProperty("capacity",capacity);
+        jsonObject.addProperty("duration",roundDuration/60000);
+        //jsonObject.addProperty("overtime",overtime/1000);
+        jsonObject.addProperty("playMode",toPlayMode());
+        JsonArray jds = new JsonArray();
+        for(Arena a: arenas){
+            JsonObject jd = new JsonObject();
+            jd.addProperty("name",a.name());
+            jd.addProperty("level",a.level);
+            jd.addProperty("xp",a.xp);
+            jd.addProperty("disabled",a.disabled());
+            jds.add(jd);
+        }
+        jsonObject.add("levels",jds);
+        return jsonObject;
     }
 }

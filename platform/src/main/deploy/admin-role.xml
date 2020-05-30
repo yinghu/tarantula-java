@@ -31,6 +31,7 @@
             <configuration tag="admin" priority="10">
                 <admin type="setup">
                     <property name="maxGameClusterCount">5</property>
+                    <property name="maxGameLevelCount">5</property>
                 </admin>
                 <admin type="yearlyAccess">
                     <property name="description">Yearly Subscription</property>

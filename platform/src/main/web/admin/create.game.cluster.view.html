@@ -119,7 +119,7 @@
             <input id ="tx-duration" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='duration'/>
         </div>
         <div class="w3-panel">
-            <select class="w3-select tx-text-14" name="play-mode" style="width: 260px;">
+            <select class="w3-select tx-text-14" id="tx-play-mode" style="width: 260px;">
                 <option value="0">Offline Mode</option>
                 <option value="2">Dedicated Mode</option>
                 <option value="1">Integrated Mode</option>
@@ -142,22 +142,21 @@
 </div>
 <script>
     document.querySelector('#tx-edit-game-lobby-form').style.display='none';
-    let cfg ={name:'arena1',level:1,xp:100};
     let lbl ={rank:1,capacity:1,duration:1,playMode:0};
-    document.querySelector('#tx-level-1').innerHTML=JSON.stringify(cfg);
-    document.querySelector('#tx-level-2').innerHTML=JSON.stringify(cfg);
-    document.querySelector('#tx-level-3').innerHTML=JSON.stringify(cfg);
-    document.querySelector('#tx-level-4').innerHTML=JSON.stringify(cfg);
-    document.querySelector('#tx-level-5').innerHTML=JSON.stringify(cfg);
+    let pending;
     document.querySelector('#tx-lobby-settings').innerHTML=JSON.stringify(lbl);
     document.querySelector('#tx-create-game-cluster').onclick=()=>{
         let _n = document.querySelector('#tx-game-cluster-name').value;
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onCreateGameCluster',name:_n},(resp)=>{
-            document.querySelector('#tx-create-game-cluster-message').innerHTML = resp.message;
             if(resp.successful){
                 //do lobby configurations
+                pending = resp;
+                _load_lobby_config();
                 document.querySelector('#tx-edit-game-lobby-form').style.display='block';
                 document.querySelector('#tx-create-game-cluster-form').style.display='none';
+            }
+            else{
+                document.querySelector('#tx-create-game-cluster-message').innerHTML = resp.message;
             }
         });       
     };
@@ -180,16 +179,41 @@
     });
     document.querySelectorAll('.tx-level-edit').forEach((a)=>{
         a.onclick=()=>{
-            console.log(a.getAttribute('tx-level-no'));
-            document.querySelector('#tx-level-edit-no').innerHTML="Update Level ["+a.getAttribute('tx-level-no')+"]";
+            let lix = a.getAttribute('tx-level-no');
+            pending.levelIndex = lix-1;
+            document.querySelector('#tx-level-edit-no').innerHTML="Update Level ["+lix+"]";
             document.querySelector('#tx-level-edit').style.display='block';
         }
     });
+    document.querySelector('#tx-lobby-next').onclick=()=>{
+        TARA_API.onService(true,{serviceTag:'role/admin',command:'onNextGameLobby',accessId:pending.accessId},(resp)=>{
+            pending = resp;
+            console.log(resp);
+            _load_lobby_config();            
+        });
+    };
+    document.querySelector('#tx-lobby-finish').onclick=()=>{
+        TARA_API.onService(true,{serviceTag:'role/admin',command:'onFinishGameLobby',accessId:pending.accessId},(resp)=>{
+            console.log(resp);
+            let m3 = document.querySelector('#tx-popup');
+            m3.innerHTML="";
+            m3.style.display = 'none';             
+        });
+    };
+    document.querySelector('#tx-level-edit-save').onclick=()=>{
+        console.log(pending.levelIndex);
+        document.querySelector('#tx-level-edit').style.display='none';
+    };
     document.querySelector('#tx-level-edit-cancel').onclick=()=>{
         document.querySelector('#tx-level-edit').style.display='none';
     };
     document.querySelector('#tx-lobby-settings-edit').onclick=()=>{
         document.querySelector('#tx-lobby-edit').style.display='block';
+    };
+    document.querySelector('#tx-lobby-edit-save').onclick=()=>{
+        let pm = document.querySelector('#tx-play-mode').value;
+        console.log(pm);
+        document.querySelector('#tx-lobby-edit').style.display='none';
     };
     document.querySelector('#tx-lobby-edit-cancel').onclick=()=>{
         document.querySelector('#tx-lobby-edit').style.display='none';
@@ -199,4 +223,17 @@
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
+    function _load_lobby_config(){
+        TARA_API.onService(true,{serviceTag:'role/admin',command:'onLoadGameLobby',accessId:pending.accessId,stub:pending.stub},(resp)=>{
+            console.log(resp);  
+            lbl.rank = resp.rank;
+            lbl.capacity = resp.capacity;
+            lbl.duration = resp.duration;
+            lbl.playMode = resp.playMode;
+            document.querySelector('#tx-lobby-settings').innerHTML=JSON.stringify(lbl);
+            resp.levels.forEach((a,i)=>{
+                document.querySelector('#tx-level-'+(i+1)).innerHTML=JSON.stringify(a);    
+            });          
+        });    
+    }
 </script>
