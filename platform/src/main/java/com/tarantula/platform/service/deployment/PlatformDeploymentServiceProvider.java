@@ -21,7 +21,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
@@ -728,6 +727,21 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return (T)gc;
         }
         return null;
+    }
+    public Lobby lobby(String typeId){
+        DataStore mds = this.tarantulaContext.masterDataStore();
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(mds.bucket(),typeId);
+        mds.load(lobbyTypeIdIndex);
+        LobbyDescriptor lb = new LobbyDescriptor();
+        lb.distributionKey(lobbyTypeIdIndex.index());
+        mds.load(lb);
+        Lobby lobby = new DefaultLobby(lb);
+        ApplicationQuery query = new ApplicationQuery(lb.distributionKey());
+        mds.list(query,(a)->{
+            lobby.addEntry(a);
+            return true;
+        });
+        return lobby;
     }
     public String resetCode(String key){
         ClusterProvider icp = this.tarantulaContext.integrationCluster();

@@ -199,7 +199,6 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.roundDuration = ((Number)properties.get("__d")).longValue();
         this.overtime = ((Number)properties.get("__o")).longValue();
         this.playMode = ((Number)properties.get("__p")).intValue();
-
         ArrayList<Arena> alist = new ArrayList<>();
         properties.forEach((k,v)->{
             if(!k.startsWith("__")){
@@ -209,7 +208,9 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
                 arena.level = Integer.parseInt(lx[0]);
                 arena.xp = Double.parseDouble(lx[1]);
                 arena.disabled(Boolean.parseBoolean(lx[2]));
-                alist.add(arena);
+                if(!arena.disabled()){//skip disabled
+                    alist.add(arena);
+                }
             }
         });
         arenas = new Arena[alist.size()];

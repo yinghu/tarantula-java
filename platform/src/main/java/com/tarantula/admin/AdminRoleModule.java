@@ -32,6 +32,7 @@ public class AdminRoleModule implements Module {
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
     private int maxGameClusterCount;
+    private int defaultGameLevelCount;
     private int maxGameLevelCount;
     private SubscriptionFee monthly;
     private SubscriptionFee yearly;
@@ -71,12 +72,12 @@ public class AdminRoleModule implements Module {
             int page = ((Number)onAccess.property("page")).intValue();
             presenceContext.page = page;
             GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
-            Lobby lobby = this.context.lobby((String) gc.property(GameCluster.GAME_LOBBY));
-            GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gc.property(GameCluster.GAME_SERVICE));
+            //should be querying from data store
+            Lobby lobby = this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_LOBBY));
             lobby.entryList().forEach((a)->{
                 GameLobby gameLobby = new GameLobby();
                 gameLobby.lobby =a;
-                gameLobby.zone = gameServiceProvider.zone(a.distributionKey());
+                gameLobby.zone = _zone(gc,a);
                 presenceContext.gameLobbyList.add(gameLobby);
             });
             //presenceContext.gameLobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_LOBBY)));
@@ -88,7 +89,7 @@ public class AdminRoleModule implements Module {
             presenceContext.lobbyList = new ArrayList<>();
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
-            presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_SERVICE)));
+            presenceContext.lobbyList.add(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_SERVICE)));
             session.write(this.builder.create().toJson(presenceContext).getBytes(),label());
         }
         else if(session.action().equals("onGameDataList")){
@@ -96,7 +97,7 @@ public class AdminRoleModule implements Module {
             presenceContext.lobbyList = new ArrayList<>();
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
-            presenceContext.lobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_DATA)));
+            presenceContext.lobbyList.add(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_DATA)));
             session.write(this.builder.create().toJson(presenceContext).getBytes(),label());
             //this.deploymentServiceProvider.shutdown((String) gc.property(GameCluster.GAME_SERVICE));
             //this.deploymentServiceProvider.shutdown((String) gc.property(GameCluster.GAME_DATA));
@@ -169,6 +170,7 @@ public class AdminRoleModule implements Module {
             session.write(zone.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onUpdateGameLevel")){
+            this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             GameCluster pending = pendingCluster.get(accessId);
@@ -177,9 +179,9 @@ public class AdminRoleModule implements Module {
             zone.arenas[index].name(onAccess.name());
             zone.arenas[index].xp = ((Number)onAccess.property("xp")).doubleValue();
             zone.arenas[index].level = ((Number)onAccess.property("level")).intValue();
+            zone.arenas[index].disabled((Boolean)onAccess.property("disabled"));
             zone.update();
             session.write(zone.toJson().toString().getBytes(),label());
-            //zone.arenas[level].level=
         }
         else if(session.action().equals("onNextGameLobby")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -207,6 +209,15 @@ public class AdminRoleModule implements Module {
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             pendingCluster.remove(accessId);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(accessId);
+            Account acc = new UserAccount();
+            acc.distributionKey(session.systemId());
+            account.load(acc);
+            if(acc.trial()||acc.subscribed()){
+                this.deploymentServiceProvider.launchGameCluster(gameCluster);
+                gameCluster.property(GameCluster.DISABLED,false);
+                gameCluster.update();
+            }
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"updated",true)).getBytes(),label());
         }
         else if(session.action().equals("onCommit")){
@@ -255,6 +266,7 @@ public class AdminRoleModule implements Module {
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.maxGameClusterCount = Integer.parseInt(this.context.configuration("setup").property("maxGameClusterCount"));
+        this.defaultGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("defaultGameLevelCount"));
         this.maxGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLevelCount"));
         this.pendingCluster = new ConcurrentHashMap<>();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
@@ -262,6 +274,23 @@ public class AdminRoleModule implements Module {
     @Override
     public String label() {
         return "admin-role";
+    }
+    private Zone _zone(GameCluster gameCluster,Descriptor descriptor){
+        DataStore dataStore = this.context.dataStore((String) gameCluster.property(GameCluster.GAME_SERVICE));
+        Zone mZone = new Zone();
+        mZone.distributionKey(descriptor.distributionKey());
+        mZone.rank = descriptor.accessRank();
+        mZone.capacity=1;
+        mZone.roundDuration = 60*1000;
+        mZone.overtime = 5000;
+        mZone.playMode = Room.OFF_LINE_MODE;
+        mZone.arenas = new Arena[maxGameLevelCount];
+        for(int i=1;i<maxGameLevelCount+1;i++){
+            mZone.arenas[i-1]=new Arena(i,i*100,"Level "+i,i>defaultGameLevelCount);
+        }
+        mZone.dataStore(dataStore);
+        dataStore.createIfAbsent(mZone,true);
+        return mZone;
     }
     private Zone _zone(GameCluster pending){
         DataStore dataStore = this.context.dataStore((String) pending.property(GameCluster.GAME_SERVICE));
@@ -275,7 +304,7 @@ public class AdminRoleModule implements Module {
         mZone.playMode = Room.OFF_LINE_MODE;
         mZone.arenas = new Arena[maxGameLevelCount];
         for(int i=1;i<maxGameLevelCount+1;i++){
-            mZone.arenas[i-1]=new Arena(i,i*100,"Level "+i,false);
+            mZone.arenas[i-1]=new Arena(i,i*100,"Level "+i,i>defaultGameLevelCount);
         }
         mZone.dataStore(dataStore);
         dataStore.createIfAbsent(mZone,true);

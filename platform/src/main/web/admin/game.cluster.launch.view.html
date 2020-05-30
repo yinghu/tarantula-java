@@ -10,7 +10,10 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-game-cluster-launch-message">
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-game-cluster-launch-message"></div>
+    <div class="w3-panel">
+        <span id="tx-game-cluster-launch-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>
+        <span id="tx-game-cluster-launch" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Launch</span>     
     </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
@@ -23,14 +26,16 @@
 </div>
 <script>
     document.querySelector("#tx-game-cluster-launch-message").innerHTML = TARA_API.query().gameClusterId;
-    TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameLobbyList',accessId:TARA_API.query().gameClusterId,headers:[{name:'score',value:456}]},(resp)=>{
-        if(resp.successful){
-            console.log(resp);                   
-        }
-        else{
-            document.querySelector('#tx-game-cluster-launch-message').innerHTML=resp.message;
-        }       
-    });
+    document.querySelector('#tx-game-cluster-launch').onclick=()=>{
+        TARA_API.onService(true,{serviceTag:'role/admin',command:'onFinishGameLobby',accessId:TARA_API.query().gameClusterId},(resp)=>{
+            if(resp.successful){
+                console.log(resp);                   
+            }
+            else{
+                document.querySelector('#tx-game-cluster-launch-message').innerHTML=resp.message;
+            }       
+        });
+    };
     document.querySelector('#tx-game-cluster-launch-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";

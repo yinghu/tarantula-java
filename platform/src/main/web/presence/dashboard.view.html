@@ -793,9 +793,20 @@
         TARA_API.onService(false,{serviceTag:'role/admin',command:'onGameClusterList'},(resp)=>{
             if(resp.successful){
                 resp.gameClusterList.forEach((g,i)=>{
+                    let disabled = g.disabled;
                     document.querySelector('#game-name-'+i).innerHTML = g.name;
-                    document.querySelector('#game-shutdown-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
-                    document.querySelector('#game-launch-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
+                    let shd = document.querySelector('#game-shutdown-id-'+i);
+                    shd.setAttribute('tx-game-cluster-id',g.gameClusterId); 
+                    let lnc = document.querySelector('#game-launch-id-'+i);
+                    lnc.setAttribute('tx-game-cluster-id',g.gameClusterId); 
+                    if(disabled == true){
+                        shd.style.display='none';
+                        lnc.style.display='block';
+                    }
+                    else{
+                        lnc.style.display='none';
+                        shd.style.display='block';
+                    }
                     document.querySelector('#game-lobby-'+i).innerHTML = g.gameLobby;
                     document.querySelector('#game-service-'+i).innerHTML = g.gameService;
                     document.querySelector('#game-data-'+i).innerHTML = g.gameData;

@@ -32,6 +32,7 @@ public class AdminContext extends ResponseHeader {
                 jo.addProperty("gameService",(String)g.property(GameCluster.GAME_SERVICE));
                 jo.addProperty("gameData",(String)g.property(GameCluster.GAME_DATA));
                 jo.addProperty("accessKey",(String)g.property(GameCluster.ACCESS_KEY));
+                jo.addProperty("disabled",(Boolean)g.property(GameCluster.DISABLED));
                 glist.add(jo);
             });
             jsonObject.add("gameClusterList",glist);
