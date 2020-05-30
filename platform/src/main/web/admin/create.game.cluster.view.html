@@ -285,7 +285,19 @@
     };
     document.querySelector('#tx-level-edit-save').onclick=()=>{
         console.log(pending.levelIndex);
-        document.querySelector('#tx-level-edit').style.display='none';
+        let _ln = document.querySelector('#tx-level-name').value;
+        let _l = document.querySelector('#tx-level').value;
+        let _lx = document.querySelector('#tx-level-xp').value;
+        let _ld = document.querySelector('#tx-level-disabled').value;
+        let payload ={serviceTag:'role/admin',command:'onUpdateGameLevel',accessId:pending.accessId,index:pending.levelIndex}
+        payload.name = _ln;
+        payload.level = _l;
+        payload.xp = _lx;
+        payload.disabled = _ld;
+        TARA_API.onService(true,payload,(resp)=>{
+            console.log(resp);
+            document.querySelector('#tx-level-edit').style.display='none';        
+        });
     };
     document.querySelector('#tx-level-edit-cancel').onclick=()=>{
         document.querySelector('#tx-level-edit').style.display='none';
@@ -294,9 +306,19 @@
         document.querySelector('#tx-lobby-edit').style.display='block';
     };
     document.querySelector('#tx-lobby-edit-save').onclick=()=>{
+        let _rank = document.querySelector('#tx-rank').value;
+        let _cap = document.querySelector('#tx-capacity').value;
+        let _dur = document.querySelector('#tx-duration').value;
         let pm = document.querySelector('#tx-play-mode').value;
-        console.log(pm);
-        document.querySelector('#tx-lobby-edit').style.display='none';
+        let payload ={serviceTag:'role/admin',command:'onUpdateGameLobby',accessId:pending.accessId}
+        payload.rank = _rank;
+        payload.capacity = _cap;
+        payload.duration = _dur;
+        payload.playMode = pm;
+        TARA_API.onService(true,payload,(resp)=>{
+            console.log(resp);
+            document.querySelector('#tx-lobby-edit').style.display='none';        
+        });
     };
     document.querySelector('#tx-lobby-edit-cancel').onclick=()=>{
         document.querySelector('#tx-lobby-edit').style.display='none';

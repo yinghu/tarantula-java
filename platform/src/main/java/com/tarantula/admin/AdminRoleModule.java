@@ -156,9 +156,17 @@ public class AdminRoleModule implements Module {
             }
         }
         else if(session.action().equals("onUpdateGameLobby")){
+            this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            int stub = onAccess.stub();
+            GameCluster pending = pendingCluster.get(accessId);
+            Zone zone = this._zone(pending);
+            zone.rank = ((Number)onAccess.property("rank")).intValue();
+            zone.capacity = ((Number)onAccess.property("capacity")).intValue();
+            zone.roundDuration = ((Number)onAccess.property("duration")).intValue()*60000;
+            zone.playMode = ((Number)onAccess.property("playMode")).intValue();
+            zone.update();
+            session.write(zone.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onUpdateGameLevel")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -166,7 +174,11 @@ public class AdminRoleModule implements Module {
             GameCluster pending = pendingCluster.get(accessId);
             Zone zone = this._zone(pending);
             int index = ((Number)onAccess.property("index")).intValue();
-
+            zone.arenas[index].name(onAccess.name());
+            zone.arenas[index].xp = ((Number)onAccess.property("xp")).doubleValue();
+            zone.arenas[index].level = ((Number)onAccess.property("level")).intValue();
+            zone.update();
+            session.write(zone.toJson().toString().getBytes(),label());
             //zone.arenas[level].level=
         }
         else if(session.action().equals("onNextGameLobby")){
@@ -265,6 +277,7 @@ public class AdminRoleModule implements Module {
         for(int i=1;i<maxGameLevelCount+1;i++){
             mZone.arenas[i-1]=new Arena(i,i*100,"Level "+i,false);
         }
+        mZone.dataStore(dataStore);
         dataStore.createIfAbsent(mZone,true);
         return mZone;
     }
