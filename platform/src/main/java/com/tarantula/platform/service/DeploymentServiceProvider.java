@@ -2,12 +2,11 @@ package com.tarantula.platform.service;
 
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.platform.presence.GameCluster;
 
 import java.io.InputStream;
 
 /**
- * Updated by yinghu lu on 6/15/2019.
+ * Updated by yinghu lu on 5/30/2020
  */
 
 public interface DeploymentServiceProvider extends ServiceProvider,MetricsListener {

@@ -19,13 +19,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
- * updated by yinghu lu on 9/8/2019.
+ * updated by yinghu lu on 5/30/2020
  */
 public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider,EventListener,SchedulingTask{
 
@@ -748,16 +749,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public Lobby lobby(String typeId){
         DataStore mds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(mds.bucket(),typeId);
-        mds.load(lobbyTypeIdIndex);
-        LobbyDescriptor lb = new LobbyDescriptor();
-        lb.distributionKey(lobbyTypeIdIndex.index());
-        mds.load(lb);
+        List<LobbyDescriptor> lbl = this.tarantulaContext.query(new String[]{mds.bucket(),typeId},new LobbyQuery(mds.bucket()));
+        if(lbl.size()==0){
+            return null;
+        }
+        LobbyDescriptor lb = lbl.get(0);
         Lobby lobby = new DefaultLobby(lb);
-        ApplicationQuery query = new ApplicationQuery(lb.distributionKey());
-        mds.list(query,(a)->{
+        List<DeploymentDescriptor> apps = this.tarantulaContext.query(new String[]{lb.distributionKey()},new ApplicationQuery(lb.distributionKey()));
+        apps.forEach((a)->{
             lobby.addEntry(a);
-            return true;
         });
         return lobby;
     }
