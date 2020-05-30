@@ -561,13 +561,22 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             _shutdown(event.typeId());
         }
         else if(event instanceof GameClusterLaunchEvent){
-            log.warn("GAME CLUSTER-->"+event.trackId());
+            log.warn("GAME CLUSTER launch-->"+event.trackId());
             GameCluster gameCluster = new GameCluster();
             gameCluster.distributionKey(event.trackId());
             this.tarantulaContext.masterDataStore().load(gameCluster);
             _launch((String)gameCluster.property(GameCluster.GAME_DATA));
             _launch((String)gameCluster.property(GameCluster.GAME_LOBBY));
             _launch((String)gameCluster.property(GameCluster.GAME_SERVICE));
+        }
+       else if(event instanceof GameClusterShutdownEvent){
+           log.warn("GAME CLUSTER shutdown-->"+event.trackId());
+           GameCluster gameCluster = new GameCluster();
+           gameCluster.distributionKey(event.trackId());
+           this.tarantulaContext.masterDataStore().load(gameCluster);
+           _shutdown((String)gameCluster.property(GameCluster.GAME_DATA));
+           _shutdown((String)gameCluster.property(GameCluster.GAME_LOBBY));
+           _shutdown((String)gameCluster.property(GameCluster.GAME_SERVICE));
        }
         return false;
     }
@@ -715,6 +724,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext.tarantulaCluster().deployService().enableLobby(lobby,true);
         this.tarantulaContext.tarantulaCluster().deployService().enableLobby(service,true);
         this.integrationEventService.publish(new GameClusterLaunchEvent(eventTopic,gameCluster.distributionKey()));
+    }
+    public <T extends OnAccess> void shutdownGameCluster(T gameCluster){
+        String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
+        String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
+        String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
+        this.tarantulaContext.tarantulaCluster().deployService().enableLobby(data,false);
+        this.tarantulaContext.tarantulaCluster().deployService().enableLobby(lobby,false);
+        this.tarantulaContext.tarantulaCluster().deployService().enableLobby(service,false);
+        this.integrationEventService.publish(new GameClusterShutdownEvent(eventTopic,gameCluster.distributionKey()));
     }
     public <T extends OnAccess> T createGameCluster(String owner,String name,String plan){
         return (T)this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name,plan);

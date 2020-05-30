@@ -54,7 +54,7 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int ON_VIEW_EVENT_CID = 23;
 
     public static final int GAME_CLUSTER_LAUNCH_EVENT_CID = 24;
-
+    public static final int GAME_CLUSTER_SHUTDOWN_EVENT_CID = 25;
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
 
@@ -127,6 +127,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case GAME_CLUSTER_LAUNCH_EVENT_CID:
                 _ins = new GameClusterLaunchEvent();
+                break;
+            case GAME_CLUSTER_SHUTDOWN_EVENT_CID:
+                _ins = new GameClusterShutdownEvent();
                 break;
             case SINGLETON_FORWARD_CID:
                 _ins = new SessionForward();

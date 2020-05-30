@@ -208,9 +208,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
                 arena.level = Integer.parseInt(lx[0]);
                 arena.xp = Double.parseDouble(lx[1]);
                 arena.disabled(Boolean.parseBoolean(lx[2]));
-                if(!arena.disabled()){//skip disabled
-                    alist.add(arena);
-                }
+                alist.add(arena);
             }
         });
         arenas = new Arena[alist.size()];

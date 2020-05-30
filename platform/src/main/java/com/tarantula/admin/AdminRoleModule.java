@@ -4,7 +4,6 @@ import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.*;
-import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.presence.*;
@@ -243,7 +242,13 @@ public class AdminRoleModule implements Module {
             }
         }
         else if(session.action().equals("onShutdownGameCluster")){
-            //this.deploymentServiceProvider.shutdown()
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
+            GameCluster gc = this.deploymentServiceProvider.gameCluster(accessId);
+            this.deploymentServiceProvider.shutdownGameCluster(gc);
+            gc.property(GameCluster.DISABLED,true);
+            gc.update();
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"updated",true)).getBytes(),label());
         }
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes(),this.label());

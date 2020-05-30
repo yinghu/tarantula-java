@@ -14,11 +14,11 @@
     </div> 
     <div class="w3-panel">
         <span id="tx-game-cluster-shutdown-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>
-        <span id="tx-game-cluster-shutdown" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Launch</span>     
+        <span id="tx-game-cluster-shutdown" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Shutdown</span>     
     </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
-            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>        
         </div>
         <div class="w3-display-bottomright w3-padding">
             <span class="tx-text-12">Powered By ICodeSoftware</span>
@@ -28,7 +28,7 @@
 <script>
     document.querySelector("#tx-game-cluster-shutdown-message").innerHTML = TARA_API.query().gameClusterId;
     document.querySelector("#tx-game-cluster-shutdown").onclick=()=>{
-        TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameLobbyList',accessId:TARA_API.query().gameClusterId},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'role/admin',command:'onShutdownGameCluster',accessId:TARA_API.query().gameClusterId},(resp)=>{
             if(resp.successful){
                 console.log(resp);                   
             }
