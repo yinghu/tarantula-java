@@ -15,6 +15,7 @@ import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SudoRoleModule implements Module,Configuration.Listener {
@@ -34,6 +35,18 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             acc.distributionKey(session.systemId());
             uDatastore.load(acc);
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes(),label());
+        }
+        else if(session.action().equals("onUserList")){
+            AccessContext accessContext = new AccessContext();
+            accessContext.userList = new ArrayList<>();
+            uDatastore.traverse((d,o,k,v)->{
+                Access acc = new User();
+                acc.distributionKey(new String(k));
+                acc.fromMap(SystemUtil.toMap(v));
+                accessContext.userList.add(acc);
+                return true;
+            });
+            session.write(accessContext.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onFindUser")){
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"find user",true)).getBytes(),this.label());

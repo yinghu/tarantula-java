@@ -48,7 +48,7 @@ public class AdminRoleModule implements Module {
             session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0)).toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onGameClusterList")){
-            this.context.log(new String(payload),OnLog.WARN);
+            //this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             int index = ((Number)onAccess.property("index")).intValue();
             GameClusterContext adminContext = new GameClusterContext();
@@ -160,7 +160,7 @@ public class AdminRoleModule implements Module {
         }
 
         else if(session.action().equals("onUpdateGameLobby")){
-            this.context.log(new String(payload),OnLog.WARN);
+            //this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             GameLobbyContext pending = pendingLobby.get(accessId);
@@ -174,7 +174,7 @@ public class AdminRoleModule implements Module {
             session.write(pending.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onUpdateGameLevel")){
-            this.context.log(new String(payload),OnLog.WARN);
+            //this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             int index = ((Number)onAccess.property("index")).intValue();

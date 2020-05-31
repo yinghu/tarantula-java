@@ -561,7 +561,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 if(mds.load(lobbyTypeIdIndex)){//stop existed
                     throw new RuntimeException("["+name+"] duplicated");
                 }
-                log.warn("Create named lobby type id->"+configuration.descriptor.typeId());
+                //log.warn("Create named lobby type id->"+configuration.descriptor.typeId());
                 Descriptor descriptor = configuration.descriptor;
                 descriptor.owner(mds.bucket());
                 descriptor.label(LobbyQuery.LABEL);
@@ -579,9 +579,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     a.typeId(descriptor.typeId());//replaced with named type id
                     a.subtypeId(a.subtypeId().replace("game",name));
                     a.tag(a.tag().replace("game",name));
-                    log.warn("Create named application on typeId->"+a.typeId());
-                    log.warn("Create named application on subtypeId->"+a.subtypeId());
-                    log.warn("Create named application on tag->"+a.tag());
+                    //log.warn("Create named application on typeId->"+a.typeId());
+                    //log.warn("Create named application on subtypeId->"+a.subtypeId());
+                    //log.warn("Create named application on tag->"+a.tag());
                     mds.create(a);
                 });
             }
