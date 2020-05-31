@@ -15,8 +15,8 @@ public class GameLobby {
         jsonObject.addProperty("tag",lobby.tag());
         jsonObject.addProperty("rank",lobby.accessRank());
         jsonObject.addProperty("capacity",zone.capacity);
-        jsonObject.addProperty("duration",zone.roundDuration);
-        jsonObject.addProperty("overtime",zone.overtime);
+        jsonObject.addProperty("duration",zone.roundDuration/60000);
+        //jsonObject.addProperty("overtime",zone.overtime);
         jsonObject.addProperty("playMode",zone.toPlayMode());
         JsonArray jds = new JsonArray();
         for(Arena a: zone.arenas){

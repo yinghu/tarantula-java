@@ -37,6 +37,7 @@ public class AdminRoleModule implements Module {
     private SubscriptionFee yearly;
 
     private ConcurrentHashMap<String,GameCluster> pendingCluster;
+    private ConcurrentHashMap<String,GameLobbyContext> pendingLobby;
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
@@ -64,24 +65,26 @@ public class AdminRoleModule implements Module {
             session.write(adminContext.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onGameLobbyList")){
-            GameLobbyContext presenceContext = new GameLobbyContext();
-            presenceContext.gameLobbyList = new ArrayList<>();
-            presenceContext.successful(true);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             int page = ((Number)onAccess.property("page")).intValue();
-            presenceContext.page = page;
-            GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
-            //should be querying from data store
-            Lobby lobby = this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_LOBBY));
-            lobby.entryList().forEach((a)->{
-                GameLobby gameLobby = new GameLobby();
-                gameLobby.lobby =a;
-                gameLobby.zone = _zone(gc,a);
-                presenceContext.gameLobbyList.add(gameLobby);
+            String accessId = (String)onAccess.property(OnAccess.ACCESS_ID);
+            GameLobbyContext lobbyContext = pendingLobby.computeIfAbsent(accessId,(k)-> {
+                GameLobbyContext presenceContext = new GameLobbyContext();
+                presenceContext.gameLobbyList = new ArrayList<>();
+                presenceContext.successful(true);
+                GameCluster gc = this.deploymentServiceProvider.gameCluster((String) onAccess.property(OnAccess.ACCESS_ID));
+                //query from master node to make sure data available always
+                Lobby lobby = this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_LOBBY));
+                lobby.entryList().forEach((a) -> {
+                    GameLobby gameLobby = new GameLobby();
+                    gameLobby.lobby = a;
+                    gameLobby.zone = _zone(gc, a);
+                    presenceContext.gameLobbyList.add(gameLobby);
+                });
+                return presenceContext;
             });
-            //presenceContext.gameLobbyList.add(this.context.lobby((String) gc.property(GameCluster.GAME_LOBBY)));
-            session.write(presenceContext.toJson().toString().getBytes(),label());
-            //gameServiceProvider.zone()
+            lobbyContext.page = page;
+            session.write(lobbyContext.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onGameServiceList")){
             PresenceContext presenceContext = new PresenceContext();
@@ -155,18 +158,20 @@ public class AdminRoleModule implements Module {
                 session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"you already have max game clusters",false)).getBytes(),label());
             }
         }
+
         else if(session.action().equals("onUpdateGameLobby")){
             this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            GameCluster pending = pendingCluster.get(accessId);
-            Zone zone = this._zone(pending);
+            GameLobbyContext pending = pendingLobby.get(accessId);
+            GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
+            Zone zone = gameLobby.zone;
             zone.rank = ((Number)onAccess.property("rank")).intValue();
             zone.capacity = ((Number)onAccess.property("capacity")).intValue();
             zone.roundDuration = ((Number)onAccess.property("duration")).intValue()*60000;
             zone.playMode = ((Number)onAccess.property("playMode")).intValue();
             zone.update();
-            session.write(zone.toJson().toString().getBytes(),label());
+            session.write(pending.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onUpdateGameLevel")){
             this.context.log(new String(payload),OnLog.WARN);
@@ -274,6 +279,7 @@ public class AdminRoleModule implements Module {
         this.defaultGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("defaultGameLevelCount"));
         this.maxGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLevelCount"));
         this.pendingCluster = new ConcurrentHashMap<>();
+        this.pendingLobby = new ConcurrentHashMap<>();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
     @Override
