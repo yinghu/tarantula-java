@@ -48,6 +48,9 @@ public class AdminRoleModule implements Module {
             session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0)).toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onGameClusterList")){
+            this.context.log(new String(payload),OnLog.WARN);
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            int index = ((Number)onAccess.property("index")).intValue();
             AdminContext adminContext = new AdminContext();
             adminContext.gameClusterList = new ArrayList<>();
             IndexSet idx = new IndexSet();

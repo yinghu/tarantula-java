@@ -139,6 +139,9 @@
                     <span id='tx-game-cluster-create' view-id='create.game.cluster' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>
                 </div>  
             </div>
+            <div id='tx-game-cluster-next' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+                <span id='tx-game-cluster-next-list' view-id='create.game.cluster' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Next List</span>    
+            </div>
             <div id='game-cluster-0' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
                 <div class="w3-container w3-padding">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
@@ -745,6 +748,58 @@
     </div>
 </div>
 <script>
+    document.querySelector('#tx-menu-close').onclick = ()=>{
+        if(TARA_API.query().systemId){
+            tx_oauth_sign_out();
+            TARA_API.onLogout((resp)=>{
+                document.querySelector("#tx-dash-board").style.display="none";
+                document.querySelector("#tx-dash-board").innerHTML="";
+            });        
+        }
+    }; 
+    document.querySelectorAll(".tx-api-opt").forEach((a)=>{
+        a.onclick = ()=>{
+            document.querySelectorAll('.tx-api-pane').forEach((a)=>{
+                    a.style.display = 'none';
+                }
+            );
+            document.querySelector('#tx-api-'+a.innerHTML).style.display='block'; 
+        }; 
+    });
+    document.querySelectorAll(".tx-opt").forEach((a)=>{
+        a.onclick = ()=>{
+            document.querySelectorAll('.tx-pane').forEach((a)=>{
+                    a.style.display = 'none';
+                }
+            );
+            if(a.innerHTML == 'Account'){
+                _tx_account();
+            }
+            else if(a.innerHTML == 'Developer'){
+                _tx_game_cluster();
+            }
+            else if(a.innerHTML == 'API'){
+                _tx_api();
+            }
+            else if(a.innerHTML == 'Metrics'){
+                _tx_metrics();
+            }
+            else if(a.innerHTML == 'Sudo'){
+                _tx_extension();
+            }
+            document.querySelector('#tx-'+a.innerHTML).style.display='block'; 
+        }; 
+    });
+    document.querySelectorAll('.tx-action').forEach((a)=>{
+        a.onclick=()=>{
+            TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
+            let vid = a.getAttribute('view-id');
+            tx_view({viewId:vid,containerId:'#tx-popup'});    
+        }
+    });
+    document.querySelector('#tx-game-cluster-next-list').onclick=()=>{
+        _tx_game_cluster_list();
+    };
     _tx_account();
     function _tx_account(){
         TARA_API.onService(false,{serviceTag:'presence/lobby',command:'onPresence'},(resp)=>{
@@ -772,6 +827,7 @@
         });
     }
     function _tx_game_cluster(){
+        TARA_API.query().gameClusterIndex=0;
         document.querySelector('#tx-game-cluster-role').innerHTML= 'ROLE: '+TARA_API.query().role;
         TARA_API.onService(false,{serviceTag:'role/admin',command:'onCheckPermission'},(resp)=>{
             if(resp.successful){
@@ -781,7 +837,7 @@
                 document.querySelector('#tx-game-cluster-create').style.display='block';
                 document.querySelector('#tx-shopping-card').style.display='block';
                 document.querySelector('#tx-game-cluster-warning').style.display='none'; 
-
+                _tx_game_cluster_list();
             }
             else{
                 document.querySelector('#tx-game-cluster-role-upgrade').style.display='block'; 
@@ -790,7 +846,9 @@
                 document.querySelector('#tx-game-cluster-warning').style.display='block'; 
             }        
         });
-        TARA_API.onService(false,{serviceTag:'role/admin',command:'onGameClusterList'},(resp)=>{
+    }
+    function _tx_game_cluster_list(){
+        TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameClusterList',index:TARA_API.query().gameClusterIndex},(resp)=>{
             if(resp.successful){
                 resp.gameClusterList.forEach((g,i)=>{
                     let disabled = g.disabled;
@@ -815,7 +873,12 @@
                     document.querySelector('#game-data-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-service-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);                    
                     document.querySelector('#game-cluster-'+i).style.display='block';
-                });        
+                    TARA_API.query().gameClusterIndex = i+1;
+                });
+                if(TARA_API.query().gameClusterIndex >0){
+                    document.querySelector('#tx-game-cluster-next').style.display='block';
+                }
+                console.log(TARA_API.query().gameClusterIndex);
             }
             else{
                 console.log(resp.message);
@@ -876,53 +939,4 @@
             });
         });
     }
-    document.querySelector('#tx-menu-close').onclick = ()=>{
-        if(TARA_API.query().systemId){
-            tx_oauth_sign_out();
-            TARA_API.onLogout((resp)=>{
-                document.querySelector("#tx-dash-board").style.display="none";
-                document.querySelector("#tx-dash-board").innerHTML="";
-            });        
-        }
-    }; 
-    document.querySelectorAll(".tx-api-opt").forEach((a)=>{
-        a.onclick = ()=>{
-            document.querySelectorAll('.tx-api-pane').forEach((a)=>{
-                    a.style.display = 'none';
-                }
-            );
-            document.querySelector('#tx-api-'+a.innerHTML).style.display='block'; 
-        }; 
-    });
-    document.querySelectorAll(".tx-opt").forEach((a)=>{
-        a.onclick = ()=>{
-            document.querySelectorAll('.tx-pane').forEach((a)=>{
-                    a.style.display = 'none';
-                }
-            );
-            if(a.innerHTML == 'Account'){
-                _tx_account();
-            }
-            else if(a.innerHTML == 'Developer'){
-                _tx_game_cluster();
-            }
-            else if(a.innerHTML == 'API'){
-                _tx_api();
-            }
-            else if(a.innerHTML == 'Metrics'){
-                _tx_metrics();
-            }
-            else if(a.innerHTML == 'Sudo'){
-                _tx_extension();
-            }
-            document.querySelector('#tx-'+a.innerHTML).style.display='block'; 
-        }; 
-    });
-    document.querySelectorAll('.tx-action').forEach((a)=>{
-        a.onclick=()=>{
-            TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
-            let vid = a.getAttribute('view-id');
-            tx_view({viewId:vid,containerId:'#tx-popup'});    
-        }
-    });
 </script>

@@ -30,7 +30,7 @@
         <configuration-list>
             <configuration tag="admin" priority="10">
                 <admin type="setup">
-                    <property name="maxGameClusterCount">5</property>
+                    <property name="maxGameClusterCount">10</property>
                     <property name="defaultGameLevelCount">3</property>
                     <property name="maxGameLevelCount">6</property>
                 </admin>
