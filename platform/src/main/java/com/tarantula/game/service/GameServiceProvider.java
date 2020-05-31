@@ -1,6 +1,7 @@
 package com.tarantula.game.service;
 
 import com.tarantula.*;
+import com.tarantula.Module;
 import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.Zone;
 import com.tarantula.logging.JDKLogger;
@@ -35,6 +36,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     private EventService publisher;
     private String dest;
     private ClusterProvider integrationCluster;
+    private ConcurrentHashMap<String, Module.OnReset> rMap = new ConcurrentHashMap<>();
     public GameServiceProvider(String name){
         NAME = name;
     }
@@ -65,7 +67,9 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         this.dataStore.createIfAbsent(deltaStatistics,true);
         return deltaStatistics;
     }
-
+    public void addModuleReset(String key,Module.OnReset reset){
+        rMap.put(key,reset);
+    }
     public Zone zone(String applicationId){//application id
         Zone zone = new Zone();
         zone.distributionKey(applicationId);
@@ -103,6 +107,12 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
             return false;
         });
         integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
+        this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.ZONE_CID,(z)->{
+            Module.OnReset reset = rMap.get(z.distributionKey());
+            if(reset!=null){
+                reset.reset();
+            }
+        });
         //integrationCluster.addEventListener(NAME,(e)->{
             //logger.warn(e.toString());
             //return false;//keep

@@ -22,4 +22,7 @@ public interface Module {
     interface OnResource{
         void on(InputStream in);
     }
+    interface OnReset{
+        void reset();
+    }
 }

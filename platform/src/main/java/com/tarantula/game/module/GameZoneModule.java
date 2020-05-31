@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by yinghu lu on 4/14/2020.
  */
-public class GameZoneModule implements Module{
+public class GameZoneModule implements Module,Module.OnReset{
 
     private ApplicationContext context;
     private Zone mZone;
@@ -91,6 +91,7 @@ public class GameZoneModule implements Module{
         mZone.gameServiceProvider = this.gameServiceProvider;
         mZone.descriptor = this.context.descriptor();
         mZone.start();
+        this.gameServiceProvider.addModuleReset(mZone.distributionKey(),this);
         context.log(this.mZone.descriptor.tag()+"/"+this.mZone.descriptor.accessRank()+"/"+this.mZone.descriptor.distributionKey(),OnLog.WARN);
     }
     public void onConnection(Connection connection){
@@ -111,5 +112,10 @@ public class GameZoneModule implements Module{
     @Override
     public String label() {
         return "game";
+    }
+
+    @Override
+    public void reset() {
+        this.context.log("reset something",OnLog.WARN);
     }
 }
