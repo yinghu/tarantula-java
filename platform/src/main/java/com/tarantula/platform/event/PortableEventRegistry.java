@@ -4,7 +4,7 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.OnViewTrack;
-import com.tarantula.platform.presence.GameCluster;
+import com.tarantula.admin.GameCluster;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 

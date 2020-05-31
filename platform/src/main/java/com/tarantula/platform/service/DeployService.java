@@ -3,7 +3,7 @@ package com.tarantula.platform.service;
 
 import com.tarantula.Descriptor;
 import com.tarantula.OnView;
-import com.tarantula.platform.presence.GameCluster;
+import com.tarantula.admin.GameCluster;
 
 public interface DeployService extends ServiceProvider {
 

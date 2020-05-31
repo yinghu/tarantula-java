@@ -9,7 +9,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.event.MapStoreRecoveryEvent;
-import com.tarantula.platform.presence.GameCluster;
+import com.tarantula.admin.GameCluster;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.DeploymentServiceProvider;
@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 

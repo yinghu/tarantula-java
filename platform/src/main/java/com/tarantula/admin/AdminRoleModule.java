@@ -51,8 +51,9 @@ public class AdminRoleModule implements Module {
             this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             int index = ((Number)onAccess.property("index")).intValue();
-            AdminContext adminContext = new AdminContext();
+            GameClusterContext adminContext = new GameClusterContext();
             adminContext.gameClusterList = new ArrayList<>();
+            adminContext.index = index;
             IndexSet idx = new IndexSet();
             idx.distributionKey(session.systemId());
             idx.label(Account.GameClusterLabel);

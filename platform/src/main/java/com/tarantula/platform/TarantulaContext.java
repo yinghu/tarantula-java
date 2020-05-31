@@ -12,7 +12,7 @@ import com.hazelcast.config.Config;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.event.PortableEventRegistry;
-import com.tarantula.platform.presence.GameCluster;
+import com.tarantula.admin.GameCluster;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;

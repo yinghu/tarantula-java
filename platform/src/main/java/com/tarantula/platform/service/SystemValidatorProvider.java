@@ -5,7 +5,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.SystemValidator;
-import com.tarantula.platform.presence.GameCluster;
+import com.tarantula.admin.GameCluster;
 import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;

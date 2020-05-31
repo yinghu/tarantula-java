@@ -1,4 +1,4 @@
-package com.tarantula.platform.presence;
+package com.tarantula.admin;
 
 import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;

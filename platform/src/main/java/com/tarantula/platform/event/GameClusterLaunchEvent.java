@@ -3,7 +3,6 @@ package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.Event;
-import com.tarantula.platform.presence.GameCluster;
 
 import java.io.IOException;
 

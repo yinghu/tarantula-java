@@ -140,7 +140,7 @@
                 </div>  
             </div>
             <div id='tx-game-cluster-next' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
-                <span id='tx-game-cluster-next-list' view-id='create.game.cluster' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Next List</span>    
+                <span id='tx-game-cluster-next-list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Next List</span>    
             </div>
             <div id='game-cluster-0' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
                 <div class="w3-container w3-padding">
@@ -873,12 +873,9 @@
                     document.querySelector('#game-data-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-service-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);                    
                     document.querySelector('#game-cluster-'+i).style.display='block';
-                    TARA_API.query().gameClusterIndex = i+1;
-                });
-                if(TARA_API.query().gameClusterIndex >0){
                     document.querySelector('#tx-game-cluster-next').style.display='block';
-                }
-                console.log(TARA_API.query().gameClusterIndex);
+                });
+                TARA_API.query().gameClusterIndex = resp.index;
             }
             else{
                 console.log(resp.message);
