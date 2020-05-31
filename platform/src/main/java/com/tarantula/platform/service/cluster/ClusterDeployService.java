@@ -403,9 +403,19 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
         lobbyDescriptor.distributionKey(query.index());
         if(ds.load(lobbyDescriptor)){
-            lobbyDescriptor.disabled(!enabled);
-            ds.update(lobbyDescriptor);
-            return true;
+            if(enabled&&lobbyDescriptor.disabled()){//enable opt
+                lobbyDescriptor.disabled(false);
+                ds.update(lobbyDescriptor);
+                return true;
+            }
+            else if((!enabled)&&(!lobbyDescriptor.disabled())){//disable opt
+                lobbyDescriptor.disabled(true);
+                ds.update(lobbyDescriptor);
+                return true;
+            }
+            else{//skip
+                return false;
+            }
         }
         else{
             return false;
@@ -531,13 +541,45 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             this.cache = cache;
         }
     }
-
-    public GameCluster createGameCluster(String owner,String name,String plan){
+    public boolean enableGameCluster(String gameClusterId){
+        GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionKey(gameClusterId);
+        DataStore mds = this.tarantulaContext.masterDataStore();
+        if(!mds.load(gameCluster)){
+            return false;
+        }
+        String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
+        String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
+        String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
+        boolean suc1 =enableLobby(data,true);
+        boolean suc2 =enableLobby(lobby,true);
+        boolean suc3 =enableLobby(service,true);
+        gameCluster.property(GameCluster.DISABLED,false);
+        mds.update(gameCluster);
+        return suc1&&suc2&&suc3;//make sure all enabled
+    }
+    public boolean disableGameCluster(String gameClusterId){
+        GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionKey(gameClusterId);
+        DataStore mds = this.tarantulaContext.masterDataStore();
+        if(!mds.load(gameCluster)){
+            return false;
+        }
+        String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
+        String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
+        String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
+        boolean suc1 = enableLobby(data,false);
+        boolean suc2 = enableLobby(lobby,false);
+        boolean suc3 = enableLobby(service,false);
+        gameCluster.property(GameCluster.DISABLED,true);
+        mds.update(gameCluster);
+        return suc1&&suc2&&suc3;//make sure all disabled
+    }
+    public GameCluster createGameCluster(String owner,String name){
         GameCluster gameCluster = new GameCluster();
         try {
             DataStore mds = this.tarantulaContext.masterDataStore();
             gameCluster.property(GameCluster.NAME,name);
-            gameCluster.property(GameCluster.PLAN,plan);
             gameCluster.property(GameCluster.OWNER,owner);
             gameCluster.property(GameCluster.ACCESS_KEY,"mock access key");
             gameCluster.property(GameCluster.TIMESTAMP,0);
@@ -545,7 +587,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             mds.create(gameCluster);//create first and discharge if any errors on loop
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();
-            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-"+plan+"-plan.xml"));
+            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-basic-plan.xml"));
             for (LobbyConfiguration configuration : parser.configurations) {
                 configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",name.toLowerCase()));//lower case only typeId
                 if(configuration.descriptor.typeId().endsWith("-lobby")){
@@ -579,9 +621,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     a.typeId(descriptor.typeId());//replaced with named type id
                     a.subtypeId(a.subtypeId().replace("game",name));
                     a.tag(a.tag().replace("game",name));
-                    //log.warn("Create named application on typeId->"+a.typeId());
-                    //log.warn("Create named application on subtypeId->"+a.subtypeId());
-                    //log.warn("Create named application on tag->"+a.tag());
                     mds.create(a);
                 });
             }

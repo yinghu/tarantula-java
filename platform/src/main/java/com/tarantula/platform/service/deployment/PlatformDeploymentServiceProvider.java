@@ -468,7 +468,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public boolean onEvent(Event event) {
        if(event instanceof MapStoreSyncEvent){
-            log.warn("Map Sync EVENT->"+event.source()+"/"+event.destination()+"/"+event.trackId());
+            //log.warn("Map Sync EVENT->"+event.source()+"/"+event.destination()+"/"+event.trackId());
             MapStoreSyncEvent mse = (MapStoreSyncEvent)event;
             Metadata mt = mse.metadata;
             RecoverableRegistry r = tarantulaContext.recoverableRegistry(mt.factoryId());
@@ -561,7 +561,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             _shutdown(event.typeId());
         }
         else if(event instanceof GameClusterLaunchEvent){
-            log.warn("GAME CLUSTER launch-->"+event.trackId());
+            //log.warn("GAME CLUSTER launch-->"+event.trackId());
             GameCluster gameCluster = new GameCluster();
             gameCluster.distributionKey(event.trackId());
             this.tarantulaContext.masterDataStore().load(gameCluster);
@@ -570,7 +570,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             _launch((String)gameCluster.property(GameCluster.GAME_SERVICE));
         }
        else if(event instanceof GameClusterShutdownEvent){
-           log.warn("GAME CLUSTER shutdown-->"+event.trackId());
+           //log.warn("GAME CLUSTER shutdown-->"+event.trackId());
            GameCluster gameCluster = new GameCluster();
            gameCluster.distributionKey(event.trackId());
            this.tarantulaContext.masterDataStore().load(gameCluster);
@@ -716,26 +716,26 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         icp.remove(serverId.getBytes());
     }
     //end of dedicated server methods
-    public <T extends OnAccess> void launchGameCluster(T gameCluster){
-        String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
-        String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
-        String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
-        this.tarantulaContext.tarantulaCluster().deployService().enableLobby(data,true);
-        this.tarantulaContext.tarantulaCluster().deployService().enableLobby(lobby,true);
-        this.tarantulaContext.tarantulaCluster().deployService().enableLobby(service,true);
-        this.integrationEventService.publish(new GameClusterLaunchEvent(eventTopic,gameCluster.distributionKey()));
+    public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
+        if(this.tarantulaContext.tarantulaCluster().deployService().enableGameCluster(gameCluster.distributionKey())){
+            this.integrationEventService.publish(new GameClusterLaunchEvent(eventTopic,gameCluster.distributionKey()));
+            return true;
+        }
+        else{
+            return false;
+        }
     }
-    public <T extends OnAccess> void shutdownGameCluster(T gameCluster){
-        String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
-        String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
-        String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
-        this.tarantulaContext.tarantulaCluster().deployService().enableLobby(data,false);
-        this.tarantulaContext.tarantulaCluster().deployService().enableLobby(lobby,false);
-        this.tarantulaContext.tarantulaCluster().deployService().enableLobby(service,false);
-        this.integrationEventService.publish(new GameClusterShutdownEvent(eventTopic,gameCluster.distributionKey()));
+    public <T extends OnAccess> boolean shutdownGameCluster(T gameCluster){
+        if(this.tarantulaContext.tarantulaCluster().deployService().disableGameCluster(gameCluster.distributionKey())){
+            this.integrationEventService.publish(new GameClusterShutdownEvent(eventTopic,gameCluster.distributionKey()));
+            return true;
+        }
+        else{
+            return false;
+        }
     }
-    public <T extends OnAccess> T createGameCluster(String owner,String name,String plan){
-        return (T)this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name,plan);
+    public <T extends OnAccess> T createGameCluster(String owner,String name){
+        return (T)this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name);
     }
     public <T extends OnAccess> T gameCluster(String key){
         GameCluster gc = new GameCluster();

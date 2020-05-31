@@ -80,9 +80,9 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //END OF MODULE OPERATION API
 
     //GAME CLUSTER APIs
-    <T extends OnAccess> T createGameCluster(String owner,String name,String plan);
-    <T extends OnAccess> void launchGameCluster(T gameCluster);
-    <T extends OnAccess> void shutdownGameCluster(T gameCluster);
+    <T extends OnAccess> T createGameCluster(String owner,String name);
+    <T extends OnAccess> boolean launchGameCluster(T gameCluster);
+    <T extends OnAccess> boolean shutdownGameCluster(T gameCluster);
     <T extends OnAccess> T gameCluster(String key);
     Lobby lobby(String typeId);
     //END OF CLUSTER

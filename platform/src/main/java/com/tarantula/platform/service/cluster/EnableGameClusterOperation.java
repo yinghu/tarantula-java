@@ -3,32 +3,31 @@ package com.tarantula.platform.service.cluster;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
-import com.tarantula.platform.presence.GameCluster;
+
 
 import java.io.IOException;
 
 /**
- * created by yinghu lu on 5/15/2020.
+ * created by yinghu lu on 5/31/2020.
  */
-public class CreateGameClusterOperation extends Operation {
+public class EnableGameClusterOperation extends Operation {
 
 
-    private GameCluster result;
-    private String owner;
-    private String name;
-    public CreateGameClusterOperation() {
+    private String gameClusterId;
+
+    private boolean result;
+
+    public EnableGameClusterOperation() {
     }
 
 
-    public CreateGameClusterOperation(String owner,String name) {
-        this.owner = owner;
-        this.name = name;
-
+    public EnableGameClusterOperation(String gameClusterId) {
+        this.gameClusterId = gameClusterId;
     }
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        this.result = cds.createGameCluster(this.owner,this.name);
+        this.result = cds.enableGameCluster(this.gameClusterId);
     }
 
     @Override
@@ -39,14 +38,12 @@ public class CreateGameClusterOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeUTF(owner);
-        out.writeUTF(name);
+        out.writeUTF(gameClusterId);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.owner = in.readUTF();
-        this.name=in.readUTF();
+        this.gameClusterId = in.readUTF();
     }
 }

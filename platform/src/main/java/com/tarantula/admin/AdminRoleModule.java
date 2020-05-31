@@ -133,7 +133,7 @@ public class AdminRoleModule implements Module {
             acc.distributionKey(session.systemId());
             if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-                GameCluster gc = this.deploymentServiceProvider.createGameCluster(session.systemId(),(String)onAccess.property("name"),"basic");
+                GameCluster gc = this.deploymentServiceProvider.createGameCluster(session.systemId(),(String)onAccess.property("name"));
                 if(gc.successful()){
                     IndexSet idx = new IndexSet();
                     idx.distributionKey(acc.distributionKey());
@@ -196,10 +196,8 @@ public class AdminRoleModule implements Module {
             acc.distributionKey(session.systemId());
             account.load(acc);
             if(acc.trial()||acc.subscribed()){
-                this.deploymentServiceProvider.launchGameCluster(gameCluster);
-                gameCluster.property(GameCluster.DISABLED,false);
-                gameCluster.update();
-                session.write(this.builder.create().toJson(new ResponseHeader(session.action(), "launch event submitted", true)).getBytes(), label());
+                boolean suc = this.deploymentServiceProvider.launchGameCluster(gameCluster);
+                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes(),label());
             }
             else {
                 session.write(this.builder.create().toJson(new ResponseHeader(session.action(), "no subscription or trial found", false)).getBytes(), label());
@@ -231,10 +229,8 @@ public class AdminRoleModule implements Module {
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             GameCluster gc = this.deploymentServiceProvider.gameCluster(accessId);
-            this.deploymentServiceProvider.shutdownGameCluster(gc);
-            gc.property(GameCluster.DISABLED,true);
-            gc.update();
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"updated",true)).getBytes(),label());
+            boolean suc = this.deploymentServiceProvider.shutdownGameCluster(gc);
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes(),label());
         }
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes(),this.label());

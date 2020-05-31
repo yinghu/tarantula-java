@@ -160,12 +160,34 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
     }
 
-    public GameCluster createGameCluster(String owner,String name,String plan){
+    public GameCluster createGameCluster(String owner,String name){
         NodeEngine nodeEngine = getNodeEngine();
-        CreateGameClusterOperation operation = new CreateGameClusterOperation(owner,name,plan);
+        CreateGameClusterOperation operation = new CreateGameClusterOperation(owner,name);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<GameCluster> future = builder.invoke();
+            return future.get(); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
+    public boolean enableGameCluster(String gamaClusterId){
+        NodeEngine nodeEngine = getNodeEngine();
+        EnableGameClusterOperation operation = new EnableGameClusterOperation(gamaClusterId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<Boolean> future = builder.invoke();
+            return future.get(); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
+    public boolean disableGameCluster(String gamaClusterId){
+        NodeEngine nodeEngine = getNodeEngine();
+        DisableGameClusterOperation operation = new DisableGameClusterOperation(gamaClusterId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<Boolean> future = builder.invoke();
             return future.get(); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);

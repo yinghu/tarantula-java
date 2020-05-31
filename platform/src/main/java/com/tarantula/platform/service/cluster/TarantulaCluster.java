@@ -4,7 +4,6 @@ package com.tarantula.platform.service.cluster;
 import java.util.*;
 import java.util.concurrent.*;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.core.*;

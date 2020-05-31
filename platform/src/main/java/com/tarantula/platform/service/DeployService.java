@@ -16,11 +16,15 @@ public interface DeployService extends ServiceProvider {
     void recover(String destination,String registerId,boolean fullBackup);
 
     boolean addLobby(Descriptor lobby);
-    boolean enableLobby(String typeId,boolean enabled);
+
     String addApplication(Descriptor application);
     boolean addView(OnView view);
     boolean resetModule(String lobbyId,Descriptor descriptor);
     String enableApplication(String applicationId,boolean enabled);
 
-    GameCluster createGameCluster(String owner,String name,String plan);
+    boolean enableLobby(String typeId,boolean enabled);
+
+    GameCluster createGameCluster(String owner,String name);
+    boolean enableGameCluster(String gameClusterId);
+    boolean disableGameCluster(String gameClusterId);
 }
