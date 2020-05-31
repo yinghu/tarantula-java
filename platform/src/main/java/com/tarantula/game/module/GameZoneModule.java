@@ -78,7 +78,7 @@ public class GameZoneModule implements Module{
             int sz = this.context.descriptor().capacity();
             mZone.arenas = new Arena[sz];
             for(int i=1;i<sz+1;i++){
-                mZone.arenas[i-1]=new Arena(i,i*100,"Level "+i,true);
+                mZone.arenas[i-1]=new Arena(i,i*100,"Level "+i,false);
             }
             mZone.update();
         }
