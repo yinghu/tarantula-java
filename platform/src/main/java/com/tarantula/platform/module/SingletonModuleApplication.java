@@ -7,6 +7,8 @@ import com.tarantula.platform.event.FastPlayEvent;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.RingBuffer;
 
+import java.util.concurrent.ScheduledFuture;
+
 /**
  * Updated by yinghu lu on 4/19/2020.
  */
@@ -18,6 +20,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     private DeploymentServiceProvider serviceProvider;
     private RingBuffer<Connection> cBuffer;
     private Connection current;
+    private ScheduledFuture scheduledFuture;
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         if(this.module.onRequest(session,payload,((cid,uid,delta) ->{
@@ -36,7 +39,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         SERVER_PUSH_INTERVAL = descriptor.timerOnModule();
         if(SERVER_PUSH_INTERVAL>0){
             this.serviceProvider.registerOnConnectionListener(this);
-            this.context.schedule(this);
+            this.scheduledFuture = this.context.schedule(this);
         }
         module.setup(context);
         this.context.log("Singleton Dynamic Module Started On ["+descriptor.moduleName()+"]", OnLog.INFO);
@@ -86,6 +89,13 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     @Override
     public void onBucket(int bucket,int state){
         //this.context.log("Bucket->"+bucket+"/"+state,OnLog.WARN);
+    }
+    @Override
+    public void clear(){
+        this.module.clear();
+        if(scheduledFuture!=null){
+            scheduledFuture.cancel(true);
+        }
     }
     @Override
     public void onState(Connection c) {

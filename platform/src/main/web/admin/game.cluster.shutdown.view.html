@@ -29,12 +29,7 @@
     document.querySelector("#tx-game-cluster-shutdown-message").innerHTML = TARA_API.query().gameClusterId;
     document.querySelector("#tx-game-cluster-shutdown").onclick=()=>{
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onShutdownGameCluster',accessId:TARA_API.query().gameClusterId},(resp)=>{
-            if(resp.successful){
-                console.log(resp);                   
-            }
-            else{
-                document.querySelector('#tx-game-cluster-shutdown-message').innerHTML=resp.message;
-            }       
+            document.querySelector('#tx-game-cluster-shutdown-message').innerHTML=resp.message;       
         });
     };
     document.querySelector('#tx-game-cluster-shutdown-close').onclick=()=>{

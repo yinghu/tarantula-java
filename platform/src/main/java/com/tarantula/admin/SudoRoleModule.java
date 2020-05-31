@@ -48,9 +48,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             //session.write(this.builder.create().toJson(this._adminObjectOnApplication(access.accessId())).getBytes(),label());
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"subscription list",true)).getBytes(),this.label());
         }
-        else if(session.action().equals("lobbyList")){
-            session.write(this.builder.create().toJson(this._adminObjectOnLobby()).getBytes(),label());
-        }
+
         else if(session.action().equals("addLobby")){
             LobbyDescriptor desc = new LobbyDescriptor();
             desc.fromMap(SystemUtil.toMap(payload));
@@ -159,34 +157,6 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         return "admin-setup";
     }
 
-    private AdminObject _adminObjectOnLobby(){
-        AdminSetupObject ao = new AdminSetupObject("list lobby",label());
-        ao.name("lobby list");
-        this.dataStore.list(new LobbyQuery(dataStore.bucket()),(a)->{
-            ao.list.add(a);
-            return true;
-        });
-        return ao;
-    }
-    private AdminObject _adminObjectOnApplication(String lobbyId){
-        AdminSetupObject ao = new AdminSetupObject("list app",label());
-        ao.name("application list");
-        ApplicationQuery aq = new ApplicationQuery(lobbyId);
-        IndexSet iset = new IndexSet();
-        iset.distributionKey(lobbyId);
-        iset.label(aq.label());
-        if(this.dataStore.load(iset)) {
-            iset.keySet.forEach((s) -> {
-                this.context.log("KEY->" + s, OnLog.INFO);
-            });
-            this.context.log("OUTPUT->"+new String(iset.toByteArray()),OnLog.INFO);
-        }
-        this.dataStore.list(aq,(a)->{
-            ao.list.add(a);
-            return true;
-        });
-        return ao;
-    }
 
     @Override
     public void onConfiguration(Configuration c) {

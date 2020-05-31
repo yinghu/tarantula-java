@@ -287,9 +287,41 @@
     };
     document.querySelectorAll('.tx-level-edit-open').forEach((a)=>{
         a.onclick=()=>{
+            let lix = parseInt(a.getAttribute('tx-level-no'));
+            TARA_API.query().levelIndex = lix;
+            let ixc = lix+1;
+            document.querySelector('#tx-level-edit-no').innerHTML="Update Level ["+ixc+"]";
+            document.querySelector('#tx-level-name').value = document.querySelector('#tx-level-v-'+lix+'-1').innerHTML;
+            document.querySelector('#tx-level').value = document.querySelector('#tx-level-v-'+lix+'-2').innerHTML;
+            document.querySelector('#tx-level-xp').value = document.querySelector('#tx-level-v-'+lix+'-3').innerHTML;
+            if(document.querySelector('#tx-level-v-'+lix+'-4').innerHTML == 'true'){
+                document.querySelector('#tx-level-disabled').checked = true;    
+            }
+            else{
+                document.querySelector('#tx-level-disabled').checked = false;
+            }
             document.querySelector('#tx-level-edit').style.display='block';
         };
     });
+    document.querySelector('#tx-level-edit-save').onclick=()=>{
+        let _ln = document.querySelector('#tx-level-name').value;
+        let _l = document.querySelector('#tx-level').value;
+        let _lx = document.querySelector('#tx-level-xp').value;
+        let _ld = document.querySelector('#tx-level-disabled').checked;
+        let payload ={serviceTag:'role/admin',command:'onUpdateGameLevel'}
+        payload.accessId = TARA_API.query().gameClusterId;
+        payload.index = TARA_API.query().levelIndex;
+        payload.name = _ln;
+        payload.level = _l/1;
+        payload.xp = _lx/1;
+        payload.disabled = _ld;
+        TARA_API.onService(true,payload,(resp)=>{
+            if(resp.successful){  
+                _reset_view(resp);
+            }
+            document.querySelector('#tx-level-edit').style.display='none';        
+        });
+    };
     document.querySelector('#tx-level-edit-cancel').onclick=()=>{
         document.querySelector('#tx-level-edit').style.display='none';
     };

@@ -1,6 +1,5 @@
 package com.tarantula.platform.service.cluster;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.core.*;
@@ -275,7 +274,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         if(sub!=null){
             ITopic<Event> top = topicList.remove(topic);
             top.removeMessageListener(sub.registrationKey);
-            log.warn("Event subscription ["+topic+"] released from integration cluster");
+            //log.warn("Event subscription ["+topic+"] released from integration cluster");
         }
     }
 
@@ -300,7 +299,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         }
     }
     public void unregisterBucketReceiver(String bucket){
-        log.warn("Bucket Receiver ["+bucket+"] unregistered from integration cluster");
+        //log.warn("Bucket Receiver ["+bucket+"] unregistered from integration cluster");
         this.unsubscribe(bucket);
         bMap.remove(bucket);
     }

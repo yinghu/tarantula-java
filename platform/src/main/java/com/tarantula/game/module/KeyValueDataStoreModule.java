@@ -13,6 +13,8 @@ public class KeyValueDataStoreModule implements Module {
     private ApplicationContext context;
     private GsonBuilder builder;
     private DataStore dataStore;
+    private DeploymentServiceProvider deploymentServiceProvider;
+    private GameServiceProvider gameServiceProvider;
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         if(session.action().equals("onSet")){
@@ -38,13 +40,17 @@ public class KeyValueDataStoreModule implements Module {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.dataStore = this.context.dataStore(this.context.descriptor().typeId());
-        GameServiceProvider gameServiceProvider = new GameServiceProvider(this.context.descriptor().typeId().replace("-data","-service"));
-        DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        gameServiceProvider = new GameServiceProvider(this.context.descriptor().typeId().replace("-data","-service"));
+        deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.deploy(gameServiceProvider);
         this.context.log("Data store ["+this.context.descriptor().typeId()+" started ]", OnLog.WARN);
     }
     @Override
     public String label() {
         return this.context.descriptor().typeId();
+    }
+    @Override
+    public void clear(){
+        this.deploymentServiceProvider.release(gameServiceProvider);
     }
 }

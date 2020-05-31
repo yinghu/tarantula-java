@@ -21,9 +21,6 @@ public class GameCluster extends OnApplicationHeader implements Portable {
     public final static String TIMESTAMP = "8";
     public final static String DISABLED = "9";
 
-    public final static String LOBBY_LIST = "10";
-    public final static String SERVICE_LIST = "11";
-    public final static String DATA_LIST = "12";
 
     @Override
     public int getClassId() {
@@ -37,9 +34,6 @@ public class GameCluster extends OnApplicationHeader implements Portable {
         if(successful){
             portableWriter.writeUTF("3",this.bucket);
             portableWriter.writeUTF("4",oid);
-            portableWriter.writeUTFArray(LOBBY_LIST,(String[])properties.get(LOBBY_LIST));
-            portableWriter.writeUTFArray(SERVICE_LIST,(String[])properties.get(SERVICE_LIST));
-            portableWriter.writeUTFArray(DATA_LIST,(String[])properties.get(DATA_LIST));
         }
     }
 
@@ -50,19 +44,14 @@ public class GameCluster extends OnApplicationHeader implements Portable {
         if(successful){
             bucket = portableReader.readUTF("3");
             oid = portableReader.readUTF("4");
-            properties.put(LOBBY_LIST,portableReader.readUTFArray(LOBBY_LIST));
-            properties.put(SERVICE_LIST,portableReader.readUTFArray(SERVICE_LIST));
-            properties.put(DATA_LIST,portableReader.readUTFArray(DATA_LIST));
         }
     }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",successful);
+        jsonObject.addProperty("message",message);
         if(successful){
             jsonObject.addProperty("accessId",this.distributionKey());
-            jsonObject.addProperty("stub",this.stub);
-        }else{
-            jsonObject.addProperty("message",message);
         }
         return jsonObject;
     }

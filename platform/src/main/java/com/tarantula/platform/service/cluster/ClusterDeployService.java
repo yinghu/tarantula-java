@@ -573,8 +573,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 lobbyTypeIdIndex.index(descriptor.distributionKey());
                 lobbyTypeIdIndex.owner(gameCluster.distributionKey());
                 mds.create(lobbyTypeIdIndex);
-                String[] alist = new String[configuration.applications.size()];
-                int[] ix={0};
                 configuration.applications.forEach((a)->{
                     a.owner(descriptor.distributionKey());
                     a.label("LDA");
@@ -586,18 +584,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     log.warn("Create named application on subtypeId->"+a.subtypeId());
                     log.warn("Create named application on tag->"+a.tag());
                     mds.create(a);
-                    alist[ix[0]]=a.distributionKey();
-                    ix[0]++;
                 });
-                if(descriptor.typeId().endsWith("-lobby")){
-                    gameCluster.property(GameCluster.LOBBY_LIST,alist);
-                }
-                else if(descriptor.typeId().endsWith("-service")){
-                    gameCluster.property(GameCluster.SERVICE_LIST,alist);
-                }
-                else if(descriptor.typeId().endsWith("-data")){
-                    gameCluster.property(GameCluster.DATA_LIST,alist);
-                }
             }
             gameCluster.message("["+name+"] game created successfully");
             mds.update(gameCluster);

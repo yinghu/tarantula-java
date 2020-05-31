@@ -36,7 +36,6 @@ public class AdminRoleModule implements Module {
     private SubscriptionFee monthly;
     private SubscriptionFee yearly;
 
-    private ConcurrentHashMap<String,GameCluster> pendingCluster;
     private ConcurrentHashMap<String,GameLobbyContext> pendingLobby;
 
     @Override
@@ -132,8 +131,6 @@ public class AdminRoleModule implements Module {
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
                 GameCluster gc = this.deploymentServiceProvider.createGameCluster(session.systemId(),(String)onAccess.property("name"),"basic");
                 if(gc.successful()){
-                    pendingCluster.put(gc.distributionKey(),gc);
-                    gc.stub(0);
                     IndexSet idx = new IndexSet();
                     idx.distributionKey(acc.distributionKey());
                     idx.label(Account.GameClusterLabel);
@@ -148,8 +145,7 @@ public class AdminRoleModule implements Module {
                     acc.gameClusterCount(1);
                     acc.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
                     account.update(acc);
-                    //USE -service data store to save lobby configs; do not use -data data store!!!1
-                    //DataStore dataStore = this.context.dataStore((String) gc.property(GameCluster.GAME_SERVICE));
+                    gc.message("Game cluster created successfully");
                 }
                 session.write(gc.toJson().toString().getBytes(),label());
             }
@@ -177,42 +173,20 @@ public class AdminRoleModule implements Module {
             this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            GameCluster pending = pendingCluster.get(accessId);
-            Zone zone = this._zone(pending);
             int index = ((Number)onAccess.property("index")).intValue();
+            GameLobbyContext pending = pendingLobby.get(accessId);
+            GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
+            Zone zone = gameLobby.zone;
             zone.arenas[index].name(onAccess.name());
             zone.arenas[index].xp = ((Number)onAccess.property("xp")).doubleValue();
             zone.arenas[index].level = ((Number)onAccess.property("level")).intValue();
             zone.arenas[index].disabled((Boolean)onAccess.property("disabled"));
             zone.update();
-            session.write(zone.toJson().toString().getBytes(),label());
-        }
-        else if(session.action().equals("onNextGameLobby")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            GameCluster pending = pendingCluster.get(accessId);
-            String[] list = (String[]) pending.property(GameCluster.LOBBY_LIST);
-            int next = (pending.stub()+1)<list.length?(pending.stub()+1):0;
-            pending.stub(next);
             session.write(pending.toJson().toString().getBytes(),label());
         }
-        else if(session.action().equals("onLoadGameLobby")){
+        else if(session.action().equals("onLaunchGameCluster")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            int stub = onAccess.stub();
-            GameCluster pending = pendingCluster.get(accessId);
-            if(pending.stub()==stub){
-                Zone mZone = this._zone(pending);
-                session.write(mZone.toJson().toString().getBytes(),label());
-            }
-            else{
-                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"illegal update",false)).getBytes(),label());
-            }
-        }
-        else if(session.action().equals("onFinishGameLobby")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            pendingCluster.remove(accessId);
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(accessId);
             Account acc = new UserAccount();
             acc.distributionKey(session.systemId());
@@ -221,8 +195,11 @@ public class AdminRoleModule implements Module {
                 this.deploymentServiceProvider.launchGameCluster(gameCluster);
                 gameCluster.property(GameCluster.DISABLED,false);
                 gameCluster.update();
+                session.write(this.builder.create().toJson(new ResponseHeader(session.action(), "launch event submitted", true)).getBytes(), label());
             }
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"updated",true)).getBytes(),label());
+            else {
+                session.write(this.builder.create().toJson(new ResponseHeader(session.action(), "no subscription or trial found", false)).getBytes(), label());
+            }
         }
         else if(session.action().equals("onCommit")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -278,7 +255,6 @@ public class AdminRoleModule implements Module {
         this.maxGameClusterCount = Integer.parseInt(this.context.configuration("setup").property("maxGameClusterCount"));
         this.defaultGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("defaultGameLevelCount"));
         this.maxGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLevelCount"));
-        this.pendingCluster = new ConcurrentHashMap<>();
         this.pendingLobby = new ConcurrentHashMap<>();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
@@ -291,24 +267,6 @@ public class AdminRoleModule implements Module {
         Zone mZone = new Zone();
         mZone.distributionKey(descriptor.distributionKey());
         mZone.rank = descriptor.accessRank();
-        mZone.capacity=1;
-        mZone.roundDuration = 60*1000;
-        mZone.overtime = 5000;
-        mZone.playMode = Room.OFF_LINE_MODE;
-        mZone.arenas = new Arena[maxGameLevelCount];
-        for(int i=1;i<maxGameLevelCount+1;i++){
-            mZone.arenas[i-1]=new Arena(i,i*100,"Level "+i,i>defaultGameLevelCount);
-        }
-        mZone.dataStore(dataStore);
-        dataStore.createIfAbsent(mZone,true);
-        return mZone;
-    }
-    private Zone _zone(GameCluster pending){
-        DataStore dataStore = this.context.dataStore((String) pending.property(GameCluster.GAME_SERVICE));
-        Zone mZone = new Zone();
-        String[] list = (String[]) pending.property(GameCluster.LOBBY_LIST);
-        mZone.distributionKey(list[pending.stub()]);
-        mZone.rank = pending.stub()+1;
         mZone.capacity=1;
         mZone.roundDuration = 60*1000;
         mZone.overtime = 5000;

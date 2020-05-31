@@ -8,6 +8,7 @@ import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.util.OnAccessDeserializer;
+import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 public class AccountRoleModule implements Module {
@@ -63,7 +64,7 @@ public class AccountRoleModule implements Module {
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
-        this.builder.registerTypeAdapter(AdminUserObject.class,new AdminObjectSerializer());
+        this.builder.registerTypeAdapter(ResponseHeader.class, new ResponseSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         this.user = this.context.dataStore(Access.DataStore);
         this.account = this.context.dataStore(Account.DataStore);
@@ -74,10 +75,8 @@ public class AccountRoleModule implements Module {
     public String label() {
         return "account-role";
     }
-    private AdminUserObject _onMessage(String message){
-        return new AdminUserObject(message,label());
+    private ResponseHeader _onMessage(String message){
+        return new ResponseHeader(message,label());
     }
-    private AdminUserObject _onAccessIndex(AccessIndex accessIndex){
-        return new AdminUserObject(accessIndex,label());
-    }
+
 }
