@@ -3,6 +3,8 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
+import com.tarantula.game.Zone;
+import com.tarantula.game.ZoneListener;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.service.Rating;
 import com.tarantula.platform.ResponseHeader;
@@ -12,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by yinghu lu on 4/14/2020.
  */
-public class MatchMakingModule implements Module {
+public class MatchMakingModule implements Module, ZoneListener {
 
     private ApplicationContext context;
     private ConcurrentHashMap<Integer,Descriptor> mZone = new ConcurrentHashMap<>();
@@ -60,11 +62,17 @@ public class MatchMakingModule implements Module {
             mZone.put(d.accessRank(),d);
         });
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
+        this.gameServiceProvider.addZoneListener(this);
         context.log("Started match making module on ->"+this.context.descriptor().typeId(), OnLog.WARN);
     }
 
     @Override
     public String label() {
         return "matchmaking";
+    }
+
+    @Override
+    public void updated(Zone zone) {
+        this.context.log(zone.distributionKey()+" on match-making",OnLog.WARN);
     }
 }

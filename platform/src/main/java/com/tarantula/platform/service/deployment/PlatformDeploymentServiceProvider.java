@@ -6,7 +6,7 @@ import com.tarantula.Module;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
-import com.tarantula.admin.GameCluster;
+import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;

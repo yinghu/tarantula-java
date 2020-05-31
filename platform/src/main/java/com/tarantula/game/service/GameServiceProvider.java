@@ -4,8 +4,8 @@ import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.Zone;
+import com.tarantula.game.ZoneListener;
 import com.tarantula.logging.JDKLogger;
-import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.service.ClusterProvider;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
@@ -14,8 +14,8 @@ import com.tarantula.platform.leaderboard.LeaderBoardSync;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.ServiceProvider;
 
-import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
@@ -36,7 +36,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     private EventService publisher;
     private String dest;
     private ClusterProvider integrationCluster;
-    private ConcurrentHashMap<String, Module.OnReset> rMap = new ConcurrentHashMap<>();
+    private CopyOnWriteArrayList<ZoneListener> zList = new CopyOnWriteArrayList<>();
     public GameServiceProvider(String name){
         NAME = name;
     }
@@ -67,9 +67,12 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         this.dataStore.createIfAbsent(deltaStatistics,true);
         return deltaStatistics;
     }
-    public void addModuleReset(String key,Module.OnReset reset){
-        rMap.put(key,reset);
+    public void addZoneListener(ZoneListener zoneListener){
+        zList.add(zoneListener);
     }
+    //public void addModuleReset(String key,Module.OnReset reset){
+        //rMap.put(key,reset);
+    //}
     public Zone zone(String applicationId){//application id
         Zone zone = new Zone();
         zone.distributionKey(applicationId);
@@ -107,11 +110,10 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
             return false;
         });
         integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
-        this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.ZONE_CID,(z)->{
-            Module.OnReset reset = rMap.get(z.distributionKey());
-            if(reset!=null){
-                reset.reset();
-            }
+        this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.ZONE_CID,(r)->{
+            zList.forEach((z)->{
+                z.updated((Zone)r);
+            });
         });
         //integrationCluster.addEventListener(NAME,(e)->{
             //logger.warn(e.toString());

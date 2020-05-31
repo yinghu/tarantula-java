@@ -9,7 +9,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.event.MapStoreRecoveryEvent;
-import com.tarantula.admin.GameCluster;
+import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.DeploymentServiceProvider;

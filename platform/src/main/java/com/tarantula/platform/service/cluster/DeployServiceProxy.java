@@ -6,7 +6,7 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
 import com.tarantula.Descriptor;
 import com.tarantula.OnView;
-import com.tarantula.admin.GameCluster;
+import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.DeployService;
