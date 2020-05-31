@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.*;
+import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
@@ -53,13 +54,16 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         }
         else if(session.action().equals("onSubscriptionList")){
             DataStore mds = this.context.dataStore(Subscription.DataStore);
+            SubscriptionContext sct = new SubscriptionContext();
+            sct.subscriptionList = new ArrayList<>();
             mds.traverse((d,o,k,v)->{
-                //this.context.log(new String(v),OnLog.WARN);
+                Subscription sub = new Membership();
+                sub.distributionKey(new String(k));
+                sub.fromMap(SystemUtil.toMap(v));
+                sct.subscriptionList.add(sub);
                 return true;
             });
-            //OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            //session.write(this.builder.create().toJson(this._adminObjectOnApplication(access.accessId())).getBytes(),label());
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"subscription list",true)).getBytes(),this.label());
+            session.write(sct.toJson().toString().getBytes(),this.label());
         }
 
         else if(session.action().equals("addLobby")){
@@ -173,8 +177,8 @@ public class SudoRoleModule implements Module,Configuration.Listener {
 
     @Override
     public void onConfiguration(Configuration c) {
-        this.context.log(c.distributionKey(),OnLog.WARN);
-        this.context.log(c.toString(),OnLog.WARN);
+        //this.context.log(c.distributionKey(),OnLog.WARN);
+        //this.context.log(c.toString(),OnLog.WARN);
         cMap.put(c.distributionKey(),c);
     }
 }

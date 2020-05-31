@@ -41,6 +41,9 @@
             <view type="login.list">
                 <property name="moduleResourceFile">sudo/login.list.view.html</property>
             </view>
+            <view type="subscription.list">
+                <property name="moduleResourceFile">sudo/subscription.list.view.html</property>
+            </view>
         </view-list>
 
     </lobby-context>
