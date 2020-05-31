@@ -117,7 +117,7 @@ public class AdminRoleModule implements Module {
         }
         else if(session.action().equals("onMetrics")){
             Metrics  metrics = this.deploymentServiceProvider.metrics();
-            AdminContext adminContext = new AdminContext();
+            MetricsContext adminContext = new MetricsContext();
             adminContext.metrics = metrics;
             session.write(adminContext.toJson().toString().getBytes(),label());
         }
