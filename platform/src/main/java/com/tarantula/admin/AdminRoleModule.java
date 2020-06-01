@@ -129,10 +129,10 @@ public class AdminRoleModule implements Module {
             //this.context.log("TEST->"+tokenValidatorProvider.validateAccessKey(key),OnLog.WARN);
             session.write(new PermissionContext(key).toJson().toString().getBytes(),label());
         }
-        else if(session.action().equals("onAddLobby")){
+        else if(session.action().equals("onAddLobby")){//subscription only
             session.write(payload,label());
         }
-        else if(session.action().equals("onAddLevel")){
+        else if(session.action().equals("onAddLevel")){//subscription only
             session.write(payload,label());
         }
         else if(session.action().equals("onCreateGameCluster")){

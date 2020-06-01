@@ -37,7 +37,7 @@
                 </admin>
                 <admin type="yearlyAccess">
                     <property name="description">Yearly Subscription</property>
-                    <property name="price">1800.00</property>
+                    <property name="price">1980.00</property>
                     <property name="currency">USD</property>
                 </admin>
                 <admin type="monthlyAccess">
