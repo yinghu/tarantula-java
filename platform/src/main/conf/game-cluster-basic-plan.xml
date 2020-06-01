@@ -53,7 +53,7 @@
         <type-id>game-service</type-id>
         <type>lobby</type>
         <category>service</category>
-        <name>GameService</name>
+        <name>LiveService</name>
         <access-mode>12</access-mode>
         <deploy-code>1</deploy-code>
         <deploy-priority>10</deploy-priority>
@@ -87,7 +87,7 @@
         <type-id>game-data</type-id>
         <type>lobby</type>
         <category>service</category>
-        <name>GameData</name>
+        <name>DataStore</name>
         <access-mode>12</access-mode>
         <deploy-code>1</deploy-code>
         <deploy-priority>20</deploy-priority>
@@ -96,7 +96,7 @@
             <application><!-- key/value set/get app-->
                 <type-id>game-data</type-id>
                 <subtype-id>game-data-module</subtype-id>
-                <name>GameData</name>
+                <name>JsonDataStore</name>
                 <type>application</type>
                 <category>service</category>
                 <singleton>true</singleton>

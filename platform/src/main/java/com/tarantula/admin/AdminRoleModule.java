@@ -12,7 +12,6 @@ import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
-import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -73,9 +72,9 @@ public class AdminRoleModule implements Module {
             int page = ((Number)onAccess.property("page")).intValue();
             String accessId = (String)onAccess.property(OnAccess.ACCESS_ID);
             GameLobbyContext lobbyContext = pendingLobby.computeIfAbsent(accessId,(k)-> {
-                GameLobbyContext presenceContext = new GameLobbyContext();
-                presenceContext.gameLobbyList = new ArrayList<>();
-                presenceContext.successful(true);
+                GameLobbyContext gameLobbyContext = new GameLobbyContext();
+                gameLobbyContext.gameLobbyList = new ArrayList<>();
+                gameLobbyContext.successful(true);
                 GameCluster gc = this.deploymentServiceProvider.gameCluster((String) onAccess.property(OnAccess.ACCESS_ID));
                 //query from master node to make sure data available always
                 Lobby lobby = this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_LOBBY));
@@ -83,35 +82,26 @@ public class AdminRoleModule implements Module {
                     GameLobby gameLobby = new GameLobby();
                     gameLobby.lobby = a;
                     gameLobby.zone = _zone(gc, a);
-                    presenceContext.gameLobbyList.add(gameLobby);
+                    gameLobbyContext.gameLobbyList.add(gameLobby);
                 });
-                return presenceContext;
+                return gameLobbyContext;
             });
             lobbyContext.page = page;
             session.write(lobbyContext.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onGameServiceList")){
-            PresenceContext presenceContext = new PresenceContext();
-            presenceContext.lobbyList = new ArrayList<>();
+            GameServiceContext gsc = new GameServiceContext();
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
-            presenceContext.lobbyList.add(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_SERVICE)));
-            session.write(this.builder.create().toJson(presenceContext).getBytes(),label());
+            gsc.lobby=(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_SERVICE)));
+            session.write(gsc.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onGameDataList")){
-            PresenceContext presenceContext = new PresenceContext();
-            presenceContext.lobbyList = new ArrayList<>();
+            GameServiceContext gsc = new GameServiceContext();
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
-            presenceContext.lobbyList.add(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_DATA)));
-            session.write(this.builder.create().toJson(presenceContext).getBytes(),label());
-            //this.deploymentServiceProvider.shutdown((String) gc.property(GameCluster.GAME_SERVICE));
-            //this.deploymentServiceProvider.shutdown((String) gc.property(GameCluster.GAME_DATA));
-            //this.deploymentServiceProvider.shutdown((String) gc.property(GameCluster.GAME_LOBBY));
-
-            //GameServiceProvider gsp = this.context.serviceProvider((String) gc.property(GameCluster.GAME_SERVICE));
-            //this.deploymentServiceProvider.release(gsp);
-            //this.context.log(gsp.name(),OnLog.WARN);
+            gsc.lobby=(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_DATA)));
+            session.write(gsc.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onShoppingList")){
             session.write(new ShoppingContext(monthly,yearly).toJson().toString().getBytes(),this.label());
@@ -255,7 +245,6 @@ public class AdminRoleModule implements Module {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
-        this.builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.account = this.context.dataStore(Account.DataStore);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
