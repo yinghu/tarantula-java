@@ -14,7 +14,7 @@ public class Stub extends RecoverableObject {
     public int seat;
     public String tag;
 
-    public int rank; //rank of game 1 basis
+    public int rank=1; //rank of game 1 basis
     public double pxp; //percentage of game xp 100 basis
     public StatsDelta stats;
     /**
