@@ -73,6 +73,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.timeoutInMinutes = minutes;
         this.timeoutInSeconds = seconds;
     }
+
     public boolean validateAccessKey(String accessKey){
         String[] sp = accessKey.split("-");
         GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(sp[0]);
@@ -86,6 +87,22 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         gc.update();
         return SystemUtil.accessKey(messageDigest(),(String)gc.property(GameCluster.GAME_LOBBY),gameClusterId,stmp);
     }
+
+    public String validateGameClusterAccessKey(String accessKey){
+        String[] sp = accessKey.split("-");
+        GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(sp[0]);
+        long stmp = ((Number)gameCluster.property(GameCluster.TIMESTAMP)).longValue();
+        String validLobby = (String)gameCluster.property(GameCluster.GAME_LOBBY);
+        return SystemUtil.validAccessKey(messageDigest(),accessKey,validLobby,stmp)?validLobby:null;
+    }
+    public String gameClusterAccessKey(String gameClusterId){
+        GameCluster gc = this.deploymentServiceProvider.gameCluster(gameClusterId);
+        long stmp =SystemUtil.toUTCMilliseconds(LocalDateTime.now());
+        gc.property(GameCluster.TIMESTAMP,stmp);
+        gc.update();
+        return SystemUtil.accessKey(messageDigest(),(String)gc.property(GameCluster.GAME_LOBBY),gameClusterId,stmp);
+    }
+
     public String ticket(String key,int stub,int duration){
         return SystemUtil.ticket(messageDigest(),key,stub,duration);
     }

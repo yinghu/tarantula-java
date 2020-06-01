@@ -35,32 +35,33 @@ public class DedicatedServerEventHandler implements RequestHandler {
             String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
             byte[] _payload = exchange.payload();
             if(action.equals("onRegistered")){ //dedicated server register on cluster
-                String typeId = exchange.header(Session.TARANTULA_TYPE_ID);
+                //String typeId = exchange.header(Session.TARANTULA_TYPE_ID);
                 String host = exchange.header("Tarantula-host");
                 int port = Integer.parseInt(exchange.header("Tarantula-port"));
-                if(tokenValidator.validateAccessKey(accessKey)){
+                String vLobby = tokenValidator.validateGameClusterAccessKey(accessKey);
+                if(vLobby!=null){
                     Connection connection = new UDPConnection(serverId,host,port);
-                    this.deploymentServiceProvider.onUDPConnection(typeId,connection);
+                    this.deploymentServiceProvider.onUDPConnection(vLobby,connection);
                 }
-                byte[] eb = this.builder.create().toJson(new ResponseHeader("onRegistered","ok",true)).getBytes();
+                byte[] eb = this.builder.create().toJson(new ResponseHeader("onRegistered",vLobby!=null?"Ok":"invalid access key",vLobby!=null)).getBytes();
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
             else if(action.equals("onStarted")){
                 byte[] eb = "{}".getBytes();
-                if(tokenValidator.validateAccessKey(accessKey)) {
+                if(tokenValidator.validateGameClusterAccessKey(accessKey)!=null) {
                     eb = this.deploymentServiceProvider.onStartedUDPConnection(serverId);
                 }
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
             else if(action.equals("onUpdated")){
-                if(tokenValidator.validateAccessKey(accessKey)){
+                if(tokenValidator.validateGameClusterAccessKey(accessKey)!=null){
                     this.deploymentServiceProvider.onUpdatedUDPConnection(serverId,_payload);
                 }
                 byte[] eb = this.builder.create().toJson(new ResponseHeader("onUpdated","ok",true)).getBytes();
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
             else if(action.equals("onEnded")){
-                if(tokenValidator.validateAccessKey(accessKey)){
+                if(tokenValidator.validateGameClusterAccessKey(accessKey)!=null){
                     this.deploymentServiceProvider.onEndedUDPConnection(serverId,_payload);
                 }
                 byte[] eb = this.builder.create().toJson(new ResponseHeader("onEnded","ok",true)).getBytes();

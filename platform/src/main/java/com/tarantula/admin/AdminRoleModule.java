@@ -115,7 +115,7 @@ public class AdminRoleModule implements Module {
         else if(session.action().equals("onCreateAccessKey")){
             //generate access key from game cluster id
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String key = tokenValidatorProvider.accessKey((String)onAccess.property("gameClusterId"));
+            String key = tokenValidatorProvider.gameClusterAccessKey((String)onAccess.property("gameClusterId"));
             //this.context.log("TEST->"+tokenValidatorProvider.validateAccessKey(key),OnLog.WARN);
             session.write(new PermissionContext(key).toJson().toString().getBytes(),label());
         }

@@ -11,10 +11,17 @@ public interface TokenValidatorProvider extends ServiceProvider {
     String MDA = "SHA-1";
 
     TokenValidator tokenValidator();
+
+    //server connection access key
     boolean validateAccessKey(String accessKey);
     String accessKey(String gameClusterId);
+
     String ticket(String key,int stub,int duration);
     boolean validateTicket(String key,int stub,String ticket);
+
+    //dedicated server register key on game cluster lobby tyeId
+    String validateGameClusterAccessKey(String gameClusterId);
+    String gameClusterAccessKey(String gameClusterId);
 
     void timeout(int minutes,int seconds);
 

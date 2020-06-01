@@ -7,11 +7,9 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.presence.User;
-import com.tarantula.platform.presence.UserAccount;
+
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.TokenValidatorProvider;
-import com.tarantula.platform.service.deployment.ApplicationQuery;
-import com.tarantula.platform.service.deployment.LobbyQuery;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
@@ -24,7 +22,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
     private ApplicationContext context;
     private DeploymentServiceProvider serviceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
-    private DataStore dataStore;
+    //private DataStore dataStore;
     private GsonBuilder builder;
     private ConcurrentHashMap<String,Configuration> cMap;
     private DataStore uDatastore;
@@ -48,6 +46,10 @@ public class SudoRoleModule implements Module,Configuration.Listener {
                 return true;
             });
             session.write(accessContext.toJson().toString().getBytes(),label());
+        }
+        else if(session.action().equals("onCreateAccessKey")){
+            String key = tokenValidatorProvider.accessKey(session.systemId());
+
         }
         else if(session.action().equals("onFindUser")){
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"find user",true)).getBytes(),this.label());
@@ -162,7 +164,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.serviceProvider.registerConfigurationListener(this);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
-        this.dataStore = this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE);
+        //this.dataStore = this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE);
         this.uDatastore = this.context.dataStore(Access.DataStore);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
