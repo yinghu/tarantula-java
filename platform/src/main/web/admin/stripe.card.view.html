@@ -158,7 +158,7 @@
         }   
     }
     function tx_shopping_commit(token,ptag){
-        TARA_API.onService(true,{serviceTag:'role/admin',command:'onCommit',checkoutId:ptag.type,orderId:token.id},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'role/admin',command:'onCommitPurchase',checkoutId:ptag.type,orderId:token.id},(resp)=>{
             //popup web payment integration page  
             document.querySelector("#tx_checkout_message").innerHTML = resp.message;   
             if(resp.successful){

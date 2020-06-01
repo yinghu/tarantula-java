@@ -31,6 +31,7 @@ public class AdminRoleModule implements Module {
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
     private int maxGameClusterCount;
+    private int maxGameLobbyCount;
     private int defaultGameLevelCount;
     private int maxGameLevelCount;
     private SubscriptionFee monthly;
@@ -128,6 +129,12 @@ public class AdminRoleModule implements Module {
             //this.context.log("TEST->"+tokenValidatorProvider.validateAccessKey(key),OnLog.WARN);
             session.write(new PermissionContext(key).toJson().toString().getBytes(),label());
         }
+        else if(session.action().equals("onAddLobby")){
+            session.write(payload,label());
+        }
+        else if(session.action().equals("onAddLevel")){
+            session.write(payload,label());
+        }
         else if(session.action().equals("onCreateGameCluster")){
             Account acc = new UserAccount();
             acc.distributionKey(session.systemId());
@@ -143,9 +150,9 @@ public class AdminRoleModule implements Module {
                         idx.keySet.add(gc.distributionKey());//update on existing
                         account.update(idx);
                     }
-                    idx.keySet.forEach((k)->{
-                       this.context.log("KEY->"+k,OnLog.WARN);
-                    });
+                    //idx.keySet.forEach((k)->{
+                       //this.context.log("KEY->"+k,OnLog.WARN);
+                    //});
                     acc.gameClusterCount(1);
                     acc.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
                     account.update(acc);
@@ -203,7 +210,7 @@ public class AdminRoleModule implements Module {
                 session.write(this.builder.create().toJson(new ResponseHeader(session.action(), "no subscription or trial found", false)).getBytes(), label());
             }
         }
-        else if(session.action().equals("onCommit")){
+        else if(session.action().equals("onCommitPurchase")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String cid = (String)onAccess.property("checkoutId");
             SubscriptionFee fee = cid.equals("monthlyAccess")?monthly:yearly;
@@ -253,6 +260,7 @@ public class AdminRoleModule implements Module {
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.maxGameClusterCount = Integer.parseInt(this.context.configuration("setup").property("maxGameClusterCount"));
+        this.maxGameLobbyCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLobbyCount"));
         this.defaultGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("defaultGameLevelCount"));
         this.maxGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLevelCount"));
         this.pendingLobby = new ConcurrentHashMap<>();

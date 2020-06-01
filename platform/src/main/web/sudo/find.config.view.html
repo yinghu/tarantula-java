@@ -1,16 +1,16 @@
 <div class="w3-modal-content">
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
         <div class="w3-display-topright w3-padding">
-            <span id="tx-pending-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+            <span id="tx-find-config-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-sign-in" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">PENDING REQUEST</span>
+            <span class="tx-margin-left-8 tx-text-24">Find Configuration</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-invalid-message">
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-find-config-message">
         <p>Your request is on pending implementation. It will be available soon</p>
     </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -23,7 +23,7 @@
     </div>
 </div>
 <script>
-    document.querySelector('#tx-pending-close').onclick=()=>{
+    document.querySelector('#tx-find-config-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       
