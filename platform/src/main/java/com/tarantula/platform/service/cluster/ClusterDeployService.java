@@ -439,15 +439,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         if(!ds.load(query)){
             return null;
         }
-        if(!descriptor.singleton()){
-            descriptor.applicationClassName("com.tarantula.platform.playmode.DynamicModuleApplication");
-        }
-        else{
-            descriptor.applicationClassName("com.tarantula.platform.playmode.SingletonModuleApplication");
-        }
-        descriptor.resetEnabled(true);
-        descriptor.runtimeDuration(descriptor.runtimeDuration()*60*1000);
-        descriptor.runtimeDurationOnInstance(descriptor.runtimeDurationOnInstance()*60*1000);
         descriptor.owner(query.index());
         descriptor.label("LDA");
         descriptor.onEdge(true);

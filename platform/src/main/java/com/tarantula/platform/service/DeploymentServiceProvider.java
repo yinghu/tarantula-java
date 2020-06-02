@@ -69,7 +69,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //Module application operation API
     String upload(InputStream inputStream,String fname) throws Exception;
     boolean createLobby(Descriptor descriptor);
-    boolean createApplication(Descriptor descriptor);
+    boolean createApplication(Descriptor descriptor,boolean launching);
     boolean enableApplication(String applicationId,boolean enabled);
     boolean launch(String typeId);
     boolean shutdown(String typeId);

@@ -94,7 +94,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             desc.maxIdlesOnInstance(3);
             desc.maxInstancesPerPartition(100);
             desc.instancesOnStartupPerPartition(1);
-            boolean suc = this.serviceProvider.createApplication(desc);
+            boolean suc = this.serviceProvider.createApplication(desc,true);
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
         }
         else if(session.action().equals("onLaunch")){//typeId

@@ -129,9 +129,20 @@ public class AdminRoleModule implements Module {
         else if(session.action().equals("onAddLobby")){//subscription only
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String)onAccess.property(OnAccess.ACCESS_ID);
-            GameLobbyContext gcx = pendingLobby.get(accessId);
-
-            session.write(payload,label());
+            GameCluster gc = this.deploymentServiceProvider.gameCluster(accessId);
+            Lobby lobby = this.deploymentServiceProvider.lobby((String)gc.property(GameCluster.GAME_LOBBY));
+            Descriptor desc = lobby.entryList().get(0).copy();
+            String gname = (String) gc.property(GameCluster.NAME);
+            boolean disabled = (Boolean)gc.property(GameCluster.DISABLED);
+            int idx = lobby.entryList().size()+1;
+            desc.name("Game Lobby "+idx);
+            desc.tag(gname+"/lobby"+idx);
+            desc.accessRank(idx);
+            boolean suc = this.deploymentServiceProvider.createApplication(desc,!disabled);
+            if(suc){
+                pendingLobby.remove(accessId);
+            }
+            session.write(toMessage(suc?"new lobby added":"lobby not added").toString().getBytes(),label());
         }
 
         else if(session.action().equals("onCreateGameCluster")){

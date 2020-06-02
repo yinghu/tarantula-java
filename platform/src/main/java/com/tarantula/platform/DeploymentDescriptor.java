@@ -6,6 +6,7 @@ import java.util.Map;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.tarantula.Descriptor;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 public class DeploymentDescriptor extends DefaultDescriptor implements Portable {
@@ -48,6 +49,22 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         super.fromMap(properties);
     }
 
+    public Descriptor copy() {
+        DeploymentDescriptor _copy = new DeploymentDescriptor();
+        _copy.typeId(this.typeId);
+        _copy.subtypeId(this.subtypeId);
+        _copy.name(this.name);
+        _copy.type(this.type);
+        _copy.category(this.category);
+        _copy.singleton(this.singleton);
+        _copy.tag(this.tag);
+        _copy.applicationClassName(this.applicationClassName);
+        _copy.moduleName(this.moduleName);
+        _copy.capacity(this.capacity);
+        _copy.accessRank(this.accessRank);
+        _copy.timerOnModule(this.timerOnModule);
+        return _copy;
+    }
     public DeploymentDescriptor deploy(String instanceId){
         DeploymentDescriptor ins = new DeploymentDescriptor();
         ins.instanceId(instanceId);

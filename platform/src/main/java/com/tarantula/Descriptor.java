@@ -117,6 +117,8 @@ public interface Descriptor extends Recoverable{
     boolean resetEnabled();
     void resetEnabled(boolean resetEnabled);
 
-
+    default Descriptor copy(){
+        return null;
+    }
 
 }

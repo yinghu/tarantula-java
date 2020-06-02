@@ -285,9 +285,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public boolean createLobby(Descriptor descriptor){
         return this.tarantulaContext.tarantulaCluster().deployService().addLobby(descriptor);
     }
-    public boolean createApplication(Descriptor descriptor){
+    public boolean createApplication(Descriptor descriptor,boolean launching){
         String  suc = this.tarantulaContext.tarantulaCluster().deployService().addApplication(descriptor);
-        if(suc!=null){//launch if lobby on line
+        if(suc!=null&&launching){//launch if lobby on line
             this.integrationEventService.publish(new ModuleApplicationEvent(this.eventTopic,descriptor.typeId(),suc,false));
         }
         return suc!=null;
