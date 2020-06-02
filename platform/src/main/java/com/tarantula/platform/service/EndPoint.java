@@ -7,7 +7,7 @@ import com.tarantula.cci.RequestHandler;
  */
 public interface EndPoint extends ServiceProvider {
 
-    long CHECK_POINT_DELTA = 60000;
+    //long CHECK_POINT_DELTA = 60000;
 
     void address(String address);
     void backlog(int backlog);

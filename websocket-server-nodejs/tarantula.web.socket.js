@@ -232,7 +232,7 @@ function connectOnTarantula(){
     });
 }
 function registerOnTarantula(callback){
-    const headers = {Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Tarantula-access-key':'BDS01/c02813e8aa89421cbbd212200d368391-6874CEFA386F1ADFBACA0C6A8AD2AED82089D2B5','Tarantula-server-id':serverId,'Tarantula-action':'onTicket'};
+    const headers = {Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Tarantula-access-key':cfg.server.web.key,'Tarantula-server-id':serverId,'Tarantula-action':'onTicket'};
     const optsx ={rejectUnauthorized: false,hostname:cfg.server.web.host,port:cfg.server.web.port,path:'/push',method:'GET',headers:headers};
     const req = http.request(optsx,(res)=>{
         var resp=[];
@@ -268,7 +268,6 @@ function actionOnTarantula(conn,_payload){
 }
 function validateOnTarantula(url,callback){
     var _payload = querystring.parse(url.substring(url.indexOf('?')+1));
-    console.log(_payload);
     _payload.stub = _payload.stub/1;
     const data = JSON.stringify(_payload);
     const headers = {Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Content-length':data.length,'Tarantula-magic-key':_payload.systemId,'Tarantula-tag':'index/user','Tarantula-action':'onTicket'};
