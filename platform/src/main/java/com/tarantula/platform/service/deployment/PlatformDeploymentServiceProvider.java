@@ -594,7 +594,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 return false;
             }
         }
-        //log.warn("VIEW->"+onView.distributionKey()+"<>"+onView.toString());
+        log.warn("View Updated->"+onView.viewId()+"<>"+onView.toString());
         OnViewEvent onViewEvent = new OnViewEvent(this.eventTopic,this.localTopic,onView);
         this.integrationEventService.publish(onViewEvent);
         return true;

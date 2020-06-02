@@ -12,9 +12,9 @@ public interface TokenValidatorProvider extends ServiceProvider {
 
     TokenValidator tokenValidator();
 
-    //server connection access key
+    //labeled access key
     boolean validateAccessKey(String accessKey);
-    String accessKey(String gameClusterId);
+    String accessKey(String label);
 
     String ticket(String key,int stub,int duration);
     boolean validateTicket(String key,int stub,String ticket);

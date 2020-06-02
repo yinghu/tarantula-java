@@ -1,6 +1,7 @@
 package com.tarantula.admin;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.*;
@@ -118,6 +119,12 @@ public class AdminRoleModule implements Module {
             String key = tokenValidatorProvider.gameClusterAccessKey((String)onAccess.property("gameClusterId"));
             //this.context.log("TEST->"+tokenValidatorProvider.validateAccessKey(key),OnLog.WARN);
             session.write(new PermissionContext(key).toJson().toString().getBytes(),label());
+        }
+        else if(session.action().equals("onTestAccessKey")){
+            //test access key
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            String key = tokenValidatorProvider.validateGameClusterAccessKey((String)onAccess.property(OnAccess.ACCESS_KEY));
+            session.write(toMessage(key!=null?"key passed":"key failed").toString().getBytes(),label());
         }
         else if(session.action().equals("onAddLobby")){//subscription only
             session.write(payload,label());
@@ -275,5 +282,10 @@ public class AdminRoleModule implements Module {
         mZone.dataStore(dataStore);
         dataStore.createIfAbsent(mZone,true);
         return mZone;
+    }
+    private JsonObject toMessage(String msg){
+        JsonObject jms = new JsonObject();
+        jms.addProperty("message",msg);
+        return jms;
     }
 }

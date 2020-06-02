@@ -44,6 +44,9 @@
             <view type="subscription.list">
                 <property name="moduleResourceFile">sudo/subscription.list.view.html</property>
             </view>
+            <view type="create.labeled.key">
+                <property name="moduleResourceFile">sudo/create.labeled.key.view.html</property>
+            </view>
         </view-list>
 
     </lobby-context>

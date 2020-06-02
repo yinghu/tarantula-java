@@ -35,6 +35,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private DataStore adataStore;//account
     private DataStore mdatastore;//membership
 
+    private DataStore deployDataStore;
+
     private List<Access.Role> roleList;
     private MessageDigest _messageDigest;
 
@@ -76,16 +78,24 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public boolean validateAccessKey(String accessKey){
         String[] sp = accessKey.split("-");
-        GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(sp[0]);
-        long stmp = ((Number)gameCluster.property(GameCluster.TIMESTAMP)).longValue();
-        return SystemUtil.validAccessKey(messageDigest(),accessKey,(String)gameCluster.property(GameCluster.GAME_LOBBY),stmp);
+        AccessKey ck = new AccessKey();
+        ck.distributionKey(sp[0]);
+        if(!deployDataStore.load(ck)){
+            return false;
+        }
+        long stmp = ((Number)ck.property(AccessKey.TIMESTAMP)).longValue();
+        String label = (String)ck.property(AccessKey.KEY_LABEL);
+        return SystemUtil.validAccessKey(messageDigest(),accessKey,label,stmp);
     }
-    public String accessKey(String gameClusterId){
-        GameCluster gc = this.deploymentServiceProvider.gameCluster(gameClusterId);
+    public String accessKey(String label){
+        AccessKey ck = new AccessKey();
         long stmp =SystemUtil.toUTCMilliseconds(LocalDateTime.now());
-        gc.property(GameCluster.TIMESTAMP,stmp);
-        gc.update();
-        return SystemUtil.accessKey(messageDigest(),(String)gc.property(GameCluster.GAME_LOBBY),gameClusterId,stmp);
+        ck.property(AccessKey.TIMESTAMP,stmp);
+        ck.property(AccessKey.KEY_LABEL,label);
+        if(deployDataStore.create(ck)){
+            return SystemUtil.accessKey(messageDigest(),label,ck.distributionKey(),stmp);
+        }
+        return null;
     }
 
     public String validateGameClusterAccessKey(String accessKey){
@@ -169,6 +179,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.udataStore =  this.serviceContext.dataStore(Access.DataStore,this.serviceContext.partitionNumber());
         this.adataStore =  this.serviceContext.dataStore(Account.DataStore,this.serviceContext.partitionNumber());
         this.mdatastore =  this.serviceContext.dataStore(Subscription.DataStore,this.serviceContext.partitionNumber());
+        this.deployDataStore = this.serviceContext.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.serviceContext.partitionNumber());
         oMap = new ConcurrentHashMap<>();
         AuthVendor google = this.serviceContext.authVendor(OnAccess.GOOGLE);
         if(google!=null){

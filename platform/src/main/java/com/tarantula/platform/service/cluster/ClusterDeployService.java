@@ -466,7 +466,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
         view.owner(query.index());
         if(ds.create(view)){
-            log.warn("Added view->"+view.owner());
             return true;
         }
         else{

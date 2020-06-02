@@ -19,7 +19,10 @@ public class PermissionContext extends ResponseHeader {
     }
     public PermissionContext(String accessKey){
         this.accessKey = accessKey;
-        this.successful = true;
+        this.successful = accessKey!=null;
+        if(!successful){
+            message = "try again later";
+        }
     }
     public JsonObject toJson(){
         JsonObject jo = new JsonObject();

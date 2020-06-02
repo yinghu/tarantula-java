@@ -1,6 +1,8 @@
 package com.tarantula.admin;
 
+import com.google.api.client.json.Json;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.*;
@@ -47,9 +49,15 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             });
             session.write(accessContext.toJson().toString().getBytes(),label());
         }
-        else if(session.action().equals("onCreateAccessKey")){
-            String key = tokenValidatorProvider.accessKey(session.systemId());
-
+        else if(session.action().equals("onCreateLabeledKey")){
+            String key = tokenValidatorProvider.accessKey("websocket");
+            PermissionContext pc = new PermissionContext(key);
+            session.write(pc.toJson().toString().getBytes(),label());
+        }
+        else if(session.action().equals("onTestLabeledKey")){
+            OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            boolean suc = tokenValidatorProvider.validateAccessKey((String)acc.property(OnAccess.ACCESS_KEY));
+            session.write(toMessage(suc?"key passed":"key failed").toString().getBytes(),label());
         }
         else if(session.action().equals("onFindUser")){
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"find user",true)).getBytes(),this.label());
@@ -182,5 +190,10 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         //this.context.log(c.distributionKey(),OnLog.WARN);
         //this.context.log(c.toString(),OnLog.WARN);
         cMap.put(c.distributionKey(),c);
+    }
+    private JsonObject toMessage(String msg){
+        JsonObject jms = new JsonObject();
+        jms.addProperty("message",msg);
+        return jms;
     }
 }
