@@ -49,9 +49,10 @@ namespace Tarantula.Networking{
         public event OnRoomEvent OnUpdating;
        
        
-        public string host;
-        public bool dedicated;
-        public string accessKey;
+        public string host;//game clustering host
+        public bool dedicated;//true to run as a dedicated server
+        public string accessKey;//dedicated server register key
+        public string gameTitle;//game title created on ui
         
         private GecHttpClient _ghc;
         private GecWebSocket _gwc;
@@ -115,7 +116,6 @@ namespace Tarantula.Networking{
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-tag","index/user"),
-                    new Header("Tarantula-type-id","game-lobby"),
                     new Header("Tarantula-action","onIndex")
                 };
                 string jstr = await _ghc.GetJson(caller,"/user/action",headers);
@@ -132,7 +132,6 @@ namespace Tarantula.Networking{
                     new Header("Tarantula-port",""+conn.port),
                     new Header("Tarantula-server-id",deviceId),
                     new Header("Tarantula-access-key",accessKey),
-                    new Header("Tarantula-type-id",conn.type),
                     new Header("Tarantula-action","onRegistered")
                 };
                 string jstr = await _ghc.GetJson(caller,"/dedicated/action",headers);
@@ -237,7 +236,7 @@ namespace Tarantula.Networking{
         public  async Task<bool> OnPlay(MonoBehaviour caller){
             try{
                 Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","game/mmk"),
+                    new Header("Tarantula-tag",gameTitle+"/mmk"),
                     new Header("Tarantula-token",presence.token),
                     new Header("Tarantula-action","onPlay")
                 };
@@ -266,7 +265,7 @@ namespace Tarantula.Networking{
         public  async Task<bool> OnSet<T>(MonoBehaviour caller,string key,T jo){
             try{
                 Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","game/data"),
+                    new Header("Tarantula-tag",gameTitle+"/data"),
                     new Header("Tarantula-token",presence.token),
                     new Header("Tarantula-action","onSet"),
                     new Header("Tarantula-name",key),
@@ -282,7 +281,7 @@ namespace Tarantula.Networking{
         public  async Task<bool> OnGet(MonoBehaviour caller,string key,Action<string> callback){
             try{
                 Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","game/data"),
+                    new Header("Tarantula-tag",gameTitle+"/data"),
                     new Header("Tarantula-token",presence.token),
                     new Header("Tarantula-action","onGet"),
                     new Header("Tarantula-name",key),

@@ -12,7 +12,7 @@ import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.concurrent.ConcurrentHashMap;
 /**
- * Created by yinghu lu on 4/14/2020.
+ * Created by yinghu lu on 6/2/2020.
  */
 public class MatchMakingModule implements Module, ZoneListener {
 
@@ -26,21 +26,7 @@ public class MatchMakingModule implements Module, ZoneListener {
         if(session.action().equals("onPlay")){
             Rating rating = this.gameServiceProvider.rating(session.systemId());
             Response response = context.presence(session.systemId()).onPlay(session,mZone.get(rating.rank));
-            if(response==null){
-                Statistics statistics = gameServiceProvider.statistics(session.systemId());
-                statistics.entry("kc").update(1).update();
-                //statistics.summary((e)->{
-                    //this.context.log("Entry->"+e.name()+"<>"+e.toString(),OnLog.WARN);
-                //});
-                LeaderBoard ldb = gameServiceProvider.leaderBoard("kc");
-                ldb.onAllBoard(statistics.entry("kc"));
-                //ldb.total().rank((r,e)->{
-                    //this.context.log("Rank->"+r,OnLog.WARN);
-                    //this.context.log("Entry->"+e.toString(),OnLog.WARN);
-                //});
-                this.context.postOffice().onTopic().send(label()+"#topic","{}".getBytes());
-            }
-            else{
+            if(response!=null){
                 session.write(this.builder.create().toJson(response).getBytes(),label());
             }
         }
