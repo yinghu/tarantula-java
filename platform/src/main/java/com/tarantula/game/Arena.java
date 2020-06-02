@@ -38,4 +38,8 @@ public class Arena extends OnApplicationHeader {
     public int getClassId() {
         return GamePortableRegistry.ARENA_CID;
     }
+    @Override
+    public String toString(){
+        return "Arena->"+level+"//"+xp+"//"+name+"//"+disabled;
+    }
 }

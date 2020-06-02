@@ -9,6 +9,8 @@ import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.ResponseSerializer;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by yinghu lu on 4/14/2020.
@@ -82,9 +84,17 @@ public class GameZoneModule implements Module,ZoneListener{
             }
             mZone.update();
         }
+        ArrayList<Arena> alist = new ArrayList<>();
         for(Arena a : mZone.arenas){
-            context.log(a.toString(),OnLog.WARN);
+            if(!a.disabled()){
+                alist.add(a);
+            }
         }
+        mZone.arenas = new Arena[alist.size()];
+        for(int i=0;i<alist.size();i++){
+            mZone.arenas[i]=alist.get(i);
+        }
+        Arrays.sort(mZone.arenas,new ArenaComparator());
         mZone.roomIndex = this.mRoom;
         mZone.stubIndex = this.mStub;
         mZone.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
@@ -121,6 +131,8 @@ public class GameZoneModule implements Module,ZoneListener{
 
     @Override
     public void updated(Zone zone) {
-        this.context.log(zone.distributionKey()+" on game zone",OnLog.WARN);
+        for(Arena a : zone.arenas){
+            this.context.log(a.toString(),OnLog.WARN);
+        }
     }
 }
