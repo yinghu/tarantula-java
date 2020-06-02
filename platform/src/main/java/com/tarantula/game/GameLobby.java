@@ -6,17 +6,15 @@ import com.tarantula.Descriptor;
 
 public class GameLobby {
     public Descriptor lobby;
-
     public Zone zone;
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("name",lobby.name());
+        jsonObject.addProperty("name",zone.name!=null?zone.name:lobby.name());
         jsonObject.addProperty("tag",lobby.tag());
         jsonObject.addProperty("rank",lobby.accessRank());
         jsonObject.addProperty("capacity",zone.capacity);
         jsonObject.addProperty("duration",zone.roundDuration/60000);
-        //jsonObject.addProperty("overtime",zone.overtime);
         jsonObject.addProperty("playMode",zone.toPlayMode());
         JsonArray jds = new JsonArray();
         for(Arena a: zone.arenas){

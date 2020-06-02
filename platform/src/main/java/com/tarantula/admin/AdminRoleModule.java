@@ -127,11 +127,13 @@ public class AdminRoleModule implements Module {
             session.write(toMessage(key!=null?"key passed":"key failed").toString().getBytes(),label());
         }
         else if(session.action().equals("onAddLobby")){//subscription only
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            String accessId = (String)onAccess.property(OnAccess.ACCESS_ID);
+            GameLobbyContext gcx = pendingLobby.get(accessId);
+
             session.write(payload,label());
         }
-        else if(session.action().equals("onAddLevel")){//subscription only
-            session.write(payload,label());
-        }
+
         else if(session.action().equals("onCreateGameCluster")){
             Account acc = new UserAccount();
             acc.distributionKey(session.systemId());
@@ -147,9 +149,6 @@ public class AdminRoleModule implements Module {
                         idx.keySet.add(gc.distributionKey());//update on existing
                         account.update(idx);
                     }
-                    //idx.keySet.forEach((k)->{
-                       //this.context.log("KEY->"+k,OnLog.WARN);
-                    //});
                     acc.gameClusterCount(1);
                     acc.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
                     account.update(acc);

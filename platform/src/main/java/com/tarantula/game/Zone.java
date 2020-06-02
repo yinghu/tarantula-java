@@ -22,6 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class Zone extends RecoverableObject implements RoomListener,DataStore.Updatable{
     public Arena[] arenas = new  Arena[0];
+    public String name;
     public int rank=1;
     public int capacity =1;
     public long roundDuration =60000;
@@ -187,6 +188,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.properties.put("__d",roundDuration);
         this.properties.put("__o",overtime);
         this.properties.put("__p",playMode);
+        this.properties.put("__n",name);
         for(Arena a : arenas){
             this.properties.put(a.name(),a.level+","+a.xp+","+a.disabled());
         }
@@ -199,6 +201,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.roundDuration = ((Number)properties.get("__d")).longValue();
         this.overtime = ((Number)properties.get("__o")).longValue();
         this.playMode = ((Number)properties.get("__p")).intValue();
+        this.name = (String)properties.get("__n");
         ArrayList<Arena> alist = new ArrayList<>();
         properties.forEach((k,v)->{
             if(!k.startsWith("__")){
