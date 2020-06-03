@@ -266,6 +266,31 @@
             </div>
         </div>     
     </div>
+    <div class="w3-card-4 w3-border w3-round w3-white tx-ok-checkout" id="tx-lobby-list-remove-form">
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+            <div class="w3-display-topright w3-padding">
+                <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
+            </div>
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-exclamation-triangle w3-text-yellow" style="font-size:24px"></i></span>
+                <span class="tx-margin-left-8 tx-text-18">Confirmation</span>
+            </div>
+        </div>
+        <div id="tx-lobby-list-remove-message" class="w3-panel w3-center w3-border-bottom w3-border-red tx-text-14">Are you sure to remove lobby?</div>
+        <div class="w3-panel w3-border-bottom w3-border-red">
+            <span id="tx-lobby-list-remove-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
+        
+            <span id="tx-lobby-list-remove-ok" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Confirm</span>     
+        </div>
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+            </div>
+            <div class="w3-display-bottomright w3-padding">
+                <span class="tx-text-12">Powered By ICodeSoftware</span>
+            </div>
+        </div> 
+    </div>
 </div>
 <script>
     //document.querySelector("#tx-game-lobby-list-message").innerHTML = TARA_API.query().gameClusterId;
@@ -372,6 +397,13 @@
         });    
     };
     document.querySelector("#tx-disable-lobby").onclick=()=>{
+        document.querySelector('#tx-lobby-list-remove-message').innerHTML = 'Are you sure to remove '+document.querySelector("#tx-lobby-list-1").innerHTML;
+        document.querySelector('#tx-lobby-list-remove-form').style.display='block';      
+    };
+    document.querySelector('#tx-lobby-list-remove-cancel').onclick=()=>{
+        document.querySelector('#tx-lobby-list-remove-form').style.display='none';
+    };
+    document.querySelector('#tx-lobby-list-remove-ok').onclick=()=>{
         let _pno = (document.querySelector('#tx-lobby-list-no').innerHTML/1)-1;
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onDisableLobby',accessId:TARA_API.query().gameClusterId,index:_pno},(resp)=>{
             if(resp.successful){
@@ -381,10 +413,10 @@
             }
             else{
                 document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;
-            }       
-        });    
+            }
+            document.querySelector('#tx-lobby-list-remove-form').style.display='none';       
+        });   
     };
-    
     function _list_lobby(){
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameLobbyList',accessId:TARA_API.query().gameClusterId,page:_page},(resp)=>{
             if(resp.successful){

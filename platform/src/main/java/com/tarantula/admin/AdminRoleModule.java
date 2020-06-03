@@ -111,7 +111,7 @@ public class AdminRoleModule implements Module {
             //test access key
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String key = tokenValidatorProvider.validateGameClusterAccessKey((String)onAccess.property(OnAccess.ACCESS_KEY));
-            session.write(toMessage(key!=null?"key passed":"key failed").toString().getBytes(),label());
+            session.write(toMessage(key!=null?"key passed":"key failed",key!=null).toString().getBytes(),label());
         }
         else if(session.action().equals("onAddLobby")){//subscription only
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -123,7 +123,7 @@ public class AdminRoleModule implements Module {
             boolean disabled = (Boolean)gc.property(GameCluster.DISABLED);
             int idx = lobby.entryList().size()+1;
             if(idx>maxGameLobbyCount){
-                session.write(toMessage("max lobby count has reached").toString().getBytes(),label());
+                session.write(toMessage("max lobby count has reached",false).toString().getBytes(),label());
             }else{
                 int _rank = idx;
                 for(Descriptor a : lobby.entryList()){
@@ -138,7 +138,7 @@ public class AdminRoleModule implements Module {
                 if(suc){
                     pendingLobby.remove(accessId);
                 }
-                session.write(toMessage(suc?"new lobby added":"lobby not added").toString().getBytes(),label());
+                session.write(toMessage(suc?"new lobby added ["+desc.name()+"]":"lobby not added",suc).toString().getBytes(),label());
             }
         }
         else if(session.action().equals("onDisableLobby")){
@@ -154,14 +154,14 @@ public class AdminRoleModule implements Module {
                     if(suc){
                         this.pendingLobby.remove(accessId);
                     }
-                    session.write(toMessage(gameLobby.lobby.distributionKey()).toString().getBytes(),label());
+                    session.write(toMessage(suc?gameLobby.lobby.name()+" Removed":"failed to remove lobby",suc).toString().getBytes(),label());
                 }
                 else{
-                    session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]").toString().getBytes(),label());
+                    session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes(),label());
                 }
             }
             else{
-                session.write(toMessage("Min lobby count ["+minGameLobbyCount+"] required").toString().getBytes(),label());
+                session.write(toMessage("Min lobby count ["+minGameLobbyCount+"] required",false).toString().getBytes(),label());
             }
         }
         else if(session.action().equals("onCreateGameCluster")){
@@ -332,8 +332,9 @@ public class AdminRoleModule implements Module {
         dataStore.createIfAbsent(mZone,true);
         return mZone;
     }
-    private JsonObject toMessage(String msg){
+    private JsonObject toMessage(String msg,boolean suc){
         JsonObject jms = new JsonObject();
+        jms.addProperty("successful",suc);
         jms.addProperty("message",msg);
         return jms;
     }
