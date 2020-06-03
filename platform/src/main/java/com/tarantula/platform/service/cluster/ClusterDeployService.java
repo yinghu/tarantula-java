@@ -319,9 +319,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 if(!a.disabled()){
                     dlist.add(a);
                 }
-                else{
-                    log.warn("disabled->"+a.tag());
-                }
                 return true;
             });
             batchCache = new BatchCache(UUID.randomUUID().toString(),dlist);

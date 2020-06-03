@@ -16,9 +16,10 @@ public class GameLobbyContext extends ResponseHeader {
             return jsonObject;
         }
         jsonObject.addProperty("successful",this.successful);
-        int _inx = page<gameLobbyList.size()?page:0;
-        GameLobby gameLobby = gameLobbyList.get(_inx);
-        jsonObject.addProperty("index",_inx);
+        jsonObject.addProperty("lobbySize",gameLobbyList.size());
+        page = page<gameLobbyList.size()?page:0;
+        GameLobby gameLobby = gameLobbyList.get(page);
+        jsonObject.addProperty("index",page);
         jsonObject.add("lobby",gameLobby.toJson());
         return jsonObject;
     }

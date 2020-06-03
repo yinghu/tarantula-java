@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.*;
-import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.presence.*;
@@ -129,7 +128,7 @@ public class AdminRoleModule implements Module {
                 int _rank = idx;
                 for(Descriptor a : lobby.entryList()){
                     if(a.accessRank()>=_rank){
-                        _rank++;
+                        _rank=a.accessRank()+1;
                     }
                 }
                 desc.name("Game Lobby "+_rank);
@@ -147,17 +146,22 @@ public class AdminRoleModule implements Module {
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             int index = ((Number)onAccess.property("index")).intValue();
             GameLobbyContext pending = this.gameLobbyContext(accessId);
-            if(index==pending.page&&pending.gameLobbyList.size()>minGameLobbyCount){
+            if(pending.gameLobbyList.size()>minGameLobbyCount){
                 //do disable operation
-                GameLobby gameLobby = pending.gameLobbyList.get(index);
-                boolean suc = this.deploymentServiceProvider.enableApplication(gameLobby.lobby.distributionKey(),false);
-                if(suc){
-                    this.pendingLobby.remove(accessId);
+                if(pending.page==index){
+                    GameLobby gameLobby = pending.gameLobbyList.get(index);
+                    boolean suc = this.deploymentServiceProvider.enableApplication(gameLobby.lobby.distributionKey(),false);
+                    if(suc){
+                        this.pendingLobby.remove(accessId);
+                    }
+                    session.write(toMessage(gameLobby.lobby.distributionKey()).toString().getBytes(),label());
                 }
-                session.write(toMessage(gameLobby.lobby.distributionKey()).toString().getBytes(),label());
+                else{
+                    session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]").toString().getBytes(),label());
+                }
             }
             else{
-                session.write(toMessage("wrong page index or min lobby count required").toString().getBytes(),label());
+                session.write(toMessage("Min lobby count ["+minGameLobbyCount+"] required").toString().getBytes(),label());
             }
         }
         else if(session.action().equals("onCreateGameCluster")){
