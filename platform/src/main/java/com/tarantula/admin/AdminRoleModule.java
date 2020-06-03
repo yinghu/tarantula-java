@@ -72,21 +72,7 @@ public class AdminRoleModule implements Module {
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             int page = ((Number)onAccess.property("page")).intValue();
             String accessId = (String)onAccess.property(OnAccess.ACCESS_ID);
-            GameLobbyContext lobbyContext = pendingLobby.computeIfAbsent(accessId,(k)-> {
-                GameLobbyContext gameLobbyContext = new GameLobbyContext();
-                gameLobbyContext.gameLobbyList = new ArrayList<>();
-                gameLobbyContext.successful(true);
-                GameCluster gc = this.deploymentServiceProvider.gameCluster((String) onAccess.property(OnAccess.ACCESS_ID));
-                //query from master node to make sure data available always
-                Lobby lobby = this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_LOBBY));
-                lobby.entryList().forEach((a) -> {
-                    GameLobby gameLobby = new GameLobby();
-                    gameLobby.lobby = a;
-                    gameLobby.zone = _zone(gc, a);
-                    gameLobbyContext.gameLobbyList.add(gameLobby);
-                });
-                return gameLobbyContext;
-            });
+            GameLobbyContext lobbyContext = this.gameLobbyContext(accessId);
             lobbyContext.page = page;
             session.write(lobbyContext.toJson().toString().getBytes(),label());
         }
@@ -117,7 +103,6 @@ public class AdminRoleModule implements Module {
             //generate access key from game cluster id
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String key = tokenValidatorProvider.gameClusterAccessKey((String)onAccess.property("gameClusterId"));
-            //this.context.log("TEST->"+tokenValidatorProvider.validateAccessKey(key),OnLog.WARN);
             session.write(new PermissionContext(key).toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onTestAccessKey")){
@@ -177,7 +162,7 @@ public class AdminRoleModule implements Module {
             //this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            GameLobbyContext pending = pendingLobby.get(accessId);
+            GameLobbyContext pending = this.gameLobbyContext(accessId);
             GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
             Zone zone = gameLobby.zone;
             zone.rank = ((Number)onAccess.property("rank")).intValue();
@@ -192,7 +177,7 @@ public class AdminRoleModule implements Module {
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             int index = ((Number)onAccess.property("index")).intValue();
-            GameLobbyContext pending = pendingLobby.get(accessId);
+            GameLobbyContext pending = this.gameLobbyContext(accessId);
             GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
             Zone zone = gameLobby.zone;
             zone.arenas[index].name(onAccess.name());
@@ -275,6 +260,23 @@ public class AdminRoleModule implements Module {
     @Override
     public String label() {
         return "admin-role";
+    }
+    private GameLobbyContext gameLobbyContext(String accessId){
+        return pendingLobby.computeIfAbsent(accessId,(k)-> {
+            GameLobbyContext gameLobbyContext = new GameLobbyContext();
+            gameLobbyContext.gameLobbyList = new ArrayList<>();
+            gameLobbyContext.successful(true);
+            GameCluster gc = this.deploymentServiceProvider.gameCluster(accessId);
+            //query from master node to make sure data available always
+            Lobby lobby = this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_LOBBY));
+            lobby.entryList().forEach((a) -> {
+                GameLobby gameLobby = new GameLobby();
+                gameLobby.lobby = a;
+                gameLobby.zone = _zone(gc, a);
+                gameLobbyContext.gameLobbyList.add(gameLobby);
+            });
+            return gameLobbyContext;
+        });
     }
     private Zone _zone(GameCluster gameCluster,Descriptor descriptor){
         DataStore dataStore = this.context.dataStore((String) gameCluster.property(GameCluster.GAME_SERVICE));
