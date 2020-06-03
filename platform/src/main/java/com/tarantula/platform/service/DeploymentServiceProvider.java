@@ -69,15 +69,16 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //Module application operation API
     String upload(InputStream inputStream,String fname) throws Exception;
     boolean createLobby(Descriptor descriptor);
-    boolean createApplication(Descriptor descriptor,boolean launching);
-    boolean enableApplication(String applicationId,boolean enabled);
-    boolean launch(String typeId);
-    boolean shutdown(String typeId);
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
     boolean reset(Descriptor descriptor);
     boolean createModule(Descriptor descriptor);
     //END OF MODULE OPERATION API
+
+    boolean createApplication(Descriptor descriptor,boolean launching);
+    boolean enableApplication(String applicationId,boolean enabled);
+    boolean launch(String typeId);
+    boolean shutdown(String typeId);
 
     //GAME CLUSTER APIs
     <T extends OnAccess> T createGameCluster(String owner,String name);

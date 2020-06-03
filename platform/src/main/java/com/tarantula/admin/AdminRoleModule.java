@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.*;
+import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.presence.*;
@@ -18,6 +19,7 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,11 +34,12 @@ public class AdminRoleModule implements Module {
     private TokenValidatorProvider tokenValidatorProvider;
     private int maxGameClusterCount;
     private int maxGameLobbyCount;
+    private int minGameLobbyCount;
     private int defaultGameLevelCount;
     private int maxGameLevelCount;
     private SubscriptionFee monthly;
     private SubscriptionFee yearly;
-
+    private RankComparator rankComparator;
     private ConcurrentHashMap<String,GameLobbyContext> pendingLobby;
 
     @Override
@@ -120,16 +123,43 @@ public class AdminRoleModule implements Module {
             String gname = (String) gc.property(GameCluster.NAME);
             boolean disabled = (Boolean)gc.property(GameCluster.DISABLED);
             int idx = lobby.entryList().size()+1;
-            desc.name("Game Lobby "+idx);
-            desc.tag(gname+"/lobby"+idx);
-            desc.accessRank(idx);
-            boolean suc = this.deploymentServiceProvider.createApplication(desc,!disabled);
-            if(suc){
-                pendingLobby.remove(accessId);
+            if(idx>maxGameLobbyCount){
+                session.write(toMessage("max lobby count has reached").toString().getBytes(),label());
+            }else{
+                int _rank = idx;
+                for(Descriptor a : lobby.entryList()){
+                    if(a.accessRank()>=_rank){
+                        _rank++;
+                    }
+                }
+                desc.name("Game Lobby "+_rank);
+                desc.tag(gname+"/lobby"+_rank);
+                desc.accessRank(_rank);
+                boolean suc = this.deploymentServiceProvider.createApplication(desc,!disabled);
+                if(suc){
+                    pendingLobby.remove(accessId);
+                }
+                session.write(toMessage(suc?"new lobby added":"lobby not added").toString().getBytes(),label());
             }
-            session.write(toMessage(suc?"new lobby added":"lobby not added").toString().getBytes(),label());
         }
-
+        else if(session.action().equals("onDisableLobby")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
+            int index = ((Number)onAccess.property("index")).intValue();
+            GameLobbyContext pending = this.gameLobbyContext(accessId);
+            if(index==pending.page&&pending.gameLobbyList.size()>minGameLobbyCount){
+                //do disable operation
+                GameLobby gameLobby = pending.gameLobbyList.get(index);
+                boolean suc = this.deploymentServiceProvider.enableApplication(gameLobby.lobby.distributionKey(),false);
+                if(suc){
+                    this.pendingLobby.remove(accessId);
+                }
+                session.write(toMessage(gameLobby.lobby.distributionKey()).toString().getBytes(),label());
+            }
+            else{
+                session.write(toMessage("wrong page index or min lobby count required").toString().getBytes(),label());
+            }
+        }
         else if(session.action().equals("onCreateGameCluster")){
             Account acc = new UserAccount();
             acc.distributionKey(session.systemId());
@@ -254,7 +284,9 @@ public class AdminRoleModule implements Module {
         this.maxGameLobbyCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLobbyCount"));
         this.defaultGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("defaultGameLevelCount"));
         this.maxGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLevelCount"));
+        this.minGameLobbyCount = Integer.parseInt(this.context.configuration("setup").property("minGameLobbyCount"));
         this.pendingLobby = new ConcurrentHashMap<>();
+        this.rankComparator = new RankComparator();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
     @Override
@@ -275,6 +307,7 @@ public class AdminRoleModule implements Module {
                 gameLobby.zone = _zone(gc, a);
                 gameLobbyContext.gameLobbyList.add(gameLobby);
             });
+            Collections.sort(gameLobbyContext.gameLobbyList,rankComparator);
             return gameLobbyContext;
         });
     }

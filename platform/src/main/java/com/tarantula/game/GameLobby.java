@@ -16,6 +16,7 @@ public class GameLobby {
         jsonObject.addProperty("capacity",zone.capacity);
         jsonObject.addProperty("duration",zone.roundDuration/60000);
         jsonObject.addProperty("playMode",zone.toPlayMode());
+        jsonObject.addProperty("disabled",lobby.disabled());
         JsonArray jds = new JsonArray();
         for(Arena a: zone.arenas){
             JsonObject jd = new JsonObject();

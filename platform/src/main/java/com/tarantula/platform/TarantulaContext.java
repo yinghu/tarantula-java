@@ -402,7 +402,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
                     lab = d;
                 }
             }
-            if(lb.entryList().size()==1){//clean lobby and clean module class loaders
+            if(lb.entryList().size()==1&&(lab!=null)){//clean lobby and clean module class loaders
                 this._lobbyMapping.remove(typeId);
                 Application lbb = this.availableApplicationManagers.remove(lab.distributionKey());
                 lbb.shutdown();

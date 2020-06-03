@@ -10,6 +10,11 @@ public class GameLobbyContext extends ResponseHeader {
     public int page;
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
+        if(gameLobbyList.size()==0){
+            jsonObject.addProperty("successful",false);
+            jsonObject.addProperty("message","no more game lobby");
+            return jsonObject;
+        }
         jsonObject.addProperty("successful",this.successful);
         int _inx = page<gameLobbyList.size()?page:0;
         GameLobby gameLobby = gameLobbyList.get(_inx);

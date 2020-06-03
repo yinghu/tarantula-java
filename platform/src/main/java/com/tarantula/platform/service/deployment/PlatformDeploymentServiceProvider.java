@@ -297,7 +297,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public boolean enableApplication(String applicationId,boolean enabled){
         String suc = this.tarantulaContext.tarantulaCluster().deployService().enableApplication(applicationId,enabled);
-        if(suc!=null){
+        if(suc!=null){//return the lobby typeId
             this.integrationEventService.publish(new ModuleApplicationEvent(this.eventTopic,suc,applicationId,!enabled));
         }
         return suc!=null;
@@ -594,7 +594,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 return false;
             }
         }
-        log.warn("View Updated->"+onView.viewId()+"<>"+onView.toString());
+        //log.warn("View Updated->"+onView.viewId()+"<>"+onView.toString());
         OnViewEvent onViewEvent = new OnViewEvent(this.eventTopic,this.localTopic,onView);
         this.integrationEventService.publish(onViewEvent);
         return true;

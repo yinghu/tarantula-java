@@ -22,7 +22,7 @@
             <application>
                 <type-id>game-lobby</type-id>
                 <subtype-id>game-lobby-module</subtype-id>
-                <name>GameLobby 1</name>
+                <name>Game Lobby 1</name>
                 <type>application</type>
                 <category>game</category>
                 <singleton>true</singleton>
@@ -36,7 +36,7 @@
             <application>
                 <type-id>game-lobby</type-id>
                 <subtype-id>game-lobby-module</subtype-id>
-                <name>GameLobby 2</name>
+                <name>Game Lobby 2</name>
                 <type>application</type>
                 <category>game</category>
                 <singleton>true</singleton>

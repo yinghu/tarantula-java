@@ -6,6 +6,8 @@ import com.tarantula.platform.ResponseHeader;
 public class PermissionContext extends ResponseHeader {
     public int maxGameClusterCount;
     public int currentCount;
+    public int maxLobbyCount;
+    public int maxLevelCount;
     public String role;
     public String accessKey;
     public PermissionContext(int maxGameClusterCount,int currentCount){
@@ -32,6 +34,8 @@ public class PermissionContext extends ResponseHeader {
         }
         jo.addProperty("maxGameClusterCount",maxGameClusterCount);
         jo.addProperty("currentCount",currentCount);
+        jo.addProperty("maxLobbyCount",maxLobbyCount);
+        jo.addProperty("maxLevelCount",maxLevelCount);
         if(role!=null){
             jo.addProperty("role",role);
         }

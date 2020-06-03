@@ -32,6 +32,7 @@
                 <admin type="setup">
                     <property name="maxGameClusterCount">10</property>
                     <property name="maxGameLobbyCount">6</property>
+                    <property name="minGameLobbyCount">1</property>
                     <property name="defaultGameLevelCount">3</property>
                     <property name="maxGameLevelCount">6</property>
                 </admin>

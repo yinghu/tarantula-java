@@ -42,7 +42,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
             this.scheduledFuture = this.context.schedule(this);
         }
         module.setup(context);
-        this.context.log("Singleton Dynamic Module Started On ["+descriptor.moduleName()+"]", OnLog.INFO);
+        //this.context.log("Singleton Dynamic Module Started On ["+descriptor.moduleName()+"]", OnLog.INFO);
     }
     @Override
     public boolean oneTime() {

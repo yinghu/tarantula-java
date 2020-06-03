@@ -18,10 +18,13 @@ public interface DeployService extends ServiceProvider {
     boolean addLobby(Descriptor lobby);
 
     String addApplication(Descriptor application);
-    boolean addView(OnView view);
     boolean resetModule(String lobbyId,Descriptor descriptor);
-    String enableApplication(String applicationId,boolean enabled);
 
+    //add view via typeId of lobby
+    boolean addView(OnView view);
+
+    //update lobby or application to set disabled as true/false
+    String enableApplication(String applicationId,boolean enabled);
     boolean enableLobby(String typeId,boolean enabled);
 
     GameCluster createGameCluster(String owner,String name);

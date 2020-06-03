@@ -316,9 +316,11 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         else if(registryId== PortableRegistry.APPLICATION_DESCRIPTOR_CID){
             List dlist = new ArrayList();
             dataStore.list(new ApplicationQuery(params[0]),(a)->{
-                //log.warn(a.toString());
                 if(!a.disabled()){
                     dlist.add(a);
+                }
+                else{
+                    log.warn("disabled->"+a.tag());
                 }
                 return true;
             });
@@ -427,9 +429,15 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         app.distributionKey(applicationId);
         String typeId = null;
         if(ds.load(app)){
-            app.disabled(!enabled);
-            ds.update(app);
-            typeId = app.typeId();
+            if(enabled&&app.disabled()){//set disabled = false;
+                app.disabled(false);
+                typeId = app.typeId();
+            }
+            else if((!enabled)&&(!app.disabled())){//set disabled = true;
+                app.disabled(!enabled);
+                ds.update(app);
+                typeId = app.typeId();
+            }
         }
         return typeId;
     }

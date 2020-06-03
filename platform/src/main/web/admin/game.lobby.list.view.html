@@ -14,8 +14,9 @@
     <div class="w3-panel  w3-border-bottom w3-border-red">
         <div class="w3-container">
             <span id='tx-lobby-list-1' class='w3-left tx-text-14 tx-margin-top-8'>Name</span>
-            <span id='tx-lobby-list-next' tx-game-cluster-id='' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Next Lobby</span>   
+            <span id='tx-lobby-list-next' tx-game-cluster-id='' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Next</span>   
             <span id='tx-add-lobby' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-12">Add Lobby</span>
+            <span id='tx-disable-lobby' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-12">Remove Lobby</span>
         </div>    
     </div>
     <div class='w3-panel w3-border-bottom w3-border-red'>
@@ -353,6 +354,17 @@
             }       
         });    
     };
+    document.querySelector("#tx-disable-lobby").onclick=()=>{
+        TARA_API.onService(true,{serviceTag:'role/admin',command:'onDisableLobby',accessId:TARA_API.query().gameClusterId,index:_page},(resp)=>{
+            if(resp.successful){
+                document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;                   
+            }
+            else{
+                document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;
+            }       
+        });    
+    };
+    
     function _list_lobby(){
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameLobbyList',accessId:TARA_API.query().gameClusterId,page:_page},(resp)=>{
             if(resp.successful){
@@ -364,20 +376,24 @@
         });
     }
     function _reset_view(resp){
-        console.log(resp);
-        document.querySelector('#tx-lobby-list-1').innerHTML = resp.lobby.name;
-        document.querySelector('#tx-lobby-list-2').innerHTML = resp.lobby.rank;
-        document.querySelector('#tx-lobby-list-3').innerHTML = resp.lobby.tag; 
-        document.querySelector('#tx-lobby-list-4').innerHTML = resp.lobby.capacity; 
-        document.querySelector('#tx-lobby-list-5').innerHTML = resp.lobby.duration; 
-        document.querySelector('#tx-lobby-list-6').innerHTML = resp.lobby.playMode; 
-        _page = resp.index;
-        resp.lobby.levels.forEach((a,i)=> {
-            document.querySelector('#tx-level-v-'+i+'-1').innerHTML = a.name;
-            document.querySelector('#tx-level-v-'+i+'-2').innerHTML = a.level;
-            document.querySelector('#tx-level-v-'+i+'-3').innerHTML = a.xp;
-            document.querySelector('#tx-level-v-'+i+'-4').innerHTML = a.disabled;  
-        });  
+        if(resp.successful){
+            document.querySelector('#tx-lobby-list-1').innerHTML = resp.lobby.name;
+            document.querySelector('#tx-lobby-list-2').innerHTML = resp.lobby.rank;
+            document.querySelector('#tx-lobby-list-3').innerHTML = resp.lobby.tag; 
+            document.querySelector('#tx-lobby-list-4').innerHTML = resp.lobby.capacity; 
+            document.querySelector('#tx-lobby-list-5').innerHTML = resp.lobby.duration; 
+            document.querySelector('#tx-lobby-list-6').innerHTML = resp.lobby.playMode;
+            _page = resp.index;
+            resp.lobby.levels.forEach((a,i)=> {
+                document.querySelector('#tx-level-v-'+i+'-1').innerHTML = a.name;
+                document.querySelector('#tx-level-v-'+i+'-2').innerHTML = a.level;
+                document.querySelector('#tx-level-v-'+i+'-3').innerHTML = a.xp;
+                document.querySelector('#tx-level-v-'+i+'-4').innerHTML = a.disabled;  
+            });
+        }
+        else{
+            document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;
+        }  
     }
 
 </script>

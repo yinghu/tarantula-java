@@ -56,7 +56,7 @@ public class DefaultApplication implements Application {
                 });
             }
         }
-        log.warn("Application ["+this.deploymentDescriptor.name()+"/"+this.deploymentDescriptor.distributionKey()+"] started");
+        //log.warn("Application ["+this.deploymentDescriptor.name()+"/"+this.deploymentDescriptor.distributionKey()+"] started");
     }
 
     @Override
