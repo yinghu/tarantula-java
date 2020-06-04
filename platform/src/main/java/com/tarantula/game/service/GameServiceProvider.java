@@ -111,9 +111,10 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         });
         integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.ZONE_CID,(r)->{
-            zMap.forEach((k,z)->{
-                z.updated((Zone)r);
-            });
+            ZoneListener zl = zMap.get(r.distributionKey());
+            if(zl!=null){
+                zl.updated((Zone)r);
+            }
         });
         //integrationCluster.addEventListener(NAME,(e)->{
             //logger.warn(e.toString());
