@@ -57,14 +57,11 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         }
         //public lobby access
         else if(session.action().equals("onLobbyList")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String typeId = onAccess.typeId();
             PresenceContext ic = new PresenceContext("onLobbyList");
             ic.lobbyList = new ArrayList<>();
-            ic.lobbyList.add(this.context.lobby(typeId));
-            //_lobbyList.forEach((a)->{
-                //ic.lobbyList.add(this.context.lobby(a));
-            //});
+            _lobbyList.forEach((a)->{
+                ic.lobbyList.add(this.context.lobby(a));
+            });
             session.write(this.builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onAddEmail")){

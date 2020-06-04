@@ -895,6 +895,7 @@
     }
     function _tx_game(){
         console.log("game panel");
+        _tx_lobby();
     }
     function _tx_api(){
     }
@@ -938,15 +939,7 @@
                 return;
             }
             resp.lobbyList.forEach((a,i)=>{
-                let vt = document.querySelector('#tx-lobby-type-id-'+i);
-                let vn = document.querySelector('#tx-lobby-name-'+i);
-                if(vt){
-                    vt.innerHTML = a.descriptor.typeId;
-                    vn.innerHTML = a.descriptor.name;
-                }
-                else{
-                    console.log("Lobby index->"+i);
-                }
+                console.log(a);
             });
         });
     }
