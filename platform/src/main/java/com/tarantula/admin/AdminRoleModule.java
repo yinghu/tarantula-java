@@ -146,17 +146,17 @@ public class AdminRoleModule implements Module {
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             int index = ((Number)onAccess.property("index")).intValue();
             GameLobbyContext pending = this.gameLobbyContext(accessId);
-            if(pending.gameLobbyList.size()>minGameLobbyCount){
+            if(pending.checkEnabledLobbyCount()>minGameLobbyCount){
                 //do disable operation
-                if(pending.page==index){
-                    GameLobby gameLobby = pending.gameLobbyList.get(index);
+                GameLobby gameLobby = pending.gameLobbyList.get(index);
+                if(pending.page==index&&(!gameLobby.lobby.disabled())){//set to disable
                     boolean suc = this.deploymentServiceProvider.enableApplication(gameLobby.lobby.distributionKey(),false);
                     if(suc){
                         gameLobby.zone.disabled(true);
                         gameLobby.zone.update();
                         this.pendingLobby.remove(accessId);
                     }
-                    session.write(toMessage(suc?gameLobby.lobby.name()+" Removed":"failed to remove lobby",suc).toString().getBytes(),label());
+                    session.write(toMessage(suc?gameLobby.lobby.name()+" disabled":"failed to disble lobby",suc).toString().getBytes(),label());
                 }
                 else{
                     session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes(),label());
@@ -164,6 +164,26 @@ public class AdminRoleModule implements Module {
             }
             else{
                 session.write(toMessage("Min lobby count ["+minGameLobbyCount+"] required",false).toString().getBytes(),label());
+            }
+        }
+        else if(session.action().equals("onEnableLobby")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
+            int index = ((Number)onAccess.property("index")).intValue();
+            GameLobbyContext pending = this.gameLobbyContext(accessId);
+            //do enable operation
+            GameLobby gameLobby = pending.gameLobbyList.get(index);
+            if(pending.page==index&&(gameLobby.lobby.disabled())){//set to enable
+                boolean suc = this.deploymentServiceProvider.enableApplication(gameLobby.lobby.distributionKey(),true);
+                if(suc){
+                    gameLobby.zone.disabled(false);
+                    gameLobby.zone.update();
+                    this.pendingLobby.remove(accessId);
+                }
+                session.write(toMessage(suc?gameLobby.lobby.name()+" enabled":"failed to enable lobby",suc).toString().getBytes(),label());
+            }
+            else{
+                session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes(),label());
             }
         }
         else if(session.action().equals("onCreateGameCluster")){

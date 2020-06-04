@@ -754,7 +754,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         LobbyDescriptor lb = lbl.get(0);
         Lobby lobby = new DefaultLobby(lb);
-        List<DeploymentDescriptor> apps = this.tarantulaContext.query(new String[]{lb.distributionKey()},new ApplicationQuery(lb.distributionKey()));
+        List<DeploymentDescriptor> apps = this.tarantulaContext.query(new String[]{lb.distributionKey(),"all"},new ApplicationQuery(lb.distributionKey()));
         apps.forEach((a)->{
             lobby.addEntry(a);
         });

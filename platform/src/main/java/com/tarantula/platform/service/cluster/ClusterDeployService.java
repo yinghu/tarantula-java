@@ -315,9 +315,15 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
         else if(registryId== PortableRegistry.APPLICATION_DESCRIPTOR_CID){
             List dlist = new ArrayList();
+            boolean loadAll = params.length==2;
             dataStore.list(new ApplicationQuery(params[0]),(a)->{
-                if(!a.disabled()){
+                if(loadAll){
                     dlist.add(a);
+                }
+                else{
+                    if(!a.disabled()){
+                        dlist.add(a);
+                    }
                 }
                 return true;
             });
@@ -428,10 +434,11 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         if(ds.load(app)){
             if(enabled&&app.disabled()){//set disabled = false;
                 app.disabled(false);
+                ds.update(app);
                 typeId = app.typeId();
             }
             else if((!enabled)&&(!app.disabled())){//set disabled = true;
-                app.disabled(!enabled);
+                app.disabled(true);
                 ds.update(app);
                 typeId = app.typeId();
             }

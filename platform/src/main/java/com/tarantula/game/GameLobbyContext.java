@@ -8,6 +8,15 @@ import java.util.List;
 public class GameLobbyContext extends ResponseHeader {
     public List<GameLobby> gameLobbyList;
     public int page;
+    public int checkEnabledLobbyCount(){
+        int[] mc = {0};
+        gameLobbyList.forEach((a)->{
+            if(!a.lobby.disabled()){
+                mc[0]++;
+            }
+        });
+        return mc[0];
+    }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         if(gameLobbyList.size()==0){

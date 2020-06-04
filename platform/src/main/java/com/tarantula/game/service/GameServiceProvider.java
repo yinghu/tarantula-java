@@ -73,9 +73,6 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     public void removeZoneListener(String key){
         zMap.remove(key);
     }
-    //public void addModuleReset(String key,Module.OnReset reset){
-        //rMap.put(key,reset);
-    //}
     public Zone zone(String applicationId){//application id
         Zone zone = new Zone();
         zone.distributionKey(applicationId);
