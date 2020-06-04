@@ -36,7 +36,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     private EventService publisher;
     private String dest;
     private ClusterProvider integrationCluster;
-    private CopyOnWriteArrayList<ZoneListener> zList = new CopyOnWriteArrayList<>();
+    private ConcurrentHashMap<String,ZoneListener> zMap = new ConcurrentHashMap<>();
     public GameServiceProvider(String name){
         NAME = name;
     }
@@ -67,8 +67,11 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         this.dataStore.createIfAbsent(deltaStatistics,true);
         return deltaStatistics;
     }
-    public void addZoneListener(ZoneListener zoneListener){
-        zList.add(zoneListener);
+    public void addZoneListener(String key,ZoneListener zoneListener){
+        zMap.put(key,zoneListener);
+    }
+    public void removeZoneListener(String key){
+        zMap.remove(key);
     }
     //public void addModuleReset(String key,Module.OnReset reset){
         //rMap.put(key,reset);
@@ -111,7 +114,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         });
         integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.ZONE_CID,(r)->{
-            zList.forEach((z)->{
+            zMap.forEach((k,z)->{
                 z.updated((Zone)r);
             });
         });

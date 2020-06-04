@@ -189,6 +189,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.properties.put("__o",overtime);
         this.properties.put("__p",playMode);
         this.properties.put("__n",name);
+        this.properties.put("__a",disabled);
         for(Arena a : arenas){
             this.properties.put(a.name(),a.level+","+a.xp+","+a.disabled());
         }
@@ -202,6 +203,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.overtime = ((Number)properties.get("__o")).longValue();
         this.playMode = ((Number)properties.get("__p")).intValue();
         this.name = (String)properties.get("__n");
+        this.disabled =(Boolean)properties.get("__a");
         ArrayList<Arena> alist = new ArrayList<>();
         properties.forEach((k,v)->{
             if(!k.startsWith("__")){

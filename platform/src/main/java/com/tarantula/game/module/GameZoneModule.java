@@ -57,6 +57,10 @@ public class GameZoneModule implements Module,ZoneListener{
             session.write(builder.create().toJson(resp).getBytes(),label());
             return left;
         }
+        else if(session.action().equals("onPlay")){
+            //by passing match-making routing
+            onJoin(session,update);
+        }
         else{
             throw new UnsupportedOperationException(session.action());
         }
@@ -101,8 +105,8 @@ public class GameZoneModule implements Module,ZoneListener{
         mZone.gameServiceProvider = this.gameServiceProvider;
         mZone.descriptor = this.context.descriptor();
         mZone.start();
-        this.gameServiceProvider.addZoneListener(this);
-        context.log(this.mZone.descriptor.tag()+"/"+this.mZone.descriptor.accessRank()+"/"+this.mZone.descriptor.distributionKey(),OnLog.WARN);
+        this.gameServiceProvider.addZoneListener(this.context.descriptor().distributionKey(),this);
+        context.log("Game lobby started->"+this.mZone.descriptor.tag(),OnLog.WARN);
     }
     public void onConnection(Connection connection){
         if(this.connection==null){
@@ -124,15 +128,19 @@ public class GameZoneModule implements Module,ZoneListener{
         return "game";
     }
 
-    //@Override
-    public void reset() {
-        this.context.log("reset something",OnLog.WARN);
+
+    @Override
+    public void clear() {
+        this.gameServiceProvider.removeZoneListener(this.context.descriptor().distributionKey());
+        this.context.log("clear->"+this.context.descriptor().name(),OnLog.WARN);
     }
 
     @Override
     public void updated(Zone zone) {
-        for(Arena a : zone.arenas){
-            this.context.log(a.toString(),OnLog.WARN);
+        if(zone.distributionKey().equals(this.context.descriptor().distributionKey())){
+            for(Arena a : zone.arenas){
+                this.context.log(a.toString(),OnLog.WARN);
+            }
         }
     }
 }

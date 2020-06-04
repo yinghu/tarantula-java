@@ -48,7 +48,7 @@ public class MatchMakingModule implements Module, ZoneListener {
             mZone.put(d.accessRank(),d);
         });
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
-        this.gameServiceProvider.addZoneListener(this);
+        this.gameServiceProvider.addZoneListener(this.context.descriptor().distributionKey(),this);
         context.log("Started match making module on ->"+this.context.descriptor().typeId(), OnLog.WARN);
     }
 
@@ -59,6 +59,6 @@ public class MatchMakingModule implements Module, ZoneListener {
 
     @Override
     public void updated(Zone zone) {
-        this.context.log(zone.distributionKey()+" on match-making",OnLog.WARN);
+        this.context.log(zone.distributionKey()+"/"+zone.disabled()+"/ on match-making",OnLog.WARN);
     }
 }

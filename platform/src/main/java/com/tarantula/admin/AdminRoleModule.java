@@ -152,6 +152,8 @@ public class AdminRoleModule implements Module {
                     GameLobby gameLobby = pending.gameLobbyList.get(index);
                     boolean suc = this.deploymentServiceProvider.enableApplication(gameLobby.lobby.distributionKey(),false);
                     if(suc){
+                        gameLobby.zone.disabled(true);
+                        gameLobby.zone.update();
                         this.pendingLobby.remove(accessId);
                     }
                     session.write(toMessage(suc?gameLobby.lobby.name()+" Removed":"failed to remove lobby",suc).toString().getBytes(),label());
