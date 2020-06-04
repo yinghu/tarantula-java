@@ -152,8 +152,6 @@ public class AdminRoleModule implements Module {
                 if(pending.page==index&&(!gameLobby.lobby.disabled())){//set to disable
                     boolean suc = this.deploymentServiceProvider.enableApplication(gameLobby.lobby.distributionKey(),false);
                     if(suc){
-                        gameLobby.zone.disabled(true);
-                        gameLobby.zone.update();
                         this.pendingLobby.remove(accessId);
                     }
                     session.write(toMessage(suc?gameLobby.lobby.name()+" disabled":"failed to disble lobby",suc).toString().getBytes(),label());
@@ -176,8 +174,6 @@ public class AdminRoleModule implements Module {
             if(pending.page==index&&(gameLobby.lobby.disabled())){//set to enable
                 boolean suc = this.deploymentServiceProvider.enableApplication(gameLobby.lobby.distributionKey(),true);
                 if(suc){
-                    gameLobby.zone.disabled(false);
-                    gameLobby.zone.update();
                     this.pendingLobby.remove(accessId);
                 }
                 session.write(toMessage(suc?gameLobby.lobby.name()+" enabled":"failed to enable lobby",suc).toString().getBytes(),label());
@@ -360,9 +356,9 @@ public class AdminRoleModule implements Module {
         mZone.roundDuration = 60*1000;
         mZone.overtime = 5000;
         mZone.playMode = Room.OFF_LINE_MODE;
-        mZone.arenas = new Arena[maxGameLevelCount];
-        for(int i=1;i<maxGameLevelCount+1;i++){
-            mZone.arenas[i-1]=new Arena(i,i*100,"Level "+i,i>defaultGameLevelCount);
+        mZone.arenas = new Arena[defaultGameLevelCount];
+        for(int i=1;i<defaultGameLevelCount+1;i++){
+            mZone.arenas[i-1]=new Arena(i,i*100,"Level "+i,false);
         }
         mZone.dataStore(dataStore);
         dataStore.createIfAbsent(mZone,true);

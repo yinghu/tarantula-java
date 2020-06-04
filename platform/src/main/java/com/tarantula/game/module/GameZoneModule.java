@@ -137,8 +137,6 @@ public class GameZoneModule implements Module,ZoneListener{
 
     @Override
     public void updated(Zone zone) {
-        for(Arena a : zone.arenas){
-            this.context.log(a.toString(),OnLog.WARN);
-        }
+        mZone.reset(zone);
     }
 }

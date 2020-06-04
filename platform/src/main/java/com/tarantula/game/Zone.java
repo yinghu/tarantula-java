@@ -99,10 +99,12 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
                 mLevel = rating.level;
             }
         }
-        jsonObject.addProperty("arena",arenas[mLevel].name());
-        jsonObject.addProperty("capacity",capacity);
-        jsonObject.addProperty("duration",roundDuration/1000);
-        jsonObject.addProperty("overtime",overtime/1000);
+        synchronized (this){
+            jsonObject.addProperty("arena",arenas[mLevel].name());
+            jsonObject.addProperty("capacity",capacity);
+            jsonObject.addProperty("duration",roundDuration/1000);
+            jsonObject.addProperty("overtime",overtime/1000);
+        }
         jsonObject.addProperty("totalJoined",room.totalJoined());
         jsonObject.addProperty("state",room.state());
         JsonArray ja = new JsonArray();
@@ -164,10 +166,12 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
                 mLevel = rating.level;
             }
         }
-        jo.addProperty("arena",arenas[mLevel].name());
-        jo.addProperty("capacity",capacity);
-        jo.addProperty("duration",roundDuration/1000);
-        jo.addProperty("overtime",overtime/1000);
+        synchronized (this){
+            jo.addProperty("arena",arenas[mLevel].name());
+            jo.addProperty("capacity",capacity);
+            jo.addProperty("duration",roundDuration/1000);
+            jo.addProperty("overtime",overtime/1000);
+        }
         jo.addProperty("totalJoined",room.totalJoined());
         jo.addProperty("roomId",room.roomId);
         JsonArray ja = new JsonArray();
@@ -187,7 +191,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.properties.put("__o",overtime);
         this.properties.put("__p",playMode);
         this.properties.put("__n",name);
-        this.properties.put("__a",disabled);
+        //this.properties.put("__a",disabled);
         for(Arena a : arenas){
             this.properties.put(a.name(),a.level+","+a.xp+","+a.disabled());
         }
@@ -200,7 +204,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.overtime = ((Number)properties.get("__o")).longValue();
         this.playMode = ((Number)properties.get("__p")).intValue();
         this.name = (String)properties.get("__n");
-        this.disabled =(Boolean)properties.get("__a");
+        //this.disabled =(Boolean)properties.get("__a");
         ArrayList<Arena> alist = new ArrayList<>();
         properties.forEach((k,v)->{
             if(!k.startsWith("__")){
@@ -249,5 +253,14 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         }
         jsonObject.add("levels",jds);
         return jsonObject;
+    }
+    public void reset(Zone updated){
+        synchronized (this){
+            this.name = updated.name;
+            this.capacity = updated.capacity;
+            this.roundDuration = updated.roundDuration;
+            this.playMode = updated.playMode;
+
+        }
     }
 }
