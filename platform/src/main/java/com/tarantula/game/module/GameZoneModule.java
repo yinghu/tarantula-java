@@ -138,9 +138,9 @@ public class GameZoneModule implements Module,ZoneListener{
     @Override
     public void updated(Zone zone) {
         if(zone.distributionKey().equals(this.context.descriptor().distributionKey())){
-            for(Arena a : zone.arenas){
-                this.context.log(a.toString(),OnLog.WARN);
-            }
+            //for(Arena a : zone.arenas){
+                //this.context.log(a.toString(),OnLog.WARN);
+            //}
         }
     }
 }

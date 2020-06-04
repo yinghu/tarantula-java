@@ -41,12 +41,7 @@ public class MatchMakingModule implements Module, ZoneListener {
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        String lb = this.context.descriptor().typeId().replace("service","lobby");
-        Lobby lobby = this.context.lobby(lb);
-        lobby.entryList().forEach((d)->{
-            context.log("Add lobby ->"+d.tag()+" ->rank ["+d.accessRank()+"]",OnLog.WARN);
-            mZone.put(d.accessRank(),d);
-        });
+        _loadLobby();
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
         this.gameServiceProvider.addZoneListener(this.context.descriptor().distributionKey(),this);
         context.log("Started match making module on ->"+this.context.descriptor().typeId(), OnLog.WARN);
@@ -59,6 +54,15 @@ public class MatchMakingModule implements Module, ZoneListener {
 
     @Override
     public void updated(Zone zone) {
-        this.context.log(zone.distributionKey()+"/"+zone.disabled()+"/ on match-making",OnLog.WARN);
+        mZone.clear();
+        _loadLobby();
+    }
+    private void _loadLobby(){
+        String lb = this.context.descriptor().typeId().replace("service","lobby");
+        Lobby lobby = this.context.lobby(lb);
+        lobby.entryList().forEach((d)->{
+            context.log("Add lobby ->"+d.tag()+" ->rank ["+d.accessRank()+"]",OnLog.WARN);
+            mZone.put(d.accessRank(),d);
+        });
     }
 }

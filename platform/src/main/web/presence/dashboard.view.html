@@ -13,6 +13,7 @@
         <div class="w3-bar w3-green">
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Account</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Developer</span>
+            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Game</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">API</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Metrics</span>
             <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-14 tx-opt">Sudo</span>
@@ -292,6 +293,9 @@
                     <span class="tx-text-12">Powered By ICodeSoftware</span>
                 </div>
             </div>
+        </div>
+        <div id="tx-Game" class="w3-container tx-pane" style="display:none;">
+            <span class="tx-text-14">To do Live Game lobby List</span>
         </div>
         <div id="tx-API" class="w3-container tx-pane" style="display:none;">
             <div class='w3-bar w3-white'>
@@ -782,6 +786,9 @@
             else if(a.innerHTML == 'Developer'){
                 _tx_game_cluster();
             }
+            else if(a.innerHTML == 'Game'){
+                _tx_game();
+            }
             else if(a.innerHTML == 'API'){
                 _tx_api();
             }
@@ -885,6 +892,9 @@
                 console.log(resp.message);
             }        
         });
+    }
+    function _tx_game(){
+        console.log("game panel");
     }
     function _tx_api(){
     }

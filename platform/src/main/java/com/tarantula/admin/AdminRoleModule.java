@@ -221,7 +221,6 @@ public class AdminRoleModule implements Module {
             GameLobbyContext pending = this.gameLobbyContext(accessId);
             GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
             Zone zone = gameLobby.zone;
-            zone.rank = ((Number)onAccess.property("rank")).intValue();
             zone.capacity = ((Number)onAccess.property("capacity")).intValue();
             zone.roundDuration = ((Number)onAccess.property("duration")).intValue()*60000;
             zone.playMode = ((Number)onAccess.property("playMode")).intValue();
@@ -341,7 +340,6 @@ public class AdminRoleModule implements Module {
         DataStore dataStore = this.context.dataStore((String) gameCluster.property(GameCluster.GAME_SERVICE));
         Zone mZone = new Zone();
         mZone.distributionKey(descriptor.distributionKey());
-        mZone.rank = descriptor.accessRank();
         mZone.capacity=1;
         mZone.roundDuration = 60*1000;
         mZone.overtime = 5000;
