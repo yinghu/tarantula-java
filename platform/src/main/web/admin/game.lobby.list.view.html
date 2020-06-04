@@ -362,12 +362,12 @@
         document.querySelector('#tx-lobby-list-edit').style.display='none';
     };
     document.querySelector('#tx-lobby-list-edit-save').onclick=()=>{
-        //let _rank = document.querySelector('#tx-rank').value;
+        let _nm = document.querySelector('#tx-lobby-name').value;
         let _cap = document.querySelector('#tx-capacity').value;
         let _dur = document.querySelector('#tx-duration').value;
         let pm = document.querySelector('#tx-play-mode').value;
         let payload ={serviceTag:'role/admin',command:'onUpdateGameLobby',accessId:TARA_API.query().gameClusterId}
-        //payload.rank = _rank/1;
+        payload.name = _nm;
         payload.capacity = _cap/1;
         payload.duration = _dur/1;
         payload.playMode = pm/1;

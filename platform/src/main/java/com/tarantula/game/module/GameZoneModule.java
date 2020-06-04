@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 /**
- * Created by yinghu lu on 4/14/2020.
+ * updated by yinghu lu on 6/4/2020.
  */
 public class GameZoneModule implements Module,ZoneListener{
 
@@ -138,9 +138,9 @@ public class GameZoneModule implements Module,ZoneListener{
     @Override
     public void updated(Zone zone) {
         if(zone.distributionKey().equals(this.context.descriptor().distributionKey())){
-            //for(Arena a : zone.arenas){
-                //this.context.log(a.toString(),OnLog.WARN);
-            //}
+            for(Arena a : zone.arenas){
+                this.context.log(a.toString(),OnLog.WARN);
+            }
         }
     }
 }

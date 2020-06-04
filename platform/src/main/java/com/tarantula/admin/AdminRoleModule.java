@@ -221,6 +221,7 @@ public class AdminRoleModule implements Module {
             GameLobbyContext pending = this.gameLobbyContext(accessId);
             GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
             Zone zone = gameLobby.zone;
+            zone.name = onAccess.name();
             zone.capacity = ((Number)onAccess.property("capacity")).intValue();
             zone.roundDuration = ((Number)onAccess.property("duration")).intValue()*60000;
             zone.playMode = ((Number)onAccess.property("playMode")).intValue();
@@ -235,11 +236,25 @@ public class AdminRoleModule implements Module {
             GameLobbyContext pending = this.gameLobbyContext(accessId);
             GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
             Zone zone = gameLobby.zone;
-            zone.arenas[index].name(onAccess.name());
-            zone.arenas[index].xp = ((Number)onAccess.property("xp")).doubleValue();
-            zone.arenas[index].level = ((Number)onAccess.property("level")).intValue();
-            zone.arenas[index].disabled((Boolean)onAccess.property("disabled"));
-            zone.update();
+            if(index<zone.arenas.length){
+                zone.arenas[index].name(onAccess.name());
+                zone.arenas[index].xp = ((Number)onAccess.property("xp")).doubleValue();
+                zone.arenas[index].level = ((Number)onAccess.property("level")).intValue();
+                zone.arenas[index].disabled((Boolean)onAccess.property("disabled"));
+                zone.update();
+            }
+            else{
+                Arena[] arenas = zone.arenas;
+                zone.arenas = new Arena[arenas.length+1];
+                for(int i=0;i<arenas.length;i++){
+                    zone.arenas[i]=arenas[i];
+                }
+                zone.arenas[arenas.length].name(onAccess.name());
+                zone.arenas[arenas.length].xp = ((Number)onAccess.property("xp")).doubleValue();
+                zone.arenas[arenas.length].level = ((Number)onAccess.property("level")).intValue();
+                zone.arenas[arenas.length].disabled((Boolean)onAccess.property("disabled"));
+                zone.update();
+            }
             session.write(pending.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onLaunchGameCluster")){
