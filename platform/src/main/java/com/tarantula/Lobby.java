@@ -12,6 +12,8 @@ public interface Lobby{
 	void addEntry(Descriptor descriptor);
 	void removeEntry(String applicationId);
 
+	void addListener(Listener listener);
+
 	interface Listener{
 		void on(Descriptor descriptor);
 	}

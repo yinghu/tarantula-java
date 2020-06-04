@@ -3,8 +3,6 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.game.Zone;
-import com.tarantula.game.ZoneListener;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.service.Rating;
 import com.tarantula.platform.ResponseHeader;
@@ -12,9 +10,9 @@ import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.concurrent.ConcurrentHashMap;
 /**
- * Created by yinghu lu on 6/2/2020.
+ * updated by yinghu lu on 6/4/2020.
  */
-public class MatchMakingModule implements Module, ZoneListener {
+public class MatchMakingModule implements Module,Lobby.Listener {
 
     private ApplicationContext context;
     private ConcurrentHashMap<Integer,Descriptor> mZone = new ConcurrentHashMap<>();
@@ -41,9 +39,14 @@ public class MatchMakingModule implements Module, ZoneListener {
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        _loadLobby();
+        String lobbyId = this.context.descriptor().typeId().replace("service","lobby");
+        Lobby lobby = this.context.lobby(lobbyId);
+        lobby.entryList().forEach((d)->{
+            context.log("Add lobby ->"+d.tag()+" ->rank ["+d.accessRank()+"]",OnLog.WARN);
+            mZone.put(d.accessRank(),d);
+        });
+        lobby.addListener(this);
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
-        this.gameServiceProvider.addZoneListener(this.context.descriptor().distributionKey(),this);
         context.log("Started match making module on ->"+this.context.descriptor().typeId(), OnLog.WARN);
     }
 
@@ -53,16 +56,13 @@ public class MatchMakingModule implements Module, ZoneListener {
     }
 
     @Override
-    public void updated(Zone zone) {
-        mZone.clear();
-        _loadLobby();
-    }
-    private void _loadLobby(){
-        String lb = this.context.descriptor().typeId().replace("service","lobby");
-        Lobby lobby = this.context.lobby(lb);
-        lobby.entryList().forEach((d)->{
-            context.log("Add lobby ->"+d.tag()+" ->rank ["+d.accessRank()+"]",OnLog.WARN);
-            mZone.put(d.accessRank(),d);
-        });
+    public void on(Descriptor descriptor) {
+        this.context.log("Lobby Updated->"+descriptor.disabled()+"//"+descriptor.accessRank(),OnLog.WARN);
+        if(descriptor.disabled()){
+            mZone.remove(descriptor.accessRank());
+        }
+        else{
+            mZone.putIfAbsent(descriptor.accessRank(),descriptor);
+        }
     }
 }
