@@ -18,7 +18,6 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,12 +37,10 @@ public class AdminRoleModule implements Module {
     private int maxGameLevelCount;
     private SubscriptionFee monthly;
     private SubscriptionFee yearly;
-    private GameLobbyComparator rankComparator;
     private ConcurrentHashMap<String,GameLobbyContext> pendingLobby;
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
-        //this.context.log(session.action(),OnLog.INFO);
         if(session.action().equals("onCheckPermission")){
             Account acc = new UserAccount();
             acc.distributionKey(session.systemId());
@@ -51,7 +48,6 @@ public class AdminRoleModule implements Module {
             session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0)).toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onGameClusterList")){
-            //this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             int index = ((Number)onAccess.property("index")).intValue();
             GameClusterContext adminContext = new GameClusterContext();
@@ -211,57 +207,66 @@ public class AdminRoleModule implements Module {
         }
 
         else if(session.action().equals("onUpdateGameLobby")){
-            //this.context.log(new String(payload),OnLog.WARN);
+            this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
+            int index = ((Number)onAccess.property("page")).intValue();
             GameLobbyContext pending = this.gameLobbyContext(accessId);
-            GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
-            Zone zone = gameLobby.zone;
-            zone.name = onAccess.name();
-            zone.capacity = ((Number)onAccess.property("capacity")).intValue();
-            zone.roundDuration = ((Number)onAccess.property("duration")).intValue()*60000;
-            zone.playMode = ((Number)onAccess.property("playMode")).intValue();
-            zone.update();
-            pendingLobby.remove(accessId);
-            session.write(pending.toJson().toString().getBytes(),label());
+            if(index==pending.page){
+                GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
+                Zone zone = gameLobby.zone;
+                zone.name = onAccess.name();
+                zone.capacity = ((Number)onAccess.property("capacity")).intValue();
+                zone.roundDuration = ((Number)onAccess.property("duration")).intValue()*60000;
+                zone.playMode = ((Number)onAccess.property("playMode")).intValue();
+                zone.update();
+                session.write(pending.toJson().toString().getBytes(),label());
+            }
+            else{
+                session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes(),label());
+            }
         }
         else if(session.action().equals("onUpdateGameLevel")){
             this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             int index = ((Number)onAccess.property("index")).intValue();
+            int page = ((Number)onAccess.property("page")).intValue();
             GameLobbyContext pending = this.gameLobbyContext(accessId);
-            GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
-            Zone zone = gameLobby.zone;
-            if(index<=maxGameLevelCount){
-                boolean updated  = false;
-                for(Arena a : zone.arenas){
-                    if(a.level==index){
-                        a.name(onAccess.name());
-                        a.xp = ((Number)onAccess.property("xp")).doubleValue();
-                        a.disabled((Boolean)onAccess.property("disabled"));
-                        updated = true;
-                        break;
+            if(page==pending.page){
+                GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
+                Zone zone = gameLobby.zone;
+                if(index<=maxGameLevelCount){
+                    boolean updated  = false;
+                    for(Arena a : zone.arenas){
+                        if(a.level==index){
+                            a.name(onAccess.name());
+                            a.xp = ((Number)onAccess.property("xp")).doubleValue();
+                            a.disabled((Boolean)onAccess.property("disabled"));
+                            updated = true;
+                            break;
+                        }
                     }
-                }
-                if(!updated){
-                    Arena[] arenas = zone.arenas;
-                    zone.arenas = new Arena[arenas.length+1];
-                    for(int i=0;i<arenas.length;i++){
-                        zone.arenas[i]=arenas[i];
+                    if(!updated){
+                        Arena[] arenas = zone.arenas;
+                        zone.arenas = new Arena[arenas.length+1];
+                        for(int i=0;i<arenas.length;i++){
+                            zone.arenas[i]=arenas[i];
+                        }
+                        zone.arenas[arenas.length]= new Arena();
+                        zone.arenas[arenas.length].name(onAccess.name());
+                        zone.arenas[arenas.length].xp = ((Number)onAccess.property("xp")).doubleValue();
+                        zone.arenas[arenas.length].level = index;
+                        zone.arenas[arenas.length].disabled((Boolean)onAccess.property("disabled"));
                     }
-                    zone.arenas[arenas.length]= new Arena();
-                    zone.arenas[arenas.length].name(onAccess.name());
-                    zone.arenas[arenas.length].xp = ((Number)onAccess.property("xp")).doubleValue();
-                    zone.arenas[arenas.length].level = index;
-                    zone.arenas[arenas.length].disabled((Boolean)onAccess.property("disabled"));
+                    zone.update();
+                    session.write(pending.toJson().toString().getBytes(),label());
                 }
-                zone.update();
-                pendingLobby.remove(accessId);
-                session.write(pending.toJson().toString().getBytes(),label());
-            }
-            else{
-                session.write(toMessage("level overflow",false).toString().getBytes(),label());
+                else{
+                    session.write(toMessage("level overflow",false).toString().getBytes(),label());
+                }
+            }else{
+                session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes(),label());
             }
         }
         else if(session.action().equals("onLaunchGameCluster")){
@@ -333,7 +338,7 @@ public class AdminRoleModule implements Module {
         this.maxGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLevelCount"));
         this.minGameLobbyCount = Integer.parseInt(this.context.configuration("setup").property("minGameLobbyCount"));
         this.pendingLobby = new ConcurrentHashMap<>();
-        this.rankComparator = new GameLobbyComparator();
+        //this.rankComparator = new GameLobbyComparator();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
     @Override
@@ -343,7 +348,7 @@ public class AdminRoleModule implements Module {
     private GameLobbyContext gameLobbyContext(String accessId){
         return pendingLobby.computeIfAbsent(accessId,(k)-> {
             GameLobbyContext gameLobbyContext = new GameLobbyContext();
-            gameLobbyContext.gameLobbyList = new ArrayList<>();
+            gameLobbyContext.gameLobbyList = new ConcurrentHashMap<>();
             gameLobbyContext.successful(true);
             GameCluster gc = this.deploymentServiceProvider.gameCluster(accessId);
             //query from master node to make sure data available always
@@ -352,9 +357,9 @@ public class AdminRoleModule implements Module {
                 GameLobby gameLobby = new GameLobby();
                 gameLobby.lobby = a;
                 gameLobby.zone = _zone(gc, a);
-                gameLobbyContext.gameLobbyList.add(gameLobby);
+                gameLobbyContext.gameLobbyList.put(a.accessRank(),gameLobby);
             });
-            Collections.sort(gameLobbyContext.gameLobbyList,rankComparator);
+            //Collections.sort(gameLobbyContext.gameLobbyList,rankComparator);
             return gameLobbyContext;
         });
     }
