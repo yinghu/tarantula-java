@@ -7,17 +7,18 @@ import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.service.Rating;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.util.ResponseSerializer;
-
 import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * updated by yinghu lu on 6/4/2020.
  */
 public class MatchMakingModule implements Module,Lobby.Listener {
 
     private ApplicationContext context;
-    private ConcurrentHashMap<Integer,Descriptor> mZone = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer,Descriptor> mZone;
     private GameServiceProvider gameServiceProvider;
     private GsonBuilder builder;
+    private String lobbyId;
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         //check Rating to match the game zone to join 
@@ -39,13 +40,9 @@ public class MatchMakingModule implements Module,Lobby.Listener {
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        String lobbyId = this.context.descriptor().typeId().replace("service","lobby");
-        Lobby lobby = this.context.lobby(lobbyId);
-        lobby.entryList().forEach((d)->{
-            context.log("Add lobby ->"+d.tag()+" ->rank ["+d.accessRank()+"]",OnLog.WARN);
-            mZone.put(d.accessRank(),d);
-        });
-        lobby.addListener(this);
+        mZone = new ConcurrentHashMap<>();//max matching level
+        lobbyId = this.context.descriptor().typeId().replace("service","lobby");
+        listLobby().addListener(this);
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
         context.log("Started match making module on ->"+this.context.descriptor().typeId(), OnLog.WARN);
     }
@@ -58,11 +55,35 @@ public class MatchMakingModule implements Module,Lobby.Listener {
     @Override
     public void on(Descriptor descriptor) {
         this.context.log("Lobby Updated->"+descriptor.disabled()+"//"+descriptor.accessRank(),OnLog.WARN);
-        if(descriptor.disabled()){
-            mZone.remove(descriptor.accessRank());
+        if(descriptor.accessRank()>0&&descriptor.accessRank()<=this.context.descriptor().capacity()){
+            mZone.clear();
+            listLobby();
         }
-        else{
-            mZone.putIfAbsent(descriptor.accessRank(),descriptor);
+    }
+    private Lobby listLobby(){
+        Lobby lobby = this.context.lobby(lobbyId);
+        int[] fi = {this.context.descriptor().capacity()};
+        lobby.entryList().forEach((a)->{
+            if(a.accessRank()>0&&a.accessRank()<=this.context.descriptor().capacity()){
+                mZone.put(a.accessRank(),a);
+                if(a.accessRank()<fi[0]){
+                    fi[0] = a.accessRank();
+                }
+            }
+        });
+        //set 1 to max lobby count from capacity setting
+        for(int i=1;i<this.context.descriptor().capacity()+1;i++){//max matching level
+            Descriptor ex = mZone.get(i);
+            if(ex==null){
+                if(mZone.get(i-1)!=null){
+                    mZone.put(i,mZone.get(i-1));//fill with last one
+                }
+                else{
+                    mZone.put(i,mZone.get(fi[0]));//fill header
+                }
+            }
+            context.log("Add lobby ->"+mZone.get(i).tag()+" ->rank ["+mZone.get(i).accessRank()+"]",OnLog.WARN);
         }
+        return lobby;
     }
 }

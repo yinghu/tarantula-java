@@ -38,7 +38,7 @@ public class AdminRoleModule implements Module {
     private int maxGameLevelCount;
     private SubscriptionFee monthly;
     private SubscriptionFee yearly;
-    private RankComparator rankComparator;
+    private GameLobbyComparator rankComparator;
     private ConcurrentHashMap<String,GameLobbyContext> pendingLobby;
 
     @Override
@@ -232,27 +232,32 @@ public class AdminRoleModule implements Module {
             GameLobbyContext pending = this.gameLobbyContext(accessId);
             GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
             Zone zone = gameLobby.zone;
-            if(index<zone.arenas.length){
-                zone.arenas[index].name(onAccess.name());
-                zone.arenas[index].xp = ((Number)onAccess.property("xp")).doubleValue();
-                //zone.arenas[index].level = ((Number)onAccess.property("level")).intValue();
-                zone.arenas[index].disabled((Boolean)onAccess.property("disabled"));
-                zone.update();
+            if(index<maxGameLevelCount){
+                if(index<zone.arenas.length){
+                    zone.arenas[index].name(onAccess.name());
+                    zone.arenas[index].xp = ((Number)onAccess.property("xp")).doubleValue();
+                    //zone.arenas[index].level = ((Number)onAccess.property("level")).intValue();
+                    zone.arenas[index].disabled((Boolean)onAccess.property("disabled"));
+                    zone.update();
+                }
+                else{
+                    Arena[] arenas = zone.arenas;
+                    zone.arenas = new Arena[arenas.length+1];
+                    for(int i=0;i<arenas.length;i++){
+                        zone.arenas[i]=arenas[i];
+                    }
+                    zone.arenas[arenas.length]= new Arena();
+                    zone.arenas[arenas.length].name(onAccess.name());
+                    zone.arenas[arenas.length].xp = ((Number)onAccess.property("xp")).doubleValue();
+                    zone.arenas[arenas.length].level = zone.arenas.length;
+                    zone.arenas[arenas.length].disabled((Boolean)onAccess.property("disabled"));
+                    zone.update();
+                }
+                session.write(pending.toJson().toString().getBytes(),label());
             }
             else{
-                Arena[] arenas = zone.arenas;
-                zone.arenas = new Arena[arenas.length+1];
-                for(int i=0;i<arenas.length;i++){
-                    zone.arenas[i]=arenas[i];
-                }
-                zone.arenas[arenas.length]= new Arena();
-                zone.arenas[arenas.length].name(onAccess.name());
-                zone.arenas[arenas.length].xp = ((Number)onAccess.property("xp")).doubleValue();
-                zone.arenas[arenas.length].level = zone.arenas.length;
-                zone.arenas[arenas.length].disabled((Boolean)onAccess.property("disabled"));
-                zone.update();
+                session.write(toMessage("level overflow",false).toString().getBytes(),label());
             }
-            session.write(pending.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onLaunchGameCluster")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -323,7 +328,7 @@ public class AdminRoleModule implements Module {
         this.maxGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLevelCount"));
         this.minGameLobbyCount = Integer.parseInt(this.context.configuration("setup").property("minGameLobbyCount"));
         this.pendingLobby = new ConcurrentHashMap<>();
-        this.rankComparator = new RankComparator();
+        this.rankComparator = new GameLobbyComparator();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
     @Override

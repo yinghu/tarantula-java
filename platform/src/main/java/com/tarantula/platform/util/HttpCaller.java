@@ -18,13 +18,15 @@ public class HttpCaller {
     public static void main(String[] args) throws Exception{
         //HttpCaller caller = new HttpCaller();
         //caller._init();
+        //System.out.println(caller.get())
         //System.out.println(caller.get());
         //System.out.println(caller.get());
         //System.out.println(caller.get());
-        //System.out.println(caller.get());
-        double xp = 5000;
-        int level = (int)xp/1000+1;
+        double xp = 10000;
+        int level = (int)xp/1000;
         System.out.println("LEVEL->"+level);
+        int rank = level%10;
+        System.out.println("RANK->"+rank);
     }
     private HttpClient client;
     private HttpRequest request;

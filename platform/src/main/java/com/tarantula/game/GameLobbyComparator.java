@@ -1,16 +1,14 @@
 package com.tarantula.game;
 
-import com.tarantula.Descriptor;
-
 import java.util.Comparator;
 
 /**
  * Created by yinghu lu on 4/29/2020.
  */
-public class RankComparator implements Comparator<Descriptor> {
+public class GameLobbyComparator implements Comparator<GameLobby> {
 
-    public int compare( Descriptor o1, Descriptor o2) {
-        int diff = o1.accessRank()-o2.accessRank();
+    public int compare( GameLobby o1, GameLobby o2) {
+        int diff = o1.lobby.accessRank()-o2.lobby.accessRank();
         if(diff>0){
             return 1;
         }

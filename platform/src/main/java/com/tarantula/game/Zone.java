@@ -97,11 +97,11 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         for(Stub stub : room.playerList()){
             Rating rating = gameServiceProvider.rating(stub.owner());
             if(rating.level<mLevel){
-                mLevel = rating.level;
+                mLevel = rating.level;//use lower level for matching
             }
         }
         synchronized (this){
-            jsonObject.addProperty("arena",arenas[mLevel].name());
+            jsonObject.addProperty("arena",arenas[mLevel-1].name());
             jsonObject.addProperty("capacity",capacity);
             jsonObject.addProperty("duration",roundDuration/1000);
             jsonObject.addProperty("overtime",overtime/1000);

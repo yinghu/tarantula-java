@@ -9,16 +9,17 @@ import com.tarantula.platform.RecoverableObject;
 
 import java.util.Map;
 /**
- * Created by yinghu lu on 4/14/2020.
+ * Updated by yinghu lu on 6/4/2020.
  * Key form [systemId]/Rating
  */
 public class Rating extends RecoverableObject implements DataStore.Updatable {
 
     public static double BASE_POINTS = 100;
     public static int LEVEL_UP_BASE = 1000;
+    public static int RANK_UP_BASE = 10;
     public int rank =1; //rank of zone
     public int level=1; //level of arena
-    public double lxp=0;  //xp of level
+    public double lxp=LEVEL_UP_BASE;  //xp of level
     public double xp=0; //total xp
     public double elo = 1200; //elo service
     public int csw = 0; //consecutive winnings
@@ -42,7 +43,13 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
         }
         lxp += dxp;
         xp += dxp;
-        level = (int)lxp/LEVEL_UP_BASE+1;
+        level = (int)lxp/LEVEL_UP_BASE;
+        if(level%RANK_UP_BASE==0){//rank up
+            rank++;
+            //reset next level from 1 - 10 and rank up again
+            level = 1;
+            lxp = LEVEL_UP_BASE;
+        }
     }
 
     @Override
