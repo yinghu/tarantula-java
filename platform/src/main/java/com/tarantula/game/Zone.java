@@ -12,6 +12,7 @@ import com.tarantula.platform.service.DeploymentServiceProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -255,12 +256,22 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         return jsonObject;
     }
     public void reset(Zone updated){
-        synchronized (this){
+        ArrayList<Arena> alist = new ArrayList<>();
+        for(Arena a : updated.arenas){
+            if(!a.disabled()){
+                alist.add(a);
+            }
+        }
+        Collections.sort(alist,new ArenaComparator());
+        synchronized (this){//update local zone copy
             this.name = updated.name;
             this.capacity = updated.capacity;
             this.roundDuration = updated.roundDuration;
             this.playMode = updated.playMode;
-
+            this.arenas = new Arena[alist.size()];
+            for(int i=0;i<this.arenas.length;i++){
+                this.arenas[i]=alist.get(i);
+            }
         }
     }
 }
