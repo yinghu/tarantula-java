@@ -29,7 +29,7 @@
                 <tag>game/lobby1</tag>
                 <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.GameZoneModule</module-name>
-                <capacity>3</capacity>
+                <capacity>10</capacity>
                 <access-rank>1</access-rank>
                 <timer-on-module>1000</timer-on-module>
             </application>
@@ -43,7 +43,7 @@
                 <tag>game/lobby2</tag>
                 <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.GameZoneModule</module-name>
-                <capacity>3</capacity>
+                <capacity>10</capacity>
                 <access-rank>2</access-rank>
                 <timer-on-module>1000</timer-on-module>
             </application>
@@ -102,6 +102,7 @@
                 <category>service</category>
                 <singleton>true</singleton>
                 <tag>game/data</tag>
+                <capacity>4000</capacity><!--max bytes per set call-->
                 <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.KeyValueDataStoreModule</module-name>
             </application>

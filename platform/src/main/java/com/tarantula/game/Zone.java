@@ -12,7 +12,6 @@ import com.tarantula.platform.service.DeploymentServiceProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -35,6 +34,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     public Descriptor descriptor;
     private CopyOnWriteArrayList<Room> rList = new CopyOnWriteArrayList<>();
     private ConcurrentLinkedDeque<Room> rQueue = new ConcurrentLinkedDeque<>();
+    public ConcurrentHashMap<Integer,Arena> aMap = new ConcurrentHashMap<>();
     public Zone(){
         this.vertex = "Zone";
     }
@@ -50,6 +50,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     }
 
     public void start(){
+        listArena();
         for(int i=0;i<3;i++){
             Room room = new Room();
             room.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
@@ -101,7 +102,8 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
             }
         }
         synchronized (this){
-            jsonObject.addProperty("arena",arenas[mLevel-1].name());
+            Arena match = aMap.get(mLevel);
+            jsonObject.addProperty("arena",match.name());
             jsonObject.addProperty("capacity",capacity);
             jsonObject.addProperty("duration",roundDuration/1000);
             jsonObject.addProperty("overtime",overtime/1000);
@@ -168,7 +170,8 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
             }
         }
         synchronized (this){
-            jo.addProperty("arena",arenas[mLevel].name());
+            Arena match = aMap.get(mLevel);
+            jo.addProperty("arena",match.name());
             jo.addProperty("capacity",capacity);
             jo.addProperty("duration",roundDuration/1000);
             jo.addProperty("overtime",overtime/1000);
@@ -255,6 +258,30 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         jsonObject.add("levels",jds);
         return jsonObject;
     }
+    private void listArena(){
+        int fi = this.descriptor.capacity();
+        for(Arena a : arenas){
+            if(a.level>0&&a.level<=this.descriptor.capacity()){
+                aMap.put(a.level,a);
+                if(a.level<fi){
+                    fi = a.level;
+                }
+            }
+        }
+        //set 1 to max level count
+        for(int i=1;i<this.descriptor.capacity()+1;i++){//max matching level
+            Arena ex = aMap.get(i);
+            if(ex==null){
+                if(aMap.get(i-1)!=null){
+                    aMap.put(i,aMap.get(i-1));//fill with last one
+                }
+                else{
+                    aMap.put(i,aMap.get(fi));//fill header
+                }
+            }
+            //context.log("Add lobby ->"+mZone.get(i).tag()+" ->rank ["+mZone.get(i).accessRank()+"]",OnLog.WARN);
+        }
+    }
     public void reset(Zone updated){
         ArrayList<Arena> alist = new ArrayList<>();
         for(Arena a : updated.arenas){
@@ -262,16 +289,17 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
                 alist.add(a);
             }
         }
-        Collections.sort(alist,new ArenaComparator());
+        this.arenas = new Arena[alist.size()];
+        for(int i=0;i<this.arenas.length;i++){
+            this.arenas[i]=alist.get(i);
+        }
         synchronized (this){//update local zone copy
             this.name = updated.name;
             this.capacity = updated.capacity;
             this.roundDuration = updated.roundDuration;
             this.playMode = updated.playMode;
-            this.arenas = new Arena[alist.size()];
-            for(int i=0;i<this.arenas.length;i++){
-                this.arenas[i]=alist.get(i);
-            }
+            aMap.clear();
+            listArena();
         }
     }
 }

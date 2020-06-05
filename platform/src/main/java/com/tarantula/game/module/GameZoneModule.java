@@ -10,7 +10,6 @@ import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 /**
  * updated by yinghu lu on 6/4/2020.
@@ -24,6 +23,7 @@ public class GameZoneModule implements Module,ZoneListener{
     private GsonBuilder builder;
     private GameServiceProvider gameServiceProvider;
     private Connection connection;
+    private int DEFAULT_LEVEL_COUNT = 3;
     @Override
     public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp
@@ -81,9 +81,8 @@ public class GameZoneModule implements Module,ZoneListener{
             mZone.roundDuration = 60*1000;
             mZone.overtime = 5000;
             mZone.playMode = Room.OFF_LINE_MODE;
-            int sz = this.context.descriptor().capacity();
-            mZone.arenas = new Arena[sz];
-            for(int i=1;i<sz+1;i++){
+            mZone.arenas = new Arena[DEFAULT_LEVEL_COUNT];
+            for(int i=1;i<DEFAULT_LEVEL_COUNT+1;i++){
                 mZone.arenas[i-1]=new Arena(i,i*100,"Level "+i,false);
             }
             mZone.update();
@@ -98,13 +97,13 @@ public class GameZoneModule implements Module,ZoneListener{
         for(int i=0;i<alist.size();i++){
             mZone.arenas[i]=alist.get(i);
         }
-        Arrays.sort(mZone.arenas,new ArenaComparator());
         mZone.roomIndex = this.mRoom;
         mZone.stubIndex = this.mStub;
         mZone.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         mZone.gameServiceProvider = this.gameServiceProvider;
         mZone.descriptor = this.context.descriptor();
         mZone.start();
+        mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->level ["+v.level+"]",OnLog.WARN));
         this.gameServiceProvider.addZoneListener(this.context.descriptor().distributionKey(),this);
         context.log("Game lobby started->"+this.mZone.descriptor.tag(),OnLog.WARN);
     }
@@ -138,5 +137,6 @@ public class GameZoneModule implements Module,ZoneListener{
     @Override
     public void updated(Zone zone) {
         mZone.reset(zone);
+        mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->level ["+v.level+"]",OnLog.WARN));
     }
 }

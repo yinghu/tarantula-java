@@ -71,24 +71,6 @@
     </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class="w3-container w3-border-bottom w3-border-red">
-            <span id='tx-level-v-0-1' class="w3-left tx-text-14 tx-margin-top-16">Pending</span>
-            <span tx-level-no="0" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit-open">Edit</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Level</span>
-            <span id='tx-level-v-0-2' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">XP</span>
-            <span id='tx-level-v-0-3' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Disabled</span>
-            <span id='tx-level-v-0-4' class="w3-right tx-text-12">true</span>    
-        </div>
-    </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class="w3-container w3-border-bottom w3-border-red">
             <span id='tx-level-v-1-1' class="w3-left tx-text-14 tx-margin-top-16">Pending</span>
             <span tx-level-no="1" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit-open">Edit</span>    
         </div>
@@ -247,6 +229,24 @@
         <div class="w3-container">
             <span class="w3-left tx-text-12">Disabled</span>
             <span id='tx-level-v-9-4' class="w3-right tx-text-12">true</span>    
+        </div>
+    </div>
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <div class="w3-container w3-border-bottom w3-border-red">
+            <span id='tx-level-v-10-1' class="w3-left tx-text-14 tx-margin-top-16">Pending</span>
+            <span tx-level-no="10" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit-open">Edit</span>    
+        </div>
+        <div class="w3-container">
+            <span class="w3-left tx-text-12">Level</span>
+            <span id='tx-level-v-10-2' class="w3-right tx-text-12">0</span>    
+        </div>
+        <div class="w3-container">
+            <span class="w3-left tx-text-12">XP</span>
+            <span id='tx-level-v-10-3' class="w3-right tx-text-12">0</span>    
+        </div>
+        <div class="w3-container">
+            <span class="w3-left tx-text-12">Disabled</span>
+            <span id='tx-level-v-10-4' class="w3-right tx-text-12">true</span>    
         </div>
     </div>
     
@@ -456,8 +456,7 @@
         a.onclick=()=>{
             let lix = parseInt(a.getAttribute('tx-level-no'));
             TARA_API.query().levelIndex = lix;
-            let ixc = lix+1;
-            document.querySelector('#tx-level-edit-no').innerHTML="Update Level ["+ixc+"]";
+            document.querySelector('#tx-level-edit-no').innerHTML="Update Level ["+lix+"]";
             document.querySelector('#tx-level-name').value = document.querySelector('#tx-level-v-'+lix+'-1').innerHTML;
             //document.querySelector('#tx-level').innerHTML = document.querySelector('#tx-level-v-'+lix+'-2').innerHTML;
             document.querySelector('#tx-level-xp').value = document.querySelector('#tx-level-v-'+lix+'-3').innerHTML;
@@ -478,7 +477,6 @@
         payload.accessId = TARA_API.query().gameClusterId;
         payload.index = TARA_API.query().levelIndex;
         payload.name = _ln;
-        //payload.level = _l/1;
         payload.xp = _lx/1;
         payload.disabled = _ld;
         TARA_API.onService(true,payload,(resp)=>{
@@ -557,7 +555,6 @@
     }
     function _reset_view(resp){
         if(resp.successful){
-            console.log(resp);
             document.querySelector('#tx-lobby-list-1').innerHTML = resp.lobby.name;
             document.querySelector('#tx-lobby-list-2').innerHTML = resp.lobby.rank;
             document.querySelector('#tx-lobby-list-3').innerHTML = resp.lobby.tag; 
@@ -574,7 +571,15 @@
                 document.querySelector('#tx-disable-lobby').style.display='none';
                 document.querySelector('#tx-enable-lobby').style.display='block';
             }
-            resp.lobby.levels.forEach((a,i)=> {
+            let i;
+            for(i=1;i<11;i++){
+                document.querySelector('#tx-level-v-'+i+'-1').innerHTML ='Pending';
+                document.querySelector('#tx-level-v-'+i+'-2').innerHTML = '0';
+                document.querySelector('#tx-level-v-'+i+'-3').innerHTML = '0';
+                document.querySelector('#tx-level-v-'+i+'-4').innerHTML = 'true';   
+            }
+            resp.lobby.levels.forEach((a)=> {
+                i = (a.level);
                 document.querySelector('#tx-level-v-'+i+'-1').innerHTML = a.name;
                 document.querySelector('#tx-level-v-'+i+'-2').innerHTML = a.level;
                 document.querySelector('#tx-level-v-'+i+'-3').innerHTML = a.xp;

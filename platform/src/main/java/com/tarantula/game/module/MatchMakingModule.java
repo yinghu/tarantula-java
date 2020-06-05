@@ -19,12 +19,14 @@ public class MatchMakingModule implements Module,Lobby.Listener {
     private GameServiceProvider gameServiceProvider;
     private GsonBuilder builder;
     private String lobbyId;
+    private int maxRank;
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         //check Rating to match the game zone to join 
         if(session.action().equals("onPlay")){
             Rating rating = this.gameServiceProvider.rating(session.systemId());
-            Response response = context.presence(session.systemId()).onPlay(session,mZone.get(rating.rank));
+            int mix = rating.rank>maxRank?maxRank:rating.rank;
+            Response response = context.presence(session.systemId()).onPlay(session,mZone.get(mix));
             if(response!=null){
                 session.write(this.builder.create().toJson(response).getBytes(),label());
             }
@@ -41,6 +43,7 @@ public class MatchMakingModule implements Module,Lobby.Listener {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         mZone = new ConcurrentHashMap<>();//max matching level
+        maxRank = this.context.descriptor().capacity();
         lobbyId = this.context.descriptor().typeId().replace("service","lobby");
         listLobby().addListener(this);
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());

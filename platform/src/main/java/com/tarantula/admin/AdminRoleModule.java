@@ -222,25 +222,29 @@ public class AdminRoleModule implements Module {
             zone.roundDuration = ((Number)onAccess.property("duration")).intValue()*60000;
             zone.playMode = ((Number)onAccess.property("playMode")).intValue();
             zone.update();
+            pendingLobby.remove(accessId);
             session.write(pending.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onUpdateGameLevel")){
-            //this.context.log(new String(payload),OnLog.WARN);
+            this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             int index = ((Number)onAccess.property("index")).intValue();
             GameLobbyContext pending = this.gameLobbyContext(accessId);
             GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
             Zone zone = gameLobby.zone;
-            if(index<maxGameLevelCount){
-                if(index<zone.arenas.length){
-                    zone.arenas[index].name(onAccess.name());
-                    zone.arenas[index].xp = ((Number)onAccess.property("xp")).doubleValue();
-                    //zone.arenas[index].level = ((Number)onAccess.property("level")).intValue();
-                    zone.arenas[index].disabled((Boolean)onAccess.property("disabled"));
-                    zone.update();
+            if(index<=maxGameLevelCount){
+                boolean updated  = false;
+                for(Arena a : zone.arenas){
+                    if(a.level==index){
+                        a.name(onAccess.name());
+                        a.xp = ((Number)onAccess.property("xp")).doubleValue();
+                        a.disabled((Boolean)onAccess.property("disabled"));
+                        updated = true;
+                        break;
+                    }
                 }
-                else{
+                if(!updated){
                     Arena[] arenas = zone.arenas;
                     zone.arenas = new Arena[arenas.length+1];
                     for(int i=0;i<arenas.length;i++){
@@ -249,10 +253,11 @@ public class AdminRoleModule implements Module {
                     zone.arenas[arenas.length]= new Arena();
                     zone.arenas[arenas.length].name(onAccess.name());
                     zone.arenas[arenas.length].xp = ((Number)onAccess.property("xp")).doubleValue();
-                    zone.arenas[arenas.length].level = zone.arenas.length;
+                    zone.arenas[arenas.length].level = index;
                     zone.arenas[arenas.length].disabled((Boolean)onAccess.property("disabled"));
-                    zone.update();
                 }
+                zone.update();
+                pendingLobby.remove(accessId);
                 session.write(pending.toJson().toString().getBytes(),label());
             }
             else{
