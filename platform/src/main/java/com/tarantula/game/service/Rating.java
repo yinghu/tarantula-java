@@ -15,7 +15,7 @@ import java.util.Map;
 public class Rating extends RecoverableObject implements DataStore.Updatable {
 
     public static double BASE_POINTS = 100;
-
+    public static int LEVEL_UP_BASE = 1000;
     public int rank =1; //rank of zone
     public int level=1; //level of arena
     public double lxp=0;  //xp of level
@@ -29,6 +29,9 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
     }
 
     public void update(Stub stub){
+        if(stub.rank==0){
+            return;
+        }
         double dxp = (1/stub.rank+stub.pxp/BASE_POINTS)*BASE_POINTS;
         if(stub.rank==1){
             csw++;
@@ -39,6 +42,7 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
         }
         lxp += dxp;
         xp += dxp;
+        level = (int)lxp/LEVEL_UP_BASE+1;
     }
 
     @Override

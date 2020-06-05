@@ -16,12 +16,15 @@ import java.time.Duration;
 public class HttpCaller {
 
     public static void main(String[] args) throws Exception{
-        HttpCaller caller = new HttpCaller();
-        caller._init();
-        System.out.println(caller.get());
-        System.out.println(caller.get());
-        System.out.println(caller.get());
-        System.out.println(caller.get());
+        //HttpCaller caller = new HttpCaller();
+        //caller._init();
+        //System.out.println(caller.get());
+        //System.out.println(caller.get());
+        //System.out.println(caller.get());
+        //System.out.println(caller.get());
+        double xp = 5000;
+        int level = (int)xp/1000+1;
+        System.out.println("LEVEL->"+level);
     }
     private HttpClient client;
     private HttpRequest request;
