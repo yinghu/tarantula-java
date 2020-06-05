@@ -235,7 +235,7 @@ public class AdminRoleModule implements Module {
             if(index<zone.arenas.length){
                 zone.arenas[index].name(onAccess.name());
                 zone.arenas[index].xp = ((Number)onAccess.property("xp")).doubleValue();
-                zone.arenas[index].level = ((Number)onAccess.property("level")).intValue();
+                //zone.arenas[index].level = ((Number)onAccess.property("level")).intValue();
                 zone.arenas[index].disabled((Boolean)onAccess.property("disabled"));
                 zone.update();
             }
@@ -248,7 +248,7 @@ public class AdminRoleModule implements Module {
                 zone.arenas[arenas.length]= new Arena();
                 zone.arenas[arenas.length].name(onAccess.name());
                 zone.arenas[arenas.length].xp = ((Number)onAccess.property("xp")).doubleValue();
-                zone.arenas[arenas.length].level = ((Number)onAccess.property("level")).intValue();
+                zone.arenas[arenas.length].level = zone.arenas.length;
                 zone.arenas[arenas.length].disabled((Boolean)onAccess.property("disabled"));
                 zone.update();
             }

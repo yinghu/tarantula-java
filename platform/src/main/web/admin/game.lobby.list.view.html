@@ -269,13 +269,14 @@
                 <span id='tx-level-edit-no' class="tx-margin-left-8 tx-text-18">Update Level</span>
             </div>
         </div>
+        <!--
+        <div class="w3-container tx-margin-top-8">
+            <label class="tx-text-12">Level</label>
+            <span id ="tx-level" class="w3-right tx-text-14"></span>
+        </div>-->
         <div class="w3-container tx-margin-top-8">
             <label class="tx-text-12">Level Name</label>
             <input id ="tx-level-name" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='level name'/>
-        </div>
-        <div class="w3-container">
-            <label class="tx-text-12">Level</label><!-- none updated value-->
-            <input id ="tx-level" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='level'/>
         </div>
         <div class="w3-container">
             <label class="tx-text-12">XP</label>
@@ -285,7 +286,7 @@
             <input id='tx-level-disabled' class="w3-check tx-text-12" type="checkbox">
             <label class="tx-text-12">Disabled</label>
         </div>    
-        <div class="w3-container tx-margin-top-4">
+        <div class="w3-container tx-margin-top-8">
             <span id="tx-level-edit-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
         
             <span id="tx-level-edit-save" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Save</span>     
@@ -458,7 +459,7 @@
             let ixc = lix+1;
             document.querySelector('#tx-level-edit-no').innerHTML="Update Level ["+ixc+"]";
             document.querySelector('#tx-level-name').value = document.querySelector('#tx-level-v-'+lix+'-1').innerHTML;
-            document.querySelector('#tx-level').value = document.querySelector('#tx-level-v-'+lix+'-2').innerHTML;
+            //document.querySelector('#tx-level').innerHTML = document.querySelector('#tx-level-v-'+lix+'-2').innerHTML;
             document.querySelector('#tx-level-xp').value = document.querySelector('#tx-level-v-'+lix+'-3').innerHTML;
             if(document.querySelector('#tx-level-v-'+lix+'-4').innerHTML == 'true'){
                 document.querySelector('#tx-level-disabled').checked = true;    
@@ -471,14 +472,13 @@
     });
     document.querySelector('#tx-level-edit-save').onclick=()=>{
         let _ln = document.querySelector('#tx-level-name').value;
-        let _l = document.querySelector('#tx-level').value;
         let _lx = document.querySelector('#tx-level-xp').value;
         let _ld = document.querySelector('#tx-level-disabled').checked;
         let payload ={serviceTag:'role/admin',command:'onUpdateGameLevel'}
         payload.accessId = TARA_API.query().gameClusterId;
         payload.index = TARA_API.query().levelIndex;
         payload.name = _ln;
-        payload.level = _l/1;
+        //payload.level = _l/1;
         payload.xp = _lx/1;
         payload.disabled = _ld;
         TARA_API.onService(true,payload,(resp)=>{
