@@ -22,7 +22,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     }
     Mode deploymentMode();
     void clusterUpdated(int scope,String nodeId,boolean state);
-
+    int clusterPartitionCount();
     //UDP SERVER APIs
     void onUDPConnection(String typeId,Connection connection);
     Connection onUDPConnection(String typeId, Connection.StateListener listener);

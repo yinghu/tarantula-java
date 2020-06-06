@@ -319,11 +319,6 @@ public class AdminRoleModule implements Module {
             chargeParams.put("source",onAccess.property("orderId")); //orderId from client stripe call
             chargeParams.put("name",OnAccess.STRIPE);
             if(this.context.validator().validateToken(chargeParams)){
-
-                //charge successfully
-                //OnBalanceTrack onBalanceTrack = new OnBalanceTrack(session.systemId(),co.credits);
-                //this.context.publish(this.context.routingKey(session.systemId(),"presence"),onBalanceTrack);
-                //suc = true;
                 session.write(this.builder.create().toJson(new ResponseHeader("onCommit", "your purchase is successful", true)).getBytes(),this.label());
             }
             else{

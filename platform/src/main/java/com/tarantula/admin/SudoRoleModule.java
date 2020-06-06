@@ -1,6 +1,5 @@
 package com.tarantula.admin;
 
-import com.google.api.client.json.Json;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.tarantula.*;
@@ -37,17 +36,9 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             uDatastore.load(acc);
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes(),label());
         }
-        else if(session.action().equals("onUserList")){
-            AccessContext accessContext = new AccessContext();
-            accessContext.userList = new ArrayList<>();
-            uDatastore.traverse((d,o,k,v)->{
-                Access acc = new User();
-                acc.distributionKey(new String(k));
-                acc.fromMap(SystemUtil.toMap(v));
-                accessContext.userList.add(acc);
-                return true;
-            });
-            session.write(accessContext.toJson().toString().getBytes(),label());
+        else if(session.action().equals("onDataStoreCountList")){
+            JsonObject jm = this.toDataStoreCount();
+            session.write(jm.toString().getBytes(),label());
         }
         else if(session.action().equals("onCreateLabeledKey")){
             String key = tokenValidatorProvider.accessKey("websocket");
@@ -172,7 +163,6 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.serviceProvider.registerConfigurationListener(this);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
-        //this.dataStore = this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE);
         this.uDatastore = this.context.dataStore(Access.DataStore);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
@@ -195,5 +185,20 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         JsonObject jms = new JsonObject();
         jms.addProperty("message",msg);
         return jms;
+    }
+    private JsonObject toDataStoreCount(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("successful",true);
+        long cnt =0;
+        for(int i=0;i<this.serviceProvider.clusterPartitionCount();i++){
+            cnt += this.context.dataStore("p"+i).count();
+        }
+        jsonObject.addProperty("AccessIndex",cnt);
+        jsonObject.addProperty("User",this.context.dataStore(Access.DataStore).count());
+        jsonObject.addProperty("Account",this.context.dataStore(Account.DataStore).count());
+        jsonObject.addProperty("Presence",this.context.dataStore(Presence.DataStore).count());
+        jsonObject.addProperty("Subscription",this.context.dataStore(Subscription.DataStore).count());
+        jsonObject.addProperty("System",this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE).count());
+        return jsonObject;
     }
 }

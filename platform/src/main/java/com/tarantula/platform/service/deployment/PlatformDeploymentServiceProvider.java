@@ -390,6 +390,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             });
         }
     }
+    public int clusterPartitionCount(){
+        return 271;//this.tarantulaContext.integrationCluster().
+    }
     @Override
     public void setup(ServiceContext serviceContext){
         this.tarantulaContext = (TarantulaContext)serviceContext;

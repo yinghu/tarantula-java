@@ -38,8 +38,8 @@
             <view type="find.user">
                 <property name="moduleResourceFile">sudo/find.user.view.html</property>
             </view>
-            <view type="login.list">
-                <property name="moduleResourceFile">sudo/login.list.view.html</property>
+            <view type="data.store.count.list">
+                <property name="moduleResourceFile">sudo/data.store.count.list.view.html</property>
             </view>
             <view type="subscription.list">
                 <property name="moduleResourceFile">sudo/subscription.list.view.html</property>

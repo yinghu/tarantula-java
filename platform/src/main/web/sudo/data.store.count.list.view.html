@@ -1,0 +1,81 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-data-count-list-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-group" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Data Store List</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-data-count-list-message"></div>
+
+    <div class="w3-panel  w3-border-bottom w3-border-red">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'>AccessIndex</span>
+            <span id='tx-AccessIndex-c' class='w3-right tx-text-14 tx-margin-top-8'>0</span>
+        </div>    
+    </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'>User</span>
+            <span id='tx-User-c' class='w3-right tx-text-14 tx-margin-top-8'>0</span>
+        </div>    
+    </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'>Account</span>
+            <span id='tx-Account-c' class='w3-right tx-text-14 tx-margin-top-8'>0</span>
+        </div>    
+    </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'>Presence</span>
+            <span id='tx-Presence-c' class='w3-right tx-text-14 tx-margin-top-8'>0</span>
+        </div>    
+    </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'>Subscription</span>
+            <span id='tx-Subscription-c' class='w3-right tx-text-14 tx-margin-top-8'>0</span>
+        </div>    
+    </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'>System</span>
+            <span id='tx-System-c' class='w3-right tx-text-14 tx-margin-top-8'>0</span>
+        </div>    
+    </div>
+     
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    TARA_API.onService(false,{serviceTag:'role/sudo',command:'onDataStoreCountList'},(resp)=>{
+        if(resp.successful){
+            console.log(resp);
+            document.querySelector('#tx-AccessIndex-c').innerHTML = resp.AccessIndex; 
+            document.querySelector('#tx-User-c').innerHTML = resp.User;
+            document.querySelector('#tx-Account-c').innerHTML = resp.Account;
+            document.querySelector('#tx-Presence-c').innerHTML = resp.Presence;
+            document.querySelector('#tx-Subscription-c').innerHTML = resp.Subscription;
+            document.querySelector('#tx-System-c').innerHTML = resp.System;                  
+        }
+        else{
+            document.querySelector('#tx-data-count-list-message').innerHTML=resp.message;
+        }        
+    });
+    document.querySelector('#tx-data-count-list-close').onclick=()=>{
+        let m3 = document.querySelector('#tx-popup');
+        m3.innerHTML="";
+        m3.style.display = 'none';       
+    };
+</script>
