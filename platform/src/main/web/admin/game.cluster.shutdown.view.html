@@ -1,7 +1,7 @@
 <div class="w3-modal-content">
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
         <div class="w3-display-topright w3-padding">
-            <span id="tx-game-cluster-shutdown-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+            <!--<span id="tx-game-cluster-shutdown-close"><i class="fa fa-close" style="font-size:12px"></i></span>-->            
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-sign-in" style="font-size:24px"></i></span>
@@ -32,7 +32,7 @@
             document.querySelector('#tx-game-cluster-shutdown-message').innerHTML=resp.message;       
         });
     };
-    document.querySelector('#tx-game-cluster-shutdown-close').onclick=()=>{
+    document.querySelector('#tx-game-cluster-shutdown-cancel').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       

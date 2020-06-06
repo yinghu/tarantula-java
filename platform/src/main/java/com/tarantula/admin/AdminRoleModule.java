@@ -118,30 +118,47 @@ public class AdminRoleModule implements Module {
         else if(session.action().equals("onAddLobby")){//subscription only
             this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String accessId = (String)onAccess.property(OnAccess.ACCESS_ID);
-            GameCluster gc = this.deploymentServiceProvider.gameCluster(accessId);
-            Lobby lobby = this.deploymentServiceProvider.lobby((String)gc.property(GameCluster.GAME_LOBBY));
-            Descriptor desc = lobby.entryList().get(0).copy();
-            String gname = (String) gc.property(GameCluster.NAME);
-            boolean disabled = (Boolean)gc.property(GameCluster.DISABLED);
-            int idx = lobby.entryList().size()+1;
-            if(idx>maxGameLobbyCount){
-                session.write(toMessage("max lobby count has reached",false).toString().getBytes(),label());
-            }else{
-                int _rank = idx;
-                for(Descriptor a : lobby.entryList()){
-                    if(a.accessRank()>=_rank){
-                        _rank=a.accessRank()+1;
+            ArrayList<Integer> _alist = new ArrayList<>();
+            for(int i=1;i<maxGameLobbyCount+1;i++){
+                Object slot = onAccess.property("slot-"+i);
+                if(slot!=null){
+                    _alist.add(i);
+                }
+            }
+            if(!_alist.isEmpty()){
+                String accessId = (String)onAccess.property(OnAccess.ACCESS_ID);
+                GameCluster gc = this.deploymentServiceProvider.gameCluster(accessId);
+                Lobby lobby = this.deploymentServiceProvider.lobby((String)gc.property(GameCluster.GAME_LOBBY));
+                String gname = (String) gc.property(GameCluster.NAME);
+                boolean disabled = (Boolean)gc.property(GameCluster.DISABLED);
+                int idx = lobby.entryList().size()+1;
+                if(idx>maxGameLobbyCount){
+                    session.write(toMessage("max lobby count has reached",false).toString().getBytes(),label());
+                }else {
+                    int[] added = {0};
+                    HashMap<Integer,Descriptor> _ex = new HashMap<>();
+                    lobby.entryList().forEach((a)->{
+                        _ex.put(a.accessRank(),a);
+                    });
+                    _alist.forEach((rk) -> {
+                        if(!_ex.containsKey(rk)){
+                            Descriptor desc = lobby.entryList().get(0).copy();
+                            desc.name("Game Lobby " + rk);
+                            desc.tag(gname + "/lobby" + rk);
+                            desc.accessRank(rk);
+                            if(this.deploymentServiceProvider.createApplication(desc, !disabled)){
+                                added[0]++;
+                            }
+                        }
+                    });
+                    if(added[0]>0){
+                        pendingLobby.remove(accessId);
                     }
+                    session.write(toMessage(added[0]>0?"total lobbies added ["+added[0]+"]":"lobby not added",added[0]>0).toString().getBytes(),label());
                 }
-                desc.name("Game Lobby "+_rank);
-                desc.tag(gname+"/lobby"+_rank);
-                desc.accessRank(_rank);
-                boolean suc = this.deploymentServiceProvider.createApplication(desc,!disabled);
-                if(suc){
-                    pendingLobby.remove(accessId);
-                }
-                session.write(toMessage(suc?"new lobby added ["+desc.name()+"]":"lobby not added",suc).toString().getBytes(),label());
+            }
+            else{
+                session.write(toMessage("No lobby slot seleccted",false).toString().getBytes(),label());
             }
         }
         else if(session.action().equals("onDisableLobby")){
@@ -355,6 +372,7 @@ public class AdminRoleModule implements Module {
     private GameLobbyContext gameLobbyContext(String accessId){
         return pendingLobby.computeIfAbsent(accessId,(k)-> {
             GameLobbyContext gameLobbyContext = new GameLobbyContext();
+            gameLobbyContext.maxLobbyCount = maxGameLobbyCount;
             gameLobbyContext.gameLobbyList = new ConcurrentHashMap<>();
             gameLobbyContext.successful(true);
             GameCluster gc = this.deploymentServiceProvider.gameCluster(accessId);

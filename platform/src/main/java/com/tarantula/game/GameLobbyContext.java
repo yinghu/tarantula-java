@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GameLobbyContext extends ResponseHeader {
     public ConcurrentHashMap<Integer,GameLobby> gameLobbyList;
+    public int maxLobbyCount;
     public int page;
     public int checkEnabledLobbyCount(){
         int[] mc = {0};
@@ -20,9 +21,14 @@ public class GameLobbyContext extends ResponseHeader {
     }
     public JsonObject availableSlots(){
         JsonObject jsonObject = new JsonObject();
+        if(gameLobbyList.size()==maxLobbyCount){
+            jsonObject.addProperty("successful",false);
+            jsonObject.addProperty("message","max lobby count reached!");
+            return jsonObject;
+        }
         jsonObject.addProperty("successful",true);
         JsonArray jds = new JsonArray();
-        for(int i=1;i<11;i++){
+        for(int i=1;i<maxLobbyCount+1;i++){
             JsonObject st = new JsonObject();
             st.addProperty("slot",i);
             st.addProperty("added",gameLobbyList.containsKey(i));
