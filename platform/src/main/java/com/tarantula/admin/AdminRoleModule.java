@@ -116,7 +116,7 @@ public class AdminRoleModule implements Module {
             session.write(gameLobbyContext.availableSlots().toString().getBytes(),label());
         }
         else if(session.action().equals("onAddLobby")){//subscription only
-            this.context.log(new String(payload),OnLog.WARN);
+            //this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             ArrayList<Integer> _alist = new ArrayList<>();
             for(int i=1;i<maxGameLobbyCount+1;i++){
