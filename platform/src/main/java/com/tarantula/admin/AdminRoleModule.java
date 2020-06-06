@@ -109,7 +109,14 @@ public class AdminRoleModule implements Module {
             String key = tokenValidatorProvider.validateGameClusterAccessKey((String)onAccess.property(OnAccess.ACCESS_KEY));
             session.write(toMessage(key!=null?"key passed":"key failed",key!=null).toString().getBytes(),label());
         }
+        else if(session.action().equals("onCheckLobbySlot")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            String accessId = (String)onAccess.property(OnAccess.ACCESS_ID);
+            GameLobbyContext gameLobbyContext = this.gameLobbyContext(accessId);
+            session.write(gameLobbyContext.availableSlots().toString().getBytes(),label());
+        }
         else if(session.action().equals("onAddLobby")){//subscription only
+            this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String)onAccess.property(OnAccess.ACCESS_ID);
             GameCluster gc = this.deploymentServiceProvider.gameCluster(accessId);
@@ -207,7 +214,7 @@ public class AdminRoleModule implements Module {
         }
 
         else if(session.action().equals("onUpdateGameLobby")){
-            this.context.log(new String(payload),OnLog.WARN);
+            //this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             int index = ((Number)onAccess.property("page")).intValue();
@@ -227,7 +234,7 @@ public class AdminRoleModule implements Module {
             }
         }
         else if(session.action().equals("onUpdateGameLevel")){
-            this.context.log(new String(payload),OnLog.WARN);
+            //this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             int index = ((Number)onAccess.property("index")).intValue();

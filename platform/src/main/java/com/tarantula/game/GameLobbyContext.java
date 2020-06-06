@@ -1,5 +1,6 @@
 package com.tarantula.game;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tarantula.platform.ResponseHeader;
 
@@ -17,16 +18,30 @@ public class GameLobbyContext extends ResponseHeader {
         });
         return mc[0];
     }
+    public JsonObject availableSlots(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("successful",true);
+        JsonArray jds = new JsonArray();
+        for(int i=1;i<11;i++){
+            JsonObject st = new JsonObject();
+            st.addProperty("slot",i);
+            st.addProperty("added",gameLobbyList.containsKey(i));
+            jds.add(st);
+        }
+        jsonObject.add("slots",jds);
+        return jsonObject;
+    }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         GameLobby gameLobby = gameLobbyList.get(page);
         if(gameLobby==null){
-            page = 0;
             jsonObject.addProperty("successful",false);
-            jsonObject.addProperty("message","no more game lobby");
+            jsonObject.addProperty("message","lobby ["+page+"] is empty slot, you can add a lobby!");
+            page = 0;
             return jsonObject;
         }
         jsonObject.addProperty("successful",this.successful);
+        jsonObject.addProperty("message","lobby ["+page+"] loaded, you can edit it!");
         jsonObject.addProperty("lobbySize",gameLobbyList.size());
         jsonObject.addProperty("index",page);
         jsonObject.add("lobby",gameLobby.toJson());
