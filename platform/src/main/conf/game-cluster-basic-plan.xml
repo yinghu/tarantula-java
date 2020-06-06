@@ -102,7 +102,7 @@
                 <category>service</category>
                 <singleton>true</singleton>
                 <tag>game/data</tag>
-                <capacity>4000</capacity><!--max bytes per set call-->
+                <capacity>1000</capacity><!--max bytes per set call-->
                 <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.game.module.KeyValueDataStoreModule</module-name>
             </application>

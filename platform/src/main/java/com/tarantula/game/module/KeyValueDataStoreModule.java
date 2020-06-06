@@ -15,13 +15,19 @@ public class KeyValueDataStoreModule implements Module {
     private DataStore dataStore;
     private DeploymentServiceProvider deploymentServiceProvider;
     private GameServiceProvider gameServiceProvider;
+    private int maxSizeOnSet;
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         if(session.action().equals("onSet")){
-            String key = session.systemId()+Recoverable.PATH_SEPARATOR+session.name();
-            dataStore.set(key.getBytes(),payload);
-            ResponseHeader resp = new ResponseHeader("onSet","Saved on key ["+key+"]",true);
-            session.write(builder.create().toJson(resp).getBytes(),label());
+            if(payload.length>maxSizeOnSet){
+                ResponseHeader resp = new ResponseHeader("onSet","payload size ["+payload.length+"] cannot be over ["+maxSizeOnSet+"]",false);
+                session.write(builder.create().toJson(resp).getBytes(),label());
+            }else{
+                String key = session.systemId()+Recoverable.PATH_SEPARATOR+session.name();
+                dataStore.set(key.getBytes(),payload);
+                ResponseHeader resp = new ResponseHeader("onSet","Saved on key ["+key+"]",true);
+                session.write(builder.create().toJson(resp).getBytes(),label());
+            }
         }
         else if(session.action().equals("onGet")){
             String key = session.systemId()+Recoverable.PATH_SEPARATOR+session.name();
@@ -43,7 +49,8 @@ public class KeyValueDataStoreModule implements Module {
         gameServiceProvider = new GameServiceProvider(this.context.descriptor().typeId().replace("-data","-service"));
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.deploy(gameServiceProvider);
-        this.context.log("Data store ["+this.context.descriptor().typeId()+" started ]", OnLog.WARN);
+        this.maxSizeOnSet = this.context.descriptor().capacity();
+        this.context.log("Data store ["+this.context.descriptor().typeId()+" started with max size on set call ["+maxSizeOnSet+"]", OnLog.WARN);
     }
     @Override
     public String label() {
