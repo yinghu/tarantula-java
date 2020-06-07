@@ -97,7 +97,7 @@ public class PendingRequest {
             this.key.cancel();
             this.key.channel().close();
         }catch (Exception ex){
-
+            ex.printStackTrace();
         }
     }
 }

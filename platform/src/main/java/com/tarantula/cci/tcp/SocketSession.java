@@ -82,4 +82,7 @@ public class SocketSession implements OnExchange {
     public void close(){
         pendingRequest.close();
     }
+    public void onError(Exception ex,String message){
+        pendingRequest.close();
+    }
 }
