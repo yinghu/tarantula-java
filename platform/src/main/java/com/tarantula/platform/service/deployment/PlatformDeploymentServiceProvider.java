@@ -391,7 +391,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     public int clusterPartitionCount(){
-        return 271;//this.tarantulaContext.integrationCluster().
+        return this.tarantulaContext.integrationCluster().partitionCount();
     }
     @Override
     public void setup(ServiceContext serviceContext){
@@ -630,10 +630,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public void registerOnConnectionListener(Connection.Listener listener){
-        vMap.forEach((k,v)->{
-            if(v instanceof Connection){
-                listener.onState((Connection) v);
-            }
+        pushRegistry.forEach((k,v)->{
+            Connection connection = this.builder.create().fromJson(new String(v.payload()), Connection.class);
+            listener.onState(connection);
         });
         wListeners.add(listener);
     }

@@ -43,7 +43,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private ExecutorService inboundEventPool;
     private int workerSize = 8;
-
+    private int partitionCount;
     private final TarantulaContext tarantulaContext;
 
     private MultiMap<String, byte[]> mIndex;
@@ -73,6 +73,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public String bucket(){
         return this.bucket;
     }
+    public int partitionCount(){
+        return partitionCount;
+    }
     public void waitForData(){}
     public int scope(){
         return Distributable.INTEGRATION_SCOPE;
@@ -94,6 +97,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             this.inboundEventPool.execute(ese);
         }
         //this.tarantulaContext.serverTopic = this.bucket;
+        partitionCount = Integer.parseInt(config.getProperty("hazelcast.partition.count"));
         config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         this.config.getListenerConfigs().add(new ListenerConfig(this));
         _cluster = Hazelcast.newHazelcastInstance(this.config);

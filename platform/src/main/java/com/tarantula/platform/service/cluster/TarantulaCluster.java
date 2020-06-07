@@ -36,6 +36,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
 
     private ExecutorService replicationPool;
     private int workerSize =8;
+    private int partitionCount;
     private final ArrayList<Closable> wlist = new ArrayList<>();
 
     private String bucket;
@@ -98,6 +99,9 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     public boolean onPartition(byte[] key){
         throw new UnsupportedOperationException("on partition not support on data cluster");
         //return this.cluster.getPartitionService().getPartition(key).getOwner().getUuid().equals(this.memberId);
+    }
+    public int partitionCount(){
+        return partitionCount;
     }
     public int size(){
         return this._hazel.getCluster().getMembers().size();
@@ -192,6 +196,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
             this.replicationPool.execute(ese);
         }
         //add platform portable provider from conf
+        partitionCount = Integer.parseInt(config.getProperty("hazelcast.partition.count"));
         config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         config.getListenerConfigs().add(new ListenerConfig(this));
         _hazel = Hazelcast.newHazelcastInstance(this.config);

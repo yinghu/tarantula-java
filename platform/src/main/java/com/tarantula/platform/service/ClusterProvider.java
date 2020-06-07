@@ -14,6 +14,7 @@ public interface ClusterProvider extends Serviceable{
     String bucket();
     String subscription();
     int size();
+    int partitionCount();
     //
     String addEventListener(String registerId,EventListener eventListener);
     void removeEventListener(String registerId);
