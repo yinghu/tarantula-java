@@ -248,7 +248,7 @@ function registerOnTarantula(callback){
                 process.exit(1);
             }
             console.log(ret.host+":"+ret.port+"//"+ret.ticket);
-            cfg.server.connection={port:ret.port,host:ret.host,ticket:"ret.ticket"};
+            cfg.server.connection={port:ret.port,host:ret.host,ticket:ret.ticket};
             mlistener = callback();
         });    
     });

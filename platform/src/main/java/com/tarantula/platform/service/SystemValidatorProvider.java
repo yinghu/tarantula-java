@@ -101,6 +101,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public String validateGameClusterAccessKey(String accessKey){
         String[] sp = accessKey.split("-");
         GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(sp[0]);
+        if(gameCluster==null){
+            return null;
+        }
         long stmp = ((Number)gameCluster.property(GameCluster.TIMESTAMP)).longValue();
         String validLobby = (String)gameCluster.property(GameCluster.GAME_LOBBY);
         return SystemUtil.validAccessKey(messageDigest(),accessKey,validLobby,stmp)?validLobby:null;
