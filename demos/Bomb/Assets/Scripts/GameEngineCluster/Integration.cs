@@ -41,7 +41,10 @@ public class Integration : MonoBehaviour{
             conn.host= ip;
             conn.port = port;
             integration.room.connection = conn;
-            await integration.OnGameRegistered(this,conn);
+            bool suc = await integration.OnGameRegistered(this,conn);
+            if(!suc){
+                Application.Quit();
+            }
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
             return;
         }
