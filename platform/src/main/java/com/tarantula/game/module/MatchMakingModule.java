@@ -10,7 +10,7 @@ import com.tarantula.platform.util.ResponseSerializer;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * updated by yinghu lu on 6/4/2020.
+ * updated by yinghu lu on 6/7/2020.
  */
 public class MatchMakingModule implements Module,Lobby.Listener {
 
@@ -47,7 +47,7 @@ public class MatchMakingModule implements Module,Lobby.Listener {
         lobbyId = this.context.descriptor().typeId().replace("service","lobby");
         listLobby().addListener(this);
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
-        context.log("Started match making module on ->"+this.context.descriptor().typeId(), OnLog.WARN);
+        context.log("Started match making module on ->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 
     @Override

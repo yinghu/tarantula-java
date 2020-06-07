@@ -15,11 +15,8 @@ public class Integration : MonoBehaviour{
     
     public GameEngineCluster integration;
     
-    //public string typeId;
     private bool pendingClick;
-    
-    //private Descriptor game;
-     
+  
     private GameObject login;
     private GameObject pve;
     private GameObject pvp;
@@ -123,6 +120,7 @@ public class Integration : MonoBehaviour{
             message.SetText("Pending ...");
         }
         else{
+            Debug.Log(integration.message);
             message.SetText(integration.message);
         }
     }
