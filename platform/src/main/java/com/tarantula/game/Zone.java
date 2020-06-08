@@ -33,7 +33,20 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     public GameServiceProvider gameServiceProvider;
     public Descriptor descriptor;
     private CopyOnWriteArrayList<Room> rList = new CopyOnWriteArrayList<>();
-    private ConcurrentLinkedDeque<Room> rQueue = new ConcurrentLinkedDeque<>();
+    private ConcurrentLinkedDeque[] pendingMatch = {
+            new ConcurrentLinkedDeque(),//0
+            new ConcurrentLinkedDeque(),//1
+            new ConcurrentLinkedDeque(),//2
+            new ConcurrentLinkedDeque(),//3
+            new ConcurrentLinkedDeque(),//4
+            new ConcurrentLinkedDeque(),//5
+            new ConcurrentLinkedDeque(),//6
+            new ConcurrentLinkedDeque(),//7
+            new ConcurrentLinkedDeque(),//8
+            new ConcurrentLinkedDeque(),//9
+            new ConcurrentLinkedDeque() //10
+    };
+    private ConcurrentLinkedDeque<Room> rQueue = pendingMatch[0];
     public ConcurrentHashMap<Integer,Arena> aMap = new ConcurrentHashMap<>();
     public Zone(){
         this.vertex = "Zone";
