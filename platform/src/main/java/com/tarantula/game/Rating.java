@@ -1,4 +1,4 @@
-package com.tarantula.game.service;
+package com.tarantula.game;
 
 import com.tarantula.DataStore;
 import com.tarantula.Recoverable;

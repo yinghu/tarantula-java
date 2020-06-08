@@ -4,7 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.game.service.Rating;
+import com.tarantula.game.Rating;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.util.ResponseSerializer;
 import java.util.concurrent.ConcurrentHashMap;

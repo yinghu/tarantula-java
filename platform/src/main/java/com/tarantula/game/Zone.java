@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.game.service.Rating;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.service.DeploymentServiceProvider;
@@ -51,7 +50,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     public Zone(){
         this.vertex = "Zone";
     }
-    public Room room(){
+    public Room room(Rating rating){
         Room room = rQueue.poll();
         if(room==null){
             room = new Room();

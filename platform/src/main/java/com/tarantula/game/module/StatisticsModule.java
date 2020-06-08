@@ -5,7 +5,7 @@ import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.RatingSerializer;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.game.service.Rating;
+import com.tarantula.game.Rating;
 import com.tarantula.platform.leaderboard.LeaderBoardView;
 import com.tarantula.platform.leaderboard.LeaderBoardViewSerializer;
 import com.tarantula.platform.statistics.StatisticsIndex;

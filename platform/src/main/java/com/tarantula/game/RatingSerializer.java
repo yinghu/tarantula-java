@@ -4,8 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.tarantula.Response;
-import com.tarantula.game.service.Rating;
 
 import java.lang.reflect.Type;
 

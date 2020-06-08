@@ -1,8 +1,8 @@
 package com.tarantula.game.service;
 
 import com.tarantula.*;
-import com.tarantula.Module;
 import com.tarantula.game.GamePortableRegistry;
+import com.tarantula.game.Rating;
 import com.tarantula.game.Zone;
 import com.tarantula.game.ZoneListener;
 import com.tarantula.logging.JDKLogger;
@@ -15,7 +15,6 @@ import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.ServiceProvider;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
