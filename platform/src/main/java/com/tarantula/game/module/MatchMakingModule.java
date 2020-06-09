@@ -26,6 +26,7 @@ public class MatchMakingModule implements Module,Lobby.Listener {
         if(session.action().equals("onPlay")){
             Rating rating = this.gameServiceProvider.rating(session.systemId());
             int mix = rating.rank>maxRank?maxRank:rating.rank;
+            this.context.log("RANK->"+mix,OnLog.WARN);
             Response response = context.presence(session.systemId()).onPlay(session,mZone.get(mix));
             if(response!=null){
                 session.write(this.builder.create().toJson(response).getBytes(),label());
@@ -85,7 +86,7 @@ public class MatchMakingModule implements Module,Lobby.Listener {
                     mZone.put(i,mZone.get(fi[0]));//fill header
                 }
             }
-            context.log("Add lobby ->"+mZone.get(i).tag()+" ->rank ["+mZone.get(i).accessRank()+"]",OnLog.WARN);
+            context.log(i+"<>Add lobby ->"+mZone.get(i).tag()+" ->rank ["+mZone.get(i).accessRank()+"]",OnLog.WARN);
         }
         return lobby;
     }
