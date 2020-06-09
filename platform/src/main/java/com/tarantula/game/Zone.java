@@ -127,6 +127,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         }
         synchronized (this){
             Arena match = aMap.get(mLevel);
+            System.out.println(match.toString());
             jsonObject.addProperty("level",mLevel);
             jsonObject.addProperty("arena",match.name());
             jsonObject.addProperty("capacity",capacity);
