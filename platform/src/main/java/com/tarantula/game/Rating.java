@@ -1,4 +1,4 @@
-package com.tarantula.game.service;
+package com.tarantula.game;
 
 import com.tarantula.DataStore;
 import com.tarantula.Recoverable;
@@ -9,7 +9,7 @@ import com.tarantula.platform.RecoverableObject;
 
 import java.util.Map;
 /**
- * Updated by yinghu lu on 6/4/2020.
+ * Updated by yinghu lu on 6/8/2020.
  * Key form [systemId]/Rating
  */
 public class Rating extends RecoverableObject implements DataStore.Updatable {
@@ -18,7 +18,8 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
     public static int LEVEL_UP_BASE = 1000;
     public static int RANK_UP_BASE = 10;
     public int rank =1; //rank of zone
-    public int level=1; //level of arena
+    public int level = 1; //total level
+    public int xpLevel=1; //level of arena
     public double lxp=LEVEL_UP_BASE;  //xp of level
     public double xp=0; //total xp
     public double elo = 1200; //elo service
@@ -43,33 +44,35 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
         }
         lxp += dxp;
         xp += dxp;
-        level = (int)lxp/LEVEL_UP_BASE;
-        if(level%RANK_UP_BASE==0){//rank up
+        xpLevel = (int)lxp/LEVEL_UP_BASE;
+        if(xpLevel%RANK_UP_BASE==0){//rank up
             rank++;
             //reset next level from 1 - 10 and rank up again
-            level = 1;
+            xpLevel = 1;
             lxp = LEVEL_UP_BASE;
         }
     }
 
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("rank",rank);
-        this.properties.put("level",level);
-        this.properties.put("lxp",lxp);
-        this.properties.put("xp",xp);
-        this.properties.put("elo",elo);
-        this.properties.put("csw",csw);
+        this.properties.put("1",rank);
+        this.properties.put("2",level);
+        this.properties.put("3",xpLevel);
+        this.properties.put("4",lxp);
+        this.properties.put("5",xp);
+        this.properties.put("6",elo);
+        this.properties.put("7",csw);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.rank = ((Number)properties.get("rank")).intValue();
-        this.level =((Number)properties.get("level")).intValue();
-        this.lxp = ((Number)properties.get("lxp")).doubleValue();
-        this.xp = ((Number)properties.get("xp")).doubleValue();
-        this.elo = ((Number)properties.get("elo")).doubleValue();
-        this.csw =((Number)properties.get("csw")).intValue();
+        this.rank = ((Number)properties.get("1")).intValue();
+        this.level =((Number)properties.get("2")).intValue();
+        this.xpLevel =((Number)properties.get("3")).intValue();
+        this.lxp = ((Number)properties.get("4")).doubleValue();
+        this.xp = ((Number)properties.get("5")).doubleValue();
+        this.elo = ((Number)properties.get("6")).doubleValue();
+        this.csw =((Number)properties.get("7")).intValue();
     }
 
     @Override

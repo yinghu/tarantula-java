@@ -5,7 +5,7 @@ import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.*;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.game.service.Rating;
+import com.tarantula.game.Rating;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -29,8 +29,7 @@ public class GameZoneModule implements Module,ZoneListener{
     public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp
         Rating rating = this.gameServiceProvider.rating(session.systemId());
-
-        Stub stub = mZone.room().join();
+        Stub stub = mZone.room(rating).join();
         stub.tag = this.context.descriptor().tag();
         stub.owner(session.systemId());
         GameObject gameObject = new GameObject();

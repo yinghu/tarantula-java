@@ -14,15 +14,19 @@ public interface Recoverable extends Distributable{
 
     String owner();
     void owner(String owner);
-
+    //map format is back-forwarding support if keeping map key no duplicated
+    //new mappings can be added in runtime to use getOrDefault on fromMap call first time
     Map<String,Object> toMap();
     void fromMap(Map<String,Object> properties);
 
+    //binary format persistence APIs
+    //Be aware it is not back-forwarding support. use map format on development stage
     byte[] toByteArray();
     void fromByteArray(byte[] data);
 
     boolean binary();
     void binary(boolean binary);
+    //END OF binary format persistence APIs
 
     boolean disabled();
     void disabled(boolean disabled);
