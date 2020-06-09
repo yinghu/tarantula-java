@@ -105,7 +105,7 @@ public class GameZoneModule implements Module,ZoneListener{
         mZone.gameServiceProvider = this.gameServiceProvider;
         mZone.descriptor = this.context.descriptor();
         mZone.start();
-        mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->level ["+v.level+"]",OnLog.WARN));
+        mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->level ["+v.level+"/"+v.name()+"]",OnLog.WARN));
         this.gameServiceProvider.addZoneListener(this.context.descriptor().distributionKey(),this);
         context.log("Game lobby started->"+this.mZone.descriptor.tag(),OnLog.WARN);
     }
@@ -139,6 +139,6 @@ public class GameZoneModule implements Module,ZoneListener{
     @Override
     public void updated(Zone zone) {
         mZone.reset(zone);
-        mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->level ["+v.level+"]",OnLog.WARN));
+        mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->level ["+v.level+"/"+v.name()+"]",OnLog.WARN));
     }
 }
