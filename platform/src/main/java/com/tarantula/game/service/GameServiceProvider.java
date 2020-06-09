@@ -78,7 +78,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         zone.distributionKey(applicationId);
         this.dataStore.createIfAbsent(zone,true);
         zone.dataStore(this.dataStore);
-        //logger.warn(zone.toString());
+        logger.warn(zone.distributionKey());
         return zone;
     }
     public LeaderBoard leaderBoard(String category){
