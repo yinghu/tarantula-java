@@ -90,7 +90,7 @@ public class Integration : MonoBehaviour{
         
     }
     private IEnumerator WaitAndLoad(){
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex+1); 
     }
     void Update (){
