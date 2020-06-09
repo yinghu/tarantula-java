@@ -240,13 +240,14 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         properties.forEach((k,v)->{
             if(!k.startsWith("__")){
                 Arena arena = new Arena();
-                arena.name(k);
+                //arena.name(k);
                 String[] lx = ((String)v).split(",");
                 arena.name(lx[0]);
                 arena.level = Integer.parseInt(lx[1]);
                 arena.xp = Double.parseDouble(lx[2]);
                 arena.disabled(Boolean.parseBoolean(lx[3]));
                 alist.add(arena);
+                System.out.println("K>"+k+"<><>"+arena.toString());
             }
         });
         arenas = new Arena[alist.size()];
