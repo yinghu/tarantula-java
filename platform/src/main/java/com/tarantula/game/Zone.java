@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Created by yinghu lu on 5/27/2020.
+ * updated by yinghu lu on 6/9/2020.
  */
 public class Zone extends RecoverableObject implements RoomListener,DataStore.Updatable{
     public Arena[] arenas = new  Arena[0];
@@ -32,14 +32,11 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     public GameServiceProvider gameServiceProvider;
     public Descriptor descriptor;
     private CopyOnWriteArrayList<Room> rList = new CopyOnWriteArrayList<>();
-    private static ConcurrentLinkedDeque<Room>[] pendingMatch = new ConcurrentLinkedDeque[11];
-    static{
-        for(int i=0;i<11;i++){
-            pendingMatch[i]=new ConcurrentLinkedDeque<>();
-        }
-    }
-    private ConcurrentLinkedDeque<Room> rQueue = pendingMatch[0];
-    public ConcurrentHashMap<Integer,Arena> aMap = new ConcurrentHashMap<>();
+
+    private ConcurrentLinkedDeque<Room>[] pendingMatch;
+    private ConcurrentLinkedDeque<Room> rQueue;//assigned to pendingMatch 0
+
+    private ConcurrentHashMap<Integer,Arena> aMap = new ConcurrentHashMap<>();
     public Zone(){
         this.vertex = "Zone";
     }
@@ -60,11 +57,17 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
             matched.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
             rList.add(matched);
             roomIndex.put(matched.roomId,matched);
+            return matched;
         }
-        return matched;
     }
 
     public void start(){
+        int pmz = this.descriptor.capacity()+1;
+        pendingMatch = new ConcurrentLinkedDeque[pmz];
+        for(int i=0;i<pmz;i++){
+            pendingMatch[i]=new ConcurrentLinkedDeque<>();
+        }
+        rQueue = pendingMatch[0];
         listArena();
         for(int i=0;i<3;i++){
             Room room = new Room();
@@ -127,7 +130,6 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         }
         synchronized (this){
             Arena match = aMap.get(mLevel);
-            System.out.println(match.toString());
             jsonObject.addProperty("level",mLevel);
             jsonObject.addProperty("arena",match.name());
             jsonObject.addProperty("capacity",capacity);
@@ -247,7 +249,6 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
                 arena.xp = Double.parseDouble(lx[2]);
                 arena.disabled(Boolean.parseBoolean(lx[3]));
                 alist.add(arena);
-                System.out.println("K>"+k+"<><>"+arena.toString());
             }
         });
         arenas = new Arena[alist.size()];

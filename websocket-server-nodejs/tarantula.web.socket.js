@@ -90,7 +90,7 @@ wsServer.on('request', function(request) {
                             else if(_pr.action ==='onStop'){
                                 let ix = pse.listeners.indexOf(connection.clientId);
                                 if(ix>=0){
-                                    //console.log('unregister on ['+_pr.label+'] from ['+connection.clientId+'/'+ix+']');
+                                    console.log('unregister on ['+_pr.label+'] from ['+connection.clientId+'/'+ix+']');
                                     pse.listeners.splice(ix,1);
                                 }
                             }

@@ -129,6 +129,7 @@ public class GlobalStateManager : AdminBehavior{
         else if(st==RoomState.ENDING){
             integration.OnUpdating -= _OnUpdating;
             gameStage.OnEnd();
+            integration.OnClose();
             NetworkManager.Instance.Disconnect();
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex-1);    
         }

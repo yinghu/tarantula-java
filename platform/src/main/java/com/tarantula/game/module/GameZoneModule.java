@@ -1,19 +1,19 @@
 package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.*;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.Rating;
-import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.service.DeploymentServiceProvider;
-import com.tarantula.platform.util.ResponseSerializer;
+import com.tarantula.platform.util.OnAccessDeserializer;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 /**
- * updated by yinghu lu on 6/4/2020.
+ * updated by yinghu lu on 6/9/2020.
  */
 public class GameZoneModule implements Module,ZoneListener{
 
@@ -43,20 +43,24 @@ public class GameZoneModule implements Module,ZoneListener{
     }
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
-        if(session.action().equals("onMessage")){
+        if(session.action().equals("onCommit")){
             Stub stub = mStub.get(session.systemId());
             Room room = mRoom.get(stub.roomId);
-            session.write("{}".getBytes(),label());
-            update.on(connection.serverId(),room.roomId+"?onMessage",payload);
+            if(room.offline()){
+                OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+                session.write(toMessage(session.action(),true).toString().getBytes(),label());
+                update.on(connection.serverId(),room.roomId+"?onCommit",payload);
+            }
+            else{
+                session.write(toMessage("only offline mode can commit by player",false).toString().getBytes(),label());
+            }
         }
         else if(session.action().equals("onLeave")){
             Stub stub = mStub.get(session.systemId());
             Room room = mRoom.get(stub.roomId);
             boolean left = room.leave(stub);
             session.instanceId(stub.roomId);
-            ResponseHeader resp = new ResponseHeader("onLeave");
-            resp.successful(left);
-            session.write(builder.create().toJson(resp).getBytes(),label());
+            session.write(toMessage("onLeave",left).toString().getBytes(),label());
             return left;
         }
         else if(session.action().equals("onPlay")){
@@ -73,7 +77,7 @@ public class GameZoneModule implements Module,ZoneListener{
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
+        this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         String gz = this.context.descriptor().typeId().replace("-lobby","-service");
         this.gameServiceProvider = this.context.serviceProvider(gz);
         mZone = this.gameServiceProvider.zone(this.context.descriptor().distributionKey());
@@ -105,7 +109,7 @@ public class GameZoneModule implements Module,ZoneListener{
         mZone.gameServiceProvider = this.gameServiceProvider;
         mZone.descriptor = this.context.descriptor();
         mZone.start();
-        mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->level ["+v.level+"/"+v.name()+"]",OnLog.WARN));
+        //mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->level ["+v.level+"/"+v.name()+"]",OnLog.WARN));
         this.gameServiceProvider.addZoneListener(this.context.descriptor().distributionKey(),this);
         context.log("Game lobby started->"+this.mZone.descriptor.tag(),OnLog.WARN);
     }
@@ -139,6 +143,12 @@ public class GameZoneModule implements Module,ZoneListener{
     @Override
     public void updated(Zone zone) {
         mZone.reset(zone);
-        mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->level ["+v.level+"/"+v.name()+"]",OnLog.WARN));
+        //mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->level ["+v.level+"/"+v.name()+"]",OnLog.WARN));
+    }
+    private JsonObject toMessage(String msg,boolean successful){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("successful",successful);
+        jsonObject.addProperty("message",msg);
+        return jsonObject;
     }
 }

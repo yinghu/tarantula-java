@@ -118,6 +118,9 @@ public class Room implements Connection.StateListener{
     }
     public int state(){ return this.state;}
     public int totalJoined(){return this.totalJoined;}
+    public boolean offline(){
+        return !this.online;
+    }
     public Connection connection(){
         return this.connection;
     }
