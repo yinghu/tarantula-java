@@ -224,7 +224,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.properties.put("__n",name);
         //this.properties.put("__a",disabled);
         for(Arena a : arenas){
-            this.properties.put(a.name(),a.level+","+a.xp+","+a.disabled());
+            this.properties.put("L"+a.level,a.name()+","+a.level+","+a.xp+","+a.disabled());
         }
         return this.properties;
     }
@@ -242,9 +242,10 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
                 Arena arena = new Arena();
                 arena.name(k);
                 String[] lx = ((String)v).split(",");
-                arena.level = Integer.parseInt(lx[0]);
-                arena.xp = Double.parseDouble(lx[1]);
-                arena.disabled(Boolean.parseBoolean(lx[2]));
+                arena.name(lx[0]);
+                arena.level = Integer.parseInt(lx[1]);
+                arena.xp = Double.parseDouble(lx[2]);
+                arena.disabled(Boolean.parseBoolean(lx[3]));
                 alist.add(arena);
             }
         });
