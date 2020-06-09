@@ -94,8 +94,8 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         if(room.totalJoined()>0){
             int mLevel = 10;
             for(Stub stub : room.playerList()){
-                if(stub.rating.level<mLevel){
-                    mLevel = stub.rating.level;//use lower level for matching
+                if(stub.rating.xpLevel<mLevel){
+                    mLevel = stub.rating.xpLevel;//use lower level for matching
                 }
             }
             pendingMatch[mLevel].offer(room);
@@ -121,12 +121,13 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         JsonObject jsonObject = new JsonObject();
         int mLevel = 10;
         for(Stub stub : room.playerList()){
-            if(stub.rating.level<mLevel){
-                mLevel = stub.rating.level;//use lower level for matching
+            if(stub.rating.xpLevel<mLevel){
+                mLevel = stub.rating.xpLevel;//use lower level for matching
             }
         }
         synchronized (this){
             Arena match = aMap.get(mLevel);
+            jsonObject.addProperty("level",mLevel);
             jsonObject.addProperty("arena",match.name());
             jsonObject.addProperty("capacity",capacity);
             jsonObject.addProperty("duration",roundDuration/1000);
@@ -189,12 +190,13 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         int mLevel = 10;
         for(Stub stub : room.playerList()){
             Rating rating = stub.rating;//gameServiceProvider.rating(stub.owner());
-            if(rating.level<mLevel){
-                mLevel = rating.level;
+            if(rating.xpLevel<mLevel){
+                mLevel = rating.xpLevel;
             }
         }
         synchronized (this){
             Arena match = aMap.get(mLevel);
+            jo.addProperty("level",mLevel);
             jo.addProperty("arena",match.name());
             jo.addProperty("capacity",capacity);
             jo.addProperty("duration",roundDuration/1000);

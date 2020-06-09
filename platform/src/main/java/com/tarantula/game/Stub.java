@@ -37,6 +37,8 @@ public class Stub extends RecoverableObject {
         jo.addProperty("seat",seat);
         jo.addProperty("roomId",roomId);
         jo.addProperty("tag",tag);
+        jo.addProperty("rank",rating.rank);
+        jo.addProperty("level",rating.xpLevel);
         return jo;
     }
 
