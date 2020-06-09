@@ -44,7 +44,11 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
         }
         lxp += dxp;
         xp += dxp;
+        int _xpLevel = xpLevel;
         xpLevel = (int)lxp/LEVEL_UP_BASE;
+        if(_xpLevel!=xpLevel){
+            level++;
+        }
         if(xpLevel%RANK_UP_BASE==0){//rank up
             rank++;
             //reset next level from 1 - 10 and rank up again

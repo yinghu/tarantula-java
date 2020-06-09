@@ -53,8 +53,10 @@ public class Room implements Connection.StateListener{
         this.roomId = UUID.randomUUID().toString();
     }
 
-    public synchronized Stub join(){
+    public synchronized Stub join(Rating rating){
         totalJoined++;
+        Stub _stub = pQueue.poll();
+        _stub.rating = rating;
         if(totalJoined==capacity){
             state = INITIALIZING;
         }
@@ -63,7 +65,7 @@ public class Room implements Connection.StateListener{
             state =  PENDING_JOIN;
         }
         initialTime = PENDING_TIME;
-        return pQueue.poll();
+        return _stub;
     }
     public synchronized boolean leave(Stub stub){
         if(state>PENDING_JOIN){

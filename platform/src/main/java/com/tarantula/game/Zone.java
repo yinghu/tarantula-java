@@ -32,33 +32,36 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     public GameServiceProvider gameServiceProvider;
     public Descriptor descriptor;
     private CopyOnWriteArrayList<Room> rList = new CopyOnWriteArrayList<>();
-    private ConcurrentLinkedDeque[] pendingMatch = {
-            new ConcurrentLinkedDeque(),//0
-            new ConcurrentLinkedDeque(),//1
-            new ConcurrentLinkedDeque(),//2
-            new ConcurrentLinkedDeque(),//3
-            new ConcurrentLinkedDeque(),//4
-            new ConcurrentLinkedDeque(),//5
-            new ConcurrentLinkedDeque(),//6
-            new ConcurrentLinkedDeque(),//7
-            new ConcurrentLinkedDeque(),//8
-            new ConcurrentLinkedDeque(),//9
-            new ConcurrentLinkedDeque() //10
-    };
+    private static ConcurrentLinkedDeque<Room>[] pendingMatch = new ConcurrentLinkedDeque[11];
+    static{
+        for(int i=0;i<11;i++){
+            pendingMatch[i]=new ConcurrentLinkedDeque<>();
+        }
+    }
     private ConcurrentLinkedDeque<Room> rQueue = pendingMatch[0];
     public ConcurrentHashMap<Integer,Arena> aMap = new ConcurrentHashMap<>();
     public Zone(){
         this.vertex = "Zone";
     }
     public Room room(Rating rating){
-        Room room = rQueue.poll();
-        if(room==null){
-            room = new Room();
-            room.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
-            rList.add(room);
-            roomIndex.put(room.roomId,room);
+        //level down matching
+        Room matched = null;
+        for(int lx = rating.xpLevel;lx>-1;lx--){
+            matched = pendingMatch[lx].poll();
+            if(matched!=null){//matched
+                break;
+            }
         }
-        return room;
+        if(matched!=null){
+            return matched;
+        }
+        else{
+            matched= new Room();
+            matched.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
+            rList.add(matched);
+            roomIndex.put(matched.roomId,matched);
+        }
+        return matched;
     }
 
     public void start(){
@@ -86,9 +89,19 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         return GamePortableRegistry.ZONE_CID;
     }
 
-    @Override
+    //@Override
     public void onWaiting(Room room) {
-        rQueue.addFirst(room);
+        if(room.totalJoined()>0){
+            int mLevel = 10;
+            for(Stub stub : room.playerList()){
+                if(stub.rating.level<mLevel){
+                    mLevel = stub.rating.level;//use lower level for matching
+                }
+            }
+            pendingMatch[mLevel].offer(room);
+        }else{
+            rQueue.addFirst(room);//add first join queue
+        }
     }
     @Override
     public void onLeaving(Stub stub){
@@ -108,9 +121,8 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         JsonObject jsonObject = new JsonObject();
         int mLevel = 10;
         for(Stub stub : room.playerList()){
-            Rating rating = gameServiceProvider.rating(stub.owner());
-            if(rating.level<mLevel){
-                mLevel = rating.level;//use lower level for matching
+            if(stub.rating.level<mLevel){
+                mLevel = stub.rating.level;//use lower level for matching
             }
         }
         synchronized (this){
@@ -158,7 +170,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         }
         for(Stub sb : room.playerList()){
             stubIndex.remove(sb.owner());
-            Rating rating = gameServiceProvider.rating(sb.owner());
+            Rating rating = sb.rating;//gameServiceProvider.rating(sb.owner());
             rating.update(sb);
             rating.update();
             if(sb.rank==1){
@@ -176,7 +188,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         //match lower arena on player rating level
         int mLevel = 10;
         for(Stub stub : room.playerList()){
-            Rating rating = gameServiceProvider.rating(stub.owner());
+            Rating rating = stub.rating;//gameServiceProvider.rating(stub.owner());
             if(rating.level<mLevel){
                 mLevel = rating.level;
             }

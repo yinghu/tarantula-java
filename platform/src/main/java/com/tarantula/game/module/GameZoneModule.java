@@ -29,7 +29,7 @@ public class GameZoneModule implements Module,ZoneListener{
     public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp
         Rating rating = this.gameServiceProvider.rating(session.systemId());
-        Stub stub = mZone.room(rating).join();
+        Stub stub = mZone.room(rating).join(rating);
         stub.tag = this.context.descriptor().tag();
         stub.owner(session.systemId());
         GameObject gameObject = new GameObject();
