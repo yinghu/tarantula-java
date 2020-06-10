@@ -160,16 +160,25 @@ namespace Tarantula.Networking{
         }
         public  async Task<bool> OnGameUpdated(MonoBehaviour caller,Gain[] gains){
             try{
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-server-id",deviceId),
-                    new Header("Tarantula-access-key",accessKey),
-                    new Header("Tarantula-action","onUpdated")
-                };
+                Header[] headers;
+                if(room.connection.offline){
+                    headers = new Header[]{
+                        new Header("Tarantula-tag",stub.tag),
+                        new Header("Tarantula-token",presence.token),
+                        new Header("Tarantula-action","onLeave")
+                    };
+                }else{//call by dedicated server
+                    headers = new Header[]{
+                        new Header("Tarantula-server-id",deviceId),
+                        new Header("Tarantula-access-key",accessKey),
+                        new Header("Tarantula-action","onUpdated")
+                    };
+                }
                 Payload p = new Payload();
                 p.gains = gains;
                 string json = JsonConvert.SerializeObject(p,JSON_SETTING);
-                string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,json);
-                return true;         
+                string jstr = await _ghc.PostJson(caller,room.connection.offline?"/service/action":"/dedicated/action",headers,json);
+                return ParseHeader(jstr);         
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_DEDICATED);
                 return false;
@@ -177,41 +186,28 @@ namespace Tarantula.Networking{
         }
         public  async Task<bool> OnGameEnded(MonoBehaviour caller,Gain[] gains,Rating[] ratings,Action<string> callback){
             try{
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-server-id",deviceId),
-                    new Header("Tarantula-access-key",accessKey),
-                    new Header("Tarantula-action","onEnded")
-                };
-                Payload p = new Payload();
-                p.gains = gains;
-                p.ratings = ratings;
-                string json = JsonConvert.SerializeObject(p,JSON_SETTING);
-                string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,json);
-                callback(jstr);
+                if(room.connection.offline){
+
+                }else{//call by dedicated server
+                    Header[] headers = new Header[]{
+                        new Header("Tarantula-server-id",deviceId),
+                        new Header("Tarantula-access-key",accessKey),
+                        new Header("Tarantula-action","onEnded")
+                    };
+                    Payload p = new Payload();
+                    p.gains = gains;
+                    p.ratings = ratings;
+                    string json = JsonConvert.SerializeObject(p,JSON_SETTING);
+                    string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,json);
+                    callback(jstr);
+                }
                 return true;           
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_DEDICATED);
                 return false;
             }
-        }
-       public  async Task<bool> OnTicket(MonoBehaviour caller){
-            try{
-                if(_liveWc){
-                    return false;
-                }
-                Header[] headers = new Header[]{
-                    new Header("Tarantula-tag","presence/lobby"),
-                    new Header("Tarantula-token",presence.token),
-                    new Header("Tarantula-action","onTicket")
-                };
-                string jstr = await _ghc.GetJson(caller,"/service/action",headers);
-                Debug.Log(jstr);
-                return await ParseTicket(jstr);            
-            }catch(Exception ex){
-                OnException?.Invoke(ex,ex.Message,ErrorCode.EC_LOGOUT);
-                return false;
-            }
-        }
+       }
+       
        public  async Task<bool> OnLogout(MonoBehaviour caller){
             try{
                 Header[] headers = new Header[]{

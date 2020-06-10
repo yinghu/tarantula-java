@@ -43,13 +43,14 @@ public class GameZoneModule implements Module,ZoneListener{
     }
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
-        if(session.action().equals("onCommit")){
+        if(session.action().equals("onUpdated")){
             Stub stub = mStub.get(session.systemId());
             Room room = mRoom.get(stub.roomId);
             if(room.offline()){
+                this.context.log(new String(payload),OnLog.WARN);
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
-                update.on(connection.serverId(),room.roomId+"?onCommit",payload);
+                //update.on(connection.serverId(),room.roomId+"?onUpdated",payload);
             }
             else{
                 session.write(toMessage("only offline mode can commit by player",false).toString().getBytes(),label());

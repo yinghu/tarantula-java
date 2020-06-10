@@ -48,11 +48,16 @@ namespace Tarantula.Networking{
             };
         }
         
-        void Update(){
+        async void Update(){
             if (Input.GetMouseButtonDown(0)) {
                 RaycastHit hit;
                 if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit)) {
                     bumpRuns[seatIndex].networkObject.SendRpc(BumpRun.RPC_ON_MOVE,Receivers.Server,hit.point,seatIndex);
+                    Gain[] stats = new Gain[]{
+                        new Gain(seatIndex,"mc",10),
+                        new Gain(seatIndex,"fc",2)
+                    };
+                    await integration.OnGameUpdated(this,stats);
                 }
                 OnLive();
             }
