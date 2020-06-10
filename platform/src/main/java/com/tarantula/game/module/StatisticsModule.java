@@ -59,9 +59,9 @@ public class StatisticsModule implements Module {
         this.builder.registerTypeAdapter(Rating.class,new RatingSerializer());
         this.builder.registerTypeAdapter(LeaderBoardView.class,new LeaderBoardViewSerializer());
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
-        this.gameServiceProvider.leaderBoard("wc").addListener((e)->{
-            this.context.log("OnBoard->"+e.toString(),OnLog.WARN);
-        });
+        //this.gameServiceProvider.leaderBoard("wc").addListener((e)->{
+            //this.context.log("OnBoard->"+e.toString(),OnLog.WARN);
+        //});
         this.context.log("Statistics started on game service provider ["+this.context.descriptor().typeId()+"]", OnLog.WARN);
     }
 

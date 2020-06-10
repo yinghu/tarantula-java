@@ -47,7 +47,7 @@ public class GameZoneModule implements Module,ZoneListener{
             Stub stub = mStub.get(session.systemId());
             Room room = mRoom.get(stub.roomId);
             if(room.offline()){
-                this.context.log(new String(payload),OnLog.WARN);
+                //this.context.log(new String(payload),OnLog.WARN);
                 room.onUpdated(payload);
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
             }
@@ -59,7 +59,7 @@ public class GameZoneModule implements Module,ZoneListener{
             Stub stub = mStub.get(session.systemId());
             Room room = mRoom.get(stub.roomId);
             if(room.offline()){
-                this.context.log(new String(payload),OnLog.WARN);
+                //this.context.log(new String(payload),OnLog.WARN);
                 room.onEnded(payload);
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
             }
