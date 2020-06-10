@@ -165,7 +165,7 @@ namespace Tarantula.Networking{
                     headers = new Header[]{
                         new Header("Tarantula-tag",stub.tag),
                         new Header("Tarantula-token",presence.token),
-                        new Header("Tarantula-action","onLeave")
+                        new Header("Tarantula-action","onUpdated")
                     };
                 }else{//call by dedicated server
                     headers = new Header[]{
@@ -186,22 +186,27 @@ namespace Tarantula.Networking{
         }
         public  async Task<bool> OnGameEnded(MonoBehaviour caller,Gain[] gains,Rating[] ratings,Action<string> callback){
             try{
+                Header[] headers;
                 if(room.connection.offline){
-
+                    headers = new Header[]{
+                        new Header("Tarantula-tag",stub.tag),
+                        new Header("Tarantula-token",presence.token),
+                        new Header("Tarantula-action","onEnded")
+                    };
                 }else{//call by dedicated server
-                    Header[] headers = new Header[]{
+                    headers = new Header[]{
                         new Header("Tarantula-server-id",deviceId),
                         new Header("Tarantula-access-key",accessKey),
                         new Header("Tarantula-action","onEnded")
                     };
-                    Payload p = new Payload();
-                    p.gains = gains;
-                    p.ratings = ratings;
-                    string json = JsonConvert.SerializeObject(p,JSON_SETTING);
-                    string jstr = await _ghc.PostJson(caller,"/dedicated/action",headers,json);
-                    callback(jstr);
                 }
-                return true;           
+                Payload p = new Payload();
+                p.gains = gains;
+                p.ratings = ratings;
+                string json = JsonConvert.SerializeObject(p,JSON_SETTING);
+                string jstr = await _ghc.PostJson(caller,room.connection.offline?"/service/action":"/dedicated/action",headers,json);
+                callback(jstr);
+                return ParseHeader(jstr);            
             }catch(Exception ex){
                 OnException?.Invoke(ex,ex.Message,ErrorCode.EC_DEDICATED);
                 return false;

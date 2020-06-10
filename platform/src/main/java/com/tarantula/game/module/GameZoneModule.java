@@ -48,12 +48,23 @@ public class GameZoneModule implements Module,ZoneListener{
             Room room = mRoom.get(stub.roomId);
             if(room.offline()){
                 this.context.log(new String(payload),OnLog.WARN);
-                OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+                room.onUpdated(payload);
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
-                //update.on(connection.serverId(),room.roomId+"?onUpdated",payload);
             }
             else{
-                session.write(toMessage("only offline mode can commit by player",false).toString().getBytes(),label());
+                session.write(toMessage("only offline mode can commit onUpdated by player",false).toString().getBytes(),label());
+            }
+        }
+        else if(session.action().equals("onEnded")){
+            Stub stub = mStub.get(session.systemId());
+            Room room = mRoom.get(stub.roomId);
+            if(room.offline()){
+                this.context.log(new String(payload),OnLog.WARN);
+                room.onEnded(payload);
+                session.write(toMessage(session.action(),true).toString().getBytes(),label());
+            }
+            else{
+                session.write(toMessage("only offline mode can commit onEnded by player",false).toString().getBytes(),label());
             }
         }
         else if(session.action().equals("onLeave")){

@@ -21,7 +21,7 @@ namespace Tarantula.Networking{
         private int seatIndex;
         public BumpRun[] bumpRuns;
         public Movement[] movements;
-        
+        private int hits;
         void Start(){
             integration = GameEngineCluster.Instance;
             GameObject tm = GameObject.Find("/UI/Timer");
@@ -58,11 +58,27 @@ namespace Tarantula.Networking{
                         new Gain(seatIndex,"fc",2)
                     };
                     await integration.OnGameUpdated(this,stats);
+                    hits++;
+                    if(hits==10){
+                        await OnEnded();
+                    }
+
                 }
                 OnLive();
             }
         }
-        
+        async Task<bool> OnEnded(){
+            Gain[] stats = new Gain[]{
+                new Gain(0,"mc",10),
+                new Gain(0,"pc",2)
+            };
+            Rating[] ratings = new Rating[]{
+                new Rating(0,1,70),
+            };
+            return await integration.OnGameEnded(this,stats,ratings,(s)=>{
+                Debug.Log(s);
+            });
+        }
         public void OnMove(int sx){
             float x = Random.Range(0,1080f);
             float y = Random.Range(0,1920f);
