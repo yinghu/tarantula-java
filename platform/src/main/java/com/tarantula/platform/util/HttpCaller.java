@@ -27,7 +27,7 @@ public class HttpCaller {
         System.out.println("LEVEL->"+level);
         int rank = level%10;
         System.out.println("RANK->"+rank);
-        for(int lx = 5;lx>-1;lx--){
+        for(int lx = 10;lx>0;lx--){
             System.out.println(lx);
         }
     }

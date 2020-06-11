@@ -44,7 +44,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     public Room match(Rating rating){
         //level down matching
         Room matched = null;
-        for(int lx = rating.xpLevel;lx>-1;lx--){
+        for(int lx = rating.xpLevel;lx>0;lx--){
             matched = pendingMatch[lx].poll();
             if(matched!=null){//matched
                 break;
@@ -54,23 +54,26 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
             return matched;
         }
         else{
-            matched= new Room();
-            matched.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
-            rList.add(matched);
-            roomIndex.put(matched.roomId,matched);
+            matched = rQueue.poll();
+            if(matched==null){
+                matched= new Room();
+                matched.start(this);
+                rList.add(matched);
+                roomIndex.put(matched.roomId,matched);
+            }
+            matched.reset(this.capacity,this.roundDuration,playMode!=Room.OFF_LINE_MODE,rating.xpLevel);
             return matched;
         }
     }
-    public Room solo(){
+    public Room solo(Rating rating){//always single player offline mode
         Room room = rQueue.poll();
         if(room==null){
             room= new Room();
-            room.start(1,roundDuration,false,this);
+            room.start(this);
             rList.add(room);
             roomIndex.put(room.roomId,room);
-        }else{
-            room.start(1,roundDuration,false,this);
         }
+        room.reset(1,this.roundDuration,false,rating.xpLevel);
         return room;
     }
     public void start(){
@@ -83,7 +86,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         listArena();
         for(int i=0;i<3;i++){
             Room room = new Room();
-            room.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
+            room.start(this);
             rQueue.offer(room);
             rList.add(room);
             roomIndex.put(room.roomId,room);
@@ -107,20 +110,21 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     //@Override
     public void onWaiting(Room room) {
         if(room.totalJoined()>0){
-            int mLevel = 10;
-            for(Stub stub : room.playerList()){
-                if(stub.rating.xpLevel<mLevel){
-                    mLevel = stub.rating.xpLevel;//use lower level for matching
-                }
-            }
-            pendingMatch[mLevel].offer(room);
+            pendingMatch[room.level()].offer(room);
         }else{
             rQueue.addFirst(room);//add first join queue
         }
     }
     @Override
     public void onLeaving(Stub stub){
-        stubIndex.remove(stub.owner());
+        stubIndex.computeIfPresent(stub.owner(),(k,v)->{
+            if(v.roomId.equals(stub.roomId)){
+                return null;//remove
+            }
+            else{
+                return v;//keep
+            }
+        });
     }
     @Override
     public Connection onConnection(Room room){
@@ -134,15 +138,10 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     @Override
     public byte[] onStarting(Room room){
         JsonObject jsonObject = new JsonObject();
-        int mLevel = 10;
-        for(Stub stub : room.playerList()){
-            if(stub.rating.xpLevel<mLevel){
-                mLevel = stub.rating.xpLevel;//use lower level for matching
-            }
-        }
+
         synchronized (this){
-            Arena match = aMap.get(mLevel);
-            jsonObject.addProperty("level",mLevel);
+            Arena match = aMap.get(room.level());
+            jsonObject.addProperty("level",room.level());
             jsonObject.addProperty("arena",match.name());
             jsonObject.addProperty("capacity",capacity);
             jsonObject.addProperty("duration",roundDuration/1000);
@@ -176,7 +175,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     }
     @Override
     public void onTimeout(Room room){
-        room.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
+        room.start(this);
         rQueue.addLast(room);
     }
     @Override
@@ -185,7 +184,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
             this.deploymentServiceProvider.onEndedUDPConnection(room.connection().serverId());
         }
         for(Stub sb : room.playerList()){
-            stubIndex.remove(sb.owner());
+            this.onLeaving(sb);
             Rating rating = sb.rating;//gameServiceProvider.rating(sb.owner());
             rating.update(sb);
             rating.update();
@@ -195,23 +194,16 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
                 gameServiceProvider.leaderBoard("wc").onAllBoard(stat);
             }
         }
-        room.start(capacity,roundDuration,playMode!=Room.OFF_LINE_MODE,this);
+        room.start(this);
         rQueue.addLast(room);
     }
     //room setting on online play mode
     private byte[] roomSetting(Room room){
         JsonObject jo = new JsonObject();
         //match lower arena on player rating level
-        int mLevel = 10;
-        for(Stub stub : room.playerList()){
-            Rating rating = stub.rating;//gameServiceProvider.rating(stub.owner());
-            if(rating.xpLevel<mLevel){
-                mLevel = rating.xpLevel;
-            }
-        }
         synchronized (this){
-            Arena match = aMap.get(mLevel);
-            jo.addProperty("level",mLevel);
+            Arena match = aMap.get(room.level());
+            jo.addProperty("level",room.level());
             jo.addProperty("arena",match.name());
             jo.addProperty("capacity",capacity);
             jo.addProperty("duration",roundDuration/1000);
@@ -237,10 +229,6 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.properties.put("__p",playMode);
         this.properties.put("__n",name);
         this.properties.put("__t",this.timestamp);
-        //this.properties.put("__a",disabled);
-        //for(Arena a : arenas){
-            //this.properties.put("L"+a.level,a.name()+","+a.level+","+a.xp+","+a.disabled());
-        //}
         return this.properties;
     }
     @Override
@@ -251,23 +239,6 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.playMode = ((Number)properties.get("__p")).intValue();
         this.name = (String)properties.get("__n");
         this.timestamp = ((Number)properties.getOrDefault("__t",0)).longValue();
-        //this.disabled =(Boolean)properties.get("__a");
-        /**
-        ArrayList<Arena> alist = new ArrayList<>();
-        properties.forEach((k,v)->{
-            if(!k.startsWith("__")){
-                Arena arena = new Arena();
-                //arena.name(k);
-                String[] lx = ((String)v).split(",");
-                arena.name(lx[0]);
-                arena.level = Integer.parseInt(lx[1]);
-                arena.xp = Double.parseDouble(lx[2]);
-                arena.disabled(Boolean.parseBoolean(lx[3]));
-                alist.add(arena);
-            }
-        });
-        arenas = new Arena[alist.size()];
-        arenas = alist.toArray(arenas);**/
     }
     @Override
     public Recoverable.Key key(){

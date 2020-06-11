@@ -12,7 +12,7 @@ import java.util.ArrayDeque;
 import java.util.UUID;
 
 /**
- * Created by yinghu lu on 4/14/2020.
+ * Updated by yinghu lu on 6/11/2020.
  */
 public class Room implements Connection.StateListener{
 
@@ -36,6 +36,7 @@ public class Room implements Connection.StateListener{
     private int capacity;
     private int totalJoined;
     private boolean online;
+    private int level;
     private Connection connection;
     private int retries;
     private long initialTime;
@@ -87,25 +88,25 @@ public class Room implements Connection.StateListener{
         }
         return true;
     }
-    public void start(int capacity,long duration,boolean online,RoomListener roomListener){
+    public void reset(int capacity,long duration,boolean online,int level){
         this.capacity = capacity;
         this.duration = duration;
         this.online = online;
-        this.initialTime = PENDING_TIME;
-        this.overtime = PENDING_TIME;
-        this.round++;
-        this.retries = CONNECTION_RETRIES;
-        this.totalJoined=0;
-        if(this.pQueue==null){
-            this.pQueue = new ArrayDeque<>(this.capacity);
-        }
-        this.pQueue.clear();
+        this.level = level;
+        this.pQueue = new ArrayDeque<>(this.capacity);
         this.stubs = new Stub[this.capacity];
         for(int i=0;i<this.capacity;i++){
             Stub stub = new Stub(i,roomId);
             this.pQueue.offer(stub);
             this.stubs[i] = stub;
         }
+    }
+    public void start(RoomListener roomListener){
+        this.initialTime = PENDING_TIME;
+        this.overtime = PENDING_TIME;
+        this.round++;
+        this.retries = CONNECTION_RETRIES;
+        this.totalJoined=0;
         this.state = WAITING;
         this.connection = null;
         this.roomListener = roomListener;
@@ -120,6 +121,9 @@ public class Room implements Connection.StateListener{
     public int totalJoined(){return this.totalJoined;}
     public boolean offline(){
         return !this.online;
+    }
+    public int level(){
+        return this.level;
     }
     public Connection connection(){
         return this.connection;

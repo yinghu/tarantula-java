@@ -10,7 +10,6 @@ import com.tarantula.game.Rating;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 /**
  * updated by yinghu lu on 6/9/2020.
@@ -29,7 +28,7 @@ public class GameZoneModule implements Module,ZoneListener{
     public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp or offline play mode
         Rating rating = this.gameServiceProvider.rating(session.systemId());
-        Room room = session.accessMode()==Session.OFF_LINE_MODE?mZone.solo():mZone.match(rating);
+        Room room = session.accessMode()==Session.OFF_LINE_MODE?mZone.solo(rating):mZone.match(rating);
         Stub stub = room.join(rating);
         stub.tag = this.context.descriptor().tag();
         stub.owner(session.systemId());
