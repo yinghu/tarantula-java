@@ -118,6 +118,10 @@ public class Room implements Connection.StateListener{
         this.state = WAITING;
         this.connection = null;
         this.roomListener = roomListener;
+        if(pQueue!=null){
+            pQueue.clear();
+        }
+        this.stubs = new Stub[0];
     }
     public int round(){
         return round;
@@ -212,6 +216,7 @@ public class Room implements Connection.StateListener{
             case PENDING_END:
                 initialTime -=TIMER_DELTA;
                 if(initialTime<=0){//delay 5 seconds to wait for game server result
+                    state = WAITING;
                     roomListener.onEnding(this);
                 }
         }

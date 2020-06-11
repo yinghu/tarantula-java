@@ -139,7 +139,6 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     @Override
     public byte[] onStarting(Room room){
         JsonObject jsonObject = new JsonObject();
-
         synchronized (this){
             Arena match = aMap.get(room.level());
             jsonObject.addProperty("level",room.level());

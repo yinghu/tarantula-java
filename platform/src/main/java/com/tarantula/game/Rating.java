@@ -2,8 +2,6 @@ package com.tarantula.game;
 
 import com.tarantula.DataStore;
 import com.tarantula.Recoverable;
-import com.tarantula.game.GamePortableRegistry;
-import com.tarantula.game.Stub;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
 
@@ -20,7 +18,7 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
     public int rank =1; //rank of zone
     public int level = 1; //total level
     public int xpLevel=1; //level of arena
-    public double lxp=LEVEL_UP_BASE;  //xp of level
+    public double lxp=0;  //xp of level
     public double xp=0; //total xp
     public double elo = 1200; //elo service
     public int csw = 0; //consecutive winnings
@@ -44,12 +42,13 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
         }
         lxp += dxp;
         xp += dxp;
-        int _xpLevel = xpLevel;
-        xpLevel = (int)lxp/LEVEL_UP_BASE;
-        if(_xpLevel!=xpLevel){
-            level++;
+        int _xpLevel = (int)lxp/LEVEL_UP_BASE;
+        if(_xpLevel>xpLevel){
+            _xpLevel = _xpLevel-xpLevel;//xplevel delta
+            xpLevel = xpLevel +(_xpLevel);//
+            level = level+(_xpLevel);//add level jump delta
         }
-        if(xpLevel%RANK_UP_BASE==0){//rank up
+        if(xpLevel-RANK_UP_BASE>0){//rank up if level pass the base
             rank++;
             //reset next level from 1 - 10 and rank up again
             xpLevel = 1;

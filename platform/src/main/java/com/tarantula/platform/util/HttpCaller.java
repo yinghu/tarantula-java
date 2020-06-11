@@ -22,10 +22,10 @@ public class HttpCaller {
         //System.out.println(caller.get());
         //System.out.println(caller.get());
         //System.out.println(caller.get());
-        double xp = 10000;
+        double xp = 21000;
         int level = (int)xp/1000;
         System.out.println("LEVEL->"+level);
-        int rank = level%10;
+        int rank = 10/10;
         System.out.println("RANK->"+rank);
         for(int lx = 10;lx>0;lx--){
             System.out.println(lx);
