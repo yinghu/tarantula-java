@@ -39,7 +39,12 @@ namespace Tarantula.Networking{
        STARTING=3,
        OVERTIME=4,
        ENDING=5
-   }     
+   } 
+   public enum AccessMode{
+       MATCH_MAKING=2,
+       OFF_LINE =3,
+       INVITATION=4
+   }    
    [CreateAssetMenu(fileName = "GameEngineCluster", menuName = "Scripts/GameEngineCluster", order = 1)]    
    public class GameEngineCluster : ScriptableObject{
       
@@ -234,12 +239,12 @@ namespace Tarantula.Networking{
             }
         }
        
-        public  async Task<bool> OnPlay(MonoBehaviour caller){
+        public  async Task<bool> OnPlay(MonoBehaviour caller,AccessMode aMode){
             try{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-tag",gameTitle+"/mmk"),
                     new Header("Tarantula-token",presence.token),
-                    new Header("Tarantula-play-mode","3"),
+                    new Header("Tarantula-access-mode",""+(int)aMode),
                     new Header("Tarantula-action","onPlay")
                 };
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
