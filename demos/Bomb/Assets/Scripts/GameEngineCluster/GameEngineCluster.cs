@@ -239,6 +239,7 @@ namespace Tarantula.Networking{
                 Header[] headers = new Header[]{
                     new Header("Tarantula-tag",gameTitle+"/mmk"),
                     new Header("Tarantula-token",presence.token),
+                    new Header("Tarantula-play-mode","3"),
                     new Header("Tarantula-action","onPlay")
                 };
                 string jstr = await _ghc.GetJson(caller,"/service/action",headers);
@@ -731,5 +732,9 @@ namespace Tarantula.Networking{
         public string ticket { get; set; }
         public string balance { get; set; }
         public string login { get; set; }
+    }
+    public class Profile{
+        public string nickname {get;set;}
+        public string avatar {get;set;}
     }
 }

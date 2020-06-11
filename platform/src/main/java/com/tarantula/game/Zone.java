@@ -253,7 +253,6 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         });
         arenas = new Arena[alist.size()];
         arenas = alist.toArray(arenas);
-        Arrays.sort(arenas,new ArenaComparator());
     }
     @Override
     public Recoverable.Key key(){

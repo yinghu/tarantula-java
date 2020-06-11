@@ -66,6 +66,13 @@ public class Integration : MonoBehaviour{
         if(!integration.online){
             await integration.OnIndex(this);
             await integration.OnDevice(this); 
+            Profile pf = new Profile();
+            pf.nickname = "yinghu";
+            pf.avatar = "some url";
+            await integration.OnSet(this,"Profile",pf);
+            await integration.OnGet(this,"Profile",(f)=>{
+                Debug.Log(f);
+            });
             Debug.Log("Online->"+integration.online);
         }
     }

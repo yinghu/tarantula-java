@@ -26,10 +26,12 @@ public interface Session extends OnApplication{
     String TARANTULA_NAME ="Tarantula-name";
     String TARANTULA_PASSWORD ="Tarantula-password";
     String TARANTULA_PAYLOAD = "Tarantula-payload";
+    String TARANTULA_PLAY_MODE = "Tarantula-play-mode";
 
 
     int FAST_PLAY_MODE = 2;
     int INSTANCE_PLAY_MODE = 4;
+    int OFF_LINE_MODE = 3;
 
 
     String source();
