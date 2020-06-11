@@ -289,6 +289,9 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         return jsonObject;
     }
     private void listArena(){
+        if(arenas.length==0){
+            return;
+        }
         int fi = this.descriptor.capacity();
         for(Arena a : arenas){
             if(a.level>0&&a.level<=this.descriptor.capacity()){
