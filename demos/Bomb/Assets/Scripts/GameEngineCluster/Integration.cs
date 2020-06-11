@@ -122,7 +122,7 @@ public class Integration : MonoBehaviour{
             return;
         }
         pendingClick = true;
-        inGame = await integration.OnPlay(this);     
+        inGame = await integration.OnPlay(this,AccessMode.OFF_LINE);     
         if(inGame){
             message.SetText("Pending ...");
         }
