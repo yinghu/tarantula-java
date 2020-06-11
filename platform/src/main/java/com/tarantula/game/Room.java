@@ -76,11 +76,19 @@ public class Room implements Connection.StateListener{
         totalJoined--;
         state = totalJoined>0?PENDING_JOIN:WAITING;
         pQueue.offer(stub);
+        if(state==PENDING_JOIN&&stub.rating.xpLevel==this.level){
+            //reset the lowest level
+            stub.disabled(true);
+            int mlevel = 10;
+            for(Stub s : stubs) {
+                if(!s.disabled()&&s.rating.xpLevel<mlevel){
+                    mlevel = s.rating.xpLevel;
+                }
+            }
+            level = mlevel;//requeue on lowest level
+        }
         roomListener.onWaiting(this);
         return true;
-    }
-    public synchronized void update(Stub stub){
-        Stub _onb = stubs[stub.seat];
     }
     private synchronized boolean end(){
         if(state==STARTING||state==OVERTIME){

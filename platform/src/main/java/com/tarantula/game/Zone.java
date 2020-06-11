@@ -24,6 +24,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     public List<Arena> arenas = new ArrayList<>();
     public String name;
     public int capacity =1;
+    private static int SOLO_CAPACITY = 1;
     public long roundDuration =60000;
     public long overtime = Room.PENDING_TIME;
     public int playMode = Room.DEDICATED_MODE;
@@ -73,7 +74,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
             rList.add(room);
             roomIndex.put(room.roomId,room);
         }
-        room.reset(1,this.roundDuration,false,rating.xpLevel);
+        room.reset(SOLO_CAPACITY,this.roundDuration,false,rating.xpLevel);
         return room;
     }
     public void start(){
