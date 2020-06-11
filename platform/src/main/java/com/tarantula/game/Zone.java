@@ -8,9 +8,10 @@ import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.service.DeploymentServiceProvider;
-
+import com.tarantula.platform.util.SystemUtil;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -20,7 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * updated by yinghu lu on 6/9/2020.
  */
 public class Zone extends RecoverableObject implements RoomListener,DataStore.Updatable{
-    public Arena[] arenas = new  Arena[0];
+    public List<Arena> arenas = new ArrayList<>();
     public String name;
     public int capacity =1;
     public long roundDuration =60000;
@@ -36,11 +37,11 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     private ConcurrentLinkedDeque<Room>[] pendingMatch;
     private ConcurrentLinkedDeque<Room> rQueue;//assigned to pendingMatch 0
 
-    private ConcurrentHashMap<Integer,Arena> aMap = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<Integer,Arena> aMap = new ConcurrentHashMap<>();
     public Zone(){
         this.vertex = "Zone";
     }
-    public Room room(Rating rating){
+    public Room match(Rating rating){
         //level down matching
         Room matched = null;
         for(int lx = rating.xpLevel;lx>-1;lx--){
@@ -60,7 +61,18 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
             return matched;
         }
     }
-
+    public Room solo(){
+        Room room = rQueue.poll();
+        if(room==null){
+            room= new Room();
+            room.start(1,roundDuration,false,this);
+            rList.add(room);
+            roomIndex.put(room.roomId,room);
+        }else{
+            room.start(1,roundDuration,false,this);
+        }
+        return room;
+    }
     public void start(){
         int pmz = this.descriptor.capacity()+1;
         pendingMatch = new ConcurrentLinkedDeque[pmz];
@@ -224,10 +236,11 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.properties.put("__o",overtime);
         this.properties.put("__p",playMode);
         this.properties.put("__n",name);
+        this.properties.put("__t",this.timestamp);
         //this.properties.put("__a",disabled);
-        for(Arena a : arenas){
-            this.properties.put("L"+a.level,a.name()+","+a.level+","+a.xp+","+a.disabled());
-        }
+        //for(Arena a : arenas){
+            //this.properties.put("L"+a.level,a.name()+","+a.level+","+a.xp+","+a.disabled());
+        //}
         return this.properties;
     }
     @Override
@@ -237,7 +250,9 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.overtime = ((Number)properties.get("__o")).longValue();
         this.playMode = ((Number)properties.get("__p")).intValue();
         this.name = (String)properties.get("__n");
+        this.timestamp = ((Number)properties.getOrDefault("__t",0)).longValue();
         //this.disabled =(Boolean)properties.get("__a");
+        /**
         ArrayList<Arena> alist = new ArrayList<>();
         properties.forEach((k,v)->{
             if(!k.startsWith("__")){
@@ -252,7 +267,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
             }
         });
         arenas = new Arena[alist.size()];
-        arenas = alist.toArray(arenas);
+        arenas = alist.toArray(arenas);**/
     }
     @Override
     public Recoverable.Key key(){
@@ -288,7 +303,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         return jsonObject;
     }
     private void listArena(){
-        if(arenas.length==0){
+        if(arenas.size()==0){
             return;
         }
         int fi = this.descriptor.capacity();
@@ -315,15 +330,9 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         }
     }
     public void reset(Zone updated){
-        ArrayList<Arena> alist = new ArrayList<>();
+        arenas.clear();
         for(Arena a : updated.arenas){
-            if(!a.disabled()){
-                alist.add(a);
-            }
-        }
-        this.arenas = new Arena[alist.size()];
-        for(int i=0;i<this.arenas.length;i++){
-            this.arenas[i]=alist.get(i);
+            arenas.add(a);
         }
         synchronized (this){//update local zone copy
             this.name = updated.name;
@@ -333,5 +342,14 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
             aMap.clear();
             listArena();
         }
+    }
+    public void update() {
+        arenas.forEach((a)->{
+            if(!this.dataStore.update(a)){
+                this.dataStore.create(a);
+            }
+        });
+        this.timestamp = SystemUtil.toUTCMilliseconds(LocalDateTime.now());
+        this.dataStore.update(this);
     }
 }

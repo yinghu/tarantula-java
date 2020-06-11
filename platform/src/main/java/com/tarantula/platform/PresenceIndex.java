@@ -55,7 +55,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         fe.systemId(session.systemId());
         fe.stub(session.stub());
         fe.routingNumber(session.routingNumber());
-        fe.accessMode(Session.FAST_PLAY_MODE);
+        fe.accessMode(session.accessMode());
         fe.balance(desc.entryCost());
         fe.ticket(session.ticket());
         fe.forwarding(true);
@@ -72,14 +72,14 @@ public class PresenceIndex extends RecoverableObject implements Presence {
                     //distributed on application Id
                     fastJoin(session,desc,(byte[])onAccess.property(OnAccess.PAYLOAD));
                     break;
-                case Session.INSTANCE_PLAY_MODE:
+                case Session.INVITATION_PLAY_MODE:
                     SessionForward fxd = new SessionForward(session.source(),session.sessionId());
                     InstancePlayEvent onInstanceEvent = new InstancePlayEvent(onAccess.applicationId(),onAccess.instanceId(),fxd);
                     onInstanceEvent.systemId(session.systemId());
                     onInstanceEvent.balance(desc.entryCost());
                     onInstanceEvent.stub(session.stub());
                     onInstanceEvent.routingNumber(session.routingNumber());
-                    onInstanceEvent.accessMode(Session.INSTANCE_PLAY_MODE);
+                    onInstanceEvent.accessMode(Session.INVITATION_PLAY_MODE);
                     onInstanceEvent.ticket(session.ticket());//session presence OID embedded in token
                     onInstanceEvent.payload((byte[])onAccess.property(OnAccess.PAYLOAD));
                     RoutingKey rk2 = this.eventService.routingKey(onAccess.instanceId(),desc.tag(),partitionFromInstanceId(onAccess.instanceId())); //route to the partition of the instance node

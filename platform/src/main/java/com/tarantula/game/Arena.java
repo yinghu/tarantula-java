@@ -1,5 +1,7 @@
 package com.tarantula.game;
 
+import com.tarantula.Recoverable;
+import com.tarantula.platform.IndexKey;
 import com.tarantula.platform.OnApplicationHeader;
 
 import java.util.Map;
@@ -9,11 +11,10 @@ public class Arena extends OnApplicationHeader {
     public double xp;
 
     public Arena(){}
-    public Arena(int level,double xp,String name,boolean disabled){
-        this.level = level;
-        this.xp = xp;
-        this.name = name;
-        this.disabled = disabled;
+    public Arena(String bucket,String oid,int level){
+        this.bucket = bucket;
+        this.oid = oid;
+        this.routingNumber = level;
     }
     @Override
     public Map<String,Object> toMap(){
@@ -38,8 +39,25 @@ public class Arena extends OnApplicationHeader {
     public int getClassId() {
         return GamePortableRegistry.ARENA_CID;
     }
+
     @Override
-    public String toString(){
-        return "Arena->"+level+"//"+xp+"//"+name+"//"+disabled;
+    public String distributionKey() {
+        if(this.bucket!=null&&this.oid!=null){
+            return new StringBuffer(this.bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(routingNumber).toString();
+        }
+        else{
+            return null;
+        }
+    }
+    @Override
+    public void distributionKey(String distributionKey) {
+        String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
+        this.bucket = klist[0];
+        this.oid = klist[1];
+        this.routingNumber = Integer.parseInt(klist[2]);
+    }
+    @Override
+    public Key key(){
+        return new IndexKey(this.bucket,this.oid,this.routingNumber);
     }
 }

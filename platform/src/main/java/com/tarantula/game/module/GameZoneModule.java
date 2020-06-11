@@ -27,9 +27,10 @@ public class GameZoneModule implements Module,ZoneListener{
     private int DEFAULT_LEVEL_COUNT = 3;
     @Override
     public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
-        //match arena with service rank/xp
+        //match arena with service rank/xp or offline play mode
         Rating rating = this.gameServiceProvider.rating(session.systemId());
-        Stub stub = mZone.room(rating).join(rating);
+        Room room = session.accessMode()==Session.OFF_LINE_MODE?mZone.solo():mZone.match(rating);
+        Stub stub = room.join(rating);
         stub.tag = this.context.descriptor().tag();
         stub.owner(session.systemId());
         GameObject gameObject = new GameObject();
@@ -92,28 +93,23 @@ public class GameZoneModule implements Module,ZoneListener{
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         String gz = this.context.descriptor().typeId().replace("-lobby","-service");
         this.gameServiceProvider = this.context.serviceProvider(gz);
-        mZone = this.gameServiceProvider.zone(this.context.descriptor().distributionKey());
-        if(mZone.arenas.length==0) {
+        mZone = this.gameServiceProvider.zone(this.context.descriptor());
+        if(mZone.arenas.size()==0) {
             //create arenas using capacity of descriptor
             mZone.capacity=1;
             mZone.roundDuration = 60*1000;
             mZone.overtime = 5000;
             mZone.playMode = Room.OFF_LINE_MODE;
-            mZone.arenas = new Arena[DEFAULT_LEVEL_COUNT];
+            //mZone.arenas = new Arena[DEFAULT_LEVEL_COUNT];
             for(int i=1;i<DEFAULT_LEVEL_COUNT+1;i++){
-                mZone.arenas[i-1]=new Arena(i,i*100,"Level "+i,false);
+                Arena arena = new Arena(mZone.bucket(),mZone.oid(),i);
+                arena.name("level"+i);
+                arena.level = i;
+                arena.xp = i*100;
+                arena.disabled(false);
+                mZone.arenas.add(arena);
             }
             mZone.update();
-        }
-        ArrayList<Arena> alist = new ArrayList<>();
-        for(Arena a : mZone.arenas){
-            if(!a.disabled()){
-                alist.add(a);
-            }
-        }
-        mZone.arenas = new Arena[alist.size()];
-        for(int i=0;i<alist.size();i++){
-            mZone.arenas[i]=alist.get(i);
         }
         mZone.roomIndex = this.mRoom;
         mZone.stubIndex = this.mStub;
@@ -154,7 +150,7 @@ public class GameZoneModule implements Module,ZoneListener{
 
     @Override
     public void updated(Zone zone) {
-        mZone.reset(zone);
+        mZone.reset(this.gameServiceProvider.zone(this.context.descriptor()));
         //mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->level ["+v.level+"/"+v.name()+"]",OnLog.WARN));
     }
     private JsonObject toMessage(String msg,boolean successful){

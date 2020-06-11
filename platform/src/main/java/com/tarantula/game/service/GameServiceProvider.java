@@ -1,10 +1,7 @@
 package com.tarantula.game.service;
 
 import com.tarantula.*;
-import com.tarantula.game.GamePortableRegistry;
-import com.tarantula.game.Rating;
-import com.tarantula.game.Zone;
-import com.tarantula.game.ZoneListener;
+import com.tarantula.game.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.service.ClusterProvider;
 import com.tarantula.platform.statistics.StatisticsIndex;
@@ -73,11 +70,19 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     public void removeZoneListener(String key){
         zMap.remove(key);
     }
-    public Zone zone(String applicationId){//application id
+    public Zone zone(Descriptor descriptor){//application id
         Zone zone = new Zone();
-        zone.distributionKey(applicationId);
+        zone.distributionKey(descriptor.distributionKey());
         this.dataStore.createIfAbsent(zone,true);
         zone.dataStore(this.dataStore);
+        for(int i=1;i<descriptor.capacity()+1;i++){
+            Arena a = new Arena(zone.bucket(),zone.oid(),i);
+            if(this.dataStore.load(a)){
+                if(!a.disabled()){//skip disabled
+                    zone.arenas.add(a);
+                }
+            }
+        }
         return zone;
     }
     public LeaderBoard leaderBoard(String category){

@@ -264,35 +264,60 @@ public class AdminRoleModule implements Module {
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             int index = ((Number)onAccess.property("index")).intValue();
             int page = ((Number)onAccess.property("page")).intValue();
+            boolean disabled = (Boolean)onAccess.property("disabled");
             GameLobbyContext pending = this.gameLobbyContext(accessId);
             if(page==pending.page){
                 GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
                 Zone zone = gameLobby.zone;
                 if(index<=maxGameLevelCount){
                     boolean updated  = false;
+                    Arena pu = new Arena();
                     for(Arena a : zone.arenas){
                         if(a.level==index){
+                            pu.name(a.name());
+                            pu.xp = a.xp;
+                            pu.level = a.level;
+                            pu.disabled(a.disabled());
                             a.name(onAccess.name());
                             a.xp = ((Number)onAccess.property("xp")).doubleValue();
-                            a.disabled((Boolean)onAccess.property("disabled"));
+                            a.disabled(disabled);
                             updated = true;
                             break;
                         }
                     }
-                    if(!updated){
-                        Arena[] arenas = zone.arenas;
-                        zone.arenas = new Arena[arenas.length+1];
-                        for(int i=0;i<arenas.length;i++){
-                            zone.arenas[i]=arenas[i];
+                    if(updated){
+                        int mc = 0;
+                        Arena ap=null;
+                        for(Arena a: zone.arenas){
+                            if(!a.disabled()){
+                                mc++;
+                            }
+                            if(a.level==pu.level){
+                                ap = a;
+                            }
                         }
-                        zone.arenas[arenas.length]= new Arena();
-                        zone.arenas[arenas.length].name(onAccess.name());
-                        zone.arenas[arenas.length].xp = ((Number)onAccess.property("xp")).doubleValue();
-                        zone.arenas[arenas.length].level = index;
-                        zone.arenas[arenas.length].disabled((Boolean)onAccess.property("disabled"));
+                        if(mc>0){
+                            zone.update();
+                            session.write(pending.toJson().toString().getBytes(),label());
+                        }
+                        else{
+                            ap.level = pu.level;
+                            ap.xp = pu.xp;
+                            ap.name(pu.name());
+                            ap.disabled(pu.disabled());
+                            session.write(toMessage("at least one level per lobby",false).toString().getBytes(),label());
+                        }
                     }
-                    zone.update();
-                    session.write(pending.toJson().toString().getBytes(),label());
+                    else{
+                        Arena a = new Arena(zone.bucket(),zone.oid(),index);
+                        a.name(onAccess.name());
+                        a.xp = ((Number)onAccess.property("xp")).doubleValue();
+                        a.level = index;
+                        a.disabled((Boolean)onAccess.property("disabled"));
+                        zone.arenas.add(a);
+                        zone.update();
+                        session.write(pending.toJson().toString().getBytes(),label());
+                    }
                 }
                 else{
                     session.write(toMessage("level overflow",false).toString().getBytes(),label());
@@ -399,12 +424,26 @@ public class AdminRoleModule implements Module {
         mZone.roundDuration = 60*1000;
         mZone.overtime = 5000;
         mZone.playMode = Room.OFF_LINE_MODE;
-        mZone.arenas = new Arena[defaultGameLevelCount];
-        for(int i=1;i<defaultGameLevelCount+1;i++){
-            mZone.arenas[i-1]=new Arena(i,i*100,"Level "+i,false);
-        }
+        mZone.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
         mZone.dataStore(dataStore);
         dataStore.createIfAbsent(mZone,true);
+        for(int i=1;i<maxGameLevelCount+1;i++){
+            Arena a = new Arena(mZone.bucket(),mZone.oid(),i);
+            if(dataStore.load(a)){
+                mZone.arenas.add(a);
+            }
+        }
+        if(mZone.arenas.size()==0){
+            for(int i=1;i<defaultGameLevelCount+1;i++){
+                Arena a = new Arena(mZone.bucket(),mZone.oid(),i);
+                a.name("level"+i);
+                a.level = i;
+                a.xp = i*100;
+                a.disabled(false);
+                mZone.arenas.add(a);
+            }
+            mZone.update();
+        }
         return mZone;
     }
     private JsonObject toMessage(String msg,boolean suc){

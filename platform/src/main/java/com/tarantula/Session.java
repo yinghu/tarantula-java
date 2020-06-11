@@ -30,7 +30,7 @@ public interface Session extends OnApplication{
 
 
     int FAST_PLAY_MODE = 2;
-    int INSTANCE_PLAY_MODE = 4;
+    int INVITATION_PLAY_MODE = 4;
     int OFF_LINE_MODE = 3;
 
 
