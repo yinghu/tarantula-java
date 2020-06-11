@@ -82,10 +82,18 @@ public class AdminRoleModule implements Module {
             session.write(gsc.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onGameDataList")){
-            GameServiceContext gsc = new GameServiceContext();
+            GameDataStoreContext gsc = new GameDataStoreContext();
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
-            gsc.lobby=(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_DATA)));
+            Lobby lobby =(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_DATA)));
+            DataStore ds = this.context.dataStore(lobby.descriptor().typeId());
+            gsc.name = lobby.descriptor().typeId();
+            gsc.tag = lobby.entryList().get(0).tag();
+            gsc.dataStore = ds.name();//lobby.descriptor().typeId();
+            gsc.dataStoreCount = ds.count();
+            DataStore ss = this.context.dataStore(lobby.descriptor().typeId().replace("-data","-service"));
+            gsc.serviceStore = ss.name();
+            gsc.serviceStoreCount = ss.count();
             session.write(gsc.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onShoppingList")){
