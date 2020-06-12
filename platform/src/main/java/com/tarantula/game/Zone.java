@@ -33,6 +33,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     public DeploymentServiceProvider deploymentServiceProvider;
     public GameServiceProvider gameServiceProvider;
     public Descriptor descriptor;
+    public int levelLimit;
     private CopyOnWriteArrayList<Room> rList = new CopyOnWriteArrayList<>();
 
     private ConcurrentLinkedDeque<Room>[] pendingMatch;
@@ -78,9 +79,9 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         return room;
     }
     public void start(){
-        int pmz = this.descriptor.capacity()+1;
-        pendingMatch = new ConcurrentLinkedDeque[pmz];
-        for(int i=0;i<pmz;i++){
+        levelLimit = this.descriptor.capacity();
+        pendingMatch = new ConcurrentLinkedDeque[levelLimit+1];
+        for(int i=0;i<levelLimit+1;i++){
             pendingMatch[i]=new ConcurrentLinkedDeque<>();
         }
         rQueue = pendingMatch[0];
@@ -186,7 +187,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         for(Stub sb : room.playerList()){
             this.onLeaving(sb);
             Rating rating = sb.rating;//gameServiceProvider.rating(sb.owner());
-            rating.update(sb);
+            rating.update(sb,levelLimit);
             rating.update();
             if(sb.rank==1){
                 Statistics.Entry stat = this.gameServiceProvider.statistics(sb.owner()).entry("wc");
@@ -223,22 +224,22 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     }
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("__c",capacity);
-        this.properties.put("__d",roundDuration);
-        this.properties.put("__o",overtime);
-        this.properties.put("__p",playMode);
-        this.properties.put("__n",name);
-        this.properties.put("__t",this.timestamp);
+        this.properties.put("1",capacity);
+        this.properties.put("2",roundDuration);
+        this.properties.put("3",overtime);
+        this.properties.put("4",playMode);
+        this.properties.put("5",name);
+        this.properties.put("6",this.timestamp);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.capacity = ((Number)properties.get("__c")).intValue();
-        this.roundDuration = ((Number)properties.get("__d")).longValue();
-        this.overtime = ((Number)properties.get("__o")).longValue();
-        this.playMode = ((Number)properties.get("__p")).intValue();
-        this.name = (String)properties.get("__n");
-        this.timestamp = ((Number)properties.getOrDefault("__t",0)).longValue();
+        this.capacity = ((Number)properties.getOrDefault("1",capacity)).intValue();
+        this.roundDuration = ((Number)properties.getOrDefault("2",roundDuration)).longValue();
+        this.overtime = ((Number)properties.getOrDefault("3",overtime)).longValue();
+        this.playMode = ((Number)properties.getOrDefault("4",playMode)).intValue();
+        this.name = (String)properties.get("5");
+        this.timestamp = ((Number)properties.getOrDefault("6",0)).longValue();
     }
     @Override
     public Recoverable.Key key(){
@@ -277,9 +278,9 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         if(arenas.size()==0){
             return;
         }
-        int fi = this.descriptor.capacity();
+        int fi = levelLimit;//this.descriptor.capacity();
         for(Arena a : arenas){
-            if(a.level>0&&a.level<=this.descriptor.capacity()){
+            if(a.level>0&&a.level<=levelLimit){
                 aMap.put(a.level,a);
                 if(a.level<fi){
                     fi = a.level;
@@ -287,7 +288,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
             }
         }
         //set 1 to max level count
-        for(int i=1;i<this.descriptor.capacity()+1;i++){//max matching level
+        for(int i=1;i<this.levelLimit+1;i++){//max matching level
             Arena ex = aMap.get(i);
             if(ex==null){
                 if(aMap.get(i-1)!=null){

@@ -14,7 +14,6 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
 
     public static double BASE_POINTS = 100;
     public static int LEVEL_UP_BASE = 1000;
-    public static int RANK_UP_BASE = 10;
     public int rank =1; //rank of zone
     public int level = 1; //total level
     public int xpLevel=1; //level of arena
@@ -28,7 +27,7 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
         this.vertex = "Rating";
     }
 
-    public void update(Stub stub){
+    public void update(Stub stub,int rankUpBase){
         if(stub.rank==0){
             return;
         }
@@ -48,7 +47,7 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
             xpLevel = xpLevel +(_xpLevel);//
             level = level+(_xpLevel);//add level jump delta
         }
-        if(xpLevel-RANK_UP_BASE>0){//rank up if level pass the base
+        if(xpLevel-rankUpBase>0){//rank up if level pass the base
             rank++;
             //reset next level from 1 - 10 and rank up again
             xpLevel = 1;
