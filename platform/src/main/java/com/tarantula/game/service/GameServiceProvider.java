@@ -33,17 +33,20 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     private String dest;
     private ClusterProvider integrationCluster;
     private ConcurrentHashMap<String,ZoneListener> zMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
 
     public GameServiceProvider(String name){
         NAME = name;
     }
 
     public Rating rating(String systemId){
-        Rating rating = new Rating();
-        rating.distributionKey(systemId);
-        this.dataStore.createIfAbsent(rating,true);
-        rating.dataStore(this.dataStore);
-        return rating;
+        return rMap.computeIfAbsent(systemId,(k)->{
+            Rating rating = new Rating();
+            rating.distributionKey(systemId);
+            this.dataStore.createIfAbsent(rating,true);
+            rating.dataStore(this.dataStore);
+            return rating;
+        });
     }
     public void elo(Rating rating1,Rating rating2){
         double p1 = probability(rating2.elo,rating1.elo);

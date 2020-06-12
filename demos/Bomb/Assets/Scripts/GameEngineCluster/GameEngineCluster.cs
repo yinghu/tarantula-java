@@ -95,7 +95,7 @@ namespace Tarantula.Networking{
                 deviceId = Guid.NewGuid().ToString();        
             }
             else{
-                deviceId = SystemInfo.deviceUniqueIdentifier;
+                deviceId = "casino1234";//SystemInfo.deviceUniqueIdentifier;
             }
             Debug.Log("GEC OPEN->"+host+"/"+dedicated+"/"+deviceId);
         }

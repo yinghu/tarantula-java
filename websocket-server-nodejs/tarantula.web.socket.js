@@ -83,14 +83,14 @@ wsServer.on('request', function(request) {
                             //register callback if streaming required otherwise send back per request
                             if(_pr.action === 'onStart'){
                                 connection.gameId = _pr.label;
-                                console.log('register on ['+_pr.label+'] from ['+connection.clientId+']');
+                                //console.log('register on ['+_pr.label+'] from ['+connection.clientId+']');
                                 pse.listeners.push(connection.clientId);
                                 //connection.sendUTF(pse.payload);
                             }
                             else if(_pr.action ==='onStop'){
                                 let ix = pse.listeners.indexOf(connection.clientId);
                                 if(ix>=0){
-                                    console.log('unregister on ['+_pr.label+'] from ['+connection.clientId+'/'+ix+']');
+                                    //console.log('unregister on ['+_pr.label+'] from ['+connection.clientId+'/'+ix+']');
                                     pse.listeners.splice(ix,1);
                                 }
                             }
@@ -106,12 +106,12 @@ wsServer.on('request', function(request) {
                 
             });**/
             connection.on('error',function(err){
-                console.log('Error on web socket connection');
+                //console.log('Error on web socket connection');
                 cMap.delete(connection.clientId);
                 let pse = pMap.get(connection.gameId);
                 let ix = pse.listeners.indexOf(connection.clientId);
                 if(ix>=0){
-                    console.log('unregister on ['+connection.gameId+'] from ['+connection.clientId+'/'+ix+']');
+                    //console.log('unregister on ['+connection.gameId+'] from ['+connection.clientId+'/'+ix+']');
                     pse.listeners.splice(ix,1);
                 }
             });
@@ -120,14 +120,14 @@ wsServer.on('request', function(request) {
                 let pse = pMap.get(connection.gameId);
                 let ix = pse.listeners.indexOf(connection.clientId);
                 if(ix>=0){
-                    console.log('unregister on ['+connection.gameId+'] from ['+connection.clientId+'/'+ix+']');
+                    //console.log('unregister on ['+connection.gameId+'] from ['+connection.clientId+'/'+ix+']');
                     pse.listeners.splice(ix,1);
                 }
-                console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.gameId);
+                //console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.gameId);
             });
         }
         else{
-            console.log('ticket failed to validate');
+            console.log('Ticket failed to validate');
             request.reject();//failure on ticket validation
         }
     });

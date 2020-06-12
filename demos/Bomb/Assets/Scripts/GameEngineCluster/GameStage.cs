@@ -59,7 +59,7 @@ namespace Tarantula.Networking{
                     };
                     await integration.OnGameUpdated(this,stats);
                     hits++;
-                    if(hits==10){
+                    if(hits==3){
                         await OnEnded();
                     }
 
@@ -73,7 +73,7 @@ namespace Tarantula.Networking{
                 new Gain(0,"pc",2)
             };
             Rating[] ratings = new Rating[]{
-                new Rating(0,1,70),
+                new Rating(0,1,60),
             };
             return await integration.OnGameEnded(this,stats,ratings,(s)=>{
                 Debug.Log(s);
