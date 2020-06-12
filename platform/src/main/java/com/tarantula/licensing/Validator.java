@@ -1,6 +1,5 @@
 package com.tarantula.licensing;
 
-import com.tarantula.TokenValidator;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.SystemUtil;
