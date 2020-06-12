@@ -46,6 +46,9 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     public Room match(Rating rating){
         //level down matching
         Room matched = null;
+        if(rating.xpLevel>levelLimit){//downgrade xp level and rank up after this round
+            rating.xpLevel=levelLimit;
+        }
         for(int lx = rating.xpLevel;lx>0;lx--){
             matched = pendingMatch[lx].poll();
             if(matched!=null){//matched
@@ -68,6 +71,9 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         }
     }
     public Room solo(Rating rating){//always single player offline mode
+        if(rating.xpLevel>levelLimit){//downgrade xp level and rank up after this round
+            rating.xpLevel=levelLimit;
+        }
         Room room = rQueue.poll();
         if(room==null){
             room= new Room();
@@ -79,9 +85,9 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         return room;
     }
     public void start(){
-        levelLimit = this.descriptor.capacity();
-        pendingMatch = new ConcurrentLinkedDeque[levelLimit+1];
-        for(int i=0;i<levelLimit+1;i++){
+        //always to start max match queue to avoid level limit refresh
+        pendingMatch = new ConcurrentLinkedDeque[descriptor.capacity()+1];
+        for(int i=0;i<descriptor.capacity()+1;i++){
             pendingMatch[i]=new ConcurrentLinkedDeque<>();
         }
         rQueue = pendingMatch[0];
@@ -230,6 +236,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.properties.put("4",playMode);
         this.properties.put("5",name);
         this.properties.put("6",this.timestamp);
+        this.properties.put("7",this.levelLimit);
         return this.properties;
     }
     @Override
@@ -240,6 +247,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.playMode = ((Number)properties.getOrDefault("4",playMode)).intValue();
         this.name = (String)properties.get("5");
         this.timestamp = ((Number)properties.getOrDefault("6",0)).longValue();
+        this.levelLimit = ((Number)properties.getOrDefault("7",levelLimit)).intValue();
     }
     @Override
     public Recoverable.Key key(){
@@ -311,6 +319,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
             this.capacity = updated.capacity;
             this.roundDuration = updated.roundDuration;
             this.playMode = updated.playMode;
+            this.levelLimit = updated.levelLimit;
             aMap.clear();
             listArena();
         }

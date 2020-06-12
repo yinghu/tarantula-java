@@ -63,6 +63,10 @@
             <span class='w3-left tx-text-12'>Connection Mode</span>
             <span id='tx-lobby-list-6' class='w3-right tx-text-12'>0</span>   
         </div>
+        <div class="w3-container">
+            <span class='w3-left tx-text-12'>Lobby Level Limit</span>
+            <span id='tx-lobby-list-7' class='w3-right tx-text-12'>0</span>   
+        </div>
     </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class="w3-container">
@@ -315,11 +319,11 @@
             <label class="tx-text-12">Short Lobby Name</label>
             <input id ="tx-lobby-name" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='name'/>
         </div>
-        <!--
+        
         <div class="w3-container">
-            <label class="tx-text-12">Lobby Play Rank</label>
-            <input id ="tx-rank" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='rank'/>
-        </div>-->
+            <label class="tx-text-12">Level Limit (3-10) </label>
+            <input id ="tx-level-limit" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='level limit'/>
+        </div>
         <div class="w3-container">
             <label class="tx-text-12">Max Players Per Room</label>
             <input id ="tx-capacity" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='capacity'/>
@@ -466,7 +470,7 @@
     };
     document.querySelector('#tx-lobby-list-edit-open').onclick=()=>{
         document.querySelector('#tx-lobby-name').value = document.querySelector("#tx-lobby-list-1").innerHTML;
-        //document.querySelector('#tx-rank').value = document.querySelector("#tx-lobby-list-2").innerHTML;
+        document.querySelector('#tx-level-limit').value = document.querySelector("#tx-lobby-list-7").innerHTML;
         document.querySelector('#tx-capacity').value = document.querySelector("#tx-lobby-list-4").innerHTML;
         document.querySelector('#tx-duration').value = document.querySelector("#tx-lobby-list-5").innerHTML;
         let pm = document.querySelector("#tx-lobby-list-6").innerHTML;
@@ -489,11 +493,13 @@
         let _cap = document.querySelector('#tx-capacity').value;
         let _dur = document.querySelector('#tx-duration').value;
         let pm = document.querySelector('#tx-play-mode').value;
+        let lm = document.querySelector('#tx-level-limit').value;
         let payload ={serviceTag:'role/admin',command:'onUpdateGameLobby',accessId:TARA_API.query().gameClusterId}
         payload.name = _nm;
         payload.capacity = _cap/1;
         payload.duration = _dur/1;
         payload.playMode = pm/1;
+        payload.levelLimit= lm/1;
         payload.page = document.querySelector('#tx-lobby-list-no').innerHTML/1;
         TARA_API.onService(true,payload,(resp)=>{
             if(resp.successful){  
@@ -657,6 +663,7 @@
             document.querySelector('#tx-lobby-list-4').innerHTML = resp.lobby.capacity; 
             document.querySelector('#tx-lobby-list-5').innerHTML = resp.lobby.duration; 
             document.querySelector('#tx-lobby-list-6').innerHTML = resp.lobby.playMode;
+            document.querySelector('#tx-lobby-list-7').innerHTML = resp.lobby.levelLimit;
             document.querySelector('#tx-lobby-list-no').innerHTML = resp.index;
             let disabled = resp.lobby.disabled;
             if(disabled == false){

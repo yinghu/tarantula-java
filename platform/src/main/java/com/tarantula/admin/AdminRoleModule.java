@@ -239,7 +239,7 @@ public class AdminRoleModule implements Module {
         }
 
         else if(session.action().equals("onUpdateGameLobby")){
-            //this.context.log(new String(payload),OnLog.WARN);
+            this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             int index = ((Number)onAccess.property("page")).intValue();
@@ -251,6 +251,10 @@ public class AdminRoleModule implements Module {
                 zone.capacity = ((Number)onAccess.property("capacity")).intValue();
                 zone.roundDuration = ((Number)onAccess.property("duration")).intValue()*60000;
                 zone.playMode = ((Number)onAccess.property("playMode")).intValue();
+                int lmit = ((Number)onAccess.property("levelLimit")).intValue();
+                if(lmit>=defaultGameLevelCount&&lmit<=maxGameLevelCount){
+                    zone.levelLimit = lmit;
+                }
                 zone.update();
                 session.write(pending.toJson().toString().getBytes(),label());
             }
