@@ -86,6 +86,9 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     }
     public void start(){
         //always to start max match queue to avoid level limit refresh
+        if(levelLimit==0){//assign default limit from descriptor capacity
+            levelLimit = this.descriptor.capacity();
+        }
         pendingMatch = new ConcurrentLinkedDeque[descriptor.capacity()+1];
         for(int i=0;i<descriptor.capacity()+1;i++){
             pendingMatch[i]=new ConcurrentLinkedDeque<>();
