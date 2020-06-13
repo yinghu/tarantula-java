@@ -24,6 +24,8 @@ public class GameLobby {
             jd.addProperty("name",a.name());
             jd.addProperty("level",a.level);
             jd.addProperty("xp",a.xp);
+            jd.addProperty("capacity",a.capacity);
+            jd.addProperty("duration",a.duration/60000);
             jd.addProperty("disabled",a.disabled());
             jds.add(jd);
         }

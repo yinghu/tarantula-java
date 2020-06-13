@@ -263,7 +263,7 @@ public class AdminRoleModule implements Module {
             }
         }
         else if(session.action().equals("onUpdateGameLevel")){
-            //this.context.log(new String(payload),OnLog.WARN);
+            this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             int index = ((Number)onAccess.property("index")).intValue();
@@ -281,9 +281,13 @@ public class AdminRoleModule implements Module {
                             pu.name(a.name());
                             pu.xp = a.xp;
                             pu.level = a.level;
+                            pu.capacity = a.capacity;
+                            pu.duration = a.duration;
                             pu.disabled(a.disabled());
                             a.name(onAccess.name());
-                            a.xp = ((Number)onAccess.property("xp")).doubleValue();
+                            a.xp = ((Number)onAccess.property("xp")).intValue();
+                            a.capacity = ((Number)onAccess.property("capacity")).intValue();
+                            a.duration = ((Number)onAccess.property("duration")).intValue()*60000;
                             a.disabled(disabled);
                             updated = true;
                             break;
@@ -307,6 +311,8 @@ public class AdminRoleModule implements Module {
                         else{
                             ap.level = pu.level;
                             ap.xp = pu.xp;
+                            ap.capacity = pu.capacity;
+                            ap.duration = pu.duration;
                             ap.name(pu.name());
                             ap.disabled(pu.disabled());
                             session.write(toMessage("at least one level per lobby",false).toString().getBytes(),label());
@@ -315,8 +321,10 @@ public class AdminRoleModule implements Module {
                     else{
                         Arena a = new Arena(zone.bucket(),zone.oid(),index);
                         a.name(onAccess.name());
-                        a.xp = ((Number)onAccess.property("xp")).doubleValue();
+                        a.xp = ((Number)onAccess.property("xp")).intValue();
                         a.level = index;
+                        a.capacity = ((Number)onAccess.property("capacity")).intValue();
+                        a.duration = ((Number)onAccess.property("duration")).intValue()*60000;
                         a.disabled((Boolean)onAccess.property("disabled"));
                         zone.arenas.add(a);
                         zone.update();

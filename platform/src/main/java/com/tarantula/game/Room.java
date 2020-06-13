@@ -36,7 +36,8 @@ public class Room implements Connection.StateListener{
     private int capacity;
     private int totalJoined;
     private boolean online;
-    private int level;
+    private int  rankUpBase;
+    private Arena arena;
     private Connection connection;
     private int retries;
     private long initialTime;
@@ -76,7 +77,7 @@ public class Room implements Connection.StateListener{
         totalJoined--;
         state = totalJoined>0?PENDING_JOIN:WAITING;
         pQueue.offer(stub);
-        if(state==PENDING_JOIN&&stub.rating.xpLevel==this.level){
+        if(state==PENDING_JOIN&&stub.rating.xpLevel==this.arena.level){
             //reset the lowest level
             stub.disabled(true);
             int mlevel = 10;
@@ -85,7 +86,7 @@ public class Room implements Connection.StateListener{
                     mlevel = s.rating.xpLevel;
                 }
             }
-            level = mlevel;//requeue on lowest level
+            arena.level = mlevel;//requeue on lowest level
         }
         roomListener.onWaiting(this);
         return true;
@@ -96,11 +97,12 @@ public class Room implements Connection.StateListener{
         }
         return true;
     }
-    public void reset(int capacity,long duration,boolean online,int level){
+    public void reset(int capacity,long duration,boolean online,int rankUpBase,Arena arena){
         this.capacity = capacity;
         this.duration = duration;
         this.online = online;
-        this.level = level;
+        this.arena = arena;
+        this.rankUpBase = rankUpBase;
         this.pQueue = new ArrayDeque<>(this.capacity);
         this.stubs = new Stub[this.capacity];
         for(int i=0;i<this.capacity;i++){
@@ -135,8 +137,15 @@ public class Room implements Connection.StateListener{
         return !this.online;
     }
     public int level(){
-        return this.level;
+        return this.arena.level;
     }
+    public int rankUpBase(){
+        return this.rankUpBase;
+    }
+    public int levelUpBase(){
+        return this.arena.xp;
+    }
+
     public Connection connection(){
         return this.connection;
     }

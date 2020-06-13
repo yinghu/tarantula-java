@@ -66,7 +66,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
                 rList.add(matched);
                 roomIndex.put(matched.roomId,matched);
             }
-            matched.reset(this.capacity,this.roundDuration,playMode!=Room.OFF_LINE_MODE,rating.xpLevel);
+            matched.reset(this.capacity,this.roundDuration,playMode!=Room.OFF_LINE_MODE,levelLimit,aMap.get(rating.xpLevel));
             return matched;
         }
     }
@@ -81,7 +81,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
             rList.add(room);
             roomIndex.put(room.roomId,room);
         }
-        room.reset(SOLO_CAPACITY,this.roundDuration,false,rating.xpLevel);
+        room.reset(SOLO_CAPACITY,this.roundDuration,false,levelLimit,aMap.get(rating.xpLevel));
         return room;
     }
     public void start(){
@@ -196,7 +196,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         for(Stub sb : room.playerList()){
             this.onLeaving(sb);
             Rating rating = sb.rating;//gameServiceProvider.rating(sb.owner());
-            rating.update(sb,levelLimit);
+            rating.update(sb,room.rankUpBase(),room.levelUpBase());
             rating.update();
             if(sb.rank==1){
                 Statistics.Entry stat = this.gameServiceProvider.statistics(sb.owner()).entry("wc");

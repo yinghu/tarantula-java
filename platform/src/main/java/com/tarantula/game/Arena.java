@@ -8,8 +8,9 @@ import java.util.Map;
 
 public class Arena extends OnApplicationHeader {
     public int level;
-    public double xp;
-
+    public int xp;
+    public int capacity;
+    public long duration;
     public Arena(){}
     public Arena(String bucket,String oid,int level){
         this.bucket = bucket;
@@ -21,6 +22,8 @@ public class Arena extends OnApplicationHeader {
         this.properties.put("name",name);
         this.properties.put("level",level);
         this.properties.put("xp",xp);
+        this.properties.put("capacity",capacity);
+        this.properties.put("duration",duration);
         this.properties.put("disabled",disabled);
         return this.properties;
     }
@@ -28,7 +31,9 @@ public class Arena extends OnApplicationHeader {
     public void fromMap(Map<String,Object> properties){
         this.name =(String)properties.get("name");
         this.level = ((Number)properties.get("level")).intValue();
-        this.xp = ((Number)properties.get("xp")).doubleValue();
+        this.xp = ((Number)properties.get("xp")).intValue();
+        this.capacity = ((Number)properties.getOrDefault("capacity",0)).intValue();
+        this.duration = ((Number)properties.getOrDefault("duration",0)).longValue();
         this.disabled = (boolean)properties.get("disabled");
     }
     @Override
