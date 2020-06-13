@@ -6,7 +6,7 @@ import com.tarantula.platform.statistics.StatsDelta;
 
 import java.util.Map;
 /**
- * Created by yinghu lu on 4/14/2020.
+ * Updated by yinghu lu on 6/12/2020.
  */
 public class Stub extends RecoverableObject {
 
@@ -18,6 +18,7 @@ public class Stub extends RecoverableObject {
     public double pxp; //percentage of game xp 100 basis
     public StatsDelta stats;
     public Rating rating;
+
     /**
      * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
      * rank - final result 1,2 rank xp = (1/rank)*100  1 - 100 2 50 ..

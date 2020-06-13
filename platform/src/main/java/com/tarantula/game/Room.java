@@ -77,17 +77,7 @@ public class Room implements Connection.StateListener{
         totalJoined--;
         state = totalJoined>0?PENDING_JOIN:WAITING;
         pQueue.offer(stub);
-        if(state==PENDING_JOIN&&stub.rating.xpLevel==this.arena.level){
-            //reset the lowest level
-            stub.disabled(true);
-            int mlevel = 10;
-            for(Stub s : stubs) {
-                if(!s.disabled()&&s.rating.xpLevel<mlevel){
-                    mlevel = s.rating.xpLevel;
-                }
-            }
-            arena.level = mlevel;//requeue on lowest level
-        }
+        //NOTE : the room still keeps the initial level setting to play
         roomListener.onWaiting(this);
         return true;
     }
@@ -119,11 +109,13 @@ public class Room implements Connection.StateListener{
         this.totalJoined=0;
         this.state = WAITING;
         this.connection = null;
-        this.roomListener = roomListener;
         if(pQueue!=null){
             pQueue.clear();
         }
         this.stubs = new Stub[0];
+        if(roomListener!=null){
+            this.roomListener = roomListener;
+        }
     }
     public int round(){
         return round;
@@ -136,16 +128,17 @@ public class Room implements Connection.StateListener{
     public boolean offline(){
         return !this.online;
     }
-    public int level(){
-        return this.arena.level;
+    public int capacity(){
+        return this.capacity;
     }
     public int rankUpBase(){
         return this.rankUpBase;
     }
-    public int levelUpBase(){
-        return this.arena.xp;
+    public long duration(){
+        return this.duration;
     }
-
+    public long overtime(){ return this.overtime; }
+    public Arena arena(){ return this.arena;}
     public Connection connection(){
         return this.connection;
     }

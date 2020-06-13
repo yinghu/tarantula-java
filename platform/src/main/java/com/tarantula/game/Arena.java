@@ -65,4 +65,13 @@ public class Arena extends OnApplicationHeader {
     public Key key(){
         return new IndexKey(this.bucket,this.oid,this.routingNumber);
     }
+    public Arena copy(){
+        Arena _cp = new Arena();
+        _cp.level = this.level;
+        _cp.xp = this.xp;
+        _cp.capacity = this.capacity;
+        _cp.duration = this.duration;
+        _cp.name = this.name;
+        return _cp;
+    }
 }

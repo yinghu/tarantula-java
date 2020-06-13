@@ -66,7 +66,10 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
                 rList.add(matched);
                 roomIndex.put(matched.roomId,matched);
             }
-            matched.reset(this.capacity,this.roundDuration,playMode!=Room.OFF_LINE_MODE,levelLimit,aMap.get(rating.xpLevel));
+            synchronized (this) {
+                Arena _ma = aMap.get(rating.xpLevel).copy();
+                matched.reset(this.capacity, this.roundDuration, playMode != Room.OFF_LINE_MODE, levelLimit, _ma);
+            }
             return matched;
         }
     }
@@ -81,7 +84,10 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
             rList.add(room);
             roomIndex.put(room.roomId,room);
         }
-        room.reset(SOLO_CAPACITY,this.roundDuration,false,levelLimit,aMap.get(rating.xpLevel));
+        synchronized (this){
+            Arena _ma = this.aMap.get(rating.xpLevel).copy();
+            room.reset(SOLO_CAPACITY,_ma.duration>0?_ma.duration:this.roundDuration,false,levelLimit,_ma);
+        }
         return room;
     }
     public void start(){
@@ -121,7 +127,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     //@Override
     public void onWaiting(Room room) {
         if(room.totalJoined()>0){
-            pendingMatch[room.level()].offer(room);
+            pendingMatch[room.arena().level].offer(room);
         }else{
             rQueue.addFirst(room);//add first join queue
         }
@@ -149,14 +155,12 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     @Override
     public byte[] onStarting(Room room){
         JsonObject jsonObject = new JsonObject();
-        synchronized (this){
-            Arena match = aMap.get(room.level());
-            jsonObject.addProperty("level",room.level());
-            jsonObject.addProperty("arena",match.name());
-            jsonObject.addProperty("capacity",capacity);
-            jsonObject.addProperty("duration",roundDuration/1000);
-            jsonObject.addProperty("overtime",overtime/1000);
-        }
+        Arena match = room.arena();
+        jsonObject.addProperty("level",match.level);
+        jsonObject.addProperty("arena",match.name());
+        jsonObject.addProperty("capacity",room.capacity());
+        jsonObject.addProperty("duration",room.duration()/1000);
+        jsonObject.addProperty("overtime",room.overtime()/1000);
         jsonObject.addProperty("totalJoined",room.totalJoined());
         jsonObject.addProperty("state",room.state());
         JsonArray ja = new JsonArray();
@@ -196,7 +200,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         for(Stub sb : room.playerList()){
             this.onLeaving(sb);
             Rating rating = sb.rating;//gameServiceProvider.rating(sb.owner());
-            rating.update(sb,room.rankUpBase(),room.levelUpBase());
+            rating.update(sb,room.rankUpBase(),room.arena().xp);
             rating.update();
             if(sb.rank==1){
                 Statistics.Entry stat = this.gameServiceProvider.statistics(sb.owner()).entry("wc");
@@ -210,15 +214,12 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     //room setting on online play mode
     private byte[] roomSetting(Room room){
         JsonObject jo = new JsonObject();
-        //match lower arena on player rating level
-        synchronized (this){
-            Arena match = aMap.get(room.level());
-            jo.addProperty("level",room.level());
-            jo.addProperty("arena",match.name());
-            jo.addProperty("capacity",capacity);
-            jo.addProperty("duration",roundDuration/1000);
-            jo.addProperty("overtime",overtime/1000);
-        }
+        Arena match = room.arena();
+        jo.addProperty("level",match.level);
+        jo.addProperty("arena",match.name());
+        jo.addProperty("capacity",room.capacity());
+        jo.addProperty("duration",room.duration()/1000);
+        jo.addProperty("overtime",room.overtime()/1000);
         jo.addProperty("totalJoined",room.totalJoined());
         jo.addProperty("roomId",room.roomId);
         JsonArray ja = new JsonArray();
@@ -309,7 +310,6 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
                     aMap.put(i,aMap.get(fi));//fill header
                 }
             }
-            //context.log("Add lobby ->"+mZone.get(i).tag()+" ->rank ["+mZone.get(i).accessRank()+"]",OnLog.WARN);
         }
     }
     public void reset(Zone updated){
