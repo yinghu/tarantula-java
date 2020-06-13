@@ -68,7 +68,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
             }
             synchronized (this) {
                 Arena _ma = aMap.get(rating.xpLevel).copy();
-                matched.reset(this.capacity, this.roundDuration, playMode != Room.OFF_LINE_MODE, levelLimit, _ma);
+                matched.reset(_ma.capacity>0?_ma.capacity:this.capacity,_ma.duration>0?_ma.duration:this.roundDuration, playMode != Room.OFF_LINE_MODE, levelLimit, _ma);
             }
             return matched;
         }
