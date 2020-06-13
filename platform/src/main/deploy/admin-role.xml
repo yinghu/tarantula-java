@@ -73,8 +73,8 @@
             <view type="game.cluster.shutdown">
                 <property name="moduleResourceFile">admin/game.cluster.shutdown.view.html</property>
             </view>
-            <view type="game.cluster.play">
-                <property name="moduleResourceFile">admin/game.cluster.play.view.html</property>
+            <view type="game.cluster.test">
+                <property name="moduleResourceFile">admin/game.cluster.test.view.html</property>
             </view>
         </view-list>
 

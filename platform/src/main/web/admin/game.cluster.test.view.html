@@ -1,7 +1,7 @@
 <div class="w3-modal-content">
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
         <div class="w3-display-topright w3-padding">
-            <span id="tx-game-cluster-play-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+            <span id="tx-game-cluster-test-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
@@ -10,7 +10,7 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-game-cluster-play-message"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-game-cluster-test-message"></div>
     
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
@@ -22,9 +22,9 @@
     </div>
 </div>
 <script>
-    document.querySelector("#tx-game-cluster-play-message").innerHTML = TARA_API.query().gameClusterId;
+    document.querySelector("#tx-game-cluster-test-message").innerHTML = TARA_API.query().gameClusterId;
     
-    document.querySelector('#tx-game-cluster-play-close').onclick=()=>{
+    document.querySelector('#tx-game-cluster-test-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       
