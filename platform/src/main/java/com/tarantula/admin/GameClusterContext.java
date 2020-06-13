@@ -10,7 +10,7 @@ import java.util.List;
 public class GameClusterContext extends ResponseHeader {
     public List<GameCluster> gameClusterList;
     public int index;
-    public int pageSize=2;
+    public int pageSize=1;
     public GameClusterContext(){
         this.successful = true;
     }
