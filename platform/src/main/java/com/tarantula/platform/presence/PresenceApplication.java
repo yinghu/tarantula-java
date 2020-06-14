@@ -65,7 +65,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-lobby"));
             liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-service"));
             liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-data"));
-            //GameServiceProvider gsp = this.context.serviceProvider(liveGame.name+"-service");
             session.write(liveGame.toJson().toString().getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onAddEmail")){
