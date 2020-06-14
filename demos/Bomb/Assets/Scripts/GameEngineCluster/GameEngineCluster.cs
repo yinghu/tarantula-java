@@ -6,6 +6,7 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using System.Net.WebSockets;
+using System.Net.Security;
 using System.Text;
 using System;
 using System.Security.Cryptography.X509Certificates;
@@ -104,6 +105,7 @@ namespace Tarantula.Networking{
             await _INSTANCE.OnClose();
         }
         private void Bootstrap(){
+            ServicePointManager.ServerCertificateValidationCallback +=(a,b,c,d)=>{return true;};
             _ghc = new GecHttpClient(host);  
             _lobbyList = new Dictionary<string,Lobby>();
             _liveWc = false;

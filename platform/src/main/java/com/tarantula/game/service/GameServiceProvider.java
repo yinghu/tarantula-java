@@ -122,6 +122,9 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
             if(zl!=null){
                 zl.updated((Zone)r);
             }
+            else{
+                logger.warn("Missed registered zone Listener->"+r.distributionKey());
+            }
         });
         //integrationCluster.addEventListener(NAME,(e)->{
             //logger.warn(e.toString());

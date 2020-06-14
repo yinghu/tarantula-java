@@ -239,7 +239,7 @@ public class AdminRoleModule implements Module {
         }
 
         else if(session.action().equals("onUpdateGameLobby")){
-            this.context.log(new String(payload),OnLog.WARN);
+            //this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             int index = ((Number)onAccess.property("page")).intValue();
@@ -263,7 +263,7 @@ public class AdminRoleModule implements Module {
             }
         }
         else if(session.action().equals("onUpdateGameLevel")){
-            this.context.log(new String(payload),OnLog.WARN);
+            //this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             int index = ((Number)onAccess.property("index")).intValue();

@@ -24,6 +24,7 @@ public class GameZoneModule implements Module,ZoneListener{
     private GameServiceProvider gameServiceProvider;
     private Connection connection;
     private int DEFAULT_LEVEL_COUNT = 3;
+    private int DEFAULT_LEVEL_UP_BASE = 1000;
     @Override
     public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp or offline play mode
@@ -99,12 +100,12 @@ public class GameZoneModule implements Module,ZoneListener{
             mZone.roundDuration = 60*1000;
             mZone.overtime = 5000;
             mZone.playMode = Room.OFF_LINE_MODE;
-            //mZone.arenas = new Arena[DEFAULT_LEVEL_COUNT];
+            mZone.levelLimit = this.context.descriptor().capacity();
             for(int i=1;i<DEFAULT_LEVEL_COUNT+1;i++){
                 Arena arena = new Arena(mZone.bucket(),mZone.oid(),i);
                 arena.name("level"+i);
                 arena.level = i;
-                arena.xp = i*100;
+                arena.xp = i*DEFAULT_LEVEL_UP_BASE;
                 arena.disabled(false);
                 mZone.arenas.add(arena);
             }
@@ -116,7 +117,7 @@ public class GameZoneModule implements Module,ZoneListener{
         mZone.gameServiceProvider = this.gameServiceProvider;
         mZone.descriptor = this.context.descriptor();
         mZone.start();
-        mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->level ["+v.level+"/"+v.name()+"]",OnLog.WARN));
+        mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
         this.gameServiceProvider.addZoneListener(this.context.descriptor().distributionKey(),this);
         context.log("Game lobby started->"+this.mZone.descriptor.tag(),OnLog.WARN);
     }
@@ -150,7 +151,7 @@ public class GameZoneModule implements Module,ZoneListener{
     @Override
     public void updated(Zone zone) {
         mZone.reset(this.gameServiceProvider.zone(this.context.descriptor()));
-        mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->level ["+v.level+"/"+v.name()+"]",OnLog.WARN));
+        mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
     }
     private JsonObject toMessage(String msg,boolean successful){
         JsonObject jsonObject = new JsonObject();
