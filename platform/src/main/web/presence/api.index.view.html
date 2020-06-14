@@ -1,7 +1,7 @@
 <div class="w3-modal-content">
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
         <div class="w3-display-topright w3-padding">
-            <span id="tx-api-index-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+                        
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-sign-in" style="font-size:24px"></i></span>
@@ -20,6 +20,7 @@
         <div class="w3-panel tx-text-14">Header : Tarantula-tag : index/user</div>
         <div class="w3-panel tx-text-14">Header : Tarantula-action : onIndex</div>
         <div class="w3-panel">
+            <span id="tx-api-index-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>
             <span id="tx-api-index" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Request</span>     
         </div>
     </div> 
@@ -41,8 +42,8 @@
             document.querySelector('#tx-api-index-message').value = resp;
         });
     };
-    document.querySelector('#tx-api-index-close').onclick=()=>{
-        let m3 = document.querySelector('#tx-popup');
+    document.querySelector('#tx-api-index-cancel').onclick=()=>{
+        let m3 = document.querySelector('#tx-popup-api');
         m3.innerHTML="";
         m3.style.display = 'none';       
     };

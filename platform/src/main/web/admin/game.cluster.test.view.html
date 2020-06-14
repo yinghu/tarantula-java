@@ -9,9 +9,41 @@
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
-    <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-game-cluster-test-message"></div>
-    
+    <!--<div class="w3-display-container w3-white tx-content-8"></div>-->
+    <!--<div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-game-cluster-test-message"></div>-->
+    <div class='w3-bar w3-white'>
+        <span class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-8 tx-test-opt'>User</span>
+        <span class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-8 tx-test-opt'>GamePlay</span>
+        <span class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-8 tx-test-opt'>DedicatedServer</span>
+    </div>
+    <div id="tx-test-User" class="w3-container tx-test-pane">
+        <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-64">
+            <div class="w3-display-topright w3-padding">
+                <span view-id='api.index' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-test-try'>Try It</span>           
+            </div>
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-code w3-text-green" style="font-size:16px"></i></span>
+                <span class="tx-margin-left-8 tx-text-14">Index</span>
+            </div>
+            <div class="w3-display-bottomleft w3-padding">
+                <span class="tx-margin-left-8 tx-text-12">Initialize game configurations</span>
+            </div>
+        </div>
+        <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-64">
+            <div class="w3-display-topright w3-padding">
+                <span view-id='api.device.login' class='w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-test-try'>Try It</span>           
+            </div>
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-code w3-text-green" style="font-size:16px"></i></span>
+                <span class="tx-margin-left-8 tx-text-14">Device Login</span>
+            </div>
+            <div class="w3-display-bottomleft w3-padding">
+                <span class="tx-margin-left-8 tx-text-12">Suitable for mobile device unique ID login</span>
+            </div>
+        </div>
+    </div>
+    <div id="tx-test-GamePlay" class="w3-container tx-test-pane" style="display:none;">GamePlay</div>
+    <div id="tx-test-DedicatedServer" class="w3-container tx-test-pane" style="display:none;">DedicatedServer</div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -22,8 +54,23 @@
     </div>
 </div>
 <script>
-    document.querySelector("#tx-game-cluster-test-message").innerHTML = TARA_API.query().gameClusterId;
-    
+    //document.querySelector("#tx-game-cluster-test-message").innerHTML = TARA_API.query().gameClusterId;
+    document.querySelectorAll(".tx-test-opt").forEach((a)=>{
+        a.onclick = ()=>{
+            document.querySelectorAll('.tx-test-pane').forEach((a)=>{
+                    a.style.display = 'none';
+                }
+            );
+            document.querySelector('#tx-test-'+a.innerHTML).style.display='block'; 
+        }; 
+    });
+    document.querySelectorAll('.tx-test-try').forEach((a)=>{
+        a.onclick=()=>{
+            TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
+            let vid = a.getAttribute('view-id');
+            tx_view({viewId:vid,containerId:'#tx-popup-api'});    
+        }
+    });
     document.querySelector('#tx-game-cluster-test-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";

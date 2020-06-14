@@ -8,7 +8,7 @@ import com.tarantula.platform.service.OnLobby;
 import com.tarantula.platform.util.*;
 
 import java.util.ArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
+
 
 /**
  * Developer: YINGHU LU
@@ -16,19 +16,18 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class PresenceApplication extends TarantulaApplicationHeader implements OnLobby.Listener {
 
-
-    private CopyOnWriteArraySet<String> _lobbyList = new CopyOnWriteArraySet<>();
-
     private DeploymentServiceProvider deploymentServiceProvider;
     private DataStore userDs;
     private DataStore accountDs;
     private DataStore memberDs;
+    private LiveGameContext liveGameContext;
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.deploymentServiceProvider.registerOnLobbyListener(this);
+        liveGameContext = new LiveGameContext();
         userDs = this.context.dataStore(Access.DataStore);
         accountDs = this.context.dataStore(Account.DataStore);
         memberDs = this.context.dataStore(Subscription.DataStore);
@@ -55,14 +54,16 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             pc.subscription = membership(session.systemId());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
         }
-        //public lobby access
+        //public lobby access by page number
         else if(session.action().equals("onLobbyList")){
-            PresenceContext ic = new PresenceContext("onLobbyList");
-            ic.lobbyList = new ArrayList<>();
-            _lobbyList.forEach((a)->{
-                ic.lobbyList.add(this.context.lobby(a));
-            });
-            session.write(this.builder.create().toJson(ic).getBytes(),this.descriptor.responseLabel());
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            int page = ((Number)onAccess.property("page")).intValue();
+            LiveGame liveGame = liveGameContext.onIndex(page);
+            liveGame.lobbyList = new ArrayList<>();
+            liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-lobby"));
+            liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-service"));
+            liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-data"));
+            session.write(liveGame.toJson().toString().getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onAddEmail")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -133,11 +134,13 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
     @Override
     public void onLobby(OnLobby onLobby) {
         if(!onLobby.closed()){
-            this._lobbyList.add(onLobby.typeId());
+            String[] ps = onLobby.typeId().split("-");
+            liveGameContext.addGameIndex(ps[0]);
             context.log("Lobby ["+onLobby.typeId()+"] is going to be live",OnLog.WARN);
         }
         else{
-            this._lobbyList.remove(onLobby.typeId());
+            String[] ps = onLobby.typeId().split("-");
+            liveGameContext.removeGameIndex(ps[0]);
             context.log("Lobby ["+onLobby.typeId()+"] is going to be offline",OnLog.WARN);
         }
     }
