@@ -1,6 +1,7 @@
 package com.tarantula.platform.presence;
 
 import com.tarantula.*;
+import com.tarantula.game.Zone;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.*;
 
@@ -64,8 +65,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-lobby"));
             liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-service"));
             liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-data"));
-            GameServiceProvider gsp = this.context.serviceProvider(liveGame.name+"-service");
-            ///
+            //GameServiceProvider gsp = this.context.serviceProvider(liveGame.name+"-service");
             session.write(liveGame.toJson().toString().getBytes(),this.descriptor.responseLabel());
         }
         else if(session.action().equals("onAddEmail")){
