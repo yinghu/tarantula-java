@@ -4,11 +4,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.service.AccessIndexService;
+import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -22,6 +22,7 @@ public class AccountRoleModule implements Module {
     private DataStore user;
     private DataStore account;
     private int maxUserCount;
+    private TokenValidatorProvider tokenValidatorProvider;
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
@@ -54,12 +55,11 @@ public class AccountRoleModule implements Module {
                 User u = new User();
                 u.distributionKey(uid);
                 if(user.load(u)){
-                    if(u.role().equals(owner.role())){
-                        u.role(AccessControl.player.name());
+                    if(!u.role().equals(owner.role())){
+                        this.tokenValidatorProvider.grantAccess(u,owner);
                     }else{
-                        u.role(owner.role());
+                        this.tokenValidatorProvider.revokeAccess(u);
                     }
-                    user.update(u);
                 }
                 session.write(toMessage("role granted ["+u.role()+"]",false).toString().getBytes(),label());
             }else{
@@ -104,6 +104,7 @@ public class AccountRoleModule implements Module {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
+        this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.user = this.context.dataStore(Access.DataStore);
         this.account = this.context.dataStore(Account.DataStore);
         this.maxUserCount = Integer.parseInt(this.context.configuration("setup").property("maxUserCount"));

@@ -30,7 +30,8 @@ public interface TokenValidatorProvider extends ServiceProvider {
     Access.Role role(String systemId);
 
     boolean upgradeRole(Access access,String role);
-
+    boolean grantAccess(Access access,Access owner);
+    boolean revokeAccess(Access access);
     List<Access.Role> list();
     AuthVendor authVendor(String name);
     void onCheck(OnLobby onLobby);

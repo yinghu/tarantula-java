@@ -3,6 +3,7 @@ package com.tarantula.platform.service;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessControl;
+import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.SystemValidator;
 import com.tarantula.platform.presence.GameCluster;
@@ -255,5 +256,33 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         access.role(t.name());
         udataStore.update(access);
         return true;
+    }
+    public boolean grantAccess(Access access,Access owner){
+        if(access.primary()||!owner.primary()){
+            return false;
+        }
+        IndexSet indexSet = new IndexSet();
+        indexSet.distributionKey(owner.distributionKey());
+        indexSet.label(Account.UserLabel);
+        if(adataStore.load(indexSet)){
+            boolean updated= false;
+            for(String k : indexSet.keySet){
+                if(k.equals(access.distributionKey())){
+                    access.role(owner.role());
+                    updated = udataStore.update(access);
+                    break;
+                }
+            }
+            return updated;
+        }else{
+            return false;
+        }
+    }
+    public boolean revokeAccess(Access access){
+        if(access.primary()){
+            return false;
+        }
+        access.role(rMap.get("player").name());
+        return udataStore.update(access);
     }
 }
