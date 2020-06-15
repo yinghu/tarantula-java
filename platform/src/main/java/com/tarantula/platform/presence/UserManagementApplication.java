@@ -81,21 +81,19 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 Access user = createLogin(uadded,uadded.distributionKey(),role,false,"password",false);
                 Account account = new UserAccount();
                 account.distributionKey(uadded.owner());
-                aDatastore.load(account);
-                account.userCount(1);
-                account.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
-                aDatastore.update(account);
-                IndexSet idx = new IndexSet();
-                idx.distributionKey(account.distributionKey());
-                idx.label(Account.UserLabel);
-                idx.keySet.add(user.distributionKey());
-                if(!aDatastore.createIfAbsent(idx,true)){
-                    idx.keySet.add(user.distributionKey());//update on existing
-                    aDatastore.update(idx);
+                if(aDatastore.load(account)){
+                    account.userCount(1);
+                    account.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
+                    aDatastore.update(account);
+                    IndexSet idx = new IndexSet();
+                    idx.distributionKey(account.distributionKey());
+                    idx.label(Account.UserLabel);
+                    idx.keySet.add(user.distributionKey());
+                    if(!aDatastore.createIfAbsent(idx,true)){
+                        idx.keySet.add(user.distributionKey());//update on existing
+                        aDatastore.update(idx);
+                    }
                 }
-                //idx.keySet.forEach((k)->{
-                    //this.context.log("KEY->"+(ix)+k,OnLog.WARN);
-                //});
             }
         });
         this.context.log("User management application started on tag ["+descriptor.tag()+"] with application mode ["+onApplication+"]",OnLog.INFO);
