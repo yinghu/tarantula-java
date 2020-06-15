@@ -1,0 +1,47 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-add-user-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-user-plus" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">ADD USER</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-add-user-message"></div>
+    <div class="w3-container w3-border-bottom w3-border-red">
+        <div class="w3-panel">
+            <input id ="tx-add-user-name" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='user name'/>
+        </div>
+        <div class="w3-panel">    
+             <input id ="tx-add-user-password" class="w3-input w3-round w3-border tx-text-16" type="password" placeholder='password'/>
+        </div>
+        <div class="w3-panel">
+            <span id="tx-add-user" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Add User</span>     
+        </div>
+    </div>
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div> 
+</div>
+<script>
+    document.querySelector('#tx-add-user').onclick=()=>{    
+        let _n = document.querySelector('#tx-add-user-name').value;
+        let _p = document.querySelector('#tx-add-user-password').value;
+        TARA_API.onService(true,{serviceTag:'role/account',command:'onAddUser',login:_n,password:_p},(resp)=>{
+            document.querySelector('#tx-add-user-message').innerHTML = resp.message;      
+        });
+    };
+    document.querySelector('#tx-add-user-close').onclick=()=>{
+        let m3 = document.querySelector('#tx-popup');
+        m3.innerHTML="";
+        m3.style.display = 'none';       
+    };
+</script>
