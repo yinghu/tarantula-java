@@ -42,6 +42,12 @@
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
+                <span class='w3-left tx-text-14'>Email Validated</span>
+                <span view-id='validate.email' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-send" style="font-size:16px"></i></span>
+                <span id='tx-player-15' class='w3-right tx-text-14'>n/a</span>
+            </div>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
+                <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>System Role</span>
                 <span view-id='upgrade.role.account' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>
                 <span id='tx-player-4' class='w3-right tx-text-14'>root</span>
@@ -661,6 +667,7 @@
                 document.querySelector('#tx-player-1').innerHTML=resp.access.login;
                 document.querySelector('#tx-player-2').innerHTML=resp.presence.balance;
                 document.querySelector('#tx-player-3').innerHTML=resp.access.emailAddress;
+                document.querySelector('#tx-player-15').innerHTML=resp.access.activated;
                 document.querySelector('#tx-player-4').innerHTML=resp.access.role;
                 TARA_API.query().role=resp.access.role;
                 document.querySelector('#tx-player-5').innerHTML=resp.access.validator;

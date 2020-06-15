@@ -18,22 +18,13 @@
         </div>
         <div class="w3-panel">
             <label class="tx-text-12">Contact Email</label>    
-             <input id ="tx-developer-email" class="w3-input w3-round w3-border tx-text-16" type="email" placeholder='email'/>
+            <input id ="tx-developer-email" class="w3-input w3-round w3-border tx-text-16" type="email" placeholder='email'/>
         </div>
         <div class="w3-panel">
             <span id="tx-upgrade-admin-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>
             <span id="tx-upgrade-admin" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Upgrade</span>     
         </div>
     </div>
-    <!--
-    <div class="w3-display-container w3-white w3-border-bottom w3-border-white tx-content-48">
-        <div class="w3-display-topleft w3-padding">
-            <span class="tx-text-14">Become A Game Developer</span>            
-        </div>
-        <div class="w3-display-bottomright w3-padding">
-            <span id="tx-upgrade-admin" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-upgrade-role-action">Upgrade</span>
-        </div>
-    </div>-->
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -46,7 +37,9 @@
 <script>
     
     document.querySelector('#tx-upgrade-admin').onclick = ()=>{
-        TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onUpgradeAdminRole',name:'admin'},(resp)=>{      
+        let _n = document.querySelector('#tx-developer-name').value;
+        let _p = document.querySelector('#tx-developer-email').value;
+        TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onUpgradeAdminRole',role:'admin',developerName:_n,email:_p},(resp)=>{      
             if(resp.successful){
                 TARA_API.query().role = resp.role;
                 document.querySelector('#tx-upgrade-admin-message').innerHTML = 'Role upgraded';    

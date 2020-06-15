@@ -13,7 +13,7 @@ public class User extends RecoverableObject implements Access {
     protected String login;
     protected String password;//hash of the password
     protected String emailAddress="n/a"; //reset validation email address
-    protected boolean active;
+    protected boolean activated;
     protected boolean validated;
     protected boolean primary;
     protected String validator;
@@ -49,11 +49,11 @@ public class User extends RecoverableObject implements Access {
     public String validator(){
         return this.validator;
     }
-    public boolean active(){
-        return this.active;
+    public boolean activated(){
+        return this.activated;
     }
-    public void active(boolean active){
-        this.active = active;
+    public void activated(boolean activated){
+        this.activated = activated;
     }
     public boolean validated(){
         return this.validated;
@@ -82,7 +82,7 @@ public class User extends RecoverableObject implements Access {
         properties.put("1",login);
         properties.put("2",password);
         properties.put("3",role);
-        properties.put("4",active);
+        properties.put("4",activated);
         properties.put("5",routingNumber);
         properties.put("6",validated);
         properties.put("7",emailAddress);
@@ -95,7 +95,7 @@ public class User extends RecoverableObject implements Access {
         this.login = (String) properties.get("1");
         this.password = (String) properties.get("2");
         this.role = (String) properties.get("3");
-        this.active = (boolean) properties.get("4");
+        this.activated = (boolean) properties.get("4");
         this.routingNumber = ((Number) properties.get("5")).intValue();
         this.validated = (boolean) properties.get("6");
         this.emailAddress = (String)properties.get("7");

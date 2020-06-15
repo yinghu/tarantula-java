@@ -1,0 +1,48 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-validate-email-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-sign-in" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">VALIDATE EMAIL</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-validate-email-message"></div>
+    <div><!-- send form -->
+        <div class="w3-panel">
+            <label class="tx-text-12">Validation Code</label>
+            <input id ="tx-validatation-code" class="w3-input w3-round w3-border tx-text-16" type="email" placeholder='validation code'/>
+        </div>
+        <div class="w3-panel">
+            <span id="tx-validate-email" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Validate</span>     
+        </div>
+    </div> 
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    //request code first if email added
+    TARA_API.onService(false,{serviceTag:'presence/lobby',command:'onRequestCode'},(resp)=>{
+            document.querySelector('#tx-validate-email-message').innerHTML = resp.message;       
+    });
+    document.querySelector('#tx-validate-email').onclick=()=>{
+        let _c = document.querySelector('#tx-validatation-code').value;
+        TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onValidateEmail',validationCode:_c},(resp)=>{
+            document.querySelector('#tx-validate-email-message').innerHTML = resp.message;       
+        });
+    };
+    document.querySelector('#tx-validate-email-close').onclick=()=>{
+        let m3 = document.querySelector('#tx-popup');
+        m3.innerHTML="";
+        m3.style.display = 'none';       
+    };
+</script>

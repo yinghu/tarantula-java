@@ -29,6 +29,9 @@
             <view type="add.email">
                 <property name="moduleResourceFile">presence/add.email.view.html</property>
             </view>
+            <view type="validate.email">
+                <property name="moduleResourceFile">presence/validate.email.view.html</property>
+            </view>
             <view type="change.password">
                 <property name="moduleResourceFile">presence/change.password.view.html</property>
             </view>

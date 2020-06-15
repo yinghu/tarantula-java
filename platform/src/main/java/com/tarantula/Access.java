@@ -30,8 +30,8 @@ public interface Access extends Recoverable {
     String emailAddress();
     void emailAddress(String emailAddress);
 
-    boolean active();
-    void active(boolean active);
+    boolean activated();
+    void activated(boolean activated);
     boolean validated();//validated to skip check password if user login from third party login token
     boolean primary();
     void primary(boolean primary);

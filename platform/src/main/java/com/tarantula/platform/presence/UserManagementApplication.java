@@ -233,7 +233,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         Access access = new User();
         access.distributionKey(systemId);
         OnSession _onSession = OnSessionTrack.PASSWORD_NOT_MATCHED;
-        if(uDatastore.load(access)){
+        if(uDatastore.load(access)&&(!access.validated())){//reject device/token users
             access.routingNumber(session.routingNumber());
             _onSession=this.context.validator().validatePassword(access,password);
             _onSession.systemId(systemId);
@@ -244,7 +244,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         Access acc = new User((String) payload.property("login"),validated,validator);
         acc.distributionKey(systemId);
         acc.password(validated?"":this.context.validator().hashPassword((String) payload.property(OnAccess.PASSWORD)));
-        acc.active(this.activated);//if false do email validation
+        acc.activated(this.activated);//if false do email validation
         acc.primary(primary);
         if(!primary){
             acc.owner(payload.owner());
