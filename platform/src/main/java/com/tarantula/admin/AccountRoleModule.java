@@ -5,11 +5,14 @@ import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
+
+import java.util.ArrayList;
 
 public class AccountRoleModule implements Module {
 
@@ -27,10 +30,19 @@ public class AccountRoleModule implements Module {
             IndexSet indexSet = new IndexSet();
             indexSet.distributionKey(session.systemId());
             indexSet.label(Account.UserLabel);
+            AccessContext atc = new AccessContext();
+            atc.userList = new ArrayList<>();
             if(account.load(indexSet)){
-
+                //atc.userList.add()
+                indexSet.keySet.forEach((k)->{
+                    User u = new User();
+                    u.distributionKey(k);
+                    if(user.load(u)){
+                        atc.userList.add(u);
+                    }
+                });
             }
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"load user list",true)).getBytes(),label());
+            session.write(atc.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onAddUser")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);

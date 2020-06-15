@@ -796,7 +796,7 @@
                 //listing live games 
                 if(a.descriptor.typeId == lbn ){
                     a.applications.forEach((b)=>{
-                        console.log(b);
+                        //console.log(b);
                         document.querySelector('#live-game-list-'+b.accessRank+'-0').innerHTML = b.tag
                         document.querySelector('#live-game-list-'+b.accessRank+'-1').style.display='block';
                         document.querySelector('#live-game-list-'+b.accessRank+'-2').style.display='none';

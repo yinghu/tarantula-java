@@ -45,9 +45,6 @@
             <view type="password.reset">
                 <property name="moduleResourceFile">password.reset.view.html</property>
             </view>
-            <view type="pending.request">
-                <property name="moduleResourceFile">pending.request.view.html</property>
-            </view>
             <view type="invalid.request">
                 <property name="moduleResourceFile">invalid.request.view.html</property>
             </view>

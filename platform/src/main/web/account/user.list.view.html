@@ -12,36 +12,15 @@
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-user-list-message"></div>
     
-    <div class='w3-panel w3-border-bottom w3-border-red'>
-        <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-user" style="font-size:16px"></i></span>
-        <span class='w3-left tx-text-14'>Player Name</span>
-        <span view-id='add.user' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>
-        <span id='tx-list-user-1' class='w3-right tx-text-14'>root</span>
+    <div id='tx-user-list-0' class='w3-panel w3-border-bottom w3-border-red'>
+        <span id='tx-list-user-0-0' class='w3-left tx-text-14'>Player Name</span>
+        <span id='tx-list-user-0-1' tx-user-list-id='' view-id='upgrade.user' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-8 tx-user-upgrade'>Upgrade</span>   
+        <span id='tx-list-user-0-2' class='w3-right tx-text-14'>root</span>
     </div>
-    <div class='w3-panel w3-border-bottom w3-border-red'>
-        <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-user" style="font-size:16px"></i></span>
-        <span class='w3-left tx-text-14'>Player Name</span>
-        <span view-id='add.user' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>
-        <span id='tx-list-user-2' class='w3-right tx-text-14'>root</span>
-    </div>
-    <div class='w3-panel w3-border-bottom w3-border-red'>
-        <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-user" style="font-size:16px"></i></span>
-        <span class='w3-left tx-text-14'>Player Name</span>
-        <span view-id='add.user' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>
-        <span id='tx-list-user-3' class='w3-right tx-text-14'>root</span>
-    </div>
-    <div class='w3-panel w3-border-bottom w3-border-red'>
-        <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-user" style="font-size:16px"></i></span>
-        <span class='w3-left tx-text-14'>Player Name</span>
-        <span view-id='add.user' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>
-        <span id='tx-list-user-4' class='w3-right tx-text-14'>root</span>
-    </div>
-    <div class='w3-panel w3-border-bottom w3-border-red'>
-        <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-user" style="font-size:16px"></i></span>
-        <span class='w3-left tx-text-14'>Player Name</span>
-        <span view-id='add.user' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>
-        <span id='tx-list-user-5' class='w3-right tx-text-14'>root</span>
-    </div> 
+    
+    
+   
+    
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -53,7 +32,17 @@
 </div>
 <script>
     TARA_API.onService(true,{serviceTag:'role/account',command:'onUserList'},(resp)=>{
-        document.querySelector('#tx-user-list-message').innerHTML = resp.message;        
+        if(resp.successful){
+             console.log(resp);   
+        }else{
+            document.querySelector('#tx-user-list-message').innerHTML = resp.message;
+        }        
+    });
+    document.querySelectorAll('.tx-user-upgrade').forEach((a,i)=>{
+        a.onclick = ()=>{
+            let vid = a.getAttribute('view-id');
+            tx_view({viewId:vid,containerId:'#tx-popup-api'});    
+        };
     });
     document.querySelector('#tx-user-list-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');

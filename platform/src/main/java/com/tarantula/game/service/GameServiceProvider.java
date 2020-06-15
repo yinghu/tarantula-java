@@ -131,7 +131,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
             //return false;//keep
         //});
         this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.RATING_CID,(r)->{
-            logger.warn(r.toString());
+            //logger.warn(r.toString());
         });
 
         //this.dataStore.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.LEADER_BOARD_ENTRY_CID,(r)->{
