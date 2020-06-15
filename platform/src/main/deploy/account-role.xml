@@ -39,9 +39,6 @@
             <view type="user.list">
                 <property name="moduleResourceFile">account/user.list.view.html</property>
             </view>
-            <view type="upgrade.user">
-                <property name="moduleResourceFile">account/upgrade.user.view.html</property>
-            </view>
         </view-list>
 
     </lobby-context>

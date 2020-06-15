@@ -28,6 +28,7 @@ public class AdminRoleModule implements Module {
     private ApplicationContext context;
     private GsonBuilder builder;
     private DataStore account;
+    private DataStore user;
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
     private int maxGameClusterCount;
@@ -42,19 +43,21 @@ public class AdminRoleModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         if(session.action().equals("onCheckPermission")){
+            User user = _user(session.systemId());
             Account acc = new UserAccount();
-            acc.distributionKey(session.systemId());
+            acc.distributionKey(user.primary()?session.systemId():user.owner());
             account.load(acc);
             session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0)).toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onGameClusterList")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            User user = _user(session.systemId());
             int index = ((Number)onAccess.property("index")).intValue();
             GameClusterContext adminContext = new GameClusterContext();
             adminContext.gameClusterList = new ArrayList<>();
             adminContext.index = index;
             IndexSet idx = new IndexSet();
-            idx.distributionKey(session.systemId());
+            idx.distributionKey(user.primary()?session.systemId():user.owner());
             idx.label(Account.GameClusterLabel);
             if(account.load(idx)){
                 idx.keySet.forEach((k)->{
@@ -211,11 +214,12 @@ public class AdminRoleModule implements Module {
             }
         }
         else if(session.action().equals("onCreateGameCluster")){
+            User ua = _user(session.systemId());
             Account acc = new UserAccount();
-            acc.distributionKey(session.systemId());
+            acc.distributionKey(ua.primary()?session.systemId():ua.owner());
             if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-                GameCluster gc = this.deploymentServiceProvider.createGameCluster(session.systemId(),(String)onAccess.property("name"));
+                GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.distributionKey(),(String)onAccess.property("name"));
                 if(gc.successful()){
                     IndexSet idx = new IndexSet();
                     idx.distributionKey(acc.distributionKey());
@@ -342,8 +346,9 @@ public class AdminRoleModule implements Module {
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(accessId);
+            User _u = _user(session.systemId());
             Account acc = new UserAccount();
-            acc.distributionKey(session.systemId());
+            acc.distributionKey(_u.primary()?session.systemId():_u.owner());
             account.load(acc);
             if(acc.trial()||acc.subscribed()){
                 boolean suc = this.deploymentServiceProvider.launchGameCluster(gameCluster);
@@ -394,6 +399,7 @@ public class AdminRoleModule implements Module {
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.account = this.context.dataStore(Account.DataStore);
+        this.user = this.context.dataStore(Access.DataStore);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.maxGameClusterCount = Integer.parseInt(this.context.configuration("setup").property("maxGameClusterCount"));
@@ -463,5 +469,13 @@ public class AdminRoleModule implements Module {
         jms.addProperty("successful",suc);
         jms.addProperty("message",msg);
         return jms;
+    }
+    private User _user(String systemId){
+        User u = new User();
+        u.distributionKey(systemId);
+        if(user.load(u)){
+            return u;
+        }
+        return null;
     }
 }

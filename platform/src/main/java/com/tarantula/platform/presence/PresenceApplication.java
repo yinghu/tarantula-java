@@ -53,8 +53,8 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
             pc.presence.version(presence.count(0));
             pc.access = user(session.systemId());
-            pc.account = account(session.systemId());
-            pc.subscription = membership(session.systemId());
+            pc.account = account(pc.access.primary()?session.systemId():pc.access.owner());
+            pc.subscription = membership(pc.access.primary()?session.systemId():pc.access.owner());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
         }
         //public lobby access by page number

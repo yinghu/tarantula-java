@@ -27,8 +27,9 @@ public class AccountRoleModule implements Module {
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         //this.context.log(session.action()+"=>"+new String(payload),OnLog.INFO);
         if(session.action().equals("onUserList")){
+            User access = _user(session.systemId());
             IndexSet indexSet = new IndexSet();
-            indexSet.distributionKey(session.systemId());
+            indexSet.distributionKey(access.primary()?session.systemId():access.owner());
             indexSet.label(Account.UserLabel);
             AccessContext atc = new AccessContext();
             atc.userList = new ArrayList<>();
@@ -49,7 +50,7 @@ public class AccountRoleModule implements Module {
             String uid = (String)onAccess.property(OnAccess.ACCESS_ID);
             User owner = new User();
             owner.distributionKey(session.systemId());
-            if(user.load(owner)){//need to check account
+            if(user.load(owner)&&owner.primary()){//only primary
                 User u = new User();
                 u.distributionKey(uid);
                 if(user.load(u)){
@@ -60,18 +61,21 @@ public class AccountRoleModule implements Module {
                     }
                     user.update(u);
                 }
+                session.write(toMessage("role granted ["+u.role()+"]",false).toString().getBytes(),label());
+            }else{
+                session.write(toMessage("only primary can update role",false).toString().getBytes(),label());
             }
-            session.write(toMessage("updated ["+uid+"]",true).toString().getBytes(),label());
         }
         else if(session.action().equals("onAddUser")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            User ua = _user(session.systemId());
             Account acc = new UserAccount();
-            acc.distributionKey(session.systemId());
+            acc.distributionKey(ua.primary()?session.systemId():ua.owner());
             if(account.load(acc)){
                 if(acc.userCount(0)<maxUserCount){
                     AccessIndex query = accessIndexService.set((String)onAccess.property("login"), user.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid());
                     if(query!=null){
-                        onAccess.owner(session.systemId());
+                        onAccess.owner(acc.distributionKey());//make sure acc id as the owner
                         onAccess.distributionKey(query.distributionKey());
                         this.context.postOffice().onTag("index/user").send(onAccess.distributionKey(),onAccess);
                         session.write(this.toMessage("user added",true).toString().getBytes(),label());
@@ -114,5 +118,13 @@ public class AccountRoleModule implements Module {
         jms.addProperty("successful",suc);
         jms.addProperty("message",msg);
         return jms;
+    }
+    private User _user(String systemId){
+        User u = new User();
+        u.distributionKey(systemId);
+        if(user.load(u)){
+            return u;
+        }
+        return null;
     }
 }
