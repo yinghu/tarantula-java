@@ -1,5 +1,6 @@
 package com.tarantula.platform.presence;
 
+import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.game.Zone;
 import com.tarantula.game.service.GameServiceProvider;
@@ -61,11 +62,16 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             int page = ((Number)onAccess.property("page")).intValue();
             LiveGame liveGame = liveGameContext.onIndex(page);
-            liveGame.lobbyList = new ArrayList<>();
-            liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-lobby"));
-            liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-service"));
-            liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-data"));
-            session.write(liveGame.toJson().toString().getBytes(),this.descriptor.responseLabel());
+            if(liveGame!=null){
+                liveGame.lobbyList = new ArrayList<>();
+                liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-lobby"));
+                liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-service"));
+                liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-data"));
+                session.write(liveGame.toJson().toString().getBytes(),this.descriptor.responseLabel());
+            }else{
+                session.write(toMessage("no lobby data",false).toString().getBytes(),this.descriptor.responseLabel());
+            }
+
         }
         else if(session.action().equals("onAddEmail")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -108,6 +114,12 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes(),this.descriptor.responseLabel());
         }
+    }
+    private JsonObject toMessage(String msg, boolean suc){
+        JsonObject jms = new JsonObject();
+        jms.addProperty("successful",suc);
+        jms.addProperty("message",msg);
+        return jms;
     }
     private User user(String systemId){
         User user = new User();

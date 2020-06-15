@@ -1,15 +1,14 @@
 package com.tarantula.admin;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.IndexSet;
-import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.util.OnAccessDeserializer;
-import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ public class AccountRoleModule implements Module {
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
-        //this.context.log(session.action()+"=>"+new String(payload),OnLog.INFO);
+        this.context.log(session.action()+"=>"+new String(payload),OnLog.INFO);
         if(session.action().equals("onUserList")){
             IndexSet indexSet = new IndexSet();
             indexSet.distributionKey(session.systemId());
@@ -44,6 +43,9 @@ public class AccountRoleModule implements Module {
             }
             session.write(atc.toJson().toString().getBytes(),label());
         }
+        else if(session.action().equals("onUpgradeUser")){
+            session.write(toMessage("updated",true).toString().getBytes(),label());
+        }
         else if(session.action().equals("onAddUser")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Account acc = new UserAccount();
@@ -55,18 +57,18 @@ public class AccountRoleModule implements Module {
                     onAccess.owner(session.systemId());
                     onAccess.distributionKey(query.distributionKey());
                     this.context.postOffice().onTag("index/user").send(onAccess.distributionKey(),onAccess);
-                    session.write(this.builder.create().toJson(_onMessage("user added")).getBytes(),label());
+                    session.write(this.toMessage("user added",true).toString().getBytes(),label());
                 }
                 else{
-                    session.write(this.builder.create().toJson(_onMessage("user already existed")).getBytes(),label());
+                    session.write(this.toMessage("user already existed",false).toString().getBytes(),label());
                 }
             }
             else{
-                session.write(this.builder.create().toJson(_onMessage("you already have max user count")).getBytes(),label());
+                session.write(this.toMessage("you already have max user count",false).toString().getBytes(),label());
             }
         }
         else{
-            session.write(payload,label());
+            throw new UnsupportedOperationException(session.action());
         }
         return session.action().equals("onLeave");
     }
@@ -76,7 +78,6 @@ public class AccountRoleModule implements Module {
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
-        this.builder.registerTypeAdapter(ResponseHeader.class, new ResponseSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         this.user = this.context.dataStore(Access.DataStore);
         this.account = this.context.dataStore(Account.DataStore);
@@ -87,8 +88,10 @@ public class AccountRoleModule implements Module {
     public String label() {
         return "account-role";
     }
-    private ResponseHeader _onMessage(String message){
-        return new ResponseHeader(message,label());
+    private JsonObject toMessage(String msg, boolean suc){
+        JsonObject jms = new JsonObject();
+        jms.addProperty("successful",suc);
+        jms.addProperty("message",msg);
+        return jms;
     }
-
 }

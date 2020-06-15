@@ -21,6 +21,7 @@ public class AccessContext extends ResponseHeader {
         JsonArray ja = new JsonArray();
         for(Access acc : userList){
             JsonObject xv = new JsonObject();
+            xv.addProperty("oid",acc.distributionKey());
             xv.addProperty("name",acc.login());
             xv.addProperty("role",acc.role());
             ja.add(xv);
