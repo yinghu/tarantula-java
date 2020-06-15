@@ -11,16 +11,61 @@
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-user-list-message"></div>
-    
-    <div id='tx-user-list-0' class='w3-panel w3-border-bottom w3-border-red'>
-        <span id='tx-list-user-0-0' class='w3-left tx-text-14'>Player Name</span>
-        <span id='tx-list-user-0-1' tx-user-list-id='' view-id='upgrade.user' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-8 tx-user-upgrade'>Upgrade</span>   
-        <span id='tx-list-user-0-2' class='w3-right tx-text-14'>root</span>
+    <div id='tx-user-list-0' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+        <div class="w3-container w3-border-bottom w3-border-red">
+            <span class='tx-text-14'>Name:</span>
+            <span id='tx-list-user-0-0' class='tx-margin-left-8 tx-text-14'>Foo</span>
+        </div>
+        <div class="w3-container tx-margin-top-8">
+            <span class='tx-text-14'>Role:</span>
+            <span id='tx-list-user-0-1' class='tx-margin-left-8 tx-text-14'>Player</span>
+            <span id='tx-list-user-0-2' tx-user-list-id='' view-id='upgrade.user' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-4 tx-user-upgrade'>Upgrade</span>
+        </div>
     </div>
-    
-    
-   
-    
+    <div id='tx-user-list-1' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+        <div class="w3-container w3-border-bottom w3-border-red">
+            <span class='tx-text-14'>Name:</span>
+            <span id='tx-list-user-1-0' class='tx-margin-left-8 tx-text-14'>Foo</span>
+        </div>
+        <div class="w3-container tx-margin-top-8">
+            <span class='tx-text-14'>Role:</span>
+            <span id='tx-list-user-1-1' class='tx-margin-left-8 tx-text-14'>Player</span>
+            <span id='tx-list-user-1-2' tx-user-list-id='' view-id='upgrade.user' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-4 tx-user-upgrade'>Upgrade</span>
+        </div>
+    </div>
+    <div id='tx-user-list-2' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+        <div class="w3-container w3-border-bottom w3-border-red">
+            <span class='tx-text-14'>Name:</span>
+            <span id='tx-list-user-2-0' class='tx-margin-left-8 tx-text-14'>Foo</span>
+        </div>
+        <div class="w3-container tx-margin-top-8">
+            <span class='tx-text-14'>Role:</span>
+            <span id='tx-list-user-2-1' class='tx-margin-left-8 tx-text-14'>Player</span>
+            <span id='tx-list-user-2-2' tx-user-list-id='' view-id='upgrade.user' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-4 tx-user-upgrade'>Upgrade</span>
+        </div>
+    </div>
+    <div id='tx-user-list-3' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+        <div class="w3-container w3-border-bottom w3-border-red">
+            <span class='tx-text-14'>Name:</span>
+            <span id='tx-list-user-3-0' class='tx-margin-left-8 tx-text-14'>Foo</span>
+        </div>
+        <div class="w3-container tx-margin-top-8">
+            <span class='tx-text-14'>Role:</span>
+            <span id='tx-list-user-3-1' class='tx-margin-left-8 tx-text-14'>Player</span>
+            <span id='tx-list-user-3-2' tx-user-list-id='' view-id='upgrade.user' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-4 tx-user-upgrade'>Upgrade</span>
+        </div>
+    </div>
+    <div id='tx-user-list-4' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
+        <div class="w3-container w3-border-bottom w3-border-red">
+            <span class='tx-text-14'>Name:</span>
+            <span id='tx-list-user-4-0' class='tx-margin-left-8 tx-text-14'>Foo</span>
+        </div>
+        <div class="w3-container tx-margin-top-8">
+            <span class='tx-text-14'>Role:</span>
+            <span id='tx-list-user-4-1' class='tx-margin-left-8 tx-text-14'>Player</span>
+            <span id='tx-list-user-4-2' tx-user-list-id='' view-id='upgrade.user' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-4 tx-user-upgrade'>Upgrade</span>
+        </div>
+    </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -34,6 +79,12 @@
     TARA_API.onService(true,{serviceTag:'role/account',command:'onUserList'},(resp)=>{
         if(resp.successful){
              console.log(resp);   
+             resp.userList.forEach((a,i)=>{
+                 document.querySelector('#tx-user-list-'+i).style.display='block';
+                 document.querySelector('#tx-list-user-'+i+'-0').innerHTML = a.name;
+                 document.querySelector('#tx-list-user-'+i+'-1').innerHTML = a.role;
+                 document.querySelector('#tx-list-user-'+i+'-2').setAttribute('tx-user-list-id',a.oid);
+             });
         }else{
             document.querySelector('#tx-user-list-message').innerHTML = resp.message;
         }        
