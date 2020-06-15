@@ -11,7 +11,9 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Updated 5/14/2020
@@ -138,10 +140,13 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             }
         }
         else if(session.action().equals("onTokenRegister")){
-            if(this.context.validator().validateToken(acc.toMap())){
+            Map<String,Object> params = acc.toMap();
+            if(this.context.validator().validateToken(params)){
                 AccessIndex _query = accessIndexService.set((String) acc.property("login"),session.systemId());
                 if(_query!=null){
-                    createLogin(acc,session.systemId(),role,true,acc.name(),true);
+                    Access user = createLogin(acc,session.systemId(),role,true,acc.name(),true);
+                    user.emailAddress((String) params.get("email"));
+                    uDatastore.update(user);
                     OnSession onSession = login(session.systemId(),"",session);
                     onSession(onSession,session);
                 }

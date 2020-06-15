@@ -92,7 +92,14 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                 session.write(this.builder.create().toJson(new ResponseHeader("","failed",false)).getBytes(),descriptor.responseLabel());
             }
         }
-        else if(session.action().equals("onUpgradeRole")){
+        else if(session.action().equals("onUpgradeAccountRole")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            User user = this.user(session.systemId());
+            boolean suc = this.context.validator().upgradeRole(user,onAccess.name());
+            PermissionContext permissionContext = new PermissionContext(onAccess.name(),suc);
+            session.write(permissionContext.toJson().toString().getBytes(),descriptor.responseLabel());
+        }
+        else if(session.action().equals("onUpgradeAdminRole")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             User user = this.user(session.systemId());
             boolean suc = this.context.validator().upgradeRole(user,onAccess.name());

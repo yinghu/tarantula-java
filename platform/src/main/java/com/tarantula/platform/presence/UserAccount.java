@@ -31,6 +31,7 @@ public class UserAccount extends User implements Account {
         properties.put("4",timestamp);
         properties.put("5",trial);
         properties.put("6",subscribed);
+        properties.put("7",owner);
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
@@ -39,7 +40,8 @@ public class UserAccount extends User implements Account {
         this.gameClusterCount = ((Number) properties.get("3")).intValue();
         this.timestamp = ((Number) properties.get("4")).longValue();
         this.trial = (Boolean) properties.get("5");
-        this.subscribed = (Boolean) properties.get("6");;
+        this.subscribed = (Boolean) properties.get("6");
+        this.owner = (String)properties.get("7");
     }
     public int userCount(int delta){
         this.userCount = this.userCount+delta;
