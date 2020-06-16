@@ -88,8 +88,13 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                     }
                 }**/
                 String code = this.deploymentServiceProvider.resetCode(session.systemId());
-                session.write(this.builder.create().toJson(new ResponseHeader("",code,true)).getBytes(),descriptor.responseLabel());
-            }else{
+                if(this.deploymentServiceProvider.registerPostOffice().onEmail().send(email,code)){
+                    session.write(this.builder.create().toJson(new ResponseHeader("","check email for code", true)).getBytes(), descriptor.responseLabel());
+                }else {
+                    session.write(this.builder.create().toJson(new ResponseHeader("","system issue, try later", false)).getBytes(), descriptor.responseLabel());
+                }
+            }
+            else{
                 session.write(this.builder.create().toJson(new ResponseHeader("","wrong email format ["+email+"]",false)).getBytes(),descriptor.responseLabel());
             }
         }
@@ -102,7 +107,11 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                 if(u.emailAddress()!=null){
                     //this.deploymentServiceProvider.registerPostOffice().onEmail().send(u.emailAddress(),"code");
                     String code = this.deploymentServiceProvider.resetCode(session.systemId());
-                    session.write(toMessage(code, true).toString().getBytes(), descriptor.responseLabel());
+                    if(this.deploymentServiceProvider.registerPostOffice().onEmail().send(u.emailAddress(),code)){
+                        session.write(this.builder.create().toJson(new ResponseHeader("","check email for code", true)).getBytes(), descriptor.responseLabel());
+                    }else {
+                        session.write(this.builder.create().toJson(new ResponseHeader("","system issue, try later", false)).getBytes(), descriptor.responseLabel());
+                    }
                 }
                 else{
                     session.write(toMessage("No email available",false).toString().getBytes(),descriptor.responseLabel());
