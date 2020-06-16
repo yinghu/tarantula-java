@@ -7,6 +7,7 @@ import com.tarantula.Module;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.PermissionContext;
+import com.tarantula.platform.presence.SubscriptionFee;
 import com.tarantula.platform.presence.User;
 
 import com.tarantula.platform.service.DeploymentServiceProvider;
@@ -198,6 +199,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         jsonObject.addProperty("Account",this.context.dataStore(Account.DataStore).count());
         jsonObject.addProperty("Presence",this.context.dataStore(Presence.DataStore).count());
         jsonObject.addProperty("Subscription",this.context.dataStore(Subscription.DataStore).count());
+        jsonObject.addProperty("Purchase",this.context.dataStore(SubscriptionFee.DataStore).count());
         jsonObject.addProperty("System",this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE).count());
         return jsonObject;
     }

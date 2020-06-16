@@ -163,15 +163,16 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         LocalDateTime end = SystemUtil.fromUTCMilliseconds(subscription.endTimestamp());
         return end.isAfter(LocalDateTime.now());
     }
-    public boolean updateSubscription(String systemId,int months){
+    public int updateSubscription(String systemId,int months){
         Subscription subscription = new Membership();
         subscription.distributionKey(systemId);
         if(!this.mdatastore.load(subscription)){
-            return false;
+            return 0;
         }
         LocalDateTime end = SystemUtil.fromUTCMilliseconds(subscription.endTimestamp());
         subscription.endTimestamp(SystemUtil.toUTCMilliseconds(end.plusMonths(months)));
         subscription.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
+        int cnt = subscription.count(1);
         this.mdatastore.update(subscription);
         boolean suc = end.isAfter(LocalDateTime.now());
         Account acc = new UserAccount();
@@ -181,7 +182,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             acc.subscribed(suc);
             adataStore.update(acc);
         }
-        return suc;
+        return cnt;
     }
     public void atMidnight(){
         ArrayList<String> rlist = new ArrayList<>();

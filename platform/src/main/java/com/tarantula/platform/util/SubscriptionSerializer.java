@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.tarantula.Account;
 import com.tarantula.Subscription;
 
 import java.lang.reflect.Type;
@@ -20,6 +19,7 @@ public class SubscriptionSerializer implements JsonSerializer<Subscription> {
         jo.addProperty("startTime",SystemUtil.fromUTCMilliseconds(access.startTimestamp()).format(DateTimeFormatter.ISO_DATE_TIME));
         jo.addProperty("endTime",SystemUtil.fromUTCMilliseconds(access.endTimestamp()).format(DateTimeFormatter.ISO_DATE_TIME));
         jo.addProperty("lastUpdated",SystemUtil.fromUTCMilliseconds(access.timestamp()).format(DateTimeFormatter.ISO_DATE_TIME));
+        jo.addProperty("updatedCount",access.count(0));
         return jo;
     }
 }

@@ -22,6 +22,7 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
     public static final int LEADER_BOARD_ENTRY_CID = 4;
     public static final int STATISTICS_ENTRY_CID = 5;
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
+    public static final int PURCHASE_CID = 6;
 
     public Recoverable create(int i) {
         Recoverable pt = null;
@@ -40,6 +41,9 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 break;
             case STATISTICS_ENTRY_CID:
                 pt = new StatisticsEntry();
+                break;
+            case PURCHASE_CID:
+                pt = new SubscriptionFee();
                 break;
             case GAME_CLUSTER_CID:
                 pt = new GameCluster();

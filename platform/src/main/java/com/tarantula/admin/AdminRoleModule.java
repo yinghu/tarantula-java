@@ -29,6 +29,7 @@ public class AdminRoleModule implements Module {
     private GsonBuilder builder;
     private DataStore account;
     private DataStore user;
+    private DataStore purchase;
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
     private int maxGameClusterCount;
@@ -372,7 +373,9 @@ public class AdminRoleModule implements Module {
             if(this.context.validator().validateToken(chargeParams)){
                 //update subscription
                 User u = this._user(session.systemId());
-                this.tokenValidatorProvider.updateSubscription(u.primary()?session.systemId():u.owner(),fee.durationMonths);
+                int cnt = this.tokenValidatorProvider.updateSubscription(u.primary()?session.systemId():u.owner(),fee.durationMonths);
+                SubscriptionFee _log = fee.log(u.primary()?session.systemId():u.owner(),cnt);
+                purchase.create(_log);
                 session.write(this.builder.create().toJson(new ResponseHeader("onCommit", "your purchase is successful", true)).getBytes(),this.label());
             }
             else{
@@ -404,6 +407,7 @@ public class AdminRoleModule implements Module {
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.account = this.context.dataStore(Account.DataStore);
         this.user = this.context.dataStore(Access.DataStore);
+        this.purchase = this.context.dataStore(SubscriptionFee.DataStore);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.maxGameClusterCount = Integer.parseInt(this.context.configuration("setup").property("maxGameClusterCount"));

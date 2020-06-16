@@ -44,6 +44,12 @@
     </div>
     <div class="w3-panel  w3-border-bottom w3-border-red">
         <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'>Purchase</span>
+            <span id='tx-Purchase-c' class='w3-right tx-text-14 tx-margin-top-8'>0</span>
+        </div>    
+    </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
+        <div class="w3-container">
             <span class='w3-left tx-text-14 tx-margin-top-8'>System</span>
             <span id='tx-System-c' class='w3-right tx-text-14 tx-margin-top-8'>0</span>
         </div>    
@@ -67,6 +73,7 @@
             document.querySelector('#tx-Account-c').innerHTML = resp.Account;
             document.querySelector('#tx-Presence-c').innerHTML = resp.Presence;
             document.querySelector('#tx-Subscription-c').innerHTML = resp.Subscription;
+            document.querySelector('#tx-Purchase-c').innerHTML = resp.Purchase; 
             document.querySelector('#tx-System-c').innerHTML = resp.System;                  
         }
         else{

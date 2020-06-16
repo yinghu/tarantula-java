@@ -1,8 +1,9 @@
 package com.tarantula;
 
-public interface Subscription extends Recoverable {
+public interface Subscription extends Recoverable,Countable {
 
     String DataStore = "subscription";
+
 
 
 

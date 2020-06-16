@@ -82,31 +82,37 @@
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>Trial</span>
-                <!--<span view-id='game.cluster.list' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-folder-open" style="font-size:16px"></i></span>-->
+                <!--<span view-id='shopping.card' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-folder-open" style="font-size:16px"></i></span>-->
                 <span id='tx-player-10' class='w3-right tx-text-14'>n/a</span>
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>Subsribed</span>
-                <!--<span view-id='game.cluster.list' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-folder-open" style="font-size:16px"></i></span>-->
+                <!--<span view-id='shopping.card' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>-->
                 <span id='tx-player-11' class='w3-right tx-text-14'>n/a</span>
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
+                <span class='w3-left tx-text-14'>Purchase Count</span>
+                <!--<span view-id='shopping.card' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>-->
+                <span id='tx-player-16' class='w3-right tx-text-14'>0</span>
+            </div>
+            <div class='w3-panel w3-border-bottom w3-border-red'>
+                <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>Start Time</span>
-                <!--<span view-id='game.cluster.list' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-folder-open" style="font-size:16px"></i></span>-->
+                <!--<span view-id='shopping.card' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>-->
                 <span id='tx-player-12' class='w3-right tx-text-14'>n/a</span>
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>End Time</span>
-                <!--<span view-id='game.cluster.list' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-folder-open" style="font-size:16px"></i></span>-->
+                <!--<span view-id='shopping.card' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>-->
                 <span id='tx-player-13' class='w3-right tx-text-14'>n/a</span>
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>Last Updated Time</span>
-                <!--<span view-id='game.cluster.list' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-folder-open" style="font-size:16px"></i></span>-->
+                <!--<span view-id='shopping.card' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>-->
                 <span id='tx-player-14' class='w3-right tx-text-14'>n/a</span>
             </div>
             <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -680,6 +686,7 @@
                     document.querySelector('#tx-player-11').innerHTML=resp.account.subscribed;
                 }
                 if(resp.subscription){
+                    document.querySelector('#tx-player-16').innerHTML=resp.subscription.updatedCount;
                     document.querySelector('#tx-player-12').innerHTML=resp.subscription.startTime;
                     document.querySelector('#tx-player-13').innerHTML=resp.subscription.endTime;
                     document.querySelector('#tx-player-14').innerHTML=resp.subscription.lastUpdated;
