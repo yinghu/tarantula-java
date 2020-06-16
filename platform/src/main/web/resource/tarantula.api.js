@@ -245,7 +245,7 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-payload-size',_ps.length);  
     aj.send(_ps);                
   };
-  let _resetCode = function(userName,emailAddress,callback){
+  let _resetCode = function(emailAddress,callback){
     let aj = new XMLHttpRequest();   
     aj.responseType = 'text';
     aj.onreadystatechange = function(){
@@ -258,8 +258,7 @@ var TARA_API = (function(){
     aj.setRequestHeader('Accept','application/json');
     aj.setRequestHeader('Tarantula-tag','index/user');
     aj.setRequestHeader('Tarantula-action','onResetCode');
-    aj.setRequestHeader('Tarantula-name',userName);
-    aj.setRequestHeader('Tarantula-magic-key',emailAddress);
+    aj.setRequestHeader('Tarantula-name',emailAddress);
     aj.send();               
   }; 
   let _resetPassword = function(payload,callback){

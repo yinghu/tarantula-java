@@ -11,15 +11,26 @@
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-add-email-message"></div>
-    <div><!-- send form -->
-        <div class="w3-panel">
-            <label class="tx-text-12">Recovery Email</label>  
-            <input id ="tx-email-address" class="w3-input w3-round w3-border tx-text-16" type="email" placeholder='email address'/>
+    <div class="w3-container w3-border-bottom w3-border-red">
+        <div id="tx-add-email-form"><!-- send form -->
+            <div class="w3-panel">
+                <label class="tx-text-12">Recovery Email</label>  
+                <input id ="tx-email-address" class="w3-input w3-round w3-border tx-text-16" type="email" placeholder='email address'/>
+            </div>
+            <div class="w3-panel">
+                <span id="tx-add-email" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Add</span>     
+            </div>
         </div>
-        <div class="w3-panel">
-            <span id="tx-add-email" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Add</span>     
+        <div id="tx-validate-code-form"><!-- send form -->
+            <div class="w3-panel">
+                <label class="tx-text-12">Validation Code</label>  
+                <input id ="tx-email-validation-code" class="w3-input w3-round w3-border tx-text-16" type="email" placeholder='validation code'/>
+            </div>
+            <div class="w3-panel">
+                <span id="tx-validate-code" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Activate</span>     
+            </div>
         </div>
-    </div> 
+    </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -30,9 +41,23 @@
     </div>
 </div>
 <script>
+    document.querySelector('#tx-validate-code-form').style.display = 'none';
     document.querySelector('#tx-add-email').onclick=()=>{
-        let _c = document.querySelector('#tx-email-address').value;
-        TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onAddEmail',emailAddress:_c},(resp)=>{
+        let _e = document.querySelector('#tx-email-address').value;
+        TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onAddEmail',emailAddress:_e},(resp)=>{
+            if(resp.successful){
+                document.querySelector('#tx-add-email-form').style.display = 'none';
+                document.querySelector('#tx-validate-code-form').style.display = 'block';
+            }
+            document.querySelector('#tx-add-email-message').innerHTML = resp.message;       
+        });
+    };
+    document.querySelector('#tx-validate-code').onclick=()=>{
+        let _c = document.querySelector('#tx-email-validation-code').value;
+        TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onValidateEmail',validationCode:_c},(resp)=>{
+            if(resp.successful){
+
+            }
             document.querySelector('#tx-add-email-message').innerHTML = resp.message;       
         });
     };

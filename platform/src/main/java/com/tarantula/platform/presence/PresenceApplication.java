@@ -2,8 +2,6 @@ package com.tarantula.platform.presence;
 
 import com.google.gson.JsonObject;
 import com.tarantula.*;
-import com.tarantula.game.Zone;
-import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.*;
 
 import com.tarantula.platform.service.DeploymentServiceProvider;
@@ -76,9 +74,11 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         else if(session.action().equals("onAddEmail")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             User auser = user(session.systemId());
-            if(auser!=null){
-                auser.emailAddress((String)onAccess.property("emailAddress"));
+            String email = (String)onAccess.property("emailAddress");
+            if(email.contains("@")){
+                auser.emailAddress(email);
                 userDs.update(auser);
+                /**
                 if(!auser.role().equals(AccessControl.player)&&auser.primary()){
                     UserAccount userAccount = new UserAccount();
                     userAccount.distributionKey(session.systemId());
@@ -86,17 +86,41 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                         userAccount.emailAddress(auser.emailAddress());
                         accountDs.update(userAccount);
                     }
-                }
-                session.write(this.builder.create().toJson(new ResponseHeader("","successful",true)).getBytes(),descriptor.responseLabel());
+                }**/
+                String code = this.deploymentServiceProvider.resetCode(session.systemId());
+                session.write(this.builder.create().toJson(new ResponseHeader("",code,true)).getBytes(),descriptor.responseLabel());
             }else{
-                session.write(this.builder.create().toJson(new ResponseHeader("","failed",false)).getBytes(),descriptor.responseLabel());
+                session.write(this.builder.create().toJson(new ResponseHeader("","wrong email format ["+email+"]",false)).getBytes(),descriptor.responseLabel());
             }
         }
         else if(session.action().equals("onRequestCode")){
-            session.write(toMessage("check email for code",true).toString().getBytes(),descriptor.responseLabel());
+            User u = user(session.systemId());
+            if(u.activated()){
+                session.write(toMessage("Email already has validated",false).toString().getBytes(),descriptor.responseLabel());
+            }
+            else{
+                if(u.emailAddress()!=null){
+                    //this.deploymentServiceProvider.registerPostOffice().onEmail().send(u.emailAddress(),"code");
+                    String code = this.deploymentServiceProvider.resetCode(session.systemId());
+                    session.write(toMessage(code, true).toString().getBytes(), descriptor.responseLabel());
+                }
+                else{
+                    session.write(toMessage("No email available",false).toString().getBytes(),descriptor.responseLabel());
+                }
+            }
         }
         else if(session.action().equals("onValidateEmail")){
-            session.write(toMessage("validated email",true).toString().getBytes(),descriptor.responseLabel());
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            String code = (String) onAccess.property("validationCode");
+            if(this.deploymentServiceProvider.checkCode(code).equals(session.systemId())){
+                User u = user(session.systemId());
+                u.activated(true);
+                userDs.update(u);
+                session.write(toMessage("validated email",true).toString().getBytes(),descriptor.responseLabel());
+            }
+            else{
+                session.write(toMessage("wrong validation code",true).toString().getBytes(),descriptor.responseLabel());
+            }
         }
         else if(session.action().equals("onUpgradeAccountRole")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);

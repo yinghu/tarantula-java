@@ -32,7 +32,7 @@
 <script>
     //request code first if email added
     TARA_API.onService(false,{serviceTag:'presence/lobby',command:'onRequestCode'},(resp)=>{
-            document.querySelector('#tx-validate-email-message').innerHTML = resp.message;       
+        document.querySelector('#tx-validate-email-message').innerHTML = resp.message;       
     });
     document.querySelector('#tx-validate-email').onclick=()=>{
         let _c = document.querySelector('#tx-validatation-code').value;

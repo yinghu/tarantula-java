@@ -1,5 +1,6 @@
 package com.tarantula.platform.presence;
 
+import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.AccessIndexService;
@@ -191,22 +192,32 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             }
             this.deploymentServiceProvider.onUpdated(Metrics.DEVICE_COUNT,1);
         }
+        else if(session.action().equals("onResetCode")){
+            String code = this.deploymentServiceProvider.resetCode(session.trackId());
+            if(this.deploymentServiceProvider.registerPostOffice().onEmail().send(session.trackId(),code)){
+                session.write(toMessage("check email for code",true).toString().getBytes(),descriptor.responseLabel());
+            }
+            else{
+                session.write(toMessage("system error,try later",true).toString().getBytes(),descriptor.responseLabel());
+            }
+        }
         else if(session.action().equals("onResetPassword")){
-            if(this.deploymentServiceProvider.checkCode((String)acc.property(OnAccess.ACCESS_KEY)).equals(acc.property("login"))){
-                Access user = new User();
-                user.distributionKey(session.systemId());
-                if(uDatastore.load(user)){
+            String code = (String)acc.property(OnAccess.ACCESS_KEY);
+            Access user = new User();
+            user.distributionKey(session.systemId());
+            if(!uDatastore.load(user)){
+                session.write(toMessage("wrong user name",false).toString().getBytes(),descriptor.responseLabel());
+            }
+            else{
+                if(user.activated()&&this.deploymentServiceProvider.checkCode(code).equals(user.emailAddress())){
                     user.password(this.context.validator().hashPassword((String) acc.property(OnAccess.PASSWORD)));
                     uDatastore.update(user);
                     OnSession onSession = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
                     onSession(onSession,session);
                 }
                 else{
-                    session.write(this.builder.create().toJson(new ResponseHeader("onResetPassword", "invalid user name", false)).getBytes(),this.descriptor.responseLabel());
+                    session.write(this.builder.create().toJson(new ResponseHeader("onResetPassword", "Invalid recovery", false)).getBytes(),this.descriptor.responseLabel());
                 }
-            }
-            else{
-                session.write(this.builder.create().toJson(new ResponseHeader("onResetPassword", "invalid token", false)).getBytes(),this.descriptor.responseLabel());
             }
         }
         else{
@@ -256,5 +267,11 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             pDatastore.create(px);
         }
         return acc;
+    }
+    private JsonObject toMessage(String msg, boolean suc){
+        JsonObject jms = new JsonObject();
+        jms.addProperty("successful",suc);
+        jms.addProperty("message",msg);
+        return jms;
     }
 }
