@@ -223,6 +223,14 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void shutdown() throws Exception {
         //this.systemValidator.shutdown();
     }
+    public boolean checkRole(Access access,String role){
+        Access.Role cr = rMap.get(access.role());
+        Access.Role fr = rMap.get(role);
+        if(fr==null){
+            return false;
+        }
+        return fr.accessControl()>cr.accessControl();
+    }
     @Override
     public boolean upgradeRole(Access access,String role){
         if(!access.primary()||role==null||(!rMap.containsKey(role))){

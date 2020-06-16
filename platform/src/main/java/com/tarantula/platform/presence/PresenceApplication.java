@@ -6,6 +6,7 @@ import com.tarantula.platform.*;
 
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.OnLobby;
+import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.*;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 public class PresenceApplication extends TarantulaApplicationHeader implements OnLobby.Listener {
 
     private DeploymentServiceProvider deploymentServiceProvider;
+    private TokenValidatorProvider tokenValidatorProvider;
     private DataStore userDs;
     private DataStore accountDs;
     private DataStore memberDs;
@@ -26,6 +28,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
+        this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.deploymentServiceProvider.registerOnLobbyListener(this);
         liveGameContext = new LiveGameContext();
@@ -78,15 +81,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             if(email.contains("@")){
                 auser.emailAddress(email);
                 userDs.update(auser);
-                /**
-                if(!auser.role().equals(AccessControl.player)&&auser.primary()){
-                    UserAccount userAccount = new UserAccount();
-                    userAccount.distributionKey(session.systemId());
-                    if(accountDs.load(userAccount)){
-                        userAccount.emailAddress(auser.emailAddress());
-                        accountDs.update(userAccount);
-                    }
-                }**/
                 String code = this.deploymentServiceProvider.resetCode(session.systemId());
                 if(this.deploymentServiceProvider.registerPostOffice().onEmail().send(email,code)){
                     session.write(this.builder.create().toJson(new ResponseHeader("","check email for code", true)).getBytes(), descriptor.responseLabel());
@@ -104,8 +98,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                 session.write(toMessage("Email already has validated",false).toString().getBytes(),descriptor.responseLabel());
             }
             else{
-                if(u.emailAddress()!=null){
-                    //this.deploymentServiceProvider.registerPostOffice().onEmail().send(u.emailAddress(),"code");
+                if(u.emailAddress()!=null&&u.emailAddress.contains("@")){
                     String code = this.deploymentServiceProvider.resetCode(session.systemId());
                     if(this.deploymentServiceProvider.registerPostOffice().onEmail().send(u.emailAddress(),code)){
                         session.write(this.builder.create().toJson(new ResponseHeader("","check email for code", true)).getBytes(), descriptor.responseLabel());
@@ -131,6 +124,19 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                 session.write(toMessage("wrong validation code",true).toString().getBytes(),descriptor.responseLabel());
             }
         }
+        else if(session.action().equals("onCheckRole")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            String role = (String)onAccess.property("role");
+            User u = this.user(session.systemId());
+            if(tokenValidatorProvider.checkRole(u,role)){
+                PresenceContext pc = new PresenceContext(session.action());
+                pc.access = u;
+                session.write(this.builder.create().toJson(pc).getBytes(),descriptor.responseLabel());
+            }
+            else{
+                session.write(toMessage("invalid role upgrade for ["+role+"] from ["+u.role+"]",false).toString().getBytes(),descriptor.responseLabel());
+            }
+        }
         else if(session.action().equals("onUpgradeAccountRole")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             User user = this.user(session.systemId());
@@ -146,7 +152,9 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             String role = (String)onAccess.property("role");
             boolean suc = this.context.validator().upgradeRole(user,role);
             String developerName = (String)onAccess.property("developerName");
-            String email = (String)onAccess.property("email");
+            Account acc = this.account(session.systemId());
+            acc.owner(developerName);
+            accountDs.update(acc);
             PermissionContext permissionContext = new PermissionContext(role,suc);
             session.write(permissionContext.toJson().toString().getBytes(),descriptor.responseLabel());
         }

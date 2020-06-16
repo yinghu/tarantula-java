@@ -11,18 +11,20 @@
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-upgrade-admin-message"></div> 
-    <div class="w3-container w3-border-bottom w3-border-red">
+    <div id='tx-upgrade-admin-form' class="w3-container w3-border-bottom w3-border-red" style="display: none;">
         <div class="w3-panel">
             <label class="tx-text-12">Developer Name</label>
             <input id ="tx-developer-name" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='developer name'/>
         </div>
         <div class="w3-panel">
-            <label class="tx-text-12">Contact Email</label>    
-            <input id ="tx-developer-email" class="w3-input w3-round w3-border tx-text-16" type="email" placeholder='email'/>
-        </div>
-        <div class="w3-panel">
             <span id="tx-upgrade-admin-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>
             <span id="tx-upgrade-admin" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Upgrade</span>     
+        </div>
+    </div>
+    <div id='tx-upgrade-admin-email-form' class="w3-container w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-panel">
+            <span id="tx-upgrade-admin-email-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>
+            <span id="tx-upgrade-admin-email" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Email Update</span>     
         </div>
     </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -35,11 +37,23 @@
     </div>
 </div>
 <script>
-    
+    TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onCheckRole',role:'admin'},(resp)=>{      
+            if(resp.successful){
+                console.log(resp);
+                if(resp.access.activated == true){
+                    document.querySelector('#tx-upgrade-admin-form').style.display='block'; 
+                }else{
+                    document.querySelector('#tx-upgrade-admin-message').innerHTML = "Update email first, then upgrade role";
+                    document.querySelector('#tx-upgrade-admin-email-form').style.display='block';
+                }    
+            }
+            else{
+                document.querySelector('#tx-upgrade-admin-message').innerHTML = resp.message;
+            }
+    });
     document.querySelector('#tx-upgrade-admin').onclick = ()=>{
         let _n = document.querySelector('#tx-developer-name').value;
-        let _p = document.querySelector('#tx-developer-email').value;
-        TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onUpgradeAdminRole',role:'admin',developerName:_n,email:_p},(resp)=>{      
+        TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onUpgradeAdminRole',role:'admin',developerName:_n},(resp)=>{      
             if(resp.successful){
                 TARA_API.query().role = resp.role;
                 document.querySelector('#tx-upgrade-admin-message').innerHTML = 'Role upgraded';    
@@ -47,6 +61,12 @@
                 document.querySelector('#tx-upgrade-admin-message').innerHTML = 'Upgrade failed';
             }       
         });        
+    }; 
+    document.querySelector('#tx-upgrade-admin-email').onclick=()=>{
+        let m3 = document.querySelector('#tx-popup');
+        m3.innerHTML="";
+        m3.style.display = 'none';
+        tx_view({viewId:'add.email',containerId:'#tx-popup'});       
     };    
     document.querySelector('#tx-upgrade-admin-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
@@ -54,6 +74,11 @@
         m3.style.display = 'none';       
     };
     document.querySelector('#tx-upgrade-admin-cancel').onclick=()=>{
+        let m3 = document.querySelector('#tx-popup');
+        m3.innerHTML="";
+        m3.style.display = 'none';       
+    };
+    document.querySelector('#tx-upgrade-admin-email-cancel').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       

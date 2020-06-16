@@ -28,7 +28,7 @@ public interface TokenValidatorProvider extends ServiceProvider {
     Presence presence(String systemId);
 
     Access.Role role(String systemId);
-
+    boolean checkRole(Access access,String role);
     boolean upgradeRole(Access access,String role);
     boolean grantAccess(Access access,Access owner);
     boolean revokeAccess(Access access);
