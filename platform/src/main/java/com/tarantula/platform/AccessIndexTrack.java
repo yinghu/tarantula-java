@@ -9,14 +9,15 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Map;
 
 /**
- * updated 8/23/19
+ * updated 6/16/2020 yinghu lu
  */
 public class AccessIndexTrack extends IntegrationScopeObject implements AccessIndex, Portable {
 
     public AccessIndexTrack(){
-        this.binary = true;
+        //this.binary = true;
     }
 
     public AccessIndexTrack(String owner, String systemId){
@@ -54,7 +55,19 @@ public class AccessIndexTrack extends IntegrationScopeObject implements AccessIn
         this.bucket = in.readUTF("2");
         this.oid  = in.readUTF("3");
     }
-
+    @Override
+    public Map<String,Object> toMap(){
+        this.properties.put("1",bucket);//lobby id
+        this.properties.put("2",oid);//game cluster id
+        //this.properties.put("3",bucketId);
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        this.bucket = (String)properties.get("1");
+        this.oid = (String)properties.get("2");
+        //this.bucketId = ((Number)properties.getOrDefault("3",0)).intValue();
+    }
     @Override
     public byte[] toByteArray(){
         ByteBuffer buffer = ByteBuffer.allocate(8+bucket.length()+oid.length());

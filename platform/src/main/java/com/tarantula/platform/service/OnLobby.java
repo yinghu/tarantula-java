@@ -4,7 +4,7 @@ package com.tarantula.platform.service;
 import com.tarantula.Recoverable;
 
 /**
- * Updated by yinghu lu on 7/20/19
+ * Updated by yinghu lu on 6/16/2020
  */
 public interface OnLobby extends Recoverable {
 

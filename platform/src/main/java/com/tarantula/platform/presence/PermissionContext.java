@@ -10,9 +10,11 @@ public class PermissionContext extends ResponseHeader {
     public int maxLevelCount;
     public String role;
     public String accessKey;
-    public PermissionContext(int maxGameClusterCount,int currentCount){
+    public boolean subscriptionExpired;
+    public PermissionContext(int maxGameClusterCount,int currentCount,boolean subscriptionExpired){
         this.maxGameClusterCount = maxGameClusterCount;
         this.currentCount = currentCount;
+        this.subscriptionExpired = subscriptionExpired;
         this.successful = true;
     }
     public PermissionContext(String role,boolean suc){
@@ -36,6 +38,7 @@ public class PermissionContext extends ResponseHeader {
         jo.addProperty("currentCount",currentCount);
         jo.addProperty("maxLobbyCount",maxLobbyCount);
         jo.addProperty("maxLevelCount",maxLevelCount);
+        jo.addProperty("subscriptionExpired",subscriptionExpired);
         if(role!=null){
             jo.addProperty("role",role);
         }

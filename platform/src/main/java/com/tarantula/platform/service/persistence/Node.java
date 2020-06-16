@@ -6,9 +6,10 @@ import com.tarantula.platform.NoReplicationObject;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.nio.ByteBuffer;
+import java.util.Map;
 
 /**
- * Created by yinghu lu on 4/18/2018.
+ * Updated by yinghu lu on 6/16/2020
  */
 public class Node extends NoReplicationObject {
 
@@ -18,7 +19,7 @@ public class Node extends NoReplicationObject {
 
     public Node(){
         this.vertex = "Node";
-        this.binary = true;
+        //this.binary = true;
     }
 
     public Node(String bucketName,String nodeName,int bucketId){
@@ -37,7 +38,19 @@ public class Node extends NoReplicationObject {
     public int getClassId() {
         return PortableRegistry.NODE_CID;
     }
-
+    @Override
+    public Map<String,Object> toMap(){
+        this.properties.put("1",bucketName);//lobby id
+        this.properties.put("2",nodeName);//game cluster id
+        this.properties.put("3",bucketId);
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        this.bucketName = (String)properties.get("1");
+        this.nodeName = (String)properties.get("2");
+        this.bucketId = ((Number)properties.getOrDefault("3",0)).intValue();
+    }
     @Override
     public byte[] toByteArray(){
         byte[] bn = bucketName.getBytes();

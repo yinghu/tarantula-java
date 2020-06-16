@@ -11,5 +11,4 @@ public interface Subscription extends Recoverable {
     void startTimestamp(long startTimestamp);
     void endTimestamp(long endTimestamp);
 
-
 }

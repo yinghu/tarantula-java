@@ -142,7 +142,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             User user = this.user(session.systemId());
             String role = (String)onAccess.property("role");
             boolean suc = this.context.validator().upgradeRole(user,role);
-            String email = (String)onAccess.property("email");
             PermissionContext permissionContext = new PermissionContext(role,suc);
             session.write(permissionContext.toJson().toString().getBytes(),descriptor.responseLabel());
         }

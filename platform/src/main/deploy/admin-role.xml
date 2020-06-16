@@ -40,11 +40,13 @@
                     <property name="description">Yearly Subscription</property>
                     <property name="price">1980.00</property>
                     <property name="currency">USD</property>
+                    <property name="durationMonths">12</property>
                 </admin>
                 <admin type="monthlyAccess">
                     <property name="description">Monthly Subscription</property>
                     <property name="price">180.00</property>
                     <property name="currency">USD</property>
+                    <property name="durationMonths">1</property>
                 </admin>
             </configuration>
         </configuration-list>

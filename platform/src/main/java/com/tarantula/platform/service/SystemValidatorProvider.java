@@ -14,6 +14,7 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -151,9 +152,36 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         subscription.distributionKey(onLobby.subscriptionId());
         mdatastore.load(subscription);
         oMap.put(onLobby.typeId(),onLobby);
-        log.warn(onLobby.toString()+" has been monitored under ->"+subscription.toString());
+        log.warn(onLobby.toString()+" has been monitored under ->"+SystemUtil.fromUTCMilliseconds(subscription.endTimestamp()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
     }
-
+    public boolean checkSubscription(String systemId){
+        Subscription subscription = new Membership();
+        subscription.distributionKey(systemId);
+        if(!this.mdatastore.load(subscription)){
+            return false;
+        }
+        LocalDateTime end = SystemUtil.fromUTCMilliseconds(subscription.endTimestamp());
+        return end.isAfter(LocalDateTime.now());
+    }
+    public boolean updateSubscription(String systemId,int months){
+        Subscription subscription = new Membership();
+        subscription.distributionKey(systemId);
+        if(!this.mdatastore.load(subscription)){
+            return false;
+        }
+        LocalDateTime end = SystemUtil.fromUTCMilliseconds(subscription.endTimestamp());
+        end.plusMonths(months);
+        this.mdatastore.update(subscription);
+        boolean suc = end.isAfter(LocalDateTime.now());
+        Account acc = new UserAccount();
+        acc.distributionKey(systemId);
+        if(adataStore.load(acc)){
+            acc.trial(false);
+            acc.subscribed(suc);
+            adataStore.update(acc);
+        }
+        return suc;
+    }
     public void atMidnight(){
         ArrayList<String> rlist = new ArrayList<>();
         LocalDateTime _curr = LocalDateTime.now();
@@ -172,7 +200,20 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             }
         });
         rlist.forEach((k)->{
-            oMap.remove(k);
+            OnLobby o = oMap.remove(k);
+            GameCluster g = new GameCluster();
+            g.distributionKey(o.gameClusterId());
+            if(deployDataStore.update(g)){
+                g.property(GameCluster.DISABLED,true);
+                deployDataStore.update(g);
+            }
+            Account acc = new UserAccount();
+            acc.distributionKey(o.subscriptionId());
+            if(adataStore.load(acc)){
+                acc.trial(false);
+                acc.subscribed(false);
+                adataStore.update(acc);
+            }
         });
     }
     @Override

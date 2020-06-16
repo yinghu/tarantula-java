@@ -35,6 +35,8 @@ public interface TokenValidatorProvider extends ServiceProvider {
     List<Access.Role> list();
     AuthVendor authVendor(String name);
     void onCheck(OnLobby onLobby);
+    boolean checkSubscription(String systemId);
+    boolean updateSubscription(String systemId,int months);
     interface AuthVendor{
         String name();
         String clientId();

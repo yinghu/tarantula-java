@@ -4,6 +4,7 @@ import com.tarantula.Recoverable;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class IndexSet extends RecoverableObject {
@@ -11,7 +12,7 @@ public class IndexSet extends RecoverableObject {
     public Set<String> keySet = new HashSet<>();
 
     public IndexSet(){
-        this.binary = true;
+        //this.binary = true;
     }
 
     public int getFactoryId() {
@@ -32,6 +33,19 @@ public class IndexSet extends RecoverableObject {
         }
     }
 
+    @Override
+    public Map<String,Object> toMap(){
+       keySet.forEach((k)->{
+           properties.put(k,"1");
+       });
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+       properties.forEach((k,v)->{
+           keySet.add(k);
+       });
+    }
 
     public int getClassId() {
         return PortableRegistry.INDEX_SET_CID;

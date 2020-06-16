@@ -4,6 +4,8 @@ import com.tarantula.*;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;
 import java.nio.ByteBuffer;
+import java.util.Map;
+
 /**
  * Updated by yinghu on 4/30/2020
  */
@@ -18,7 +20,6 @@ public class PresenceIndex extends RecoverableObject implements Presence {
 
 
     public PresenceIndex(){
-        this.binary = true;
         this.vertex = "Presence";
     }
     public synchronized double balance() {
@@ -108,6 +109,22 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         return PresencePortableRegistry.PRESENCE_CID;
     }
 
+    @Override
+    public Map<String,Object> toMap(){
+        this.properties.put("1",balance);
+        this.properties.put("2",counter);
+        this.properties.put("3",disabled);
+        this.properties.put("4",this.timestamp);
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        this.balance = ((Number)properties.getOrDefault("1",0)).doubleValue();
+        this.counter = ((Number)properties.getOrDefault("2",0)).intValue();
+        this.disabled = (Boolean)properties.getOrDefault("3",false);
+        this.timestamp = ((Number)properties.getOrDefault("4",0)).longValue();
+
+    }
     @Override
     public byte[] toByteArray(){
         ByteBuffer buffer = ByteBuffer.allocate(24);

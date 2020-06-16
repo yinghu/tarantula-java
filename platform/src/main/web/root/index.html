@@ -335,7 +335,7 @@
             console.log(googleUser.getBasicProfile().getId());       
             let id_token = googleUser.getAuthResponse().id_token;
             TARA_API.onToken({name:'google',"token":id_token,command:'onToken',login:uid},function(resp){
-                //console.log(resp);
+                console.log(resp);
                 if(resp.successful){
                     tx_on_login();    
                 }else{

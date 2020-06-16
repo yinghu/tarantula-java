@@ -134,7 +134,7 @@
     function _list_user(){
         TARA_API.onService(true,{serviceTag:'role/account',command:'onUserList'},(resp)=>{
             if(resp.successful){
-                console.log(resp);   
+                //console.log(resp);   
                 resp.userList.forEach((a,i)=>{
                     document.querySelector('#tx-user-list-'+i).style.display='block';
                     document.querySelector('#tx-list-user-'+i+'-0').innerHTML = a.name;

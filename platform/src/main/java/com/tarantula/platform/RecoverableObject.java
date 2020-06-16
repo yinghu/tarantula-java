@@ -31,7 +31,7 @@ public class RecoverableObject implements Recoverable {
     protected long sequence;
     protected int routingNumber;
 
-    protected boolean binary;
+    //protected boolean binary;
 
     protected boolean distributable;
     protected String index;
@@ -102,10 +102,11 @@ public class RecoverableObject implements Recoverable {
 
     }
     public boolean binary(){
-        return this.binary;
+        return false;
+        //return this.binary;
     }
     public void binary(boolean binary){
-        this.binary = binary;
+        //this.binary = binary;
     }
     public boolean disabled() {
         return this.disabled;

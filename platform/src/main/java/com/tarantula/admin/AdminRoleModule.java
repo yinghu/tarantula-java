@@ -47,7 +47,8 @@ public class AdminRoleModule implements Module {
             Account acc = new UserAccount();
             acc.distributionKey(user.primary()?session.systemId():user.owner());
             account.load(acc);
-            session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0)).toJson().toString().getBytes(),label());
+            boolean ex = this.tokenValidatorProvider.checkSubscription(user.primary()?session.systemId():user.owner());
+            session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0),!ex).toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onGameClusterList")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -369,6 +370,9 @@ public class AdminRoleModule implements Module {
             chargeParams.put("source",onAccess.property("orderId")); //orderId from client stripe call
             chargeParams.put("name",OnAccess.STRIPE);
             if(this.context.validator().validateToken(chargeParams)){
+                //update subscription
+                User u = this._user(session.systemId());
+                this.tokenValidatorProvider.updateSubscription(u.primary()?session.systemId():u.owner(),fee.durationMonths);
                 session.write(this.builder.create().toJson(new ResponseHeader("onCommit", "your purchase is successful", true)).getBytes(),this.label());
             }
             else{
@@ -393,8 +397,8 @@ public class AdminRoleModule implements Module {
         this.context = context;
         Configuration ya = this.context.configuration("yearlyAccess");
         Configuration ma = this.context.configuration("monthlyAccess");
-        monthly = new SubscriptionFee("monthlyAccess",ma.property("description"),ma.property("price"),ma.property("currency"));
-        yearly = new SubscriptionFee("yearlyAccess",ya.property("description"),ya.property("price"),ya.property("currency"));
+        monthly = new SubscriptionFee("monthlyAccess",ma.property("description"),ma.property("price"),ma.property("currency"),Integer.parseInt(ma.property("durationMonths")));
+        yearly = new SubscriptionFee("yearlyAccess",ya.property("description"),ya.property("price"),ya.property("currency"),Integer.parseInt(ma.property("durationMonths")));
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
