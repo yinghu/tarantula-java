@@ -39,7 +39,6 @@
 <script>
     TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onCheckRole',role:'admin'},(resp)=>{      
             if(resp.successful){
-                console.log(resp);
                 if(resp.access.activated == true){
                     document.querySelector('#tx-upgrade-admin-form').style.display='block'; 
                 }else{

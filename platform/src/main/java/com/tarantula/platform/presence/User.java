@@ -12,7 +12,7 @@ public class User extends RecoverableObject implements Access {
 
     protected String login;
     protected String password;//hash of the password
-    protected String emailAddress="n/a"; //reset validation email address
+    protected String emailAddress; //reset validation email address
     protected boolean activated;
     protected boolean validated;
     protected boolean primary;

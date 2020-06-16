@@ -120,10 +120,6 @@ public class UserEventHandler implements RequestHandler {
                     this.eventService.publish(event);
                 }
                 else if(action.equals("onResetCode")){
-                    //String code = this.deploymentServiceProvider.resetCode(name);
-                    //boolean suc = this.deploymentServiceProvider.registerPostOffice().onEmail().send(magicKey,code);
-                    //byte[] eb = this.builder.create().toJson(new ResponseHeader("onResetCode",suc?"check email":"failed to send mail",suc)).getBytes();
-                    //_hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"onResetCode",true));
                     event.trackId(name);
                     this.eventService.publish(event);
                 }
@@ -142,11 +138,6 @@ public class UserEventHandler implements RequestHandler {
                     }
                 }
                 else if(action.equals("onIndex")){
-                    //RoutingKey routingKey = eventService.routingKey((this.bucket+"/"+sid),tag);
-                    //IndexEvent indexEvent = new IndexEvent(this.serverTopic,sid);
-                    //indexEvent.destination(routingKey.route());
-                    //indexEvent.action("onIndex");
-                    //indexEvent.trackId(typeId);
                     event.trackId(typeId);
                     this.eventService.publish(event);
                 }
