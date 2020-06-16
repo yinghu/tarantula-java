@@ -17,7 +17,6 @@ import java.util.Map;
 public class AccessIndexTrack extends IntegrationScopeObject implements AccessIndex, Portable {
 
     public AccessIndexTrack(){
-        //this.binary = true;
     }
 
     public AccessIndexTrack(String owner, String systemId){

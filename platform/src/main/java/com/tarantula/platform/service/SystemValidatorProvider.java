@@ -170,7 +170,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             return false;
         }
         LocalDateTime end = SystemUtil.fromUTCMilliseconds(subscription.endTimestamp());
-        end.plusMonths(months);
+        subscription.endTimestamp(SystemUtil.toUTCMilliseconds(end.plusMonths(months)));
+        subscription.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
         this.mdatastore.update(subscription);
         boolean suc = end.isAfter(LocalDateTime.now());
         Account acc = new UserAccount();

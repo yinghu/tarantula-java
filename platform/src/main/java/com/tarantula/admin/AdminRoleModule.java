@@ -398,7 +398,7 @@ public class AdminRoleModule implements Module {
         Configuration ya = this.context.configuration("yearlyAccess");
         Configuration ma = this.context.configuration("monthlyAccess");
         monthly = new SubscriptionFee("monthlyAccess",ma.property("description"),ma.property("price"),ma.property("currency"),Integer.parseInt(ma.property("durationMonths")));
-        yearly = new SubscriptionFee("yearlyAccess",ya.property("description"),ya.property("price"),ya.property("currency"),Integer.parseInt(ma.property("durationMonths")));
+        yearly = new SubscriptionFee("yearlyAccess",ya.property("description"),ya.property("price"),ya.property("currency"),Integer.parseInt(ya.property("durationMonths")));
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());

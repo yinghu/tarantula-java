@@ -3,7 +3,7 @@ package com.tarantula.platform;
 import com.tarantula.Distributable;
 
 /**
- * Created by yinghu lu on 10/2/2018.
+ * Updated by yinghu lu on 6/16/2020.
  */
 public class IntegrationScopeObject extends RecoverableObject {
 
