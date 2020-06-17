@@ -67,49 +67,49 @@
                 <span class='w3-left tx-text-14'>Session Count</span>
                 <span id='tx-player-7' class='w3-right tx-text-14'>0</span>
             </div>
-            <div class='w3-panel w3-border-bottom w3-border-red'>
+            <div id='tx-player-8-block' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>User Count</span>
                 <span view-id='user.list' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-folder-open" style="font-size:16px"></i></span>
                 <span id='tx-player-8' class='w3-right tx-text-14'>n/a</span>
             </div>
-            <div class='w3-panel w3-border-bottom w3-border-red'>
+            <div id='tx-player-9-block' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>Game Cluster Count</span>
                 <!--<span view-id='game.cluster.list' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-folder-open" style="font-size:16px"></i></span>-->
                 <span id='tx-player-9' class='w3-right tx-text-14'>n/a</span>
             </div>
-            <div class='w3-panel w3-border-bottom w3-border-red'>
+            <div id='tx-player-10-block' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>Trial</span>
                 <!--<span view-id='shopping.card' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-folder-open" style="font-size:16px"></i></span>-->
                 <span id='tx-player-10' class='w3-right tx-text-14'>n/a</span>
             </div>
-            <div class='w3-panel w3-border-bottom w3-border-red'>
+            <div id='tx-player-11-block' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>Subsribed</span>
                 <span view-id='shopping.card' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>
                 <span id='tx-player-11' class='w3-right tx-text-14'>n/a</span>
             </div>
-            <div class='w3-panel w3-border-bottom w3-border-red'>
+            <div id='tx-player-16-block' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>Purchase Count</span>
                 <!--<span view-id='shopping.card' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>-->
                 <span id='tx-player-16' class='w3-right tx-text-14'>0</span>
             </div>
-            <div class='w3-panel w3-border-bottom w3-border-red'>
+            <div id='tx-player-12-block' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>Start Time</span>
                 <!--<span view-id='shopping.card' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>-->
                 <span id='tx-player-12' class='w3-right tx-text-14'>n/a</span>
             </div>
-            <div class='w3-panel w3-border-bottom w3-border-red'>
+            <div id='tx-player-13-block' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>End Time</span>
                 <!--<span view-id='shopping.card' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>-->
                 <span id='tx-player-13' class='w3-right tx-text-14'>n/a</span>
             </div>
-            <div class='w3-panel w3-border-bottom w3-border-red'>
+            <div id='tx-player-14-block' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-minus" style="font-size:16px"></i></span>
                 <span class='w3-left tx-text-14'>Last Updated Time</span>
                 <!--<span view-id='shopping.card' class="w3-right tx-margin-left-8 w3-text-green tx-action"><i class="fa fa-plus-square" style="font-size:16px"></i></span>-->
@@ -684,12 +684,20 @@
                     document.querySelector('#tx-player-9').innerHTML=resp.account.gameClusterCount;
                     document.querySelector('#tx-player-10').innerHTML=resp.account.trial;
                     document.querySelector('#tx-player-11').innerHTML=resp.account.subscribed;
+                    document.querySelector('#tx-player-8-block').style.display='block';
+                    document.querySelector('#tx-player-9-block').style.display='block';
+                    document.querySelector('#tx-player-10-block').style.display='block';
+                    document.querySelector('#tx-player-11-block').style.display='block';
                 }
                 if(resp.subscription){
                     document.querySelector('#tx-player-16').innerHTML=resp.subscription.updatedCount;
                     document.querySelector('#tx-player-12').innerHTML=resp.subscription.startTime;
                     document.querySelector('#tx-player-13').innerHTML=resp.subscription.endTime;
                     document.querySelector('#tx-player-14').innerHTML=resp.subscription.lastUpdated;
+                    document.querySelector('#tx-player-16-block').style.display='block';
+                    document.querySelector('#tx-player-12-block').style.display='block';
+                    document.querySelector('#tx-player-13-block').style.display='block';
+                    document.querySelector('#tx-player-14-block').style.display='block';
                 }
             }    
         });
