@@ -25,7 +25,7 @@ public class UserAccount extends User implements Account {
         return UserPortableRegistry.USER_ACCOUNT_CID;
     }
     public Map<String,Object> toMap(){
-        properties.put("1",emailAddress);
+        //properties.put("1",emailAddress);
         properties.put("2",userCount);
         properties.put("3",gameClusterCount);
         properties.put("4",timestamp);
@@ -35,7 +35,7 @@ public class UserAccount extends User implements Account {
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
-        this.emailAddress = (String)properties.get("1");
+        //this.emailAddress = (String)properties.get("1");
         this.userCount = ((Number) properties.get("2")).intValue();
         this.gameClusterCount = ((Number) properties.get("3")).intValue();
         this.timestamp = ((Number) properties.get("4")).longValue();

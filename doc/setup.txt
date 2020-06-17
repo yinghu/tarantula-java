@@ -1,25 +1,19 @@
-1. TortoiseHG download and setup
-   http://tortoisehg.bitbucket.org/download/index.html
+1. git user/password setup
+   .gitconfig [user] [credential] section
+   .git-credential https://[user]:[password]@github
 
-2. Run two following commands to get source code clone from bitbucket.org on windows command Prompt
-   hg clone https://heydere@bitbucket.org/ye2/platform
+## GET OPEN JDK 14 AND MAVEN 3
+2. curl -O https://download.java.net/java/GA/jdk14/076bab302c7b4508975440c56f6cc26a/36/GPL/openjdk-14_linux-x64_bin.tar.gz
+wget http://www-eu.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
 
-3. JAVA SDK download and setup
-   http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 
-4. Set JAVA_HOME  as like C:\Program Files\Java\jdk1.8.0_65 In WINDOWS Environment variables.
-
-5. Server build tool download and setup
+3. Server build tool download and setup
    pick apache-maven-3.3.9-bin.zip on https://maven.apache.org/download.cgi and unzip into like c:\dev
 
-6. Set MAVEN_HOME as like C:\development\apache-maven-3.3.9-bin\apache-maven-3.3.9 In WINDOWS Environment variables.
+4. Set MAVEN_HOME as like C:\development\apache-maven-3.3.9-bin\apache-maven-3.3.9 In WINDOWS Environment variables.
    Also add the MAVEN_HOME value to Path WINDOWS Environment variables.
 
-7. Add following two host names on C:\Windows\System32\drivers\etc\hosts via notepad with admin permission
-    127.0.0.1 cx.tarantula01.com
-    127.0.0.1 tarantula.com
-
-8. reopen windows command prompt once you finished 1 to 6
+5. reopen windows command prompt once you finished 1 to 6
    go to server source code root, which includes pom.xml, then run the following command
    mvn clean install -DcreateChecksum=true
    Once you see those lines you are successful to build the server code base
@@ -30,7 +24,7 @@
    [INFO] Final Memory: 27M/405M
    [INFO] ------------------------------------------------------------------------
 
-9. Bring the server up. You are still on the same windows command prompt
+6. Bring the server up. You are still on the same windows command prompt
    once you build successfully you can go to \target\release\tarantula-platform-1.0-bin\tarantula-platform-1.0\bin then run following command
    tarantula.bat on Windows tarantula.sh on Linux or MacOS
 
@@ -39,10 +33,6 @@ INTEGRATION DEVELOPMENT TOOLS : IntelliJ IDE (JAVA), Brackets (JAVASCRIPT)
 
 ###############################################
 Ubuntu 16.x.x Setup
-
-## GET OPEN JDK 14 AND MAVEN 3
-curl -O https://download.java.net/java/GA/jdk14/076bab302c7b4508975440c56f6cc26a/36/GPL/openjdk-14_linux-x64_bin.tar.gz
-wget http://www-eu.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
 
 #####################################################
 

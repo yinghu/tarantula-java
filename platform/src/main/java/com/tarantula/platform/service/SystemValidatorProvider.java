@@ -286,7 +286,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         }
         UserAccount acc = new UserAccount();
         acc.distributionKey(access.distributionKey());
-        acc.emailAddress(access.emailAddress());
+        //acc.emailAddress(access.emailAddress());
         LocalDateTime loc = LocalDateTime.now();
         acc.timestamp(SystemUtil.toUTCMilliseconds(loc));
         if(!adataStore.createIfAbsent(acc,true)){
