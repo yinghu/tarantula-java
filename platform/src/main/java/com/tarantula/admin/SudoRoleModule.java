@@ -13,7 +13,6 @@ import com.tarantula.platform.presence.User;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
-import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SudoRoleModule implements Module,Configuration.Listener {
 
     private ApplicationContext context;
-    private DeploymentServiceProvider serviceProvider;
+    private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
     //private DataStore dataStore;
     private GsonBuilder builder;
@@ -49,10 +48,18 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         else if(session.action().equals("onTestLabeledKey")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
             boolean suc = tokenValidatorProvider.validateAccessKey((String)acc.property(OnAccess.ACCESS_KEY));
-            session.write(toMessage(suc?"key passed":"key failed").toString().getBytes(),label());
+            session.write(toMessage(suc?"key passed":"key failed",suc).toString().getBytes(),label());
+        }
+        else if(session.action().equals("onStopAccessIndex")){
+            deploymentServiceProvider.stopAccessIndex();
+            session.write(toMessage(session.action(),true).toString().getBytes(),label());
+        }
+        else if(session.action().equals("onStartAccessIndex")){
+            deploymentServiceProvider.startAccessIndex();
+            session.write(toMessage(session.action(),true).toString().getBytes(),label());
         }
         else if(session.action().equals("onFindUser")){
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"find user",true)).getBytes(),this.label());
+            session.write(toMessage(session.action(),true).toString().getBytes(),label());
         }
         else if(session.action().equals("onSubscriptionList")){
             DataStore mds = this.context.dataStore(Subscription.DataStore);
@@ -67,7 +74,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             });
             session.write(sct.toJson().toString().getBytes(),this.label());
         }
-
+        /**
         else if(session.action().equals("addLobby")){
             LobbyDescriptor desc = new LobbyDescriptor();
             desc.fromMap(SystemUtil.toMap(payload));
@@ -135,7 +142,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         }
         else if(session.action().equals("listConfigs")){
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"ok",true)).getBytes(),label());
-        }
+        }**/
         else if(session.action().equals("deployView")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             OnView onView = new OnViewTrack();
@@ -148,26 +155,25 @@ public class SudoRoleModule implements Module,Configuration.Listener {
                 onView.moduleResourceFile(rname);
             }
             onView.contentBaseUrl((String) onAccess.property("deployUrl"));
-            this.serviceProvider.deploy(onView);
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"view deployed",true)).getBytes(),label());
+            this.deploymentServiceProvider.deploy(onView);
+            session.write(toMessage("view deployed",true).toString().getBytes(),label());
         }
         else{
-            session.write(payload,label());
+           throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");
         }
-        return session.action().equals("onLeave");
+        return false;
     }
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
         this.cMap = new ConcurrentHashMap<>();
-        this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        this.serviceProvider.registerConfigurationListener(this);
+        this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        this.deploymentServiceProvider.registerConfigurationListener(this);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.uDatastore = this.context.dataStore(Access.DataStore);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.context.log("Admin setup module started", OnLog.INFO);
     }
     @Override
@@ -182,8 +188,9 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         //this.context.log(c.toString(),OnLog.WARN);
         cMap.put(c.distributionKey(),c);
     }
-    private JsonObject toMessage(String msg){
+    private JsonObject toMessage(String msg,boolean suc){
         JsonObject jms = new JsonObject();
+        jms.addProperty("successful",suc);
         jms.addProperty("message",msg);
         return jms;
     }
@@ -191,7 +198,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",true);
         long cnt =0;
-        for(int i=0;i<this.serviceProvider.clusterPartitionCount();i++){
+        for(int i=0;i<this.deploymentServiceProvider.clusterPartitionCount();i++){
             cnt += this.context.dataStore("p"+i).count();
         }
         jsonObject.addProperty("AccessIndex",cnt);

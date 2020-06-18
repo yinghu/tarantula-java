@@ -29,7 +29,7 @@
 <script>
     //document.querySelector("#tx-create-access-key-message").innerHTML = TARA_API.query().gameClusterId;
     document.querySelector('#tx-stop-access-index-ok').onclick=()=>{
-        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onStopAccessIndex',accessKey:_key},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onStopAccessIndex'},(resp)=>{
             document.querySelector('#tx-stop-access-index-message').innerHTML = resp.message;  
         });    
     };

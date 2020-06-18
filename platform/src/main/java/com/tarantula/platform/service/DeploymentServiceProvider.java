@@ -85,4 +85,9 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
     //System metrics data
     <T extends OnAccess> T metrics();
+
+    //Access index set operation API
+    void stopAccessIndex();
+    void startAccessIndex();
+    void registerAccessIndexListener(AccessIndexService.Listener listener);
 }

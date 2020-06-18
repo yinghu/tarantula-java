@@ -4,7 +4,7 @@ package com.tarantula.platform.service;
 import com.tarantula.AccessIndex;
 
 /**
- * Updated by yinghu lu on 8/26/19
+ * Updated by yinghu lu on 6/18/2020
  */
 public interface AccessIndexService extends ServiceProvider {
 
@@ -14,4 +14,8 @@ public interface AccessIndexService extends ServiceProvider {
 
     AccessIndex get(String accessKey);
 
+    interface Listener{
+        void onStop();
+        void onStart();
+    }
 }

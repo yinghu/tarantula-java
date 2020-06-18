@@ -42,6 +42,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private CopyOnWriteArrayList<OnView.Listener> vListeners = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<Configuration.Listener> cListeners = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<Connection.Listener> wListeners = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<AccessIndexService.Listener> aListeners = new CopyOnWriteArrayList<>();
+
 
     private ConcurrentHashMap<String,Recoverable> vMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Event> pushRegistry = new ConcurrentHashMap<>();
@@ -768,6 +770,17 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         byte[] ret = icp.remove(resetCode.getBytes());
         return (ret!=null?new String(ret):"");
+    }
+    public void stopAccessIndex(){
+        //publish stop event
+        aListeners.forEach((a)->a.onStop());
+    }
+    public void startAccessIndex(){
+        //publish start event
+        aListeners.forEach((a)->a.onStart());
+    }
+    public void registerAccessIndexListener(AccessIndexService.Listener listener){
+        aListeners.add(listener);
     }
     public void atMidnight(){
         //log.warn("MIDNIGHT->");

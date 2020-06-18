@@ -15,7 +15,7 @@ import com.tarantula.platform.util.SystemUtil;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class UserEventHandler implements RequestHandler {
+public class UserEventHandler implements RequestHandler,AccessIndexService.Listener{
 
     private static TarantulaLogger log = JDKLogger.getLogger(UserEventHandler.class);
 
@@ -177,10 +177,21 @@ public class UserEventHandler implements RequestHandler {
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
         this.deploymentServiceProvider = tcx.deploymentServiceProvider();
+        this.deploymentServiceProvider.registerAccessIndexListener(this);
         this.accessIndexService = tcx.accessIndexService();
         this.bucket = tcx.bucket();
     }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
+    }
+
+    @Override
+    public void onStop() {
+        log.warn("access index stopped");
+    }
+
+    @Override
+    public void onStart() {
+        log.warn("access index stopped");
     }
 }
