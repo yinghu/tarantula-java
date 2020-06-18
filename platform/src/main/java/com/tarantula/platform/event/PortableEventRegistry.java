@@ -2,6 +2,7 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
+import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.OnViewTrack;
 import com.tarantula.platform.presence.GameCluster;
@@ -68,6 +69,8 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int ON_VIEW_CID = 105;
 
     public static final int GAME_CLUSTER_CID = 106;
+
+    public static final int ACCESS_INDEX_CID = 107;
 
     public Portable create(int cid) {
         Portable _ins;
@@ -157,6 +160,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case GAME_CLUSTER_CID:
                 _ins = new GameCluster();
+                break;
+            case ACCESS_INDEX_CID:
+                _ins = new AccessIndexTrack();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");

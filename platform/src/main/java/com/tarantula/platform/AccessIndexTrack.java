@@ -5,7 +5,7 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.AccessIndex;
 import com.tarantula.Recoverable;
-import com.tarantula.platform.service.cluster.PortableRegistry;
+import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -33,12 +33,12 @@ public class AccessIndexTrack extends IntegrationScopeObject implements AccessIn
 
     @Override
     public int getFactoryId() {
-        return PortableRegistry.OID;
+        return PortableEventRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PortableRegistry.ACCESS_INDEX_CID;
+        return PortableEventRegistry.ACCESS_INDEX_CID;
     }
 
     @Override
