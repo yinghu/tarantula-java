@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -57,9 +58,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private String contentDir;
     private Metrics metrics;
 
+    private AtomicBoolean onAccessIndex;
 
     @Override
     public void start() throws Exception {
+        onAccessIndex = new AtomicBoolean(true);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ApplicationConfiguration.class,new ConfigurationDeserializer());
         this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
@@ -780,6 +783,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         aListeners.forEach((a)->a.onStart());
     }
     public void registerAccessIndexListener(AccessIndexService.Listener listener){
+        if(onAccessIndex.get()){
+            listener.onStart();
+        }
+        else{
+            listener.onStop();
+        }
         aListeners.add(listener);
     }
     public void atMidnight(){

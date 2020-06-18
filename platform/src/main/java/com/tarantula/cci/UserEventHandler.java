@@ -14,6 +14,7 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UserEventHandler implements RequestHandler,AccessIndexService.Listener{
 
@@ -26,6 +27,9 @@ public class UserEventHandler implements RequestHandler,AccessIndexService.Liste
     private GsonBuilder builder;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
     private DeploymentServiceProvider deploymentServiceProvider;
+
+    private AtomicBoolean onIndex;
+
     public UserEventHandler(){
 
     }
@@ -67,20 +71,25 @@ public class UserEventHandler implements RequestHandler,AccessIndexService.Liste
                 else if(action.equals("onToken")){//to server topic
                     AccessIndex acc = accessIndexService.get(magicKey);
                     if(acc!=null){//existing entry
-
                         event.systemId(acc.distributionKey());
                         RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
                         event.destination(_routingKey.route());
                         event.routingNumber(_routingKey.routingNumber());
-                    }else{//new exchange
+                        this.eventService.publish(event);
+                    }
+                    else if(onIndex.get()){//third party token exchange first time
                         event.action("onTokenRegister");
                         String trackId = this.bucket+Recoverable.PATH_SEPARATOR+SystemUtil.oid();
                         event.systemId(trackId);
                         RoutingKey _routingKey = eventService.routingKey(trackId,tag);
                         event.destination(_routingKey.route());
                         event.routingNumber(_routingKey.routingNumber());
+                        this.eventService.publish(event);
                     }
-                    this.eventService.publish(event);
+                    else{
+                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service will be available shortly",false)).getBytes();
+                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                    }
                 }
                 else if(action.equals("onTicket")){
                     AccessIndex acc = accessIndexService.get(magicKey);
@@ -96,12 +105,18 @@ public class UserEventHandler implements RequestHandler,AccessIndexService.Liste
                     }
                 }
                 else if(action.equals("onRegister")){//to server topic
-                    String trackId = this.bucket+Recoverable.PATH_SEPARATOR+ SystemUtil.oid();
-                    event.systemId(trackId);
-                    RoutingKey _routingKey = eventService.routingKey(trackId,tag);
-                    event.destination(_routingKey.route());
-                    event.routingNumber(_routingKey.routingNumber());
-                    this.eventService.publish(event);
+                    if(onIndex.get()){ //register
+                        String trackId = this.bucket+Recoverable.PATH_SEPARATOR+ SystemUtil.oid();
+                        event.systemId(trackId);
+                        RoutingKey _routingKey = eventService.routingKey(trackId,tag);
+                        event.destination(_routingKey.route());
+                        event.routingNumber(_routingKey.routingNumber());
+                        this.eventService.publish(event);
+                    }
+                    else{
+                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service will be available shortly",false)).getBytes();
+                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                    }
                 }
                 else if(action.equals("onDevice")){//to server topic
                     AccessIndex acc = accessIndexService.get(magicKey);
@@ -110,14 +125,19 @@ public class UserEventHandler implements RequestHandler,AccessIndexService.Liste
                         RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
                         event.destination(_routingKey.route());
                         event.routingNumber(_routingKey.routingNumber());
-                    }else{
+                        this.eventService.publish(event);
+                    }else if(onIndex.get()){//device login exchange first time
                         String trackId = this.bucket+Recoverable.PATH_SEPARATOR+ SystemUtil.oid();
                         event.trackId(trackId);
                         RoutingKey _routingKey = eventService.routingKey(trackId,tag);
                         event.destination(_routingKey.route());
                         event.routingNumber(_routingKey.routingNumber());
+                        this.eventService.publish(event);
                     }
-                    this.eventService.publish(event);
+                    else{
+                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service will be available shortly",false)).getBytes();
+                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                    }
                 }
                 else if(action.equals("onResetCode")){
                     event.trackId(name);
@@ -175,6 +195,7 @@ public class UserEventHandler implements RequestHandler,AccessIndexService.Liste
         return true;
     }
     public void setup(ServiceContext tcx){
+        this.onIndex = new AtomicBoolean(false);
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
         this.deploymentServiceProvider = tcx.deploymentServiceProvider();
         this.deploymentServiceProvider.registerAccessIndexListener(this);
@@ -188,10 +209,12 @@ public class UserEventHandler implements RequestHandler,AccessIndexService.Liste
     @Override
     public void onStop() {
         log.warn("access index stopped");
+        onIndex.set(false);
     }
 
     @Override
     public void onStart() {
-        log.warn("access index stopped");
+        log.warn("access index started");
+        onIndex.set(true);
     }
 }
