@@ -15,12 +15,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     String DEPLOY_DATA_STORE = "tarantula";
 
     String NAME = "DeploymentServiceProvider";
-    enum Mode{
-        ALL,
-        PRESENCE,
-        APPLICATION
-    }
-    Mode deploymentMode();
+
     void clusterUpdated(int scope,String nodeId,boolean state);
     int clusterPartitionCount();
     //UDP SERVER APIs

@@ -73,7 +73,7 @@ public class TarantulaMain {
 			}
 			TarantulaContext btx = TarantulaContext.getInstance();
 			TarantulaContext.memberDiscovery = (ScopedMemberDiscovery) Class.forName(override(overriding,"tarantula.member.discovery.name",_user,_config)).getConstructor().newInstance();
-			btx.deploymentMode = override(overriding,"tarantula.deployment.mode",_user,_config);
+			//btx.deploymentMode = override(overriding,"tarantula.deployment.mode",_user,_config);
 			btx.platformVersion = override(overriding,"tarantula.platform.version",_user,_config);
 			btx.platformRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.routing.number",_user,_config));
 			btx.bootstrapRetries = Integer.parseInt(override(overriding,"tarantula.bootstrap.max.retries",_user,_config));

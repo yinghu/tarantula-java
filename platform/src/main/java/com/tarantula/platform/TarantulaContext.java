@@ -103,7 +103,6 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
     public String dataBucketGroup;
     public String dataBucketNode;
-    //public String dataBucketId; //string integer
 
     public String dataReplicationThreadPoolSetting;
 
@@ -120,7 +119,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     public long timeoutOnInstance;
     public int metricsUpdateIntervalMinutes=1;
     public String clusterNamePrefix;
-    public String deploymentMode ="ALL";
+
     public String platformVersion;
     public int platformRoutingNumber;
     public String endpointIp ="localhost";

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Updated 5/14/2020
+ * Updated 6/17/2020
  */
 public class UserManagementApplication extends TarantulaApplicationHeader{
 
@@ -35,7 +35,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     private DataStore pDatastore;
     private DataStore aDatastore;
 
-    private boolean onApplication;
+    //private boolean onApplication;
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
@@ -49,7 +49,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.roleList = this.tokenValidatorProvider.list();
-        this.onApplication = this.deploymentServiceProvider.deploymentMode()== DeploymentServiceProvider.Mode.APPLICATION;
+        //this.onApplication = this.deploymentServiceProvider.deploymentMode()== DeploymentServiceProvider.Mode.APPLICATION;
         String root = configuration.property("root");
         String pwd = configuration.property("password");
         OnAccess onAccess = new OnAccessTrack();
@@ -99,7 +99,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 }
             }
         });
-        this.context.log("User management application started on tag ["+descriptor.tag()+"] with application mode ["+onApplication+"]",OnLog.INFO);
+        this.context.log("User management application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
     }
     @Override
     public void callback(Session session,byte[] payload) throws Exception {
