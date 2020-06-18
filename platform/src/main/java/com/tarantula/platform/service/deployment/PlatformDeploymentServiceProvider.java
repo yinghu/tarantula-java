@@ -818,7 +818,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return ((emailAddress, data) ->Email.send(emailAddress,data));
         }
         public OnEmail onEmail(){
-            return ((emailAddress, data) ->Email.send(emailAddress,data));
+            return ((emailAddress, data) -> false);//Email.send(emailAddress,data));
         }
 
         public OnTag onTag(String tag){

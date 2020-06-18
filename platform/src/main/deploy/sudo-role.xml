@@ -47,6 +47,12 @@
             <view type="create.labeled.key">
                 <property name="moduleResourceFile">sudo/create.labeled.key.view.html</property>
             </view>
+            <view type="stop.access.index">
+                <property name="moduleResourceFile">sudo/stop.access.index.view.html</property>
+            </view>
+            <view type="start.access.index">
+                <property name="moduleResourceFile">sudo/start.access.index.view.html</property>
+            </view>
         </view-list>
 
     </lobby-context>
