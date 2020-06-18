@@ -92,7 +92,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.recoveryDir = properties.get("recoveryDir");
         this.dRecovered = Boolean.parseBoolean(properties.get("dRecovered"));
         this.iRecovered = Boolean.parseBoolean(properties.get("iRecovered"));
-        this.node = new Node(properties.get("bucket"),properties.get("node"),Integer.parseInt(properties.get("bucketId")));
+        this.node = new Node(properties.get("bucket"),properties.get("node"));
         this.replicationTopic = "tarantula-replication-topic-"+this.database;
         this.backupTopic = "tarantula-backup-topic-"+this.database;
     }

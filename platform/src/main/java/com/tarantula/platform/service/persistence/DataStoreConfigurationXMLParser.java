@@ -31,7 +31,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
 
     private String dataBucketGroup;
     private String dataBucketNode;
-    private String dataBucketId;
+    //private String dataBucketId;
     private String dataStoreProviderConfiguration;
     private String dataDir;
     private String dataRecoveryDir;
@@ -43,7 +43,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
         this.dataStoreProviderConfiguration = dconfig;
         this.dataBucketGroup = tx.dataBucketGroup;
         this.dataBucketNode = tx.dataBucketNode;
-        this.dataBucketId = tx.dataBucketId;
+        //this.dataBucketId = tx.dataBucketId;
         this.dataDir = tx.dataStoreDir;
         this.dataRecoveryDir = tx.dataStoreRecoveryDir;
         this.dRecovered = tx.dRecovered.get();
@@ -81,7 +81,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             properties.put("truncated",trimming);
             properties.put("bucket",this.dataBucketGroup);
             properties.put("node",this.dataBucketNode);
-            properties.put("bucketId",this.dataBucketId);
+            //properties.put("bucketId",this.dataBucketId);
             properties.put("dir",this.dataDir);
             properties.put("recoveryDir",this.dataRecoveryDir);
             properties.put("dRecovered",this.dRecovered?"true":"false");
