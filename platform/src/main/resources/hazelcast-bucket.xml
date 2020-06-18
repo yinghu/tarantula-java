@@ -5,7 +5,6 @@
            http://www.hazelcast.com/schema/config/hazelcast-config-3.12.xsd">
     <group>
         <name>tarantula</name>
-        <password>tarantula</password>
     </group>
 
     <management-center enabled="false">http://10.0.0.6:8080/mancenter</management-center>
