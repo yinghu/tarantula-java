@@ -582,7 +582,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
            _shutdown((String)gameCluster.property(GameCluster.GAME_LOBBY));
            _shutdown((String)gameCluster.property(GameCluster.GAME_SERVICE));
        }
-        return false;
+       else if(event instanceof AccessIndexStateEvent){
+            onAccessIndex.set(event.closed());
+            if(onAccessIndex.get()){
+                aListeners.forEach((a)->a.onStart());
+            }
+            else{
+                aListeners.forEach((a)->a.onStop());
+            }
+       }
+       return false;
     }
     public void registerInstanceRegistryListener(InstanceRegistry.Listener instanceRegistryListener){
         rListeners.put(instanceRegistryListener.onLobby(),instanceRegistryListener);
@@ -776,11 +785,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public void stopAccessIndex(){
         //publish stop event
-        aListeners.forEach((a)->a.onStop());
+        //aListeners.forEach((a)->a.onStop());
+        this.integrationEventService.publish(new AccessIndexStateEvent(this.eventTopic,false));
     }
     public void startAccessIndex(){
         //publish start event
-        aListeners.forEach((a)->a.onStart());
+        //aListeners.forEach((a)->a.onStart());
+        this.integrationEventService.publish(new AccessIndexStateEvent(this.eventTopic,true));
     }
     public void registerAccessIndexListener(AccessIndexService.Listener listener){
         if(onAccessIndex.get()){
