@@ -15,7 +15,7 @@ import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 import java.util.Properties;
 
 /**
- * Updated by yinghu lu on 4/7/2019.
+ * Updated by yinghu lu on 6/18/2020
  */
 public class AccessIndexClusterService implements ManagedService,RemoteService, MigrationListener {
 
@@ -24,6 +24,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
     private NodeEngine nodeEngine;
 
     private DataStoreOnPartition[] dataStoreOnPartitions;
+    private DataStore masterStore;
     private TarantulaContext tarantulaContext;
 
     @Override
@@ -86,8 +87,10 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
         }
     }
     public void setup() {
+        masterStore = this.tarantulaContext.masterDataStore();
         for(DataStoreOnPartition dso : dataStoreOnPartitions){
             dso.dataStore = this.tarantulaContext.dataStore(dso.name);
+            //masterStore.createIfAbsent(new PartitionIndex(masterStore.bucket(),dso.name),true);
             boolean loc = this.nodeEngine.getPartitionService().getPartition(dso.partition).isLocal();
             dso.local.set(loc);
             dso.enabled.set(loc);
