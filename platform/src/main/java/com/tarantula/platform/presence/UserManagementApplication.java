@@ -12,7 +12,6 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +33,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     private DataStore uDatastore;
     private DataStore pDatastore;
     private DataStore aDatastore;
-
+    private DataStore sDatastore;
     //private boolean onApplication;
     @Override
     public void setup(ApplicationContext context) throws Exception {
@@ -58,11 +57,13 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         uDatastore = this.context.dataStore(Access.DataStore);
         pDatastore = this.context.dataStore(Presence.DataStore);
         aDatastore = this.context.dataStore(Account.DataStore);
+        sDatastore = this.context.dataStore(OnSession.DataStore);
+
         DataStore mDatastore = this.context.dataStore(Subscription.DataStore);
-        String rootId = uDatastore.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid();
-        AccessIndex accessIndex = accessIndexService.set((String) onAccess.property("login"),rootId);
+        //String rootId = uDatastore.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid();
+        AccessIndex accessIndex = accessIndexService.set((String) onAccess.property("login"));
         if(accessIndex!=null){
-            Access user = createLogin(onAccess, rootId,AccessControl.root.name(),false,"password",true);
+            Access user = createLogin(onAccess,accessIndex.distributionKey(),AccessControl.root.name(),false,"password",true);
             Account acc = new UserAccount();
             acc.distributionKey(user.distributionKey());
             acc.trial(false);
@@ -143,13 +144,19 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         else if(session.action().equals("onTokenRegister")){
             Map<String,Object> params = acc.toMap();
             if(this.context.validator().validateToken(params)){
-                AccessIndex _query = accessIndexService.set((String) acc.property("login"),session.systemId());
+                AccessIndex _query = accessIndexService.get((String) acc.property("login"));
                 if(_query!=null){
+                    //OnSession _onSession = new OnSessionTrack();
+                    //_onSession.distributionKey(session.systemId());
+                    //_onSession.token("abc123");
+                    //sDatastore.createIfAbsent(_onSession,false);
+                    //this.context.log(_onSession.toString(),OnLog.WARN);
+                    acc.property(OnAccess.PASSWORD,"abc123");
                     Access user = createLogin(acc,session.systemId(),role,true,acc.name(),true);
                     user.emailAddress((String) params.get("email"));
                     user.activated(true);
                     uDatastore.update(user);
-                    OnSession onSession = login(session.systemId(),"",session);
+                    OnSession onSession = login(session.systemId(),"abc123",session);
                     onSession(onSession,session);
                 }
                 else{
@@ -160,8 +167,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             }
         }
         else if(session.action().equals("onRegister")){
-            AccessIndex _query = accessIndexService.set((String) acc.property("login"),session.systemId());
-            if(_query==null){
+            AccessIndex _query = accessIndexService.get((String) acc.property(OnAccess.LOGIN));
+            if(_query==null){//double-check
                 session.write(builder.create().toJson(new ResponseHeader(session.action(),false,0,"login [" + acc.property("login") + "] cannot be registered","error")).getBytes(),this.descriptor.responseLabel());
             }
             else{
@@ -173,23 +180,23 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             }
         }
         else if(session.action().equals("onDevice")){
-            String deviceId = (String) acc.property("deviceId");
-            if(session.systemId()!=null){//registered
-                OnSession access = this.login(session.systemId(),deviceId,session);
+            String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
+            OnSession access = this.login(session.systemId(),deviceId,session);
+            onSession(access,session);
+            this.deploymentServiceProvider.onUpdated(Metrics.DEVICE_COUNT,1);
+        }
+        else if(session.action().equals("onDeviceRegister")){
+            String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
+            AccessIndex accessIndex = this.accessIndexService.get(deviceId);
+            if(accessIndex!=null){
+                acc.property("login",deviceId);
+                acc.property("password",deviceId);
+                this.createLogin(acc,session.systemId(),role,true,"device",true);
+                OnSession access = this.login(session.trackId(),(String) acc.property(OnAccess.PASSWORD),session);
                 onSession(access,session);
             }
             else{
-                AccessIndex accessIndex = this.accessIndexService.set(deviceId,session.trackId());
-                if(accessIndex!=null){
-                    acc.property("login",deviceId);
-                    acc.property("password",deviceId);
-                    this.createLogin(acc,session.trackId(),role,true,"device",true);
-                    OnSession access = this.login(session.trackId(),(String) acc.property(OnAccess.PASSWORD),session);
-                    onSession(access,session);
-                }
-                else{
-                    session.write(this.builder.create().toJson(new ResponseHeader("onDevice","wrong device id", false)).getBytes(),this.descriptor.responseLabel());
-                }
+                session.write(this.builder.create().toJson(new ResponseHeader("onDevice","wrong device id", false)).getBytes(),this.descriptor.responseLabel());
             }
             this.deploymentServiceProvider.onUpdated(Metrics.DEVICE_COUNT,1);
         }
@@ -245,7 +252,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         Access access = new User();
         access.distributionKey(systemId);
         OnSession _onSession = OnSessionTrack.PASSWORD_NOT_MATCHED;
-        if(uDatastore.load(access)){//???reject device/token users
+        if(uDatastore.load(access)){
             access.routingNumber(session.routingNumber());
             _onSession=this.context.validator().validatePassword(access,password);
             _onSession.systemId(systemId);
@@ -255,7 +262,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     private Access createLogin(OnAccess payload,String systemId,String roleName,boolean validated,String validator,boolean primary){
         Access acc = new User((String) payload.property("login"),validated,validator);
         acc.distributionKey(systemId);
-        acc.password(validated?"":this.context.validator().hashPassword((String) payload.property(OnAccess.PASSWORD)));
+        String pwd = (String)payload.property(OnAccess.PASSWORD);
+        acc.password(this.context.validator().hashPassword(pwd));
         acc.activated(this.activated);//if false do email validation
         acc.primary(primary);
         if(!primary){

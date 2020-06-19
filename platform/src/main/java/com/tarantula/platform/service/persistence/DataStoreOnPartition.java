@@ -2,6 +2,7 @@ package com.tarantula.platform.service.persistence;
 
 import com.sleepycat.je.Database;
 import com.tarantula.DataStore;
+import com.tarantula.platform.service.cluster.PartitionIndex;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -10,6 +11,7 @@ public class DataStoreOnPartition {
     public final int partition;
     public final String name;
     public DataStore dataStore;//set on data store ready
+    public PartitionIndex partitionIndex;
     public Database database;
     public final AtomicBoolean enabled;
     public final AtomicBoolean local;

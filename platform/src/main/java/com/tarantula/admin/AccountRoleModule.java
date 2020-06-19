@@ -73,7 +73,7 @@ public class AccountRoleModule implements Module {
             acc.distributionKey(ua.primary()?session.systemId():ua.owner());
             if(account.load(acc)){
                 if(acc.userCount(0)<maxUserCount){
-                    AccessIndex query = accessIndexService.set((String)onAccess.property("login"), user.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid());
+                    AccessIndex query = accessIndexService.set((String)onAccess.property("login"));
                     if(query!=null){
                         onAccess.owner(acc.distributionKey());//make sure acc id as the owner
                         onAccess.distributionKey(query.distributionKey());

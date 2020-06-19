@@ -36,9 +36,9 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
     }
 
     @Override
-    public AccessIndex set(String accessKey,String bucket){
+    public AccessIndex set(String accessKey){
         NodeEngine nodeEngine = getNodeEngine();
-        AccessIndexSetOperation operation = new AccessIndexSetOperation(accessKey,bucket);
+        AccessIndexSetOperation operation = new AccessIndexSetOperation(accessKey);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(accessKey);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,partitionId);
         try {

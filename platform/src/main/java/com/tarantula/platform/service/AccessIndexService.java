@@ -10,7 +10,7 @@ public interface AccessIndexService extends ServiceProvider {
 
     String NAME = "AccessIndexService";
 
-    AccessIndex set(String accessKey, String systemId);
+    AccessIndex set(String accessKey);
 
     AccessIndex get(String accessKey);
 

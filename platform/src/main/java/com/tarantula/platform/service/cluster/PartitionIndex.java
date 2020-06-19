@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.cluster;
 
+import com.tarantula.Countable;
 import com.tarantula.DataStore;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.DistributionKey;
@@ -7,22 +8,25 @@ import com.tarantula.platform.RecoverableObject;
 
 import java.util.Map;
 
-public class PartitionIndex extends RecoverableObject implements DataStore.Updatable {
+public class PartitionIndex extends RecoverableObject implements DataStore.Updatable, Countable {
 
     public PartitionIndex(){}
-    public PartitionIndex(String bucket,String index){
+    public PartitionIndex(String bucket,String index,int initialSeed){
         this.bucket = bucket;
         this.index = index;
+        this.version = initialSeed;
     }
-
+    public synchronized int count(int delta){
+        return (version=version+delta);
+    }
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("1",sequence);
+        this.properties.put("1",version);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.sequence = ((Number)properties.getOrDefault("1",1000)).longValue();
+        this.version = ((Number)properties.getOrDefault("1",1000)).intValue();
     }
 
     public int getClassId() {

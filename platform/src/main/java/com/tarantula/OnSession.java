@@ -5,6 +5,8 @@ package com.tarantula;
  */
 public interface OnSession extends OnApplication,Response{
 
+    String DataStore = "session";
+
     String token();
     void token(String token);
 

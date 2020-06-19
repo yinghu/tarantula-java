@@ -61,11 +61,14 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
     }
 
 
-    public AccessIndex set(String accessKey,String systemId){
+    public AccessIndex set(String accessKey){
         DataStoreOnPartition dso = this.onPartition(accessKey);
         if(dso.enabled.get()){
-            AccessIndex accessIndex = new AccessIndexTrack(accessKey,systemId);
+            int pid = dso.partitionIndex.count(1);
+            dso.partitionIndex.update();
+            AccessIndex accessIndex = new AccessIndexTrack(accessKey,dso.partitionIndex.bucket(),dso.partitionIndex.index(),pid);
             if(dso.dataStore.createIfAbsent(accessIndex,false)){
+                log.warn("index->"+accessIndex.distributionKey());
                 return accessIndex;
             }
             else{
@@ -90,7 +93,9 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
         masterStore = this.tarantulaContext.masterDataStore();
         for(DataStoreOnPartition dso : dataStoreOnPartitions){
             dso.dataStore = this.tarantulaContext.dataStore(dso.name);
-            //masterStore.createIfAbsent(new PartitionIndex(masterStore.bucket(),dso.name),true);
+            dso.partitionIndex = new PartitionIndex(this.masterStore.bucket(),dso.name,1000);
+            dso.partitionIndex.dataStore(masterStore);
+            masterStore.createIfAbsent(dso.partitionIndex,true);
             boolean loc = this.nodeEngine.getPartitionService().getPartition(dso.partition).isLocal();
             dso.local.set(loc);
             dso.enabled.set(loc);

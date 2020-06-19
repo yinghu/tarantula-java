@@ -3,7 +3,6 @@ package com.tarantula.platform;
 import com.tarantula.OnSession;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-import java.nio.ByteBuffer;
 import java.util.Map;
 
 /**
@@ -17,10 +16,9 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     private String ticket;
 
     public static final OnSession PASSWORD_NOT_MATCHED = new OnSessionTrack("PASSWORD NOT MATCHED");
-    public static final OnSession TOKEN_NOT_VALID = new OnSessionTrack("TOKEN NOT VALID");
+    //public static final OnSession TOKEN_NOT_VALID = new OnSessionTrack("TOKEN NOT VALID");
 
     public OnSessionTrack(){
-        //this.binary = true;
         this.vertex = "OnSession";
     }
     public OnSessionTrack(String msg){
@@ -56,30 +54,14 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
 
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("systemId",systemId);
-        this.properties.put("timestamp",this.timestamp);
-        this.properties.put("disabled",this.disabled);
+        this.properties.put("1",token);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.systemId = (String)properties.get("systemId");
-        this.timestamp = ((Number)properties.get("timestamp")).longValue();
-        this.disabled = (boolean)properties.get("disabled");
+        this.token = (String)properties.get("1");
     }
-    @Override
-    public byte[] toByteArray(){
-        ByteBuffer buffer = ByteBuffer.allocate(20);
-        buffer.putInt(stub);
-        buffer.putLong(timestamp);
-        return buffer.array();
-    }
-    @Override
-    public void fromByteArray(byte[] data){
-        ByteBuffer buffer = ByteBuffer.wrap(data);
-        this.stub = buffer.getInt();
-        this.timestamp = buffer.getLong();
-    }
+
     public String token(){
         return this.token;
     }
@@ -100,11 +82,7 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         this.ticket = ticket;
     }
 
-    @Override
-    public Key key(){
-        return new AssociateKey(this.bucket,this.oid,this.vertex);
-    }
     public String toString(){
-        return "OnSession->"+systemId+"/"+stub;
+        return "OnSession->["+token+"]";
     }
 }

@@ -8,7 +8,6 @@ import com.tarantula.Recoverable;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Map;
 
 /**
@@ -19,12 +18,11 @@ public class AccessIndexTrack extends IntegrationScopeObject implements AccessIn
     public AccessIndexTrack(){
     }
 
-    public AccessIndexTrack(String owner, String systemId){
-        this();
+    public AccessIndexTrack(String owner,String bucket,String label,int pid){
         this.owner = owner;
-        String[] sid = systemId.split(Recoverable.PATH_SEPARATOR);
-        this.bucket = sid[0];
-        this.oid = sid[1];
+        this.bucket = bucket;
+        this.label = label;
+        this.version = pid;
     }
     public AccessIndexTrack(String owner){
         this();
@@ -45,57 +43,36 @@ public class AccessIndexTrack extends IntegrationScopeObject implements AccessIn
     public void writePortable(PortableWriter out) throws IOException {
         out.writeUTF("1",this.owner);
         out.writeUTF("2",bucket);
-        out.writeUTF("3",this.oid);
+        out.writeUTF("3",this.label);
+        out.writeInt("4",this.version);
     }
 
     @Override
     public void readPortable(PortableReader in) throws IOException {
         this.owner = in.readUTF("1");
         this.bucket = in.readUTF("2");
-        this.oid  = in.readUTF("3");
+        this.label  = in.readUTF("3");
+        this.version = in.readInt("4");
     }
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",bucket);//lobby id
-        this.properties.put("2",oid);//game cluster id
-        //this.properties.put("3",bucketId);
+        this.properties.put("2",label);//game cluster id
+        this.properties.put("3",version);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.bucket = (String)properties.get("1");
-        this.oid = (String)properties.get("2");
-        //this.bucketId = ((Number)properties.getOrDefault("3",0)).intValue();
+        this.label = (String)properties.get("2");
+        this.version = ((Number)properties.getOrDefault("3",0)).intValue();
     }
-    @Override
-    public byte[] toByteArray(){
-        ByteBuffer buffer = ByteBuffer.allocate(8+bucket.length()+oid.length());
-        buffer.putInt(this.bucket.length());
-        buffer.put(this.bucket.getBytes());
-        buffer.putInt(this.oid.length());
-        buffer.put(this.oid.getBytes());
-        return buffer.array();
-    }
-    @Override
-    public void fromByteArray(byte[] data){
-        ByteBuffer buffer = ByteBuffer.wrap(data);
-        int len = buffer.getInt();
-        StringBuffer sb = new StringBuffer();
-        for(int i=0;i<len;i++){
-            sb.append((char) buffer.get());
-        }
-        this.bucket = sb.toString();
-        len = buffer.getInt();
-        sb.setLength(0);
-        for(int i=0;i<len;i++){
-            sb.append((char) buffer.get());
-        }
-        this.oid = sb.toString();
-        //read data from byte array
+    public String distributionKey(){
+        return this.bucket+Recoverable.PATH_SEPARATOR+this.label+"-"+version;
     }
     @Override
     public String toString(){
-        return "Access Index ["+bucket+"/"+owner+"/"+oid+"]";
+        return "Access Index ["+bucket+"/"+owner+"/"+label+"/"+version+"]";
     }
     public void distributionKey(String distributionKey){
        //skip the natural key

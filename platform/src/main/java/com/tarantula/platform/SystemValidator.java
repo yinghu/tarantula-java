@@ -40,7 +40,7 @@ public class SystemValidator{
         }
         @Override
         public OnSession validatePassword(Access access, String password) {
-            if(access.validated()||(SystemUtil.hashPassword(systemValidatorProvider.messageDigest(),password).equals(access.password()))){
+            if(SystemUtil.hashPassword(systemValidatorProvider.messageDigest(),password).equals(access.password())){
                 Presence presence = systemValidatorProvider.presence(access.distributionKey());
                 OnSession _ox = new OnSessionTrack();
                 _ox.systemId(access.distributionKey());

@@ -79,12 +79,18 @@ public class UserEventHandler implements RequestHandler,AccessIndexService.Liste
                     }
                     else if(onIndex.get()){//third party token exchange first time
                         event.action("onTokenRegister");
-                        String trackId = this.bucket+Recoverable.PATH_SEPARATOR+SystemUtil.oid();
-                        event.systemId(trackId);
-                        RoutingKey _routingKey = eventService.routingKey(trackId,tag);
-                        event.destination(_routingKey.route());
-                        event.routingNumber(_routingKey.routingNumber());
-                        this.eventService.publish(event);
+                        AccessIndex _tindex = accessIndexService.set(magicKey);
+                        if(_tindex!=null){
+                            event.systemId(_tindex.distributionKey());
+                            RoutingKey _routingKey = eventService.routingKey(_tindex.distributionKey(),tag);
+                            event.destination(_routingKey.route());
+                            event.routingNumber(_routingKey.routingNumber());
+                            this.eventService.publish(event);
+                        }
+                        else{
+                            byte[] eb = this.builder.create().toJson(new ResponseHeader("onTokenRegister","["+magicKey+"] not available",false)).getBytes();
+                            _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                        }
                     }
                     else{
                         byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service will be available shortly",false)).getBytes();
@@ -106,12 +112,17 @@ public class UserEventHandler implements RequestHandler,AccessIndexService.Liste
                 }
                 else if(action.equals("onRegister")){//to server topic
                     if(onIndex.get()){ //register
-                        String trackId = this.bucket+Recoverable.PATH_SEPARATOR+ SystemUtil.oid();
-                        event.systemId(trackId);
-                        RoutingKey _routingKey = eventService.routingKey(trackId,tag);
-                        event.destination(_routingKey.route());
-                        event.routingNumber(_routingKey.routingNumber());
-                        this.eventService.publish(event);
+                        AccessIndex _aindex = this.accessIndexService.set(magicKey);
+                        if(_aindex!=null){
+                            event.systemId(_aindex.distributionKey());
+                            RoutingKey _routingKey = eventService.routingKey(_aindex.distributionKey(),tag);
+                            event.destination(_routingKey.route());
+                            event.routingNumber(_routingKey.routingNumber());
+                            this.eventService.publish(event);
+                        }else{
+                            byte[] eb = this.builder.create().toJson(new ResponseHeader("onRegister","["+magicKey+"] not available",false)).getBytes();
+                            _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                        }
                     }
                     else{
                         byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service will be available shortly",false)).getBytes();
@@ -127,12 +138,19 @@ public class UserEventHandler implements RequestHandler,AccessIndexService.Liste
                         event.routingNumber(_routingKey.routingNumber());
                         this.eventService.publish(event);
                     }else if(onIndex.get()){//device login exchange first time
-                        String trackId = this.bucket+Recoverable.PATH_SEPARATOR+ SystemUtil.oid();
-                        event.trackId(trackId);
-                        RoutingKey _routingKey = eventService.routingKey(trackId,tag);
-                        event.destination(_routingKey.route());
-                        event.routingNumber(_routingKey.routingNumber());
-                        this.eventService.publish(event);
+                        AccessIndex _dindex = accessIndexService.set(magicKey);
+                        if(_dindex!=null){
+                            event.action("onDeviceRegister");
+                            event.systemId(_dindex.distributionKey());
+                            RoutingKey _routingKey = eventService.routingKey(_dindex.distributionKey(),tag);
+                            event.destination(_routingKey.route());
+                            event.routingNumber(_routingKey.routingNumber());
+                            this.eventService.publish(event);
+                        }
+                        else{
+                            byte[] eb = this.builder.create().toJson(new ResponseHeader("onDeviceRegister","["+magicKey+"] not available",false)).getBytes();
+                            _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                        }
                     }
                     else{
                         byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service will be available shortly",false)).getBytes();
