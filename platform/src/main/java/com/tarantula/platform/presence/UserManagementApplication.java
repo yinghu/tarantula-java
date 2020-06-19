@@ -122,7 +122,10 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         else if(session.action().equals("onToken")){//exchange token
             boolean suc = this.context.validator().validateToken(acc.toMap());
             if(suc){
-                OnSession onSession = this.login(session.systemId(),"",session);
+                OnSession _ox = new OnSessionTrack();
+                _ox.distributionKey(session.systemId());
+                sDatastore.load(_ox);
+                OnSession onSession = this.login(session.systemId(),_ox.token(),session);
                 onSession(onSession,session);
             }else{
                 session.write(this.builder.create().toJson(new ResponseHeader("onToken", "invalid token", false)).getBytes(),this.descriptor.responseLabel());
@@ -146,17 +149,16 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             if(this.context.validator().validateToken(params)){
                 AccessIndex _query = accessIndexService.get((String) acc.property("login"));
                 if(_query!=null){
-                    //OnSession _onSession = new OnSessionTrack();
-                    //_onSession.distributionKey(session.systemId());
-                    //_onSession.token("abc123");
-                    //sDatastore.createIfAbsent(_onSession,false);
-                    //this.context.log(_onSession.toString(),OnLog.WARN);
-                    acc.property(OnAccess.PASSWORD,"abc123");
+                    OnSession _onSession = new OnSessionTrack();
+                    _onSession.distributionKey(session.systemId());
+                    _onSession.token(SystemUtil.oid());
+                    sDatastore.createIfAbsent(_onSession,false);
+                    acc.property(OnAccess.PASSWORD,_onSession.token());
                     Access user = createLogin(acc,session.systemId(),role,true,acc.name(),true);
                     user.emailAddress((String) params.get("email"));
                     user.activated(true);
                     uDatastore.update(user);
-                    OnSession onSession = login(session.systemId(),"abc123",session);
+                    OnSession onSession = login(session.systemId(),_onSession.token(),session);
                     onSession(onSession,session);
                 }
                 else{
@@ -192,7 +194,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 acc.property("login",deviceId);
                 acc.property("password",deviceId);
                 this.createLogin(acc,session.systemId(),role,true,"device",true);
-                OnSession access = this.login(session.trackId(),(String) acc.property(OnAccess.PASSWORD),session);
+                OnSession access = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
                 onSession(access,session);
             }
             else{

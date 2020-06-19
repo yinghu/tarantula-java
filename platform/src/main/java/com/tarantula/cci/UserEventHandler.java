@@ -10,7 +10,6 @@ import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.util.ResponseSerializer;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
