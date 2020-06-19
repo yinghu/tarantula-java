@@ -92,7 +92,7 @@ public class UserEventHandler implements RequestHandler,AccessIndexService.Liste
                         }
                     }
                     else{
-                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service will be available shortly",false)).getBytes();
+                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
                         _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
                     }
                 }
@@ -124,7 +124,7 @@ public class UserEventHandler implements RequestHandler,AccessIndexService.Liste
                         }
                     }
                     else{
-                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service will be available shortly",false)).getBytes();
+                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
                         _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
                     }
                 }
@@ -152,7 +152,7 @@ public class UserEventHandler implements RequestHandler,AccessIndexService.Liste
                         }
                     }
                     else{
-                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service will be available shortly",false)).getBytes();
+                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
                         _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
                     }
                 }

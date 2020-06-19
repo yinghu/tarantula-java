@@ -203,6 +203,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         }
         jsonObject.addProperty("AccessIndex",cnt);
         jsonObject.addProperty("User",this.context.dataStore(Access.DataStore).count());
+        jsonObject.addProperty("Session",this.context.dataStore(OnSession.DataStore).count());
         jsonObject.addProperty("Account",this.context.dataStore(Account.DataStore).count());
         jsonObject.addProperty("Presence",this.context.dataStore(Presence.DataStore).count());
         jsonObject.addProperty("Subscription",this.context.dataStore(Subscription.DataStore).count());

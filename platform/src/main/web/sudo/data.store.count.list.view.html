@@ -26,6 +26,12 @@
     </div>
     <div class="w3-panel  w3-border-bottom w3-border-red">
         <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'>Session</span>
+            <span id='tx-Session-c' class='w3-right tx-text-14 tx-margin-top-8'>0</span>
+        </div>    
+    </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
+        <div class="w3-container">
             <span class='w3-left tx-text-14 tx-margin-top-8'>Account</span>
             <span id='tx-Account-c' class='w3-right tx-text-14 tx-margin-top-8'>0</span>
         </div>    
@@ -70,6 +76,7 @@
             console.log(resp);
             document.querySelector('#tx-AccessIndex-c').innerHTML = resp.AccessIndex; 
             document.querySelector('#tx-User-c').innerHTML = resp.User;
+            document.querySelector('#tx-Session-c').innerHTML = resp.Session;
             document.querySelector('#tx-Account-c').innerHTML = resp.Account;
             document.querySelector('#tx-Presence-c').innerHTML = resp.Presence;
             document.querySelector('#tx-Subscription-c').innerHTML = resp.Subscription;

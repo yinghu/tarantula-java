@@ -34,7 +34,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     private DataStore pDatastore;
     private DataStore aDatastore;
     private DataStore sDatastore;
-    //private boolean onApplication;
+
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
@@ -48,7 +48,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.roleList = this.tokenValidatorProvider.list();
-        //this.onApplication = this.deploymentServiceProvider.deploymentMode()== DeploymentServiceProvider.Mode.APPLICATION;
         String root = configuration.property("root");
         String pwd = configuration.property("password");
         OnAccess onAccess = new OnAccessTrack();
@@ -60,7 +59,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         sDatastore = this.context.dataStore(OnSession.DataStore);
 
         DataStore mDatastore = this.context.dataStore(Subscription.DataStore);
-        //String rootId = uDatastore.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid();
         AccessIndex accessIndex = accessIndexService.set((String) onAccess.property("login"));
         if(accessIndex!=null){
             Access user = createLogin(onAccess,accessIndex.distributionKey(),AccessControl.root.name(),false,"password",true);
