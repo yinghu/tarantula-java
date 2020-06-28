@@ -173,7 +173,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         }
         this.integrationEnvironment = new Environment(new File(integrationPath),envConfig);
         this.activeEnvironment = new Environment(new File(activePath),envConfig);
-        if(!dRecovered){
+        if(!dRecovered){ //first node up to cache existing data stores
             log.info("Waiting for loading data on first member from data scope store");
             HashSet<String> ln = new HashSet<>();
             for(String dn : this.environment.getDatabaseNames()){
@@ -184,7 +184,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 ds.count();
             });
         }
-        if(!iRecovered){
+        if(!iRecovered){//first node up to cache existing data stores
             log.info("Waiting for loading data on first member from integration scope store");
             for(String dn : this.integrationEnvironment.getDatabaseNames()){
                 DataStore ds = this.create(dn);
@@ -584,6 +584,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             ((ReplicatedDataStore)rds).onReplication(mse);
         }
         else if(event instanceof MapStoreVotingEvent){
+            log.warn("ppp->>>>>>>>skipping from this node>"+event.toString());
             if(!event.trackId().equals(this.registerId)){
                 if(event.stub()==Distributable.DATA_SCOPE){
                     this.serviceContext.schedule(new OneTimeRunner(100,()->{
