@@ -105,7 +105,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 buffer.get(pb);
                 MapStoreRecoveryEvent m = new MapStoreRecoveryEvent(destination,fn,pb,registerId,c,t,v++);
                 _send(m);
-                Thread.sleep(10);
+                Thread.sleep(100);
                 buffer.clear();
             }
         }
