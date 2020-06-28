@@ -13,8 +13,6 @@ public interface DeployService extends ServiceProvider {
 
     Batch query(String batchId,int count);
 
-    //void recover(String destination,String registerId,boolean fullBackup);
-
     boolean addLobby(Descriptor lobby);
 
     String addApplication(Descriptor application);
