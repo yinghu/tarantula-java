@@ -1,39 +1,3 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <service-configuration>
-
-    <!-- view configurations-->
-    <!--
-    <configuration tag="index" type="com.tarantula.platform.ApplicationConfiguration" priority="10">
-        <index type="pending">
-            <property name="moduleResourceFile">html/pending.view.html</property>
-        </index>
-        <index type="authentication">
-            <property name="moduleResourceFile">html/authentication.view.html</property>
-        </index>
-        <index type="game.lobby">
-            <property name="moduleFile">game.lobby.module.js</property>
-            <property name="moduleName">GameLobby</property>
-            <property name="moduleResourceFile">html/game.lobby.view.html</property>
-        </index>
-        <index type="dashboard">
-            <property name="moduleResourceFile">dashboard.view.html</property>
-        </index>
-        <index type="sign.in">
-            <property name="moduleResourceFile">sign.in.view.html</property>
-        </index>
-        <index type="sign.up">
-            <property name="moduleResourceFile">sign.up.view.html</property>
-        </index>
-        <index type="password.reset">
-            <property name="moduleResourceFile">password.reset.view.html</property>
-        </index>
-        <index type="pending.request">
-            <property name="moduleResourceFile">pending.request.view.html</property>
-        </index>
-        <index type="invalid.request">
-            <property name="moduleResourceFile">invalid.request.view.html</property>
-        </index>
-    </configuration>
-        -->
-
 </service-configuration>

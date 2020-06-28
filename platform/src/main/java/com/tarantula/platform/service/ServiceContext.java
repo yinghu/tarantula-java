@@ -5,12 +5,15 @@ import com.tarantula.*;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * Updated by yinghu lu on 6/15/19
+ * Updated by yinghu lu on 6/27/20
  */
 public interface ServiceContext {
 
+    //create none-partitioned integration scope data store
     DataStore dataStore(String name);
+    //create data scope partitioned data store
     DataStore dataStore(String name,int partition);
+
     ScheduledFuture<?> schedule(SchedulingTask task);
     EventService eventService(int scope);
     ClusterProvider clusterProvider(int scope);

@@ -7,15 +7,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Updated by yinghu on 6/28/2019.
+ * Updated by yinghu on 6/27/2020.
  */
 public interface DataStoreProvider extends ServiceProvider {
 
     int CONCURRENCY_ACCESS_LIMIT = 100;
 
     void configure(Map<String,String> properties);
+    //create none-partitioned integration scope data store
     DataStore create(String name);
+
+    //create partitioned data scope data store
     DataStore create(String name,int partition);
+
     List<String> list();
 
     //incremental back up

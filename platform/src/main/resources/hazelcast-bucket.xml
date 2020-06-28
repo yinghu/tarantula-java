@@ -15,7 +15,7 @@
         <property name="hazelcast.heartbeat.failuredetector.type">deadline</property>
         <property name="hazelcast.heartbeat.interval.seconds">5</property>
         <property name="hazelcast.max.no.heartbeat.seconds">120</property>
-        <property name="hazelcast.socket.bind.any">true</property>
+        <property name="hazelcast.socket.bind.any">false</property>
         <property name="hazelcast.connection.monitor.max.faults">1</property>
         <property name="hazelcast.executor.client.thread.count">8</property>
         <property name="hazelcast.executor.event.thread.count">8</property>
