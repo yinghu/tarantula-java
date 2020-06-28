@@ -49,15 +49,15 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void setup(){
         if(scope==Distributable.INTEGRATION_SCOPE){
             this.tarantulaContext.integrationCluster().addEventListener(this.nodeEngine.getLocalMember().getUuid(),(e)->{
-                log.warn(e.toString()+"["+this.scope+"]");
+                log.warn("Recovering integration scope data on master node to ->"+e.source());
                 recover(e.source(),e.source(),true);
                 return false;
             });
         }
         else if(scope==Distributable.DATA_SCOPE){
             this.tarantulaContext.tarantulaCluster().addEventListener(this.nodeEngine.getLocalMember().getUuid(),(e)->{
-                log.warn(e.toString()+"["+scope+"]");
-                recover(e.source(),e.sessionId(),true);
+                log.warn("Recovering data scope data on master node to ->"+e.source());
+                recover(e.source(),e.source(),true);
                 return false;
             });
         }
@@ -113,15 +113,15 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
         }
     }
-    public void recover(String destination,String registerId,boolean fullBackup){
+    private void recover(String destination,String registerId,boolean fullBackup){
         DataStoreProvider dsp = this.tarantulaContext.dataStoreProvider();
-        String loc = this.scope==Distributable.DATA_SCOPE?this.tarantulaContext.tarantulaCluster().subscription():this.tarantulaContext.integrationCluster().subscription();
-        if(destination.equals(loc)){
-            log.info("There is no need to recover from first node");
-            MapStoreRecoveryEvent mre = new MapStoreRecoveryEvent(destination,"",new byte[0],registerId,0,0,0);
-            this._send(mre);
-            return;
-        }
+        //String loc = this.scope==Distributable.DATA_SCOPE?this.tarantulaContext.tarantulaCluster().subscription():this.tarantulaContext.integrationCluster().subscription();
+        //if(destination.equals(loc)){
+            //log.info(">>>>>>>>>>>>>>>>>>>>There is no need to recover from first node");
+            //MapStoreRecoveryEvent mre = new MapStoreRecoveryEvent(destination,"",new byte[0],registerId,0,0,0);
+            //this._send(mre);
+            //return;
+        //}
         this.tarantulaContext.schedule(new OneTimeRunner(100,()->{
             if(fullBackup){
                 int ct[] = {0};

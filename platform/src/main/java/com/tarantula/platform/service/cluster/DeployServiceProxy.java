@@ -81,18 +81,6 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-
-    public void recover(String destination,String registerId,boolean fullBackup){
-        NodeEngine nodeEngine = getNodeEngine();
-        DeployServiceRecoverOperation operation = new DeployServiceRecoverOperation(destination,registerId,fullBackup);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Void> future = builder.invoke();
-            future.get(); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
     public boolean addLobby(Descriptor lobby){
         NodeEngine nodeEngine = getNodeEngine();
         AddLobbyOperation operation = new AddLobbyOperation(lobby);
