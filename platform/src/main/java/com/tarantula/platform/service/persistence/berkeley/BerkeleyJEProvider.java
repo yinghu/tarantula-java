@@ -203,7 +203,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.registerId = this.dataCluster.addEventListener(null,(e)->{
             if(e instanceof MapStoreVotingEvent){
                 activeCount.countDown();
-                log.info("Updated from data->"+e.toString());
+                log.info("Updated from data->"+e.trackId()+"<><><>"+this.registerId);
             }
             else if(e instanceof MapStoreSyncEvent){
                 tc.incrementAndGet();
@@ -216,7 +216,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.integrationId = this.integrationCluster.addEventListener(null,(e)->{
             if(e instanceof MapStoreVotingEvent){
                 activeCount.countDown();
-                log.info("Updated from Integration->"+e.toString());
+                log.info("Updated from Integration->"+e.trackId()+"<><><>"+this.integrationId);
             }
             else if(e instanceof MapStoreSyncEvent){
                 tc.incrementAndGet();
