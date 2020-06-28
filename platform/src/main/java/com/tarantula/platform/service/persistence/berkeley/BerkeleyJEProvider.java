@@ -235,10 +235,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         log.info("Total active entries ["+tc.get()+"] from cluster nodes and Berkeley JAVA Edition data store is ready");
         this.dataCluster.subscribe(this.replicationTopic,this);
         this.integrationCluster.subscribe(this.backupTopic,this);
-        //if(dailyBackup){
-            //this.serviceContext.schedule(this);
-        //}
-
     }
     @Override
     public void start() throws Exception {
@@ -599,6 +595,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                         migrateFromIntegrationScope(event);
                     }));
                 }
+            }
+            else{
+                log.warn("skipping from this node>"+event.toString());
             }
         }
         return false;
