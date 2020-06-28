@@ -203,7 +203,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.registerId = this.dataCluster.addEventListener(null,(e)->{
             if(e instanceof MapStoreVotingEvent){
                 activeCount.countDown();
-                log.info("Updated from "+e.toString());
+                log.info("Updated from data->"+e.toString());
             }
             else if(e instanceof MapStoreSyncEvent){
                 tc.incrementAndGet();
@@ -216,7 +216,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.integrationId = this.integrationCluster.addEventListener(null,(e)->{
             if(e instanceof MapStoreVotingEvent){
                 activeCount.countDown();
-                log.info("Updated from "+e.toString());
+                log.info("Updated from Integration->"+e.toString());
             }
             else if(e instanceof MapStoreSyncEvent){
                 tc.incrementAndGet();
@@ -584,7 +584,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             ((ReplicatedDataStore)rds).onReplication(mse);
         }
         else if(event instanceof MapStoreVotingEvent){
-            log.warn("ppp->>>>>>>>skipping from this node>"+event.toString());
             if(!event.trackId().equals(this.registerId)){
                 if(event.stub()==Distributable.DATA_SCOPE){
                     this.serviceContext.schedule(new OneTimeRunner(100,()->{
@@ -596,9 +595,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                         migrateFromIntegrationScope(event);
                     }));
                 }
-            }
-            else{
-                log.warn("skipping from this node>"+event.toString());
             }
         }
         return false;
