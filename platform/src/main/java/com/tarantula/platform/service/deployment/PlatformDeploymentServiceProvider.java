@@ -492,7 +492,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 });
             }
             else{
-                log.warn("Not supported type->"+ot.toString());
+                //log.warn("Not supported type->"+ot.toString());
             }
         }
         else if(event instanceof OnViewEvent){
