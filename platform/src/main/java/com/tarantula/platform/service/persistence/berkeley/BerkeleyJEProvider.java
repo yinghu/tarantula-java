@@ -399,7 +399,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     }
     @Override
     public void onUpdated(Metadata metadata, byte[] key, byte[] value) {
+        //log.warn("DATA STORE->"+metadata.source());
         if(metadata.scope()==Recoverable.DATA_SCOPE){
+            //use data store prefix as the active database
             this.activeDataStore.put(null,new DatabaseEntry(key),new DatabaseEntry(new ActiveEntry(metadata.source()).toByteArray()));
             this.dataScopePublisher.publish(new MapStoreSyncEvent(this.replicationTopic,this.node.nodeName,key,value,(RecoverableMetadata) metadata));
             if(metadata.distributable()){
