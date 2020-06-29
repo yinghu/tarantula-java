@@ -7,16 +7,14 @@ import com.tarantula.Event;
 import java.io.IOException;
 
 /**
- * Updated by yinghu lu on 4/7/2019.
+ * Updated by yinghu lu on 6/28/2020
  */
 public class MapStoreRecoveryEvent extends Data implements Event {
 
 
     public MapStoreRecoveryEvent(){
-        this.forwarding = true;
     }
     public MapStoreRecoveryEvent(String destination, String source,byte[] value,String registerId,int count,int size,int version){
-        this();
         this.destination = destination;
         this.source = source;
         this.payload = value;

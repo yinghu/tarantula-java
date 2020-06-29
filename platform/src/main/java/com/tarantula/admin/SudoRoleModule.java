@@ -74,6 +74,10 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             });
             session.write(sct.toJson().toString().getBytes(),this.label());
         }
+        else if(session.action().equals("onBackupDataStore")){
+            this.deploymentServiceProvider.issueDataStoreBackup();
+            session.write(toMessage("backup commnad issued",true).toString().getBytes(),label());
+        }
         /**
         else if(session.action().equals("addLobby")){
             LobbyDescriptor desc = new LobbyDescriptor();

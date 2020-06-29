@@ -90,4 +90,8 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     void stopAccessIndex();
     void startAccessIndex();
     void registerAccessIndexListener(AccessIndexService.Listener listener);
+
+    //data store backup operation API
+    void issueDataStoreBackup();
+
 }

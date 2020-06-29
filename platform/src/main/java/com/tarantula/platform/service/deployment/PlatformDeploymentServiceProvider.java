@@ -591,6 +591,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 aListeners.forEach((a)->a.onStop());
             }
        }
+       else if(event instanceof MapStoreBackupEvent){
+           this.tarantulaContext.dataStoreProvider().backup(Distributable.DATA_SCOPE);
+           this.tarantulaContext.dataStoreProvider().backup(Distributable.INTEGRATION_SCOPE);
+       }
        return false;
     }
     public void registerInstanceRegistryListener(InstanceRegistry.Listener instanceRegistryListener){
@@ -801,6 +805,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             listener.onStop();
         }
         aListeners.add(listener);
+    }
+    public void issueDataStoreBackup(){
+        this.integrationEventService.publish(new MapStoreBackupEvent(this.eventTopic));
+        //this.tarantulaContext.dataStoreProvider().backup(Distributable.DATA_SCOPE);
+        //this.tarantulaContext.dataStoreProvider().backup(Distributable.INTEGRATION_SCOPE);
     }
     public void atMidnight(){
         //log.warn("MIDNIGHT->");

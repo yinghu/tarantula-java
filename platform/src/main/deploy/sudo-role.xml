@@ -53,6 +53,9 @@
             <view type="start.access.index">
                 <property name="moduleResourceFile">sudo/start.access.index.view.html</property>
             </view>
+            <view type="data.store.backup">
+                <property name="moduleResourceFile">sudo/data.store.backup.view.html</property>
+            </view>
         </view-list>
 
     </lobby-context>

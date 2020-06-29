@@ -24,8 +24,10 @@ public interface DataStoreProvider extends ServiceProvider {
 
     //incremental back up
     void backup(int scope);
+
     //full back up with callback recover
     void backup(int scope,OnBackup backup);
+
     //recover from incremental back up
     void recover(int scope,OnBackup backup);
 

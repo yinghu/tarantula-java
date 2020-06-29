@@ -27,6 +27,8 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int ON_DEPLOY_EVENT_CID = 6;
 
+    public static final int MAP_STORE_BACKUP_EVENT_CID = 7;
+
     public static final int SERVICE_ACTION_EVENT_CID = 9;
 
     public static final int APPLICATION_SERVICE_EVENT_CID = 10;
@@ -58,6 +60,7 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int GAME_CLUSTER_SHUTDOWN_EVENT_CID = 25;
 
     public static final int ACCESS_INDEX_STATE_EVENT_CID = 26;
+
 
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
@@ -96,7 +99,9 @@ public class PortableEventRegistry implements PortableFactory {
             case ON_DEPLOY_EVENT_CID:
                 _ins = new OnDeployEvent();
                 break;
-
+            case MAP_STORE_BACKUP_EVENT_CID:
+                _ins = new MapStoreBackupEvent();
+                break;
             case SERVICE_ACTION_EVENT_CID:
                 _ins = new ServiceActionEvent();
                 break;
