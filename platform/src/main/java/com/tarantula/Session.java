@@ -3,7 +3,7 @@ package com.tarantula;
 /**
  * Session represents the exchange between client and server via asynchronous way.
  * It is not relative to a physical connection.
- * Updated by yinghu lu on 7/30/2019
+ * Updated by yinghu lu on 6/29/2020
  * */
 
 public interface Session extends OnApplication{
@@ -24,7 +24,7 @@ public interface Session extends OnApplication{
     String TARANTULA_MAGIC_KEY ="Tarantula-magic-key"; //the routing key
     String TARANTULA_TAG ="Tarantula-tag";
     String TARANTULA_NAME ="Tarantula-name";
-    String TARANTULA_PASSWORD ="Tarantula-password";
+    //String TARANTULA_PASSWORD ="Tarantula-password";
     String TARANTULA_PAYLOAD = "Tarantula-payload";
     String TARANTULA_ACCESS_MODE = "Tarantula-access-mode";
 
