@@ -1,5 +1,8 @@
 package com.tarantula.platform.util;
 
+import com.google.gson.JsonObject;
+import com.tarantula.Session;
+
 public class SampleLoad {
     private final String host;
     private final String prefix;
@@ -18,7 +21,16 @@ public class SampleLoad {
         for(int i=0;i<size;i++){
             try{
                 //register
-                System.out.println(httpCaller.get("user/action","index/user","onIndex"));
+                System.out.println(httpCaller.index());
+                String[] headers = new String[]{
+                        Session.TARANTULA_TAG,"index/user",
+                        Session.TARANTULA_ACTION,"onRegister",
+                        Session.TARANTULA_MAGIC_KEY,"test1"
+                };
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("login","test1");
+                jsonObject.addProperty("password","test");
+                System.out.println(httpCaller.post("user/action",jsonObject.toString().getBytes(),headers));
 
             }catch (Exception ex){
                 //ignore
@@ -27,7 +39,7 @@ public class SampleLoad {
         }
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.6:8090","",1);
+        SampleLoad sampleLoad = new SampleLoad("https://gameclustering.com","",1);
         sampleLoad._init();
         sampleLoad.batch();
     }
