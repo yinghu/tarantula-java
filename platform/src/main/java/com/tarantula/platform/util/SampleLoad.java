@@ -1,6 +1,6 @@
 package com.tarantula.platform.util;
 
-public class SampleLoad implements Runnable{
+public class SampleLoad {
     private final String host;
     private final String prefix;
     private final int size;
@@ -14,7 +14,7 @@ public class SampleLoad implements Runnable{
         httpCaller = new HttpCaller(host);
         httpCaller._init();
     }
-    public void run(){
+    public void batch(){
         for(int i=0;i<size;i++){
             try{
                 //register
@@ -29,7 +29,7 @@ public class SampleLoad implements Runnable{
     public static void main(String[] args) throws Exception{
         SampleLoad sampleLoad = new SampleLoad("http://10.0.0.6:8090","",1);
         sampleLoad._init();
-        sampleLoad.run();
+        sampleLoad.batch();
     }
 }
 
