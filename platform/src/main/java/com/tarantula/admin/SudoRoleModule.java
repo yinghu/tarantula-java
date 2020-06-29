@@ -10,6 +10,7 @@ import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.presence.SubscriptionFee;
 import com.tarantula.platform.presence.User;
 
+import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
@@ -23,6 +24,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
+    private AccessIndexService accessIndexService;
     //private DataStore dataStore;
     private GsonBuilder builder;
     private ConcurrentHashMap<String,Configuration> cMap;
@@ -59,7 +61,14 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             session.write(toMessage(session.action(),true).toString().getBytes(),label());
         }
         else if(session.action().equals("onFindUser")){
-            session.write(toMessage(session.action(),true).toString().getBytes(),label());
+            OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String login = (String)acc.property(OnAccess.LOGIN);
+            AccessIndex accessIndex = accessIndexService.get(login);
+            if(accessIndex!=null){
+                session.write(toMessage(accessIndex.distributionKey(),true).toString().getBytes(),login);
+            }else{
+                session.write(toMessage("["+login+"] not found",false).toString().getBytes(),label());
+            }
         }
         else if(session.action().equals("onSubscriptionList")){
             DataStore mds = this.context.dataStore(Subscription.DataStore);
@@ -77,6 +86,9 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         else if(session.action().equals("onBackupDataStore")){
             this.deploymentServiceProvider.issueDataStoreBackup();
             session.write(toMessage("backup commnad issued",true).toString().getBytes(),label());
+        }
+        else if(session.action().equals("onFindDataStore")){
+            session.write(toMessage("find data store",true).toString().getBytes(),label());
         }
         /**
         else if(session.action().equals("addLobby")){
@@ -175,6 +187,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.deploymentServiceProvider.registerConfigurationListener(this);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
+        this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         this.uDatastore = this.context.dataStore(Access.DataStore);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());

@@ -3,6 +3,8 @@ package com.tarantula.platform.util;
 import com.google.gson.JsonObject;
 import com.tarantula.Session;
 
+import java.util.UUID;
+
 public class SampleLoad {
     private final String host;
     private final String prefix;
@@ -10,7 +12,7 @@ public class SampleLoad {
     private HttpCaller httpCaller;
     public SampleLoad(String host,String prefix,int size){
         this.host = host;
-        this.prefix = prefix;
+        this.prefix = prefix!=null?prefix: UUID.randomUUID().toString();
         this.size = size;
     }
     public void _init() throws Exception{
@@ -22,14 +24,15 @@ public class SampleLoad {
             try{
                 //register
                 System.out.println(httpCaller.index());
+                String _login = prefix+"-"+i;
                 String[] headers = new String[]{
                         Session.TARANTULA_TAG,"index/user",
                         Session.TARANTULA_ACTION,"onRegister",
-                        Session.TARANTULA_MAGIC_KEY,"test1"
+                        Session.TARANTULA_MAGIC_KEY,_login
                 };
                 JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty("login","test1");
-                jsonObject.addProperty("password","test");
+                jsonObject.addProperty("login",_login);
+                jsonObject.addProperty("password","password");
                 System.out.println(httpCaller.post("user/action",jsonObject.toString().getBytes(),headers));
 
             }catch (Exception ex){
@@ -39,7 +42,7 @@ public class SampleLoad {
         }
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("https://gameclustering.com","",1);
+        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.234:8090",null,1000);
         sampleLoad._init();
         sampleLoad.batch();
     }
