@@ -15,31 +15,16 @@ import java.time.Duration;
 
 public class HttpCaller {
 
-    public static void main(String[] args) throws Exception{
-        //HttpCaller caller = new HttpCaller();
-        //caller._init();
-        //System.out.println(caller.get())
-        //System.out.println(caller.get());
-        //System.out.println(caller.get());
-        //System.out.println(caller.get());
-        double xp = 21000;
-        int level = (int)xp/1000;
-        System.out.println("LEVEL->"+level);
-        int rank = 10/10;
-        System.out.println("RANK->"+rank);
-        for(int lx = 10;lx>0;lx--){
-            System.out.println(lx);
-        }
-    }
     private HttpClient client;
-    private HttpRequest request;
-    public HttpCaller(){
-
+    private String host;
+    public HttpCaller(String host){
+        this.host = host;
     }
     public void _init() throws Exception{
         SSLContext sct = SSLContext.getInstance("TLS");
         sct.init(null,new TrustManager[]{new _X509TrustManager()},null);
         client = HttpClient.newBuilder().sslContext(sct).build();
+        /**
         request = HttpRequest.newBuilder()
                 .uri(URI.create("http://10.0.0.234:8090/admin"))
                 .timeout(Duration.ofSeconds(5))
@@ -49,9 +34,18 @@ public class HttpCaller {
                 .header(Session.TARANTULA_NAME,"root")
                 .header(Session.TARANTULA_PASSWORD,"root")
                 .GET()
-                .build();
+                .build();**/
+
     }
-    public String get() throws Exception{
+    public String get(String path,String tag,String command) throws Exception{
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(host+"/"+path))
+                .timeout(Duration.ofSeconds(5))
+                .header("Accept", "application/json")
+                .header(Session.TARANTULA_TAG,tag)
+                .header(Session.TARANTULA_ACTION,command)
+                .GET()
+                .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         return (response.body());
     }
@@ -66,7 +60,7 @@ public class HttpCaller {
         @Override
         public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
             //run on client to check if certificate is valid
-            if(!chain[0].getSubjectDN().getName().equals("CN=gameenginecluster.com")){
+            if(!chain[0].getSubjectDN().getName().equals("CN=gameclustering.com")){
                 throw new CertificateException("Invalid certificate");
             }
             certificate = chain;
