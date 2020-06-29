@@ -33,7 +33,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Updated by yinghu lu on 6/28/2019.
+ * Updated by yinghu lu on 6/28/2020.
  */
 public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,EventListener{
 
@@ -69,9 +69,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     private Environment activeEnvironment;
     private String replicationTopic;
     private String backupTopic;
-    private String registerId;
-    private String integrationId;
-    //
+
     private String activeDataStoreName ="activeData";
     private Database activeDataStore;
 
@@ -173,7 +171,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         }
         this.integrationEnvironment = new Environment(new File(integrationPath),envConfig);
         this.activeEnvironment = new Environment(new File(activePath),envConfig);
-        if(!dRecovered){
+        if(!dRecovered){ //first node up to cache existing data stores
             log.info("Waiting for loading data on first member from data scope store");
             HashSet<String> ln = new HashSet<>();
             for(String dn : this.environment.getDatabaseNames()){
@@ -184,7 +182,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 ds.count();
             });
         }
-        if(!iRecovered){
+        if(!iRecovered){//first node up to cache existing data stores
             log.info("Waiting for loading data on first member from integration scope store");
             for(String dn : this.integrationEnvironment.getDatabaseNames()){
                 DataStore ds = this.create(dn);
@@ -199,11 +197,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
 
         //Pull active entries from data and integration cluster
         AtomicInteger tc = new AtomicInteger(0);
-        CountDownLatch activeCount = new CountDownLatch(this.dataCluster.size()+this.integrationCluster.size()-2);
-        this.registerId = this.dataCluster.addEventListener(null,(e)->{
+        CountDownLatch activeCount = new CountDownLatch(this.dataCluster.size()+this.integrationCluster.size()-2);//excluding this node
+        String registerId = this.dataCluster.addEventListener(null,(e)->{
             if(e instanceof MapStoreVotingEvent){
                 activeCount.countDown();
-                log.info("Updated from "+e.toString());
             }
             else if(e instanceof MapStoreSyncEvent){
                 tc.incrementAndGet();
@@ -213,10 +210,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             }
             return false;
         });
-        this.integrationId = this.integrationCluster.addEventListener(null,(e)->{
+        String integrationId = this.integrationCluster.addEventListener(null,(e)->{
             if(e instanceof MapStoreVotingEvent){
                 activeCount.countDown();
-                log.info("Updated from "+e.toString());
             }
             else if(e instanceof MapStoreSyncEvent){
                 tc.incrementAndGet();
@@ -230,15 +226,13 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.integrationScopePublisher.publish(new MapStoreVotingEvent(this.backupTopic,this.integrationCluster.subscription(),integrationId,Distributable.INTEGRATION_SCOPE));
         try{
             activeCount.await();//waiting for updating from other nodes
+            this.dataCluster.removeEventListener(registerId);
+            this.integrationCluster.removeEventListener(integrationId);
         }catch (Exception ex){}
         //open replication doors
         log.info("Total active entries ["+tc.get()+"] from cluster nodes and Berkeley JAVA Edition data store is ready");
         this.dataCluster.subscribe(this.replicationTopic,this);
         this.integrationCluster.subscribe(this.backupTopic,this);
-        //if(dailyBackup){
-            //this.serviceContext.schedule(this);
-        //}
-
     }
     @Override
     public void start() throws Exception {
@@ -588,18 +582,18 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             ((ReplicatedDataStore)rds).onReplication(mse);
         }
         else if(event instanceof MapStoreVotingEvent){
-            if(!event.trackId().equals(this.registerId)){
-                if(event.stub()==Distributable.DATA_SCOPE){
-                    this.serviceContext.schedule(new OneTimeRunner(100,()->{
-                        migrateFromDataScope(event);
-                    }));
-                }
-                else if(event.stub()==Distributable.INTEGRATION_SCOPE){
-                    this.serviceContext.schedule(new OneTimeRunner(100,()->{
-                        migrateFromIntegrationScope(event);
-                    }));
-                }
+            //if(!event.trackId().equals(this.registerId)){
+            if(event.stub()==Distributable.DATA_SCOPE){
+                this.serviceContext.schedule(new OneTimeRunner(100,()->{
+                    migrateFromDataScope(event);
+                }));
             }
+            else if(event.stub()==Distributable.INTEGRATION_SCOPE){
+                this.serviceContext.schedule(new OneTimeRunner(100,()->{
+                    migrateFromIntegrationScope(event);
+                }));
+            }
+            //}
         }
         return false;
     }

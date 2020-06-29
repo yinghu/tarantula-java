@@ -108,6 +108,7 @@ public class ClusterRecoveryService implements Serviceable {
                             countDownLatch.countDown();
                         }
                     });
+                    //send recover event to master node
                     hc.getTopic(fm.getUuid()).publish(new MapStoreVotingEvent(fm.getUuid(),rid,fm.getUuid(),Distributable.DATA_SCOPE));
                     countDownLatch.await();
                     loaded.set(true);
