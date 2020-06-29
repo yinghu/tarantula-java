@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public interface DataStoreProvider extends ServiceProvider {
 
-    int CONCURRENCY_ACCESS_LIMIT = 100;
+    int CONCURRENCY_ACCESS_LIMIT = 8;
 
     void configure(Map<String,String> properties);
     //create none-partitioned integration scope data store
