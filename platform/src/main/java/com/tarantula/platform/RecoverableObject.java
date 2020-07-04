@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Updated by yinghu on 8/23/19.
+ * Updated by yinghu on 7/4/2020
  */
 public class RecoverableObject implements Recoverable {
 
@@ -28,7 +28,7 @@ public class RecoverableObject implements Recoverable {
 
     protected long timestamp;
     protected int version;
-    protected long sequence;
+    //protected long sequence;
     protected int routingNumber;
 
     protected boolean distributable;
@@ -130,12 +130,7 @@ public class RecoverableObject implements Recoverable {
     public void version(int version){
         this.version = version;
     }
-    public long sequence(){
-        return this.sequence;
-    }
-    public void sequence(long sequence){
-        this.sequence = sequence;
-    }
+
     public int routingNumber(){
         return this.routingNumber;
     }

@@ -34,4 +34,11 @@ public interface DataStoreProvider extends ServiceProvider {
     interface OnBackup{
         void on(String fName,int fSize,ReadableByteChannel in);
     }
+    interface ShardProvider{
+        int version();
+        int id();
+
+        void set(String k,byte[] v);
+        byte[] get(String k);
+    }
 }

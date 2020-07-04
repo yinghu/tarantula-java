@@ -40,11 +40,12 @@ public interface Recoverable extends Distributable{
     long timestamp();
     void timestamp(long timestamp);
 
+    //the shard version
     int version();
     void version(int version);
 
-    long sequence();
-    void sequence(long sequence);
+    //long sequence();
+    //void sequence(long sequence);
 
     boolean onEdge();
     void onEdge(boolean onEdge);

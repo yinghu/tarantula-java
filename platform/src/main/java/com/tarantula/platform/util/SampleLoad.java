@@ -121,14 +121,25 @@ public class SampleLoad {
         dataSource.setMaxTotal(5);
         dataSource.setMinIdle(0);
         Connection connection = dataSource.getConnection();
-        PreparedStatement cmd = connection.prepareStatement("insert into kvs(k,v) values(?,?)");
+        PreparedStatement cmd = connection.prepareStatement("update shard_version set version = version+1 where name=?");
+        //cmd.execute("update shard_version set version = version+1 where name=",)
+        //PreparedStatement cmd = connection.prepareStatement("select v from kvb where k =?");
+        //cmd.setString(1,"key02");
+        /**
+        PreparedStatement cmd = connection.prepareStatement("insert into kvb(k,v) values(?,?)");
         JsonObject v = new JsonObject();
         v.addProperty("name","test");
         v.addProperty("age",15);
         cmd.setString(1,"key02");
-        cmd.setString(2,v.toString());
+        cmd.setBytes(2,v.toString().getBytes());
+        **/
+        //ResultSet rs = cmd.executeQuery();
+        //if(rs.next()){
+            //System.out.println(new String(rs.getBytes("v")));
+        //}
+        //cmd.close();
+        cmd.setString(1,"pd01");
         cmd.execute();
-        cmd.close();
         dataSource.close();
     }
 }
