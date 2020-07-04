@@ -125,7 +125,7 @@ public class SampleLoad {
         JsonObject v = new JsonObject();
         v.addProperty("name","test");
         v.addProperty("age",15);
-        cmd.setString(1,"key01");
+        cmd.setString(1,"key02");
         cmd.setString(2,v.toString());
         cmd.execute();
         cmd.close();

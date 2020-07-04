@@ -138,7 +138,8 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
 	public void start() throws Exception {
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
- 	    ClientConfig dconf = new ClientConfig();
+ 	    /**
+        ClientConfig dconf = new ClientConfig();
         dconf.getGroupConfig().setName(this.clusterNamePrefix+"-"+this.dataBucketGroup);
         dconf.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         this.memberDiscovery(Distributable.DATA_SCOPE).find().forEach((ia)->{
@@ -151,10 +152,10 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         this.memberDiscovery(Distributable.INTEGRATION_SCOPE).find().forEach((ia)->{
             String ip = ia.getHostAddress();
             iconf.getNetworkConfig().addAddress(ip+":5702");
-        });
+        });**/
         dRecovered = new AtomicBoolean(false);
         iRecovered = new AtomicBoolean(false);
-        new ClusterRecoveryService(dconf,iconf,this.dataStoreRecoveryDir,this.scheduledExecutorService,dRecovered,iRecovered,bootstrapRetries).start();
+        //new ClusterRecoveryService(dconf,iconf,this.dataStoreRecoveryDir,this.scheduledExecutorService,dRecovered,iRecovered,bootstrapRetries).start();
  	    _systemStorageInstanceStarted = new CountDownLatch(1);
          _storageInstanceStarted = new CountDownLatch(1);
         _tarantulaClusterStarted = new CountDownLatch(1);
