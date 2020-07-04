@@ -2,7 +2,8 @@ package com.tarantula.platform.util;
 
 import com.google.gson.JsonObject;
 import com.tarantula.Session;
-
+import org.apache.commons.dbcp2.BasicDataSource;
+import java.sql.*;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -65,9 +66,30 @@ public class SampleLoad {
         System.out.println("Average duration ["+(timeRun.get()/size)+"]");
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.153:8090",null,5000);
-        sampleLoad._init();
-        sampleLoad.batch();
+        //SampleLoad sampleLoad = new SampleLoad("http://10.0.0.153:8090",null,5000);
+        //sampleLoad._init();
+        //sampleLoad.batch();
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        dataSource.setUrl("jdbc:mysql://10.0.0.153:3306/tarantula");
+        dataSource.setUsername("tarantula");
+        dataSource.setPassword("tarantula");
+
+        // Connection pooling properties
+        dataSource.setInitialSize(0);
+        dataSource.setMaxIdle(5);
+        dataSource.setMaxTotal(5);
+        dataSource.setMinIdle(0);
+        Connection connection = dataSource.getConnection();
+        PreparedStatement cmd = connection.prepareStatement("insert into kvs(k,v) values(?,?)");
+        JsonObject v = new JsonObject();
+        v.addProperty("name","test");
+        v.addProperty("age",15);
+        cmd.setString(1,"key01");
+        cmd.setString(2,v.toString());
+        cmd.execute();
+        cmd.close();
+        dataSource.close();
     }
 }
 
