@@ -24,11 +24,51 @@ public class SampleLoad {
     public void _init() throws Exception{
         httpCaller = new HttpCaller(host);
         httpCaller._init();
-        pool = Executors.newFixedThreadPool(50);
+        pool = Executors.newFixedThreadPool(100);
     }
-    public void batch() throws Exception{
+    public void device() throws Exception{
         CountDownLatch batch = new CountDownLatch(size);
         AtomicLong timeRun = new AtomicLong(0);
+        long start = System.currentTimeMillis();
+        for(int i=0;i<size;i++){
+            try{
+                //register
+                String _login = prefix+"-"+i;
+                String[] headers = new String[]{
+                        Session.TARANTULA_TAG,"index/user",
+                        Session.TARANTULA_ACTION,"onDevice",
+                        Session.TARANTULA_MAGIC_KEY,_login
+                };
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("deviceId",_login);
+                //jsonObject.addProperty("password","password");
+                pool.execute(()->{
+                    try{
+                        long st = System.currentTimeMillis();
+                        httpCaller.index();
+                        httpCaller.post("user/action",jsonObject.toString().getBytes(),headers);
+                        long ed = System.currentTimeMillis()-st;
+                        timeRun.addAndGet(ed);
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+                    finally {
+                        batch.countDown();
+                    }
+                });
+            }catch (Exception ex){
+                //ignore
+                ex.printStackTrace();
+            }
+        }
+        batch.await();
+        pool.shutdownNow();
+        System.out.println("Average duration ["+(timeRun.get()/size)+"] with total time ["+((System.currentTimeMillis()-start)/1000)+"]");
+    }
+    public void register() throws Exception{
+        CountDownLatch batch = new CountDownLatch(size);
+        AtomicLong timeRun = new AtomicLong(0);
+        long start = System.currentTimeMillis();
         for(int i=0;i<size;i++){
             try{
                 //register
@@ -62,12 +102,12 @@ public class SampleLoad {
         }
         batch.await();
         pool.shutdownNow();
-        System.out.println("Average duration ["+(timeRun.get()/size)+"]");
+        System.out.println("Average duration ["+(timeRun.get()/size)+"] with total time ["+((System.currentTimeMillis()-start)/1000)+"]");
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.30:8090",null,50000);
+        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.153",null,10000);
         sampleLoad._init();
-        sampleLoad.batch();
+        sampleLoad.device();
     }
 }
 
