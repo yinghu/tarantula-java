@@ -99,8 +99,6 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
     public String serviceConfiguration;
 
-    //public String dataStoreProviderConfiguration;
-
     public String dataBucketGroup;
     public String dataBucketNode;
 
@@ -108,8 +106,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
     public String dataStoreDir;
     public String dataStoreRecoveryDir;
-    //public AtomicBoolean dRecovered;
-    //public AtomicBoolean iRecovered;
+
     public int bootstrapRetries = 1 ;
     public String dataStoreMaster;
 
@@ -163,8 +160,6 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         new ServiceBootstrap(new CountDownLatch(0),null,spc,"service-provider",true).start();
         DataStoreConfigurationXMLParser sparser = new DataStoreConfigurationXMLParser("tarantula-platform-data-store-config.xml",this,this.dataStoreProviders);
         new ServiceBootstrap(new CountDownLatch(0),_storageInstanceStarted,sparser,"system-data-store-parser",true).start();
-        //DataStoreConfigurationXMLParser parser = new DataStoreConfigurationXMLParser(this.dataStoreProviderConfiguration,this,this.dataStoreProviders);
-        //new ServiceBootstrap(_systemStorageInstanceStarted,_storageInstanceStarted,parser,"user-data-store-parser",false).start();//false flag to skip on error mode
         Config cfg = new ClasspathXmlConfig(Thread.currentThread().getContextClassLoader(),CONFIG_DATA);
         cfg.getGroupConfig().setName(this.clusterNamePrefix+"-"+this.dataBucketGroup);
         this.tarantulaCluster= new TarantulaCluster(cfg,this.dataBucketGroup,this);
