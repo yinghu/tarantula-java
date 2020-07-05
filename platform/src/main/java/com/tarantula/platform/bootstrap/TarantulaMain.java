@@ -100,7 +100,7 @@ public class TarantulaMain {
 		    btx.maxIdlesOnInstance = Integer.parseInt(override(overriding,"tarantula.instance.session.idle.number",_user,_config));
 		    btx.timeoutOnInstance = 1000*Long.parseLong(override(overriding,"tarantula.instance.session.timeout.s",_user,_config));
 			btx.applicationSchedulingPoolSetting = override(overriding,"tarantula.scheduler.pool.setting",_user,_config);
-			btx.dataStoreProviderConfiguration = override(overriding,"tarantula.data.store.configuration.file",_user,_config);
+			//btx.dataStoreProviderConfiguration = override(overriding,"tarantula.data.store.configuration.file",_user,_config);
             btx.serviceConfiguration = override(overriding,"tarantula.service.configuration.file",_user,_config);
 			btx.dataStoreMaster = override(overriding,"tarantula.data.store.master",_user,_config);
 			btx.dataStoreDailyBackup = Boolean.parseBoolean(override(overriding,"tarantula.data.store.daily.backup",_user,_config));

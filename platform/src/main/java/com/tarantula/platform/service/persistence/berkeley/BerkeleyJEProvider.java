@@ -49,11 +49,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     private String integrationBackupPath;
     private String database;
     private boolean trimming;
+    private int partitionNumber;
 
     private boolean dailyBackup;
-    private boolean dRecovered;
-    private boolean iRecovered;
-    private String recoveryDir;
+
+    //private String recoveryDir;
     private Node node;
 
     private EventService dataScopePublisher;
@@ -88,9 +88,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("dataPath");
         this.integrationBackupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
         this.dailyBackup = properties.get("dailyBackup")!=null?Boolean.parseBoolean(properties.get("dailyBackup")):false;
-        this.recoveryDir = properties.get("recoveryDir");
-        this.dRecovered = Boolean.parseBoolean(properties.get("dRecovered"));
-        this.iRecovered = Boolean.parseBoolean(properties.get("iRecovered"));
+        this.partitionNumber = Integer.parseInt(properties.get("partitionNumber"));
         this.node = new Node(properties.get("bucket"),properties.get("node"));
         this.replicationTopic = "tarantula-replication-topic-"+this.database;
         this.backupTopic = "tarantula-backup-topic-"+this.database;
@@ -159,6 +157,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     }
     @Override
     public void waitForData() {
+        /**
         EnvironmentConfig envConfig = new EnvironmentConfig();
         envConfig.setAllowCreate(true);
         envConfig.setSharedCache(true);
@@ -172,30 +171,26 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         }
         this.integrationEnvironment = new Environment(new File(integrationPath),envConfig);
         this.activeEnvironment = new Environment(new File(activePath),envConfig);
-        if(!dRecovered){ //first node up to cache existing data stores
-            log.info("Waiting for loading data on first member from data scope store");
-            HashSet<String> ln = new HashSet<>();
-            for(String dn : this.environment.getDatabaseNames()){
-                ln.add(dn.split("-")[0]);
-            }
-            ln.forEach((n)->{
-                DataStore ds = this.create(n,this.serviceContext.partitionNumber());
-                ds.count();
-            });
+        //log.info("Waiting for loading data on first member from data scope store");
+        HashSet<String> ln = new HashSet<>();
+        for(String dn : this.environment.getDatabaseNames()){
+            ln.add(dn.split("-")[0]);
         }
-        if(!iRecovered){//first node up to cache existing data stores
-            log.info("Waiting for loading data on first member from integration scope store");
-            for(String dn : this.integrationEnvironment.getDatabaseNames()){
-                DataStore ds = this.create(dn);
-                ds.count();
-            }
+        ln.forEach((n)->{
+            DataStore ds = this.create(n,this.serviceContext.partitionNumber());
+            ds.count();
+        });
+        //log.info("Waiting for loading data on first member from integration scope store");
+        for(String dn : this.integrationEnvironment.getDatabaseNames()){
+            DataStore ds = this.create(dn);
+            ds.count();
         }
         log.info("Berkeley JAVA Edition data store ["+activeDataStoreName+"] truncated with total records ["+truncate(this.activeDataStoreName)+"]");
         log.info("Berkeley JAVA Edition data store ["+activeIntegrationStoreName+"] truncated with total records ["+truncate(this.activeIntegrationStoreName)+"]");
         this.activeDataStore = this.createDatabase(activeDataStoreName,Distributable.LOCAL_SCOPE);
         this.activeIntegrationStore = this.createDatabase(activeIntegrationStoreName,Distributable.LOCAL_SCOPE);
         this.create(this.database,this.serviceContext.partitionNumber());
-
+        **/
         //Pull active entries from data and integration cluster
         AtomicInteger tc = new AtomicInteger(0);
         CountDownLatch activeCount = new CountDownLatch(this.dataCluster.size()+this.integrationCluster.size()-2);//excluding this node
@@ -257,28 +252,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         if(!Files.exists(_piback)){
             Files.createDirectories(_piback);
         }
-        if(dRecovered){
-            String dest = dataPath+FileSystems.getDefault().getSeparator();
-            String src = recoveryDir+FileSystems.getDefault().getSeparator()+"data";
-            log.info("Copying files from ["+src+"] to ["+dest+"]");
-            for(String ef : _path.toFile().list()){
-                Files.delete(Paths.get(dest+ef));
-            }
-            for(String s : Paths.get(src).toFile().list()){
-                Files.move(Paths.get(src+FileSystems.getDefault().getSeparator()+s),Paths.get(dest+s));
-            }
-        }
-        if(iRecovered){
-            String dest = integrationPath+FileSystems.getDefault().getSeparator();
-            String src = recoveryDir+FileSystems.getDefault().getSeparator()+"integration";
-            log.info("Copying files from ["+src+"] to ["+dest+"]");
-            for(String ef : _ipath.toFile().list()){
-                Files.delete(Paths.get(dest+ef));
-            }
-            for(String s : Paths.get(src).toFile().list()){
-                Files.move(Paths.get(src+FileSystems.getDefault().getSeparator()+s),Paths.get(dest+s));
-            }
-        }
         File f = new File(dataPath+FileSystems.getDefault().getSeparator()+"last.dat");
         if(!f.exists()){
             f.createNewFile();
@@ -297,6 +270,38 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             fo.writeUTF(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             fo.close();
         }
+        EnvironmentConfig envConfig = new EnvironmentConfig();
+        envConfig.setAllowCreate(true);
+        envConfig.setSharedCache(true);
+        this.environment = new Environment(new File(dataPath),envConfig);
+        if(trimming){
+            log.warn("Database ["+this.database+"] configured as trimming mode");
+            for(int i=0;i<this.partitionNumber;i++){
+                long ret = this.environment.truncateDatabase(null,this.database+"-"+i,true);
+                log.warn("Records ["+ret+"] truncated from ["+this.database+"-"+i+"]");
+            }
+        }
+        this.integrationEnvironment = new Environment(new File(integrationPath),envConfig);
+        this.activeEnvironment = new Environment(new File(activePath),envConfig);
+        //log.info("Waiting for loading data on first member from data scope store");
+        HashSet<String> ln = new HashSet<>();
+        for(String dn : this.environment.getDatabaseNames()){
+            ln.add(dn.split("-")[0]);
+        }
+        ln.forEach((n)->{
+            DataStore ds = this.create(n,this.partitionNumber);
+            ds.count();
+        });
+        //log.info("Waiting for loading data on first member from integration scope store");
+        for(String dn : this.integrationEnvironment.getDatabaseNames()){
+            DataStore ds = this.create(dn);
+            ds.count();
+        }
+        log.info("Berkeley JAVA Edition data store ["+activeDataStoreName+"] truncated with total records ["+truncate(this.activeDataStoreName)+"]");
+        log.info("Berkeley JAVA Edition data store ["+activeIntegrationStoreName+"] truncated with total records ["+truncate(this.activeIntegrationStoreName)+"]");
+        this.activeDataStore = this.createDatabase(activeDataStoreName,Distributable.LOCAL_SCOPE);
+        this.activeIntegrationStore = this.createDatabase(activeIntegrationStoreName,Distributable.LOCAL_SCOPE);
+        this.create(this.database,this.partitionNumber);
     }
 
     @Override
@@ -424,7 +429,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         }
     }
     public void onLoaded(Metadata metadata,byte[] key,byte[] value){
-        log.warn("loaded->"+new String(key));
         if(metadata.scope()==Recoverable.DATA_SCOPE){
             if(metadata.distributable()){
                 this.dataCluster.set(metadata,key,value);

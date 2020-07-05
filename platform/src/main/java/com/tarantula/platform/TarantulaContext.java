@@ -99,7 +99,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
     public String serviceConfiguration;
 
-    public String dataStoreProviderConfiguration;
+    //public String dataStoreProviderConfiguration;
 
     public String dataBucketGroup;
     public String dataBucketNode;
@@ -108,8 +108,8 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
     public String dataStoreDir;
     public String dataStoreRecoveryDir;
-    public AtomicBoolean dRecovered;
-    public AtomicBoolean iRecovered;
+    //public AtomicBoolean dRecovered;
+    //public AtomicBoolean iRecovered;
     public int bootstrapRetries = 1 ;
     public String dataStoreMaster;
 
@@ -141,24 +141,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
 	public void start() throws Exception {
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
- 	    /**
-        ClientConfig dconf = new ClientConfig();
-        dconf.getGroupConfig().setName(this.clusterNamePrefix+"-"+this.dataBucketGroup);
-        dconf.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
-        this.memberDiscovery(Distributable.DATA_SCOPE).find().forEach((ia)->{
-            String ip = ia.getHostAddress();
-            dconf.getNetworkConfig().addAddress(ip+":5701");
-        });
-        ClientConfig iconf = new ClientConfig();
-        iconf.getGroupConfig().setName(this.clusterNamePrefix+"-integration");
-        iconf.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
-        this.memberDiscovery(Distributable.INTEGRATION_SCOPE).find().forEach((ia)->{
-            String ip = ia.getHostAddress();
-            iconf.getNetworkConfig().addAddress(ip+":5702");
-        });**/
-        dRecovered = new AtomicBoolean(false);
-        iRecovered = new AtomicBoolean(false);
-        //new ClusterRecoveryService(dconf,iconf,this.dataStoreRecoveryDir,this.scheduledExecutorService,dRecovered,iRecovered,bootstrapRetries).start();
+
  	    _systemStorageInstanceStarted = new CountDownLatch(1);
          _storageInstanceStarted = new CountDownLatch(1);
         _tarantulaClusterStarted = new CountDownLatch(1);
@@ -171,6 +154,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         _deployServiceStarted = new CountDownLatch(2);
         _systemServiceStarted = new CountDownLatch(1);
         node_started = new AtomicBoolean(false);
+
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
         PortableProviderConfigurationParser pcs = new PortableProviderConfigurationParser("tarantula-platform-portable-provider.xml");
         pcs.parse().forEach((r)->{
@@ -178,9 +162,9 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         });
         new ServiceBootstrap(new CountDownLatch(0),null,spc,"service-provider",true).start();
         DataStoreConfigurationXMLParser sparser = new DataStoreConfigurationXMLParser("tarantula-platform-data-store-config.xml",this,this.dataStoreProviders);
-        new ServiceBootstrap(new CountDownLatch(0),_systemStorageInstanceStarted,sparser,"system-data-store-parser",true).start();
-        DataStoreConfigurationXMLParser parser = new DataStoreConfigurationXMLParser(this.dataStoreProviderConfiguration,this,this.dataStoreProviders);
-        new ServiceBootstrap(_systemStorageInstanceStarted,_storageInstanceStarted,parser,"user-data-store-parser",false).start();//false flag to skip on error mode
+        new ServiceBootstrap(new CountDownLatch(0),_storageInstanceStarted,sparser,"system-data-store-parser",true).start();
+        //DataStoreConfigurationXMLParser parser = new DataStoreConfigurationXMLParser(this.dataStoreProviderConfiguration,this,this.dataStoreProviders);
+        //new ServiceBootstrap(_systemStorageInstanceStarted,_storageInstanceStarted,parser,"user-data-store-parser",false).start();//false flag to skip on error mode
         Config cfg = new ClasspathXmlConfig(Thread.currentThread().getContextClassLoader(),CONFIG_DATA);
         cfg.getGroupConfig().setName(this.clusterNamePrefix+"-"+this.dataBucketGroup);
         this.tarantulaCluster= new TarantulaCluster(cfg,this.dataBucketGroup,this);

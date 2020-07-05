@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Updated by yinghu on 6/27/2019.
+ * Updated by yinghu on 7/5/2020
  */
 public class DataStoreConfigurationXMLParser extends DefaultHandler implements Serviceable {
 
@@ -31,25 +31,23 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
 
     private String dataBucketGroup;
     private String dataBucketNode;
-    //private String dataBucketId;
+
     private String dataStoreProviderConfiguration;
     private String dataDir;
     private String dataRecoveryDir;
-    private boolean dRecovered;
-    private boolean iRecovered;
 
+    private int partitionNumber;
     private String dataStoreDailyBackup;
 
-    private String _ptag="";
+
     public DataStoreConfigurationXMLParser(String dconfig,TarantulaContext tx, ConcurrentHashMap<String,ServiceProvider> _providers){
         this.dataStoreProviderConfiguration = dconfig;
         this.dataBucketGroup = tx.dataBucketGroup;
         this.dataBucketNode = tx.dataBucketNode;
-        //this.dataBucketId = tx.dataBucketId;
+        this.partitionNumber = tx.partitionNumber();
         this.dataDir = tx.dataStoreDir;
         this.dataRecoveryDir = tx.dataStoreRecoveryDir;
-        this.dRecovered = tx.dRecovered.get();
-        this.iRecovered = tx.iRecovered.get();
+        ;
         this.dataStoreDailyBackup = tx.dataStoreDailyBackup?"true":"false";
         this._loaded = _providers;
     }
@@ -83,11 +81,9 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             properties.put("truncated",trimming);
             properties.put("bucket",this.dataBucketGroup);
             properties.put("node",this.dataBucketNode);
-            //properties.put("bucketId",this.dataBucketId);
+            properties.put("partitionNumber",this.partitionNumber+"");
             properties.put("dir",this.dataDir);
             properties.put("recoveryDir",this.dataRecoveryDir);
-            properties.put("dRecovered",this.dRecovered?"true":"false");
-            properties.put("iRecovered",this.iRecovered?"true":"false");
             properties.put("dailyBackup",dataStoreDailyBackup);
             this.currentLoad = name.trim();
         }
