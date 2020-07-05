@@ -122,6 +122,9 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
     public String platformVersion;
     public int platformRoutingNumber;
+    public int integrationShardingNumber;
+    public int dataShardingNumber;
+
     public String endpointIp ="localhost";
     public int endpointPort = 6393;
     public static ScopedMemberDiscovery memberDiscovery;
