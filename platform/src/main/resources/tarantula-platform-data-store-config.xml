@@ -6,10 +6,12 @@
         <property name="backupPath">backup</property>
     </data-source>
     <sharding-provider name="integration" scope="2" provider="com.tarantula.platform.service.persistence.mysql.MysqlShardingProvider">
-
+        <shard>
+            <property name=""></property>
+        </shard>
 
     </sharding-provider>
     <sharding-provider name="data" scope="1" provider="com.tarantula.platform.service.persistence.mysql.MysqlShardingProvider">
-
+        <shard></shard>
     </sharding-provider>
 </data-store-service>
