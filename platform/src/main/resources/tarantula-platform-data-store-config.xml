@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<data-store-list>
+<data-store-service>
     <data-source name="tarantula" provider="com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider" truncated="false">
         <property name="dataPath">tarantula/data</property>
         <property name="integrationPath">tarantula/integration</property>
         <property name="activePath">tarantula/active</property>
         <property name="backupPath">backup</property>
     </data-source>
-</data-store-list>
+    <sharding-provider name="mysql" provider="com.tarantula.platform.service.persistence.mysql.MysqlShardingProvider">
+        <shard></shard>
+
+    </sharding-provider>
+</data-store-service>

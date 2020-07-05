@@ -39,6 +39,8 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
     private boolean iRecovered;
 
     private String dataStoreDailyBackup;
+
+    private String _ptag="";
     public DataStoreConfigurationXMLParser(String dconfig,TarantulaContext tx, ConcurrentHashMap<String,ServiceProvider> _providers){
         this.dataStoreProviderConfiguration = dconfig;
         this.dataBucketGroup = tx.dataBucketGroup;
@@ -89,6 +91,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             properties.put("dailyBackup",dataStoreDailyBackup);
             this.currentLoad = name.trim();
         }
+        else if(qname.equals("sharding-provider")){}
         else if(qname.equals("property")){
             currentProperty = attributes.getValue("name").trim();
         }
