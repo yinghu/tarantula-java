@@ -6,6 +6,7 @@ import com.sleepycat.je.DiskOrderedCursor;
 import com.sleepycat.je.OperationStatus;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.event.MapStoreSyncEvent;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
@@ -14,7 +15,6 @@ import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.service.persistence.ReplicatedDataStore;
 import com.tarantula.platform.util.SystemUtil;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -263,44 +263,20 @@ public class PartitionDataStore extends ReplicatedDataStore{
             if(edgeList==null){
                 return;
             }
-            ByteBuffer key = ByteBuffer.allocate(100);
-            boolean continuing = true;
-            for(byte b: edgeList){
-                if(b!=','){
-                    key.put(b);
-                }
-                else{
-                    key.flip();
-                    byte[] ka = new byte[key.limit()];
-                    key.get(ka);
-                    T t = query.create();
-                    byte[] v;
-                    if((v=_get(partitions[SystemUtil.partition(ka,partition)],ka))!=null){
-                        t.fromMap(SystemUtil.toMap(v));
-                        t.distributionKey(new String(ka,ENCODING));
-                        if(!stream.on(t)){
-                            continuing = false;
-                            break;
-                        }
-                    }
-                    key.clear();
-                }
-            }
-            if(continuing){
-                key.flip();
-                if(key.limit()>0){
-                    byte[] ka = new byte[key.limit()];
-                    key.get(ka);
-                    T t = query.create();
-                    byte[] v;
-                    if((v=_get(partitions[SystemUtil.partition(ka,partition)],ka))!=null){
-                        t.fromMap(SystemUtil.toMap(v));
-                        t.distributionKey(new String(ka,ENCODING));
-                        stream.on(t);
+            IndexSet indexSet = new IndexSet();
+            indexSet.fromMap(SystemUtil.toMap(edgeList));
+            for(String b: indexSet.keySet){
+                T t = query.create();
+                byte[] v;
+                byte[] ka = b.getBytes();
+                if((v=_get(partitions[SystemUtil.partition(ka,partition)],ka))!=null){
+                    t.fromMap(SystemUtil.toMap(v));
+                    t.distributionKey(b);
+                    if(!stream.on(t)){
+                        break;
                     }
                 }
             }
-
         }catch (Exception ex){
             log.error("Error on list",ex);
         }
@@ -337,20 +313,19 @@ public class PartitionDataStore extends ReplicatedDataStore{
         if(_put(dso,key,value)){
             this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),dso.partition,false),key,value);
             if(t.onEdge()){
+                IndexSet indexSet = new IndexSet();
+                indexSet.distributionKey(t.owner());
+                indexSet.label(t.label());
                 byte[] owner = (t.owner()+Recoverable.PATH_SEPARATOR+t.label()).getBytes(ENCODING);
                 byte[] v;
                 DataStoreOnPartition edo = partitions[SystemUtil.partition(owner,partition)];
                 if((v= _get(edo,owner))!=null){
                     //append
-                    ByteBuffer buffer = ByteBuffer.allocate(v.length+key.length+1);
-                    buffer.put(v).put((byte)',').put(key);
-                    v = buffer.array();
+                    indexSet.fromMap(SystemUtil.toMap(v));
                 }
-                else{
-                    //new edge
-                    v = key;
-                }
+                indexSet.keySet.add(new String(key));
                 //ignore if insert failed
+                v = SystemUtil.toJson(indexSet.toMap());
                 if(_put(edo,owner,v)){
                     //send replication
                     this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),edo.partition,true),owner,v);

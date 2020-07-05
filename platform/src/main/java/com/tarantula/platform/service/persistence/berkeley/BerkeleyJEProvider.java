@@ -5,6 +5,7 @@ import com.sleepycat.je.util.DbBackup;
 import com.sleepycat.je.util.LogVerificationReadableByteChannel;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.event.MapStoreSyncEvent;
 import com.tarantula.platform.event.MapStoreVotingEvent;
 import com.tarantula.platform.service.ClusterProvider;
@@ -409,14 +410,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         if(metadata.scope()==Recoverable.DATA_SCOPE){
             //use data store prefix as the active database
             this.activeDataStore.put(null,new DatabaseEntry(key),new DatabaseEntry(new ActiveEntry(metadata.source()).toByteArray()));
-            this.dataScopePublisher.publish(new MapStoreSyncEvent(this.replicationTopic,this.node.nodeName,key,value,(RecoverableMetadata) metadata));
+            //this.dataScopePublisher.publish(new MapStoreSyncEvent(this.replicationTopic,this.node.nodeName,key,value,(RecoverableMetadata) metadata));
             if(metadata.distributable()){
                 this.dataCluster.set(metadata,key,value);
             }
         }
         else if(metadata.scope()==Recoverable.INTEGRATION_SCOPE){
             this.activeIntegrationStore.put(null,new DatabaseEntry(key),new DatabaseEntry(new ActiveEntry(metadata.source()).toByteArray()));
-            this.integrationScopePublisher.publish(new MapStoreSyncEvent(this.backupTopic,this.node.nodeName,key,value,(RecoverableMetadata)metadata));
+            //this.integrationScopePublisher.publish(new MapStoreSyncEvent(this.backupTopic,this.node.nodeName,key,value,(RecoverableMetadata)metadata));
             if(metadata.distributable()){
                 this.integrationCluster.set(metadata,key,value);
             }
@@ -808,40 +809,19 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 if(edgeList==null){
                     return;
                 }
-                ByteBuffer key = ByteBuffer.allocate(100);
-                boolean continuing = true;
-                for(byte b: edgeList){
-                    if(b!=','){
-                        key.put(b);
-                    }
-                    else{
-                        key.flip();
-                        byte[] ka = new byte[key.limit()];
-                        key.get(ka);
-                        T t = query.create();
-                        byte[] v;
-                        if((v=get(t,ka))!=null){
-                            t.fromMap(SystemUtil.toMap(v));
-                            t.distributionKey(new String(ka,ENCODING));
-                            if(!stream.on(t)){
-                                continuing = false;
-                                break;
-                            }
-                        }
-                        key.clear();
-                    }
-                }
-                if(continuing){
-                    key.flip();
-                    if(key.limit()>0){
-                        byte[] ka = new byte[key.limit()];
-                        key.get(ka);
-                        T t = query.create();
-                        byte[] v;
-                        if((v=get(t,ka))!=null){
-                            t.fromMap(SystemUtil.toMap(v));
-                            t.distributionKey(new String(ka,ENCODING));
-                            stream.on(t);
+                IndexSet indexSet = new IndexSet();
+                indexSet.fromMap(SystemUtil.toMap(edgeList));
+
+                for(String b: indexSet.keySet){
+                    T t = query.create();
+                    byte[] v;
+                    byte[] ka = b.getBytes();
+                    if((v=get(t,ka))!=null){
+                        t.fromMap(SystemUtil.toMap(v));
+                        t.distributionKey(new String(ka,ENCODING));
+                        if(!stream.on(t)){
+
+                            break;
                         }
                     }
                 }
@@ -885,15 +865,16 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         }
         private <T extends Recoverable> void onEdge(T t,byte[] key) throws Exception{
             byte[] owner = (t.owner()+Recoverable.PATH_SEPARATOR+t.label()).getBytes(ENCODING);
+            IndexSet indexSet = new IndexSet();
+            indexSet.distributionKey(t.owner());
+            indexSet.label(t.label());
             byte[] v;
             if((v=_get(owner))!=null){
-                ByteBuffer buffer = ByteBuffer.allocate(v.length+key.length+1);
-                buffer.put(v).put((byte)',').put(key);
-                v = buffer.array();
-            }else{
-                v = key;
+                indexSet.fromMap(SystemUtil.toMap(v));
             }
-            if(_put(owner,v)) {
+            indexSet.keySet.add(new String(key));
+            v = SystemUtil.toJson(indexSet.toMap());
+            if(_put(owner,v)){
                 this.mapStoreListener.onUpdated(new RecoverableMetadata(this.dataStore, t.getFactoryId(), t.getClassId(), t.scope(), true, false, null), owner, v);
             }
         }
