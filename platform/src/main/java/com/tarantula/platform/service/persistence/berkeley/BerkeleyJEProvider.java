@@ -398,6 +398,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.integrationScopePublisher.publish(mve);
     }
     @Override
+    public void onUpdating(Map<String,Object> pending){
+        //
+    }
+    @Override
     public void onUpdated(Metadata metadata, byte[] key, byte[] value) {
         //log.warn("DATA STORE->"+metadata.source());
         if(metadata.scope()==Recoverable.DATA_SCOPE){
