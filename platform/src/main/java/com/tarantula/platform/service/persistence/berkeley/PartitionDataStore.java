@@ -41,7 +41,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
         this.bucket = bucket;
         this.node = node;
         this.prefix = prefix;
-
         this.mapStoreListener = mapStoreListener;
         this.partitions = new DataStoreOnPartition[this.partition];
         for(int i=0;i<this.partition;i++){

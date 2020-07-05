@@ -398,8 +398,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.integrationScopePublisher.publish(mve);
     }
     @Override
-    public void onUpdating(Map<String,Object> pending){
-        //
+    public byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending){
+        String ds = metadata.source();
+        int pt = metadata.partition();
+        return SystemUtil.toJson(pending);
     }
     @Override
     public void onUpdated(Metadata metadata, byte[] key, byte[] value) {

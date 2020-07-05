@@ -5,11 +5,12 @@ import com.tarantula.Metadata;
 import java.util.Map;
 
 /**
- * Updated by yinghu lu on 4/7/2019.
+ * Updated by yinghu lu on 7/4/2020
  */
 public interface MapStoreListener {
 
-    void onUpdating(Map<String,Object> pending);
+    //call before updating
+    byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending);
     //void onLoading()
 
     void onUpdated(Metadata metadata, byte[] key, byte[] value);
