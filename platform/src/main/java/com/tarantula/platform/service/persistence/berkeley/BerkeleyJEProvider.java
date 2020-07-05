@@ -44,7 +44,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
 
     private String dataPath;
     private String integrationPath;
-    private String activePath;
+    //private String activePath;
     private String backupPath;
     private String integrationBackupPath;
     private String database;
@@ -67,15 +67,15 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
 
     private Environment environment;
     private Environment integrationEnvironment;
-    private Environment activeEnvironment;
+    //private Environment activeEnvironment;
     private String replicationTopic;
     private String backupTopic;
 
-    private String activeDataStoreName ="activeData";
-    private Database activeDataStore;
+    //private String activeDataStoreName ="activeData";
+    //private Database activeDataStore;
 
-    private String activeIntegrationStoreName ="activeIntegrationData";
-    private Database activeIntegrationStore;
+    //private String activeIntegrationStoreName ="activeIntegrationData";
+    //private Database activeIntegrationStore;
 
     @Override
     public void configure(Map<String, String> properties) {
@@ -84,7 +84,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         //dataPath, integrationPath, activePath, backupPath
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("dataPath");
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
-        this.activePath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("activePath");
+        //this.activePath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("activePath");
         this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("dataPath");
         this.integrationBackupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
         this.dailyBackup = properties.get("dailyBackup")!=null?Boolean.parseBoolean(properties.get("dailyBackup")):false;
@@ -114,7 +114,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 return this.integrationEnvironment.openDatabase(null,name,dbConfig);
             }
             else{
-                return this.activeEnvironment.openDatabase(null,name,dbConfig);
+               //return this.activeEnvironment.openDatabase(null,name,dbConfig);
+                throw new UnsupportedOperationException("scope ["+scope+"] not supported");
             }
         }catch (Exception ex){
             throw new RuntimeException(name,ex);
@@ -122,7 +123,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     }
     private long truncate(String dname){
         try{
-            return this.activeEnvironment.truncateDatabase(null,dname,true);
+            return 0;//this.activeEnvironment.truncateDatabase(null,dname,true);
         }catch (Exception ex){
             //ex.printStackTrace();
             return 0;
@@ -192,6 +193,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.create(this.database,this.serviceContext.partitionNumber());
         **/
         //Pull active entries from data and integration cluster
+        /**
         AtomicInteger tc = new AtomicInteger(0);
         CountDownLatch activeCount = new CountDownLatch(this.dataCluster.size()+this.integrationCluster.size()-2);//excluding this node
         String registerId = this.dataCluster.addEventListener(null,(e)->{
@@ -225,8 +227,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             this.dataCluster.removeEventListener(registerId);
             this.integrationCluster.removeEventListener(integrationId);
         }catch (Exception ex){}
-        //open replication doors
-        log.info("Total active entries ["+tc.get()+"] from cluster nodes and Berkeley JAVA Edition data store is ready");
+         **/
+         //open replication doors
+        //log.info("Total active entries ["+tc.get()+"] from cluster nodes and Berkeley JAVA Edition data store is ready");
         this.dataCluster.subscribe(this.replicationTopic,this);
         this.integrationCluster.subscribe(this.backupTopic,this);
     }
@@ -240,10 +243,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         if(!Files.exists(_ipath)){
             Files.createDirectories(_ipath);
         }
-        Path _apath = Paths.get(this.activePath);
-        if(!Files.exists(_apath)){
-            Files.createDirectories(_apath);
-        }
+        //Path _apath = Paths.get(this.activePath);
+        //if(!Files.exists(_apath)){
+            //Files.createDirectories(_apath);
+        //}
         Path _pback = Paths.get(this.backupPath);
         if(!Files.exists(_pback)){
             Files.createDirectories(_pback);
@@ -282,7 +285,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             }
         }
         this.integrationEnvironment = new Environment(new File(integrationPath),envConfig);
-        this.activeEnvironment = new Environment(new File(activePath),envConfig);
+        //this.activeEnvironment = new Environment(new File(activePath),envConfig);
         //log.info("Waiting for loading data on first member from data scope store");
         HashSet<String> ln = new HashSet<>();
         for(String dn : this.environment.getDatabaseNames()){
@@ -297,11 +300,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             DataStore ds = this.create(dn);
             ds.count();
         }
-        log.info("Berkeley JAVA Edition data store ["+activeDataStoreName+"] truncated with total records ["+truncate(this.activeDataStoreName)+"]");
-        log.info("Berkeley JAVA Edition data store ["+activeIntegrationStoreName+"] truncated with total records ["+truncate(this.activeIntegrationStoreName)+"]");
-        this.activeDataStore = this.createDatabase(activeDataStoreName,Distributable.LOCAL_SCOPE);
-        this.activeIntegrationStore = this.createDatabase(activeIntegrationStoreName,Distributable.LOCAL_SCOPE);
+        //log.info("Berkeley JAVA Edition data store ["+activeDataStoreName+"] truncated with total records ["+truncate(this.activeDataStoreName)+"]");
+        //log.info("Berkeley JAVA Edition data store ["+activeIntegrationStoreName+"] truncated with total records ["+truncate(this.activeIntegrationStoreName)+"]");
+        //this.activeDataStore = this.createDatabase(activeDataStoreName,Distributable.LOCAL_SCOPE);
+        //this.activeIntegrationStore = this.createDatabase(activeIntegrationStoreName,Distributable.LOCAL_SCOPE);
         this.create(this.database,this.partitionNumber);
+        log.info("Tarantula data store started");
     }
 
     @Override
@@ -309,11 +313,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         dMap.forEach((k,v)->{
             v.close();
         });
-        this.activeDataStore.close();
-        this.activeIntegrationStore.close();
+        //this.activeDataStore.close();
+        //this.activeIntegrationStore.close();
         this.environment.close();
         this.integrationEnvironment.close();
-        this.activeEnvironment.close();
+        //this.activeEnvironment.close();
         log.info("Berkeley JE data store shut down on ["+node.toString()+"]");
     }
     private void truncateOnBackup(Database tds){
@@ -335,6 +339,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         log.info("Total records deleted ["+dc+"] from action entries on ["+tds.getDatabaseName()+"]");
     }
     private void migrateFromDataScope(Event mve){
+        /**
         DiskOrderedCursor cursor = activeDataStore.openCursor(null);
         DatabaseEntry pk = new DatabaseEntry();
         DatabaseEntry pv = new DatabaseEntry();
@@ -367,9 +372,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         cursor.close();
         mve.destination(mve.source());
         mve.stub(tc);
-        this.dataScopePublisher.publish(mve);
+        this.dataScopePublisher.publish(mve);**/
     }
     private void migrateFromIntegrationScope(Event mve){
+        /**
         DiskOrderedCursor cursor = activeIntegrationStore.openCursor(null);
         DatabaseEntry pk = new DatabaseEntry();
         DatabaseEntry pv = new DatabaseEntry();
@@ -401,7 +407,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         cursor.close();
         mve.destination(mve.source());
         mve.stub(tc);
-        this.integrationScopePublisher.publish(mve);
+        this.integrationScopePublisher.publish(mve);**/
     }
     @Override
     public byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending){
@@ -414,14 +420,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         //log.warn("DATA STORE->"+metadata.source());
         if(metadata.scope()==Recoverable.DATA_SCOPE){
             //use data store prefix as the active database
-            this.activeDataStore.put(null,new DatabaseEntry(key),new DatabaseEntry(new ActiveEntry(metadata.source()).toByteArray()));
+            //this.activeDataStore.put(null,new DatabaseEntry(key),new DatabaseEntry(new ActiveEntry(metadata.source()).toByteArray()));
             //this.dataScopePublisher.publish(new MapStoreSyncEvent(this.replicationTopic,this.node.nodeName,key,value,(RecoverableMetadata) metadata));
             if(metadata.distributable()){
                 this.dataCluster.set(metadata,key,value);
             }
         }
         else if(metadata.scope()==Recoverable.INTEGRATION_SCOPE){
-            this.activeIntegrationStore.put(null,new DatabaseEntry(key),new DatabaseEntry(new ActiveEntry(metadata.source()).toByteArray()));
+            //this.activeIntegrationStore.put(null,new DatabaseEntry(key),new DatabaseEntry(new ActiveEntry(metadata.source()).toByteArray()));
             //this.integrationScopePublisher.publish(new MapStoreSyncEvent(this.backupTopic,this.node.nodeName,key,value,(RecoverableMetadata)metadata));
             if(metadata.distributable()){
                 this.integrationCluster.set(metadata,key,value);
@@ -442,12 +448,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     }
     public void backup(int scope){
         if(scope==Distributable.DATA_SCOPE){
-            this.truncateOnBackup(this.activeDataStore);
+            //this.truncateOnBackup(this.activeDataStore);
             this.environment.sync();
             this._backup(this.environment,dataPath,backupPath);
         }
         else if(scope==Distributable.INTEGRATION_SCOPE){
-            this.truncateOnBackup(this.activeIntegrationStore);
+            //this.truncateOnBackup(this.activeIntegrationStore);
             this.integrationEnvironment.sync();
             this._backup(integrationEnvironment,integrationPath,integrationBackupPath);
         }
@@ -505,12 +511,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     }
     public void backup(int scope,OnBackup onBackup){
         if(scope==Distributable.DATA_SCOPE){
-            this.truncateOnBackup(this.activeDataStore);
+            //this.truncateOnBackup(this.activeDataStore);
             this.environment.sync();
             this._backup(onBackup,dataPath,this.environment);
         }
         else if(scope==Distributable.INTEGRATION_SCOPE){
-            this.truncateOnBackup(this.activeIntegrationStore);
+            //this.truncateOnBackup(this.activeIntegrationStore);
             this.integrationEnvironment.sync();
             this._backup(onBackup,integrationPath,this.integrationEnvironment);
         }

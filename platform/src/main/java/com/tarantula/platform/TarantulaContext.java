@@ -97,8 +97,6 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     private final ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
 
 
-    public String serviceConfiguration;
-
     public String dataBucketGroup;
     public String dataBucketNode;
 

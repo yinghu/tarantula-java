@@ -177,15 +177,14 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     private BatchCache createQuery(int registryId,String[] params){
         BatchCache batchCache = null;
         DataStore dataStore = tarantulaContext.masterDataStore();
+
         if(registryId==PortableRegistry.SERVICE_CONFIGURATION_CID){
             List rlist = dataStore.list(new ServiceConfigurationQuery(params[0]));
             if(rlist.isEmpty()){
                 ServiceConfigurationParser ssp = new ServiceConfigurationParser();
                 ssp.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("tarantula-platform-service-config.xml"));
                 rlist.addAll(ssp.configurationMapping.values());
-                ServiceConfigurationParser sp = new ServiceConfigurationParser();
-                sp.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(this.tarantulaContext.serviceConfiguration));
-                rlist.addAll(sp.configurationMapping.values());
+
                 rlist.forEach((o)->{
                     ServiceConfiguration r = (ServiceConfiguration)o;
                     r.owner(params[0]);
