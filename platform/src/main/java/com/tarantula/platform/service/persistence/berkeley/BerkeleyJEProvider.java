@@ -417,6 +417,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         }
     }
     public void onLoaded(Metadata metadata,byte[] key,byte[] value){
+        log.warn("loaded->"+new String(key));
         if(metadata.scope()==Recoverable.DATA_SCOPE){
             if(metadata.distributable()){
                 this.dataCluster.set(metadata,key,value);
@@ -646,7 +647,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                     okey = t.key().asString();
                 }
                 byte[] key = okey.getBytes(ENCODING);
-                byte[] value = t.binary() ? t.toByteArray() : SystemUtil.toJson(t.toMap());
+                byte[] value = SystemUtil.toJson(t.toMap());
                 boolean suc = set(t,key,value);
                 if(suc&&t.onEdge()){//update edge
                     onEdge(t,key);
@@ -681,7 +682,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                     return false;
                 }
                 byte[] key = akey.getBytes(ENCODING);
-                return set(t,key,t.binary()?t.toByteArray():SystemUtil.toJson(t.toMap()));
+                return set(t,key,SystemUtil.toJson(t.toMap()));
             }catch (Exception ex){
                 log.error("error on update",ex);
                 return false;
@@ -704,7 +705,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 byte[] key = akey.getBytes(ENCODING);
                 byte[] v;
                 if((v=_get(key))==null){
-                    boolean suc = set(t,key,t.binary()?t.toByteArray():SystemUtil.toJson(t.toMap()));
+                    boolean suc = set(t,key,SystemUtil.toJson(t.toMap()));
                     if(suc&&t.onEdge()){
                         onEdge(t,key);
                     }
@@ -712,12 +713,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 }
                 else{
                     if(loading){
-                        if(t.binary()){
-                            t.fromByteArray(v);
-                        }
-                        else{
-                            t.fromMap(SystemUtil.toMap(v));
-                        }
+                        t.fromMap(SystemUtil.toMap(v));
                     }
                     return false;
                 }
@@ -742,12 +738,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 if((value=get(t,key))==null){
                     return false;
                 }
-                if(t.binary()){
-                    t.fromByteArray(value);
-                }
-                else{
-                    t.fromMap(SystemUtil.toMap(value));
-                }
+                t.fromMap(SystemUtil.toMap(value));
                 return true;
             }catch (Exception ex){
                 log.error("error on load",ex);
@@ -824,12 +815,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                         T t = query.create();
                         byte[] v;
                         if((v=get(t,ka))!=null){
-                            if(t.binary()){
-                                t.fromByteArray(v);
-                            }
-                            else{
-                                t.fromMap(SystemUtil.toMap(v));
-                            }
+                            t.fromMap(SystemUtil.toMap(v));
                             t.distributionKey(new String(ka,ENCODING));
                             if(!stream.on(t)){
                                 continuing = false;
@@ -847,12 +833,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                         T t = query.create();
                         byte[] v;
                         if((v=get(t,ka))!=null){
-                            if(t.binary()){
-                                t.fromByteArray(v);
-                            }
-                            else{
-                                t.fromMap(SystemUtil.toMap(v));
-                            }
+                            t.fromMap(SystemUtil.toMap(v));
                             t.distributionKey(new String(ka,ENCODING));
                             stream.on(t);
                         }

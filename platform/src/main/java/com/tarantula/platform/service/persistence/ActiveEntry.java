@@ -11,7 +11,7 @@ public class ActiveEntry extends RecoverableObject {
         this.vertex = source;
         this.timestamp = System.currentTimeMillis();
     }
-    @Override
+
     public byte[] toByteArray(){
         ByteBuffer buffer = ByteBuffer.allocate(12+vertex.length());
         buffer.putInt(this.vertex.length());
@@ -19,7 +19,7 @@ public class ActiveEntry extends RecoverableObject {
         buffer.putLong(this.timestamp);
         return buffer.array();
     }
-    @Override
+
     public void fromByteArray(byte[] data){
         ByteBuffer buffer = ByteBuffer.wrap(data);
         int len = buffer.getInt();

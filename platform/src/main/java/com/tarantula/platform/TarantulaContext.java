@@ -473,11 +473,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     public <T extends Recoverable> T query(String key,T t){
         Batch batch = this.tarantulaCluster.deployService().query(t.getClassId(),new String[]{key});
         if(batch.size>0){
-            if(!t.binary()){
-                t.fromMap(SystemUtil.toMap(batch.payload));
-            }else{
-                t.fromByteArray(batch.payload);
-            }
+            t.fromMap(SystemUtil.toMap(batch.payload));
             t.distributionKey(batch.key);
         }
         return t;
@@ -487,22 +483,14 @@ public class TarantulaContext implements Serviceable,ServiceContext{
         Batch batch = this.tarantulaCluster.deployService().query(factory.registryId(),params);
         if(batch.size>0){
             T sc = factory.create();
-            if(!sc.binary()){
-                sc.fromMap(SystemUtil.toMap(batch.payload));
-            }else{
-                sc.fromByteArray(batch.payload);
-            }
+            sc.fromMap(SystemUtil.toMap(batch.payload));
             sc.distributionKey(batch.key);
             _slist.add(sc);
             sc.owner(factory.distributionKey());
             for(int i=batch.count+1;i<batch.size;i++){
                 Batch bx = this.tarantulaCluster.deployService().query(batch.batchId,i);
                 T scx = factory.create();
-                if(!scx.binary()){
-                    scx.fromMap(SystemUtil.toMap(bx.payload));
-                }else{
-                    scx.fromByteArray(bx.payload);
-                }
+                scx.fromMap(SystemUtil.toMap(bx.payload));
                 scx.distributionKey(bx.key);
                 _slist.add(scx);
                 scx.owner(factory.distributionKey());

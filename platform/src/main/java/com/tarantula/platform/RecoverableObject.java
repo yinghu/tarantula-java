@@ -93,19 +93,19 @@ public class RecoverableObject implements Recoverable {
     public void fromMap(Map<String,Object> properties){
         properties.forEach((String k,Object v)->this.properties.put(k,v));
     }
-    public byte[] toByteArray(){
-        return new byte[0];
-    }
-    public void fromByteArray(byte[] data){
+    //public byte[] toByteArray(){
+        //return new byte[0];
+    //}
+    //public void fromByteArray(byte[] data){
 
-    }
-    public boolean binary(){
-        return false;
+    //}
+    //public boolean binary(){
+        //return false;
 
-    }
-    public void binary(boolean binary){
+    //}
+    //public void binary(boolean binary){
 
-    }
+    //}
     public boolean disabled() {
         return this.disabled;
     }

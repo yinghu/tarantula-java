@@ -19,19 +19,7 @@ public class IndexSet extends RecoverableObject {
         return PortableRegistry.OID;
     }
 
-    @Override
-    public byte[] toByteArray(){
-        StringBuilder sb = new StringBuilder();
-        keySet.forEach((k)->sb.append(k).append(","));
-        return sb.substring(0,sb.length()-1).getBytes();
-    }
-    @Override
-    public void fromByteArray(byte[] data){
-        String[] keys = new String(data).split(",");
-        for(String k : keys){
-            keySet.add(k);
-        }
-    }
+
 
     @Override
     public Map<String,Object> toMap(){

@@ -22,12 +22,7 @@ public abstract class AbstractRecoverableListener implements RecoverableListener
         OnFilter onFilter = oMap.get(metadata.classId());
         if(onFilter!=null){
             Recoverable recoverable = this.create(metadata.classId());
-            if(recoverable.binary()){
-                recoverable.fromByteArray(value);
-            }
-            else{
-                recoverable.fromMap(SystemUtil.toMap(value));
-            }
+            recoverable.fromMap(SystemUtil.toMap(value));
             recoverable.distributionKey(new String(key));
             onFilter.onUpdated(recoverable);
         }

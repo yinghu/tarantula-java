@@ -125,23 +125,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this.timestamp = ((Number)properties.getOrDefault("4",0)).longValue();
 
     }
-    @Override
-    public byte[] toByteArray(){
-        ByteBuffer buffer = ByteBuffer.allocate(24);
-        buffer.putLong(timestamp);
-        buffer.putDouble(balance);
-        buffer.putInt(counter);
-        buffer.putInt(disabled?1:0);
-        return buffer.array();
-    }
-    @Override
-    public void fromByteArray(byte[] data){
-        ByteBuffer buffer = ByteBuffer.wrap(data);
-        this.timestamp = buffer.getLong();
-        this.balance = buffer.getDouble();
-        this.counter = buffer.getInt();
-        this.disabled = buffer.getInt()==1;
-    }
+
     public int count(int delta){
         if(delta<=0){
             return this.counter;

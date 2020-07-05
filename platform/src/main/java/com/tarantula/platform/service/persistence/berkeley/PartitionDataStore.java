@@ -17,6 +17,7 @@ import com.tarantula.platform.util.SystemUtil;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
@@ -89,7 +90,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 okey = t.key().asString();
             }
             byte[] key = okey.getBytes(ENCODING);
-            byte[] value = t.binary() ? t.toByteArray() : SystemUtil.toJson(t.toMap());
+            byte[] value = SystemUtil.toJson(t.toMap());
             return _set(t,key,value);
         }catch (Exception ex){
             log.error("Error on create",ex);
@@ -121,7 +122,8 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = akey.getBytes(ENCODING);
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            byte[] value = t.binary()?t.toByteArray():SystemUtil.toJson(t.toMap());
+            Map<String,Object> _map = t.toMap();
+            byte[] value = SystemUtil.toJson(_map);
             if(_put(dso,key,value)){
                 this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),dso.partition,false),key,value);
                 return true;
@@ -151,16 +153,11 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] key = akey.getBytes(ENCODING);
             byte[] v;
             if((v=_get(partitions[SystemUtil.partition(key,partition)],key))==null){
-                return _set(t,key,t.binary()?t.toByteArray():SystemUtil.toJson(t.toMap()));
+                return _set(t,key,SystemUtil.toJson(t.toMap()));
             }
             else{
                 if(loading){
-                    if(t.binary()){
-                        t.fromByteArray(v);
-                    }
-                    else{
-                        t.fromMap(SystemUtil.toMap(v));
-                    }
+                    t.fromMap(SystemUtil.toMap(v));
                 }
                 return false;
             }
@@ -185,12 +182,8 @@ public class PartitionDataStore extends ReplicatedDataStore{
             if((value=_get(partitions[SystemUtil.partition(key,partition)],key))==null){
                 return false;
             }
-            if(t.binary()){
-                t.fromByteArray(value);
-            }
-            else{
-                t.fromMap(SystemUtil.toMap(value));
-            }
+            Map<String,Object> _map = SystemUtil.toMap(value);
+            t.fromMap(_map);
             return true;
         }catch (Exception ex){
             log.error("Error on load",ex);
@@ -284,12 +277,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                     T t = query.create();
                     byte[] v;
                     if((v=_get(partitions[SystemUtil.partition(ka,partition)],ka))!=null){
-                        if(t.binary()){
-                            t.fromByteArray(v);
-                        }
-                        else{
-                            t.fromMap(SystemUtil.toMap(v));
-                        }
+                        t.fromMap(SystemUtil.toMap(v));
                         t.distributionKey(new String(ka,ENCODING));
                         if(!stream.on(t)){
                             continuing = false;
@@ -307,12 +295,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                     T t = query.create();
                     byte[] v;
                     if((v=_get(partitions[SystemUtil.partition(ka,partition)],ka))!=null){
-                        if(t.binary()){
-                            t.fromByteArray(v);
-                        }
-                        else{
-                            t.fromMap(SystemUtil.toMap(v));
-                        }
+                        t.fromMap(SystemUtil.toMap(v));
                         t.distributionKey(new String(ka,ENCODING));
                         stream.on(t);
                     }

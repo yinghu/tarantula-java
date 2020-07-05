@@ -477,12 +477,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             Metadata mt = mse.metadata;
             RecoverableRegistry r = tarantulaContext.recoverableRegistry(mt.factoryId());
             Recoverable ot = r.create(mt.classId());
-            if(ot.binary()){
-                ot.fromByteArray(event.payload());
-            }
-            else{
-                ot.fromMap(SystemUtil.toMap(event.payload()));
-            }
+            ot.fromMap(SystemUtil.toMap(event.payload()));
             if(ot instanceof Configuration){
                 Configuration ov = (Configuration) ot;
                 vMap.put(new String(mse.key),ot);
@@ -867,7 +862,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
            return (dkey,t)->{
                String key = t.key().asString();
                RecoverableMetadata m = new RecoverableMetadata(t.getFactoryId(),t.getClassId());
-               byte[] payload = t.binary()?t.toByteArray(): SystemUtil.toJson(t.toMap());
+               byte[] payload = SystemUtil.toJson(t.toMap());
                RoutingKey routingKey = integrationEventService.routingKey(dkey,tag);
                MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),routingKey.source(),t.owner(),key!=null?key.getBytes():new byte[0],payload,m);
                integrationEventService.publish(mapStoreSyncEvent);
@@ -877,7 +872,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return (dkey,t)->{
                 String key = t.key().asString();
                 RecoverableMetadata m = new RecoverableMetadata(t.getFactoryId(),t.getClassId());
-                byte[] payload = t.binary()?t.toByteArray(): SystemUtil.toJson(t.toMap());
+                byte[] payload = SystemUtil.toJson(t.toMap());
                 RoutingKey routingKey = integrationEventService.instanceRoutingKey(applicationId,dkey);
                 MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),routingKey.source(),t.owner(),key!=null?key.getBytes():new byte[0],payload,m);
                 integrationEventService.publish(mapStoreSyncEvent);

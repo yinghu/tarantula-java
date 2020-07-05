@@ -148,7 +148,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         if(batch.size>0){
             Recoverable r = batchCache.cache.get(0);
             batch.key = r.distributionKey();
-            batch.payload = r.binary()?r.toByteArray():SystemUtil.toJson(r.toMap());
+            batch.payload = SystemUtil.toJson(r.toMap());
         }
         else{
             batch.payload = new byte[0];
@@ -166,7 +166,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             _cache.remove(batchId);//remove on last count
         }
         batch.key = r.distributionKey();
-        batch.payload = r.binary()?r.toByteArray():SystemUtil.toJson(r.toMap());
+        batch.payload = SystemUtil.toJson(r.toMap());
         return batch;
     }
     private BatchCache onQuery(int registryId,String[] params){

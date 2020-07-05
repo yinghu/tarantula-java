@@ -21,11 +21,11 @@ public interface Recoverable extends Distributable{
 
     //binary format persistence APIs
     //Be aware it is not back-forwarding support. use map format on development stage
-    byte[] toByteArray();
-    void fromByteArray(byte[] data);
+    //byte[] toByteArray();
+    //void fromByteArray(byte[] data);
 
-    boolean binary();
-    void binary(boolean binary);
+    //boolean binary();
+    //void binary(boolean binary);
     //END OF binary format persistence APIs
 
     boolean disabled();

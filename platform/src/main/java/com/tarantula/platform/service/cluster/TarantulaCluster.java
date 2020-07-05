@@ -124,12 +124,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
             T t = query.create();
             byte[] v = vMap.get(k);
             if(v!=null){
-                if(t.binary()){
-                    t.fromByteArray(v);
-                }
-                else{
-                    t.fromMap(SystemUtil.toMap(v));
-                }
+                t.fromMap(SystemUtil.toMap(v));
                 t.distributionKey(new String(k));
                 if(!stream.on(t)){
                     break;
@@ -154,12 +149,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         byte[] k = t.key().asString().getBytes();
         byte[] v = get(k);
         if(v!=null){
-            if(t.binary()){
-                t.fromByteArray(v);
-            }
-            else{
-                t.fromMap(SystemUtil.toMap(v));
-            }
+            t.fromMap(SystemUtil.toMap(v));
             return true;
         }
         else{
