@@ -111,7 +111,7 @@ public class SampleLoad {
         //sampleLoad.batch();
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://10.0.0.153:3306/tarantula");
+        dataSource.setUrl("jdbc:mysql://10.0.0.153:3306/");
         dataSource.setUsername("tarantula");
         dataSource.setPassword("tarantula");
 
@@ -121,7 +121,14 @@ public class SampleLoad {
         dataSource.setMaxTotal(5);
         dataSource.setMinIdle(0);
         Connection connection = dataSource.getConnection();
-        PreparedStatement cmd = connection.prepareStatement("update shard_version set version = version+1 where name=?");
+        Statement cmd = connection.createStatement();
+        cmd.execute("CREATE DATABASE IF NOT EXISTS tarantula2");
+        cmd.execute("USE tarantula2");
+        cmd.execute("CREATE TABLE IF NOT EXISTS shard (partition_no INT NOT NULL,version INT,node VARCHAR(10),bucket VARCHAR(10),start_time VARCHAR(100),PRIMARY KEY(partition_no))");
+        for(int i=0;i<127;i++){
+            cmd.execute("INSERT INTO shard(partition_no) VALUES("+i+")");
+        }
+        //PreparedStatement cmd = connection.prepareStatement("update shard_version set version = version+1 where name=?");
         //cmd.execute("update shard_version set version = version+1 where name=",)
         //PreparedStatement cmd = connection.prepareStatement("select v from kvb where k =?");
         //cmd.setString(1,"key02");
@@ -138,8 +145,8 @@ public class SampleLoad {
             //System.out.println(new String(rs.getBytes("v")));
         //}
         //cmd.close();
-        cmd.setString(1,"pd01");
-        cmd.execute();
+        //cmd.setString(1,"pd01");
+        //cmd.execute();
         dataSource.close();
     }
 }

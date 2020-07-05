@@ -1,6 +1,6 @@
 CREATE DATABASE IF NOT EXISTS tarantula;
 USE tarantula;
-CREATE TABLE IF NOT EXISTS shard (partition INT NUT NULL PRIMARY KEY,version INT,node VARCHAR(10),bucket VARCHAR(10),start_time VARCHAR(100));
+CREATE TABLE IF NOT EXISTS shard (partition INT NOT NULL PRIMARY KEY,version INT,node VARCHAR(10),bucket VARCHAR(10),start_time VARCHAR(100));
 INSERT INTO shard(partition) VALUES(0);
 INSERT INTO shard(partition) VALUES(1);
 INSERT INTO shard(partition) VALUES(2);
@@ -128,26 +128,6 @@ INSERT INTO shard(partition) VALUES(123);
 INSERT INTO shard(partition) VALUES(124);
 INSERT INTO shard(partition) VALUES(125);
 INSERT INTO shard(partition) VALUES(126);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 CREATE TABLE IF NOT EXISTS partition_0 (k VARCHAR(100),v BLOB);
 CREATE TABLE IF NOT EXISTS partition_1 (k VARCHAR(100),v BLOB);
