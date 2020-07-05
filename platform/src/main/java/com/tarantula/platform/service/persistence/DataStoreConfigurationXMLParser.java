@@ -47,7 +47,6 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
         this.partitionNumber = tx.partitionNumber();
         this.dataDir = tx.dataStoreDir;
         this.dataRecoveryDir = tx.dataStoreRecoveryDir;
-        ;
         this.dataStoreDailyBackup = tx.dataStoreDailyBackup?"true":"false";
         this._loaded = _providers;
     }
@@ -87,7 +86,11 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             properties.put("dailyBackup",dataStoreDailyBackup);
             this.currentLoad = name.trim();
         }
-        else if(qname.equals("sharding-provider")){}
+        else if(qname.equals("sharding-provider")){
+            System.out.println(attributes.getValue("name"));
+            System.out.println(attributes.getValue("scope"));
+            System.out.println(attributes.getValue("provider"));
+        }
         else if(qname.equals("property")){
             currentProperty = attributes.getValue("name").trim();
         }
