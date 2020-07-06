@@ -1,6 +1,5 @@
 package com.tarantula.platform.service.persistence;
 
-import com.tarantula.DataStore;
 import com.tarantula.platform.service.ServiceProvider;
 import com.tarantula.platform.service.Serviceable;
 import com.tarantula.platform.TarantulaContext;
@@ -73,7 +72,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             properties.clear();
         }
         else if(qname.equals("shard")){
-            this.shard.properties.putAll(this.properties);
+            this._start(properties,this.shard);
             this.shardingProvider.addShard(this.shard);
             this.properties.clear();
         }
@@ -146,7 +145,13 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             throw new RuntimeException(ex);
         }
     }
-
+    void _start(HashMap<String,String> config,Shard shard){
+        try{
+            shard.configuration(config);
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
     public void start() throws Exception {
         try{
             File f = new File("/etc/tarantula/"+this.dataStoreProviderConfiguration);
