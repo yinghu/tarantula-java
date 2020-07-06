@@ -291,9 +291,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     }
 
     public DataStore dataStore(String name){
-        if(resetEnabled){
-            return this.tarantulaContext.dataStore(name);
-        }
+        //if(resetEnabled){
+            //return this.tarantulaContext.dataStore(name);
+        //}
         return this.tarantulaContext.dataStore(name,this.tarantulaContext.partitionNumber());
     }
 

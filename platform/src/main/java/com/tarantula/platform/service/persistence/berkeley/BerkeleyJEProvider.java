@@ -203,6 +203,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         }
         this.integrationEnvironment = new Environment(new File(integrationPath),envConfig);
         //log.info("Waiting for loading data on first member from data scope store");
+        /**
         HashSet<String> ln = new HashSet<>();
         for(String dn : this.environment.getDatabaseNames()){
             ln.add(dn.split("_")[0]);
@@ -215,9 +216,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         for(String dn : this.integrationEnvironment.getDatabaseNames()){
             DataStore ds = this.create(dn);
             ds.count();
-        }
+        }**/
         this.create(this.database,this.partitionNumber);
-        log.info("Tarantula data store started on bucket ["+this.node.bucket()+"]");
+        log.info("Tarantula data store started");
     }
 
     @Override
