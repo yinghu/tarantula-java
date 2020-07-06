@@ -39,6 +39,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
     private int partitionNumber;
     private String dataStoreDailyBackup;
 
+    private ShardingProvider shardingProvider;
 
     public DataStoreConfigurationXMLParser(String dconfig,TarantulaContext tx, ConcurrentHashMap<String,ServiceProvider> _providers){
         this.dataStoreProviderConfiguration = dconfig;
@@ -64,6 +65,9 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             _start(ds);
             properties.clear();
         }
+        else if(qname.equals("sharding-provider")){
+
+        }
         else if(qname.equals("property")){
             properties.put(currentProperty, value);
         }
@@ -87,9 +91,15 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             this.currentLoad = name.trim();
         }
         else if(qname.equals("sharding-provider")){
-            System.out.println(attributes.getValue("name"));
-            System.out.println(attributes.getValue("scope"));
-            System.out.println(attributes.getValue("provider"));
+            this.shardingProvider = this.shardingProvider(attributes.getValue("provider"));
+            HashMap<String,String> _cfg = new HashMap<>();
+            _cfg.put("name",attributes.getValue("name"));
+            _cfg.put("scope",attributes.getValue("scope"));
+            _cfg.put("shards",attributes.getValue("shards"));
+            this.shardingProvider.configure(_cfg);
+        }
+        else if(qname.equals("shard")){
+
         }
         else if(qname.equals("property")){
             currentProperty = attributes.getValue("name").trim();
@@ -102,6 +112,13 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
     DataStoreProvider dataStoreProvider(String provider){
         try {
             return (DataStoreProvider)Class.forName(provider).getConstructor().newInstance();
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
+    ShardingProvider shardingProvider(String provider){
+        try {
+            return (ShardingProvider)Class.forName(provider).getConstructor().newInstance();
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }

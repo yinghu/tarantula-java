@@ -1,6 +1,7 @@
 package com.tarantula.platform.service;
 
 import com.tarantula.DataStore;
+import com.tarantula.platform.service.persistence.ShardingProvider;
 
 import java.nio.channels.ReadableByteChannel;
 import java.util.List;
@@ -14,6 +15,8 @@ public interface DataStoreProvider extends ServiceProvider {
     int CONCURRENCY_ACCESS_LIMIT = 17;
 
     void configure(Map<String,String> properties);
+    void addShardingProvider(ShardingProvider shardingProvider);
+
     //create none-partitioned integration scope data store
     DataStore create(String name);
 
@@ -34,11 +37,5 @@ public interface DataStoreProvider extends ServiceProvider {
     interface OnBackup{
         void on(String fName,int fSize,ReadableByteChannel in);
     }
-    interface ShardProvider{
-        int version();
-        int id();
 
-        void set(String k,byte[] v);
-        byte[] get(String k);
-    }
 }
