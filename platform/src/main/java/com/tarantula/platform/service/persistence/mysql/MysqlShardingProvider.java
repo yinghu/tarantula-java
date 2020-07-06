@@ -21,6 +21,11 @@ public class MysqlShardingProvider implements ShardingProvider {
     @Override
     public void start() throws Exception {
         //create connections
+        for(Shard shard : shardList){
+            shard.properties.forEach((k,v)->{
+                log.info(k+"<><>"+v);
+            });
+        }
     }
 
     @Override

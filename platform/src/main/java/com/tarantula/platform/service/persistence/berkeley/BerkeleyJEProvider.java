@@ -85,7 +85,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.backupTopic = "tarantula-backup-topic-"+this.database;
     }
     public void addShardingProvider(ShardingProvider shardingProvider){
-
+        log.info("sharding provider->"+shardingProvider.name());
     }
     @Override
     public DataStore create(String name) {

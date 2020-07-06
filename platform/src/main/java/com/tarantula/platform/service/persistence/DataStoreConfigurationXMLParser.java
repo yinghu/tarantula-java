@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
+import com.tarantula.DataStore;
 import com.tarantula.platform.service.ServiceProvider;
 import com.tarantula.platform.service.Serviceable;
 import com.tarantula.platform.TarantulaContext;
@@ -40,7 +41,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
     private String dataStoreDailyBackup;
 
     private ShardingProvider shardingProvider;
-
+    private Shard shard;
     public DataStoreConfigurationXMLParser(String dconfig,TarantulaContext tx, ConcurrentHashMap<String,ServiceProvider> _providers){
         this.dataStoreProviderConfiguration = dconfig;
         this.dataBucketGroup = tx.dataBucketGroup;
@@ -66,7 +67,15 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             properties.clear();
         }
         else if(qname.equals("sharding-provider")){
-
+            DataStoreProvider dsp = (DataStoreProvider) _loaded.get("tarantula");
+            _start(this.shardingProvider);
+            dsp.addShardingProvider(this.shardingProvider);
+            properties.clear();
+        }
+        else if(qname.equals("shard")){
+            this.shard.properties.putAll(this.properties);
+            this.shardingProvider.addShard(this.shard);
+            this.properties.clear();
         }
         else if(qname.equals("property")){
             properties.put(currentProperty, value);
@@ -99,7 +108,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             this.shardingProvider.configure(_cfg);
         }
         else if(qname.equals("shard")){
-
+            this.shard = new Shard(Integer.parseInt(attributes.getValue("sharding-number")));
         }
         else if(qname.equals("property")){
             currentProperty = attributes.getValue("name").trim();
@@ -124,6 +133,13 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
         }
     }
     void _start(DataStoreProvider ds){
+        try{
+            ds.start();
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
+    void _start(ShardingProvider ds){
         try{
             ds.start();
         }catch (Exception ex){
