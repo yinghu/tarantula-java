@@ -9,6 +9,9 @@ import java.util.Map;
  */
 public interface MapStoreListener {
 
+    //return null if 
+    byte[] onCreating(String key,Map<String,Object> map);
+
     //call before updating
     byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending);
     //void onLoading()
