@@ -5,6 +5,7 @@ import com.tarantula.platform.service.persistence.Shard;
 import com.tarantula.platform.service.persistence.ShardingProvider;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Map;
 
@@ -64,6 +65,14 @@ public class MysqlShardingProvider implements ShardingProvider {
                 Statement cmd = con.createStatement();
                 cmd.execute("CREATE TABLE IF NOT EXISTS "+name+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v BLOB)");
                 cmd.close();
+                PreparedStatement pstm = con.prepareStatement("INSERT INTO meta_info VALUES (?,?,?,?,?)");
+                pstm.setString(1,name);
+                pstm.setString(2,"node");
+                pstm.setString(3,"bucket");
+                pstm.setInt(4,0);
+                pstm.setInt(5,0);
+                pstm.execute();
+                pstm.close();
                 con.close();
             }
         }catch (Exception ex){
@@ -76,9 +85,17 @@ public class MysqlShardingProvider implements ShardingProvider {
             for(Shard shard : shardList){
                 Connection con = shard.connection();
                 Statement cmd = con.createStatement();
+                PreparedStatement pstm = con.prepareStatement("INSERT INTO meta_info VALUES (?,?,?,?,?)");
                 for(int i=0;i<partitions;i++){
                     cmd.addBatch("CREATE TABLE IF NOT EXISTS "+prefix+"_"+i+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v BLOB)");
+                    pstm.setString(1,prefix+"_"+i);
+                    pstm.setString(2,"node");
+                    pstm.setString(3,"bucket");
+                    pstm.setInt(4,0);
+                    pstm.setInt(5,0);
+                    pstm.execute();
                 }
+                pstm.close();
                 cmd.executeBatch();
                 cmd.close();
                 con.close();
@@ -87,4 +104,5 @@ public class MysqlShardingProvider implements ShardingProvider {
             throw new RuntimeException(ex);
         }
     }
+
 }

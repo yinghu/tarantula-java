@@ -216,7 +216,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         jsonObject.addProperty("successful",true);
         long cnt =0;
         for(int i=0;i<this.deploymentServiceProvider.clusterPartitionCount();i++){
-            cnt += this.context.dataStore("p"+i).count();
+            //cnt += this.context.dataStore("p_"+i).count();
         }
         jsonObject.addProperty("AccessIndex",cnt);
         jsonObject.addProperty("User",this.context.dataStore(Access.DataStore).count());
