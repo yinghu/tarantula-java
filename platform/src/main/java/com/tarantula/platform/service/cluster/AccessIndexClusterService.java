@@ -34,7 +34,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
         this.nodeEngine.getPartitionService().addMigrationListener(this);
         this.dataStoreOnPartitions = new DataStoreOnPartition[this.nodeEngine.getPartitionService().getPartitionCount()];
         for(int i=0;i<this.dataStoreOnPartitions.length;i++){
-            this.dataStoreOnPartitions[i]=new DataStoreOnPartition(i,"p"+i);
+            this.dataStoreOnPartitions[i]=new DataStoreOnPartition(i,"p_"+i);
         }
         new ServiceBootstrap(tarantulaContext._storageStarted,tarantulaContext._accessIndexServiceStarted,new AccessIndexServiceBootstrap(this),"access-index-service",true).start();
     }

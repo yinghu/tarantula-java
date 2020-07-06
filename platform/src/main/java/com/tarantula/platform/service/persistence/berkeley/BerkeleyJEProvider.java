@@ -68,6 +68,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     private String replicationTopic;
     private String backupTopic;
 
+    private ShardingProvider iShardingProvider;
+    private ShardingProvider dShardingProvider;
 
     @Override
     public void configure(Map<String, String> properties) {
@@ -85,12 +87,18 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.backupTopic = "tarantula-backup-topic-"+this.database;
     }
     public void addShardingProvider(ShardingProvider shardingProvider){
-        log.info("sharding provider->"+shardingProvider.name());
+        if(shardingProvider.scope()==Distributable.INTEGRATION_SCOPE){
+            iShardingProvider = shardingProvider;
+        }
+        else if(shardingProvider.scope()==Distributable.DATA_SCOPE){
+            dShardingProvider = shardingProvider;
+        }
     }
     @Override
     public DataStore create(String name) {
         return this.dMap.computeIfAbsent(name,(k)->{
             Database db = this.createDatabase(name,Distributable.INTEGRATION_SCOPE);
+            this.iShardingProvider.registerDataStore(name);
             return  new BerkeleyDataStore(this.node,db,this);
         });
     }
@@ -118,8 +126,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         return this.dMap.computeIfAbsent(name,(k)->{
             Database[] shards = new Database[partition];
             for(int i=0;i<partition;i++){
-                shards[i]=createDatabase(name+"-"+i,Distributable.DATA_SCOPE);
+                shards[i]=createDatabase(name+"_"+i,Distributable.DATA_SCOPE);
             }
+            this.dShardingProvider.registerDataStore(name,partition);
             return new PartitionDataStore(partition,this.node.bucketName,this.node.nodeName,name,shards,this);
         });
     }
@@ -142,78 +151,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     }
     @Override
     public void waitForData() {
-        /**
-        EnvironmentConfig envConfig = new EnvironmentConfig();
-        envConfig.setAllowCreate(true);
-        envConfig.setSharedCache(true);
-        this.environment = new Environment(new File(dataPath),envConfig);
-        if(trimming){
-            log.warn("Database ["+this.database+"] configured as trimming mode");
-            for(int i=0;i<serviceContext.partitionNumber();i++){
-                long ret = this.environment.truncateDatabase(null,this.database+"-"+i,true);
-                log.warn("Records ["+ret+"] truncated from ["+this.database+"-"+i+"]");
-            }
-        }
-        this.integrationEnvironment = new Environment(new File(integrationPath),envConfig);
-        this.activeEnvironment = new Environment(new File(activePath),envConfig);
-        //log.info("Waiting for loading data on first member from data scope store");
-        HashSet<String> ln = new HashSet<>();
-        for(String dn : this.environment.getDatabaseNames()){
-            ln.add(dn.split("-")[0]);
-        }
-        ln.forEach((n)->{
-            DataStore ds = this.create(n,this.serviceContext.partitionNumber());
-            ds.count();
-        });
-        //log.info("Waiting for loading data on first member from integration scope store");
-        for(String dn : this.integrationEnvironment.getDatabaseNames()){
-            DataStore ds = this.create(dn);
-            ds.count();
-        }
-        log.info("Berkeley JAVA Edition data store ["+activeDataStoreName+"] truncated with total records ["+truncate(this.activeDataStoreName)+"]");
-        log.info("Berkeley JAVA Edition data store ["+activeIntegrationStoreName+"] truncated with total records ["+truncate(this.activeIntegrationStoreName)+"]");
-        this.activeDataStore = this.createDatabase(activeDataStoreName,Distributable.LOCAL_SCOPE);
-        this.activeIntegrationStore = this.createDatabase(activeIntegrationStoreName,Distributable.LOCAL_SCOPE);
-        this.create(this.database,this.serviceContext.partitionNumber());
-        **/
-        //Pull active entries from data and integration cluster
-        /**
-        AtomicInteger tc = new AtomicInteger(0);
-        CountDownLatch activeCount = new CountDownLatch(this.dataCluster.size()+this.integrationCluster.size()-2);//excluding this node
-        String registerId = this.dataCluster.addEventListener(null,(e)->{
-            if(e instanceof MapStoreVotingEvent){
-                activeCount.countDown();
-            }
-            else if(e instanceof MapStoreSyncEvent){
-                tc.incrementAndGet();
-                MapStoreSyncEvent mse = (MapStoreSyncEvent)e;
-                ReplicatedDataStore rds = (ReplicatedDataStore) this.create(e.source(),this.serviceContext.partitionNumber());
-                rds.put(mse.key,mse.payload());
-            }
-            return false;
-        });
-        String integrationId = this.integrationCluster.addEventListener(null,(e)->{
-            if(e instanceof MapStoreVotingEvent){
-                activeCount.countDown();
-            }
-            else if(e instanceof MapStoreSyncEvent){
-                tc.incrementAndGet();
-                MapStoreSyncEvent mse = (MapStoreSyncEvent)e;
-                ReplicatedDataStore rds = (ReplicatedDataStore) this.create(e.source());
-                rds.put(mse.key,mse.payload());
-            }
-            return false;
-        });
-        this.dataScopePublisher.publish(new MapStoreVotingEvent(this.replicationTopic,this.dataCluster.subscription(),registerId,Distributable.DATA_SCOPE));
-        this.integrationScopePublisher.publish(new MapStoreVotingEvent(this.backupTopic,this.integrationCluster.subscription(),integrationId,Distributable.INTEGRATION_SCOPE));
-        try{
-            activeCount.await();//waiting for updating from other nodes
-            this.dataCluster.removeEventListener(registerId);
-            this.integrationCluster.removeEventListener(integrationId);
-        }catch (Exception ex){}
-         **/
-         //open replication doors
-        //log.info("Total active entries ["+tc.get()+"] from cluster nodes and Berkeley JAVA Edition data store is ready");
         this.dataCluster.subscribe(this.replicationTopic,this);
         this.integrationCluster.subscribe(this.backupTopic,this);
     }
@@ -268,7 +205,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         //log.info("Waiting for loading data on first member from data scope store");
         HashSet<String> ln = new HashSet<>();
         for(String dn : this.environment.getDatabaseNames()){
-            ln.add(dn.split("-")[0]);
+            ln.add(dn.split("_")[0]);
         }
         ln.forEach((n)->{
             DataStore ds = this.create(n,this.partitionNumber);
@@ -279,12 +216,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             DataStore ds = this.create(dn);
             ds.count();
         }
-         this.create(this.database,this.partitionNumber);
-        log.info("Tarantula data store started");
+        this.create(this.database,this.partitionNumber);
+        log.info("Tarantula data store started on bucket ["+this.node.bucket()+"]");
     }
 
     @Override
     public void shutdown() throws Exception {
+        iShardingProvider.shutdown();
+        dShardingProvider.shutdown();
         dMap.forEach((k,v)->{
             v.close();
         });
@@ -311,75 +250,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         log.info("Total records deleted ["+dc+"] from action entries on ["+tds.getDatabaseName()+"]");
     }
     private void migrateFromDataScope(Event mve){
-        /**
-        DiskOrderedCursor cursor = activeDataStore.openCursor(null);
-        DatabaseEntry pk = new DatabaseEntry();
-        DatabaseEntry pv = new DatabaseEntry();
-        int tc = 0;
-        do{
-            if(cursor.getNext(pk,pv,null)==OperationStatus.SUCCESS){
-                tc++;
-                ActiveEntry activeEntry = new ActiveEntry();
-                activeEntry.fromByteArray(pv.getData());
-                DataStore pds = this.create(activeEntry.vertex(),this.serviceContext.partitionNumber());
-                byte[] mv = pds.get(pk.getData());
-                if(mv!=null){
-                    //push to target node
-                    RecoverableMetadata r = new RecoverableMetadata();
-                    MapStoreSyncEvent mse = new MapStoreSyncEvent(mve.source(),activeEntry.vertex(),pk.getData(),mv,r);
-                    mse.trackId(mve.trackId());
-                    this.dataScopePublisher.publish(mse);
-                }else{
-                    log.warn("Missing data from ["+activeEntry.vertex()+"]");
-                }
-                boolean deleted = !(this.serviceContext.partitions()[SystemUtil.partition(pk.getData(),this.serviceContext.partitionNumber())].opening());
-                if(deleted){
-                    activeDataStore.delete(null,pk);
-                }
-            }
-            else{
-                break;
-            }
-        }while (true);
-        cursor.close();
-        mve.destination(mve.source());
-        mve.stub(tc);
-        this.dataScopePublisher.publish(mve);**/
     }
     private void migrateFromIntegrationScope(Event mve){
-        /**
-        DiskOrderedCursor cursor = activeIntegrationStore.openCursor(null);
-        DatabaseEntry pk = new DatabaseEntry();
-        DatabaseEntry pv = new DatabaseEntry();
-        int tc =0;
-        do{
-            if(cursor.getNext(pk,pv,null)==OperationStatus.SUCCESS){
-                tc++;
-                ActiveEntry activeEntry = new ActiveEntry();
-                activeEntry.fromByteArray(pv.getData());
-                DataStore rds = this.create(activeEntry.vertex());
-                byte[] mv = rds.get(pk.getData());
-                if(mv!=null){
-                    RecoverableMetadata r = new RecoverableMetadata();
-                    MapStoreSyncEvent mse = new MapStoreSyncEvent(mve.source(),activeEntry.vertex(),pk.getData(),mv,r);
-                    mse.trackId(mve.trackId());
-                    this.integrationScopePublisher.publish(mse);
-                }else{
-                    log.warn("Missing data from ["+activeEntry.vertex()+"]");
-                }
-                boolean deleted = !this.integrationCluster.onPartition(pk.getData());
-                if(deleted){
-                    activeIntegrationStore.delete(null,pk);
-                }
-            }
-            else{
-                break;
-            }
-        }while (true);
-        cursor.close();
-        mve.destination(mve.source());
-        mve.stub(tc);
-        this.integrationScopePublisher.publish(mve);**/
     }
     @Override
     public byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending){

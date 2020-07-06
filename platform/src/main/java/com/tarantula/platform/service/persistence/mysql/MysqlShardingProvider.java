@@ -4,6 +4,8 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.service.persistence.Shard;
 import com.tarantula.platform.service.persistence.ShardingProvider;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import java.util.Map;
 
 /**
@@ -21,16 +23,14 @@ public class MysqlShardingProvider implements ShardingProvider {
     @Override
     public void start() throws Exception {
         //create connections
-        for(Shard shard : shardList){
-            shard.properties.forEach((k,v)->{
-                log.info(k+"<><>"+v);
-            });
-        }
     }
 
     @Override
     public void shutdown() throws Exception {
         //close connections
+        for(Shard shard : shardList){
+            shard.shutdown();
+        }
     }
 
 
@@ -57,7 +57,34 @@ public class MysqlShardingProvider implements ShardingProvider {
         shardList[shard.shardNumber]=shard;
     }
     @Override
+    public void registerDataStore(String name){
+        try{
+            for(Shard shard : shardList){
+                Connection con = shard.connection();
+                Statement cmd = con.createStatement();
+                cmd.execute("CREATE TABLE IF NOT EXISTS "+name+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v BLOB)");
+                cmd.close();
+                con.close();
+            }
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
+    @Override
     public void registerDataStore(String prefix,int partitions){
-
+        try{
+            for(Shard shard : shardList){
+                Connection con = shard.connection();
+                Statement cmd = con.createStatement();
+                for(int i=0;i<partitions;i++){
+                    cmd.addBatch("CREATE TABLE IF NOT EXISTS "+prefix+"_"+i+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v BLOB)");
+                }
+                cmd.executeBatch();
+                cmd.close();
+                con.close();
+            }
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
 }

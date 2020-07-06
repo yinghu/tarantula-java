@@ -62,7 +62,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
         if(qname.equals("data-source")){
             DataStoreProvider ds = (DataStoreProvider)_loaded.get(currentLoad);
             ds.configure(properties);
-            _start(ds);
+            //_start(ds);
             properties.clear();
         }
         else if(qname.equals("sharding-provider")){
@@ -78,6 +78,10 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
         }
         else if(qname.equals("property")){
             properties.put(currentProperty, value);
+        }
+        else if(qname.equals("data-store-service")){
+            DataStoreProvider ds = (DataStoreProvider)_loaded.get(currentLoad);
+            _start(ds);
         }
 
     }
