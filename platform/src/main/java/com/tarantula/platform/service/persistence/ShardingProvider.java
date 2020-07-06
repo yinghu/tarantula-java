@@ -12,4 +12,5 @@ public interface ShardingProvider extends Serviceable {
     int scope();
     void configure(Map<String,String> properties);
     void addShard(Shard shard);
+    void registerDataStore(String prefix,int partitions);
 }

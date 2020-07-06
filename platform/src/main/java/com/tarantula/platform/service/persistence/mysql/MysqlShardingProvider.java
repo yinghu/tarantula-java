@@ -56,4 +56,8 @@ public class MysqlShardingProvider implements ShardingProvider {
     public void addShard(Shard shard) {
         shardList[shard.shardNumber]=shard;
     }
+    @Override
+    public void registerDataStore(String prefix,int partitions){
+
+    }
 }
