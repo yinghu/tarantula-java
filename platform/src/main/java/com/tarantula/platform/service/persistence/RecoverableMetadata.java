@@ -27,6 +27,11 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
     private String index;
 
     public RecoverableMetadata(){}
+    public RecoverableMetadata(String source,int partition,int scope){
+        this.source = source;
+        this.partition = partition;
+        this.scope = scope;
+    }
     public RecoverableMetadata(String source,int factoryId,int classId,int scope,boolean onEdge,boolean distributable,String index){
         this.source = source;
         this.factoryId = factoryId;

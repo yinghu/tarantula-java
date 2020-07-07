@@ -25,7 +25,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -255,6 +254,15 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     private void migrateFromIntegrationScope(Event mve){
     }
     @Override
+    public byte[] onCreating(Metadata metadata,String key,Map<String,Object> creating){
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+            return iShardingProvider.create(metadata,key,creating);
+        }
+        else{
+            return dShardingProvider.create(metadata,key,creating);
+        }
+    }
+    @Override
     public byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending){
         String ds = metadata.source();
         int pt = metadata.partition();
@@ -465,13 +473,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         private final Node node;
         private final MapStoreListener mapStoreListener;
         private final String dataStore;
-
+        private final int partition;
         private final Semaphore pass = new Semaphore(DataStoreProvider.CONCURRENCY_ACCESS_LIMIT);
 
         public BerkeleyDataStore(Node node,Database database,MapStoreListener mapStoreListener){
             this.node = node;
             this.berkeleyStore = database;
             this.dataStore = this.berkeleyStore.getDatabaseName();
+            this.partition = Integer.parseInt(this.dataStore.split("_")[1]);
             this.mapStoreListener = mapStoreListener;
         }
         @Override
@@ -559,9 +568,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                     akey = t.key().asString();
                 }
                 byte[] key = akey.getBytes(ENCODING);
-                byte[] v;
-                if((v=_get(key))==null){
-                    boolean suc = set(t,key,SystemUtil.toJson(t.toMap()));
+                byte[] v = mapStoreListener.onCreating(new RecoverableMetadata(dataStore,partition,t.scope()),akey,t.toMap());
+                if(v!=null){
+                    boolean suc = set(t,key,v);
                     if(suc&&t.onEdge()){
                         onEdge(t,key);
                     }

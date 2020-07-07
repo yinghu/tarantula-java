@@ -1,8 +1,10 @@
 package com.tarantula.platform.service.persistence.mysql;
 
+import com.tarantula.Metadata;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.service.persistence.Shard;
 import com.tarantula.platform.service.persistence.ShardingProvider;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -104,5 +106,19 @@ public class MysqlShardingProvider implements ShardingProvider {
             throw new RuntimeException(ex);
         }
     }
-
+    public byte[] create(Metadata metadata, String key, Map<String,Object> data){
+        try{
+            Connection connection = shardList[0].connection();
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?)");
+            preparedStatement.setString(1,key);
+            byte[] ret = SystemUtil.toJson(data);
+            preparedStatement.setBytes(2, ret);
+            preparedStatement.execute();
+            preparedStatement.close();
+            connection.close();
+            return ret;
+        }catch (Exception ex){
+            return null;
+        }
+    }
 }

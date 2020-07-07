@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
+import com.tarantula.Metadata;
 import com.tarantula.platform.service.Serviceable;
 
 import java.util.Map;
@@ -14,4 +15,6 @@ public interface ShardingProvider extends Serviceable {
     void addShard(Shard shard);
     void registerDataStore(String name);
     void registerDataStore(String prefix,int partitions);
+
+    byte[] create(Metadata metadata,String key,Map<String,Object> data);
 }
