@@ -25,6 +25,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
 
     private DataStoreOnPartition[] dataStoreOnPartitions;
     private DataStore masterStore;
+    private PartitionIndex localKey;
     private TarantulaContext tarantulaContext;
 
     @Override
@@ -64,9 +65,10 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
     public AccessIndex set(String accessKey){
         DataStoreOnPartition dso = this.onPartition(accessKey);
         if(dso.enabled.get()){
-            int pid = dso.partitionIndex.count(1);
-            dso.partitionIndex.update();
-            AccessIndex accessIndex = new AccessIndexTrack(accessKey,dso.partitionIndex.bucket(),dso.partitionIndex.index(),pid);
+            int pid = localKey.count(1);
+            localKey.update();
+            AccessIndex accessIndex = new AccessIndexTrack(accessKey,dso.partitionIndex.bucket(),dso.partitionIndex.label(),pid);
+            //log.warn("KEY->"+accessIndex.distributionKey());
             if(dso.dataStore.createIfAbsent(accessIndex,false)){
                 return accessIndex;
             }
@@ -90,11 +92,12 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
     }
     public void setup() {
         masterStore = this.tarantulaContext.masterDataStore();
+        localKey = new PartitionIndex(masterStore.bucket(),masterStore.node()+"-nodeId","",1000);
+        localKey.dataStore(masterStore);
+        masterStore.createIfAbsent(localKey,true);
         for(DataStoreOnPartition dso : dataStoreOnPartitions){
             dso.dataStore = this.tarantulaContext.dataStore(dso.name);
-            dso.partitionIndex = new PartitionIndex(this.masterStore.bucket(),dso.name,1000);
-            dso.partitionIndex.dataStore(masterStore);
-            masterStore.createIfAbsent(dso.partitionIndex,true);
+            dso.partitionIndex = new PartitionIndex(this.masterStore.bucket(),this.masterStore.node(),dso.name,1000);
             boolean loc = this.nodeEngine.getPartitionService().getPartition(dso.partition).isLocal();
             dso.local.set(loc);
             dso.enabled.set(loc);

@@ -112,7 +112,7 @@ public class MysqlShardingProvider implements ShardingProvider {
     }
     public byte[] create(Metadata metadata, String key, Map<String,Object> data){
         try{
-            Connection connection = shardList[0].connection();
+            Connection connection = shardList[metadata.partition()%shards].connection();
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?)");
             preparedStatement.setString(1,key);
             byte[] ret = SystemUtil.toJson(data);

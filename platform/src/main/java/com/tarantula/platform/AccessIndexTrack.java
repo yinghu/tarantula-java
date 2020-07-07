@@ -15,6 +15,8 @@ import java.util.Map;
  */
 public class AccessIndexTrack extends IntegrationScopeObject implements AccessIndex, Portable {
 
+    private int nodeId;
+
     public AccessIndexTrack(){
     }
 
@@ -22,13 +24,15 @@ public class AccessIndexTrack extends IntegrationScopeObject implements AccessIn
         this.owner = owner;
         this.bucket = bucket;
         this.label = label;
-        this.version = pid;
+        this.nodeId = pid;
     }
     public AccessIndexTrack(String owner){
         this();
         this.owner = owner;
     }
-
+    public int nodeId(){
+        return this.nodeId;
+    }
     @Override
     public int getFactoryId() {
         return PortableEventRegistry.OID;
@@ -44,7 +48,7 @@ public class AccessIndexTrack extends IntegrationScopeObject implements AccessIn
         out.writeUTF("1",this.owner);
         out.writeUTF("2",bucket);
         out.writeUTF("3",this.label);
-        out.writeInt("4",this.version);
+        out.writeInt("4",this.nodeId);
     }
 
     @Override
@@ -52,27 +56,27 @@ public class AccessIndexTrack extends IntegrationScopeObject implements AccessIn
         this.owner = in.readUTF("1");
         this.bucket = in.readUTF("2");
         this.label  = in.readUTF("3");
-        this.version = in.readInt("4");
+        this.nodeId = in.readInt("4");
     }
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",bucket);//lobby id
         this.properties.put("2",label);//game cluster id
-        this.properties.put("3",version);
+        this.properties.put("3",nodeId);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.bucket = (String)properties.get("1");
         this.label = (String)properties.get("2");
-        this.version = ((Number)properties.getOrDefault("3",0)).intValue();
+        this.nodeId = ((Number)properties.getOrDefault("3",0)).intValue();
     }
     public String distributionKey(){
-        return this.bucket+Recoverable.PATH_SEPARATOR+this.label+"-"+version;
+        return this.bucket+Recoverable.PATH_SEPARATOR+this.label+"-"+nodeId;
     }
     @Override
     public String toString(){
-        return "Access Index ["+bucket+"/"+owner+"/"+label+"/"+version+"]";
+        return "Access Index ["+owner+"]->"+bucket+"/"+label+"/"+nodeId+"]";
     }
     public void distributionKey(String distributionKey){
        //skip the natural key

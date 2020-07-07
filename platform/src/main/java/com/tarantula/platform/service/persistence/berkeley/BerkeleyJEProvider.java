@@ -255,7 +255,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     }
     @Override
     public byte[] onCreating(Metadata metadata,String key,Map<String,Object> creating){
-        log.warn("source->"+metadata.source());
+        //log.warn("source->"+metadata.source());
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             return iShardingProvider.create(metadata,key,creating);
         }
@@ -571,7 +571,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 byte[] key = akey.getBytes(ENCODING);
                 byte[] v = mapStoreListener.onCreating(new RecoverableMetadata(dataStore,partition,t.scope()),akey,t.toMap());
                 if(v!=null){
-                    boolean suc = set(t,key,v);
+                    boolean suc = set(t,key,v);//set(t,key,SystemUtil.toJson(t.toMap()));
                     if(suc&&t.onEdge()){
                         onEdge(t,key);
                     }

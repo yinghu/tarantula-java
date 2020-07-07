@@ -5,5 +5,5 @@ package com.tarantula;
  * Global scope unique key index mark api
  */
 public interface AccessIndex extends Recoverable {
-    //String systemId();
+    int nodeId();
 }
