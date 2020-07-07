@@ -255,6 +255,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     }
     @Override
     public byte[] onCreating(Metadata metadata,String key,Map<String,Object> creating){
+        log.warn("source->"+metadata.source());
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             return iShardingProvider.create(metadata,key,creating);
         }

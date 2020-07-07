@@ -104,9 +104,9 @@ public class SampleLoad {
         System.out.println("Average duration ["+(timeRun.get()/size)+"]");
     }
     public static void main(String[] args) throws Exception{
-        //SampleLoad sampleLoad = new SampleLoad("http://10.0.0.153:8090",null,5000);
-        //sampleLoad._init();
-        //sampleLoad.batch();
+        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.192:8090",null,5000);
+        sampleLoad._init();
+        sampleLoad.register();
     }
 }
 
