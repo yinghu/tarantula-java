@@ -12,6 +12,7 @@ public class DataStoreOnPartition {
     public final String name;
     public DataStore dataStore;//set on data store ready
     public PartitionIndex partitionIndex;
+
     public Database database;
     public final AtomicBoolean enabled;
     public final AtomicBoolean local;

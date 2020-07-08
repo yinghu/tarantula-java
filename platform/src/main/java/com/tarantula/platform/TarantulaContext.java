@@ -32,7 +32,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 	
 	private static final TarantulaContext BC = new TarantulaContext();
 
-    public static  CountDownLatch _systemStorageInstanceStarted ;
+    //public static  CountDownLatch _systemStorageInstanceStarted ;
 
 	public static  CountDownLatch _storageInstanceStarted ;
  	
@@ -137,7 +137,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 	public void start() throws Exception {
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
 
- 	    _systemStorageInstanceStarted = new CountDownLatch(1);
+ 	    //_systemStorageInstanceStarted = new CountDownLatch(1);
          _storageInstanceStarted = new CountDownLatch(1);
         _tarantulaClusterStarted = new CountDownLatch(1);
          _integrationClusterStarted = new CountDownLatch(1);
