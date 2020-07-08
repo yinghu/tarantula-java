@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
-
+//data scope data store
 public class PartitionDataStore extends ReplicatedDataStore{
     private static String ENCODING = "UTF-8";
     private final DataStoreOnPartition[] partitions;

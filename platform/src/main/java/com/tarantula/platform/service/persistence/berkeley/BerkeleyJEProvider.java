@@ -475,7 +475,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         return false;
     }
 
-    public static class BerkeleyDataStore extends ReplicatedDataStore {
+    //integration scope data store
+    private static class BerkeleyDataStore extends ReplicatedDataStore {
 
         private ConcurrentHashMap<Integer,RecoverableListener> rMap = new ConcurrentHashMap<>();
 
@@ -650,7 +651,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             try {
                 pass.acquire();
                 if(_put(key,value)){
-                    this.mapStoreListener.onUpdated(new RecoverableMetadata(this.dataStore,0,0,this.scope(),true,false,null),key,value);
+                    //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.dataStore,0,0,this.scope(),true,false,null),key,value);
                 }
             }catch (Exception ex){
                 log.error("error on set",ex);
@@ -747,12 +748,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             indexSet.keySet.add(new String(key));
             v = SystemUtil.toJson(indexSet.toMap());
             if(_put(owner,v)){
-                this.mapStoreListener.onUpdated(new RecoverableMetadata(this.dataStore, t.getFactoryId(), t.getClassId(), t.scope(), true, false, null), owner, v);
+                //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.dataStore, t.getFactoryId(), t.getClassId(), t.scope(), true, false, null), owner, v);
             }
         }
         private <T extends Recoverable> boolean set(T t,byte[] key,byte[] value){
             if(this._put(key,value)){
-                this.mapStoreListener.onUpdated(new RecoverableMetadata(this.dataStore,t.getFactoryId(),t.getClassId(),t.scope(),false,t.distributable(),t.index()),key,value);
+                //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.dataStore,t.getFactoryId(),t.getClassId(),t.scope(),false,t.distributable(),t.index()),key,value);
                 return true;
             }else{
                 return false;
@@ -761,7 +762,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         private <T extends Recoverable>  byte[] get(T t,byte[] key){
             byte[] v = _get(key);
             if(v!=null){
-                this.mapStoreListener.onLoaded(new RecoverableMetadata(this.dataStore,t.getFactoryId(),t.getClassId(),t.scope(),false,t.distributable(),t.index()),key,v);
+                //this.mapStoreListener.onLoaded(new RecoverableMetadata(this.dataStore,t.getFactoryId(),t.getClassId(),t.scope(),false,t.distributable(),t.index()),key,v);
             }
             return v;
         }
