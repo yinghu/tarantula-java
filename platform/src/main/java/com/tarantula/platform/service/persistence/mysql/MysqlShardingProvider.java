@@ -113,7 +113,7 @@ public class MysqlShardingProvider implements ShardingProvider {
     }
     public byte[] create(Metadata metadata, String key, Map<String,Object> data){
         try{
-            //log.warn("DATA TABLE 1->"+metadata.source());
+            log.warn("DATA TABLE 1->"+metadata.source());
             Connection connection = shardList[metadata.partition()%shards].connection();
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?)");
             preparedStatement.setString(1,key);
@@ -129,7 +129,7 @@ public class MysqlShardingProvider implements ShardingProvider {
     }
     public byte[] load(Metadata metadata,String key){
         try{
-            //log.warn("DATA TABLE 2->"+metadata.source());
+            log.warn("DATA TABLE 2->"+metadata.source());
             Connection connection = shardList[metadata.partition()%shards].connection();
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT v FROM "+metadata.source()+" WHERE k=?");
             preparedStatement.setString(1,key);
@@ -138,6 +138,20 @@ public class MysqlShardingProvider implements ShardingProvider {
                 return rs.getBytes("v");
             }
             return null;
+        }catch (Exception ex){
+            return null;
+        }
+    }
+    public byte[] update(Metadata metadata,String key,Map<String,Object> data){
+        try{
+            log.warn("DATA TABLE 3->"+metadata.source());
+            Connection connection = shardList[metadata.partition()%shards].connection();
+            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE "+metadata.source()+" SET v=? WHERE k=?");
+            byte[] ret = SystemUtil.toJson(data);
+            preparedStatement.setBytes(1,ret);
+            preparedStatement.setString(2,key);
+            preparedStatement.execute();
+            return ret;
         }catch (Exception ex){
             return null;
         }

@@ -5,7 +5,6 @@ import com.sleepycat.je.util.DbBackup;
 import com.sleepycat.je.util.LogVerificationReadableByteChannel;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
-import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.event.MapStoreSyncEvent;
 import com.tarantula.platform.event.MapStoreVotingEvent;
 import com.tarantula.platform.service.ClusterProvider;
@@ -98,7 +97,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         return this.dMap.computeIfAbsent(name,(k)->{
             Database db = this.createDatabase(name,Distributable.INTEGRATION_SCOPE);
             this.iShardingProvider.registerDataStore(name);
-            return  new BerkeleyDataStore(this.node,db,this);
+            return  new AccessIndexDataStore(this.node,db,this);
         });
     }
     private Database createDatabase(String name,int scope){
@@ -256,18 +255,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     }
     @Override
     public byte[] onCreating(Metadata metadata,String key,Map<String,Object> creating){
-        //log.warn("source->"+metadata.source());
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             return iShardingProvider.create(metadata,key,creating);
         }
         else{
-            if(metadata.backup()){
-                return dShardingProvider.create(metadata,key,creating);
-            }
-            else{
-                //inserting version or timestamp
-                return SystemUtil.toJson(creating);
-            }
+            return dShardingProvider.create(metadata,key,creating);
         }
     }
     @Override
@@ -279,13 +271,16 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             return dShardingProvider.load(metadata,key);
         }
     }
-    //@Override
+    @Override
     public byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending){
-        String ds = metadata.source();
-        int pt = metadata.partition();
-        return SystemUtil.toJson(pending);
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+            return iShardingProvider.update(metadata,key,pending);
+        }
+        else{
+            return dShardingProvider.update(metadata,key,pending);
+        }
     }
-    //@Override
+    /**
     public void onUpdated(Metadata metadata, byte[] key, byte[] value) {
         //log.warn("DATA STORE->"+metadata.source());
         if(metadata.scope()==Recoverable.DATA_SCOPE){
@@ -313,7 +308,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 this.integrationCluster.set(metadata,key,value);
             }
         }
-    }
+    }**/
     public void backup(int scope){
         if(scope==Distributable.DATA_SCOPE){
             this.environment.sync();
@@ -489,7 +484,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     }
 
     //partial implementation of createIfAbsent and load for access index persistence
-    private static class BerkeleyDataStore extends ReplicatedDataStore {
+    private static class AccessIndexDataStore extends ReplicatedDataStore {
 
         private ConcurrentHashMap<Integer,RecoverableListener> rMap = new ConcurrentHashMap<>();
 
@@ -501,7 +496,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         private final Metadata metadata1;
         private final Semaphore pass = new Semaphore(DataStoreProvider.CONCURRENCY_ACCESS_LIMIT);
 
-        public BerkeleyDataStore(Node node,Database database,MapStoreListener mapStoreListener){
+        public AccessIndexDataStore(Node node,Database database,MapStoreListener mapStoreListener){
             this.node = node;
             this.berkeleyStore = database;
             this.dataStore = this.berkeleyStore.getDatabaseName();

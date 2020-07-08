@@ -18,4 +18,6 @@ public interface ShardingProvider extends Serviceable {
 
     byte[] create(Metadata metadata,String key,Map<String,Object> data);
     byte[] load(Metadata metadata,String key);
+    byte[] update(Metadata metadata,String key,Map<String,Object> data);
+
 }

@@ -18,13 +18,13 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
     private String source;
     private int factoryId;
     private int classId;
-    private int version;
+    //private int version;
     private int scope = Distributable.DATA_SCOPE;
     private int partition;
-    private long timestamp;
-    private boolean onEdge;
-    private boolean distributable;
-    private String index;
+    //private long timestamp;
+    //private boolean onEdge;
+    //private boolean distributable;
+    //private String index;
 
     public RecoverableMetadata(){}
     public RecoverableMetadata(String source,int partition,int scope){
@@ -52,12 +52,6 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
         this.classId = classId;
         this.partition = partition;
         this.onEdge = onEdge;
-    }
-    public boolean distributable(){
-        return this.distributable;
-    }
-    public String index(){
-        return this.index;
     }
     @Override
     public int getFactoryId() {

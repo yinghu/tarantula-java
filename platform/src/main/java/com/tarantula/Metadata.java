@@ -8,12 +8,11 @@ public interface Metadata extends Recoverable {
      String source();
      int factoryId();
      int classId();
-     int version();
-     int scope();
+     //int version();
+     //int scope();
      int partition();
-     long timestamp();
-     boolean onEdge();
-     boolean distributable(); //set key/value on cluster
-     boolean backup(); //set key/value on backup data base
-     String index();
+     //long timestamp();
+     //boolean onEdge();
+     //boolean distributable(); //set key/value on cluster
+     //String index();
 }
