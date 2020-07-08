@@ -54,7 +54,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private ConcurrentHashMap<String,EventListener> eMap = new ConcurrentHashMap<>();
 
     private MetricsListener metricsListener;
-
+    private CopyOnWriteArrayList<BucketListener> bList = new CopyOnWriteArrayList<>();
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
         this.config = config;
         this.bucket = bucket;
@@ -328,6 +328,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
                 }
             }
         });
+        bList.forEach((b)->{
+            b.onBucket(pt,opening?BucketReceiver.OPEN:BucketReceiver.CLOSE);
+        });
     }
 
     public RoutingKey routingKey(String magicKey,String tag){
@@ -346,7 +349,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public void registerMetricsListener(MetricsListener metricsListener){
         this.metricsListener = metricsListener;
     }
-    public void addBucketListener(BucketListener bucketListener){}
+    public void addBucketListener(BucketListener bucketListener){
+        this.bList.add(bucketListener);
+    }
     @Override
     public void stateChanged(LifecycleEvent state) {
      LifecycleEvent.LifecycleState cs = state.getState();

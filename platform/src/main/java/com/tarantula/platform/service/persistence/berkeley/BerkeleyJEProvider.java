@@ -146,6 +146,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.dataCluster = serviceContext.clusterProvider(Distributable.DATA_SCOPE);
         this.dataScopePublisher = serviceContext.eventService(Distributable.DATA_SCOPE);
         this.integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
+        this.integrationCluster.addBucketListener(this);
         this.integrationScopePublisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
     }
     @Override
@@ -482,8 +483,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     }
 
     @Override
-    public void onBucket(int bucket, int state) {
+    public void onBucket(int _bucket, int state) {
         //notify partitions updated
+        log.warn("bucket->"+_bucket+"<>"+state);
     }
 
     //partial implementation of createIfAbsent and load for access index persistence
