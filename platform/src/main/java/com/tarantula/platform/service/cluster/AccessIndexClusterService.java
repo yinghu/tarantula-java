@@ -64,20 +64,14 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
 
     public AccessIndex set(String accessKey){
         DataStoreOnPartition dso = this.onPartition(accessKey);
-        if(dso.enabled.get()){
-            int pid = localKey.count(1);
-            localKey.update();
-            AccessIndex accessIndex = new AccessIndexTrack(accessKey,dso.partitionIndex.bucket(),dso.partitionIndex.label(),pid);
-            log.warn("KEY->"+accessIndex.distributionKey());
-            if(dso.dataStore.createIfAbsent(accessIndex,false)){
-                return accessIndex;
-            }
-            else{
-                return null;
-            }
+        int pid = localKey.count(1);
+        localKey.update();
+        AccessIndex accessIndex = new AccessIndexTrack(accessKey,dso.partitionIndex.bucket(),dso.partitionIndex.label(),pid);
+        log.warn("KEY->"+accessIndex.distributionKey());
+        if(dso.dataStore.createIfAbsent(accessIndex,false)){
+            return accessIndex;
         }
         else{
-            log.warn("Partition ["+dso.partition+"] not available");
             return null;
         }
     }
@@ -98,9 +92,6 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
         for(DataStoreOnPartition dso : dataStoreOnPartitions){
             dso.dataStore = this.tarantulaContext.dataStore(dso.name);
             dso.partitionIndex = new PartitionIndex(this.masterStore.bucket(),this.masterStore.node(),dso.name,1000);
-            boolean loc = this.nodeEngine.getPartitionService().getPartition(dso.partition).isLocal();
-            dso.local.set(loc);
-            dso.enabled.set(loc);
         }
         log.warn("Access index service is ready on ["+nodeEngine.getLocalMember().getUuid()+"]");
     }
@@ -109,16 +100,6 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
         return this.dataStoreOnPartitions[partition];
     }
 
-    private void onPartition(String memberId,int partition){
-        DataStoreOnPartition dso = this.dataStoreOnPartitions[partition];
-        if(memberId.equals(this.tarantulaContext.integrationCluster().subscription())){
-            dso.local.set(true);
-            dso.enabled.set(true);
-        }
-        else{
-            dso.reset();
-        }
-    }
 
     @Override
     public void migrationStarted(MigrationEvent migrationEvent) {
@@ -127,7 +108,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
 
     @Override
     public void migrationCompleted(MigrationEvent migrationEvent) {
-        this.onPartition(migrationEvent.getNewOwner().getUuid(),migrationEvent.getPartitionId());
+        //this.onPartition(migrationEvent.getNewOwner().getUuid(),migrationEvent.getPartitionId());
     }
 
     @Override
