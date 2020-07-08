@@ -483,7 +483,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
 
     @Override
     public void onBucket(int bucket, int state) {
-        
+        //notify partitions updated
     }
 
     //partial implementation of createIfAbsent and load for access index persistence
