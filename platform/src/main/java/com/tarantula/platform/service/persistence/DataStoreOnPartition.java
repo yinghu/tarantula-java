@@ -2,6 +2,8 @@ package com.tarantula.platform.service.persistence;
 
 import com.sleepycat.je.Database;
 import com.tarantula.DataStore;
+import com.tarantula.Distributable;
+import com.tarantula.Metadata;
 import com.tarantula.platform.service.cluster.PartitionIndex;
 
 public class DataStoreOnPartition {
@@ -11,7 +13,7 @@ public class DataStoreOnPartition {
     public PartitionIndex partitionIndex;
 
     public Database database;
-
+    public Metadata metadata;
     public DataStoreOnPartition(int partition,String name){
         this.partition = partition;
         this.name = name;
@@ -20,5 +22,6 @@ public class DataStoreOnPartition {
         this.partition = partition;
         this.name = dataStore.getDatabaseName();
         this.database = dataStore;
+        this.metadata = new RecoverableMetadata(name,partition, Distributable.DATA_SCOPE);
     }
 }

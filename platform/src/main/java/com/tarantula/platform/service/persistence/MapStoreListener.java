@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.persistence;
 
 import com.tarantula.Metadata;
+import com.tarantula.Recoverable;
 
 import java.util.Map;
 
@@ -16,8 +17,6 @@ public interface MapStoreListener {
 
     byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending);
 
-    //byte[] onBackup(Metadata metadata,String key,Map<String,Object> pending);
+    void onDistributing(Metadata metadata,byte[] key, byte[] value);
 
-    //void onUpdated(Metadata metadata, byte[] key, byte[] value);
-    //void onLoaded(Metadata metadata,byte[] key,byte[] value);
 }

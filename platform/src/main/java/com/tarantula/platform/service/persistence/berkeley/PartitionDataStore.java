@@ -11,7 +11,6 @@ import com.tarantula.platform.event.MapStoreSyncEvent;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 import com.tarantula.platform.service.persistence.MapStoreListener;
-import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.service.persistence.ReplicatedDataStore;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -89,8 +88,22 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 okey = t.key().asString();
             }
             byte[] key = okey.getBytes(ENCODING);
-            byte[] value = SystemUtil.toJson(t.toMap());
-            return _set(t,key,value);
+            DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
+            byte[] value;
+            if(t.backup()){
+                value = this.mapStoreListener.onCreating(dso.metadata,okey,t.toMap());
+            }else{
+                value = SystemUtil.toJson(t.toMap());
+            }
+            boolean suc = _put(dso,key,value);
+            if(suc){
+                //do replication
+                this.mapStoreListener.onDistributing(dso.metadata,key,value);
+            }
+            if(suc&&t.onEdge()&&t.owner()!=null&&t.label()!=null){
+                suc = onEdge(t,okey);
+            }
+            return suc;
         }catch (Exception ex){
             log.error("Error on create",ex);
             return false;
@@ -99,7 +112,28 @@ public class PartitionDataStore extends ReplicatedDataStore{
             pass.release();
         }
     }
-
+    private <T extends Recoverable> boolean onEdge(T t,String okey){
+        IndexSet indexSet = new IndexSet();
+        indexSet.distributionKey(t.owner());
+        indexSet.label(t.label());
+        byte[] _kn = indexSet.distributionKey().getBytes();
+        DataStoreOnPartition dos = this.partitions[SystemUtil.partition(_kn,partition)];
+        byte[] ix = _get(dos,_kn);
+        if(ix!=null){
+            indexSet.fromMap(SystemUtil.toMap(ix));
+        }
+        indexSet.keySet.add(okey);
+        byte[] _vn = SystemUtil.toJson(t.toMap());
+        if(t.backup()){
+            _vn = ix!=null?this.mapStoreListener.onUpdating(dos.metadata,indexSet.distributionKey(),t.toMap()):this.mapStoreListener.onCreating(dos.metadata,indexSet.distributionKey(),t.toMap());
+        }
+        boolean suc = _put(dos,_kn,_vn);
+        if(suc){
+            //do replication
+            this.mapStoreListener.onDistributing(dos.metadata,_kn,_vn);
+        }
+        return suc;
+    }
     @Override
     public <T extends Recoverable> int create(T[] tb) {
         int suc =0;
@@ -122,8 +156,9 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] key = akey.getBytes(ENCODING);
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
             Map<String,Object> _map = t.toMap();
-            byte[] value = SystemUtil.toJson(_map);
+            byte[] value = t.backup()?this.mapStoreListener.onUpdating(dso.metadata,akey,t.toMap()):SystemUtil.toJson(_map);
             if(_put(dso,key,value)){
+                this.mapStoreListener.onDistributing(dso.metadata,key,value);
                 //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),dso.partition,false),key,value);
                 return true;
             }
@@ -343,11 +378,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
     private byte[] _get(DataStoreOnPartition dso,byte[] key){
         DatabaseEntry ve = new DatabaseEntry();
         OperationStatus status = dso.database.get(null,new DatabaseEntry(key),ve,null);
-        if(status==OperationStatus.SUCCESS){
-            return ve.getData();
-        }
-        else{
-            return null;
-        }
+        return status==OperationStatus.SUCCESS?ve.getData():null;
     }
 }

@@ -280,9 +280,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             return dShardingProvider.update(metadata,key,pending);
         }
     }
-    /**
-    public void onUpdated(Metadata metadata, byte[] key, byte[] value) {
-        //log.warn("DATA STORE->"+metadata.source());
+    @Override
+    public void onDistributing(Metadata metadata, byte[] key, byte[] value) {
+        log.warn("DATA STORE->"+metadata.source());
         if(metadata.scope()==Recoverable.DATA_SCOPE){
             //use data store prefix as the active database
             //this.dataScopePublisher.publish(new MapStoreSyncEvent(this.replicationTopic,this.node.nodeName,key,value,(RecoverableMetadata) metadata));
@@ -297,6 +297,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             }
         }
     }
+    /**
     public void onLoaded(Metadata metadata,byte[] key,byte[] value){
         if(metadata.scope()==Recoverable.DATA_SCOPE){
             if(metadata.distributable()){

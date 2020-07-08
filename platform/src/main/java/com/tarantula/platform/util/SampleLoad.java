@@ -23,7 +23,7 @@ public class SampleLoad {
     public void _init() throws Exception{
         httpCaller = new HttpCaller(host);
         httpCaller._init();
-        pool = Executors.newFixedThreadPool(100);
+        pool = Executors.newFixedThreadPool(50);
     }
     public void device() throws Exception{
         CountDownLatch batch = new CountDownLatch(size);
@@ -105,7 +105,7 @@ public class SampleLoad {
 
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.6:8090",null,1000);
+        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.234:8090",null,1000);
         sampleLoad._init();
         sampleLoad.register();
     }
