@@ -89,12 +89,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = okey.getBytes(ENCODING);
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
-            byte[] value;
-            if(t.backup()){
-                value = this.mapStoreListener.onCreating(dso.metadata,okey,t.toMap());
-            }else{
-                value = SystemUtil.toJson(t.toMap());
-            }
+            byte[] value = t.backup()?this.mapStoreListener.onCreating(dso.metadata,okey,t.toMap()):SystemUtil.toJson(t.toMap());
             boolean suc = _put(dso,key,value);
             if(suc){
                 //do replication
@@ -155,8 +150,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = akey.getBytes(ENCODING);
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            Map<String,Object> _map = t.toMap();
-            byte[] value = t.backup()?this.mapStoreListener.onUpdating(dso.metadata,akey,t.toMap()):SystemUtil.toJson(_map);
+            byte[] value = t.backup()?this.mapStoreListener.onUpdating(dso.metadata,akey,t.toMap()):SystemUtil.toJson(t.toMap());
             if(_put(dso,key,value)){
                 this.mapStoreListener.onDistributing(dso.metadata,key,value);
                 //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),dso.partition,false),key,value);
@@ -185,9 +179,16 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 akey = t.key().asString();
             }
             byte[] key = akey.getBytes(ENCODING);
+            DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             byte[] v;
+            boolean suc = false;
             if((v=_get(partitions[SystemUtil.partition(key,partition)],key))==null){
-                return _set(t,key,SystemUtil.toJson(t.toMap()));
+                v = SystemUtil.toJson(t.toMap());
+                if(_put(dso,key,v)&&t.onEdge()){
+                    this.mapStoreListener.onDistributing(dso.metadata,key,v);
+                    suc = onEdge(t,akey);
+                }
+                return suc;
             }
             else{
                 if(loading){
