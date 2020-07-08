@@ -14,10 +14,10 @@ public class ServiceContextProxy implements ServiceContext {
         this.tarantulaContext = tarantulaContext;
     }
 
-    @Override
-    public DataStore dataStore(String name) {
-        return this.tarantulaContext.dataStore(name);
-    }
+    //@Override
+    //public DataStore dataStore(String name) {
+        //return this.tarantulaContext.dataStore(name);
+    //}
 
     @Override
     public DataStore dataStore(String name, int partition) {

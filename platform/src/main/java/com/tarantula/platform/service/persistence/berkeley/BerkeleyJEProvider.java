@@ -485,6 +485,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         private final MapStoreListener mapStoreListener;
         private final String dataStore;
         private final int partition;
+        private final Metadata metadata1;
         private final Semaphore pass = new Semaphore(DataStoreProvider.CONCURRENCY_ACCESS_LIMIT);
 
         public BerkeleyDataStore(Node node,Database database,MapStoreListener mapStoreListener){
@@ -492,7 +493,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             this.berkeleyStore = database;
             this.dataStore = this.berkeleyStore.getDatabaseName();
             this.partition = Integer.parseInt(this.dataStore.split("_")[1]);
-            this.mapStoreListener = mapStoreListener;
+            this.metadata1 = new RecoverableMetadata(dataStore,partition,Distributable.INTEGRATION_SCOPE);
+           this.mapStoreListener = mapStoreListener;
         }
         @Override
         public String bucket() {
@@ -579,7 +581,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                     akey = t.key().asString();
                 }
                 byte[] key = akey.getBytes(ENCODING);
-                byte[] v = mapStoreListener.onCreating(new RecoverableMetadata(dataStore,partition,t.scope()),akey,t.toMap());
+                byte[] v = mapStoreListener.onCreating(metadata1,akey,t.toMap());
                 if(v!=null){
                     boolean suc = set(t,key,v);//set(t,key,SystemUtil.toJson(t.toMap()));
                     if(suc&&t.onEdge()){
@@ -612,7 +614,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 byte[] key = akey.getBytes(ENCODING);
                 byte[] value;
                 if((value=get(t,key))==null){
-                    value = mapStoreListener.onLoading(new RecoverableMetadata(dataStore,partition,t.scope()),akey);
+                    value = mapStoreListener.onLoading(metadata1,akey);
                     if(value==null){
                         return false;
                     }
