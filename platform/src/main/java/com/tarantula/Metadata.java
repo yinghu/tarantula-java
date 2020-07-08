@@ -1,7 +1,7 @@
 package com.tarantula;
 
 /**
- * Updated by yinghu lu on 8/23/2019.
+ * Updated by yinghu lu on 7/8/2020
  */
 public interface Metadata extends Recoverable {
 
@@ -13,6 +13,7 @@ public interface Metadata extends Recoverable {
      int partition();
      long timestamp();
      boolean onEdge();
-     boolean distributable();
+     boolean distributable(); //set key/value on cluster
+     boolean backup(); //set key/value on backup data base
      String index();
 }

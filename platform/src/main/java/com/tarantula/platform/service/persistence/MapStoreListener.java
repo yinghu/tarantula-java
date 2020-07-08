@@ -9,14 +9,13 @@ import java.util.Map;
  */
 public interface MapStoreListener {
 
-    //return null if 
-
-    //call before updating
+    //call before create
     byte[] onCreating(Metadata metadata,String key,Map<String,Object> creating);
+    //call after load
     byte[] onLoading(Metadata metadata,String key);
 
-    byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending);
+    //byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending);
 
-    void onUpdated(Metadata metadata, byte[] key, byte[] value);
-    void onLoaded(Metadata metadata,byte[] key,byte[] value);
+    //void onUpdated(Metadata metadata, byte[] key, byte[] value);
+    //void onLoaded(Metadata metadata,byte[] key,byte[] value);
 }

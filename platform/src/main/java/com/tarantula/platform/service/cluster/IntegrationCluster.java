@@ -346,6 +346,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public void registerMetricsListener(MetricsListener metricsListener){
         this.metricsListener = metricsListener;
     }
+    public void addBucketListener(BucketListener bucketListener){}
     @Override
     public void stateChanged(LifecycleEvent state) {
      LifecycleEvent.LifecycleState cs = state.getState();

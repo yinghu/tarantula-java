@@ -113,7 +113,7 @@ public class MysqlShardingProvider implements ShardingProvider {
     }
     public byte[] create(Metadata metadata, String key, Map<String,Object> data){
         try{
-            log.warn("DATA TABLE 1->"+metadata.source());
+            //log.warn("DATA TABLE 1->"+metadata.source());
             Connection connection = shardList[metadata.partition()%shards].connection();
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?)");
             preparedStatement.setString(1,key);
@@ -129,7 +129,7 @@ public class MysqlShardingProvider implements ShardingProvider {
     }
     public byte[] load(Metadata metadata,String key){
         try{
-            log.warn("DATA TABLE 2->"+metadata.source());
+            //log.warn("DATA TABLE 2->"+metadata.source());
             Connection connection = shardList[metadata.partition()%shards].connection();
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT v FROM "+metadata.source()+" WHERE k=?");
             preparedStatement.setString(1,key);

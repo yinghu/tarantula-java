@@ -124,7 +124,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             Map<String,Object> _map = t.toMap();
             byte[] value = SystemUtil.toJson(_map);
             if(_put(dso,key,value)){
-                this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),dso.partition,false),key,value);
+                //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),dso.partition,false),key,value);
                 return true;
             }
             else{
@@ -229,7 +229,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             pass.acquire();
             int pt = SystemUtil.partition(key,partition);
             if(_put(this.partitions[pt],key,value)){
-                this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,this.scope(),0,0,pt,true),key,value);
+                //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,this.scope(),0,0,pt,true),key,value);
             }
         }
         catch (Exception ex){
@@ -311,7 +311,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
     private <T extends Recoverable> boolean _set(T t,byte[] key,byte[] value) throws Exception{
         DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
         if(_put(dso,key,value)){
-            this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),dso.partition,false),key,value);
+            //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),dso.partition,false),key,value);
             if(t.onEdge()){
                 IndexSet indexSet = new IndexSet();
                 indexSet.distributionKey(t.owner());
@@ -328,7 +328,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 v = SystemUtil.toJson(indexSet.toMap());
                 if(_put(edo,owner,v)){
                     //send replication
-                    this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),edo.partition,true),owner,v);
+                    //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),edo.partition,true),owner,v);
                 }
             }
             return true;

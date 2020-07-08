@@ -9,6 +9,9 @@ public interface Recoverable extends Distributable{
 
     String PATH_SEPARATOR = "/";
 
+    boolean backup();
+    void backup(boolean backup);
+
     String oid();
     void oid(String oid);
 
@@ -18,15 +21,6 @@ public interface Recoverable extends Distributable{
     //new mappings can be added in runtime to use getOrDefault on fromMap call first time
     Map<String,Object> toMap();
     void fromMap(Map<String,Object> properties);
-
-    //binary format persistence APIs
-    //Be aware it is not back-forwarding support. use map format on development stage
-    //byte[] toByteArray();
-    //void fromByteArray(byte[] data);
-
-    //boolean binary();
-    //void binary(boolean binary);
-    //END OF binary format persistence APIs
 
     boolean disabled();
     void disabled(boolean disabled);
@@ -44,8 +38,6 @@ public interface Recoverable extends Distributable{
     int version();
     void version(int version);
 
-    //long sequence();
-    //void sequence(long sequence);
 
     boolean onEdge();
     void onEdge(boolean onEdge);

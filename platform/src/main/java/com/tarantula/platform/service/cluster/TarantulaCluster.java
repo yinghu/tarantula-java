@@ -172,6 +172,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     public RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener){
         return rMap.computeIfAbsent(recoverableListener.registryId(),(rid)->recoverableListener);
     }
+    public void addBucketListener(BucketListener bucketListener){}
     public void unregisterRecoverableListener(int factoryId){
         this.rMap.remove(factoryId);
     }

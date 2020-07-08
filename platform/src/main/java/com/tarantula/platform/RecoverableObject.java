@@ -28,7 +28,7 @@ public class RecoverableObject implements Recoverable {
 
     protected long timestamp;
     protected int version;
-    //protected long sequence;
+    protected boolean backup;
     protected int routingNumber;
 
     protected boolean distributable;
@@ -93,19 +93,13 @@ public class RecoverableObject implements Recoverable {
     public void fromMap(Map<String,Object> properties){
         properties.forEach((String k,Object v)->this.properties.put(k,v));
     }
-    //public byte[] toByteArray(){
-        //return new byte[0];
-    //}
-    //public void fromByteArray(byte[] data){
 
-    //}
-    //public boolean binary(){
-        //return false;
-
-    //}
-    //public void binary(boolean binary){
-
-    //}
+    public boolean backup(){
+        return this.backup;
+    }
+    public void backup(boolean backup){
+        this.backup = backup;
+    }
     public boolean disabled() {
         return this.disabled;
     }

@@ -33,7 +33,7 @@ import java.util.concurrent.Semaphore;
 /**
  * Updated by yinghu lu on 6/28/2020.
  */
-public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,EventListener{
+public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,EventListener,BucketListener{
 
     private static JDKLogger log = JDKLogger.getLogger(BerkeleyJEProvider.class);
 
@@ -260,7 +260,13 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             return iShardingProvider.create(metadata,key,creating);
         }
         else{
-            return dShardingProvider.create(metadata,key,creating);
+            if(metadata.backup()){
+                return dShardingProvider.create(metadata,key,creating);
+            }
+            else{
+                //inserting version or timestamp
+                return SystemUtil.toJson(creating);
+            }
         }
     }
     @Override
@@ -272,13 +278,13 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             return dShardingProvider.load(metadata,key);
         }
     }
-    @Override
+    //@Override
     public byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending){
         String ds = metadata.source();
         int pt = metadata.partition();
         return SystemUtil.toJson(pending);
     }
-    @Override
+    //@Override
     public void onUpdated(Metadata metadata, byte[] key, byte[] value) {
         //log.warn("DATA STORE->"+metadata.source());
         if(metadata.scope()==Recoverable.DATA_SCOPE){
@@ -475,7 +481,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         return false;
     }
 
-    //integration scope data store
+    @Override
+    public void onBucket(int bucket, int state) {
+        
+    }
+
+    //partial implementation of createIfAbsent and load for access index persistence
     private static class BerkeleyDataStore extends ReplicatedDataStore {
 
         private ConcurrentHashMap<Integer,RecoverableListener> rMap = new ConcurrentHashMap<>();
@@ -494,7 +505,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             this.dataStore = this.berkeleyStore.getDatabaseName();
             this.partition = Integer.parseInt(this.dataStore.split("_")[1]);
             this.metadata1 = new RecoverableMetadata(dataStore,partition,Distributable.INTEGRATION_SCOPE);
-           this.mapStoreListener = mapStoreListener;
+            this.mapStoreListener = mapStoreListener;
         }
         @Override
         public String bucket() {
