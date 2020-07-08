@@ -3,7 +3,6 @@ package com.tarantula.platform.service.persistence;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
-import java.util.HashMap;
 import java.util.Map;
 /**
  * Created by yinghu on 7/5/2020.

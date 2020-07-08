@@ -8,6 +8,7 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Map;
 
@@ -112,6 +113,7 @@ public class MysqlShardingProvider implements ShardingProvider {
     }
     public byte[] create(Metadata metadata, String key, Map<String,Object> data){
         try{
+            log.warn("DATA TABLE 1->"+metadata.source());
             Connection connection = shardList[metadata.partition()%shards].connection();
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?)");
             preparedStatement.setString(1,key);
@@ -121,6 +123,21 @@ public class MysqlShardingProvider implements ShardingProvider {
             preparedStatement.close();
             connection.close();
             return ret;
+        }catch (Exception ex){
+            return null;
+        }
+    }
+    public byte[] load(Metadata metadata,String key){
+        try{
+            log.warn("DATA TABLE 2->"+metadata.source());
+            Connection connection = shardList[metadata.partition()%shards].connection();
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT v FROM "+metadata.source()+" WHERE k=?");
+            preparedStatement.setString(1,key);
+            ResultSet rs = preparedStatement.executeQuery();
+            if(rs.next()){
+                return rs.getBytes("v");
+            }
+            return null;
         }catch (Exception ex){
             return null;
         }

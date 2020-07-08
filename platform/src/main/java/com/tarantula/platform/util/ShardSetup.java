@@ -9,13 +9,15 @@ public class ShardSetup {
 
 
     public static void main(String[] args) throws Exception{
+
+
         Connection connection = DriverManager.getConnection("jdbc:mysql://10.0.0.153:3306?user=tarantula&password=tarantula");
         Statement cmd = connection.createStatement();
         cmd.execute("CREATE DATABASE IF NOT EXISTS integration0");
         cmd.execute("CREATE DATABASE IF NOT EXISTS integration1");
-        cmd.execute("CREATE DATABASE IF NOT EXISTS integration2");
+        cmd.execute("CREATE DATABASE IF NOT EXISTS integration");
         cmd.execute("CREATE DATABASE IF NOT EXISTS tarantula");
-        cmd.execute("USE integration0");
+        cmd.execute("USE integration");
         cmd.execute("CREATE TABLE IF NOT EXISTS meta_info (data_store_name VARCHAR(25) PRIMARY KEY,node VARCHAR(15),bucket VARCHAR(15),scope INT,version INT)");
         cmd.execute("USE integration1");
         cmd.execute("CREATE TABLE IF NOT EXISTS meta_info (data_store_name VARCHAR(25) PRIMARY KEY,node VARCHAR(15),bucket VARCHAR(15),scope INT,version INT)");

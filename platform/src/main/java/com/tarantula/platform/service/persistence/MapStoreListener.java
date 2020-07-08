@@ -13,8 +13,9 @@ public interface MapStoreListener {
 
     //call before updating
     byte[] onCreating(Metadata metadata,String key,Map<String,Object> creating);
+    byte[] onLoading(Metadata metadata,String key);
+
     byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending);
-    //void onLoading()
 
     void onUpdated(Metadata metadata, byte[] key, byte[] value);
     void onLoaded(Metadata metadata,byte[] key,byte[] value);

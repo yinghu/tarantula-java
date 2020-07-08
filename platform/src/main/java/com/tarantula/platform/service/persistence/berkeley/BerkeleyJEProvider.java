@@ -264,6 +264,15 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         }
     }
     @Override
+    public byte[] onLoading(Metadata metadata,String key){
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+            return iShardingProvider.load(metadata,key);
+        }
+        else{
+            return dShardingProvider.load(metadata,key);
+        }
+    }
+    @Override
     public byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending){
         String ds = metadata.source();
         int pt = metadata.partition();
@@ -602,7 +611,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 byte[] key = akey.getBytes(ENCODING);
                 byte[] value;
                 if((value=get(t,key))==null){
-                    return false;
+                    value = mapStoreListener.onLoading(new RecoverableMetadata(dataStore,partition,t.scope()),akey);
+                    if(value==null){
+                        return false;
+                    }
+                    set(key,value);
                 }
                 t.fromMap(SystemUtil.toMap(value));
                 return true;

@@ -68,7 +68,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
             int pid = localKey.count(1);
             localKey.update();
             AccessIndex accessIndex = new AccessIndexTrack(accessKey,dso.partitionIndex.bucket(),dso.partitionIndex.label(),pid);
-            //log.warn("KEY->"+accessIndex.distributionKey());
+            log.warn("KEY->"+accessIndex.distributionKey());
             if(dso.dataStore.createIfAbsent(accessIndex,false)){
                 return accessIndex;
             }

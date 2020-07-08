@@ -17,4 +17,5 @@ public interface ShardingProvider extends Serviceable {
     void registerDataStore(String prefix,int partitions);
 
     byte[] create(Metadata metadata,String key,Map<String,Object> data);
+    byte[] load(Metadata metadata,String key);
 }
