@@ -515,59 +515,18 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         }
         @Override
         public <T extends Recoverable> boolean create(T t) {
-            try {
-                pass.acquire();
-                String okey = t.key().asString();
-                if (okey == null) {
-                    //use bucket/oid as the key
-                    t.bucket(this.node.bucketName);
-                    t.oid(SystemUtil.oid());
-                    okey = t.key().asString();
-                }
-                byte[] key = okey.getBytes(ENCODING);
-                byte[] value = SystemUtil.toJson(t.toMap());
-                boolean suc = set(t,key,value);
-                if(suc&&t.onEdge()){//update edge
-                    onEdge(t,key);
-                }
-                return suc;
-            }catch (Exception ex){
-                log.error("error on create",ex);
-                return false;
-            }
-            finally {
-                pass.release();
-            }
+            return false;
         }
 
         @Override
         public <T extends Recoverable> int create(T[] tb) {
-            int suc =0;
-            for(T t : tb){
-                if(this.create(t)){
-                    suc++;
-                }
-            }
-            return suc;
+            return 0;
         }
 
         @Override
         public <T extends Recoverable> boolean update(T t) {
-            try{
-                pass.acquire();
-                String akey = t.key().asString();
-                if(akey==null){
-                    return false;
-                }
-                byte[] key = akey.getBytes(ENCODING);
-                return set(t,key,SystemUtil.toJson(t.toMap()));
-            }catch (Exception ex){
-                log.error("error on update",ex);
-                return false;
-            }
-            finally {
-                pass.release();
-            }
+
+            return false;
         }
 
         @Override
@@ -575,26 +534,15 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             try{
                 pass.acquire();
                 String akey = t.key().asString();
-                if(akey==null){
-                    t.bucket(this.node.bucketName);
-                    t.oid(SystemUtil.oid());
-                    akey = t.key().asString();
+                if(akey==null){//must be not null
+                    return false;
                 }
                 byte[] key = akey.getBytes(ENCODING);
                 byte[] v = mapStoreListener.onCreating(metadata1,akey,t.toMap());
                 if(v!=null){
-                    boolean suc = set(t,key,v);//set(t,key,SystemUtil.toJson(t.toMap()));
-                    if(suc&&t.onEdge()){
-                        onEdge(t,key);
-                    }
-                    return suc;
+                    return _set(key,v);//set(t,key,SystemUtil.toJson(t.toMap()));
                 }
-                else{
-                    if(loading){
-                        t.fromMap(SystemUtil.toMap(v));
-                    }
-                    return false;
-                }
+                return false;
             }catch (Exception ex){
                 log.error("error on createIfAbsent",ex);
                 return false;
@@ -613,12 +561,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 }
                 byte[] key = akey.getBytes(ENCODING);
                 byte[] value;
-                if((value=get(t,key))==null){
+                if((value=_get(key))==null){
                     value = mapStoreListener.onLoading(metadata1,akey);
                     if(value==null){
                         return false;
                     }
-                    set(key,value);
+                    _set(key,value);
                 }
                 t.fromMap(SystemUtil.toMap(value));
                 return true;
@@ -631,79 +579,22 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
 
         }
         public void traverse(Overflow overflow) {
-            DiskOrderedCursor cursor = this.berkeleyStore.openCursor(null);
-            DatabaseEntry pk = new DatabaseEntry();
-            DatabaseEntry pv = new DatabaseEntry();
-            do{
-                if(cursor.getNext(pk,pv,null)==OperationStatus.SUCCESS){
-                    if(!overflow.on(this.dataStore,0,pk.getData(),pv.getData())){
-                        break;
-                    }
-                }
-                else{
-                    break;
-                }
-            }while (true);
-            cursor.close();
         }
         public void put(byte[] key,byte[] value){
-            this._put(key,value);
         }
         public void set(byte[] key,byte[] value){
-            try {
-                pass.acquire();
-                if(_put(key,value)){
-                    //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.dataStore,0,0,this.scope(),true,false,null),key,value);
-                }
-            }catch (Exception ex){
-                log.error("error on set",ex);
-            }
-            finally {
-                pass.release();
-            }
         }
         public byte[] get(byte[] key){
-            return _get(key);
+            return null;
         }
         @Override
         public <T extends Recoverable> List<T> list(RecoverableFactory<T> query) {
-            List<T> alist = new ArrayList<>();
-            this.list(query,(t)->{
-                alist.add(t);
-                return true;
-            });
-            return alist;
+            return null;//alist;
         }
 
         @Override
         public <T extends Recoverable> void list(RecoverableFactory<T> query, Stream<T> stream) {
-            try {
-                String akey = (query.distributionKey() + Recoverable.PATH_SEPARATOR + query.label());
-                byte[] owner = akey.getBytes(ENCODING);
-                byte[] edgeList = _get(owner);
-                if(edgeList==null){
-                    return;
-                }
-                IndexSet indexSet = new IndexSet();
-                indexSet.fromMap(SystemUtil.toMap(edgeList));
 
-                for(String b: indexSet.keySet){
-                    T t = query.create();
-                    byte[] v;
-                    byte[] ka = b.getBytes();
-                    if((v=get(t,ka))!=null){
-                        t.fromMap(SystemUtil.toMap(v));
-                        t.distributionKey(new String(ka,ENCODING));
-                        if(!stream.on(t)){
-
-                            break;
-                        }
-                    }
-                }
-
-            }catch (Exception ex){
-                ex.printStackTrace();
-            }
         }
 
 
@@ -723,7 +614,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             //receive replication event
             Metadata metadata = me.metadata;
             if(!me.source().equals(this.node.nodeName)){
-                this._put(me.key,me.payload());
+                this._set(me.key,me.payload());
             }
             if(!metadata.onEdge()){//callback on local application register
                 RecoverableListener rl = rMap.get(metadata.factoryId());
@@ -738,37 +629,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         public int scope(){
             return Distributable.INTEGRATION_SCOPE;
         }
-        private <T extends Recoverable> void onEdge(T t,byte[] key) throws Exception{
-            byte[] owner = (t.owner()+Recoverable.PATH_SEPARATOR+t.label()).getBytes(ENCODING);
-            IndexSet indexSet = new IndexSet();
-            indexSet.distributionKey(t.owner());
-            indexSet.label(t.label());
-            byte[] v;
-            if((v=_get(owner))!=null){
-                indexSet.fromMap(SystemUtil.toMap(v));
-            }
-            indexSet.keySet.add(new String(key));
-            v = SystemUtil.toJson(indexSet.toMap());
-            if(_put(owner,v)){
-                //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.dataStore, t.getFactoryId(), t.getClassId(), t.scope(), true, false, null), owner, v);
-            }
-        }
-        private <T extends Recoverable> boolean set(T t,byte[] key,byte[] value){
-            if(this._put(key,value)){
-                //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.dataStore,t.getFactoryId(),t.getClassId(),t.scope(),false,t.distributable(),t.index()),key,value);
-                return true;
-            }else{
-                return false;
-            }
-        }
-        private <T extends Recoverable>  byte[] get(T t,byte[] key){
-            byte[] v = _get(key);
-            if(v!=null){
-                //this.mapStoreListener.onLoaded(new RecoverableMetadata(this.dataStore,t.getFactoryId(),t.getClassId(),t.scope(),false,t.distributable(),t.index()),key,v);
-            }
-            return v;
-        }
-        private boolean _put(byte[] key,byte[] value){
+        private boolean _set(byte[] key,byte[] value){
             return berkeleyStore.put(null,new DatabaseEntry(key),new DatabaseEntry(value))==OperationStatus.SUCCESS;
         }
         private byte[] _get(byte[] key){
