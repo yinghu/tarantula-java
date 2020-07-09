@@ -216,12 +216,12 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 dataStore.list(query,(b)->{
                     if(!b.disabled()){
                         blist.add(b);
-                        //log.info(b.toString());
                     }
                     return true;
                 });
                 if(blist.isEmpty()){
                     //load from local config
+                    log.warn("Initializing lobby list on ["+params[0]+"]");
                     List<String> dxml = loadFromLocal();
                     XMLParser xp = new XMLParser();
                     dxml.forEach((xm)->{

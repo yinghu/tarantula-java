@@ -114,14 +114,14 @@ public class PartitionDataStore extends ReplicatedDataStore{
         IndexSet indexSet = new IndexSet();
         indexSet.distributionKey(t.owner());
         indexSet.label(t.label());
-        byte[] _kn = indexSet.distributionKey().getBytes();
+        byte[] _kn = indexSet.key().asString().getBytes();
         DataStoreOnPartition dos = this.partitions[SystemUtil.partition(_kn,partition)];
         byte[] ix = _get(dos,_kn);
         if(ix!=null){
             indexSet.fromMap(SystemUtil.toMap(ix));
         }
         indexSet.keySet.add(okey);
-        byte[] _vn = SystemUtil.toJson(t.toMap());
+        byte[] _vn = SystemUtil.toJson(indexSet.toMap());
         boolean suc = _put(dos,_kn,_vn);
         if(suc){
             //do backup and replication

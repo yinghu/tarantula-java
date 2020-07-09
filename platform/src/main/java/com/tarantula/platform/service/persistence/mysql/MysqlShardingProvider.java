@@ -61,7 +61,7 @@ public class MysqlShardingProvider implements ShardingProvider {
         shardList[shard.shardNumber]=shard;
     }
     @Override
-    public void registerDataStore(String name){
+    public synchronized void registerDataStore(String name){
         try{
             for(Shard shard : shardList){
                 Connection con = shard.connection();
@@ -77,7 +77,9 @@ public class MysqlShardingProvider implements ShardingProvider {
                     pstm.setInt(5,0);
                     pstm.execute();
                     pstm.close();
-                }catch (Exception ignore){}
+                }catch (Exception ignore){
+                    log.warn("Error on register data store"+name+"->"+ignore.getMessage());
+                }
                 con.close();
             }
         }catch (Exception ex){
@@ -85,7 +87,7 @@ public class MysqlShardingProvider implements ShardingProvider {
         }
     }
     @Override
-    public void registerDataStore(String prefix,int partitions){
+    public synchronized void registerDataStore(String prefix,int partitions){
         try{
             for(Shard shard : shardList){
                 Connection con = shard.connection();
@@ -100,7 +102,9 @@ public class MysqlShardingProvider implements ShardingProvider {
                         pstm.setInt(4,0);
                         pstm.setInt(5,0);
                         pstm.execute();
-                    }catch (Exception ignore){}
+                    }catch (Exception ignore){
+                        log.warn("Error on register data store"+prefix+i+"->"+ignore.getMessage());
+                    }
                 }
                 pstm.close();
                 cmd.executeBatch();
