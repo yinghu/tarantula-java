@@ -9,15 +9,12 @@ import java.util.Map;
  */
 public class Shard {
     final public int shardNumber;
-    //private Map<String,String> properties;
     private BasicDataSource dataSource = new BasicDataSource();
 
     public Shard(int shardNumber){
         this.shardNumber = shardNumber;
-        //properties = new HashMap<>();
     }
-    public void configuration(Map<String,String> config) throws Exception{
-        //properties.putAll(config);
+    public void configuration(Map<String,String> config){
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl(config.get("url"));
         dataSource.setUsername(config.get("user"));

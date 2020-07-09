@@ -72,7 +72,7 @@ public class MysqlShardingProvider implements ShardingProvider {
             for(Shard shard : shardList){
                 Connection con = shard.connection();
                 Statement cmd = con.createStatement();
-                cmd.execute("CREATE TABLE IF NOT EXISTS "+name+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON)");
+                cmd.execute("CREATE TABLE IF NOT EXISTS "+name+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON,c INT NOT NULL,f INT NOT NULL, INDEX ix_c(c), INDEX ix_f(f))");
                 cmd.close();
                 try{
                     PreparedStatement pstm = con.prepareStatement("INSERT INTO meta_info VALUES (?,?,?,?,?)");
@@ -106,7 +106,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                 PreparedStatement pstm = con.prepareStatement("INSERT INTO meta_info VALUES (?,?,?,?,?)");
                 for(int i=0;i<partitions;i++){
                     try{
-                        cmd.execute("CREATE TABLE IF NOT EXISTS "+prefix+"_"+i+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON)");
+                        cmd.execute("CREATE TABLE IF NOT EXISTS "+prefix+"_"+i+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON,c INT NOT NULL,f INT NOT NULL, INDEX ix_c(c),INDEX ix_f(f))");
                         pstm.setString(1,prefix+"_"+i);
                         pstm.setString(2,"node");
                         pstm.setString(3,"bucket");
@@ -134,11 +134,13 @@ public class MysqlShardingProvider implements ShardingProvider {
         try{
             Connection connection = shardList[metadata.partition()%shards].connection();
             try{
-                PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?)");
+                PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?,?,?)");
                 preparedStatement.setString(1,key);
                 String ret = SystemUtil.toJsonString(data);
                 log.warn("CREATE KEY->"+key+"<><>"+ret);
                 preparedStatement.setString(2, ret);
+                preparedStatement.setInt(3,metadata.classId());
+                preparedStatement.setInt(4,metadata.factoryId());
                 preparedStatement.execute();
                 preparedStatement.close();
                 return ret.getBytes();
