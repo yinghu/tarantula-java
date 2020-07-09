@@ -117,51 +117,69 @@ public class MysqlShardingProvider implements ShardingProvider {
     }
     public byte[] create(Metadata metadata, String key, Map<String,Object> data){
         try{
-            log.warn("DATA TABLE 1->"+metadata.source());
             Connection connection = shardList[metadata.partition()%shards].connection();
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?)");
-            preparedStatement.setString(1,key);
-            String ret = SystemUtil.toJsonString(data);
-            preparedStatement.setString(2, ret);
-            preparedStatement.execute();
-            preparedStatement.close();
-            connection.close();
-            return ret.getBytes();
+            try{
+                PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?)");
+                preparedStatement.setString(1,key);
+                String ret = SystemUtil.toJsonString(data);
+                preparedStatement.setString(2, ret);
+                preparedStatement.execute();
+                preparedStatement.close();
+                return ret.getBytes();
+            }catch (Exception eex){
+                throw new RuntimeException(eex.getMessage());
+            }
+            finally {
+                connection.close();
+            }
         }catch (Exception ex){
+            log.warn("error on create->"+ex.getMessage());
             return null;
         }
     }
     public byte[] load(Metadata metadata,String key){
         try{
-            log.warn("DATA TABLE 2->"+metadata.source());
             Connection connection = shardList[metadata.partition()%shards].connection();
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT v FROM "+metadata.source()+" WHERE k=?");
-            preparedStatement.setString(1,key);
-            ResultSet rs = preparedStatement.executeQuery();
-            byte[] ret = null;
-            if(rs.next()){
-                ret = rs.getString("v").getBytes();
+            try{
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT v FROM "+metadata.source()+" WHERE k=?");
+                preparedStatement.setString(1,key);
+                ResultSet rs = preparedStatement.executeQuery();
+                byte[] ret = null;
+                if(rs.next()){
+                    ret = rs.getString("v").getBytes();
+                }
+                preparedStatement.close();
+                return ret;
+            }catch (Exception eex){
+                throw new RuntimeException(eex.getMessage());
             }
-            preparedStatement.close();
-            connection.close();
-            return ret;
+            finally {
+                connection.close();
+            }
         }catch (Exception ex){
+            log.warn("error on load->"+ex.getMessage());
             return null;
         }
     }
     public byte[] update(Metadata metadata,String key,Map<String,Object> data){
         try{
-            log.warn("DATA TABLE 3->"+metadata.source());
             Connection connection = shardList[metadata.partition()%shards].connection();
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE "+metadata.source()+" SET v=? WHERE k=?");
-            String ret = SystemUtil.toJsonString(data);
-            preparedStatement.setString(1,ret);
-            preparedStatement.setString(2,key);
-            preparedStatement.execute();
-            preparedStatement.close();
-            connection.close();
-            return ret.getBytes();
+            try{
+                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE "+metadata.source()+" SET v=? WHERE k=?");
+                String ret = SystemUtil.toJsonString(data);
+                preparedStatement.setString(1,ret);
+                preparedStatement.setString(2,key);
+                preparedStatement.execute();
+                preparedStatement.close();
+                return ret.getBytes();
+            }catch (Exception eex){
+                throw new RuntimeException(eex.getMessage());
+            }
+            finally {
+                connection.close();
+            }
         }catch (Exception ex){
+            log.warn("error on update->"+ex.getMessage());
             return null;
         }
     }
