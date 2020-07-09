@@ -89,14 +89,17 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = okey.getBytes(ENCODING);
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
-            byte[] value = t.backup()?this.mapStoreListener.onCreating(dso.metadata,okey,t.toMap()):SystemUtil.toJson(t.toMap());
+            byte[] value = SystemUtil.toJson(t.toMap());
             boolean suc = _put(dso,key,value);
             if(suc){
-                //do replication
+                //do backup and replication
+                if(t.backup()){
+                    this.mapStoreListener.onCreating(dso.metadata,okey,t.toMap());
+                }
                 this.mapStoreListener.onDistributing(dso.metadata,key,value);
-            }
-            if(suc&&t.onEdge()&&t.owner()!=null&&t.label()!=null){
-                suc = onEdge(t,okey);
+                if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
+                    suc = onEdge(t,okey);
+                }
             }
             return suc;
         }catch (Exception ex){
@@ -119,12 +122,17 @@ public class PartitionDataStore extends ReplicatedDataStore{
         }
         indexSet.keySet.add(okey);
         byte[] _vn = SystemUtil.toJson(t.toMap());
-        if(t.backup()){
-            _vn = ix!=null?this.mapStoreListener.onUpdating(dos.metadata,indexSet.distributionKey(),t.toMap()):this.mapStoreListener.onCreating(dos.metadata,indexSet.distributionKey(),t.toMap());
-        }
         boolean suc = _put(dos,_kn,_vn);
         if(suc){
-            //do replication
+            //do backup and replication
+            if(t.backup()){
+                if(ix!=null){
+                    this.mapStoreListener.onUpdating(dos.metadata,indexSet.distributionKey(),t.toMap());
+                }
+                else{
+                    this.mapStoreListener.onCreating(dos.metadata,indexSet.distributionKey(),t.toMap());
+                }
+            }
             this.mapStoreListener.onDistributing(dos.metadata,_kn,_vn);
         }
         return suc;
@@ -150,8 +158,11 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = akey.getBytes(ENCODING);
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            byte[] value = t.backup()?this.mapStoreListener.onUpdating(dso.metadata,akey,t.toMap()):SystemUtil.toJson(t.toMap());
+            byte[] value = SystemUtil.toJson(t.toMap());
             if(_put(dso,key,value)){
+                if(t.backup()){
+                    this.mapStoreListener.onUpdating(dso.metadata,akey,t.toMap());
+                }
                 this.mapStoreListener.onDistributing(dso.metadata,key,value);
                 //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),dso.partition,false),key,value);
                 return true;
@@ -181,12 +192,18 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] key = akey.getBytes(ENCODING);
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             byte[] v;
-            boolean suc = false;
+            boolean suc;
             if((v=_get(partitions[SystemUtil.partition(key,partition)],key))==null){
                 v = SystemUtil.toJson(t.toMap());
-                if(_put(dso,key,v)&&t.onEdge()){
-                    this.mapStoreListener.onDistributing(dso.metadata,key,v);
-                    suc = onEdge(t,akey);
+                suc = _put(dso,key,v);
+                if(suc) {
+                    if(t.backup()){
+                        this.mapStoreListener.onCreating(dso.metadata,akey,t.toMap());
+                    }
+                    this.mapStoreListener.onDistributing(dso.metadata, key, v);
+                    if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
+                        suc = onEdge(t, akey);
+                    }
                 }
                 return suc;
             }
@@ -344,7 +361,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
         }
 
     }
-
+    /**
     private <T extends Recoverable> boolean _set(T t,byte[] key,byte[] value) throws Exception{
         DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
         if(_put(dso,key,value)){
@@ -372,7 +389,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
         }else{
             return true;
         }
-    }
+    }**/
     private boolean _put(DataStoreOnPartition dso,byte[] key,byte[] value){
         return dso.database.put(null,new DatabaseEntry(key),new DatabaseEntry(value))==OperationStatus.SUCCESS;
     }
