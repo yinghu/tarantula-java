@@ -107,7 +107,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
 
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.dataStore = serviceContext.dataStore(NAME,serviceContext.partitionNumber());
+        this.dataStore = serviceContext.dataStore(NAME.replace("-","_"),serviceContext.partitionNumber());
         this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
         this.dest = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).subscription();
         serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).addEventListener(NAME,(e)->{

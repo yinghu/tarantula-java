@@ -45,7 +45,7 @@ public class KeyValueDataStoreModule implements Module {
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        this.dataStore = this.context.dataStore(this.context.descriptor().typeId());
+        this.dataStore = this.context.dataStore(this.context.descriptor().typeId().replace("-","_"));
         gameServiceProvider = new GameServiceProvider(this.context.descriptor().typeId().replace("-data","-service"));
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.deploy(gameServiceProvider);

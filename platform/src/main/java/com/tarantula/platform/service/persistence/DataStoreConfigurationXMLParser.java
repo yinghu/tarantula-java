@@ -108,6 +108,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             _cfg.put("name",attributes.getValue("name"));
             _cfg.put("scope",attributes.getValue("scope"));
             _cfg.put("shards",attributes.getValue("shards"));
+            _cfg.put("enabled",attributes.getValue("enabled"));
             this.shardingProvider.configure(_cfg);
         }
         else if(qname.equals("shard")){

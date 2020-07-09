@@ -23,6 +23,7 @@ public class MysqlShardingProvider implements ShardingProvider {
     private String name;
     private int scope;
     private int shards;
+    private boolean enabled;
     private Shard[] shardList;
     @Override
     public void start() throws Exception {
@@ -53,6 +54,7 @@ public class MysqlShardingProvider implements ShardingProvider {
         this.name = properties.get("name");
         this.scope = Integer.parseInt(properties.get("scope"));
         this.shards = Integer.parseInt(properties.get("shards"));
+        this.enabled = Boolean.parseBoolean(properties.get("enabled"));
         this.shardList = new Shard[shards];
     }
 
@@ -62,6 +64,10 @@ public class MysqlShardingProvider implements ShardingProvider {
     }
     @Override
     public void registerDataStore(String name){
+        if(!enabled){
+            log.warn("Data backup is disabled->"+name);
+            return;
+        }
         try{
             for(Shard shard : shardList){
                 Connection con = shard.connection();
@@ -88,6 +94,10 @@ public class MysqlShardingProvider implements ShardingProvider {
     }
     @Override
     public  void registerDataStore(String prefix,int partitions){
+        if(!enabled){
+            log.warn("Data backup is disabled->"+prefix);
+            return;
+        }
         try{
             log.warn("registering data store->"+prefix+"<>"+partitions);
             for(Shard shard : shardList){
@@ -117,6 +127,10 @@ public class MysqlShardingProvider implements ShardingProvider {
         }
     }
     public byte[] create(Metadata metadata, String key, Map<String,Object> data){
+        if(!enabled){
+            log.warn("Data backup is disabled->"+key);
+            return SystemUtil.toJson(data);
+        }
         try{
             Connection connection = shardList[metadata.partition()%shards].connection();
             try{
@@ -140,6 +154,10 @@ public class MysqlShardingProvider implements ShardingProvider {
         }
     }
     public byte[] load(Metadata metadata,String key){
+        if(!enabled){
+            log.warn("Data backup is disabled->"+key);
+            return null;
+        }
         try{
             Connection connection = shardList[metadata.partition()%shards].connection();
             try{
@@ -164,6 +182,10 @@ public class MysqlShardingProvider implements ShardingProvider {
         }
     }
     public byte[] update(Metadata metadata,String key,Map<String,Object> data){
+        if(!enabled){
+            log.warn("Data backup is disabled->"+key);
+            return SystemUtil.toJson(data);
+        }
         try{
             Connection connection = shardList[metadata.partition()%shards].connection();
             try{
