@@ -127,10 +127,10 @@ public class PartitionDataStore extends ReplicatedDataStore{
             //do backup and replication
             if(t.backup()){
                 if(ix!=null){
-                    this.mapStoreListener.onUpdating(dos.metadata,indexSet.key().asString(),t.toMap());
+                    this.mapStoreListener.onUpdating(dos.metadata,indexSet.key().asString(),indexSet.toMap());
                 }
                 else{
-                    this.mapStoreListener.onCreating(dos.metadata,indexSet.key().asString(),t.toMap());
+                    this.mapStoreListener.onCreating(dos.metadata,indexSet.key().asString(),indexSet.toMap());
                 }
             }
             this.mapStoreListener.onDistributing(dos.metadata,_kn,_vn);

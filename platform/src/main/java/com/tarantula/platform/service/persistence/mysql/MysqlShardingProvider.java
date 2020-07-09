@@ -89,25 +89,26 @@ public class MysqlShardingProvider implements ShardingProvider {
     @Override
     public  void registerDataStore(String prefix,int partitions){
         try{
+            log.warn("registering data store->"+prefix+"<>"+partitions);
             for(Shard shard : shardList){
                 Connection con = shard.connection();
                 Statement cmd = con.createStatement();
                 PreparedStatement pstm = con.prepareStatement("INSERT INTO meta_info VALUES (?,?,?,?,?)");
                 for(int i=0;i<partitions;i++){
-                    cmd.addBatch("CREATE TABLE IF NOT EXISTS "+prefix+"_"+i+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON)");
                     try{
+                        cmd.execute("CREATE TABLE IF NOT EXISTS "+prefix+"_"+i+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON)");
                         pstm.setString(1,prefix+"_"+i);
                         pstm.setString(2,"node");
                         pstm.setString(3,"bucket");
                         pstm.setInt(4,0);
                         pstm.setInt(5,0);
                         pstm.execute();
+                        pstm.clearParameters();
                     }catch (Exception ignore){
                         log.warn("Error on register data store"+prefix+i+"->"+ignore.getMessage());
                     }
                 }
                 pstm.close();
-                cmd.executeBatch();
                 cmd.close();
                 con.close();
             }
@@ -122,6 +123,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                 PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?)");
                 preparedStatement.setString(1,key);
                 String ret = SystemUtil.toJsonString(data);
+                log.warn("CREATE KEY->"+key+"<><>"+ret);
                 preparedStatement.setString(2, ret);
                 preparedStatement.execute();
                 preparedStatement.close();
@@ -167,6 +169,7 @@ public class MysqlShardingProvider implements ShardingProvider {
             try{
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE "+metadata.source()+" SET v=? WHERE k=?");
                 String ret = SystemUtil.toJsonString(data);
+                log.warn("UPDATE KEY->"+key+"<><>"+ret);
                 preparedStatement.setString(1,ret);
                 preparedStatement.setString(2,key);
                 preparedStatement.execute();
