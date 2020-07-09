@@ -138,10 +138,13 @@ public class MysqlShardingProvider implements ShardingProvider {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT v FROM "+metadata.source()+" WHERE k=?");
             preparedStatement.setString(1,key);
             ResultSet rs = preparedStatement.executeQuery();
+            byte[] ret = null;
             if(rs.next()){
-                return rs.getBytes("v");
+                ret = rs.getBytes("v");
             }
-            return null;
+            preparedStatement.close();
+            connection.close();
+            return ret;
         }catch (Exception ex){
             return null;
         }
@@ -155,6 +158,8 @@ public class MysqlShardingProvider implements ShardingProvider {
             preparedStatement.setBytes(1,ret);
             preparedStatement.setString(2,key);
             preparedStatement.execute();
+            preparedStatement.close();
+            connection.close();
             return ret;
         }catch (Exception ex){
             return null;

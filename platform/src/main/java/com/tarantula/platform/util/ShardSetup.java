@@ -20,6 +20,6 @@ public class ShardSetup {
     }
 
     public static void main(String[] args) throws Exception{
-        createShard(new String[]{"integration100","tarantula100"});
+        createShard(new String[]{"integration101","tarantula101"});
     }
 }
