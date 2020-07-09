@@ -268,11 +268,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
             cursor.close();
         }
     }
-
-
-    public void batch(byte[] key, Overflow overflow) {
-
-    }
     public void put(byte[] key,byte[] value){
         _put(this.partitions[SystemUtil.partition(key,partition)],key,value);
     }
