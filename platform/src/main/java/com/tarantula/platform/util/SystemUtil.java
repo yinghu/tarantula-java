@@ -150,6 +150,21 @@ public class SystemUtil {
         });
         return json.toString().getBytes(Charset.forName("UTF-8"));
     }
+    public static String toJsonString(Map<String,Object> kv){
+        JsonObject json = new JsonObject();
+        kv.forEach((k,v)->{
+            if(v!=null&& (v instanceof String)){
+                json.addProperty(k,(String)v);
+            }
+            else if(v!=null&& (v instanceof Boolean)){
+                json.addProperty(k,(Boolean)v);
+            }
+            else if(v!=null&& (v instanceof Number)){
+                json.addProperty(k,(Number)v);
+            }
+        });
+        return json.toString();//.getBytes(Charset.forName("UTF-8"));
+    }
     public static Map<String,Object> toMap(byte[] json){
         JsonParser jp = new JsonParser();
         InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(json));

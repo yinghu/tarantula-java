@@ -61,12 +61,12 @@ public class MysqlShardingProvider implements ShardingProvider {
         shardList[shard.shardNumber]=shard;
     }
     @Override
-    public synchronized void registerDataStore(String name){
+    public void registerDataStore(String name){
         try{
             for(Shard shard : shardList){
                 Connection con = shard.connection();
                 Statement cmd = con.createStatement();
-                cmd.execute("CREATE TABLE IF NOT EXISTS "+name+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v BLOB)");
+                cmd.execute("CREATE TABLE IF NOT EXISTS "+name+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON)");
                 cmd.close();
                 try{
                     PreparedStatement pstm = con.prepareStatement("INSERT INTO meta_info VALUES (?,?,?,?,?)");
@@ -87,14 +87,14 @@ public class MysqlShardingProvider implements ShardingProvider {
         }
     }
     @Override
-    public synchronized void registerDataStore(String prefix,int partitions){
+    public  void registerDataStore(String prefix,int partitions){
         try{
             for(Shard shard : shardList){
                 Connection con = shard.connection();
                 Statement cmd = con.createStatement();
                 PreparedStatement pstm = con.prepareStatement("INSERT INTO meta_info VALUES (?,?,?,?,?)");
                 for(int i=0;i<partitions;i++){
-                    cmd.addBatch("CREATE TABLE IF NOT EXISTS "+prefix+"_"+i+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v BLOB)");
+                    cmd.addBatch("CREATE TABLE IF NOT EXISTS "+prefix+"_"+i+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON)");
                     try{
                         pstm.setString(1,prefix+"_"+i);
                         pstm.setString(2,"node");
@@ -121,12 +121,12 @@ public class MysqlShardingProvider implements ShardingProvider {
             Connection connection = shardList[metadata.partition()%shards].connection();
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?)");
             preparedStatement.setString(1,key);
-            byte[] ret = SystemUtil.toJson(data);
-            preparedStatement.setBytes(2, ret);
+            String ret = SystemUtil.toJsonString(data);
+            preparedStatement.setString(2, ret);
             preparedStatement.execute();
             preparedStatement.close();
             connection.close();
-            return ret;
+            return ret.getBytes();
         }catch (Exception ex){
             return null;
         }
@@ -140,7 +140,7 @@ public class MysqlShardingProvider implements ShardingProvider {
             ResultSet rs = preparedStatement.executeQuery();
             byte[] ret = null;
             if(rs.next()){
-                ret = rs.getBytes("v");
+                ret = rs.getString("v").getBytes();
             }
             preparedStatement.close();
             connection.close();
@@ -154,13 +154,13 @@ public class MysqlShardingProvider implements ShardingProvider {
             log.warn("DATA TABLE 3->"+metadata.source());
             Connection connection = shardList[metadata.partition()%shards].connection();
             PreparedStatement preparedStatement = connection.prepareStatement("UPDATE "+metadata.source()+" SET v=? WHERE k=?");
-            byte[] ret = SystemUtil.toJson(data);
-            preparedStatement.setBytes(1,ret);
+            String ret = SystemUtil.toJsonString(data);
+            preparedStatement.setString(1,ret);
             preparedStatement.setString(2,key);
             preparedStatement.execute();
             preparedStatement.close();
             connection.close();
-            return ret;
+            return ret.getBytes();
         }catch (Exception ex){
             return null;
         }
