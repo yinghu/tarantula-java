@@ -24,6 +24,7 @@ public class MysqlShardingProvider implements ShardingProvider {
     private int scope;
     private int shards;
     private boolean enabled;
+    private boolean backup;
     private Shard[] shardList;
     @Override
     public void start() throws Exception {
@@ -55,6 +56,7 @@ public class MysqlShardingProvider implements ShardingProvider {
         this.scope = Integer.parseInt(properties.get("scope"));
         this.shards = Integer.parseInt(properties.get("shards"));
         this.enabled = Boolean.parseBoolean(properties.get("enabled"));
+        this.backup = Boolean.parseBoolean(properties.get("backup"));
         this.shardList = new Shard[shards];
     }
 
@@ -84,7 +86,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                     pstm.execute();
                     pstm.close();
                 }catch (Exception ignore){
-                    log.warn("Error on register data store"+name+"->"+ignore.getMessage());
+                    //log.warn("Error on register data store"+name+"->"+ignore.getMessage());
                 }
                 con.close();
             }
@@ -115,7 +117,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                         pstm.execute();
                         pstm.clearParameters();
                     }catch (Exception ignore){
-                        log.warn("Error on register data store"+prefix+i+"->"+ignore.getMessage());
+                        //log.warn("Error on register data store"+prefix+i+"->"+ignore.getMessage());
                     }
                 }
                 pstm.close();
@@ -151,7 +153,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                 connection.close();
             }
         }catch (Exception ex){
-            log.warn("error on create->"+ex.getMessage());
+            //log.warn("error on create->"+ex.getMessage());
             return null;
         }
     }

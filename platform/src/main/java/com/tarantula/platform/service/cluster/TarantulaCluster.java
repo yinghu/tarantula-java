@@ -65,6 +65,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         return this.deployService;
     }
     public EventService subscribe(String topic, EventListener callback){
+        log.warn("subscribing listener >>>>>>>>>>>>>>>>>>>>>>>>>");
         this.eventSubscribers.computeIfAbsent(topic,(t)->{
             EventSubscriber eventSubscriber = new EventSubscriber();
             eventSubscriber.callback = callback;
@@ -238,6 +239,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
          return false;
     }
     public String addEventListener(String registerId,EventListener e){
+        log.warn("adding event listener >>>>>>>>>>>>>>>>>>>>>>>>>");
         if(registerId==null){
             String rid = UUID.randomUUID().toString();
             eMap.put(rid,e);
