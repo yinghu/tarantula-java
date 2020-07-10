@@ -1,6 +1,7 @@
 package com.tarantula.platform.service;
 
 import com.tarantula.DataStore;
+import com.tarantula.platform.service.persistence.Node;
 import com.tarantula.platform.service.persistence.ShardingProvider;
 
 import java.nio.channels.ReadableByteChannel;
@@ -17,6 +18,7 @@ public interface DataStoreProvider extends ServiceProvider {
     void configure(Map<String,String> properties);
     void addShardingProvider(ShardingProvider shardingProvider);
 
+    Node node();
     //create none-partitioned integration scope data store
     DataStore create(String name);
 

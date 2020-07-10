@@ -24,7 +24,7 @@ public class PortableRegistry extends AbstractRecoverableListener{
 
     public static final int LOBBY_TYPE_ID_INDEX_CID = 13;
 
-    public static final int NODE_CID = 15;
+    //public static final int NODE_CID = 15;
 
     public static final int ACCESS_KEY = 16;
 
@@ -82,9 +82,9 @@ public class PortableRegistry extends AbstractRecoverableListener{
             case ON_VIEW_OID:
                 _ins = new OnViewTrack();
                 break;
-            case NODE_CID:
-                _ins = new Node();
-                break;
+            //case NODE_CID:
+                //_ins = new Node();
+                //break;
             case ACCESS_KEY:
                 _ins = new AccessKey();
                 break;

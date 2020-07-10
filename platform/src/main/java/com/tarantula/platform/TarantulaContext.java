@@ -21,6 +21,7 @@ import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationXMLParser;
+import com.tarantula.platform.service.persistence.Node;
 import com.tarantula.platform.util.GoogleAuthCredentialsDeserializer;
 import com.tarantula.platform.util.StripePaymentCredentialsDeserializer;
 import com.tarantula.platform.util.SystemUtil;
@@ -99,7 +100,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
     public String dataBucketGroup;
     public String dataBucketNode;
-
+    private Node node;
     public String dataReplicationThreadPoolSetting;
 
     public String dataStoreDir;
@@ -136,7 +137,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
 
 	public void start() throws Exception {
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
-
+        this.node = new Node(this.dataBucketGroup,this.dataBucketNode);
  	    //_systemStorageInstanceStarted = new CountDownLatch(1);
          _storageInstanceStarted = new CountDownLatch(1);
         _tarantulaClusterStarted = new CountDownLatch(1);
@@ -396,7 +397,6 @@ public class TarantulaContext implements Serviceable,ServiceContext{
  	        ex.printStackTrace();
         }
     }
-    //@Override
     public DataStore dataStore(String name){
         DataStoreProvider dataStoreProvider = (DataStoreProvider)dataStoreProviders.get(name);
         if(dataStoreProvider==null){
@@ -498,6 +498,16 @@ public class TarantulaContext implements Serviceable,ServiceContext{
             v.setup(this);
             v.waitForData();//block for global data sync
         });
+        AccessIndex bid = this.accessIndexService().get(node.bucketName);
+        if(bid==null){
+            bid = this.accessIndexService().set(node.bucketName);
+        }
+        node.bucketId = bid.distributionKey();
+        AccessIndex nid = this.accessIndexService().get(node.nodeName);
+        if(nid==null){
+            nid = this.accessIndexService().set(node.nodeName);
+        }
+        node.nodeId = nid.distributionKey();
     }
     public boolean deployServiceProvider(ServiceProvider serviceProvider){
         try{

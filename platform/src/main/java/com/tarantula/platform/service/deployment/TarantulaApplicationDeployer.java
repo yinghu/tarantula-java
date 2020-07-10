@@ -16,16 +16,13 @@ public class TarantulaApplicationDeployer implements Serviceable {
 	}
 
 	public void start() throws Exception {
-		AccessIndex aix = this.context.accessIndexService().get(this.context.masterDataStore().bucket());
-		if(aix==null){
-			aix = this.context.accessIndexService().set(this.context.masterDataStore().bucket());
-		}
-		List<ServiceConfiguration> _slist = this.context.query(new String[]{aix.distributionKey()},new ServiceConfigurationQuery(aix.distributionKey()));
+		String bucketId = this.context.bucketId();
+		List<ServiceConfiguration> _slist = this.context.query(new String[]{bucketId},new ServiceConfigurationQuery(bucketId));
 		Collections.sort(_slist,new ServiceConfigurationComparator());
 		for(ServiceConfiguration c: _slist){
 			this.context.configure(c); //setup configurations
 		}
-		List<LobbyDescriptor> bList = this.context.query(new String[]{aix.distributionKey()},new LobbyQuery(aix.distributionKey()));//this.context.tarantulaCluster.list(query);
+		List<LobbyDescriptor> bList = this.context.query(new String[]{bucketId},new LobbyQuery(bucketId));//this.context.tarantulaCluster.list(query);
 		ArrayList<LobbyConfiguration> configurations = new ArrayList();
 		bList.forEach((d)->{
 			this.context.setLobby(d);//override the default one

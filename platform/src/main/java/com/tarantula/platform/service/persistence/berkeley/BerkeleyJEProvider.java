@@ -92,6 +92,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             dShardingProvider = shardingProvider;
         }
     }
+    public Node node(){
+        return this.node;
+    }
     @Override
     public DataStore create(String name) {
         return this.dMap.computeIfAbsent(name,(k)->{

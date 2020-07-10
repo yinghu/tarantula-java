@@ -9,6 +9,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.EndPoint;
 import com.tarantula.platform.service.cluster.ScopedMemberDiscovery;
+import com.tarantula.platform.service.persistence.Node;
 
 public class TarantulaMain {
 	static {

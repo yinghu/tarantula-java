@@ -1,22 +1,18 @@
 package com.tarantula.platform.service.persistence;
 
-
-import com.tarantula.platform.DistributionKey;
-import com.tarantula.platform.NoReplicationObject;
-import com.tarantula.platform.service.cluster.PortableRegistry;
-
-import java.util.Map;
-
 /**
  * Updated by yinghu lu on 6/16/2020
  */
-public class Node extends NoReplicationObject {
+public class Node{
 
     public String bucketName;
     public String nodeName;
 
+    public String bucketId;
+    public String nodeId;
+
+
     public Node(){
-        this.vertex = "Node";
     }
 
     public Node(String bucketName,String nodeName){
@@ -24,7 +20,7 @@ public class Node extends NoReplicationObject {
         this.bucketName = bucketName;
         this.nodeName = nodeName;
     }
-
+    /**
     @Override
     public int getFactoryId() {
         return PortableRegistry.OID;
@@ -54,5 +50,5 @@ public class Node extends NoReplicationObject {
     }
     public String toString(){
         return "Bucket ["+bucketName+"] On Node ["+nodeName+"]";
-    }
+    }**/
 }
