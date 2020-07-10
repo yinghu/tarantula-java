@@ -6,6 +6,7 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 import com.tarantula.TarantulaLogger;
 import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.TarantulaContext;
 
 import java.util.Properties;
 
@@ -13,9 +14,11 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     private static TarantulaLogger log = JDKLogger.getLogger(ClusterRecoverService.class);
 
     private NodeEngine nodeEngine;
+    private TarantulaContext tarantulaContext;
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.nodeEngine = nodeEngine;
+        tarantulaContext = TarantulaContext.getInstance();
         log.warn("Cluster Recover Service Started");
     }
 
@@ -39,6 +42,11 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
 
     }
     public byte[] load(String source,byte[] key){
-        return source.getBytes();
+        log.warn("Recovering ["+new String(key)+"]from ["+source+"]");
+        String[] src = source.split("_");
+        byte[] ret = this.tarantulaContext.dataStore(src[0],tarantulaContext.partitionNumber()).get(key);
+        if(ret!=null){
+        log.warn(new String(ret));}
+        return ret;
     }
 }

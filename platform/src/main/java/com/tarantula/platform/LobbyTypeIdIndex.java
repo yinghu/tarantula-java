@@ -13,13 +13,14 @@ public class LobbyTypeIdIndex extends RecoverableObject {
     public LobbyTypeIdIndex(){
 
     }
-    public LobbyTypeIdIndex(String bucket,String typeId){
-        this.bucket = bucket;
+    //for query
+    public LobbyTypeIdIndex(String bucketId,String typeId){
+        this.bucket = bucketId;
         this.label =  typeId;
     }
-    public LobbyTypeIdIndex(String bucket,String typeId,String index,String owner){
-        this();
-        this.bucket = bucket;
+    //for create
+    public LobbyTypeIdIndex(String bucketId,String typeId,String index,String owner){
+        this.bucket = bucketId;
         this.label =  typeId;
         this.index = index;
         this.owner = owner;//game cluster id

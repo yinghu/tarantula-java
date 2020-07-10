@@ -278,6 +278,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public DeployService deployService(){
         return this.deployService;
     }
+    public RecoverService recoverService(){
+        return this.tarantulaContext.tarantulaCluster().recoverService();
+    }
     private void onDispatch(Event event){
         //dispatch event to registered callback
         this.replicationQueue.offer(event);

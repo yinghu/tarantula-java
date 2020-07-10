@@ -26,6 +26,7 @@ public interface ClusterProvider extends Serviceable{
     //CLUSTERING SERVICE
     AccessIndexService accessIndexService();
     DeployService deployService();
+    RecoverService recoverService();
     boolean onPartition(byte[] key);
 
     //CLUSTER KEY VALUE STORE WITH KEY INDEX

@@ -249,7 +249,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     }
 	public OnLobby configure(LobbyConfiguration conf) throws Exception{
 		DefaultLobby lb = this.setLobby(conf.descriptor);
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(lb.descriptor().bucket(),lb.descriptor().typeId());
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(lb.descriptor().owner(),lb.descriptor().typeId());
         masterDataStore().load(lobbyTypeIdIndex);
         GameCluster gameCluster = new GameCluster();
         gameCluster.distributionKey(lobbyTypeIdIndex.owner);

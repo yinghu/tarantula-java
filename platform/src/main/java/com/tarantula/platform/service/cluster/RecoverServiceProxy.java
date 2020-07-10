@@ -5,7 +5,6 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;
-import com.tarantula.platform.service.DeployService;
 import com.tarantula.platform.service.RecoverService;
 import com.tarantula.platform.service.ServiceContext;
 
@@ -14,8 +13,8 @@ import java.util.concurrent.Future;
 public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecoverService> implements RecoverService {
 
     private String objectName;
-    public RecoverServiceProxy(String objectName, NodeEngine nodeEngine, ClusterRecoverService deployServiceService){
-        super(nodeEngine,deployServiceService);
+    public RecoverServiceProxy(String objectName, NodeEngine nodeEngine, ClusterRecoverService clusterRecoverService){
+        super(nodeEngine,clusterRecoverService);
         this.objectName = objectName;
     }
 
@@ -59,7 +58,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     public byte[] recover(String source, byte[] key) {
         NodeEngine nodeEngine = getNodeEngine();
         RecoverOperation operation = new RecoverOperation(source,key);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<byte[]> future = builder.invoke();
             return future.get(); //retry if timeout

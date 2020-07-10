@@ -49,6 +49,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     private ConcurrentHashMap<Integer,RecoverableListener> rMap = new ConcurrentHashMap<>();
     private String memberId;
     private DeployService deployService;
+    private RecoverService recoverService;
     private ConcurrentHashMap<String,EventListener> eMap = new ConcurrentHashMap<>();
     private MetricsListener metricsListener;
 
@@ -63,6 +64,9 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     }
     public DeployService deployService(){
         return this.deployService;
+    }
+    public RecoverService recoverService(){
+        return this.recoverService;
     }
     public EventService subscribe(String topic, EventListener callback){
         this.eventSubscribers.computeIfAbsent(topic,(t)->{
@@ -195,6 +199,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         mIndex = this._hazel.getMultiMap(INDEX_MAP);
         vMap = this._hazel.getMap(VALUE_MAP);
         this.deployService = this._hazel.getDistributedObject(DeployService.NAME,DeployService.NAME);
+        this.recoverService = this._hazel.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
         memberId = _hazel.getCluster().getLocalMember().getUuid();
         this.subscribe(memberId,this);
         metricsListener = (k,v)->{};

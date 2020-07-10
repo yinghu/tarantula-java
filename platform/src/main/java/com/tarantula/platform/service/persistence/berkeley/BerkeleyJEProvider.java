@@ -308,6 +308,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             }
         }
     }
+    public byte[] onRecovering(Metadata metadata,byte[] key){
+        return this.dataCluster.recoverService().recover(metadata.source(),key);
+    }
     /**
     public void onLoaded(Metadata metadata,byte[] key,byte[] value){
         if(metadata.scope()==Recoverable.DATA_SCOPE){
@@ -597,8 +600,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         }
         public void traverse(Overflow overflow) {
         }
-        public void put(byte[] key,byte[] value){
-        }
+
         public void set(byte[] key,byte[] value){
         }
         public byte[] get(byte[] key){

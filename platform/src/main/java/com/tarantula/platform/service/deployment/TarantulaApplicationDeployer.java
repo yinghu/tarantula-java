@@ -29,7 +29,6 @@ public class TarantulaApplicationDeployer implements Serviceable {
 		ArrayList<LobbyConfiguration> configurations = new ArrayList();
 		bList.forEach((d)->{
 			this.context.setLobby(d);//override the default one
-			//System.out.println(d.typeId()+"<><><>"+d.distributionKey());
 			LobbyConfiguration lcx = new LobbyConfiguration();
 			lcx.descriptor  = d;
 			configurations.add(lcx);

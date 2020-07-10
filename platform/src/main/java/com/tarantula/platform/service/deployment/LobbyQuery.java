@@ -7,16 +7,17 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 
 
 /**
- * Updated by yinghu on 4/8/2019.
+ * Updated by yinghu on 7/10/2020.
  */
 public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {
 
     public static String LABEL = "LB";
 
-    public  String bucket;
 
-    public LobbyQuery(String bucket){
-        this.bucket  = bucket;
+    private   String bucketId;
+
+    public LobbyQuery(String bucketId){
+        this.bucketId  = bucketId;
     }
 
     public LobbyDescriptor create() {
@@ -24,7 +25,7 @@ public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {
     }
 
     public String distributionKey() {
-        return this.bucket;
+        return this.bucketId;
     }
 
     public  int registryId(){

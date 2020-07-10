@@ -21,6 +21,7 @@ public interface MapStoreListener {
     byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending);
 
     void onDistributing(Metadata metadata,byte[] key, byte[] value);
+    byte[] onRecovering(Metadata metadata,byte[] key);
 
     int onVersioning(Metadata metadata);
 

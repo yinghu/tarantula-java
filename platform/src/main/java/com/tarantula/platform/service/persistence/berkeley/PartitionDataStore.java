@@ -235,6 +235,8 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] key = akey.getBytes();
             byte[] value;
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
+            log.warn(t.getClassId()+"///"+t.getFactoryId());
+            this.mapStoreListener.onRecovering(dso.metadata,key);
             if((value=_get(dso,key))==null){
                 if((value=mapStoreListener.onLoading(dso.metadata,akey))==null){
                     return false;
@@ -278,9 +280,9 @@ public class PartitionDataStore extends ReplicatedDataStore{
             cursor.close();
         }
     }
-    public void put(byte[] key,byte[] value){
-        _put(this.partitions[SystemUtil.partition(key,partition)],key,value);
-    }
+    //public void put(byte[] key,byte[] value){
+        //_put(this.partitions[SystemUtil.partition(key,partition)],key,value);
+    //}
     @Override
     public void set(byte[] key, byte[] value) {
         try{
@@ -366,35 +368,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
         }
 
     }
-    /**
-    private <T extends Recoverable> boolean _set(T t,byte[] key,byte[] value) throws Exception{
-        DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-        if(_put(dso,key,value)){
-            //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),dso.partition,false),key,value);
-            if(t.onEdge()){
-                IndexSet indexSet = new IndexSet();
-                indexSet.distributionKey(t.owner());
-                indexSet.label(t.label());
-                byte[] owner = (t.owner()+Recoverable.PATH_SEPARATOR+t.label()).getBytes(ENCODING);
-                byte[] v;
-                DataStoreOnPartition edo = partitions[SystemUtil.partition(owner,partition)];
-                if((v= _get(edo,owner))!=null){
-                    //append
-                    indexSet.fromMap(SystemUtil.toMap(v));
-                }
-                indexSet.keySet.add(new String(key));
-                //ignore if insert failed
-                v = SystemUtil.toJson(indexSet.toMap());
-                if(_put(edo,owner,v)){
-                    //send replication
-                    //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),edo.partition,true),owner,v);
-                }
-            }
-            return true;
-        }else{
-            return true;
-        }
-    }**/
     private boolean _put(DataStoreOnPartition dso,byte[] key,byte[] value){
         return dso.database.put(null,new DatabaseEntry(key),new DatabaseEntry(value))==OperationStatus.SUCCESS;
     }
