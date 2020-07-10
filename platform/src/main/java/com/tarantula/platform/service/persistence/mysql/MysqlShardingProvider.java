@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.persistence.mysql;
 
 import com.tarantula.Metadata;
+import com.tarantula.Recoverable;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.service.persistence.Shard;
 import com.tarantula.platform.service.persistence.ShardingProvider;
@@ -86,7 +87,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                     pstm.execute();
                     pstm.close();
                 }catch (Exception ignore){
-                    //log.warn("Error on register data store"+name+"->"+ignore.getMessage());
+                    log.warn("Error on register data store"+name+"->"+ignore.getMessage());
                 }
                 con.close();
             }
@@ -117,7 +118,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                         pstm.execute();
                         pstm.clearParameters();
                     }catch (Exception ignore){
-                        //log.warn("Error on register data store"+prefix+i+"->"+ignore.getMessage());
+                        log.warn("Error on register data store"+prefix+i+"->"+ignore.getMessage());
                     }
                 }
                 pstm.close();
@@ -127,6 +128,13 @@ public class MysqlShardingProvider implements ShardingProvider {
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
+    }
+    public <T extends Recoverable> byte[] create(Metadata metadata, String key, T t){
+        if(!enabled){
+            log.warn("Data backup is disabled->"+key);
+            return SystemUtil.toJson(t.toMap());
+        }
+        return null;
     }
     public byte[] create(Metadata metadata, String key, Map<String,Object> data){
         if(!enabled){
@@ -153,7 +161,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                 connection.close();
             }
         }catch (Exception ex){
-            //log.warn("error on create->"+ex.getMessage());
+            log.warn("error on create->"+ex.getMessage());
             return null;
         }
     }

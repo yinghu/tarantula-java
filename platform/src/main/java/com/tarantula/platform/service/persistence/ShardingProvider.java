@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.persistence;
 
 import com.tarantula.Metadata;
+import com.tarantula.Recoverable;
 import com.tarantula.platform.service.Serviceable;
 
 import java.util.Map;
@@ -20,4 +21,5 @@ public interface ShardingProvider extends Serviceable {
     byte[] load(Metadata metadata,String key);
     byte[] update(Metadata metadata,String key,Map<String,Object> data);
 
+    <T extends Recoverable> byte[] create(Metadata metadata, String key, T t);
 }
