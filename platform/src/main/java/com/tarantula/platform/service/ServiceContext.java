@@ -9,8 +9,6 @@ import java.util.concurrent.ScheduledFuture;
  */
 public interface ServiceContext {
 
-    //create none-partitioned integration scope data store
-    //DataStore dataStore(String name);
     //create data scope partitioned data store
     DataStore dataStore(String name,int partition);
 
@@ -25,6 +23,8 @@ public interface ServiceContext {
     int partitionNumber();
     Connection endpoint();
     String bucket();
+    String bucketId();
+    String nodeId();
     RecoverableRegistry recoverableRegistry(int registryId);
     TokenValidatorProvider.AuthVendor authVendor(String name);
 

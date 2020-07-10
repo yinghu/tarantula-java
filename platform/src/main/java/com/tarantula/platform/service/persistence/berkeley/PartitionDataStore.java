@@ -319,6 +319,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             String akey = (query.distributionKey() + Recoverable.PATH_SEPARATOR + query.label());
             byte[] owner = akey.getBytes();
             DataStoreOnPartition dso = partitions[SystemUtil.partition(owner,partition)];
+            this.mapStoreListener.onRecovering(dso.metadata,owner);
             byte[] edgeList = _get(dso,owner);
             if(edgeList==null){
                 return;

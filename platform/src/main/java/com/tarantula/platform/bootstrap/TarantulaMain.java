@@ -84,7 +84,7 @@ public class TarantulaMain {
 			btx.dataBucketGroup = override(overriding,"tarantula.data.bucket.group",_user,_config);
 			btx.dataBucketNode = override(overriding,"tarantula.data.bucket.node",_user,_config);
 			btx.dataStoreDir = override(overriding,"tarantula.data.store.dir",_user,_config);
-			btx.dataStoreRecoveryDir = override(overriding,"tarantula.data.store.recovery.dir",_user,_config);
+			//btx.dataStoreRecoveryDir = override(overriding,"tarantula.data.store.recovery.dir",_user,_config);
 			btx.dataReplicationThreadPoolSetting = override(overriding,"tarantula.data.replication.pool.setting",_user,_config);
             btx.eventThreadPoolSetting = override(overriding,"tarantula.event.pool.setting",_user,_config);
             btx.retries  = Integer.parseInt(override(overriding,"tarantula.event.max.retries",_user,_config));

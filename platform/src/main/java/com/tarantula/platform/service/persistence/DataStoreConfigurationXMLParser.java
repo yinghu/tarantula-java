@@ -34,7 +34,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
 
     private String dataStoreProviderConfiguration;
     private String dataDir;
-    private String dataRecoveryDir;
+    //private String dataRecoveryDir;
 
     private int partitionNumber;
     private int accessIndexPartitionNumber;
@@ -50,7 +50,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
         this.partitionNumber = tx.partitionNumber();
         this.accessIndexPartitionNumber = tx.accessIndexRoutingNumber;
         this.dataDir = tx.dataStoreDir;
-        this.dataRecoveryDir = tx.dataStoreRecoveryDir;
+        //this.dataRecoveryDir = tx.dataStoreRecoveryDir;
         this.dataStoreDailyBackup = tx.dataStoreDailyBackup?"true":"false";
         this._loaded = _providers;
         this.tarantulaContext = tx;
@@ -102,7 +102,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             properties.put("node",this.dataBucketNode);
             properties.put("partitionNumber",this.partitionNumber+"");
             properties.put("dir",this.dataDir);
-            properties.put("recoveryDir",this.dataRecoveryDir);
+            //properties.put("recoveryDir",this.dataRecoveryDir);
             properties.put("dailyBackup",dataStoreDailyBackup);
             this.currentLoad = name.trim();
         }

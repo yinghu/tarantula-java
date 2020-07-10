@@ -14,11 +14,6 @@ public class ServiceContextProxy implements ServiceContext {
         this.tarantulaContext = tarantulaContext;
     }
 
-    //@Override
-    //public DataStore dataStore(String name) {
-        //return this.tarantulaContext.dataStore(name);
-    //}
-
     @Override
     public DataStore dataStore(String name, int partition) {
         return this.tarantulaContext.dataStore(name,partition);
@@ -71,7 +66,12 @@ public class ServiceContextProxy implements ServiceContext {
     public String bucket() {
         return this.tarantulaContext.bucket();
     }
-
+    public String bucketId(){
+        return this.tarantulaContext.bucketId();
+    }
+    public String nodeId(){
+        return this.tarantulaContext.nodeId();
+    }
     @Override
     public RecoverableRegistry recoverableRegistry(int registryId) {
         return this.tarantulaContext.recoverableRegistry(registryId);

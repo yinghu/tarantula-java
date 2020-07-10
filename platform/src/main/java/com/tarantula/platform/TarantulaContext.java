@@ -103,7 +103,7 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     public String dataReplicationThreadPoolSetting;
 
     public String dataStoreDir;
-    public String dataStoreRecoveryDir;
+    //public String dataStoreRecoveryDir;
 
     public int bootstrapRetries = 1 ;
     public String dataStoreMaster;
@@ -522,6 +522,12 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     }
     public String bucket(){
  	    return this.dataBucketGroup;
+    }
+    public String bucketId(){
+ 	    return "bid";
+    }
+    public String nodeId(){
+        return "nid";
     }
     public static MemberDiscovery memberDiscovery(int scope){
  	    memberDiscovery.scope(scope);
