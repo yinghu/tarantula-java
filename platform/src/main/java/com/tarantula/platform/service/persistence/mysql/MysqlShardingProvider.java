@@ -1,8 +1,10 @@
 package com.tarantula.platform.service.persistence.mysql;
 
+import com.tarantula.Distributable;
 import com.tarantula.Metadata;
 import com.tarantula.Recoverable;
 import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.service.cluster.PartitionState;
 import com.tarantula.platform.service.persistence.Shard;
 import com.tarantula.platform.service.persistence.ShardingProvider;
 import com.tarantula.platform.util.SystemUtil;
@@ -24,6 +26,7 @@ public class MysqlShardingProvider implements ShardingProvider {
     private String name;
     private int scope;
     private int shards;
+    private PartitionState[] partitionStates;
     private boolean enabled;
     private boolean backup;
     private Shard[] shardList;
@@ -58,7 +61,10 @@ public class MysqlShardingProvider implements ShardingProvider {
         this.shards = Integer.parseInt(properties.get("shards"));
         this.enabled = Boolean.parseBoolean(properties.get("enabled"));
         this.backup = Boolean.parseBoolean(properties.get("backup"));
+        int pno = scope== Distributable.INTEGRATION_SCOPE?Integer.parseInt(properties.get("p1")):Integer.parseInt(properties.get("p2"));
+        this.partitionStates = new PartitionState[pno];
         this.shardList = new Shard[shards];
+        log.warn("Sharding provider partitions->"+pno+"<>"+scope+"<>"+name);
     }
 
     @Override
@@ -77,6 +83,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                 Statement cmd = con.createStatement();
                 cmd.execute("CREATE TABLE IF NOT EXISTS "+name+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON,c INT NOT NULL,f INT NOT NULL, INDEX ix_c(c), INDEX ix_f(f))");
                 cmd.close();
+                /**
                 try{
                     PreparedStatement pstm = con.prepareStatement("INSERT INTO meta_info VALUES (?,?,?,?,?)");
                     pstm.setString(1,name);
@@ -88,7 +95,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                     pstm.close();
                 }catch (Exception ignore){
                     log.warn("Error on register data store"+name+"->"+ignore.getMessage());
-                }
+                }**/
                 con.close();
             }
         }catch (Exception ex){
@@ -106,22 +113,22 @@ public class MysqlShardingProvider implements ShardingProvider {
             for(Shard shard : shardList){
                 Connection con = shard.connection();
                 Statement cmd = con.createStatement();
-                PreparedStatement pstm = con.prepareStatement("INSERT INTO meta_info VALUES (?,?,?,?,?)");
+                //PreparedStatement pstm = con.prepareStatement("INSERT INTO meta_info VALUES (?,?,?,?,?)");
                 for(int i=0;i<partitions;i++){
                     try{
                         cmd.execute("CREATE TABLE IF NOT EXISTS "+prefix+"_"+i+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON,c INT NOT NULL,f INT NOT NULL, INDEX ix_c(c),INDEX ix_f(f))");
-                        pstm.setString(1,prefix+"_"+i);
-                        pstm.setString(2,"node");
-                        pstm.setString(3,"bucket");
-                        pstm.setInt(4,0);
-                        pstm.setInt(5,0);
-                        pstm.execute();
-                        pstm.clearParameters();
+                        //pstm.setString(1,prefix+"_"+i);
+                        //pstm.setString(2,"node");
+                        //pstm.setString(3,"bucket");
+                        //pstm.setInt(4,0);
+                        //pstm.setInt(5,0);
+                        //pstm.execute();
+                        //pstm.clearParameters();
                     }catch (Exception ignore){
                         log.warn("Error on register data store"+prefix+i+"->"+ignore.getMessage());
                     }
                 }
-                pstm.close();
+                //pstm.close();
                 cmd.close();
                 con.close();
             }

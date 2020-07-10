@@ -37,6 +37,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
     private String dataRecoveryDir;
 
     private int partitionNumber;
+    private int accessIndexPartitionNumber;
     private String dataStoreDailyBackup;
 
     private ShardingProvider shardingProvider;
@@ -46,6 +47,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
         this.dataBucketGroup = tx.dataBucketGroup;
         this.dataBucketNode = tx.dataBucketNode;
         this.partitionNumber = tx.partitionNumber();
+        this.accessIndexPartitionNumber = tx.accessIndexRoutingNumber;
         this.dataDir = tx.dataStoreDir;
         this.dataRecoveryDir = tx.dataStoreRecoveryDir;
         this.dataStoreDailyBackup = tx.dataStoreDailyBackup?"true":"false";
@@ -107,6 +109,8 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             HashMap<String,String> _cfg = new HashMap<>();
             _cfg.put("name",attributes.getValue("name"));
             _cfg.put("scope",attributes.getValue("scope"));
+            _cfg.put("p2",this.partitionNumber+"");
+            _cfg.put("p1",this.accessIndexPartitionNumber+"");
             _cfg.put("shards",attributes.getValue("shards"));
             _cfg.put("enabled",attributes.getValue("enabled"));
             this.shardingProvider.configure(_cfg);
