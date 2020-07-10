@@ -51,7 +51,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
 
     private Node node;
 
-    private EventService dataScopePublisher;
+    //private EventService dataScopePublisher;
     //private EventService integrationScopePublisher;
 
     private ClusterProvider dataCluster;
@@ -143,14 +143,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.dataCluster = serviceContext.clusterProvider(Distributable.DATA_SCOPE);
-        this.dataScopePublisher = serviceContext.eventService(Distributable.DATA_SCOPE);
+        //this.dataScopePublisher = serviceContext.eventService(Distributable.DATA_SCOPE);
         this.integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.integrationCluster.addBucketListener(this);
         //this.integrationScopePublisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
     }
     @Override
     public void waitForData() {
-        this.dataCluster.subscribe(this.replicationTopic,this);
+        //this.dataCluster.subscribe(this.replicationTopic,this);
         //this.integrationCluster.subscribe(this.backupTopic,this);
     }
     @Override
