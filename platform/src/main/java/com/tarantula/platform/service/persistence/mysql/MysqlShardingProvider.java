@@ -66,6 +66,9 @@ public class MysqlShardingProvider implements ShardingProvider {
         this.backup = Boolean.parseBoolean(properties.get("backup"));
         int pno = scope== Distributable.INTEGRATION_SCOPE?Integer.parseInt(properties.get("p1")):Integer.parseInt(properties.get("p2"));
         this.partitionStates = new PartitionState[pno];
+        for(int i=0;i<pno;i++){
+            this.partitionStates[i]=new PartitionState(i,false);
+        }
         this.shardList = new Shard[shards];
         log.warn("Sharding provider partitions->"+pno+"<>"+scope+"<>"+name);
     }
