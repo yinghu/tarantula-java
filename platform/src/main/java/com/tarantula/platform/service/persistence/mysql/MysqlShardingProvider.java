@@ -26,6 +26,7 @@ public class MysqlShardingProvider implements ShardingProvider {
     private String name;
     private int scope;
     private int shards;
+    private String node;
     private PartitionState[] partitionStates;
     private boolean enabled;
     private boolean backup;
@@ -57,6 +58,7 @@ public class MysqlShardingProvider implements ShardingProvider {
     @Override
     public void configure(Map<String, String> properties) {
         this.name = properties.get("name");
+        this.node = properties.get("node");
         this.scope = Integer.parseInt(properties.get("scope"));
         this.shards = Integer.parseInt(properties.get("shards"));
         this.enabled = Boolean.parseBoolean(properties.get("enabled"));
@@ -141,7 +143,30 @@ public class MysqlShardingProvider implements ShardingProvider {
             log.warn("Data backup is disabled->"+key);
             return SystemUtil.toJson(t.toMap());
         }
-        return null;
+        try{
+            Map<String,Object> data = t.toMap();
+            Connection connection = shardList[metadata.partition()%shards].connection();
+            try{
+                PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?,?,?)");
+                preparedStatement.setString(1,key);
+                String ret = SystemUtil.toJsonString(data);
+                log.warn("CREATE KEY->"+key+"<><>"+ret);
+                preparedStatement.setString(2, ret);
+                preparedStatement.setInt(3,t.getClassId());
+                preparedStatement.setInt(4,t.getFactoryId());
+                preparedStatement.execute();
+                preparedStatement.close();
+                return ret.getBytes();
+            }catch (Exception eex){
+                throw new RuntimeException(eex.getMessage());
+            }
+            finally {
+                connection.close();
+            }
+        }catch (Exception ex){
+            log.warn("error on create->"+ex.getMessage());
+            return null;
+        }
     }
     public byte[] create(Metadata metadata, String key, Map<String,Object> data){
         if(!enabled){
@@ -225,6 +250,29 @@ public class MysqlShardingProvider implements ShardingProvider {
         }catch (Exception ex){
             log.warn("error on update->"+ex.getMessage());
             return null;
+        }
+    }
+
+    @Override
+    public void onBucket(int bucket, int state) {
+        log.warn("Bucket->"+bucket+"<><>"+state);
+        try{
+            Connection connection = shardList[bucket%shards].connection();
+            try{
+                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE meta_info SET n=?,v=v+1 WHERE p=?");
+                preparedStatement.setString(1,node);
+                preparedStatement.setInt(2,bucket);
+                preparedStatement.execute();
+                preparedStatement.close();
+            }catch (Exception eex){
+                throw new RuntimeException(eex.getMessage());
+            }
+            finally {
+                connection.close();
+            }
+        }catch (Exception ex){
+            log.warn("error on update->"+ex.getMessage());
+            //return null;
         }
     }
 }

@@ -42,6 +42,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
 
     private ShardingProvider shardingProvider;
     private Shard shard;
+    private TarantulaContext tarantulaContext;
     public DataStoreConfigurationXMLParser(String dconfig,TarantulaContext tx, ConcurrentHashMap<String,ServiceProvider> _providers){
         this.dataStoreProviderConfiguration = dconfig;
         this.dataBucketGroup = tx.dataBucketGroup;
@@ -52,6 +53,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
         this.dataRecoveryDir = tx.dataStoreRecoveryDir;
         this.dataStoreDailyBackup = tx.dataStoreDailyBackup?"true":"false";
         this._loaded = _providers;
+        this.tarantulaContext = tx;
     }
     private void parse(InputStream xml) throws Exception{
         SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -111,6 +113,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             _cfg.put("scope",attributes.getValue("scope"));
             _cfg.put("p2",this.partitionNumber+"");
             _cfg.put("p1",this.accessIndexPartitionNumber+"");
+            _cfg.put("node",tarantulaContext.dataBucketNode);
             _cfg.put("shards",attributes.getValue("shards"));
             _cfg.put("enabled",attributes.getValue("enabled"));
             this.shardingProvider.configure(_cfg);
@@ -143,6 +146,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
     void _start(DataStoreProvider ds){
         try{
             ds.start();
+            ds.setup(this.tarantulaContext);
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }

@@ -12,6 +12,9 @@ public interface MapStoreListener {
 
     //call on create
     byte[] onCreating(Metadata metadata,String key,Map<String,Object> creating);
+
+    <T extends Recoverable> byte[] onCreating(Metadata metadata,String key,T t);
+
     //call on load
     byte[] onLoading(Metadata metadata,String key);
 

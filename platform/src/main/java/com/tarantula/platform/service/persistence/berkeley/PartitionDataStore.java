@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 //data scope data store
 public class PartitionDataStore extends ReplicatedDataStore{
-    private static String ENCODING = "UTF-8";
+    //private static String ENCODING = "UTF-8";
     private final DataStoreOnPartition[] partitions;
     private final int partition;
     private final String bucket;
@@ -87,7 +87,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 t.oid(SystemUtil.oid());
                 okey = t.key().asString();
             }
-            byte[] key = okey.getBytes(ENCODING);
+            byte[] key = okey.getBytes();
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             byte[] value = SystemUtil.toJson(t.toMap());
             boolean suc = _put(dso,key,value);
@@ -156,7 +156,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             if(akey==null){
                 return false;
             }
-            byte[] key = akey.getBytes(ENCODING);
+            byte[] key = akey.getBytes();
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
             byte[] value = SystemUtil.toJson(t.toMap());
             if(_put(dso,key,value)){
@@ -189,7 +189,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 t.oid(SystemUtil.oid());
                 akey = t.key().asString();
             }
-            byte[] key = akey.getBytes(ENCODING);
+            byte[] key = akey.getBytes();
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             byte[] v;
             boolean suc;
@@ -229,10 +229,14 @@ public class PartitionDataStore extends ReplicatedDataStore{
             if(akey==null){
                 return false;
             }
-            byte[] key = akey.getBytes(ENCODING);
+            byte[] key = akey.getBytes();
             byte[] value;
-            if((value=_get(partitions[SystemUtil.partition(key,partition)],key))==null){
-                return false;
+            DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
+            if((value=_get(dso,key))==null){
+                if((value=mapStoreListener.onLoading(dso.metadata,akey))==null){
+                    return false;
+                }
+                _put(dso,key,value);
             }
             Map<String,Object> _map = SystemUtil.toMap(value);
             t.fromMap(_map);
@@ -305,7 +309,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
     public <T extends Recoverable> void list(RecoverableFactory<T> query, Stream<T> stream) {
         try {
             String akey = (query.distributionKey() + Recoverable.PATH_SEPARATOR + query.label());
-            byte[] owner = akey.getBytes(ENCODING);
+            byte[] owner = akey.getBytes();
             DataStoreOnPartition dso = partitions[SystemUtil.partition(owner,partition)];
             byte[] edgeList = _get(dso,owner);
             if(edgeList==null){

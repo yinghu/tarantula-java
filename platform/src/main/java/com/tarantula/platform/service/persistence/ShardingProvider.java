@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
+import com.tarantula.BucketListener;
 import com.tarantula.Metadata;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.service.Serviceable;
@@ -8,7 +9,7 @@ import java.util.Map;
 /**
  * Created by yinghu on 7/5/2020.
  */
-public interface ShardingProvider extends Serviceable {
+public interface ShardingProvider extends Serviceable, BucketListener {
 
     String name();
     int scope();

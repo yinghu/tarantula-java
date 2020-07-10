@@ -36,7 +36,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
 
     private static JDKLogger log = JDKLogger.getLogger(BerkeleyJEProvider.class);
 
-    private static String ENCODING = "UTF-8";
+    //private static String ENCODING = "UTF-8";
 
     private String dataPath;
     private String integrationPath;
@@ -262,6 +262,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             return dShardingProvider.create(metadata,key,creating);
         }
     }
+    public <T extends Recoverable> byte[] onCreating(Metadata metadata,String key,T t){
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+            return iShardingProvider.create(metadata,key,t);
+        }
+        else{
+            return dShardingProvider.create(metadata,key,t);
+        }
+    }
     @Override
     public byte[] onLoading(Metadata metadata,String key){
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
@@ -482,6 +490,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     public void onBucket(int _bucket, int state) {
         //notify partitions updated
         log.warn("bucket->"+_bucket+"<>"+state);
+        dShardingProvider.onBucket(_bucket,state);
     }
 
     //partial implementation of createIfAbsent and load for access index persistence
@@ -546,10 +555,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 if(akey==null){//must be not null
                     return false;
                 }
-                byte[] key = akey.getBytes(ENCODING);
-                byte[] v = mapStoreListener.onCreating(metadata1,akey,t.toMap());
+                byte[] v = mapStoreListener.onCreating(metadata1,akey,t);
                 if(v!=null){
-                    return _set(key,v);//set(t,key,SystemUtil.toJson(t.toMap()));
+                    return _set(akey.getBytes(),v);//set(t,key,SystemUtil.toJson(t.toMap()));
                 }
                 return false;
             }catch (Exception ex){
@@ -568,7 +576,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 if(akey==null){
                     return false;
                 }
-                byte[] key = akey.getBytes(ENCODING);
+                byte[] key = akey.getBytes();
                 byte[] value;
                 if((value=_get(key))==null){
                     value = mapStoreListener.onLoading(metadata1,akey);
