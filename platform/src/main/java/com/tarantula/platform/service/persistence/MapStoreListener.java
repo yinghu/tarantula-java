@@ -22,4 +22,6 @@ public interface MapStoreListener {
 
     void onDistributing(Metadata metadata,byte[] key, byte[] value);
 
+    int onVersioning(Metadata metadata);
+
 }

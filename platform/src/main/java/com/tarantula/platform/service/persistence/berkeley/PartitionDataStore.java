@@ -89,12 +89,15 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = okey.getBytes();
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
-            byte[] value = SystemUtil.toJson(t.toMap());
+            int v = mapStoreListener.onVersioning(dso.metadata);
+            Map<String,Object> md = t.toMap();
+            md.put("version",v);
+            byte[] value = SystemUtil.toJson(md);
             boolean suc = _put(dso,key,value);
             if(suc){
                 //do backup and replication
                 if(t.backup()){
-                    this.mapStoreListener.onCreating(dso.metadata,okey,t.toMap());
+                    this.mapStoreListener.onCreating(dso.metadata,okey,md);
                 }
                 this.mapStoreListener.onDistributing(dso.metadata,key,value);
                 if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
@@ -237,6 +240,9 @@ public class PartitionDataStore extends ReplicatedDataStore{
                     return false;
                 }
                 _put(dso,key,value);
+            }
+            else{//validation
+
             }
             Map<String,Object> _map = SystemUtil.toMap(value);
             t.fromMap(_map);

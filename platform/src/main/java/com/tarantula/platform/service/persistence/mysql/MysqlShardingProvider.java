@@ -89,19 +89,6 @@ public class MysqlShardingProvider implements ShardingProvider {
                 Statement cmd = con.createStatement();
                 cmd.execute("CREATE TABLE IF NOT EXISTS "+name+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON,c INT NOT NULL,f INT NOT NULL, INDEX ix_c(c), INDEX ix_f(f))");
                 cmd.close();
-                /**
-                try{
-                    PreparedStatement pstm = con.prepareStatement("INSERT INTO meta_info VALUES (?,?,?,?,?)");
-                    pstm.setString(1,name);
-                    pstm.setString(2,"node");
-                    pstm.setString(3,"bucket");
-                    pstm.setInt(4,0);
-                    pstm.setInt(5,0);
-                    pstm.execute();
-                    pstm.close();
-                }catch (Exception ignore){
-                    log.warn("Error on register data store"+name+"->"+ignore.getMessage());
-                }**/
                 con.close();
             }
         }catch (Exception ex){
@@ -119,28 +106,22 @@ public class MysqlShardingProvider implements ShardingProvider {
             for(Shard shard : shardList){
                 Connection con = shard.connection();
                 Statement cmd = con.createStatement();
-                //PreparedStatement pstm = con.prepareStatement("INSERT INTO meta_info VALUES (?,?,?,?,?)");
                 for(int i=0;i<partitions;i++){
                     try{
                         cmd.execute("CREATE TABLE IF NOT EXISTS "+prefix+"_"+i+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON,c INT NOT NULL,f INT NOT NULL, INDEX ix_c(c),INDEX ix_f(f))");
-                        //pstm.setString(1,prefix+"_"+i);
-                        //pstm.setString(2,"node");
-                        //pstm.setString(3,"bucket");
-                        //pstm.setInt(4,0);
-                        //pstm.setInt(5,0);
-                        //pstm.execute();
-                        //pstm.clearParameters();
                     }catch (Exception ignore){
                         log.warn("Error on register data store"+prefix+i+"->"+ignore.getMessage());
                     }
                 }
-                //pstm.close();
                 cmd.close();
                 con.close();
             }
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
+    }
+    public int version(int bucket){
+        return this.partitionStates[bucket].version;
     }
     public <T extends Recoverable> byte[] create(Metadata metadata, String key, T t){
         if(!enabled){
@@ -216,6 +197,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                 if(rs.next()){
                     ret = rs.getString("v").getBytes();
                 }
+                rs.close();
                 preparedStatement.close();
                 return ret;
             }catch (Exception eex){
@@ -272,6 +254,15 @@ public class MysqlShardingProvider implements ShardingProvider {
                 preparedStatement.setInt(2,bucket);
                 preparedStatement.execute();
                 preparedStatement.close();
+                preparedStatement = connection.prepareStatement("SELECT v FROM meta_info WHERE p=?");
+                preparedStatement.setInt(1,bucket);
+                ResultSet rs = preparedStatement.executeQuery();
+                if(rs.next()){
+                    partitionStates[bucket].version = rs.getInt("v");
+                }
+                rs.close();
+                preparedStatement.close();
+                log.warn("Bucket->"+bucket+"<version>"+partitionStates[bucket].version);
             }catch (Exception eex){
                 throw new RuntimeException(eex.getMessage());
             }

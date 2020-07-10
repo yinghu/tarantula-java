@@ -23,4 +23,5 @@ public interface ShardingProvider extends Serviceable, BucketListener {
     byte[] update(Metadata metadata,String key,Map<String,Object> data);
 
     <T extends Recoverable> byte[] create(Metadata metadata, String key, T t);
+    int version(int bucket);
 }

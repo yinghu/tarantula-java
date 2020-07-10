@@ -253,6 +253,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     }
     private void migrateFromIntegrationScope(Event mve){
     }
+    public int onVersioning(Metadata metadata){
+        return this.dShardingProvider.version(metadata.partition());
+    }
     @Override
     public byte[] onCreating(Metadata metadata,String key,Map<String,Object> creating){
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
