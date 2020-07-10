@@ -4,6 +4,7 @@ import com.tarantula.Distributable;
 import com.tarantula.Metadata;
 import com.tarantula.Recoverable;
 import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.service.BucketReceiver;
 import com.tarantula.platform.service.cluster.PartitionState;
 import com.tarantula.platform.service.persistence.Shard;
 import com.tarantula.platform.service.persistence.ShardingProvider;
@@ -256,6 +257,10 @@ public class MysqlShardingProvider implements ShardingProvider {
     @Override
     public void onBucket(int bucket, int state) {
         log.warn("Bucket->"+bucket+"<><>"+state);
+        partitionStates[bucket].opening = state== BucketReceiver.OPEN;
+        if(!partitionStates[bucket].opening){
+            return;
+        }
         try{
             Connection connection = shardList[bucket%shards].connection();
             try{
