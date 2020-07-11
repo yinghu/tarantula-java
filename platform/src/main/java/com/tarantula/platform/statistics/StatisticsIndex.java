@@ -17,7 +17,7 @@ public class StatisticsIndex extends RecoverableObject implements Statistics {
     private Map<String,StatisticsEntry> mappings = new ConcurrentHashMap<>();
 
     public StatisticsIndex(){
-        this.vertex = "Stats";
+        this.label = "Stats";
     }
 
     public Entry entry(String key) {
@@ -75,6 +75,6 @@ public class StatisticsIndex extends RecoverableObject implements Statistics {
     }
     @Override
     public Key key(){
-        return new AssociateKey(this.bucket,this.oid,this.vertex);
+        return new AssociateKey(this.bucket,this.oid,this.label);
     }
 }

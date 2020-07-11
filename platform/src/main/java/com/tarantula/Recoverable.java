@@ -25,9 +25,6 @@ public interface Recoverable extends Distributable{
     boolean disabled();
     void disabled(boolean disabled);
 
-    String vertex();
-    void vertex(String vertex);
-
     String label();
     void label(String label);
 

@@ -23,7 +23,7 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
 
 
     public Rating(){
-        this.vertex = "Rating";
+        this.label = "Rating";
     }
 
     public void update(Stub stub,int rankUpBase,int levelUpBase){
@@ -86,7 +86,7 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
     }
     @Override
     public Recoverable.Key key(){
-        return new AssociateKey(this.bucket,this.oid,this.vertex);
+        return new AssociateKey(this.bucket,this.oid,this.label);
     }
 
 }

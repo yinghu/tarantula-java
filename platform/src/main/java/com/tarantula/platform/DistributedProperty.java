@@ -12,7 +12,6 @@ public class DistributedProperty extends RecoverableObject implements Property{
     public String value;
 
     public DistributedProperty(){
-        this.vertex = "DeploymentProperty";
     }
 
     public DistributedProperty(String name,String value){

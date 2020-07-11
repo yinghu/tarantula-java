@@ -17,7 +17,7 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
     private String classifier;
     private String category;
     public LeaderBoardEntry(){
-        this.vertex ="Entry";
+        //this.vertex ="Entry";
         this.owner="--";
         this.value=0;
         this.timestamp=0;

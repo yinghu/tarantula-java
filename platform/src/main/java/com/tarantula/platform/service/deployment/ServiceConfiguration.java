@@ -9,14 +9,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Updated by yinghu on 4/15/2019.
- */
+ * Updated by yinghu on 7/10/2020
+ * **/
 public class ServiceConfiguration extends DeploymentObject {
 
     public static final String LABEL = "SCG";
 
     public ServiceConfiguration(){
-        this.vertex = "ServiceConfiguration";
+        //this.vertex = "ServiceConfiguration";
         this.label = LABEL;
         this.onEdge = true;
     }

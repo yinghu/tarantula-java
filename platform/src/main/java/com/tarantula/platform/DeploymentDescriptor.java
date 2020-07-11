@@ -13,7 +13,7 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
 
 
     public DeploymentDescriptor(){
-        this.vertex = "DeploymentApplication";
+        //this.vertex = "DeploymentApplication";
         this.onEdge = true;
     }
 

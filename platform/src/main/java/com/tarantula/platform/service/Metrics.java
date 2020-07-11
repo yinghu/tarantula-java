@@ -54,7 +54,7 @@ public class Metrics extends OnApplicationHeader {
     public Statistics statistics;
 
     public Metrics(){
-        this.vertex = "Metrics";
+        this.label = "Metrics";
     }
     public Metrics(String nodeId){
         this();
@@ -71,6 +71,6 @@ public class Metrics extends OnApplicationHeader {
         //skip the natural key
     }
     public Key key(){
-        return new CompositeKey(this.vertex,this.owner);
+        return new CompositeKey(this.label,this.owner);
     }
 }

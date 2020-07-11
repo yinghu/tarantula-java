@@ -41,7 +41,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
 
     public ConcurrentHashMap<Integer,Arena> aMap = new ConcurrentHashMap<>();
     public Zone(){
-        this.vertex = "Zone";
+        this.label = "Zone";
     }
     public Room match(Rating rating){
         //level down matching
@@ -255,7 +255,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     }
     @Override
     public Recoverable.Key key(){
-        return new AssociateKey(this.bucket,this.oid,this.vertex);
+        return new AssociateKey(this.bucket,this.oid,this.label);
     }
     public String toPlayMode(){
         if(playMode == Room.DEDICATED_MODE){

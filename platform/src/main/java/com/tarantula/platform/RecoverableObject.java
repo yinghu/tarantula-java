@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Updated by yinghu on 7/4/2020
+ * Updated by yinghu on 7/10/2020
  */
 public class RecoverableObject implements Recoverable {
 
@@ -22,13 +22,11 @@ public class RecoverableObject implements Recoverable {
 
     protected  Map<String,Object> properties = new HashMap();
 
-    protected  String vertex;
-
     protected  boolean onEdge;
 
     protected long timestamp;
     protected int version;
-    protected boolean backup=true;
+    protected boolean backup;
     protected int routingNumber;
 
     protected boolean distributable;
@@ -71,8 +69,6 @@ public class RecoverableObject implements Recoverable {
     public void owner(String owner){
         this.owner = owner;
     }
-    public String vertex(){ return this.vertex;}
-    public void vertex(String vertex){ this.vertex = vertex;}
 
     public String label(){
         return this.label;

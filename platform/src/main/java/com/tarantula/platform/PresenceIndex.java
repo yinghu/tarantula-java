@@ -3,7 +3,6 @@ package com.tarantula.platform;
 import com.tarantula.*;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;
-import java.nio.ByteBuffer;
 import java.util.Map;
 
 /**
@@ -20,7 +19,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
 
 
     public PresenceIndex(){
-        this.vertex = "Presence";
+        this.label = "Presence";
     }
     public synchronized double balance() {
         return this.balance;
@@ -147,6 +146,6 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
     @Override
     public Key key(){
-        return new AssociateKey(this.bucket,this.oid,this.vertex);
+        return new AssociateKey(this.bucket,this.oid,this.label);
     }
 }

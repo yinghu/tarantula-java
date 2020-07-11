@@ -19,10 +19,10 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     //public static final OnSession TOKEN_NOT_VALID = new OnSessionTrack("TOKEN NOT VALID");
 
     public OnSessionTrack(){
-        this.vertex = "OnSession";
+        //this.vertex = "OnSession";
     }
     public OnSessionTrack(String msg){
-        this();
+        //this();
         this.message = msg;
         this.successful = false;
     }

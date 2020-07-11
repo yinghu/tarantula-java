@@ -17,7 +17,7 @@ public class OnInstanceTrack extends OnApplicationHeader implements OnInstance {
     private int idle;
 
     public OnInstanceTrack(){
-        this.vertex="OnInstance";
+        //this.vertex="OnInstance";
         this.label = "IOI";
         this.onEdge = true;
     }

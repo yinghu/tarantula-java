@@ -23,7 +23,7 @@ public class InstanceIndex  extends OnApplicationHeader implements InstanceRegis
     public List<OnInstance.Listener> onInstanceListener = new CopyOnWriteArrayList<>();
 
     public InstanceIndex(){
-        this.vertex = "InstanceRegistry";
+        //this.vertex = "InstanceRegistry";
         this.label = "INS";
         this.onEdge = true;
     }

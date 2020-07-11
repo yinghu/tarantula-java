@@ -20,7 +20,7 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
     public static final String LABEL = "AFC";
 
     public ApplicationConfiguration(){
-        this.vertex = "ApplicationConfiguration";
+        ///this.vertex = "ApplicationConfiguration";
         this.label = LABEL;
         this.onEdge = true;
     }

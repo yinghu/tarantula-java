@@ -26,7 +26,7 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
 
     private boolean loaded;
     public StatisticsEntry(){
-        this.vertex = "Stats";
+        this.label = "Stats";
     }
     public StatisticsEntry(String bucket,String oid,String name){
         this();
@@ -136,7 +136,7 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     }
     @Override
     public Key key(){
-        return new ResourceKey(this.bucket,this.oid,new String[]{vertex,name});
+        return new ResourceKey(this.bucket,this.oid,new String[]{label,name});
     }
     Statistics.Entry duplicate(){
         return new StatisticsEntry(this);

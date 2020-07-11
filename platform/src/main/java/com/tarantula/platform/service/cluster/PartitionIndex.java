@@ -10,7 +10,7 @@ import java.util.Map;
 public class PartitionIndex extends NoReplicationObject implements DataStore.Updatable, Countable {
 
     public PartitionIndex(){
-        this.vertex="PartitionIndex";
+        //this.vertex="PartitionIndex";
     }
     public PartitionIndex(String bucket,String label,String index,int initialSeed){
         this();
@@ -41,7 +41,7 @@ public class PartitionIndex extends NoReplicationObject implements DataStore.Upd
 
     public String distributionKey() {
         if(this.bucket!=null&&this.label!=null){
-            return new StringBuffer(this.bucket).append(Recoverable.PATH_SEPARATOR).append(vertex).append(Recoverable.PATH_SEPARATOR).append(label).toString();
+            return new StringBuffer(this.bucket).append(Recoverable.PATH_SEPARATOR).append(label).toString();
         }
         else{
             return null;
@@ -57,8 +57,8 @@ public class PartitionIndex extends NoReplicationObject implements DataStore.Upd
             //ignore wrong format key
         }
     }
-    @Override
-    public Key key(){//format bucket/partition
-        return new AssociateKey(this.bucket,vertex,label);
-    }
+    //@Override
+    //public Key key(){//format bucket/partition
+        //return new AssociateKey(this.bucket,label);
+    //}
 }

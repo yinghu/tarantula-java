@@ -19,7 +19,7 @@ public class User extends RecoverableObject implements Access {
     protected String validator;
     protected String role;
     public User(){
-        this.vertex = "User";
+        //this.vertex = "User";
         this.label = "VA";
     }
     public User(String login,boolean validated,String validator){

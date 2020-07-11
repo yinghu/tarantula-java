@@ -7,7 +7,7 @@ import java.util.Map;
 public class LobbyDescriptor extends DefaultDescriptor {
 
     public LobbyDescriptor(){
-        this.vertex = "Lobby";
+        //this.vertex = "Lobby";
         this.label = "LB";
     }
     @Override

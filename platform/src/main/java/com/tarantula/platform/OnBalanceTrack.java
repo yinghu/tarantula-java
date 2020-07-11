@@ -12,10 +12,10 @@ import java.util.Map;
 public class OnBalanceTrack extends OnApplicationHeader implements OnBalance {
 
     public OnBalanceTrack(){
-        this.vertex = "OnBalance";
+       //this.vertex = "OnBalance";
     }
     public OnBalanceTrack(String systemId, double balance){
-        this();
+        //this();
         this.owner = systemId;
         this.balance=balance;
         redeemed = true;
