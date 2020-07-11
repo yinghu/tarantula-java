@@ -4,7 +4,7 @@ package com.tarantula;
 import java.util.List;
 
 /**
- * Updated by yinghu on 6/16/2019.
+ * Updated by yinghu on 7/10/2020.
  */
 public interface DataStore{
 
@@ -27,11 +27,9 @@ public interface DataStore{
     <T extends Recoverable> boolean createIfAbsent(T t, boolean loading);
     <T extends Recoverable> boolean load(T t);
 
-
-    void traverse(Overflow overflow);
-    
     void set(byte[] key,byte[] value);
     byte[] get(byte[] key);
+
     <T extends Recoverable> List<T> list(RecoverableFactory<T> query);
     <T extends Recoverable> void list(RecoverableFactory<T> query,Stream<T> stream);
 
@@ -42,9 +40,7 @@ public interface DataStore{
     interface Stream<T extends Recoverable>{
         boolean on(T t);
     }
-    interface Overflow{
-        boolean on(String ds,int partition,byte[] key,byte[] value);
-    }
+
     interface Updatable{
         void dataStore(DataStore dataStore);
         void update();

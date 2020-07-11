@@ -86,7 +86,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
     }
     public void setup() {
         masterStore = this.tarantulaContext.masterDataStore();
-        localKey = new PartitionIndex(masterStore.bucket(),masterStore.node()+"-nodeId","",1000);
+        localKey = new PartitionIndex(masterStore.bucket(),masterStore.node()+"-partition-id","",1000);
         localKey.dataStore(masterStore);
         masterStore.createIfAbsent(localKey,true);
         for(DataStoreOnPartition dso : dataStoreOnPartitions){

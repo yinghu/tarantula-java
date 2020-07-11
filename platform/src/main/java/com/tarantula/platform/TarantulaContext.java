@@ -510,6 +510,8 @@ public class TarantulaContext implements Serviceable,ServiceContext{
             nid = this.accessIndexService().set(node.nodeName);
         }
         node.nodeId = nid.distributionKey();
+        log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
+        log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
     }
     public boolean deployServiceProvider(ServiceProvider serviceProvider){
         try{
@@ -536,10 +538,10 @@ public class TarantulaContext implements Serviceable,ServiceContext{
  	    return this.dataBucketGroup;
     }
     public String bucketId(){
- 	    return "bid";
+ 	    return node.bucketId;
     }
     public String nodeId(){
-        return "nid";
+        return node.nodeId;
     }
     public static MemberDiscovery memberDiscovery(int scope){
  	    memberDiscovery.scope(scope);

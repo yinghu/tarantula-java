@@ -254,7 +254,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             return false;
         }
     }
-
+    /**
     @Override
     public void traverse(Overflow overflow) {
         for(DataStoreOnPartition dso: partitions){
@@ -279,7 +279,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
         }finally {
             cursor.close();
         }
-    }
+    }**/
     //public void put(byte[] key,byte[] value){
         //_put(this.partitions[SystemUtil.partition(key,partition)],key,value);
     //}

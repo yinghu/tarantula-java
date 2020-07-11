@@ -26,7 +26,7 @@ public class RecoverableObject implements Recoverable {
 
     protected long timestamp;
     protected int version;
-    protected boolean backup;
+    protected boolean backup =true;
     protected int routingNumber;
 
     protected boolean distributable;

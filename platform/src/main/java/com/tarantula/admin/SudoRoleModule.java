@@ -74,13 +74,13 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             DataStore mds = this.context.dataStore(Subscription.DataStore);
             SubscriptionContext sct = new SubscriptionContext();
             sct.subscriptionList = new ArrayList<>();
-            mds.traverse((d,o,k,v)->{
-                Subscription sub = new Membership();
-                sub.distributionKey(new String(k));
-                sub.fromMap(SystemUtil.toMap(v));
-                sct.subscriptionList.add(sub);
-                return true;
-            });
+            //mds.traverse((d,o,k,v)->{
+                //Subscription sub = new Membership();
+                //sub.distributionKey(new String(k));
+                //sub.fromMap(SystemUtil.toMap(v));
+                //sct.subscriptionList.add(sub);
+                //return true;
+            //});
             session.write(sct.toJson().toString().getBytes(),this.label());
         }
         else if(session.action().equals("onBackupDataStore")){

@@ -601,9 +601,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 return false;
             }
         }
-        public void traverse(Overflow overflow) {
-        }
-
         public void set(byte[] key,byte[] value){
         }
         public byte[] get(byte[] key){
