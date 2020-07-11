@@ -815,8 +815,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     @Override
     public void run() {
-        //metrics.update();
-        //metrics.statistics.summary((e)->e.update());
+        this.tarantulaContext.metrics().summary((e)->e.update());
     }
     public void onUpdated(String key,double value){
         this.tarantulaContext.onUpdated(key,value);
