@@ -97,7 +97,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             if(suc){
                 //do backup and replication
                 if(t.backup()){
-                    this.mapStoreListener.onCreating(dso.metadata,okey,md);
+                    this.mapStoreListener.onCreating(dso.metadata,okey,t);
                 }
                 this.mapStoreListener.onDistributing(dso.metadata,key,value);
                 if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
@@ -130,10 +130,10 @@ public class PartitionDataStore extends ReplicatedDataStore{
             //do backup and replication
             if(t.backup()){
                 if(ix!=null){
-                    this.mapStoreListener.onUpdating(dos.metadata,indexSet.key().asString(),indexSet.toMap());
+                    this.mapStoreListener.onUpdating(dos.metadata,indexSet.key().asString(),indexSet);
                 }
                 else{
-                    this.mapStoreListener.onCreating(dos.metadata,indexSet.key().asString(),indexSet.toMap());
+                    this.mapStoreListener.onCreating(dos.metadata,indexSet.key().asString(),indexSet);
                 }
             }
             this.mapStoreListener.onDistributing(dos.metadata,_kn,_vn);
@@ -154,7 +154,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] value = SystemUtil.toJson(t.toMap());
             if(_put(dso,key,value)){
                 if(t.backup()){
-                    this.mapStoreListener.onUpdating(dso.metadata,akey,t.toMap());
+                    this.mapStoreListener.onUpdating(dso.metadata,akey,t);
                 }
                 this.mapStoreListener.onDistributing(dso.metadata,key,value);
                 //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),dso.partition,false),key,value);
@@ -191,7 +191,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 suc = _put(dso,key,v);
                 if(suc) {
                     if(t.backup()){
-                        this.mapStoreListener.onCreating(dso.metadata,akey,t.toMap());
+                        this.mapStoreListener.onCreating(dso.metadata,akey,t);
                     }
                     this.mapStoreListener.onDistributing(dso.metadata, key, v);
                     if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
@@ -225,7 +225,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] key = akey.getBytes();
             byte[] value;
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            log.warn(t.getClassId()+"///"+t.getFactoryId());
             this.mapStoreListener.onRecovering(dso.metadata,key);
             if((value=_get(dso,key))==null){
                 if((value=mapStoreListener.onLoading(dso.metadata,akey))==null){

@@ -18,10 +18,11 @@ public interface ShardingProvider extends Serviceable, BucketListener {
     void registerDataStore(String name);
     void registerDataStore(String prefix,int partitions);
 
-    byte[] create(Metadata metadata,String key,Map<String,Object> data);
+    //byte[] create(Metadata metadata,String key,Map<String,Object> data);
     byte[] load(Metadata metadata,String key);
     byte[] update(Metadata metadata,String key,Map<String,Object> data);
 
+    <T extends Recoverable> byte[] update(Metadata metadata, String key, T t);
     <T extends Recoverable> byte[] create(Metadata metadata, String key, T t);
     int version(int bucket);
 }

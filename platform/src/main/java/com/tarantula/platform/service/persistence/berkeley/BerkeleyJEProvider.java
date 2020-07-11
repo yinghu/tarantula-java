@@ -259,21 +259,21 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     public int onVersioning(Metadata metadata){
         return this.dShardingProvider.version(metadata.partition());
     }
-    @Override
-    public byte[] onCreating(Metadata metadata,String key,Map<String,Object> creating){
-        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
-            return iShardingProvider.create(metadata,key,creating);
-        }
-        else{
-            return dShardingProvider.create(metadata,key,creating);
-        }
-    }
+
     public <T extends Recoverable> byte[] onCreating(Metadata metadata,String key,T t){
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             return iShardingProvider.create(metadata,key,t);
         }
         else{
             return dShardingProvider.create(metadata,key,t);
+        }
+    }
+    public <T extends Recoverable> byte[] onUpdating(Metadata metadata,String key,T t){
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+            return iShardingProvider.update(metadata,key,t);
+        }
+        else{
+            return dShardingProvider.update(metadata,key,t);
         }
     }
     @Override
@@ -285,15 +285,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             return dShardingProvider.load(metadata,key);
         }
     }
-    @Override
-    public byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending){
-        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
-            return iShardingProvider.update(metadata,key,pending);
-        }
-        else{
-            return dShardingProvider.update(metadata,key,pending);
-        }
-    }
+
     @Override
     public void onDistributing(Metadata metadata, byte[] key, byte[] value) {
         //log.warn("DATA STORE->"+metadata.source());

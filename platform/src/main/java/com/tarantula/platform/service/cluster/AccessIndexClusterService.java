@@ -1,9 +1,6 @@
 package com.tarantula.platform.service.cluster;
 
 import com.hazelcast.core.DistributedObject;
-
-import com.hazelcast.core.MigrationEvent;
-import com.hazelcast.core.MigrationListener;
 import com.hazelcast.spi.*;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
@@ -17,7 +14,7 @@ import java.util.Properties;
 /**
  * Updated by yinghu lu on 6/18/2020
  */
-public class AccessIndexClusterService implements ManagedService,RemoteService, MigrationListener {
+public class AccessIndexClusterService implements ManagedService,RemoteService {
 
     private static TarantulaLogger log = JDKLogger.getLogger(AccessIndexClusterService.class);
 
@@ -32,7 +29,6 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.tarantulaContext = TarantulaContext.getInstance();
         this.nodeEngine = nodeEngine;
-        this.nodeEngine.getPartitionService().addMigrationListener(this);
         this.dataStoreOnPartitions = new DataStoreOnPartition[this.nodeEngine.getPartitionService().getPartitionCount()];
         for(int i=0;i<this.dataStoreOnPartitions.length;i++){
             this.dataStoreOnPartitions[i]=new DataStoreOnPartition(i,"p_"+i);
@@ -65,23 +61,14 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
     public AccessIndex set(String accessKey){
         DataStoreOnPartition dso = this.onPartition(accessKey);
         int pid = localKey.count(1);
-        localKey.update();
+        localKey.update();//TO DO ID SEGMENT TO REDUCE DISK WRITES
         AccessIndex accessIndex = new AccessIndexTrack(accessKey,dso.partitionIndex.bucket(),dso.partitionIndex.label(),pid);
-        if(dso.dataStore.createIfAbsent(accessIndex,false)){
-            return accessIndex;
-        }
-        else{
-            return null;
-        }
+        return dso.dataStore.createIfAbsent(accessIndex,false)?accessIndex:null;
     }
     public AccessIndex get(String accessKey){
         AccessIndex suc = new AccessIndexTrack(accessKey);
         DataStore dataStore = this.onPartition(accessKey).dataStore;
-        if(dataStore.load(suc)){
-            return suc;
-        }else{
-            return null;
-        }
+        return dataStore.load(suc)?suc:null;
     }
     public void setup() {
         masterStore = this.tarantulaContext.masterDataStore();
@@ -98,22 +85,4 @@ public class AccessIndexClusterService implements ManagedService,RemoteService, 
         int partition = this.nodeEngine.getPartitionService().getPartitionId(accessKey);
         return this.dataStoreOnPartitions[partition];
     }
-
-
-    @Override
-    public void migrationStarted(MigrationEvent migrationEvent) {
-
-    }
-
-    @Override
-    public void migrationCompleted(MigrationEvent migrationEvent) {
-        //this.onPartition(migrationEvent.getNewOwner().getUuid(),migrationEvent.getPartitionId());
-    }
-
-    @Override
-    public void migrationFailed(MigrationEvent migrationEvent) {
-
-    }
-
-
 }

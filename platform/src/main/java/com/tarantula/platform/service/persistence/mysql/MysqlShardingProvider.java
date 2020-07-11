@@ -211,6 +211,33 @@ public class MysqlShardingProvider implements ShardingProvider {
             return null;
         }
     }
+    public <T extends Recoverable> byte[] update(Metadata metadata,String key,T t){
+        if(!enabled){
+            log.warn("Data backup is disabled->"+key);
+            return SystemUtil.toJson(t.toMap());
+        }
+        try{
+            Connection connection = shardList[metadata.partition()%shards].connection();
+            try{
+                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE "+metadata.source()+" SET v=? WHERE k=?");
+                String ret = SystemUtil.toJsonString(t.toMap());
+                log.warn("UPDATE KEY->"+key+"<><>"+ret);
+                preparedStatement.setString(1,ret);
+                preparedStatement.setString(2,key);
+                preparedStatement.execute();
+                preparedStatement.close();
+                return ret.getBytes();
+            }catch (Exception eex){
+                throw new RuntimeException(eex.getMessage());
+            }
+            finally {
+                connection.close();
+            }
+        }catch (Exception ex){
+            log.warn("error on update->"+ex.getMessage());
+            return null;
+        }
+    }
     public byte[] update(Metadata metadata,String key,Map<String,Object> data){
         if(!enabled){
             log.warn("Data backup is disabled->"+key);
@@ -241,7 +268,6 @@ public class MysqlShardingProvider implements ShardingProvider {
 
     @Override
     public void onBucket(int bucket, int state) {
-        //log.warn("Bucket->"+bucket+"<><>"+state);
         partitionStates[bucket].opening = state== BucketReceiver.OPEN;
         if(!partitionStates[bucket].opening){
             return;
@@ -262,7 +288,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                 }
                 rs.close();
                 preparedStatement.close();
-                log.warn("Bucket->"+bucket+"<version>"+partitionStates[bucket].version);
+                log.warn("Bucket->"+bucket+"<><>Version->"+partitionStates[bucket].version);
             }catch (Exception eex){
                 throw new RuntimeException(eex.getMessage());
             }
@@ -271,7 +297,6 @@ public class MysqlShardingProvider implements ShardingProvider {
             }
         }catch (Exception ex){
             log.warn("error on update->"+ex.getMessage());
-            //return null;
         }
     }
 }

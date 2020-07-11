@@ -10,15 +10,11 @@ import java.util.Map;
  */
 public interface MapStoreListener {
 
-    //call on create
-    byte[] onCreating(Metadata metadata,String key,Map<String,Object> creating);
 
     <T extends Recoverable> byte[] onCreating(Metadata metadata,String key,T t);
-
-    //call on load
+    <T extends Recoverable> byte[] onUpdating(Metadata metadata,String key,T t);
     byte[] onLoading(Metadata metadata,String key);
 
-    byte[] onUpdating(Metadata metadata,String key,Map<String,Object> pending);
 
     void onDistributing(Metadata metadata,byte[] key, byte[] value);
     byte[] onRecovering(Metadata metadata,byte[] key);

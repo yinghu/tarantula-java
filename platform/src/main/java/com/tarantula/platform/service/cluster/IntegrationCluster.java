@@ -315,7 +315,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         }).start();
     }
     public void onPartition(int pt,boolean opening){
-        log.warn("Partition ["+pt+"] with opening ["+opening+"]");
+        //log.warn("Partition ["+pt+"] with opening ["+opening+"]");
         this.partitionStates[pt].opening = opening;
         bMap.forEach((k,v)->{
             if(v.partition()==pt&&opening){//open if closed
