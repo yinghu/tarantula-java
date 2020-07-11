@@ -9,7 +9,6 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.EndPoint;
 import com.tarantula.platform.service.cluster.ScopedMemberDiscovery;
-import com.tarantula.platform.service.persistence.Node;
 
 public class TarantulaMain {
 	static {
@@ -74,18 +73,15 @@ public class TarantulaMain {
 			}
 			TarantulaContext btx = TarantulaContext.getInstance();
 			TarantulaContext.memberDiscovery = (ScopedMemberDiscovery) Class.forName(override(overriding,"tarantula.member.discovery.name",_user,_config)).getConstructor().newInstance();
-			//btx.deploymentMode = override(overriding,"tarantula.deployment.mode",_user,_config);
 			btx.platformVersion = override(overriding,"tarantula.platform.version",_user,_config);
 			btx.platformRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.routing.number",_user,_config));
 			btx.accessIndexRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.access.index.routing.number",_user,_config));
-			//btx.dataShardingNumber = Integer.parseInt(override(overriding,"tarantula.platform.data.sharding.number",_user,_config));
 			btx.bootstrapRetries = Integer.parseInt(override(overriding,"tarantula.bootstrap.max.retries",_user,_config));
 			btx.metricsUpdateIntervalMinutes = Integer.parseInt(override(overriding,"tarantula.operation.metrics.interval.m",_user,_config));
 			btx.clusterNamePrefix = override(overriding,"tarantula.cluster.name",_user,_config);
 			btx.dataBucketGroup = override(overriding,"tarantula.data.bucket.group",_user,_config);
 			btx.dataBucketNode = override(overriding,"tarantula.data.bucket.node",_user,_config);
 			btx.dataStoreDir = override(overriding,"tarantula.data.store.dir",_user,_config);
-			//btx.dataStoreRecoveryDir = override(overriding,"tarantula.data.store.recovery.dir",_user,_config);
 			btx.dataReplicationThreadPoolSetting = override(overriding,"tarantula.data.replication.pool.setting",_user,_config);
             btx.eventThreadPoolSetting = override(overriding,"tarantula.event.pool.setting",_user,_config);
             btx.retries  = Integer.parseInt(override(overriding,"tarantula.event.max.retries",_user,_config));
@@ -101,7 +97,6 @@ public class TarantulaMain {
 		    btx.maxIdlesOnInstance = Integer.parseInt(override(overriding,"tarantula.instance.session.idle.number",_user,_config));
 		    btx.timeoutOnInstance = 1000*Long.parseLong(override(overriding,"tarantula.instance.session.timeout.s",_user,_config));
 			btx.applicationSchedulingPoolSetting = override(overriding,"tarantula.scheduler.pool.setting",_user,_config);
-
 			btx.dataStoreMaster = override(overriding,"tarantula.data.store.master",_user,_config);
 			btx.dataStoreDailyBackup = Boolean.parseBoolean(override(overriding,"tarantula.data.store.daily.backup",_user,_config));
 			btx.authContext = override(overriding,"tarantula.auth.context",_user,_config);
