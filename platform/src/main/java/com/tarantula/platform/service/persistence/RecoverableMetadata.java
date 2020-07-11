@@ -11,20 +11,16 @@ import com.tarantula.platform.event.PortableEventRegistry;
 import java.io.IOException;
 
 /**
- * Updated by yinghu lu on 4/7/2019.
+ * Updated by yinghu lu on 7/11/2020
  */
 public class RecoverableMetadata extends RecoverableObject implements Metadata, Portable {
 
     private String source;
     private int factoryId;
     private int classId;
-    //private int version;
+
     private int scope = Distributable.DATA_SCOPE;
     private int partition;
-    //private long timestamp;
-    //private boolean onEdge;
-    //private boolean distributable;
-    //private String index;
 
     public RecoverableMetadata(){}
     public RecoverableMetadata(String source,int partition,int scope){
@@ -32,27 +28,11 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
         this.partition = partition;
         this.scope = scope;
     }
-    public RecoverableMetadata(String source,int factoryId,int classId,int scope,boolean onEdge,boolean distributable,String index){
-        this.source = source;
-        this.factoryId = factoryId;
-        this.classId = classId;
-        this.scope = scope;
-        this.onEdge = onEdge;
-        this.distributable = distributable;
-        this.index = index;
-    }
     public RecoverableMetadata(int factoryId,int classId){
         this.factoryId = factoryId;
         this.classId = classId;
     }
-    public RecoverableMetadata(String source,int scope,int factoryId,int classId,int partition,boolean onEdge){
-        this.source = source;
-        this.scope = scope;
-        this.factoryId = factoryId;
-        this.classId = classId;
-        this.partition = partition;
-        this.onEdge = onEdge;
-    }
+
     @Override
     public int getFactoryId() {
         return PortableEventRegistry.OID;
@@ -87,7 +67,7 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
     }
     @Override
     public String toString(){
-        return "Metadata ["+source+"/"+factoryId+"/"+classId+"/"+scope+"/"+partition+"/"+timestamp+"/"+onEdge+"/"+distributable+"/"+index+"]";
+        return "Metadata ["+source+"/"+factoryId+"/"+classId+"/"+scope+"/"+partition+"/"+timestamp+"/"+onEdge+"/"+index+"]";
     }
     //METADATA CONTRACT METHODS
     public int factoryId(){
@@ -96,16 +76,9 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
     public int classId(){
         return this.classId;
     }
-    public int version(){
-        return this.version;
-    }
     public int scope(){
         return this.scope;
     }
-    public long timestamp(){
-        return this.timestamp;
-    }
-    public boolean onEdge(){ return this.onEdge;}
     public String source(){return this.source;}
     public int partition(){return this.partition;}
 }

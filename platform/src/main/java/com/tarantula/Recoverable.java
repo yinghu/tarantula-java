@@ -9,14 +9,15 @@ public interface Recoverable extends Distributable{
 
     String PATH_SEPARATOR = "/";
 
+    //marked as backup operation on remote data storage
     boolean backup();
-    void backup(boolean backup);
 
     String oid();
     void oid(String oid);
 
     String owner();
     void owner(String owner);
+
     //map format is back-forwarding support if keeping map key no duplicated
     //new mappings can be added in runtime to use getOrDefault on fromMap call first time
     Map<String,Object> toMap();
@@ -38,6 +39,7 @@ public interface Recoverable extends Distributable{
 
     boolean onEdge();
     void onEdge(boolean onEdge);
+
     int getFactoryId();
     int getClassId();
 

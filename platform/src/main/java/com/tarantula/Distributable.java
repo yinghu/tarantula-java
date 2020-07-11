@@ -1,6 +1,6 @@
 package com.tarantula;
 /**
- * Updated by yinghu on 8/23/19
+ * Updated by yinghu on 7/11/2020
  */
 public interface Distributable {
 
@@ -19,8 +19,10 @@ public interface Distributable {
 
     int scope();
 
-    void distributable(boolean distributable);
     void index(String index);
-    boolean distributable();
+
     String index();
+
+    // marked as cluster distributing
+    boolean distributable();
 }

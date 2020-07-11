@@ -2,13 +2,13 @@ package com.tarantula.platform.presence;
 
 
 import com.tarantula.Access;
-import com.tarantula.platform.RecoverableObject;
+import com.tarantula.platform.BackupObject;
 import java.util.Map;
 
 /**
  * Updated by yinghu on 5/14/2020
  */
-public class User extends RecoverableObject implements Access {
+public class User extends BackupObject implements Access {
 
     protected String login;
     protected String password;//hash of the password
@@ -19,7 +19,6 @@ public class User extends RecoverableObject implements Access {
     protected String validator;
     protected String role;
     public User(){
-        //this.vertex = "User";
         this.label = "VA";
     }
     public User(String login,boolean validated,String validator){

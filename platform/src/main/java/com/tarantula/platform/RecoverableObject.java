@@ -26,10 +26,9 @@ public class RecoverableObject implements Recoverable {
 
     protected long timestamp;
     protected int version;
-    protected boolean backup =true;
+
     protected int routingNumber;
 
-    protected boolean distributable;
     protected String index;
 
 
@@ -91,22 +90,18 @@ public class RecoverableObject implements Recoverable {
     }
 
     public boolean backup(){
-        return this.backup;
+        return false;
     }
-    public void backup(boolean backup){
-        this.backup = backup;
-    }
+
     public boolean disabled() {
         return this.disabled;
     }
-    public void distributable(boolean distributable){
-        this.distributable = distributable;
-    }
+
     public void index(String index){
         this.index = index;
     }
     public boolean distributable(){
-        return this.distributable;
+        return false;
     }
     public String index(){
         return this.index;
