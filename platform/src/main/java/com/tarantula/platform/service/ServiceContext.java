@@ -7,7 +7,7 @@ import java.util.concurrent.ScheduledFuture;
 /**
  * Updated by yinghu lu on 6/27/20
  */
-public interface ServiceContext {
+public interface ServiceContext{
 
     //create data scope partitioned data store
     DataStore dataStore(String name,int partition);
@@ -27,5 +27,4 @@ public interface ServiceContext {
     String nodeId();
     RecoverableRegistry recoverableRegistry(int registryId);
     TokenValidatorProvider.AuthVendor authVendor(String name);
-
 }

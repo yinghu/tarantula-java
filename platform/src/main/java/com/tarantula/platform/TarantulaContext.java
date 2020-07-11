@@ -22,11 +22,12 @@ import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationXMLParser;
 import com.tarantula.platform.service.persistence.Node;
+import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.util.GoogleAuthCredentialsDeserializer;
 import com.tarantula.platform.util.StripePaymentCredentialsDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
-public class TarantulaContext implements Serviceable,ServiceContext{
+public class TarantulaContext implements Serviceable,ServiceContext,MetricsListener{
 
 
     private static TarantulaLogger log = JDKLogger.getLogger(TarantulaContext.class);
@@ -114,12 +115,12 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     public int maxIdlesOnInstance;
     public long timeoutOnInstance;
     public int metricsUpdateIntervalMinutes=1;
+    private StatisticsIndex nodeMetrics;
     public String clusterNamePrefix;
 
     public String platformVersion;
     public int platformRoutingNumber;
     public int accessIndexRoutingNumber;
-    //public int dataShardingNumber;
 
     public String endpointIp ="localhost";
     public int endpointPort = 6393;
@@ -510,8 +511,15 @@ public class TarantulaContext implements Serviceable,ServiceContext{
             nid = this.accessIndexService().set(node.nodeName);
         }
         node.nodeId = nid.distributionKey();
+        nodeMetrics = new StatisticsIndex();
+        nodeMetrics.distributionKey(node.nodeId);
+        nodeMetrics.dataStore(masterDataStore());
+        masterDataStore().createIfAbsent(nodeMetrics,true);
+        this.tarantulaCluster.registerMetricsListener(this);
+        this.integrationCluster.registerMetricsListener(this);
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
+
     }
     public boolean deployServiceProvider(ServiceProvider serviceProvider){
         try{
@@ -542,6 +550,12 @@ public class TarantulaContext implements Serviceable,ServiceContext{
     }
     public String nodeId(){
         return node.nodeId;
+    }
+    public Statistics metrics(){
+ 	    return this.nodeMetrics;
+    }
+    public void onUpdated(String mkey,double delta){
+        this.nodeMetrics.entry(mkey).update(delta);
     }
     public static MemberDiscovery memberDiscovery(int scope){
  	    memberDiscovery.scope(scope);

@@ -15,7 +15,6 @@ public class PortableRegistry extends AbstractRecoverableListener{
 	public static final int OID = 1;
 
     public static final int PROPERTY_CID = 3;
-    public static final int METRICS_CID = 4;
 
     public static final int PARTITION_INDEX_OID = 5;
 
@@ -23,8 +22,6 @@ public class PortableRegistry extends AbstractRecoverableListener{
     public static final int ON_LOBBY_CID = 12;
 
     public static final int LOBBY_TYPE_ID_INDEX_CID = 13;
-
-    //public static final int NODE_CID = 15;
 
     public static final int ACCESS_KEY = 16;
 
@@ -67,9 +64,7 @@ public class PortableRegistry extends AbstractRecoverableListener{
             case APPLICATION_CONFIGURATION_CID:
                 _ins = new ApplicationConfiguration();
                 break;
-            case METRICS_CID:
-                _ins = new Metrics();
-                break;
+
             case PARTITION_INDEX_OID:
                 _ins = new PartitionIndex();
                 break;
@@ -82,9 +77,7 @@ public class PortableRegistry extends AbstractRecoverableListener{
             case ON_VIEW_OID:
                 _ins = new OnViewTrack();
                 break;
-            //case NODE_CID:
-                //_ins = new Node();
-                //break;
+
             case ACCESS_KEY:
                 _ins = new AccessKey();
                 break;

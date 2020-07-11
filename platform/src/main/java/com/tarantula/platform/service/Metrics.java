@@ -1,9 +1,8 @@
 package com.tarantula.platform.service;
 
 import com.tarantula.Statistics;
-import com.tarantula.platform.CompositeKey;
+
 import com.tarantula.platform.OnApplicationHeader;
-import com.tarantula.platform.service.cluster.PortableRegistry;
 
 
 public class Metrics extends OnApplicationHeader {
@@ -53,24 +52,7 @@ public class Metrics extends OnApplicationHeader {
 
     public Statistics statistics;
 
-    public Metrics(){
-        this.label = "Metrics";
-    }
-    public Metrics(String nodeId){
-        this();
-        this.owner = nodeId;
-    }
-    public int getFactoryId() {
-        return PortableRegistry.OID;
-    }
-
-    public int getClassId() {
-        return PortableRegistry.METRICS_CID;
-    }
-    public void distributionKey(String distributionKey){
-        //skip the natural key
-    }
-    public Key key(){
-        return new CompositeKey(this.label,this.owner);
+    public Metrics(Statistics statistics){
+        this.statistics = statistics;
     }
 }

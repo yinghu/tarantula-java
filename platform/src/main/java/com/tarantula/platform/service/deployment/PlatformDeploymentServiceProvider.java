@@ -56,7 +56,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private String contentTemDir;
     private String contentDir;
-    private Metrics metrics;
 
     private AtomicBoolean onAccessIndex;
 
@@ -80,7 +79,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public <T extends OnAccess> T metrics(){
-        return (T)metrics;
+        return (T)new Metrics(this.tarantulaContext.metrics());
     }
     public String upload(InputStream inputStream,String fname) throws Exception{
         //save to local deploy/tem dir
@@ -443,20 +442,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public void waitForData() {
         this.integrationEventService.publish(new MapStoreVotingEvent(this.eventTopic,localTopic,registerKey,Distributable.INTEGRATION_SCOPE));
-        DataStore mds = this.tarantulaContext.masterDataStore();
-        this.metrics = new Metrics(this.tarantulaContext.dataBucketNode);
-        this.metrics.property(Metrics.STATS_KEY,mds.bucket()+Recoverable.PATH_SEPARATOR+SystemUtil.oid());
-        metrics.dataStore(mds);
-        mds.createIfAbsent(metrics,true);
-        StatisticsIndex statistics = new StatisticsIndex();
-        statistics.distributionKey((String)metrics.property(Metrics.STATS_KEY));
-        statistics.dataStore(mds);
-        mds.createIfAbsent(statistics,true);
-        this.metrics.statistics = statistics;
-        this.metrics.property(Metrics.START_TIME,SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
-        this.metrics.update();
-        this.tarantulaContext.integrationCluster().registerMetricsListener((k,v)->metrics.statistics.entry(k).update(v));
-        this.tarantulaContext.tarantulaCluster().registerMetricsListener((k,v)->metrics.statistics.entry(k).update(v));
         this.tarantulaContext.schedule(this);
         log.info("Platform deployment service started on ["+localTopic+"/"+registerKey+"]");
     }
@@ -830,11 +815,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     @Override
     public void run() {
-        metrics.update();
-        metrics.statistics.summary((e)->e.update());
+        //metrics.update();
+        //metrics.statistics.summary((e)->e.update());
     }
     public void onUpdated(String key,double value){
-        metrics.statistics.entry(key).update(value);
+        this.tarantulaContext.onUpdated(key,value);
     }
     private class PostOfficeSession implements PostOffice{
 

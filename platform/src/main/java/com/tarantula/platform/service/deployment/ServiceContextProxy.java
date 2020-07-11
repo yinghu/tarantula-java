@@ -72,6 +72,7 @@ public class ServiceContextProxy implements ServiceContext {
     public String nodeId(){
         return this.tarantulaContext.nodeId();
     }
+
     @Override
     public RecoverableRegistry recoverableRegistry(int registryId) {
         return this.tarantulaContext.recoverableRegistry(registryId);
