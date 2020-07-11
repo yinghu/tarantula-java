@@ -1,9 +1,11 @@
 package com.tarantula;
 
 /**
- * Updated by yinghu lu on 8/26/2019.
+ * Updated by yinghu lu on 7/11/2020
  */
 public interface OnView extends Recoverable {
+
+    String LABEL ="LVT";
 
     String viewId();
     void viewId(String viewId);

@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Updated by yinghu lu on 8/23/19.
+ * Updated by yinghu lu on 7/11/2020
  */
 public class OnViewTrack extends RecoverableObject implements OnView, Portable {
 
@@ -23,7 +23,7 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
 
     public OnViewTrack(){
         this.onEdge = true;
-        this.label = "LVT";
+        this.label = LABEL;
     }
     public String viewId(){
         return this.viewId;

@@ -10,6 +10,8 @@ public interface Application extends Serviceable{
 
     long DELTA = 60000;
 
+    String LABEL = "LDA";
+
     Descriptor descriptor();
 
     Configuration configuration(String type);

@@ -6,9 +6,9 @@ import java.util.Map;
 
 public class LobbyDescriptor extends DefaultDescriptor {
 
+    public static String LABEL = "LB";
     public LobbyDescriptor(){
-        //this.vertex = "Lobby";
-        this.label = "LB";
+        this.label = LABEL;
     }
     @Override
     public int getClassId() {

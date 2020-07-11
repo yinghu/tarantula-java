@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * updated by yinghu on 3/6/2019.
+ * updated by yinghu on 7/11/2020
  */
 public class InstanceIndex  extends OnApplicationHeader implements InstanceRegistry{
 
@@ -23,8 +23,7 @@ public class InstanceIndex  extends OnApplicationHeader implements InstanceRegis
     public List<OnInstance.Listener> onInstanceListener = new CopyOnWriteArrayList<>();
 
     public InstanceIndex(){
-        //this.vertex = "InstanceRegistry";
-        this.label = "INS";
+        this.label = LABEL;
         this.onEdge = true;
     }
 

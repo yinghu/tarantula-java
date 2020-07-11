@@ -11,8 +11,6 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
  */
 public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {
 
-    public static String LABEL = "LB";
-
 
     private   String bucketId;
 
@@ -34,7 +32,7 @@ public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {
 
 
     public String label(){
-        return LABEL;
+        return LobbyDescriptor.LABEL;
     }
 
 

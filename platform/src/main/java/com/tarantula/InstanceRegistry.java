@@ -10,7 +10,7 @@ public interface InstanceRegistry extends OnApplication,Countable{
     int ON_INSTANCE =0;
     int ALREADY_ON_INSTANCE =1;
     int INSTANCE_FULL = 4;
-
+    String LABEL ="INS";
     int capacity();
     void capacity(int capacity);
 

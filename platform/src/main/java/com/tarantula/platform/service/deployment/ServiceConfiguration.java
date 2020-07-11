@@ -16,7 +16,7 @@ public class ServiceConfiguration extends DeploymentObject {
     public static final String LABEL = "SCG";
 
     public ServiceConfiguration(){
-        //this.vertex = "ServiceConfiguration";
+
         this.label = LABEL;
         this.onEdge = true;
     }

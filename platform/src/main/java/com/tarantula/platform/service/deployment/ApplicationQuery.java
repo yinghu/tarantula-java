@@ -2,6 +2,7 @@ package com.tarantula.platform.service.deployment;
 
 import com.tarantula.RecoverableFactory;
 import com.tarantula.platform.DeploymentDescriptor;
+import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 
@@ -32,6 +33,6 @@ public class ApplicationQuery implements RecoverableFactory<DeploymentDescriptor
     }
 
     public String label(){
-        return "LDA";
+        return Application.LABEL;
     }
 }

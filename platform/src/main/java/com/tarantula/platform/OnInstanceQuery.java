@@ -30,6 +30,6 @@ public class OnInstanceQuery implements RecoverableFactory<OnInstance> {
     }
 
     public String label(){
-        return "IOI";
+        return OnInstance.LABEL;
     }
 }

@@ -10,6 +10,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.event.MapStoreRecoveryEvent;
 import com.tarantula.platform.presence.GameCluster;
+import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.DeploymentServiceProvider;
@@ -236,7 +237,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                         blist.add(c.descriptor);
                         c.applications.forEach((a)->{
                             a.owner(c.descriptor.distributionKey());
-                            a.label("LDA");
+                            a.label(Application.LABEL);
                             a.onEdge(true);
                             dataStore.create(a);
                         });
@@ -367,7 +368,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
         ds.create(lobbyTypeIdIndex);
         descriptor.owner(ds.bucket());
-        descriptor.label(LobbyQuery.LABEL);
+        descriptor.label(LobbyDescriptor.LABEL);
         descriptor.onEdge(true);
         descriptor.resetEnabled(true);
         ds.create(descriptor);
@@ -388,7 +389,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         lobby.description(descriptor.description());
         lobby.configurationName(descriptor.configurationName());
         lobby.responseLabel(descriptor.responseLabel());
-        lobby.label("LDA");
+        lobby.label(Application.LABEL);
         lobby.owner(descriptor.distributionKey());
         lobby.onEdge(true);
         if(ds.create(lobby)){
@@ -607,7 +608,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 //log.warn("Create named lobby type id->"+configuration.descriptor.typeId());
                 Descriptor descriptor = configuration.descriptor;
                 descriptor.owner(mds.bucket());
-                descriptor.label(LobbyQuery.LABEL);
+                descriptor.label(LobbyDescriptor.LABEL);
                 descriptor.onEdge(true);
                 descriptor.resetEnabled(true);
                 descriptor.disabled(true);//pending launch
@@ -617,7 +618,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 mds.create(lobbyTypeIdIndex);
                 configuration.applications.forEach((a)->{
                     a.owner(descriptor.distributionKey());
-                    a.label("LDA");
+                    a.label(Application.LABEL);
                     a.onEdge(true);
                     a.typeId(descriptor.typeId());//replaced with named type id
                     a.subtypeId(a.subtypeId().replace("game",name));

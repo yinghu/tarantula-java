@@ -8,6 +8,7 @@ package com.tarantula;
  */
 public interface OnInstance extends OnBalance,DataStore.Updatable{
 
+    String LABEL = "IOI";
     boolean joined();
 
     void joined(boolean joined);

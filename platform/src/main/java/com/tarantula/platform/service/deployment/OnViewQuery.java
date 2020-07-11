@@ -31,6 +31,6 @@ public class OnViewQuery implements RecoverableFactory<OnView> {
     }
 
     public String label(){
-        return "LVT";
+        return OnView.LABEL;
     }
 }

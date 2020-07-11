@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.deployment;
 
 
+import com.tarantula.InstanceRegistry;
 import com.tarantula.RecoverableFactory;
 import com.tarantula.platform.InstanceIndex;
 import com.tarantula.platform.service.cluster.PortableRegistry;
@@ -31,6 +32,6 @@ public class InstanceRegistryQuery implements RecoverableFactory<InstanceIndex> 
     }
 
     public String label(){
-        return "INS";
+        return InstanceRegistry.LABEL;
     }
 }
