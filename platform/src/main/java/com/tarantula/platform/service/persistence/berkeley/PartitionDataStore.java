@@ -140,16 +140,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
         }
         return suc;
     }
-    @Override
-    public <T extends Recoverable> int create(T[] tb) {
-        int suc =0;
-        for(T t : tb){
-            if(this.create(t)){
-                suc++;
-            }
-        }
-        return suc;
-    }
 
     @Override
     public <T extends Recoverable> boolean update(T t) {

@@ -498,14 +498,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     @Override
     public void onBucket(int _bucket, int state) {
         //notify partitions updated
-        log.warn("bucket->"+_bucket+"<>"+state);
         dShardingProvider.onBucket(_bucket,state);
     }
 
     //partial implementation of createIfAbsent and load for access index persistence
     private static class AccessIndexDataStore extends ReplicatedDataStore {
-
-        private ConcurrentHashMap<Integer,RecoverableListener> rMap = new ConcurrentHashMap<>();
 
         private final Database berkeleyStore;
         private final Node node;
@@ -542,18 +539,13 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         }
         @Override
         public <T extends Recoverable> boolean create(T t) {
-            return false;
-        }
-
-        @Override
-        public <T extends Recoverable> int create(T[] tb) {
-            return 0;
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public <T extends Recoverable> boolean update(T t) {
 
-            return false;
+            throw new UnsupportedOperationException();
         }
 
         @Override
@@ -566,7 +558,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 }
                 byte[] v = mapStoreListener.onCreating(metadata1,akey,t);
                 if(v!=null){
-                    return _set(akey.getBytes(),v);//set(t,key,SystemUtil.toJson(t.toMap()));
+                    return _set(akey.getBytes(),v);
                 }
                 return false;
             }catch (Exception ex){
@@ -601,46 +593,34 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
                 return false;
             }
         }
-        public void set(byte[] key,byte[] value){
-        }
+        public void set(byte[] key,byte[] value){throw new UnsupportedOperationException(); }
         public byte[] get(byte[] key){
-            return null;
+            throw new UnsupportedOperationException();
         }
         @Override
         public <T extends Recoverable> List<T> list(RecoverableFactory<T> query) {
-            return null;//alist;
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public <T extends Recoverable> void list(RecoverableFactory<T> query, Stream<T> stream) {
-
+            throw new UnsupportedOperationException();
         }
 
 
         @Override
         public RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener) {
-            return rMap.computeIfAbsent(recoverableListener.registryId(),(rid)->recoverableListener);
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void unregisterRecoverableListener(int factoryId) {
-            rMap.remove(factoryId);
+            throw new UnsupportedOperationException();
         }
-
 
         @Override
         public void onReplication(MapStoreSyncEvent me) {
-            //receive replication event
-            Metadata metadata = me.metadata;
-            if(!me.source().equals(this.node.nodeName)){
-                this._set(me.key,me.payload());
-            }
-            if(!metadata.onEdge()){//callback on local application register
-                RecoverableListener rl = rMap.get(metadata.factoryId());
-                if(rl!=null){
-                    rl.onUpdated(metadata,me.key,me.payload());
-                }
-            }
+            throw new UnsupportedOperationException();
         }
         public void close(){
             this.berkeleyStore.close();

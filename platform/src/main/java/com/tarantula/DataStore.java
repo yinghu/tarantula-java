@@ -20,11 +20,10 @@ public interface DataStore{
 
     <T extends Recoverable> boolean create(T t);
 
-    <T extends Recoverable> int create(T[] tb);
-
     <T extends Recoverable> boolean update(T t);
 
     <T extends Recoverable> boolean createIfAbsent(T t, boolean loading);
+
     <T extends Recoverable> boolean load(T t);
 
     void set(byte[] key,byte[] value);
