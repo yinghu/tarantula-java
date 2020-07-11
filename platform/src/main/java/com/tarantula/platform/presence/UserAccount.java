@@ -13,7 +13,6 @@ public class UserAccount extends User implements Account {
     private boolean subscribed;
 
     public UserAccount(){
-        //this.vertex = "Account";
     }
 
     public int getFactoryId() {

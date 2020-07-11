@@ -241,7 +241,7 @@ public class MysqlShardingProvider implements ShardingProvider {
 
     @Override
     public void onBucket(int bucket, int state) {
-        log.warn("Bucket->"+bucket+"<><>"+state);
+        //log.warn("Bucket->"+bucket+"<><>"+state);
         partitionStates[bucket].opening = state== BucketReceiver.OPEN;
         if(!partitionStates[bucket].opening){
             return;

@@ -28,7 +28,7 @@ public class ShardSetup {
     }
 
     public static void main(String[] args) throws Exception{
-        createShard("integration_data_10",271);
-        createShard("tarantula_data_10",17);
+        createShard("integration_data_11",271);
+        createShard("tarantula_data_11",17);
     }
 }
