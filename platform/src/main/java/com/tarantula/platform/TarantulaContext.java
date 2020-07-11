@@ -498,6 +498,8 @@ public class TarantulaContext implements Serviceable,ServiceContext{
             v.setup(this);
             v.waitForData();//block for global data sync
         });
+    }
+    public void _registerNode(){
         AccessIndex bid = this.accessIndexService().get(node.bucketName);
         if(bid==null){
             bid = this.accessIndexService().set(node.bucketName);

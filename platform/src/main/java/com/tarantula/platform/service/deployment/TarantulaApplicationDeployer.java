@@ -16,6 +16,7 @@ public class TarantulaApplicationDeployer implements Serviceable {
 	}
 
 	public void start() throws Exception {
+		this.context._registerNode();
 		String bucketId = this.context.bucketId();
 		List<ServiceConfiguration> _slist = this.context.query(new String[]{bucketId},new ServiceConfigurationQuery(bucketId));
 		Collections.sort(_slist,new ServiceConfigurationComparator());
