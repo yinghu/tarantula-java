@@ -495,6 +495,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         if(this.scope==Distributable.DATA_SCOPE){
             Member lm = nodeEngine.getLocalMember();
             int sz = nodeEngine.getClusterService().getSize();
+            if(sz==1){
+                return;
+            }
             int pt = 0;
             for(Member m : nodeEngine.getClusterService().getMembers()){
                 if(lm.getUuid().equals(m.getUuid())){

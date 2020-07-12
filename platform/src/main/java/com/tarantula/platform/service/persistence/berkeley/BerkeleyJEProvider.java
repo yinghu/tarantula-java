@@ -9,6 +9,7 @@ import com.tarantula.platform.event.MapStoreSyncEvent;
 import com.tarantula.platform.service.ClusterProvider;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.ServiceContext;
+import com.tarantula.platform.service.cluster.PartitionState;
 import com.tarantula.platform.service.persistence.*;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -412,6 +413,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Bu
     @Override
     public void onBucket(int _bucket, int state) {
         //notify partitions updated
+        //PartitionState _ps = new PartitionState(_bucket);
+        //_ps.bucket(node.bucketName);
+        //dataCluster.set(_ps.key().asString().getBytes(),SystemUtil.toJson(_ps.toMap()));
+        //byte[] d = dataCluster.get(_ps.key().asString().getBytes());
+        ///log.warn("PARTITION STATE->"+new String(d));
         dShardingProvider.onBucket(_bucket,state);
     }
 

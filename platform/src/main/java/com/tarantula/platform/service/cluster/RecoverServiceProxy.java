@@ -72,7 +72,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     public void replicate(String source,byte[] key,byte[] value){
         NodeEngine nodeEngine = getNodeEngine();
         ReplicateOperation operation = new ReplicateOperation(source,key,value);
-        Set<Member> mlist = nodeEngine.getHazelcastInstance().getCluster().getMembers();
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         mlist.forEach((m)->{
             if(!m.localMember()){
                 InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
