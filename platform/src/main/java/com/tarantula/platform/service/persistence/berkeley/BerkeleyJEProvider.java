@@ -6,11 +6,9 @@ import com.sleepycat.je.util.LogVerificationReadableByteChannel;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.event.MapStoreSyncEvent;
-import com.tarantula.platform.event.MapStoreVotingEvent;
 import com.tarantula.platform.service.ClusterProvider;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.ServiceContext;
-import com.tarantula.platform.service.cluster.OneTimeRunner;
 import com.tarantula.platform.service.persistence.*;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -24,6 +22,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,11 +31,9 @@ import java.util.concurrent.Semaphore;
 /**
  * Updated by yinghu lu on 6/28/2020.
  */
-public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,EventListener,BucketListener{
+public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,BucketListener{
 
     private static JDKLogger log = JDKLogger.getLogger(BerkeleyJEProvider.class);
-
-    //private static String ENCODING = "UTF-8";
 
     private String dataPath;
     private String integrationPath;
@@ -51,20 +48,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
 
     private Node node;
 
-    //private EventService dataScopePublisher;
-    //private EventService integrationScopePublisher;
-
     private ClusterProvider dataCluster;
     private ClusterProvider integrationCluster;
-    private ServiceContext serviceContext;
 
     private ConcurrentHashMap<String,ReplicatedDataStore> dMap = new ConcurrentHashMap<>();
 
     private Environment environment;
     private Environment integrationEnvironment;
 
-    private String replicationTopic;
-    private String backupTopic;
 
     private ShardingProvider iShardingProvider;
     private ShardingProvider dShardingProvider;
@@ -81,8 +72,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.dailyBackup = properties.get("dailyBackup")!=null?Boolean.parseBoolean(properties.get("dailyBackup")):false;
         this.partitionNumber = Integer.parseInt(properties.get("partitionNumber"));
         this.node = new Node(properties.get("bucket"),properties.get("node"));
-        this.replicationTopic = "tarantula-replication-topic-"+this.database;
-        this.backupTopic = "tarantula-backup-topic-"+this.database;
+
     }
     public void addShardingProvider(ShardingProvider shardingProvider){
         if(shardingProvider.scope()==Distributable.INTEGRATION_SCOPE){
@@ -144,17 +134,13 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
 
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.serviceContext = serviceContext;
         this.dataCluster = serviceContext.clusterProvider(Distributable.DATA_SCOPE);
-        //this.dataScopePublisher = serviceContext.eventService(Distributable.DATA_SCOPE);
         this.integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.integrationCluster.addBucketListener(this);
-        //this.integrationScopePublisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
     }
     @Override
     public void waitForData() {
-        //this.dataCluster.subscribe(this.replicationTopic,this);
-        //this.integrationCluster.subscribe(this.backupTopic,this);
+
     }
     @Override
     public void start() throws Exception {
@@ -205,7 +191,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         }
         this.integrationEnvironment = new Environment(new File(integrationPath),envConfig);
         //log.info("Waiting for loading data on first member from data scope store");
-        /**
         HashSet<String> ln = new HashSet<>();
         for(String dn : this.environment.getDatabaseNames()){
             ln.add(dn.split("_")[0]);
@@ -218,9 +203,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         for(String dn : this.integrationEnvironment.getDatabaseNames()){
             DataStore ds = this.create(dn);
             ds.count();
-        }**/
+        }
         this.create(this.database,this.partitionNumber);
-        log.info("Tarantula data store started");
+        log.info("Tarantula data store started on ["+node.toString()+"]");
     }
 
     @Override
@@ -234,32 +219,13 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         this.integrationEnvironment.close();
         log.info("Berkeley JE data store shut down on ["+node.toString()+"]");
     }
-    private void truncateOnBackup(Database tds){
-        DiskOrderedCursor cursor = tds.openCursor(null);
-        DatabaseEntry pk = new DatabaseEntry();
-        DatabaseEntry pv = new DatabaseEntry();
-        int dc = 0;
-        do{
-            if(cursor.getNext(pk,pv,null)==OperationStatus.SUCCESS){
-                if(tds.delete(null,pk)==OperationStatus.SUCCESS){
-                    dc++;
-                }
-            }
-            else{
-                break;
-            }
-        }while (true);
-        cursor.close();
-        log.info("Total records deleted ["+dc+"] from action entries on ["+tds.getDatabaseName()+"]");
-    }
-    private void migrateFromDataScope(Event mve){
-    }
-    private void migrateFromIntegrationScope(Event mve){
-    }
+
+    // map store listener methods
+    @Override
     public int onVersioning(Metadata metadata){
         return this.dShardingProvider.version(metadata.partition());
     }
-
+    @Override
     public <T extends Recoverable> byte[] onCreating(Metadata metadata,String key,T t){
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             return iShardingProvider.create(metadata,key,t);
@@ -268,6 +234,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             return dShardingProvider.create(metadata,key,t);
         }
     }
+    @Override
     public <T extends Recoverable> byte[] onUpdating(Metadata metadata,String key,T t){
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             return iShardingProvider.update(metadata,key,t);
@@ -288,24 +255,16 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
 
     @Override
     public void onDistributing(Metadata metadata, byte[] key, byte[] value) {
-        log.warn("Distributed->"+new String(value));
         if(metadata.scope()==Recoverable.DATA_SCOPE){
-            //use data store prefix as the active database
-            //this.dataScopePublisher.publish(new MapStoreSyncEvent(this.replicationTopic,this.node.nodeName,key,value,(RecoverableMetadata) metadata));
-            if(metadata.distributable()){
-                this.dataCluster.set(metadata,key,value);
-            }
-        }
-        else if(metadata.scope()==Recoverable.INTEGRATION_SCOPE){
-            //this.integrationScopePublisher.publish(new MapStoreSyncEvent(this.backupTopic,this.node.nodeName,key,value,(RecoverableMetadata)metadata));
-            if(metadata.distributable()){
-                this.integrationCluster.set(metadata,key,value);
-            }
+            this.dataCluster.recoverService().replicate(metadata.source(),key,value);
         }
     }
+    @Override
     public byte[] onRecovering(Metadata metadata,byte[] key){
         return this.dataCluster.recoverService().recover(metadata.source(),key);
     }
+    //end of map store listener
+
     public void backup(int scope){
         if(scope==Distributable.DATA_SCOPE){
             this.environment.sync();
@@ -449,30 +408,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
             backup(Distributable.INTEGRATION_SCOPE);
         }
     }
-    @Override
-    public boolean onEvent(Event event) {
-        if(event instanceof MapStoreSyncEvent){
-            MapStoreSyncEvent mse = (MapStoreSyncEvent)event;
-            Metadata mt = mse.metadata;
-            DataStore rds = mt.scope()==Distributable.DATA_SCOPE?this.create(mt.source(),this.serviceContext.partitionNumber()):this.create(mt.source());
-            ((ReplicatedDataStore)rds).onReplication(mse);
-        }
-        else if(event instanceof MapStoreVotingEvent){
-            //if(!event.trackId().equals(this.registerId)){
-            if(event.stub()==Distributable.DATA_SCOPE){
-                this.serviceContext.schedule(new OneTimeRunner(100,()->{
-                    migrateFromDataScope(event);
-                }));
-            }
-            else if(event.stub()==Distributable.INTEGRATION_SCOPE){
-                this.serviceContext.schedule(new OneTimeRunner(100,()->{
-                    migrateFromIntegrationScope(event);
-                }));
-            }
-            //}
-        }
-        return false;
-    }
 
     @Override
     public void onBucket(int _bucket, int state) {
@@ -585,7 +520,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         public <T extends Recoverable> void list(RecoverableFactory<T> query, Stream<T> stream) {
             throw new UnsupportedOperationException();
         }
-        
+
         @Override
         public RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener) {
             throw new UnsupportedOperationException();

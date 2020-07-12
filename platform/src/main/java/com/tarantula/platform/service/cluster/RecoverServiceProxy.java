@@ -66,4 +66,16 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             throw ExceptionUtil.rethrow(e);
         }
     }
+    @Override
+    public void replicate(String source,byte[] key,byte[] value){
+        NodeEngine nodeEngine = getNodeEngine();
+        ReplicateOperation operation = new ReplicateOperation(source,key,value);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<Void> future = builder.invoke();
+            future.get(); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
 }

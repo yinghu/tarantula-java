@@ -49,4 +49,8 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         log.warn(new String(ret));}
         return ret;
     }
+    public void replicate(String source,byte[] key,byte[] value){
+        log.warn("Replicating ["+new String(key)+"]from ["+source+"]");
+
+    }
 }
