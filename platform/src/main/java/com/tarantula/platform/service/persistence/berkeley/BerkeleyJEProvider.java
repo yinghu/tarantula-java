@@ -531,10 +531,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Bu
             throw new UnsupportedOperationException();
         }
 
-        @Override
-        public void onReplication(MapStoreSyncEvent me) {
-            throw new UnsupportedOperationException();
-        }
         public void close(){
             this.berkeleyStore.close();
         }

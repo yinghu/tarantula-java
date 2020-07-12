@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.cluster;
 
+import com.hazelcast.core.Member;
 import com.hazelcast.spi.AbstractDistributedObject;
 
 import com.hazelcast.spi.InvocationBuilder;
@@ -8,6 +9,7 @@ import com.hazelcast.util.ExceptionUtil;
 import com.tarantula.platform.service.RecoverService;
 import com.tarantula.platform.service.ServiceContext;
 
+import java.util.Set;
 import java.util.concurrent.Future;
 
 public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecoverService> implements RecoverService {
@@ -70,12 +72,17 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     public void replicate(String source,byte[] key,byte[] value){
         NodeEngine nodeEngine = getNodeEngine();
         ReplicateOperation operation = new ReplicateOperation(source,key,value);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Void> future = builder.invoke();
-            future.get(); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
+        Set<Member> mlist = nodeEngine.getHazelcastInstance().getCluster().getMembers();
+        mlist.forEach((m)->{
+            if(!m.localMember()){
+                InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+                try {
+                    final Future<Void> future = builder.invoke();
+                    future.get(); //retry if timeout
+                } catch (Exception e) {
+                    throw ExceptionUtil.rethrow(e);
+                }
+            }
+        });
     }
 }

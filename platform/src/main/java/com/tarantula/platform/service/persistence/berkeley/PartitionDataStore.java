@@ -2,12 +2,11 @@ package com.tarantula.platform.service.persistence.berkeley;
 
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.DiskOrderedCursor;
 import com.sleepycat.je.OperationStatus;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.IndexSet;
-import com.tarantula.platform.event.MapStoreSyncEvent;
+
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 import com.tarantula.platform.service.persistence.MapStoreListener;
@@ -320,7 +319,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
             String akey = (query.distributionKey() + Recoverable.PATH_SEPARATOR + query.label());
             byte[] owner = akey.getBytes();
             DataStoreOnPartition dso = partitions[SystemUtil.partition(owner,partition)];
-            this.mapStoreListener.onRecovering(dso.metadata,owner);
             byte[] edgeList = _get(dso,owner);
             if(edgeList==null){
                 return;
@@ -355,21 +353,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
         rMap.remove(factoryId);
     }
 
-    @Override
-    public void onReplication(MapStoreSyncEvent msd) {
-        Metadata mt = msd.metadata;
-        if(!msd.source().equals(this.node)){
-            _put(partitions[mt.partition()],msd.key,msd.payload());
-        }
-        if(!mt.onEdge()){
-            //callback on local application register
-            RecoverableListener rl = rMap.get(mt.factoryId());
-            if(rl!=null){
-                rl.onUpdated(mt,msd.key,msd.payload());
-            }
-        }
-
-    }
     private boolean _put(DataStoreOnPartition dso,byte[] key,byte[] value){
         return dso.database.put(null,new DatabaseEntry(key),new DatabaseEntry(value))==OperationStatus.SUCCESS;
     }
