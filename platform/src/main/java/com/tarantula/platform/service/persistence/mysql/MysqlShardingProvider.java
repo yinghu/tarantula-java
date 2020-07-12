@@ -241,10 +241,10 @@ public class MysqlShardingProvider implements ShardingProvider {
 
     @Override
     public void onBucket(int bucket, int state) {
-        partitionStates[bucket].opening = state== BucketReceiver.OPEN;
-        if(!partitionStates[bucket].opening){
+        if(state==BucketReceiver.CLOSE||partitionStates[bucket].opening){//skip close or already opening
             return;
         }
+        partitionStates[bucket].opening = true;
         try{
             Connection connection = shardList[bucket%shards].connection();
             try{
