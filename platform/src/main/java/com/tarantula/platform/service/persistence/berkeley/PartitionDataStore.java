@@ -192,17 +192,20 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = akey.getBytes();
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
-            byte[] v;
+            byte[] v = t.backup()?mapStoreListener.onLoading(dso.metadata,akey):_get(dso,key);
             boolean suc;
-            if((v=_get(partitions[SystemUtil.partition(key,partition)],key))==null){
-                v = SystemUtil.toJson(t.toMap());
-                suc = _put(dso,key,v);
+            if(v==null){
+                int vn = mapStoreListener.onVersioning(dso.metadata);
+                Map<String,Object> md = t.toMap();
+                md.put(VERSION_NAME,vn);
+                byte[] vx = SystemUtil.toJson(md);
+                suc = _put(dso,key,vx);
                 if(suc) {
                     if(t.backup()){
                         this.mapStoreListener.onCreating(dso.metadata,akey,t);
                     }
                     if(t.distributable()){
-                        this.mapStoreListener.onDistributing(dso.metadata, key, v);
+                        this.mapStoreListener.onDistributing(dso.metadata, key,vx);
                     }
                     if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
                         suc = onEdge(t, akey);

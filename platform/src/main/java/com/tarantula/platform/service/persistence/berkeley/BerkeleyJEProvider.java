@@ -306,19 +306,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
     public byte[] onRecovering(Metadata metadata,byte[] key){
         return this.dataCluster.recoverService().recover(metadata.source(),key);
     }
-    /**
-    public void onLoaded(Metadata metadata,byte[] key,byte[] value){
-        if(metadata.scope()==Recoverable.DATA_SCOPE){
-            if(metadata.distributable()){
-                this.dataCluster.set(metadata,key,value);
-            }
-        }
-        else if(metadata.scope()==Recoverable.INTEGRATION_SCOPE){
-            if(metadata.distributable()){
-                this.integrationCluster.set(metadata,key,value);
-            }
-        }
-    }**/
     public void backup(int scope){
         if(scope==Distributable.DATA_SCOPE){
             this.environment.sync();
@@ -598,8 +585,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Ev
         public <T extends Recoverable> void list(RecoverableFactory<T> query, Stream<T> stream) {
             throw new UnsupportedOperationException();
         }
-
-
+        
         @Override
         public RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener) {
             throw new UnsupportedOperationException();
