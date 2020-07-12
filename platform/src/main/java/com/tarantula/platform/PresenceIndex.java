@@ -21,6 +21,10 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public PresenceIndex(){
         this.label = "Presence";
     }
+    @Override
+    public boolean distributable(){
+        return true;
+    }
     public synchronized double balance() {
         return this.balance;
     }

@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 //data scope data store
 public class PartitionDataStore extends ReplicatedDataStore{
-    //private static String ENCODING = "UTF-8";
+    public static String VERSION_NAME = "_v_";
     private final DataStoreOnPartition[] partitions;
     private final int partition;
     private final String bucket;
@@ -91,15 +91,17 @@ public class PartitionDataStore extends ReplicatedDataStore{
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             int v = mapStoreListener.onVersioning(dso.metadata);
             Map<String,Object> md = t.toMap();
-            md.put("version",v);
+            md.put(VERSION_NAME,v);
             byte[] value = SystemUtil.toJson(md);
             boolean suc = _put(dso,key,value);
             if(suc){
                 //do backup and replication
-                if(t.backup()){
+                if(t.backup()){//backing up onto database
                     this.mapStoreListener.onCreating(dso.metadata,okey,t);
                 }
-                this.mapStoreListener.onDistributing(dso.metadata,key,value);
+                if(t.distributable()){//distributing onto cluster
+                    this.mapStoreListener.onDistributing(dso.metadata,key,value);
+                }
                 if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
                     suc = onEdge(t,okey);
                 }
@@ -136,7 +138,9 @@ public class PartitionDataStore extends ReplicatedDataStore{
                     this.mapStoreListener.onCreating(dos.metadata,indexSet.key().asString(),indexSet);
                 }
             }
-            this.mapStoreListener.onDistributing(dos.metadata,_kn,_vn);
+            if(t.distributable()){
+                this.mapStoreListener.onDistributing(dos.metadata,_kn,_vn);
+            }
         }
         return suc;
     }
@@ -151,13 +155,17 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = akey.getBytes();
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            byte[] value = SystemUtil.toJson(t.toMap());
+            int v = this.mapStoreListener.onVersioning(dso.metadata);
+            Map<String,Object> md = t.toMap();
+            md.put(VERSION_NAME,v);
+            byte[] value = SystemUtil.toJson(md);
             if(_put(dso,key,value)){
                 if(t.backup()){
                     this.mapStoreListener.onUpdating(dso.metadata,akey,t);
                 }
-                this.mapStoreListener.onDistributing(dso.metadata,key,value);
-                //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,t.scope(),t.getFactoryId(),t.getClassId(),dso.partition,false),key,value);
+                if(t.distributable()){
+                    this.mapStoreListener.onDistributing(dso.metadata,key,value);
+                }
                 return true;
             }
             else{
@@ -193,7 +201,9 @@ public class PartitionDataStore extends ReplicatedDataStore{
                     if(t.backup()){
                         this.mapStoreListener.onCreating(dso.metadata,akey,t);
                     }
-                    this.mapStoreListener.onDistributing(dso.metadata, key, v);
+                    if(t.distributable()){
+                        this.mapStoreListener.onDistributing(dso.metadata, key, v);
+                    }
                     if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
                         suc = onEdge(t, akey);
                     }
@@ -225,7 +235,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] key = akey.getBytes();
             byte[] value;
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            this.mapStoreListener.onRecovering(dso.metadata,key);
             if((value=_get(dso,key))==null){
                 if((value=mapStoreListener.onLoading(dso.metadata,akey))==null){
                     return false;

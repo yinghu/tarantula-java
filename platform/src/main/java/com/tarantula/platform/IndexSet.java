@@ -2,6 +2,7 @@ package com.tarantula.platform;
 
 import com.tarantula.Recoverable;
 import com.tarantula.platform.service.cluster.PortableRegistry;
+import com.tarantula.platform.service.persistence.berkeley.PartitionDataStore;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -26,12 +27,17 @@ public class IndexSet extends RecoverableObject {
        keySet.forEach((k)->{
            properties.put(k,"1");
        });
-        return this.properties;
+       return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
        properties.forEach((k,v)->{
-           keySet.add(k);
+           if(!k.equals(PartitionDataStore.VERSION_NAME)){
+                keySet.add(k);
+           }
+           else{
+               version = ((Number)v).intValue();
+           }
        });
     }
 
