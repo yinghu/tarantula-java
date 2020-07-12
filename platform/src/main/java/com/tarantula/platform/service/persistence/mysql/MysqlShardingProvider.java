@@ -135,7 +135,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                 PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?,?,?)");
                 preparedStatement.setString(1,key);
                 String ret = SystemUtil.toJsonString(data);
-                log.warn("CREATE KEY->"+key+"<><>"+ret);
+                //log.warn("CREATE KEY->"+key+"<><>"+ret);
                 preparedStatement.setString(2, ret);
                 preparedStatement.setInt(3,t.getClassId());
                 preparedStatement.setInt(4,t.getFactoryId());
@@ -153,35 +153,7 @@ public class MysqlShardingProvider implements ShardingProvider {
             return null;
         }
     }
-    public byte[] create(Metadata metadata, String key, Map<String,Object> data){
-        if(!enabled){
-            log.warn("Data backup is disabled->"+key);
-            return SystemUtil.toJson(data);
-        }
-        try{
-            Connection connection = shardList[metadata.partition()%shards].connection();
-            try{
-                PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?,?,?)");
-                preparedStatement.setString(1,key);
-                String ret = SystemUtil.toJsonString(data);
-                log.warn("CREATE KEY->"+key+"<><>"+ret);
-                preparedStatement.setString(2, ret);
-                preparedStatement.setInt(3,metadata.classId());
-                preparedStatement.setInt(4,metadata.factoryId());
-                preparedStatement.execute();
-                preparedStatement.close();
-                return ret.getBytes();
-            }catch (Exception eex){
-                throw new RuntimeException(eex.getMessage());
-            }
-            finally {
-                connection.close();
-            }
-        }catch (Exception ex){
-            log.warn("error on create->"+ex.getMessage());
-            return null;
-        }
-    }
+    @Override
     public byte[] load(Metadata metadata,String key){
         if(!enabled){
             log.warn("Data backup is disabled->"+key);
@@ -211,6 +183,7 @@ public class MysqlShardingProvider implements ShardingProvider {
             return null;
         }
     }
+    @Override
     public <T extends Recoverable> byte[] update(Metadata metadata,String key,T t){
         if(!enabled){
             log.warn("Data backup is disabled->"+key);
