@@ -27,17 +27,17 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
 	private HazelcastInstance _hazel;
 	private final TarantulaContext _tarantulaContext;
 
-    private final ConcurrentHashMap<String,ITopic<Event>> topicList = new ConcurrentHashMap<>();
+    //private final ConcurrentHashMap<String,ITopic<Event>> topicList = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<String,EventSubscriber> eventSubscribers = new ConcurrentHashMap<>();
+    //private ConcurrentHashMap<String,EventSubscriber> eventSubscribers = new ConcurrentHashMap<>();
 
-    private final ConcurrentLinkedQueue<Event> replicationPendingQueue = new ConcurrentLinkedQueue();
+    //private final ConcurrentLinkedQueue<Event> replicationPendingQueue = new ConcurrentLinkedQueue();
 
 
-    private ExecutorService replicationPool;
-    private int workerSize =8;
+    //private ExecutorService replicationPool;
+    //private int workerSize =8;
     private int partitionCount;
-    private final ArrayList<Closable> wlist = new ArrayList<>();
+    //private final ArrayList<Closable> wlist = new ArrayList<>();
 
     private String bucket;
     private final String INDEX_MAP = "tarantula.recoverable.index.Key";
@@ -51,7 +51,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     private DeployService deployService;
     private RecoverService recoverService;
     private ConcurrentHashMap<String,EventListener> eMap = new ConcurrentHashMap<>();
-    private MetricsListener metricsListener;
+    //private MetricsListener metricsListener;
 
     public TarantulaCluster(final Config config,final String bucket,final TarantulaContext tarantulaContext){
 		this.config  = config;
@@ -69,6 +69,9 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         return this.recoverService;
     }
     public EventService subscribe(String topic, EventListener callback){
+        return null;
+        //return this._tarantulaContext.integrationCluster().subscribe(topic,callback);
+        /**
         this.eventSubscribers.computeIfAbsent(topic,(t)->{
             EventSubscriber eventSubscriber = new EventSubscriber();
             eventSubscriber.callback = callback;
@@ -76,14 +79,16 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
             eventSubscriber.topic.addMessageListener((Message<Event> m) -> this.onQueue(m.getMessageObject()));
             return eventSubscriber;
         });
-        return this;
+        return this;**/
     }
     public void unsubscribe(String topic){
+        //this._tarantulaContext.integrationCluster().unsubscribe(topic);
+        /**
         EventSubscriber sub = eventSubscribers.remove(topic);
         if(sub!=null){
             ITopic<Event> top = topicList.remove(topic);
             top.removeMessageListener(sub.registrationKey);
-        }
+        }**/
     }
     public void registerEventListener(String topic, EventListener callback){
 
@@ -181,6 +186,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         this.rMap.remove(factoryId);
     }
 	public void start() throws Exception {
+        /**
         TarantulaExecutorServiceFactory.createExecutorService("data-"+this._tarantulaContext.dataReplicationThreadPoolSetting,(pool,poolSize,rh)->{
             this.replicationPool = pool;
             this.workerSize = poolSize;
@@ -189,7 +195,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
             EventSubscriptionWorker ese = new EventSubscriptionWorker(this,eventSubscribers,replicationPendingQueue);
             wlist.add(ese);
             this.replicationPool.execute(ese);
-        }
+        }**/
         //add platform portable provider from conf
         partitionCount = Integer.parseInt(config.getProperty("hazelcast.partition.count"));
         config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
@@ -201,19 +207,19 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         this.deployService = this._hazel.getDistributedObject(DeployService.NAME,DeployService.NAME);
         this.recoverService = this._hazel.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
         memberId = _hazel.getCluster().getLocalMember().getUuid();
-        this.subscribe(memberId,this);
-        metricsListener = (k,v)->{};
+        //this.subscribe(memberId,this);
+        //metricsListener = (k,v)->{};
     }
 
 	public void shutdown() throws Exception {
         try{
-            replicationPool.shutdown();
-            for(Closable e : wlist){
-                e.close();
-            }
+            //replicationPool.shutdown();
+            //for(Closable e : wlist){
+                //e.close();
+            //}
         }catch (Exception ex){
             log.error("error on event shutdown",ex);
-            this.replicationPool.shutdownNow();
+            //this.replicationPool.shutdownNow();
         }
         if(this._hazel!=null){
             this._hazel.getLifecycleService().shutdown();
@@ -222,16 +228,16 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
 
 
     public void publish(Event out) {
-        ITopic<Event> _t = this.topicList.computeIfAbsent(out.destination(),(String dest)-> this._hazel.getTopic(dest));
-        _t.publish(out);
-        metricsListener.onUpdated(Metrics.EVENT_OUT_COUNT,1);
+        //ITopic<Event> _t = this.topicList.computeIfAbsent(out.destination(),(String dest)-> this._hazel.getTopic(dest));
+        //_t.publish(out);
+        //metricsListener.onUpdated(Metrics.EVENT_OUT_COUNT,1);
     }
 
     public void retry(String retryKey) {
 
     }
 
-    @Override
+    /**
     public boolean onEvent(Event event){
          EventListener e = eMap.get(event.trackId());
          if(e!=null){
@@ -241,8 +247,9 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
             metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
          }
          return false;
-    }
+    }**/
     public String addEventListener(String registerId,EventListener e){
+        /**
         if(registerId==null){
             String rid = UUID.randomUUID().toString();
             eMap.put(rid,e);
@@ -250,17 +257,18 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         }else {
             eMap.put(registerId,e);
             return registerId;
-        }
-
+        }**/
+        throw new UnsupportedOperationException();
     }
     public void removeEventListener(String registerId){
-        eMap.remove(registerId);
+        //eMap.remove(registerId);
     }
+    /**
     public boolean onQueue(Event event) {
         this.replicationPendingQueue.offer(event);
         metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
         return true;
-    }
+    }**/
     public RoutingKey routingKey(String magicKey,String tag){
         return null;
     }
@@ -274,7 +282,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         return this._tarantulaContext.platformRoutingNumber;
     }
     public void registerMetricsListener(MetricsListener metricsListener){
-        this.metricsListener = metricsListener;
+        //this.metricsListener = metricsListener;
     }
     @Override
     public void stateChanged(LifecycleEvent state) {

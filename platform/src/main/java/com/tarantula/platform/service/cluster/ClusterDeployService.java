@@ -12,7 +12,6 @@ import com.tarantula.platform.event.MapStoreRecoveryEvent;
 import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.Batch;
-import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.deployment.ServiceConfigurationParser;
@@ -48,6 +47,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         new ServiceBootstrap(tarantulaContext._integrationClusterStarted,tarantulaContext._deployServiceStarted,new DeployServiceBootstrap(this),"deploy-service",true).start();
     }
     public void setup(){
+        /**
         if(scope==Distributable.INTEGRATION_SCOPE){
             this.tarantulaContext.integrationCluster().addEventListener(this.nodeEngine.getLocalMember().getUuid(),(e)->{
                 log.warn("Recovering integration scope data on master node to ->"+e.source());
@@ -61,7 +61,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 recover(e.source(),e.source(),true);
                 return false;
             });
-        }
+        }**/
         log.info("Clustering deployment service started ["+nodeEngine.getConfig().getGroupConfig().getName()+"] on scope ["+this.scope+"]");
     }
     @Override
@@ -84,6 +84,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
 
     }
+    /**
     private void _send(Event event){
         if(this.scope==Distributable.DATA_SCOPE){
             this.tarantulaContext.tarantulaCluster().publish(event);
@@ -113,7 +114,8 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         catch (Exception ex){
 
         }
-    }
+    }**/
+    /**
     private void recover(String destination,String registerId,boolean fullBackup){
         DataStoreProvider dsp = this.tarantulaContext.dataStoreProvider();
         //String loc = this.scope==Distributable.DATA_SCOPE?this.tarantulaContext.tarantulaCluster().subscription():this.tarantulaContext.integrationCluster().subscription();
@@ -137,7 +139,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 });
             }
         }));
-    }
+    }**/
 
     public Batch query(int registryId,String[] params){
         //log.warn("Query on->"+registryId+"/"+nodeEngine.getLocalMember().getAddress().toString());
@@ -495,9 +497,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         if(this.scope==Distributable.DATA_SCOPE){
             Member lm = nodeEngine.getLocalMember();
             int sz = nodeEngine.getClusterService().getSize();
-            if(sz==1){
-                return;
-            }
             int pt = 0;
             for(Member m : nodeEngine.getClusterService().getMembers()){
                 if(lm.getUuid().equals(m.getUuid())){
