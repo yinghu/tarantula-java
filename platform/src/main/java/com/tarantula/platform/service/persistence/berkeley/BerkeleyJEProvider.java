@@ -35,7 +35,7 @@ import java.util.concurrent.Semaphore;
 /**
  * Updated by yinghu lu on 6/28/2020.
  */
-public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,BucketListener{
+public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     private static JDKLogger log = JDKLogger.getLogger(BerkeleyJEProvider.class);
 
@@ -144,7 +144,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Bu
     public void setup(ServiceContext serviceContext) {
         this.dataCluster = serviceContext.clusterProvider(Distributable.DATA_SCOPE);
         this.integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
-        this.integrationCluster.addBucketListener(this);
+        //this.integrationCluster.addBucketListener(this);
         for(int i=0;i<workSize;i++){
             replicationPool.execute(()->{
                 while (true){

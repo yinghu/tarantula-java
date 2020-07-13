@@ -5,7 +5,7 @@ import com.tarantula.*;
 import java.util.List;
 
 /**
- * Update by yinghu on 4/9/2019.
+ * Update by yinghu on 7/13/2020
  */
 public interface ClusterProvider extends Serviceable{
 
@@ -44,5 +44,5 @@ public interface ClusterProvider extends Serviceable{
     RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener);
     void unregisterRecoverableListener(int factoryId);
     void registerMetricsListener(MetricsListener metricsListener);
-    void addBucketListener(BucketListener bucketListener);
+    //void addBucketListener(BucketListener bucketListener);
 }
