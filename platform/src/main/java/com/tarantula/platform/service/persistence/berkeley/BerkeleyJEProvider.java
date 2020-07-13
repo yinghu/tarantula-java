@@ -59,7 +59,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Bu
 
     private ClusterProvider dataCluster;
     private ClusterProvider integrationCluster;
-
     private ConcurrentHashMap<String,ReplicatedDataStore> dMap = new ConcurrentHashMap<>();
 
     private Environment environment;
@@ -240,7 +239,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Bu
 
     @Override
     public void shutdown() throws Exception {
-        //replicationPool.shutdownNow();
         iShardingProvider.shutdown();
         dShardingProvider.shutdown();
         dMap.forEach((k,v)->{

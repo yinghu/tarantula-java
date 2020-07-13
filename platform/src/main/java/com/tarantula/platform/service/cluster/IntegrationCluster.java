@@ -330,9 +330,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
                 }
             }
         });
-        bList.forEach((b)->{
-            b.onBucket(pt,opening?BucketReceiver.OPEN:BucketReceiver.CLOSE);
-        });
+        bList.forEach((b)->b.onBucket(pt,opening?BucketReceiver.OPEN:BucketReceiver.CLOSE));
     }
 
     public RoutingKey routingKey(String magicKey,String tag){

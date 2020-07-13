@@ -207,6 +207,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         this.deployService = this._hazel.getDistributedObject(DeployService.NAME,DeployService.NAME);
         this.recoverService = this._hazel.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
         memberId = _hazel.getCluster().getLocalMember().getUuid();
+
         //this.subscribe(memberId,this);
         //metricsListener = (k,v)->{};
     }
