@@ -5,6 +5,7 @@ import com.sleepycat.je.util.DbBackup;
 import com.sleepycat.je.util.LogVerificationReadableByteChannel;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
+import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
 import com.tarantula.platform.event.MapStoreSyncEvent;
 import com.tarantula.platform.service.ClusterProvider;
 import com.tarantula.platform.service.DataStoreProvider;
@@ -27,6 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -44,6 +47,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Bu
     private String database;
     private boolean trimming;
     private int partitionNumber;
+
+    private String replicationPoolSetting;
+    private ExecutorService replicationPool;
+    private int workSize;
+    private final ConcurrentLinkedQueue<Runnable> replicationPendingQueue = new ConcurrentLinkedQueue();
 
     private boolean dailyBackup;
 
@@ -73,7 +81,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Bu
         this.dailyBackup = properties.get("dailyBackup")!=null?Boolean.parseBoolean(properties.get("dailyBackup")):false;
         this.partitionNumber = Integer.parseInt(properties.get("partitionNumber"));
         this.node = new Node(properties.get("bucket"),properties.get("node"));
-
+        this.replicationPoolSetting = properties.get("poolSetting");
     }
     public void addShardingProvider(ShardingProvider shardingProvider){
         if(shardingProvider.scope()==Distributable.INTEGRATION_SCOPE){
@@ -138,6 +146,23 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Bu
         this.dataCluster = serviceContext.clusterProvider(Distributable.DATA_SCOPE);
         this.integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.integrationCluster.addBucketListener(this);
+        for(int i=0;i<workSize;i++){
+            replicationPool.execute(()->{
+                while (true){
+                    Runnable runnable = replicationPendingQueue.poll();
+                    try {
+                        if(runnable!=null){
+                            runnable.run();
+                        }
+                        else{
+                            Thread.sleep(100);
+                        }
+                    }catch (Exception ex){
+
+                    }
+                }
+            });
+        }
     }
     @Override
     public void waitForData() {
@@ -206,11 +231,16 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Bu
             ds.count();
         }
         this.create(this.database,this.partitionNumber);
+        TarantulaExecutorServiceFactory.createExecutorService("data-"+this.replicationPoolSetting,(pool, poolSize, rh)->{
+            this.replicationPool = pool;
+            this.workSize = poolSize;
+        });
         log.info("Tarantula data store started on ["+node.toString()+"]");
     }
 
     @Override
     public void shutdown() throws Exception {
+        //replicationPool.shutdownNow();
         iShardingProvider.shutdown();
         dShardingProvider.shutdown();
         dMap.forEach((k,v)->{
@@ -257,7 +287,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener,Bu
     @Override
     public void onDistributing(Metadata metadata, byte[] key, byte[] value) {
         if(metadata.scope()==Recoverable.DATA_SCOPE){
-            this.dataCluster.recoverService().replicate(metadata.source(),key,value);
+            replicationPendingQueue.offer(()-> this.dataCluster.recoverService().replicate(metadata.source(),key,value));
         }
     }
     @Override

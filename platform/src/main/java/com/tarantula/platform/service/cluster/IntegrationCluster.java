@@ -39,7 +39,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private final ConcurrentHashMap<String,BucketReceiver> bMap = new ConcurrentHashMap<>();
     public PartitionState[] partitionStates;
 
-    private final ArrayList<Closable> wlist = new ArrayList<>();
+    //private final ArrayList<Closable> wlist = new ArrayList<>();
 
     private ExecutorService inboundEventPool;
     private int workerSize = 8;
@@ -93,7 +93,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         });
         for(int i=0;i<this.workerSize;i++){
             EventSubscriptionWorker ese = new EventSubscriptionWorker(this,eventSubscribers,replicationQueue);
-            wlist.add(ese);
+            //wlist.add(ese);
             this.inboundEventPool.execute(ese);
         }
         partitionCount = Integer.parseInt(config.getProperty("hazelcast.partition.count"));
@@ -115,16 +115,16 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
     public void shutdown() throws Exception {
         try{
-            this.inboundEventPool.shutdown();
+            //this.inboundEventPool.shutdown();
             bMap.forEach((k,b)->{
                 b.shutdown();
             });
-            for(Closable e : wlist){
-                e.close();
-            }
+            //for(Closable e : wlist){
+                //e.close();
+            //}
         }catch (Exception ex){
             log.error("error on event shutdown",ex);
-            this.inboundEventPool.shutdownNow();
+            //this.inboundEventPool.shutdownNow();
         }
         if(_cluster!=null){
             _cluster.getLifecycleService().shutdown();

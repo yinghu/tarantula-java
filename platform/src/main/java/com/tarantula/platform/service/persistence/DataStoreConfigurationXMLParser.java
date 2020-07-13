@@ -102,7 +102,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             properties.put("node",this.dataBucketNode);
             properties.put("partitionNumber",this.partitionNumber+"");
             properties.put("dir",this.dataDir);
-            //properties.put("recoveryDir",this.dataRecoveryDir);
+            properties.put("poolSetting",this.tarantulaContext.dataReplicationThreadPoolSetting);
             properties.put("dailyBackup",dataStoreDailyBackup);
             this.currentLoad = name.trim();
         }
