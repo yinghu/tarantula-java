@@ -244,9 +244,13 @@ public class MysqlShardingProvider implements ShardingProvider {
 
     @Override
     public void onBucket(int bucket, int state) {
-        if(state==BucketReceiver.CLOSE){//skip close or already opening
+        if(state==BucketReceiver.CLOSE){//close always
             partitionStates[bucket].opening = false;
-            log.warn(node+" is giving up bucket->"+bucket+" with version->"+partitionStates[bucket].version);
+            log.warn(node+" is closing bucket->"+bucket+" with version->"+partitionStates[bucket].version);
+            return;
+        }
+        else if(state==BucketReceiver.OPEN&&partitionStates[bucket].opening){//keep open
+            log.warn(node+" is keeping up bucket->"+bucket+" with version->"+partitionStates[bucket].version);
             return;
         }
         partitionStates[bucket].opening = true;
