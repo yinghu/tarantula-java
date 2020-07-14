@@ -244,8 +244,10 @@ public class MysqlShardingProvider implements ShardingProvider {
 
     @Override
     public void onBucket(int bucket, int state) {
-        if(state==BucketReceiver.CLOSE||partitionStates[bucket].opening){//skip close or already opening
-                return;
+        if(state==BucketReceiver.CLOSE){//skip close or already opening
+            partitionStates[bucket].opening = false;
+            log.warn(node+" is giving up bucket->"+bucket+" with version->"+partitionStates[bucket].version);
+            return;
         }
         partitionStates[bucket].opening = true;
         try{
@@ -264,7 +266,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                 }
                 rs.close();
                 preparedStatement.close();
-                log.warn("Bucket->"+bucket+"<><>Version->"+partitionStates[bucket].version);
+                log.warn(node+" is taking over bucket->"+bucket+" with version->"+partitionStates[bucket].version);
             }catch (Exception eex){
                 throw new RuntimeException(eex.getMessage());
             }
