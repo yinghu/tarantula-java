@@ -60,13 +60,21 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     public byte[] recover(String source, byte[] key) {
         NodeEngine nodeEngine = getNodeEngine();
         RecoverOperation operation = new RecoverOperation(source,key);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<byte[]> future = builder.invoke();
-            return future.get(); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        byte[] ret = null;
+        for(Member m : mlist){
+            try {
+                InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+                final Future<byte[]> future = builder.invoke();
+                ret = future.get();
+                if(ret!=null){
+                    break;
+                }
+            } catch (Exception e) {
+                throw ExceptionUtil.rethrow(e);
+            }
         }
+        return ret;
     }
     @Override
     public void replicate(String source,byte[] key,byte[] value){
