@@ -506,7 +506,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             }
             log.warn("partition updating on member added->["+pt+"/"+sz+"]"+lm.getUuid());
             for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
-                this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt,sz);
+                this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
             }
         }
         this.deploymentServiceProvider.clusterUpdated(this.scope,membershipServiceEvent.getMember().getUuid(),true);
@@ -526,7 +526,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             }
             log.warn("partition updating on member removed->["+pt+"/"+sz+"]"+lm.getUuid());
             for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
-                this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt,sz);
+                this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
             }
         }
         this.deploymentServiceProvider.clusterUpdated(this.scope,membershipServiceEvent.getMember().getUuid(),false);

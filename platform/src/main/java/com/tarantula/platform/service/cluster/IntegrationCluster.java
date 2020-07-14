@@ -18,9 +18,10 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * updated by yinghu on 4/10/2019
+ * updated by yinghu on 7/14/2020
  */
 public class IntegrationCluster extends TarantulaApplicationHeader implements ClusterProvider,EventService,LifecycleListener{
 
@@ -38,8 +39,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private final ConcurrentHashMap<String,BucketReceiver> bMap = new ConcurrentHashMap<>();
     public PartitionState[] partitionStates;
-
-    //private final ArrayList<Closable> wlist = new ArrayList<>();
+    private AtomicBoolean _start;
 
     private ExecutorService inboundEventPool;
     private int workerSize = 8;
@@ -54,7 +54,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private ConcurrentHashMap<String,EventListener> eMap = new ConcurrentHashMap<>();
 
     private MetricsListener metricsListener;
-    //private CopyOnWriteArrayList<BucketListener> bList = new CopyOnWriteArrayList<>();
+
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
         this.config = config;
         this.bucket = bucket;
@@ -63,6 +63,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         for(int i=0;i<tarantulaContext.platformRoutingNumber;i++){
             this.partitionStates[i]=new PartitionState(i,false);
         }
+        _start = new AtomicBoolean(false);
     }
     public String name(){
         return "IntegrationCluster";
@@ -93,7 +94,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         });
         for(int i=0;i<this.workerSize;i++){
             EventSubscriptionWorker ese = new EventSubscriptionWorker(this,eventSubscribers,replicationQueue);
-            //wlist.add(ese);
             this.inboundEventPool.execute(ese);
         }
         partitionCount = Integer.parseInt(config.getProperty("hazelcast.partition.count"));
@@ -112,6 +112,10 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         new ServiceBootstrap(this.tarantulaContext._deployServiceStarted,this.tarantulaContext._storageStarted,new StorageServiceBootstrap(this.tarantulaContext),"data-store-starter",true).start();
         new ServiceBootstrap(this.tarantulaContext._storageStarted,this.tarantulaContext._systemServiceStarted,new SystemServiceBootstrap(this.tarantulaContext),"system-service-starter",true).start();
         this.metricsListener = (k,v)->{};
+        _start.set(true);
+        for(PartitionState p: partitionStates){
+            this.tarantulaContext.dataStoreProvider().onBucket(p.partition,p.opening?BucketReceiver.OPEN:BucketReceiver.CLOSE);
+        }
     }
     public void shutdown() throws Exception {
         try{
@@ -313,8 +317,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             }
         }).start();
     }
-    public void onPartition(int pt,boolean opening,int size){
-        log.warn("Partition ["+pt+"] with opening ["+opening+"/"+size+"]");
+    public void onPartition(int pt,boolean opening){
+        log.warn("Partition ["+pt+"] with opening ["+opening+"]");
         this.partitionStates[pt].opening = opening;
         bMap.forEach((k,v)->{
             if(v.partition()==pt&&opening){//open if closed
@@ -330,8 +334,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
                 }
             }
         });
-        this.tarantulaContext.dataStoreProvider().onBucket(pt,opening?BucketReceiver.OPEN:BucketReceiver.CLOSE);
-        //bList.forEach((b)->b.onBucket(pt,opening?BucketReceiver.OPEN:BucketReceiver.CLOSE));
+        if(_start.get()){
+            this.tarantulaContext.dataStoreProvider().onBucket(pt,opening?BucketReceiver.OPEN:BucketReceiver.CLOSE);
+        }
     }
 
     public RoutingKey routingKey(String magicKey,String tag){
