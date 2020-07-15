@@ -39,7 +39,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private final ConcurrentHashMap<String,BucketReceiver> bMap = new ConcurrentHashMap<>();
     public PartitionState[] partitionStates;
-    private AtomicBoolean _start;
+    //private AtomicBoolean _start;
 
     private ExecutorService inboundEventPool;
     private int workerSize = 8;
@@ -63,7 +63,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         for(int i=0;i<tarantulaContext.platformRoutingNumber;i++){
             this.partitionStates[i]=new PartitionState(i,false);
         }
-        _start = new AtomicBoolean(false);
+        //_start = new AtomicBoolean(false);
     }
     public String name(){
         return "IntegrationCluster";
@@ -112,10 +112,10 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         new ServiceBootstrap(this.tarantulaContext._deployServiceStarted,this.tarantulaContext._storageStarted,new StorageServiceBootstrap(this.tarantulaContext),"data-store-starter",true).start();
         new ServiceBootstrap(this.tarantulaContext._storageStarted,this.tarantulaContext._systemServiceStarted,new SystemServiceBootstrap(this.tarantulaContext),"system-service-starter",true).start();
         this.metricsListener = (k,v)->{};
-        _start.set(true);
-        for(PartitionState p: partitionStates){
-            this.tarantulaContext.dataStoreProvider().onBucket(p.partition,p.opening?BucketReceiver.OPEN:BucketReceiver.CLOSE);
-        }
+        //_start.set(true);
+        //for(PartitionState p: partitionStates){
+            //this.tarantulaContext.dataStoreProvider().onBucket(p.partition,p.opening?BucketReceiver.OPEN:BucketReceiver.CLOSE);
+        //}
     }
     public void shutdown() throws Exception {
         try{
@@ -334,9 +334,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
                 }
             }
         });
-        if(_start.get()){
-            this.tarantulaContext.dataStoreProvider().onBucket(pt,opening?BucketReceiver.OPEN:BucketReceiver.CLOSE);
-        }
+        //if(_start.get()){
+            //this.tarantulaContext.dataStoreProvider().onBucket(pt,opening?BucketReceiver.OPEN:BucketReceiver.CLOSE);
+        //}
     }
 
     public RoutingKey routingKey(String magicKey,String tag){

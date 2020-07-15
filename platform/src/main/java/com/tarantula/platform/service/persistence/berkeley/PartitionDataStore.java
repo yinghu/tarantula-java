@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 //data scope data store
 public class PartitionDataStore extends ReplicatedDataStore{
-    public static String VERSION_NAME = "_v_";
+    //public static String VERSION_NAME = "_v_";
     private final DataStoreOnPartition[] partitions;
     private final int partition;
     private final String bucket;
@@ -88,10 +88,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = okey.getBytes();
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
-            //int v = mapStoreListener.onVersioning(dso.metadata);
-            Map<String,Object> md = t.toMap();
-            //md.put(VERSION_NAME,v);
-            byte[] value = SystemUtil.toJson(md);
+            byte[] value = SystemUtil.toJson(t.toMap());
             boolean suc = _put(dso,key,value);
             if(suc){
                 //do backup and replication
@@ -124,6 +121,12 @@ public class PartitionDataStore extends ReplicatedDataStore{
         if(ix!=null){
             indexSet.fromMap(SystemUtil.toMap(ix));
         }
+        else{
+            ix = mapStoreListener.onRecovering(dos.metadata,_kn);
+            if(ix!=null){
+                indexSet.fromMap(SystemUtil.toMap(ix));
+            }
+        }
         indexSet.keySet.add(okey);
         byte[] _vn = SystemUtil.toJson(indexSet.toMap());
         boolean suc = _put(dos,_kn,_vn);
@@ -154,10 +157,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = akey.getBytes();
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            //int v = this.mapStoreListener.onVersioning(dso.metadata);
-            Map<String,Object> md = t.toMap();
-            //md.put(VERSION_NAME,v);
-            byte[] value = SystemUtil.toJson(md);
+            byte[] value = SystemUtil.toJson(t.toMap());
             if(_put(dso,key,value)){
                 if(t.backup()){
                     this.mapStoreListener.onUpdating(dso.metadata,akey,t);
@@ -191,15 +191,13 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = akey.getBytes();
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
-            byte[] v = t.backup()?mapStoreListener.onLoading(dso.metadata,akey):_get(dso,key);
-            boolean suc;
+            byte[] v = _get(dso,key);
             if(v==null){
-                //int vn = mapStoreListener.onVersioning(dso.metadata);
-                Map<String,Object> md = t.toMap();
-                //md.put(VERSION_NAME,vn);
-                byte[] vx = SystemUtil.toJson(md);
-                suc = _put(dso,key,vx);
-                if(suc) {
+                v = mapStoreListener.onRecovering(dso.metadata,key);
+            }
+            if(v==null){
+                byte[] vx = SystemUtil.toJson(t.toMap());
+                if(_put(dso,key,vx)) {
                     if(t.backup()){
                         this.mapStoreListener.onCreating(dso.metadata,akey,t);
                     }
@@ -207,10 +205,11 @@ public class PartitionDataStore extends ReplicatedDataStore{
                         this.mapStoreListener.onDistributing(dso.metadata, key,vx);
                     }
                     if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
-                        suc = onEdge(t, akey);
+                        onEdge(t, akey);
                     }
+                    return true;
                 }
-                return suc;
+                return false;
             }
             else{
                 if(loading){

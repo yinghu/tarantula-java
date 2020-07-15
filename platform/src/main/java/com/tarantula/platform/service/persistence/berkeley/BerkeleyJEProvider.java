@@ -162,6 +162,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 }
             });
         }
+        this.iShardingProvider.setup(serviceContext);
+        this.dShardingProvider.setup(serviceContext);
     }
     @Override
     public void waitForData() {
@@ -263,7 +265,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             }
         }
         else if(t.scope()==Distributable.INTEGRATION_SCOPE){
-            return dShardingProvider.create(metadata,key,t);
+            return iShardingProvider.create(metadata,key,t);
         }
         return null;
     }
@@ -285,7 +287,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         return null;
     }
     @Override
-    public byte[] onLoading(Metadata metadata,String key){
+    public <T extends Recoverable> T onLoading(Metadata metadata,String key){
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             return iShardingProvider.load(metadata,key);
         }
@@ -459,7 +461,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         //dataCluster.set(_ps.key().asString().getBytes(),SystemUtil.toJson(_ps.toMap()));
         //byte[] d = dataCluster.get(_ps.key().asString().getBytes());
         ///log.warn("PARTITION STATE->"+new String(d));
-        dShardingProvider.onBucket(_bucket,state);
+        //dShardingProvider.onBucket(_bucket,state);
     }
 
     //partial implementation of createIfAbsent and load for access index persistence
@@ -540,14 +542,16 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 }
                 byte[] key = akey.getBytes();
                 byte[] value;
-                if((value=_get(key))==null){
-                    value = mapStoreListener.onLoading(metadata1,akey);
-                    if(value==null){
-                        return false;
-                    }
-                    _set(key,value);
+                if((value=_get(key))!=null){
+                    t.fromMap(SystemUtil.toMap(value));
+                    return true;
                 }
-                t.fromMap(SystemUtil.toMap(value));
+                T c = mapStoreListener.onLoading(metadata1,akey);
+                if(c==null){
+                    return false;
+                }
+                _set(key,SystemUtil.toJson(c.toMap()));
+                t.fromMap(c.toMap());
                 return true;
             }catch (Exception ex){
                 log.error("error on load",ex);

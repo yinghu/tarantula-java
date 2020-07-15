@@ -3,14 +3,12 @@ package com.tarantula.platform.service.persistence.mysql;
 import com.tarantula.Distributable;
 import com.tarantula.Metadata;
 import com.tarantula.Recoverable;
+import com.tarantula.RecoverableRegistry;
 import com.tarantula.logging.JDKLogger;
-import com.tarantula.platform.service.BucketReceiver;
 import com.tarantula.platform.service.ServiceContext;
-import com.tarantula.platform.service.cluster.PartitionState;
 import com.tarantula.platform.service.persistence.Shard;
 import com.tarantula.platform.service.persistence.ShardingProvider;
 import com.tarantula.platform.util.SystemUtil;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,8 +26,7 @@ public class MysqlShardingProvider implements ShardingProvider {
     private String name;
     private int scope;
     private int shards;
-    private String node;
-    private PartitionState[] partitionStates;
+    private ServiceContext serviceContext;
     private boolean enabled;
 
     private Shard[] shardList;
@@ -53,6 +50,11 @@ public class MysqlShardingProvider implements ShardingProvider {
         return name;
     }
 
+    @Override
+    public void setup(ServiceContext serviceContext) {
+        this.serviceContext = serviceContext;
+    }
+
 
     @Override
     public int scope() {
@@ -62,15 +64,11 @@ public class MysqlShardingProvider implements ShardingProvider {
     @Override
     public void configure(Map<String, String> properties) {
         this.name = properties.get("name");
-        this.node = properties.get("node");
+        //this.node = properties.get("node");
         this.scope = Integer.parseInt(properties.get("scope"));
         this.shards = Integer.parseInt(properties.get("shards"));
         this.enabled = Boolean.parseBoolean(properties.get("enabled"));
         int pno = scope== Distributable.INTEGRATION_SCOPE?Integer.parseInt(properties.get("p1")):Integer.parseInt(properties.get("p2"));
-        this.partitionStates = new PartitionState[pno];
-        for(int i=0;i<pno;i++){
-            this.partitionStates[i]=new PartitionState(i,false);
-        }
         this.shardList = new Shard[shards];
         log.warn("Sharding provider partitions->"+pno+"<>"+scope+"<>"+name);
     }
@@ -80,12 +78,14 @@ public class MysqlShardingProvider implements ShardingProvider {
         shardList[shard.shardNumber]=shard;
     }
     @Override
+
     public void registerDataStore(String name){
         if(!enabled){
             log.warn("Data backup is disabled->"+name);
             return;
         }
         try{
+            log.warn("registering data store->"+name);
             for(Shard shard : shardList){
                 Connection con = shard.connection();
                 Statement cmd = con.createStatement();
@@ -135,7 +135,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                 PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?,?,?)");
                 preparedStatement.setString(1,key);
                 String ret = SystemUtil.toJsonString(data);
-                //log.warn("CREATE KEY->"+key+"<><>"+ret);
+                log.warn("CREATE KEY->"+key+"<><>"+ret+"<><>"+metadata.source());
                 preparedStatement.setString(2, ret);
                 preparedStatement.setInt(3,t.getClassId());
                 preparedStatement.setInt(4,t.getFactoryId());
@@ -154,7 +154,7 @@ public class MysqlShardingProvider implements ShardingProvider {
         }
     }
     @Override
-    public byte[] load(Metadata metadata,String key){
+    public <T extends Recoverable> T load(Metadata metadata,String key){
         if(!enabled){
             log.warn("Data backup is disabled->"+key);
             return null;
@@ -162,12 +162,18 @@ public class MysqlShardingProvider implements ShardingProvider {
         try{
             Connection connection = shardList[metadata.partition()%shards].connection();
             try{
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT v FROM "+metadata.source()+" WHERE k=?");
+                log.warn("LOAD KEY->"+key+"<><>"+metadata.source());
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT v,c,f FROM "+metadata.source()+" WHERE k=?");
                 preparedStatement.setString(1,key);
                 ResultSet rs = preparedStatement.executeQuery();
-                byte[] ret = null;
+                T ret =null;
                 if(rs.next()){
-                    ret = rs.getString("v").getBytes();
+                    byte[] _ret = rs.getString("v").getBytes();
+                    int c = rs.getInt("c");
+                    int f = rs.getInt("f");
+                    RecoverableRegistry rgis = serviceContext.recoverableRegistry(f);
+                    ret = (T)rgis.create(c);
+                    ret.fromMap(SystemUtil.toMap(_ret));
                 }
                 rs.close();
                 preparedStatement.close();
@@ -194,7 +200,7 @@ public class MysqlShardingProvider implements ShardingProvider {
             try{
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE "+metadata.source()+" SET v=? WHERE k=?");
                 String ret = SystemUtil.toJsonString(t.toMap());
-                log.warn("UPDATE KEY->"+key+"<><>"+ret);
+                log.warn("UPDATE KEY->"+key+"<><>"+ret+"<><>"+metadata.source());
                 preparedStatement.setString(1,ret);
                 preparedStatement.setString(2,key);
                 preparedStatement.execute();
@@ -211,6 +217,7 @@ public class MysqlShardingProvider implements ShardingProvider {
             return null;
         }
     }
+    /**
     public byte[] update(Metadata metadata,String key,Map<String,Object> data){
         if(!enabled){
             log.warn("Data backup is disabled->"+key);
@@ -237,8 +244,8 @@ public class MysqlShardingProvider implements ShardingProvider {
             log.warn("error on update->"+ex.getMessage());
             return null;
         }
-    }
-
+    }**/
+    /**
     @Override
     public void onBucket(int bucket, int state) {
         if(state==BucketReceiver.CLOSE){//close always
@@ -277,5 +284,5 @@ public class MysqlShardingProvider implements ShardingProvider {
         }catch (Exception ex){
             log.warn("error on update->"+ex.getMessage());
         }
-    }
+    }**/
 }

@@ -113,7 +113,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             _cfg.put("scope",attributes.getValue("scope"));
             _cfg.put("p2",this.partitionNumber+"");
             _cfg.put("p1",this.accessIndexPartitionNumber+"");
-            _cfg.put("node",tarantulaContext.dataBucketNode);
+            //_cfg.put("node",tarantulaContext.dataBucketNode);
             _cfg.put("shards",attributes.getValue("shards"));
             _cfg.put("enabled",attributes.getValue("enabled"));
             this.shardingProvider.configure(_cfg);

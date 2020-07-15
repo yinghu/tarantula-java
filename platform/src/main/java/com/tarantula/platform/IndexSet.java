@@ -32,12 +32,7 @@ public class IndexSet extends RecoverableObject {
     @Override
     public void fromMap(Map<String,Object> properties){
        properties.forEach((k,v)->{
-           if(!k.equals(PartitionDataStore.VERSION_NAME)){
-                keySet.add(k);
-           }
-           else{
-               version = ((Number)v).intValue();
-           }
+           keySet.add(k);
        });
     }
 
