@@ -122,7 +122,7 @@ public class MysqlShardingProvider implements ShardingProvider {
             throw new RuntimeException(ex);
         }
     }
-   
+
     public <T extends Recoverable> byte[] create(Metadata metadata, String key, T t){
         if(!enabled){
             log.warn("Data backup is disabled->"+key);
