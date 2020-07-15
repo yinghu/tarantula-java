@@ -10,4 +10,10 @@ public class IntegrationScopeObject extends RecoverableObject {
     public int scope(){
         return Distributable.INTEGRATION_SCOPE;
     }
+    @Override
+    public boolean backup(){
+        return false;
+    }
+    @Override
+    public boolean distributable(){return false;}
 }
