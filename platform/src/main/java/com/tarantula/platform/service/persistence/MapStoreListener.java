@@ -21,6 +21,6 @@ public interface MapStoreListener {
     byte[] onRecovering(Metadata metadata,byte[] key);
 
     //backup partition version on backup
-    int onVersioning(Metadata metadata);
+    //int onVersioning(Metadata metadata);
 
 }

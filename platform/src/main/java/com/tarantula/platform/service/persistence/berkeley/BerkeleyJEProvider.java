@@ -251,35 +251,48 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     // map store listener methods
     @Override
-    public int onVersioning(Metadata metadata){
-        return this.dShardingProvider.version(metadata.partition());
-    }
-    @Override
     public <T extends Recoverable> byte[] onCreating(Metadata metadata,String key,T t){
-        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
-            return iShardingProvider.create(metadata,key,t);
+        if(t.scope()==Distributable.DATA_SCOPE){
+            if(t.backup()){
+                replicationPendingQueue.offer(()->{
+                    dShardingProvider.create(metadata,key,t);
+                });
+                return null;
+            }else{
+                return dShardingProvider.create(metadata,key,t);
+            }
         }
-        else{
+        else if(t.scope()==Distributable.INTEGRATION_SCOPE){
             return dShardingProvider.create(metadata,key,t);
         }
+        return null;
     }
     @Override
     public <T extends Recoverable> byte[] onUpdating(Metadata metadata,String key,T t){
-        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+        if(t.scope()==Distributable.DATA_SCOPE){
+            if(t.backup()){
+                replicationPendingQueue.offer(()->{
+                    dShardingProvider.update(metadata,key,t);
+                });
+                return null;
+            }else{
+                return dShardingProvider.update(metadata,key,t);
+            }
+        }
+        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             return iShardingProvider.update(metadata,key,t);
         }
-        else{
-            return dShardingProvider.update(metadata,key,t);
-        }
+        return null;
     }
     @Override
     public byte[] onLoading(Metadata metadata,String key){
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             return iShardingProvider.load(metadata,key);
         }
-        else{
+        else if(metadata.scope()==Distributable.DATA_SCOPE){
             return dShardingProvider.load(metadata,key);
         }
+        return null;
     }
 
     @Override

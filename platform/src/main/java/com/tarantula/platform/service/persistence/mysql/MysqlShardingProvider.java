@@ -31,7 +31,7 @@ public class MysqlShardingProvider implements ShardingProvider {
     private String node;
     private PartitionState[] partitionStates;
     private boolean enabled;
-    private boolean backup;
+
     private Shard[] shardList;
 
     @Override
@@ -66,7 +66,6 @@ public class MysqlShardingProvider implements ShardingProvider {
         this.scope = Integer.parseInt(properties.get("scope"));
         this.shards = Integer.parseInt(properties.get("shards"));
         this.enabled = Boolean.parseBoolean(properties.get("enabled"));
-        this.backup = Boolean.parseBoolean(properties.get("backup"));
         int pno = scope== Distributable.INTEGRATION_SCOPE?Integer.parseInt(properties.get("p1")):Integer.parseInt(properties.get("p2"));
         this.partitionStates = new PartitionState[pno];
         for(int i=0;i<pno;i++){
@@ -123,9 +122,7 @@ public class MysqlShardingProvider implements ShardingProvider {
             throw new RuntimeException(ex);
         }
     }
-    public int version(int bucket){
-        return this.partitionStates[bucket].version;
-    }
+
     public <T extends Recoverable> byte[] create(Metadata metadata, String key, T t){
         if(!enabled){
             log.warn("Data backup is disabled->"+key);
