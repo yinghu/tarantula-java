@@ -88,9 +88,9 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = okey.getBytes();
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
-            int v = mapStoreListener.onVersioning(dso.metadata);
+            //int v = mapStoreListener.onVersioning(dso.metadata);
             Map<String,Object> md = t.toMap();
-            md.put(VERSION_NAME,v);
+            //md.put(VERSION_NAME,v);
             byte[] value = SystemUtil.toJson(md);
             boolean suc = _put(dso,key,value);
             if(suc){
@@ -154,9 +154,9 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = akey.getBytes();
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            int v = this.mapStoreListener.onVersioning(dso.metadata);
+            //int v = this.mapStoreListener.onVersioning(dso.metadata);
             Map<String,Object> md = t.toMap();
-            md.put(VERSION_NAME,v);
+            //md.put(VERSION_NAME,v);
             byte[] value = SystemUtil.toJson(md);
             if(_put(dso,key,value)){
                 if(t.backup()){
@@ -194,9 +194,9 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] v = t.backup()?mapStoreListener.onLoading(dso.metadata,akey):_get(dso,key);
             boolean suc;
             if(v==null){
-                int vn = mapStoreListener.onVersioning(dso.metadata);
+                //int vn = mapStoreListener.onVersioning(dso.metadata);
                 Map<String,Object> md = t.toMap();
-                md.put(VERSION_NAME,vn);
+                //md.put(VERSION_NAME,vn);
                 byte[] vx = SystemUtil.toJson(md);
                 suc = _put(dso,key,vx);
                 if(suc) {
@@ -238,13 +238,10 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] value;
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
             if((value=_get(dso,key))==null){
-                if((value=mapStoreListener.onLoading(dso.metadata,akey))==null){
+                if((value=mapStoreListener.onRecovering(dso.metadata,key))==null){
                     return false;
                 }
                 _put(dso,key,value);
-            }
-            else{//validation
-
             }
             Map<String,Object> _map = SystemUtil.toMap(value);
             t.fromMap(_map);

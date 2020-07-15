@@ -251,10 +251,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     // map store listener methods
     @Override
-    public int onVersioning(Metadata metadata){
-        return this.dShardingProvider.version(metadata.partition());
-    }
-    @Override
     public <T extends Recoverable> byte[] onCreating(Metadata metadata,String key,T t){
         if(t.scope()==Distributable.DATA_SCOPE){
             if(t.backup()){
