@@ -11,9 +11,10 @@ import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.ServiceContext;
 
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
- * updated by yinghu lu on 6/12/2018.
+ * updated by yinghu lu on 7/16/2020.
  */
 public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessIndexClusterService> implements AccessIndexService, DistributedObject {
 
@@ -41,11 +42,12 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         AccessIndexSetOperation operation = new AccessIndexSetOperation(accessKey);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(accessKey);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,partitionId);
+        final Future<AccessIndex> future = builder.invoke();
         try {
-            final Future<AccessIndex> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(5, TimeUnit.SECONDS);
         } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
+            future.cancel(true);
+            return null;
         }
     }
     @Override
@@ -57,11 +59,12 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         AccessIndexGetOperation operation = new AccessIndexGetOperation(accessKey);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(accessKey);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,partitionId);
+        final Future<AccessIndexTrack> future = builder.invoke();
         try {
-            final Future<AccessIndexTrack> future = builder.invoke();
-            return future.get();
+            return future.get(5,TimeUnit.SECONDS);
         } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
+            future.cancel(true);
+            return null;
         }
     }
     @Override

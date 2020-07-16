@@ -5,12 +5,12 @@ import com.hazelcast.spi.AbstractDistributedObject;
 
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
-import com.hazelcast.util.ExceptionUtil;
 import com.tarantula.platform.service.RecoverService;
 import com.tarantula.platform.service.ServiceContext;
 
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecoverService> implements RecoverService {
 
@@ -63,15 +63,18 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         byte[] ret = null;
         for(Member m : mlist){
-            try {
+            if(!m.localMember()){
                 InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
                 final Future<byte[]> future = builder.invoke();
-                ret = future.get();
-                if(ret!=null){
-                    break;
+                try {
+                    ret = future.get(5,TimeUnit.SECONDS);
+                    if(ret!=null){
+                        break;
+                    }
+                } catch (Exception e) {
+                    future.cancel(true);
+                    //goes to next node if failed
                 }
-            } catch (Exception e) {
-                throw ExceptionUtil.rethrow(e);
             }
         }
         return ret;
@@ -81,16 +84,22 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         NodeEngine nodeEngine = getNodeEngine();
         ReplicateOperation operation = new ReplicateOperation(source,key,value);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        mlist.forEach((m)->{
+        int maxReplicationNode = 3;
+        for(Member m :mlist){
             if(!m.localMember()){
                 InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+                final Future<Void> future = builder.invoke();
                 try {
-                    final Future<Void> future = builder.invoke();
-                    future.get(); //retry if timeout
+                    future.get(5, TimeUnit.SECONDS);
+                    maxReplicationNode--;
+                    if(maxReplicationNode==0){
+                        break;
+                    }
                 } catch (Exception e) {
-                    throw ExceptionUtil.rethrow(e);
+                    future.cancel(true);
+                    //goes to next node if failed
                 }
             }
-        });
+        }
     }
 }
