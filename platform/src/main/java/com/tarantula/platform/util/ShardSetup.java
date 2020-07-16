@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class ShardSetup {
 
-
+    //create the database
     public static void createShard(String shard, Map<String,String> config) throws Exception{
         String url = config.get("url");
         String user = config.get("user");
