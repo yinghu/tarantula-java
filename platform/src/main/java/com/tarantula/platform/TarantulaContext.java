@@ -298,7 +298,7 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
         if(this._lobbyMapping.containsKey(typeId)){
             return;
         }
-        List<LobbyDescriptor> bList = this.query(new String[]{this.masterDataStore().bucket(),typeId},new LobbyQuery(this.masterDataStore().bucket()));
+        List<LobbyDescriptor> bList = this.query(new String[]{this.bucketId(),typeId},new LobbyQuery(this.bucketId()));
         bList.forEach((d)->{
             if(d.typeId().equals(typeId)){
                 this.setLobby(d);//

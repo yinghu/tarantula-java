@@ -218,6 +218,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 RecoverableFactory query = new LobbyQuery(params[0]);
                 dataStore.list(query,(b)->{
                     if(!b.disabled()){
+                        log.warn("Lobby->"+b.toString());
                         blist.add(b);
                     }
                     return true;
@@ -609,7 +610,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 }
                 //log.warn("Create named lobby type id->"+configuration.descriptor.typeId());
                 Descriptor descriptor = configuration.descriptor;
-                descriptor.owner(mds.bucket());
+                descriptor.owner(this.tarantulaContext.bucketId());
                 descriptor.label(LobbyDescriptor.LABEL);
                 descriptor.onEdge(true);
                 descriptor.resetEnabled(true);
