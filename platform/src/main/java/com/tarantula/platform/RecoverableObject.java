@@ -101,7 +101,7 @@ public class RecoverableObject implements Recoverable {
         this.index = index;
     }
     public boolean distributable(){
-        return false;
+        return true;
     }
     public String index(){
         return this.index;
