@@ -364,7 +364,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
     public boolean addLobby(Descriptor descriptor){
         DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(ds.bucket(),descriptor.typeId());
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.bucketId(),descriptor.typeId());
         if(ds.load(lobbyTypeIdIndex)){
             return false;
         }
@@ -403,7 +403,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
     public boolean enableLobby(String typeId,boolean enabled){
         DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex query = new LobbyTypeIdIndex(ds.bucket(),typeId);
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),typeId);
         if(!ds.load(query)){
             return false;
         }
@@ -449,7 +449,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
     public String addApplication(Descriptor descriptor){
         DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex query = new LobbyTypeIdIndex(ds.bucket(),descriptor.typeId());
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),descriptor.typeId());
         if(!ds.load(query)){
             return null;
         }
@@ -465,7 +465,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
     public boolean addView(OnView view){
         DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex query = new LobbyTypeIdIndex(ds.bucket(),view.owner());
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),view.owner());
         if(!ds.load(query)){
             return false;
         }
@@ -603,7 +603,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 else if(configuration.descriptor.typeId().endsWith("-data")){
                     gameCluster.property(GameCluster.GAME_DATA,configuration.descriptor.typeId());
                 }
-                LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(mds.bucket(),configuration.descriptor.typeId());
+                LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.bucketId(),configuration.descriptor.typeId());
                 if(mds.load(lobbyTypeIdIndex)){//stop existed
                     throw new RuntimeException("["+name+"] duplicated");
                 }
