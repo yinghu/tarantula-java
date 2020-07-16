@@ -17,7 +17,7 @@ public class Shard {
         this.shardNumber = shardNumber;
     }
     public void configuration(Map<String,String> config) throws Exception{
-        ShardSetup.createShard(config.get("database"));
+        ShardSetup.createShard(config.get("database"),config);
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl(config.get("url")+ Recoverable.PATH_SEPARATOR+config.get("database"));
         dataSource.setUsername(config.get("user"));
