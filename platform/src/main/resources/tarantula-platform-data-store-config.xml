@@ -8,7 +8,7 @@
     <sharding-provider name="integration" scope="2" shards="1" provider="com.tarantula.platform.service.persistence.mysql.MysqlShardingProvider" enabled="true">
         <shard sharding-number="0">
             <property name="url">jdbc:mysql://10.0.0.153:3306</property>
-            <property name="database">integration_data_n3</property>
+            <property name="database">integration_data_n4</property>
             <property name="user">tarantula</property>
             <property name="password">tarantula</property>
             <property name="poolSize">8</property>
@@ -32,7 +32,7 @@
     <sharding-provider name="data" scope="1" shards="1" provider="com.tarantula.platform.service.persistence.mysql.MysqlShardingProvider" enabled="true">
         <shard sharding-number="0">
             <property name="url">jdbc:mysql://10.0.0.153:3306</property>
-            <property name="database">tarantula_data_n3</property>
+            <property name="database">tarantula_data_n4</property>
             <property name="user">tarantula</property>
             <property name="password">tarantula</property>
             <property name="poolSize">8</property>
