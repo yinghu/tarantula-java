@@ -14,9 +14,4 @@ public class ShardSetup {
         cmd.close();
         connection.close();
     }
-
-    public static void main(String[] args) throws Exception{
-        createShard("integration_data_tx");
-        createShard("tarantula_data_tx");
-    }
 }

@@ -1,5 +1,7 @@
 package com.tarantula.platform.service.persistence;
 
+import com.tarantula.Recoverable;
+import com.tarantula.platform.util.ShardSetup;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
@@ -14,9 +16,10 @@ public class Shard {
     public Shard(int shardNumber){
         this.shardNumber = shardNumber;
     }
-    public void configuration(Map<String,String> config){
+    public void configuration(Map<String,String> config) throws Exception{
+        ShardSetup.createShard(config.get("database"));
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl(config.get("url"));
+        dataSource.setUrl(config.get("url")+ Recoverable.PATH_SEPARATOR+config.get("database"));
         dataSource.setUsername(config.get("user"));
         dataSource.setPassword(config.get("password"));
         // Connection pooling properties
