@@ -85,7 +85,7 @@ public class MysqlShardingProvider implements ShardingProvider {
             return;
         }
         try{
-            log.warn("registering data store->"+name);
+            //log.warn("registering data store->"+name);
             for(Shard shard : shardList){
                 Connection con = shard.connection();
                 Statement cmd = con.createStatement();
@@ -104,7 +104,7 @@ public class MysqlShardingProvider implements ShardingProvider {
             return;
         }
         try{
-            log.warn("registering data store->"+prefix+"<>"+partitions);
+            //log.warn("registering data store->"+prefix+"<>"+partitions);
             for(Shard shard : shardList){
                 Connection con = shard.connection();
                 Statement cmd = con.createStatement();
