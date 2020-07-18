@@ -119,7 +119,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             this.shardingProvider.configure(_cfg);
         }
         else if(qname.equals("shard")){
-            this.shard = new Shard(Integer.parseInt(attributes.getValue("sharding-number")));
+            this.shard = new Shard(Integer.parseInt(attributes.getValue("sharding-number")),this.shardingProvider.enabled());
         }
         else if(qname.equals("property")){
             currentProperty = attributes.getValue("name").trim();
@@ -161,6 +161,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
     void _start(HashMap<String,String> config,Shard shard){
         try{
             shard.configuration(config);
+            shard.start();
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }

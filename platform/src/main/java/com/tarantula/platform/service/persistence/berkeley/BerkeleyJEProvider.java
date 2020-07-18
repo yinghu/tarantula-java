@@ -453,17 +453,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
     }
 
-    @Override
-    public void onBucket(int _bucket, int state) {
-        //notify partitions updated
-        //PartitionState _ps = new PartitionState(_bucket);
-        //_ps.bucket(node.bucketName);
-        //dataCluster.set(_ps.key().asString().getBytes(),SystemUtil.toJson(_ps.toMap()));
-        //byte[] d = dataCluster.get(_ps.key().asString().getBytes());
-        ///log.warn("PARTITION STATE->"+new String(d));
-        //dShardingProvider.onBucket(_bucket,state);
-    }
-
     //partial implementation of createIfAbsent and load for access index persistence
     private static class AccessIndexDataStore extends ReplicatedDataStore {
 
@@ -520,8 +509,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                     return false;
                 }
                 byte[] v = mapStoreListener.onCreating(metadata1,akey,t);
-                if(v!=null){
-                    return _set(akey.getBytes(),v);
+                byte[] k = akey.getBytes();
+                if(v!=null&&_get(k)==null){
+                    return _set(k,v);
                 }
                 return false;
             }catch (Exception ex){

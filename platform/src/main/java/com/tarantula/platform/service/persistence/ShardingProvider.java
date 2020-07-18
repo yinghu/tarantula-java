@@ -6,11 +6,11 @@ import com.tarantula.platform.service.ServiceProvider;
 
 import java.util.Map;
 /**
- * Created by yinghu on 7/5/2020.
+ * updated by yinghu on 7/18/2020.
  */
 public interface ShardingProvider extends ServiceProvider {
 
-    //String name();
+    boolean enabled();
     int scope();
     void configure(Map<String,String> properties);
     void addShard(Shard shard);

@@ -1,6 +1,6 @@
 package com.tarantula.platform.service;
 
-import com.tarantula.BucketListener;
+
 import com.tarantula.DataStore;
 import com.tarantula.platform.service.persistence.Node;
 import com.tarantula.platform.service.persistence.ShardingProvider;
@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Updated by yinghu on 6/27/2020.
  */
-public interface DataStoreProvider extends ServiceProvider, BucketListener {
+public interface DataStoreProvider extends ServiceProvider {
 
     int CONCURRENCY_ACCESS_LIMIT = 17;
 

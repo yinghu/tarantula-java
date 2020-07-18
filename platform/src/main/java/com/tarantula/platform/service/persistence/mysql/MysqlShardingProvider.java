@@ -43,8 +43,9 @@ public class MysqlShardingProvider implements ShardingProvider {
             shard.shutdown();
         }
     }
-
-
+    public boolean enabled(){
+        return this.enabled;
+    }
     @Override
     public String name() {
         return name;
@@ -64,7 +65,6 @@ public class MysqlShardingProvider implements ShardingProvider {
     @Override
     public void configure(Map<String, String> properties) {
         this.name = properties.get("name");
-        //this.node = properties.get("node");
         this.scope = Integer.parseInt(properties.get("scope"));
         this.shards = Integer.parseInt(properties.get("shards"));
         this.enabled = Boolean.parseBoolean(properties.get("enabled"));
@@ -85,7 +85,6 @@ public class MysqlShardingProvider implements ShardingProvider {
             return;
         }
         try{
-            //log.warn("registering data store->"+name);
             for(Shard shard : shardList){
                 Connection con = shard.connection();
                 Statement cmd = con.createStatement();
@@ -104,7 +103,6 @@ public class MysqlShardingProvider implements ShardingProvider {
             return;
         }
         try{
-            //log.warn("registering data store->"+prefix+"<>"+partitions);
             for(Shard shard : shardList){
                 Connection con = shard.connection();
                 Statement cmd = con.createStatement();
@@ -125,7 +123,6 @@ public class MysqlShardingProvider implements ShardingProvider {
 
     public <T extends Recoverable> byte[] create(Metadata metadata, String key, T t){
         if(!enabled){
-            log.warn("Data backup is disabled->"+key);
             return SystemUtil.toJson(t.toMap());
         }
         try{
@@ -135,7 +132,6 @@ public class MysqlShardingProvider implements ShardingProvider {
                 PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?,?,?)");
                 preparedStatement.setString(1,key);
                 String ret = SystemUtil.toJsonString(data);
-                //log.warn("CREATE KEY->"+key+"<><>"+ret+"<><>"+metadata.source());
                 preparedStatement.setString(2, ret);
                 preparedStatement.setInt(3,t.getClassId());
                 preparedStatement.setInt(4,t.getFactoryId());
@@ -156,13 +152,11 @@ public class MysqlShardingProvider implements ShardingProvider {
     @Override
     public <T extends Recoverable> T load(Metadata metadata,String key){
         if(!enabled){
-            log.warn("Data backup is disabled->"+key);
-            return null;
+           return null;
         }
         try{
             Connection connection = shardList[metadata.partition()%shards].connection();
             try{
-                //log.warn("LOAD KEY->"+key+"<><>"+metadata.source());
                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT v,c,f FROM "+metadata.source()+" WHERE k=?");
                 preparedStatement.setString(1,key);
                 ResultSet rs = preparedStatement.executeQuery();
@@ -192,7 +186,6 @@ public class MysqlShardingProvider implements ShardingProvider {
     @Override
     public <T extends Recoverable> byte[] update(Metadata metadata,String key,T t){
         if(!enabled){
-            log.warn("Data backup is disabled->"+key);
             return SystemUtil.toJson(t.toMap());
         }
         try{
@@ -200,7 +193,6 @@ public class MysqlShardingProvider implements ShardingProvider {
             try{
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE "+metadata.source()+" SET v=? WHERE k=?");
                 String ret = SystemUtil.toJsonString(t.toMap());
-                //log.warn("UPDATE KEY->"+key+"<><>"+ret+"<><>"+metadata.source());
                 preparedStatement.setString(1,ret);
                 preparedStatement.setString(2,key);
                 preparedStatement.execute();
