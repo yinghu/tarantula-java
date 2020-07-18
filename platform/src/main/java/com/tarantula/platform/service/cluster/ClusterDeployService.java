@@ -366,15 +366,18 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public boolean addLobby(Descriptor descriptor){
         DataStore ds = this.tarantulaContext.masterDataStore();
         LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.bucketId(),descriptor.typeId());
-        if(ds.load(lobbyTypeIdIndex)){
+        if(!ds.createIfAbsent(lobbyTypeIdIndex,false)){
             return false;
         }
-        ds.create(lobbyTypeIdIndex);
-        descriptor.owner(ds.bucket());
+        descriptor.owner(this.tarantulaContext.bucketId());
         descriptor.label(LobbyDescriptor.LABEL);
         descriptor.onEdge(true);
         descriptor.resetEnabled(true);
         ds.create(descriptor);
+        lobbyTypeIdIndex.index(descriptor.distributionKey());
+        ds.update(lobbyTypeIdIndex);
+        return descriptor.distributionKey()!=null;
+        /**
         if(descriptor.deployCode()<=0||descriptor.tag()==null){
             return true;
         }
@@ -400,7 +403,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
         else{
             return false;
-        }
+        }**/
     }
     public boolean enableLobby(String typeId,boolean enabled){
         DataStore ds = this.tarantulaContext.masterDataStore();
@@ -455,7 +458,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             return null;
         }
         descriptor.owner(query.index());
-        descriptor.label("LDA");
+        descriptor.label(Application.LABEL);
         descriptor.onEdge(true);
         if(ds.create(descriptor)){
             return descriptor.distributionKey();

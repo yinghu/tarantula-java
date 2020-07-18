@@ -241,7 +241,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public boolean createModule(Descriptor descriptor){
         DynamicModuleClassLoader mc = new DynamicModuleClassLoader(descriptor);
         XMLParser xmlParser = new XMLParser();
-        //ResponseHeader resp = new ResponseHeader("createModule");
         boolean[] suc = {true};
         mc.loadResource("descriptor.xml",(in)->{
             try{

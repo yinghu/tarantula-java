@@ -90,17 +90,20 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         else if(session.action().equals("onFindDataStore")){
             session.write(toMessage("find data store",true).toString().getBytes(),label());
         }
-        /**
-        else if(session.action().equals("addLobby")){
-            LobbyDescriptor desc = new LobbyDescriptor();
-            desc.fromMap(SystemUtil.toMap(payload));
-            desc.type("lobby");
-            desc.accessMode(Access.PROTECT_ACCESS_MODE);
-            desc.deployCode(1);
-            desc.tag(desc.typeId()+Recoverable.PATH_SEPARATOR+"lobby");
-            boolean suc = this.serviceProvider.createLobby(desc);
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
+
+        else if(session.action().equals("onAddModule")){
+            OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            this.context.log(acc.property(OnAccess.MODULE_CODE_BASE).toString(),OnLog.WARN);
+            this.context.log(acc.property(OnAccess.MODULE_ARTIFACT).toString(),OnLog.WARN);
+            this.context.log(acc.property(OnAccess.MODULE_VERSION).toString(),OnLog.WARN);
+            DeploymentDescriptor desc = new DeploymentDescriptor();
+            desc.codebase(acc.property(OnAccess.MODULE_CODE_BASE).toString());
+            desc.moduleArtifact(acc.property(OnAccess.MODULE_ARTIFACT).toString());
+            desc.moduleVersion(acc.property(OnAccess.MODULE_VERSION).toString());
+            boolean suc = this.deploymentServiceProvider.createModule(desc);
+            session.write(this.toMessage(suc?"module added":"module not added",suc).toString().getBytes(),label());
         }
+        /**
         else if(session.action().equals("addApplication")){
             DeploymentDescriptor desc = new DeploymentDescriptor();
             desc.fromMap(SystemUtil.toMap(payload));

@@ -3,12 +3,11 @@
     <lobby-context>
         <type-id>gec-play-list</type-id>
         <type>lobby</type>
-        <category>game</category>
-        <tag>play-list/lobby</tag>
+        <category>service</category>
         <name>Play List</name>
         <response-label>playlist</response-label>
         <access-mode>12</access-mode>
-        <deploy-code>1</deploy-code>
+        <deploy-code>2</deploy-code>
         <description>Tarantula Play List</description>
         <application-list>
             <application>
@@ -16,10 +15,11 @@
                 <subtype-id>gec-play-list</subtype-id>
                 <name>playlist</name>
                 <type>application</type>
+                <tag>play-list/recently</tag>
                 <category>service</category>
                 <singleton>true</singleton>
                 <module-name>com.tarantula.playlist.RecentlyPlayListModule</module-name>
-                <description>Tarantula Play List</description>
+                <description>Tarantula Recently Play List</description>
             </application>
         </application-list>
 

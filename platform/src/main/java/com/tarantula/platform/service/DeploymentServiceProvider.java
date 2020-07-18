@@ -68,6 +68,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
     boolean reset(Descriptor descriptor);
     boolean createModule(Descriptor descriptor);
+
     //END OF MODULE OPERATION API
 
     boolean createApplication(Descriptor descriptor,boolean launching);
