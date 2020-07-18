@@ -26,7 +26,7 @@
                 <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
                 <max-idles-on-instance>3</max-idles-on-instance>
                 <timer-on-module>50</timer-on-module>
-                <module-name>com.tarantula.demo.Boost</module-name>
+                <module-name>com.tarantula.playlist.Boost</module-name>
                 <description>Tarantula Demo Sync Game</description>
             </application>
             <application>
@@ -42,7 +42,7 @@
                 <max-instances-per-partition>10</max-instances-per-partition>
                 <max-idles-on-instance>3</max-idles-on-instance>
                 <timer-on-module>50</timer-on-module>
-                <module-name>com.tarantula.demo.Boost</module-name>
+                <module-name>com.tarantula.playlist.Boost</module-name>
                 <description>Tarantula Demo Sync Game</description>
             </application>
             <application>
@@ -58,7 +58,7 @@
                 <max-instances-per-partition>10</max-instances-per-partition>
                 <max-idles-on-instance>3</max-idles-on-instance>
                 <timer-on-module>50</timer-on-module>
-                <module-name>com.tarantula.demo.Boost</module-name>
+                <module-name>com.tarantula.playlist.Boost</module-name>
                 <description>Tarantula Demo Sync Game</description>
             </application>
             <application>
@@ -69,7 +69,7 @@
                 <category>service</category>
                 <entry-cost>0</entry-cost>
                 <singleton>true</singleton>
-                <module-name>com.tarantula.demo.DemoService</module-name>
+                <module-name>com.tarantula.playlist.DemoService</module-name>
                 <description>Tarantula Demo Sync Game</description>
             </application>
         </application-list>
@@ -107,7 +107,7 @@
             <instances-on-startup-per-partition>1</instances-on-startup-per-partition>
             <max-idles-on-instance>3</max-idles-on-instance>
             <timer-on-module>100</timer-on-module>
-            <module-name>com.tarantula.demo.quest.RobotQuestModule</module-name>
+            <module-name>com.tarantula.playlist.quest.RobotQuestModule</module-name>
             <description>Tarantula Quest Sync Game</description>
         </application>
         </application-list>
