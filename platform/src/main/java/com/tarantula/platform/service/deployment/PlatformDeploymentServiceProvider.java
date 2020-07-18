@@ -744,7 +744,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public Lobby lobby(String typeId){
         DataStore mds = this.tarantulaContext.masterDataStore();
-        List<LobbyDescriptor> lbl = this.tarantulaContext.query(new String[]{mds.bucket(),typeId},new LobbyQuery(mds.bucket()));
+        List<LobbyDescriptor> lbl = this.tarantulaContext.query(new String[]{this.tarantulaContext.bucketId(),typeId},new LobbyQuery(this.tarantulaContext.bucketId()));
         if(lbl.size()==0){
             return null;
         }
