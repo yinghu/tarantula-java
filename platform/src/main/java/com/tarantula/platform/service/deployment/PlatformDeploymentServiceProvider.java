@@ -620,6 +620,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
     }
     public void deploy(OnLobby onLobby){
+        if(onLobby.deployCode()<2){
+            return;
+        }
         vMap.put(onLobby.typeId(),onLobby);
         if(onLobby.resetEnabled()){
             this.tarantulaContext.tokenValidatorProvider().onCheck(onLobby);

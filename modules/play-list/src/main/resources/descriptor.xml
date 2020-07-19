@@ -7,7 +7,7 @@
         <name>Play List</name>
         <response-label>playlist</response-label>
         <access-mode>12</access-mode>
-        <deploy-code>2</deploy-code>
+        <deploy-code>1</deploy-code>
         <description>Tarantula Play List</description>
         <application-list>
             <application>
