@@ -60,6 +60,15 @@
             <view type="add.module">
                 <property name="moduleResourceFile">sudo/add.module.view.html</property>
             </view>
+            <view type="launch.module">
+                <property name="moduleResourceFile">sudo/launch.module.view.html</property>
+            </view>
+            <view type="shutdown.module">
+                <property name="moduleResourceFile">sudo/shutdown.module.view.html</property>
+            </view>
+            <view type="reset.module">
+                <property name="moduleResourceFile">sudo/reset.module.view.html</property>
+            </view>
         </view-list>
 
     </lobby-context>

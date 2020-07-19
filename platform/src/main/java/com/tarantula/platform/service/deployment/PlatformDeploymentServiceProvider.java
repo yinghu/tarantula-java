@@ -264,6 +264,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 b.codebase(descriptor.codebase());
                 b.moduleArtifact(descriptor.moduleArtifact());
                 b.moduleVersion(descriptor.moduleVersion());
+                if(b.singleton()){
+                    b.applicationClassName("com.tarantula.platform.module.SingletonModuleApplication");
+                }
+                else{
+                    b.applicationClassName("com.tarantula.platform.module.DynamicModuleApplication");
+                }
                 String x = deployService.addApplication(b);
                 if(x==null){
                     log.warn("Failed to add application ->"+b.toString());
@@ -281,9 +287,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         return suc[0];//this.builder.create().toJson(resp);
     }
+    /**
     public boolean createLobby(Descriptor descriptor){
         return this.tarantulaContext.tarantulaCluster().deployService().addLobby(descriptor);
-    }
+    }**/
     public boolean createApplication(Descriptor descriptor,boolean launching){
         String  suc = this.tarantulaContext.tarantulaCluster().deployService().addApplication(descriptor);
         if(suc!=null&&launching){//launch if lobby on line
@@ -294,6 +301,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private void _setApplicationOnLobby(String typeId,String applicationId){
         this.tarantulaContext.setApplicationOnLobby(typeId,applicationId);
     }
+
     public boolean enableApplication(String applicationId,boolean enabled){
         String suc = this.tarantulaContext.tarantulaCluster().deployService().enableApplication(applicationId,enabled);
         if(suc!=null){//return the lobby typeId

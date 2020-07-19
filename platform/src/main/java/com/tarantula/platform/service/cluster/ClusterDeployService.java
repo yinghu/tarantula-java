@@ -373,6 +373,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         descriptor.label(LobbyDescriptor.LABEL);
         descriptor.onEdge(true);
         descriptor.resetEnabled(true);
+        descriptor.disabled(true);
         ds.create(descriptor);
         lobbyTypeIdIndex.index(descriptor.distributionKey());
         ds.update(lobbyTypeIdIndex);

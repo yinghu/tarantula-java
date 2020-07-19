@@ -1,0 +1,44 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-shutdown-module-close"><i class="fa fa-close" style="font-size:12px"></i></span>
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Shutdown Module</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-shutdown-module-message"></div>
+    <div><!-- send form -->
+        <div class="w3-panel">
+            <label class="tx-text-12">TypeId</label>
+            <input id ="tx-shutdown-module-type-id" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='type ID'/>
+        </div>
+        <div class="w3-panel">
+            <span id="tx-shutdown-module" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Shutdown</span>
+        </div>
+    </div> 
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector('#tx-shutdown-module').onclick=()=>{
+        let _c = document.querySelector('#tx-shutdown-module-type-id').value;
+        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onShutdownModule',typeId:_c},(resp)=>{
+            document.querySelector('#tx-shutdown-module-message').innerHTML = resp.message;
+        });
+    };
+    document.querySelector('#tx-shutdown-module-close').onclick=()=>{
+        let m3 = document.querySelector('#tx-popup');
+        m3.innerHTML="";
+        m3.style.display = 'none';       
+    };
+</script>

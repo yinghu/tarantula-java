@@ -63,7 +63,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
     //Module application operation API
     String upload(InputStream inputStream,String fname) throws Exception;
-    boolean createLobby(Descriptor descriptor);
+    //boolean createLobby(Descriptor descriptor);
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
     boolean reset(Descriptor descriptor);

@@ -103,6 +103,16 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             boolean suc = this.deploymentServiceProvider.createModule(desc);
             session.write(this.toMessage(suc?"module added":"module not added",suc).toString().getBytes(),label());
         }
+        else if(session.action().equals("onLaunchModule")){//typeId
+            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            boolean suc = this.deploymentServiceProvider.launch(access.typeId());
+            session.write(this.toMessage(suc?"module launched":"module not launched",suc).toString().getBytes(),label());
+        }
+        else if(session.action().equals("onShutdownModule")){//typeId
+            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            boolean suc = this.deploymentServiceProvider.shutdown(access.typeId());
+            session.write(this.toMessage(suc?"module shutdown":"module not shutdown",suc).toString().getBytes(),label());
+        }
         /**
         else if(session.action().equals("addApplication")){
             DeploymentDescriptor desc = new DeploymentDescriptor();
@@ -115,11 +125,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             boolean suc = this.serviceProvider.createApplication(desc,true);
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
         }
-        else if(session.action().equals("onLaunch")){//typeId
-            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            boolean suc = this.serviceProvider.launch(access.typeId());
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
-        }
+
         else if(session.action().equals("onShutdown")){//typeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             boolean suc = this.serviceProvider.shutdown(access.typeId());
