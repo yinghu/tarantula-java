@@ -218,7 +218,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 RecoverableFactory query = new LobbyQuery(params[0]);
                 dataStore.list(query,(b)->{
                     if(!b.disabled()){
-                        log.warn("Lobby->"+b.toString());
+                        //log.warn("Lobby->"+b.toString());
                         blist.add(b);
                     }
                     return true;

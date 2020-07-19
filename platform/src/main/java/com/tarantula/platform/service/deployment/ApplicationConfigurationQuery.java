@@ -1,12 +1,13 @@
 package com.tarantula.platform.service.deployment;
 
+import com.tarantula.Configuration;
 import com.tarantula.RecoverableFactory;
 import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.util.SystemUtil;
 
 /**
- * Created by yinghu lu on 4/16/2019.
+ * Updated by yinghu lu on 7/19/2020.
  */
 public class ApplicationConfigurationQuery implements RecoverableFactory<ApplicationConfiguration> {
 
@@ -31,7 +32,7 @@ public class ApplicationConfigurationQuery implements RecoverableFactory<Applica
 
     @Override
     public String label() {
-        return SystemUtil.toString(new String[]{ApplicationConfiguration.LABEL,tag});
+        return SystemUtil.toString(new String[]{Configuration.LABEL,tag});
     }
 
 

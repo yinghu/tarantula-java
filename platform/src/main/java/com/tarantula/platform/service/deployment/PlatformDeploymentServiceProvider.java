@@ -399,7 +399,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             });
         }
     }
-  
+
     @Override
     public void setup(ServiceContext serviceContext){
         this.tarantulaContext = (TarantulaContext)serviceContext;
@@ -641,6 +641,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         wListeners.add(listener);
     }
     public void deploy(Configuration configuration){
+        log.warn(configuration.toString());
         RecoverableMetadata mt = new RecoverableMetadata(configuration.getFactoryId(),configuration.getClassId());
         byte[] k = configuration.key().asString()!=null?configuration.key().asString().getBytes():"".getBytes();
         byte[] v = SystemUtil.toJson(configuration.toMap());

@@ -10,17 +10,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Updated by yinghu on 4/16/2019.
+ * Updated by yinghu on 7/19/2020
  */
 public class ApplicationConfiguration extends RecoverableObject implements Configuration{
 
     protected String tag;
     protected String type;
 
-    public static final String LABEL = "AFC";
 
     public ApplicationConfiguration(){
-        ///this.vertex = "ApplicationConfiguration";
         this.label = LABEL;
         this.onEdge = true;
     }
