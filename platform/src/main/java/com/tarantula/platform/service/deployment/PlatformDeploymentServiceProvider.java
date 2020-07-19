@@ -344,9 +344,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     private void _shutdown(String typeId){
         this.oListeners.forEach((ol)->{
-            OnLobby onLobby =(OnLobby) vMap.get(typeId);
-            onLobby.closed(true);
-            ol.onLobby(onLobby);//removed lobby entry
+            if(vMap.containsKey(typeId)){//skip system level modules
+                OnLobby onLobby =(OnLobby) vMap.get(typeId);
+                onLobby.closed(true);
+                ol.onLobby(onLobby);
+            }
         });
         this.tarantulaContext.unsetLobby(typeId,(d)->{//clean up from runtime context
             //remove modules
