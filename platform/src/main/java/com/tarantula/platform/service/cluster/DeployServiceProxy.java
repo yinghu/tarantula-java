@@ -136,9 +136,9 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public boolean resetModule(String lobbyId,Descriptor descriptor){
+    public boolean resetModule(Descriptor descriptor){
         NodeEngine nodeEngine = getNodeEngine();
-        ResetModuleOperation operation = new ResetModuleOperation(lobbyId,descriptor);
+        ResetModuleOperation operation = new ResetModuleOperation(descriptor);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Boolean> future = builder.invoke();

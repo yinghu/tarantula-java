@@ -108,60 +108,22 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             boolean suc = this.deploymentServiceProvider.launch(access.typeId());
             session.write(this.toMessage(suc?"module launched":"module not launched",suc).toString().getBytes(),label());
         }
+        else if(session.action().equals("onResetModule")){//subtypeId
+            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            Descriptor desc = new DeploymentDescriptor();
+            desc.typeId(access.typeId());
+            desc.moduleArtifact((String) access.property(OnAccess.MODULE_ARTIFACT));
+            desc.moduleVersion((String)access.property(OnAccess.MODULE_VERSION));
+            desc.codebase((String)access.property(OnAccess.MODULE_CODE_BASE));
+            boolean suc  = this.deploymentServiceProvider.reset(desc);
+            session.write(this.toMessage(suc?"module rest":"module not reset",suc).toString().getBytes(),label());
+        }
         else if(session.action().equals("onShutdownModule")){//typeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             boolean suc = this.deploymentServiceProvider.shutdown(access.typeId());
             session.write(this.toMessage(suc?"module shutdown":"module not shutdown",suc).toString().getBytes(),label());
         }
         /**
-        else if(session.action().equals("addApplication")){
-            DeploymentDescriptor desc = new DeploymentDescriptor();
-            desc.fromMap(SystemUtil.toMap(payload));
-            desc.type("application");
-            desc.deployPriority(10);
-            desc.maxIdlesOnInstance(3);
-            desc.maxInstancesPerPartition(100);
-            desc.instancesOnStartupPerPartition(1);
-            boolean suc = this.serviceProvider.createApplication(desc,true);
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
-        }
-
-        else if(session.action().equals("onShutdown")){//typeId
-            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            boolean suc = this.serviceProvider.shutdown(access.typeId());
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
-        }
-        else if(session.action().equals("disableApplication")){//applicationId
-            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            boolean suc = this.serviceProvider.enableApplication(access.applicationId(),false);
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
-        }
-        else if(session.action().equals("enableApplication")){//applicationId
-            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            boolean suc = this.serviceProvider.enableApplication(access.applicationId(),true);
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
-        }
-        else if(session.action().equals("onReset")){//subtypeId
-            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            Descriptor desc = this.context.descriptor(access.applicationId());
-            if(desc!=null&&desc.subtypeId()!=null&&(!desc.subtypeId().equals("lobby"))){
-                desc.moduleArtifact((String) access.property("moduleArtifact"));
-                desc.moduleVersion((String)access.property("moduleVersion"));
-                desc.codebase((String)access.property("codebase"));
-                boolean suc  = this.serviceProvider.reset(desc);
-                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
-            }
-            else{
-                session.write(payload,label());
-            }
-        }
-        else if(session.action().equals("addModule")){
-            DeploymentDescriptor desc = new DeploymentDescriptor();
-            desc.fromMap(SystemUtil.toMap(payload));
-            boolean suc = this.serviceProvider.createModule(desc);
-            //this.context.log(ret,OnLog.INFO);
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"ok":"failed",suc)).getBytes(),this.label());
-        }
         else if(session.action().equals("listViews")){
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"ok",true)).getBytes(),label());
         }

@@ -482,17 +482,21 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             return false;
         }
     }
-    public boolean resetModule(String lobbyId,Descriptor descriptor){
+    public boolean resetModule(Descriptor descriptor){
         boolean[] suc ={false};
         DataStore dataStore = this.tarantulaContext.masterDataStore();
-        dataStore.list(new ApplicationQuery(lobbyId),(a)->{
-            if(a.subtypeId().equals(descriptor.subtypeId())){
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.bucketId(),descriptor.typeId());
+        if(!dataStore.load(lobbyTypeIdIndex)){
+            return false;
+        }
+        dataStore.list(new ApplicationQuery(lobbyTypeIdIndex.index()),(a)->{
+            //if(a.subtypeId().equals(descriptor.subtypeId())){
                 a.codebase(descriptor.codebase());
                 a.moduleArtifact(descriptor.moduleArtifact());
                 a.moduleVersion(descriptor.moduleVersion());
                 dataStore.update(a);
                 suc[0]=true;
-            }
+            //}
             return true;
         });
         return suc[0];

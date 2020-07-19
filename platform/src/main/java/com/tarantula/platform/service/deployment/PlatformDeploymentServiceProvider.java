@@ -121,7 +121,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public Module module(Descriptor descriptor){
         if(descriptor.codebase()!=null){
-            DynamicModuleClassLoader mc = cMap.computeIfAbsent(descriptor.subtypeId(),(k)-> {
+            DynamicModuleClassLoader mc = cMap.computeIfAbsent(descriptor.typeId(),(k)-> {
                 DynamicModuleClassLoader _cl = new DynamicModuleClassLoader(descriptor);
                 _cl._load();
                 return _cl;
@@ -205,14 +205,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return flag==null?fromContext(name):fromModule(name,flag);
     }
     public void resource(Descriptor descriptor, String name, Module.OnResource onResource){
-        DynamicModuleClassLoader dyn = cMap.get(descriptor.subtypeId());
+        DynamicModuleClassLoader dyn = cMap.get(descriptor.typeId());
         dyn.loadResource(name,onResource);
     }
     public boolean reset(Descriptor descriptor){
-        //update app desc via subtypeId
-        Lobby lobby = tarantulaContext.lobby(descriptor.typeId());
-        boolean suc = this.tarantulaContext.tarantulaCluster().deployService().resetModule(lobby.descriptor().distributionKey(),descriptor);
-
+        //update app desc via typeId
+         boolean suc = this.tarantulaContext.tarantulaCluster().deployService().resetModule(descriptor);
         if(suc){
             this.integrationEventService.publish(new ModuleResetEvent(this.eventTopic,(DeploymentDescriptor) descriptor));
         }
@@ -227,7 +225,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     private void _reset(Descriptor descriptor){
-        DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.subtypeId(),(k,c)->{
+        DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.typeId(),(k,c)->{
             DynamicModuleClassLoader nmc = new DynamicModuleClassLoader(descriptor);
             nmc.proxies.addAll(c.proxies);
             c._clear();
@@ -275,6 +273,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     log.warn("Failed to add application ->"+b.toString());
                 }
             });
+            /** no view module
             a.views.forEach(v->{
                 //add view to app
                 v.owner(a.descriptor.typeId());
@@ -283,7 +282,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 if(!xv){
                     log.warn("Failed to add view ->"+v.toString());
                 }
-            });
+            });**/
         });
         return suc[0];//this.builder.create().toJson(resp);
     }
@@ -321,7 +320,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 this.tarantulaContext.tarantulaCluster().deployService().enableLobby(d.typeId(),false);
             }
             if(d.moduleName()!=null&&d.codebase()!=null){ //clean class loader if all apps removed on the class loader
-                DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.subtypeId());
+                DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.typeId());
                 if(dynamicModuleClassLoader!=null){
                     log.warn("Module resource clear on ["+d.codebase()+"/"+d.moduleArtifact()+"/"+d.moduleVersion()+"/"+d.subtypeId()+"]");
                     dynamicModuleClassLoader._clear();
@@ -355,10 +354,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 rListeners.remove(d.tag());
             }
             if(d.moduleName()!=null&&d.codebase()!=null){ //clean class loader if all apps removed on the class loader
-                DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.subtypeId());
+                DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.typeId());
                 if(dynamicModuleClassLoader!=null){
                     log.warn("Module resource clear on ["+d.codebase()+"/"+d.moduleArtifact()+"/"+d.moduleVersion()+"/"+d.subtypeId()+"]");
                     dynamicModuleClassLoader._clear();
+                    /** no view module
                     vMap.forEach((k,v)->{
                         if(v instanceof OnView){
                             OnView ov = (OnView)v;
@@ -368,7 +368,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                                 this.vListeners.forEach(listener -> listener.onView(ov));
                             }
                         }
-                    });
+                    });**/
                 }
             }
         });
@@ -917,7 +917,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         }
         private void _setup(){
-            DynamicModuleClassLoader moduleClassLoader = cMap.get(descriptor.subtypeId());
+            DynamicModuleClassLoader moduleClassLoader = cMap.get(descriptor.typeId());
             this.module = moduleClassLoader.newModule(descriptor.moduleName());
         }
         @Override
@@ -930,7 +930,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         public void reset(){
             try{
-                DynamicModuleClassLoader moduleClassLoader = cMap.get(descriptor.subtypeId());
+                DynamicModuleClassLoader moduleClassLoader = cMap.get(descriptor.typeId());
                 this.clear();//clear on old instance
                 this.module = moduleClassLoader.newModule(descriptor.moduleName());
                 this.module.setup(applicationContext);//inject the limited content to prevent unexpected calls from modules

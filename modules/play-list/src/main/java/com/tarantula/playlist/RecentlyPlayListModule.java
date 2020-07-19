@@ -18,7 +18,7 @@ public class RecentlyPlayListModule implements Module {
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
-        this.context.log("Recently Play List started", OnLog.WARN);
+        this.context.log("Recently Play List started on tag->"+context.descriptor().tag(), OnLog.WARN);
     }
 
     @Override

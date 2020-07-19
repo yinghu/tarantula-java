@@ -27,14 +27,14 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
 	}
     @Override
 	public void readPortable(PortableReader in) throws IOException {
-		this.subtypeId = in.readUTF("1");
+		this.typeId = in.readUTF("1");
         this.codebase = in.readUTF("2");
         this.moduleArtifact = in.readUTF("3");
 		this.moduleVersion = in.readUTF("4");
     }
     @Override
 	public void writePortable(PortableWriter out) throws IOException {
-		out.writeUTF("1",this.subtypeId);
+		out.writeUTF("1",this.typeId);
         out.writeUTF("2",this.codebase);
 		out.writeUTF("3",this.moduleArtifact);
 		out.writeUTF("4",this.moduleVersion);

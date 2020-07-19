@@ -16,7 +16,7 @@ public interface DeployService extends ServiceProvider {
     boolean addLobby(Descriptor lobby);
 
     String addApplication(Descriptor application);
-    boolean resetModule(String lobbyId,Descriptor descriptor);
+    boolean resetModule(Descriptor descriptor);
 
     //add view via typeId of lobby
     boolean addView(OnView view);

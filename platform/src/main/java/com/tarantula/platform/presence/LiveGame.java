@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tarantula.Descriptor;
 import com.tarantula.Lobby;
-import com.tarantula.platform.util.DescriptorSerializer;
 
 import java.util.ArrayList;
 
@@ -22,7 +21,7 @@ public class LiveGame {
         jsonObject.addProperty("name",name);
         jsonObject.addProperty("index",index);
         if(this.lobbyList!=null){
-            DescriptorSerializer ser = new DescriptorSerializer();
+            //DescriptorSerializer ser = new DescriptorSerializer();
             JsonArray blist = new JsonArray();
             for(Lobby lobby : this.lobbyList){
                 JsonObject jlobby = new JsonObject();

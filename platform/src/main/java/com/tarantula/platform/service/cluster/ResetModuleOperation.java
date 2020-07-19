@@ -13,8 +13,7 @@ import java.io.IOException;
  */
 public class ResetModuleOperation extends Operation {
 
-    private String lobbyId;
-    private String  subtypeId;
+    private String typeId;
     private String codebase;
     private String artifact;
     private String version;
@@ -24,9 +23,8 @@ public class ResetModuleOperation extends Operation {
     }
 
 
-    public ResetModuleOperation(String lobbyId,Descriptor descriptor) {
-        this.lobbyId = lobbyId;
-        this.subtypeId = descriptor.subtypeId();
+    public ResetModuleOperation(Descriptor descriptor) {
+        this.typeId = descriptor.typeId();
         this.codebase = descriptor.codebase();
         this.artifact = descriptor.moduleArtifact();
         this.version = descriptor.moduleVersion();
@@ -35,11 +33,11 @@ public class ResetModuleOperation extends Operation {
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
         Descriptor descriptor = new DeploymentDescriptor();
-        descriptor.subtypeId(subtypeId);
+        descriptor.typeId(typeId);
         descriptor.codebase(codebase);
         descriptor.moduleArtifact(artifact);
         descriptor.moduleVersion(version);
-        this.result = cds.resetModule(lobbyId,descriptor);
+        this.result = cds.resetModule(descriptor);
     }
 
     @Override
@@ -50,8 +48,7 @@ public class ResetModuleOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeUTF(lobbyId);
-        out.writeUTF(subtypeId);
+        out.writeUTF(typeId);
         out.writeUTF(codebase);
         out.writeUTF(artifact);
         out.writeUTF(version);
@@ -60,8 +57,7 @@ public class ResetModuleOperation extends Operation {
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.lobbyId = in.readUTF();
-        this.subtypeId = in.readUTF();
+        this.typeId = in.readUTF();
         this.codebase = in.readLine();
         this.artifact = in.readUTF();
         this.version = in.readUTF();
