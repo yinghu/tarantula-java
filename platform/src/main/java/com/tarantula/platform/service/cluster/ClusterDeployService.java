@@ -8,7 +8,6 @@ import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
-import com.tarantula.platform.event.MapStoreRecoveryEvent;
 import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.Batch;
@@ -19,8 +18,6 @@ import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.io.File;
-import java.nio.ByteBuffer;
-import java.nio.channels.ReadableByteChannel;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
@@ -47,21 +44,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         new ServiceBootstrap(tarantulaContext._integrationClusterStarted,tarantulaContext._deployServiceStarted,new DeployServiceBootstrap(this),"deploy-service",true).start();
     }
     public void setup(){
-        /**
-        if(scope==Distributable.INTEGRATION_SCOPE){
-            this.tarantulaContext.integrationCluster().addEventListener(this.nodeEngine.getLocalMember().getUuid(),(e)->{
-                log.warn("Recovering integration scope data on master node to ->"+e.source());
-                recover(e.source(),e.source(),true);
-                return false;
-            });
-        }
-        else if(scope==Distributable.DATA_SCOPE){
-            this.tarantulaContext.tarantulaCluster().addEventListener(this.nodeEngine.getLocalMember().getUuid(),(e)->{
-                log.warn("Recovering data scope data on master node to ->"+e.source());
-                recover(e.source(),e.source(),true);
-                return false;
-            });
-        }**/
         log.info("Clustering deployment service started ["+nodeEngine.getConfig().getGroupConfig().getName()+"] on scope ["+this.scope+"]");
     }
     @Override
@@ -84,62 +66,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
 
     }
-    /**
-    private void _send(Event event){
-        if(this.scope==Distributable.DATA_SCOPE){
-            this.tarantulaContext.tarantulaCluster().publish(event);
-        }
-        else{
-            this.tarantulaContext.integrationCluster().publish(event);
-        }
-    }
-    private void _read(String fn, int c,int t, ReadableByteChannel vc,String destination,String registerId){
-        try{
-            ByteBuffer buffer = ByteBuffer.allocate(100000);
-            int v = 0;
-            while (true) {
-                final int len = vc.read(buffer);
-                if (len < 0) {
-                    break;
-                }
-                byte[] pb = new byte[len];
-                buffer.flip();
-                buffer.get(pb);
-                MapStoreRecoveryEvent m = new MapStoreRecoveryEvent(destination,fn,pb,registerId,c,t,v++);
-                _send(m);
-                Thread.sleep(100);
-                buffer.clear();
-            }
-        }
-        catch (Exception ex){
-
-        }
-    }**/
-    /**
-    private void recover(String destination,String registerId,boolean fullBackup){
-        DataStoreProvider dsp = this.tarantulaContext.dataStoreProvider();
-        //String loc = this.scope==Distributable.DATA_SCOPE?this.tarantulaContext.tarantulaCluster().subscription():this.tarantulaContext.integrationCluster().subscription();
-        //if(destination.equals(loc)){
-            //log.info(">>>>>>>>>>>>>>>>>>>>There is no need to recover from first node");
-            //MapStoreRecoveryEvent mre = new MapStoreRecoveryEvent(destination,"",new byte[0],registerId,0,0,0);
-            //this._send(mre);
-            //return;
-        //}
-        this.tarantulaContext.schedule(new OneTimeRunner(100,()->{
-            if(fullBackup){
-                int ct[] = {0};
-                dsp.backup(this.scope,(fn,c,fc)->{
-                    this._read(fn,ct[0]++,c,fc,destination,registerId);
-                });
-            }
-            else{
-                int ct[] = {0};
-                dsp.recover(this.scope,(fn,c,fc)->{
-                    this._read(fn,ct[0]++,c,fc,destination,registerId);
-                });
-            }
-        }));
-    }**/
 
     public Batch query(int registryId,String[] params){
         //log.warn("Query on->"+registryId+"/"+nodeEngine.getLocalMember().getAddress().toString());

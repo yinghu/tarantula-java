@@ -56,6 +56,10 @@
                 <property name="tarantula-scope">2</property>
             </properties>
         </service>
+        <service enabled="true">
+            <name>RecoverService</name>
+            <class-name>com.tarantula.platform.service.cluster.ClusterRecoverService</class-name>
+        </service>
     </services>
     <partition-group enabled="true" group-type="HOST_AWARE" />
     <map name="integration.recoverable.data.Value">
