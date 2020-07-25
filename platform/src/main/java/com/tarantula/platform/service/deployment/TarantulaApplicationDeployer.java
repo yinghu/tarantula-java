@@ -21,7 +21,7 @@ public class TarantulaApplicationDeployer implements Serviceable {
 		for(ServiceConfiguration c: _slist){
 			this.context.configure(c); //setup configurations
 		}
-		List<LobbyDescriptor> bList = this.context.query(new String[]{bucketId},new LobbyQuery(bucketId));//this.context.tarantulaCluster.list(query);
+		List<LobbyDescriptor> bList = this.context.query(new String[]{bucketId},new LobbyQuery(bucketId));
 		ArrayList<LobbyConfiguration> configurations = new ArrayList();
 		bList.forEach((d)->{
 			this.context.setLobby(d);//override the default one

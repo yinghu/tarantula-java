@@ -10,20 +10,17 @@ import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
-import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.util.*;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 
 /**
  * updated by yinghu lu on 5/30/2020
@@ -47,10 +44,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
 
     private ConcurrentHashMap<String,Recoverable> vMap = new ConcurrentHashMap<>();
+
+    //push event cache mappings
     private ConcurrentHashMap<String,Event> pushRegistry = new ConcurrentHashMap<>();
 
+    //module class loader mappings
     private ConcurrentHashMap<String,DynamicModuleClassLoader> cMap = new ConcurrentHashMap<>();
+
+    //content cache ( web admin )
     private ConcurrentHashMap<String,byte[]> rMap = new ConcurrentHashMap<>();
+
     private TarantulaContext tarantulaContext;
     private GsonBuilder builder;
 
@@ -569,15 +572,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
            _shutdown((String)gameCluster.property(GameCluster.GAME_LOBBY));
            _shutdown((String)gameCluster.property(GameCluster.GAME_SERVICE));
        }
-       else if(event instanceof AccessIndexStateEvent){
-            onAccessIndex.set(event.closed());
-            if(onAccessIndex.get()){
-                aListeners.forEach((a)->a.onStart());
-            }
-            else{
-                aListeners.forEach((a)->a.onStop());
-            }
-       }
        else if(event instanceof MapStoreBackupEvent){
            this.tarantulaContext.dataStoreProvider().backup(Distributable.DATA_SCOPE);
            this.tarantulaContext.dataStoreProvider().backup(Distributable.INTEGRATION_SCOPE);
@@ -779,14 +773,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return (ret!=null?new String(ret):"");
     }
     public void stopAccessIndex(){
-        //publish stop event
-        //aListeners.forEach((a)->a.onStop());
-        this.integrationEventService.publish(new AccessIndexStateEvent(this.eventTopic,false));
+        //callback on local endpoints
+        onAccessIndex.set(false);
+        aListeners.forEach((a)->a.onStop());
     }
     public void startAccessIndex(){
-        //publish start event
-        //aListeners.forEach((a)->a.onStart());
-        this.integrationEventService.publish(new AccessIndexStateEvent(this.eventTopic,true));
+        //callback on local endpoints
+        onAccessIndex.set(true);
+        aListeners.forEach((a)->a.onStart());
     }
     public void registerAccessIndexListener(AccessIndexService.Listener listener){
         if(onAccessIndex.get()){

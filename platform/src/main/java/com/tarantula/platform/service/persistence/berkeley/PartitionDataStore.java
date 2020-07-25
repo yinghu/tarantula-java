@@ -192,7 +192,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] key = akey.getBytes();
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             byte[] v = _get(dso,key);
-            if(v==null){
+            if(v==null&&t.distributable()){
                 v = mapStoreListener.onRecovering(dso.metadata,key);
             }
             if(v==null){
