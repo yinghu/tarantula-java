@@ -5,7 +5,9 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
 import com.tarantula.Descriptor;
+import com.tarantula.Event;
 import com.tarantula.OnView;
+import com.tarantula.platform.event.ServerPushEvent;
 import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.Batch;
@@ -180,5 +182,12 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
+    }
+
+    public boolean addServerPushEvent(Event serverPushEvent){
+        return false;
+    }
+    public boolean removeServerPushEvent(Event serverPushEvent){
+        return false;
     }
 }

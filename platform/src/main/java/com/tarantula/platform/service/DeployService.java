@@ -2,6 +2,7 @@ package com.tarantula.platform.service;
 
 
 import com.tarantula.Descriptor;
+import com.tarantula.Event;
 import com.tarantula.OnView;
 import com.tarantula.platform.presence.GameCluster;
 
@@ -28,4 +29,7 @@ public interface DeployService extends ServiceProvider {
     GameCluster createGameCluster(String owner,String name);
     boolean enableGameCluster(String gameClusterId);
     boolean disableGameCluster(String gameClusterId);
+
+    boolean addServerPushEvent(Event serverPushEvent);
+    boolean removeServerPushEvent(Event serverPushEvent);
 }

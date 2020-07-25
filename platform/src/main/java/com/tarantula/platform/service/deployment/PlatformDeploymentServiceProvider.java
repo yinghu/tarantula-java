@@ -39,7 +39,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private CopyOnWriteArrayList<OnLobby.Listener> oListeners = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<OnView.Listener> vListeners = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<Configuration.Listener> cListeners = new CopyOnWriteArrayList<>();
+
     private CopyOnWriteArrayList<Connection.Listener> wListeners = new CopyOnWriteArrayList<>();
+
+    //callback on access index service
     private CopyOnWriteArrayList<AccessIndexService.Listener> aListeners = new CopyOnWriteArrayList<>();
 
 

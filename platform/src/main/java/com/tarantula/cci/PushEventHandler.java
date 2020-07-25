@@ -8,6 +8,7 @@ import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.DisableServerPushEvent;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
+import com.tarantula.platform.service.DeployService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.TokenValidatorProvider;
@@ -29,6 +30,7 @@ public class PushEventHandler implements RequestHandler {
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
     private GsonBuilder builder;
     private Connection endpoint;
+    private DeployService deployService;
     public String name(){
         return "/push";
     }
@@ -109,6 +111,7 @@ public class PushEventHandler implements RequestHandler {
 
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
+        this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
         this.bucket = tcx.bucket();
         this.endpoint = tcx.endpoint();
         tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
