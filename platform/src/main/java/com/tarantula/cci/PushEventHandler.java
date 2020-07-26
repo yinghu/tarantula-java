@@ -20,7 +20,7 @@ public class PushEventHandler implements RequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(PushEventHandler.class);
 
-    private String bucket;
+    //private String bucket;
     private EventService eventService;
     private TokenValidatorProvider tokenValidatorProvider;
 
@@ -112,7 +112,7 @@ public class PushEventHandler implements RequestHandler {
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
         this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
-        this.bucket = tcx.bucket();
+        //this.bucket = tcx.bucket();
         this.endpoint = tcx.endpoint();
         tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
     }

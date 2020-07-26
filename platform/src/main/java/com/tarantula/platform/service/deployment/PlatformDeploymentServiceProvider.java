@@ -266,10 +266,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         return suc[0];//this.builder.create().toJson(resp);
     }
-    /**
-    public boolean createLobby(Descriptor descriptor){
-        return this.tarantulaContext.tarantulaCluster().deployService().addLobby(descriptor);
-    }**/
+
     public boolean createApplication(Descriptor descriptor,boolean launching){
         String  suc = this.tarantulaContext.tarantulaCluster().deployService().addApplication(descriptor);
         if(suc!=null&&launching){//launch if lobby on line
@@ -384,7 +381,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public void setup(ServiceContext serviceContext){
         this.tarantulaContext = (TarantulaContext)serviceContext;
-        //this.deploymentMode = Mode.valueOf(this.tarantulaContext.deploymentMode);
         ClusterProvider ics = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.integrationEventService = ics.subscribe(eventTopic,this);
         localTopic = ics.subscription();
