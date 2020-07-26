@@ -28,4 +28,6 @@ public interface DeployService extends ServiceProvider {
     GameCluster createGameCluster(String owner,String name);
     boolean enableGameCluster(String gameClusterId);
     boolean disableGameCluster(String gameClusterId);
+
+
 }
