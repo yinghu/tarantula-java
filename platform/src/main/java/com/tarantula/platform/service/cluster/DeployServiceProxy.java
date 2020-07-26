@@ -224,4 +224,22 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
+    public boolean upload(String fileName,byte[] content){
+        NodeEngine nodeEngine = getNodeEngine();
+        DeployServiceUploadOperation operation = new DeployServiceUploadOperation(fileName,content);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(5, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
+    }
 }

@@ -33,4 +33,6 @@ public interface DeployService extends ServiceProvider {
 
     boolean addServerPushEvent(Event serverPushEvent);
     boolean removeServerPushEvent(String serverId);
+
+    boolean upload(String fileName,byte[] content);
 }

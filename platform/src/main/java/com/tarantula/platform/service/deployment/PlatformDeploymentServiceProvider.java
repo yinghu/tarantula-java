@@ -87,38 +87,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends OnAccess> T metrics(){
         return (T)new Metrics(this.tarantulaContext.metrics());
     }
-    public String upload(InputStream inputStream,String fname) throws Exception{
-        //save to local deploy/tem dir
-        BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(this.contentTemDir+"/"+fname));
-        int b;
-        do{
-            b = inputStream.read();
-            if(b!=-1){
-                fos.write(b);
-            }
-        }while (b!=-1);
-        fos.flush();
-        fos.close();
-        this.tarantulaContext.schedule(new ContentReplicator(this,fname));
-        ResponseHeader resp = new ResponseHeader("upload [",fname+"] saved successfully",true);
-        return this.builder.create().toJson(resp);
-    }
-    void _pushContent(String fname){
-        try{
-            BufferedInputStream fin = new BufferedInputStream(new FileInputStream(this.contentTemDir+"/"+fname));
-            byte[] ret = fin.readAllBytes();
-            fin.close();
-            OnUploadEvent onUploadEvent = new OnUploadEvent(this.eventTopic,this.localTopic,fname,ret);
-            this.integrationEventService.publish(onUploadEvent);
-        }catch (Exception ex){
-            log.error("error on content push",ex);
-        }
-    }
-    private void writeContent(OnUploadEvent onUploadEvent){
+
+    public void upload(String fileName,byte[] content){
         try{
             //write to local deploy dir to be ready for deployment
-            BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(this.tarantulaContext.deployDir+"/"+onUploadEvent.trackId()));
-            fos.write(onUploadEvent.payload());
+            BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(this.tarantulaContext.deployDir+"/"+fileName));
+            fos.write(content);
             fos.flush();
             fos.close();
         }catch (Exception ex){
@@ -216,7 +190,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public boolean reset(Descriptor descriptor){
         //update app desc via typeId
-         boolean suc = this.tarantulaContext.tarantulaCluster().deployService().resetModule(descriptor);
+        boolean suc = this.tarantulaContext.tarantulaCluster().deployService().resetModule(descriptor);
         if(suc){
             this.integrationEventService.publish(new ModuleResetEvent(this.eventTopic,(DeploymentDescriptor) descriptor));
         }
@@ -386,6 +360,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.deploy(ob);
         });
     }
+    /**
     public void clusterUpdated(int scope,String nodeId,boolean state){
         log.warn("Cluster updated->"+nodeId+"/"+state+"/"+scope);
         if(scope==Distributable.INTEGRATION_SCOPE&&(!state)){
@@ -405,7 +380,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             });
         }
     }
-
+    **/
     @Override
     public void setup(ServiceContext serviceContext){
         this.tarantulaContext = (TarantulaContext)serviceContext;
@@ -454,7 +429,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     @Override
     public void waitForData() {
-        this.integrationEventService.publish(new MapStoreVotingEvent(this.eventTopic,localTopic,registerKey,Distributable.INTEGRATION_SCOPE));
+        //this.integrationEventService.publish(new MapStoreVotingEvent(this.eventTopic,localTopic,registerKey,Distributable.INTEGRATION_SCOPE));
         this.tarantulaContext.schedule(this);
         log.info("Platform deployment service started on ["+localTopic+"/"+registerKey+"]");
     }
@@ -500,9 +475,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
            this.vListeners.forEach((cl)->{
                cl.onView(onView);
            });
-        }
-        else if(event instanceof OnUploadEvent){
-            this.writeContent((OnUploadEvent)event);
         }
         else if(event instanceof MapStoreVotingEvent){
             if(!event.trackId().equals(registerKey)){
@@ -752,7 +724,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return null;
     }
     public Lobby lobby(String typeId){
-        DataStore mds = this.tarantulaContext.masterDataStore();
+        //DataStore mds = this.tarantulaContext.masterDataStore();
         List<LobbyDescriptor> lbl = this.tarantulaContext.query(new String[]{this.tarantulaContext.bucketId(),typeId},new LobbyQuery(this.tarantulaContext.bucketId()));
         if(lbl.size()==0){
             return null;

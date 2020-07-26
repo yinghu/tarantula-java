@@ -16,8 +16,6 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
     String NAME = "DeploymentServiceProvider";
 
-    void clusterUpdated(int scope,String nodeId,boolean state);
-
     //UDP SERVER APIs
     void onUDPConnection(String typeId,Connection connection);
     Connection onUDPConnection(String typeId, Connection.StateListener listener);
@@ -67,7 +65,8 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     String checkCode(String resetCode);
 
     //Module and application operation API
-    String upload(InputStream inputStream,String fname) throws Exception;
+    void upload(String fname,byte[] content);
+
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
     boolean reset(Descriptor descriptor);

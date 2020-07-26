@@ -20,9 +20,6 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int INSTANCE_PLAY_EVENT_CID = 3;
 
-    public static final int ON_UPLOAD_EVENT_CID = 4;
-
-
     public static final int FAST_PLAY_EVENT_CID = 5;
 
     public static final int ON_DEPLOY_EVENT_CID = 6;
@@ -86,9 +83,6 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case INSTANCE_PLAY_EVENT_CID:
                 _ins = new InstancePlayEvent();
-                break;
-            case ON_UPLOAD_EVENT_CID:
-                _ins = new OnUploadEvent();
                 break;
             case FAST_PLAY_EVENT_CID:
                 _ins = new FastPlayEvent();

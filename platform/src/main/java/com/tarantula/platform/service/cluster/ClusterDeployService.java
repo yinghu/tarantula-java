@@ -8,7 +8,6 @@ import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
-import com.tarantula.platform.event.ServerPushEvent;
 import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.Batch;
@@ -445,7 +444,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
             }
         }
-        this.deploymentServiceProvider.clusterUpdated(this.scope,membershipServiceEvent.getMember().getUuid(),true);
+        //this.deploymentServiceProvider.clusterUpdated(this.scope,membershipServiceEvent.getMember().getUuid(),true);
     }
 
     @Override
@@ -465,7 +464,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
             }
         }
-        this.deploymentServiceProvider.clusterUpdated(this.scope,membershipServiceEvent.getMember().getUuid(),false);
+        //this.deploymentServiceProvider.clusterUpdated(this.scope,membershipServiceEvent.getMember().getUuid(),false);
     }
 
     @Override
@@ -577,5 +576,8 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
     public void removeServerPushEvent(String serverId){
         this.deploymentServiceProvider.removeConnection(serverId);
+    }
+    public void upload(String fileName,byte[] content){
+        this.deploymentServiceProvider.upload(fileName,content);
     }
 }

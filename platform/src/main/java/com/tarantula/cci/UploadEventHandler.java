@@ -6,7 +6,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.DeployService;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -14,14 +14,13 @@ import com.tarantula.platform.util.ResponseSerializer;
 import java.io.InputStream;
 
 /**
- * Created by yinghu lu on 11/9/19.
+ * Updated by yinghu lu on 7/26/20.
  */
 public class UploadEventHandler implements RequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(UploadEventHandler.class);
 
-
-    private DeploymentServiceProvider deploymentServiceProvider;
+    private DeployService deployService;
     private TokenValidator tokenValidator;
     private TokenValidatorProvider tokenValidatorProvider;
     private GsonBuilder builder;
@@ -38,8 +37,9 @@ public class UploadEventHandler implements RequestHandler {
                 InputStream in = exchange.onStream();
                 String path = exchange.path();
                 log.warn(onSession.systemId() + " is uploading module [" + path + "]");
-                String ret = this.deploymentServiceProvider.upload(in, path.substring(path.lastIndexOf("/") + 1));
-                exchange.onEvent(new ResponsiveEvent("", "", ret.getBytes(), 0, "text/html", "", true));
+                boolean suc = deployService.upload(path.substring(path.lastIndexOf("/") + 1),in.readAllBytes());
+                ResponseHeader resp = new ResponseHeader("upload",suc?"uploaded":"failed",suc);
+                exchange.onEvent(new ResponsiveEvent("", "",this.builder.create().toJson(resp).getBytes(), 0, "text/html", "", true));
             }
             else{
                 ResponseHeader resp = new ResponseHeader("upload","no permission operation",true);
@@ -64,7 +64,7 @@ public class UploadEventHandler implements RequestHandler {
     public void setup(ServiceContext tcx){
         this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.tokenValidator = tokenValidatorProvider.tokenValidator();
-        this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
+         this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
     }
     public boolean onEvent(Event event){
        return true;
@@ -72,4 +72,5 @@ public class UploadEventHandler implements RequestHandler {
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
     }
+
 }
