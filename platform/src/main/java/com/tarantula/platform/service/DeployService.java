@@ -32,5 +32,5 @@ public interface DeployService extends ServiceProvider {
 
 
     boolean addServerPushEvent(Event serverPushEvent);
-    boolean removeServerPushEvent(Event serverPushEvent);
+    boolean removeServerPushEvent(String serverId);
 }

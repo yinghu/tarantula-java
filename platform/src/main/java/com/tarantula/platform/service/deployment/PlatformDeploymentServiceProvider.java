@@ -521,24 +521,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 });
             }
         }
-        else if(event instanceof ServerPushEvent){
-            Connection occ = this.builder.create().fromJson(new String(event.payload()), Connection.class);
-            occ.disabled(false);
-            pushRegistry.put(occ.key().asString(),event);//serverId cache
-            this.wListeners.forEach((l)->{
-                l.onState(occ);
-            });
-        }
-        else if(event instanceof DisableServerPushEvent){
-            Event pes = pushRegistry.remove(event.clientId());
-            if(pes!=null){
-                Connection occ = this.builder.create().fromJson(new String(pes.payload()), Connection.class);
-                occ.disabled(true);
-                this.wListeners.forEach((l)->{
-                    l.onState(occ);
-                });
-            }
-        }
         else if(event instanceof ModuleApplicationEvent){
             if(!event.disabled()){
                 _setApplicationOnLobby(event.typeId(),event.applicationId());
@@ -629,7 +611,26 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerOnLobbyListener(OnLobby.Listener onLobbyListener){
         oListeners.add(onLobbyListener);
     }
-
+    public void addServerPushEvent(Event event){
+        log.warn("add server push->"+event.trackId());
+        Connection occ = this.builder.create().fromJson(new String(event.payload()), Connection.class);
+        occ.disabled(false);
+        pushRegistry.put(event.trackId(), event);//serverId cache
+        this.wListeners.forEach((l) -> {
+            l.onState(occ);
+        });
+    }
+    public void removeConnection(String serverId){
+        log.warn("remove server push->"+serverId);
+        Event pes = pushRegistry.remove(serverId);
+        if(pes!=null){
+            Connection occ = this.builder.create().fromJson(new String(pes.payload()), Connection.class);
+            occ.disabled(true);
+            this.wListeners.forEach((l)->{
+                l.onState(occ);
+            });
+        }
+    }
     public void registerOnConnectionListener(Connection.Listener listener){
         pushRegistry.forEach((k,v)->{
             Connection connection = this.builder.create().fromJson(new String(v.payload()), Connection.class);

@@ -5,11 +5,9 @@ import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.event.DisableServerPushEvent;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
 import com.tarantula.platform.service.DeployService;
-import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -61,13 +59,14 @@ public class PushEventHandler implements RequestHandler {
                     //log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
                     String sid = exchange.id();
                     _hex.put(sid,exchange);
-                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid);
-                    pushEvent.bucket(this.bucket);
-                    pushEvent.clientId(serverId);
-                    pushEvent.owner(this.eventService.subscription());
-                    pushEvent.destination(DeploymentServiceProvider.DEPLOY_TOPIC);
-                    pushEvent.payload(_payload);
-                    eventService.publish(pushEvent);
+                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,serverId,_payload);
+                    //pushEvent.bucket(this.bucket);
+                    //pushEvent.clientId(serverId);
+                    //pushEvent.owner(this.eventService.subscription());
+                    //pushEvent.destination(DeploymentServiceProvider.DEPLOY_TOPIC);
+                    //pushEvent.payload(_payload);
+                    //eventService.publish(pushEvent);
+                    deployService.addServerPushEvent(pushEvent);
                 }
                 else{
                     log.warn("Invalid ticket");
@@ -79,12 +78,13 @@ public class PushEventHandler implements RequestHandler {
                 _hex.forEach((k,v)->{
                     if(v.header(Session.TARANTULA_SERVER_ID).equals(serverId)){
                         _hex.remove(k);
-                        DisableServerPushEvent pushEvent = new DisableServerPushEvent(this.serverTopic,k);
-                        pushEvent.bucket(this.bucket);
-                        pushEvent.clientId(serverId);
-                        pushEvent.owner(this.eventService.subscription());
-                        pushEvent.destination(DeploymentServiceProvider.DEPLOY_TOPIC);
-                        eventService.publish(pushEvent);
+                        //DisableServerPushEvent pushEvent = new DisableServerPushEvent(this.serverTopic,k);
+                        //pushEvent.bucket(this.bucket);
+                        //pushEvent.clientId(serverId);
+                        //pushEvent.owner(this.eventService.subscription());
+                        //pushEvent.destination(DeploymentServiceProvider.DEPLOY_TOPIC);
+                        //eventService.publish(pushEvent);
+                        deployService.removeServerPushEvent(serverId);
                     }
                 });
             }

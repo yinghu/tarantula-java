@@ -14,9 +14,11 @@ public class ServerPushEvent extends Data implements EventOnAction {
 
     }
 
-    public ServerPushEvent(String source, String sessionId){
+    public ServerPushEvent(String source, String sessionId,String serverId,byte[] payload){
         this.source = source;
         this.sessionId = sessionId;
+        this.trackId = serverId;
+        this.payload = payload;
     }
     @Override
     public int getFactoryId(){
@@ -28,22 +30,16 @@ public class ServerPushEvent extends Data implements EventOnAction {
     }
     @Override
     public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("1",this.bucket);
         out.writeUTF("2",this.source);
         out.writeUTF("3",this.sessionId);
-        out.writeUTF("4",this.destination);
-        out.writeUTF("6",this.clientId);//serverId
-        out.writeUTF("7",this.owner);//node Id
+        out.writeUTF("6",this.trackId);//serverId
         out.writeByteArray("9",this.payload);
     }
     @Override
     public void readPortable(PortableReader in) throws IOException {
-        this.bucket = in.readUTF("1");
         this.source = in.readUTF("2");
         this.sessionId = in.readUTF("3");
-        this.destination = in.readUTF("4");
-        this.clientId = in.readUTF("6");
-        this.owner = in.readUTF("7");
+        this.trackId = in.readUTF("6");
         this.payload = in.readByteArray("9");
     }
 

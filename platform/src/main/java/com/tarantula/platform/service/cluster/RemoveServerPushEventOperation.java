@@ -9,22 +9,18 @@ import java.io.IOException;
 /**
  * Created by yinghu lu on 7/25/2020
  */
-public class AccessIndexServiceOperation extends Operation {
+public class RemoveServerPushEventOperation extends Operation {
 
-    private boolean enabled;
-    public AccessIndexServiceOperation() {
+    private String serverId;
+    public RemoveServerPushEventOperation() {
     }
-    public AccessIndexServiceOperation(boolean enabled) {
-        this.enabled = enabled;
+    public RemoveServerPushEventOperation(String serverId) {
+        this.serverId = serverId;
     }
     @Override
     public void run() throws Exception {
-        AccessIndexClusterService cds = this.getService();
-        if(enabled){
-            cds.enable();
-        }else {
-            cds.disable();
-        }
+        ClusterDeployService cds = this.getService();
+        cds.removeServerPushEvent(serverId);
     }
 
     @Override
@@ -35,12 +31,12 @@ public class AccessIndexServiceOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeBoolean(enabled);
+        out.writeUTF(serverId);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        enabled = in.readBoolean();
+        serverId = in.readUTF();
     }
 }

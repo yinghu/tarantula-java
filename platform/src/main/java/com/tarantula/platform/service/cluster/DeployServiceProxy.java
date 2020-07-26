@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.cluster;
 
+import com.hazelcast.core.Member;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
@@ -9,11 +10,14 @@ import com.tarantula.Event;
 import com.tarantula.OnView;
 import com.tarantula.platform.event.ServerPushEvent;
 import com.tarantula.platform.presence.GameCluster;
+import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.DeployService;
 
+import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployService> implements DeployService{
 
@@ -185,9 +189,39 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
     }
 
     public boolean addServerPushEvent(Event serverPushEvent){
-        return false;
+        NodeEngine nodeEngine = getNodeEngine();
+        AddServerPushEventOperation operation = new AddServerPushEventOperation(serverPushEvent);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(5, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
     }
-    public boolean removeServerPushEvent(Event serverPushEvent){
-        return false;
+    public boolean removeServerPushEvent(String serverId){
+        NodeEngine nodeEngine = getNodeEngine();
+        RemoveServerPushEventOperation operation = new RemoveServerPushEventOperation(serverId);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(5, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
     }
 }

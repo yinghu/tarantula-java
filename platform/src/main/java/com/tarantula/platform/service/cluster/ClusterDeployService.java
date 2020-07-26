@@ -8,6 +8,7 @@ import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
+import com.tarantula.platform.event.ServerPushEvent;
 import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.Batch;
@@ -571,5 +572,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
         return gameCluster;
     }
-
+    public void addServerPushEvent(Event event){
+        this.deploymentServiceProvider.addServerPushEvent(event);
+    }
+    public void removeServerPushEvent(String serverId){
+        this.deploymentServiceProvider.removeConnection(serverId);
+    }
 }

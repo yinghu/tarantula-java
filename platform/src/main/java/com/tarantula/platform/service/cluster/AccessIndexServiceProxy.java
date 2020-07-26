@@ -71,7 +71,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
 
     public boolean update(boolean state){
         NodeEngine nodeEngine = getNodeEngine();
-        AccessIndexServiceOperation operation = new AccessIndexServiceOperation(state);
+        AccessIndexServiceUpdateOperation operation = new AccessIndexServiceUpdateOperation(state);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int expected = mlist.size();
         for(Member m :mlist){

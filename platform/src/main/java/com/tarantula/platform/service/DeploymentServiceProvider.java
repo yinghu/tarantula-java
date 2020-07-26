@@ -38,7 +38,8 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     void registerInstanceRegistryListener(InstanceRegistry.Listener deploymentListener);
     void deploy(InstanceRegistry registry);
 
-
+    void addServerPushEvent(Event event);
+    void removeConnection(String serverId);
     void registerOnConnectionListener(Connection.Listener listener);
 
 
