@@ -6,11 +6,9 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import java.io.IOException;
 
 /**
- * Created by yinghu on 7/15//2019.
+ * Created by yinghu on 7/25//2020.
  */
 public class ServerPushEvent extends Data implements EventOnAction {
-
-
 
     public ServerPushEvent(){
 
@@ -34,7 +32,6 @@ public class ServerPushEvent extends Data implements EventOnAction {
         out.writeUTF("2",this.source);
         out.writeUTF("3",this.sessionId);
         out.writeUTF("4",this.destination);
-        //out.writeUTF("5",this.trackId);
         out.writeUTF("6",this.clientId);//serverId
         out.writeUTF("7",this.owner);//node Id
         out.writeByteArray("9",this.payload);
@@ -45,7 +42,6 @@ public class ServerPushEvent extends Data implements EventOnAction {
         this.source = in.readUTF("2");
         this.sessionId = in.readUTF("3");
         this.destination = in.readUTF("4");
-        //this.trackId = in.readUTF("5");
         this.clientId = in.readUTF("6");
         this.owner = in.readUTF("7");
         this.payload = in.readByteArray("9");
@@ -53,15 +49,6 @@ public class ServerPushEvent extends Data implements EventOnAction {
 
     @Override
     public String toString(){
-        return "Server Push Event ["+this.sessionId+"/"+disabled+"/"+owner;
-    }
-    @Override
-    public int hashCode(){
-        return this.sessionId.hashCode();
-    }
-    @Override
-    public boolean equals(Object obj){
-        ServerPushEvent ix = (ServerPushEvent)obj;
-        return this.sessionId.equals(ix.sessionId());
+        return "Server Push Event ["+this.clientId+"]";
     }
 }

@@ -7,6 +7,7 @@ import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 
 import java.util.Properties;
@@ -24,7 +25,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
     private DataStore masterStore;
     private PartitionIndex localKey;
     private TarantulaContext tarantulaContext;
-
+    private DeploymentServiceProvider deploymentServiceProvider;
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.tarantulaContext = TarantulaContext.getInstance();
@@ -70,7 +71,14 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
         DataStore dataStore = this.onPartition(accessKey).dataStore;
         return dataStore.load(suc)?suc:null;
     }
+    public void enable(){
+        this.deploymentServiceProvider.startAccessIndex();
+    }
+    public void disable(){
+        this.deploymentServiceProvider.stopAccessIndex();
+    }
     public void setup() {
+        this.deploymentServiceProvider = this.tarantulaContext.deploymentServiceProvider();
         masterStore = this.tarantulaContext.masterDataStore();
         localKey = new PartitionIndex(masterStore.bucket(),masterStore.node()+"-partition-id","",1000);
         localKey.dataStore(masterStore);

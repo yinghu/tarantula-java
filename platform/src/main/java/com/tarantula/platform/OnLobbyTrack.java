@@ -20,11 +20,13 @@ public class OnLobbyTrack extends RecoverableObject implements OnLobby {
 
     private String subscriptionId;
 
+    private int deployCode;
     public OnLobbyTrack(){
 
     }
-    public OnLobbyTrack(String typeId,boolean resetEnabled,boolean closed,String gameClusterId,String subscriptionId){
+    public OnLobbyTrack(String typeId,int deployCode,boolean resetEnabled,boolean closed,String gameClusterId,String subscriptionId){
         this.typeId = typeId;
+        this.deployCode  = deployCode;
         this.resetEnabled = resetEnabled;
         this.closed = closed;
         this.gameClusterId = gameClusterId;
@@ -36,6 +38,9 @@ public class OnLobbyTrack extends RecoverableObject implements OnLobby {
     public String subscriptionId(){ return this.subscriptionId;}
     public String typeId() {
         return this.typeId;
+    }
+    public int deployCode(){
+        return this.deployCode;
     }
     public boolean resetEnabled(){
         return this.resetEnabled;

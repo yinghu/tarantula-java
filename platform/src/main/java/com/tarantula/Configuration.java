@@ -3,9 +3,11 @@ package com.tarantula;
 import java.util.List;
 
 /**
- * Updated by yinghu on 9/21/2018.
+ * Updated by yinghu on 7/19/2020
  */
 public interface Configuration extends Recoverable {
+
+    String LABEL = "AFC";
 
     String tag();
     void tag(String tag);

@@ -11,5 +11,8 @@ public class NoReplicationObject extends RecoverableObject {
     public int scope(){
         return Distributable.LOCAL_SCOPE;
     }
+    public boolean distributable(){
+        return false;
+    }
 
 }

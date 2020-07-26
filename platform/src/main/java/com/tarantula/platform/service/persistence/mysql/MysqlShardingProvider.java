@@ -81,7 +81,7 @@ public class MysqlShardingProvider implements ShardingProvider {
 
     public void registerDataStore(String name){
         if(!enabled){
-            log.warn("Data backup is disabled->"+name);
+            //log.warn("Data backup is disabled->"+name);
             return;
         }
         try{
@@ -99,7 +99,7 @@ public class MysqlShardingProvider implements ShardingProvider {
     @Override
     public  void registerDataStore(String prefix,int partitions){
         if(!enabled){
-            log.warn("Data backup is disabled->"+prefix);
+            //log.warn("Data backup is disabled->"+prefix);
             return;
         }
         try{
@@ -209,72 +209,4 @@ public class MysqlShardingProvider implements ShardingProvider {
             return null;
         }
     }
-    /**
-    public byte[] update(Metadata metadata,String key,Map<String,Object> data){
-        if(!enabled){
-            log.warn("Data backup is disabled->"+key);
-            return SystemUtil.toJson(data);
-        }
-        try{
-            Connection connection = shardList[metadata.partition()%shards].connection();
-            try{
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE "+metadata.source()+" SET v=? WHERE k=?");
-                String ret = SystemUtil.toJsonString(data);
-                log.warn("UPDATE KEY->"+key+"<><>"+ret);
-                preparedStatement.setString(1,ret);
-                preparedStatement.setString(2,key);
-                preparedStatement.execute();
-                preparedStatement.close();
-                return ret.getBytes();
-            }catch (Exception eex){
-                throw new RuntimeException(eex.getMessage());
-            }
-            finally {
-                connection.close();
-            }
-        }catch (Exception ex){
-            log.warn("error on update->"+ex.getMessage());
-            return null;
-        }
-    }**/
-    /**
-    @Override
-    public void onBucket(int bucket, int state) {
-        if(state==BucketReceiver.CLOSE){//close always
-            partitionStates[bucket].opening = false;
-            //log.warn(node+" is closing bucket->"+bucket+" with version->"+partitionStates[bucket].version);
-            return;
-        }
-        else if(state==BucketReceiver.OPEN&&partitionStates[bucket].opening){//keep open
-            //log.warn(node+" is keeping up bucket->"+bucket+" with version->"+partitionStates[bucket].version);
-            return;
-        }
-        partitionStates[bucket].opening = true;
-        try{
-            Connection connection = shardList[bucket%shards].connection();
-            try{
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE meta_info SET n=?,v=v+1 WHERE p=?");
-                preparedStatement.setString(1,node);
-                preparedStatement.setInt(2,bucket);
-                preparedStatement.execute();
-                preparedStatement.close();
-                preparedStatement = connection.prepareStatement("SELECT v FROM meta_info WHERE p=?");
-                preparedStatement.setInt(1,bucket);
-                ResultSet rs = preparedStatement.executeQuery();
-                if(rs.next()){
-                    partitionStates[bucket].version = rs.getInt("v");
-                }
-                rs.close();
-                preparedStatement.close();
-                log.warn(node+" is taking over bucket->"+bucket+" with version->"+partitionStates[bucket].version);
-            }catch (Exception eex){
-                throw new RuntimeException(eex.getMessage());
-            }
-            finally {
-                connection.close();
-            }
-        }catch (Exception ex){
-            log.warn("error on update->"+ex.getMessage());
-        }
-    }**/
 }

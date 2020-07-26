@@ -1,15 +1,16 @@
 package com.tarantula.platform.service.cluster;
 
 import com.hazelcast.core.DistributedObject;
+import com.hazelcast.core.Member;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
-import com.hazelcast.util.ExceptionUtil;
 import com.tarantula.*;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.ServiceContext;
 
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -66,6 +67,25 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             future.cancel(true);
             return null;
         }
+    }
+
+    public boolean update(boolean state){
+        NodeEngine nodeEngine = getNodeEngine();
+        AccessIndexServiceOperation operation = new AccessIndexServiceOperation(state);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(5, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
     }
     @Override
     public void start() throws Exception {

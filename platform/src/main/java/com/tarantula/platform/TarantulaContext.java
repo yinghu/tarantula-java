@@ -256,7 +256,7 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
         GameCluster gameCluster = new GameCluster();
         gameCluster.distributionKey(lobbyTypeIdIndex.owner);
         masterDataStore().load(gameCluster);
-		OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),lb.descriptor().resetEnabled(),false,lobbyTypeIdIndex.owner(),(String) gameCluster.property(GameCluster.OWNER));
+		OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),lb.descriptor().deployCode(),lb.descriptor().resetEnabled(),false,lobbyTypeIdIndex.owner(),(String) gameCluster.property(GameCluster.OWNER));
 		Collections.sort(conf.applications, new DeploymentDescriptorComparator());//deploy by priority
         for (DeploymentDescriptor c : conf.applications) {
             this.setApplicationManager(c, lb);
@@ -309,9 +309,9 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
                 this.configureViews(lc);
                 try{
                     OnLobby ob = this.configure(lc);
-                    if(lc.descriptor.deployCode>0){
-                        listener.onLobby(ob);
-                    }
+                    //if(lc.descriptor.deployCode>0){
+                    listener.onLobby(ob);
+                    //}
                 }catch (Exception ex){ex.printStackTrace();}
             }
         });

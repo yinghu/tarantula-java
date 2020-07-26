@@ -14,6 +14,8 @@ public interface AccessIndexService extends ServiceProvider {
 
     AccessIndex get(String accessKey);
 
+    boolean update(boolean state);
+
     interface Listener{
         void onStop();
         void onStart();

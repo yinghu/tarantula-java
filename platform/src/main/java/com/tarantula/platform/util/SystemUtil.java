@@ -211,15 +211,7 @@ public class SystemUtil {
         }
         return buffer.substring(0,buffer.length()-1);
     }
-    /**
-    public static RoutingKey route(String magic, String tag, int routingNumber){
-        StringBuffer sb = new StringBuffer(magic.substring(0,magic.indexOf(Recoverable.PATH_SEPARATOR)+1));
-        sb.append(Recoverable.PATH_SEPARATOR).append(tag);
-        return new ServiceRoutingKey(sb.toString(),routingNumber);
-    }**/
-    public static String mimeTypeFromWebBase64(String header){
-        return header.substring(header.indexOf(":")+1,header.indexOf(";"));
-    }
+
     public static long toMidnight(){
         LocalTime mid = LocalTime.MIDNIGHT;
         LocalDate date = LocalDate.now();

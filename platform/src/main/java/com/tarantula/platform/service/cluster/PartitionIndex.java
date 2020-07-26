@@ -51,7 +51,7 @@ public class PartitionIndex extends NoReplicationObject implements DataStore.Upd
         try{
             String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
             this.bucket = klist[0];
-            this.label = klist[2];
+            this.label = klist[1];
         }catch (Exception ex){
             //ignore wrong format key
         }

@@ -21,7 +21,7 @@ public class TarantulaApplicationDeployer implements Serviceable {
 		for(ServiceConfiguration c: _slist){
 			this.context.configure(c); //setup configurations
 		}
-		List<LobbyDescriptor> bList = this.context.query(new String[]{bucketId},new LobbyQuery(bucketId));//this.context.tarantulaCluster.list(query);
+		List<LobbyDescriptor> bList = this.context.query(new String[]{bucketId},new LobbyQuery(bucketId));
 		ArrayList<LobbyConfiguration> configurations = new ArrayList();
 		bList.forEach((d)->{
 			this.context.setLobby(d);//override the default one
@@ -39,16 +39,11 @@ public class TarantulaApplicationDeployer implements Serviceable {
 			this.context.configureViews(c);//deploy views
 			c.applications = this.context.query(new String[]{c.descriptor.distributionKey()},new ApplicationQuery(c.descriptor.distributionKey()));
 			OnLobby _ob = this.context.configure(c);
-			if(c.descriptor.deployCode()>1){//system lobby if deploy code <=0, default 0
-				this.onLobby(_ob);
-			}
+			this.context.deploymentService().deploy(_ob);
 		}
 	}
 
 	public void shutdown() throws Exception {
 		
-	}
-	private void onLobby(OnLobby deployed){
-		this.context.deploymentService().deploy(deployed);
 	}
 }

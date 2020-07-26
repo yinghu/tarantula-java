@@ -17,7 +17,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     String NAME = "DeploymentServiceProvider";
 
     void clusterUpdated(int scope,String nodeId,boolean state);
-    int clusterPartitionCount();
+
     //UDP SERVER APIs
     void onUDPConnection(String typeId,Connection connection);
     Connection onUDPConnection(String typeId, Connection.StateListener listener);
@@ -38,9 +38,13 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     void registerInstanceRegistryListener(InstanceRegistry.Listener deploymentListener);
     void deploy(InstanceRegistry registry);
 
+
     void registerOnConnectionListener(Connection.Listener listener);
+
+
     //deploy and callback configuration
     void deploy(Configuration configuration);
+
     void registerConfigurationListener(Configuration.Listener listener);
 
     //deploy and callback on view
@@ -61,20 +65,18 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     String resetCode(String key);
     String checkCode(String resetCode);
 
-    //Module application operation API
+    //Module and application operation API
     String upload(InputStream inputStream,String fname) throws Exception;
-    //boolean createLobby(Descriptor descriptor);
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
     boolean reset(Descriptor descriptor);
     boolean createModule(Descriptor descriptor);
 
-    //END OF MODULE OPERATION API
-
     boolean createApplication(Descriptor descriptor,boolean launching);
     boolean enableApplication(String applicationId,boolean enabled);
     boolean launch(String typeId);
     boolean shutdown(String typeId);
+    //END OF Module API
 
     //GAME CLUSTER APIs
     <T extends OnAccess> T createGameCluster(String owner,String name);
