@@ -268,9 +268,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public boolean createApplication(Descriptor descriptor,boolean launching){
-        String  suc = this.tarantulaContext.tarantulaCluster().deployService().addApplication(descriptor);
+        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        String  suc = deployService.addApplication(descriptor);
         if(suc!=null&&launching){//launch if lobby on line
-            this.integrationEventService.publish(new ModuleApplicationEvent(this.eventTopic,descriptor.typeId(),suc,false));
+            deployService.launchApplication(descriptor.typeId(),suc);
+            //this.integrationEventService.publish(new ModuleApplicationEvent(this.eventTopic,descriptor.typeId(),suc,false));
         }
         return suc!=null;
     }
@@ -279,9 +281,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public boolean enableApplication(String applicationId,boolean enabled){
-        String suc = this.tarantulaContext.tarantulaCluster().deployService().enableApplication(applicationId,enabled);
+        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        String suc = deployService.enableApplication(applicationId,enabled);
         if(suc!=null){//return the lobby typeId
-            this.integrationEventService.publish(new ModuleApplicationEvent(this.eventTopic,suc,applicationId,!enabled));
+            return enabled?deployService.launchApplication(suc,applicationId):deployService.shutdownApplication(suc,applicationId);
         }
         return suc!=null;
     }

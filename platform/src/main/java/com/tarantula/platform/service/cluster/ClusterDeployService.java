@@ -596,4 +596,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         this.deploymentServiceProvider.shutdownLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
         this.deploymentServiceProvider.shutdownLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
     }
+    public void launchApplication(String typeId,String applicationId){
+
+    }
+    public void shutdownApplication(String typeId,String applicationId){
+
+    }
 }

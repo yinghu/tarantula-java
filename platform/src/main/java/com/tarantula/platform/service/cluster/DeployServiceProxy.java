@@ -203,6 +203,42 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
+    public boolean launchApplication(String typeId,String applicationId){
+        NodeEngine nodeEngine = getNodeEngine();
+        LaunchApplicationOperation operation = new LaunchApplicationOperation(typeId,applicationId);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(5, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
+    }
+    public boolean shutdownApplication(String typeId,String applicationId){
+        NodeEngine nodeEngine = getNodeEngine();
+        ShutdownApplicationOperation operation = new ShutdownApplicationOperation(typeId,applicationId);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(5, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
+    }
     public boolean shutdownGameCluster(String gameClusterKey){
         NodeEngine nodeEngine = getNodeEngine();
         ShutdownGameClusterOperation operation = new ShutdownGameClusterOperation(gameClusterKey);
