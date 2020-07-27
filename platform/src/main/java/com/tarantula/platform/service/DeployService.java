@@ -30,6 +30,8 @@ public interface DeployService extends ServiceProvider {
     boolean enableGameCluster(String gameClusterId);
     boolean disableGameCluster(String gameClusterId);
 
+    boolean launchGameCluster(String gameClusterKey);
+    boolean shutdownGameCluster(String gameClusterKey);
 
     boolean addServerPushEvent(Event serverPushEvent);
     boolean removeServerPushEvent(String serverId);

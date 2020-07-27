@@ -8,9 +8,7 @@ import com.hazelcast.util.ExceptionUtil;;
 import com.tarantula.Descriptor;
 import com.tarantula.Event;
 import com.tarantula.OnView;
-import com.tarantula.platform.event.ServerPushEvent;
 import com.tarantula.platform.presence.GameCluster;
-import com.tarantula.platform.service.AccessIndexService;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.DeployService;
@@ -187,7 +185,42 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-
+    public boolean launchGameCluster(String gameClusterKey){
+        NodeEngine nodeEngine = getNodeEngine();
+        LaunchGameClusterOperation operation = new LaunchGameClusterOperation(gameClusterKey);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(5, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
+    }
+    public boolean shutdownGameCluster(String gameClusterKey){
+        NodeEngine nodeEngine = getNodeEngine();
+        ShutdownGameClusterOperation operation = new ShutdownGameClusterOperation(gameClusterKey);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(5, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
+    }
     public boolean addServerPushEvent(Event serverPushEvent){
         NodeEngine nodeEngine = getNodeEngine();
         AddServerPushEventOperation operation = new AddServerPushEventOperation(serverPushEvent);

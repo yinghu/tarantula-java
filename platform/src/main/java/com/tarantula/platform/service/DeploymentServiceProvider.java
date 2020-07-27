@@ -53,6 +53,8 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     void registerOnViewListener(OnView.Listener onViewListener);
 
     //deploy and callback on lobby
+    void deployLobby(String typeId);
+    void shutdownLobby(String typeId);
     void deploy(OnLobby onLobby);
 
     void registerOnLobbyListener(OnLobby.Listener onLobbyListener);

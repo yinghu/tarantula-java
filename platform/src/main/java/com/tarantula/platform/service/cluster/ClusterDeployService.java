@@ -580,4 +580,20 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void upload(String fileName,byte[] content){
         this.deploymentServiceProvider.upload(fileName,content);
     }
+    public void launchGameCluster(String gameClusterKey){
+        GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionKey(gameClusterKey);
+        this.tarantulaContext.masterDataStore().load(gameCluster);
+        this.deploymentServiceProvider.deployLobby((String)gameCluster.property(GameCluster.GAME_DATA));
+        this.deploymentServiceProvider.deployLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
+        this.deploymentServiceProvider.deployLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
+    }
+    public void shutdownGameCluster(String gameClusterKey){
+        GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionKey(gameClusterKey);
+        this.tarantulaContext.masterDataStore().load(gameCluster);
+        this.deploymentServiceProvider.shutdownLobby((String)gameCluster.property(GameCluster.GAME_DATA));
+        this.deploymentServiceProvider.shutdownLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
+        this.deploymentServiceProvider.shutdownLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
+    }
 }

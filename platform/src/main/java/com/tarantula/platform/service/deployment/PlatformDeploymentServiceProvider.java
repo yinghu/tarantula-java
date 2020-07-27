@@ -319,7 +319,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         return suc;
     }
-    private void _shutdown(String typeId){
+    public void shutdownLobby(String typeId){
         this.oListeners.forEach((ol)->{
             if(vMap.containsKey(typeId)){//skip system level modules
                 OnLobby onLobby =(OnLobby) vMap.get(typeId);
@@ -352,7 +352,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         });
     }
-    private void _launch(String typeId){
+    public void deployLobby(String typeId){
         this.tarantulaContext.setOnLobby(typeId,(ob)->{
             this.deploy(ob);
         });
@@ -502,29 +502,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             _reset((Descriptor)mse.portable());
         }
         else if(event instanceof ModuleLaunchEvent){
-            _launch(event.typeId());
+            deployLobby(event.typeId());
         }
         else if(event instanceof ModuleShutdownEvent){
-            _shutdown(event.typeId());
+            shutdownLobby(event.typeId());
         }
-        else if(event instanceof GameClusterLaunchEvent){
-            //log.warn("GAME CLUSTER launch-->"+event.trackId());
-            GameCluster gameCluster = new GameCluster();
-            gameCluster.distributionKey(event.trackId());
-            this.tarantulaContext.masterDataStore().load(gameCluster);
-            _launch((String)gameCluster.property(GameCluster.GAME_DATA));
-            _launch((String)gameCluster.property(GameCluster.GAME_LOBBY));
-            _launch((String)gameCluster.property(GameCluster.GAME_SERVICE));
-        }
-       else if(event instanceof GameClusterShutdownEvent){
-           //log.warn("GAME CLUSTER shutdown-->"+event.trackId());
-           GameCluster gameCluster = new GameCluster();
-           gameCluster.distributionKey(event.trackId());
-           this.tarantulaContext.masterDataStore().load(gameCluster);
-           _shutdown((String)gameCluster.property(GameCluster.GAME_DATA));
-           _shutdown((String)gameCluster.property(GameCluster.GAME_LOBBY));
-           _shutdown((String)gameCluster.property(GameCluster.GAME_SERVICE));
-       }
        else if(event instanceof MapStoreBackupEvent){
            this.tarantulaContext.dataStoreProvider().backup(Distributable.DATA_SCOPE);
            this.tarantulaContext.dataStoreProvider().backup(Distributable.INTEGRATION_SCOPE);
@@ -690,18 +672,18 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     //end of dedicated server methods
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
-        if(this.tarantulaContext.tarantulaCluster().deployService().enableGameCluster(gameCluster.distributionKey())){
-            this.integrationEventService.publish(new GameClusterLaunchEvent(eventTopic,gameCluster.distributionKey()));
-            return true;
+        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        if(deployService.enableGameCluster(gameCluster.distributionKey())){
+            return deployService.launchGameCluster(gameCluster.distributionKey());
         }
         else{
             return false;
         }
     }
     public <T extends OnAccess> boolean shutdownGameCluster(T gameCluster){
-        if(this.tarantulaContext.tarantulaCluster().deployService().disableGameCluster(gameCluster.distributionKey())){
-            this.integrationEventService.publish(new GameClusterShutdownEvent(eventTopic,gameCluster.distributionKey()));
-            return true;
+        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        if(deployService.disableGameCluster(gameCluster.distributionKey())){
+            return deployService.shutdownGameCluster(gameCluster.distributionKey());
         }
         else{
             return false;
