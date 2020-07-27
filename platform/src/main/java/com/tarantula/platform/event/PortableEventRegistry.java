@@ -40,11 +40,7 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int MODULE_RESET_EVENT_CID = 15;
 
-    public static final int MODULE_LAUNCH_EVENT_CID = 16;
-
     public static final int MODULE_APPLICATION_EVENT_CID = 17;
-
-    public static final int MODULE_SHUTDOWN_EVENT_CID = 18;
 
     public static final int LEADER_BOARD_GLOBAL_EVENT_CID = 20;
 
@@ -114,14 +110,8 @@ public class PortableEventRegistry implements PortableFactory {
             case MODULE_RESET_EVENT_CID:
                 _ins = new ModuleResetEvent();
                 break;
-            case MODULE_LAUNCH_EVENT_CID:
-                _ins = new ModuleLaunchEvent();
-                break;
             case MODULE_APPLICATION_EVENT_CID:
                 _ins = new ModuleApplicationEvent();
-                break;
-            case MODULE_SHUTDOWN_EVENT_CID:
-                _ins = new ModuleShutdownEvent();
                 break;
             case SINGLETON_FORWARD_CID:
                 _ins = new SessionForward();

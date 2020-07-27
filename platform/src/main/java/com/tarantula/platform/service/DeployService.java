@@ -39,4 +39,8 @@ public interface DeployService extends ServiceProvider {
     boolean removeServerPushEvent(String serverId);
 
     boolean upload(String fileName,byte[] content);
+
+    boolean launchModule(String typeId);
+    boolean shutdownModule(String typeId);
+    boolean updateModule(Descriptor descriptor);
 }

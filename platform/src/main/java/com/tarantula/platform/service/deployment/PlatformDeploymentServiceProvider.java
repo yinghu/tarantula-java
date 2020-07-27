@@ -190,9 +190,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public boolean reset(Descriptor descriptor){
         //update app desc via typeId
-        boolean suc = this.tarantulaContext.tarantulaCluster().deployService().resetModule(descriptor);
+        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        boolean suc = deployService.resetModule(descriptor);
         if(suc){
-            this.integrationEventService.publish(new ModuleResetEvent(this.eventTopic,(DeploymentDescriptor) descriptor));
+            deployService.updateModule(descriptor);
         }
         return suc;
     }
@@ -204,7 +205,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             throw new RuntimeException(ex);
         }
     }
-    private void _reset(Descriptor descriptor){
+    public void update(Descriptor descriptor){
         DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.typeId(),(k,c)->{
             DynamicModuleClassLoader nmc = new DynamicModuleClassLoader(descriptor);
             nmc.proxies.addAll(c.proxies);
@@ -309,16 +310,18 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
     }
     public boolean launch(String typeId){
-        boolean suc = this.tarantulaContext.tarantulaCluster().deployService().enableLobby(typeId,true);
+        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        boolean suc = deployService.enableLobby(typeId,true);
         if(suc){
-            this.integrationEventService.publish(new ModuleLaunchEvent(this.eventTopic,typeId));
+            deployService.launchModule(typeId);
         }
         return suc;
     }
     public boolean shutdown(String typeId){
-        boolean suc = this.tarantulaContext.tarantulaCluster().deployService().enableLobby(typeId,false);
+        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        boolean suc = deployService.enableLobby(typeId,false);
         if(suc){
-            this.integrationEventService.publish(new ModuleShutdownEvent(this.eventTopic,typeId));
+            deployService.shutdownModule(typeId);
         }
         return suc;
     }
@@ -499,16 +502,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             else{
                 _unsetApplicationOnLobby(event.typeId(),event.applicationId());
             }
-        }
-        else if(event instanceof ModuleResetEvent){
-            ModuleResetEvent mse = (ModuleResetEvent)event;
-            _reset((Descriptor)mse.portable());
-        }
-        else if(event instanceof ModuleLaunchEvent){
-            deployLobby(event.typeId());
-        }
-        else if(event instanceof ModuleShutdownEvent){
-            shutdownLobby(event.typeId());
         }
        else if(event instanceof MapStoreBackupEvent){
            this.tarantulaContext.dataStoreProvider().backup(Distributable.DATA_SCOPE);

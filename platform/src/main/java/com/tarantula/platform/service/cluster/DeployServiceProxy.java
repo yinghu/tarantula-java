@@ -257,6 +257,60 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
+    public boolean launchModule(String typeId){
+        NodeEngine nodeEngine = getNodeEngine();
+        LaunchModuleOperation operation = new LaunchModuleOperation(typeId);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(5, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
+    }
+    public boolean shutdownModule(String typeId){
+        NodeEngine nodeEngine = getNodeEngine();
+        ShutdownModuleOperation operation = new ShutdownModuleOperation(typeId);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(5, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
+    }
+    public boolean updateModule(Descriptor descriptor){
+        NodeEngine nodeEngine = getNodeEngine();
+        UpdateModuleOperation operation = new UpdateModuleOperation(descriptor);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(5, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
+    }
     public boolean addServerPushEvent(Event serverPushEvent){
         NodeEngine nodeEngine = getNodeEngine();
         AddServerPushEventOperation operation = new AddServerPushEventOperation(serverPushEvent);

@@ -76,6 +76,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     boolean enableApplication(String applicationId,boolean enabled);
     boolean launch(String typeId);
     boolean shutdown(String typeId);
+    void update(Descriptor descriptor);
     //END OF Module API
 
     //GAME CLUSTER APIs

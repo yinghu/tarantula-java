@@ -602,4 +602,13 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void shutdownApplication(String typeId,String applicationId){
 
     }
+    public void launchModule(String typeId){
+        this.deploymentServiceProvider.deployLobby(typeId);
+    }
+    public void shutdownModule(String typeId){
+        this.deploymentServiceProvider.shutdownLobby(typeId);
+    }
+    public void updateModule(Descriptor descriptor){
+        this.deploymentServiceProvider.update(descriptor);
+    }
 }
