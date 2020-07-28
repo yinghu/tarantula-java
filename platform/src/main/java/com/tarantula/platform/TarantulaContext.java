@@ -309,9 +309,7 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
                 this.configureViews(lc);
                 try{
                     OnLobby ob = this.configure(lc);
-                    //if(lc.descriptor.deployCode>0){
                     listener.onLobby(ob);
-                    //}
                 }catch (Exception ex){ex.printStackTrace();}
             }
         });

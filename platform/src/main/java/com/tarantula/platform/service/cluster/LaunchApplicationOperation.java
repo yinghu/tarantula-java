@@ -12,19 +12,19 @@ import java.io.IOException;
 public class LaunchApplicationOperation extends Operation {
 
     private String typeId;
-    private String applicationkey;
+    private String applicationKey;
     public LaunchApplicationOperation() {
     }
 
 
-    public LaunchApplicationOperation(String typeId,String applicationkey) {
+    public LaunchApplicationOperation(String typeId,String applicationKey) {
         this.typeId = typeId;
-        this.applicationkey = applicationkey;
+        this.applicationKey = applicationKey;
     }
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.launchApplication(typeId,applicationkey);
+        cds.launchApplication(typeId,applicationKey);
     }
 
     @Override
@@ -36,13 +36,13 @@ public class LaunchApplicationOperation extends Operation {
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(typeId);
-        out.writeUTF(applicationkey);
+        out.writeUTF(applicationKey);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         this.typeId = in.readUTF();
-        this.applicationkey = in.readUTF();
+        this.applicationKey = in.readUTF();
     }
 }

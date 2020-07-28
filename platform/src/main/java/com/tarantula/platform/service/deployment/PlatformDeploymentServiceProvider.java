@@ -277,7 +277,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         return suc!=null;
     }
-    private void _setApplicationOnLobby(String typeId,String applicationId){
+    public void deployApplication(String typeId,String applicationId){
         this.tarantulaContext.setApplicationOnLobby(typeId,applicationId);
     }
 
@@ -289,7 +289,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         return suc!=null;
     }
-    private void  _unsetApplicationOnLobby(String typeId,String applicationId){
+    public void  shutdownApplication(String typeId,String applicationId){
         this.tarantulaContext.unsetApplication(typeId,applicationId,(d)->{
             if(d.singleton()&&d.category().equals("lobby")){
                 this.oListeners.forEach((ol)->{ //remove lobby entry
@@ -495,14 +495,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     v.trackId(event.trackId());
                     this.integrationEventService.publish(v);
                 });
-            }
-        }
-        else if(event instanceof ModuleApplicationEvent){
-            if(!event.disabled()){
-                _setApplicationOnLobby(event.typeId(),event.applicationId());
-            }
-            else{
-                _unsetApplicationOnLobby(event.typeId(),event.applicationId());
             }
         }
        else if(event instanceof MapStoreBackupEvent){

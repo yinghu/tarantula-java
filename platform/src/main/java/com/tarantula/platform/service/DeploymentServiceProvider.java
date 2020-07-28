@@ -53,6 +53,8 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //deploy and callback on lobby
     void deployLobby(String typeId);
     void shutdownLobby(String typeId);
+    void deployApplication(String applicationId,String typeId);
+    void shutdownApplication(String applicationId,String typeId);
     void deploy(OnLobby onLobby);
 
     void registerOnLobbyListener(OnLobby.Listener onLobbyListener);
@@ -98,6 +100,6 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //data store backup operation API
     void issueDataStoreBackup();
 
-    DeployService deployService(int scope);
+    //DeployService deployService(int scope);
 
 }
