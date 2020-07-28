@@ -9,7 +9,7 @@ import com.tarantula.Module;
 
 public interface DeploymentServiceProvider extends ServiceProvider,MetricsListener {
 
-    String DEPLOY_TOPIC = "tarantula-deployment";
+    //String DEPLOY_TOPIC = "tarantula-deployment";
     String DEPLOY_DATA_STORE = "tarantula";
 
     String NAME = "DeploymentServiceProvider";
@@ -47,6 +47,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //deploy and callback on view
 
     boolean deploy(OnView onView);
+    void update(OnView onView);
     OnView invalidView();
     void registerOnViewListener(OnView.Listener onViewListener);
 

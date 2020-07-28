@@ -31,7 +31,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private EventService integrationEventService;
 
-    private String eventTopic = DEPLOY_TOPIC;
+    //private String eventTopic = DEPLOY_TOPIC;
     private String localTopic;
     private String registerKey;
 
@@ -388,7 +388,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void setup(ServiceContext serviceContext){
         this.tarantulaContext = (TarantulaContext)serviceContext;
         ClusterProvider ics = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
-        this.integrationEventService = ics.subscribe(eventTopic,this);
+        //this.integrationEventService = ics.subscribe(eventTopic,this);
         localTopic = ics.subscription();
         registerKey = ics.addEventListener(null,this);
         try{
@@ -448,7 +448,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     @Override
     public boolean onEvent(Event event) {
-       if(event instanceof MapStoreSyncEvent){
+        /**
+        if(event instanceof MapStoreSyncEvent){
             //log.warn("Map Sync EVENT->"+event.source()+"/"+event.destination()+"/"+event.trackId());
             MapStoreSyncEvent mse = (MapStoreSyncEvent)event;
             Metadata mt = mse.metadata;
@@ -467,19 +468,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 //log.warn("Not supported type->"+ot.toString());
             }
         }
-        else if(event instanceof OnViewEvent){
-           OnView onView = (OnView)((OnViewEvent) event).portable();
-           checkContent(onView);
-           vMap.putIfAbsent(onView.viewId(),onView);
-           //remove caches
-           rMap.remove(onView.moduleResourceFile());
-           if(onView.moduleFile()!=null){
-               rMap.remove(onView.moduleFile());
-           }
-           this.vListeners.forEach((cl)->{
-               cl.onView(onView);
-           });
-        }
         else if(event instanceof MapStoreVotingEvent){
             if(!event.trackId().equals(registerKey)){
                 log.warn("VOTING EVENT->"+event.source()+"/"+event.trackId());
@@ -496,15 +484,23 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     this.integrationEventService.publish(v);
                 });
             }
-        }
-       else if(event instanceof MapStoreBackupEvent){
-           this.tarantulaContext.dataStoreProvider().backup(Distributable.DATA_SCOPE);
-           this.tarantulaContext.dataStoreProvider().backup(Distributable.INTEGRATION_SCOPE);
-       }
+        }**/
        return false;
     }
     public void registerInstanceRegistryListener(InstanceRegistry.Listener instanceRegistryListener){
         rListeners.put(instanceRegistryListener.onLobby(),instanceRegistryListener);
+    }
+    public void update(OnView onView){
+        checkContent(onView);
+        vMap.putIfAbsent(onView.viewId(),onView);
+        //remove caches
+        rMap.remove(onView.moduleResourceFile());
+        if(onView.moduleFile()!=null){
+            rMap.remove(onView.moduleFile());
+        }
+        this.vListeners.forEach((cl)->{
+            cl.onView(onView);
+        });
     }
     public OnView invalidView(){
         return (OnView)vMap.get("invalid.request");
@@ -518,9 +514,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 return false;
             }
         }
-        //log.warn("View Updated->"+onView.viewId()+"<>"+onView.toString());
-        //OnViewEvent onViewEvent = new OnViewEvent(this.eventTopic,this.localTopic,onView);
-        //this.integrationEventService.publish(onViewEvent);
         return deployService.updateView(onView);
     }
     public void registerOnViewListener(OnView.Listener onViewListener){
@@ -589,8 +582,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             //r.disabled(true);
             //v = SystemUtil.toJson(r.toMap());
         //}
-        MapStoreSyncEvent mse = new MapStoreSyncEvent(this.eventTopic,localTopic,k, v,mt);
-        this.integrationEventService.publish(mse);
+        //MapStoreSyncEvent mse = new MapStoreSyncEvent(this.eventTopic,localTopic,k, v,mt);
+        //this.integrationEventService.publish(mse);
     }
     public void registerConfigurationListener(Configuration.Listener listener){
         vMap.forEach((k,v)->{
@@ -737,9 +730,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         aListeners.add(listener);
     }
     public void issueDataStoreBackup(){
-        this.integrationEventService.publish(new MapStoreBackupEvent(this.eventTopic));
-        //this.tarantulaContext.dataStoreProvider().backup(Distributable.DATA_SCOPE);
-        //this.tarantulaContext.dataStoreProvider().backup(Distributable.INTEGRATION_SCOPE);
+
     }
     public void atMidnight(){
         //log.warn("MIDNIGHT->");

@@ -24,8 +24,6 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int ON_DEPLOY_EVENT_CID = 6;
 
-    public static final int MAP_STORE_BACKUP_EVENT_CID = 7;
-
     public static final int SERVICE_ACTION_EVENT_CID = 9;
 
     public static final int APPLICATION_SERVICE_EVENT_CID = 10;
@@ -44,7 +42,6 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int CONNECTION_STATE_EVENT_CID = 21;
 
-    public static final int ON_VIEW_EVENT_CID = 23;
 
 
 
@@ -82,9 +79,7 @@ public class PortableEventRegistry implements PortableFactory {
             case ON_DEPLOY_EVENT_CID:
                 _ins = new OnDeployEvent();
                 break;
-            case MAP_STORE_BACKUP_EVENT_CID:
-                _ins = new MapStoreBackupEvent();
-                break;
+
             case SERVICE_ACTION_EVENT_CID:
                 _ins = new ServiceActionEvent();
                 break;
@@ -125,9 +120,6 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case CONNECTION_STATE_EVENT_CID:
                 _ins = new ConnectionStateEvent();
-                break;
-            case ON_VIEW_EVENT_CID:
-                _ins = new OnViewEvent();
                 break;
             case ON_VIEW_CID:
                 _ins = new OnViewTrack();

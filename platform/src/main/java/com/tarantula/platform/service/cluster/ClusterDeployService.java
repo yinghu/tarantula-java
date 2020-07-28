@@ -611,4 +611,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void updateModule(Descriptor descriptor){
         this.deploymentServiceProvider.update(descriptor);
     }
+    public void updateView(OnView onView){
+        this.deploymentServiceProvider.update(onView);
+    }
 }
