@@ -23,7 +23,7 @@ public interface DeployService extends ServiceProvider {
 
     //add view via typeId of lobby
     boolean addView(OnView view);
-
+    boolean updateView(OnView onView);
     //update lobby or application to set disabled as true/false
     String enableApplication(String applicationId,boolean enabled);
     boolean enableLobby(String typeId,boolean enabled);

@@ -510,17 +510,18 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return (OnView)vMap.get("invalid.request");
     }
     public boolean deploy(OnView onView){
+        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         if(!vMap.containsKey(onView.viewId())&&onView.distributionKey()==null){
             //create new entry
-            boolean suc = tarantulaContext.tarantulaCluster().deployService().addView(onView);
+            boolean suc = deployService.addView(onView);
             if(!suc){
                 return false;
             }
         }
         //log.warn("View Updated->"+onView.viewId()+"<>"+onView.toString());
-        OnViewEvent onViewEvent = new OnViewEvent(this.eventTopic,this.localTopic,onView);
-        this.integrationEventService.publish(onViewEvent);
-        return true;
+        //OnViewEvent onViewEvent = new OnViewEvent(this.eventTopic,this.localTopic,onView);
+        //this.integrationEventService.publish(onViewEvent);
+        return deployService.updateView(onView);
     }
     public void registerOnViewListener(OnView.Listener onViewListener){
         vMap.forEach((k,v)->{
