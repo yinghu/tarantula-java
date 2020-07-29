@@ -584,32 +584,32 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         GameCluster gameCluster = new GameCluster();
         gameCluster.distributionKey(gameClusterKey);
         this.tarantulaContext.masterDataStore().load(gameCluster);
-        this.deploymentServiceProvider.deployLobby((String)gameCluster.property(GameCluster.GAME_DATA));
-        this.deploymentServiceProvider.deployLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
-        this.deploymentServiceProvider.deployLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
+        this.deploymentServiceProvider.addLobby((String)gameCluster.property(GameCluster.GAME_DATA));
+        this.deploymentServiceProvider.addLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
+        this.deploymentServiceProvider.addLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
     }
     public void shutdownGameCluster(String gameClusterKey){
         GameCluster gameCluster = new GameCluster();
         gameCluster.distributionKey(gameClusterKey);
         this.tarantulaContext.masterDataStore().load(gameCluster);
-        this.deploymentServiceProvider.shutdownLobby((String)gameCluster.property(GameCluster.GAME_DATA));
-        this.deploymentServiceProvider.shutdownLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
-        this.deploymentServiceProvider.shutdownLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
+        this.deploymentServiceProvider.removeLobby((String)gameCluster.property(GameCluster.GAME_DATA));
+        this.deploymentServiceProvider.removeLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
+        this.deploymentServiceProvider.removeLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
     }
     public void launchApplication(String typeId,String applicationId){
-        this.deploymentServiceProvider.deployApplication(applicationId,typeId);
+        this.deploymentServiceProvider.addApplication(applicationId,typeId);
     }
     public void shutdownApplication(String typeId,String applicationId){
-        this.deploymentServiceProvider.shutdownApplication(applicationId,typeId);
+        this.deploymentServiceProvider.removeApplication(applicationId,typeId);
     }
     public void launchModule(String typeId){
-        this.deploymentServiceProvider.deployLobby(typeId);
+        this.deploymentServiceProvider.addLobby(typeId);
     }
     public void shutdownModule(String typeId){
-        this.deploymentServiceProvider.shutdownLobby(typeId);
+        this.deploymentServiceProvider.removeLobby(typeId);
     }
     public void updateModule(Descriptor descriptor){
-        this.deploymentServiceProvider.update(descriptor);
+        this.deploymentServiceProvider.updateModule(descriptor);
     }
     public void updateView(OnView onView){
         this.deploymentServiceProvider.update(onView);

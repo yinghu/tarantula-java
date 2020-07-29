@@ -195,7 +195,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             throw new RuntimeException(ex);
         }
     }
-    public void update(Descriptor descriptor){
+    public void updateModule(Descriptor descriptor){
         DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.typeId(),(k,c)->{
             DynamicModuleClassLoader nmc = new DynamicModuleClassLoader(descriptor);
             nmc.proxies.addAll(c.proxies);
@@ -267,7 +267,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         return suc!=null;
     }
-    public void deployApplication(String typeId,String applicationId){
+    public void addApplication(String typeId,String applicationId){
         this.tarantulaContext.setApplicationOnLobby(typeId,applicationId);
     }
 
@@ -279,7 +279,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         return suc!=null;
     }
-    public void  shutdownApplication(String typeId,String applicationId){
+    public void  removeApplication(String typeId,String applicationId){
         this.tarantulaContext.unsetApplication(typeId,applicationId,(d)->{
             if(d.singleton()&&d.category().equals("lobby")){
                 this.oListeners.forEach((ol)->{ //remove lobby entry
@@ -315,7 +315,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         return suc;
     }
-    public void shutdownLobby(String typeId){
+    public void removeLobby(String typeId){
         this.oListeners.forEach((ol)->{
             if(vMap.containsKey(typeId)){//skip system level modules
                 OnLobby onLobby =(OnLobby) vMap.get(typeId);
@@ -348,7 +348,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         });
     }
-    public void deployLobby(String typeId){
+    public void addLobby(String typeId){
         this.tarantulaContext.setOnLobby(typeId,(ob)->{
             this.deploy(ob);
         });

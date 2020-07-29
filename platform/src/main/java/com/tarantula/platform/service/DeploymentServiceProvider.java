@@ -51,12 +51,12 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     void registerOnViewListener(OnView.Listener onViewListener);
 
     //deploy and callback on lobby
-    void deployLobby(String typeId);
-    void shutdownLobby(String typeId);
-    void deployApplication(String applicationId,String typeId);
-    void shutdownApplication(String applicationId,String typeId);
-    void deploy(OnLobby onLobby);
+    void addLobby(String typeId);
+    void removeLobby(String typeId);
+    void addApplication(String applicationId,String typeId);
+    void removeApplication(String applicationId,String typeId);
 
+    void deploy(OnLobby onLobby);
     void registerOnLobbyListener(OnLobby.Listener onLobbyListener);
 
     byte[] resource(String name,String flag);
@@ -76,7 +76,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
     boolean createApplication(Descriptor descriptor,boolean launching);
     boolean enableApplication(String applicationId,boolean enabled);
-    void update(Descriptor descriptor);
+    void updateModule(Descriptor descriptor);
     //END OF Module API
 
     //GAME CLUSTER APIs
