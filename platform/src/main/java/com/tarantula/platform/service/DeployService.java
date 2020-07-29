@@ -38,6 +38,7 @@ public interface DeployService extends ServiceProvider {
     boolean addServerPushEvent(Event serverPushEvent);
     boolean removeServerPushEvent(String serverId);
 
+    //distribute the module or view content in cluster
     boolean upload(String fileName,byte[] content);
 
     boolean launchModule(String typeId);

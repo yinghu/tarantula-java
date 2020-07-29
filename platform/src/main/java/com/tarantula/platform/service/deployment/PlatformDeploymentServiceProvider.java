@@ -88,17 +88,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return (T)new Metrics(this.tarantulaContext.metrics());
     }
 
-    public void upload(String fileName,byte[] content){
-        try{
-            //write to local deploy dir to be ready for deployment
-            BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(this.tarantulaContext.deployDir+"/"+fileName));
-            fos.write(content);
-            fos.flush();
-            fos.close();
-        }catch (Exception ex){
-            log.error("error on content write",ex);
-        }
-    }
+
     public Module module(Descriptor descriptor){
         if(descriptor.codebase()!=null){
             DynamicModuleClassLoader mc = cMap.computeIfAbsent(descriptor.typeId(),(k)-> {
@@ -188,7 +178,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         DynamicModuleClassLoader dyn = cMap.get(descriptor.typeId());
         dyn.loadResource(name,onResource);
     }
-    public boolean reset(Descriptor descriptor){
+    public boolean resetModule(Descriptor descriptor){
         //update app desc via typeId
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         boolean suc = deployService.resetModule(descriptor);
@@ -309,7 +299,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         });
     }
-    public boolean launch(String typeId){
+    public boolean launchModule(String typeId){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         boolean suc = deployService.enableLobby(typeId,true);
         if(suc){
@@ -317,7 +307,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         return suc;
     }
-    public boolean shutdown(String typeId){
+    public boolean shutdownModule(String typeId){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         boolean suc = deployService.enableLobby(typeId,false);
         if(suc){

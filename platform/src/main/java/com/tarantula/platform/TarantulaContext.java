@@ -1,5 +1,7 @@
 package com.tarantula.platform;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
@@ -611,6 +613,18 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
             return gb.create().fromJson(new String(data),AuthObject.class);
         }catch (Exception ex){
             return null;
+        }
+    }
+
+    public void _writeContent(String fileName,byte[] content){
+        try{
+            //write to local deploy dir to be ready for deployment
+            BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(this.deployDir+"/"+fileName));
+            fos.write(content);
+            fos.flush();
+            fos.close();
+        }catch (Exception ex){
+            log.error("error on content write",ex);
         }
     }
 }

@@ -105,7 +105,7 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         }
         else if(session.action().equals("onLaunchModule")){//typeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            boolean suc = this.deploymentServiceProvider.launch(access.typeId());
+            boolean suc = this.deploymentServiceProvider.launchModule(access.typeId());
             session.write(this.toMessage(suc?"module launched":"module not launched",suc).toString().getBytes(),label());
         }
         else if(session.action().equals("onResetModule")){//subtypeId
@@ -115,12 +115,12 @@ public class SudoRoleModule implements Module,Configuration.Listener {
             desc.moduleArtifact((String) access.property(OnAccess.MODULE_ARTIFACT));
             desc.moduleVersion((String)access.property(OnAccess.MODULE_VERSION));
             desc.codebase((String)access.property(OnAccess.MODULE_CODE_BASE));
-            boolean suc  = this.deploymentServiceProvider.reset(desc);
+            boolean suc  = this.deploymentServiceProvider.resetModule(desc);
             session.write(this.toMessage(suc?"module rest":"module not reset",suc).toString().getBytes(),label());
         }
         else if(session.action().equals("onShutdownModule")){//typeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            boolean suc = this.deploymentServiceProvider.shutdown(access.typeId());
+            boolean suc = this.deploymentServiceProvider.shutdownModule(access.typeId());
             session.write(this.toMessage(suc?"module shutdown":"module not shutdown",suc).toString().getBytes(),label());
         }
         /**

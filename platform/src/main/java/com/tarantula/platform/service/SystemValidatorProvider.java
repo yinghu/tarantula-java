@@ -193,11 +193,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             if(this.mdatastore.load(subscription)){
                 LocalDateTime end = SystemUtil.fromUTCMilliseconds(subscription.endTimestamp());
                 if(end.isBefore(_curr)){
-                    deploymentServiceProvider.shutdown(o.typeId());
+                    deploymentServiceProvider.shutdownModule(o.typeId());
                     rlist.add(k);
                 }
             }else{
-                deploymentServiceProvider.shutdown(o.typeId());
+                deploymentServiceProvider.shutdownModule(o.typeId());
                 rlist.add(k);
             }
         });

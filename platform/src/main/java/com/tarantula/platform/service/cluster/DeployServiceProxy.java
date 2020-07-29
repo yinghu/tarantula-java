@@ -374,7 +374,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(5, TimeUnit.SECONDS);
+                future.get(10, TimeUnit.SECONDS);
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);

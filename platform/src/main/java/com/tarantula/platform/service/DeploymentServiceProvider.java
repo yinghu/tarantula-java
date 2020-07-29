@@ -9,7 +9,6 @@ import com.tarantula.Module;
 
 public interface DeploymentServiceProvider extends ServiceProvider,MetricsListener {
 
-    //String DEPLOY_TOPIC = "tarantula-deployment";
     String DEPLOY_DATA_STORE = "tarantula";
 
     String NAME = "DeploymentServiceProvider";
@@ -68,17 +67,15 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     String checkCode(String resetCode);
 
     //Module and application operation API
-    void upload(String fname,byte[] content);
-
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
-    boolean reset(Descriptor descriptor);
     boolean createModule(Descriptor descriptor);
+    boolean launchModule(String typeId);
+    boolean resetModule(Descriptor descriptor);
+    boolean shutdownModule(String typeId);
 
     boolean createApplication(Descriptor descriptor,boolean launching);
     boolean enableApplication(String applicationId,boolean enabled);
-    boolean launch(String typeId);
-    boolean shutdown(String typeId);
     void update(Descriptor descriptor);
     //END OF Module API
 
@@ -87,6 +84,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     <T extends OnAccess> boolean launchGameCluster(T gameCluster);
     <T extends OnAccess> boolean shutdownGameCluster(T gameCluster);
     <T extends OnAccess> T gameCluster(String key);
+
     Lobby lobby(String typeId);
     //END OF CLUSTER
 

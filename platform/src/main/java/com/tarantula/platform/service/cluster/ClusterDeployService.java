@@ -578,7 +578,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         this.deploymentServiceProvider.removeConnection(serverId);
     }
     public void upload(String fileName,byte[] content){
-        this.deploymentServiceProvider.upload(fileName,content);
+        this.tarantulaContext._writeContent(fileName,content);
     }
     public void launchGameCluster(String gameClusterKey){
         GameCluster gameCluster = new GameCluster();
