@@ -72,10 +72,10 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
         return dataStore.load(suc)?suc:null;
     }
     public void enable(){
-        this.deploymentServiceProvider.startAccessIndex();
+        this.deploymentServiceProvider.distributionCallback().startAccessIndex();
     }
     public void disable(){
-        this.deploymentServiceProvider.stopAccessIndex();
+        this.deploymentServiceProvider.distributionCallback().stopAccessIndex();
     }
     public void setup() {
         this.deploymentServiceProvider = this.tarantulaContext.deploymentServiceProvider();

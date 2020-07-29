@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * updated by yinghu lu on 5/30/2020
  */
-public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider,EventListener,SchedulingTask{
+public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider,EventListener,SchedulingTask, DeploymentServiceProvider.DistributionCallback {
 
     private TarantulaLogger log = JDKLogger.getLogger(PlatformDeploymentServiceProvider.class);
 
@@ -350,7 +350,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public void addLobby(String typeId){
         this.tarantulaContext.setOnLobby(typeId,(ob)->{
-            this.deploy(ob);
+            this.register(ob);
         });
     }
     /**
@@ -427,8 +427,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     @Override
-    public boolean deploy(ServiceProvider serviceProvider) {
-        return this.tarantulaContext.deployServiceProvider(serviceProvider);
+    public void register(ServiceProvider serviceProvider) {
+        this.tarantulaContext.deployServiceProvider(serviceProvider);
     }
     public void release(ServiceProvider serviceProvider){
         this.tarantulaContext.releaseServiceProvider(serviceProvider.name());
@@ -512,14 +512,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         vListeners.add(onViewListener);
     }
 
-    public void deploy(InstanceRegistry registry){
+    public void register(InstanceRegistry registry){
         rListeners.forEach((k,l)->{
             if(l.onLobby().equals(registry.subtypeId())){
                 try{l.onRegistry(registry);}catch (Exception ex){}//ignore ex
             }
         });
     }
-    public void deploy(OnLobby onLobby){
+    public void register(OnLobby onLobby){
         if(onLobby.deployCode()<2){
             return;
         }
@@ -731,6 +731,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public void atMidnight(){
         //log.warn("MIDNIGHT->");
+    }
+    public DistributionCallback distributionCallback(){
+        return this;
     }
     public PostOffice registerPostOffice(){
         return new PostOfficeSession();

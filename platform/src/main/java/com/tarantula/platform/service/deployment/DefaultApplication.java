@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Developer: YINGHU LU
- * Updated : 3/6/2019
+ * Updated : 7/29/2020
  */
 public class DefaultApplication implements Application {
 
@@ -63,7 +63,7 @@ public class DefaultApplication implements Application {
     public void shutdown() throws Exception {
         onAvailable.forEach((String k,InstanceRegistry ir)->{
             ir.disabled(true);
-            this.tarantulaContext.deploymentService().deploy(ir);
+            this.tarantulaContext.deploymentService().register(ir);
         });
         onAvailable.clear();
         log.warn("Application ["+this.deploymentDescriptor.name()+"/"+this.deploymentDescriptor.distributionKey()+"] shutdown");
@@ -72,7 +72,7 @@ public class DefaultApplication implements Application {
        InstanceRegistry ir = onAvailable.remove(instanceId);
        ir.disabled(true);
        this.tarantulaContext.masterDataStore().update(ir);
-       this.tarantulaContext.deploymentService().deploy(ir);
+       this.tarantulaContext.deploymentService().register(ir);
        log.warn("Instance ["+ir.distributionKey()+"] unloaded");
     }
     private InstanceIndex _loadIndex(String rid){
@@ -127,7 +127,7 @@ public class DefaultApplication implements Application {
            if(v.routingNumber()==instance.partition()){
                v.typeId(this.deploymentDescriptor.typeId());
                v.subtypeId(this.deploymentDescriptor.tag());
-               this.tarantulaContext.deploymentService().deploy(v);
+               this.tarantulaContext.deploymentService().register(v);
                instance.onPartition(k);
            }
        });
@@ -137,7 +137,7 @@ public class DefaultApplication implements Application {
         if(instanceRegistry!=null){
             instanceRegistry.typeId(this.deploymentDescriptor.typeId());
             instanceRegistry.subtypeId(this.deploymentDescriptor.tag());
-            this.tarantulaContext.deploymentService().deploy(instanceRegistry);
+            this.tarantulaContext.deploymentService().register(instanceRegistry);
             instance.onPartition(instanceRegistry.distributionKey());
             return true;
         }

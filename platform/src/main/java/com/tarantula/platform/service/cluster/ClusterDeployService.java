@@ -572,10 +572,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         return gameCluster;
     }
     public void addServerPushEvent(Event event){
-        this.deploymentServiceProvider.addServerPushEvent(event);
+        this.deploymentServiceProvider.distributionCallback().addServerPushEvent(event);
     }
     public void removeServerPushEvent(String serverId){
-        this.deploymentServiceProvider.removeConnection(serverId);
+        this.deploymentServiceProvider.distributionCallback().removeConnection(serverId);
     }
     public void upload(String fileName,byte[] content){
         this.tarantulaContext._writeContent(fileName,content);
@@ -584,34 +584,34 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         GameCluster gameCluster = new GameCluster();
         gameCluster.distributionKey(gameClusterKey);
         this.tarantulaContext.masterDataStore().load(gameCluster);
-        this.deploymentServiceProvider.addLobby((String)gameCluster.property(GameCluster.GAME_DATA));
-        this.deploymentServiceProvider.addLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
-        this.deploymentServiceProvider.addLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
+        this.deploymentServiceProvider.distributionCallback().addLobby((String)gameCluster.property(GameCluster.GAME_DATA));
+        this.deploymentServiceProvider.distributionCallback().addLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
+        this.deploymentServiceProvider.distributionCallback().addLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
     }
     public void shutdownGameCluster(String gameClusterKey){
         GameCluster gameCluster = new GameCluster();
         gameCluster.distributionKey(gameClusterKey);
         this.tarantulaContext.masterDataStore().load(gameCluster);
-        this.deploymentServiceProvider.removeLobby((String)gameCluster.property(GameCluster.GAME_DATA));
-        this.deploymentServiceProvider.removeLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
-        this.deploymentServiceProvider.removeLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
+        this.deploymentServiceProvider.distributionCallback().removeLobby((String)gameCluster.property(GameCluster.GAME_DATA));
+        this.deploymentServiceProvider.distributionCallback().removeLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
+        this.deploymentServiceProvider.distributionCallback().removeLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
     }
     public void launchApplication(String typeId,String applicationId){
-        this.deploymentServiceProvider.addApplication(applicationId,typeId);
+        this.deploymentServiceProvider.distributionCallback().addApplication(applicationId,typeId);
     }
     public void shutdownApplication(String typeId,String applicationId){
-        this.deploymentServiceProvider.removeApplication(applicationId,typeId);
+        this.deploymentServiceProvider.distributionCallback().removeApplication(applicationId,typeId);
     }
     public void launchModule(String typeId){
-        this.deploymentServiceProvider.addLobby(typeId);
+        this.deploymentServiceProvider.distributionCallback().addLobby(typeId);
     }
     public void shutdownModule(String typeId){
-        this.deploymentServiceProvider.removeLobby(typeId);
+        this.deploymentServiceProvider.distributionCallback().removeLobby(typeId);
     }
     public void updateModule(Descriptor descriptor){
-        this.deploymentServiceProvider.updateModule(descriptor);
+        this.deploymentServiceProvider.distributionCallback().updateModule(descriptor);
     }
     public void updateView(OnView onView){
-        this.deploymentServiceProvider.update(onView);
+        this.deploymentServiceProvider.distributionCallback().update(onView);
     }
 }
