@@ -17,6 +17,7 @@ import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SudoRoleModule implements Module {
@@ -123,14 +124,12 @@ public class SudoRoleModule implements Module {
             boolean suc = this.deploymentServiceProvider.shutdownModule(access.typeId());
             session.write(this.toMessage(suc?"module shutdown":"module not shutdown",suc).toString().getBytes(),label());
         }
-        /**
-        else if(session.action().equals("listViews")){
+        else if(session.action().equals("onConfigurationList")){
+            List<Configuration> configurationList = this.deploymentServiceProvider.configuration();
+            configurationList.forEach((c)->c.update());
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"ok",true)).getBytes(),label());
         }
-        else if(session.action().equals("listConfigs")){
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"ok",true)).getBytes(),label());
-        }**/
-        else if(session.action().equals("deployView")){
+        else if(session.action().equals("onDeployView")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             OnView onView = new OnViewTrack();
             onView.owner(onAccess.typeId());//associated with a lobby type Id

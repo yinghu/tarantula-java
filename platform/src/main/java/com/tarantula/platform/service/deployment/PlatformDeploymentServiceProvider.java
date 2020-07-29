@@ -16,6 +16,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,14 +39,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ConcurrentHashMap<String,InstanceRegistry.Listener> rListeners = new ConcurrentHashMap<>();
     private CopyOnWriteArrayList<OnLobby.Listener> oListeners = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<OnView.Listener> vListeners = new CopyOnWriteArrayList<>();
-    //private CopyOnWriteArrayList<Configuration.Listener> cListeners = new CopyOnWriteArrayList<>();
 
     private CopyOnWriteArrayList<Connection.Listener> wListeners = new CopyOnWriteArrayList<>();
 
     //callback on access index service
     private CopyOnWriteArrayList<AccessIndexService.Listener> aListeners = new CopyOnWriteArrayList<>();
 
-    //on view and configuration mappings
+    //on view, on lobby , configs mappings
     private ConcurrentHashMap<String,Recoverable> vMap = new ConcurrentHashMap<>();
 
     //push event cache mappings
@@ -559,7 +559,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         wListeners.add(listener);
     }
-    public void deploy(Configuration configuration){
+    public List<Configuration> configuration(){
+        ArrayList<Configuration> clist = new ArrayList<>();
+        vMap.forEach((k,v)->{
+            if(v instanceof Configuration){
+                clist.add((Configuration) v);
+            }
+        });
+        return clist;
+    }
+    public void register(Configuration configuration){
         log.warn(">>>>>>>>>>>>>>>"+configuration.key().asString());
         vMap.put(configuration.key().asString(),configuration);
         //RecoverableMetadata mt = new RecoverableMetadata(configuration.getFactoryId(),configuration.getClassId());

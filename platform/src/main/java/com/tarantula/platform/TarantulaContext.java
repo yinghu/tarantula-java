@@ -229,7 +229,7 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
     public void configure(ServiceConfiguration conf) throws Exception{
         List<ApplicationConfiguration> alist = this.query(new String[]{conf.distributionKey(),conf.tag},new ApplicationConfigurationQuery(conf.distributionKey(),conf.tag));
         for(ApplicationConfiguration afg : alist){
-            conf.configurationMappings.put(new CompositeKey(conf.tag,afg.type),afg);
+            conf.configurationMappings.put(new CompositeKey(conf.tag,afg.type()),afg);
         }
         if(conf.serviceProviderName!=null){ //application service provider
             ServiceProvider serviceProvider = (ServiceProvider) Class.forName(conf.serviceProviderName).getConstructor().newInstance();

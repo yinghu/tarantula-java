@@ -48,7 +48,7 @@
         let _c = document.querySelector('#tx-view-content-url').value;
         let _i = document.querySelector('#tx-view-id').value;
         let _n = document.querySelector('#tx-view-resource-name').value;
-        TARA_API.onService(true,{serviceTag:'role/sudo',command:'deployView',typeId:_t,deployUrl:_c,viewId:_i,resourceName:_n},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onDeployView',typeId:_t,deployUrl:_c,viewId:_i,resourceName:_n},(resp)=>{
             console.log(resp);
             //document.querySelector('#tx-deploy-view-message').innerHTML = resp.message;        
         });        

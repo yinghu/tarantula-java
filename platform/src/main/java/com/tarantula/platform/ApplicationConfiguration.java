@@ -8,14 +8,17 @@ import com.tarantula.platform.util.SystemUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Updated by yinghu on 7/19/2020
  */
 public class ApplicationConfiguration extends RecoverableObject implements Configuration{
 
-    protected String tag;
-    protected String type;
+    private String tag;
+    private String type;
+
+    private CopyOnWriteArrayList<Configuration.Listener> listeners = new CopyOnWriteArrayList<>();
 
 
     public ApplicationConfiguration(){
@@ -63,14 +66,12 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
 
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("disabled",this.disabled);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.tag = (String)properties.get("tag");
         this.type = (String)properties.get("type");
-        this.disabled = (boolean)properties.get("disabled");
         properties.forEach((String k,Object v)->{
             this.properties.put(k,v);
         });
@@ -85,6 +86,11 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
     }
 
     public void registerListener(Configuration.Listener listener){
-
+        this.listeners.add(listener);
+    }
+    public void update(){
+        this.listeners.forEach((c)->{
+            c.onUpdated(this);
+        });
     }
 }

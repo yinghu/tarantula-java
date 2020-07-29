@@ -69,6 +69,10 @@
             <view type="reset.module">
                 <property name="moduleResourceFile">sudo/reset.module.view.html</property>
             </view>
+
+            <view type="configuration.list">
+                <property name="moduleResourceFile">sudo/configuration.list.view.html</property>
+            </view>
         </view-list>
 
     </lobby-context>

@@ -3,6 +3,8 @@ package com.tarantula.platform.service;
 import com.tarantula.*;
 import com.tarantula.Module;
 
+import java.util.List;
+
 /**
  * Updated by yinghu lu on 5/30/2020
  */
@@ -38,11 +40,9 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     void registerOnConnectionListener(Connection.Listener listener);
 
 
-    //deploy and callback configuration
-    void deploy(Configuration configuration);
-
-    //void registerConfigurationListener(Configuration.Listener listener);
-
+    //register and callback configuration
+    void register(Configuration configuration);
+    List<Configuration> configuration();
     //deploy and callback on view
 
     boolean deploy(OnView onView);
@@ -98,5 +98,6 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
     //data store backup operation API
     void issueDataStoreBackup();
+
 
 }

@@ -19,8 +19,8 @@ public interface Configuration extends Recoverable {
     String property(String name);
 
     void registerListener(Configuration.Listener listener);
-
+    void update();
     interface Listener{
-        void onConfiguration(Configuration c);
+        void onUpdated(Configuration c);
     }
 }
