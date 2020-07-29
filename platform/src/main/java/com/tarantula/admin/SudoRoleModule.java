@@ -19,7 +19,7 @@ import com.tarantula.platform.util.SystemUtil;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SudoRoleModule implements Module,Configuration.Listener {
+public class SudoRoleModule implements Module {
 
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
@@ -156,7 +156,6 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         this.context = context;
         this.cMap = new ConcurrentHashMap<>();
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        this.deploymentServiceProvider.registerConfigurationListener(this);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         this.uDatastore = this.context.dataStore(Access.DataStore);
@@ -169,13 +168,6 @@ public class SudoRoleModule implements Module,Configuration.Listener {
         return "admin-setup";
     }
 
-
-    @Override
-    public void onConfiguration(Configuration c) {
-        //this.context.log(c.distributionKey(),OnLog.WARN);
-        //this.context.log(c.toString(),OnLog.WARN);
-        cMap.put(c.distributionKey(),c);
-    }
     private JsonObject toMessage(String msg,boolean suc){
         JsonObject jms = new JsonObject();
         jms.addProperty("successful",suc);

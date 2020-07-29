@@ -38,14 +38,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ConcurrentHashMap<String,InstanceRegistry.Listener> rListeners = new ConcurrentHashMap<>();
     private CopyOnWriteArrayList<OnLobby.Listener> oListeners = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<OnView.Listener> vListeners = new CopyOnWriteArrayList<>();
-    private CopyOnWriteArrayList<Configuration.Listener> cListeners = new CopyOnWriteArrayList<>();
+    //private CopyOnWriteArrayList<Configuration.Listener> cListeners = new CopyOnWriteArrayList<>();
 
     private CopyOnWriteArrayList<Connection.Listener> wListeners = new CopyOnWriteArrayList<>();
 
     //callback on access index service
     private CopyOnWriteArrayList<AccessIndexService.Listener> aListeners = new CopyOnWriteArrayList<>();
 
-
+    //on view and configuration mappings
     private ConcurrentHashMap<String,Recoverable> vMap = new ConcurrentHashMap<>();
 
     //push event cache mappings
@@ -378,7 +378,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void setup(ServiceContext serviceContext){
         this.tarantulaContext = (TarantulaContext)serviceContext;
         ClusterProvider ics = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
-        //this.integrationEventService = ics.subscribe(eventTopic,this);
+        this.integrationEventService = (EventService) ics;//ics.subscribe(eventTopic,this);
         localTopic = ics.subscription();
         registerKey = ics.addEventListener(null,this);
         try{
@@ -560,10 +560,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         wListeners.add(listener);
     }
     public void deploy(Configuration configuration){
-        log.warn(configuration.toString());
-        RecoverableMetadata mt = new RecoverableMetadata(configuration.getFactoryId(),configuration.getClassId());
-        byte[] k = configuration.key().asString()!=null?configuration.key().asString().getBytes():"".getBytes();
-        byte[] v = SystemUtil.toJson(configuration.toMap());
+        log.warn(">>>>>>>>>>>>>>>"+configuration.key().asString());
+        vMap.put(configuration.key().asString(),configuration);
+        //RecoverableMetadata mt = new RecoverableMetadata(configuration.getFactoryId(),configuration.getClassId());
+        //byte[] k = configuration.key().asString()!=null?configuration.key().asString().getBytes():"".getBytes();
+        //byte[] v = SystemUtil.toJson(configuration.toMap());
         //if(configuration.disabled()){
             //Configuration r = (Configuration) vMap.get(configuration.key().asString());
             //r.disabled(true);
@@ -572,15 +573,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         //MapStoreSyncEvent mse = new MapStoreSyncEvent(this.eventTopic,localTopic,k, v,mt);
         //this.integrationEventService.publish(mse);
     }
-    public void registerConfigurationListener(Configuration.Listener listener){
-        vMap.forEach((k,v)->{
-            if(v instanceof Configuration){
-                v.distributionKey(k);
-                listener.onConfiguration((Configuration)v);
-            }
-        });
-        this.cListeners.add(listener);
-    }
+    //public void registerConfigurationListener(Configuration.Listener listener){
+        //vMap.forEach((k,v)->{
+            //if(v instanceof Configuration){
+                //v.distributionKey(k);
+                //listener.onConfiguration((Configuration)v);
+            //}
+        //});
+        //this.cListeners.add(listener);
+    //}
     //dedicated server methods
     public void onUDPConnection(String typeId,Connection connection){
         this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));

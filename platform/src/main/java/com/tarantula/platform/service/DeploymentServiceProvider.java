@@ -41,7 +41,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //deploy and callback configuration
     void deploy(Configuration configuration);
 
-    void registerConfigurationListener(Configuration.Listener listener);
+    //void registerConfigurationListener(Configuration.Listener listener);
 
     //deploy and callback on view
 

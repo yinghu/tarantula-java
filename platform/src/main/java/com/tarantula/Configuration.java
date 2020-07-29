@@ -18,6 +18,8 @@ public interface Configuration extends Recoverable {
     List<Property> properties();
     String property(String name);
 
+    void registerListener(Configuration.Listener listener);
+
     interface Listener{
         void onConfiguration(Configuration c);
     }

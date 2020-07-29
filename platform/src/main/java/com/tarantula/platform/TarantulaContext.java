@@ -242,7 +242,7 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
 
         for(Configuration c : conf.configurationMappings.values()){
             rlist.add(c);
-            this.deploymentServiceProvider.deploy(c);
+            //this.deploymentServiceProvider.deploy(c);
         }
         configurations.put(conf.tag,rlist);
  	}

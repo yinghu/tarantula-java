@@ -410,6 +410,8 @@ public class AdminRoleModule implements Module {
         this.purchase = this.context.dataStore(SubscriptionFee.DataStore);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        this.deploymentServiceProvider.deploy(ya);
+        this.deploymentServiceProvider.deploy(ma);
         this.maxGameClusterCount = Integer.parseInt(this.context.configuration("setup").property("maxGameClusterCount"));
         this.maxGameLobbyCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLobbyCount"));
         this.defaultGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("defaultGameLevelCount"));

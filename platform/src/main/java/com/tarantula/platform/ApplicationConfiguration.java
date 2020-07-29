@@ -84,4 +84,7 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
         return PortableRegistry.APPLICATION_CONFIGURATION_CID;
     }
 
+    public void registerListener(Configuration.Listener listener){
+
+    }
 }
