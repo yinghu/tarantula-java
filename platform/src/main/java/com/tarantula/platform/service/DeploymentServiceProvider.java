@@ -99,6 +99,4 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //data store backup operation API
     void issueDataStoreBackup();
 
-    //DeployService deployService(int scope);
-
 }

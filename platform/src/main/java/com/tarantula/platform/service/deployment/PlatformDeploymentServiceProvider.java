@@ -425,9 +425,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext.schedule(this);
         log.info("Platform deployment service started on ["+localTopic+"/"+registerKey+"]");
     }
-    public DeployService deployService(int scope){
-        return scope==Distributable.DATA_SCOPE?this.tarantulaContext.tarantulaCluster().deployService():this.tarantulaContext.integrationCluster().deployService();
-    }
 
     @Override
     public boolean deploy(ServiceProvider serviceProvider) {
