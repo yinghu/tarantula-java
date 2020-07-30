@@ -38,7 +38,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private ConcurrentHashMap<String,InstanceRegistry.Listener> rListeners = new ConcurrentHashMap<>();
     private CopyOnWriteArrayList<OnLobby.Listener> oListeners = new CopyOnWriteArrayList<>();
-    private CopyOnWriteArrayList<OnView.Listener> vListeners = new CopyOnWriteArrayList<>();
 
     private CopyOnWriteArrayList<Connection.Listener> wListeners = new CopyOnWriteArrayList<>();
 
@@ -485,12 +484,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(onView.moduleFile()!=null){
             rMap.remove(onView.moduleFile());
         }
-        this.vListeners.forEach((cl)->{
-            cl.onView(onView);
-        });
     }
-    public OnView invalidView(){
-        return (OnView)vMap.get("invalid.request");
+    public OnView onView(String viewId){
+        return (OnView)vMap.get(viewId);
     }
     public boolean deploy(OnView onView){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
@@ -503,14 +499,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         return deployService.updateView(onView);
     }
-    public void registerOnViewListener(OnView.Listener onViewListener){
-        vMap.forEach((k,v)->{
-            if(v instanceof OnView){
-                onViewListener.onView((OnView)v);
-            }
-        });
-        vListeners.add(onViewListener);
-    }
+
 
     public void register(InstanceRegistry registry){
         rListeners.forEach((k,l)->{

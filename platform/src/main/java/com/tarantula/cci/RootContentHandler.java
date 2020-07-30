@@ -60,7 +60,7 @@ public class RootContentHandler implements RequestHandler {
 
     @Override
     public void start() throws Exception {
-        this.invalidView = this.deploymentServiceProvider.invalidView();
+        this.invalidView = this.deploymentServiceProvider.onView(OnView.INVALID_VIEW_ID);
         log.info("Root content event handler started");
     }
 

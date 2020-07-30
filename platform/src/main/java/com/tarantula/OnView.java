@@ -6,6 +6,7 @@ package com.tarantula;
 public interface OnView extends Recoverable {
 
     String LABEL ="LVT";
+    String INVALID_VIEW_ID = "invalid.request";
 
     String viewId();
     void viewId(String viewId);
@@ -26,7 +27,4 @@ public interface OnView extends Recoverable {
     String moduleResourceFile();
     void moduleResourceFile(String moduleResourceFile);
 
-    interface Listener{
-        void onView(OnView onView);
-    }
 }

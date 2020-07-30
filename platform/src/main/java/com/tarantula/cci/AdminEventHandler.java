@@ -58,7 +58,7 @@ public class AdminEventHandler implements RequestHandler{
         this.builder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
-        this.invalidView = this.deploymentServiceProvider.invalidView();
+        this.invalidView = this.deploymentServiceProvider.onView(OnView.INVALID_VIEW_ID);
         log.info("Admin event handler started");
     }
 

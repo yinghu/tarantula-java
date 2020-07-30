@@ -15,14 +15,13 @@ import com.tarantula.platform.util.OnViewSerializer;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class ViewEventHandler implements RequestHandler, OnView.Listener {
+public class ViewEventHandler implements RequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(ViewEventHandler.class);
 
 
     private DeploymentServiceProvider deploymentServiceProvider;
 
-    private ConcurrentHashMap<String,OnView> _vMap;
     private GsonBuilder builder;
     public ViewEventHandler(){
     }
@@ -31,9 +30,9 @@ public class ViewEventHandler implements RequestHandler, OnView.Listener {
     }
     public void onRequest(OnExchange exchange){
         String viewId = exchange.header(Session.TARANTULA_VIEW_ID);
-        OnView onView = _vMap.get(viewId);
+        OnView onView = this.deploymentServiceProvider.onView(viewId);
         if(onView==null){
-            onView = _vMap.get("invalid.request");
+            onView = this.deploymentServiceProvider.onView(OnView.INVALID_VIEW_ID);
         }
         byte[] ret = this.builder.create().toJson(onView).getBytes();
         exchange.onEvent(new ResponsiveEvent("","",ret,0,"application/json","",true));
@@ -44,8 +43,6 @@ public class ViewEventHandler implements RequestHandler, OnView.Listener {
         log.info("View content handler started");
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnView.class,new OnViewSerializer());
-        this._vMap = new ConcurrentHashMap<>();
-        this.deploymentServiceProvider.registerOnViewListener(this);
     }
 
     @Override
@@ -61,11 +58,5 @@ public class ViewEventHandler implements RequestHandler, OnView.Listener {
     }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
-    }
-
-    @Override
-    public void onView(OnView onView) {
-        //log.warn(onView.viewId()+">>"+onView.toString());
-        _vMap.put(onView.viewId(),onView);
     }
 }
