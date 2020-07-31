@@ -48,7 +48,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     OnView onView(String viewId);
 
 
-    void register(OnLobby onLobby);
+    //void register(OnLobby onLobby);
     void registerOnLobbyListener(OnLobby.Listener onLobbyListener);
 
     byte[] resource(String name,String flag);
@@ -103,6 +103,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void update(OnView onView);
         void stopAccessIndex();
         void startAccessIndex();
+        void register(OnLobby onLobby);
     }
 
 }

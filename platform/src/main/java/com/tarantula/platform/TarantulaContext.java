@@ -248,7 +248,8 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
  	}
     public void configureViews(LobbyConfiguration conf){
  	    conf.views.forEach((v)->{
-            this.deploymentServiceProvider.deploy(v);
+            //this.tarantulaCluster.deployService().updateView(v);
+ 	        this.deploymentServiceProvider.distributionCallback().update(v);
         });
     }
 	public OnLobby configure(LobbyConfiguration conf) throws Exception{

@@ -33,8 +33,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private EventService integrationEventService;
 
     //private String eventTopic = DEPLOY_TOPIC;
-    private String localTopic;
-    private String registerKey;
+    //private String localTopic;
+    //private String registerKey;
 
     private ConcurrentHashMap<String,InstanceRegistry.Listener> rListeners = new ConcurrentHashMap<>();
     private CopyOnWriteArrayList<OnLobby.Listener> oListeners = new CopyOnWriteArrayList<>();
@@ -378,8 +378,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext = (TarantulaContext)serviceContext;
         ClusterProvider ics = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.integrationEventService = (EventService) ics;//ics.subscribe(eventTopic,this);
-        localTopic = ics.subscription();
-        registerKey = ics.addEventListener(null,this);
+        //localTopic = ics.subscription();
+        //registerKey = ics.addEventListener(null,this);
         try{
             contentTemDir = this.tarantulaContext.deployDir+"/tem";
             contentDir = this.tarantulaContext.deployDir+"/web";
@@ -422,7 +422,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void waitForData() {
         //this.integrationEventService.publish(new MapStoreVotingEvent(this.eventTopic,localTopic,registerKey,Distributable.INTEGRATION_SCOPE));
         this.tarantulaContext.schedule(this);
-        log.info("Platform deployment service started on ["+localTopic+"/"+registerKey+"]");
+        log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
 
     @Override
