@@ -1,7 +1,7 @@
 package com.tarantula;
 
 /**
- * Updated 5/23/2018 yinghu lu
+ * Updated 8/1/2020 yinghu lu
  */
 public interface Property extends Recoverable{
     String name();

@@ -12,7 +12,12 @@
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-configuration-list-message"></div> 
     <div class="w3-panel w3-border-bottom w3-border-red">
-        
+        <div class="w3-panel w3-center tx-text-12">
+            <textarea id="tx-configuration-edit">RESPONSE OUTPUT</textarea> 
+        </div>
+        <div class="w3-panel">
+            <span id="tx-configuration-update" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Update</span>     
+        </div>    
     </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
@@ -24,11 +29,19 @@
     </div>
 </div>
 <script>
-    //document.querySelector("#tx-create-access-key-message").innerHTML = TARA_API.query().gameClusterId;
+    let configurations;
     TARA_API.onService(false,{serviceTag:'role/sudo',command:'onConfigurationList'},(resp)=>{
-        document.querySelector('#tx-configuration-list-message').innerHTML = resp.message;  
+        configurations = resp.configurations;
+        document.querySelector('#tx-configuration-edit').value = JSON.stringify(configurations[0]);  
     });    
-    
+    document.querySelector('#tx-configuration-update').onclick=()=>{
+        let payload = JSON.parse(document.querySelector('#tx-configuration-edit').value); 
+        payload.serviceTag = 'role/sudo';
+        payload.command = 'onUpdateConfiguration'; 
+        TARA_API.onService(true,payload,(resp)=>{
+            document.querySelector('#tx-configuration-list-message').innerHTML = resp.message;  
+        });      
+    };
     document.querySelector('#tx-configuration-list-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";

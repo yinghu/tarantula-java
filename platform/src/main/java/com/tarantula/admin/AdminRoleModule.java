@@ -413,10 +413,12 @@ public class AdminRoleModule implements Module {
         ya.registerListener((c)->{
             //reload monthly
             this.context.log("UPDATE->"+SystemUtil.toJsonString(c.toMap()),OnLog.WARN);
+            yearly =  new SubscriptionFee("yearlyAccess",c.property("description"),c.property("price"),c.property("currency"),Integer.parseInt(c.property("durationMonths")));
         });
         ma.registerListener((c)->{
             //reload monthly
             this.context.log("UPDATE->"+SystemUtil.toJsonString(c.toMap()),OnLog.WARN);
+            monthly = new SubscriptionFee("monthlyAccess",c.property("description"),c.property("price"),c.property("currency"),Integer.parseInt(c.property("durationMonths")));
         });
         this.deploymentServiceProvider.register(ya);
         this.deploymentServiceProvider.register(ma);

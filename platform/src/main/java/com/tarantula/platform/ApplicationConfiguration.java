@@ -20,7 +20,6 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
 
     private CopyOnWriteArrayList<Configuration.Listener> listeners = new CopyOnWriteArrayList<>();
 
-
     public ApplicationConfiguration(){
         this.label = LABEL;
         this.onEdge = true;
@@ -93,4 +92,5 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
            c.onUpdated(updated);
        });
     }
+
 }

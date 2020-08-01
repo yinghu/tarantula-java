@@ -1,6 +1,7 @@
 package com.tarantula.admin;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.Module;
@@ -17,7 +18,9 @@ import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SudoRoleModule implements Module {
@@ -126,8 +129,19 @@ public class SudoRoleModule implements Module {
         }
         else if(session.action().equals("onConfigurationList")){
             List<Configuration> configurationList = this.deploymentServiceProvider.configuration();
-            configurationList.forEach((c)->this.deploymentServiceProvider.update(c));
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"ok",true)).getBytes(),label());
+            session.write(toJson(configurationList).toString().getBytes(),label());
+        }
+        else if(session.action().equals("onUpdateConfiguration")){
+            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            Configuration configuration = new ApplicationConfiguration();
+            configuration.distributionKey(access.property(OnAccess.ACCESS_ID).toString());
+            Map<String,Object> _payload = access.toMap();
+            _payload.remove(OnAccess.ACCESS_ID);
+            _payload.remove(OnAccess.COMMAND);
+            _payload.remove(OnAccess.SERVICE_TAG);
+            configuration.fromMap(_payload);
+            boolean suc = this.deploymentServiceProvider.update(configuration);
+            session.write(toMessage("configuration updated ["+access.property(OnAccess.ACCESS_ID)+"]",suc).toString().getBytes(),label());
         }
         else if(session.action().equals("onDeployView")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -172,6 +186,22 @@ public class SudoRoleModule implements Module {
         jms.addProperty("successful",suc);
         jms.addProperty("message",msg);
         return jms;
+    }
+    private JsonObject toJson(List<Configuration> configurations){
+        JsonObject jsonObject = new JsonObject();
+        JsonArray clist = new JsonArray();
+        configurations.forEach(configuration ->{
+            JsonObject jc = new JsonObject();
+            jc.addProperty("accessId",configuration.distributionKey());
+            jc.addProperty("type",configuration.type());
+            jc.addProperty("tag",configuration.tag());
+            configuration.properties().forEach((p)->{
+                jc.addProperty(p.name(),p.value());
+            });
+            clist.add(jc);
+        });
+        jsonObject.add("configurations",clist);
+        return jsonObject;
     }
     private JsonObject toDataStoreCount(){
         JsonObject jsonObject = new JsonObject();

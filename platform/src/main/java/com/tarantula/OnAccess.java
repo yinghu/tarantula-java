@@ -7,6 +7,8 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
 
     String ACCESS_KEY = "accessKey";
     String ACCESS_ID = "accessId";
+    String COMMAND = "command";
+    String SERVICE_TAG = "serviceTag";
     String PAYLOAD = "payload";
     String PASSWORD = "password";
     String GOOGLE = "google";
