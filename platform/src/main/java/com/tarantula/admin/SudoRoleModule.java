@@ -141,7 +141,7 @@ public class SudoRoleModule implements Module {
             _payload.remove(OnAccess.SERVICE_TAG);
             configuration.fromMap(_payload);
             boolean suc = this.deploymentServiceProvider.update(configuration);
-            session.write(toMessage("configuration updated ["+access.property(OnAccess.ACCESS_ID)+"]",suc).toString().getBytes(),label());
+            session.write(toMessage("configuration updated ["+configuration.distributionKey()+"]",suc).toString().getBytes(),label());
         }
         else if(session.action().equals("onDeployView")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);

@@ -57,7 +57,7 @@ public class UpdateModuleOperation extends Operation {
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         this.typeId = in.readUTF();
-        this.codebase = in.readLine();
+        this.codebase = in.readUTF();
         this.artifact = in.readUTF();
         this.version = in.readUTF();
     }
