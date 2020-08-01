@@ -64,6 +64,6 @@ public class ServiceActionEvent extends Data implements EventOnAction {
 
     @Override
 	public String toString(){
-		return "SERVICE ACTION EVENT ["+instanceId+"/"+action+"/"+forwarding+"]["+this.systemId+"/"+this.stub+"]";
+		return "SERVICE ACTION EVENT ["+action+"/"+forwarding+"]["+this.systemId+"/"+this.stub+"]";
 	}
 }
