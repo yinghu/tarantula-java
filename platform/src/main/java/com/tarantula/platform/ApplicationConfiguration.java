@@ -70,7 +70,6 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.properties.clear();
         this.tag = (String)properties.get("tag");
         this.type = (String)properties.get("type");
         properties.forEach((String k,Object v)->{
@@ -89,9 +88,9 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
     public void registerListener(Configuration.Listener listener){
         this.listeners.add(listener);
     }
-    public void update(){
-        this.listeners.forEach((c)->{
-            c.onUpdated(this);
-        });
+    public void update(Configuration updated){
+       this.listeners.forEach((c)->{
+           c.onUpdated(updated);
+       });
     }
 }

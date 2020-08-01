@@ -19,7 +19,7 @@ public interface Configuration extends Recoverable {
     String property(String name);
 
     void registerListener(Configuration.Listener listener);
-    void update();
+    void update(Configuration update);
     interface Listener{
         void onUpdated(Configuration c);
     }

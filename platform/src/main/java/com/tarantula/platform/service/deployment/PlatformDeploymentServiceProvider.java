@@ -566,9 +566,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public void resetConfiguration(Configuration configuration){
         Configuration c = (Configuration) vMap.get(configuration.distributionKey());
-        log.warn(SystemUtil.toJsonString(configuration.toMap()));
-        c.fromMap(configuration.toMap());
-        c.update();
+        c.update(configuration);
     }
     public void register(Configuration configuration){
         vMap.put(configuration.key().asString(),configuration);
