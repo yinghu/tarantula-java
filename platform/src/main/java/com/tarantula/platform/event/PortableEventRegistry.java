@@ -30,10 +30,6 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int MAP_STORE_SYNC_EVENT_CID =11;
 
-    public static final int MAP_STORE_VOTING_EVENT_CID = 12;
-
-    public static final int MAP_STORE_RECOVERY_EVENT_CID = 13;
-
     public static final int SERVER_PUSH_EVENT_CID = 14;
 
     public static final int MODULE_RESET_EVENT_CID = 15;
@@ -90,12 +86,7 @@ public class PortableEventRegistry implements PortableFactory {
             case MAP_STORE_SYNC_EVENT_CID:
                 _ins = new MapStoreSyncEvent();
                 break;
-            case MAP_STORE_VOTING_EVENT_CID:
-                _ins = new MapStoreVotingEvent();
-                break;
-            case MAP_STORE_RECOVERY_EVENT_CID:
-                _ins = new MapStoreRecoveryEvent();
-                break;
+
             case SERVER_PUSH_EVENT_CID:
                 _ins = new ServerPushEvent();
                 break;
