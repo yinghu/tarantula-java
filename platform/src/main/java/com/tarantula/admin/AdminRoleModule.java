@@ -412,11 +412,11 @@ public class AdminRoleModule implements Module {
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         ya.registerListener((c)->{
             //reload yearly
-            this.context.log("UPDATE->"+c.type(),OnLog.WARN);
+            this.context.log("UPDATE->"+SystemUtil.toJsonString(c.toMap()),OnLog.WARN);
         });
         ma.registerListener((c)->{
             //reload monthly
-            this.context.log("UPDATE->"+c.type(),OnLog.WARN);
+            this.context.log("UPDATE->"+SystemUtil.toJsonString(c.toMap()),OnLog.WARN);
         });
         this.deploymentServiceProvider.register(ya);
         this.deploymentServiceProvider.register(ma);

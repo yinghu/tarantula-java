@@ -500,7 +500,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return deployService.updateView(onView);
     }
 
-
     public void register(InstanceRegistry registry){
         rListeners.forEach((k,l)->{
             if(l.onLobby().equals(registry.subtypeId())){
@@ -557,29 +556,23 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         return clist;
     }
-    public void register(Configuration configuration){
-        log.warn(">>>>>>>>>>>>>>>"+configuration.key().asString());
-        vMap.put(configuration.key().asString(),configuration);
-        //RecoverableMetadata mt = new RecoverableMetadata(configuration.getFactoryId(),configuration.getClassId());
-        //byte[] k = configuration.key().asString()!=null?configuration.key().asString().getBytes():"".getBytes();
-        //byte[] v = SystemUtil.toJson(configuration.toMap());
-        //if(configuration.disabled()){
-            //Configuration r = (Configuration) vMap.get(configuration.key().asString());
-            //r.disabled(true);
-            //v = SystemUtil.toJson(r.toMap());
-        //}
-        //MapStoreSyncEvent mse = new MapStoreSyncEvent(this.eventTopic,localTopic,k, v,mt);
-        //this.integrationEventService.publish(mse);
+    public boolean update(Configuration configuration){
+        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        boolean updated = deployService.updateConfiguration(configuration);
+        if(!updated){
+            return updated;
+        }
+        return deployService.resetConfiguration(configuration);
     }
-    //public void registerConfigurationListener(Configuration.Listener listener){
-        //vMap.forEach((k,v)->{
-            //if(v instanceof Configuration){
-                //v.distributionKey(k);
-                //listener.onConfiguration((Configuration)v);
-            //}
-        //});
-        //this.cListeners.add(listener);
-    //}
+    public void resetConfiguration(Configuration configuration){
+        Configuration c = (Configuration) vMap.get(configuration.distributionKey());
+        log.warn(SystemUtil.toJsonString(configuration.toMap()));
+        c.fromMap(configuration.toMap());
+        c.update();
+    }
+    public void register(Configuration configuration){
+        vMap.put(configuration.key().asString(),configuration);
+    }
     //dedicated server methods
     public void onUDPConnection(String typeId,Connection connection){
         this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));

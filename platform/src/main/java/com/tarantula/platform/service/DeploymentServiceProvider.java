@@ -34,12 +34,12 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
     //deploy and callback instance registry
     void registerInstanceRegistryListener(InstanceRegistry.Listener deploymentListener);
-    void register(InstanceRegistry registry);
 
     //register server push listener
     void registerOnConnectionListener(Connection.Listener listener);
 
     //register and callback configuration
+    boolean update(Configuration configuration);
     void register(Configuration configuration);
     List<Configuration> configuration();
 
@@ -47,8 +47,6 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     boolean deploy(OnView onView);
     OnView onView(String viewId);
 
-
-    //void register(OnLobby onLobby);
     void registerOnLobbyListener(OnLobby.Listener onLobbyListener);
 
     byte[] resource(String name,String flag);
@@ -101,9 +99,11 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void addServerPushEvent(Event event);
         void removeConnection(String serverId);
         void update(OnView onView);
+        void resetConfiguration(Configuration configuration);
         void stopAccessIndex();
         void startAccessIndex();
         void register(OnLobby onLobby);
+        void register(InstanceRegistry registry);
     }
 
 }

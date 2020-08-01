@@ -70,6 +70,7 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
     }
     @Override
     public void fromMap(Map<String,Object> properties){
+        this.properties.clear();
         this.tag = (String)properties.get("tag");
         this.type = (String)properties.get("type");
         properties.forEach((String k,Object v)->{

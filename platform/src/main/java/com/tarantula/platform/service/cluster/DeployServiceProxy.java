@@ -5,6 +5,7 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
+import com.tarantula.Configuration;
 import com.tarantula.Descriptor;
 import com.tarantula.Event;
 import com.tarantula.OnView;
@@ -132,6 +133,17 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
     public boolean addView(OnView view){
         NodeEngine nodeEngine = getNodeEngine();
         AddViewOperation operation = new AddViewOperation(view);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<Boolean> future = builder.invoke();
+            return future.get(); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
+    public boolean updateConfiguration(Configuration configuration){
+        NodeEngine nodeEngine = getNodeEngine();
+        UpdateConfigurationOperation operation = new UpdateConfigurationOperation(configuration);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Boolean> future = builder.invoke();
@@ -314,6 +326,24 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
     public boolean updateView(OnView onView){
         NodeEngine nodeEngine = getNodeEngine();
         UpdateOnViewOperation operation = new UpdateOnViewOperation(onView);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(5, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
+    }
+    public boolean resetConfiguration(Configuration configuration){
+        NodeEngine nodeEngine = getNodeEngine();
+        ResetConfigurationOperation operation = new ResetConfigurationOperation(configuration);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int expected = mlist.size();
         for(Member m :mlist){

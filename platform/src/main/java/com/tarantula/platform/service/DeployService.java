@@ -1,6 +1,7 @@
 package com.tarantula.platform.service;
 
 
+import com.tarantula.Configuration;
 import com.tarantula.Descriptor;
 import com.tarantula.Event;
 import com.tarantula.OnView;
@@ -24,6 +25,10 @@ public interface DeployService extends ServiceProvider {
     //add view via typeId of lobby
     boolean addView(OnView view);
     boolean updateView(OnView onView);
+
+    boolean updateConfiguration(Configuration configuration);
+    boolean resetConfiguration(Configuration configuration);
+
     //update lobby or application to set disabled as true/false
     String enableApplication(String applicationId,boolean enabled);
     boolean enableLobby(String typeId,boolean enabled);

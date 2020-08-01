@@ -614,4 +614,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void updateView(OnView onView){
         this.deploymentServiceProvider.distributionCallback().update(onView);
     }
+    public boolean updateConfiguration(Configuration configuration){
+        return this.tarantulaContext.masterDataStore().update(configuration);
+    }
+    public void resetConfiguration(Configuration configuration){
+        this.deploymentServiceProvider.distributionCallback().resetConfiguration(configuration);
+    }
 }

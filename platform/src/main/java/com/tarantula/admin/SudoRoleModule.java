@@ -126,7 +126,7 @@ public class SudoRoleModule implements Module {
         }
         else if(session.action().equals("onConfigurationList")){
             List<Configuration> configurationList = this.deploymentServiceProvider.configuration();
-            configurationList.forEach((c)->c.update());
+            configurationList.forEach((c)->this.deploymentServiceProvider.update(c));
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"ok",true)).getBytes(),label());
         }
         else if(session.action().equals("onDeployView")){
