@@ -108,7 +108,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.dataStore = serviceContext.dataStore(NAME.replace("-","_"),serviceContext.partitionNumber());
+        this.dataStore = serviceContext.dataStore(NAME.replace("-","_"),serviceContext.partitionNumber());//typeId_service
         this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
         this.dest = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).subscription();
         serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).addEventListener(NAME,(e)->{
@@ -175,12 +175,12 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
 
     @Override
     public <T extends Recoverable> void onCreated(T t, byte[] key, byte[] value) {
-
+        logger.warn("created->"+t.distributionKey());
     }
 
     @Override
     public <T extends Recoverable> void onUpdated(T t, byte[] key, byte[] value) {
-        logger.warn("update->"+t.distributionKey());
+        //logger.warn("update->"+t.distributionKey());
         //serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService().distribute(t);
         ZoneListener zl = zMap.get(t.distributionKey());
         if(zl!=null){
@@ -189,10 +189,5 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         else{
             logger.warn("Missed registered zone Listener->"+t.distributionKey());
         }
-    }
-
-    @Override
-    public <T extends Recoverable> void onLoaded(T t, byte[] key, byte[] value) {
-
     }
 }

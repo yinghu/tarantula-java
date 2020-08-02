@@ -349,7 +349,9 @@ public class PartitionDataStore extends ReplicatedDataStore{
             log.error("Error on list",ex);
         }
     }
-
+    public Backup backup(){
+        return this;
+    }
     private boolean _put(DataStoreOnPartition dso,byte[] key,byte[] value){
         return dso.database.put(null,new DatabaseEntry(key),new DatabaseEntry(value))==OperationStatus.SUCCESS;
     }

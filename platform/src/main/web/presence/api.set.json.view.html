@@ -43,12 +43,12 @@
         headers.push({name:'Tarantula-action',value:'onSet'});
         headers.push({name:'Tarantula-name',value:'Profile'});
         headers.push({name:'Tarantula-token',value:TARA_API.query().token});
-        TARA_API.onPost('/service/action',headers,{a:'a',b:'b'},(resp)=>{
+        TARA_API.onPost('/service/action',headers,{a:'a',b:'b',c:'c'},(resp)=>{
             document.querySelector('#tx-api-set-json-message').value = resp;
         });
     };
     document.querySelector('#tx-api-set-json-close').onclick=()=>{
-        let m3 = document.querySelector('#tx-popup');
+        let m3 = document.querySelector('#tx-popup-api');
         m3.innerHTML="";
         m3.style.display = 'none';       
     };

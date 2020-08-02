@@ -14,6 +14,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
     public static final int ZONE_CID = 2;
     public static final int STUB_CID = 3;
     public static final int ARENA_CID = 4;
+    public static final int MAPPING_OBJECT_CID = 5;
     @Override
     public int registryId() {
         return OID;
@@ -34,6 +35,9 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
                 break;
             case ARENA_CID:
                 pt = new Arena();
+                break;
+            case MAPPING_OBJECT_CID:
+                pt = new MappingObject();
                 break;
             default:
         }

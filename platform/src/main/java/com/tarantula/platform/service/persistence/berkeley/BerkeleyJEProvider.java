@@ -103,7 +103,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
     private Database createDatabase(String name,int scope){
         try{
-            //log.warn("Create database ["+name+"] on scope ["+scope+"]");
+            log.warn("Create database ["+name+"] on scope ["+scope+"]");
             DatabaseConfig dbConfig = new DatabaseConfig();
             dbConfig.setAllowCreate(true);
             dbConfig.setDeferredWrite(true);
@@ -560,6 +560,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         @Override
         public <T extends Recoverable> void list(RecoverableFactory<T> query, Stream<T> stream) {
             throw new UnsupportedOperationException();
+        }
+        public Backup backup(){
+            return null;
         }
         public void registerListener(int registerId,Listener listener){
 

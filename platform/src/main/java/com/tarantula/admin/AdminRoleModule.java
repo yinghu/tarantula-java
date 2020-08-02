@@ -91,12 +91,12 @@ public class AdminRoleModule implements Module {
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
             Lobby lobby =(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_DATA)));
-            DataStore ds = this.context.dataStore(lobby.descriptor().typeId());
+            DataStore ds = this.context.dataStore(lobby.descriptor().typeId().replace("-","_"));
             gsc.name = lobby.descriptor().typeId();
             gsc.tag = lobby.entryList().get(0).tag();
             gsc.dataStore = ds.name();//lobby.descriptor().typeId();
             gsc.dataStoreCount = ds.count();
-            DataStore ss = this.context.dataStore(lobby.descriptor().typeId().replace("-data","-service"));
+            DataStore ss = this.context.dataStore(lobby.descriptor().typeId().replace("-data","_service"));
             gsc.serviceStore = ss.name();
             gsc.serviceStoreCount = ss.count();
             session.write(gsc.toJson().toString().getBytes(),label());

@@ -26,18 +26,20 @@ public interface DataStore{
 
     <T extends Recoverable> boolean load(T t);
 
-    void set(byte[] key,byte[] value);
-    byte[] get(byte[] key);
-
     <T extends Recoverable> List<T> list(RecoverableFactory<T> query);
     <T extends Recoverable> void list(RecoverableFactory<T> query,Stream<T> stream);
 
     void registerListener(int registerId,Listener listener);
+    Backup backup();
+
+    interface Backup{
+        void set(byte[] key,byte[] value);
+        byte[] get(byte[] key);
+    }
 
     interface Listener{
         <T extends Recoverable> void onCreated(T t,byte[] key,byte[] value);
         <T extends Recoverable> void onUpdated(T t,byte[] key,byte[] value);
-        <T extends Recoverable> void onLoaded(T t,byte[] key,byte[] value);
     }
 
     interface Stream<T extends Recoverable>{
