@@ -299,8 +299,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     @Override
     public void onDistributing(Metadata metadata, byte[] key, byte[] value) {
-        if(metadata.scope()==Recoverable.DATA_SCOPE){
+        if(metadata.scope()==Distributable.DATA_SCOPE){
             replicationPendingQueue.offer(()-> this.dataCluster.recoverService().replicate(metadata.source(),key,value));
+        }
+        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+            replicationPendingQueue.offer(()->this.integrationCluster.accessIndexService().replicate(metadata.source(),key,value));
         }
     }
     @Override
@@ -511,7 +514,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 byte[] v = mapStoreListener.onCreating(metadata1,akey,t);
                 byte[] k = akey.getBytes();
                 if(v!=null&&_get(k)==null){
-                    return _set(k,v);
+                    if(_set(k,v)){
+                        mapStoreListener.onDistributing(metadata1,k,v);
+                    }
+                    return true;
                 }
                 return false;
             }catch (Exception ex){
@@ -548,9 +554,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 return false;
             }
         }
-        public void set(byte[] key,byte[] value){throw new UnsupportedOperationException(); }
+        public void set(byte[] key,byte[] value){
+            _set(key,value);
+        }
         public byte[] get(byte[] key){
-            throw new UnsupportedOperationException();
+            return _get(key);
         }
         @Override
         public <T extends Recoverable> List<T> list(RecoverableFactory<T> query) {
@@ -562,7 +570,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             throw new UnsupportedOperationException();
         }
         public Backup backup(){
-            return null;
+            return this;
         }
         public void registerListener(int registerId,Listener listener){
 

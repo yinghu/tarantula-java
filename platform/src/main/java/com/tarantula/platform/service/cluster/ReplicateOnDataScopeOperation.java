@@ -9,17 +9,17 @@ import java.io.IOException;
 /**
  * updated by yinghu lu on 7/10/2020.
  */
-public class ReplicateOperation extends Operation {
+public class ReplicateOnDataScopeOperation extends Operation {
 
     private String source;
     private byte[] key;
     private byte[] value;
 
-    public ReplicateOperation() {
+    public ReplicateOnDataScopeOperation() {
     }
 
 
-    public ReplicateOperation(String source, byte[] key,byte[] value) {
+    public ReplicateOnDataScopeOperation(String source, byte[] key, byte[] value) {
         this.source = source;
         this.key = key;
         this.value = value;

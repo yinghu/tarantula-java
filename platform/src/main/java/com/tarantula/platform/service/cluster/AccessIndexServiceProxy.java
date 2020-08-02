@@ -87,6 +87,24 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         }
         return expected==0;
     }
+    public boolean replicate(String source,byte[] key,byte[] value){
+        NodeEngine nodeEngine = getNodeEngine();
+        ReplicateOnIntegrationScopeOperation operation = new ReplicateOnIntegrationScopeOperation(source,key,value);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(5, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
+    }
     @Override
     public void start() throws Exception {
 
