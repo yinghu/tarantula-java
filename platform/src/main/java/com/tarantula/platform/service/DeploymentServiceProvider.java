@@ -93,8 +93,8 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     interface DistributionCallback{
         void addLobby(String typeId);
         void removeLobby(String typeId);
-        void addApplication(String applicationId,String typeId);
-        void removeApplication(String applicationId,String typeId);
+        void addApplication(String typeId,String applicationId);
+        void removeApplication(String typeId,String applicationId);
         void updateModule(Descriptor descriptor);
         void addServerPushEvent(Event event);
         void removeConnection(String serverId);

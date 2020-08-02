@@ -597,10 +597,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         this.deploymentServiceProvider.distributionCallback().removeLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
     }
     public void launchApplication(String typeId,String applicationId){
-        this.deploymentServiceProvider.distributionCallback().addApplication(applicationId,typeId);
+        this.deploymentServiceProvider.distributionCallback().addApplication(typeId,applicationId);
     }
     public void shutdownApplication(String typeId,String applicationId){
-        this.deploymentServiceProvider.distributionCallback().removeApplication(applicationId,typeId);
+        this.deploymentServiceProvider.distributionCallback().removeApplication(typeId,applicationId);
     }
     public void launchModule(String typeId){
         this.deploymentServiceProvider.distributionCallback().addLobby(typeId);

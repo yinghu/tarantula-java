@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * updated by yinghu lu on 5/30/2020
  */
-public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider,EventListener,SchedulingTask, DeploymentServiceProvider.DistributionCallback {
+public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider,SchedulingTask, DeploymentServiceProvider.DistributionCallback {
 
     private TarantulaLogger log = JDKLogger.getLogger(PlatformDeploymentServiceProvider.class);
 
@@ -243,16 +243,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     log.warn("Failed to add application ->"+b.toString());
                 }
             });
-            /** no view module
-            a.views.forEach(v->{
-                //add view to app
-                v.owner(a.descriptor.typeId());
-                boolean xv = deployService.addView(v);
-                //log.warn(xv.message());
-                if(!xv){
-                    log.warn("Failed to add view ->"+v.toString());
-                }
-            });**/
+            //skip view and configs
         });
         return suc[0];//this.builder.create().toJson(resp);
     }
@@ -262,7 +253,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         String  suc = deployService.addApplication(descriptor);
         if(suc!=null&&launching){//launch if lobby on line
             deployService.launchApplication(descriptor.typeId(),suc);
-            //this.integrationEventService.publish(new ModuleApplicationEvent(this.eventTopic,descriptor.typeId(),suc,false));
         }
         return suc!=null;
     }
@@ -332,17 +322,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 if(dynamicModuleClassLoader!=null){
                     log.warn("Module resource clear on ["+d.codebase()+"/"+d.moduleArtifact()+"/"+d.moduleVersion()+"/"+d.subtypeId()+"]");
                     dynamicModuleClassLoader._clear();
-                    /** no view module
-                    vMap.forEach((k,v)->{
-                        if(v instanceof OnView){
-                            OnView ov = (OnView)v;
-                            if(ov.flag().equals(d.subtypeId())){
-                                ov.disabled(true);
-                                vMap.remove(k);
-                                this.vListeners.forEach(listener -> listener.onView(ov));
-                            }
-                        }
-                    });**/
                 }
             }
         });
@@ -352,27 +331,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.register(ob);
         });
     }
-    /**
-    public void clusterUpdated(int scope,String nodeId,boolean state){
-        log.warn("Cluster updated->"+nodeId+"/"+state+"/"+scope);
-        if(scope==Distributable.INTEGRATION_SCOPE&&(!state)){
-            pushRegistry.forEach((k,v)->{
-                ApplicationConfiguration ac = new ApplicationConfiguration();
-                ac.oid(v.clientId());
-                ac.bucket(v.bucket());
-                Configuration c = (Configuration) vMap.get(ac.key().asString());
-                //log.warn("Configuration ->"+c.tag()+"/"+c.disabled()+"/"+nodeId+"/"+v.owner());
-                if(c.tag().equals(nodeId)){
-                    vMap.remove(ac.key());
-                    c.disabled(true);
-                    this.cListeners.forEach((l)->{
-                        l.onConfiguration(c);
-                    });
-                }
-            });
-        }
-    }
-    **/
     @Override
     public void setup(ServiceContext serviceContext){
         this.tarantulaContext = (TarantulaContext)serviceContext;
@@ -420,7 +378,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     @Override
     public void waitForData() {
-        //this.integrationEventService.publish(new MapStoreVotingEvent(this.eventTopic,localTopic,registerKey,Distributable.INTEGRATION_SCOPE));
         this.tarantulaContext.schedule(this);
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
@@ -432,47 +389,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void release(ServiceProvider serviceProvider){
         this.tarantulaContext.releaseServiceProvider(serviceProvider.name());
     }
-    @Override
-    public boolean onEvent(Event event) {
-        /**
-        if(event instanceof MapStoreSyncEvent){
-            //log.warn("Map Sync EVENT->"+event.source()+"/"+event.destination()+"/"+event.trackId());
-            MapStoreSyncEvent mse = (MapStoreSyncEvent)event;
-            Metadata mt = mse.metadata;
-            RecoverableRegistry r = tarantulaContext.recoverableRegistry(mt.factoryId());
-            Recoverable ot = r.create(mt.classId());
-            ot.fromMap(SystemUtil.toMap(event.payload()));
-            if(ot instanceof Configuration){
-                Configuration ov = (Configuration) ot;
-                vMap.put(new String(mse.key),ot);
-                ov.distributionKey(new String(mse.key));
-                this.cListeners.forEach((cl)->{
-                    cl.onConfiguration(ov);
-                });
-            }
-            else{
-                //log.warn("Not supported type->"+ot.toString());
-            }
-        }
-        else if(event instanceof MapStoreVotingEvent){
-            if(!event.trackId().equals(registerKey)){
-                log.warn("VOTING EVENT->"+event.source()+"/"+event.trackId());
-                vMap.forEach((ks,v)->{
-                    RecoverableMetadata mt = new RecoverableMetadata(v.getFactoryId(),v.getClassId());
-                    byte[] k = ks.getBytes();//v.key().asString()!=null?v.key().asString().getBytes():"".getBytes();
-                    MapStoreSyncEvent mse = new MapStoreSyncEvent(event.source(),event.trackId(),k,SystemUtil.toJson(v.toMap()),mt);
-                    mse.trackId(event.trackId());
-                    this.integrationEventService.publish(mse);
-                });
-                this.pushRegistry.forEach((k,v)->{
-                    v.destination(event.source());
-                    v.trackId(event.trackId());
-                    this.integrationEventService.publish(v);
-                });
-            }
-        }**/
-       return false;
-    }
+
     public void registerInstanceRegistryListener(InstanceRegistry.Listener instanceRegistryListener){
         rListeners.put(instanceRegistryListener.onLobby(),instanceRegistryListener);
     }
