@@ -32,9 +32,13 @@ public interface DataStore{
     <T extends Recoverable> List<T> list(RecoverableFactory<T> query);
     <T extends Recoverable> void list(RecoverableFactory<T> query,Stream<T> stream);
 
+    void registerListener(int registerId,Listener listener);
 
-    RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener);
-    void unregisterRecoverableListener(int factoryId);
+    interface Listener{
+        <T extends Recoverable> void onCreated(T t,byte[] key,byte[] value);
+        <T extends Recoverable> void onUpdated(T t,byte[] key,byte[] value);
+        <T extends Recoverable> void onLoaded(T t,byte[] key,byte[] value);
+    }
 
     interface Stream<T extends Recoverable>{
         boolean on(T t);

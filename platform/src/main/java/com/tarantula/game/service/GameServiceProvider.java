@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener{
+public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener,DataStore.Listener{
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
@@ -34,7 +34,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     private ClusterProvider integrationCluster;
     private ConcurrentHashMap<String,ZoneListener> zMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
-
+    private ServiceContext serviceContext;
     public GameServiceProvider(String name){
         NAME = name;
     }
@@ -107,6 +107,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
 
     @Override
     public void setup(ServiceContext serviceContext) {
+        this.serviceContext = serviceContext;
         this.dataStore = serviceContext.dataStore(NAME.replace("-","_"),serviceContext.partitionNumber());
         this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
         this.dest = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).subscription();
@@ -117,6 +118,8 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
             return false;
         });
         integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
+        this.dataStore.registerListener(new GamePortableRegistry().registryId(),this);
+        /**
         this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.ZONE_CID,(r)->{
             ZoneListener zl = zMap.get(r.distributionKey());
             if(zl!=null){
@@ -126,13 +129,8 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
                 logger.warn("Missed registered zone Listener->"+r.distributionKey());
             }
         });
-        //integrationCluster.addEventListener(NAME,(e)->{
-            //logger.warn(e.toString());
-            //return false;//keep
-        //});
-        this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.RATING_CID,(r)->{
-            //logger.warn(r.toString());
-        });
+        **/
+
 
         //this.dataStore.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.LEADER_BOARD_ENTRY_CID,(r)->{
             //logger.warn("DS->"+r.key().asString());
@@ -173,5 +171,28 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     @Override
     public void onUpdated(LeaderBoard.Entry entry) {
         publisher.publish(new LeaderBoardGlobalEvent(dest,NAME,entry));
+    }
+
+    @Override
+    public <T extends Recoverable> void onCreated(T t, byte[] key, byte[] value) {
+
+    }
+
+    @Override
+    public <T extends Recoverable> void onUpdated(T t, byte[] key, byte[] value) {
+        logger.warn("update->"+t.distributionKey());
+        //serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService().distribute(t);
+        ZoneListener zl = zMap.get(t.distributionKey());
+        if(zl!=null){
+            zl.updated((Zone)t);
+        }
+        else{
+            logger.warn("Missed registered zone Listener->"+t.distributionKey());
+        }
+    }
+
+    @Override
+    public <T extends Recoverable> void onLoaded(T t, byte[] key, byte[] value) {
+
     }
 }

@@ -456,7 +456,8 @@ public class AdminRoleModule implements Module {
         });
     }
     private Zone _zone(GameCluster gameCluster,Descriptor descriptor){
-        DataStore dataStore = this.context.dataStore((String) gameCluster.property(GameCluster.GAME_SERVICE));
+        String dn = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        DataStore dataStore = this.context.dataStore(dn.replace("-","_"));
         Zone mZone = new Zone();
         mZone.distributionKey(descriptor.distributionKey());
         mZone.capacity=1;

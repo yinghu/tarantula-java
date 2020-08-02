@@ -1,10 +1,7 @@
 package com.tarantula.platform.service;
 
 
-import com.tarantula.Configuration;
-import com.tarantula.Descriptor;
-import com.tarantula.Event;
-import com.tarantula.OnView;
+import com.tarantula.*;
 import com.tarantula.platform.presence.GameCluster;
 
 public interface DeployService extends ServiceProvider {
@@ -49,4 +46,6 @@ public interface DeployService extends ServiceProvider {
     boolean launchModule(String typeId);
     boolean shutdownModule(String typeId);
     boolean updateModule(Descriptor descriptor);
+
+    boolean distribute(Recoverable recoverable);
 }

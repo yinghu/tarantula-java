@@ -561,17 +561,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         public <T extends Recoverable> void list(RecoverableFactory<T> query, Stream<T> stream) {
             throw new UnsupportedOperationException();
         }
+        public void registerListener(int registerId,Listener listener){
 
-        @Override
-        public RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener) {
-            throw new UnsupportedOperationException();
         }
-
-        @Override
-        public void unregisterRecoverableListener(int factoryId) {
-            throw new UnsupportedOperationException();
-        }
-
         public void close(){
             this.berkeleyStore.close();
         }

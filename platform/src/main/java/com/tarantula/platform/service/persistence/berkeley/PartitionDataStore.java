@@ -28,7 +28,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
     private final String prefix;
 
     private final MapStoreListener mapStoreListener;
-    private ConcurrentHashMap<Integer,RecoverableListener> rMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer,Listener> rMap = new ConcurrentHashMap<>();
 
     private static TarantulaLogger log = JDKLogger.getLogger(PartitionDataStore.class);
 
@@ -98,6 +98,10 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 if(t.distributable()){//distributing onto cluster
                     this.mapStoreListener.onDistributing(dso.metadata,key,value);
                 }
+                Listener listener = rMap.get(t.getFactoryId());
+                if(listener!=null){
+                    listener.onCreated(t,key,value);
+                }
                 if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
                     suc = onEdge(t,okey);
                 }
@@ -165,6 +169,10 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 if(t.distributable()){
                     this.mapStoreListener.onDistributing(dso.metadata,key,value);
                 }
+                Listener listener = rMap.get(t.getFactoryId());
+                if(listener!=null){
+                    listener.onUpdated(t,key,value);
+                }
                 return true;
             }
             else{
@@ -203,6 +211,10 @@ public class PartitionDataStore extends ReplicatedDataStore{
                     }
                     if(t.distributable()){
                         this.mapStoreListener.onDistributing(dso.metadata, key,vx);
+                    }
+                    Listener listener = rMap.get(t.getFactoryId());
+                    if(listener!=null){
+                        listener.onCreated(t,key,vx);
                     }
                     if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
                         onEdge(t, akey);
@@ -338,19 +350,11 @@ public class PartitionDataStore extends ReplicatedDataStore{
         }
     }
 
-
-    @Override
-    public RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener) {
-        return rMap.computeIfAbsent(recoverableListener.registryId(),(rid)->recoverableListener);
-    }
-
-    @Override
-    public void unregisterRecoverableListener(int factoryId) {
-        rMap.remove(factoryId);
-    }
-
     private boolean _put(DataStoreOnPartition dso,byte[] key,byte[] value){
         return dso.database.put(null,new DatabaseEntry(key),new DatabaseEntry(value))==OperationStatus.SUCCESS;
+    }
+    public void registerListener(int registerId,Listener listener){
+        rMap.putIfAbsent(registerId,listener);
     }
     private byte[] _get(DataStoreOnPartition dso,byte[] key){
         DatabaseEntry ve = new DatabaseEntry();

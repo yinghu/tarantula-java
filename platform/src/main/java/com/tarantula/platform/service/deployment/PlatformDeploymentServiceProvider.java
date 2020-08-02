@@ -473,6 +473,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         return clist;
     }
+
     public boolean update(Configuration configuration){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         boolean updated = deployService.updateConfiguration(configuration);

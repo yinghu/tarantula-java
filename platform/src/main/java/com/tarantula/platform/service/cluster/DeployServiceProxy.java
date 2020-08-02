@@ -5,10 +5,7 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
-import com.tarantula.Configuration;
-import com.tarantula.Descriptor;
-import com.tarantula.Event;
-import com.tarantula.OnView;
+import com.tarantula.*;
 import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.Batch;
@@ -398,6 +395,24 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
     public boolean upload(String fileName,byte[] content){
         NodeEngine nodeEngine = getNodeEngine();
         DeployServiceUploadOperation operation = new DeployServiceUploadOperation(fileName,content);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(10, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
+    }
+    public boolean distribute(Recoverable recoverable){
+        NodeEngine nodeEngine = getNodeEngine();
+        RecoverableDistributionOperation operation = new RecoverableDistributionOperation(recoverable);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int expected = mlist.size();
         for(Member m :mlist){
