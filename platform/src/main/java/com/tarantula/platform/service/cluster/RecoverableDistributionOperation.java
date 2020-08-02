@@ -21,7 +21,7 @@ public class RecoverableDistributionOperation extends Operation {
     private int classId;
     private String key;
     private byte[] value;
-    //private boolean result;
+
     public RecoverableDistributionOperation() {
     }
 

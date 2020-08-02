@@ -12,6 +12,7 @@ public interface ServiceProvider extends Serviceable {
 
     default void waitForData(){}
     default void registerMetricsListener(MetricsListener metricsListener){}
+
     //midnight check
     default void atMidnight(){}
 }
