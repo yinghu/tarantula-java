@@ -12,6 +12,7 @@ import java.io.IOException;
 public class ReplicateOnDataScopeOperation extends Operation {
 
     private String source;
+    private int partition;
     private byte[] key;
     private byte[] value;
 
@@ -19,15 +20,16 @@ public class ReplicateOnDataScopeOperation extends Operation {
     }
 
 
-    public ReplicateOnDataScopeOperation(String source, byte[] key, byte[] value) {
+    public ReplicateOnDataScopeOperation(String source,int partition, byte[] key, byte[] value) {
         this.source = source;
+        this.partition = partition;
         this.key = key;
         this.value = value;
     }
     @Override
     public void run() throws Exception {
         ClusterRecoverService cis = this.getService();
-        cis.replicate(source,key,value);
+        cis.replicate(source,partition,key,value);
     }
 
     @Override
@@ -39,6 +41,7 @@ public class ReplicateOnDataScopeOperation extends Operation {
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(this.source);
+        out.writeInt(this.partition);
         out.writeByteArray(key);
         out.writeByteArray(value);
     }
@@ -47,6 +50,7 @@ public class ReplicateOnDataScopeOperation extends Operation {
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         this.source = in.readUTF();
+        this.partition = in.readInt();
         this.key = in.readByteArray();
         this.value = in.readByteArray();
     }

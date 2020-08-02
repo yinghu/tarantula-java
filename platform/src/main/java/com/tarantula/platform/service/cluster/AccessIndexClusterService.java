@@ -93,9 +93,8 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
         int partition = this.nodeEngine.getPartitionService().getPartitionId(accessKey);
         return this.dataStoreOnPartitions[partition];
     }
-    public void replicate(String source,byte[] key,byte[] value){
-        log.warn("Replicating ["+new String(key)+"]from ["+source+"]->"+new String(value));
-        //String[] src = source.split("_");
-        //this.tarantulaContext.dataStore(src[0],tarantulaContext.partitionNumber()).backup().set(key,value);
+    public void replicate(int partition,byte[] key,byte[] value){
+        log.warn("Replicating ["+new String(key)+"]->"+partition+"<><><>"+new String(value));
+        this.dataStoreOnPartitions[partition].dataStore.backup().set(key,value);
     }
 }

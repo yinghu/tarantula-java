@@ -16,7 +16,7 @@ public interface AccessIndexService extends ServiceProvider {
 
     boolean update(boolean state);
 
-    boolean replicate(String source,byte[] key,byte[] value);
+    boolean replicate(int partition,byte[] key,byte[] value);
 
     interface Listener{
         void onStop();

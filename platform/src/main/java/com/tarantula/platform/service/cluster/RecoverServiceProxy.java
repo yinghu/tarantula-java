@@ -80,9 +80,9 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         return ret;
     }
     @Override
-    public void replicate(String source,byte[] key,byte[] value){
+    public void replicate(String source,int partition,byte[] key,byte[] value){
         NodeEngine nodeEngine = getNodeEngine();
-        ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(source,key,value);
+        ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(source,partition,key,value);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int maxReplicationNode = 3;
         for(Member m :mlist){

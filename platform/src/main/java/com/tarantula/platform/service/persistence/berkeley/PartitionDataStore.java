@@ -10,6 +10,7 @@ import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 import com.tarantula.platform.service.persistence.MapStoreListener;
+import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.service.persistence.ReplicatedDataStore;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -43,6 +44,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
         this.partitions = new DataStoreOnPartition[this.partition];
         for(int i=0;i<this.partition;i++){
             this.partitions[i]=new DataStoreOnPartition(i,shards[i]);
+            this.partitions[i].metadata = new RecoverableMetadata(this.prefix,i,Distributable.DATA_SCOPE);
         }
     }
     @Override
@@ -296,9 +298,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
         try{
             pass.acquire();
             int pt = SystemUtil.partition(key,partition);
-            if(_put(this.partitions[pt],key,value)){
-                //this.mapStoreListener.onUpdated(new RecoverableMetadata(this.prefix,this.scope(),0,0,pt,true),key,value);
-            }
+            _put(this.partitions[pt],key,value);
         }
         catch (Exception ex){
             log.error("Error on set",ex);

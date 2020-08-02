@@ -103,7 +103,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
     private Database createDatabase(String name,int scope){
         try{
-            log.warn("Create database ["+name+"] on scope ["+scope+"]");
+            //log.warn("Create database ["+name+"] on scope ["+scope+"]");
             DatabaseConfig dbConfig = new DatabaseConfig();
             dbConfig.setAllowCreate(true);
             dbConfig.setDeferredWrite(true);
@@ -300,10 +300,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public void onDistributing(Metadata metadata, byte[] key, byte[] value) {
         if(metadata.scope()==Distributable.DATA_SCOPE){
-            replicationPendingQueue.offer(()-> this.dataCluster.recoverService().replicate(metadata.source(),key,value));
+            replicationPendingQueue.offer(()-> this.dataCluster.recoverService().replicate(metadata.source(),metadata.partition(),key,value));
         }
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
-            replicationPendingQueue.offer(()->this.integrationCluster.accessIndexService().replicate(metadata.source(),key,value));
+            replicationPendingQueue.offer(()->this.integrationCluster.accessIndexService().replicate(metadata.partition(),key,value));
         }
     }
     @Override

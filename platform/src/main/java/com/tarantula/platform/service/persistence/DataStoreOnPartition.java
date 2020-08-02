@@ -22,6 +22,6 @@ public class DataStoreOnPartition {
         this.partition = partition;
         this.name = dataStore.getDatabaseName();
         this.database = dataStore;
-        this.metadata = new RecoverableMetadata(name,partition, Distributable.DATA_SCOPE);
+        //this.metadata = new RecoverableMetadata(name,partition, Distributable.DATA_SCOPE);
     }
 }
