@@ -20,6 +20,13 @@ public class ServerPushEvent extends Data implements EventOnAction {
         this.trackId = serverId;
         this.payload = payload;
     }
+    public ServerPushEvent(String source, String sessionId,String serverId,String clientId,byte[] payload){
+        this.source = source;
+        this.sessionId = sessionId;
+        this.trackId = serverId;
+        this.clientId = clientId;
+        this.payload = payload;
+    }
     @Override
     public int getFactoryId(){
         return PortableEventRegistry.OID;
