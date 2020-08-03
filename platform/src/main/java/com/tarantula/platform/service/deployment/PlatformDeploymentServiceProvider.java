@@ -383,7 +383,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext.tarantulaCluster().deployService().syncServerPushEvent();
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
-
+    public void memberRemoved(String memberId){
+        log.warn("Member removed->"+memberId);
+    }
+    public void memberAdded(String memberId){
+        log.warn("Member added->"+memberId);
+    }
     @Override
     public void register(ServiceProvider serviceProvider) {
         this.tarantulaContext.deployServiceProvider(serviceProvider);
