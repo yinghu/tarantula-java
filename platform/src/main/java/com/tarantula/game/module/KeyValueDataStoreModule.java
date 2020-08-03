@@ -30,8 +30,8 @@ public class KeyValueDataStoreModule implements Module {
                 mo.distributionKey(session.systemId());
                 mo.label(session.name());
                 mo.fromMap(SystemUtil.toMap(payload));
-                dataStore.create(mo);
-                ResponseHeader resp = new ResponseHeader("onSet","Saved on key ["+key+"]",true);
+                boolean suc = dataStore.update(mo);
+                ResponseHeader resp = new ResponseHeader("onSet","Saved on key ["+key+"]",suc);
                 session.write(builder.create().toJson(resp).getBytes(),label());
             }
         }

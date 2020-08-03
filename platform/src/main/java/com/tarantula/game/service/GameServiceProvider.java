@@ -119,33 +119,6 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         });
         integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.dataStore.registerListener(new GamePortableRegistry().registryId(),this);
-        /**
-        this.dataStore.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.ZONE_CID,(r)->{
-            ZoneListener zl = zMap.get(r.distributionKey());
-            if(zl!=null){
-                zl.updated((Zone)r);
-            }
-            else{
-                logger.warn("Missed registered zone Listener->"+r.distributionKey());
-            }
-        });
-        **/
-
-
-        //this.dataStore.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.LEADER_BOARD_ENTRY_CID,(r)->{
-            //logger.warn("DS->"+r.key().asString());
-            //logger.warn("LD->"+r.toString());
-        //});
-         /**
-        RecoverableListener c = this.dataStore.registerRecoverableListener(new PresencePortableRegistry());
-        c.addRecoverableFilter(PresencePortableRegistry.STATISTICS_CID,(r)->{
-            //logger.warn("DS->"+r.key().asString());
-            logger.warn("DS->"+r.toString());
-        });
-        c.addRecoverableFilter(PresencePortableRegistry.STATISTICS_ENTRY_CID,(r)->{
-           // logger.warn("EN->"+r.key().asString());
-            logger.warn("EN->"+r.toString());
-        });**/
         logger.info("Game service provider ["+ NAME+"] started");
     }
     @Override

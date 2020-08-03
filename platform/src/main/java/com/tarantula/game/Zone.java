@@ -329,7 +329,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     }
     public void update() {
         arenas.forEach((a)->{
-            if(!this.dataStore.update(a)){
+            if(!this.dataStore.update(a)){//failed if no key associated
                 this.dataStore.create(a);
             }
         });
