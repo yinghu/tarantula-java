@@ -384,7 +384,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
     public void memberRemoved(String memberId){
-        log.warn("Member removed->"+memberId);
+        this.pushRegistry.forEach((k,v)->{
+            if(v.clientId().equals(memberId)){
+                log.warn("Member removed->"+k);
+                this.pushRegistry.remove(k);
+            }
+        });
     }
     public void memberAdded(String memberId){
         log.warn("Member added->"+memberId);

@@ -358,6 +358,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
     }
     public boolean addServerPushEvent(Event serverPushEvent){
         NodeEngine nodeEngine = getNodeEngine();
+        serverPushEvent.clientId(nodeEngine.getLocalMember().getUuid());
         AddServerPushEventOperation operation = new AddServerPushEventOperation(serverPushEvent);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int expected = mlist.size();
