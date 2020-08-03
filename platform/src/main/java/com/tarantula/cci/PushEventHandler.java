@@ -60,12 +60,6 @@ public class PushEventHandler implements RequestHandler {
                     String sid = exchange.id();
                     _hex.put(sid,exchange);
                     ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,serverId,_payload);
-                    //pushEvent.bucket(this.bucket);
-                    //pushEvent.clientId(serverId);
-                    //pushEvent.owner(this.eventService.subscription());
-                    //pushEvent.destination(DeploymentServiceProvider.DEPLOY_TOPIC);
-                    //pushEvent.payload(_payload);
-                    //eventService.publish(pushEvent);
                     deployService.addServerPushEvent(pushEvent);
                 }
                 else{
@@ -78,12 +72,6 @@ public class PushEventHandler implements RequestHandler {
                 _hex.forEach((k,v)->{
                     if(v.header(Session.TARANTULA_SERVER_ID).equals(serverId)){
                         _hex.remove(k);
-                        //DisableServerPushEvent pushEvent = new DisableServerPushEvent(this.serverTopic,k);
-                        //pushEvent.bucket(this.bucket);
-                        //pushEvent.clientId(serverId);
-                        //pushEvent.owner(this.eventService.subscription());
-                        //pushEvent.destination(DeploymentServiceProvider.DEPLOY_TOPIC);
-                        //eventService.publish(pushEvent);
                         deployService.removeServerPushEvent(serverId);
                     }
                 });
