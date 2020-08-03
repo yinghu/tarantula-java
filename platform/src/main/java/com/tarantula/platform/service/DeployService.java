@@ -38,6 +38,10 @@ public interface DeployService extends ServiceProvider {
     boolean shutdownGameCluster(String gameClusterKey);
 
     boolean addServerPushEvent(Event serverPushEvent);
+
+    boolean addServerPushEvent(String memberId,Event serverPushEvent);
+
+
     boolean removeServerPushEvent(String serverId);
 
     //distribute the module or view content in cluster
@@ -47,5 +51,5 @@ public interface DeployService extends ServiceProvider {
     boolean shutdownModule(String typeId);
     boolean updateModule(Descriptor descriptor);
 
-    boolean distribute(Recoverable recoverable);
+    void syncServerPushEvent();
 }

@@ -374,6 +374,26 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
+    public boolean addServerPushEvent(String memberId,Event serverPushEvent){
+        NodeEngine nodeEngine = getNodeEngine();
+        AddServerPushEventOperation operation = new AddServerPushEventOperation(serverPushEvent);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = 1;
+        for(Member m :mlist){
+            if(m.getUuid().equals(memberId)){
+                InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+                final Future<Void> future = builder.invoke();
+                try {
+                    future.get(5, TimeUnit.SECONDS);
+                    expected--;
+                } catch (Exception e) {
+                    future.cancel(true);
+                    //goes to next node if failed
+                }
+            }
+        }
+        return expected==0;
+    }
     public boolean removeServerPushEvent(String serverId){
         NodeEngine nodeEngine = getNodeEngine();
         RemoveServerPushEventOperation operation = new RemoveServerPushEventOperation(serverId);
@@ -410,22 +430,15 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean distribute(Recoverable recoverable){
+    public void syncServerPushEvent(){
         NodeEngine nodeEngine = getNodeEngine();
-        RecoverableDistributionOperation operation = new RecoverableDistributionOperation(recoverable);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+        ServerPushEventSyncOperation operation = new ServerPushEventSyncOperation(nodeEngine.getLocalMember().getUuid());
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
             final Future<Void> future = builder.invoke();
-            try {
-                future.get(10, TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                //goes to next node if failed
-            }
+            future.get(5,TimeUnit.SECONDS); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
         }
-        return expected==0;
     }
 }

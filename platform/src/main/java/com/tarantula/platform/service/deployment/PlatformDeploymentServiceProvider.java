@@ -9,6 +9,7 @@ import com.tarantula.platform.event.*;
 import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.cluster.OneTimeRunner;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.util.*;
 
@@ -379,6 +380,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public void waitForData() {
         this.tarantulaContext.schedule(this);
+        this.tarantulaContext.tarantulaCluster().deployService().syncServerPushEvent();
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
 
@@ -456,6 +458,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 l.onState(occ);
             });
         }
+    }
+    public void syncServerPushEvent(String memberId){
+        this.tarantulaContext.schedule(new OneTimeRunner(1,()->{
+            log.warn("push event distributing...");
+            pushRegistry.forEach((k,v)->{
+                tarantulaContext.tarantulaCluster().deployService().addServerPushEvent(memberId,v);
+            });
+        }));
     }
     public void registerOnConnectionListener(Connection.Listener listener){
         pushRegistry.forEach((k,v)->{

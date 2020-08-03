@@ -104,6 +104,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void startAccessIndex();
         void register(OnLobby onLobby);
         void register(InstanceRegistry registry);
+        void syncServerPushEvent(String memberId);
     }
 
 }

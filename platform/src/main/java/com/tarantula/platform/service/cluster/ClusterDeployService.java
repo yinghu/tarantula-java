@@ -620,4 +620,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void resetConfiguration(Configuration configuration){
         this.deploymentServiceProvider.distributionCallback().resetConfiguration(configuration);
     }
+    public void serverPushEventSync(String memberId){
+        this.deploymentServiceProvider.distributionCallback().syncServerPushEvent(memberId);//dispatch task
+    }
 }

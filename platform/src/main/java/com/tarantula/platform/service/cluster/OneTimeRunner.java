@@ -18,7 +18,7 @@ public class OneTimeRunner implements SchedulingTask {
 
     @Override
     public long initialDelay() {
-        return 100;
+        return 0;
     }
 
     @Override
