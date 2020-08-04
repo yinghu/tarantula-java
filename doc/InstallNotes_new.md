@@ -1,5 +1,6 @@
 [Home](README.md) > Install Notes
 ## Prerequisites
+All instructions are based on windows 10.
 ### 1. dotnet core SDK 3.1 and runtime 3.1 and 2.1 
 Download and Install dotnet SDK and Runtime
 ```
@@ -32,6 +33,14 @@ Once the code is checked out into these two directories, ensure that:
 ```
 dotnet restore --configfile ..\with-buddies-server\NuGet.config Pantheon.Server.sln
 ```
+### 7. Set up environment variables
+#### 1. WB_ENV = local|Docker
+To run applications on local docker access set WB_ENV = Docker
+To run applications on remote AWS access set WB_ENV = local
+#### 2. WB_AUTO_CONFIG_WORKSPACE_DIR 
+#### 3. WB_AUTO_CONFIG_REMOTE_DIR
+
+
 ## Setup pantheon-server on local docker environment
 ### 1. 
 ### 2. 
@@ -39,20 +48,6 @@ dotnet restore --configfile ..\with-buddies-server\NuGet.config Pantheon.Server.
 
 ## 0. Prerequisites
 
-
-## 1. Check out code
-
-Both `pantheon-server` and `with-buddies-server` must be checked out into their respective directories (with the same name) within the **same root folder** (in the example below, this is **pantheon**). This ideally results in the following folder structure:
-
-* `drive:\path-to\pantheon\pantheon-server`
-* `drive:\path-to\pantheon\with-buddies-server`
-
-### 1.1 Tracking correct branches
-
-Once the code is checked out into these two directories, ensure that:
-
-* `pantheon-server` is tracking the `develop` branch
-* `with-buddies-server` is tracking the `pantheon-develop` branch (**not** `develop`).
 
 ## 2. Obtain AWS credentials
 
