@@ -12,6 +12,7 @@ import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.ServiceProvider;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.deployment.ServiceConfigurationParser;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -622,5 +623,11 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
     public void serverPushEventSync(String memberId){
         this.deploymentServiceProvider.distributionCallback().syncServerPushEvent(memberId);//dispatch task
+    }
+    public void syncService(String source,int factoryId,int classId,byte[] key,byte[] value){
+        ServiceProvider serviceProvider = this.tarantulaContext.serviceProvider(source);
+        if(serviceProvider!=null){
+            serviceProvider.updateForData(factoryId,classId,key,value);
+        }
     }
 }

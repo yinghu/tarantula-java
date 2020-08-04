@@ -12,7 +12,7 @@ public interface ServiceProvider extends Serviceable {
 
     default void waitForData(){}
     default void registerMetricsListener(MetricsListener metricsListener){}
-
+    default void updateForData(int factoryId,int classId,byte[] key,byte[] value){}
     //midnight check
     default void atMidnight(){}
 }

@@ -153,14 +153,22 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
 
     @Override
     public <T extends Recoverable> void onUpdated(T t, byte[] key, byte[] value) {
-        //logger.warn("update->"+t.distributionKey());
+        logger.warn("update->"+t.distributionKey());
+        this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService().sync(NAME,t.getFactoryId(),t.getClassId(),key,value);
         //serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService().distribute(t);
-        ZoneListener zl = zMap.get(t.distributionKey());
-        if(zl!=null){
-            zl.updated((Zone)t);
-        }
-        else{
-            logger.warn("Missed registered zone Listener->"+t.distributionKey());
-        }
+        //ZoneListener zl = zMap.get(t.distributionKey());
+        //if(zl!=null){
+            //zl.updated((Zone)t);
+        //}
+        //else{
+            //logger.warn("Missed registered zone Listener->"+t.distributionKey());
+        //}
+    }
+    @Override
+    public void updateForData(int factoryId,int classId,byte[] key,byte[] value){
+        //Recoverable t = serviceContext.recoverableRegistry(factoryId).create(classId);
+        //t.distributionKey();
+        logger.warn("update for data key->"+new String(key));
+        logger.warn("update for data value->"+new String(value));
     }
 }

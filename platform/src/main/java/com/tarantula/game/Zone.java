@@ -257,6 +257,22 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     public Recoverable.Key key(){
         return new AssociateKey(this.bucket,this.oid,this.label);
     }
+    @Override
+    public String distributionKey() {
+        if(this.bucket!=null&&this.oid!=null){
+            return new StringBuffer(this.bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(label).toString();
+        }
+        else{
+            return null;
+        }
+    }
+    @Override
+    public void distributionKey(String distributionKey) {
+        String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
+        this.bucket = klist[0];
+        this.oid = klist[1];
+        this.label = klist[2];
+    }
     public String toPlayMode(){
         if(playMode == Room.DEDICATED_MODE){
             return "Dedicated";

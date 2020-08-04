@@ -107,6 +107,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void syncServerPushEvent(String memberId);
         void memberRemoved(String memberId);
         void memberAdded(String memberId);
+
     }
 
 }

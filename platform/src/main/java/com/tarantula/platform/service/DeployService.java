@@ -52,4 +52,7 @@ public interface DeployService extends ServiceProvider {
     boolean updateModule(Descriptor descriptor);
 
     void syncServerPushEvent();
+
+    boolean sync(String source,int factoryId,int classId,byte[] key,byte[] value);
+
 }

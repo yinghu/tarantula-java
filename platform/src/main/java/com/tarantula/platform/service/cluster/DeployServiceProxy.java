@@ -442,4 +442,22 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
+    public boolean sync(String source,int factoryId,int classId,byte[] key,byte[] value){
+        NodeEngine nodeEngine = getNodeEngine();
+        DataSyncOperation operation = new DataSyncOperation(source,factoryId,classId,key,value);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(10, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
+    }
 }
