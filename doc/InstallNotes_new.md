@@ -15,13 +15,8 @@ Microsoft.NETCore.App 2.1.19 [C:\Program Files\dotnet\shared\Microsoft.NETCore.A
 Microsoft.NETCore.App 3.1.5 [C:\Program Files\dotnet\shared\Microsoft.NETCore.App]
 Microsoft.WindowsDesktop.App 3.1.5 [C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App]
 ```
-### 2. git cli  
-### 3. docker desktop
-Download docker desktop and install
-* `NOTE: You may need to enable vitual settings on BIOS level`  
-### 4. aws-vault
-### 5. aws cli
-### 6. prepare code bases (with-buddies-server and pantheon-server)
+### 2. git cli   
+### 3. prepare code bases (with-buddies-server and pantheon-server)
 #### 1. Check out code bases
 Both `pantheon-server` and `with-buddies-server` must be checked out into their respective directories (with the same name) within the **same root folder** (in the example below, this is **pantheon**). This ideally results in the following folder structure:
 
@@ -36,7 +31,12 @@ Once the code is checked out into these two directories, ensure that:
 ```
 dotnet restore --configfile ..\with-buddies-server\NuGet.config Pantheon.Server.sln
 ```
-### 7. Set up environment variables
+### 4. docker desktop
+#### 1. Download docker desktop and install
+* `NOTE: You may need to enable vitual settings on BIOS level depending on OS`  
+#### 2. Setup local container
+
+### 5. Set up environment variables
 #### 1. WB_ENV = local|Docker
 * `To run applications on local docker access set WB_ENV = Docker`
 * `To run applications on remote AWS access set WB_ENV = local`
@@ -48,6 +48,6 @@ You can optionally set auto-config work space. Two folders are in the workspace 
 You can optionally set auto-config checkout folder. The config code is in the folder if you set the variable
 * `LocalDevAutoConfigRemote_Pantheon.git`
 
-## Setup pantheon-server on local docker environment
-## Setup pantheon-server on remote AWS environment   
+### 5. Setup pantheon-server on local docker environment
+### 6. Setup pantheon-server on remote AWS environment   
 
