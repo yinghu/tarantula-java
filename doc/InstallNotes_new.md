@@ -1,7 +1,7 @@
 [Home](README.md) > Install Notes
 ## Prerequisites
 All instructions and samples are based on windows 10.
-*NOTE: rake is no longer used.
+*`NOTE: rake is no longer used.`
 ### 1. dotnet core SDK 3.1 and runtime 3.1 and 2.1 
 Download and Install dotnet SDK and Runtime
 ```
@@ -38,15 +38,15 @@ dotnet restore --configfile ..\with-buddies-server\NuGet.config Pantheon.Server.
 ```
 ### 7. Set up environment variables
 #### 1. WB_ENV = local|Docker
-*To run applications on local docker access set WB_ENV = Docker
-*To run applications on remote AWS access set WB_ENV = local
+*`To run applications on local docker access set WB_ENV = Docker`
+*`To run applications on remote AWS access set WB_ENV = local`
 #### 2. WB_AUTO_CONFIG_WORKSPACE_DIR (Optional)
 You can optionally set auto-config work space. Two folders are in the workspace if you set the variable
-*AutoConfig_Pantheon
-*AutoConfigLocalDev_Pantheon
+*`AutoConfig_Pantheon`
+*`AutoConfigLocalDev_Pantheon`
 #### 3. WB_AUTO_CONFIG_REMOTE_DIR (Optional)
 You can optionally set auto-config checkout folder. The config code is in the folder if you set the variable
-*LocalDevAutoConfigRemote_Pantheon.git
+*`LocalDevAutoConfigRemote_Pantheon.git`
 
 ## Setup pantheon-server on local docker environment
 ## Setup pantheon-server on remote AWS environment   
