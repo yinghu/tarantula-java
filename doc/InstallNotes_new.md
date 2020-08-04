@@ -18,16 +18,20 @@ Microsoft.WindowsDesktop.App 3.1.5 [C:\Program Files\dotnet\shared\Microsoft.Win
 ### 4. aws-vault
 ### 5. aws cli
 ### 6. prepare code bases (with-buddies-server and pantheon-server)
+#### 1. Check out code bases
 Both `pantheon-server` and `with-buddies-server` must be checked out into their respective directories (with the same name) within the **same root folder** (in the example below, this is **pantheon**). This ideally results in the following folder structure:
 
 * `drive:\path-to\pantheon\pantheon-server`
 * `drive:\path-to\pantheon\with-buddies-server`
 
 Once the code is checked out into these two directories, ensure that:
-
+#### 2. Track correct branches
 * `pantheon-server` is tracking the `develop` branch
 * `with-buddies-server` is tracking the `pantheon-develop` branch (**not** `develop`).
-
+#### 3. Restore .NET packages
+```
+dotnet restore --configfile ..\with-buddies-server\NuGet.config Pantheon.Server.sln
+```
 ## Setup pantheon-server on local docker environment
 ### 1. 
 ### 2. 
