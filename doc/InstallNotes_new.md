@@ -1,9 +1,9 @@
 [Home](README.md) > Install Notes
 # Prerequisites
-## 0. dotnet SKD and runtime 
-## 1. git cli
-## 2. docker desktop 
-## 3. 
+### 0. dotnet SKD and runtime 
+### 1. git cli
+### 2. docker desktop 
+### 3. 
 # Setup pantheon-server on local docker environment
 # Setup pantheon-server on remote AWS environment   
 
