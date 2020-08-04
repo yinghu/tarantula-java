@@ -18,7 +18,7 @@ Microsoft.WindowsDesktop.App 3.1.5 [C:\Program Files\dotnet\shared\Microsoft.Win
 ### 2. git cli  
 ### 3. docker desktop
 Download docker desktop and install
-*NOTE: You may need to enable vitual settings on BIOS level  
+* `NOTE: You may need to enable vitual settings on BIOS level`  
 ### 4. aws-vault
 ### 5. aws cli
 ### 6. prepare code bases (with-buddies-server and pantheon-server)
@@ -38,15 +38,15 @@ dotnet restore --configfile ..\with-buddies-server\NuGet.config Pantheon.Server.
 ```
 ### 7. Set up environment variables
 #### 1. WB_ENV = local|Docker
-*`To run applications on local docker access set WB_ENV = Docker`
-*`To run applications on remote AWS access set WB_ENV = local`
+* `To run applications on local docker access set WB_ENV = Docker`
+* `To run applications on remote AWS access set WB_ENV = local`
 #### 2. WB_AUTO_CONFIG_WORKSPACE_DIR (Optional)
 You can optionally set auto-config work space. Two folders are in the workspace if you set the variable
-*`AutoConfig_Pantheon`
-*`AutoConfigLocalDev_Pantheon`
+* `AutoConfig_Pantheon`
+* `AutoConfigLocalDev_Pantheon`
 #### 3. WB_AUTO_CONFIG_REMOTE_DIR (Optional)
 You can optionally set auto-config checkout folder. The config code is in the folder if you set the variable
-*`LocalDevAutoConfigRemote_Pantheon.git`
+* `LocalDevAutoConfigRemote_Pantheon.git`
 
 ## Setup pantheon-server on local docker environment
 ## Setup pantheon-server on remote AWS environment   
