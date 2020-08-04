@@ -1,5 +1,5 @@
 [Home](README.md) > Install Notes
-# Prerequisites
+## Prerequisites
 ### 0. dotnet core SDK 3.1 and runtime 3.1 and 2.1 
 Download and Install dotnet SDK and Runtime
 ```
@@ -19,8 +19,8 @@ Microsoft.WindowsDesktop.App 3.1.5 [C:\Program Files\dotnet\shared\Microsoft.Win
 ### 4. aws cli
 ### 5. prepare code bases (with-buddies-server and pantheon-server)
 
-# Setup pantheon-server on local docker environment
-# Setup pantheon-server on remote AWS environment   
+## Setup pantheon-server on local docker environment
+## Setup pantheon-server on remote AWS environment   
 
 ## 0. Prerequisites
 
