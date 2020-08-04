@@ -1,9 +1,20 @@
 [Home](README.md) > Install Notes
 # Prerequisites
-### 0. dotnet SKD and runtime 
+### 0. dotnet core SDK 3.1 and runtime 3.1 and 2.1 
+---- Sample SDK and RUNTIMES ----  
+SDK : 3.1.301 [C:\Program Files\dotnet\sdk]
+RUNTIMES :
+Microsoft.AspNetCore.All 2.1.19 [C:\Program Files\dotnet\shared\Microsoft.AspNetCore.All]
+Microsoft.AspNetCore.App 2.1.19 [C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App]
+Microsoft.AspNetCore.App 3.1.5 [C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App]
+Microsoft.NETCore.App 2.1.19 [C:\Program Files\dotnet\shared\Microsoft.NETCore.App]
+Microsoft.NETCore.App 3.1.5 [C:\Program Files\dotnet\shared\Microsoft.NETCore.App]
+Microsoft.WindowsDesktop.App 3.1.5 [C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App]
+
 ### 1. git cli
 ### 2. docker desktop 
-### 3. 
+### 3. aws-vault
+
 # Setup pantheon-server on local docker environment
 # Setup pantheon-server on remote AWS environment   
 
