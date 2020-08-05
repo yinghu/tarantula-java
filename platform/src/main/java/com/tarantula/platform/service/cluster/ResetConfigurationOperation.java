@@ -28,7 +28,7 @@ public class ResetConfigurationOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.resetConfiguration(configuration);
+        //cds.resetConfiguration(configuration);
     }
 
     @Override

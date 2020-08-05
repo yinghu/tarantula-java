@@ -30,7 +30,7 @@ public class UpdateConfigurationOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        result = cds.updateConfiguration(configuration);
+        //result = cds.updateConfiguration(configuration);
     }
 
     @Override

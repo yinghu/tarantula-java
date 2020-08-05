@@ -20,11 +20,11 @@ public interface DeployService extends ServiceProvider {
     boolean resetModule(Descriptor descriptor);
 
     //add view via typeId of lobby
-    boolean addView(OnView view);
-    boolean updateView(OnView onView);
+    //boolean addView(OnView view);
+    //boolean updateView(OnView onView);
 
-    boolean updateConfiguration(Configuration configuration);
-    boolean resetConfiguration(Configuration configuration);
+    //boolean updateConfiguration(Configuration configuration);
+    //boolean resetConfiguration(Configuration configuration);
 
     //update lobby or application to set disabled as true/false
     String enableApplication(String applicationId,boolean enabled);
