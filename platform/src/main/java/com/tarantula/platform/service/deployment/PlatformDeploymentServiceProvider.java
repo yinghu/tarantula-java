@@ -407,7 +407,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerInstanceRegistryListener(InstanceRegistry.Listener instanceRegistryListener){
         rListeners.put(instanceRegistryListener.onLobby(),instanceRegistryListener);
     }
-    public void update(OnView onView){
+    private void update(OnView onView){
         checkContent(onView);
         vMap.putIfAbsent(onView.viewId(),onView);
         //remove caches
@@ -496,7 +496,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return clist;
     }
 
-    public boolean update(Configuration configuration){
+    private boolean update(Configuration configuration){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         boolean updated = deployService.updateConfiguration(configuration);
         if(!updated){
@@ -505,6 +505,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return deployService.resetConfiguration(configuration);
     }
     public void register(Configurable configurable){
+        if(configurable instanceof OnView){
+            update((OnView)configurable);
+            return;
+        }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
     }
     public void resetConfiguration(Configuration configuration){

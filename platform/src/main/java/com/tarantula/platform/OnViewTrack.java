@@ -113,4 +113,10 @@ public class OnViewTrack extends ConfigurableObject implements OnView, Portable 
         moduleName = portableReader.readUTF("6");
         moduleResourceFile= portableReader.readUTF("7");
     }
+    public void distributionKey(String distributionKey){
+        //skip the natural key
+    }
+    public Key key(){
+        return new NaturalKey(this.viewId);
+    }
 }
