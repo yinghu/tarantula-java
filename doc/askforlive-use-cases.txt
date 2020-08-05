@@ -1,0 +1,44 @@
+Use case : send a request ASK FOR LIVES from player's friend list.
+   web endpoint :  ask-for-lives/ask
+   method : http post 
+   posting data : a list of wb user id like {userids:[1,2,3]}	
+   response code : 202
+   sample response : like [{userId:1,cooldown:timestamp},{userId:2,cooldown:timestamp}]
+   server process:
+	validate user id list
+        check if each of user id list is on the player's friend list 
+        check if each of user id list is in cooling down  
+	check if each of user id list is in presence state			 
+	send ASK FOR LIVE request to inbox of each of user id list if passing previous checks
+        response only the list of user id received ASK FOR LIVE request (ignore failed userid)  
+	sameple response payload : [{userId:1,cooldown:timestamp},{userId:2,cooldown:timestamp}]
+    	expected result : ASK FOR LIVE requests should be in inbox of each of userids
+
+Use case : send a life from player's ASK FOR LIVES request in inbox/send a life from player's friend list without ASK FOR LIVES request.
+   web endpoint : ask-for-lives/send
+   method : http post
+   posting data : a list of wb user id like {userids:[1,2,3]}
+   response code : 202 
+   response body : none	   
+   server process:
+	validate user id list
+	check if each of player's ASK FOR LIVES request is not expired.
+	check if each of user id list is on the player's friend list for sending a life from player's friend list without ASK FOR LIVES request
+	check if each of user id list is in presence state.
+	send a life and reset cooldown to each of user id list if passing previous checks
+	expected result : a pending life should be in inbox of each of userids.				   	   
+
+Use case : accept a life from player's inbox.
+   web endpoint :  ask-for-lives/accept/{userid}
+   method : http get
+   response : 200
+	
+   server process:
+	validate user id
+ 	check if the life is expired
+	grant a life to the player if passing previous checks
+        set cooldown for the sending player
+	expected result : a new life in the player's inventory
+
+
+    
