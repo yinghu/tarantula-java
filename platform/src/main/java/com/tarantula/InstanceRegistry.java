@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * updated by yinghu on 8/7/2019
  */
-public interface InstanceRegistry extends OnApplication,Countable{
+public interface InstanceRegistry extends OnApplication,Countable,Configurable{
 
     int ON_INSTANCE =0;
     int ALREADY_ON_INSTANCE =1;
@@ -28,4 +28,5 @@ public interface InstanceRegistry extends OnApplication,Countable{
         void onRegistry(InstanceRegistry instanceRegistry);
         String onLobby();
     }
+
 }

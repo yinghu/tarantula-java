@@ -419,7 +419,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public OnView onView(String viewId){
         return (OnView)vMap.get(viewId);
     }
-    public boolean deploy(OnView onView){
+    /**
+    private boolean deploy(OnView onView){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         if(!vMap.containsKey(onView.viewId())&&onView.distributionKey()==null){
             //create new entry
@@ -429,16 +430,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         }
         return deployService.updateView(onView);
-    }
+    }**/
 
-    public void register(InstanceRegistry registry){
+    private void register(InstanceRegistry registry){
         rListeners.forEach((k,l)->{
             if(l.onLobby().equals(registry.subtypeId())){
                 try{l.onRegistry(registry);}catch (Exception ex){}//ignore ex
             }
         });
     }
-    public void register(OnLobby onLobby){
+    private void register(OnLobby onLobby){
         if(onLobby.deployCode()<2){
             return;
         }
@@ -495,18 +496,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         return clist;
     }
-
-    private boolean update(Configuration configuration){
-        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
-        boolean updated = deployService.updateConfiguration(configuration);
-        if(!updated){
-            return updated;
-        }
-        return deployService.resetConfiguration(configuration);
-    }
     public void register(Configurable configurable){
         if(configurable instanceof OnView){
             update((OnView)configurable);
+            return;
+        }
+        else if(configurable instanceof InstanceRegistry){
+            register((InstanceRegistry)configurable);
             return;
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);

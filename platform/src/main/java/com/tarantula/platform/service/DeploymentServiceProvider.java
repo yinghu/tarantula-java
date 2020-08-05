@@ -97,8 +97,8 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void resetConfiguration(Configuration configuration);
         void stopAccessIndex();
         void startAccessIndex();
-        void register(OnLobby onLobby);
-        void register(InstanceRegistry registry);
+        //void register(OnLobby onLobby);
+        //void register(InstanceRegistry registry);
         void syncServerPushEvent(String memberId);
         void memberRemoved(String memberId);
         void memberAdded(String memberId);
