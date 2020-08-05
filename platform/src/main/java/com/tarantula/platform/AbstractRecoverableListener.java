@@ -2,6 +2,7 @@ package com.tarantula.platform;
 
 import com.tarantula.Metadata;
 import com.tarantula.Recoverable;
+import com.tarantula.RecoverableFactory;
 import com.tarantula.RecoverableListener;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -37,7 +38,9 @@ public abstract class AbstractRecoverableListener implements RecoverableListener
     abstract public int registryId();
 
     abstract public Recoverable create(int i);
-
+    public <T extends Recoverable> RecoverableFactory<T> query(int registerId, String[] params){
+        return null;
+    }
     private static class OnFilter{
         List<Filter> list = new CopyOnWriteArrayList<>();
         public void onUpdated(Recoverable t){
