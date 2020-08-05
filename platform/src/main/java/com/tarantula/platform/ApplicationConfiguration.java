@@ -8,17 +8,15 @@ import com.tarantula.platform.util.SystemUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Updated by yinghu on 7/19/2020
  */
-public class ApplicationConfiguration extends RecoverableObject implements Configuration{
+public class ApplicationConfiguration extends ConfigurableObject implements Configuration{
 
     private String tag;
     private String type;
 
-    private CopyOnWriteArrayList<Configuration.Listener> listeners = new CopyOnWriteArrayList<>();
 
     public ApplicationConfiguration(){
         this.label = LABEL;
@@ -84,13 +82,5 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
         return PortableRegistry.APPLICATION_CONFIGURATION_CID;
     }
 
-    public void registerListener(Configuration.Listener listener){
-        this.listeners.add(listener);
-    }
-    public void update(Configurable updated){
-       this.listeners.forEach((c)->{
-           c.onUpdated(updated);
-       });
-    }
 
 }

@@ -1,12 +1,12 @@
 package com.tarantula.platform.service;
 
 
-import com.tarantula.Recoverable;
+import com.tarantula.Configurable;
 
 /**
  * Updated by yinghu lu on 6/16/2020
  */
-public interface OnLobby extends Recoverable {
+public interface OnLobby extends Configurable {
 
     String typeId(); //associated with lobby id
     String gameClusterId(); //associated with game cluster

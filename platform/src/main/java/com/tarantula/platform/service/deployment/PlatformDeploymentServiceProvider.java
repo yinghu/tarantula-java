@@ -47,7 +47,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private CopyOnWriteArrayList<AccessIndexService.Listener> aListeners = new CopyOnWriteArrayList<>();
 
     //on view, on lobby , configs mappings
-    private ConcurrentHashMap<String,Recoverable> vMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,Configurable> vMap = new ConcurrentHashMap<>();
 
     //push event cache mappings
     private ConcurrentHashMap<String,Event> pushRegistry = new ConcurrentHashMap<>();

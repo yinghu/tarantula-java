@@ -3,7 +3,7 @@ package com.tarantula;
 /**
  * Updated by yinghu lu on 7/11/2020
  */
-public interface OnView extends Recoverable {
+public interface OnView extends Configurable {
 
     String LABEL ="LVT";
     String INVALID_VIEW_ID = "invalid.request";
