@@ -505,6 +505,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             register((InstanceRegistry)configurable);
             return;
         }
+        else if(configurable instanceof OnLobby){
+            register((OnLobby)configurable);
+            return;
+        }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
     }
     public void resetConfiguration(Configuration configuration){

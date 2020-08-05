@@ -127,28 +127,8 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public boolean addView(OnView view){
-        NodeEngine nodeEngine = getNodeEngine();
-        AddViewOperation operation = new AddViewOperation(view);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Boolean> future = builder.invoke();
-            return future.get(); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
-    public boolean updateConfiguration(Configuration configuration){
-        NodeEngine nodeEngine = getNodeEngine();
-        UpdateConfigurationOperation operation = new UpdateConfigurationOperation(configuration);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Boolean> future = builder.invoke();
-            return future.get(); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
+
+
     public boolean resetModule(Descriptor descriptor){
         NodeEngine nodeEngine = getNodeEngine();
         ResetModuleOperation operation = new ResetModuleOperation(descriptor);
@@ -320,42 +300,8 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean updateView(OnView onView){
-        NodeEngine nodeEngine = getNodeEngine();
-        UpdateOnViewOperation operation = new UpdateOnViewOperation(onView);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(5, TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                //goes to next node if failed
-            }
-        }
-        return expected==0;
-    }
-    public boolean resetConfiguration(Configuration configuration){
-        NodeEngine nodeEngine = getNodeEngine();
-        ResetConfigurationOperation operation = new ResetConfigurationOperation(configuration);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(5, TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                //goes to next node if failed
-            }
-        }
-        return expected==0;
-    }
+
+
     public boolean addServerPushEvent(Event serverPushEvent){
         NodeEngine nodeEngine = getNodeEngine();
         serverPushEvent.clientId(nodeEngine.getLocalMember().getUuid());
