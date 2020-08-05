@@ -40,9 +40,6 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
     //list configurations
     List<Configuration> configuration();
-
-    //deploy and callback on view
-    boolean deploy(OnView onView);
     OnView onView(String viewId);
 
     void registerOnLobbyListener(OnLobby.Listener onLobbyListener);
