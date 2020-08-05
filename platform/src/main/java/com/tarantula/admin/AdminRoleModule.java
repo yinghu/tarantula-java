@@ -410,14 +410,16 @@ public class AdminRoleModule implements Module {
         this.purchase = this.context.dataStore(SubscriptionFee.DataStore);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        ya.registerListener((c)->{
+        ya.registerListener((cf)->{
             //reload monthly
-            this.context.log("UPDATE->"+SystemUtil.toJsonString(c.toMap()),OnLog.WARN);
+            this.context.log("UPDATE->"+SystemUtil.toJsonString(cf.toMap()),OnLog.WARN);
+            Configuration c = (Configuration)cf;
             yearly =  new SubscriptionFee("yearlyAccess",c.property("description"),c.property("price"),c.property("currency"),Integer.parseInt(c.property("durationMonths")));
         });
-        ma.registerListener((c)->{
+        ma.registerListener((cf)->{
             //reload monthly
-            this.context.log("UPDATE->"+SystemUtil.toJsonString(c.toMap()),OnLog.WARN);
+            this.context.log("UPDATE->"+SystemUtil.toJsonString(cf.toMap()),OnLog.WARN);
+            Configuration c = (Configuration)cf;
             monthly = new SubscriptionFee("monthlyAccess",c.property("description"),c.property("price"),c.property("currency"),Integer.parseInt(c.property("durationMonths")));
         });
         this.deploymentServiceProvider.register(ya);

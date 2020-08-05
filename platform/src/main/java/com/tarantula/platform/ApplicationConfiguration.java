@@ -87,7 +87,7 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
     public void registerListener(Configuration.Listener listener){
         this.listeners.add(listener);
     }
-    public void update(Configuration updated){
+    public void update(Configurable updated){
        this.listeners.forEach((c)->{
            c.onUpdated(updated);
        });

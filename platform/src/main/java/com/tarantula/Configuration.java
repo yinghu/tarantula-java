@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Updated by yinghu on 7/19/2020
  */
-public interface Configuration extends Recoverable {
+public interface Configuration extends Configurable {
 
     String LABEL = "AFC";
 
@@ -17,10 +17,4 @@ public interface Configuration extends Recoverable {
     void configure(String name,String value);
     List<Property> properties();
     String property(String name);
-
-    void registerListener(Configuration.Listener listener);
-    void update(Configuration update);
-    interface Listener{
-        void onUpdated(Configuration c);
-    }
 }
