@@ -678,20 +678,23 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void run() {
         this.tarantulaContext.metrics().summary((e)->e.update());
     }
+    //metrics update call
     public void onUpdated(String key,double value){
         this.tarantulaContext.onUpdated(key,value);
     }
     public void updateForData(int factoryId,int classId,byte[] key,byte[] value){
         String _k = new String(key);
         log.warn("updated->"+factoryId+"/"+classId+"/"+new String(key));
-        Configurable config = (Configurable) vMap.get(_k);
+        Configurable config = vMap.get(_k);
         Recoverable _c = this.tarantulaContext.recoverableRegistry(factoryId).create(classId);
         _c.fromMap(SystemUtil.toMap(value));
         config.update((Configurable)_c);
     }
     @Override
     public <T extends Recoverable> void onCreated(T t, byte[] key, byte[] value) {
-
+        //if(t.getFactoryId()==PortableRegistry.OID&&t.getClassId()==PortableRegistry.APPLICATION_CONFIGURATION_CID){
+            //this.tarantulaContext.tarantulaCluster().deployService().sync(NAME,t.getFactoryId(),t.getClassId(),key,value);
+        //}
     }
 
     @Override

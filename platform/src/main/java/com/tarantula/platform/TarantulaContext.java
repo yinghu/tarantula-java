@@ -6,16 +6,11 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.google.gson.GsonBuilder;
-import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
-import com.hazelcast.config.GroupConfig;
-import com.hazelcast.security.UsernamePasswordCredentials;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
-import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
