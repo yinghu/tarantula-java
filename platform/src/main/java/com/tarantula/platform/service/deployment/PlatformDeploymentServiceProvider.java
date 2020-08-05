@@ -10,6 +10,7 @@ import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
+import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.util.*;
 
@@ -27,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * updated by yinghu lu on 5/30/2020
  */
-public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider,SchedulingTask, DeploymentServiceProvider.DistributionCallback {
+public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider,SchedulingTask, DeploymentServiceProvider.DistributionCallback,DataStore.Listener {
 
     private TarantulaLogger log = JDKLogger.getLogger(PlatformDeploymentServiceProvider.class);
 
@@ -381,6 +382,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void waitForData() {
         this.tarantulaContext.schedule(this);
         this.tarantulaContext.tarantulaCluster().deployService().syncServerPushEvent();
+        this.tarantulaContext.masterDataStore().registerListener(PortableRegistry.OID,this);
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
     public void memberRemoved(String memberId){
@@ -502,12 +504,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         return deployService.resetConfiguration(configuration);
     }
+    public void register(Configurable configurable){
+        vMap.putIfAbsent(configurable.key().asString(),configurable);
+    }
     public void resetConfiguration(Configuration configuration){
         Configuration c = (Configuration) vMap.get(configuration.distributionKey());
         c.update(configuration);
-    }
-    public void register(Configuration configuration){
-        vMap.put(configuration.key().asString(),configuration);
     }
     //dedicated server methods
     public void onUDPConnection(String typeId,Connection connection){
@@ -679,6 +681,26 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void onUpdated(String key,double value){
         this.tarantulaContext.onUpdated(key,value);
     }
+    public void updateForData(int factoryId,int classId,byte[] key,byte[] value){
+        String _k = new String(key);
+        log.warn("updated->"+factoryId+"/"+classId+"/"+new String(key));
+        Configurable config = (Configurable) vMap.get(_k);
+        Recoverable _c = this.tarantulaContext.recoverableRegistry(factoryId).create(classId);
+        _c.fromMap(SystemUtil.toMap(value));
+        config.update((Configurable)_c);
+    }
+    @Override
+    public <T extends Recoverable> void onCreated(T t, byte[] key, byte[] value) {
+
+    }
+
+    @Override
+    public <T extends Recoverable> void onUpdated(T t, byte[] key, byte[] value) {
+        if(t.getFactoryId()==PortableRegistry.OID&&t.getClassId()==PortableRegistry.APPLICATION_CONFIGURATION_CID){
+            this.tarantulaContext.tarantulaCluster().deployService().sync(NAME,t.getFactoryId(),t.getClassId(),key,value);
+        }
+    }
+
     private class PostOfficeSession implements PostOffice{
 
         public OnConnection onConnection(String serverId){

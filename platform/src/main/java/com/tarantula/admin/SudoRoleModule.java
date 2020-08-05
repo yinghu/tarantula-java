@@ -140,7 +140,7 @@ public class SudoRoleModule implements Module {
             _payload.remove(OnAccess.COMMAND);
             _payload.remove(OnAccess.SERVICE_TAG);
             configuration.fromMap(_payload);
-            boolean suc = this.deploymentServiceProvider.update(configuration);
+            boolean suc = this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE).update(configuration);
             session.write(toMessage("configuration updated ["+configuration.distributionKey()+"]",suc).toString().getBytes(),label());
         }
         else if(session.action().equals("onDeployView")){

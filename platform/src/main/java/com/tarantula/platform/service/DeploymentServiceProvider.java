@@ -38,9 +38,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //register server push listener
     void registerOnConnectionListener(Connection.Listener listener);
 
-    //register and callback configuration
-    boolean update(Configuration configuration);
-    void register(Configuration configuration);
+    //list configurations
     List<Configuration> configuration();
 
     //deploy and callback on view
