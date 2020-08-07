@@ -28,27 +28,27 @@
 
         </application-list>
         <configuration-list>
-            <configuration tag="admin" priority="10">
-                <admin type="setup">
+
+                <configuration tag="admin" type="setup">
                     <property name="maxGameClusterCount">10</property>
                     <property name="maxGameLobbyCount">10</property>
                     <property name="minGameLobbyCount">1</property>
                     <property name="defaultGameLevelCount">3</property>
                     <property name="maxGameLevelCount">10</property>
-                </admin>
-                <admin type="yearlyAccess">
+                </configuration>
+                <configuration tag="admin" type="yearlyAccess">
                     <property name="description">Yearly Subscription</property>
                     <property name="price">1980.00</property>
                     <property name="currency">USD</property>
                     <property name="durationMonths">12</property>
-                </admin>
-                <admin type="monthlyAccess">
+                </configuration>
+                <configuration tag="admin" type="monthlyAccess">
                     <property name="description">Monthly Subscription</property>
                     <property name="price">180.00</property>
                     <property name="currency">USD</property>
                     <property name="durationMonths">1</property>
-                </admin>
-            </configuration>
+                </configuration>
+
         </configuration-list>
         <view-list>
             <view type="create.game.cluster">

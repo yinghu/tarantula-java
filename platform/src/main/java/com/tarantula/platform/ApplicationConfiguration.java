@@ -19,7 +19,6 @@ public class ApplicationConfiguration extends ConfigurableObject implements Conf
 
 
     public ApplicationConfiguration(){
-        this.label = LABEL;
         this.onEdge = true;
     }
 
@@ -41,7 +40,7 @@ public class ApplicationConfiguration extends ConfigurableObject implements Conf
     }
 
     public String label(){
-        return SystemUtil.toString(new String[]{this.label,this.tag});
+        return Configuration.LABEL;
     }
     public void configure(String name,String value){
         this.properties.put(name,value);

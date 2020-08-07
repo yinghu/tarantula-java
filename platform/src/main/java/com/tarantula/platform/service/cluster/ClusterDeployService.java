@@ -14,7 +14,6 @@ import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.ServiceProvider;
 import com.tarantula.platform.service.deployment.*;
-import com.tarantula.platform.service.deployment.ServiceConfigurationParser;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -107,32 +106,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     private BatchCache createQuery(int registryId,String[] params){
         BatchCache batchCache = null;
         DataStore dataStore = tarantulaContext.masterDataStore();
-
-        if(registryId==PortableRegistry.SERVICE_CONFIGURATION_CID){
-            List rlist = dataStore.list(new ServiceConfigurationQuery(params[0]));
-            if(rlist.isEmpty()){
-                ServiceConfigurationParser ssp = new ServiceConfigurationParser();
-                ssp.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("tarantula-platform-service-config.xml"));
-                rlist.addAll(ssp.configurationMapping.values());
-
-                rlist.forEach((o)->{
-                    ServiceConfiguration r = (ServiceConfiguration)o;
-                    r.owner(params[0]);
-                    dataStore.create(r);
-                    r.configurationMappings.forEach((k,v)->{
-                        v.owner(r.distributionKey());
-                        v.tag(r.tag);
-                        dataStore.create(v);
-                    });
-                });
-            }
-            batchCache = new BatchCache(UUID.randomUUID().toString(),rlist);
-        }
-        else if(registryId==PortableRegistry.APPLICATION_CONFIGURATION_CID){
-            List alist = dataStore.list(new ApplicationConfigurationQuery(params[0],params[1]));
-            batchCache = new BatchCache(UUID.randomUUID().toString(),alist);
-        }
-        else if(registryId==PortableRegistry.LOBBY_CID){
+        if(registryId==PortableRegistry.LOBBY_CID){
             List blist = new ArrayList();
             if(params.length>1){//
                 LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(params[0],params[1]);
@@ -175,14 +149,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                             v.owner(c.descriptor.distributionKey());
                             dataStore.create(v);
                         });
-                        c.configurations.forEach((s)->{
-                            s.owner(c.descriptor.distributionKey());
-                            dataStore.create(s);
-                            s.configurationMappings.forEach((k,cf)->{
-                                cf.owner(s.distributionKey());
-                                cf.tag(s.tag);
-                                dataStore.create(cf);
-                            });
+                        c.configurations.forEach((cf)->{
+                            cf.owner(c.descriptor.distributionKey());
+                            dataStore.create(cf);
                         });
                     });
                 }
@@ -238,6 +207,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 }
             }
             batchCache = new BatchCache(UUID.randomUUID().toString(),olist);
+        }
+        else if(registryId==PortableRegistry.APPLICATION_CONFIGURATION_CID){
+            List alist = dataStore.list(new ApplicationConfigurationQuery(params[0]));
+            batchCache = new BatchCache(UUID.randomUUID().toString(),alist);
         }
         else if(registryId==PortableRegistry.ON_VIEW_OID){
             List vlist = dataStore.list(new OnViewQuery(params[0]));

@@ -41,4 +41,4 @@ Use case : accept a life from player's inbox.
 	expected result : a new life in the player's inventory
 
 
-    
+https://docs.google.com/document/d/1qheWvlH0tRitMykwq1jiRMV42vLZQg0OJJProQhWqZQ/edit

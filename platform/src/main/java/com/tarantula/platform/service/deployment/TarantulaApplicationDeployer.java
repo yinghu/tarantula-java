@@ -16,11 +16,6 @@ public class TarantulaApplicationDeployer implements Serviceable {
 	public void start() throws Exception {
 		this.context._registerNode();
 		String bucketId = this.context.bucketId();
-		List<ServiceConfiguration> _slist = this.context.query(new String[]{bucketId},new ServiceConfigurationQuery(bucketId));
-		Collections.sort(_slist,new ServiceConfigurationComparator());
-		for(ServiceConfiguration c: _slist){
-			this.context.configure(c); //setup configurations
-		}
 		List<LobbyDescriptor> bList = this.context.query(new String[]{bucketId},new LobbyQuery(bucketId));
 		ArrayList<LobbyConfiguration> configurations = new ArrayList();
 		bList.forEach((d)->{
@@ -31,10 +26,8 @@ public class TarantulaApplicationDeployer implements Serviceable {
 		});
 		Collections.sort(configurations,new LobbyComparator());
 		for(LobbyConfiguration c:configurations){//may load from cluster or data store or local files
-			c.configurations = this.context.query(new String[]{c.descriptor.distributionKey()},new ServiceConfigurationQuery(c.descriptor.distributionKey()));
-			for(ServiceConfiguration scc : c.configurations){
-				this.context.configure(scc);
-			}
+			c.configurations = this.context.query(new String[]{c.descriptor.distributionKey()},new ApplicationConfigurationQuery(c.descriptor.distributionKey()));
+			this.context.configureConfigurations(c);
 			c.views = this.context.query(new String[]{c.descriptor.distributionKey()},new OnViewQuery(c.descriptor.distributionKey()));
 			this.context.configureViews(c);//deploy views
 			c.applications = this.context.query(new String[]{c.descriptor.distributionKey()},new ApplicationQuery(c.descriptor.distributionKey()));

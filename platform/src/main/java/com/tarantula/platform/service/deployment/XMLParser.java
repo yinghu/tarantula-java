@@ -30,9 +30,7 @@ public class XMLParser extends DefaultHandler{
 	OnView view;
     String pname;
 
-    String configurationTag;
-    CompositeKey configurationKey;
-    ServiceConfiguration applicationConfiguration;
+    Configuration applicationConfiguration;
 
     public XMLParser(){
 	}
@@ -68,22 +66,10 @@ public class XMLParser extends DefaultHandler{
         else if(qname.equals("configuration-list")){
             this.tblock = qname;
         }
-        else if(tblock.equals("configuration-list")&&qname.equals("configuration")){
-            this.configurationTag = attributes.getValue("tag");
-            int priority = 0;
-            if(attributes.getValue("priority")!=null){
-                priority = Integer.parseInt(attributes.getValue("priority"));
-            }
-            this.applicationConfiguration = new ServiceConfiguration(this.configurationTag,priority);
-        }
-        else if(tblock.equals("configuration-list")&&qname.equals("service-provider")){
-            this.applicationConfiguration.serviceProviderName = attributes.getValue("name");
-        }
-        else if(tblock.equals("configuration-list")&&qname.equals(this.configurationTag)){
-            Configuration tc = new ApplicationConfiguration();
-            tc.type(attributes.getValue("type"));
-            this.configurationKey = new CompositeKey(this.configurationTag,tc.type());
-            this.applicationConfiguration.configurationMappings.put(this.configurationKey,tc);
+        else if(qname.equals("configuration")){
+            this.applicationConfiguration = new ApplicationConfiguration();
+            this.applicationConfiguration.tag(attributes.getValue("tag"));
+            this.applicationConfiguration.type(attributes.getValue("type"));
         }
         else if(tblock.equals("configuration-list")&&qname.equals("property")){
             pname = attributes.getValue("name");
@@ -252,7 +238,7 @@ public class XMLParser extends DefaultHandler{
                 }
             }
             else if(tblock.equals("configuration-list")&&qname.equals("property")){
-                this.applicationConfiguration.configurationMappings.get(this.configurationKey).configure(pname,value);
+                this.applicationConfiguration.configure(pname,value);
             }
 			else if(tblock.equals("application-list")&&qname.equals("application")){
                 this.configuration.applications.add(this.applicationDescriptor);
@@ -273,7 +259,6 @@ public class XMLParser extends DefaultHandler{
 			else if(qname.equals("lobby-context")){
 				this.configurations.add(this.configuration);
 			}
-
 
 		}catch(Exception ex){
 			ex.printStackTrace();

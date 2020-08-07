@@ -24,15 +24,13 @@
 
         </application-list>
         <configuration-list>
-            <configuration tag="user" priority="10">
-                <user type="setup">
-                    <property name="lobbyId">presence</property>
-                    <property name="activated">false</property>
-                    <property name="initialBalance">1000000</property>
-                    <property name="roleName">player</property>
-                    <property name="root">root</property>
-                    <property name="password">root</property>
-                </user>
+            <configuration tag="user" type="setup">
+                <property name="lobbyId">presence</property>
+                <property name="activated">false</property>
+                <property name="initialBalance">1000000</property>
+                <property name="roleName">player</property>
+                <property name="root">root</property>
+                <property name="password">root</property>
             </configuration>
         </configuration-list>
         <view-list>

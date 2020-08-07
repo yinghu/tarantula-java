@@ -26,11 +26,11 @@
             </application>
         </application-list>
         <configuration-list>
-            <configuration tag="account" priority="10">
-                <account type="setup">
+
+                <configuration tag="account" type="setup">
                     <property name="maxUserCount">5</property>
-                </account>
-            </configuration>
+                </configuration>
+
         </configuration-list>
         <view-list>
             <view type="add.user">

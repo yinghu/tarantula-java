@@ -4,23 +4,22 @@ import com.tarantula.Configuration;
 import com.tarantula.RecoverableFactory;
 import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.service.cluster.PortableRegistry;
-import com.tarantula.platform.util.SystemUtil;
+
 
 /**
  * Updated by yinghu lu on 7/19/2020.
  */
-public class ApplicationConfigurationQuery implements RecoverableFactory<ApplicationConfiguration> {
+public class ApplicationConfigurationQuery implements RecoverableFactory<Configuration> {
 
 
-    private String serviceConfigurationId;
-    private String tag;
-    public ApplicationConfigurationQuery(String serviceConfigurationId,String tag){
-        this.serviceConfigurationId = serviceConfigurationId;
-        this.tag = tag;
+    private String lobbyId;
+
+    public ApplicationConfigurationQuery(String lobbyId){
+        this.lobbyId = lobbyId;
     }
 
     @Override
-    public ApplicationConfiguration create() {
+    public Configuration create() {
         ApplicationConfiguration ac = new ApplicationConfiguration();
         return ac;
     }
@@ -32,12 +31,12 @@ public class ApplicationConfigurationQuery implements RecoverableFactory<Applica
 
     @Override
     public String label() {
-        return SystemUtil.toString(new String[]{Configuration.LABEL,tag});
+        return Configuration.LABEL;
     }
 
 
     @Override
     public String distributionKey() {
-        return serviceConfigurationId;
+        return lobbyId;
     }
 }

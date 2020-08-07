@@ -221,29 +221,14 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
         }
         lb.addEntry(c);
     }
-    public void configure(ServiceConfiguration conf) throws Exception{
-        List<ApplicationConfiguration> alist = this.query(new String[]{conf.distributionKey(),conf.tag},new ApplicationConfigurationQuery(conf.distributionKey(),conf.tag));
-        for(ApplicationConfiguration afg : alist){
-            conf.configurationMappings.put(new CompositeKey(conf.tag,afg.type()),afg);
+    public void configureConfigurations(LobbyConfiguration conf){
+        if(conf.configurations.size()>0){
+            configurations.put(conf.configurations.get(0).tag(),conf.configurations);
         }
-        if(conf.serviceProviderName!=null){ //application service provider
-            ServiceProvider serviceProvider = (ServiceProvider) Class.forName(conf.serviceProviderName).getConstructor().newInstance();
-            serviceProvider.start();
-            serviceProvider.setup(new ServiceContextProxy(this));//inject the proxy to service provider instead of the singleton
-            serviceProvider.waitForData();
-            this.serviceProviders.put(serviceProvider.name(),serviceProvider);
-        }
-        List<Configuration> rlist = new ArrayList<>();
-
-        for(Configuration c : conf.configurationMappings.values()){
-            rlist.add(c);
-            //this.deploymentServiceProvider.deploy(c);
-        }
-        configurations.put(conf.tag,rlist);
  	}
     public void configureViews(LobbyConfiguration conf){
  	    conf.views.forEach((v)->{
-            this.deploymentServiceProvider.register(v);
+ 	        this.deploymentServiceProvider.register(v);
         });
     }
 	public OnLobby configure(LobbyConfiguration conf) throws Exception{

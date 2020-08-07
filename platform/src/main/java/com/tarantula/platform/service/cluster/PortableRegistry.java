@@ -6,8 +6,6 @@ import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.event.SessionForward;
 import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.Batch;
-import com.tarantula.platform.service.Metrics;
-import com.tarantula.platform.service.deployment.ServiceConfiguration;
 import com.tarantula.platform.service.persistence.*;
 
 public class PortableRegistry extends AbstractRecoverableListener{
@@ -24,8 +22,6 @@ public class PortableRegistry extends AbstractRecoverableListener{
     public static final int LOBBY_TYPE_ID_INDEX_CID = 13;
 
     public static final int ACCESS_KEY = 16;
-
-    public static final int SERVICE_CONFIGURATION_CID = 20;//DEPLOY OBJECT
 
     public static final int ON_INSTANCE_CID = 23;//DEPLOY OBJECT
 
@@ -84,9 +80,6 @@ public class PortableRegistry extends AbstractRecoverableListener{
 
             case ACCESS_KEY:
                 _ins = new AccessKey();
-                break;
-            case SERVICE_CONFIGURATION_CID:
-                _ins = new ServiceConfiguration();
                 break;
 
             case ON_INSTANCE_CID:
