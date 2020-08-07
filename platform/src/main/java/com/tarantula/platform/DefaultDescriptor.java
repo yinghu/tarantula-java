@@ -44,8 +44,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor{
 
     protected  String applicationClassName;
     protected  int instancesOnStartupPerPartition =1;
-    protected  String configurationName;
-    protected  String configurationType;
 
     protected int maxIdlesOnInstance;
     protected long runtimeDuration;
@@ -280,8 +278,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor{
         _props.put("maxInstancesPerPartition",this.maxInstancesPerPartition);
         _props.put("applicationClassName",this.applicationClassName);
         _props.put("instancesOnStartupPerPartition",this.instancesOnStartupPerPartition);
-        _props.put("configurationName",this.configurationName);
-        _props.put("configurationType",this.configurationType);
         _props.put("maxIdlesOnInstance",this.maxIdlesOnInstance);
         _props.put("responseLabel",this.responseLabel);
         _props.put("runtimeDuration",this.runtimeDuration);
@@ -320,8 +316,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor{
         this.maxInstancesPerPartition = properties.get("maxInstancesPerPartition")!=null?((Number)properties.get("maxInstancesPerPartition")).intValue():1;
         this.applicationClassName = properties.get("applicationClassName")!=null?(String)properties.get("applicationClassName"):null;
         this.instancesOnStartupPerPartition = properties.get("instancesOnStartupPerPartition")!=null?((Number)properties.get("instancesOnStartupPerPartition")).intValue():10;
-        this.configurationName =properties.get("configurationName")!=null? (String)properties.get("configurationName"):null;
-        this.configurationType =properties.get("configurationType")!=null? (String)properties.get("configurationType"):null;
         this.maxIdlesOnInstance =properties.get("maxIdlesOnInstance")!=null?((Number)properties.get("maxIdlesOnInstance")).intValue():0;
         this.responseLabel =properties.get("responseLabel")!=null? (String)properties.get("responseLabel"):null;
         this.runtimeDuration = properties.get("runtimeDuration")!=null?((Number)properties.get("runtimeDuration")).longValue():0;
@@ -343,19 +337,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor{
 
     public void instancesOnStartupPerPartition(int instancesOnStartup){
         this.instancesOnStartupPerPartition = instancesOnStartup;
-    }
-
-    public String configurationName(){
-        return  this.configurationName;
-    }
-    public void configurationName(String configurationName){
-        this.configurationName = configurationName;
-    }
-    public String configurationType(){
-        return configurationType;
-    }
-    public void configurationType(String configurationType){
-        this.configurationType = configurationType;
     }
     public long runtimeDuration(){
         return this.runtimeDuration;

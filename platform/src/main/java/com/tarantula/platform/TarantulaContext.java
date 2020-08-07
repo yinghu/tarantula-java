@@ -223,7 +223,7 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
     }
     public void configureConfigurations(LobbyConfiguration conf){
         if(conf.configurations.size()>0){
-            configurations.put(conf.configurations.get(0).tag(),conf.configurations);
+            configurations.put(conf.descriptor.typeId(),conf.configurations);
         }
  	}
     public void configureViews(LobbyConfiguration conf){

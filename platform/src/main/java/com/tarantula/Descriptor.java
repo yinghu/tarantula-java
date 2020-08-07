@@ -100,14 +100,6 @@ public interface Descriptor extends Recoverable{
 
     void applicationClassName(String applicationClassName);
 
-
-
-    String configurationName();
-    void configurationName(String configurationName);
-
-    String configurationType();
-    void configurationType(String configurationType);
-
     long runtimeDuration(); //the application duration time in minutes
     void runtimeDuration(long runtimeDuration);
 

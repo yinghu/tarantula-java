@@ -203,7 +203,7 @@ public class SudoRoleModule implements Module {
             JsonObject jc = new JsonObject();
             jc.addProperty("accessId",configuration.distributionKey());
             jc.addProperty("type",configuration.type());
-            jc.addProperty("tag",configuration.tag());
+            //jc.addProperty("tag",configuration.tag());
             configuration.properties().forEach((p)->{
                 jc.addProperty(p.name(),p.value());
             });

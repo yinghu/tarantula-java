@@ -68,7 +68,7 @@ public class XMLParser extends DefaultHandler{
         }
         else if(qname.equals("configuration")){
             this.applicationConfiguration = new ApplicationConfiguration();
-            this.applicationConfiguration.tag(attributes.getValue("tag"));
+            //this.applicationConfiguration.tag(attributes.getValue("tag"));
             this.applicationConfiguration.type(attributes.getValue("type"));
         }
         else if(tblock.equals("configuration-list")&&qname.equals("property")){
@@ -116,9 +116,6 @@ public class XMLParser extends DefaultHandler{
             }
             else if(tblock.equals("lobby-context")&&qname.equals("response-label")){
                 this.configuration.descriptor.responseLabel(value);
-            }
-            else if(tblock.equals("lobby-context")&&qname.equals("configuration-name")){
-                this.configuration.descriptor.configurationName(value);
             }
             else if(tblock.equals("lobby-context")&&qname.equals("reset-enabled")){
                 this.configuration.descriptor.resetEnabled(Boolean.parseBoolean(value));
@@ -198,12 +195,6 @@ public class XMLParser extends DefaultHandler{
             }
 			else if(tblock.equals("application-list")&&qname.equals("class-name")){
 				this.applicationDescriptor.applicationClassName(value);
-            }
-            else if(tblock.equals("application-list")&&qname.equals("configuration-name")){
-                this.applicationDescriptor.configurationName(value);
-            }
-            else if(tblock.equals("application-list")&&qname.equals("configuration-type")){
-                this.applicationDescriptor.configurationType(value);
             }
             else if(tblock.equals("application-list")&&qname.equals("instances-on-startup-per-partition")){
                 this.applicationDescriptor.instancesOnStartupPerPartition(Integer.parseInt(value));

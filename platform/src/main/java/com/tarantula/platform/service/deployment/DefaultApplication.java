@@ -48,13 +48,11 @@ public class DefaultApplication implements Application {
 
     @Override
     public void start() throws Exception{
-        if(this.deploymentDescriptor.configurationName()!=null){
-            List<Configuration> clist = this.tarantulaContext.configurations(this.deploymentDescriptor.configurationName());
-            if(clist!=null){
-                clist.forEach((c)->{
-                    this.configurations.put(c.type(),c);
-                });
-            }
+        List<Configuration> clist = this.tarantulaContext.configurations(this.deploymentDescriptor.typeId());
+        if(clist!=null){
+            clist.forEach((c)->{
+                this.configurations.put(c.type(),c);
+            });
         }
         //log.warn("Application ["+this.deploymentDescriptor.name()+"/"+this.deploymentDescriptor.distributionKey()+"] started");
     }

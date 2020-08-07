@@ -70,10 +70,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void start() throws Exception {
         onAccessIndex = new AtomicBoolean(true);
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(ApplicationConfiguration.class,new ConfigurationDeserializer());
         this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseDeserializer());
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
     }
 
     @Override
@@ -225,7 +222,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         xmlParser.configurations.forEach((a)->{
-            //ResponseHeader r = this.builder.create().fromJson(deployService.addLobby(a.descriptor),ResponseHeader.class);
             suc[0] = deployService.addLobby(a.descriptor);
             if(!suc[0]){
                 return;
@@ -247,7 +243,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             });
             //skip view and configs
         });
-        return suc[0];//this.builder.create().toJson(resp);
+        return suc[0];
     }
 
     public boolean createApplication(Descriptor descriptor,boolean launching){

@@ -9,8 +9,8 @@ public interface Configuration extends Configurable {
 
     String LABEL = "AFC";
 
-    String tag();
-    void tag(String tag);
+    //String tag();
+    //void tag(String tag);
     String type();
     void type(String type);
 

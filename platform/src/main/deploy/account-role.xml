@@ -22,7 +22,6 @@
                 <module-name>com.tarantula.admin.AccountRoleModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <access-control>20</access-control>
-                <configuration-name>account</configuration-name>
             </application>
         </application-list>
         <configuration-list>

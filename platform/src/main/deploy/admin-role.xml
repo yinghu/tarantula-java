@@ -23,7 +23,6 @@
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
-                <configuration-name>admin</configuration-name>
             </application>
 
         </application-list>
