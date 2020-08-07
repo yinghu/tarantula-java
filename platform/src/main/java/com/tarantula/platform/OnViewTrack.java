@@ -4,7 +4,9 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.OnView;
-import com.tarantula.platform.event.PortableEventRegistry;
+
+import com.tarantula.platform.service.cluster.PortableRegistry;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -86,12 +88,12 @@ public class OnViewTrack extends ConfigurableObject implements OnView, Portable 
     }
     @Override
     public int getFactoryId() {
-        return PortableEventRegistry.OID;
+        return PortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PortableEventRegistry.ON_VIEW_CID;
+        return PortableRegistry.ON_VIEW_OID;
     }
 
     @Override

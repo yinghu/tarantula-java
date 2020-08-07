@@ -2,8 +2,10 @@ package com.tarantula.platform.service.deployment;
 
 import java.util.*;
 import com.tarantula.platform.*;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.OnLobby;
 import com.tarantula.platform.service.Serviceable;
+import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class TarantulaApplicationDeployer implements Serviceable {
 
@@ -34,6 +36,7 @@ public class TarantulaApplicationDeployer implements Serviceable {
 			OnLobby _ob = this.context.configure(c);
 			this.context.deploymentService().register(_ob);
 		}
+		this.context.masterDataStore().registerListener(PortableRegistry.OID,this.context.deploymentServiceProvider());
 	}
 
 	public void shutdown() throws Exception {

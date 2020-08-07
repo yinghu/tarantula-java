@@ -51,8 +51,6 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int BATCH_CID = 104;
 
-    public static final int ON_VIEW_CID = 105;
-
     public static final int GAME_CLUSTER_CID = 106;
 
     public static final int ACCESS_INDEX_CID = 107;
@@ -111,9 +109,6 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case CONNECTION_STATE_EVENT_CID:
                 _ins = new ConnectionStateEvent();
-                break;
-            case ON_VIEW_CID:
-                _ins = new OnViewTrack();
                 break;
             case GAME_CLUSTER_CID:
                 _ins = new GameCluster();

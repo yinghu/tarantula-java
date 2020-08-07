@@ -33,6 +33,8 @@ public class PortableRegistry extends AbstractRecoverableListener{
 
     public static final int ON_CONNECTION_CID = 27;
 
+    public static final int ON_VIEW_OID = 28;
+
     //START 100 working with EVENT PORTABLE on same OID
     public static final int SINGLETON_FORWARD_CID = PortableEventRegistry.SINGLETON_FORWARD_CID;
 
@@ -44,7 +46,6 @@ public class PortableRegistry extends AbstractRecoverableListener{
 
     public static final int BATCH_CID = PortableEventRegistry.BATCH_CID;
 
-    public static final int ON_VIEW_OID = PortableEventRegistry.ON_VIEW_CID;
 
     public static final int ACCESS_INDEX_CID = PortableEventRegistry.ACCESS_INDEX_CID;
 

@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * updated by yinghu lu on 5/30/2020
  */
-public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider,SchedulingTask, DeploymentServiceProvider.DistributionCallback,DataStore.Listener {
+public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider,SchedulingTask, DeploymentServiceProvider.DistributionCallback {
 
     private TarantulaLogger log = JDKLogger.getLogger(PlatformDeploymentServiceProvider.class);
 
@@ -378,7 +378,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void waitForData() {
         this.tarantulaContext.schedule(this);
         this.tarantulaContext.tarantulaCluster().deployService().syncServerPushEvent();
-        this.tarantulaContext.masterDataStore().registerListener(PortableRegistry.OID,this);
+        //this.tarantulaContext.masterDataStore().registerListener(PortableRegistry.OID,this);
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
     public void memberRemoved(String memberId){

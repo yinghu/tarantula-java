@@ -9,7 +9,7 @@ import java.util.List;
  * Updated by yinghu lu on 5/30/2020
  */
 
-public interface DeploymentServiceProvider extends ServiceProvider,MetricsListener {
+public interface DeploymentServiceProvider extends ServiceProvider,MetricsListener,DataStore.Listener {
 
     String DEPLOY_DATA_STORE = "tarantula";
 
