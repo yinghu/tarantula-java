@@ -155,17 +155,8 @@ public class SudoRoleModule implements Module {
                 onView.moduleResourceFile(rname);
             }
             onView.contentBaseUrl((String) onAccess.property("deployUrl"));
-            OnView ex = this.deploymentServiceProvider.onView(onView.viewId());
-            if(ex!=null){
-                //do update
-                this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE).update(onView);
-            }
-            else{
-                //do create
-                this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE).create(onView);
-            }
-            //this.deploymentServiceProvider.deploy(onView);
-            session.write(toMessage("view deployed",true).toString().getBytes(),label());
+            boolean suc = this.deploymentServiceProvider.createView(onView);
+            session.write(toMessage("view deployed",suc).toString().getBytes(),label());
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");

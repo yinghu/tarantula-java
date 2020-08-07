@@ -41,7 +41,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //list configurations
     List<Configuration> configuration();
     OnView onView(String viewId);
-
+    boolean createView(OnView onView);
     void registerOnLobbyListener(OnLobby.Listener onLobbyListener);
 
     byte[] resource(String name,String flag);

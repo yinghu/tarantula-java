@@ -94,6 +94,17 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
+    public boolean addView(OnView onView){
+        NodeEngine nodeEngine = getNodeEngine();
+        AddViewOperation operation = new AddViewOperation(onView);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<Boolean> future = builder.invoke();
+            return future.get(); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
     public String addApplication(Descriptor application){
         NodeEngine nodeEngine = getNodeEngine();
         AddApplicationOperation operation = new AddApplicationOperation(application);

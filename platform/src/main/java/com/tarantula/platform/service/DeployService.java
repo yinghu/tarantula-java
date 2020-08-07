@@ -13,6 +13,7 @@ public interface DeployService extends ServiceProvider {
     Batch query(String batchId,int count);
 
     boolean addLobby(Descriptor lobby);
+    boolean addView(OnView onView);
 
     String addApplication(Descriptor application);
     boolean launchApplication(String typeId,String applicationId);

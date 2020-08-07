@@ -416,18 +416,17 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public OnView onView(String viewId){
         return (OnView)vMap.get(viewId);
     }
-    /**
-    private boolean deploy(OnView onView){
+
+    public boolean createView(OnView onView){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
-        if(!vMap.containsKey(onView.viewId())&&onView.distributionKey()==null){
-            //create new entry
-            boolean suc = deployService.addView(onView);
-            if(!suc){
-                return false;
-            }
+        OnView _v = (OnView)vMap.get(onView.viewId());
+        if(_v==null){
+            return deployService.addView(onView);
         }
-        return deployService.updateView(onView);
-    }**/
+        else{
+            return this.tarantulaContext.masterDataStore().update(onView);
+        }
+    }
 
     private void register(InstanceRegistry registry){
         rListeners.forEach((k,l)->{
@@ -688,6 +687,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     @Override
     public <T extends Recoverable> void onCreated(T t, String akey,byte[] key, byte[] value) {
+        log.warn(akey+"<><><><><>"+new String(value));
+        //if(t instanceof OnView){
+            //update((OnView) t);
+        //}
         //if(t.getFactoryId()==PortableRegistry.OID&&t.getClassId()==PortableRegistry.APPLICATION_CONFIGURATION_CID){
             //this.tarantulaContext.tarantulaCluster().deployService().sync(NAME,t.getFactoryId(),t.getClassId(),key,value);
         //}
