@@ -69,9 +69,27 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         }
     }
 
-    public boolean update(boolean state){
+    public boolean enable(){
         NodeEngine nodeEngine = getNodeEngine();
-        AccessIndexServiceUpdateOperation operation = new AccessIndexServiceUpdateOperation(state);
+        AccessIndexServiceUpdateOperation operation = new AccessIndexServiceUpdateOperation(true);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(5, TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
+    }
+    public boolean disable(){
+        NodeEngine nodeEngine = getNodeEngine();
+        AccessIndexServiceUpdateOperation operation = new AccessIndexServiceUpdateOperation(false);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int expected = mlist.size();
         for(Member m :mlist){

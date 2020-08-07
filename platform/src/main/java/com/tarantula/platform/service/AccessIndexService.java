@@ -14,7 +14,8 @@ public interface AccessIndexService extends ServiceProvider {
 
     AccessIndex get(String accessKey);
 
-    boolean update(boolean state);
+    boolean enable();
+    boolean disable();
 
     boolean replicate(int partition,byte[] key,byte[] value);
 

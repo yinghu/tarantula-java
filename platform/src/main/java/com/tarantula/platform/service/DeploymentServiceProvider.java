@@ -93,12 +93,10 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void updateModule(Descriptor descriptor);
         void addServerPushEvent(Event event);
         void removeConnection(String serverId);
-        //void update(OnView onView);
-        //void resetConfiguration(Configuration configuration);
+
         void stopAccessIndex();
         void startAccessIndex();
-        //void register(OnLobby onLobby);
-        //void register(InstanceRegistry registry);
+
         void syncServerPushEvent(String memberId);
         void memberRemoved(String memberId);
         void memberAdded(String memberId);

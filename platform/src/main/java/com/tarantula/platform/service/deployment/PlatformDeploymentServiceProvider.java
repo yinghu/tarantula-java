@@ -632,12 +632,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return (ret!=null?new String(ret):"");
     }
     public void stopAccessIndex(){
-        //callback on local endpoints
         onAccessIndex.set(false);
         aListeners.forEach((a)->a.onStop());
     }
     public void startAccessIndex(){
-        //callback on local endpoints
         onAccessIndex.set(true);
         aListeners.forEach((a)->a.onStart());
     }
@@ -654,7 +652,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     }
     public void atMidnight(){
-        //log.warn("MIDNIGHT->");
+
     }
     public DistributionCallback distributionCallback(){
         return this;

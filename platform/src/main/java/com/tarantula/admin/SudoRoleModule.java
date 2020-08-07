@@ -57,11 +57,11 @@ public class SudoRoleModule implements Module {
             session.write(toMessage(suc?"key passed":"key failed",suc).toString().getBytes(),label());
         }
         else if(session.action().equals("onStopAccessIndex")){
-            accessIndexService.update(false);
+            accessIndexService.disable();
             session.write(toMessage(session.action(),true).toString().getBytes(),label());
         }
         else if(session.action().equals("onStartAccessIndex")){
-            accessIndexService.update(true);
+            accessIndexService.enable();
             session.write(toMessage(session.action(),true).toString().getBytes(),label());
         }
         else if(session.action().equals("onFindUser")){
