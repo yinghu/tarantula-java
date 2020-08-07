@@ -382,6 +382,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
     public void memberRemoved(String memberId){
+        //removed push event from the dead node
         this.pushRegistry.forEach((k,v)->{
             if(v.clientId().equals(memberId)){
                 log.warn("Member removed->"+k);
@@ -448,7 +449,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerOnLobbyListener(OnLobby.Listener onLobbyListener){
         oListeners.add(onLobbyListener);
     }
-    public void addServerPushEvent(Event event){
+    public void registerServerPushEvent(Event event){
         log.warn("add server push->"+event.trackId());
         Connection occ = this.builder.create().fromJson(new String(event.payload()), Connection.class);
         occ.disabled(false);
@@ -457,7 +458,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             l.onState(occ);
         });
     }
-    public void removeConnection(String serverId){
+    public void releaseServerPushEvent(String serverId){
         log.warn("remove server push->"+serverId);
         Event pes = pushRegistry.remove(serverId);
         if(pes!=null){
@@ -506,10 +507,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return;
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
-    }
-    public void resetConfiguration(Configuration configuration){
-        Configuration c = (Configuration) vMap.get(configuration.distributionKey());
-        c.update(configuration);
     }
     //dedicated server methods
     public void onUDPConnection(String typeId,Connection connection){
@@ -680,25 +677,26 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void onUpdated(String key,double value){
         this.tarantulaContext.onUpdated(key,value);
     }
-    public void updateForData(int factoryId,int classId,byte[] key,byte[] value){
-        String _k = new String(key);
-        log.warn("updated->"+factoryId+"/"+classId+"/"+new String(key));
-        Configurable config = vMap.get(_k);
+    public void updateForData(int factoryId,int classId,String key,byte[] value){
+        Configurable config = vMap.get(key);
+        if(config==null){
+            return;
+        }
         Recoverable _c = this.tarantulaContext.recoverableRegistry(factoryId).create(classId);
         _c.fromMap(SystemUtil.toMap(value));
         config.update((Configurable)_c);
     }
     @Override
-    public <T extends Recoverable> void onCreated(T t, byte[] key, byte[] value) {
+    public <T extends Recoverable> void onCreated(T t, String akey,byte[] key, byte[] value) {
         //if(t.getFactoryId()==PortableRegistry.OID&&t.getClassId()==PortableRegistry.APPLICATION_CONFIGURATION_CID){
             //this.tarantulaContext.tarantulaCluster().deployService().sync(NAME,t.getFactoryId(),t.getClassId(),key,value);
         //}
     }
 
     @Override
-    public <T extends Recoverable> void onUpdated(T t, byte[] key, byte[] value) {
-        if(t.getFactoryId()==PortableRegistry.OID&&t.getClassId()==PortableRegistry.APPLICATION_CONFIGURATION_CID){
-            this.tarantulaContext.tarantulaCluster().deployService().sync(NAME,t.getFactoryId(),t.getClassId(),key,value);
+    public <T extends Recoverable> void onUpdated(T t,String akey, byte[] key, byte[] value) {
+        if(vMap.containsKey(akey)){
+            this.tarantulaContext.tarantulaCluster().deployService().sync(NAME,t.getFactoryId(),t.getClassId(),akey,key,value);
         }
     }
 

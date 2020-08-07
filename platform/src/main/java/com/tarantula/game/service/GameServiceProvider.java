@@ -147,14 +147,14 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     }
 
     @Override
-    public <T extends Recoverable> void onCreated(T t, byte[] key, byte[] value) {
+    public <T extends Recoverable> void onCreated(T t, String akey,byte[] key, byte[] value) {
         logger.warn("created->"+t.distributionKey());
     }
 
     @Override
-    public <T extends Recoverable> void onUpdated(T t, byte[] key, byte[] value) {
+    public <T extends Recoverable> void onUpdated(T t, String akey,byte[] key, byte[] value) {
         logger.warn("update->"+t.distributionKey());
-        this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService().sync(NAME,t.getFactoryId(),t.getClassId(),key,value);
+        this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService().sync(NAME,t.getFactoryId(),t.getClassId(),akey,key,value);
         //serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService().distribute(t);
         //ZoneListener zl = zMap.get(t.distributionKey());
         //if(zl!=null){
@@ -165,10 +165,10 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         //}
     }
     @Override
-    public void updateForData(int factoryId,int classId,byte[] key,byte[] value){
+    public void updateForData(int factoryId,int classId,String key,byte[] value){
         //Recoverable t = serviceContext.recoverableRegistry(factoryId).create(classId);
         //t.distributionKey();
-        logger.warn("update for data key->"+new String(key));
+        logger.warn("update for data key->"+key);
         logger.warn("update for data value->"+new String(value));
     }
 }

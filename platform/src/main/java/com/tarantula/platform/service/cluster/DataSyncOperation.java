@@ -14,6 +14,7 @@ public class DataSyncOperation extends Operation {
     private String source;
     private int factoryId;
     private int classId;
+    private String akey;
     private byte[] key;
     private byte[] value;
 
@@ -21,17 +22,18 @@ public class DataSyncOperation extends Operation {
     }
 
 
-    public DataSyncOperation(String source,int factoryId,int classId,byte[] key,byte[] value) {
+    public DataSyncOperation(String source,int factoryId,int classId,String akey,byte[] key,byte[] value) {
         this.source = source;
         this.factoryId = factoryId;
         this.classId = classId;
+        this.akey = akey;
         this.key = key;
         this.value = value;
     }
     @Override
     public void run() throws Exception {
         ClusterDeployService cis = this.getService();
-        cis.syncService(source,factoryId,classId,key,value);
+        cis.syncService(source,factoryId,classId,akey,value);
     }
 
     @Override
@@ -45,7 +47,7 @@ public class DataSyncOperation extends Operation {
         out.writeUTF(source);
         out.writeInt(factoryId);
         out.writeInt(classId);
-        out.writeByteArray(key);
+        out.writeUTF(akey);
         out.writeByteArray(value);
     }
 
@@ -55,7 +57,7 @@ public class DataSyncOperation extends Operation {
         this.source = in.readUTF();
         this.factoryId = in.readInt();
         this.classId = in.readInt();
-        this.key = in.readByteArray();
+        this.akey = in.readUTF();
         this.value = in.readByteArray();
     }
 }

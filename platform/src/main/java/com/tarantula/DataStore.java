@@ -38,8 +38,8 @@ public interface DataStore{
     }
 
     interface Listener{
-        <T extends Recoverable> void onCreated(T t,byte[] key,byte[] value);
-        <T extends Recoverable> void onUpdated(T t,byte[] key,byte[] value);
+        <T extends Recoverable> void onCreated(T t,String akey,byte[] key,byte[] value);
+        <T extends Recoverable> void onUpdated(T t,String akey,byte[] key,byte[] value);
     }
 
     interface Stream<T extends Recoverable>{

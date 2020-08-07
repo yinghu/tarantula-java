@@ -91,13 +91,14 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void addApplication(String typeId,String applicationId);
         void removeApplication(String typeId,String applicationId);
         void updateModule(Descriptor descriptor);
-        void addServerPushEvent(Event event);
-        void removeConnection(String serverId);
+
+        void registerServerPushEvent(Event event);
+        void releaseServerPushEvent(String serverId);
+        void syncServerPushEvent(String memberId);
 
         void stopAccessIndex();
         void startAccessIndex();
 
-        void syncServerPushEvent(String memberId);
         void memberRemoved(String memberId);
         void memberAdded(String memberId);
 

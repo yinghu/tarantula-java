@@ -31,12 +31,12 @@ public interface DeployService extends ServiceProvider {
     boolean launchGameCluster(String gameClusterKey);
     boolean shutdownGameCluster(String gameClusterKey);
 
-    boolean addServerPushEvent(Event serverPushEvent);
+    void addServerPushEvent(Event serverPushEvent);
+    void removeServerPushEvent(String serverId);
 
+    void syncServerPushEvent();
     boolean addServerPushEvent(String memberId,Event serverPushEvent);
 
-
-    boolean removeServerPushEvent(String serverId);
 
     //distribute the module or view content in cluster
     boolean upload(String fileName,byte[] content);
@@ -45,8 +45,8 @@ public interface DeployService extends ServiceProvider {
     boolean shutdownModule(String typeId);
     boolean updateModule(Descriptor descriptor);
 
-    void syncServerPushEvent();
 
-    boolean sync(String source,int factoryId,int classId,byte[] key,byte[] value);
+    //data store sync
+    boolean sync(String source,int factoryId,int classId,String akey,byte[] key,byte[] value);
 
 }

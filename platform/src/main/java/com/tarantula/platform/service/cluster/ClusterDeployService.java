@@ -546,10 +546,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         return gameCluster;
     }
     public void addServerPushEvent(Event event){
-        this.deploymentServiceProvider.distributionCallback().addServerPushEvent(event);
+        this.deploymentServiceProvider.distributionCallback().registerServerPushEvent(event);
     }
     public void removeServerPushEvent(String serverId){
-        this.deploymentServiceProvider.distributionCallback().removeConnection(serverId);
+        this.deploymentServiceProvider.distributionCallback().releaseServerPushEvent(serverId);
     }
     public void upload(String fileName,byte[] content){
         this.tarantulaContext._writeContent(fileName,content);
@@ -597,7 +597,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void serverPushEventSync(String memberId){
         this.deploymentServiceProvider.distributionCallback().syncServerPushEvent(memberId);//dispatch task
     }
-    public void syncService(String source,int factoryId,int classId,byte[] key,byte[] value){
+    public void syncService(String source,int factoryId,int classId,String key,byte[] value){
         ServiceProvider serviceProvider = this.tarantulaContext.serviceProvider(source);
         if(serviceProvider!=null){
             serviceProvider.updateForData(factoryId,classId,key,value);

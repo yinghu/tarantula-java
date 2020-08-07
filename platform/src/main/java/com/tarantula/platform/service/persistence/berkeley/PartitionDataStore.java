@@ -102,7 +102,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 }
                 Listener listener = rMap.get(t.getFactoryId());
                 if(listener!=null){
-                    listener.onCreated(t,key,value);
+                    listener.onCreated(t,okey,key,value);
                 }
                 if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
                     suc = onEdge(t,okey);
@@ -173,7 +173,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 }
                 Listener listener = rMap.get(t.getFactoryId());
                 if(listener!=null){
-                    listener.onUpdated(t,key,value);
+                    listener.onUpdated(t,akey,key,value);
                 }
                 return true;
             }
@@ -216,7 +216,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                     }
                     Listener listener = rMap.get(t.getFactoryId());
                     if(listener!=null){
-                        listener.onCreated(t,key,vx);
+                        listener.onCreated(t,akey,key,vx);
                     }
                     if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
                         onEdge(t, akey);

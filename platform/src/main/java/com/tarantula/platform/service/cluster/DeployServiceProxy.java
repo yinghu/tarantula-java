@@ -302,24 +302,24 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
     }
 
 
-    public boolean addServerPushEvent(Event serverPushEvent){
+    public void addServerPushEvent(Event serverPushEvent){
         NodeEngine nodeEngine = getNodeEngine();
         serverPushEvent.clientId(nodeEngine.getLocalMember().getUuid());
         AddServerPushEventOperation operation = new AddServerPushEventOperation(serverPushEvent);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
+        //int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
                 future.get(5, TimeUnit.SECONDS);
-                expected--;
+                //expected--;
             } catch (Exception e) {
                 future.cancel(true);
                 //goes to next node if failed
             }
         }
-        return expected==0;
+        //return expected==0;
     }
     public boolean addServerPushEvent(String memberId,Event serverPushEvent){
         NodeEngine nodeEngine = getNodeEngine();
@@ -341,23 +341,23 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean removeServerPushEvent(String serverId){
+    public void removeServerPushEvent(String serverId){
         NodeEngine nodeEngine = getNodeEngine();
         RemoveServerPushEventOperation operation = new RemoveServerPushEventOperation(serverId);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
+        //int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
                 future.get(5, TimeUnit.SECONDS);
-                expected--;
+                //expected--;
             } catch (Exception e) {
                 future.cancel(true);
                 //goes to next node if failed
             }
         }
-        return expected==0;
+        //return expected==0;
     }
     public boolean upload(String fileName,byte[] content){
         NodeEngine nodeEngine = getNodeEngine();
@@ -388,9 +388,9 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public boolean sync(String source,int factoryId,int classId,byte[] key,byte[] value){
+    public boolean sync(String source,int factoryId,int classId,String akey,byte[] key,byte[] value){
         NodeEngine nodeEngine = getNodeEngine();
-        DataSyncOperation operation = new DataSyncOperation(source,factoryId,classId,key,value);
+        DataSyncOperation operation = new DataSyncOperation(source,factoryId,classId,akey,key,value);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int expected = mlist.size();
         for(Member m :mlist){
