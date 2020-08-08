@@ -16,21 +16,12 @@ public class DescriptorSerializer implements JsonSerializer<Descriptor> {
         JsonObject jo = new JsonObject();
         jo.addProperty("type",descriptor.type());
         jo.addProperty("typeId",descriptor.typeId());
-        //jo.addProperty("subtypeId",descriptor.subtypeId());
-        //jo.addProperty("category",descriptor.category());
-        //jo.addProperty("capacity",descriptor.capacity());
         jo.addProperty("name",descriptor.name());
-        //jo.addProperty("description",descriptor.description());
-        //jo.addProperty("icon",descriptor.icon());
-        //jo.addProperty("viewId",descriptor.viewId());
-        //jo.addProperty("entryCost",descriptor.entryCost());
-        //jo.addProperty("responseLabel",descriptor.responseLabel());
         if(!descriptor.type().equals("lobby")){
             jo.addProperty("singleton",descriptor.singleton());
             jo.addProperty("tag",descriptor.tag());
             jo.addProperty("accessRank",descriptor.accessRank());
             jo.addProperty("applicationId",descriptor.distributionKey());
-            //jo.addProperty("accessMode",descriptor.accessMode());
         }
         return jo;
     }

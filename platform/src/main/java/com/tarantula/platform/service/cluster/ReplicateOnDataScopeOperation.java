@@ -11,25 +11,24 @@ import java.io.IOException;
  */
 public class ReplicateOnDataScopeOperation extends Operation {
 
-    private String source;
-    private int partition;
-    private byte[] key;
-    private byte[] value;
+
+
+    private ReplicationData[] batch;
 
     public ReplicateOnDataScopeOperation() {
     }
 
 
     public ReplicateOnDataScopeOperation(String source,int partition, byte[] key, byte[] value) {
-        this.source = source;
-        this.partition = partition;
-        this.key = key;
-        this.value = value;
+        this.batch = new ReplicationData[]{new ReplicationData(source,partition,key,value)};
+    }
+    public ReplicateOnDataScopeOperation(ReplicationData[] batch) {
+        this.batch = batch;
     }
     @Override
     public void run() throws Exception {
         ClusterRecoverService cis = this.getService();
-        cis.replicate(source,partition,key,value);
+        cis.replicateAsBatch(batch);
     }
 
     @Override
@@ -40,18 +39,21 @@ public class ReplicateOnDataScopeOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeUTF(this.source);
-        out.writeInt(this.partition);
-        out.writeByteArray(key);
-        out.writeByteArray(value);
+        out.writeInt(batch.length);
+        for(ReplicationData d : batch){
+            out.writeUTF(d.source);
+            out.writeInt(d.partition);
+            out.writeByteArray(d.key);
+            out.writeByteArray(d.value);
+        }
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.source = in.readUTF();
-        this.partition = in.readInt();
-        this.key = in.readByteArray();
-        this.value = in.readByteArray();
+        batch = new ReplicationData[in.readInt()];
+        for(int i=0;i<batch.length;i++){
+            batch[i]=new ReplicationData(in.readUTF(),in.readInt(),in.readByteArray(),in.readByteArray());
+        }
     }
 }
