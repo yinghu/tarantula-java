@@ -8,12 +8,12 @@ import com.tarantula.Event;
 import java.io.IOException;
 
 /**
- * updated by yinghu on 5/10/2018.
+ * updated by yinghu on 8/8/2020
  */
 public class FastPlayEvent extends Data implements Event{
 
     public FastPlayEvent(){
-        this.forwarding = true;
+
     }
     public FastPlayEvent(String applicationId, SessionForward forward){
         this();

@@ -23,7 +23,7 @@ public class SampleLoad {
     public void _init() throws Exception{
         httpCaller = new HttpCaller(host);
         httpCaller._init();
-        pool = Executors.newFixedThreadPool(50);
+        pool = Executors.newFixedThreadPool(100);
     }
     public void device() throws Exception{
         CountDownLatch batch = new CountDownLatch(size);

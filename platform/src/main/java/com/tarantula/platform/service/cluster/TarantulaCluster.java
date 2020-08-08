@@ -34,7 +34,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     //cluster cache
     private MultiMap<String, byte[]> mIndex;
     private Map<byte[],byte[]> vMap;
-    private ConcurrentHashMap<Integer,RecoverableListener> rMap = new ConcurrentHashMap<>();
+    //private ConcurrentHashMap<Integer,RecoverableListener> rMap = new ConcurrentHashMap<>();
     private String memberId;
     private DeployService deployService;
     private RecoverService recoverService;
@@ -116,10 +116,6 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         if(metadata.index()!=null){
             mIndex.put(metadata.index(),key);
         }
-        RecoverableListener r = rMap.get(metadata.factoryId());
-        if(r!=null){
-            r.onUpdated(metadata,key,value);
-        }
     }
     public byte[] get(byte[] key){
         return this.vMap.get(key);
@@ -148,13 +144,6 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         return null;
     }
 
-    public RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener){
-        return rMap.computeIfAbsent(recoverableListener.registryId(),(rid)->recoverableListener);
-    }
-
-    public void unregisterRecoverableListener(int factoryId){
-        this.rMap.remove(factoryId);
-    }
 	public void start() throws Exception {
         //add platform portable provider from conf
         partitionCount = Integer.parseInt(config.getProperty("hazelcast.partition.count"));

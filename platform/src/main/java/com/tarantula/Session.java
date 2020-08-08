@@ -58,8 +58,8 @@ public interface Session extends OnApplication{
     String clientId();
     void clientId(String clientId);
 
-    boolean forwarding();
-    void forwarding(boolean forwarding);
+    //boolean forwarding();
+    //void forwarding(boolean forwarding);
 
     boolean streaming();
     void streaming(boolean streaming);

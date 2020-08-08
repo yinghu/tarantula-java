@@ -1,6 +1,5 @@
 package com.tarantula.platform;
 
-import com.tarantula.Metadata;
 import com.tarantula.Recoverable;
 import com.tarantula.RecoverableFactory;
 import com.tarantula.RecoverableListener;
@@ -19,21 +18,18 @@ public abstract class AbstractRecoverableListener implements RecoverableListener
     private ConcurrentHashMap<Integer,OnFilter> oMap = new ConcurrentHashMap<>();
 
     @Override
-    public void onUpdated(Metadata metadata, byte[] key, byte[] value) {
-        OnFilter onFilter = oMap.get(metadata.classId());
+    public void onUpdated(int classId,String key, byte[] value) {
+        OnFilter onFilter = oMap.get(classId);
         if(onFilter!=null){
-            Recoverable recoverable = this.create(metadata.classId());
+            Recoverable recoverable = this.create(classId);
             recoverable.fromMap(SystemUtil.toMap(value));
-            recoverable.distributionKey(new String(key));
+            recoverable.distributionKey(key);
             onFilter.onUpdated(recoverable);
         }
     }
     @Override
     public void addRecoverableFilter(int classId,Filter recoverableFilter){
         oMap.computeIfAbsent(classId,(cid)->new OnFilter()).list.add(recoverableFilter);
-    }
-    public void removeRecoverableFilter(int classId){
-        oMap.remove(classId);
     }
     abstract public int registryId();
 

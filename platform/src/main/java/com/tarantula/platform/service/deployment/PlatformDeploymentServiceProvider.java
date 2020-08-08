@@ -10,7 +10,6 @@ import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
-import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.util.*;
 
@@ -728,20 +727,18 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         public OnTag onTag(String tag){
            return (dkey,t)->{
                String key = t.key().asString();
-               RecoverableMetadata m = new RecoverableMetadata(t.getFactoryId(),t.getClassId());
                byte[] payload = SystemUtil.toJson(t.toMap());
                RoutingKey routingKey = integrationEventService.routingKey(dkey,tag);
-               MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),routingKey.source(),t.owner(),key!=null?key.getBytes():new byte[0],payload,m);
+               MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),t.owner(),t.getFactoryId(),t.getClassId(),key!=null?key:"",payload);
                integrationEventService.publish(mapStoreSyncEvent);
            };
         }
         public OnApplication onApplication(String applicationId){
             return (dkey,t)->{
                 String key = t.key().asString();
-                RecoverableMetadata m = new RecoverableMetadata(t.getFactoryId(),t.getClassId());
                 byte[] payload = SystemUtil.toJson(t.toMap());
                 RoutingKey routingKey = integrationEventService.instanceRoutingKey(applicationId,dkey);
-                MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),routingKey.source(),t.owner(),key!=null?key.getBytes():new byte[0],payload,m);
+                MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),t.owner(),t.getFactoryId(),t.getClassId(),key!=null?key:"",payload);
                 integrationEventService.publish(mapStoreSyncEvent);
             };
         }

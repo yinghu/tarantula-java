@@ -202,10 +202,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public boolean onEvent(Event event) {
         if(event instanceof MapStoreSyncEvent){
             MapStoreSyncEvent msc = (MapStoreSyncEvent)event;
-            Metadata md = msc.metadata;
-            RecoverableListener rc = this.rMap.get(md.factoryId());
+            RecoverableListener rc = this.rMap.get(msc.accessMode);
             if(rc!=null){
-                rc.onUpdated(md,msc.key,msc.payload());
+                rc.onUpdated(msc.stub(),msc.index,msc.payload());
             }
             else{
                 this.application.onEvent(event);

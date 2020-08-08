@@ -24,7 +24,7 @@ abstract public class Data extends OnApplicationHeader implements Portable{
 
     protected String clientId;
 
-    protected boolean forwarding;
+    //protected boolean forwarding;
     protected boolean streaming;
     protected String action;
 
@@ -128,13 +128,6 @@ abstract public class Data extends OnApplicationHeader implements Portable{
     }
     public void clientId(String clientId){
         this.clientId =clientId;
-    }
-
-    public boolean forwarding(){
-        return  this.forwarding;
-    }
-    public void forwarding(boolean forwarding){
-       this.forwarding = forwarding;
     }
 
     public String action(){

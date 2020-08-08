@@ -14,7 +14,7 @@ public class InstancePlayEvent extends Data implements Event {
 
 
     public InstancePlayEvent(){
-        this.forwarding = true;
+        //this.forwarding = true;
     }
     public InstancePlayEvent(String applicationId, String instanceId,SessionForward forward){
         this();

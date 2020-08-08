@@ -15,8 +15,7 @@ public class TimeoutEvent extends Data implements Event {
         this.stub = stub;
         this.routingNumber =routingNumber;
     }
-    public TimeoutEvent(){
-    }
+
     @Override
     public String toString(){
         return "Time out ["+systemId+"/"+stub+"/"+routingNumber+"]";

@@ -41,8 +41,6 @@ public interface ClusterProvider extends Serviceable{
     byte[] firstIndex(String index);
     byte[] remove(byte[] key);
 
-    RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener);
-    void unregisterRecoverableListener(int factoryId);
     void registerMetricsListener(MetricsListener metricsListener);
-    //void addBucketListener(BucketListener bucketListener);
+
 }

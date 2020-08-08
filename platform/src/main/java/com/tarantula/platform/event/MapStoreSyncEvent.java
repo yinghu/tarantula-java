@@ -8,52 +8,39 @@ import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import java.io.IOException;
 
 /**
- * Updated by yinghu lu on 4/7/2019.
+ * Updated by yinghu lu on 8/8/2020
  */
 public class MapStoreSyncEvent extends Data implements Event {
 
-    public byte[] key;
-    public RecoverableMetadata metadata;
 
     public MapStoreSyncEvent(){
-        this.forwarding = true;
+
     }
-    public MapStoreSyncEvent(String destination, String source,byte[] key,byte[] value, RecoverableMetadata metadata){
-        this();
+    public MapStoreSyncEvent(String destination,String systemId,int factoryId,int classId,String key,byte[] value){
         this.destination = destination;
-        this.source = source;
-        this.key = key;
-        this.payload = value;
-        this.metadata = metadata;
-    }
-    public MapStoreSyncEvent(String destination, String source,String systemId,byte[] key,byte[] value, RecoverableMetadata metadata){
-        this();
-        this.destination = destination;
-        this.source = source;
         this.systemId = systemId;
-        this.key = key;
+        this.accessMode = factoryId;
+        this.stub = classId;
+        this.index = key;
         this.payload = value;
-        this.metadata = metadata;
     }
     @Override
     public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("1",this.source);
-        out.writeUTF("2",this.destination);
-        out.writeByteArray("3",this.key);
-        out.writeByteArray("4",this.payload);
-        out.writePortable("5",this.metadata);
-        out.writeUTF("6",this.systemId);
-        out.writeUTF("7",this.trackId);
+        out.writeUTF("1",this.destination);
+        out.writeUTF("2",this.systemId);
+        out.writeInt("3",accessMode);
+        out.writeInt("4",stub);
+        out.writeUTF("5",this.index);
+        out.writeByteArray("6",this.payload);
     }
     @Override
     public void readPortable(PortableReader in) throws IOException {
-        this.source = in.readUTF("1");
-        this.destination = in.readUTF("2");
-        this.key = in.readByteArray("3");
-        this.payload = in.readByteArray("4");
-        this.metadata = in.readPortable("5");
-        this.systemId = in.readUTF("6");
-        this.trackId = in.readUTF("7");
+        this.destination = in.readUTF("1");
+        this.systemId = in.readUTF("2");
+        this.accessMode = in.readInt("3");
+        this.stub = in.readInt("4");
+        this.index = in.readUTF("5");
+        this.payload = in.readByteArray("6");
     }
     @Override
     public int getClassId() {
@@ -65,6 +52,6 @@ public class MapStoreSyncEvent extends Data implements Event {
     }
     @Override
     public String toString(){
-        return "Map store sync event ->["+metadata.toString()+"/"+destination+"/"+source+"/"+systemId+"]";
+        return "Map store sync event ->["+systemId+"/"+index+">>>"+new String(payload)+"]";
     }
 }

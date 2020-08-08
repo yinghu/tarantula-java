@@ -48,7 +48,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private MultiMap<String, byte[]> mIndex;
     private Map<byte[],byte[]> vMap;
-    private ConcurrentHashMap<Integer,RecoverableListener> rMap = new ConcurrentHashMap<>();
+
     private String memberId;
     private DeployService deployService;
     private RecoverService recoverService;
@@ -206,10 +206,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         if(metadata.index()!=null){
             mIndex.put(metadata.index(),key);
         }
-        RecoverableListener r = rMap.get(metadata.factoryId());
-        if(r!=null){
-            r.onUpdated(metadata,key,value);
-        }
     }
     public byte[] get(byte[] key){
         return this.vMap.get(key);
@@ -250,12 +246,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public byte[] remove(byte[] key){
         return vMap.remove(key);
     }
-    public RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener){
-        return rMap.computeIfAbsent(recoverableListener.registryId(),(rid)->recoverableListener);
-    }
-    public void unregisterRecoverableListener(int factoryId){
-        this.rMap.remove(factoryId);
-    }
+
     public EventService subscribe(String topic, EventListener callback){
         this.eventSubscribers.computeIfAbsent(topic,(t)->{
             EventSubscriber eventSubscriber = new EventSubscriber();
@@ -336,9 +327,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
                 }
             }
         });
-        //if(_start.get()){
-            //this.tarantulaContext.dataStoreProvider().onBucket(pt,opening?BucketReceiver.OPEN:BucketReceiver.CLOSE);
-        //}
     }
 
     public RoutingKey routingKey(String magicKey,String tag){
@@ -357,9 +345,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public void registerMetricsListener(MetricsListener metricsListener){
         this.metricsListener = metricsListener;
     }
-    //public void addBucketListener(BucketListener bucketListener){
-        //this.bList.add(bucketListener);
-    //}
+
     @Override
     public void stateChanged(LifecycleEvent state) {
      LifecycleEvent.LifecycleState cs = state.getState();

@@ -5,9 +5,9 @@ package com.tarantula;
  */
 public interface RecoverableListener extends RecoverableRegistry{
 
-    void onUpdated(Metadata metadata, byte[] key, byte[] value);
+    void onUpdated(int classId, String key, byte[] value);
     void addRecoverableFilter(int classId,Filter recoverableFilter);
-    void removeRecoverableFilter(int classId);
+
     interface Filter {
         void on(Recoverable updated);
     }
