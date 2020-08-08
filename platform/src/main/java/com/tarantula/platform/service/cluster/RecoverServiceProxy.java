@@ -102,4 +102,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             }
         }
     }
+    public void batch(ReplicationData[] batch){
+
+    }
 }

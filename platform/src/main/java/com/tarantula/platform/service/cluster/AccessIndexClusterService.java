@@ -97,4 +97,9 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
         log.warn("Replicating ["+new String(key)+"]->"+partition+"<><><>"+new String(value));
         this.dataStoreOnPartitions[partition].dataStore.backup().set(key,value);
     }
+    public void replicateAsBatch(ReplicationData[] batch){
+        for(ReplicationData d : batch){
+            replicate(d.partition,d.key,d.value);
+        }
+    }
 }

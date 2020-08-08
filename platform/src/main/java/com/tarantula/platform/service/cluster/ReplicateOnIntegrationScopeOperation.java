@@ -12,24 +12,22 @@ import java.io.IOException;
 public class ReplicateOnIntegrationScopeOperation extends Operation {
 
 
-    private int partition;
-    private byte[] key;
-    private byte[] value;
+    private ReplicationData[] batch;
 
     public ReplicateOnIntegrationScopeOperation() {
     }
 
 
     public ReplicateOnIntegrationScopeOperation( int partition,byte[] key, byte[] value) {
-
-        this.partition = partition;
-        this.key = key;
-        this.value = value;
+        this.batch = new ReplicationData[]{new ReplicationData(partition,key,value)};
+    }
+    public ReplicateOnIntegrationScopeOperation(ReplicationData[] batch) {
+        this.batch = batch;
     }
     @Override
     public void run() throws Exception {
         AccessIndexClusterService cis = this.getService();
-        cis.replicate(partition,key,value);
+        cis.replicateAsBatch(batch);
     }
 
     @Override
@@ -40,17 +38,20 @@ public class ReplicateOnIntegrationScopeOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-
-        out.writeInt(partition);
-        out.writeByteArray(key);
-        out.writeByteArray(value);
+        out.writeInt(batch.length);
+        for(ReplicationData d : batch){
+            out.writeInt(d.partition);
+            out.writeByteArray(d.key);
+            out.writeByteArray(d.value);
+        }
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.partition = in.readInt();
-        this.key = in.readByteArray();
-        this.value = in.readByteArray();
+        batch = new ReplicationData[in.readInt()];
+        for(int i=0;i<batch.length;i++){
+            batch[i]=new ReplicationData(in.readInt(),in.readByteArray(),in.readByteArray());
+        }
     }
 }
