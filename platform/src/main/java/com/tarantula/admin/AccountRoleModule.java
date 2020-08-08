@@ -8,13 +8,15 @@ import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.service.AccessIndexService;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class AccountRoleModule implements Module {
+public class AccountRoleModule implements Module,AccessIndexService.Listener {
 
     private ApplicationContext context;
     private GsonBuilder builder;
@@ -23,7 +25,7 @@ public class AccountRoleModule implements Module {
     private DataStore account;
     private int maxUserCount;
     private TokenValidatorProvider tokenValidatorProvider;
-
+    private AtomicBoolean accessIndexEnabled;
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         //this.context.log(session.action()+"=>"+new String(payload),OnLog.INFO);
@@ -67,29 +69,34 @@ public class AccountRoleModule implements Module {
             }
         }
         else if(session.action().equals("onAddUser")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            User ua = _user(session.systemId());
-            Account acc = new UserAccount();
-            acc.distributionKey(ua.primary()?session.systemId():ua.owner());
-            if(account.load(acc)){
-                if(acc.userCount(0)<maxUserCount){
-                    AccessIndex query = accessIndexService.set((String)onAccess.property("login"));
-                    if(query!=null){
-                        onAccess.owner(acc.distributionKey());//make sure acc id as the owner
-                        onAccess.distributionKey(query.distributionKey());
-                        this.context.postOffice().onTag("index/user").send(onAccess.distributionKey(),onAccess);
-                        session.write(this.toMessage("user added",true).toString().getBytes(),label());
+            if(accessIndexEnabled.get()){
+                OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+                User ua = _user(session.systemId());
+                Account acc = new UserAccount();
+                acc.distributionKey(ua.primary()?session.systemId():ua.owner());
+                if(account.load(acc)){
+                    if(acc.userCount(0)<maxUserCount){
+                        AccessIndex query = accessIndexService.set((String)onAccess.property("login"));
+                        if(query!=null){
+                            onAccess.owner(acc.distributionKey());//make sure acc id as the owner
+                            onAccess.distributionKey(query.distributionKey());
+                            this.context.postOffice().onTag("index/user").send(onAccess.distributionKey(),onAccess);
+                            session.write(this.toMessage("user added",true).toString().getBytes(),label());
+                        }
+                        else{
+                            session.write(this.toMessage("user already existed",false).toString().getBytes(),label());
+                        }
                     }
                     else{
-                        session.write(this.toMessage("user already existed",false).toString().getBytes(),label());
+                        session.write(this.toMessage("you already have max user count",false).toString().getBytes(),label());
                     }
                 }
                 else{
-                    session.write(this.toMessage("you already have max user count",false).toString().getBytes(),label());
+                    session.write(this.toMessage("no permission to add user",false).toString().getBytes(),label());
                 }
             }
             else{
-                session.write(this.toMessage("no permission to add user",false).toString().getBytes(),label());
+                session.write(this.toMessage("add user service not available",false).toString().getBytes(),label());
             }
         }
         else{
@@ -101,6 +108,7 @@ public class AccountRoleModule implements Module {
     @Override
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
+        this.accessIndexEnabled = new AtomicBoolean(false);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
@@ -108,6 +116,8 @@ public class AccountRoleModule implements Module {
         this.user = this.context.dataStore(Access.DataStore);
         this.account = this.context.dataStore(Account.DataStore);
         this.maxUserCount = Integer.parseInt(this.context.configuration("setup").property("maxUserCount"));
+        DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        deploymentServiceProvider.registerAccessIndexListener(this);
         this.context.log("Account role module started with max user count ["+maxUserCount+"]", OnLog.INFO);
     }
     @Override
@@ -127,5 +137,15 @@ public class AccountRoleModule implements Module {
             return u;
         }
         return null;
+    }
+
+    @Override
+    public void onStop() {
+        accessIndexEnabled.set(false);
+    }
+
+    @Override
+    public void onStart() {
+        accessIndexEnabled.set(true);
     }
 }
