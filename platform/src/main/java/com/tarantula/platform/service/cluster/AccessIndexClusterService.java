@@ -94,7 +94,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
         return this.dataStoreOnPartitions[partition];
     }
     private void replicate(int partition,byte[] key,byte[] value){
-        log.warn("Replicating ["+new String(key)+"]->"+partition+"<><><>"+new String(value));
+        //log.warn("Replicating ["+new String(key)+"]->"+partition+"<><><>"+new String(value));
         this.dataStoreOnPartitions[partition].dataStore.backup().set(key,value);
     }
     public void replicateAsBatch(ReplicationData[] batch){
@@ -103,7 +103,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
         }
     }
     public byte[] recover(int partition,byte[] key){
-        log.warn("Recovering from ["+partition+"]->"+new String(key));
+        //log.warn("Recovering from ["+partition+"]->"+new String(key));
         return this.dataStoreOnPartitions[partition].dataStore.backup().get(key);
     }
 }
