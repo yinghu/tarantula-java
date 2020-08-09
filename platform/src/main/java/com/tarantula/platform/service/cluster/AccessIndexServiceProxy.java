@@ -71,10 +71,10 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
 
     public boolean enable(){
         NodeEngine nodeEngine = getNodeEngine();
-        AccessIndexServiceUpdateOperation operation = new AccessIndexServiceUpdateOperation(true);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int expected = mlist.size();
         for(Member m :mlist){
+            AccessIndexServiceUpdateOperation operation = new AccessIndexServiceUpdateOperation(true);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
@@ -89,10 +89,10 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
     }
     public boolean disable(){
         NodeEngine nodeEngine = getNodeEngine();
-        AccessIndexServiceUpdateOperation operation = new AccessIndexServiceUpdateOperation(false);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int expected = mlist.size();
         for(Member m :mlist){
+            AccessIndexServiceUpdateOperation operation = new AccessIndexServiceUpdateOperation(false);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
@@ -107,11 +107,11 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
     }
     public boolean replicate(int partition,byte[] key,byte[] value){
         NodeEngine nodeEngine = getNodeEngine();
-        ReplicateOnIntegrationScopeOperation operation = new ReplicateOnIntegrationScopeOperation(partition,key,value);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int expected = mlist.size();
         for(Member m :mlist){
             if(!m.localMember()){
+                ReplicateOnIntegrationScopeOperation operation = new ReplicateOnIntegrationScopeOperation(partition,key,value);
                 InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
                 final Future<Void> future = builder.invoke();
                 try {
@@ -127,20 +127,22 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
     }
     public byte[] recover(int partition,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();
-        AccessIndexRecoverOperation operation = new AccessIndexRecoverOperation(partition,key);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         byte[] ret = null;
         for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
-            final Future<byte[]> future = builder.invoke();
-            try {
-                ret = future.get(5, TimeUnit.SECONDS);
-                if(ret!=null){
-                    break;
+            if(!m.localMember()){
+                AccessIndexRecoverOperation operation = new AccessIndexRecoverOperation(partition,key);
+                InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
+                final Future<byte[]> future = builder.invoke();
+                try {
+                    ret = future.get(5, TimeUnit.SECONDS);
+                    if(ret!=null){
+                        break;
+                    }
+                } catch (Exception e) {
+                    future.cancel(true);
+                    //goes to next node if failed
                 }
-            } catch (Exception e) {
-                future.cancel(true);
-                //goes to next node if failed
             }
         }
         return ret;

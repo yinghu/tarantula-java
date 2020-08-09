@@ -59,11 +59,11 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     @Override
     public byte[] recover(String source, byte[] key) {
         NodeEngine nodeEngine = getNodeEngine();
-        RecoverOperation operation = new RecoverOperation(source,key);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         byte[] ret = null;
         for(Member m : mlist){
             if(!m.localMember()){
+                RecoverOperation operation = new RecoverOperation(source,key);
                 InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
                 final Future<byte[]> future = builder.invoke();
                 try {
@@ -82,11 +82,11 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     @Override
     public void replicate(String source,int partition,byte[] key,byte[] value){
         NodeEngine nodeEngine = getNodeEngine();
-        ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(source,partition,key,value);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int maxReplicationNode = 3;
         for(Member m :mlist){
             if(!m.localMember()){
+                ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(source,partition,key,value);
                 InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
                 final Future<Void> future = builder.invoke();
                 try {
