@@ -4,6 +4,7 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.AccessIndex;
+import com.tarantula.Distributable;
 import com.tarantula.Recoverable;
 import com.tarantula.platform.event.PortableEventRegistry;
 
@@ -13,7 +14,7 @@ import java.util.Map;
 /**
  * updated 6/16/2020 yinghu lu
  */
-public class AccessIndexTrack extends IntegrationScopeObject implements AccessIndex, Portable {
+public class AccessIndexTrack extends RecoverableObject implements AccessIndex, Portable {
 
     private int nodeId;
 
@@ -33,6 +34,15 @@ public class AccessIndexTrack extends IntegrationScopeObject implements AccessIn
     public int nodeId(){
         return this.nodeId;
     }
+    public int scope(){
+        return Distributable.INTEGRATION_SCOPE;
+    }
+    @Override
+    public boolean backup(){
+        return true;
+    }
+    @Override
+    public boolean distributable(){return true;}
     @Override
     public int getFactoryId() {
         return PortableEventRegistry.OID;

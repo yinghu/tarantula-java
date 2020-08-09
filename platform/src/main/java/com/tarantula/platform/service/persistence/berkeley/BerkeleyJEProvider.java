@@ -308,7 +308,13 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
     @Override
     public byte[] onRecovering(Metadata metadata,byte[] key){
-        return this.dataCluster.recoverService().recover(metadata.source(),key);
+        if(metadata.scope()==Distributable.DATA_SCOPE){
+            return this.dataCluster.recoverService().recover(metadata.source(),key);
+        }
+        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+            return this.integrationCluster.accessIndexService().recover(metadata.partition(),key);
+        }
+        return null;
     }
     //end of map store listener
 
@@ -511,11 +517,20 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 if(akey==null){//must be not null
                     return false;
                 }
-                byte[] v = mapStoreListener.onCreating(metadata1,akey,t);
                 byte[] k = akey.getBytes();
-                if(v!=null&&_get(k)==null){
+                byte[] v = _get(k);//get local
+                if(v==null){
+                    v = mapStoreListener.onRecovering(metadata1,k);//get cluster
+                    if(v!=null){
+                        _set(k,v);//local set
+                    }
+                }
+                if(v==null){//if no record on cluster, create record on database
+                    v = mapStoreListener.onCreating(metadata1,akey,t);
+                }
+                if(v!=null){
                     if(_set(k,v)){
-                        mapStoreListener.onDistributing(metadata1,k,v);
+                        mapStoreListener.onDistributing(metadata1,k,v);//set cluster
                     }
                     return true;
                 }
@@ -538,11 +553,16 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 }
                 byte[] key = akey.getBytes();
                 byte[] value;
-                if((value=_get(key))!=null){
+                if((value=_get(key))!=null){//from local
                     t.fromMap(SystemUtil.toMap(value));
                     return true;
                 }
-                T c = mapStoreListener.onLoading(metadata1,akey);
+                if((value=mapStoreListener.onRecovering(metadata1,key))!=null){//from cluster
+                    t.fromMap(SystemUtil.toMap(value));
+                    _set(key,value);
+                    return true;
+                }
+                T c = mapStoreListener.onLoading(metadata1,akey);//from database
                 if(c==null){
                     return false;
                 }

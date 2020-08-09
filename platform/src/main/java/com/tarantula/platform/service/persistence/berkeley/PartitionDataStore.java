@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
-//data scope data store
+
 public class PartitionDataStore extends ReplicatedDataStore{
-    //public static String VERSION_NAME = "_v_";
+
     private final DataStoreOnPartition[] partitions;
     private final int partition;
     private final String bucket;
@@ -123,12 +123,12 @@ public class PartitionDataStore extends ReplicatedDataStore{
         indexSet.label(t.label());
         byte[] _kn = indexSet.key().asString().getBytes();
         DataStoreOnPartition dos = this.partitions[SystemUtil.partition(_kn,partition)];
-        byte[] ix = _get(dos,_kn);
+        byte[] ix = _get(dos,_kn);//from local
         if(ix!=null){
             indexSet.fromMap(SystemUtil.toMap(ix));
         }
         else{
-            ix = mapStoreListener.onRecovering(dos.metadata,_kn);
+            ix = mapStoreListener.onRecovering(dos.metadata,_kn);//from cluster
             if(ix!=null){
                 indexSet.fromMap(SystemUtil.toMap(ix));
             }
@@ -201,9 +201,9 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = akey.getBytes();
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
-            byte[] v = _get(dso,key);
-            if(v==null&&t.distributable()){
-                v = mapStoreListener.onRecovering(dso.metadata,key);
+            byte[] v = _get(dso,key);//from local
+            if(v==null){
+                v = mapStoreListener.onRecovering(dso.metadata,key);//from cluster
             }
             if(v==null){
                 byte[] vx = SystemUtil.toJson(t.toMap());
@@ -250,8 +250,8 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] key = akey.getBytes();
             byte[] value;
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            if((value=_get(dso,key))==null){
-                if((value=mapStoreListener.onRecovering(dso.metadata,key))==null){
+            if((value=_get(dso,key))==null){//get local
+                if((value=mapStoreListener.onRecovering(dso.metadata,key))==null){//get cluster
                     return false;
                 }
                 _put(dso,key,value);
@@ -264,35 +264,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             return false;
         }
     }
-    /**
-    @Override
-    public void traverse(Overflow overflow) {
-        for(DataStoreOnPartition dso: partitions){
-            _traverse(dso,overflow);
-        }
-    }
-    private void _traverse(DataStoreOnPartition dso,Overflow overflow) {
-        DiskOrderedCursor cursor = dso.database.openCursor(null);
-        try{
-            DatabaseEntry pk = new DatabaseEntry();
-            DatabaseEntry pv = new DatabaseEntry();
-            do{
-                if(cursor.getNext(pk,pv,null)==OperationStatus.SUCCESS){
-                    if(!overflow.on(this.prefix,dso.partition,pk.getData(),pv.getData())){
-                        break;
-                    }
-                }
-                else{
-                    break;
-                }
-            }while (true);
-        }finally {
-            cursor.close();
-        }
-    }**/
-    //public void put(byte[] key,byte[] value){
-        //_put(this.partitions[SystemUtil.partition(key,partition)],key,value);
-    //}
+
     @Override
     public void set(byte[] key, byte[] value) {
         try{
@@ -327,9 +299,12 @@ public class PartitionDataStore extends ReplicatedDataStore{
             String akey = (query.distributionKey() + Recoverable.PATH_SEPARATOR + query.label());
             byte[] owner = akey.getBytes();
             DataStoreOnPartition dso = partitions[SystemUtil.partition(owner,partition)];
-            byte[] edgeList = _get(dso,owner);
-            if(edgeList==null){
-                return;
+            byte[] edgeList;
+            if((edgeList=_get(dso,owner))==null){//from local
+                edgeList = mapStoreListener.onRecovering(dso.metadata,owner);//from cluster
+                if(edgeList==null){
+                    return;
+                }
             }
             IndexSet indexSet = new IndexSet();
             indexSet.fromMap(SystemUtil.toMap(edgeList));
@@ -337,7 +312,13 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 T t = query.create();
                 byte[] v;
                 byte[] ka = b.getBytes();
-                if((v=_get(partitions[SystemUtil.partition(ka,partition)],ka))!=null){
+                DataStoreOnPartition dwso = partitions[SystemUtil.partition(ka,partition)];
+                if((v=_get(dwso,ka))==null){//from local
+                    if((v = mapStoreListener.onRecovering(dwso.metadata,ka))!=null){//from cluster
+                        _put(dwso,ka,v);//set local
+                    }
+                }
+                if(v!=null){
                     t.fromMap(SystemUtil.toMap(v));
                     t.distributionKey(b);
                     if(!stream.on(t)){

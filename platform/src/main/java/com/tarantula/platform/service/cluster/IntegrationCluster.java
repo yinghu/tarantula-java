@@ -51,7 +51,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private String memberId;
     private DeployService deployService;
-    private RecoverService recoverService;
+    //private RecoverService recoverService;
     private ConcurrentHashMap<String,EventListener> eMap = new ConcurrentHashMap<>();
 
     private MetricsListener metricsListener;
@@ -109,7 +109,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.memberId = this._cluster.getCluster().getLocalMember().getUuid();
         this.subscribe(this.memberId,this);
         this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);
-        this.recoverService = this._cluster.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
+        //this.recoverService = this._cluster.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
         //this.tarantulaContext.tarantulaCluster().subscribe(this.memberId,this);
         new ServiceBootstrap(this.tarantulaContext._deployServiceStarted,this.tarantulaContext._storageStarted,new StorageServiceBootstrap(this.tarantulaContext),"data-store-starter",true).start();
         new ServiceBootstrap(this.tarantulaContext._storageStarted,this.tarantulaContext._systemServiceStarted,new SystemServiceBootstrap(this.tarantulaContext),"system-service-starter",true).start();
@@ -275,7 +275,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         return this.deployService;
     }
     public RecoverService recoverService(){
-        return this.recoverService;
+        throw new UnsupportedOperationException("no recover service on integration cluster");
     }
     private void onDispatch(Event event){
         //dispatch event to registered callback

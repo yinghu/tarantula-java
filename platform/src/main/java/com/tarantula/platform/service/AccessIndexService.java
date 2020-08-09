@@ -18,6 +18,7 @@ public interface AccessIndexService extends ServiceProvider {
     boolean disable();
 
     boolean replicate(int partition,byte[] key,byte[] value);
+    byte[] recover(int partition,byte[] key);
 
     interface Listener{
         void onStop();
