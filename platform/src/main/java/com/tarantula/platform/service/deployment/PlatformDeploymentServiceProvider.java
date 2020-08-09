@@ -10,7 +10,6 @@ import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
-import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.util.*;
 
 import java.io.*;
@@ -332,7 +331,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void setup(ServiceContext serviceContext){
         this.tarantulaContext = (TarantulaContext)serviceContext;
         ClusterProvider ics = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
-        this.integrationEventService = (EventService) ics;//ics.subscribe(eventTopic,this);
+        this.integrationEventService = ics.publisher();//(EventService) ics;//ics.subscribe(eventTopic,this);
         //localTopic = ics.subscription();
         //registerKey = ics.addEventListener(null,this);
         try{
@@ -686,7 +685,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     @Override
     public <T extends Recoverable> void onCreated(T t, String akey,byte[] key, byte[] value) {
-        log.warn(akey+"<><><><><>"+new String(value));
+        //log.warn(akey+"<><><><><>"+new String(value));
         //if(t instanceof OnView){
             //update((OnView) t);
         //}
@@ -721,7 +720,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return ((emailAddress, data) ->Email.send(emailAddress,data));
         }
         public OnEmail onEmail(){
-            return ((emailAddress, data) -> false);//Email.send(emailAddress,data));
+            return ((emailAddress, data) -> Email.send(emailAddress,data));
         }
 
         public OnTag onTag(String tag){

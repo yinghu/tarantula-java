@@ -105,7 +105,7 @@ public class SampleLoad {
 
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.30:8090",null,10000);
+        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.30:8090",null,50000);
         sampleLoad._init();
         sampleLoad.register();
     }

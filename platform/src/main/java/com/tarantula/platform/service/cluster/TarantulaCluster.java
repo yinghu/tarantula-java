@@ -25,7 +25,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
 	private HazelcastInstance _hazel;
 	private final TarantulaContext _tarantulaContext;
 
-    private int partitionCount;
+    //private int partitionCount;
 
     private String bucket;
     private final String INDEX_MAP = "tarantula.recoverable.index.Key";
@@ -34,11 +34,10 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     //cluster cache
     private MultiMap<String, byte[]> mIndex;
     private Map<byte[],byte[]> vMap;
-    //private ConcurrentHashMap<Integer,RecoverableListener> rMap = new ConcurrentHashMap<>();
     private String memberId;
     private DeployService deployService;
     private RecoverService recoverService;
-    private ConcurrentHashMap<String,EventListener> eMap = new ConcurrentHashMap<>();
+    //private ConcurrentHashMap<String,EventListener> eMap = new ConcurrentHashMap<>();
 
     public TarantulaCluster(final Config config,final String bucket,final TarantulaContext tarantulaContext){
 		this.config  = config;
@@ -75,18 +74,18 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     public int scope(){
         return Distributable.DATA_SCOPE;
     }
-    public boolean onPartition(byte[] key){
-        throw new UnsupportedOperationException("on partition not support on data cluster");
+    //public boolean onPartition(byte[] key){
+        //throw new UnsupportedOperationException("on partition not support on data cluster");
         //return this.cluster.getPartitionService().getPartition(key).getOwner().getUuid().equals(this.memberId);
-    }
-    public int partitionCount(){
-        return partitionCount;
-    }
-    public int size(){
-        return this._hazel.getCluster().getMembers().size();
-    }
+    //}
+    //public int partitionCount(){
+        //return partitionCount;
+    //}
+    //public int size(){
+        //return this._hazel.getCluster().getMembers().size();
+    //}
     public EventService publisher(){
-        return this;
+        return this._tarantulaContext.integrationCluster().publisher();
     }
 
     public <T extends Recoverable> List<T> list(RecoverableFactory<T> query){
@@ -146,7 +145,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
 
 	public void start() throws Exception {
         //add platform portable provider from conf
-        partitionCount = Integer.parseInt(config.getProperty("hazelcast.partition.count"));
+        //partitionCount = Integer.parseInt(config.getProperty("hazelcast.partition.count"));
         config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         config.getListenerConfigs().add(new ListenerConfig(this));
         _hazel = Hazelcast.newHazelcastInstance(this.config);

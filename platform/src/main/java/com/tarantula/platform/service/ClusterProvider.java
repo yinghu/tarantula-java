@@ -13,13 +13,12 @@ public interface ClusterProvider extends Serviceable{
     int scope();
     String bucket();
     String subscription();
-    int size();
-    int partitionCount();
-    //
+
     String addEventListener(String registerId,EventListener eventListener);
     void removeEventListener(String registerId);
 
     //EventListener Register
+    EventService publisher();
     EventService subscribe(String topic, EventListener callback);
     void unsubscribe(String topic);
 
@@ -27,7 +26,6 @@ public interface ClusterProvider extends Serviceable{
     AccessIndexService accessIndexService();
     DeployService deployService();
     RecoverService recoverService();
-    boolean onPartition(byte[] key);
 
     //CLUSTER KEY VALUE STORE WITH KEY INDEX
     <T extends Recoverable> List<T> list(RecoverableFactory<T> query);
