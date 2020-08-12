@@ -14,6 +14,7 @@ public interface ServiceProvider extends Serviceable {
 
     default void waitForData(){}
     default void registerMetricsListener(MetricsListener metricsListener){}
+
     default void register(Configurable configurable){}
     default void updateForData(int factoryId,int classId,String key,byte[] value){}
     //midnight check
