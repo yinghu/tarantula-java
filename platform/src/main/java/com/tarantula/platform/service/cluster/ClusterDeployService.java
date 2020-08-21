@@ -595,7 +595,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void syncService(String source,int factoryId,int classId,String key,byte[] value){
         ServiceProvider serviceProvider = this.tarantulaContext.serviceProvider(source);
         if(serviceProvider!=null){
-            serviceProvider.updateForData(factoryId,classId,key,value);
+            //serviceProvider.updateForData(factoryId,classId,key,value);
         }
     }
 }

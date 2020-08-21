@@ -505,6 +505,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
     }
+    public void release(Configurable configurable){
+
+    }
     //dedicated server methods
     public void onUDPConnection(String typeId,Connection connection){
         this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));

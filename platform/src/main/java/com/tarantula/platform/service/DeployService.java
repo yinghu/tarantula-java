@@ -50,4 +50,6 @@ public interface DeployService extends ServiceProvider {
     //data store sync
     boolean sync(String source,int factoryId,int classId,String akey,byte[] key,byte[] value);
 
+
+
 }

@@ -164,7 +164,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
             //logger.warn("Missed registered zone Listener->"+t.distributionKey());
         //}
     }
-    @Override
+    //@Override
     public void updateForData(int factoryId,int classId,String key,byte[] value){
         //Recoverable t = serviceContext.recoverableRegistry(factoryId).create(classId);
         //t.distributionKey();
