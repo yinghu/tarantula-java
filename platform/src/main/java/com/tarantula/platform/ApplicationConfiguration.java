@@ -2,20 +2,25 @@ package com.tarantula.platform;
 
 
 import com.tarantula.*;
+import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.RecoverService;
+import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.cluster.PortableRegistry;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Updated by yinghu on 7/19/2020
  */
-public class ApplicationConfiguration extends ConfigurableObject implements Configuration{
+public class ApplicationConfiguration extends RecoverableObject implements Configuration{
 
 
     private String type;
-
+    private CopyOnWriteArrayList<Configurable.Listener> _listeners = new CopyOnWriteArrayList<>();
 
     public ApplicationConfiguration(){
         this.onEdge = true;
@@ -74,5 +79,15 @@ public class ApplicationConfiguration extends ConfigurableObject implements Conf
         return PortableRegistry.APPLICATION_CONFIGURATION_CID;
     }
 
-
+    public void registerListener(Listener listener){
+        this._listeners.add(listener);
+    }
+    @Override
+    public void update(ServiceContext serviceContext){
+        RecoverService rsp = serviceContext.clusterProvider(Distributable.DATA_SCOPE).recoverService();
+        byte[] _data = rsp.recover(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.distributionKey().getBytes());
+        System.out.println(new String(_data)+"<><>"+this.distributionKey());
+        this.fromMap(SystemUtil.toMap(_data));
+        this._listeners.forEach((a)->{a.onUpdated(this);});
+    }
 }

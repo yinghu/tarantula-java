@@ -1,6 +1,5 @@
 package com.tarantula.platform.service;
 
-import com.tarantula.Configurable;
 
 /**
  * Updated by yinghu lu on 5/2/2020

@@ -684,7 +684,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         Recoverable _c = this.tarantulaContext.recoverableRegistry(factoryId).create(classId);
         _c.fromMap(SystemUtil.toMap(value));
-        config.update((Configurable)_c);
+        //config.update((Configurable)_c);
+        config.update(new ServiceContextProxy(this.tarantulaContext));
     }
     @Override
     public <T extends Recoverable> void onCreated(T t, String akey,byte[] key, byte[] value) {
@@ -700,7 +701,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public <T extends Recoverable> void onUpdated(T t,String akey, byte[] key, byte[] value) {
         if(vMap.containsKey(akey)){
-            this.tarantulaContext.tarantulaCluster().deployService().sync(NAME,t.getFactoryId(),t.getClassId(),akey,key,value);
+            //this.tarantulaContext.tarantulaCluster().deployService().sync(NAME,t.getFactoryId(),t.getClassId(),akey,key,value);
+            Configurable configurable = vMap.get(akey);
+            configurable.update(new ServiceContextProxy(this.tarantulaContext));
         }
     }
 

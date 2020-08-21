@@ -1,10 +1,11 @@
 package com.tarantula;
 
+import com.tarantula.platform.service.ServiceContext;
+
 public interface Configurable extends Recoverable, DataStore.Updatable {
 
-    void registerListener(Listener listener);
-
-    void update(Configurable update);
+    default void registerListener(Listener listener){}
+    default void update(ServiceContext serviceContext){}
 
     interface Listener{
         void onUpdated(Configurable c);

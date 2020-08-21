@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Updated by yinghu lu on 7/11/2020
  */
-public class OnViewTrack extends ConfigurableObject implements OnView, Portable {
+public class OnViewTrack extends RecoverableObject implements OnView, Portable {
 
     protected String contentBaseUrl;
     protected String moduleFile;

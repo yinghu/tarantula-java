@@ -8,7 +8,7 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 /**
  * Updated by yinghu lu on 5/24/2020
  */
-public class OnLobbyTrack extends ConfigurableObject implements OnLobby {
+public class OnLobbyTrack extends RecoverableObject implements OnLobby {
 
     private String typeId;
 

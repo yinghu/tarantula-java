@@ -140,10 +140,4 @@ public class InstanceIndex  extends OnApplicationHeader implements InstanceRegis
         InstanceIndex ix = (InstanceIndex)obj;
         return this.distributionKey().equals(ix.distributionKey());
     }
-    public void registerListener(Configurable.Listener listener){
-
-    }
-    public void update(Configurable updated){
-
-    }
 }
