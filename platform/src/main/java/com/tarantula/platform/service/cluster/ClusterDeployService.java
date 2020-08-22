@@ -580,22 +580,14 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void updateModule(Descriptor descriptor){
         this.deploymentServiceProvider.distributionCallback().updateModule(descriptor);
     }
-    //public void updateView(OnView onView){
-        //this.deploymentServiceProvider.register(onView);
-    //}
-    //public boolean updateConfiguration(Configuration configuration){
-        //return this.tarantulaContext.masterDataStore().update(configuration);
-    //}
-    //public void resetConfiguration(Configuration configuration){
-        //this.deploymentServiceProvider.distributionCallback().resetConfiguration(configuration);
-    //}
+
     public void serverPushEventSync(String memberId){
         this.deploymentServiceProvider.distributionCallback().syncServerPushEvent(memberId);//dispatch task
     }
-    public void syncService(String source,int factoryId,int classId,String key,byte[] value){
-        ServiceProvider serviceProvider = this.tarantulaContext.serviceProvider(source);
-        if(serviceProvider!=null){
-            //serviceProvider.updateForData(factoryId,classId,key,value);
-        }
+    public void sync(String key){
+        this.deploymentServiceProvider.distributionCallback().syncKey(key);
+    }
+    public byte[] load(String source,byte[] key){
+        return this.tarantulaContext.dataStore(source,tarantulaContext.partitionNumber()).backup().get(key);
     }
 }

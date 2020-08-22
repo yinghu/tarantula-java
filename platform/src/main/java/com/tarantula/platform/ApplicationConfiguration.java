@@ -1,7 +1,6 @@
 package com.tarantula.platform;
-
-
 import com.tarantula.*;
+import com.tarantula.platform.service.DeployService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.RecoverService;
 import com.tarantula.platform.service.ServiceContext;
@@ -18,15 +17,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class ApplicationConfiguration extends RecoverableObject implements Configuration{
 
-
     private String type;
     private CopyOnWriteArrayList<Configurable.Listener> _listeners = new CopyOnWriteArrayList<>();
 
     public ApplicationConfiguration(){
         this.onEdge = true;
     }
-
-
 
     public String type() {
         return this.type;
@@ -64,7 +60,6 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        //this.tag = (String)properties.get("tag");
         this.type = (String)properties.get("type");
         properties.forEach((String k,Object v)->{
             this.properties.put(k,v);
@@ -84,9 +79,8 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
     }
     @Override
     public void update(ServiceContext serviceContext){
-        RecoverService rsp = serviceContext.clusterProvider(Distributable.DATA_SCOPE).recoverService();
-        byte[] _data = rsp.recover(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.distributionKey().getBytes());
-        System.out.println(new String(_data)+"<><>"+this.distributionKey());
+        DeployService rsp = serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService();
+        byte[] _data = rsp.load(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.distributionKey().getBytes());
         this.fromMap(SystemUtil.toMap(_data));
         this._listeners.forEach((a)->{a.onUpdated(this);});
     }

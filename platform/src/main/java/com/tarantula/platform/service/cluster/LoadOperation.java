@@ -9,38 +9,40 @@ import java.io.IOException;
 /**
  * updated by yinghu lu on 7/10/2020.
  */
-public class DataSyncOperation extends Operation {
+public class LoadOperation extends Operation {
 
-    private String akey;
+    private String source;
+    private byte[] key;
+    private byte[] value;
 
-
-    public DataSyncOperation() {
+    public LoadOperation() {
     }
-
-
-    public DataSyncOperation(String akey) {
-        this.akey = akey;
+    public LoadOperation(String source, byte[] key) {
+        this.source = source;
+        this.key = key;
     }
     @Override
     public void run() throws Exception {
         ClusterDeployService cis = this.getService();
-        cis.sync(akey);
+        value = cis.load(source,key);
     }
 
     @Override
     public Object getResponse() {
-        return null;
+        return this.value;
     }
 
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeUTF(akey);
+        out.writeUTF(this.source);
+        out.writeByteArray(key);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.akey = in.readUTF();
+        this.source = in.readUTF();
+        this.key = in.readByteArray();
     }
 }

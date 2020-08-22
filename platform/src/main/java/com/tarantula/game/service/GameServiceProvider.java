@@ -154,7 +154,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     @Override
     public <T extends Recoverable> void onUpdated(T t, String akey,byte[] key, byte[] value) {
         logger.warn("updated->"+akey+"<><><>"+new String(value));
-        this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService().sync(NAME,t.getFactoryId(),t.getClassId(),akey,key,value);
+        //this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService().sync(NAME,t.getFactoryId(),t.getClassId(),akey,key,value);
         //serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService().distribute(t);
         //ZoneListener zl = zMap.get(t.distributionKey());
         //if(zl!=null){

@@ -9,7 +9,7 @@ import java.util.List;
  * Updated by yinghu lu on 5/30/2020
  */
 
-public interface DeploymentServiceProvider extends ServiceProvider,MetricsListener,DataStore.Listener {
+public interface DeploymentServiceProvider extends ServiceProvider,MetricsListener{
 
     String DEPLOY_DATA_STORE = "tarantula";
 
@@ -41,7 +41,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //list configurations
     List<Configuration> configuration();
     void register(Configurable configurable);
-    //void release(Configurable configurable);
+    void configure(String key);
     OnView onView(String viewId);
     boolean createView(OnView onView);
     void registerOnLobbyListener(OnLobby.Listener onLobbyListener);
@@ -104,6 +104,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void memberRemoved(String memberId);
         void memberAdded(String memberId);
 
+        void syncKey(String key);
     }
 
 }

@@ -505,8 +505,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
     }
-    public void release(Configurable configurable){
-
+    public void configure(String key){
+        if(vMap.containsKey(key)){
+            this.tarantulaContext.tarantulaCluster().deployService().sync(key);
+        }
     }
     //dedicated server methods
     public void onUDPConnection(String typeId,Connection connection){
@@ -677,36 +679,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void onUpdated(String key,double value){
         this.tarantulaContext.onUpdated(key,value);
     }
-    public void updateForData(int factoryId,int classId,String key,byte[] value){
-        Configurable config = vMap.get(key);
-        if(config==null){
-            return;
-        }
-        Recoverable _c = this.tarantulaContext.recoverableRegistry(factoryId).create(classId);
-        _c.fromMap(SystemUtil.toMap(value));
-        //config.update((Configurable)_c);
-        config.update(new ServiceContextProxy(this.tarantulaContext));
-    }
-    @Override
-    public <T extends Recoverable> void onCreated(T t, String akey,byte[] key, byte[] value) {
-        //log.warn(akey+"<><><><><>"+new String(value));
-        //if(t instanceof OnView){
-            //update((OnView) t);
-        //}
-        //if(t.getFactoryId()==PortableRegistry.OID&&t.getClassId()==PortableRegistry.APPLICATION_CONFIGURATION_CID){
-            //this.tarantulaContext.tarantulaCluster().deployService().sync(NAME,t.getFactoryId(),t.getClassId(),key,value);
-        //}
-    }
 
-    @Override
-    public <T extends Recoverable> void onUpdated(T t,String akey, byte[] key, byte[] value) {
-        if(vMap.containsKey(akey)){
-            //this.tarantulaContext.tarantulaCluster().deployService().sync(NAME,t.getFactoryId(),t.getClassId(),akey,key,value);
-            Configurable configurable = vMap.get(akey);
+
+    public void syncKey(String key){
+        if(vMap.containsKey(key)){
+            Configurable configurable = vMap.get(key);
             configurable.update(new ServiceContextProxy(this.tarantulaContext));
         }
     }
-
     private class PostOfficeSession implements PostOffice{
 
         public OnConnection onConnection(String serverId){

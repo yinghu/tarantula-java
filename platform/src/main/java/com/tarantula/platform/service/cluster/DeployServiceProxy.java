@@ -7,6 +7,7 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
 import com.tarantula.*;
 import com.tarantula.platform.presence.GameCluster;
+import com.tarantula.platform.service.RecoverService;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.DeployService;
@@ -180,6 +181,17 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Boolean> future = builder.invoke();
+            return future.get(); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
+    public byte[] load(String dataSource,byte[] key){
+        NodeEngine nodeEngine = getNodeEngine();
+        LoadOperation operation = new LoadOperation(dataSource,key);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<byte[]> future = builder.invoke();
             return future.get(); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
@@ -399,9 +411,9 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public boolean sync(String source,int factoryId,int classId,String akey,byte[] key,byte[] value){
+    public boolean sync(String key){
         NodeEngine nodeEngine = getNodeEngine();
-        DataSyncOperation operation = new DataSyncOperation(source,factoryId,classId,akey,key,value);
+        DataSyncOperation operation = new DataSyncOperation(key);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int expected = mlist.size();
         for(Member m :mlist){

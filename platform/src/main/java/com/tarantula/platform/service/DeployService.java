@@ -46,10 +46,8 @@ public interface DeployService extends ServiceProvider {
     boolean shutdownModule(String typeId);
     boolean updateModule(Descriptor descriptor);
 
-
-    //data store sync
-    boolean sync(String source,int factoryId,int classId,String akey,byte[] key,byte[] value);
-
+    boolean sync(String key);
+    byte[] load(String dataSource,byte[] key);
 
 
 }
