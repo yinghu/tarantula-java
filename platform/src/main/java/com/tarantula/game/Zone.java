@@ -8,6 +8,7 @@ import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.util.SystemUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -40,6 +41,8 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     private ConcurrentLinkedDeque<Room> rQueue;//assigned to pendingMatch 0
 
     public ConcurrentHashMap<Integer,Arena> aMap = new ConcurrentHashMap<>();
+
+    private Configurable.Listener listener;
     public Zone(){
         this.label = "Zone";
     }
@@ -351,5 +354,11 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         });
         this.timestamp = SystemUtil.toUTCMilliseconds(LocalDateTime.now());
         this.dataStore.update(this);
+    }
+    public void registerListener(Listener listener){
+        this.listener = listener;
+    }
+    public void update(ServiceContext serviceContext){
+        this.listener.onUpdated(this);
     }
 }

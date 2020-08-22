@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener,DataStore.Listener{
+public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener{
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
@@ -32,7 +32,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     private EventService publisher;
     private String dest;
     private ClusterProvider integrationCluster;
-    private ConcurrentHashMap<String,ZoneListener> zMap = new ConcurrentHashMap<>();
+
     private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
     private ServiceContext serviceContext;
     public GameServiceProvider(String name){
@@ -67,12 +67,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         this.dataStore.createIfAbsent(deltaStatistics,true);
         return deltaStatistics;
     }
-    public void addZoneListener(String key,ZoneListener zoneListener){
-        zMap.put(key,zoneListener);
-    }
-    public void removeZoneListener(String key){
-        zMap.remove(key);
-    }
+
     public Zone zone(Descriptor descriptor){//application id
         Zone zone = new Zone();
         zone.distributionKey(descriptor.distributionKey());
@@ -118,7 +113,6 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
             return false;
         });
         integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
-        this.dataStore.registerListener(new GamePortableRegistry().registryId(),this);
         logger.info("Game service provider ["+ NAME+"] started");
     }
     @Override
@@ -146,29 +140,4 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
         publisher.publish(new LeaderBoardGlobalEvent(dest,NAME,entry));
     }
 
-    @Override
-    public <T extends Recoverable> void onCreated(T t, String akey,byte[] key, byte[] value) {
-        logger.warn("created->"+akey+"<><><>"+new String(value));
-    }
-
-    @Override
-    public <T extends Recoverable> void onUpdated(T t, String akey,byte[] key, byte[] value) {
-        logger.warn("updated->"+akey+"<><><>"+new String(value));
-        //this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService().sync(NAME,t.getFactoryId(),t.getClassId(),akey,key,value);
-        //serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService().distribute(t);
-        //ZoneListener zl = zMap.get(t.distributionKey());
-        //if(zl!=null){
-            //zl.updated((Zone)t);
-        //}
-        //else{
-            //logger.warn("Missed registered zone Listener->"+t.distributionKey());
-        //}
-    }
-    //@Override
-    public void updateForData(int factoryId,int classId,String key,byte[] value){
-        //Recoverable t = serviceContext.recoverableRegistry(factoryId).create(classId);
-        //t.distributionKey();
-        logger.warn("update for data key->"+key);
-        logger.warn("update for data value->"+new String(value));
-    }
 }

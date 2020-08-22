@@ -1,5 +1,4 @@
 package com.tarantula.game.module;
-
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.tarantula.*;
@@ -9,12 +8,11 @@ import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
-
 import java.util.concurrent.ConcurrentHashMap;
 /**
  * updated by yinghu lu on 6/9/2020.
  */
-public class GameZoneModule implements Module,ZoneListener{
+public class GameZoneModule implements Module,Configurable.Listener{
 
     private ApplicationContext context;
     private Zone mZone;
@@ -118,7 +116,7 @@ public class GameZoneModule implements Module,ZoneListener{
         mZone.descriptor = this.context.descriptor();
         mZone.start();
         mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
-        this.gameServiceProvider.addZoneListener(this.context.descriptor().distributionKey(),this);
+        mZone.registerListener(this);
         context.log("Game lobby started->"+this.mZone.descriptor.tag(),OnLog.WARN);
     }
     public void onConnection(Connection connection){
@@ -144,12 +142,10 @@ public class GameZoneModule implements Module,ZoneListener{
 
     @Override
     public void clear() {
-        this.gameServiceProvider.removeZoneListener(this.context.descriptor().distributionKey());
         this.context.log("clear->"+this.context.descriptor().name(),OnLog.WARN);
     }
 
-    @Override
-    public void updated(Zone zone) {
+    public void onUpdated(Configurable zone) {
         mZone.reset(this.gameServiceProvider.zone(this.context.descriptor()));
         mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
     }
