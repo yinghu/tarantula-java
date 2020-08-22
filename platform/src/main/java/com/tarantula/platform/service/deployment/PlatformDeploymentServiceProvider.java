@@ -680,7 +680,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext.onUpdated(key,value);
     }
 
-
+    public void release(Configurable configurable){
+        this.vMap.remove(configurable.distributionKey());
+    }
     public void syncKey(String key){
         if(vMap.containsKey(key)){
             Configurable configurable = vMap.get(key);
