@@ -770,6 +770,20 @@
             document.querySelector('#tx-lobby-list-enable-form').style.display='none';       
         });   
     };
+    document.querySelector('#tx-lobby-list-reload-ok').onclick=()=>{
+        let _pno = (document.querySelector('#tx-lobby-list-no').innerHTML/1);
+        TARA_API.onService(true,{serviceTag:'role/admin',command:'onReloadLobby',accessId:TARA_API.query().gameClusterId,index:_pno},(resp)=>{
+            if(resp.successful){
+                document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;   
+                _page=document.querySelector('#tx-lobby-list-no').innerHTML/1;
+                _list_lobby();                
+            }
+            else{
+                document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;
+            }
+            document.querySelector('#tx-lobby-list-reload-form').style.display='none';       
+        });   
+    };
     function _list_lobby(){
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameLobbyList',accessId:TARA_API.query().gameClusterId,page:_page},(resp)=>{
             if(resp.successful){

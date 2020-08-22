@@ -215,6 +215,15 @@ public class AdminRoleModule implements Module {
                 session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes(),label());
             }
         }
+        else if(session.action().equals("onReloadLobby")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
+            int index = ((Number)onAccess.property("index")).intValue();
+            GameLobbyContext pending = this.gameLobbyContext(accessId);
+            GameLobby gameLobby = pending.gameLobbyList.get(index);
+            this.deploymentServiceProvider.configure(gameLobby.zone.distributionKey());
+            session.write(toMessage("Lobby reloaded",true).toString().getBytes(),label());
+        }
         else if(session.action().equals("onCreateGameCluster")){
             User ua = _user(session.systemId());
             Account acc = new UserAccount();
