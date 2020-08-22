@@ -7,6 +7,7 @@ import com.tarantula.Module;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
+import com.tarantula.platform.service.DeployService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.util.SystemUtil;
@@ -359,6 +360,19 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.listener = listener;
     }
     public void update(ServiceContext serviceContext){
-        this.listener.onUpdated(this);
+        //DeployService deployService = serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService();
+        Zone zone = new Zone();
+        zone.distributionKey(descriptor.distributionKey());
+        this.dataStore.createIfAbsent(zone,true);
+        zone.dataStore(this.dataStore);
+        for(int i=1;i<descriptor.capacity()+1;i++){
+            Arena a = new Arena(zone.bucket(),zone.oid(),i);
+            if(this.dataStore.load(a)){
+                if(!a.disabled()){//skip disabled
+                    zone.arenas.add(a);
+                }
+            }
+        }
+        this.listener.onUpdated(zone);
     }
 }

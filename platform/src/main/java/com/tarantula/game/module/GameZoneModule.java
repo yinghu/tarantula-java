@@ -23,6 +23,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
     private Connection connection;
     private int DEFAULT_LEVEL_COUNT = 3;
     private int DEFAULT_LEVEL_UP_BASE = 1000;
+    private DeploymentServiceProvider deploymentServiceProvider;
     @Override
     public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp or offline play mode
@@ -89,6 +90,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
+        this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         String gz = this.context.descriptor().typeId().replace("-lobby","-service");
         this.gameServiceProvider = this.context.serviceProvider(gz);
         mZone = this.gameServiceProvider.zone(this.context.descriptor());
@@ -117,6 +119,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
         mZone.start();
         mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
         mZone.registerListener(this);
+        deploymentServiceProvider.register(mZone);
         context.log("Game lobby started->"+this.mZone.descriptor.tag(),OnLog.WARN);
     }
     public void onConnection(Connection connection){
@@ -142,6 +145,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
 
     @Override
     public void clear() {
+        this.deploymentServiceProvider.release(mZone);
         this.context.log("clear->"+this.context.descriptor().name(),OnLog.WARN);
     }
 
