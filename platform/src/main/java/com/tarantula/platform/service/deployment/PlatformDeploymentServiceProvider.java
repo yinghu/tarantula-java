@@ -681,7 +681,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public void release(Configurable configurable){
-        log.warn("config->"+configurable.distributionKey()+" released");
         this.vMap.remove(configurable.distributionKey());
     }
     public void syncKey(String key){

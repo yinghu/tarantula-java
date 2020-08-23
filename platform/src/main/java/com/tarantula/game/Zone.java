@@ -360,14 +360,16 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
         this.listener = listener;
     }
     public void update(ServiceContext serviceContext){
-        //DeployService deployService = serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService();
+        DeployService deployService = serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService();
         Zone zone = new Zone();
         zone.distributionKey(descriptor.distributionKey());
-        this.dataStore.createIfAbsent(zone,true);
-        zone.dataStore(this.dataStore);
+        byte[] _data = deployService.load(this.dataStore.name(),zone.distributionKey().getBytes());
+        zone.fromMap(SystemUtil.toMap(_data));
         for(int i=1;i<descriptor.capacity()+1;i++){
             Arena a = new Arena(zone.bucket(),zone.oid(),i);
-            if(this.dataStore.load(a)){
+            _data = deployService.load(dataStore.name(),a.distributionKey().getBytes());
+            if(_data!=null){
+                a.fromMap(SystemUtil.toMap(_data));
                 if(!a.disabled()){//skip disabled
                     zone.arenas.add(a);
                 }

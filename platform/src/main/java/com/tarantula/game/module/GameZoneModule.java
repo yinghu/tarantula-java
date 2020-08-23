@@ -150,7 +150,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
     }
 
     public void onUpdated(Configurable zone) {
-        mZone.reset(this.gameServiceProvider.zone(this.context.descriptor()));
+        mZone.reset((Zone)zone);
         mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
     }
     private JsonObject toMessage(String msg,boolean successful){
