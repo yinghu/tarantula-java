@@ -34,7 +34,7 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
     private ClusterProvider integrationCluster;
 
     private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
-    private ServiceContext serviceContext;
+
     public GameServiceProvider(String name){
         NAME = name;
     }
@@ -102,7 +102,6 @@ public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener
 
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.serviceContext = serviceContext;
         this.dataStore = serviceContext.dataStore(NAME.replace("-","_"),serviceContext.partitionNumber());//typeId_service
         this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
         this.dest = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).subscription();
