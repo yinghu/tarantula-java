@@ -89,10 +89,13 @@ public class HttpEndpoint implements EndPoint {
 		httpSudoHandler.resource(this.resource);
 		this.hserver.createContext(httpSudoHandler.path(),httpSudoHandler);
 
-
 		HttpViewHandler httpViewHandler = new HttpViewHandler();
 		httpViewHandler.resource(this.resource);
 		this.hserver.createContext(httpViewHandler.path(),httpViewHandler);
+
+		HttpGameServerHandler httpGameServerHandler = new HttpGameServerHandler();
+		httpGameServerHandler.resource(this.resource);
+		this.hserver.createContext(httpGameServerHandler.path(),httpGameServerHandler);
 
 		hserver.start();
         started = true;
