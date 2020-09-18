@@ -233,7 +233,7 @@ function connectOnTarantula(){
 }
 function registerOnTarantula(callback){
     const headers = {Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Tarantula-access-key':cfg.server.web.key,'Tarantula-server-id':serverId,'Tarantula-action':'onTicket'};
-    const optsx ={rejectUnauthorized: false,hostname:cfg.server.web.host,port:cfg.server.web.port,path:'/push',method:'GET',headers:headers};
+    const optsx ={rejectUnauthorized: false,hostname:cfg.server.web.host,port:cfg.server.web.port,path:'/server',method:'GET',headers:headers};
     const req = http.request(optsx,(res)=>{
         var resp=[];
         res.on('data', (data) => {
