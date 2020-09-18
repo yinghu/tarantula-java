@@ -2,6 +2,8 @@ package com.tarantula.platform.util;
 
 import com.google.gson.JsonObject;
 import com.tarantula.Session;
+
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -105,9 +107,17 @@ public class SampleLoad {
 
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.234:8090",null,50000);
-        sampleLoad._init();
-        sampleLoad.register();
+        //SampleLoad sampleLoad = new SampleLoad("http://10.0.0.234:8090",null,50000);
+        //sampleLoad._init();
+        //sampleLoad.register();
+        FIFOBuffer<String> fifoBuffer = new FIFOBuffer<>(10,new String[10]);
+        for(int i=0; i<11;i++){
+            fifoBuffer.push("name-"+i);
+        }
+        fifoBuffer.list(new ArrayList<>()).forEach((s)->{
+            System.out.println(s);
+        });
     }
+
 }
 
