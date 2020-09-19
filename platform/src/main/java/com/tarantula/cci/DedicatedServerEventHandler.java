@@ -41,7 +41,7 @@ public class DedicatedServerEventHandler implements RequestHandler {
                 String vLobby = tokenValidator.validateGameClusterAccessKey(accessKey);
                 if(vLobby!=null){
                     Connection connection = new UDPConnection(serverId,host,port);
-                    this.deploymentServiceProvider.onUDPConnection(vLobby,connection);
+                    this.deploymentServiceProvider.distributionCallback().onConnection(vLobby,connection);
                 }
                 byte[] eb = this.builder.create().toJson(new ResponseHeader("onRegistered",vLobby!=null?"Ok":"invalid access key",vLobby!=null)).getBytes();
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
@@ -49,20 +49,20 @@ public class DedicatedServerEventHandler implements RequestHandler {
             else if(action.equals("onStarted")){
                 byte[] eb = "{}".getBytes();
                 if(tokenValidator.validateGameClusterAccessKey(accessKey)!=null) {
-                    eb = this.deploymentServiceProvider.onStartedUDPConnection(serverId);
+                    eb = this.deploymentServiceProvider.distributionCallback().onStartedConnection(serverId);
                 }
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
             else if(action.equals("onUpdated")){
                 if(tokenValidator.validateGameClusterAccessKey(accessKey)!=null){
-                    this.deploymentServiceProvider.onUpdatedUDPConnection(serverId,_payload);
+                    this.deploymentServiceProvider.distributionCallback().onUpdatedConnection(serverId,_payload);
                 }
                 byte[] eb = this.builder.create().toJson(new ResponseHeader("onUpdated","ok",true)).getBytes();
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));
             }
             else if(action.equals("onEnded")){
                 if(tokenValidator.validateGameClusterAccessKey(accessKey)!=null){
-                    this.deploymentServiceProvider.onEndedUDPConnection(serverId,_payload);
+                    this.deploymentServiceProvider.distributionCallback().onEndedConnection(serverId,_payload);
                 }
                 byte[] eb = this.builder.create().toJson(new ResponseHeader("onEnded","ok",true)).getBytes();
                 exchange.onEvent(new ResponsiveEvent("","",eb,"dedicated",true));

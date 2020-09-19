@@ -16,13 +16,13 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     String NAME = "DeploymentServiceProvider";
 
     //UDP SERVER APIs
-    void onUDPConnection(String typeId,Connection connection);
-    Connection onUDPConnection(String typeId, Connection.StateListener listener);
-    void onStartedUDPConnection(String serverId,byte[] started);
-    void onUpdatedUDPConnection(String serverId,byte[] updated);
-    void onEndedUDPConnection(String serverId,byte[] ended);
+    //void onUDPConnection(String typeId,Connection connection);
+    Connection onConnection(String typeId, Connection.StateListener listener);
+    void onStartedConnection(String serverId,byte[] started);
+    //void onUpdatedUDPConnection(String serverId,byte[] updated);
+    //void onEndedUDPConnection(String serverId,byte[] ended);
     void onEndedUDPConnection(String serverId);
-    byte[] onStartedUDPConnection(String serverId);
+    //byte[] onStartedUDPConnection(String serverId);
     //END OF DEDICATED SERVER APIs
 
     /**
@@ -106,6 +106,13 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void memberAdded(String memberId);
 
         void syncKey(String key);
+
+        //game server callbacks
+        void onConnection(String typeId,Connection connection);
+        byte[] onStartedConnection(String serverId);
+        void onUpdatedConnection(String serverId,byte[] updated);
+        void onEndedConnection(String serverId,byte[] ended);
+
     }
 
 }

@@ -511,10 +511,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     //dedicated server methods
-    public void onUDPConnection(String typeId,Connection connection){
+    public void onConnection(String typeId,Connection connection){
         this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));
     }
-    public Connection onUDPConnection(String typeId,Connection.StateListener listener){
+    public Connection onConnection(String typeId,Connection.StateListener listener){
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         byte[] ret = icp.firstIndex(typeId);
         if(ret==null){
@@ -534,11 +534,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         return connection;
     }
-    public void onStartedUDPConnection(String serverId,byte[] started){
+    public void onStartedConnection(String serverId,byte[] started){
         String _serverId = serverId+"_v";
         this.tarantulaContext.integrationCluster().set(_serverId.getBytes(),started);
     }
-    public void onUpdatedUDPConnection(String serverId,byte[] updated){
+    public void onUpdatedConnection(String serverId,byte[] updated){
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         byte[] sub = icp.get(serverId.getBytes());
         if (sub != null) {
@@ -550,11 +550,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             log.warn("Server connection not existed ->"+serverId);
         }
     }
-    public byte[] onStartedUDPConnection(String serverId){
+    public byte[] onStartedConnection(String serverId){
         String _serverId = serverId+"_v";
         return this.tarantulaContext.integrationCluster().remove(_serverId.getBytes());
     }
-    public void onEndedUDPConnection(String serverId,byte[] ended) {
+    public void onEndedConnection(String serverId,byte[] ended) {
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         byte[] sub = icp.remove(serverId.getBytes());
         if (sub != null) {
