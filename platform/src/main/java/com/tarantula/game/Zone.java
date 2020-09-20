@@ -199,7 +199,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     @Override
     public void onEnding(Room room) {
         if(!room.offline()){
-            this.deploymentServiceProvider.onEndedUDPConnection(room.connection().serverId());
+            this.deploymentServiceProvider.onEndedConnection(room.connection().serverId());
         }
         for(Stub sb : room.playerList()){
             this.onLeaving(sb);

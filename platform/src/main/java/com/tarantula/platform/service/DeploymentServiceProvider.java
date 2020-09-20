@@ -21,7 +21,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     void onStartedConnection(String serverId,byte[] started);
     //void onUpdatedUDPConnection(String serverId,byte[] updated);
     //void onEndedUDPConnection(String serverId,byte[] ended);
-    void onEndedUDPConnection(String serverId);
+    void onEndedConnection(String serverId);
     //byte[] onStartedUDPConnection(String serverId);
     //END OF DEDICATED SERVER APIs
 

@@ -228,18 +228,15 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         mIndex.lock(index);
         mIndex.put(index,key);
         mIndex.unlock(index);
-        //log.warn("Index->1"+index+"/"+mIndex.get(index).isEmpty());
     }
     public byte[] firstIndex(String index){
         byte[] ret = null;
         mIndex.lock(index);
-        //log.warn("Index->2"+index+"/"+mIndex.get(index).isEmpty());
         Iterator<byte[]> it = mIndex.get(index).iterator();
         if(it.hasNext()){
             ret = it.next();
             mIndex.remove(index,ret);
         }
-        //log.warn("Index->3"+index+"/"+mIndex.get(index).isEmpty());
         mIndex.unlock(index);
         return ret;
     }
