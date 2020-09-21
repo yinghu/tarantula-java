@@ -2,11 +2,15 @@ package com.tarantula.cci.webhook;
 
 import com.tarantula.Event;
 import com.tarantula.cci.OnExchange;
+import com.tarantula.platform.util.HttpCaller;
 
 /**
  * Created by yinghu lu on 9/19/2020.
  */
 public class WebhookSession implements OnExchange {
+
+    private HttpCaller httpCaller;
+
     @Override
     public String id() {
         return null;
@@ -34,6 +38,7 @@ public class WebhookSession implements OnExchange {
 
     @Override
     public boolean onEvent(Event event) {
+        //use http caller to request the remote game server.
         return false;
     }
 }

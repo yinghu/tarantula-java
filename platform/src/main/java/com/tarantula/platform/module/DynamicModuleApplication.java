@@ -124,10 +124,11 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     }
     @Override
     public void onState(Connection c) {
-        if(c.type().equals(Connection.WEB_SOCKET)){
+        //if(c.type().equals(Connection.WEB_SOCKET)){
             this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on application ["+descriptor.name()+"]",OnLog.WARN);
             //onWebSocket(c);
-        }
+            module.onConnection(c);
+        //}
     }
     /**
     private void onWebSocket(Connection c) {
