@@ -39,6 +39,13 @@ public class WebhookSession implements OnExchange {
     @Override
     public boolean onEvent(Event event) {
         //use http caller to request the remote game server.
+        if(event.payload()!=null&&event.payload().length>0){
+            //do post
+            //httpCaller.post(event.)
+        }
+        else{
+            //do get
+        }
         return false;
     }
 }
