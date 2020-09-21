@@ -34,7 +34,7 @@ public class GameServerSimulator {
         json.addProperty("host","10.0.0.234");
         json.addProperty("port",16393);
         json.addProperty("type", Connection.UDP);
-        json.addProperty("maxRooms",10);
+        json.addProperty("maxConnections",10);
         String[] headers = new String[]{
                 Session.TARANTULA_ACCESS_KEY,accessKey,
                 Session.TARANTULA_ACTION,"onStart",

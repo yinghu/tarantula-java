@@ -3,6 +3,7 @@ package com.tarantula.cci;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.tarantula.*;
+import com.tarantula.cci.udp.UDPSession;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.UDPConnection;
@@ -12,8 +13,11 @@ import com.tarantula.platform.service.DeployService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.TokenValidatorProvider;
+import com.tarantula.platform.util.ConnectionDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
+import java.net.InetSocketAddress;
+import java.nio.channels.DatagramChannel;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,17 +47,17 @@ public class GameServerEventHandler implements RequestHandler {
             byte[] _payload = exchange.payload();
             if(action.equals("onStart")){//access key
                 if(tokenValidatorProvider.validateAccessKey(accessKey)){
-                    log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
+                    Connection connection = this.builder.create().fromJson(new String(_payload),Connection.class);
                     //this.deploymentServiceProvider.distributionCallback().onConnection("typeId",new UDPConnection());
-                    //String sid = exchange.id();
-                    //_hex.put(sid,exchange);
-                    //ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,serverId,_payload);
-                    //deployService.addServerPushEvent(pushEvent);
-                    //exchange.onEvent(new ResponsiveEvent("","",_payload,"push",true));
+                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,_payload);
+                    deployService.addServerPushEvent(pushEvent);
+                    DatagramChannel datagramChannel = DatagramChannel.open();
+                    datagramChannel.connect(new InetSocketAddress(connection.host(),connection.port()));
+                    UDPSession udpSession = new UDPSession(serverId,datagramChannel);
+                    _hex.put(udpSession.id(),udpSession);
                 }
                 else{
                     log.warn("Invalid ticket");
-                    //exchange.close();
                 }
                 exchange.onEvent(new ResponsiveEvent("","",_payload,"push",true));
             }
@@ -77,6 +81,7 @@ public class GameServerEventHandler implements RequestHandler {
     public void start() throws Exception {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
+        this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
 

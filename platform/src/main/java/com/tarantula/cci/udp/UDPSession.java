@@ -1,13 +1,24 @@
 package com.tarantula.cci.udp;
 
+import com.tarantula.Connection;
 import com.tarantula.Event;
 import com.tarantula.cci.OnExchange;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
 
 public class UDPSession implements OnExchange {
 
+    private final String serverId;
+    private final DatagramChannel datagramChannel;
+
+    public UDPSession(String serverId,DatagramChannel datagramChannel){
+
+        this.serverId = serverId;
+        this.datagramChannel = datagramChannel;
+    }
     @Override
     public String id() {
-        return null;
+        return serverId;
     }
 
     @Override
@@ -17,12 +28,12 @@ public class UDPSession implements OnExchange {
 
     @Override
     public String method() {
-        return null;
+        return Connection.UDP;
     }
 
     @Override
     public String header(String name) {
-        return null;
+        return this.serverId;
     }
 
     @Override
@@ -32,6 +43,12 @@ public class UDPSession implements OnExchange {
 
     @Override
     public boolean onEvent(Event event) {
+        try{
+            ByteBuffer buffer = ByteBuffer.wrap(event.payload());
+            datagramChannel.write(buffer);
+        }catch (Exception ex){
+            return true;
+        }
         return false;
     }
 }
