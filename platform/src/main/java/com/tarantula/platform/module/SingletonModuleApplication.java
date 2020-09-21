@@ -98,10 +98,11 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     }
     @Override
     public void onState(Connection c) {
-        if(c.type().equals(Connection.WEB_SOCKET)){
+        //if(c.type().equals(Connection.WEB_SOCKET)){
             this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"]",OnLog.WARN);
+            this.module.onConnection(c);
             //onWebSocket(c);
-        }
+        //}
     }
     /**
     private void onWebSocket(Connection c) {

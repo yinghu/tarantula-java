@@ -57,18 +57,24 @@ public class GameServerEventHandler implements RequestHandler {
                     _hex.put(udpSession.id(),udpSession);
                 }
                 else{
-                    log.warn("Invalid ticket");
+                    log.warn("Invalid ticket on start");
                 }
-                exchange.onEvent(new ResponsiveEvent("","",_payload,"push",true));
+                exchange.onEvent(new ResponsiveEvent("","",_payload,"server",true));
             }
             else if(action.equals("onStop")){//no more access key check event from server socket
-                //log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
-                _hex.forEach((k,v)->{
-                    if(v.header(Session.TARANTULA_SERVER_ID).equals(serverId)){
-                        _hex.remove(k);
-                        deployService.removeServerPushEvent(serverId);
-                    }
-                });
+                if(tokenValidatorProvider.validateAccessKey(accessKey)){
+                    log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
+                    _hex.forEach((k,v)->{
+                        if(v.id().equals(serverId)){
+                            _hex.remove(k);
+                            deployService.removeServerPushEvent(serverId);
+                        }
+                    });
+                }
+                else{
+                    log.warn("Invalid ticket on stop");
+                }
+                exchange.onEvent(new ResponsiveEvent("","",_payload,"server",true));
             }
         }catch (Exception ex){
             ex.printStackTrace();

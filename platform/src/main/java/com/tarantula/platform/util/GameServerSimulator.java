@@ -18,17 +18,19 @@ public class GameServerSimulator {
     static HttpCaller caller;
     static String serverId;
     static JsonParser parser;
+    static String accessKey = "BDS01/81280cec10d244d5a324d5fcb211fdcd-75596F4EB936FFF376D31E26D5F204F48E23C921";
     public static void main(String[] args) throws Exception{
         parser = new JsonParser();
         serverId = UUID.randomUUID().toString();
         caller = new HttpCaller("http://10.0.0.234:8090");
         caller._init();
         caller.index();
-        JsonObject resp = parser.parse(onRegister("BDS01/81280cec10d244d5a324d5fcb211fdcd-75596F4EB936FFF376D31E26D5F204F48E23C921")).getAsJsonObject();
+        JsonObject resp = parser.parse(onStart(accessKey)).getAsJsonObject();
         System.out.println(resp);
+        onStop(accessKey);
     }
 
-    static String onRegister(String accessKey) throws Exception{
+    static String onStart(String accessKey) throws Exception{
         JsonObject json = new JsonObject();
         json.addProperty("serverId",serverId);
         json.addProperty("host","10.0.0.234");
@@ -41,6 +43,14 @@ public class GameServerSimulator {
                 Session.TARANTULA_SERVER_ID,serverId
         };
         return caller.post("server",json.toString().getBytes(),headers);
+    }
+    static String onStop(String accessKey) throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_ACCESS_KEY,accessKey,
+                Session.TARANTULA_ACTION,"onStop",
+                Session.TARANTULA_SERVER_ID,serverId
+        };
+        return caller.get("server",headers);
     }
     static String key(){
         SecureRandom secureRandom = new SecureRandom();

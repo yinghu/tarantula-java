@@ -122,13 +122,15 @@ public class GameZoneModule implements Module,Configurable.Listener{
         deploymentServiceProvider.register(mZone);
         context.log("Game lobby started->"+this.mZone.descriptor.tag(),OnLog.WARN);
     }
-    //public void onConnection(Connection connection){
+    @Override
+    public void onConnection(Connection connection){
         //if(this.connection==null){
             //this.connection = connection.copy();
             //return;
         //}
         //this.connection.reset(connection);
-    //}
+        this.context.log("connection->"+connection.disabled(),OnLog.WARN);
+    }
     @Override
     public void onTimer(OnUpdate update){
         mZone.onTimer((c,u,d)->{
