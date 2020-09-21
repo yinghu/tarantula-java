@@ -24,19 +24,11 @@ public class GameServerSimulator {
         caller = new HttpCaller("http://10.0.0.234:8090");
         caller._init();
         caller.index();
-        JsonObject resp = parser.parse(onTicket("BDS01/81280cec10d244d5a324d5fcb211fdcd-75596F4EB936FFF376D31E26D5F204F48E23C921")).getAsJsonObject();
-        System.out.println(resp.get("ticket").getAsString());
-        System.out.println(onRegister(resp.get("ticket").getAsString()));
+        JsonObject resp = parser.parse(onRegister("BDS01/81280cec10d244d5a324d5fcb211fdcd-75596F4EB936FFF376D31E26D5F204F48E23C921")).getAsJsonObject();
+        System.out.println(resp);
     }
-    static String onTicket(String accessKey) throws Exception{
-        String[] headers = new String[]{
-                Session.TARANTULA_ACCESS_KEY,accessKey,
-                Session.TARANTULA_ACTION,"onTicket",
-                Session.TARANTULA_SERVER_ID,serverId
-        };
-        return caller.get("server",headers);
-    }
-    static String onRegister(String ticket) throws Exception{
+
+    static String onRegister(String accessKey) throws Exception{
         JsonObject json = new JsonObject();
         json.addProperty("serverId",serverId);
         json.addProperty("host","10.0.0.234");
@@ -44,8 +36,8 @@ public class GameServerSimulator {
         json.addProperty("type", Connection.UDP);
         json.addProperty("maxRooms",10);
         String[] headers = new String[]{
-                Session.TARANTULA_ACCESS_KEY,ticket,
-                Session.TARANTULA_ACTION,"onRegister",
+                Session.TARANTULA_ACCESS_KEY,accessKey,
+                Session.TARANTULA_ACTION,"onStart",
                 Session.TARANTULA_SERVER_ID,serverId
         };
         return caller.post("server",json.toString().getBytes(),headers);

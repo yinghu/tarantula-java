@@ -20,7 +20,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
     private ConcurrentHashMap<String, Room> mRoom = new ConcurrentHashMap<>();
     private GsonBuilder builder;
     private GameServiceProvider gameServiceProvider;
-    private Connection connection;
+    //private Connection connection;
     private int DEFAULT_LEVEL_COUNT = 3;
     private int DEFAULT_LEVEL_UP_BASE = 1000;
     private DeploymentServiceProvider deploymentServiceProvider;
@@ -36,7 +36,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
         gameObject.successful(true);
         gameObject.ticket = this.context.validator().ticket(session.systemId(),session.stub());
         gameObject.stub = stub;
-        gameObject.connection = connection;
+        //gameObject.connection = connection;
         mStub.put(session.systemId(),stub);
         session.write(gameObject.toJson().toString().getBytes(),label());
         //onUpdate.on(stub.roomId,"{}".getBytes());
@@ -122,19 +122,19 @@ public class GameZoneModule implements Module,Configurable.Listener{
         deploymentServiceProvider.register(mZone);
         context.log("Game lobby started->"+this.mZone.descriptor.tag(),OnLog.WARN);
     }
-    public void onConnection(Connection connection){
-        if(this.connection==null){
-            this.connection = connection.copy();
-            return;
-        }
-        this.connection.reset(connection);
-    }
+    //public void onConnection(Connection connection){
+        //if(this.connection==null){
+            //this.connection = connection.copy();
+            //return;
+        //}
+        //this.connection.reset(connection);
+    //}
     @Override
     public void onTimer(OnUpdate update){
         mZone.onTimer((c,u,d)->{
-            if(connection!=null&&!connection.disabled()){
-                update.on(connection.serverId(),u,d);
-            }
+            //if(connection!=null&&!connection.disabled()){
+                //update.on(connection.serverId(),u,d);
+            //}
         });
     }
     @Override

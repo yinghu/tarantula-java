@@ -20,8 +20,8 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     //private long pendingTimer;
 
     private ScheduledFuture timerSchedule;
-    private RingBuffer<Connection> cBuffer;
-    private Connection current;
+    //private RingBuffer<Connection> cBuffer;
+   //private Connection current;
     @Override
     public void initialize(Session session) throws Exception {
         session.joined(true);
@@ -43,7 +43,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        this.cBuffer = new RingBuffer<>(new Connection[5]);
+        //this.cBuffer = new RingBuffer<>(new Connection[5]);
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.context.onRegistry().registerOnInstanceListener(this);
         try{
@@ -126,9 +126,10 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
     public void onState(Connection c) {
         if(c.type().equals(Connection.WEB_SOCKET)){
             this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on application ["+descriptor.name()+"]",OnLog.WARN);
-            onWebSocket(c);
+            //onWebSocket(c);
         }
     }
+    /**
     private void onWebSocket(Connection c) {
         if(!c.disabled()){
             if(!cBuffer.push(c)){
@@ -166,5 +167,5 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
                 }
             }
         }
-    }
+    }**/
 }

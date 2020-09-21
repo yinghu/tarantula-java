@@ -58,7 +58,7 @@ public class AccountEventHandler implements RequestHandler {
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
         this.invalidView = this.deploymentServiceProvider.onView(OnView.INVALID_VIEW_ID);
-        log.info("Admin event handler started");
+        log.info("Account event handler started");
     }
 
     @Override

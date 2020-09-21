@@ -5,9 +5,11 @@ import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.UDPConnection;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
 import com.tarantula.platform.service.DeployService;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -23,6 +25,7 @@ public class GameServerEventHandler implements RequestHandler {
     //private String bucket;
     private EventService eventService;
     private TokenValidatorProvider tokenValidatorProvider;
+    private DeploymentServiceProvider deploymentServiceProvider;
 
     private String serverTopic;
     private final ConcurrentHashMap<String, OnExchange> _hex = new ConcurrentHashMap<>();
@@ -38,23 +41,10 @@ public class GameServerEventHandler implements RequestHandler {
             String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
             String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
             byte[] _payload = exchange.payload();
-            if(action.equals("onTicket")){
-                byte[] et;
-                if(this.tokenValidatorProvider.validateAccessKey(accessKey)){
-                    JsonObject jo = new JsonObject();
-                    jo.addProperty("ticket", tokenValidatorProvider.ticket(serverId,1,5));
-                    jo.addProperty("successful",true);
-                    et = jo.toString().getBytes();
-                }
-                else{
-                    ResponseHeader err = new ResponseHeader("onTicket","invalid access key",false);
-                    et = builder.create().toJson(err).getBytes();
-                }
-                exchange.onEvent(new ResponsiveEvent("","",et,"push",true));
-            }
-            else if(action.equals("onStart")){//access key
-                if(tokenValidatorProvider.validateTicket(serverId,1,accessKey)){
+            if(action.equals("onStart")){//access key
+                if(tokenValidatorProvider.validateAccessKey(accessKey)){
                     log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
+                    //this.deploymentServiceProvider.distributionCallback().onConnection("typeId",new UDPConnection());
                     //String sid = exchange.id();
                     //_hex.put(sid,exchange);
                     //ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,serverId,_payload);
@@ -89,6 +79,7 @@ public class GameServerEventHandler implements RequestHandler {
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
+
         log.info("Game server event handler started");
     }
 
@@ -100,9 +91,8 @@ public class GameServerEventHandler implements RequestHandler {
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
         this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
-        //this.bucket = tcx.bucket();
-        //this.endpoint = tcx.endpoint();
-        tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
+        this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
+        this.deploymentServiceProvider = tcx.deploymentServiceProvider();
     }
     public  boolean onEvent(Event event){
         OnExchange hx = this._hex.get(event.sessionId());

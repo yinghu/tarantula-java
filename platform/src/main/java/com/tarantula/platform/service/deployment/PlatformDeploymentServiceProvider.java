@@ -795,10 +795,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         public void onTimer(OnUpdate update){
             module.onTimer(update);
         }
-        @Override
-        public void onConnection(Connection connection){
-            module.onConnection(connection);
-        }
+        //@Override
+        //public void onConnection(Connection connection){
+            //module.onConnection(connection);
+        //}
         public void reset(){
             try{
                 DynamicModuleClassLoader moduleClassLoader = cMap.get(descriptor.typeId());

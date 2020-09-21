@@ -17,8 +17,8 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
 
     private Module module;
     private DeploymentServiceProvider serviceProvider;
-    private RingBuffer<Connection> cBuffer;
-    private Connection current;
+    //private RingBuffer<Connection> cBuffer;
+    //private Connection current;
     private ScheduledFuture scheduledFuture;
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
@@ -32,7 +32,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        this.cBuffer = new RingBuffer<>(new Connection[5]);
+        //this.cBuffer = new RingBuffer<>(new Connection[5]);
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.module = this.serviceProvider.module(this.descriptor);
         SERVER_PUSH_INTERVAL = descriptor.timerOnModule();
@@ -100,9 +100,10 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     public void onState(Connection c) {
         if(c.type().equals(Connection.WEB_SOCKET)){
             this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"]",OnLog.WARN);
-            onWebSocket(c);
+            //onWebSocket(c);
         }
     }
+    /**
     private void onWebSocket(Connection c) {
         if(!c.disabled()){
             if(!cBuffer.push(c)){
@@ -140,5 +141,5 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
                 }
             }
         }
-    }
+    }**/
 }

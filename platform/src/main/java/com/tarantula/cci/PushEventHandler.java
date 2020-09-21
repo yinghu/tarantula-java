@@ -89,7 +89,7 @@ public class PushEventHandler implements RequestHandler {
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
-        log.info("Push event handler started");
+        log.info("TCP Push event handler started");
     }
 
     @Override
