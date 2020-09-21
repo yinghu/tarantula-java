@@ -27,7 +27,7 @@ public class GameServerEventHandler implements RequestHandler {
     private String serverTopic;
     private final ConcurrentHashMap<String, OnExchange> _hex = new ConcurrentHashMap<>();
     private GsonBuilder builder;
-    private Connection endpoint;
+
     private DeployService deployService;
     public String name(){
         return "/server";
@@ -43,8 +43,6 @@ public class GameServerEventHandler implements RequestHandler {
                 if(this.tokenValidatorProvider.validateAccessKey(accessKey)){
                     JsonObject jo = new JsonObject();
                     jo.addProperty("ticket", tokenValidatorProvider.ticket(serverId,1,5));
-                    jo.addProperty("host",endpoint.host());
-                    jo.addProperty("port",endpoint.port());
                     jo.addProperty("successful",true);
                     et = jo.toString().getBytes();
                 }
@@ -54,20 +52,22 @@ public class GameServerEventHandler implements RequestHandler {
                 }
                 exchange.onEvent(new ResponsiveEvent("","",et,"push",true));
             }
-            else if(action.equals("onConnect")){//access key
+            else if(action.equals("onStart")){//access key
                 if(tokenValidatorProvider.validateTicket(serverId,1,accessKey)){
-                    //log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
-                    String sid = exchange.id();
-                    _hex.put(sid,exchange);
-                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,serverId,_payload);
-                    deployService.addServerPushEvent(pushEvent);
+                    log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
+                    //String sid = exchange.id();
+                    //_hex.put(sid,exchange);
+                    //ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,serverId,_payload);
+                    //deployService.addServerPushEvent(pushEvent);
+                    //exchange.onEvent(new ResponsiveEvent("","",_payload,"push",true));
                 }
                 else{
                     log.warn("Invalid ticket");
-                    exchange.close();
+                    //exchange.close();
                 }
+                exchange.onEvent(new ResponsiveEvent("","",_payload,"push",true));
             }
-            else if(action.equals("onDisconnect")){//no more access key check event from server socket
+            else if(action.equals("onStop")){//no more access key check event from server socket
                 //log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
                 _hex.forEach((k,v)->{
                     if(v.header(Session.TARANTULA_SERVER_ID).equals(serverId)){
@@ -89,7 +89,7 @@ public class GameServerEventHandler implements RequestHandler {
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
-        log.info("Push event handler started");
+        log.info("Game server event handler started");
     }
 
     @Override
@@ -101,7 +101,7 @@ public class GameServerEventHandler implements RequestHandler {
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
         this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
         //this.bucket = tcx.bucket();
-        this.endpoint = tcx.endpoint();
+        //this.endpoint = tcx.endpoint();
         tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
     }
     public  boolean onEvent(Event event){

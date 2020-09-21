@@ -3,6 +3,7 @@ package com.tarantula.platform.service;
 import com.tarantula.*;
 import com.tarantula.Module;
 
+import javax.crypto.SecretKey;
 import java.util.List;
 
 /**
@@ -12,17 +13,15 @@ import java.util.List;
 public interface DeploymentServiceProvider extends ServiceProvider,MetricsListener{
 
     String DEPLOY_DATA_STORE = "tarantula";
+    String SERVER_KEY_SPEC = "AES";
 
     String NAME = "DeploymentServiceProvider";
 
-    //UDP SERVER APIs
-    //void onUDPConnection(String typeId,Connection connection);
+    //GAME SERVER APIs
     Connection onConnection(String typeId, Connection.StateListener listener);
     void onStartedConnection(String serverId,byte[] started);
-    //void onUpdatedUDPConnection(String serverId,byte[] updated);
-    //void onEndedUDPConnection(String serverId,byte[] ended);
     void onEndedConnection(String serverId);
-    //byte[] onStartedUDPConnection(String serverId);
+    SecretKey serverKey();
     //END OF DEDICATED SERVER APIs
 
     /**

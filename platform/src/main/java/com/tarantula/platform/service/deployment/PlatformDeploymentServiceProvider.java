@@ -12,10 +12,13 @@ import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
 import com.tarantula.platform.util.*;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,6 +38,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     //private String eventTopic = DEPLOY_TOPIC;
     //private String localTopic;
     //private String registerKey;
+    private SecureRandom secureRandom;
 
     private ConcurrentHashMap<String,InstanceRegistry.Listener> rListeners = new ConcurrentHashMap<>();
     private CopyOnWriteArrayList<OnLobby.Listener> oListeners = new CopyOnWriteArrayList<>();
@@ -66,6 +70,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     @Override
     public void start() throws Exception {
+        this.secureRandom = new SecureRandom();
         onAccessIndex = new AtomicBoolean(true);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
@@ -566,7 +571,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             log.warn("Server connection not existed ->"+serverId);
         }
     }
-    public void onEndedUDPConnection(String serverId){
+    public void onEndedConnection(String serverId){
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         icp.remove(serverId.getBytes());
     }
@@ -625,6 +630,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         byte[] ret = icp.remove(resetCode.getBytes());
         return (ret!=null?new String(ret):"");
+    }
+    public SecretKey serverKey(){
+        byte[] key = new byte[16];
+        secureRandom.nextBytes(key);
+        SecretKey secretKey = new SecretKeySpec(key, SERVER_KEY_SPEC);
+        return secretKey;
     }
     public void stopAccessIndex(){
         onAccessIndex.set(false);

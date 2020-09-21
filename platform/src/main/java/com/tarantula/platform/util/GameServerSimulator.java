@@ -1,31 +1,54 @@
 package com.tarantula.platform.util;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.tarantula.Connection;
 import com.tarantula.Session;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.UUID;
 
 /**
  * Created by yinghu lu on 9/19/2020.
  */
 public class GameServerSimulator {
     static HttpCaller caller;
+    static String serverId;
+    static JsonParser parser;
     public static void main(String[] args) throws Exception{
+        parser = new JsonParser();
+        serverId = UUID.randomUUID().toString();
         caller = new HttpCaller("http://10.0.0.234:8090");
         caller._init();
         caller.index();
-        System.out.println(OnTicket("BDS01/81280cec10d244d5a324d5fcb211fdcd-75596F4EB936FFF376D31E26D5F204F48E23C921"));
-        System.out.println(key());
+        JsonObject resp = parser.parse(onTicket("BDS01/81280cec10d244d5a324d5fcb211fdcd-75596F4EB936FFF376D31E26D5F204F48E23C921")).getAsJsonObject();
+        System.out.println(resp.get("ticket").getAsString());
+        System.out.println(onRegister(resp.get("ticket").getAsString()));
     }
-    static String OnTicket(String accessKey) throws Exception{
+    static String onTicket(String accessKey) throws Exception{
         String[] headers = new String[]{
                 Session.TARANTULA_ACCESS_KEY,accessKey,
                 Session.TARANTULA_ACTION,"onTicket",
-                Session.TARANTULA_SERVER_ID,"SERVER_ID"
+                Session.TARANTULA_SERVER_ID,serverId
         };
         return caller.get("server",headers);
+    }
+    static String onRegister(String ticket) throws Exception{
+        JsonObject json = new JsonObject();
+        json.addProperty("serverId",serverId);
+        json.addProperty("host","10.0.0.234");
+        json.addProperty("port",16393);
+        json.addProperty("type", Connection.UDP);
+        json.addProperty("maxRooms",10);
+        String[] headers = new String[]{
+                Session.TARANTULA_ACCESS_KEY,ticket,
+                Session.TARANTULA_ACTION,"onRegister",
+                Session.TARANTULA_SERVER_ID,serverId
+        };
+        return caller.post("server",json.toString().getBytes(),headers);
     }
     static String key(){
         SecureRandom secureRandom = new SecureRandom();
