@@ -4,7 +4,6 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
-import com.tarantula.platform.OnViewTrack;
 import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
@@ -37,8 +36,6 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int LEADER_BOARD_GLOBAL_EVENT_CID = 20;
 
     public static final int CONNECTION_STATE_EVENT_CID = 21;
-
-
 
 
     //EVENT PORTABLE OBJECTS

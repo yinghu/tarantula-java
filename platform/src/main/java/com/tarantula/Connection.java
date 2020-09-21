@@ -2,7 +2,7 @@ package com.tarantula;
 
 public interface Connection extends Response {
 
-    String WEB_SOCKET = "websocket";
+    String WEB_HOOK = "webhook";
     String UDP = "udp";
 
     String type();

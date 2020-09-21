@@ -3,6 +3,8 @@ package com.tarantula.platform.service.deployment;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
+import com.tarantula.cci.udp.UDPSessionService;
+import com.tarantula.cci.webhook.WebhookSessionService;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
@@ -452,9 +454,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         oListeners.add(onLobbyListener);
     }
     public void registerServerPushEvent(Event event){
-        log.warn("add server push->"+event.trackId());
         Connection occ = this.builder.create().fromJson(new String(event.payload()), Connection.class);
         occ.disabled(false);
+        log.warn("add server push->"+event.trackId()+"/"+occ.type());
+        if(occ.type().equals(Connection.UDP)){
+            event.eventService(new UDPSessionService());
+        }
+        else if(occ.type().equals(Connection.WEB_HOOK)){
+            event.eventService(new WebhookSessionService());
+        }
         pushRegistry.put(event.trackId(), event);//serverId cache
         this.wListeners.forEach((l) -> {
             l.onState(occ);
