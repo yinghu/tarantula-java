@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * updated by yinghu lu on 6/9/2020.
  */
-public class GameZoneModule implements Module,Configurable.Listener{
+public class GameZoneModule implements Module,Configurable.Listener,Connection.StateListener{
 
     private ApplicationContext context;
     private Zone mZone;
@@ -129,7 +129,13 @@ public class GameZoneModule implements Module,Configurable.Listener{
             //return;
         //}
         //this.connection.reset(connection);
-        this.context.log("connection->"+connection.serverId(),OnLog.WARN);
+        Connection c = this.deploymentServiceProvider.onConnection("game",this);
+        if(c!=null){
+            this.context.log("connection->"+connection.serverId(),OnLog.WARN);
+        }
+        else{
+            this.context.log("no connection->",OnLog.WARN);
+        }
         this.context.postOffice().onConnection(connection.serverId()).send("game","hello".getBytes());
     }
     @Override
@@ -161,5 +167,15 @@ public class GameZoneModule implements Module,Configurable.Listener{
         jsonObject.addProperty("successful",successful);
         jsonObject.addProperty("message",msg);
         return jsonObject;
+    }
+
+    @Override
+    public void onUpdated(byte[] updated) {
+
+    }
+
+    @Override
+    public void onEnded(byte[] ended) {
+
     }
 }

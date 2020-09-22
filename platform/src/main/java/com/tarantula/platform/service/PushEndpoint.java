@@ -1,9 +1,9 @@
 package com.tarantula.platform.service;
 
 import com.google.gson.JsonObject;
-import com.tarantula.platform.WebSocketConnection;
+import com.tarantula.platform.UniverseConnection;
 
-public class PushEndpoint extends WebSocketConnection {
+public class PushEndpoint extends UniverseConnection {
 
     public PushEndpoint(String host,int port){
         this.host = host;

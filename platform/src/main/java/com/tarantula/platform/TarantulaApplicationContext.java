@@ -56,6 +56,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         this.configurations = configurations;
         this.resetEnabled = descriptor.resetEnabled();
     }
+    public String typeId(){
+        return this._descriptor.typeId();
+    }
     public synchronized void onState(Connection onConnection){
         this.application.onState(onConnection);
     }

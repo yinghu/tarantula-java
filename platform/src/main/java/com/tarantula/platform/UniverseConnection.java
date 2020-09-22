@@ -6,7 +6,7 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.util.Map;
 
-public class WebSocketConnection extends ResponseHeader implements Connection {
+public class UniverseConnection extends ResponseHeader implements Connection {
 
     protected String type;
     protected String serverId;
@@ -17,19 +17,13 @@ public class WebSocketConnection extends ResponseHeader implements Connection {
     protected String path;
     protected int maxConnections;
 
-    public WebSocketConnection(){
+    public UniverseConnection(){
 
     }
-    public WebSocketConnection(WebSocketConnection webSocketConnection){
-        this.type = webSocketConnection.type;
-        this.serverId = webSocketConnection.serverId;
-        this.secured = webSocketConnection.secured;
-        this.protocol = webSocketConnection.protocol;
-        this.host = webSocketConnection.host;
-        this.port = webSocketConnection.port;
-        this.path = webSocketConnection.path;
-        this.maxConnections = webSocketConnection.maxConnections;
-        this.disabled = webSocketConnection.disabled;
+    public UniverseConnection(String serverId,String host,int port){
+        this.serverId = serverId;
+        this.host = host;
+        this.port = port;
     }
 
     @Override
@@ -109,20 +103,6 @@ public class WebSocketConnection extends ResponseHeader implements Connection {
         this.maxConnections = maxConnections;
     }
 
-    public Connection copy(){
-        return new WebSocketConnection(this);
-    }
-    public void reset(Connection connection){
-        this.type = connection.type();
-        this.serverId = connection.serverId();
-        this.secured = connection.secured();
-        this.protocol = connection.protocol();
-        this.host = connection.host();
-        this.port = connection.port();
-        this.path = connection.path();
-        this.maxConnections = connection.maxConnections();
-        this.disabled = connection.disabled();
-    }
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("type",this.type);

@@ -109,7 +109,7 @@ public class PortableRegistry extends AbstractRecoverableListener{
                 _ins = new Batch();
                 break;
             case ON_CONNECTION_CID:
-                _ins = new WebSocketConnection();
+                _ins = new UniverseConnection();
                 break;
             default:
                 throw new IllegalArgumentException("Not supported event type");

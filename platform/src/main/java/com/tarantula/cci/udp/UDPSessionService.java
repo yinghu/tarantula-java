@@ -1,17 +1,31 @@
 package com.tarantula.cci.udp;
 
-import com.tarantula.Event;
-import com.tarantula.EventListener;
-import com.tarantula.EventService;
-import com.tarantula.RoutingKey;
+import com.tarantula.*;
+
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
 
 /**
  * Created by yinghu lu on 9/21/2020.
  */
 public class UDPSessionService implements EventService {
+
+    private DatagramChannel datagramChannel;
+    private Connection connection;
+
+    public UDPSessionService(Connection connection){
+        this.connection = connection;
+    }
+
     @Override
     public void publish(Event out) {
-
+        try{
+            ByteBuffer buffer = ByteBuffer.wrap(out.payload());
+            datagramChannel.write(buffer);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -51,11 +65,12 @@ public class UDPSessionService implements EventService {
 
     @Override
     public void start() throws Exception {
-
+        this.datagramChannel = DatagramChannel.open();
+        this.datagramChannel.connect(new InetSocketAddress(connection.host(),connection.port()));
     }
 
     @Override
     public void shutdown() throws Exception {
-
+        this.datagramChannel.close();
     }
 }

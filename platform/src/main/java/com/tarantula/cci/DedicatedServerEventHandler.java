@@ -4,7 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.UDPConnection;
+import com.tarantula.platform.UniverseConnection;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.ServiceContext;
@@ -40,7 +40,7 @@ public class DedicatedServerEventHandler implements RequestHandler {
                 int port = Integer.parseInt(exchange.header("Tarantula-port"));
                 String vLobby = tokenValidator.validateGameClusterAccessKey(accessKey);
                 if(vLobby!=null){
-                    Connection connection = new UDPConnection(serverId,host,port);
+                    Connection connection = new UniverseConnection(serverId,host,port);
                     this.deploymentServiceProvider.distributionCallback().onConnection(vLobby,connection);
                 }
                 byte[] eb = this.builder.create().toJson(new ResponseHeader("onRegistered",vLobby!=null?"Ok":"invalid access key",vLobby!=null)).getBytes();

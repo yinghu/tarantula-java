@@ -32,10 +32,11 @@ public interface Connection extends Response {
     int maxConnections();
     void maxConnections(int maxConnections);
 
-    default Connection copy(){return null;}
-    default void reset(Connection connection){}
+    //default Connection copy(){return null;}
+    //default void reset(Connection connection){}
 
     interface Listener{
+        String typeId();
         void onState(Connection connection);
     }
     interface StateListener{

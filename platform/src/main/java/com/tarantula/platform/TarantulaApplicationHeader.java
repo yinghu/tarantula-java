@@ -61,6 +61,9 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
     public void onBucket(int bucket,int state) {
 
     }
+    public String typeId(){
+        return this.descriptor.typeId();
+    }
     public void onState(Connection onConnection){
 
     }
