@@ -129,7 +129,8 @@ public class GameZoneModule implements Module,Configurable.Listener{
             //return;
         //}
         //this.connection.reset(connection);
-        this.context.log("connection->"+connection.disabled(),OnLog.WARN);
+        this.context.log("connection->"+connection.serverId(),OnLog.WARN);
+        this.context.postOffice().onConnection(connection.serverId()).send("game","hello".getBytes());
     }
     @Override
     public void onTimer(OnUpdate update){

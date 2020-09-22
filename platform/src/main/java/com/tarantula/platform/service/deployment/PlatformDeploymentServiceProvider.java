@@ -456,14 +456,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerServerPushEvent(Event event){
         Connection occ = this.builder.create().fromJson(new String(event.payload()), Connection.class);
         occ.disabled(false);
+        event.eventService(this.integrationEventService);
         log.warn("add server push->"+event.trackId()+"/"+occ.type());
-        if(occ.type().equals(Connection.UDP)){
-            event.eventService(new UDPSessionService());
-        }
-        else if(occ.type().equals(Connection.WEB_HOOK)){
-            event.eventService(new WebhookSessionService());
-        }
-        pushRegistry.put(event.trackId(), event);//serverId cache
+        //if(occ.type().equals(Connection.UDP)){
+            //event.eventService(new UDPSessionService());
+        //}
+        //else if(occ.type().equals(Connection.WEB_HOOK)){
+            //event.eventService(new WebhookSessionService());
+        //}
+        pushRegistry.put(occ.serverId(), event);//serverId cache
         this.wListeners.forEach((l) -> {
             l.onState(occ);
         });

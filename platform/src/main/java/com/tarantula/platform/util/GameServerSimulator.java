@@ -7,9 +7,14 @@ import com.tarantula.Session;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by yinghu lu on 9/19/2020.
@@ -19,7 +24,24 @@ public class GameServerSimulator {
     static String serverId;
     static JsonParser parser;
     static String accessKey = "BDS01/81280cec10d244d5a324d5fcb211fdcd-75596F4EB936FFF376D31E26D5F204F48E23C921";
+    static DatagramChannel datagramChannel;
+
     public static void main(String[] args) throws Exception{
+        datagramChannel = DatagramChannel.open();
+        datagramChannel.bind(new InetSocketAddress("10.0.0.234",16393));
+        CountDownLatch ct = new CountDownLatch(1);
+        Thread t = new Thread(()->{
+            try {
+                ByteBuffer buffer = ByteBuffer.allocate(1024);
+                SocketAddress sc = datagramChannel.receive(buffer);
+                System.out.println(sc.toString()+""+new String(buffer.array()).trim());
+
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+            ct.countDown();
+        });
+        t.start();
         parser = new JsonParser();
         serverId = UUID.randomUUID().toString();
         caller = new HttpCaller("http://10.0.0.234:8090");
@@ -27,7 +49,8 @@ public class GameServerSimulator {
         caller.index();
         JsonObject resp = parser.parse(onStart(accessKey)).getAsJsonObject();
         System.out.println(resp);
-        onStop(accessKey);
+        ct.await();
+        //onStop(accessKey);
     }
 
     static String onStart(String accessKey) throws Exception{
