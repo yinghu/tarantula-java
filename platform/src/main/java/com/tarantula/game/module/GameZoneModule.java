@@ -131,7 +131,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.S
         //this.connection.reset(connection);
         Connection c = this.deploymentServiceProvider.onConnection("game",this);
         if(c!=null){
-            this.context.log("connection->"+connection.serverId(),OnLog.WARN);
+            this.context.log("connection->"+connection.serverId()+"//"+c.sequence(),OnLog.WARN);
         }
         else{
             this.context.log("no connection->",OnLog.WARN);

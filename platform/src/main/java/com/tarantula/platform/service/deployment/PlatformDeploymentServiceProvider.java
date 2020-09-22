@@ -479,6 +479,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(pes!=null){
             Connection occ = this.builder.create().fromJson(new String(pes.payload()), Connection.class);
             occ.disabled(true);
+            if(occ.type().equals(Connection.UDP)){
+
+            }
             this.wListeners.forEach((l)->{
                 l.onState(occ);
             });
@@ -530,6 +533,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     //dedicated server methods
     public void onConnection(String typeId,Connection connection){
+        connection.sequence(this.tarantulaContext.integrationCluster().sequence());
         this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));
     }
     public Connection onConnection(String typeId,Connection.StateListener listener){
@@ -540,6 +544,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         Connection connection = new UniverseConnection();
         connection.fromMap(SystemUtil.toMap(ret));
+        ServerPushEvent pushEvent = (ServerPushEvent) pushRegistry.get(connection.serverId());
+        //pushEvent.eventService()
+        /**
         icp.set(connection.serverId().getBytes(),icp.subscription().getBytes());
         icp.addEventListener(connection.serverId(),(e)->{
             if(!e.closed()){
@@ -549,7 +556,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 listener.onEnded(e.payload());
             }
             return e.closed();//removed on closed
-        });
+        });**/
         return connection;
     }
     public void onStartedConnection(String serverId,byte[] started){

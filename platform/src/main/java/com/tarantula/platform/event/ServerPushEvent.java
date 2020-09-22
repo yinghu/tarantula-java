@@ -3,6 +3,7 @@ package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.Event;
+import com.tarantula.EventService;
 
 import java.io.IOException;
 
@@ -52,7 +53,9 @@ public class ServerPushEvent extends Data implements Event {
         this.clientId = in.readUTF("4");
         this.payload = in.readByteArray("5");
     }
-
+    public EventService eventService(){
+        return this.eventService;
+    }
     @Override
     public String toString(){
         return "Server Push Event ["+this.clientId+"]";

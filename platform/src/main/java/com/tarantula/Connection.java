@@ -11,6 +11,9 @@ public interface Connection extends Response {
     String serverId();
     void serverId(String serverId);
 
+    long sequence();
+    void sequence(long sequence);
+
     boolean secured();
     void secured(boolean secured);
 

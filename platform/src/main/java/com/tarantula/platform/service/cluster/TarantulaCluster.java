@@ -84,6 +84,9 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     //public int size(){
         //return this._hazel.getCluster().getMembers().size();
     //}
+    public long sequence(){
+        return this._tarantulaContext.integrationCluster().sequence();
+    }
     public EventService publisher(){
         return this._tarantulaContext.integrationCluster().publisher();
     }

@@ -5,15 +5,17 @@ import com.tarantula.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by yinghu lu on 9/21/2020.
  */
-public class UDPSessionService implements EventService {
+public class UDPSessionService implements EventService{
 
     private DatagramChannel datagramChannel;
     private Connection connection;
-
+    //private ConcurrentHashMap<>
+    private Thread receiver;
     public UDPSessionService(Connection connection){
         this.connection = connection;
     }
@@ -67,10 +69,28 @@ public class UDPSessionService implements EventService {
     public void start() throws Exception {
         this.datagramChannel = DatagramChannel.open();
         this.datagramChannel.connect(new InetSocketAddress(connection.host(),connection.port()));
+        this.receiver = new Thread(()->{
+           run();
+        });
+        this.receiver.start();
     }
 
     @Override
     public void shutdown() throws Exception {
         this.datagramChannel.close();
+        this.receiver.interrupt();
+    }
+
+
+    private void run() {
+        try{
+            while (true){
+                ByteBuffer buffer = ByteBuffer.allocate(1024);
+                datagramChannel.receive(buffer);
+                //callback
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 }

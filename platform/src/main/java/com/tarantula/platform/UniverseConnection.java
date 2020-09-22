@@ -8,14 +8,15 @@ import java.util.Map;
 
 public class UniverseConnection extends ResponseHeader implements Connection {
 
-    protected String type;
-    protected String serverId;
-    protected boolean secured;
-    protected String protocol;
-    protected String host;
-    protected int port;
-    protected String path;
-    protected int maxConnections;
+    private String type;
+    private String serverId;
+    private long sequence;
+    private boolean secured;
+    private String protocol;
+    private String host;
+    private int port;
+    private String path;
+    private int maxConnections;
 
     public UniverseConnection(){
 
@@ -46,6 +47,12 @@ public class UniverseConnection extends ResponseHeader implements Connection {
         this.serverId = serverId;
     }
 
+    public long sequence(){
+        return this.sequence;
+    }
+    public void sequence(long sequence){
+        this.sequence = sequence;
+    }
     @Override
     public boolean secured() {
         return secured;
@@ -107,6 +114,7 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     public Map<String,Object> toMap(){
         this.properties.put("type",this.type);
         this.properties.put("serverId",this.serverId);
+        this.properties.put("sequence",this.sequence);
         this.properties.put("secured",this.secured);
         this.properties.put("protocol",this.protocol);
         this.properties.put("host",this.host);
@@ -120,6 +128,7 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     public void fromMap(Map<String,Object> properties){
         this.type = (String)properties.get("type");
         this.serverId = (String)properties.get("serverId");
+        this.sequence = ((Number)properties.get("sequence")).longValue();
         this.secured =(Boolean)properties.get("secured");
         this.protocol = (String)properties.get("protocol");
         this.host = (String)properties.get("host");

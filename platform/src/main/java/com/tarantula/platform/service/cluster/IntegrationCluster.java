@@ -30,6 +30,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private final String bucket;
     private final String INDEX_MAP = "integration.recoverable.index.Key";
     private final String VALUE_MAP = "integration.recoverable.data.Value";
+    private final String SEQUENCE = "integration.recoverable.data.Sequence";
     private HazelcastInstance _cluster;
 
     private final ConcurrentHashMap<String,ITopic<Event>> topicList = new ConcurrentHashMap<>();
@@ -48,6 +49,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private MultiMap<String, byte[]> mIndex;
     private Map<byte[],byte[]> vMap;
+    private IAtomicLong vSequence;
 
     private String memberId;
     private DeployService deployService;
@@ -75,19 +77,12 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public String bucket(){
         return this.bucket;
     }
-    //public int partitionCount(){
-        //return partitionCount;
-    //}
+
     public void waitForData(){}
     public int scope(){
         return Distributable.INTEGRATION_SCOPE;
     }
-    //public boolean onPartition(byte[] key){
-        //return this._cluster.getPartitionService().getPartition(key).getOwner().getUuid().equals(this.memberId);
-    //}
-    //public int size(){
-       // return this._cluster.getCluster().getMembers().size();
-    //}
+
     public void start() throws Exception {
         TarantulaExecutorServiceFactory.createExecutorService("integration-"+this.tarantulaContext.eventThreadPoolSetting,(pool,poolSize,rh)->{
             this.inboundEventPool = pool;
@@ -97,13 +92,14 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             EventSubscriptionWorker ese = new EventSubscriptionWorker(this,eventSubscribers,replicationQueue);
             this.inboundEventPool.execute(ese);
         }
-        //partitionCount = Integer.parseInt(config.getProperty("hazelcast.partition.count"));
+        //config.getCPSubsystemConfig().setCPMemberCount(3);
         config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         this.config.getListenerConfigs().add(new ListenerConfig(this));
         _cluster = Hazelcast.newHazelcastInstance(this.config);
         this.tarantulaContext._integrationInstanceStarted.await();
         mIndex = this._cluster.getMultiMap(INDEX_MAP);
         vMap = this._cluster.getMap(VALUE_MAP);
+        vSequence = this._cluster.getAtomicLong(SEQUENCE);
         AccessIndexService accessIndexService =_cluster.getDistributedObject(AccessIndexService.NAME,AccessIndexService.NAME);
         this.tarantulaContext.serviceProvider(accessIndexService);
         this.memberId = this._cluster.getCluster().getLocalMember().getUuid();
@@ -243,7 +239,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public byte[] remove(byte[] key){
         return vMap.remove(key);
     }
-
+    public long sequence(){
+        return vSequence.incrementAndGet();
+    }
     public EventService subscribe(String topic, EventListener callback){
         this.eventSubscribers.computeIfAbsent(topic,(t)->{
             EventSubscriber eventSubscriber = new EventSubscriber();
