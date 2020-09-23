@@ -154,7 +154,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     }
     @Override
     public void onConnecting(Room room){
-        this.deploymentServiceProvider.onStartedConnection(room.connection().serverId(),roomSetting(room));
+        //this.deploymentServiceProvider.onStartedConnection(room.connection().serverId(),roomSetting(room));
     }
     @Override
     public byte[] onStarting(Room room){
@@ -199,7 +199,7 @@ public class Zone extends RecoverableObject implements RoomListener,DataStore.Up
     @Override
     public void onEnding(Room room) {
         if(!room.offline()){
-            this.deploymentServiceProvider.onEndedConnection(room.connection().serverId());
+            //this.deploymentServiceProvider.onEndedConnection(room.connection().serverId());
         }
         for(Stub sb : room.playerList()){
             this.onLeaving(sb);

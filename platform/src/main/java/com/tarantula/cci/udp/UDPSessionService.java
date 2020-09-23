@@ -88,6 +88,7 @@ public class UDPSessionService implements EventService{
                 ByteBuffer buffer = ByteBuffer.allocate(1024);
                 datagramChannel.receive(buffer);
                 //callback
+                System.out.println("receiving message");
             }
         }catch (Exception ex){
             ex.printStackTrace();

@@ -38,6 +38,7 @@ public interface ClusterProvider extends Serviceable{
     void set(byte[] key,byte[] value);
     void index(String index,byte[] key);
     byte[] firstIndex(String index);
+    void removeIndex(String index);
     byte[] remove(byte[] key);
 
     void registerMetricsListener(MetricsListener metricsListener);

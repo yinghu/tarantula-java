@@ -46,7 +46,7 @@ public class GameServerEventHandler implements RequestHandler {
             if(action.equals("onStart")){//access key
                 if(tokenValidatorProvider.validateAccessKey(accessKey)){
                     Connection connection = this.builder.create().fromJson(new String(_payload),Connection.class);
-                    this.deploymentServiceProvider.distributionCallback().onConnection("game",connection);
+                    this.deploymentServiceProvider.distributionCallback().onConnection(serverId,connection);
                     ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,_payload);
                     deployService.addServerPushEvent(pushEvent);
                     DatagramChannel datagramChannel = DatagramChannel.open();
@@ -62,6 +62,7 @@ public class GameServerEventHandler implements RequestHandler {
             else if(action.equals("onStop")){//no more access key check event from server socket
                 if(tokenValidatorProvider.validateAccessKey(accessKey)){
                     log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
+                    //this.deploymentServiceProvider
                     _hex.forEach((k,v)->{
                         if(v.id().equals(serverId)){
                             _hex.remove(k);

@@ -559,6 +559,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });**/
         return connection;
     }
+
     public void onStartedConnection(String serverId,byte[] started){
         String _serverId = serverId+"_v";
         this.tarantulaContext.integrationCluster().set(_serverId.getBytes(),started);

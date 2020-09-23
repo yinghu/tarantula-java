@@ -129,7 +129,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.S
             //return;
         //}
         //this.connection.reset(connection);
-        Connection c = this.deploymentServiceProvider.onConnection("game",this);
+        Connection c = this.deploymentServiceProvider.onConnection(connection.serverId(),this);
         if(c!=null){
             this.context.log("connection->"+connection.serverId()+"//"+c.sequence(),OnLog.WARN);
         }

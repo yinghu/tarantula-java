@@ -142,6 +142,8 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     public byte[] firstIndex(String index){
         return null;
     }
+    public void removeIndex(String index){
+    }
     public byte[] remove(byte[] key){
         return null;
     }

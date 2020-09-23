@@ -236,6 +236,11 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         mIndex.unlock(index);
         return ret;
     }
+    public void removeIndex(String index){
+        mIndex.lock(index);
+        mIndex.remove(index);
+        mIndex.unlock(index);
+    }
     public byte[] remove(byte[] key){
         return vMap.remove(key);
     }
