@@ -23,7 +23,7 @@ public class GameServerSimulator {
     static HttpCaller caller;
     static String serverId;
     static JsonParser parser;
-    static String accessKey = "BDS01/81280cec10d244d5a324d5fcb211fdcd-75596F4EB936FFF376D31E26D5F204F48E23C921";
+    static String accessKey = "BDS01/ee71a0f14f344cfda8f34974df958743-F0E3A7B7B711608C9C4F0A17E2006EDA8AA3100E";
     static DatagramChannel datagramChannel;
 
     public static void main(String[] args) throws Exception{

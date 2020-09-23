@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * Developer: YINGHU LU
  * Date: updated 5/20/2020
  */
-public class PresenceApplication extends TarantulaApplicationHeader implements OnLobby.Listener {
+public class PresenceApplication extends TarantulaApplicationHeader implements OnLobby.Listener{
 
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
@@ -43,6 +43,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                 //this.context.dataStore("presence").create(ob);
             }
         });
+        this.deploymentServiceProvider.registerOnConnectionListener(this);
         this.context.log("Presence application started on ["+descriptor.tag()+"]",OnLog.INFO);
     }
 
@@ -215,5 +216,10 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             liveGameContext.removeGameIndex(ps[0]);
             context.log("Lobby ["+onLobby.typeId()+"] is going to be offline",OnLog.WARN);
         }
+    }
+    @Override
+    public void onState(Connection c) {
+        this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"]",OnLog.WARN);
+        //this.module.onConnection(c);
     }
 }

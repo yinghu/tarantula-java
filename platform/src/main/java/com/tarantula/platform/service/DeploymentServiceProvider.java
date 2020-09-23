@@ -18,7 +18,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     String NAME = "DeploymentServiceProvider";
 
     //GAME SERVER APIs
-    Connection onConnection(String serverId, Connection.InboundListener listener);
+    Connection onConnection(String typeId, Connection.InboundListener listener);
     //void onStartedConnection(String serverId,byte[] started);
     //void onEndedConnection(String serverId);
     SecretKey serverKey();
@@ -107,7 +107,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void syncKey(String key);
 
         //game server callbacks
-        void onConnection(String serverId,Connection connection);
+        Connection onConnection(String typeId,Connection connection);
         byte[] onStartedConnection(String serverId);
         void onUpdatedConnection(String serverId,byte[] updated);
         void onEndedConnection(String serverId,byte[] ended);

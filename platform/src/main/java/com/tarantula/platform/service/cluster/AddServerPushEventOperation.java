@@ -37,12 +37,13 @@ public class AddServerPushEventOperation extends Operation {
         out.writeUTF(event.sessionId());
         out.writeUTF(event.trackId());
         out.writeUTF(event.clientId());
+        out.writeUTF(event.typeId());
         out.writeByteArray(event.payload());
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        event = new ServerPushEvent(in.readUTF(),in.readUTF(),in.readUTF(),in.readUTF(),in.readByteArray());
+        event = new ServerPushEvent(in.readUTF(),in.readUTF(),in.readUTF(),in.readUTF(),in.readUTF(),in.readByteArray());
     }
 }

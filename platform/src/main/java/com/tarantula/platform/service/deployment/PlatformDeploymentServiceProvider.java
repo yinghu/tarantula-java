@@ -8,7 +8,6 @@ import com.tarantula.cci.webhook.WebhookSessionService;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
-import com.tarantula.platform.bootstrap.TarantulaThreadFactory;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.*;
@@ -507,20 +506,24 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         pushRegistry.put(occ.serverId(), event);//serverId cache
         this.wListeners.forEach((l) -> {
-            l.onState(occ);
+            if(l.typeId().equals(event.typeId())){
+                l.onState(occ);
+            }
         });
     }
     public void releaseServerPushEvent(String serverId){
         log.warn("remove server push->"+serverId);
-        Event pes = pushRegistry.remove(serverId);
+        ServerPushEvent pes = (ServerPushEvent) pushRegistry.remove(serverId);
         if(pes!=null){
             Connection occ = this.builder.create().fromJson(new String(pes.payload()), Connection.class);
             occ.disabled(true);
             if(occ.type().equals(Connection.UDP)){
-
+                try{pes.eventService().shutdown();}catch (Exception ex){}
             }
             this.wListeners.forEach((l)->{
-                l.onState(occ);
+                if(pes.typeId().equals(l.typeId())){
+                    l.onState(occ);
+                }
             });
         }
     }
@@ -535,7 +538,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerOnConnectionListener(Connection.Listener listener){
         pushRegistry.forEach((k,v)->{
             Connection connection = this.builder.create().fromJson(new String(v.payload()), Connection.class);
-            listener.onState(connection);
+            if(v.typeId().equals(listener.typeId())){
+                listener.onState(connection);
+            }
         });
         wListeners.add(listener);
     }
@@ -569,9 +574,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     //dedicated server methods
-    public void onConnection(String typeId,Connection connection){
+    public Connection onConnection(String typeId,Connection connection){
         connection.sequence(this.tarantulaContext.integrationCluster().sequence());
         this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));
+        return connection;
     }
     public Connection onConnection(String typeId,Connection.InboundListener listener){
         ClusterProvider icp = this.tarantulaContext.integrationCluster();

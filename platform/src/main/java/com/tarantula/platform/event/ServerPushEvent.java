@@ -22,11 +22,12 @@ public class ServerPushEvent extends Data implements Event {
         this.trackId = serverId;
         this.payload = payload;
     }
-    public ServerPushEvent(String source, String sessionId,String serverId,String clientId,byte[] payload){
+    public ServerPushEvent(String source, String sessionId,String serverId,String clientId,String typeId,byte[] payload){
         this.source = source;
         this.sessionId = sessionId;
         this.trackId = serverId;
         this.clientId = clientId;
+        this.typeId = typeId;
         this.payload = payload;
     }
     @Override
@@ -43,7 +44,8 @@ public class ServerPushEvent extends Data implements Event {
         out.writeUTF("2",this.sessionId);
         out.writeUTF("3",this.trackId);//serverId
         out.writeUTF("4",this.clientId);
-        out.writeByteArray("5",this.payload);
+        out.writeUTF("5",this.typeId);
+        out.writeByteArray("6",this.payload);
     }
     @Override
     public void readPortable(PortableReader in) throws IOException {
@@ -51,13 +53,14 @@ public class ServerPushEvent extends Data implements Event {
         this.sessionId = in.readUTF("2");
         this.trackId = in.readUTF("3");
         this.clientId = in.readUTF("4");
-        this.payload = in.readByteArray("5");
+        this.typeId = in.readUTF("5");
+        this.payload = in.readByteArray("6");
     }
     public EventService eventService(){
         return this.eventService;
     }
     @Override
     public String toString(){
-        return "Server Push Event ["+this.clientId+"]";
+        return "Server Push Event ["+this.typeId+"]";
     }
 }

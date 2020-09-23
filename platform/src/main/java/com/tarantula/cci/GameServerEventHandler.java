@@ -2,7 +2,6 @@ package com.tarantula.cci;
 
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
-import com.tarantula.cci.udp.UDPSession;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
@@ -13,9 +12,6 @@ import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.ConnectionDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
-
-import java.net.InetSocketAddress;
-import java.nio.channels.DatagramChannel;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,41 +39,63 @@ public class GameServerEventHandler implements RequestHandler {
             String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
             String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
             byte[] _payload = exchange.payload();
-            if(action.equals("onStart")){//access key
-                if(tokenValidatorProvider.validateAccessKey(accessKey)){
-                    Connection connection = this.builder.create().fromJson(new String(_payload),Connection.class);
-                    this.deploymentServiceProvider.distributionCallback().onConnection(serverId,connection);
+            if(action.equals("onStart")){//start game server
+                String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
+                if(typeId!=null){
                     ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,_payload);
+                    pushEvent.typeId(typeId);
                     deployService.addServerPushEvent(pushEvent);
-                    DatagramChannel datagramChannel = DatagramChannel.open();
-                    datagramChannel.connect(new InetSocketAddress(connection.host(),connection.port()));
-                    UDPSession udpSession = new UDPSession(serverId,datagramChannel);
-                    _hex.put(udpSession.id(),udpSession);
                 }
                 else{
-                    log.warn("Invalid ticket on start");
+                    log.warn("Invalid access key on start");
                 }
-                exchange.onEvent(new ResponsiveEvent("","",_payload,"server",true));
+                exchange.onEvent(new ResponsiveEvent("","",_payload,"start",true));
             }
-            else if(action.equals("onStop")){//no more access key check event from server socket
-                if(tokenValidatorProvider.validateAccessKey(accessKey)){
-                    log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
-                    //this.deploymentServiceProvider
-                    _hex.forEach((k,v)->{
+            else if(action.equals("onJoin")){
+                String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
+                byte[] ret;
+                if(typeId!=null){
+                    Connection connection = this.builder.create().fromJson(new String(_payload),Connection.class);
+                    Connection room = this.deploymentServiceProvider.distributionCallback().onConnection(typeId,connection);
+                    ret = this.builder.create().toJson(room).getBytes();
+                }
+                else{
+                    log.warn("Invalid ticket on room");
+                    ret = "".getBytes();
+                }
+                exchange.onEvent(new ResponsiveEvent("","",ret,"room",true));
+            }
+            else if(action.equals("onLeave")){
+                String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
+                byte[] ret;
+                if(typeId!=null){
+                    Connection connection = this.builder.create().fromJson(new String(_payload),Connection.class);
+                    Connection room = this.deploymentServiceProvider.distributionCallback().onConnection(typeId,connection);
+                    ret = this.builder.create().toJson(room).getBytes();
+                }
+                else{
+                    log.warn("Invalid ticket on room");
+                    ret = "".getBytes();
+                }
+                exchange.onEvent(new ResponsiveEvent("","",ret,"room",true));
+            }
+            else if(action.equals("onStop")){//stop the game server
+                if(tokenValidatorProvider.validateGameClusterAccessKey(accessKey)!=null){
+                    deployService.removeServerPushEvent(serverId);
+                    _hex.forEach((k,v)->{//removed session if any
                         if(v.id().equals(serverId)){
                             _hex.remove(k);
-                            deployService.removeServerPushEvent(serverId);
                         }
                     });
                 }
                 else{
                     log.warn("Invalid ticket on stop");
                 }
-                exchange.onEvent(new ResponsiveEvent("","",_payload,"server",true));
+                exchange.onEvent(new ResponsiveEvent("","",_payload,"stop",true));
             }
         }catch (Exception ex){
             ex.printStackTrace();
-            _hex.remove(exchange.id()); //removed cache on any errors
+            //_hex.remove(exchange.id()); //removed cache on any errors
             exchange.onError(ex,"Bad request");
         }
     }
@@ -111,7 +129,7 @@ public class GameServerEventHandler implements RequestHandler {
            }
         }
         else{
-           log.warn(event.toString()+" unexpected removed on server push");
+           log.warn(event.toString()+" unexpected removed on game server push");
         }
         return true;
     }
