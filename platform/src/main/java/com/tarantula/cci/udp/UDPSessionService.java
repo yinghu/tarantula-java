@@ -72,6 +72,7 @@ public class UDPSessionService implements EventService{
         this.receiver = new Thread(()->{
            run();
         });
+        this.receiver.setName("tarantula-udp-"+connection.serverId());
         this.receiver.start();
     }
 
@@ -88,7 +89,7 @@ public class UDPSessionService implements EventService{
                 ByteBuffer buffer = ByteBuffer.allocate(1024);
                 datagramChannel.receive(buffer);
                 //callback
-                System.out.println("receiving message");
+                System.out.println("receiving message->"+new String(buffer.array()).trim());
             }
         }catch (Exception ex){
             ex.printStackTrace();

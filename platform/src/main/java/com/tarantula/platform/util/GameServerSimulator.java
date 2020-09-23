@@ -35,7 +35,7 @@ public class GameServerSimulator {
                 ByteBuffer buffer = ByteBuffer.allocate(1024);
                 SocketAddress sc = datagramChannel.receive(buffer);
                 System.out.println(sc.toString()+""+new String(buffer.array()).trim());
-                datagramChannel.send(ByteBuffer.wrap("pop".getBytes()),sc);
+                datagramChannel.send(ByteBuffer.wrap("popop".getBytes()),sc);
 
             }catch (Exception ex){
                 ex.printStackTrace();
