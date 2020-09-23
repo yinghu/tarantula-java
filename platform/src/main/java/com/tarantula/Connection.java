@@ -35,15 +35,15 @@ public interface Connection extends Response {
     int maxConnections();
     void maxConnections(int maxConnections);
 
-    //default Connection copy(){return null;}
-    //default void reset(Connection connection){}
+    default void registerInboundListener(InboundListener listener){}
+    default void update(byte[] payload){}
 
     interface Listener{
         String typeId();
         void onState(Connection connection);
     }
-    interface StateListener{
+    interface InboundListener{
         void onUpdated(byte[] updated);
-        void onEnded(byte[] ended);
+        //void onEnded(byte[] ended);
     }
 }

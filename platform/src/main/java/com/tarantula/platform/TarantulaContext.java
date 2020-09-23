@@ -102,7 +102,6 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
     public String dataReplicationThreadPoolSetting;
 
     public String dataStoreDir;
-    //public String dataStoreRecoveryDir;
 
     public int bootstrapRetries = 1 ;
     public String dataStoreMaster;
@@ -124,6 +123,8 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
     public static ScopedMemberDiscovery memberDiscovery;
 
     public String authContext = "localhost";
+    public boolean udpEndpointEnabled;
+    public String udpReceiverThreadPoolSetting;
 
  	private TarantulaContext(){
  	    this.endpointService = new EndpointService(this);

@@ -14,7 +14,7 @@ import java.util.UUID;
 /**
  * Updated by yinghu lu on 6/11/2020.
  */
-public class Room implements Connection.StateListener{
+public class Room implements Connection.InboundListener{
 
     static final int WAITING = 0; //waiting for first join
     static final int PENDING_JOIN = 1; //waiting after first join
@@ -240,8 +240,7 @@ public class Room implements Connection.StateListener{
             }
         });
     }
-
-    @Override
+    /**
     public void onEnded(byte[] ended) {
         this.end();
         JsonParser jp = new JsonParser();
@@ -265,5 +264,5 @@ public class Room implements Connection.StateListener{
                 });
             }
         });
-    }
+    }**/
 }

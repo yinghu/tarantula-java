@@ -1,11 +1,12 @@
 package com.tarantula.cci.udp;
 
+
 import com.tarantula.*;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * Created by yinghu lu on 9/21/2020.
@@ -13,11 +14,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UDPSessionService implements EventService{
 
     private DatagramChannel datagramChannel;
-    private Connection connection;
-    //private ConcurrentHashMap<>
+    private final Connection connection;
+    private final ConcurrentLinkedDeque<ByteBuffer> pendingData;
+
     private Thread receiver;
-    public UDPSessionService(Connection connection){
+    public UDPSessionService(Connection connection,ConcurrentLinkedDeque<ByteBuffer> pendingData){
         this.connection = connection;
+        this.pendingData = pendingData;
     }
 
     @Override
@@ -88,8 +91,8 @@ public class UDPSessionService implements EventService{
             while (true){
                 ByteBuffer buffer = ByteBuffer.allocate(1024);
                 datagramChannel.receive(buffer);
-                //callback
-                System.out.println("receiving message->"+new String(buffer.array()).trim());
+                //dispatch
+                pendingData.offer(buffer);
             }
         }catch (Exception ex){
             ex.printStackTrace();

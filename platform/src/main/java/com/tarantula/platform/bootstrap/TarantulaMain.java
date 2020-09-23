@@ -100,6 +100,8 @@ public class TarantulaMain {
 			btx.dataStoreMaster = override(overriding,"tarantula.data.store.master",_user,_config);
 			btx.dataStoreDailyBackup = Boolean.parseBoolean(override(overriding,"tarantula.data.store.daily.backup",_user,_config));
 			btx.authContext = override(overriding,"tarantula.auth.context",_user,_config);
+			btx.udpEndpointEnabled = Boolean.parseBoolean(override(overriding,"tarantula.endpoint.udp.enable",_user,_config));
+			btx.udpReceiverThreadPoolSetting = override(overriding,"tarantula.endpoint.udp.pool.in.setting",_user,_config);
 			boolean tcpEnabled = Boolean.parseBoolean(override(overriding,"tarantula.endpoint.socket.enable",_user,_config));
 			if(tcpEnabled){
 				EndPoint se = (EndPoint)Class.forName(override(overriding,"tarantula.endpoint.socket",_user,_config)).getConstructor().newInstance();

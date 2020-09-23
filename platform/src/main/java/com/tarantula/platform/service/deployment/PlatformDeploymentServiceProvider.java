@@ -7,6 +7,8 @@ import com.tarantula.cci.udp.UDPSessionService;
 import com.tarantula.cci.webhook.WebhookSessionService;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
+import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
+import com.tarantula.platform.bootstrap.TarantulaThreadFactory;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.*;
@@ -17,6 +19,7 @@ import com.tarantula.platform.util.*;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,7 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -70,16 +75,26 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private AtomicBoolean onAccessIndex;
 
+    private ConcurrentLinkedDeque<ByteBuffer> pendingData;
+    private ConcurrentHashMap<Long,Connection> connections;
+    private ExecutorService udpPool;
+    private int workSize;
     @Override
     public void start() throws Exception {
         this.secureRandom = new SecureRandom();
+        this.pendingData = new ConcurrentLinkedDeque<>();
+        this.connections = new ConcurrentHashMap<>();
         onAccessIndex = new AtomicBoolean(true);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
+
     }
 
     @Override
     public void shutdown() throws Exception {
+        if(tarantulaContext.udpEndpointEnabled){
+            udpPool.shutdown();
+        }
         log.info("Platform deployment service provider shut down");
     }
     @Override
@@ -383,7 +398,29 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void waitForData() {
         this.tarantulaContext.schedule(this);
         this.tarantulaContext.tarantulaCluster().deployService().syncServerPushEvent();
-        //this.tarantulaContext.masterDataStore().registerListener(PortableRegistry.OID,this);
+        if(this.tarantulaContext.udpEndpointEnabled){
+            TarantulaExecutorServiceFactory.createExecutorService(this.tarantulaContext.udpReceiverThreadPoolSetting,(pool, psize, rh)->{
+                this.udpPool = pool;
+                this.workSize = psize;
+            });
+            for(int i=0;i<workSize;i++){
+                udpPool.execute(()->{
+                    while (true){
+                        try{
+                            ByteBuffer pending = pendingData.poll();
+                            if(pending!=null){
+                                connections.forEach((k,v)->v.update(pending.array()));
+                            }
+                            else{
+                                Thread.sleep(100);
+                            }
+                        }catch (Exception ex){
+                            ex.printStackTrace();
+                        }
+                    }
+                });
+            }
+        }
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
     public void memberRemoved(String memberId){
@@ -458,7 +495,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         occ.disabled(false);
         log.warn("add server push->"+event.trackId()+"/"+occ.type());
         if(occ.type().equals(Connection.UDP)){
-            UDPSessionService udpSessionService = new UDPSessionService(occ);
+            UDPSessionService udpSessionService = new UDPSessionService(occ,pendingData);
             try{udpSessionService.start();}catch (Exception ex){}
             event.eventService(udpSessionService);
         }
@@ -536,7 +573,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         connection.sequence(this.tarantulaContext.integrationCluster().sequence());
         this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));
     }
-    public Connection onConnection(String typeId,Connection.StateListener listener){
+    public Connection onConnection(String typeId,Connection.InboundListener listener){
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         byte[] ret = icp.firstIndex(typeId);
         if(ret==null){
@@ -544,19 +581,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         Connection connection = new UniverseConnection();
         connection.fromMap(SystemUtil.toMap(ret));
-        ServerPushEvent pushEvent = (ServerPushEvent) pushRegistry.get(connection.serverId());
-        //pushEvent.eventService()
-        /**
-        icp.set(connection.serverId().getBytes(),icp.subscription().getBytes());
-        icp.addEventListener(connection.serverId(),(e)->{
-            if(!e.closed()){
-                listener.onUpdated(e.payload());
-            }
-            else{
-                listener.onEnded(e.payload());
-            }
-            return e.closed();//removed on closed
-        });**/
+        connection.registerInboundListener(listener);
+        connections.put(connection.sequence(),connection);
         return connection;
     }
 

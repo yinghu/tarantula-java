@@ -18,7 +18,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     String NAME = "DeploymentServiceProvider";
 
     //GAME SERVER APIs
-    Connection onConnection(String serverId, Connection.StateListener listener);
+    Connection onConnection(String serverId, Connection.InboundListener listener);
     //void onStartedConnection(String serverId,byte[] started);
     //void onEndedConnection(String serverId);
     SecretKey serverKey();

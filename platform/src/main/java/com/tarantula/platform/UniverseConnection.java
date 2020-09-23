@@ -17,6 +17,7 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     private int port;
     private String path;
     private int maxConnections;
+    private InboundListener listener;
 
     public UniverseConnection(){
 
@@ -151,5 +152,12 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     }
     public String toString(){
         return new String(SystemUtil.toJson(toMap()));
+    }
+
+    public void registerInboundListener(InboundListener listener){
+        this.listener = listener;
+    }
+    public void update(byte[] payload){
+        listener.onUpdated(payload);
     }
 }
