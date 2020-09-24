@@ -24,6 +24,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
     private DataStore accountDs;
     private DataStore memberDs;
     private LiveGameContext liveGameContext;
+    private Connection connection;
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
@@ -58,6 +59,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             pc.account = account(pc.access.primary()?session.systemId():pc.access.owner());
             pc.subscription = membership(pc.access.primary()?session.systemId():pc.access.owner());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
+            this.context.postOffice().onConnection(connection.serverId()).send("label","presence".getBytes());
         }
         //public lobby access by page number
         else if(session.action().equals("onLobbyList")){
@@ -220,6 +222,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
     @Override
     public void onState(Connection c) {
         this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"]",OnLog.WARN);
+        this.connection = c;
         //this.module.onConnection(c);
     }
 }

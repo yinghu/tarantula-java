@@ -30,7 +30,7 @@ public class ServerPushSimulator {
     public static void main(String[] args) throws Exception{
         datagramChannel = DatagramChannel.open();
         datagramChannel.bind(new InetSocketAddress("10.0.0.234",16393));
-        CountDownLatch ct = new CountDownLatch(0);
+        CountDownLatch ct = new CountDownLatch(1);
         Thread t = new Thread(()->{
             try {
                 ByteBuffer buffer = ByteBuffer.allocate(1024);

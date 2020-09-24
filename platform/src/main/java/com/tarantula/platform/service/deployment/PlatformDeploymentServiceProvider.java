@@ -492,6 +492,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerServerPushEvent(Event event){
         Connection occ = this.builder.create().fromJson(new String(event.payload()), Connection.class);
         occ.disabled(false);
+        occ.sequence(this.tarantulaContext.integrationCluster().sequence());
+        connections.put(occ.sequence(),occ);
         log.warn("add server push->"+event.trackId()+"/"+occ.type());
         if(occ.type().equals(Connection.UDP)){
             UDPSessionService udpSessionService = new UDPSessionService(occ,pendingData);
