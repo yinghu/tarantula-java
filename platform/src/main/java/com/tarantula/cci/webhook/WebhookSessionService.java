@@ -5,6 +5,8 @@ import com.tarantula.EventListener;
 import com.tarantula.EventService;
 import com.tarantula.RoutingKey;
 
+import java.net.http.WebSocket;
+
 /**
  * Created by yinghu lu on 9/21/2020.
  */
@@ -51,7 +53,6 @@ public class WebhookSessionService implements EventService {
 
     @Override
     public void start() throws Exception {
-
     }
 
     @Override
