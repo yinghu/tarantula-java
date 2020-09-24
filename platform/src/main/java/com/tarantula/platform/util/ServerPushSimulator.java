@@ -52,7 +52,7 @@ public class ServerPushSimulator {
         JsonObject resp = parser.parse(onStart(accessKey)).getAsJsonObject();
         System.out.println(resp);
         ct.await();
-        onStop(accessKey);
+        //onStop(accessKey);
     }
 
     static String onStart(String accessKey) throws Exception{

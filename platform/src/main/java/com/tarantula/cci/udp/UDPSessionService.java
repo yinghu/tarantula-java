@@ -2,6 +2,7 @@ package com.tarantula.cci.udp;
 
 
 import com.tarantula.*;
+import com.tarantula.cci.PendingInboundMessage;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -15,10 +16,10 @@ public class UDPSessionService implements EventService{
 
     private DatagramChannel datagramChannel;
     private final Connection connection;
-    private final ConcurrentLinkedDeque<ByteBuffer> pendingData;
+    private final ConcurrentLinkedDeque<PendingInboundMessage> pendingData;
 
     private Thread receiver;
-    public UDPSessionService(Connection connection,ConcurrentLinkedDeque<ByteBuffer> pendingData){
+    public UDPSessionService(Connection connection,ConcurrentLinkedDeque<PendingInboundMessage> pendingData){
         this.connection = connection;
         this.pendingData = pendingData;
     }
@@ -92,7 +93,7 @@ public class UDPSessionService implements EventService{
                 ByteBuffer buffer = ByteBuffer.allocate(1024);
                 datagramChannel.receive(buffer);
                 //dispatch
-                pendingData.offer(buffer);
+                pendingData.offer(new PendingInboundMessage(connection.serverId(),buffer));
             }
         }catch (Exception ex){
             ex.printStackTrace();

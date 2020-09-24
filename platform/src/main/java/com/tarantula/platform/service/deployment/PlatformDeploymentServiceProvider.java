@@ -3,6 +3,7 @@ package com.tarantula.platform.service.deployment;
 import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
+import com.tarantula.cci.PendingInboundMessage;
 import com.tarantula.cci.udp.UDPSessionService;
 import com.tarantula.cci.webhook.WebhookSessionService;
 import com.tarantula.logging.JDKLogger;
@@ -74,15 +75,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private AtomicBoolean onAccessIndex;
 
-    private ConcurrentLinkedDeque<ByteBuffer> pendingData;
-    private ConcurrentHashMap<Long,Connection> connections;
+    private ConcurrentLinkedDeque<PendingInboundMessage> pendingData;
+    //private ConcurrentHashMap<Long,Connection> connections;
     private ExecutorService udpPool;
     private int workSize;
     @Override
     public void start() throws Exception {
         this.secureRandom = new SecureRandom();
         this.pendingData = new ConcurrentLinkedDeque<>();
-        this.connections = new ConcurrentHashMap<>();
+        //this.connections = new ConcurrentHashMap<>();
         onAccessIndex = new AtomicBoolean(true);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
@@ -406,9 +407,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 udpPool.execute(()->{
                     while (true){
                         try{
-                            ByteBuffer pending = pendingData.poll();
+                            PendingInboundMessage pending = pendingData.poll();
                             if(pending!=null){
-                                connections.forEach((k,v)->v.update(pending.array()));
+                                //connections.forEach((k,v)->v.update(pending.message.array()));
+                                ServerPushEvent pushEvent = (ServerPushEvent) pushRegistry.get(pending.serverId);
+                                pushEvent.onMessage(pending.message);
                             }
                             else{
                                 Thread.sleep(100);
@@ -493,7 +496,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         Connection occ = this.builder.create().fromJson(new String(event.payload()), Connection.class);
         occ.disabled(false);
         occ.sequence(this.tarantulaContext.integrationCluster().sequence());
-        connections.put(occ.sequence(),occ);
         log.warn("add server push->"+event.trackId()+"/"+occ.type());
         if(occ.type().equals(Connection.UDP)){
             UDPSessionService udpSessionService = new UDPSessionService(occ,pendingData);
@@ -506,6 +508,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         else{
             event.eventService(this.integrationEventService);
         }
+        ((ServerPushEvent)event).addConnection(occ);
         pushRegistry.put(occ.serverId(), event);//serverId cache
         this.wListeners.forEach((l) -> {
             if(l.typeId().equals(event.typeId())){
@@ -581,7 +584,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));
         return connection;
     }
-    public Connection onConnection(String typeId,Connection.InboundListener listener){
+    public Connection onConnection(String typeId,Connection.InboundMessageListener listener){
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         byte[] ret = icp.firstIndex(typeId);
         if(ret==null){
@@ -589,8 +592,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         Connection connection = new UniverseConnection();
         connection.fromMap(SystemUtil.toMap(ret));
-        connection.registerInboundListener(listener);
-        connections.put(connection.sequence(),connection);
+        connection.registerInboundMessageListener(listener);
+        ((ServerPushEvent)pushRegistry.get(connection.serverId())).addConnection(connection);
         return connection;
     }
 

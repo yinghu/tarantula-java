@@ -14,7 +14,7 @@ import java.util.UUID;
 /**
  * Updated by yinghu lu on 6/11/2020.
  */
-public class Room implements Connection.InboundListener{
+public class Room implements Connection.InboundMessageListener{
 
     static final int WAITING = 0; //waiting for first join
     static final int PENDING_JOIN = 1; //waiting after first join

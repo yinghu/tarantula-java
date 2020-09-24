@@ -35,14 +35,14 @@ public interface Connection extends Response {
     int maxConnections();
     void maxConnections(int maxConnections);
 
-    default void registerInboundListener(InboundListener listener){}
+    default void registerInboundMessageListener(InboundMessageListener listener){}
     default void update(byte[] payload){}
 
     interface Listener{
         String typeId();
         void onState(Connection connection);
     }
-    interface InboundListener{
+    interface InboundMessageListener{
         void onUpdated(byte[] updated);
         //void onEnded(byte[] ended);
     }

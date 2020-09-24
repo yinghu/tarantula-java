@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * updated by yinghu lu on 6/9/2020.
  */
-public class GameZoneModule implements Module,Configurable.Listener,Connection.InboundListener{
+public class GameZoneModule implements Module,Configurable.Listener,Connection.InboundMessageListener{
 
     private ApplicationContext context;
     private Zone mZone;

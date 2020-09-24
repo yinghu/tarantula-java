@@ -2,15 +2,20 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.tarantula.Connection;
 import com.tarantula.Event;
 import com.tarantula.EventService;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by yinghu on 7/25//2020.
  */
 public class ServerPushEvent extends Data implements Event {
+
+    private ConcurrentHashMap<Long,Connection> cMap = new ConcurrentHashMap<>();
 
     public ServerPushEvent(){
 
@@ -58,6 +63,15 @@ public class ServerPushEvent extends Data implements Event {
     }
     public EventService eventService(){
         return this.eventService;
+    }
+    public void addConnection(Connection connection){
+        cMap.put(connection.sequence(),connection);
+    }
+    public void onMessage(ByteBuffer pendingInboundMessage){
+        cMap.forEach((k,v)->v.update(pendingInboundMessage.array()));
+    }
+    public void clear(){
+
     }
     @Override
     public String toString(){
