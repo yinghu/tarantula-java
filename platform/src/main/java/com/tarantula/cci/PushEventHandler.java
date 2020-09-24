@@ -38,9 +38,36 @@ public class PushEventHandler implements RequestHandler {
             String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
             String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
             byte[] _payload = exchange.payload();
-            if(action.equals("onTicket")){
+            if(action.equals("onStart")){
+                String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
+                if(typeId!=null){
+                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,_payload);
+                    pushEvent.typeId(typeId);
+                    deployService.addServerPushEvent(pushEvent);
+                }
+                else{
+                    log.warn("Invalid ticket");
+                }
+                exchange.onEvent(new ResponsiveEvent("","",_payload,"start",true));
+            }
+            else if(action.equals("onStop")){
+                if(this.tokenValidatorProvider.validateAccessKey(accessKey)!=null){
+                    deployService.removeServerPushEvent(serverId);
+                    _hex.forEach((k,v)->{//removed session if any
+                        if(v.id().equals(serverId)){
+                            _hex.remove(k);
+                        }
+                    });
+                }
+                else{
+                    log.warn("Invalid ticket");
+                }
+                exchange.onEvent(new ResponsiveEvent("","",_payload,"start",true));
+            }
+            //start of socket connection methods
+            else if(action.equals("onTicket")){
                 byte[] et;
-                if(this.tokenValidatorProvider.validateAccessKey(accessKey)){
+                if(this.tokenValidatorProvider.validateAccessKey(accessKey)!=null){
                     JsonObject jo = new JsonObject();
                     jo.addProperty("ticket", tokenValidatorProvider.ticket(serverId,1,5));
                     jo.addProperty("host",endpoint.host());
@@ -56,7 +83,6 @@ public class PushEventHandler implements RequestHandler {
             }
             else if(action.equals("onConnect")){//access key
                 if(tokenValidatorProvider.validateTicket(serverId,1,accessKey)){
-                    //log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
                     String sid = exchange.id();
                     _hex.put(sid,exchange);
                     ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,serverId,_payload);
@@ -68,7 +94,6 @@ public class PushEventHandler implements RequestHandler {
                 }
             }
             else if(action.equals("onDisconnect")){//no more access key check event from server socket
-                //log.warn("push->"+exchange.path()+"/"+serverId+"/"+exchange.id()+"/"+"/"+action+"/"+exchange.streaming());
                 _hex.forEach((k,v)->{
                     if(v.header(Session.TARANTULA_SERVER_ID).equals(serverId)){
                         _hex.remove(k);
@@ -76,6 +101,7 @@ public class PushEventHandler implements RequestHandler {
                     }
                 });
             }
+            //end of socket connection methods
         }catch (Exception ex){
             ex.printStackTrace();
             _hex.remove(exchange.id()); //removed cache on any errors
@@ -100,7 +126,6 @@ public class PushEventHandler implements RequestHandler {
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
         this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
-        //this.bucket = tcx.bucket();
         this.endpoint = tcx.endpoint();
         tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
     }

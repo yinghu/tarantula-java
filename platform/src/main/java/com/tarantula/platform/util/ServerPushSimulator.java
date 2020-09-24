@@ -19,18 +19,18 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Created by yinghu lu on 9/19/2020.
  */
-public class GameServerSimulator {
+public class ServerPushSimulator {
     static HttpCaller caller;
     static String serverId;
     static JsonParser parser;
-    static String accessKey = "BDS01/ee71a0f14f344cfda8f34974df958743-F0E3A7B7B711608C9C4F0A17E2006EDA8AA3100E";
-    //static String accessKey = "BDS01/74853109aa094806a796daac974af5f6-80AA94233D78FCC5D001E45BF23A05A8BE940166";
+    //static String accessKey = "BDS01/ee71a0f14f344cfda8f34974df958743-F0E3A7B7B711608C9C4F0A17E2006EDA8AA3100E";
+    static String accessKey = "BDS01/0794911cd333453f9ff3660e58dc427b-31CE1E59CA8F83407C318EC439F1817B0D59BD01";
     static DatagramChannel datagramChannel;
 
     public static void main(String[] args) throws Exception{
         datagramChannel = DatagramChannel.open();
         datagramChannel.bind(new InetSocketAddress("10.0.0.234",16393));
-        CountDownLatch ct = new CountDownLatch(1);
+        CountDownLatch ct = new CountDownLatch(0);
         Thread t = new Thread(()->{
             try {
                 ByteBuffer buffer = ByteBuffer.allocate(1024);
@@ -52,7 +52,7 @@ public class GameServerSimulator {
         JsonObject resp = parser.parse(onStart(accessKey)).getAsJsonObject();
         System.out.println(resp);
         ct.await();
-        //onStop(accessKey);
+        onStop(accessKey);
     }
 
     static String onStart(String accessKey) throws Exception{
@@ -67,7 +67,7 @@ public class GameServerSimulator {
                 Session.TARANTULA_ACTION,"onStart",
                 Session.TARANTULA_SERVER_ID,serverId
         };
-        return caller.post("server",json.toString().getBytes(),headers);
+        return caller.post("push",json.toString().getBytes(),headers);
     }
     static String onStop(String accessKey) throws Exception{
         String[] headers = new String[]{
@@ -75,7 +75,7 @@ public class GameServerSimulator {
                 Session.TARANTULA_ACTION,"onStop",
                 Session.TARANTULA_SERVER_ID,serverId
         };
-        return caller.get("server",headers);
+        return caller.get("push",headers);
     }
     static String key(){
         SecureRandom secureRandom = new SecureRandom();

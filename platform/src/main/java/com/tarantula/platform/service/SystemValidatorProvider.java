@@ -78,16 +78,16 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.timeoutInSeconds = seconds;
     }
 
-    public boolean validateAccessKey(String accessKey){
+    public String validateAccessKey(String accessKey){
         String[] sp = accessKey.split("-");
         AccessKey ck = new AccessKey();
         ck.distributionKey(sp[0]);
         if(!deployDataStore.load(ck)){
-            return false;
+            return null;
         }
         long stmp = ((Number)ck.property(AccessKey.TIMESTAMP)).longValue();
         String label = (String)ck.property(AccessKey.KEY_LABEL);
-        return SystemUtil.validAccessKey(messageDigest(),accessKey,label,stmp);
+        return SystemUtil.validAccessKey(messageDigest(),accessKey,label,stmp)?label:null;
     }
     public String accessKey(String label){
         AccessKey ck = new AccessKey();

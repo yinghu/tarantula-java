@@ -13,13 +13,13 @@ public interface TokenValidatorProvider extends ServiceProvider {
     TokenValidator tokenValidator();
 
     //labeled access key
-    boolean validateAccessKey(String accessKey);
+    String validateAccessKey(String accessKey);
     String accessKey(String label);
 
     String ticket(String key,int stub,int duration);
     boolean validateTicket(String key,int stub,String ticket);
 
-    //dedicated server register key on game cluster lobby tyeId
+    //game server register key on game cluster lobby tyeId
     String validateGameClusterAccessKey(String gameClusterId);
     String gameClusterAccessKey(String gameClusterId);
 

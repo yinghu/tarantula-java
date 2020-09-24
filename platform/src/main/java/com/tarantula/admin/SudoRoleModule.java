@@ -47,13 +47,15 @@ public class SudoRoleModule implements Module {
             session.write(jm.toString().getBytes(),label());
         }
         else if(session.action().equals("onCreateLabeledKey")){
-            String key = tokenValidatorProvider.accessKey("websocket");
+            this.context.log(new String(payload),OnLog.WARN);
+            OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String key = tokenValidatorProvider.accessKey(acc.typeId());
             PermissionContext pc = new PermissionContext(key);
             session.write(pc.toJson().toString().getBytes(),label());
         }
         else if(session.action().equals("onTestLabeledKey")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            boolean suc = tokenValidatorProvider.validateAccessKey((String)acc.property(OnAccess.ACCESS_KEY));
+            boolean suc = tokenValidatorProvider.validateAccessKey((String)acc.property(OnAccess.ACCESS_KEY))!=null;
             session.write(toMessage(suc?"key passed":"key failed",suc).toString().getBytes(),label());
         }
         else if(session.action().equals("onStopAccessIndex")){
