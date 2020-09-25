@@ -4,6 +4,7 @@ package com.tarantula.cci.udp;
 import com.tarantula.*;
 import com.tarantula.cci.PendingInboundMessage;
 
+import javax.crypto.Cipher;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
@@ -22,12 +23,16 @@ public class UDPSessionService implements EventService{
     public UDPSessionService(Connection connection,ConcurrentLinkedDeque<PendingInboundMessage> pendingData){
         this.connection = connection;
         this.pendingData = pendingData;
+        //cipher = Cipher.getInstance()
     }
 
     @Override
     public void publish(Event out) {
         try{
-            ByteBuffer buffer = ByteBuffer.wrap(out.payload());
+            ByteBuffer buffer = ByteBuffer.allocate(512);
+            buffer.put((byte) 0);
+            buffer.put((byte)5);
+            //buffer.
             datagramChannel.write(buffer);
         }catch (Exception ex){
             ex.printStackTrace();
@@ -86,7 +91,6 @@ public class UDPSessionService implements EventService{
         this.receiver.interrupt();
     }
 
-
     private void run() {
         try{
             while (true){
@@ -96,7 +100,7 @@ public class UDPSessionService implements EventService{
                 pendingData.offer(new PendingInboundMessage(connection.serverId(),buffer));
             }
         }catch (Exception ex){
-            ex.printStackTrace();
+            //ex.printStackTrace();
         }
     }
 }
