@@ -1,14 +1,37 @@
 package com.tarantula.platform.util;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.nio.ByteBuffer;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Properties;
 
 public class Email {
 
-    public static void main(String[] args){
-        Email.send("yinghu_lu@hotmail.com","validation code: 4567");
+    public static void main(String[] args) throws Exception{
+        //Email.send("yinghu_lu@hotmail.com","validation code: 4567");
+        //SecretKey key = this.deploymentServiceProvider.serverKey();
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] key = new byte[16];
+        secureRandom.nextBytes(key);
+        SecretKey skey = new SecretKeySpec(key, "AES");
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+        cipher.init(Cipher.ENCRYPT_MODE,skey);
+        ByteBuffer buffer = ByteBuffer.allocate(32);
+        buffer.putInt(Integer.MAX_VALUE);
+        byte[] ret = cipher.doFinal(buffer.array());
+        System.out.println(ret.length);
+        cipher.init(Cipher.DECRYPT_MODE,skey);
+        byte[] xret = cipher.doFinal(ret);
+        System.out.println(xret.length);
+        ByteBuffer reb = ByteBuffer.allocate(32);
+        reb.put(xret);
+        System.out.println(reb.getInt(0));
     }
     public static boolean send(String to,String text){
 

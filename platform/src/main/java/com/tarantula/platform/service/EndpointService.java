@@ -57,11 +57,6 @@ public class EndpointService implements Serviceable,EndPoint.Resource{
         pushEventHandler.start();
         rMap.put(pushEventHandler.name(),pushEventHandler);
 
-        DedicatedServerEventHandler dedicatedServerEventHandler = new DedicatedServerEventHandler();
-        dedicatedServerEventHandler.setup(this.tarantulaContext);
-        dedicatedServerEventHandler.start();
-        rMap.put(dedicatedServerEventHandler.name(),dedicatedServerEventHandler);
-
         AdminEventHandler adminEventHandler = new AdminEventHandler();
         adminEventHandler.setup(this.tarantulaContext);
         adminEventHandler.start();

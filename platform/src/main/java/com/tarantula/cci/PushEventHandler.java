@@ -8,10 +8,15 @@ import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
 import com.tarantula.platform.service.DeployService;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.ResponseSerializer;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import java.nio.ByteBuffer;
+import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,6 +34,7 @@ public class PushEventHandler implements RequestHandler {
     private GsonBuilder builder;
     private Connection endpoint;
     private DeployService deployService;
+    private DeploymentServiceProvider deploymentServiceProvider;
     public String name(){
         return "/push";
     }
@@ -39,16 +45,21 @@ public class PushEventHandler implements RequestHandler {
             String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
             byte[] _payload = exchange.payload();
             if(action.equals("onStart")){
+                JsonObject resp = new JsonObject();
                 String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
                 if(typeId!=null){
+                    resp.addProperty("typeId",typeId);
+                    resp.addProperty("successful",true);
+                    resp.addProperty("serverKey",Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey().getEncoded()));
                     ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,_payload);
                     pushEvent.typeId(typeId);
                     deployService.addServerPushEvent(pushEvent);
                 }
                 else{
+                    resp.addProperty("successful",false);
                     log.warn("Invalid ticket");
                 }
-                exchange.onEvent(new ResponsiveEvent("","",_payload,"start",true));
+                exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
             }
             else if(action.equals("onStop")){
                 if(this.tokenValidatorProvider.validateAccessKey(accessKey)!=null){
@@ -127,7 +138,8 @@ public class PushEventHandler implements RequestHandler {
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
         this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
         this.endpoint = tcx.endpoint();
-        tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
+        this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
+        this.deploymentServiceProvider = tcx.deploymentServiceProvider();
     }
     public  boolean onEvent(Event event){
         OnExchange hx = this._hex.get(event.sessionId());

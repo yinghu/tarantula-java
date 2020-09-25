@@ -24,7 +24,6 @@ abstract public class Data extends OnApplicationHeader implements Portable{
 
     protected String clientId;
 
-    //protected boolean forwarding;
     protected boolean streaming;
     protected String action;
 

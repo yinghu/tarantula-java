@@ -44,6 +44,5 @@ public interface Connection extends Response {
     }
     interface InboundMessageListener{
         void onUpdated(byte[] updated);
-        //void onEnded(byte[] ended);
     }
 }

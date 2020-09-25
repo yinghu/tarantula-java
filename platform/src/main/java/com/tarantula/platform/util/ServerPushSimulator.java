@@ -30,7 +30,7 @@ public class ServerPushSimulator {
     public static void main(String[] args) throws Exception{
         datagramChannel = DatagramChannel.open();
         datagramChannel.bind(new InetSocketAddress("10.0.0.234",16393));
-        CountDownLatch ct = new CountDownLatch(1);
+        CountDownLatch ct = new CountDownLatch(0);
         Thread t = new Thread(()->{
             try {
                 ByteBuffer buffer = ByteBuffer.allocate(1024);
@@ -52,7 +52,8 @@ public class ServerPushSimulator {
         JsonObject resp = parser.parse(onStart(accessKey)).getAsJsonObject();
         System.out.println(resp);
         ct.await();
-        //onStop(accessKey);
+        onStop(accessKey);
+
     }
 
     static String onStart(String accessKey) throws Exception{

@@ -65,10 +65,6 @@ public class HttpEndpoint implements EndPoint {
 		httpApplicationHandler.resource(this.resource);
 		this.hserver.createContext(httpApplicationHandler.path(), httpApplicationHandler);
 
-		//HttpDedicatedServerHandler httpDedicatedHandler = new HttpDedicatedServerHandler();
-		//httpDedicatedHandler.resource(this.resource);
-		//this.hserver.createContext(httpDedicatedHandler.path(), httpDedicatedHandler);
-
 		HttpPushServerHandler httpPushServerHandler = new HttpPushServerHandler();
 		httpPushServerHandler.resource(this.resource);
 		this.hserver.createContext(httpPushServerHandler.path(),httpPushServerHandler);

@@ -67,6 +67,9 @@ public class ServerPushEvent extends Data implements Event {
     public void addConnection(Connection connection){
         cMap.put(connection.sequence(),connection);
     }
+    public void removeConnection(long sequence){
+        cMap.remove(sequence);
+    }
     public void onMessage(ByteBuffer pendingInboundMessage){
         cMap.forEach((k,v)->v.update(pendingInboundMessage.array()));
     }

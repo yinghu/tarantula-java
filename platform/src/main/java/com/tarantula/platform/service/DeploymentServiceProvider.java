@@ -19,8 +19,6 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
     //GAME SERVER APIs
     Connection onConnection(String typeId, Connection.InboundMessageListener listener);
-    //void onStartedConnection(String serverId,byte[] started);
-    //void onEndedConnection(String serverId);
     SecretKey serverKey();
     //END OF DEDICATED SERVER APIs
 
@@ -29,8 +27,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
      * */
     void register(ServiceProvider serviceProvider);
     void release(ServiceProvider serviceProvider);
-
-
+    
     //deploy and callback instance registry
     void registerInstanceRegistryListener(InstanceRegistry.Listener deploymentListener);
 
