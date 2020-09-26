@@ -23,10 +23,10 @@ public class ServerPushSimulator {
     static HttpCaller caller;
     static String serverId;
     static JsonParser parser;
-    static String udpHost="10.0.0.192";
-    static String host = "http://10.0.0.192:8090";
-    static String accessKey = "BDS01/106c0e870f324829a432a31e3a94adba-4E2AC1EC9580C6B07239887AF6936A6698944B6B";
-    //static String accessKey = "BDS01/0794911cd333453f9ff3660e58dc427b-31CE1E59CA8F83407C318EC439F1817B0D59BD01";
+    static String udpHost="10.0.0.234";
+    static String host = "http://10.0.0.234:8090";
+    //static String accessKey = "BDS01/106c0e870f324829a432a31e3a94adba-4E2AC1EC9580C6B07239887AF6936A6698944B6B";
+    static String accessKey = "BDS01/0794911cd333453f9ff3660e58dc427b-31CE1E59CA8F83407C318EC439F1817B0D59BD01";
     static DatagramChannel datagramChannel;
 
     public static void main(String[] args) throws Exception{

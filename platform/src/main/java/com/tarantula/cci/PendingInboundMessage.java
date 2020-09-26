@@ -7,8 +7,6 @@ import java.nio.ByteBuffer;
  */
 public class PendingInboundMessage {
     public String serverId;
-    public int sequence;
-    public short messageTypeId;
     public ByteBuffer message;
     public PendingInboundMessage(String serverId,ByteBuffer message){
         this.serverId = serverId;

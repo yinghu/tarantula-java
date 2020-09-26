@@ -96,7 +96,10 @@ public class UDPSessionService implements EventService{
             while (true){
                 ByteBuffer buffer = ByteBuffer.allocate(1024);
                 datagramChannel.receive(buffer);
-                //dispatch
+                if(buffer.get()==1){
+                    //ack
+                    continue;
+                }
                 pendingData.offer(new PendingInboundMessage(connection.serverId(),buffer));
             }
         }catch (Exception ex){
