@@ -3,8 +3,10 @@ package com.tarantula.cci.udp;
 
 import com.tarantula.*;
 import com.tarantula.cci.PendingInboundMessage;
+import com.tarantula.cci.PendingOutboundMessage;
 
 import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
@@ -20,20 +22,27 @@ public class UDPSessionService implements EventService{
     private final ConcurrentLinkedDeque<PendingInboundMessage> pendingData;
 
     private Thread receiver;
-    public UDPSessionService(Connection connection,ConcurrentLinkedDeque<PendingInboundMessage> pendingData){
+    private final Cipher cipher;
+    private final SecretKey secretKey;
+    public UDPSessionService(Connection connection,ConcurrentLinkedDeque<PendingInboundMessage> pendingData,Cipher cipher,SecretKey secretKey){
         this.connection = connection;
         this.pendingData = pendingData;
-        //cipher = Cipher.getInstance()
+        this.cipher = cipher;
+        this.secretKey = secretKey;
     }
 
     @Override
     public void publish(Event out) {
         try{
-            ByteBuffer buffer = ByteBuffer.allocate(512);
-            buffer.put((byte) 0);
-            buffer.put((byte)5);
-            //buffer.
-            datagramChannel.write(buffer);
+            PendingOutboundMessage pendingOutboundMessage = new PendingOutboundMessage();
+            pendingOutboundMessage.ack(false);
+            pendingOutboundMessage.type(out.code());
+            cipher.init(Cipher.ENCRYPT_MODE,secretKey);
+            ByteBuffer seq = ByteBuffer.allocate(32);
+            seq.putInt(out.stub());
+            pendingOutboundMessage.sequence(cipher.doFinal(seq.array()));
+            pendingOutboundMessage.payload(out.payload());
+            datagramChannel.write(pendingOutboundMessage.message());
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -94,12 +103,13 @@ public class UDPSessionService implements EventService{
     private void run() {
         try{
             while (true){
-                ByteBuffer buffer = ByteBuffer.allocate(1024);
+                ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE);
                 datagramChannel.receive(buffer);
-                if(buffer.get()==1){//exclude ack
+                PendingInboundMessage pendingInboundMessage = new PendingInboundMessage(connection.serverId(),buffer);
+                if(pendingInboundMessage.ack()){
                     continue;
                 }
-                pendingData.offer(new PendingInboundMessage(connection.serverId(),buffer));
+                pendingData.offer(pendingInboundMessage);
             }
         }catch (Exception ex){
             //ex.printStackTrace();

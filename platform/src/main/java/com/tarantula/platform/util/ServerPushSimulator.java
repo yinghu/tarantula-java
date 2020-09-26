@@ -4,7 +4,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.tarantula.Connection;
 import com.tarantula.Session;
+import com.tarantula.cci.PendingInboundMessage;
+import com.tarantula.cci.PendingOutboundMessage;
+import com.tarantula.platform.service.DeploymentServiceProvider;
 
+import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.InetSocketAddress;
@@ -28,17 +32,26 @@ public class ServerPushSimulator {
     //static String accessKey = "BDS01/106c0e870f324829a432a31e3a94adba-4E2AC1EC9580C6B07239887AF6936A6698944B6B";
     static String accessKey = "BDS01/0794911cd333453f9ff3660e58dc427b-31CE1E59CA8F83407C318EC439F1817B0D59BD01";
     static DatagramChannel datagramChannel;
-
+    static Cipher cipher;
+    static SecretKey secretKey;
     public static void main(String[] args) throws Exception{
         datagramChannel = DatagramChannel.open();
         datagramChannel.bind(new InetSocketAddress(udpHost,16393));
+        cipher = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME);
         CountDownLatch ct = new CountDownLatch(1);
         Thread t = new Thread(()->{
             try {
-                ByteBuffer buffer = ByteBuffer.allocate(1024);
+                ByteBuffer buffer = ByteBuffer.allocate(512);
                 SocketAddress sc = datagramChannel.receive(buffer);
-                System.out.println(sc.toString()+""+new String(buffer.array()).trim());
-                datagramChannel.send(ByteBuffer.wrap("popop".getBytes()),sc);
+                cipher.init(Cipher.DECRYPT_MODE,secretKey);
+                PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("2",buffer);
+                //cipher.init(Cipher.DECRYPT_MODE,secretKey);
+                byte[] ret = cipher.doFinal(pendingInboundMessage.sequence());
+                ByteBuffer seq = ByteBuffer.wrap(ret);
+                System.out.println(sc.toString()+">>"+seq.getInt(0)+"<><><>"+pendingInboundMessage.ack()+"<><>>"+pendingInboundMessage.type()+"<><>"+new String(pendingInboundMessage.payload()).trim());
+                PendingOutboundMessage msg = new PendingOutboundMessage();
+                msg.payload("pop".getBytes());
+                datagramChannel.send(msg.message(),sc);
 
             }catch (Exception ex){
                 ex.printStackTrace();
@@ -52,6 +65,7 @@ public class ServerPushSimulator {
         caller._init();
         caller.index();
         JsonObject resp = parser.parse(onStart(accessKey)).getAsJsonObject();
+        secretKey = new SecretKeySpec(Base64.getDecoder().decode(resp.get("serverKey").getAsString()),DeploymentServiceProvider.SERVER_KEY_SPEC);
         System.out.println(resp);
         ct.await();
         Thread.sleep(3000);

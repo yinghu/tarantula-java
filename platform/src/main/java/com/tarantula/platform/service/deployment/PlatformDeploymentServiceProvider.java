@@ -17,15 +17,16 @@ import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
 import com.tarantula.platform.util.*;
 
+import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -411,7 +412,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                             PendingInboundMessage pending = pendingData.poll();
                             if(pending!=null){
                                 ServerPushEvent pushEvent = (ServerPushEvent) pushRegistry.get(pending.serverId);
-                                pushEvent.onMessage(pending.message);
+                                pushEvent.onMessage(pending);
                             }
                             else{
                                 Thread.sleep(100);
@@ -492,13 +493,22 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerOnLobbyListener(OnLobby.Listener onLobbyListener){
         oListeners.add(onLobbyListener);
     }
+    private Cipher cipher(){
+        try{
+            return Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME);
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
     public void registerServerPushEvent(Event event){
         Connection occ = this.builder.create().fromJson(new String(event.payload()), Connection.class);
         occ.disabled(false);
-        occ.sequence(this.tarantulaContext.integrationCluster().sequence());
+        occ.sequence(100);
         log.warn("add server push->"+event.trackId()+"/"+occ.type());
+        SecretKey secretKey = new SecretKeySpec(this.tarantulaContext.integrationCluster().get(occ.serverId().getBytes()),DeploymentServiceProvider.SERVER_KEY_SPEC);
+        Cipher cipher = cipher();
         if(occ.type().equals(Connection.UDP)){
-            UDPSessionService udpSessionService = new UDPSessionService(occ,pendingData);
+            UDPSessionService udpSessionService = new UDPSessionService(occ,pendingData,cipher,secretKey);
             try{udpSessionService.start();}catch (Exception ex){}
             event.eventService(udpSessionService);
         }
@@ -512,6 +522,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             event.eventService(this.integrationEventService);
         }
         ((ServerPushEvent)event).addConnection(occ);
+        //((ServerPushEvent)event).decoder(occ);
         pushRegistry.put(occ.serverId(), event);//serverId cache
         this.wListeners.forEach((l) -> {
             if(l.typeId().equals(event.typeId())){
@@ -583,7 +594,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     //dedicated server methods
     public Connection onConnection(String typeId,Connection connection){
-        connection.sequence(this.tarantulaContext.integrationCluster().sequence());
+        connection.sequence(100);
         this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));
         return connection;
     }
@@ -692,11 +703,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         byte[] ret = icp.remove(resetCode.getBytes());
         return (ret!=null?new String(ret):"");
     }
-    public SecretKey serverKey(){
-        byte[] key = new byte[16];
+    public byte[] serverKey(String serverId){
+        byte[] key = new byte[KEY_SIZE];
         secureRandom.nextBytes(key);
-        SecretKey secretKey = new SecretKeySpec(key, SERVER_KEY_SPEC);
-        return secretKey;
+        //SecretKey secretKey = new SecretKeySpec(key, SERVER_KEY_SPEC);
+        this.tarantulaContext.integrationCluster().set(serverId.getBytes(),key);
+        return key;
     }
     public void stopAccessIndex(){
         onAccessIndex.set(false);

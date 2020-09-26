@@ -1,5 +1,8 @@
 package com.tarantula.platform.util;
 
+import com.tarantula.cci.PendingInboundMessage;
+import com.tarantula.platform.service.DeploymentServiceProvider;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -7,6 +10,7 @@ import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.nio.ByteBuffer;
+import java.security.Key;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Properties;
@@ -19,19 +23,32 @@ public class Email {
         SecureRandom secureRandom = new SecureRandom();
         byte[] key = new byte[16];
         secureRandom.nextBytes(key);
-        SecretKey skey = new SecretKeySpec(key, "AES");
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+        SecretKey skey = new SecretKeySpec(key, DeploymentServiceProvider.SERVER_KEY_SPEC);
+        Cipher cipher = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME);
         cipher.init(Cipher.ENCRYPT_MODE,skey);
+        ByteBuffer msg = ByteBuffer.allocate(512);
+        msg.put((byte) 0);
+        msg.putInt(115);
         ByteBuffer buffer = ByteBuffer.allocate(32);
-        buffer.putInt(Integer.MAX_VALUE);
+        buffer.putInt(789);
         byte[] ret = cipher.doFinal(buffer.array());
-        System.out.println(ret.length);
-        cipher.init(Cipher.DECRYPT_MODE,skey);
-        byte[] xret = cipher.doFinal(ret);
+        msg.put(ret); //SEQ
+        msg.put("TEST78889999999999999999999999999999999995".getBytes());
+        PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("sid",msg);
+        System.out.println("ACK->"+pendingInboundMessage.ack());
+        System.out.println("TYPE->"+pendingInboundMessage.type());
+        Key skey2 = new SecretKeySpec(key, DeploymentServiceProvider.SERVER_KEY_SPEC);
+
+        cipher.init(Cipher.DECRYPT_MODE,skey2);
+
+        byte[] xret = cipher.doFinal(pendingInboundMessage.sequence());
         System.out.println(xret.length);
         ByteBuffer reb = ByteBuffer.allocate(32);
         reb.put(xret);
-        System.out.println(reb.getInt(0));
+        System.out.println("SEQ->"+reb.getInt(0));
+        System.out.println("PAYLOAD->"+new String(pendingInboundMessage.payload()));
+
+
     }
     public static boolean send(String to,String text){
 

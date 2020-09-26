@@ -50,7 +50,7 @@ public class PushEventHandler implements RequestHandler {
                 if(typeId!=null){
                     resp.addProperty("typeId",typeId);
                     resp.addProperty("successful",true);
-                    resp.addProperty("serverKey",Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey().getEncoded()));
+                    resp.addProperty("serverKey",Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(serverId)));
                     ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,_payload);
                     pushEvent.typeId(typeId);
                     deployService.addServerPushEvent(pushEvent);

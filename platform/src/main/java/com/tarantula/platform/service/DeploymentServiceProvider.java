@@ -14,12 +14,14 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
     String DEPLOY_DATA_STORE = "tarantula";
     String SERVER_KEY_SPEC = "AES";
+    String CIPHER_NAME = "AES/ECB/PKCS5PADDING";
+    int KEY_SIZE = 16;
 
     String NAME = "DeploymentServiceProvider";
 
     //GAME SERVER APIs
     Connection onConnection(String typeId, Connection.InboundMessageListener listener);
-    SecretKey serverKey();
+    byte[] serverKey(String serverId);
     //END OF DEDICATED SERVER APIs
 
     /**

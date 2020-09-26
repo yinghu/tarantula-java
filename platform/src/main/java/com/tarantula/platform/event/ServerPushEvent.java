@@ -5,9 +5,9 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.Connection;
 import com.tarantula.Event;
 import com.tarantula.EventService;
+import com.tarantula.cci.PendingInboundMessage;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ServerPushEvent extends Data implements Event {
 
-    private ConcurrentHashMap<Long,Connection> cMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer,Connection> cMap = new ConcurrentHashMap<>();
 
     public ServerPushEvent(){
 
@@ -67,12 +67,14 @@ public class ServerPushEvent extends Data implements Event {
     public void addConnection(Connection connection){
         cMap.put(connection.sequence(),connection);
     }
-    public void removeConnection(long sequence){
+
+    public void removeConnection(int sequence){
         cMap.remove(sequence);
     }
-    public void onMessage(ByteBuffer pendingInboundMessage){
+    public void onMessage(PendingInboundMessage pendingInboundMessage){
         //process message
-        cMap.forEach((k,v)->v.update(pendingInboundMessage.array()));
+        //Connection connection = cMap.get(decoder.doFinal(pendingInboundMessage.sequence()));
+        cMap.forEach((k,v)->v.update(pendingInboundMessage.payload()));
     }
     public void clear(){
 
@@ -80,5 +82,25 @@ public class ServerPushEvent extends Data implements Event {
     @Override
     public String toString(){
         return "Server Push Event ["+this.typeId+"]";
+    }
+    @Override
+    public void write(byte[] delta,int batch,String contentType,String label){
+        //this.write(delta,batch,contentType,label,false);
+    }
+    @Override
+    public void write(byte[] payload,int batch,String contentType,String label,boolean closed){
+        //this.eventService.publish(new ResponsiveEvent(this.source,this.sessionId,payload,batch,contentType,label,closed));
+    }
+    @Override
+    public void write(byte[] message,String label){
+        this.write(message,label,false);
+    }
+    @Override
+    public void write(byte[] payload,String label,boolean closed){
+        ResponsiveEvent responsiveEvent = new ResponsiveEvent(this.source,this.sessionId,payload,label,closed);
+        String[] settings = label.split("/");
+        responsiveEvent.stub(Integer.parseInt(settings[0]));//sequence
+        responsiveEvent.code(Integer.parseInt(settings[1]));//parser number
+        this.eventService.publish(responsiveEvent);
     }
 }
