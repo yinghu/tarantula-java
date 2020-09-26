@@ -6,6 +6,7 @@ import com.tarantula.Module;
 import com.tarantula.cci.PendingInboundMessage;
 import com.tarantula.cci.udp.UDPSessionService;
 import com.tarantula.cci.webhook.WebhookSessionService;
+import com.tarantula.cci.websocket.WebSocketSessionService;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
@@ -409,7 +410,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                         try{
                             PendingInboundMessage pending = pendingData.poll();
                             if(pending!=null){
-                                //connections.forEach((k,v)->v.update(pending.message.array()));
                                 ServerPushEvent pushEvent = (ServerPushEvent) pushRegistry.get(pending.serverId);
                                 pushEvent.onMessage(pending.message);
                             }
@@ -504,6 +504,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         else if(occ.type().equals(Connection.WEB_HOOK)){
             event.eventService(new WebhookSessionService());
+        }
+        else if(occ.type().equals(Connection.WEB_SOCKET)){
+            event.eventService(new WebSocketSessionService());
         }
         else{
             event.eventService(this.integrationEventService);

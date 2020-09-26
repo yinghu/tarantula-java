@@ -4,6 +4,7 @@ public interface Connection extends Response {
 
     String WEB_HOOK = "webhook";
     String UDP = "udp";
+    String WEB_SOCKET = "websocket";
 
     String type();
     void type(String type);
