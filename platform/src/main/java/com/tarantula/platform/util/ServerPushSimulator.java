@@ -50,6 +50,7 @@ public class ServerPushSimulator {
                 ByteBuffer seq = ByteBuffer.wrap(ret);
                 System.out.println(sc.toString()+">>"+seq.getInt(0)+"<><><>"+pendingInboundMessage.ack()+"<><>>"+pendingInboundMessage.type()+"<><>"+new String(pendingInboundMessage.payload()).trim());
                 PendingOutboundMessage msg = new PendingOutboundMessage();
+                msg.type(13);
                 msg.payload("pop".getBytes());
                 datagramChannel.send(msg.message(),sc);
 

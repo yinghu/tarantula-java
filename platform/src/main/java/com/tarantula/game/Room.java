@@ -225,7 +225,7 @@ public class Room implements Connection.InboundMessageListener{
     }
 
     @Override
-    public void onUpdated(byte[] updated) {
+    public void onUpdated(int code,byte[] updated) {
         JsonParser jp = new JsonParser();
         InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(updated));
         JsonObject j = jp.parse(inr).getAsJsonObject();

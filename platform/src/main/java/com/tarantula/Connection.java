@@ -37,13 +37,13 @@ public interface Connection extends Response {
     void maxConnections(int maxConnections);
 
     default void registerInboundMessageListener(InboundMessageListener listener){}
-    default void update(byte[] payload){}
+    default void update(int code,byte[] payload){}
 
     interface Listener{
         String typeId();
         void onState(Connection connection);
     }
     interface InboundMessageListener{
-        void onUpdated(byte[] updated);
+        void onUpdated(int code,byte[] updated);
     }
 }

@@ -74,7 +74,7 @@ public class ServerPushEvent extends Data implements Event {
     public void onMessage(PendingInboundMessage pendingInboundMessage){
         //process message
         //Connection connection = cMap.get(decoder.doFinal(pendingInboundMessage.sequence()));
-        cMap.forEach((k,v)->v.update(pendingInboundMessage.payload()));
+        cMap.forEach((k,v)->v.update(pendingInboundMessage.type(),pendingInboundMessage.payload()));
     }
     public void clear(){
 

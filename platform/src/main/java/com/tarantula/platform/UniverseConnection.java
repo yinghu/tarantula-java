@@ -157,7 +157,7 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     public void registerInboundMessageListener(InboundMessageListener listener){
         this.listener = listener;
     }
-    public void update(byte[] payload){
-        listener.onUpdated(payload);
+    public void update(int code,byte[] payload){
+        listener.onUpdated(code,payload);
     }
 }

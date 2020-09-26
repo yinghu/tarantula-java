@@ -48,7 +48,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
             Room room = mRoom.get(stub.roomId);
             if(room.offline()){
                 //this.context.log(new String(payload),OnLog.WARN);
-                room.onUpdated(payload);
+                room.onUpdated(10,payload);
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
             }
             else{
@@ -170,7 +170,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
     }
 
     @Override
-    public void onUpdated(byte[] updated) {
+    public void onUpdated(int code,byte[] updated) {
         this.context.log(new String(updated).trim(),OnLog.WARN);
     }
 }

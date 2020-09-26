@@ -223,8 +223,8 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
     public void onState(Connection c) {
         this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"]",OnLog.WARN);
         this.connection = c;
-        c.registerInboundMessageListener((d)->{
-            this.context.log("MSG->"+new String(d).trim(),OnLog.WARN);
+        c.registerInboundMessageListener((code,d)->{
+            this.context.log("MSG->"+code+"<><><><>"+new String(d).trim(),OnLog.WARN);
         });
         //this.module.onConnection(c);
     }
