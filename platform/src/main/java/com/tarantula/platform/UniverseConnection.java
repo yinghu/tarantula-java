@@ -17,15 +17,11 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     private int port;
     private String path;
     private int maxConnections;
+    private Connection server;
     private InboundMessageListener listener;
 
     public UniverseConnection(){
 
-    }
-    public UniverseConnection(String serverId,String host,int port){
-        this.serverId = serverId;
-        this.host = host;
-        this.port = port;
     }
 
     @Override
@@ -123,6 +119,15 @@ public class UniverseConnection extends ResponseHeader implements Connection {
         this.properties.put("path",this.path);
         this.properties.put("maxConnections",maxConnections);
         this.properties.put("disabled",this.disabled);
+        this.properties.put("hasServer",server!=null);
+        if(server!=null){
+            this.properties.put("stype",this.type);
+            this.properties.put("ssecured",this.secured);
+            this.properties.put("sprotocol",this.protocol);
+            this.properties.put("shost",this.host);
+            this.properties.put("sport",this.port);
+            this.properties.put("spath",this.path);
+        }
         return this.properties;
     }
     @Override
@@ -137,6 +142,15 @@ public class UniverseConnection extends ResponseHeader implements Connection {
         this.path = (String)properties.get("path");
         this.maxConnections = ((Number)properties.get("maxConnections")).intValue();
         this.disabled = (boolean)properties.get("disabled");
+        if((Boolean) properties.get("hasServer")){
+            server = new UniverseConnection();
+            server.type((String) properties.get("stype"));
+            server.secured((Boolean)properties.get("secured"));
+            server.protocol((String)properties.get("sprotocol"));
+            server.host((String)properties.get("shost"));
+            server.port(((Number)properties.get("sport")).intValue());
+            server.path((String)properties.get("spath"));
+        }
     }
     public int getFactoryId() {
         return PortableRegistry.OID;
@@ -153,7 +167,9 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     public String toString(){
         return new String(SystemUtil.toJson(toMap()));
     }
-
+    public Connection server(){
+        return server!=null?server:this;
+    }
     public void registerInboundMessageListener(InboundMessageListener listener){
         this.listener = listener;
     }

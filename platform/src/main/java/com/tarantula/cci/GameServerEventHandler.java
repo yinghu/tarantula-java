@@ -51,7 +51,7 @@ public class GameServerEventHandler implements RequestHandler {
                 }
                 exchange.onEvent(new ResponsiveEvent("","",_payload,"start",true));
             }
-            else if(action.equals("onJoin")){
+            else if(action.equals("onJoin")){//client connections
                 String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
                 byte[] ret;
                 if(typeId!=null){

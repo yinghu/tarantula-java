@@ -36,6 +36,8 @@ public interface Connection extends Response {
     int maxConnections();
     void maxConnections(int maxConnections);
 
+    Connection server();
+
     default void registerInboundMessageListener(InboundMessageListener listener){}
     default void update(int code,byte[] payload){}
 

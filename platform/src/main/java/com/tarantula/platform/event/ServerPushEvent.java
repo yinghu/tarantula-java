@@ -79,7 +79,7 @@ public class ServerPushEvent extends Data implements Event {
         //process message
         try{
             ByteBuffer buffer = ByteBuffer.wrap(decrypt.doFinal(pendingInboundMessage.sequence()));
-            System.out.println("SEQUECE->"+buffer.getInt());
+            System.out.println("SEQUENCE->"+buffer.getInt());
             //Connection connection = cMap.get(buffer.getInt());
             //connection.update(pendingInboundMessage.type(),pendingInboundMessage.payload());
             cMap.forEach((k,v)->v.update(pendingInboundMessage.type(),pendingInboundMessage.payload()));
