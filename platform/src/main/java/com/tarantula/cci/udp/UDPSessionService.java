@@ -6,11 +6,11 @@ import com.tarantula.cci.PendingInboundMessage;
 import com.tarantula.cci.PendingOutboundMessage;
 
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by yinghu lu on 9/21/2020.
@@ -22,13 +22,13 @@ public class UDPSessionService implements EventService{
     private final ConcurrentLinkedDeque<PendingInboundMessage> pendingData;
 
     private Thread receiver;
-    private final Cipher cipher;
-    private final SecretKey secretKey;
-    public UDPSessionService(Connection connection,ConcurrentLinkedDeque<PendingInboundMessage> pendingData,Cipher cipher,SecretKey secretKey){
+    private final Cipher encrypt;
+    private final AtomicInteger messageId;
+    public UDPSessionService(Connection connection,ConcurrentLinkedDeque<PendingInboundMessage> pendingData,Cipher cipher){
         this.connection = connection;
         this.pendingData = pendingData;
-        this.cipher = cipher;
-        this.secretKey = secretKey;
+        this.encrypt = cipher;
+        messageId = new AtomicInteger(0);
     }
 
     @Override
@@ -37,10 +37,10 @@ public class UDPSessionService implements EventService{
             PendingOutboundMessage pendingOutboundMessage = new PendingOutboundMessage();
             pendingOutboundMessage.ack(false);
             pendingOutboundMessage.type(out.code());
-            cipher.init(Cipher.ENCRYPT_MODE,secretKey);
             ByteBuffer seq = ByteBuffer.allocate(32);
             seq.putInt(out.stub());
-            pendingOutboundMessage.sequence(cipher.doFinal(seq.array()));
+            pendingOutboundMessage.sequence(encrypt.doFinal(seq.array()));
+            pendingOutboundMessage.messageId(messageId.incrementAndGet());
             pendingOutboundMessage.payload(out.payload());
             datagramChannel.write(pendingOutboundMessage.message());
         }catch (Exception ex){

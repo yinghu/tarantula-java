@@ -17,6 +17,9 @@ public class PendingOutboundMessage {
     public void type(int type){
         message.putInt(PendingInboundMessage.TYPE_POS,type);
     }
+    public void messageId(int messageId){
+        message.putInt(PendingInboundMessage.MESSAGE_ID_POS,messageId);
+    }
     public void sequence(byte[] sequence){
         message.position(PendingInboundMessage.SEQ_POS);
         message.put(sequence);

@@ -7,7 +7,9 @@ import com.tarantula.Event;
 import com.tarantula.EventService;
 import com.tarantula.cci.PendingInboundMessage;
 
+import javax.crypto.Cipher;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -16,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServerPushEvent extends Data implements Event {
 
     private ConcurrentHashMap<Integer,Connection> cMap = new ConcurrentHashMap<>();
-
+    private Cipher decrypt;
     public ServerPushEvent(){
 
     }
@@ -67,14 +69,23 @@ public class ServerPushEvent extends Data implements Event {
     public void addConnection(Connection connection){
         cMap.put(connection.sequence(),connection);
     }
-
+    public void cipher(Cipher decrypt){
+        this.decrypt = decrypt;
+    }
     public void removeConnection(int sequence){
         cMap.remove(sequence);
     }
     public void onMessage(PendingInboundMessage pendingInboundMessage){
         //process message
-        //Connection connection = cMap.get(decoder.doFinal(pendingInboundMessage.sequence()));
-        cMap.forEach((k,v)->v.update(pendingInboundMessage.type(),pendingInboundMessage.payload()));
+        try{
+            ByteBuffer buffer = ByteBuffer.wrap(decrypt.doFinal(pendingInboundMessage.sequence()));
+            System.out.println("SEQUECE->"+buffer.getInt());
+            //Connection connection = cMap.get(buffer.getInt());
+            //connection.update(pendingInboundMessage.type(),pendingInboundMessage.payload());
+            cMap.forEach((k,v)->v.update(pendingInboundMessage.type(),pendingInboundMessage.payload()));
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
     public void clear(){
 

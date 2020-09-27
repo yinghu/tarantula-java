@@ -26,7 +26,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -493,9 +492,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerOnLobbyListener(OnLobby.Listener onLobbyListener){
         oListeners.add(onLobbyListener);
     }
-    private Cipher cipher(){
+    private Cipher cipher(int mode,SecretKey secretKey){
         try{
-            return Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME);
+            Cipher cipher = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME);
+            cipher.init(mode,secretKey);
+            return cipher;
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -505,12 +506,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         occ.disabled(false);
         occ.sequence(100);
         log.warn("add server push->"+event.trackId()+"/"+occ.type());
-        SecretKey secretKey = new SecretKeySpec(this.tarantulaContext.integrationCluster().get(occ.serverId().getBytes()),DeploymentServiceProvider.SERVER_KEY_SPEC);
-        Cipher cipher = cipher();
         if(occ.type().equals(Connection.UDP)){
-            UDPSessionService udpSessionService = new UDPSessionService(occ,pendingData,cipher,secretKey);
+            SecretKey secretKey = new SecretKeySpec(this.tarantulaContext.integrationCluster().get(occ.serverId().getBytes()),DeploymentServiceProvider.SERVER_KEY_SPEC);
+            Cipher encrypt = cipher(Cipher.ENCRYPT_MODE,secretKey);
+            UDPSessionService udpSessionService = new UDPSessionService(occ,pendingData,encrypt);
             try{udpSessionService.start();}catch (Exception ex){}
             event.eventService(udpSessionService);
+            Cipher decrypt = cipher(Cipher.DECRYPT_MODE,secretKey);
+            ((ServerPushEvent)event).cipher(decrypt);
         }
         else if(occ.type().equals(Connection.WEB_HOOK)){
             event.eventService(new WebhookSessionService());
@@ -522,7 +525,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             event.eventService(this.integrationEventService);
         }
         ((ServerPushEvent)event).addConnection(occ);
-        //((ServerPushEvent)event).decoder(occ);
         pushRegistry.put(occ.serverId(), event);//serverId cache
         this.wListeners.forEach((l) -> {
             if(l.typeId().equals(event.typeId())){
