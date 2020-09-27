@@ -505,11 +505,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         Connection occ = this.builder.create().fromJson(new String(event.payload()), Connection.class);
         occ.disabled(false);
         occ.sequence(100);
-        log.warn("add server push->"+event.trackId()+"/"+occ.type());
-        if(occ.type().equals(Connection.UDP)){
+        log.warn("add server push->"+new String(event.payload()));
+        if(occ.server().type().equals(Connection.UDP)){
             SecretKey secretKey = new SecretKeySpec(this.tarantulaContext.integrationCluster().get(occ.serverId().getBytes()),DeploymentServiceProvider.SERVER_KEY_SPEC);
             Cipher encrypt = cipher(Cipher.ENCRYPT_MODE,secretKey);
-            UDPSessionService udpSessionService = new UDPSessionService(occ,pendingData,encrypt);
+            UDPSessionService udpSessionService = new UDPSessionService(occ.server(),pendingData,encrypt);
             try{udpSessionService.start();}catch (Exception ex){}
             event.eventService(udpSessionService);
             Cipher decrypt = cipher(Cipher.DECRYPT_MODE,secretKey);

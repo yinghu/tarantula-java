@@ -4,34 +4,22 @@ import com.google.gson.*;
 
 import com.tarantula.Connection;
 import com.tarantula.platform.UniverseConnection;
-
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ConnectionDeserializer implements JsonDeserializer<Connection> {
 
     @Override
     public Connection deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jo = jsonElement.getAsJsonObject();
+        Connection desc = toConnection(jo);
+        if(jo.has("server")){
+            JsonObject server = jo.getAsJsonObject("server");
+            desc.server(toConnection(server));
+        }
+        return desc;
+    }
+    private Connection toConnection(JsonObject jo){
         Connection desc = new UniverseConnection();
-        Map<String,Object> _properties = new HashMap<>();
-        jo.entrySet().forEach((e)->{
-            JsonElement je = e.getValue();
-            if(je.isJsonPrimitive()){
-                JsonPrimitive m = je.getAsJsonPrimitive();
-                if(m.isString()){
-                    _properties.put(e.getKey(),m.getAsString());
-                }
-                else if(m.isNumber()){
-                    _properties.put(e.getKey(),m.getAsNumber());
-                }
-                else if(m.isBoolean()){
-                    _properties.put(e.getKey(),m.getAsBoolean());
-                }
-            }
-        });
-        /**
         if(jo.has("type")){
             desc.type(jo.get("type").getAsString());
         }
@@ -56,10 +44,6 @@ public class ConnectionDeserializer implements JsonDeserializer<Connection> {
         if(jo.has("maxConnections")){
             desc.maxConnections(jo.get("maxConnections").getAsInt());
         }
-        if(jo.has("hasServer")&&jo.get("hasServer").getAsBoolean()){
-
-        }**/
-        desc.fromMap(_properties);
         return desc;
     }
 }

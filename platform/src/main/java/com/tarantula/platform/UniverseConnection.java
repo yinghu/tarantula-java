@@ -170,6 +170,9 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     public Connection server(){
         return server!=null?server:this;
     }
+    public void server(Connection connection){
+        this.server = connection;
+    }
     public void registerInboundMessageListener(InboundMessageListener listener){
         this.listener = listener;
     }
