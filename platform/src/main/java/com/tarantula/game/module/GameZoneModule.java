@@ -130,13 +130,16 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         //}
         //this.connection.reset(connection);
         Connection c = this.deploymentServiceProvider.onConnection(this.context.descriptor().typeId(),this);
+        connection.registerInboundMessageListener((t,d)->{
+            this.context.log("PAYLOAD->"+new String(d),OnLog.WARN);
+        });
         if(c!=null){
             this.context.log("connection->"+connection.serverId()+"//"+c.sequence(),OnLog.WARN);
         }
         else{
             this.context.log("no connection->",OnLog.WARN);
         }
-        this.context.postOffice().onConnection(connection).send("game","hello".getBytes());
+        this.context.postOffice().onConnection(connection).send("100/14","hello".getBytes());
     }
     @Override
     public void onTimer(OnUpdate update){

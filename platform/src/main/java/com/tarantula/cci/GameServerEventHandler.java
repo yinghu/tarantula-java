@@ -1,6 +1,7 @@
 package com.tarantula.cci;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
@@ -12,6 +13,8 @@ import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.ConnectionDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
+
+import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -40,8 +43,12 @@ public class GameServerEventHandler implements RequestHandler {
             String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
             byte[] _payload = exchange.payload();
             if(action.equals("onStart")){//start game server
+                JsonObject resp = new JsonObject();
                 String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
                 if(typeId!=null){
+                    resp.addProperty("typeId",typeId);
+                    resp.addProperty("successful",true);
+                    resp.addProperty("serverKey", Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(serverId)));
                     ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,_payload);
                     pushEvent.typeId(typeId);
                     deployService.addServerPushEvent(pushEvent);
@@ -49,7 +56,7 @@ public class GameServerEventHandler implements RequestHandler {
                 else{
                     log.warn("Invalid access key on start");
                 }
-                exchange.onEvent(new ResponsiveEvent("","",_payload,"start",true));
+                exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
             }
             else if(action.equals("onJoin")){//client connections
                 String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);

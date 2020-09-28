@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.tarantula.Connection;
 import com.tarantula.Session;
+import com.tarantula.cci.PendingInboundMessage;
+import com.tarantula.cci.PendingOutboundMessage;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -33,10 +35,15 @@ public class GameServerSimulator {
         CountDownLatch ct = new CountDownLatch(1);
         Thread t = new Thread(()->{
             try {
-                ByteBuffer buffer = ByteBuffer.allocate(1024);
+                ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE);
                 SocketAddress sc = datagramChannel.receive(buffer);
-                System.out.println(sc.toString()+""+new String(buffer.array()).trim());
-                datagramChannel.send(ByteBuffer.wrap("popop".getBytes()),sc);
+                PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("",buffer);
+                System.out.println(sc.toString()+""+new String(pendingInboundMessage.payload()));
+                PendingOutboundMessage out = new PendingOutboundMessage();
+                out.sequence(pendingInboundMessage.sequence());
+                out.payload("killer".getBytes());
+                out.connectionId(2);
+                datagramChannel.send(out.message(),sc);
 
             }catch (Exception ex){
                 ex.printStackTrace();
@@ -52,7 +59,8 @@ public class GameServerSimulator {
         JsonObject resp = parser.parse(onStart(accessKey)).getAsJsonObject();
         System.out.println(resp);
         ct.await();
-        //onStop(accessKey);
+        Thread.sleep(3000);
+        onStop(accessKey);
     }
 
     static String onStart(String accessKey) throws Exception{
