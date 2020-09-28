@@ -4,6 +4,7 @@ package com.tarantula.cci.udp;
 import com.tarantula.*;
 import com.tarantula.cci.PendingInboundMessage;
 import com.tarantula.cci.PendingOutboundMessage;
+import com.tarantula.platform.service.ConnectionEventService;
 
 import javax.crypto.Cipher;
 import java.net.InetSocketAddress;
@@ -15,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by yinghu lu on 9/21/2020.
  */
-public class UDPSessionService implements EventService{
+public class UDPSessionService implements ConnectionEventService {
 
     private DatagramChannel datagramChannel;
     private final Connection connection;
@@ -113,6 +114,15 @@ public class UDPSessionService implements EventService{
             }
         }catch (Exception ex){
             //ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void publish(Event event,Connection connection) {
+        try{
+            //datagramChannel.write(pendingOutboundMessage.message());
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
     }
 }

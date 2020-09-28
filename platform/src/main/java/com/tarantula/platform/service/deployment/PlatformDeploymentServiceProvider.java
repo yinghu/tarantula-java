@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.cci.PendingInboundMessage;
+import com.tarantula.cci.PendingOutboundMessage;
 import com.tarantula.cci.udp.UDPSessionService;
 import com.tarantula.cci.webhook.WebhookSessionService;
 import com.tarantula.cci.websocket.WebSocketSessionService;
@@ -777,9 +778,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         public OnConnection onConnection(Connection connection){
             return (label,data)->{
                 //lookup push event via serverId
-                Event sc = pushRegistry.get(connection.serverId());
+                ServerPushEvent sc = (ServerPushEvent) pushRegistry.get(connection.serverId());
                 if(sc!=null){
-                    sc.write(data,label);
+                    PendingOutboundMessage pendingOutboundMessage = new PendingOutboundMessage();
+                    pendingOutboundMessage.connectionId(connection.connectionId());
+                    pendingOutboundMessage.payload(sc.payload());
+                    //sc.onMessage(pendingOutboundMessage);
+                    //sc.write(data,label);
                 }
             };
         }
