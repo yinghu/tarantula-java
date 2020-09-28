@@ -136,7 +136,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         else{
             this.context.log("no connection->",OnLog.WARN);
         }
-        this.context.postOffice().onConnection(connection.serverId()).send("game","hello".getBytes());
+        this.context.postOffice().onConnection(connection).send("game","hello".getBytes());
     }
     @Override
     public void onTimer(OnUpdate update){

@@ -4,7 +4,7 @@ public interface PostOffice{
 
     //app to client
     OnTopic onTopic();
-    OnConnection onConnection(String serverId);
+    OnConnection onConnection(Connection connection);
     OnEmail onEmail();
     OnSMS onSMS();
     //app to app

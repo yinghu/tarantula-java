@@ -774,10 +774,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     private class PostOfficeSession implements PostOffice{
 
-        public OnConnection onConnection(String serverId){
+        public OnConnection onConnection(Connection connection){
             return (label,data)->{
                 //lookup push event via serverId
-                Event sc = pushRegistry.get(serverId);
+                Event sc = pushRegistry.get(connection.serverId());
                 if(sc!=null){
                     sc.write(data,label);
                 }

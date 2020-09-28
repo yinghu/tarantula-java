@@ -86,6 +86,7 @@ public class ServerPushEvent extends Data implements Event {
             ex.printStackTrace();
         }
     }
+
     public void clear(){
 
     }
