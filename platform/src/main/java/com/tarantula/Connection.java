@@ -12,6 +12,9 @@ public interface Connection extends Recoverable {
     String serverId();
     void serverId(String serverId);
 
+    long connectionId();
+    void connectionId(long connectionId);
+
     int sequence();
     void sequence(int sequence);
 

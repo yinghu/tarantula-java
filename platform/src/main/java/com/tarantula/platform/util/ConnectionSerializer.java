@@ -11,6 +11,8 @@ public class ConnectionSerializer implements JsonSerializer<Connection> {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("type",connection.type());
         jsonObject.addProperty("serverId",connection.serverId());
+        jsonObject.addProperty("connectionId",connection.connectionId());
+        jsonObject.addProperty("sequence",connection.sequence());
         jsonObject.addProperty("secured",connection.secured());
         jsonObject.addProperty("protocol",connection.protocol());
         jsonObject.addProperty("subProtocol",connection.subProtocol());
@@ -18,7 +20,7 @@ public class ConnectionSerializer implements JsonSerializer<Connection> {
         jsonObject.addProperty("port",connection.port());
         jsonObject.addProperty("path",connection.path());
         jsonObject.addProperty("maxConnections",connection.maxConnections());
-        /**
+
         if(connection.server()!=null){
             JsonObject server = new JsonObject();
             Connection sc = connection.server();
@@ -32,7 +34,7 @@ public class ConnectionSerializer implements JsonSerializer<Connection> {
             server.addProperty("path",sc.path());
             server.addProperty("maxConnections",sc.maxConnections());
             jsonObject.add("server",server);
-        }**/
+        }
         return jsonObject;
     }
 }

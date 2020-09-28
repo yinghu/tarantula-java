@@ -20,6 +20,9 @@ public class PendingOutboundMessage {
     public void messageId(int messageId){
         message.putInt(PendingInboundMessage.MESSAGE_ID_POS,messageId);
     }
+    public void connectionId(long connectionId){
+        message.putLong(PendingInboundMessage.CONNECTION_ID_POS,connectionId);
+    }
     public void sequence(byte[] sequence){
         message.position(PendingInboundMessage.SEQ_POS);
         message.put(sequence);

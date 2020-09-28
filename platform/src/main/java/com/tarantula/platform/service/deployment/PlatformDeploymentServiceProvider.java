@@ -84,11 +84,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void start() throws Exception {
         this.secureRandom = new SecureRandom();
         this.pendingData = new ConcurrentLinkedDeque<>();
-        //this.connections = new ConcurrentHashMap<>();
-        onAccessIndex = new AtomicBoolean(true);
+        this.onAccessIndex = new AtomicBoolean(true);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
-
+        this.builder.registerTypeAdapter(Connection.class,new ConnectionSerializer());
     }
 
     @Override
@@ -504,8 +503,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerServerPushEvent(Event event){
         Connection occ = this.builder.create().fromJson(new String(event.payload()), Connection.class);
         occ.disabled(false);
-        occ.sequence(100);
-        log.warn("add server push->"+new String(event.payload()));
+        occ.connectionId(this.tarantulaContext.integrationCluster().sequence());
+        log.warn("add server push->"+occ.connectionId());
         if(occ.server().type().equals(Connection.UDP)){
             SecretKey secretKey = new SecretKeySpec(this.tarantulaContext.integrationCluster().get(occ.serverId().getBytes()),DeploymentServiceProvider.SERVER_KEY_SPEC);
             Cipher encrypt = cipher(Cipher.ENCRYPT_MODE,secretKey);
@@ -596,8 +595,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     //dedicated server methods
     public Connection onConnection(String typeId,Connection connection){
-        connection.sequence(100);
-        this.tarantulaContext.integrationCluster().index(typeId,SystemUtil.toJson(connection.toMap()));
+        this.tarantulaContext.integrationCluster().index(typeId,this.builder.create().toJson(connection).getBytes());
         return connection;
     }
     public Connection onConnection(String typeId,Connection.InboundMessageListener listener){
@@ -606,8 +604,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(ret==null){
             return null;
         }
-        Connection connection = new UniverseConnection();
-        connection.fromMap(SystemUtil.toMap(ret));
+        Connection connection = this.builder.create().fromJson(new String(ret),Connection.class);
         connection.registerInboundMessageListener(listener);
         ((ServerPushEvent)pushRegistry.get(connection.serverId())).addConnection(connection);
         return connection;

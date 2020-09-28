@@ -1,6 +1,7 @@
 package com.tarantula.platform.util;
 
 import com.tarantula.cci.PendingInboundMessage;
+import com.tarantula.cci.PendingOutboundMessage;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 
 import javax.crypto.Cipher;
@@ -26,15 +27,17 @@ public class Email {
         SecretKey skey = new SecretKeySpec(key, DeploymentServiceProvider.SERVER_KEY_SPEC);
         Cipher cipher = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME);
         cipher.init(Cipher.ENCRYPT_MODE,skey);
-        ByteBuffer msg = ByteBuffer.allocate(512);
-        msg.put((byte) 0);
-        msg.putInt(115);
+        PendingOutboundMessage out = new PendingOutboundMessage();
+        out.ack(false);
+        out.messageId(10);
+        out.connectionId(Long.MAX_VALUE);
+        out.type(10);
         ByteBuffer buffer = ByteBuffer.allocate(32);
         buffer.putInt(789);
         byte[] ret = cipher.doFinal(buffer.array());
-        msg.put(ret); //SEQ
-        msg.put("TEST78889999999999999999999999999999999995".getBytes());
-        PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("sid",msg);
+        out.sequence(ret); //SEQ
+        out.payload("TEST78889999999999999999999999999999999995".getBytes());
+        PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("sid",out.message());
         System.out.println("ACK->"+pendingInboundMessage.ack());
         System.out.println("TYPE->"+pendingInboundMessage.type());
         Key skey2 = new SecretKeySpec(key, DeploymentServiceProvider.SERVER_KEY_SPEC);
@@ -46,6 +49,8 @@ public class Email {
         ByteBuffer reb = ByteBuffer.allocate(32);
         reb.put(xret);
         System.out.println("SEQ->"+reb.getInt(0));
+        System.out.println("MID->"+pendingInboundMessage.messageId());
+        System.out.println("CID->"+pendingInboundMessage.connectionId());
         System.out.println("PAYLOAD->"+new String(pendingInboundMessage.payload()));
 
 

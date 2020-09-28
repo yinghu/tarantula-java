@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ServerPushEvent extends Data implements Event {
 
-    private ConcurrentHashMap<Integer,Connection> cMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long,Connection> cMap = new ConcurrentHashMap<>();
     private Cipher decrypt;
     public ServerPushEvent(){
 
@@ -67,22 +67,21 @@ public class ServerPushEvent extends Data implements Event {
         return this.eventService;
     }
     public void addConnection(Connection connection){
-        cMap.put(connection.sequence(),connection);
+        cMap.put(connection.connectionId(),connection);
     }
     public void cipher(Cipher decrypt){
         this.decrypt = decrypt;
     }
-    public void removeConnection(int sequence){
-        cMap.remove(sequence);
+    public void removeConnection(long connectionId){
+        cMap.remove(connectionId);
     }
     public void onMessage(PendingInboundMessage pendingInboundMessage){
         //process message
         try{
             ByteBuffer buffer = ByteBuffer.wrap(decrypt.doFinal(pendingInboundMessage.sequence()));
             System.out.println("SEQUENCE->"+buffer.getInt());
-            //Connection connection = cMap.get(buffer.getInt());
-            //connection.update(pendingInboundMessage.type(),pendingInboundMessage.payload());
-            cMap.forEach((k,v)->v.update(pendingInboundMessage.type(),pendingInboundMessage.payload()));
+            Connection connection = cMap.get(pendingInboundMessage.connectionId());
+            connection.update(pendingInboundMessage.type(),pendingInboundMessage.payload());
         }catch (Exception ex){
             ex.printStackTrace();
         }

@@ -10,8 +10,9 @@ public class PendingInboundMessage {
     public static int ACK_POS = 0;
     public static int TYPE_POS = 1;
     public static int MESSAGE_ID_POS = 5;
-    public static int SEQ_POS = 9;
-    public static int PAYLOAD_POS = 57;
+    public static int CONNECTION_ID_POS = 9;
+    public static int SEQ_POS = 17;
+    public static int PAYLOAD_POS = 65;
 
     public final String serverId;
     private final ByteBuffer message;
@@ -28,6 +29,9 @@ public class PendingInboundMessage {
     }
     public int type(){
         return message.getInt(TYPE_POS);
+    }
+    public long connectionId(){
+        return message.getLong(CONNECTION_ID_POS);
     }
     public byte[] sequence(){
         byte[] seq = new byte[48];

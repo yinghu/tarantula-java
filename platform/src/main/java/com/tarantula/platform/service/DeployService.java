@@ -38,7 +38,6 @@ public interface DeployService extends ServiceProvider {
     void syncServerPushEvent();
     boolean addServerPushEvent(String memberId,Event serverPushEvent);
 
-
     //distribute the module or view content in cluster
     boolean upload(String fileName,byte[] content);
 
