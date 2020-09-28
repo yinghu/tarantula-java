@@ -52,7 +52,11 @@ public class ServerPushSimulator {
                 PendingOutboundMessage msg = new PendingOutboundMessage();
                 msg.type(13);
                 msg.sequence(pendingInboundMessage.sequence());
+                msg.connectionId(3);
                 msg.payload("pop".getBytes());
+                datagramChannel.send(msg.message(),sc);
+                datagramChannel.send(msg.message(),sc);
+                datagramChannel.send(msg.message(),sc);
                 datagramChannel.send(msg.message(),sc);
 
             }catch (Exception ex){

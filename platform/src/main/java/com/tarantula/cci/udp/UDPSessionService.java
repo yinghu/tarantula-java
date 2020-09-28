@@ -34,19 +34,7 @@ public class UDPSessionService implements ConnectionEventService {
 
     @Override
     public void publish(Event out) {
-        try{
-            PendingOutboundMessage pendingOutboundMessage = new PendingOutboundMessage();
-            pendingOutboundMessage.ack(false);
-            pendingOutboundMessage.type(out.code());
-            ByteBuffer seq = ByteBuffer.allocate(32);
-            seq.putInt(out.stub());
-            pendingOutboundMessage.sequence(encrypt.doFinal(seq.array()));
-            pendingOutboundMessage.messageId(messageId.incrementAndGet());
-            pendingOutboundMessage.payload(out.payload());
-            datagramChannel.write(pendingOutboundMessage.message());
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
+
     }
 
     @Override
@@ -118,9 +106,20 @@ public class UDPSessionService implements ConnectionEventService {
     }
 
     @Override
-    public void publish(Event event,Connection connection) {
+    public void publish(byte[] payload,String label,Connection connection) {
         try{
-            //datagramChannel.write(pendingOutboundMessage.message());
+            PendingOutboundMessage pendingOutboundMessage = new PendingOutboundMessage();
+            pendingOutboundMessage.ack(false);
+            pendingOutboundMessage.connectionId(connection.connectionId());
+            //label sequence/type
+            String[] params = label.split(Recoverable.PATH_SEPARATOR);
+            pendingOutboundMessage.type(Integer.parseInt(params[1]));
+            ByteBuffer seq = ByteBuffer.allocate(32);
+            seq.putInt(Integer.parseInt(params[0]));
+            pendingOutboundMessage.sequence(encrypt.doFinal(seq.array()));
+            pendingOutboundMessage.messageId(messageId.incrementAndGet());
+            pendingOutboundMessage.payload(payload);
+            datagramChannel.write(pendingOutboundMessage.message());
         }catch (Exception ex){
             ex.printStackTrace();
         }

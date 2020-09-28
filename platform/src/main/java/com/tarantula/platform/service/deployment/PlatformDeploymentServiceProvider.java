@@ -780,11 +780,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 //lookup push event via serverId
                 ServerPushEvent sc = (ServerPushEvent) pushRegistry.get(connection.serverId());
                 if(sc!=null){
-                    PendingOutboundMessage pendingOutboundMessage = new PendingOutboundMessage();
-                    pendingOutboundMessage.connectionId(connection.connectionId());
-                    pendingOutboundMessage.payload(sc.payload());
-                    //sc.onMessage(pendingOutboundMessage);
-                    //sc.write(data,label);
+                    sc.onMessage(data,label,connection);
                 }
             };
         }

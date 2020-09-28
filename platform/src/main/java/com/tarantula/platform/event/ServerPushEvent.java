@@ -6,7 +6,6 @@ import com.tarantula.Connection;
 import com.tarantula.Event;
 import com.tarantula.EventService;
 import com.tarantula.cci.PendingInboundMessage;
-import com.tarantula.cci.PendingOutboundMessage;
 import com.tarantula.platform.service.ConnectionEventService;
 
 import javax.crypto.Cipher;
@@ -88,9 +87,9 @@ public class ServerPushEvent extends Data implements Event {
             ex.printStackTrace();
         }
     }
-    //public void onMessage(PendingOutboundMessage pendingOutboundMessage){
-        //((ConnectionEventService)eventService).publish(pendingOutboundMessage);
-    //}
+    public void onMessage(byte[] payload,String label,Connection connection){
+        ((ConnectionEventService)eventService).publish(payload,label,connection);
+    }
     public void clear(){
 
     }
@@ -107,15 +106,7 @@ public class ServerPushEvent extends Data implements Event {
         //this.eventService.publish(new ResponsiveEvent(this.source,this.sessionId,payload,batch,contentType,label,closed));
     }
     @Override
-    public void write(byte[] message,String label){
-        this.write(message,label,false);
-    }
+    public void write(byte[] message,String label){ }
     @Override
-    public void write(byte[] payload,String label,boolean closed){
-        //ResponsiveEvent responsiveEvent = new ResponsiveEvent(this.source,this.sessionId,payload,label,closed);
-        //String[] settings = label.split("/");
-        //responsiveEvent.stub(Integer.parseInt(settings[0]));//sequence
-        //responsiveEvent.code(Integer.parseInt(settings[1]));//parser number
-        //this.eventService.publish(responsiveEvent);
-    }
+    public void write(byte[] payload,String label,boolean closed){ }
 }
