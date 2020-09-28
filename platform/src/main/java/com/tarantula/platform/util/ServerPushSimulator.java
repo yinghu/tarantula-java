@@ -86,7 +86,7 @@ public class ServerPushSimulator {
         server.addProperty("host",udpHost);
         server.addProperty("port",16393);
         server.addProperty("type", Connection.UDP);
-        server.addProperty("maxConnections",10);
+        server.addProperty("maxConnections",1000);
         //json.add("serer",server);
         String[] headers = new String[]{
                 Session.TARANTULA_ACCESS_KEY,accessKey,

@@ -1,6 +1,6 @@
 package com.tarantula;
 
-public interface Connection extends Response {
+public interface Connection extends Recoverable {
 
     String WEB_HOOK = "webhook";
     String UDP = "udp";

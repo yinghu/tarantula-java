@@ -1,7 +1,6 @@
 package com.tarantula.platform.util;
 
 import com.google.gson.*;
-import com.tarantula.Access;
 import com.tarantula.Descriptor;
 import com.tarantula.Lobby;
 import com.tarantula.platform.presence.PresenceContext;
@@ -56,6 +55,9 @@ public class PresenceContextSerializer implements JsonSerializer<PresenceContext
         }
         if(presenceContext.subscription!=null){
             pc.add("subscription",new SubscriptionSerializer().serialize(presenceContext.subscription,type,jsonSerializationContext));
+        }
+        if(presenceContext.connection!=null){
+            pc.add("connection",new ConnectionSerializer().serialize(presenceContext.connection,type,jsonSerializationContext));
         }
         return pc;
     }

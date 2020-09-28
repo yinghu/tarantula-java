@@ -21,6 +21,7 @@ public class PresenceContext extends ResponseHeader {
     public OnSession presence;
     public String googleClientId;
     public String stripeClientId;
+    public Connection connection;
     public PresenceContext(){
         this.code = 200;
         this.successful=true;
