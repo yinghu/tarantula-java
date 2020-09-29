@@ -1,5 +1,6 @@
 package com.icodesoftware.protocol;
 
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
 /**
@@ -16,10 +17,15 @@ public class PendingInboundMessage {
 
     public final String serverId;
     private final ByteBuffer message;
+    private final SocketAddress source;
 
-    public PendingInboundMessage(String serverId, ByteBuffer message){
+    public PendingInboundMessage(String serverId, ByteBuffer message,SocketAddress source){
         this.serverId = serverId;
         this.message = message;
+        this.source = source;
+    }
+    public SocketAddress source(){
+        return source;
     }
     public boolean ack(){
         return message.get(ACK_POS)==1;

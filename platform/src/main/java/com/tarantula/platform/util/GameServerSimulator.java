@@ -38,7 +38,7 @@ public class GameServerSimulator {
                 for(int i=0;i<100;i++) {
                     ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE);
                     SocketAddress sc = datagramChannel.receive(buffer);
-                    PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("", buffer);
+                    PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("", buffer,sc);
                     System.out.println(sc.toString() + "" + new String(pendingInboundMessage.payload()));
 
                     PendingOutboundMessage out = new PendingOutboundMessage();

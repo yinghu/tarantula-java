@@ -36,7 +36,7 @@ public class Email {
         byte[] ret = cipher.doFinal(buffer.array());
         out.sequence(ret); //SEQ
         out.payload("TEST78889999999999999999999999999999999995".getBytes());
-        PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("sid",out.message());
+        PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("sid",out.message(),null);
         System.out.println("ACK->"+pendingInboundMessage.ack());
         System.out.println("TYPE->"+pendingInboundMessage.type());
         Key skey2 = new SecretKeySpec(key, DeploymentServiceProvider.SERVER_KEY_SPEC);

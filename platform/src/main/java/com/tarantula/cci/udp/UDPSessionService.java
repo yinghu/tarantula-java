@@ -8,6 +8,7 @@ import com.tarantula.platform.service.ConnectionEventService;
 
 import javax.crypto.Cipher;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -93,8 +94,8 @@ public class UDPSessionService implements ConnectionEventService {
         try{
             while (true){
                 ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE);
-                datagramChannel.receive(buffer);
-                PendingInboundMessage pendingInboundMessage = new PendingInboundMessage(connection.serverId(),buffer);
+                SocketAddress sc = datagramChannel.receive(buffer);
+                PendingInboundMessage pendingInboundMessage = new PendingInboundMessage(connection.serverId(),buffer,sc);
                 if(pendingInboundMessage.ack()){
                     continue;
                 }
