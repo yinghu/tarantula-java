@@ -2,10 +2,10 @@ package com.tarantula.platform.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.icodesoftware.protocol.PendingInboundMessage;
+import com.icodesoftware.protocol.PendingOutboundMessage;
 import com.tarantula.Connection;
 import com.tarantula.Session;
-import com.tarantula.cci.PendingInboundMessage;
-import com.tarantula.cci.PendingOutboundMessage;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 
 import javax.crypto.Cipher;
@@ -15,7 +15,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
-import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;

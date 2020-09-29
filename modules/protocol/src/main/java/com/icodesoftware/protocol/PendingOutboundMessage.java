@@ -1,4 +1,4 @@
-package com.tarantula.cci;
+package com.icodesoftware.protocol;
 
 import java.nio.ByteBuffer;
 

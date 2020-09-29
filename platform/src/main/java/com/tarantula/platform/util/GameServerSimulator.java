@@ -2,10 +2,10 @@ package com.tarantula.platform.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.icodesoftware.protocol.PendingInboundMessage;
+import com.icodesoftware.protocol.PendingOutboundMessage;
 import com.tarantula.Connection;
 import com.tarantula.Session;
-import com.tarantula.cci.PendingInboundMessage;
-import com.tarantula.cci.PendingOutboundMessage;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;

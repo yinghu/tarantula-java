@@ -1,10 +1,9 @@
 package com.tarantula.platform.service.deployment;
 
 import com.google.gson.GsonBuilder;
+import com.icodesoftware.protocol.PendingInboundMessage;
 import com.tarantula.*;
 import com.tarantula.Module;
-import com.tarantula.cci.PendingInboundMessage;
-import com.tarantula.cci.PendingOutboundMessage;
 import com.tarantula.cci.udp.UDPSessionService;
 import com.tarantula.cci.webhook.WebhookSessionService;
 import com.tarantula.cci.websocket.WebSocketSessionService;

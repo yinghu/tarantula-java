@@ -1,4 +1,4 @@
-package com.tarantula.cci;
+package com.icodesoftware.protocol;
 
 import java.nio.ByteBuffer;
 
@@ -17,7 +17,7 @@ public class PendingInboundMessage {
     public final String serverId;
     private final ByteBuffer message;
 
-    public PendingInboundMessage(String serverId,ByteBuffer message){
+    public PendingInboundMessage(String serverId, ByteBuffer message){
         this.serverId = serverId;
         this.message = message;
     }

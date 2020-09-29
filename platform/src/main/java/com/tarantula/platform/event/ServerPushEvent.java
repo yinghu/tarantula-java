@@ -2,10 +2,10 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.protocol.PendingInboundMessage;
 import com.tarantula.Connection;
 import com.tarantula.Event;
 import com.tarantula.EventService;
-import com.tarantula.cci.PendingInboundMessage;
 import com.tarantula.platform.service.ConnectionEventService;
 
 import javax.crypto.Cipher;

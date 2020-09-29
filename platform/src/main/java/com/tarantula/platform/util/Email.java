@@ -1,7 +1,7 @@
 package com.tarantula.platform.util;
 
-import com.tarantula.cci.PendingInboundMessage;
-import com.tarantula.cci.PendingOutboundMessage;
+import com.icodesoftware.protocol.PendingInboundMessage;
+import com.icodesoftware.protocol.PendingOutboundMessage;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 
 import javax.crypto.Cipher;
@@ -13,7 +13,6 @@ import javax.mail.internet.MimeMessage;
 import java.nio.ByteBuffer;
 import java.security.Key;
 import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.Properties;
 
 public class Email {
