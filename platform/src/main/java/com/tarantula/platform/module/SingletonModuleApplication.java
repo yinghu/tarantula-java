@@ -56,8 +56,8 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     @Override
     public void run() {
         try{
-            this.module.onTimer(((cid,uid,delta) ->
-                    this.serviceProvider.registerPostOffice().onConnection(cid).send(this.module.label()+"#"+uid,delta)
+            this.module.onTimer(((connection,label,delta) ->
+                    this.serviceProvider.registerPostOffice().onConnection(connection).send(label,delta)
             ));
         }catch (Exception ex){
             //ignore it
@@ -67,8 +67,8 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     public boolean onEvent(Event event){
         try{
             if(event instanceof FastPlayEvent){
-                this.module.onJoin(event,(cid,uid,delta)->
-                    this.serviceProvider.registerPostOffice().onConnection(cid).send(this.module.label()+"#"+uid,delta)
+                this.module.onJoin(event,(connection,label,delta)->
+                    this.serviceProvider.registerPostOffice().onConnection(connection).send(label,delta)
                 );
             }
             else{

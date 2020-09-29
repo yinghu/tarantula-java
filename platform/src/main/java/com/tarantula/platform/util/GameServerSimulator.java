@@ -35,15 +35,18 @@ public class GameServerSimulator {
         CountDownLatch ct = new CountDownLatch(1);
         Thread t = new Thread(()->{
             try {
-                ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE);
-                SocketAddress sc = datagramChannel.receive(buffer);
-                PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("",buffer);
-                System.out.println(sc.toString()+""+new String(pendingInboundMessage.payload()));
-                PendingOutboundMessage out = new PendingOutboundMessage();
-                out.sequence(pendingInboundMessage.sequence());
-                out.payload("killer".getBytes());
-                out.connectionId(2);
-                datagramChannel.send(out.message(),sc);
+                for(int i=0;i<100;i++) {
+                    ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE);
+                    SocketAddress sc = datagramChannel.receive(buffer);
+                    PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("", buffer);
+                    System.out.println(sc.toString() + "" + new String(pendingInboundMessage.payload()));
+
+                    PendingOutboundMessage out = new PendingOutboundMessage();
+                    out.sequence(pendingInboundMessage.sequence());
+                    out.payload("killer".getBytes());
+                    out.connectionId(pendingInboundMessage.connectionId());
+                    datagramChannel.send(out.message(),sc);
+                }
 
             }catch (Exception ex){
                 ex.printStackTrace();

@@ -20,10 +20,11 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
     private ConcurrentHashMap<String, Room> mRoom = new ConcurrentHashMap<>();
     private GsonBuilder builder;
     private GameServiceProvider gameServiceProvider;
-    //private Connection connection;
+    private Connection connection;
     private int DEFAULT_LEVEL_COUNT = 3;
     private int DEFAULT_LEVEL_UP_BASE = 1000;
     private DeploymentServiceProvider deploymentServiceProvider;
+    private int count;
     @Override
     public void onJoin(Session session,OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp or offline play mode
@@ -128,7 +129,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
             //this.connection = connection.copy();
             //return;
         //}
-        //this.connection.reset(connection);
+        this.connection = connection;
         Connection c = this.deploymentServiceProvider.onConnection(this.context.descriptor().typeId(),this);
         connection.registerInboundMessageListener((t,d)->{
             this.context.log("PAYLOAD->"+new String(d),OnLog.WARN);
@@ -143,11 +144,11 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
     }
     @Override
     public void onTimer(OnUpdate update){
-        mZone.onTimer((c,u,d)->{
-            //if(connection!=null&&!connection.disabled()){
-                //update.on(connection.serverId(),u,d);
-            //}
-        });
+        //mZone.onTimer((c,u,d)->{
+            if(connection!=null&&!connection.disabled()){
+                update.on(connection,"100/16",(this.context.descriptor().name()+"->"+(count++)).getBytes());
+            }
+        //});
     }
     @Override
     public String label() {
