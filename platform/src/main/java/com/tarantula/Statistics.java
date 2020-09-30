@@ -1,5 +1,7 @@
 package com.tarantula;
 
+import com.icodesoftware.Recoverable;
+
 import java.util.List;
 
 /**

@@ -1,6 +1,7 @@
 package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
+import com.icodesoftware.Recoverable;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.MappingObject;
@@ -25,7 +26,7 @@ public class KeyValueDataStoreModule implements Module {
                 ResponseHeader resp = new ResponseHeader("onSet","payload size ["+payload.length+"] cannot be over ["+maxSizeOnSet+"]",false);
                 session.write(builder.create().toJson(resp).getBytes(),label());
             }else{
-                String key = session.systemId()+Recoverable.PATH_SEPARATOR+session.name();
+                String key = session.systemId()+ Recoverable.PATH_SEPARATOR+session.name();
                 MappingObject mo = new MappingObject();
                 mo.distributionKey(session.systemId());
                 mo.label(session.name());

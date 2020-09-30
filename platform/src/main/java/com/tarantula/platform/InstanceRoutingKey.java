@@ -1,6 +1,6 @@
 package com.tarantula.platform;
 
-import com.tarantula.Recoverable;
+import com.icodesoftware.Recoverable;
 import com.tarantula.RoutingKey;
 
 /**

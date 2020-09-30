@@ -3,6 +3,7 @@ package com.tarantula.game;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.Recoverable;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.service.GameServiceProvider;

@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.deployment;
 
 import com.google.gson.GsonBuilder;
+import com.icodesoftware.Recoverable;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;

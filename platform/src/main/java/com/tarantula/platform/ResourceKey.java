@@ -1,6 +1,6 @@
 package com.tarantula.platform;
 
-import com.tarantula.Recoverable;
+import com.icodesoftware.Recoverable;
 
 /**
  * Updated by yinghu on 8/23/19

@@ -1,6 +1,8 @@
 package com.tarantula;
 
-public interface Descriptor extends Recoverable{
+import com.icodesoftware.Recoverable;
+
+public interface Descriptor extends Recoverable {
 
     //the order of the deployment
     int deployPriority();

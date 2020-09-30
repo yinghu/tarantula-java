@@ -1,5 +1,6 @@
 package com.tarantula;
 
+import com.icodesoftware.Recoverable;
 import com.tarantula.platform.service.ServiceContext;
 
 public interface Configurable extends Recoverable, DataStore.Updatable {

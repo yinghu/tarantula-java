@@ -1,6 +1,6 @@
 package com.tarantula.game;
 
-import com.tarantula.Recoverable;
+import com.icodesoftware.Recoverable;
 import com.tarantula.platform.AbstractRecoverableListener;
 
 /**

@@ -1,6 +1,6 @@
 package com.tarantula.platform.presence;
 
-import com.tarantula.Recoverable;
+import com.icodesoftware.Recoverable;
 import com.tarantula.platform.IndexKey;
 import com.tarantula.platform.RecoverableObject;
 

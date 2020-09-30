@@ -1,5 +1,7 @@
 package com.tarantula;
 
+import com.icodesoftware.Recoverable;
+
 public interface PostOffice{
 
     //app to client
@@ -32,7 +34,7 @@ public interface PostOffice{
 
     //app to app messaging
     interface OnTag{
-       void send(String distributionKey,Recoverable data);
+       void send(String distributionKey, Recoverable data);
     }
     interface OnApplication{
         void send(String distributionKey,Recoverable data);

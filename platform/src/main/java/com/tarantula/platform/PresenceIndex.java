@@ -1,5 +1,6 @@
 package com.tarantula.platform;
 
+import com.icodesoftware.Recoverable;
 import com.tarantula.*;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;

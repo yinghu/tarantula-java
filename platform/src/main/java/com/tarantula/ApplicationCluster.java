@@ -1,5 +1,7 @@
 package com.tarantula;
 
+import com.icodesoftware.Recoverable;
+
 /**
  * an application cluster that includes a set of applications.
  * for instance a game including lobby, room, stats, leader board, etc.

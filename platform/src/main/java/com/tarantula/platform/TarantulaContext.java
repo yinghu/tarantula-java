@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.Serviceable;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
@@ -439,7 +440,7 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
         }
         return t;
     }
-    public <T extends Recoverable> List<T> query(String[] params,RecoverableFactory<T> factory){
+    public <T extends Recoverable> List<T> query(String[] params, RecoverableFactory<T> factory){
         List<T> _slist = new ArrayList<>();
         Batch batch = this.tarantulaCluster.deployService().query(factory.registryId(),params);
         if(batch.size>0){

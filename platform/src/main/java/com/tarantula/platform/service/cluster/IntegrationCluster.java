@@ -5,6 +5,7 @@ import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.core.*;
 import com.hazelcast.core.Message;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.Recoverable;
 import com.tarantula.*;
 
 import com.tarantula.EventListener;

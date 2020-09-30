@@ -1,5 +1,7 @@
 package com.tarantula;
 
+import com.icodesoftware.Recoverable;
+
 /**
  * Updated by yinghu on 3/26/2018.
  * The vertex query factory with a filter

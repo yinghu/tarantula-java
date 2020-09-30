@@ -1,5 +1,7 @@
 package com.tarantula;
 
+import com.icodesoftware.Recoverable;
+
 public interface Subscription extends Recoverable,Countable {
 
     String DataStore = "subscription";

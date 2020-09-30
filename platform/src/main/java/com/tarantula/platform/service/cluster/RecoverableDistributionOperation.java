@@ -3,9 +3,7 @@ package com.tarantula.platform.service.cluster;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
-import com.tarantula.Configuration;
-import com.tarantula.Recoverable;
-import com.tarantula.platform.ApplicationConfiguration;
+import com.icodesoftware.Recoverable;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.io.IOException;

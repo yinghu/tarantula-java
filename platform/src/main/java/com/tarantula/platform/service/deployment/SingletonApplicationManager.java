@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.deployment;
 
+import com.icodesoftware.Recoverable;
 import com.tarantula.*;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.TarantulaApplicationContext;

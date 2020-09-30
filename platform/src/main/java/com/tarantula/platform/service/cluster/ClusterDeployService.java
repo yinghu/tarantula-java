@@ -5,6 +5,7 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.Member;
 import com.hazelcast.spi.*;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.Recoverable;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;

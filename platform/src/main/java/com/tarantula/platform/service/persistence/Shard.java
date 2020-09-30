@@ -1,7 +1,7 @@
 package com.tarantula.platform.service.persistence;
 
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.Serviceable;
-import com.tarantula.Recoverable;
 import com.tarantula.platform.util.ShardSetup;
 import org.apache.commons.dbcp2.BasicDataSource;
 

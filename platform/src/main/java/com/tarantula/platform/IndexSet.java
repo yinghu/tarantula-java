@@ -1,8 +1,7 @@
 package com.tarantula.platform;
 
-import com.tarantula.Recoverable;
+import com.icodesoftware.Recoverable;
 import com.tarantula.platform.service.cluster.PortableRegistry;
-import com.tarantula.platform.service.persistence.berkeley.PartitionDataStore;
 
 import java.util.HashSet;
 import java.util.Map;

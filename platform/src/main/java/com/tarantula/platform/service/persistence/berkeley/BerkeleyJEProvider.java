@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.persistence.berkeley;
 
 import com.icodesoftware.Distributable;
+import com.icodesoftware.Recoverable;
 import com.sleepycat.je.*;
 import com.sleepycat.je.util.DbBackup;
 import com.sleepycat.je.util.LogVerificationReadableByteChannel;

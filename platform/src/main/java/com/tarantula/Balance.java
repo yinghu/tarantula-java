@@ -1,7 +1,9 @@
 package com.tarantula;
 
 
-public interface Balance extends Recoverable{
+import com.icodesoftware.Recoverable;
+
+public interface Balance extends Recoverable {
 
     double balance();
     boolean transact(double delta);

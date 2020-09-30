@@ -1,6 +1,7 @@
 package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
+import com.icodesoftware.Recoverable;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.RatingSerializer;

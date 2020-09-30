@@ -1,5 +1,7 @@
 package com.tarantula;
 
+import com.icodesoftware.Recoverable;
+
 public interface Connection extends Recoverable {
 
     String WEB_HOOK = "webhook";

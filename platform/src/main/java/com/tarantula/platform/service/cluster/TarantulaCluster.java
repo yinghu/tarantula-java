@@ -8,6 +8,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.core.*;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.Recoverable;
 import com.tarantula.*;
 
 import com.tarantula.EventListener;
