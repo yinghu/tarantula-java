@@ -3,7 +3,6 @@ import com.icodesoftware.Distributable;
 import com.tarantula.*;
 import com.tarantula.platform.service.DeployService;
 import com.tarantula.platform.service.DeploymentServiceProvider;
-import com.tarantula.platform.service.RecoverService;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.util.SystemUtil;

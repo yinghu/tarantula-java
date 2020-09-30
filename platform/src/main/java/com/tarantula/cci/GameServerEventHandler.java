@@ -55,6 +55,8 @@ public class GameServerEventHandler implements RequestHandler {
                     deployService.addServerPushEvent(pushEvent);
                 }
                 else{
+                    resp.addProperty("successful",false);
+                    resp.addProperty("message","Invalid access key");
                     log.warn("Invalid access key on start");
                 }
                 exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));

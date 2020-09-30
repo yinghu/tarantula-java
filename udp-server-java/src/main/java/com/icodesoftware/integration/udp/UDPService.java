@@ -1,5 +1,6 @@
 package com.icodesoftware.integration.udp;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
 import com.icodesoftware.service.Serviceable;
@@ -23,13 +24,15 @@ public class UDPService implements Runnable, Serviceable {
     private final ConcurrentLinkedDeque<PendingInboundMessage> mQueue;
     private ExecutorService executorService;
     private HttpCaller httpCaller;
+    private String configHeader;
     private JsonObject config;
     public UDPService(JsonObject config){
         this.config = config;
         this.address = config.getAsJsonObject("connection").get("host").getAsString();
         this.port = config.getAsJsonObject("connection").get("port").getAsInt();;
         mQueue = new ConcurrentLinkedDeque<>();
-        httpCaller = new HttpCaller(config.getAsJsonObject("tarantula").get("url").getAsString());
+        configHeader = config.get("tarantula").getAsString();
+        httpCaller = new HttpCaller(config.getAsJsonObject(configHeader).get("url").getAsString());
     }
     @Override
     public void run(){
@@ -69,25 +72,28 @@ public class UDPService implements Runnable, Serviceable {
         httpCaller._init();
         String serverId = UUID.randomUUID().toString();
         String[] headers = new String[]{
-                HttpCaller.TARANTULA_ACCESS_KEY,config.getAsJsonObject("tarantula").get("accessKey").getAsString(),
+                HttpCaller.TARANTULA_ACCESS_KEY,config.getAsJsonObject(configHeader).get("accessKey").getAsString(),
                 HttpCaller.TARANTULA_ACTION,"onStart",
                 HttpCaller.TARANTULA_SERVER_ID,serverId
         };
         config.getAsJsonObject("connection").addProperty("serverId",serverId);
         config.getAsJsonObject("connection").getAsJsonObject("server").addProperty("serverId",serverId);
-
-        String resp = httpCaller.post(config.getAsJsonObject("tarantula").get("path").getAsString(),config.getAsJsonObject("connection").toString().getBytes(),headers);
-        log.warning(resp);
+        JsonParser parser = new JsonParser();
+        String resp = httpCaller.post(config.getAsJsonObject(configHeader).get("path").getAsString(),config.getAsJsonObject("connection").toString().getBytes(),headers);
+        JsonObject pc = parser.parse(resp).getAsJsonObject();
+        if(!pc.get("successful").getAsBoolean()){
+            throw new RuntimeException(pc.get("message").getAsString());
+        }
         //httpCaller.post()
 
     }
     public void shutdown() throws Exception{
         String[] headers = new String[]{
-                HttpCaller.TARANTULA_ACCESS_KEY,config.getAsJsonObject("tarantula").get("accessKey").getAsString(),
+                HttpCaller.TARANTULA_ACCESS_KEY,config.getAsJsonObject(configHeader).get("accessKey").getAsString(),
                 HttpCaller.TARANTULA_ACTION,"onStop",
                 HttpCaller.TARANTULA_SERVER_ID,config.getAsJsonObject("connection").get("serverId").getAsString()
         };
-        httpCaller.get(config.getAsJsonObject("tarantula").get("path").getAsString(),headers);
+        httpCaller.get(config.getAsJsonObject(configHeader).get("path").getAsString(),headers);
         this.datagramChannel.close();
     }
 }

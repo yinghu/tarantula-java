@@ -58,7 +58,8 @@ public class PushEventHandler implements RequestHandler {
                 }
                 else{
                     resp.addProperty("successful",false);
-                    log.warn("Invalid ticket");
+                    resp.addProperty("message","invalid access key");
+                    log.warn("Invalid access key");
                 }
                 exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
             }

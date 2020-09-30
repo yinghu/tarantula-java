@@ -46,7 +46,7 @@ public class Main {
         }
         UDPService udpReceiver = new UDPService(config);
         udpReceiver.start();
-        Thread t = new Thread(udpReceiver);
+        Thread t = new Thread(udpReceiver,"udp-service");
         t.start();
         Runtime.getRuntime().addShutdownHook(new Thread(()->{
             try{udpReceiver.shutdown();}catch (Exception ex){}
