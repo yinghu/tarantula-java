@@ -9,6 +9,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.google.gson.GsonBuilder;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
+import com.icodesoftware.Distributable;
+import com.icodesoftware.service.Serviceable;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.presence.GameCluster;
@@ -406,7 +408,7 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
     }
     @Override
     public ClusterProvider clusterProvider(int scope){
-        return scope==Distributable.INTEGRATION_SCOPE?integrationCluster:tarantulaCluster;
+        return scope== Distributable.INTEGRATION_SCOPE?integrationCluster:tarantulaCluster;
     }
 
     public EventService eventService(int scope){

@@ -1,6 +1,6 @@
 package com.tarantula.platform;
 
-import com.tarantula.Distributable;
+import com.icodesoftware.Distributable;
 
 /**
  * Updated by yinghu lu on 6/16/2020.

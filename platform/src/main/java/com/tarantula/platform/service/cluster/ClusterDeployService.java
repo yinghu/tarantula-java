@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.Member;
 import com.hazelcast.spi.*;
+import com.icodesoftware.Distributable;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
@@ -398,7 +399,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
     @Override
     public void memberAdded(MembershipServiceEvent membershipServiceEvent) {
-        if(this.scope==Distributable.DATA_SCOPE){
+        if(this.scope == Distributable.DATA_SCOPE){
             Member lm = nodeEngine.getLocalMember();
             int sz = nodeEngine.getClusterService().getSize();
             int pt = 0;

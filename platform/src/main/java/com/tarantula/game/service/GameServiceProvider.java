@@ -1,5 +1,6 @@
 package com.tarantula.game.service;
 
+import com.icodesoftware.Distributable;
 import com.tarantula.*;
 import com.tarantula.game.*;
 import com.tarantula.logging.JDKLogger;

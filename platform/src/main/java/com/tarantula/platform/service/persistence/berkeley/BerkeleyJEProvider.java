@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.persistence.berkeley;
 
+import com.icodesoftware.Distributable;
 import com.sleepycat.je.*;
 import com.sleepycat.je.util.DbBackup;
 import com.sleepycat.je.util.LogVerificationReadableByteChannel;
@@ -81,7 +82,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.replicationPoolSetting = properties.get("poolSetting");
     }
     public void addShardingProvider(ShardingProvider shardingProvider){
-        if(shardingProvider.scope()==Distributable.INTEGRATION_SCOPE){
+        if(shardingProvider.scope()== Distributable.INTEGRATION_SCOPE){
             iShardingProvider = shardingProvider;
         }
         else if(shardingProvider.scope()==Distributable.DATA_SCOPE){

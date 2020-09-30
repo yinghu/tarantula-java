@@ -1,5 +1,6 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.service.Serviceable;
 import com.tarantula.*;
 
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 /**
  * Update by yinghu on 7/13/2020
  */
-public interface ClusterProvider extends Serviceable{
+public interface ClusterProvider extends Serviceable {
 
     String name();
     int scope();

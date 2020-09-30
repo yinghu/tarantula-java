@@ -2,7 +2,6 @@ package com.tarantula.platform.service.persistence;
 
 import com.sleepycat.je.Database;
 import com.tarantula.DataStore;
-import com.tarantula.Distributable;
 import com.tarantula.Metadata;
 import com.tarantula.platform.service.cluster.PartitionIndex;
 

@@ -1,6 +1,6 @@
 package com.tarantula.platform.service.persistence.mysql;
 
-import com.tarantula.Distributable;
+import com.icodesoftware.Distributable;
 import com.tarantula.Metadata;
 import com.tarantula.Recoverable;
 import com.tarantula.RecoverableRegistry;

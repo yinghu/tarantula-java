@@ -2,7 +2,7 @@ package com.icodesoftware.integration;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.icodesoftware.integration.udp.UDPReceiver;
+import com.icodesoftware.integration.udp.UDPService;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,12 +44,12 @@ public class Main {
         else{
             config = jsonParser.parse(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("udp.conf"))).getAsJsonObject();
         }
-        UDPReceiver udpReceiver = new UDPReceiver(config);
+        UDPService udpReceiver = new UDPService(config);
         udpReceiver.start();
         Thread t = new Thread(udpReceiver);
         t.start();
         Runtime.getRuntime().addShutdownHook(new Thread(()->{
-            try{udpReceiver.stop();}catch (Exception ex){}
+            try{udpReceiver.shutdown();}catch (Exception ex){}
         }));
     }
 }

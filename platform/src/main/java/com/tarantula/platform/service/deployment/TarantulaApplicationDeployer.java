@@ -1,8 +1,9 @@
 package com.tarantula.platform.service.deployment;
 import java.util.*;
+
+import com.icodesoftware.service.Serviceable;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.OnLobby;
-import com.tarantula.platform.service.Serviceable;
 
 public class TarantulaApplicationDeployer implements Serviceable {
 

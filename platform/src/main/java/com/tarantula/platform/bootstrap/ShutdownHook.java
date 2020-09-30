@@ -3,7 +3,7 @@ package com.tarantula.platform.bootstrap;
 import java.util.LinkedList;
 
 
-import com.tarantula.platform.service.Serviceable;
+import com.icodesoftware.service.Serviceable;
 import com.tarantula.logging.TarantulaLogManager;
 
 public class ShutdownHook extends Thread {

@@ -1,8 +1,8 @@
 package com.tarantula.platform.bootstrap;
 
-import java.util.concurrent.CountDownLatch;
+import com.icodesoftware.service.Serviceable;
 
-import com.tarantula.platform.service.Serviceable;
+import java.util.concurrent.CountDownLatch;
 
 public class ServiceBootstrap extends Thread{
 	private final CountDownLatch waiting;

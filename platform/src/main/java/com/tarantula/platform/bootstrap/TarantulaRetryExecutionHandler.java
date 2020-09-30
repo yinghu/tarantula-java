@@ -1,6 +1,6 @@
 package com.tarantula.platform.bootstrap;
 
-import com.tarantula.platform.service.Serviceable;
+import com.icodesoftware.service.Serviceable;
 import com.tarantula.logging.JDKLogger;
 
 import java.util.concurrent.*;

@@ -7,6 +7,7 @@ import java.util.concurrent.*;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.core.*;
+import com.icodesoftware.Distributable;
 import com.tarantula.*;
 
 import com.tarantula.EventListener;

@@ -1,4 +1,4 @@
-package com.tarantula.integration.udp;
+package com.icodesoftware.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
-public class JDKLoggingFormatter extends Formatter {
+public class TarantulaFormatter extends Formatter {
     @Override
     public String format(LogRecord record) {
         //use string builder to format record data

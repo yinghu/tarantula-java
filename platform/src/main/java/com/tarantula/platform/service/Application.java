@@ -1,12 +1,13 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.service.Serviceable;
 import com.tarantula.*;
 
 /**
  * Developer: YINGHU LU
  * Date Updated: 8/7/2019
  */
-public interface Application extends Serviceable{
+public interface Application extends Serviceable {
 
     long DELTA = 60000;
 

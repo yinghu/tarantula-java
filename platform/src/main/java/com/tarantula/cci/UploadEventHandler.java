@@ -1,6 +1,7 @@
 package com.tarantula.cci;
 
 import com.google.gson.GsonBuilder;
+import com.icodesoftware.Distributable;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessControl;

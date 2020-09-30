@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.deployment;
 
 import com.google.gson.GsonBuilder;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.tarantula.*;
 import com.tarantula.Module;

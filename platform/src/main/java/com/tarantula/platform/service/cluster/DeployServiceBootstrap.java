@@ -1,6 +1,6 @@
 package com.tarantula.platform.service.cluster;
 
-import com.tarantula.platform.service.Serviceable;
+import com.icodesoftware.service.Serviceable;
 
 /**
  * Created by yinghu lu on 8/17/2018.

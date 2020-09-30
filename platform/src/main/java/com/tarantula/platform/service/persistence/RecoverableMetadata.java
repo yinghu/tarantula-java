@@ -3,7 +3,7 @@ package com.tarantula.platform.service.persistence;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.Distributable;
+import com.icodesoftware.Distributable;
 import com.tarantula.Metadata;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.event.PortableEventRegistry;

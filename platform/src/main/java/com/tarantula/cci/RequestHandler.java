@@ -1,9 +1,8 @@
 package com.tarantula.cci;
 
+import com.icodesoftware.service.Serviceable;
 import com.tarantula.*;
-import com.tarantula.platform.service.MetricsListener;
 import com.tarantula.platform.service.ServiceContext;
-import com.tarantula.platform.service.Serviceable;
 
 /**
  * Created by yinghu lu on 4/27/2018.

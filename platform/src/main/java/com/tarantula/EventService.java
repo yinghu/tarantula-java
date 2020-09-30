@@ -1,6 +1,6 @@
 package com.tarantula;
 
-import com.tarantula.platform.service.Serviceable;
+import com.icodesoftware.service.Serviceable;
 
 public interface EventService extends EventListener, Serviceable {
 

@@ -3,9 +3,11 @@ package com.tarantula;
 
 //portable interface, which could be replicated in cluster wide or persistent in storage
 
+import com.icodesoftware.Distributable;
+
 import java.util.Map;
 
-public interface Recoverable extends Distributable{
+public interface Recoverable extends Distributable {
 
     String PATH_SEPARATOR = "/";
 

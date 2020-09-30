@@ -1,7 +1,7 @@
 package com.tarantula.platform.service.deployment;
 
+import com.icodesoftware.service.Serviceable;
 import com.tarantula.platform.service.ServiceProvider;
-import com.tarantula.platform.service.Serviceable;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Updated by yinghu on 6/27/2018.
  */
-public class ServiceProviderConfigurationParser extends DefaultHandler implements Serviceable{
+public class ServiceProviderConfigurationParser extends DefaultHandler implements Serviceable {
 
 
     private ArrayList<ServiceProviderConfiguration> configurationMapping = new ArrayList<>();
