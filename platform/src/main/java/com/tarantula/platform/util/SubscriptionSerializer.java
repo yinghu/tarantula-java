@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.tarantula.Subscription;
+import com.icodesoftware.Subscription;
 
 import java.lang.reflect.Type;
 import java.time.format.DateTimeFormatter;

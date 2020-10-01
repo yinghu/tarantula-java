@@ -1,9 +1,6 @@
 package com.tarantula.platform.service.deployment;
 
-import com.icodesoftware.Access;
-import com.icodesoftware.Event;
-import com.icodesoftware.EventListener;
-import com.icodesoftware.Recoverable;
+import com.icodesoftware.*;
 import com.tarantula.*;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.TarantulaApplicationContext;
@@ -36,7 +33,7 @@ public class SingletonApplicationManager extends DefaultApplication implements B
             }
         }
         else{
-            this.singleton.log("["+singleton.descriptor().tag()+"] has no public access",OnLog.WARN);
+            this.singleton.log("["+singleton.descriptor().tag()+"] has no public access", OnLog.WARN);
         }
     }
     @Override

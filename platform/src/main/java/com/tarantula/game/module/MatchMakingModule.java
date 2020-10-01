@@ -1,10 +1,7 @@
 package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Lobby;
-import com.icodesoftware.Response;
-import com.icodesoftware.Session;
+import com.icodesoftware.*;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.service.GameServiceProvider;
@@ -62,7 +59,7 @@ public class MatchMakingModule implements Module, Lobby.Listener {
 
     @Override
     public void on(Descriptor descriptor) {
-        this.context.log("Lobby Updated->"+descriptor.disabled()+"//"+descriptor.accessRank(),OnLog.WARN);
+        this.context.log("Lobby Updated->"+descriptor.disabled()+"//"+descriptor.accessRank(), OnLog.WARN);
         if(descriptor.accessRank()>0&&descriptor.accessRank()<=this.context.descriptor().capacity()){
             mZone.clear();
             listLobby();

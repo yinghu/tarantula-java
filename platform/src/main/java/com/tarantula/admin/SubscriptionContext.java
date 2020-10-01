@@ -2,7 +2,7 @@ package com.tarantula.admin;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.tarantula.Subscription;
+import com.icodesoftware.Subscription;
 import com.tarantula.platform.ResponseHeader;
 
 import java.util.List;

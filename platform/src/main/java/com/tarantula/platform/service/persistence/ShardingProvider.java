@@ -1,7 +1,7 @@
 package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.Recoverable;
-import com.tarantula.Metadata;
+import com.icodesoftware.service.Metadata;
 import com.tarantula.platform.service.ServiceProvider;
 
 import java.util.Map;

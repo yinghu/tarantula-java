@@ -1,10 +1,7 @@
 package com.tarantula.platform;
 
 import com.google.gson.GsonBuilder;
-import com.icodesoftware.Connection;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Event;
-import com.icodesoftware.Session;
+import com.icodesoftware.*;
 import com.tarantula.*;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.statistics.StatisticsSerializer;
@@ -24,7 +21,7 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
     }
 
     public void onError(Session session, Exception ex) {
-        this.context.log(session.toString(),ex,OnLog.ERROR);
+        this.context.log(session.toString(),ex, OnLog.ERROR);
         String msg = ex.getMessage()!=null?ex.getMessage():"Unexpected error";
         session.write(this.builder.create().toJson(new ResponseHeader("onError",false,400,msg,"error")).getBytes(),"error");
     }

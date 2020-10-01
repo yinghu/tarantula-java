@@ -1,7 +1,7 @@
 package com.tarantula.platform.util;
 
 import com.google.gson.*;
-import com.tarantula.OnAccess;
+import com.icodesoftware.OnAccess;
 import com.tarantula.platform.OnAccessTrack;
 
 import java.lang.reflect.Type;

@@ -5,6 +5,7 @@ import com.icodesoftware.EventListener;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.service.EventService;
+import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.Serviceable;
 import com.tarantula.*;
 
@@ -36,7 +37,7 @@ public interface ClusterProvider extends Serviceable {
     //CLUSTER KEY VALUE STORE WITH KEY INDEX
     <T extends Recoverable> List<T> list(RecoverableFactory<T> query);
     <T extends Recoverable> void list(RecoverableFactory<T> query, DataStore.Stream<T> stream);
-    void set(Metadata metadata,byte[] key,byte[] value);
+    void set(Metadata metadata, byte[] key, byte[] value);
     byte[] get(byte[] key);
     <T extends Recoverable> boolean load(T t);
     long sequence();

@@ -1,5 +1,7 @@
 package com.tarantula;
 
+import com.icodesoftware.Property;
+
 import java.util.List;
 
 /**

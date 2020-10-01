@@ -3,7 +3,7 @@ package com.tarantula.platform.service.persistence.mysql;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableRegistry;
-import com.tarantula.Metadata;
+import com.icodesoftware.service.Metadata;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.persistence.Shard;
@@ -184,7 +184,7 @@ public class MysqlShardingProvider implements ShardingProvider {
         }
     }
     @Override
-    public <T extends Recoverable> byte[] update(Metadata metadata,String key,T t){
+    public <T extends Recoverable> byte[] update(Metadata metadata, String key, T t){
         if(!enabled){
             return SystemUtil.toJson(t.toMap());
         }

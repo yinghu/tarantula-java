@@ -1,9 +1,6 @@
 package com.tarantula.platform.module;
 
-import com.icodesoftware.Connection;
-import com.icodesoftware.OnInstance;
-import com.icodesoftware.SchedulingTask;
-import com.icodesoftware.Session;
+import com.icodesoftware.*;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.TarantulaApplicationHeader;

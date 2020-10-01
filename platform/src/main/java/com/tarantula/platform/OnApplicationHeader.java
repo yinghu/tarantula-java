@@ -1,6 +1,6 @@
 package com.tarantula.platform;
 
-import com.tarantula.OnAccess;
+import com.icodesoftware.OnAccess;
 
 /**
  * Updated by yinghu on 5/25/2020

@@ -3,8 +3,9 @@ package com.tarantula.platform.service.persistence;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+
 import com.icodesoftware.Distributable;
-import com.tarantula.Metadata;
+import com.icodesoftware.service.Metadata;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.event.PortableEventRegistry;
 

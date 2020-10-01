@@ -1,6 +1,6 @@
 package com.tarantula.platform.presence;
 
-import com.tarantula.Subscription;
+import com.icodesoftware.Subscription;
 import com.tarantula.platform.RecoverableObject;
 
 import java.util.Map;

@@ -1,6 +1,6 @@
 package com.tarantula.platform;
 
-import com.tarantula.OnAccess;
+import com.icodesoftware.OnAccess;
 import com.tarantula.platform.presence.UserPortableRegistry;
 import com.tarantula.platform.util.SystemUtil;
 

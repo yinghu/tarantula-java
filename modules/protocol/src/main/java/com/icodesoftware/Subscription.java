@@ -1,7 +1,4 @@
-package com.tarantula;
-
-import com.icodesoftware.Countable;
-import com.icodesoftware.Recoverable;
+package com.icodesoftware;
 
 public interface Subscription extends Recoverable, Countable {
 

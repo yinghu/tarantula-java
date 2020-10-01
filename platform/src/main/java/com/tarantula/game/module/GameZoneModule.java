@@ -2,6 +2,8 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Connection;
+import com.icodesoftware.OnAccess;
+import com.icodesoftware.OnLog;
 import com.icodesoftware.Session;
 import com.tarantula.*;
 import com.tarantula.Module;
@@ -134,7 +136,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         this.connection = connection;
         Connection c = this.deploymentServiceProvider.onConnection(this.context.descriptor().typeId(),this);
         connection.registerInboundMessageListener((t,d)->{
-            this.context.log("PAYLOAD->"+new String(d),OnLog.WARN);
+            this.context.log("PAYLOAD->"+new String(d), OnLog.WARN);
         });
         if(c!=null){
             this.context.log("connection->"+connection.serverId()+"//"+c.sequence(),OnLog.WARN);

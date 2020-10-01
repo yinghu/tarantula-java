@@ -9,6 +9,7 @@ import com.hazelcast.core.*;
 import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
 import com.icodesoftware.service.EventService;
+import com.icodesoftware.service.Metadata;
 import com.tarantula.*;
 
 import com.tarantula.logging.JDKLogger;
@@ -114,7 +115,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
             }
         }
     }
-    public void set(Metadata metadata,byte[] key,byte[] value){
+    public void set(Metadata metadata, byte[] key, byte[] value){
         this.vMap.put(key,value);
         if(metadata.index()!=null){
             mIndex.put(metadata.index(),key);
