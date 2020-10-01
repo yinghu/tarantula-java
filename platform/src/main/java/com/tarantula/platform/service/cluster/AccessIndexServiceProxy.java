@@ -5,6 +5,7 @@ import com.hazelcast.core.Member;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
+import com.icodesoftware.AccessIndex;
 import com.tarantula.*;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.service.AccessIndexService;

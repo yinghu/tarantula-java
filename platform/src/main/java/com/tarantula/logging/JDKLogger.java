@@ -1,6 +1,7 @@
 package com.tarantula.logging;
 
-import com.tarantula.TarantulaLogger;
+import com.icodesoftware.TarantulaLogger;
+
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-public class JDKLogger implements TarantulaLogger{
+public class JDKLogger implements TarantulaLogger {
 		
 		private static final boolean __DEV__ = true;
 		

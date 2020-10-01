@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.icodesoftware.Event;
 import com.icodesoftware.OnInstance;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.TarantulaLogger;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;

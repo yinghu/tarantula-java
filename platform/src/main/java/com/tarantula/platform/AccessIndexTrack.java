@@ -3,9 +3,9 @@ package com.tarantula.platform;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.AccessIndex;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
-import com.tarantula.AccessIndex;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;

@@ -1,7 +1,7 @@
 package com.tarantula.platform.service;
 
 
-import com.tarantula.AccessIndex;
+import com.icodesoftware.AccessIndex;
 
 /**
  * Updated by yinghu lu on 6/18/2020

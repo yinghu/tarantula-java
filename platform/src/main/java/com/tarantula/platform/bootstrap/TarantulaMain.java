@@ -3,7 +3,7 @@ package com.tarantula.platform.bootstrap;
 import java.io.*;
 import java.util.Properties;
 
-import com.tarantula.TarantulaLogger;
+import com.icodesoftware.TarantulaLogger;
 import com.tarantula.licensing.Validator;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
