@@ -1,6 +1,6 @@
 package com.tarantula.platform.service;
 
-import com.tarantula.InstanceRegistry;
+import com.icodesoftware.InstanceRegistry;
 
 /*
  * Updated by yinghu on 8/1/2019

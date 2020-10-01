@@ -1,6 +1,4 @@
-package com.tarantula;
-
-import com.icodesoftware.*;
+package com.icodesoftware;
 
 /**
  * updated by yinghu on 4/11/2019.

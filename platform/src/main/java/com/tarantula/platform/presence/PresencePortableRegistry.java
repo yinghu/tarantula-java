@@ -1,6 +1,7 @@
 package com.tarantula.platform.presence;
 
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.service.GameCluster;
 import com.tarantula.platform.AbstractRecoverableListener;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.statistics.StatisticsIndex;

@@ -1,10 +1,11 @@
 package com.tarantula.platform;
+import com.icodesoftware.Configurable;
+import com.icodesoftware.Configuration;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Property;
-import com.tarantula.*;
-import com.tarantula.platform.service.DeployService;
-import com.tarantula.platform.service.DeploymentServiceProvider;
-import com.tarantula.platform.service.ServiceContext;
+import com.icodesoftware.service.DeployService;
+import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -16,7 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Updated by yinghu on 7/19/2020
  */
-public class ApplicationConfiguration extends RecoverableObject implements Configuration{
+public class ApplicationConfiguration extends RecoverableObject implements Configuration {
 
     private String type;
     private CopyOnWriteArrayList<Configurable.Listener> _listeners = new CopyOnWriteArrayList<>();

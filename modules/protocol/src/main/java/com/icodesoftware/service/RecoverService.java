@@ -1,6 +1,4 @@
-package com.tarantula.platform.service;
-
-import com.tarantula.platform.service.cluster.ReplicationData;
+package com.icodesoftware.service;
 
 public interface RecoverService extends ServiceProvider{
 

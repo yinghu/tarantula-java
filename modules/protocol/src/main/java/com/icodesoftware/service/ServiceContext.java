@@ -1,16 +1,14 @@
-package com.tarantula.platform.service;
+package com.icodesoftware.service;
 
 import com.icodesoftware.*;
-import com.icodesoftware.service.EventService;
-import com.icodesoftware.service.OnPartition;
-import com.tarantula.*;
+
 
 import java.util.concurrent.ScheduledFuture;
 
 /**
  * Updated by yinghu lu on 6/27/20
  */
-public interface ServiceContext{
+public interface ServiceContext {
 
     //create data scope partitioned data store
     DataStore dataStore(String name, int partition);

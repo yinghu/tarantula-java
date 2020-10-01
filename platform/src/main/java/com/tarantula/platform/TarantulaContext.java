@@ -10,12 +10,8 @@ import com.google.gson.GsonBuilder;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.icodesoftware.*;
-import com.icodesoftware.service.EventService;
-import com.icodesoftware.service.OnPartition;
-import com.icodesoftware.service.Serviceable;
-import com.tarantula.*;
+import com.icodesoftware.service.*;
 import com.tarantula.logging.JDKLogger;
-import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
@@ -28,7 +24,7 @@ import com.tarantula.platform.util.GoogleAuthCredentialsDeserializer;
 import com.tarantula.platform.util.StripePaymentCredentialsDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
-public class TarantulaContext implements Serviceable,ServiceContext,MetricsListener{
+public class TarantulaContext implements Serviceable, ServiceContext, MetricsListener {
 
 
     private static TarantulaLogger log = JDKLogger.getLogger(TarantulaContext.class);

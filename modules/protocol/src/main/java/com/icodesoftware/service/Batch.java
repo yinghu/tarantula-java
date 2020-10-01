@@ -1,10 +1,8 @@
-package com.tarantula.platform.service;
+package com.icodesoftware.service;
 
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.platform.RecoverableObject;
-import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 
@@ -35,11 +33,13 @@ public class Batch extends RecoverableObject implements Portable {
 
     @Override
     public int getFactoryId() {
-        return PortableEventRegistry.OID;
+        return 10;
+        //return PortableEventRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PortableEventRegistry.BATCH_CID;
+        return 1;
+        //return PortableEventRegistry.BATCH_CID;
     }
 }

@@ -1,7 +1,7 @@
 package com.tarantula.platform.module;
 
 import com.icodesoftware.Descriptor;
-import com.tarantula.InstanceRegistry;
+import com.icodesoftware.InstanceRegistry;
 import com.tarantula.platform.ResponseHeader;
 
 import java.util.List;

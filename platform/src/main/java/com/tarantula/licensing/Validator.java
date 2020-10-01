@@ -1,7 +1,7 @@
 package com.tarantula.licensing;
 
+import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.logging.JDKLogger;
-import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.io.BufferedReader;

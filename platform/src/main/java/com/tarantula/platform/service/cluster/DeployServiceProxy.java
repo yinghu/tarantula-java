@@ -7,18 +7,17 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Event;
-import com.tarantula.*;
-import com.tarantula.platform.presence.GameCluster;
-import com.tarantula.platform.service.RecoverService;
-import com.tarantula.platform.service.ServiceContext;
-import com.tarantula.platform.service.Batch;
-import com.tarantula.platform.service.DeployService;
+import com.icodesoftware.OnView;
+import com.icodesoftware.service.Batch;
+import com.icodesoftware.service.DeployService;
+import com.icodesoftware.service.GameCluster;
+import com.icodesoftware.service.ServiceContext;
 
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployService> implements DeployService{
+public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployService> implements DeployService {
 
     private final String objectName;
 
@@ -63,7 +62,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
 
     }
     @Override
-    public Batch query(int registryId,String[] params){
+    public Batch query(int registryId, String[] params){
         NodeEngine nodeEngine = getNodeEngine();
         DeployServiceQueryOperation operation = new DeployServiceQueryOperation(registryId,params);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
@@ -155,7 +154,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
     }
 
-    public GameCluster createGameCluster(String owner,String name){
+    public GameCluster createGameCluster(String owner, String name){
         NodeEngine nodeEngine = getNodeEngine();
         CreateGameClusterOperation operation = new CreateGameClusterOperation(owner,name);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());

@@ -1,10 +1,10 @@
 package com.tarantula.platform.service.deployment;
 
 import com.icodesoftware.*;
-import com.tarantula.*;
-import com.tarantula.Module;
+import com.icodesoftware.Module;
+import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.TarantulaApplicationContext;
-import com.tarantula.platform.service.ServiceProvider;
+
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 

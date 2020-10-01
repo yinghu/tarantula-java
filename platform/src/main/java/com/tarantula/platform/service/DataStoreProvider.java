@@ -2,6 +2,7 @@ package com.tarantula.platform.service;
 
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.service.persistence.Node;
 import com.tarantula.platform.service.persistence.ShardingProvider;
 

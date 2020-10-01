@@ -1,12 +1,11 @@
-package com.tarantula;
+package com.icodesoftware;
 
-import com.icodesoftware.*;
-import com.tarantula.platform.service.ServiceProvider;
+import com.icodesoftware.service.ServiceProvider;
 
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
-public interface ApplicationContext{
+public interface ApplicationContext {
 
     Lobby lobby(String typeId);
     List<Lobby> index();

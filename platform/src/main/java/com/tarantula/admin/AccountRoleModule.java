@@ -3,21 +3,19 @@ package com.tarantula.admin;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.tarantula.*;
-import com.tarantula.Module;
+import com.icodesoftware.Module;
+import com.icodesoftware.service.AccessIndexService;
+import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
-import com.tarantula.platform.service.AccessIndexService;
-import com.tarantula.platform.service.DeploymentServiceProvider;
-import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class AccountRoleModule implements Module,AccessIndexService.Listener {
+public class AccountRoleModule implements Module, AccessIndexService.Listener {
 
     private ApplicationContext context;
     private GsonBuilder builder;

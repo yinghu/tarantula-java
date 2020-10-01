@@ -5,10 +5,9 @@ import java.util.ArrayList;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import com.tarantula.Configuration;
-import com.tarantula.OnView;
+import com.icodesoftware.Configuration;
+import com.icodesoftware.OnView;
 import com.tarantula.platform.ApplicationConfiguration;
-import com.tarantula.platform.CompositeKey;
 import com.tarantula.platform.OnViewTrack;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

@@ -1,13 +1,12 @@
 package com.tarantula.platform.module;
 
 import com.icodesoftware.*;
-import com.tarantula.*;
+import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.platform.CompositeKey;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.event.FastPlayEvent;
 import com.tarantula.platform.event.InstancePlayEvent;
-import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.util.LobbyContextSerializer;
 
 import java.util.ArrayList;

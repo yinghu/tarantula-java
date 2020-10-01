@@ -2,8 +2,8 @@ package com.tarantula.admin;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.icodesoftware.service.GameCluster;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.presence.GameCluster;
 
 import java.util.List;
 

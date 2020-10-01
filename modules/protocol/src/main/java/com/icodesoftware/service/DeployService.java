@@ -1,10 +1,9 @@
-package com.tarantula.platform.service;
+package com.icodesoftware.service;
 
 
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Event;
-import com.tarantula.*;
-import com.tarantula.platform.presence.GameCluster;
+import com.icodesoftware.OnView;
 
 public interface DeployService extends ServiceProvider {
 

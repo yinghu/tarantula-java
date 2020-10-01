@@ -1,7 +1,5 @@
-package com.tarantula.platform.service;
+package com.icodesoftware.service;
 
-
-import com.icodesoftware.service.Serviceable;
 
 /**
  * Updated by yinghu lu on 5/2/2020

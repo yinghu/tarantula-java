@@ -1,8 +1,8 @@
-package com.tarantula.platform.service;
+package com.icodesoftware.service;
 
 import com.icodesoftware.Access;
+import com.icodesoftware.Presence;
 import com.icodesoftware.TokenValidator;
-import com.tarantula.*;
 
 import java.util.List;
 import java.util.Map;

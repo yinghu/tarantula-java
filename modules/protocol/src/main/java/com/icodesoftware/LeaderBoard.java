@@ -1,14 +1,9 @@
-package com.tarantula;
-
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Recoverable;
-
-import javax.xml.crypto.Data;
+package com.icodesoftware;
 
 /**
  * Updated by yinghu on 4/30/20
  */
-public interface LeaderBoard{
+public interface LeaderBoard {
 
     String DAILY = "daily";
     String WEEKLY = "weekly";

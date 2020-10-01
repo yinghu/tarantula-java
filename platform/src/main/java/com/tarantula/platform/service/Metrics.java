@@ -1,7 +1,6 @@
 package com.tarantula.platform.service;
 
-import com.tarantula.Statistics;
-
+import com.icodesoftware.Statistics;
 import com.tarantula.platform.OnApplicationHeader;
 
 

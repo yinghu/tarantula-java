@@ -2,10 +2,10 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
+import com.icodesoftware.service.Batch;
+import com.icodesoftware.service.GameCluster;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
-import com.tarantula.platform.presence.GameCluster;
-import com.tarantula.platform.service.Batch;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 
 

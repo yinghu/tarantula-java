@@ -1,8 +1,8 @@
 package com.tarantula.platform.leaderboard;
 
 import com.icodesoftware.DataStore;
-import com.tarantula.LeaderBoard;
-import com.tarantula.Statistics;
+import com.icodesoftware.LeaderBoard;
+import com.icodesoftware.Statistics;
 
 import java.time.LocalDate;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 /**
  * Updated 5/4/2020
  */
-public class LeaderBoardSync implements LeaderBoard{
+public class LeaderBoardSync implements LeaderBoard {
 
 
     private String category;

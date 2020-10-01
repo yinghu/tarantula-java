@@ -5,14 +5,13 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.Member;
 import com.hazelcast.spi.*;
 import com.icodesoftware.*;
-import com.tarantula.*;
+import com.icodesoftware.service.Batch;
+import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.GameCluster;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
-import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.Application;
-import com.tarantula.platform.service.Batch;
-import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
@@ -67,7 +66,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
     }
 
-    public Batch query(int registryId,String[] params){
+    public Batch query(int registryId, String[] params){
         //log.warn("Query on->"+registryId+"/"+nodeEngine.getLocalMember().getAddress().toString());
         BatchCache batchCache = onQuery(registryId,params);
         Batch batch = new Batch();
@@ -483,7 +482,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         mds.update(gameCluster);
         return suc1&&suc2&&suc3;//make sure all disabled
     }
-    public GameCluster createGameCluster(String owner,String name){
+    public GameCluster createGameCluster(String owner, String name){
         GameCluster gameCluster = new GameCluster();
         try {
             DataStore mds = this.tarantulaContext.masterDataStore();

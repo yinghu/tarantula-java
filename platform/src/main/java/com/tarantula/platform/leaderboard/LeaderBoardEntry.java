@@ -1,7 +1,7 @@
 package com.tarantula.platform.leaderboard;
 
+import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Recoverable;
-import com.tarantula.LeaderBoard;
 import com.tarantula.platform.NaturalKey;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;

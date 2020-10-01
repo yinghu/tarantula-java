@@ -1,7 +1,7 @@
-package com.tarantula.platform.service;
+package com.icodesoftware.service;
 
 
-import com.tarantula.Configurable;
+import com.icodesoftware.Configurable;
 
 /**
  * Updated by yinghu lu on 6/16/2020

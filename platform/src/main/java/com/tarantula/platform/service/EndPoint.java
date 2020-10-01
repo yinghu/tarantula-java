@@ -1,5 +1,6 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.cci.RequestHandler;
 
 /**

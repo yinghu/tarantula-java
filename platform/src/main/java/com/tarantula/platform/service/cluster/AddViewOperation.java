@@ -3,7 +3,7 @@ package com.tarantula.platform.service.cluster;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
-import com.tarantula.OnView;
+import com.icodesoftware.OnView;
 import com.tarantula.platform.OnViewTrack;
 import com.tarantula.platform.util.SystemUtil;
 

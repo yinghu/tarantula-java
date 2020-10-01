@@ -1,13 +1,12 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.*;
-import com.tarantula.*;
+import com.icodesoftware.service.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.SystemValidator;
-import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
@@ -43,7 +42,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private List<Access.Role> roleList;
     private MessageDigest _messageDigest;
 
-    private ConcurrentHashMap<String,OnLobby> oMap;
+    private ConcurrentHashMap<String, OnLobby> oMap;
     private DeploymentServiceProvider deploymentServiceProvider;
 
     public MessageDigest messageDigest(){

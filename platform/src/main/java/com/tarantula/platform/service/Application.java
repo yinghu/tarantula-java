@@ -1,9 +1,9 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.Configuration;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Event;
 import com.icodesoftware.service.Serviceable;
-import com.tarantula.*;
 
 /**
  * Developer: YINGHU LU

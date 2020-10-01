@@ -1,7 +1,7 @@
 package com.tarantula.platform.service.persistence;
 
+import com.icodesoftware.service.ServiceProvider;
 import com.icodesoftware.service.Serviceable;
-import com.tarantula.platform.service.ServiceProvider;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.DataStoreProvider;
 import org.xml.sax.Attributes;
@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DataStoreConfigurationXMLParser extends DefaultHandler implements Serviceable {
 
 
-    public final ConcurrentHashMap<String,ServiceProvider> _loaded;
+    public final ConcurrentHashMap<String, ServiceProvider> _loaded;
 
     String currentLoad;
     HashMap<String,String> properties = new HashMap();

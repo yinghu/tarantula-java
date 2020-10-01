@@ -1,7 +1,7 @@
 package com.tarantula.platform.leaderboard;
 
 import com.icodesoftware.DataStore;
-import com.tarantula.LeaderBoard;
+import com.icodesoftware.LeaderBoard;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;

@@ -3,8 +3,8 @@ package com.tarantula.platform.service.deployment;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.tarantula.Configuration;
-import com.tarantula.OnView;
+import com.icodesoftware.Configuration;
+import com.icodesoftware.OnView;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.LobbyDescriptor;
 

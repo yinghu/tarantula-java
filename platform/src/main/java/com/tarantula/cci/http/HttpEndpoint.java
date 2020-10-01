@@ -3,9 +3,9 @@ package com.tarantula.cci.http;
 import java.net.InetSocketAddress;
 import java.util.concurrent.*;
 
+import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.Serviceable;
 import com.sun.net.httpserver.HttpServer;
-import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
 import com.tarantula.platform.service.EndPoint;

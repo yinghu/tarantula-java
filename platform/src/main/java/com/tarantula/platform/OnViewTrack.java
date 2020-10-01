@@ -3,8 +3,8 @@ package com.tarantula.platform;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.OnView;
 
+import com.icodesoftware.OnView;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.io.IOException;

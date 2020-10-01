@@ -1,7 +1,4 @@
-package com.tarantula;
-
-import com.icodesoftware.Connection;
-import com.icodesoftware.Session;
+package com.icodesoftware;
 
 import java.io.InputStream;
 

@@ -2,12 +2,11 @@ package com.tarantula.platform.presence;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.tarantula.*;
+import com.icodesoftware.service.AccessIndexService;
+import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.*;
-import com.tarantula.platform.service.AccessIndexService;
-import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.Metrics;
-import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 

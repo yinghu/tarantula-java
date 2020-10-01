@@ -2,7 +2,7 @@ package com.tarantula.platform.util;
 
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
-import com.tarantula.platform.service.DeploymentServiceProvider;
+import com.icodesoftware.service.DeploymentServiceProvider;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

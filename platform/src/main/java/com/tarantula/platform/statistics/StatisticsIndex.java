@@ -1,4 +1,5 @@
 package com.tarantula.platform.statistics;
+import com.icodesoftware.Statistics;
 import com.tarantula.*;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;

@@ -1,10 +1,7 @@
 package com.tarantula.platform.service.deployment;
 
 
-import com.icodesoftware.Access;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Event;
-import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.*;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
@@ -32,7 +29,7 @@ public class DefaultApplication implements Application {
 
     protected ConcurrentHashMap<String,InstanceIndex> onAvailable = new ConcurrentHashMap();
 
-    protected HashMap<String,Configuration> configurations = new HashMap<>();
+    protected HashMap<String, Configuration> configurations = new HashMap<>();
 
     public DefaultApplication(final TarantulaContext tarantulaContext, final DeploymentDescriptor deploymentDescriptor){
         this.tarantulaContext = tarantulaContext;

@@ -1,8 +1,8 @@
-package com.tarantula.platform.service;
+package com.icodesoftware.service;
 
 import com.icodesoftware.*;
-import com.tarantula.*;
-import com.tarantula.Module;
+import com.icodesoftware.Module;
+
 
 import java.util.List;
 

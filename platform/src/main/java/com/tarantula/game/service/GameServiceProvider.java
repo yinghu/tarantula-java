@@ -1,19 +1,16 @@
 package com.tarantula.game.service;
 
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Distributable;
+import com.icodesoftware.*;
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.EventService;
-import com.tarantula.*;
+import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.*;
 import com.tarantula.logging.JDKLogger;
-import com.tarantula.platform.service.ClusterProvider;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.leaderboard.LeaderBoardSync;
-import com.tarantula.platform.service.ServiceContext;
-import com.tarantula.platform.service.ServiceProvider;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider,LeaderBoard.Listener{
+public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener{
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;

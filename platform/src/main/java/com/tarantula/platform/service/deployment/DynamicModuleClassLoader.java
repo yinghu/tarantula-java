@@ -1,7 +1,7 @@
 package com.tarantula.platform.service.deployment;
 
-import com.icodesoftware.Descriptor;
-import com.tarantula.Module;
+import com.icodesoftware.*;
+import com.icodesoftware.Module;
 
 import java.io.InputStream;
 import java.net.JarURLConnection;

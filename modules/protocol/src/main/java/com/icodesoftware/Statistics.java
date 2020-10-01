@@ -1,14 +1,11 @@
-package com.tarantula;
-
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Recoverable;
+package com.icodesoftware;
 
 import java.util.List;
 
 /**
  * Updated by yinghu on 5/2/2020
  */
-public interface Statistics{
+public interface Statistics {
 
 
     Entry entry(String key);

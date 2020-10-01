@@ -1,6 +1,4 @@
-package com.tarantula;
-
-import com.icodesoftware.*;
+package com.icodesoftware;
 
 import java.util.List;
 

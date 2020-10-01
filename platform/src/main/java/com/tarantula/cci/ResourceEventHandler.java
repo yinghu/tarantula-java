@@ -2,12 +2,11 @@ package com.tarantula.cci;
 
 import com.icodesoftware.Event;
 import com.icodesoftware.TarantulaLogger;
-import com.tarantula.*;
+import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.ServiceContext;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.Metrics;
-import com.tarantula.platform.service.ServiceContext;
 
 
 public class ResourceEventHandler implements RequestHandler {

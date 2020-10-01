@@ -1,6 +1,6 @@
 package com.tarantula.platform.leaderboard;
 
-import com.tarantula.LeaderBoard;
+import com.icodesoftware.LeaderBoard;
 
 import java.util.Comparator;
 

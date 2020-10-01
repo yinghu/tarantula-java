@@ -1,7 +1,7 @@
 package com.tarantula.platform.statistics;
 
 import com.icodesoftware.Recoverable;
-import com.tarantula.Statistics;
+import com.icodesoftware.Statistics;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.ResourceKey;
 import com.tarantula.platform.presence.PresencePortableRegistry;

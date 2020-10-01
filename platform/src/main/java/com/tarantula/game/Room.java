@@ -3,14 +3,13 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.Connection;
-import com.tarantula.Module;
 import com.tarantula.platform.statistics.StatsDelta;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.UUID;
-
+import com.icodesoftware.Module;
 /**
  * Updated by yinghu lu on 6/11/2020.
  */

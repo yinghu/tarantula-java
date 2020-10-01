@@ -6,8 +6,8 @@ import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
+import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.HttpCaller;
-import com.tarantula.platform.service.DeploymentServiceProvider;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

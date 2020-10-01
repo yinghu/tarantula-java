@@ -2,12 +2,11 @@ package com.tarantula.platform;
 
 import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
-import com.tarantula.*;
-import com.tarantula.Module;
+import com.icodesoftware.Module;
+import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.BucketReceiver;
-import com.tarantula.platform.service.ServiceProvider;
 import com.tarantula.platform.service.deployment.ApplicationContextProxy;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -339,7 +338,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
         this.application.onBucket(bucket,state);
     }
-    public void resource(String name,Module.OnResource onResource){
+    public void resource(String name, Module.OnResource onResource){
         this.tarantulaContext.deploymentService().resource(this.descriptor(),name,onResource);
     }
 

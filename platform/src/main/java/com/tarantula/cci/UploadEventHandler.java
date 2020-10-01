@@ -2,14 +2,13 @@ package com.tarantula.cci;
 
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
-import com.tarantula.*;
+import com.icodesoftware.service.DeployService;
+import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.service.DeployService;
-import com.tarantula.platform.service.ServiceContext;
-import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.ResponseSerializer;
 
 import java.io.InputStream;

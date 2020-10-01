@@ -2,8 +2,7 @@ package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
-import com.tarantula.*;
-import com.tarantula.Module;
+import com.icodesoftware.Module;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.ResponseHeader;

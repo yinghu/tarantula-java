@@ -2,11 +2,10 @@ package com.tarantula.platform;
 
 import com.icodesoftware.Access;
 import com.icodesoftware.OnSession;
+import com.icodesoftware.Presence;
 import com.icodesoftware.TokenValidator;
-import com.tarantula.*;
-import com.tarantula.platform.service.Metrics;
+import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.service.SystemValidatorProvider;
-import com.tarantula.platform.service.TokenValidatorProvider;
 import com.tarantula.platform.util.SystemUtil;
 import java.security.MessageDigest;
 import java.util.Map;

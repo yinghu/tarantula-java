@@ -1,6 +1,6 @@
 package com.tarantula.platform.leaderboard;
 
-import com.tarantula.LeaderBoard;
+import com.icodesoftware.LeaderBoard;
 import com.tarantula.platform.RecoverableObject;
 import java.util.Arrays;
 import java.util.HashMap;

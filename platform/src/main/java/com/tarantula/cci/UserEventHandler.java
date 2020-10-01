@@ -1,23 +1,22 @@
 package com.tarantula.cci;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
+import com.icodesoftware.service.AccessIndexService;
+import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.EventService;
-import com.tarantula.*;
+import com.icodesoftware.service.ServiceContext;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServiceActionEvent;
-import com.tarantula.platform.service.AccessIndexService;
-import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.Metrics;
-import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class UserEventHandler implements RequestHandler,AccessIndexService.Listener{
+public class UserEventHandler implements RequestHandler, AccessIndexService.Listener{
 
     private static TarantulaLogger log = JDKLogger.getLogger(UserEventHandler.class);
 

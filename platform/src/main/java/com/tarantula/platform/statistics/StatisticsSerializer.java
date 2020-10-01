@@ -1,7 +1,7 @@
 package com.tarantula.platform.statistics;
 
 import com.google.gson.*;
-import com.tarantula.Statistics;
+import com.icodesoftware.Statistics;
 
 import java.lang.reflect.Type;
 
