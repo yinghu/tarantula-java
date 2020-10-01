@@ -2,6 +2,7 @@ package com.tarantula.platform.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.EventService;
+import com.icodesoftware.service.OnPartition;
 import com.tarantula.*;
 
 import java.util.concurrent.ScheduledFuture;

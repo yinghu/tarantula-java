@@ -1,4 +1,4 @@
-package com.tarantula.platform.service;
+package com.icodesoftware.service;
 
 public interface OnPartition {
     int partition();

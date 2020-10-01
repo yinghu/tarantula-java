@@ -1,16 +1,13 @@
 package com.tarantula;
 
-import com.icodesoftware.Event;
-import com.icodesoftware.OnApplication;
-import com.icodesoftware.OnInstance;
-import com.icodesoftware.Session;
+import com.icodesoftware.*;
 
 import java.util.List;
 
 /**
  * updated by yinghu on 8/7/2019
  */
-public interface InstanceRegistry extends OnApplication,Countable,Configurable{
+public interface InstanceRegistry extends OnApplication, Countable,Configurable{
 
     int ON_INSTANCE =0;
     int ALREADY_ON_INSTANCE =1;

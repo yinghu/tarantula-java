@@ -1,9 +1,6 @@
-package com.tarantula;
+package com.icodesoftware;
 
-import com.icodesoftware.Connection;
-import com.icodesoftware.Recoverable;
-
-public interface PostOffice{
+public interface PostOffice {
 
     //app to client
     OnTopic onTopic();

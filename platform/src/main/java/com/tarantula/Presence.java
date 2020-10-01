@@ -1,6 +1,5 @@
 package com.tarantula;
 
-
 import com.icodesoftware.*;
 
 /**

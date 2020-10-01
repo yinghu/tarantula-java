@@ -1,8 +1,8 @@
 package com.tarantula.platform.service.cluster;
 
+import com.icodesoftware.Countable;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
-import com.tarantula.Countable;
 import com.tarantula.platform.*;
 
 import java.util.Map;

@@ -1,14 +1,14 @@
 package com.tarantula.platform.service.cluster;
 
 
+import com.icodesoftware.service.OnPartition;
 import com.tarantula.platform.IndexKey;
 import com.tarantula.platform.RecoverableObject;
-import com.tarantula.platform.service.OnPartition;
 
 import java.util.Map;
 
 
-public class PartitionState extends RecoverableObject implements OnPartition{
+public class PartitionState extends RecoverableObject implements OnPartition {
     public int partition;
     public boolean opening;
     public int version;

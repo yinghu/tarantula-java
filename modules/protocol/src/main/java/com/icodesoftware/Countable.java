@@ -1,8 +1,8 @@
-package com.tarantula;
+package com.icodesoftware;
 
 /**
  * Updated by yinghu on 6/1/2018.
  */
-public interface Countable{
+public interface Countable {
     int count(int delta);
 }

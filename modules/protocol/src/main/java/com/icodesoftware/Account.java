@@ -1,6 +1,4 @@
-package com.tarantula;
-
-import com.icodesoftware.Access;
+package com.icodesoftware;
 
 public interface Account extends Access {
 

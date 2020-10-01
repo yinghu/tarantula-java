@@ -1,6 +1,6 @@
 package com.tarantula.platform.presence;
 
-import com.tarantula.Account;
+import com.icodesoftware.Account;
 
 import java.util.Map;
 
