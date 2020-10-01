@@ -1,6 +1,6 @@
 package com.tarantula.platform.service.deployment;
 
-import com.tarantula.SchedulingTask;
+import com.icodesoftware.SchedulingTask;
 import com.tarantula.TarantulaLogger;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.DeploymentDescriptor;

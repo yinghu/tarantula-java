@@ -1,7 +1,7 @@
 package com.tarantula.platform.service.cluster;
 
-import com.tarantula.Event;
-import com.tarantula.EventListener;
+import com.icodesoftware.Event;
+import com.icodesoftware.EventListener;
 import com.tarantula.platform.service.BucketReceiver;
 import com.tarantula.platform.service.BucketReceiverListener;
 

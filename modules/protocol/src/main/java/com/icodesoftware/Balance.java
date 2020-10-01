@@ -1,7 +1,5 @@
-package com.tarantula;
+package com.icodesoftware;
 
-
-import com.icodesoftware.Recoverable;
 
 public interface Balance extends Recoverable {
 

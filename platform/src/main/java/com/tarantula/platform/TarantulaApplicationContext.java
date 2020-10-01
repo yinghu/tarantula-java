@@ -1,8 +1,8 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.*;
+import com.icodesoftware.EventListener;
 import com.tarantula.*;
-import com.tarantula.EventListener;
 import com.tarantula.Module;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.Application;

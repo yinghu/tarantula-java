@@ -1,5 +1,6 @@
 package com.tarantula.cci;
 
+import com.icodesoftware.Event;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;

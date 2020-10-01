@@ -1,7 +1,6 @@
 package com.tarantula.cci;
 
-import com.tarantula.EventListener;
-import com.tarantula.platform.service.Closable;
+import com.icodesoftware.EventListener;
 
 import java.io.InputStream;
 

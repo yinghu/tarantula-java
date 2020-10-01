@@ -1,7 +1,7 @@
 package com.tarantula.platform;
 
+import com.icodesoftware.OnInstance;
 import com.icodesoftware.RecoverableFactory;
-import com.tarantula.OnInstance;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 /**

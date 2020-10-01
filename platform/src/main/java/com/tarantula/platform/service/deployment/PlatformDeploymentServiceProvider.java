@@ -3,6 +3,7 @@ package com.tarantula.platform.service.deployment;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.PendingInboundMessage;
+import com.icodesoftware.service.EventService;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.cci.udp.UDPSessionService;

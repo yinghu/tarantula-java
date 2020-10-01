@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.icodesoftware.*;
+import com.icodesoftware.service.EventService;
 import com.icodesoftware.service.Serviceable;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;

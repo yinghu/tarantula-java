@@ -1,9 +1,9 @@
 package com.tarantula.cci.websocket;
 
-import com.tarantula.Event;
-import com.tarantula.EventListener;
-import com.tarantula.EventService;
-import com.tarantula.RoutingKey;
+import com.icodesoftware.Event;
+import com.icodesoftware.EventListener;
+import com.icodesoftware.RoutingKey;
+import com.icodesoftware.service.EventService;
 
 import java.net.URI;
 import java.net.http.HttpClient;

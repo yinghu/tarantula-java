@@ -1,7 +1,9 @@
 package com.tarantula.platform.service.deployment;
 
 
+import com.icodesoftware.Access;
 import com.icodesoftware.Descriptor;
+import com.icodesoftware.Event;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
@@ -37,7 +39,7 @@ public class DefaultApplication implements Application {
     }
 
     public boolean checkAccessControl(Event event){
-        if(this.deploymentDescriptor.accessMode()==Access.PUBLIC_ACCESS_MODE){
+        if(this.deploymentDescriptor.accessMode()== Access.PUBLIC_ACCESS_MODE){
             return true;
         }
         return this.tarantulaContext.tokenValidatorProvider().tokenValidator().validateTicket(event.systemId(),event.stub(),event.ticket());

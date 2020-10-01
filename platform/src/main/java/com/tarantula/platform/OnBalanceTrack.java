@@ -1,6 +1,6 @@
 package com.tarantula.platform;
 
-import com.tarantula.OnBalance;
+import com.icodesoftware.OnBalance;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.Map;

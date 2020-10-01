@@ -1,6 +1,8 @@
 package com.tarantula;
 
+import com.icodesoftware.Event;
 import com.icodesoftware.OnApplication;
+import com.icodesoftware.OnInstance;
 import com.icodesoftware.Session;
 
 import java.util.List;

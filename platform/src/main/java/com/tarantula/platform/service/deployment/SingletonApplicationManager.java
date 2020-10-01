@@ -1,5 +1,8 @@
 package com.tarantula.platform.service.deployment;
 
+import com.icodesoftware.Access;
+import com.icodesoftware.Event;
+import com.icodesoftware.EventListener;
 import com.icodesoftware.Recoverable;
 import com.tarantula.*;
 import com.tarantula.platform.DeploymentDescriptor;
@@ -12,7 +15,7 @@ import com.tarantula.platform.service.cluster.ApplicationBucketReceiver;
 /**
  * Updated by yinghu 6/3/2019
  */
-public class SingletonApplicationManager extends DefaultApplication implements BucketReceiverListener,EventListener{
+public class SingletonApplicationManager extends DefaultApplication implements BucketReceiverListener, EventListener {
 
     private TarantulaApplicationContext singleton;
 
@@ -26,7 +29,7 @@ public class SingletonApplicationManager extends DefaultApplication implements B
         dd.owner(dd.distributionKey());
         this.singleton = this.launch(dd,null);
         this.singleton._setup();//inject the app context proxy to decouple the TarantulaApplicationContext
-        if(dd.accessMode()!=Access.PRIVATE_ACCESS_MODE){
+        if(dd.accessMode()!= Access.PRIVATE_ACCESS_MODE){
             for(int r=0;r<this.tarantulaContext.platformRoutingNumber;r++){
                 StringBuffer bs = new StringBuffer(this.tarantulaContext.dataBucketGroup).append(Recoverable.PATH_SEPARATOR).append(singleton.descriptor().tag()).append(Recoverable.PATH_SEPARATOR).append(r);
                 this.tarantulaContext.integrationCluster().registerBucketReceiver(new ApplicationBucketReceiver(bs.toString(),r,this,this));

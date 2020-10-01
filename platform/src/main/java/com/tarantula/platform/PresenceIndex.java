@@ -1,9 +1,7 @@
 package com.tarantula.platform;
 
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.Response;
-import com.icodesoftware.Session;
+import com.icodesoftware.*;
+import com.icodesoftware.service.EventService;
 import com.tarantula.*;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;

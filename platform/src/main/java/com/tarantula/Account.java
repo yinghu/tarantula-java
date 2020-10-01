@@ -1,6 +1,8 @@
 package com.tarantula;
 
-public interface Account extends Access{
+import com.icodesoftware.Access;
+
+public interface Account extends Access {
 
     String DataStore = "account";
     String UserLabel = "users";

@@ -1,6 +1,8 @@
 package com.tarantula.platform;
 
+import com.icodesoftware.Access;
 import com.icodesoftware.OnSession;
+import com.icodesoftware.TokenValidator;
 import com.tarantula.*;
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.SystemValidatorProvider;
@@ -28,7 +30,7 @@ public class SystemValidator{
         return new _TokenValidator();
     }
 
-    private class _TokenValidator implements TokenValidator{
+    private class _TokenValidator implements TokenValidator {
 
         @Override
         public OnSession validateToken(String token) {

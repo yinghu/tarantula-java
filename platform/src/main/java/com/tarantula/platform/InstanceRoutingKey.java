@@ -1,7 +1,7 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.Recoverable;
-import com.tarantula.RoutingKey;
+import com.icodesoftware.RoutingKey;
 
 /**
  * Updated by yinghu lu on 8/9/2019.

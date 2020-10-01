@@ -3,7 +3,7 @@ package com.tarantula.platform.service.cluster;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
-import com.tarantula.Event;
+import com.icodesoftware.Event;
 import com.tarantula.platform.event.ServerPushEvent;
 
 import java.io.IOException;

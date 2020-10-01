@@ -1,5 +1,7 @@
 package com.tarantula.platform;
 
+import com.icodesoftware.Event;
+import com.icodesoftware.OnInstance;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Session;
 import com.tarantula.*;

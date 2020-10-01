@@ -3,7 +3,7 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.Event;
+import com.icodesoftware.Event;
 
 import java.io.IOException;
 

@@ -1,7 +1,7 @@
 package com.tarantula.platform.service.cluster;
 
-import com.tarantula.Event;
-import com.tarantula.EventService;
+import com.icodesoftware.Event;
+import com.icodesoftware.service.EventService;
 import com.tarantula.platform.service.Closable;
 
 

@@ -1,6 +1,6 @@
 package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.Portable;
-import com.tarantula.EventService;
+import com.icodesoftware.service.EventService;
 import com.tarantula.platform.OnApplicationHeader;
 
 abstract public class Data extends OnApplicationHeader implements Portable{

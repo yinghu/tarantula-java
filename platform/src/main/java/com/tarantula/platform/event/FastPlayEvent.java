@@ -3,14 +3,14 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.Event;
+import com.icodesoftware.Event;
 
 import java.io.IOException;
 
 /**
  * updated by yinghu on 8/8/2020
  */
-public class FastPlayEvent extends Data implements Event{
+public class FastPlayEvent extends Data implements Event {
 
     public FastPlayEvent(){
 

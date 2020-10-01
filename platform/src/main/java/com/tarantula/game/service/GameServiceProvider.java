@@ -3,6 +3,7 @@ package com.tarantula.game.service;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.service.EventService;
 import com.tarantula.*;
 import com.tarantula.game.*;
 import com.tarantula.logging.JDKLogger;

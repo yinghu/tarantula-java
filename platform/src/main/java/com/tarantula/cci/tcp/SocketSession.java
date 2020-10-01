@@ -1,6 +1,6 @@
 package com.tarantula.cci.tcp;
 
-import com.tarantula.Event;
+import com.icodesoftware.Event;
 import com.tarantula.cci.OnExchange;
 import java.nio.ByteBuffer;
 import java.util.Map;

@@ -1,6 +1,6 @@
 package com.tarantula.platform;
 
-import com.tarantula.Access;
+import com.icodesoftware.Access;
 
 public class AccessControl implements Access.Role {
 

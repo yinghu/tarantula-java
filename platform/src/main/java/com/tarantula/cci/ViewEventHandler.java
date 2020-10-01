@@ -1,8 +1,8 @@
 package com.tarantula.cci;
 
 import com.google.gson.GsonBuilder;
+import com.icodesoftware.Event;
 import com.icodesoftware.Session;
-import com.tarantula.Event;
 import com.tarantula.OnView;
 import com.tarantula.TarantulaLogger;
 import com.tarantula.logging.JDKLogger;

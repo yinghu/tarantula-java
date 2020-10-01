@@ -1,7 +1,7 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.Connection;
-import com.tarantula.EventService;
+import com.icodesoftware.service.EventService;
 
 
 /**

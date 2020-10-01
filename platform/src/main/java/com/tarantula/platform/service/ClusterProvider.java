@@ -1,8 +1,10 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.EventListener;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
+import com.icodesoftware.service.EventService;
 import com.icodesoftware.service.Serviceable;
 import com.tarantula.*;
 
@@ -18,7 +20,7 @@ public interface ClusterProvider extends Serviceable {
     String bucket();
     String subscription();
 
-    String addEventListener(String registerId,EventListener eventListener);
+    String addEventListener(String registerId, EventListener eventListener);
     void removeEventListener(String registerId);
 
     //EventListener Register

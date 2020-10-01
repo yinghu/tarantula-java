@@ -1,7 +1,7 @@
 package com.tarantula.cci;
 
+import com.icodesoftware.EventListener;
 import com.icodesoftware.service.Serviceable;
-import com.tarantula.*;
 import com.tarantula.platform.service.ServiceContext;
 
 /**

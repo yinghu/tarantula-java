@@ -1,4 +1,5 @@
 package com.tarantula.cci.http;
+import com.icodesoftware.Event;
 import com.icodesoftware.Session;
 import com.sun.net.httpserver.HttpExchange;
 import com.tarantula.*;

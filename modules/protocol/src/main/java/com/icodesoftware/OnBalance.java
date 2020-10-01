@@ -1,6 +1,4 @@
-package com.tarantula;
-
-import com.icodesoftware.OnApplication;
+package com.icodesoftware;
 
 /**
  * Updated by yinghu on 4/24/2018.

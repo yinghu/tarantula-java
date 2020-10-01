@@ -1,6 +1,6 @@
 package com.tarantula.platform.service;
 
-import com.tarantula.SchedulingTask;
+import com.icodesoftware.SchedulingTask;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.util.SystemUtil;
 

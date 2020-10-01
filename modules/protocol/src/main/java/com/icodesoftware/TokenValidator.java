@@ -1,6 +1,4 @@
-package com.tarantula;
-
-import com.icodesoftware.OnSession;
+package com.icodesoftware;
 
 import java.util.Map;
 
@@ -8,7 +6,7 @@ import java.util.Map;
  * Updated by yinghu lu 5/7/2020
  */
 //user application authentication utility API
-public interface TokenValidator{
+public interface TokenValidator {
 
 
     //validate and parse the token, call before dispatching event
@@ -17,7 +15,7 @@ public interface TokenValidator{
 
     //hash password to avoid direct password persistence
     String hashPassword(String password);
-    OnSession validatePassword(Access hash,String password);
+    OnSession validatePassword(Access hash, String password);
 
     //generate the ticket with limited life circle
     String ticket(String systemId,int stub);

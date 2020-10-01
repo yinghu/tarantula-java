@@ -1,6 +1,6 @@
 package com.tarantula.platform.service.cluster;
 
-import com.tarantula.SchedulingTask;
+import com.icodesoftware.SchedulingTask;
 
 public class OneTimeRunner implements SchedulingTask {
 

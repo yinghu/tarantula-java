@@ -1,9 +1,6 @@
 package com.tarantula.platform.module;
 
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Lobby;
-import com.icodesoftware.Response;
-import com.icodesoftware.Session;
+import com.icodesoftware.*;
 import com.tarantula.*;
 import com.tarantula.platform.CompositeKey;
 import com.tarantula.platform.ResponseHeader;
@@ -26,7 +23,7 @@ public class LobbyApplication extends TarantulaApplicationHeader implements OnIn
 
     private ConcurrentHashMap<String, ConcurrentLinkedDeque<InstanceRegistry>> rQueue = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,InstanceRegistry> rMap = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<CompositeKey,OnInstance> oMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<CompositeKey, OnInstance> oMap = new ConcurrentHashMap<>();
 
     private ConcurrentLinkedDeque<Event> eQueue = new ConcurrentLinkedDeque<>();
 

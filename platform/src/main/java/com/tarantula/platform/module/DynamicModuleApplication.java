@@ -1,6 +1,8 @@
 package com.tarantula.platform.module;
 
 import com.icodesoftware.Connection;
+import com.icodesoftware.OnInstance;
+import com.icodesoftware.SchedulingTask;
 import com.icodesoftware.Session;
 import com.tarantula.*;
 import com.tarantula.Module;
@@ -11,7 +13,7 @@ import java.util.concurrent.ScheduledFuture;
 /**
  * Update by yinghu lu on 5/7/2020.
  */
-public class DynamicModuleApplication extends TarantulaApplicationHeader implements Session.TimeoutListener, SchedulingTask,OnInstance.Listener {
+public class DynamicModuleApplication extends TarantulaApplicationHeader implements Session.TimeoutListener, SchedulingTask, OnInstance.Listener {
 
     private long SERVER_PUSH_INTERVAL = 50;
 

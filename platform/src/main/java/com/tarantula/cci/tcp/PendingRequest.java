@@ -1,6 +1,6 @@
 package com.tarantula.cci.tcp;
 
-import com.tarantula.Event;
+import com.icodesoftware.Event;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
