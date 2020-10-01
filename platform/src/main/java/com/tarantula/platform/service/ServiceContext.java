@@ -2,6 +2,7 @@ package com.tarantula.platform.service;
 
 import com.icodesoftware.Connection;
 import com.icodesoftware.DataStore;
+import com.icodesoftware.RecoverableRegistry;
 import com.tarantula.*;
 
 import java.util.concurrent.ScheduledFuture;

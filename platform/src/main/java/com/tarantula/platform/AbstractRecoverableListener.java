@@ -2,7 +2,7 @@ package com.tarantula.platform;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.tarantula.RecoverableListener;
+import com.icodesoftware.RecoverableListener;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;

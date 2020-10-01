@@ -4,8 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.icodesoftware.OnSession;
 import com.icodesoftware.Recoverable;
-import com.tarantula.OnSession;
 import com.tarantula.platform.OnSessionTrack;
 
 import java.io.ByteArrayInputStream;
@@ -112,7 +112,7 @@ public class SystemUtil {
         String hash = SystemUtil.toHexString(messageDigest.digest());
         return hash.equals(sp[1]);
     }
-    public  static OnSession validToken(MessageDigest messageDigest,String token) {
+    public  static OnSession validToken(MessageDigest messageDigest, String token) {
         //System.out.println(token);
         int sp = token.indexOf(" ");
         String systemId = token.substring(0,sp);

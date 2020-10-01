@@ -1,6 +1,6 @@
 package com.tarantula.platform.service.deployment;
 
-import com.tarantula.RecoverableListener;
+import com.icodesoftware.RecoverableListener;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;

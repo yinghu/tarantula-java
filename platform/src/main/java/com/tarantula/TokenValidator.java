@@ -1,5 +1,7 @@
 package com.tarantula;
 
+import com.icodesoftware.OnSession;
+
 import java.util.Map;
 
 /**

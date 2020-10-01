@@ -2,8 +2,8 @@ package com.tarantula.platform.service.persistence.mysql;
 
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.RecoverableRegistry;
 import com.tarantula.Metadata;
-import com.tarantula.RecoverableRegistry;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.service.persistence.Shard;
