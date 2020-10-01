@@ -1,6 +1,9 @@
 package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
+import com.icodesoftware.Descriptor;
+import com.icodesoftware.Response;
+import com.icodesoftware.Session;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.service.GameServiceProvider;

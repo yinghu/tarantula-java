@@ -1,10 +1,12 @@
 package com.tarantula;
 
+import com.icodesoftware.Session;
+
 /**
  * Event represents an asynchronous message
  * Updated by yinghu lu on 8/23/2019
  * */
-public interface Event extends Session{
+public interface Event extends Session {
 
     String tag();
     void tag(String tag);

@@ -1,6 +1,7 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Session;
 import com.tarantula.*;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.service.deployment.InstanceManager;

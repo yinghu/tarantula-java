@@ -5,6 +5,7 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
+import com.icodesoftware.Descriptor;
 import com.tarantula.*;
 import com.tarantula.platform.presence.GameCluster;
 import com.tarantula.platform.service.RecoverService;

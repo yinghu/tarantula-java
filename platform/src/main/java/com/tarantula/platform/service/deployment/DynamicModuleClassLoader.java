@@ -1,6 +1,6 @@
 package com.tarantula.platform.service.deployment;
 
-import com.tarantula.Descriptor;
+import com.icodesoftware.Descriptor;
 import com.tarantula.Module;
 
 import java.io.InputStream;

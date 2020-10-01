@@ -1,7 +1,7 @@
 package com.tarantula.cci.http;
 
+import com.icodesoftware.Session;
 import com.sun.net.httpserver.HttpExchange;
-import com.tarantula.Session;
 
 import java.io.*;
 import java.nio.charset.Charset;

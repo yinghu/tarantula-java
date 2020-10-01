@@ -1,7 +1,7 @@
 package com.tarantula.cci.tcp;
 
 import com.google.gson.*;
-import com.tarantula.Session;
+import com.icodesoftware.Session;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;

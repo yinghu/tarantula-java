@@ -1,6 +1,7 @@
 package com.tarantula.platform.presence;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Session;
 import com.tarantula.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.AccessIndexService;
@@ -232,7 +233,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             throw new UnsupportedOperationException(session.action());
         }
     }
-    private void onSession(OnSession access,Session session){
+    private void onSession(OnSession access, Session session){
         if(access.successful()){
             PresenceContext ptx = new PresenceContext("onLogin");
             ptx.presence= access;

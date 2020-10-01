@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.tarantula.Response;
+import com.icodesoftware.Response;
 
 import java.lang.reflect.Type;
 

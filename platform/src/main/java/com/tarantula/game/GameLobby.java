@@ -2,7 +2,7 @@ package com.tarantula.game;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.tarantula.Descriptor;
+import com.icodesoftware.Descriptor;
 
 public class GameLobby {
     public Descriptor lobby;

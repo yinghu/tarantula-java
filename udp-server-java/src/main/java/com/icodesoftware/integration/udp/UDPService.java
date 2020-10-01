@@ -1,6 +1,7 @@
 package com.icodesoftware.integration.udp;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.icodesoftware.Session;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
 import com.icodesoftware.service.Serviceable;
@@ -72,9 +73,9 @@ public class UDPService implements Runnable, Serviceable {
         httpCaller._init();
         String serverId = UUID.randomUUID().toString();
         String[] headers = new String[]{
-                HttpCaller.TARANTULA_ACCESS_KEY,config.getAsJsonObject(configHeader).get("accessKey").getAsString(),
-                HttpCaller.TARANTULA_ACTION,"onStart",
-                HttpCaller.TARANTULA_SERVER_ID,serverId
+                Session.TARANTULA_ACCESS_KEY,config.getAsJsonObject(configHeader).get("accessKey").getAsString(),
+                Session.TARANTULA_ACTION,"onStart",
+                Session.TARANTULA_SERVER_ID,serverId
         };
         config.getAsJsonObject("connection").addProperty("serverId",serverId);
         config.getAsJsonObject("connection").getAsJsonObject("server").addProperty("serverId",serverId);
@@ -89,9 +90,9 @@ public class UDPService implements Runnable, Serviceable {
     }
     public void shutdown() throws Exception{
         String[] headers = new String[]{
-                HttpCaller.TARANTULA_ACCESS_KEY,config.getAsJsonObject(configHeader).get("accessKey").getAsString(),
-                HttpCaller.TARANTULA_ACTION,"onStop",
-                HttpCaller.TARANTULA_SERVER_ID,config.getAsJsonObject("connection").get("serverId").getAsString()
+                Session.TARANTULA_ACCESS_KEY,config.getAsJsonObject(configHeader).get("accessKey").getAsString(),
+                Session.TARANTULA_ACTION,"onStop",
+                Session.TARANTULA_SERVER_ID,config.getAsJsonObject("connection").get("serverId").getAsString()
         };
         httpCaller.get(config.getAsJsonObject(configHeader).get("path").getAsString(),headers);
         this.datagramChannel.close();

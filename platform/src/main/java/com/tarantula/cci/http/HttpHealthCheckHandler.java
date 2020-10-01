@@ -1,8 +1,7 @@
 package com.tarantula.cci.http;
 
+import com.icodesoftware.Session;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.tarantula.Session;
 import com.tarantula.cci.HttpDispatcher;
 import com.tarantula.platform.service.EndPoint;
 

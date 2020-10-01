@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.tarantula.Descriptor;
+import com.icodesoftware.Descriptor;
 import com.tarantula.Lobby;
 
 public class DefaultLobby implements Lobby{

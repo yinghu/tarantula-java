@@ -1,7 +1,8 @@
 package com.tarantula.platform.util;
 
 import com.google.gson.JsonObject;
-import com.tarantula.Session;
+import com.icodesoftware.Session;
+import com.icodesoftware.util.HttpCaller;
 
 import java.util.ArrayList;
 import java.util.UUID;

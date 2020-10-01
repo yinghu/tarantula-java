@@ -1,4 +1,4 @@
-package com.tarantula;
+package com.icodesoftware;
 
 /**
  * Session represents the exchange between client and server via asynchronous way.
@@ -6,7 +6,7 @@ package com.tarantula;
  * Updated by yinghu lu on 6/29/2020
  * */
 
-public interface Session extends OnApplication{
+public interface Session extends OnApplication {
     //standard HTTP headers
     String HTTP_CONTENT_TYPE ="Content-type";
 

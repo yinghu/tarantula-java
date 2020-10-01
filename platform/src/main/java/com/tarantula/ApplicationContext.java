@@ -1,5 +1,7 @@
 package com.tarantula;
 
+import com.icodesoftware.Descriptor;
+import com.icodesoftware.Session;
 import com.tarantula.platform.service.ServiceProvider;
 
 import java.util.List;

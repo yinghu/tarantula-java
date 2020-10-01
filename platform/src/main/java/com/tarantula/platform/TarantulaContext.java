@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.google.gson.GsonBuilder;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
+import com.icodesoftware.Descriptor;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.Serviceable;
@@ -306,7 +307,7 @@ public class TarantulaContext implements Serviceable,ServiceContext,MetricsListe
             if(lb==null){
                 return;
             }
-            HashMap<String,Descriptor> _codeBase = new HashMap<>();
+            HashMap<String, Descriptor> _codeBase = new HashMap<>();
             Descriptor lab = null;
             for(Descriptor d : lb.entryList()){
                 Application ap = this.availableApplicationManagers.get(d.distributionKey());

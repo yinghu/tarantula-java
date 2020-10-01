@@ -1,6 +1,6 @@
 package com.tarantula.cci.tcp;
 
-import com.tarantula.Session;
+import com.icodesoftware.Session;
 
 import java.util.HashMap;
 import java.util.Map;

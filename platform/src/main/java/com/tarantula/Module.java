@@ -1,10 +1,12 @@
 package com.tarantula;
 
+import com.icodesoftware.Session;
+
 import java.io.InputStream;
 
 public interface Module {
 
-    default void onJoin(Session session,OnUpdate onUpdate) throws Exception{}
+    default void onJoin(Session session, OnUpdate onUpdate) throws Exception{}
 
     boolean onRequest(Session session, byte[] payload,OnUpdate update) throws Exception;
 

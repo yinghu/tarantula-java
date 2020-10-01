@@ -1,9 +1,9 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.Descriptor;
 import com.tarantula.*;
 import com.tarantula.Module;
 
-import javax.crypto.SecretKey;
 import java.util.List;
 
 /**

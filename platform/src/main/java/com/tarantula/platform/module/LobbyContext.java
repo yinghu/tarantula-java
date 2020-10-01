@@ -1,6 +1,6 @@
 package com.tarantula.platform.module;
 
-import com.tarantula.Descriptor;
+import com.icodesoftware.Descriptor;
 import com.tarantula.InstanceRegistry;
 import com.tarantula.platform.ResponseHeader;
 

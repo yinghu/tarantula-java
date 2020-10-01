@@ -1,7 +1,9 @@
 package com.tarantula.platform.service.deployment;
 
 import com.google.gson.GsonBuilder;
+import com.icodesoftware.Descriptor;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.Session;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.tarantula.*;
 import com.tarantula.Module;
@@ -267,7 +269,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return suc[0];
     }
 
-    public boolean createApplication(Descriptor descriptor,boolean launching){
+    public boolean createApplication(Descriptor descriptor, boolean launching){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         String  suc = deployService.addApplication(descriptor);
         if(suc!=null&&launching){//launch if lobby on line
@@ -832,7 +834,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return this.module.onRequest(session,payload,update);
         }
         @Override
-        public void onTimeout(Session session,OnUpdate onUpdate){
+        public void onTimeout(Session session, OnUpdate onUpdate){
             this.module.onTimeout(session,onUpdate);
         }
         @Override

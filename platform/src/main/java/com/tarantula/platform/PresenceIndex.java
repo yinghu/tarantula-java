@@ -1,6 +1,9 @@
 package com.tarantula.platform;
 
+import com.icodesoftware.Descriptor;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Response;
+import com.icodesoftware.Session;
 import com.tarantula.*;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;
@@ -41,7 +44,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public void registerEventService(EventService eventService){
         this.eventService = eventService;
     }
-    public Response onPlay(Session session,Descriptor descriptor,RoutingKey routingKey){
+    public Response onPlay(Session session, Descriptor descriptor, RoutingKey routingKey){
         return onPlay(session,descriptor);
     }
     public Response onPlay(Session session,Descriptor desc){

@@ -1,5 +1,6 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.Descriptor;
 import com.icodesoftware.service.Serviceable;
 import com.tarantula.*;
 

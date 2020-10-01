@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.deployment;
 
+import com.icodesoftware.Session;
 import com.tarantula.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.ApplicationAllocator;

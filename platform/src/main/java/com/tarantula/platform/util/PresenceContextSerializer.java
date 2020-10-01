@@ -1,7 +1,7 @@
 package com.tarantula.platform.util;
 
 import com.google.gson.*;
-import com.tarantula.Descriptor;
+import com.icodesoftware.Descriptor;
 import com.tarantula.Lobby;
 import com.tarantula.platform.presence.PresenceContext;
 

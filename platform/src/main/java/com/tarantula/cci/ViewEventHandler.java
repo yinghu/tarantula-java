@@ -1,9 +1,9 @@
 package com.tarantula.cci;
 
 import com.google.gson.GsonBuilder;
+import com.icodesoftware.Session;
 import com.tarantula.Event;
 import com.tarantula.OnView;
-import com.tarantula.Session;
 import com.tarantula.TarantulaLogger;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
@@ -11,8 +11,6 @@ import com.tarantula.platform.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.platform.util.OnViewSerializer;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ViewEventHandler implements RequestHandler {

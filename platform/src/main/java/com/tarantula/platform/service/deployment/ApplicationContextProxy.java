@@ -1,5 +1,7 @@
 package com.tarantula.platform.service.deployment;
 
+import com.icodesoftware.Descriptor;
+import com.icodesoftware.Session;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.platform.TarantulaApplicationContext;

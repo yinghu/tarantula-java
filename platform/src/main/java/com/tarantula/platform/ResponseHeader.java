@@ -1,6 +1,6 @@
 package com.tarantula.platform;
 
-import com.tarantula.Response;
+import com.icodesoftware.Response;
 
 /**
  * Updated by yinghu on 9/6/2019

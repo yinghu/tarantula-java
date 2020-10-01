@@ -1,5 +1,7 @@
 package com.icodesoftware.util;
 
+import com.icodesoftware.Session;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -21,11 +23,11 @@ public class HttpCaller {
     private HttpClient client;
     private String host;
 
-    public static String TARANTULA_PAYLOAD_SIZE ="Tarantula-payload-size";
-    public static String TARANTULA_ACTION ="Tarantula-action";
-    public static String TARANTULA_TAG ="Tarantula-tag";
-    public static String TARANTULA_SERVER_ID ="Tarantula-server-id";
-    public static String TARANTULA_ACCESS_KEY ="Tarantula-access-key";
+    //public static String TARANTULA_PAYLOAD_SIZE ="Tarantula-payload-size";
+    //public static String TARANTULA_ACTION ="Tarantula-action";
+    //public static String TARANTULA_TAG ="Tarantula-tag";
+    //public static String TARANTULA_SERVER_ID ="Tarantula-server-id";
+    //public static String TARANTULA_ACCESS_KEY ="Tarantula-access-key";
 
     public HttpCaller(String host){
         this.host = host;
@@ -37,7 +39,7 @@ public class HttpCaller {
     }
     public String index() throws Exception{
         String[] headers = new String[]{
-            TARANTULA_TAG,"index/user",TARANTULA_ACTION,"onIndex"
+                Session.TARANTULA_TAG,"index/user",Session.TARANTULA_ACTION,"onIndex"
         };
         return get("user/action",headers);
     }
@@ -58,7 +60,7 @@ public class HttpCaller {
                 .timeout(Duration.ofSeconds(TIME_OUT))
                 .header(ACCEPT, ACCEPT_JSON)
                 .header(CONTENT_TYPE, CONTENT_FORM)
-                .header(TARANTULA_PAYLOAD_SIZE,payload.length+"")
+                .header(Session.TARANTULA_PAYLOAD_SIZE,payload.length+"")
                 .headers(headers)
                 .POST(HttpRequest.BodyPublishers.ofByteArray(payload))
                 .build();

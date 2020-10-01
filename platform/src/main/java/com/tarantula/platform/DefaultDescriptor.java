@@ -1,11 +1,11 @@
 package com.tarantula.platform;
 
-import com.tarantula.Descriptor;
+import com.icodesoftware.Descriptor;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.Map;
 
-public class DefaultDescriptor extends DeploymentObject implements Descriptor{
+public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 
 	protected String typeId;
     protected String applicationId;

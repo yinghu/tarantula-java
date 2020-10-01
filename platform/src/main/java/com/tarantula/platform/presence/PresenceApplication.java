@@ -1,6 +1,7 @@
 package com.tarantula.platform.presence;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Session;
 import com.tarantula.*;
 import com.tarantula.platform.*;
 

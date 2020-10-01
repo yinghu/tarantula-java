@@ -1,5 +1,8 @@
 package com.tarantula.platform.module;
 
+import com.icodesoftware.Descriptor;
+import com.icodesoftware.Response;
+import com.icodesoftware.Session;
 import com.tarantula.*;
 import com.tarantula.platform.CompositeKey;
 import com.tarantula.platform.ResponseHeader;
@@ -113,7 +116,7 @@ public class LobbyApplication extends TarantulaApplicationHeader implements OnIn
             switch (ret){
                 case InstanceRegistry.INSTANCE_FULL://refund and send fully joined message to players
                     refund(event.systemId(),ir.applicationId());
-                    ResponseHeader rh = new ResponseHeader("onPlay",false,Response.INSTANCE_FULL,"instance fully joined","error");
+                    ResponseHeader rh = new ResponseHeader("onPlay",false, Response.INSTANCE_FULL,"instance fully joined","error");
                     event.write(this.builder.create().toJson(rh).getBytes(),this.descriptor.responseLabel());
                     break;
                 case InstanceRegistry.ALREADY_ON_INSTANCE://refund silently

@@ -1,7 +1,7 @@
 package com.tarantula.cci.tcp;
 
 import com.google.gson.GsonBuilder;
-import com.tarantula.Session;
+import com.icodesoftware.Session;
 import com.tarantula.platform.service.ServiceContext;
 import com.tarantula.cci.RequestHandler;
 import com.tarantula.logging.JDKLogger;

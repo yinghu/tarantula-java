@@ -1,5 +1,7 @@
 package com.tarantula.platform;
 
+import com.icodesoftware.Descriptor;
+import com.icodesoftware.Session;
 import com.tarantula.*;
 import com.tarantula.EventListener;
 import com.tarantula.Module;
