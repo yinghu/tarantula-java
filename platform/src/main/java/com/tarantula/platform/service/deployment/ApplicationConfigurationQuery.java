@@ -1,7 +1,7 @@
 package com.tarantula.platform.service.deployment;
 
+import com.icodesoftware.RecoverableFactory;
 import com.tarantula.Configuration;
-import com.tarantula.RecoverableFactory;
 import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 

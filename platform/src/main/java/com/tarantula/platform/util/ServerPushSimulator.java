@@ -2,11 +2,11 @@ package com.tarantula.platform.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
 import com.icodesoftware.util.HttpCaller;
-import com.tarantula.Connection;
 import com.tarantula.platform.service.DeploymentServiceProvider;
 
 import javax.crypto.Cipher;

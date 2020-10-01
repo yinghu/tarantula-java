@@ -1,6 +1,7 @@
 package com.tarantula.platform;
 
 import com.google.gson.GsonBuilder;
+import com.icodesoftware.Connection;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Session;
 import com.tarantula.*;

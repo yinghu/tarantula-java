@@ -1,6 +1,8 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.Connection;
 import com.icodesoftware.Descriptor;
+import com.icodesoftware.Lobby;
 import com.tarantula.*;
 import com.tarantula.Module;
 

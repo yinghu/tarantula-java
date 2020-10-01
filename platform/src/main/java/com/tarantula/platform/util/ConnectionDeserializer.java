@@ -2,7 +2,7 @@ package com.tarantula.platform.util;
 
 import com.google.gson.*;
 
-import com.tarantula.Connection;
+import com.icodesoftware.Connection;
 import com.tarantula.platform.UniverseConnection;
 import java.lang.reflect.Type;
 

@@ -2,8 +2,8 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.Connection;
 import com.icodesoftware.protocol.PendingInboundMessage;
-import com.tarantula.Connection;
 import com.tarantula.Event;
 import com.tarantula.EventService;
 import com.tarantula.platform.service.ConnectionEventService;
@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ServerPushEvent extends Data implements Event {
 
-    private ConcurrentHashMap<Long,Connection> cMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long, Connection> cMap = new ConcurrentHashMap<>();
     private Cipher decrypt;
     public ServerPushEvent(){
 

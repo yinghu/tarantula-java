@@ -1,6 +1,4 @@
-package com.tarantula;
-
-import com.icodesoftware.Recoverable;
+package com.icodesoftware;
 
 public interface Connection extends Recoverable {
 

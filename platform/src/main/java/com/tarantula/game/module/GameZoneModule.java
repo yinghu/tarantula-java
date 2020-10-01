@@ -1,6 +1,7 @@
 package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 import com.tarantula.*;
 import com.tarantula.Module;

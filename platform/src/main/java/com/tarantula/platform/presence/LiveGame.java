@@ -3,7 +3,7 @@ package com.tarantula.platform.presence;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Descriptor;
-import com.tarantula.Lobby;
+import com.icodesoftware.Lobby;
 
 import java.util.ArrayList;
 

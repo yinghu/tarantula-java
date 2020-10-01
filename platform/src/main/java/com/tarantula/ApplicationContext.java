@@ -1,6 +1,8 @@
 package com.tarantula;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Descriptor;
+import com.icodesoftware.Lobby;
 import com.icodesoftware.Session;
 import com.tarantula.platform.service.ServiceProvider;
 

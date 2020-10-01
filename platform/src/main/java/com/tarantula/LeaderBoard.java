@@ -1,5 +1,6 @@
 package com.tarantula;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 
 import javax.xml.crypto.Data;

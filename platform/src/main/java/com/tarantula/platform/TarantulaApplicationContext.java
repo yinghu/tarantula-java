@@ -1,7 +1,6 @@
 package com.tarantula.platform;
 
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Session;
+import com.icodesoftware.*;
 import com.tarantula.*;
 import com.tarantula.EventListener;
 import com.tarantula.Module;
@@ -20,7 +19,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class TarantulaApplicationContext implements ApplicationContext, EventListener,Connection.Listener{
+public class TarantulaApplicationContext implements ApplicationContext, EventListener, Connection.Listener{
 
     private Descriptor _descriptor;
 	private TarantulaApplication application;

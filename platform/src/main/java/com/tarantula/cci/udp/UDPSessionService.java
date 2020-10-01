@@ -1,6 +1,7 @@
 package com.tarantula.cci.udp;
 
 
+import com.icodesoftware.Connection;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;

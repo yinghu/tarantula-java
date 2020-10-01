@@ -2,7 +2,7 @@ package com.tarantula.game;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.tarantula.Connection;
+import com.icodesoftware.Connection;
 import com.tarantula.Module;
 import com.tarantula.platform.statistics.StatsDelta;
 

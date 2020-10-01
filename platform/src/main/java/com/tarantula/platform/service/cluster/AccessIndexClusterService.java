@@ -2,6 +2,7 @@ package com.tarantula.platform.service.cluster;
 
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.spi.*;
+import com.icodesoftware.DataStore;
 import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessIndexTrack;

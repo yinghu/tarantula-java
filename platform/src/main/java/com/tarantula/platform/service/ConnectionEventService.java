@@ -1,6 +1,6 @@
 package com.tarantula.platform.service;
 
-import com.tarantula.Connection;
+import com.icodesoftware.Connection;
 import com.tarantula.EventService;
 
 

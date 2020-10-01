@@ -2,7 +2,7 @@ package com.tarantula.platform.util;
 
 import com.google.gson.*;
 import com.icodesoftware.Descriptor;
-import com.tarantula.Lobby;
+import com.icodesoftware.Lobby;
 import com.tarantula.platform.presence.PresenceContext;
 
 import java.lang.reflect.Type;

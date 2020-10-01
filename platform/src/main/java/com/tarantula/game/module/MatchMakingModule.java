@@ -2,6 +2,7 @@ package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.Descriptor;
+import com.icodesoftware.Lobby;
 import com.icodesoftware.Response;
 import com.icodesoftware.Session;
 import com.tarantula.*;
@@ -15,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * updated by yinghu lu on 6/7/2020.
  */
-public class MatchMakingModule implements Module,Lobby.Listener {
+public class MatchMakingModule implements Module, Lobby.Listener {
 
     private ApplicationContext context;
     private ConcurrentHashMap<Integer,Descriptor> mZone;

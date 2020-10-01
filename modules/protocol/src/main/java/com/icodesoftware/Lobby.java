@@ -1,11 +1,9 @@
-package com.tarantula;
-
-import com.icodesoftware.Descriptor;
+package com.icodesoftware;
 
 import java.util.List;
 
 
-public interface Lobby{
+public interface Lobby {
 
 	Descriptor descriptor();
 

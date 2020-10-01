@@ -1,7 +1,7 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.Recoverable;
-import com.tarantula.RecoverableFactory;
+import com.icodesoftware.RecoverableFactory;
 import com.tarantula.RecoverableListener;
 import com.tarantula.platform.util.SystemUtil;
 

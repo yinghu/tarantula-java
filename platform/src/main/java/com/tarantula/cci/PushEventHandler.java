@@ -2,6 +2,7 @@ package com.tarantula.cci;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Connection;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Session;
 import com.tarantula.*;

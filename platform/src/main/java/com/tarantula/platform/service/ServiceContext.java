@@ -1,5 +1,7 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.Connection;
+import com.icodesoftware.DataStore;
 import com.tarantula.*;
 
 import java.util.concurrent.ScheduledFuture;
@@ -10,7 +12,7 @@ import java.util.concurrent.ScheduledFuture;
 public interface ServiceContext{
 
     //create data scope partitioned data store
-    DataStore dataStore(String name,int partition);
+    DataStore dataStore(String name, int partition);
 
     ScheduledFuture<?> schedule(SchedulingTask task);
     EventService eventService(int scope);

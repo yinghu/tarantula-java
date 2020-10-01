@@ -1,7 +1,7 @@
 package com.tarantula.game;
 
 import com.google.gson.JsonObject;
-import com.tarantula.Connection;
+import com.icodesoftware.Connection;
 import com.tarantula.platform.ResponseHeader;
 
 /**

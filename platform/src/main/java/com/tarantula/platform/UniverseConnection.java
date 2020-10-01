@@ -1,6 +1,6 @@
 package com.tarantula.platform;
 
-import com.tarantula.Connection;
+import com.icodesoftware.Connection;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.util.SystemUtil;
 

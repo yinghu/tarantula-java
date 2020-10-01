@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.icodesoftware.Descriptor;
-import com.tarantula.Lobby;
+import com.icodesoftware.Lobby;
 
-public class DefaultLobby implements Lobby{
+public class DefaultLobby implements Lobby {
 
 	private Descriptor lobby;
 	private ConcurrentHashMap<String,Descriptor> applicationIndex = new ConcurrentHashMap<>();

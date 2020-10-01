@@ -1,5 +1,6 @@
 package com.tarantula;
 
+import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 
 public interface TarantulaApplication extends Initializer,EventListener,BucketListener, Connection.Listener{

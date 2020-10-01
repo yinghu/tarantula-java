@@ -1,6 +1,6 @@
 package com.tarantula.game;
 
-import com.tarantula.Connection;
+import com.icodesoftware.Connection;
 
 public interface RoomListener {
     void onWaiting(Room room);

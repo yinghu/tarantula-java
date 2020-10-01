@@ -1,6 +1,6 @@
 package com.tarantula.platform.leaderboard;
 
-import com.tarantula.DataStore;
+import com.icodesoftware.DataStore;
 import com.tarantula.LeaderBoard;
 import com.tarantula.Statistics;
 

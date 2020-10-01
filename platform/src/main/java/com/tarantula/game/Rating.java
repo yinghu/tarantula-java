@@ -1,7 +1,7 @@
 package com.tarantula.game;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
-import com.tarantula.DataStore;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
 

@@ -2,7 +2,7 @@ package com.tarantula.game;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.tarantula.Lobby;
+import com.icodesoftware.Lobby;
 import com.tarantula.platform.ResponseHeader;
 
 public class GameServiceContext extends ResponseHeader {

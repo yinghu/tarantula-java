@@ -1,6 +1,7 @@
 package com.tarantula.platform.module;
 
 import com.icodesoftware.Descriptor;
+import com.icodesoftware.Lobby;
 import com.icodesoftware.Response;
 import com.icodesoftware.Session;
 import com.tarantula.*;

@@ -1,7 +1,7 @@
 package com.tarantula.platform.service.persistence;
 
+import com.icodesoftware.DataStore;
 import com.sleepycat.je.Database;
-import com.tarantula.DataStore;
 import com.tarantula.Metadata;
 import com.tarantula.platform.service.cluster.PartitionIndex;
 

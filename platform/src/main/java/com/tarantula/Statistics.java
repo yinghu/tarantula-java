@@ -1,5 +1,6 @@
 package com.tarantula;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public interface Statistics{
     List<Entry> summary();
     void summary(Stream query);
 
-    interface Entry extends Recoverable,DataStore.Updatable{
+    interface Entry extends Recoverable, DataStore.Updatable{
         String name();
         double total();
         double daily();

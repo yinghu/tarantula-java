@@ -2,9 +2,7 @@ package com.tarantula.game;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.Recoverable;
+import com.icodesoftware.*;
 import com.tarantula.*;
 import com.tarantula.Module;
 import com.tarantula.game.service.GameServiceProvider;
@@ -25,7 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * updated by yinghu lu on 6/9/2020.
  */
-public class Zone extends RecoverableObject implements RoomListener,DataStore.Updatable,Configurable{
+public class Zone extends RecoverableObject implements RoomListener, DataStore.Updatable,Configurable{
     public List<Arena> arenas = new ArrayList<>();
     public String name;
     public int capacity =1;

@@ -1,5 +1,6 @@
 package com.tarantula.platform.module;
 
+import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 import com.tarantula.*;
 import com.tarantula.Module;

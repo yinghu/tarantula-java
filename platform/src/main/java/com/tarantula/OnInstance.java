@@ -1,12 +1,14 @@
 package com.tarantula;
 
 
+import com.icodesoftware.DataStore;
+
 /**
  * Developer: YINGHU LU
  * Date: Updated 3/6/2019
  * Time: 8:28 PM
  */
-public interface OnInstance extends OnBalance,DataStore.Updatable{
+public interface OnInstance extends OnBalance, DataStore.Updatable{
 
     String LABEL = "IOI";
     boolean joined();
