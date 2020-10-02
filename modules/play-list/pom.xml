@@ -26,8 +26,8 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>com.tarantula</groupId>
-            <artifactId>gec-platform</artifactId>
+            <groupId>com.icodesoftware</groupId>
+            <artifactId>gec-protocol</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>
