@@ -499,8 +499,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             ServerPushEvent serverPushEvent = (ServerPushEvent)event;
             Connection occ = this.builder.create().fromJson(new String(serverPushEvent.payload()), Connection.class);
             occ.disabled(false);
-            occ.connectionId(this.tarantulaContext.integrationCluster().sequence());
-            log.warn("add server push->"+occ.connectionId());
+            log.warn("add server push->"+occ.connectionId()+"//"+occ.sequence());
             if(occ.server().type().equals(Connection.UDP)){
                 SecretKey secretKey = new SecretKeySpec(this.tarantulaContext.integrationCluster().get(occ.serverId().getBytes()),DeploymentServiceProvider.SERVER_KEY_SPEC);
                 Cipher encrypt = cipher(Cipher.ENCRYPT_MODE,secretKey);
@@ -701,11 +700,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         byte[] ret = icp.remove(resetCode.getBytes());
         return (ret!=null?new String(ret):"");
     }
-    public byte[] serverKey(String serverId){
+    public byte[] serverKey(Connection connection){
         byte[] key = new byte[KEY_SIZE];
         secureRandom.nextBytes(key);
         //SecretKey secretKey = new SecretKeySpec(key, SERVER_KEY_SPEC);
-        this.tarantulaContext.integrationCluster().set(serverId.getBytes(),key);
+        connection.connectionId(integrationCluster.sequence());
+        connection.sequence(secureRandom.nextInt());
+        this.tarantulaContext.integrationCluster().set(connection.serverId().getBytes(),key);
         return key;
     }
     public void stopAccessIndex(){

@@ -8,8 +8,11 @@ import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
+import com.tarantula.platform.util.ConnectionDeserializer;
+import com.tarantula.platform.util.ConnectionSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
+import java.awt.color.ICC_Profile;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,8 +47,11 @@ public class PushEventHandler implements RequestHandler {
                 if(typeId!=null){
                     resp.addProperty("typeId",typeId);
                     resp.addProperty("successful",true);
-                    resp.addProperty("serverKey",Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(serverId)));
-                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,_payload);
+                    Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
+                    resp.addProperty("serverKey",Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
+                    resp.addProperty("connectionId",connection.connectionId());
+                    resp.addProperty("sequence",connection.sequence());
+                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
                     pushEvent.typeId(typeId);
                     deployService.addServerPushEvent(pushEvent);
                 }
@@ -119,6 +125,8 @@ public class PushEventHandler implements RequestHandler {
     public void start() throws Exception {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
+        this.builder.registerTypeAdapter(Connection.class,new ConnectionSerializer());
+        this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
         log.info("TCP Push event handler started");

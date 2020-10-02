@@ -9,6 +9,7 @@ import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
 import com.tarantula.platform.util.ConnectionDeserializer;
+import com.tarantula.platform.util.ConnectionSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.Base64;
@@ -45,8 +46,11 @@ public class GameServerEventHandler implements RequestHandler {
                 if(typeId!=null){
                     resp.addProperty("typeId",typeId);
                     resp.addProperty("successful",true);
-                    resp.addProperty("serverKey", Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(serverId)));
-                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,_payload);
+                    Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
+                    resp.addProperty("serverKey", Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
+                    resp.addProperty("connectionId",connection.connectionId());
+                    resp.addProperty("sequence",connection.sequence());
+                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
                     pushEvent.typeId(typeId);
                     deployService.addServerPushEvent(pushEvent);
                 }
@@ -111,6 +115,7 @@ public class GameServerEventHandler implements RequestHandler {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
+        this.builder.registerTypeAdapter(Connection.class,new ConnectionSerializer());
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
         log.info("Game server event handler started");
