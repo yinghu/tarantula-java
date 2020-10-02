@@ -1,7 +1,6 @@
-package com.tarantula.platform.bootstrap;
+package com.icodesoftware.util;
 
 import com.icodesoftware.service.Serviceable;
-import com.tarantula.logging.JDKLogger;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -9,7 +8,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TarantulaRetryExecutionHandler implements RejectedExecutionHandler, Serviceable {
 
-	private static final JDKLogger log = JDKLogger.getLogger(TarantulaRetryExecutionHandler.class);
 
 	private final String name;
     private final int maxPoolSize;
@@ -35,7 +33,6 @@ public class TarantulaRetryExecutionHandler implements RejectedExecutionHandler,
 	@Override
 	public void start() throws Exception {
 		if(started.compareAndSet(false,true)){
-			log.warn("Triggered backup execution pool for ["+name+"] with size ["+maxPoolSize+"]");
 			executorService = Executors.newFixedThreadPool(maxPoolSize,new TarantulaThreadFactory(name+"-backup"));
 			for(int i=0;i<maxPoolSize;i++){
 				executorService.execute(()->{
@@ -60,7 +57,6 @@ public class TarantulaRetryExecutionHandler implements RejectedExecutionHandler,
 	@Override
 	public void shutdown() throws Exception {
 		if(started.get()){
-			log.warn("Shut down backup pool ["+name+"] with total retries ["+totalRetries+"]");
 			executorService.shutdown();
 		}
 	}

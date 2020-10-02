@@ -5,7 +5,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.EventService;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
-import com.tarantula.logging.JDKLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.event.ServiceActionEvent;
 import com.tarantula.platform.service.*;

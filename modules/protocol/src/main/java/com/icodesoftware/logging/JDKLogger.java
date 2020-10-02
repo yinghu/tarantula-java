@@ -1,4 +1,4 @@
-package com.tarantula.logging;
+package com.icodesoftware.logging;
 
 import com.icodesoftware.TarantulaLogger;
 

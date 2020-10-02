@@ -8,10 +8,10 @@ import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
 import com.icodesoftware.service.*;
 
-import com.tarantula.logging.JDKLogger;
+import com.icodesoftware.util.TarantulaExecutorServiceFactory;
+import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
-import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
 import com.tarantula.platform.bootstrap.TarantulaMain;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.*;
@@ -84,7 +84,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
 
     public void start() throws Exception {
-        TarantulaExecutorServiceFactory.createExecutorService("integration-"+this.tarantulaContext.eventThreadPoolSetting,(pool,poolSize,rh)->{
+        TarantulaExecutorServiceFactory.createExecutorService("integration-"+this.tarantulaContext.eventThreadPoolSetting,(pool, poolSize, rh)->{
             this.inboundEventPool = pool;
             this.workerSize = poolSize;
         });

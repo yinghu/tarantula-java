@@ -9,8 +9,8 @@ import com.hazelcast.core.*;
 import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
 import com.icodesoftware.service.*;
+import com.icodesoftware.logging.JDKLogger;
 
-import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.util.SystemUtil;

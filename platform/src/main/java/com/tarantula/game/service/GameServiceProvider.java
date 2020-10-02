@@ -6,7 +6,7 @@ import com.icodesoftware.service.EventService;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.*;
-import com.tarantula.logging.JDKLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.LeaderBoardEntry;

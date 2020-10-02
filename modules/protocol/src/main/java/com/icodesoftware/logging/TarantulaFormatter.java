@@ -1,4 +1,4 @@
-package com.icodesoftware.util;
+package com.icodesoftware.logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

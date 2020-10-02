@@ -2,7 +2,7 @@ package com.tarantula.platform.service.deployment;
 
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
-import com.tarantula.logging.JDKLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.EventOnAction;
 import com.tarantula.platform.event.OnDeployEvent;

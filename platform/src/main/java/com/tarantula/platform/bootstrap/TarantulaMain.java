@@ -5,14 +5,14 @@ import java.util.Properties;
 
 import com.icodesoftware.TarantulaLogger;
 import com.tarantula.licensing.Validator;
-import com.tarantula.logging.JDKLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.EndPoint;
 import com.tarantula.platform.service.cluster.ScopedMemberDiscovery;
 
 public class TarantulaMain {
 	static {
-		System.setProperty("java.util.logging.manager","com.tarantula.logging.TarantulaLogManager");
+		System.setProperty("java.util.logging.manager","com.icodesoftware.logging.TarantulaLogManager");
 	}
 	private static final TarantulaLogger log = JDKLogger.getLogger(TarantulaMain.class);
 

@@ -3,9 +3,9 @@ package com.tarantula.cci.tcp;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.tarantula.cci.RequestHandler;
-import com.tarantula.logging.JDKLogger;
-import com.tarantula.platform.bootstrap.TarantulaExecutorServiceFactory;
+import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.service.EndPoint;
 
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class SocketEndPoint implements EndPoint{
     @Override
     public void start() throws Exception {
         this.running = true;
-        TarantulaExecutorServiceFactory.createExecutorService(this.inboundThreadPoolSetting,(pool,psize,rh)->{
+        TarantulaExecutorServiceFactory.createExecutorService(this.inboundThreadPoolSetting,(pool, psize, rh)->{
             this.dispatcherPool = pool;
             this.workSize = psize;
         });

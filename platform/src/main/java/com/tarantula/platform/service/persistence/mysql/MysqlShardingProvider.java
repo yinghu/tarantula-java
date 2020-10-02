@@ -5,7 +5,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableRegistry;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
-import com.tarantula.logging.JDKLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.service.persistence.Shard;
 import com.tarantula.platform.service.persistence.ShardingProvider;
 import com.tarantula.platform.util.SystemUtil;

@@ -1,26 +1,23 @@
-package com.tarantula.platform.bootstrap;
+package com.icodesoftware.util;
+
+import com.icodesoftware.service.Serviceable;
 
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import com.icodesoftware.service.Serviceable;
-import com.tarantula.logging.JDKLogger;
-
 
 public class TarantulaRejectedExecutionHandler implements RejectedExecutionHandler, Serviceable {
 	
-	private static final JDKLogger log = JDKLogger.getLogger(TarantulaRejectedExecutionHandler.class);
-	
+
 	private final String name;
     private final int maxPoolSize;
 
-	public TarantulaRejectedExecutionHandler(final String name,final int overflow ){
+	public TarantulaRejectedExecutionHandler(final String name, final int overflow ){
 		this.name = name;
         this.maxPoolSize = overflow;
 	}
 	
 	public void rejectedExecution(Runnable runnable, ThreadPoolExecutor tpool) {
-		log.warn("Task discharged on thread pool ["+this.name+"/"+maxPoolSize+"] with total tasks ["+tpool.getTaskCount()+"] on threads ["+tpool.getActiveCount()+"]");
 	}
 
 	@Override

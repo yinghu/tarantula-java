@@ -7,7 +7,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.platform.service.ReplicationData;
-import com.tarantula.logging.JDKLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;

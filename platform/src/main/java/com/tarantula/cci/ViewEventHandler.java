@@ -7,7 +7,7 @@ import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.ServiceContext;
-import com.tarantula.logging.JDKLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.util.OnViewSerializer;

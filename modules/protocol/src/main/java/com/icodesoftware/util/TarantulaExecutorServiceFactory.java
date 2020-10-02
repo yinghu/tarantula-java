@@ -1,4 +1,4 @@
-package com.tarantula.platform.bootstrap;
+package com.icodesoftware.util;
 
 import com.icodesoftware.service.Serviceable;
 

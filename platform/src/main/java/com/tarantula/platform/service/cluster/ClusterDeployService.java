@@ -7,7 +7,7 @@ import com.hazelcast.spi.*;
 import com.icodesoftware.*;
 import com.icodesoftware.service.Batch;
 import com.icodesoftware.service.DeploymentServiceProvider;
-import com.tarantula.logging.JDKLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.Application;

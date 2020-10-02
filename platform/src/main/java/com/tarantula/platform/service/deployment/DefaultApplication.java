@@ -2,7 +2,7 @@ package com.tarantula.platform.service.deployment;
 
 
 import com.icodesoftware.*;
-import com.tarantula.logging.JDKLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.ApplicationAllocator;
 import com.tarantula.platform.service.Application;

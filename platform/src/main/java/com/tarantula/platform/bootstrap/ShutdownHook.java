@@ -4,7 +4,7 @@ import java.util.LinkedList;
 
 
 import com.icodesoftware.service.Serviceable;
-import com.tarantula.logging.TarantulaLogManager;
+import com.icodesoftware.logging.TarantulaLogManager;
 
 public class ShutdownHook extends Thread {
 
