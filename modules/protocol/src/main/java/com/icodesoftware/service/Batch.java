@@ -1,45 +1,12 @@
 package com.icodesoftware.service;
 
-import com.hazelcast.nio.serialization.Portable;
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
-
-import java.io.IOException;
-
-public class Batch extends RecoverableObject implements Portable {
-
-    public String batchId;
-    public String key;
-    public int count;
-    public int size;
-    public byte[] payload;
-    @Override
-    public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("1",this.batchId);
-        out.writeUTF("2",this.key);
-        out.writeInt("3",this.count);
-        out.writeInt("4",this.size);
-        out.writeByteArray("5",payload);
-    }
-    @Override
-    public void readPortable(PortableReader in) throws IOException {
-        this.batchId = in.readUTF("1");
-        this.key = in.readUTF("2");
-        this.count= in.readInt("3");
-        this.size = in.readInt("4");
-        this.payload = in.readByteArray("5");
-    }
 
 
-    @Override
-    public int getFactoryId() {
-        return 10;
-        //return PortableEventRegistry.OID;
-    }
+public interface Batch {
 
-    @Override
-    public int getClassId() {
-        return 1;
-        //return PortableEventRegistry.BATCH_CID;
-    }
+    String batchId();
+    String batchKey();
+    int count();
+    int size();
+    byte[] payload();
 }

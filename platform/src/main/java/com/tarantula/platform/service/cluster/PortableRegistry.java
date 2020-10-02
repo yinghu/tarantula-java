@@ -1,7 +1,6 @@
 package com.tarantula.platform.service.cluster;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.service.Batch;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.event.SessionForward;
@@ -106,7 +105,7 @@ public class PortableRegistry extends AbstractRecoverableListener{
                 _ins = new DeploymentDescriptor();
                 break;
             case BATCH_CID:
-                _ins = new Batch();
+                _ins = new BatchData();
                 break;
             case ON_CONNECTION_CID:
                 _ins = new UniverseConnection();

@@ -7,7 +7,6 @@ import com.hazelcast.spi.*;
 import com.icodesoftware.*;
 import com.icodesoftware.service.Batch;
 import com.icodesoftware.service.DeploymentServiceProvider;
-import com.icodesoftware.service.GameCluster;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
@@ -69,13 +68,13 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public Batch query(int registryId, String[] params){
         //log.warn("Query on->"+registryId+"/"+nodeEngine.getLocalMember().getAddress().toString());
         BatchCache batchCache = onQuery(registryId,params);
-        Batch batch = new Batch();
+        BatchData batch = new BatchData();
         batch.batchId = batchCache.batchId;
         batch.count = 0;
         batch.size = batchCache.cache.size();
         if(batch.size>0){
             Recoverable r = batchCache.cache.get(0);
-            batch.key = r.distributionKey();
+            batch.batchKey = r.distributionKey();
             batch.payload = SystemUtil.toJson(r.toMap());
         }
         else{
@@ -86,14 +85,14 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
     public Batch query(String batchId,int count){
         BatchCache batchCache = _cache.get(batchId);
-        Batch batch = new Batch();
+        BatchData batch = new BatchData();
         batch.count = count;
         batch.size = batchCache.cache.size();
         Recoverable r = batchCache.cache.get(count);
         if((count+1)==batch.size){
             _cache.remove(batchId);//remove on last count
         }
-        batch.key = r.distributionKey();
+        batch.batchKey = r.distributionKey();
         batch.payload = SystemUtil.toJson(r.toMap());
         return batch;
     }

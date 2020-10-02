@@ -3,6 +3,7 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Event;
+import com.icodesoftware.OnAccess;
 import com.icodesoftware.OnView;
 
 public interface DeployService extends ServiceProvider {
@@ -26,7 +27,8 @@ public interface DeployService extends ServiceProvider {
     String enableApplication(String applicationId,boolean enabled);
     boolean enableLobby(String typeId,boolean enabled);
 
-    GameCluster createGameCluster(String owner,String name);
+    //GameCluster createGameCluster(String owner,String name);
+    <T extends OnAccess> T createGameCluster(String owner,String name);
     boolean enableGameCluster(String gameClusterId);
     boolean disableGameCluster(String gameClusterId);
 
@@ -48,6 +50,5 @@ public interface DeployService extends ServiceProvider {
 
     boolean sync(String key);
     byte[] load(String dataSource,byte[] key);
-
 
 }

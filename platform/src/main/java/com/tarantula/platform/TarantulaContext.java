@@ -431,26 +431,26 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     public <T extends Recoverable> T query(String key,T t){
         Batch batch = this.tarantulaCluster.deployService().query(t.getClassId(),new String[]{key});
-        if(batch.size>0){
-            t.fromMap(SystemUtil.toMap(batch.payload));
-            t.distributionKey(batch.key);
+        if(batch.size()>0){
+            t.fromMap(SystemUtil.toMap(batch.payload()));
+            t.distributionKey(batch.batchKey());
         }
         return t;
     }
     public <T extends Recoverable> List<T> query(String[] params, RecoverableFactory<T> factory){
         List<T> _slist = new ArrayList<>();
         Batch batch = this.tarantulaCluster.deployService().query(factory.registryId(),params);
-        if(batch.size>0){
+        if(batch.size()>0){
             T sc = factory.create();
-            sc.fromMap(SystemUtil.toMap(batch.payload));
-            sc.distributionKey(batch.key);
+            sc.fromMap(SystemUtil.toMap(batch.payload()));
+            sc.distributionKey(batch.batchKey());
             _slist.add(sc);
             sc.owner(factory.distributionKey());
-            for(int i=batch.count+1;i<batch.size;i++){
-                Batch bx = this.tarantulaCluster.deployService().query(batch.batchId,i);
+            for(int i=batch.count()+1;i<batch.size();i++){
+                Batch bx = this.tarantulaCluster.deployService().query(batch.batchId(),i);
                 T scx = factory.create();
-                scx.fromMap(SystemUtil.toMap(bx.payload));
-                scx.distributionKey(bx.key);
+                scx.fromMap(SystemUtil.toMap(bx.payload()));
+                scx.distributionKey(bx.batchKey());
                 _slist.add(scx);
                 scx.owner(factory.distributionKey());
             }

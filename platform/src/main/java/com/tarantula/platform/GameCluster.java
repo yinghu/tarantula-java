@@ -1,10 +1,10 @@
-package com.icodesoftware.service;
+package com.tarantula.platform;
 
 import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-
+import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 
@@ -22,8 +22,7 @@ public class GameCluster extends OnApplicationHeader implements Portable {
 
     @Override
     public int getClassId() {
-        return 10;
-        //return PortableEventRegistry.GAME_CLUSTER_CID;
+       return PortableEventRegistry.GAME_CLUSTER_CID;
     }
 
     @Override
@@ -57,7 +56,6 @@ public class GameCluster extends OnApplicationHeader implements Portable {
 
     @Override
     public int getFactoryId() {
-        return 1;
-        //return PortableEventRegistry.OID;
+        return PortableEventRegistry.OID;
     }
 }

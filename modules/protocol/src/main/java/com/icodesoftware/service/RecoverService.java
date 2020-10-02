@@ -6,6 +6,6 @@ public interface RecoverService extends ServiceProvider{
 
     byte[] recover(String source,byte[] key);
     void replicate(String source,int partition,byte[] key,byte[] value);
-    void batch(ReplicationData[] batch);
+    //void batch(ReplicationData[] batch);
 
 }

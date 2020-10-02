@@ -7,10 +7,10 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Event;
+import com.icodesoftware.OnAccess;
 import com.icodesoftware.OnView;
 import com.icodesoftware.service.Batch;
 import com.icodesoftware.service.DeployService;
-import com.icodesoftware.service.GameCluster;
 import com.icodesoftware.service.ServiceContext;
 
 import java.util.Set;
@@ -154,12 +154,12 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
     }
 
-    public GameCluster createGameCluster(String owner, String name){
+    public <T extends OnAccess> T createGameCluster(String owner, String name){
         NodeEngine nodeEngine = getNodeEngine();
         CreateGameClusterOperation operation = new CreateGameClusterOperation(owner,name);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
-            final Future<GameCluster> future = builder.invoke();
+            final Future<T> future = builder.invoke();
             return future.get(); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);

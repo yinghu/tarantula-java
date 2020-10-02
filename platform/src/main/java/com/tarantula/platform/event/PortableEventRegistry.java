@@ -2,10 +2,10 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
-import com.icodesoftware.service.Batch;
-import com.icodesoftware.service.GameCluster;
 import com.tarantula.platform.AccessIndexTrack;
+import com.tarantula.platform.BatchData;
 import com.tarantula.platform.DeploymentDescriptor;
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 
 
@@ -99,7 +99,7 @@ public class PortableEventRegistry implements PortableFactory {
                 _ins = new DeploymentDescriptor();
                 break;
             case BATCH_CID:
-                _ins = new Batch();
+                _ins = new BatchData();
                 break;
             case LEADER_BOARD_GLOBAL_EVENT_CID:
                 _ins = new LeaderBoardGlobalEvent();

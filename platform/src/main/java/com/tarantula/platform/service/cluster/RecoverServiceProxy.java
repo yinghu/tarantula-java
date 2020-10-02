@@ -6,7 +6,6 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.service.RecoverService;
-import com.icodesoftware.service.ReplicationData;
 import com.icodesoftware.service.ServiceContext;
 
 import java.util.Set;
@@ -102,8 +101,5 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 }
             }
         }
-    }
-    public void batch(ReplicationData[] batch){
-
     }
 }
