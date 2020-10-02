@@ -1,4 +1,4 @@
-package com.icodesoftware.service;
+package com.tarantula.platform.service;
 
 public class ReplicationData {
     public String source;

@@ -3,7 +3,6 @@ package com.tarantula.cci;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
-import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.ResponseHeader;

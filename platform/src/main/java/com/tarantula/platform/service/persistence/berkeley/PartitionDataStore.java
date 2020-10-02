@@ -7,7 +7,6 @@ import com.icodesoftware.TarantulaLogger;
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.OperationStatus;
-import com.tarantula.*;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.IndexSet;
 

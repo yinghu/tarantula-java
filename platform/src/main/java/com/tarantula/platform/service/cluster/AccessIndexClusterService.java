@@ -6,7 +6,7 @@ import com.icodesoftware.AccessIndex;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.DeploymentServiceProvider;
-import com.icodesoftware.service.ReplicationData;
+import com.tarantula.platform.service.ReplicationData;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;

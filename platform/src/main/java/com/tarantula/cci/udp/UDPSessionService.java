@@ -4,7 +4,6 @@ package com.tarantula.cci.udp;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
-import com.tarantula.*;
 import com.tarantula.platform.service.ConnectionEventService;
 
 import javax.crypto.Cipher;

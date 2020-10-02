@@ -3,10 +3,8 @@ package com.tarantula.platform.service.deployment;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.InstanceRegistry;
 import com.icodesoftware.Session;
-import com.tarantula.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.ApplicationAllocator;
-import com.tarantula.platform.service.Instance;
 import com.tarantula.platform.util.SystemUtil;
 import java.util.List;
 

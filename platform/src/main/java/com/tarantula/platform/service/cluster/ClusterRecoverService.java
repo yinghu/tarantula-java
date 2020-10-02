@@ -5,7 +5,7 @@ import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.service.ReplicationData;
+import com.tarantula.platform.service.ReplicationData;
 import com.tarantula.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
 

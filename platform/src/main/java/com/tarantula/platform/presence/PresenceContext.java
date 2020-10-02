@@ -1,8 +1,6 @@
 package com.tarantula.platform.presence;
 
-
 import com.icodesoftware.*;
-import com.tarantula.*;
 import com.tarantula.platform.ResponseHeader;
 
 import java.util.List;

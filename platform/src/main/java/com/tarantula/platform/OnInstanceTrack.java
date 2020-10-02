@@ -2,7 +2,6 @@ package com.tarantula.platform;
 
 
 import com.icodesoftware.OnInstance;
-import com.tarantula.*;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.util.Map;

@@ -2,7 +2,6 @@ package com.tarantula.platform;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.EventService;
-import com.tarantula.*;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;
 import java.util.Map;
