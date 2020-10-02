@@ -19,10 +19,11 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
     String NAME = "DeploymentServiceProvider";
 
-    //GAME SERVER APIs
+    //GAME SERVER/PUSH SERVER APIs
     Connection onConnection(String typeId, Connection.InboundMessageListener listener);
     byte[] serverKey(String serverId);
-    //END OF DEDICATED SERVER APIs
+    void registerOnConnectionListener(Connection.Listener listener);
+    //END OF GAME SERVER/PUSH SERVER APIs
 
     /**
      * Register/Release the service provider on service pool
@@ -32,9 +33,6 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     
     //deploy and callback instance registry
     void registerInstanceRegistryListener(InstanceRegistry.Listener deploymentListener);
-
-    //register server push listener
-    void registerOnConnectionListener(Connection.Listener listener);
 
     //list configurations
     List<Configuration> configuration();
@@ -96,6 +94,8 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void registerServerPushEvent(Event event);
         void releaseServerPushEvent(String serverId);
         void syncServerPushEvent(String memberId);
+        Connection onConnection(String typeId,Connection connection);
+
 
         void stopAccessIndex();
         void startAccessIndex();
@@ -104,12 +104,6 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void memberAdded(String memberId);
 
         void syncKey(String key);
-
-        //game server callbacks
-        Connection onConnection(String typeId,Connection connection);
-        byte[] onStartedConnection(String serverId);
-        void onUpdatedConnection(String serverId,byte[] updated);
-        void onEndedConnection(String serverId,byte[] ended);
 
     }
 

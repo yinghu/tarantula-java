@@ -57,7 +57,7 @@ public class GameServerEventHandler implements RequestHandler {
                 }
                 exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
             }
-            else if(action.equals("onJoin")){//client connections
+            else if(action.equals("onConnect")){//client connections
                 String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
                 byte[] ret;
                 if(typeId!=null){
@@ -71,7 +71,7 @@ public class GameServerEventHandler implements RequestHandler {
                 }
                 exchange.onEvent(new ResponsiveEvent("","",ret,"room",true));
             }
-            else if(action.equals("onLeave")){
+            else if(action.equals("onDisconnect")){
                 String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
                 byte[] ret;
                 if(typeId!=null){
