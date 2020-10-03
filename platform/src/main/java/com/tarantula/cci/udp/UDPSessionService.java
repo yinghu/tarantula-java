@@ -77,6 +77,10 @@ public class UDPSessionService implements ConnectionEventService {
     public void start() throws Exception {
         this.datagramChannel = DatagramChannel.open();
         this.datagramChannel.connect(new InetSocketAddress(connection.host(),connection.port()));
+        this.publish("hello1".getBytes(),connection.sequence()+"/"+10,connection);
+        this.publish("hello2".getBytes(),connection.sequence()+"/"+10,connection);
+        this.publish("hello3".getBytes(),connection.sequence()+"/"+10,connection);
+        this.publish("hello4".getBytes(),connection.sequence()+"/"+10,connection);
         this.receiver = new Thread(()->{
            run();
         });
@@ -120,7 +124,8 @@ public class UDPSessionService implements ConnectionEventService {
             pendingOutboundMessage.sequence(encrypt.doFinal(seq.array()));
             pendingOutboundMessage.messageId(messageId.incrementAndGet());
             pendingOutboundMessage.payload(payload);
-            datagramChannel.write(pendingOutboundMessage.message());
+            ByteBuffer out = pendingOutboundMessage.message();
+            datagramChannel.write(out);
         }catch (Exception ex){
             ex.printStackTrace();
         }

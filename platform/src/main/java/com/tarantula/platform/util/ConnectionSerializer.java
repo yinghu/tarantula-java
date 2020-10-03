@@ -27,6 +27,8 @@ public class ConnectionSerializer implements JsonSerializer<Connection> {
             Connection sc = connection.server();
             server.addProperty("type",sc.type());
             server.addProperty("serverId",sc.serverId());
+            server.addProperty("connectionId",sc.connectionId());
+            server.addProperty("sequence",sc.sequence());
             server.addProperty("secured",sc.secured());
             server.addProperty("protocol",sc.protocol());
             server.addProperty("subProtocol",sc.subProtocol());

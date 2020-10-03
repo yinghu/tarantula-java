@@ -49,8 +49,8 @@ public class PushEventHandler implements RequestHandler {
                     resp.addProperty("successful",true);
                     Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
                     resp.addProperty("serverKey",Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
-                    resp.addProperty("connectionId",connection.connectionId());
-                    resp.addProperty("sequence",connection.sequence());
+                    resp.addProperty("connectionId",connection.server().connectionId());
+                    resp.addProperty("sequence",connection.server().sequence());
                     ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
                     pushEvent.typeId(typeId);
                     deployService.addServerPushEvent(pushEvent);
