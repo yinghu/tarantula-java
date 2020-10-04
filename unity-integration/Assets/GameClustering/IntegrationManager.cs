@@ -8,7 +8,7 @@ namespace GameClustering
     [CreateAssetMenu(fileName = "IntegrationManager", menuName = "GameClustering/IntegrationManager", order = 1)]
     public class IntegrationManager : ScriptableObject
     {
-        private static readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
+        private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
 
         public string gecHost = "localhost:8090";
         private HttpCaller _httpCaller;
@@ -44,13 +44,13 @@ namespace GameClustering
         
         public  async Task<bool> Device(MonoBehaviour caller){
             try{
-                var device = new Device{ DeviceId = "ABC123"};
+                var device = new Device{ DeviceId = "ABC1235"};
                 var headers = new Header[]{
                     new Header{ Name = Header.TarantulaTag,Value = "index/user"},
                     new Header{ Name = Header.TarantulaMagicKey, Value = device.DeviceId},
                     new Header{ Name = Header.TarantulaAction, Value = "onDevice"}
                 };
-                var json = JsonConvert.SerializeObject(device,_jsonSerializerSettings);
+                var json = JsonConvert.SerializeObject(device,JsonSerializerSettings);
                 var response = await _httpCaller.PostJson(caller,"/user/action",headers,json);
                 Debug.Log(response);
                 return true;

@@ -20,7 +20,7 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
         OnAccess   access = new OnAccessTrack();
         JsonObject e = jsonElement.getAsJsonObject();
         e.entrySet().forEach((Map.Entry<String,JsonElement> kv)->{
-            String k = kv.getKey();
+            String k = toLowercaseAtFirst(kv.getKey());
             JsonElement ve = kv.getValue();
             if(ve.isJsonPrimitive()){
                 JsonPrimitive jo = ve.getAsJsonPrimitive();
@@ -41,7 +41,7 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
                 JsonArray alist = ve.getAsJsonArray();
                 alist.forEach((a)->{//key value pair
                     JsonObject nv = a.getAsJsonObject();
-                    String _k = nv.get("name").getAsString();
+                    String _k = toLowercaseAtFirst(nv.get("name").getAsString());
                     JsonPrimitive jp = nv.get("value").getAsJsonPrimitive();
                     if(jp.isString()){
                         access.property(_k,jp.getAsString());
@@ -94,5 +94,11 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
         else if(k.equals("timestamp")){
             access.timestamp(((Number)v).longValue());
         }
+    }
+    private String toLowercaseAtFirst(String str){
+        char[] chars = str.toCharArray();
+        char first =Character.toLowerCase(chars[0]);
+        chars[0]=first;
+        return new String(chars);
     }
 }
