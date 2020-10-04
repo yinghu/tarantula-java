@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.tarantula</groupId>
-  <artifactId>gec-udp-server</artifactId>
+  <artifactId>gec-integration-server</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
-  <name>gec-udp-server</name>
-  <description>Tarantula Platform UDP Server</description>
+  <name>gec-integration-server</name>
+  <description>Tarantula Platform Integration Server</description>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
