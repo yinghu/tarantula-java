@@ -7,9 +7,10 @@ namespace Integration
     {
         public IntegrationManager integrationManager;
 
-        void Start()
+        async void Start()
         {
-            integrationManager.Index(this);
+            await integrationManager.Index(this);
+            await integrationManager.Device(this);
         }
 
     }

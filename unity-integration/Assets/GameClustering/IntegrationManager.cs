@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace GameClustering
@@ -6,6 +8,8 @@ namespace GameClustering
     [CreateAssetMenu(fileName = "IntegrationManager", menuName = "GameClustering/IntegrationManager", order = 1)]
     public class IntegrationManager : ScriptableObject
     {
+        private static readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
+
         public string gecHost = "localhost:8090";
         private HttpCaller _httpCaller;
         private static IntegrationManager _instance;
@@ -22,19 +26,39 @@ namespace GameClustering
             Debug.Log("Started manager");
         }
 
-        public async void Index(MonoBehaviour caller)
+        public async Task<bool> Index(MonoBehaviour caller)
         {
-            Debug.Log("Indexing");
             try{
                 var headers = new Header[]{
-                    new Header{ Name = "Tarantula-tag", Value = "index/user"},
-                    new Header{ Name = "Tarantula-action",Value = "onIndex"}
+                    new Header{ Name = Header.TarantulaTag , Value = "index/user"},
+                    new Header{ Name = Header.TarantulaAction ,Value = "onIndex"}
                 };
                 var response = await _httpCaller.GetJson(caller,"/user/action",headers);
                 Debug.Log(response);
+                return true;
             }catch(Exception ex){
                Debug.Log(ex.Message);
+               return false;
             }
         }
+        
+        public  async Task<bool> Device(MonoBehaviour caller){
+            try{
+                var device = new Device{ DeviceId = "ABC123"};
+                var headers = new Header[]{
+                    new Header{ Name = Header.TarantulaTag,Value = "index/user"},
+                    new Header{ Name = Header.TarantulaMagicKey, Value = device.DeviceId},
+                    new Header{ Name = Header.TarantulaAction, Value = "onDevice"}
+                };
+                var json = JsonConvert.SerializeObject(device,_jsonSerializerSettings);
+                var response = await _httpCaller.PostJson(caller,"/user/action",headers,json);
+                Debug.Log(response);
+                return true;
+            }catch(Exception ex){
+                Debug.Log(ex.Message);
+                return false;
+            }
+        }
+        
     }
 }
