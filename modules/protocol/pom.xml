@@ -6,6 +6,8 @@
     <groupId>com.icodesoftware</groupId>
     <artifactId>gec-protocol</artifactId>
     <version>1.0</version>
+    <packaging>jar</packaging>
+    <name>gec-protocol</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
