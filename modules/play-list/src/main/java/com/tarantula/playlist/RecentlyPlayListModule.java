@@ -1,10 +1,8 @@
 package com.tarantula.playlist;
 
 
-import com.icodesoftware.ApplicationContext;
+import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.OnLog;
-import com.icodesoftware.Session;
 
 public class RecentlyPlayListModule implements Module {
 
@@ -25,5 +23,10 @@ public class RecentlyPlayListModule implements Module {
     @Override
     public String label() {
         return "playlist";
+    }
+
+    @Override
+    public void onConnection(Connection connection){
+        this.context.log(">>>>>>"+connection.type(),OnLog.WARN);
     }
 }

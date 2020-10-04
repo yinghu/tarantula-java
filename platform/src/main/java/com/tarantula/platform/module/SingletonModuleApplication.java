@@ -34,9 +34,9 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         this.module = this.serviceProvider.module(this.descriptor);
         SERVER_PUSH_INTERVAL = descriptor.timerOnModule();
         if(SERVER_PUSH_INTERVAL>0){
-            this.serviceProvider.registerOnConnectionListener(this);
             this.scheduledFuture = this.context.schedule(this);
         }
+        this.serviceProvider.registerOnConnectionListener(this);
         module.setup(context);
     }
     @Override
