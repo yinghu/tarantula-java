@@ -71,10 +71,10 @@ public class UDPService implements Runnable, Serviceable {
                     PendingInboundMessage pendingInboundMessage = mQueue.poll();
                     if(pendingInboundMessage!=null){
                         log.warn(new String(pendingInboundMessage.payload()));
-                        ByteBuffer buffer = ByteBuffer.wrap(decrypt.doFinal(pendingInboundMessage.sequence()));
-                        log.warn("SEQUENCE->"+buffer.getInt(0)+"//type->"+pendingInboundMessage.type());
+                        //ByteBuffer buffer = ByteBuffer.wrap(decrypt.doFinal(pendingInboundMessage.sequence()));
+                        //log.warn("SEQUENCE->"+buffer.getInt(0)+"//type->"+pendingInboundMessage.type());
                         log.warn("ack->"+pendingInboundMessage.ack()+"//mid->"+pendingInboundMessage.messageId());
-                        log.warn("connectionId->"+pendingInboundMessage.connectionId());
+                        log.warn("connectionId->"+pendingInboundMessage.connectionId()+"//"+pendingInboundMessage.source().toString());
                         PendingOutboundMessage outboundMessage = new PendingOutboundMessage();
                         outboundMessage.ack(true);
                         outboundMessage.connectionId(10);
@@ -87,7 +87,7 @@ public class UDPService implements Runnable, Serviceable {
                         Thread.sleep(100);
                     }
                 }catch (Exception ex){
-
+                    ex.printStackTrace();
                 }
             }
         });

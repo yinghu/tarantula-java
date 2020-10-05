@@ -13,6 +13,7 @@ namespace GameClustering
         public string gecHost = "localhost:8090";
         private HttpCaller _httpCaller;
         public UdpCaller _udpCaller;
+        private bool _live;
         private static IntegrationManager _instance;
         [RuntimeInitializeOnLoadMethod]
         private static void _Init(){
@@ -27,6 +28,7 @@ namespace GameClustering
             _httpCaller = new HttpCaller(gecHost);
             _udpCaller = new UdpCaller();
             _udpCaller.Connect("10.0.0.234",16393);
+            _live = true;
             Debug.Log("Started manager");
         }
 
@@ -62,6 +64,20 @@ namespace GameClustering
                 Debug.Log(ex.Message);
                 return false;
             }
+        }
+        
+        public async Task<bool> OnUDPSocketMessage(){
+            try{
+                //do receive loop
+                while(_live){
+                    await _udpCaller.Receive();
+                    //ParseInboundMessage(msg);
+                }    
+                return false;
+            }catch(Exception ex){
+                Debug.Log(ex.Message);
+                return false;
+            }   
         }
         
     }

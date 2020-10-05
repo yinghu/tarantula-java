@@ -597,6 +597,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return connection;
     }
     public Connection onConnection(String typeId,Connection.InboundMessageListener listener){
+        
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         byte[] ret = icp.firstIndex(typeId);
         if(ret==null){

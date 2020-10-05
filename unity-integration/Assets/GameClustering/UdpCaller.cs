@@ -30,6 +30,10 @@ namespace GameClustering
                Debug.Log("cid->"+inboundMessage.ConnectionId());
                Debug.Log("Payload->" + Encoding.UTF8.GetString(inboundMessage.Payload()));
             }
+            else
+            {
+                Debug.Log("NO MESSAGE");
+            }
         }
     }
 }
