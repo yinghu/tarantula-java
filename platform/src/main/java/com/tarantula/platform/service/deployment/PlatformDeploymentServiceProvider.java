@@ -597,7 +597,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return connection;
     }
     public Connection onConnection(String typeId,Connection.InboundMessageListener listener){
-        
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         byte[] ret = icp.firstIndex(typeId);
         if(ret==null){
@@ -702,7 +701,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return (ret!=null?new String(ret):"");
     }
     public byte[] serverKey(Connection connection){
-        byte[] key = new byte[KEY_SIZE];
+        byte[] key = this.tarantulaContext.integrationCluster().get(connection.serverId().getBytes());
+        if(key!=null){
+            return key;
+        }
+        key = new byte[KEY_SIZE];
         secureRandom.nextBytes(key);
         //SecretKey secretKey = new SecretKeySpec(key, SERVER_KEY_SPEC);
         connection.server().connectionId(integrationCluster.sequence());

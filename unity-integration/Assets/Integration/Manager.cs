@@ -21,6 +21,10 @@ namespace Integration
             {
                 Debug.Log("DEVICE FAILED");
             }
+            Debug.Log(integrationManager.Presence.SystemId);
+            Debug.Log(integrationManager.Presence.Token);
+            await integrationManager.Service(this);
+            Debug.Log(integrationManager.Presence.ServerKey);
             //var outboundMessage = new OutboundMessage();
             //outboundMessage.Ack(true);
             //outboundMessage.Type(122);
@@ -36,8 +40,8 @@ namespace Integration
             //Debug.Log("Payload->" + Encoding.UTF8.GetString(inboundMessage.Payload()));
             //outboundMessage.Close();
             //inboundMessage.Close();
-            StartCoroutine(Send());
-            await integrationManager.OnUDPSocketMessage();
+            //StartCoroutine(Send());
+            //await integrationManager.OnUDPSocketMessage();
         }
 
         private async void Update()
