@@ -403,7 +403,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                         try{
                             PendingInboundMessage pending = pendingData.poll();
                             if(pending!=null){
-                                ServerPushEvent pushEvent = (ServerPushEvent) pushRegistry.get(pending.serverId);
+                                ServerPushEvent pushEvent = pushRegistry.get(pending.serverId);
                                 pushEvent.onMessage(pending);
                             }
                             else{

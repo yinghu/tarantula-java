@@ -77,10 +77,6 @@ public class UDPSessionService implements ConnectionEventService {
     public void start() throws Exception {
         this.datagramChannel = DatagramChannel.open();
         this.datagramChannel.connect(new InetSocketAddress(connection.host(),connection.port()));
-        this.publish("hello1".getBytes(),connection.sequence()+"/"+10,connection);
-        this.publish("hello2".getBytes(),connection.sequence()+"/"+10,connection);
-        this.publish("hello3".getBytes(),connection.sequence()+"/"+10,connection);
-        this.publish("hello4".getBytes(),connection.sequence()+"/"+10,connection);
         this.receiver = new Thread(()->{
            run();
         });

@@ -1,9 +1,17 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace GameClustering
 {
     public class InboundMessage
     {
+        public const long AckPos = 0;
+        public const long TypePos = 1;
+        public const long MessageIdPos = 5;
+        public const long ConnectionIdPos = 9;
+        public const long SequencePos = 17;
+        public const long PayloadPos = 65;
+        
         private readonly MemoryStream _memoryStream;
         public InboundMessage(byte[] buffer)
         {
@@ -12,33 +20,60 @@ namespace GameClustering
 
         public bool Ack()
         {
-            _memoryStream.ReadByte();
-            return true;
+            _memoryStream.Position = AckPos;
+            return _memoryStream.ReadByte() == 1;
         }
 
         public int Type()
         {
-            return 1;
+            _memoryStream.Position = TypePos;
+            var type = new byte[4];
+            _memoryStream.Read(type, 0, 4);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(type);
+            }
+            return BitConverter.ToInt32(type, 0);
         }
 
         public int MessageId()
         {
-            return 1;
+            _memoryStream.Position = MessageIdPos;
+            var  messageId = new byte[4];
+            _memoryStream.Read(messageId, 0, 4);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(messageId);
+            }
+            return BitConverter.ToInt32(messageId, 0);
         }
 
-        public int Sequence()
+        public byte[] Sequence()
         {
-            return 1;
+            _memoryStream.Position = ConnectionIdPos;
+            var sequence = new byte[48];
+            _memoryStream.Read(sequence, 0, 48);
+            return sequence;
         }
 
         public long ConnectionId()
         {
-            return 1;
+            _memoryStream.Position = ConnectionIdPos;
+            var connectionId = new byte[8];
+            _memoryStream.Read(connectionId, 0, 8);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(connectionId);
+            }
+            return BitConverter.ToInt64(connectionId, 0);
         }
 
-        public byte[] Message()
+        public byte[] Payload()
         {
-            return null;
+            _memoryStream.Position = PayloadPos;
+            var payload = new byte[OutboundMessage.MessageSize-PayloadPos];
+            _memoryStream.Read(payload, 0, payload.Length);
+            return payload;
         }
         public void Close()
         {

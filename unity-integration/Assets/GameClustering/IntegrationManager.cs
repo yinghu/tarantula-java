@@ -12,6 +12,7 @@ namespace GameClustering
 
         public string gecHost = "localhost:8090";
         private HttpCaller _httpCaller;
+        public UdpCaller _udpCaller;
         private static IntegrationManager _instance;
         [RuntimeInitializeOnLoadMethod]
         private static void _Init(){
@@ -20,16 +21,19 @@ namespace GameClustering
         }
 
         public static IntegrationManager Instance => _instance;
+        
         private void Bootstrap()
         {
             _httpCaller = new HttpCaller(gecHost);
+            _udpCaller = new UdpCaller();
+            _udpCaller.Connect("10.0.0.234",16393);
             Debug.Log("Started manager");
         }
 
         public async Task<bool> Index(MonoBehaviour caller)
         {
             try{
-                var headers = new Header[]{
+                var headers = new []{
                     new Header{ Name = Header.TarantulaTag , Value = "index/user"},
                     new Header{ Name = Header.TarantulaAction ,Value = "onIndex"}
                 };
@@ -45,7 +49,7 @@ namespace GameClustering
         public  async Task<bool> Device(MonoBehaviour caller){
             try{
                 var device = new Device{ DeviceId = "ABC1235"};
-                var headers = new Header[]{
+                var headers = new []{
                     new Header{ Name = Header.TarantulaTag,Value = "index/user"},
                     new Header{ Name = Header.TarantulaMagicKey, Value = device.DeviceId},
                     new Header{ Name = Header.TarantulaAction, Value = "onDevice"}

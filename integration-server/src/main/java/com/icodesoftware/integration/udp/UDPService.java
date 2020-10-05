@@ -75,6 +75,13 @@ public class UDPService implements Runnable, Serviceable {
                         log.warn("SEQUENCE->"+buffer.getInt(0)+"//type->"+pendingInboundMessage.type());
                         log.warn("ack->"+pendingInboundMessage.ack()+"//mid->"+pendingInboundMessage.messageId());
                         log.warn("connectionId->"+pendingInboundMessage.connectionId());
+                        PendingOutboundMessage outboundMessage = new PendingOutboundMessage();
+                        outboundMessage.ack(true);
+                        outboundMessage.connectionId(10);
+                        outboundMessage.messageId(13);
+                        outboundMessage.type(5);
+                        outboundMessage.payload(pendingInboundMessage.payload());
+                        this.datagramChannel.send(outboundMessage.message(),pendingInboundMessage.source());
                     }
                     else{
                         Thread.sleep(100);
