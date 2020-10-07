@@ -46,5 +46,10 @@ namespace GameClustering
         {
             _handlers[type] = messageHandler;
         }
+        
+        public void UnregisterMessageHandler(int type)
+        {
+            _handlers.Remove(type);
+        }
     }
 }

@@ -8,5 +8,6 @@ namespace GameClustering
         Task ReceiveAsync();
         Task<bool> SendAsync(OutboundMessage message);
         void RegisterMessageHandler(int type,IMessageHandler messageHandler);
+        void UnregisterMessageHandler(int type);
     }
 }
