@@ -71,10 +71,9 @@ public class UDPService implements Runnable, Serviceable {
                 try{
                     PendingInboundMessage pendingInboundMessage = mQueue.poll();
                     if(pendingInboundMessage!=null){
-                        //log.warn(new String(pendingInboundMessage.payload()));
-                        ByteBuffer buffer = ByteBuffer.wrap(decrypt.doFinal(pendingInboundMessage.payload()));
-                        log.warn(new String(buffer.array()));
-                        //log.warn("SEQUENCE->"+buffer.getInt(0)+"//type->"+pendingInboundMessage.type());
+                        log.warn(new String(pendingInboundMessage.payload()));
+                        ByteBuffer buffer = ByteBuffer.wrap(decrypt.doFinal(pendingInboundMessage.sequence()));
+                        log.warn("SEQUENCE->"+buffer.getInt(0)+"//type->"+pendingInboundMessage.type());
                         log.warn("ack->"+pendingInboundMessage.ack()+"->mid->"+pendingInboundMessage.messageId()+"->type->"+pendingInboundMessage.type());
                         log.warn("connectionId->"+pendingInboundMessage.connectionId()+"<>"+pendingInboundMessage.source().toString());
                         PendingOutboundMessage outboundMessage = new PendingOutboundMessage();
