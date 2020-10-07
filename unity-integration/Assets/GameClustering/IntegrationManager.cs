@@ -13,13 +13,14 @@ namespace GameClustering
 
         public string gecHost = "localhost:8090";
         private HttpCaller _httpCaller;
-        public UdpCaller _udpCaller;
+        public IMessenger Messenger { private set; get; }
         private bool _live;
         private static IntegrationManager _instance;
 
         public Presence Presence { get; private set; }
+        private Connection _connection;
 
-        [RuntimeInitializeOnLoadMethod]
+            [RuntimeInitializeOnLoadMethod]
         private static void _Init(){
             _instance = Resources.Load<IntegrationManager>("IntegrationManager");
             _instance.Bootstrap();    
@@ -30,9 +31,9 @@ namespace GameClustering
         private void Bootstrap()
         {
             _httpCaller = new HttpCaller(gecHost);
-            _udpCaller = new UdpCaller();
-            _udpCaller.Connect("10.0.0.234",16393);
-            _live = true;
+            //_udpCaller = new UdpCaller();
+            //_udpCaller.Connect("10.0.0.234",16393);
+            //_live = true;
             Debug.Log("Started manager");
         }
 
@@ -71,7 +72,25 @@ namespace GameClustering
                 if (suc)
                 {
                     var pt = jo.SelectToken("presence");
-                    Presence = new Presence {SystemId = (string)pt.SelectToken("systemId"), Token = (string)pt.SelectToken("token")};
+                    var pc = jo.SelectToken("connection");
+                    if (pc != null)
+                    {
+                        _connection = new Connection
+                        {
+                            Type =  (string)pc.SelectToken("type"),
+                            Host = (string)pc.SelectToken("host"),
+                            Port = (int)pc.SelectToken("port")
+                        };
+                        Messenger = new UdpMessenger();
+                        Messenger.Connect(_connection);
+                        _live = true;
+                    }
+                    Presence = new Presence
+                    {
+                        SystemId = (string)pt.SelectToken("systemId"),
+                        Token = (string)pt.SelectToken("token"),
+                        ServerKey = pc != null? (string)jo.SelectToken("serverKey"):null
+                    };
                 }
                 Debug.Log(response);
                 return true;
@@ -116,7 +135,7 @@ namespace GameClustering
                 //do receive loop
                 while(_live)
                 {
-                    await _udpCaller.Receive();
+                    await Messenger.ReceiveAsync();
                     //ParseInboundMessage(msg);
                 }    
                 return false;

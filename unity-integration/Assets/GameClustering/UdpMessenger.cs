@@ -5,21 +5,21 @@ using UnityEngine;
 
 namespace GameClustering
 {
-    public class UdpCaller
+    public class UdpMessenger : IMessenger
     {
         private UdpClient _udpClient;
 
-        public void Connect(string host, int port)
+        public void Connect(Connection connection)
         {
-            _udpClient = new UdpClient(host,port);
+            _udpClient = new UdpClient(connection.Host,connection.Port);
         }
-        public async Task<bool> Send(OutboundMessage outboundMessage)
+        public async Task<bool> SendAsync(OutboundMessage outboundMessage)
         {
             var payload = outboundMessage.Message();
             var bytes = await _udpClient.SendAsync(payload,payload.Length); 
             return bytes>0;    
         }
-        public async Task Receive(){
+        public async Task ReceiveAsync(){
             var ret = await _udpClient.ReceiveAsync();
             if (ret.Buffer.Length > 0)
             {

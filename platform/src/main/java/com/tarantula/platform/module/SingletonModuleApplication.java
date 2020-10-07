@@ -6,6 +6,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.event.FastPlayEvent;
 
+import java.security.SecureRandom;
 import java.util.concurrent.ScheduledFuture;
 
 /**
@@ -91,6 +92,10 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         if(scheduledFuture!=null){
             scheduledFuture.cancel(true);
         }
+    }
+    @Override
+    public String typeId(){
+        return module.label();
     }
     @Override
     public void onState(Connection c) {

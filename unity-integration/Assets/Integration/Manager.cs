@@ -25,8 +25,8 @@ namespace Integration
             }
             Debug.Log(integrationManager.Presence.SystemId);
             Debug.Log(integrationManager.Presence.Token);
-            await integrationManager.Service(this);
-            Debug.Log(integrationManager.Presence.ServerKey);
+            //await integrationManager.Service(this);
+            //Debug.Log(integrationManager.Presence.ServerKey);
             var key = Convert.FromBase64String(integrationManager.Presence.ServerKey);
             var m = new MemoryStream(InboundMessage.SequenceSize);
             var seq = BitConverter.GetBytes(-798);
@@ -56,7 +56,7 @@ namespace Integration
             var seq1 = m.ToArray();
             Debug.Log("m->"+seq1.Length);
             outboundMessage.Sequence(seq1);
-            await (integrationManager._udpCaller.Send(outboundMessage));
+            await integrationManager.Messenger.SendAsync(outboundMessage);
             //var decrypt = rijAlg.CreateDecryptor(rijAlg.Key, key);
             //var ret = decrypt.TransformFinalBlock(payload, 0, payload.Length);
             //Debug.Log(Encoding.UTF8.GetString(ret));
@@ -84,21 +84,6 @@ namespace Integration
 
         private async void Update()
         {
-        }
-        private IEnumerator Send()
-        {
-            yield return new WaitForSeconds(5);
-            var integrationManager = IntegrationManager.Instance;
-            var outboundMessage = new OutboundMessage();
-            outboundMessage.Ack(true);
-            outboundMessage.Type(122);
-            outboundMessage.MessageId(20);
-            outboundMessage.ConnectionId(201);
-            var payload = Encoding.UTF8.GetBytes("Hello123456789");
-            outboundMessage.Payload(payload);
-            
-            Task.FromResult(integrationManager._udpCaller.Send(outboundMessage));
-            //StartCoroutine(Send());
         }
     }
 }

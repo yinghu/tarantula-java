@@ -22,7 +22,7 @@ public class RecentlyPlayListModule implements Module {
 
     @Override
     public String label() {
-        return "playlist";
+        return "presence";
     }
 
     @Override

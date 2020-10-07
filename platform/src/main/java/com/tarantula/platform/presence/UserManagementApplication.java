@@ -12,6 +12,7 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +35,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     private DataStore pDatastore;
     private DataStore aDatastore;
     private DataStore sDatastore;
+
+    private Connection connection;
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
@@ -98,6 +101,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 }
             }
         });
+        this.deploymentServiceProvider.registerOnConnectionListener(this);
         this.context.log("User management application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
     }
     @Override
@@ -239,6 +243,11 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             List<Lobby> lobbyList = new ArrayList();
             lobbyList.add(this.context.lobby(this.lobbyId));
             ptx.lobbyList=(lobbyList);
+            if(this.connection!=null){
+                ptx.connection = this.connection;
+                byte[] key = this.deploymentServiceProvider.serverKey(this.connection);
+                ptx.serverKey = Base64.getEncoder().encodeToString(key);
+            }
             session.write(this.builder.create().toJson(ptx).getBytes(),this.descriptor.responseLabel());
             session.systemId(access.systemId());
             session.stub(access.stub());
@@ -282,5 +291,15 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         jms.addProperty("successful",suc);
         jms.addProperty("message",msg);
         return jms;
+    }
+    @Override
+    public String typeId(){
+        return "presence";
+    }
+    @Override
+    public void onState(Connection c) {
+        this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"]",OnLog.WARN);
+        this.context.log("Server->"+c.server().host(),OnLog.WARN);
+        this.connection = c;
     }
 }
