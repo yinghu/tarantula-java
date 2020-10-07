@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
  */
 public class PendingInboundMessage {
 
-    public static int SEQ_SIZE = 48;
+    public static int SEQ_SIZE = 16;
     public static int ACK_POS = 0;
     public static int TYPE_POS = 1;
     public static int MESSAGE_ID_POS = 5;

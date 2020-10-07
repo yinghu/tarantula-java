@@ -112,9 +112,9 @@ public class UDPService implements Runnable, Serviceable {
         byte[] key = Base64.getDecoder().decode(pc.get("serverKey").getAsString());
         IvParameterSpec iv = new IvParameterSpec(key);
         SecretKey secretKey = new SecretKeySpec(key,DeploymentServiceProvider.SERVER_KEY_SPEC);
-        encrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC7PADDING);
+        encrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
         encrypt.init(Cipher.ENCRYPT_MODE,secretKey,iv);
-        decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC7PADDING);
+        decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
         decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
     }
     public void shutdown() throws Exception{

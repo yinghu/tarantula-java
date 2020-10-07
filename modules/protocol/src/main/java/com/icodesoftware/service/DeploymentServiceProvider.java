@@ -13,7 +13,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     String DEPLOY_DATA_STORE = "tarantula";
     String SERVER_KEY_SPEC = "AES";
     String CIPHER_NAME_CBC_PKC5PADDING = "AES/CBC/PKCS5PADDING";
-    String CIPHER_NAME_CBC_PKC7PADDING = "AES/CBC/PKCS7PADDING";
+    //String CIPHER_NAME_CBC_PKC7PADDING = "AES/CBC/PKCS7PADDING";
     int KEY_SIZE = 16;
 
     String NAME = "DeploymentServiceProvider";

@@ -498,12 +498,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     byte[] key = tarantulaContext.integrationCluster().get(occ.serverId().getBytes());
                     IvParameterSpec iv = new IvParameterSpec(key);
                     SecretKey secretKey = new SecretKeySpec(key,DeploymentServiceProvider.SERVER_KEY_SPEC);
-                    Cipher encrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC7PADDING);
+                    Cipher encrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
                     encrypt.init(Cipher.ENCRYPT_MODE,secretKey,iv);
                     UDPSessionService udpSessionService = new UDPSessionService(occ.server(),pendingData,encrypt);
                     udpSessionService.start();
                     serverPushEvent.eventService(udpSessionService);
-                    Cipher decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC7PADDING);
+                    Cipher decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
                     decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
                     serverPushEvent.cipher(decrypt);
                 }catch (Exception ex){
