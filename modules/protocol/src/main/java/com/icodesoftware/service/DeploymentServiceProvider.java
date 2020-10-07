@@ -3,9 +3,7 @@ package com.icodesoftware.service;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 
-
 import java.util.List;
-
 /**
  * Updated by yinghu lu on 5/30/2020
  */
@@ -14,7 +12,8 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
     String DEPLOY_DATA_STORE = "tarantula";
     String SERVER_KEY_SPEC = "AES";
-    String CIPHER_NAME = "AES/ECB/PKCS5PADDING";
+    String CIPHER_NAME_CBC_PKC5PADDING = "AES/CBC/PKCS5PADDING";
+    String CIPHER_NAME_CBC_PKC7PADDING = "AES/CBC/PKCS7PADDING";
     int KEY_SIZE = 16;
 
     String NAME = "DeploymentServiceProvider";

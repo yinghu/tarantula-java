@@ -8,12 +8,13 @@ import java.nio.ByteBuffer;
  */
 public class PendingInboundMessage {
 
+    public static int SEQ_SIZE = 48;
     public static int ACK_POS = 0;
     public static int TYPE_POS = 1;
     public static int MESSAGE_ID_POS = 5;
     public static int CONNECTION_ID_POS = 9;
     public static int SEQ_POS = 17;
-    public static int PAYLOAD_POS = 65;
+    public static int PAYLOAD_POS = SEQ_POS+SEQ_SIZE;//65;
 
     public final String serverId;
     private final ByteBuffer message;
@@ -40,7 +41,7 @@ public class PendingInboundMessage {
         return message.getLong(CONNECTION_ID_POS);
     }
     public byte[] sequence(){
-        byte[] seq = new byte[48];
+        byte[] seq = new byte[SEQ_SIZE];
         message.position(SEQ_POS);
         message.get(seq);
         return seq;

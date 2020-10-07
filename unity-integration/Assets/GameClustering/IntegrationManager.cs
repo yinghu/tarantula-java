@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -101,8 +100,6 @@ namespace GameClustering
                 {
                     Presence.ServerKey = (string)jo.SelectToken("serverKey");
                 }
-                var aes = Aes.Create();
-                
                 Debug.Log(response);
                 return true;
             }

@@ -12,6 +12,7 @@ import com.icodesoftware.util.HttpCaller;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -70,11 +71,12 @@ public class UDPService implements Runnable, Serviceable {
                 try{
                     PendingInboundMessage pendingInboundMessage = mQueue.poll();
                     if(pendingInboundMessage!=null){
-                        log.warn(new String(pendingInboundMessage.payload()));
-                        //ByteBuffer buffer = ByteBuffer.wrap(decrypt.doFinal(pendingInboundMessage.sequence()));
+                        //log.warn(new String(pendingInboundMessage.payload()));
+                        ByteBuffer buffer = ByteBuffer.wrap(decrypt.doFinal(pendingInboundMessage.payload()));
+                        log.warn(new String(buffer.array()));
                         //log.warn("SEQUENCE->"+buffer.getInt(0)+"//type->"+pendingInboundMessage.type());
-                        log.warn("ack->"+pendingInboundMessage.ack()+"//mid->"+pendingInboundMessage.messageId());
-                        log.warn("connectionId->"+pendingInboundMessage.connectionId()+"//"+pendingInboundMessage.source().toString());
+                        log.warn("ack->"+pendingInboundMessage.ack()+"->mid->"+pendingInboundMessage.messageId()+"->type->"+pendingInboundMessage.type());
+                        log.warn("connectionId->"+pendingInboundMessage.connectionId()+"<>"+pendingInboundMessage.source().toString());
                         PendingOutboundMessage outboundMessage = new PendingOutboundMessage();
                         outboundMessage.ack(true);
                         outboundMessage.connectionId(10);
@@ -108,11 +110,12 @@ public class UDPService implements Runnable, Serviceable {
             throw new RuntimeException(pc.get("message").getAsString());
         }
         byte[] key = Base64.getDecoder().decode(pc.get("serverKey").getAsString());
+        IvParameterSpec iv = new IvParameterSpec(key);
         SecretKey secretKey = new SecretKeySpec(key,DeploymentServiceProvider.SERVER_KEY_SPEC);
-        encrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME);
-        encrypt.init(Cipher.ENCRYPT_MODE,secretKey);
-        decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME);
-        decrypt.init(Cipher.DECRYPT_MODE,secretKey);
+        encrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC7PADDING);
+        encrypt.init(Cipher.ENCRYPT_MODE,secretKey,iv);
+        decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC7PADDING);
+        decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
     }
     public void shutdown() throws Exception{
         String[] headers = new String[]{

@@ -54,7 +54,7 @@ namespace GameClustering
         public void Sequence(byte[] sequence)
         {
             _memoryStream.Position = InboundMessage.SequencePos;
-            _memoryStream.Write(sequence,0,48);
+            _memoryStream.Write(sequence,0,sequence.Length);
         }
         
         public void Payload(byte[] payload)

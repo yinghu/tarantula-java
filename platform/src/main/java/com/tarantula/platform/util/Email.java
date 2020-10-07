@@ -3,9 +3,11 @@ package com.tarantula.platform.util;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
 import com.icodesoftware.service.DeploymentServiceProvider;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -13,38 +15,47 @@ import javax.mail.internet.MimeMessage;
 import java.nio.ByteBuffer;
 import java.security.Key;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Properties;
-
 public class Email {
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+    }
 
     public static void main(String[] args) throws Exception{
         //Email.send("yinghu_lu@hotmail.com","validation code: 4567");
         //SecretKey key = this.deploymentServiceProvider.serverKey();
+
         SecureRandom secureRandom = new SecureRandom();
         byte[] key = new byte[16];
+        //byte[] iv = new byte[16];
         secureRandom.nextBytes(key);
+        //secureRandom.nextBytes(iv);
         SecretKey skey = new SecretKeySpec(key, DeploymentServiceProvider.SERVER_KEY_SPEC);
-        Cipher cipher = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME);
-        cipher.init(Cipher.ENCRYPT_MODE,skey);
+        Cipher cipher = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC7PADDING,"BC");
+        cipher.init(Cipher.ENCRYPT_MODE,skey,new IvParameterSpec(key));
         PendingOutboundMessage out = new PendingOutboundMessage();
         out.ack(false);
         out.messageId(10);
-        out.connectionId(Long.MAX_VALUE);
+        out.connectionId(100);
         out.type(10);
         ByteBuffer buffer = ByteBuffer.allocate(32);
         buffer.putInt(789);
         byte[] ret = cipher.doFinal(buffer.array());
+        System.out.println(">>>"+ret.length);
         out.sequence(ret); //SEQ
         out.payload("TEST78889999999999999999999999999999999995".getBytes());
         PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("sid",out.message(),null);
         System.out.println("ACK->"+pendingInboundMessage.ack());
         System.out.println("TYPE->"+pendingInboundMessage.type());
         Key skey2 = new SecretKeySpec(key, DeploymentServiceProvider.SERVER_KEY_SPEC);
+        Cipher cipher1 = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC7PADDING,"BC");
+        System.out.println("block->"+cipher1.getBlockSize());
+        IvParameterSpec ivc = new IvParameterSpec(key);
+        cipher1.init(Cipher.DECRYPT_MODE,skey2,ivc);
 
-        cipher.init(Cipher.DECRYPT_MODE,skey2);
-
-        byte[] xret = cipher.doFinal(pendingInboundMessage.sequence());
-        System.out.println(xret.length);
+        byte[] xret = cipher1.doFinal(pendingInboundMessage.sequence());
+        System.out.println("MMMM-"+xret.length);
         ByteBuffer reb = ByteBuffer.allocate(32);
         reb.put(xret);
         System.out.println("SEQ->"+reb.getInt(0));

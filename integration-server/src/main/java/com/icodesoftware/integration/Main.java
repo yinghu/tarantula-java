@@ -4,14 +4,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.logging.TarantulaLogManager;
 import com.icodesoftware.integration.udp.UDPService;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.security.Security;
 
 public class Main {
     static {//set log manager
         System.setProperty("java.util.logging.manager","com.icodesoftware.logging.TarantulaLogManager");
+        Security.addProvider(new BouncyCastleProvider());
     }
     public static void main(String[] args) throws Exception{
         JsonParser jsonParser = new JsonParser();

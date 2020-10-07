@@ -37,7 +37,7 @@ public class ServerPushSimulator {
     public static void main(String[] args) throws Exception{
         datagramChannel = DatagramChannel.open();
         datagramChannel.bind(new InetSocketAddress(udpHost,16393));
-        cipher = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME);
+        cipher = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
         CountDownLatch ct = new CountDownLatch(1);
         Thread t = new Thread(()->{
             try {

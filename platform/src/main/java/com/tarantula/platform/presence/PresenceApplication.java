@@ -9,6 +9,8 @@ import com.tarantula.platform.*;
 
 import com.tarantula.platform.util.*;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
 
@@ -61,7 +63,9 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             pc.subscription = membership(pc.access.primary()?session.systemId():pc.access.owner());
             if(this.connection!=null){
                 pc.connection = this.connection;
-                pc.serverKey = Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(this.connection));
+                byte[] key = this.deploymentServiceProvider.serverKey(this.connection);
+                SecretKey secretKey = new SecretKeySpec(key,DeploymentServiceProvider.SERVER_KEY_SPEC);
+                pc.serverKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
             }
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
             //this.deploymentServiceProvider.onConnection()

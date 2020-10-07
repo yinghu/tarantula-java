@@ -1,6 +1,7 @@
 package com.tarantula.platform.bootstrap;
 
 import java.io.*;
+import java.security.Security;
 import java.util.Properties;
 
 import com.icodesoftware.TarantulaLogger;
@@ -9,6 +10,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.EndPoint;
 import com.tarantula.platform.service.cluster.ScopedMemberDiscovery;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class TarantulaMain {
 	static {
@@ -39,6 +41,7 @@ public class TarantulaMain {
 			if(!Validator.validate()){
 				throw new IllegalArgumentException("no license found");
 			}
+			Security.addProvider(new BouncyCastleProvider());
 			Properties _config = new Properties();
 			_config.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("tarantula-default.properties"));
 			Properties _user = new Properties();
