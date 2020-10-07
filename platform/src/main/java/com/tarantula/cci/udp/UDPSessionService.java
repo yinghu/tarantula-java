@@ -115,7 +115,7 @@ public class UDPSessionService implements ConnectionEventService {
             //label sequence/type
             String[] params = label.split(Recoverable.PATH_SEPARATOR);
             pendingOutboundMessage.type(Integer.parseInt(params[1]));
-            ByteBuffer seq = ByteBuffer.allocate(32);
+            ByteBuffer seq = ByteBuffer.allocate(4);
             seq.putInt(Integer.parseInt(params[0]));
             pendingOutboundMessage.sequence(encrypt.doFinal(seq.array()));
             pendingOutboundMessage.messageId(messageId.incrementAndGet());
