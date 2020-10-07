@@ -5,7 +5,7 @@ namespace GameClustering
 {
     public class InboundMessage
     {
-        public const int SequenceSize = 48;
+        public const int SequenceSize = 16;
         public const long AckPos = 0;
         public const long TypePos = 1;
         public const long MessageIdPos = 5;
