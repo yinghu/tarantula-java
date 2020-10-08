@@ -46,6 +46,7 @@ namespace GameClustering
             message.Sequence(EncryptSequence(sequence));
             message.Payload(payload);
             var outMessage = message.Message();
+            message.Close();
             var bytes = await _udpClient.SendAsync(outMessage,outMessage.Length); 
             return bytes>0;
         }
@@ -58,6 +59,7 @@ namespace GameClustering
                if(_handlers.TryGetValue(inboundMessage.Type(),out var handler)){
                    Debug.Log("sequence->"+DecryptSequence(inboundMessage.Sequence()));
                    handler.Invoke(inboundMessage);
+                   inboundMessage.Close();
                }
                else
                {

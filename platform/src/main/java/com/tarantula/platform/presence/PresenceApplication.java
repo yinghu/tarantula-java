@@ -61,14 +61,14 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             pc.access = user(session.systemId());
             pc.account = account(pc.access.primary()?session.systemId():pc.access.owner());
             pc.subscription = membership(pc.access.primary()?session.systemId():pc.access.owner());
-            if(this.connection!=null){
-                pc.connection = this.connection;
-                byte[] key = this.deploymentServiceProvider.serverKey(this.connection);
-                pc.serverKey = Base64.getEncoder().encodeToString(key);
-            }
+            //if(this.connection!=null){
+                //pc.connection = this.connection;
+                //byte[] key = this.deploymentServiceProvider.serverKey(this.connection);
+                //pc.serverKey = Base64.getEncoder().encodeToString(key);
+            //}
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
             //this.deploymentServiceProvider.onConnection()
-            this.context.postOffice().onConnection(connection.server()).send(connection.server().sequence()+"/"+12,"presence".getBytes());
+            //this.context.postOffice().onConnection(connection.server()).send(connection.server().sequence()+"/"+12,"presence".getBytes());
         }
         //public lobby access by page number
         else if(session.action().equals("onLobbyList")){
