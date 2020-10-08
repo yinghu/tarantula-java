@@ -102,8 +102,8 @@ public class UDPSessionService implements ConnectionEventService {
                 if(connection.secured()){
                     buffer.flip();
                     byte[] payload = new byte[buffer.limit()];
-                    buffer.get(payload);
-                    PendingInboundMessage pendingInboundMessage = new PendingInboundMessage(connection.serverId(),ByteBuffer.wrap(payload),sc);
+                    buffer.get(payload,0,payload.length);
+                    PendingInboundMessage pendingInboundMessage = new PendingInboundMessage(connection.serverId(),ByteBuffer.wrap(decrypt(payload)),sc);
                     if(pendingInboundMessage.ack()){
                         continue;
                     }

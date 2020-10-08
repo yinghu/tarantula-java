@@ -709,6 +709,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         secureRandom.nextBytes(key);
         //SecretKey secretKey = new SecretKeySpec(key, SERVER_KEY_SPEC);
         connection.server().connectionId(integrationCluster.sequence());
+        connection.connectionId(connection.server().connectionId());
         connection.server().sequence(secureRandom.nextInt());
         this.tarantulaContext.integrationCluster().set(connection.serverId().getBytes(),key);
         return key;
