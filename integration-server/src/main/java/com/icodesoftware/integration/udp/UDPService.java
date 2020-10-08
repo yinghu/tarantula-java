@@ -10,7 +10,9 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.HttpCaller;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -72,8 +74,7 @@ public class UDPService implements Runnable, Serviceable {
                     PendingInboundMessage pendingInboundMessage = mQueue.poll();
                     if(pendingInboundMessage!=null){
                         log.warn(new String(pendingInboundMessage.payload()));
-                        ByteBuffer buffer = ByteBuffer.wrap(decrypt.doFinal(pendingInboundMessage.sequence()));
-                        log.warn("SEQUENCE->"+buffer.getInt(0)+"//type->"+pendingInboundMessage.type());
+                        log.warn("SEQUENCE->"+decrypt(pendingInboundMessage.sequence())+"//type->"+pendingInboundMessage.type());
                         log.warn("ack->"+pendingInboundMessage.ack()+"->mid->"+pendingInboundMessage.messageId()+"->type->"+pendingInboundMessage.type());
                         log.warn("connectionId->"+pendingInboundMessage.connectionId()+"<>"+pendingInboundMessage.source().toString());
                         PendingOutboundMessage outboundMessage = new PendingOutboundMessage();
@@ -81,6 +82,7 @@ public class UDPService implements Runnable, Serviceable {
                         outboundMessage.connectionId(10);
                         outboundMessage.messageId(13);
                         outboundMessage.type(1);
+                        outboundMessage.sequence(encrypt(4));
                         outboundMessage.payload(pendingInboundMessage.payload());
                         this.datagramChannel.send(outboundMessage.message(),pendingInboundMessage.source());
                     }
@@ -124,5 +126,14 @@ public class UDPService implements Runnable, Serviceable {
         };
         httpCaller.get(config.getAsJsonObject(configHeader).get("path").getAsString(),headers);
         this.datagramChannel.close();
+    }
+    private byte[] encrypt(int sequence) throws IllegalBlockSizeException, BadPaddingException{
+        ByteBuffer buffer = ByteBuffer.allocate(4);
+        buffer.putInt(sequence);
+        return encrypt.doFinal(buffer.array());
+    }
+    private int decrypt(byte[] sequence) throws IllegalBlockSizeException, BadPaddingException{
+        ByteBuffer buffer = ByteBuffer.wrap(decrypt.doFinal(sequence));
+        return buffer.getInt(0);
     }
 }

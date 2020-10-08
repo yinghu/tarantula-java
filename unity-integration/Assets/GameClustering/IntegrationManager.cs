@@ -15,6 +15,7 @@ namespace GameClustering
         private HttpCaller _httpCaller;
         public IMessenger Messenger { private set; get; }
         private bool _live;
+        private string _deviceId;
         private static IntegrationManager _instance;
 
         public Presence Presence { get; private set; }
@@ -31,6 +32,7 @@ namespace GameClustering
         private void Bootstrap()
         {
             _httpCaller = new HttpCaller(gecHost);
+            _deviceId = SystemInfo.deviceUniqueIdentifier;
             Debug.Log("Started manager");
         }
 
@@ -55,7 +57,7 @@ namespace GameClustering
         
         public  async Task<bool> Device(MonoBehaviour caller){
             try{
-                var device = new Device{ DeviceId = "ABC1235"};
+                var device = new Device{ DeviceId = _deviceId};
                 var headers = new []
                 {
                     new Header{ Name = Header.TarantulaTag,Value = "index/user"},
@@ -79,13 +81,14 @@ namespace GameClustering
                             Port = (int)pc.SelectToken("port")
                         };
                         Messenger = new UdpMessenger();
-                        Messenger.Connect(_connection);
+                        Messenger.Connect(_connection,Convert.FromBase64String((string)jo.SelectToken("serverKey")));
                         _live = true;
                     }
                     Presence = new Presence
                     {
                         SystemId = (string)pt.SelectToken("systemId"),
                         Token = (string)pt.SelectToken("token"),
+                        Ticket = (string)pt.SelectToken("ticket"),
                         ServerKey = pc != null? (string)jo.SelectToken("serverKey"):null
                     };
                 }

@@ -4,6 +4,7 @@
     {
         public string SystemId { set; get; }
         public string Token { set; get; }
+        public string Ticket { set; get; }
         public string ServerKey { set; get; }
     }
 }
