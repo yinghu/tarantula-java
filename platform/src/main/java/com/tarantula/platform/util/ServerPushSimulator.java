@@ -46,18 +46,18 @@ public class ServerPushSimulator {
                 cipher.init(Cipher.DECRYPT_MODE,secretKey);
                 PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("2",buffer,sc);
                 //cipher.init(Cipher.DECRYPT_MODE,secretKey);
-                byte[] ret = cipher.doFinal(pendingInboundMessage.sequence());
-                ByteBuffer seq = ByteBuffer.wrap(ret);
-                System.out.println(sc.toString()+">>"+seq.getInt(0)+"<><><>"+pendingInboundMessage.ack()+"<><>>"+pendingInboundMessage.type()+"<><>"+new String(pendingInboundMessage.payload()).trim());
+                //byte[] ret = cipher.doFinal(pendingInboundMessage.sequence());
+                //ByteBuffer seq = ByteBuffer.wrap(ret);
+                //System.out.println(sc.toString()+">>"+seq.getInt(0)+"<><><>"+pendingInboundMessage.ack()+"<><>>"+pendingInboundMessage.type()+"<><>"+new String(pendingInboundMessage.payload()).trim());
                 PendingOutboundMessage msg = new PendingOutboundMessage();
                 msg.type(13);
                 msg.sequence(pendingInboundMessage.sequence());
                 msg.connectionId(3);
                 msg.payload("pop".getBytes());
-                datagramChannel.send(msg.message(),sc);
-                datagramChannel.send(msg.message(),sc);
-                datagramChannel.send(msg.message(),sc);
-                datagramChannel.send(msg.message(),sc);
+                //datagramChannel.send(msg.message(),sc);
+                //datagramChannel.send(msg.message(),sc);
+                //datagramChannel.send(msg.message(),sc);
+                //datagramChannel.send(msg.message(),sc);
 
             }catch (Exception ex){
                 ex.printStackTrace();

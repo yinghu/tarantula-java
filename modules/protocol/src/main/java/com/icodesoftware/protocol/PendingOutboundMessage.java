@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 public class PendingOutboundMessage {
     public static int MESSAGE_SIZE = 512;
     private ByteBuffer message;
+    private int payloadSize;
     public PendingOutboundMessage(){
         message = ByteBuffer.allocate(MESSAGE_SIZE);
     }
@@ -23,16 +24,18 @@ public class PendingOutboundMessage {
     public void connectionId(long connectionId){
         message.putLong(PendingInboundMessage.CONNECTION_ID_POS,connectionId);
     }
-    public void sequence(byte[] sequence){
-        message.position(PendingInboundMessage.SEQ_POS);
-        message.put(sequence);
+    public void sequence(int sequence){
+        message.putInt(PendingInboundMessage.SEQ_POS,sequence);
     }
     public void payload(byte[] payload){
         message.position(PendingInboundMessage.PAYLOAD_POS);
         message.put(payload);
+        payloadSize = payload.length;
     }
-    public ByteBuffer message(){
-        message.flip();
-        return this.message;
+    public byte[] message(){
+        byte[] payload = new byte[PendingInboundMessage.PAYLOAD_POS+payloadSize];
+        message.position(PendingInboundMessage.ACK_POS);
+        message.get(payload);
+        return payload;
     }
 }

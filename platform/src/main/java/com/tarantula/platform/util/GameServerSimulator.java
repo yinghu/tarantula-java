@@ -46,7 +46,7 @@ public class GameServerSimulator {
                     out.sequence(pendingInboundMessage.sequence());
                     out.payload("killer".getBytes());
                     out.connectionId(pendingInboundMessage.connectionId());
-                    datagramChannel.send(out.message(),sc);
+                    //datagramChannel.send(out.message(),sc);
                 }
 
             }catch (Exception ex){

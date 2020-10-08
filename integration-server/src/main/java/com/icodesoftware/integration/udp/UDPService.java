@@ -40,12 +40,14 @@ public class UDPService implements Runnable, Serviceable {
     private JsonObject config;
     private Cipher encrypt;
     private Cipher decrypt;
+    private boolean secured;
     public UDPService(JsonObject config){
         this.config = config;
         this.address = config.getAsJsonObject("connection").get("host").getAsString();
         this.port = config.getAsJsonObject("connection").get("port").getAsInt();;
         mQueue = new ConcurrentLinkedDeque<>();
         configHeader = config.get("tarantula").getAsString();
+        secured = config.getAsJsonObject("connection").get("secured").getAsBoolean();
         httpCaller = new HttpCaller(config.getAsJsonObject(configHeader).get("url").getAsString());
     }
     @Override
@@ -53,10 +55,21 @@ public class UDPService implements Runnable, Serviceable {
         log.warn("WAITING FOR MESSAGE ...");
         while (true){
             try{
-                ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE);
+                ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE*2);
                 SocketAddress src = this.datagramChannel.receive(buffer);
-                PendingInboundMessage inboundMessage = new PendingInboundMessage("",buffer,src);
-                mQueue.offer(inboundMessage);
+                if(secured){
+                    buffer.flip();
+                    byte[] data = new byte[buffer.limit()];
+                    log.warn("LIMIT->"+data.length);
+                    buffer.get(data,0,data.length);
+                    ByteBuffer _buffer = ByteBuffer.wrap(decrypt(data));
+                    PendingInboundMessage inboundMessage = new PendingInboundMessage("",_buffer,src);
+                    mQueue.offer(inboundMessage);
+                }
+                else{
+                    PendingInboundMessage inboundMessage = new PendingInboundMessage("",buffer,src);
+                    mQueue.offer(inboundMessage);
+                }
             }catch (Exception ex){
                 //ignore
                 ex.printStackTrace();
@@ -74,17 +87,21 @@ public class UDPService implements Runnable, Serviceable {
                     PendingInboundMessage pendingInboundMessage = mQueue.poll();
                     if(pendingInboundMessage!=null){
                         log.warn(new String(pendingInboundMessage.payload()));
-                        log.warn("SEQUENCE->"+decrypt(pendingInboundMessage.sequence())+"//type->"+pendingInboundMessage.type());
+                        log.warn("SEQUENCE->"+(pendingInboundMessage.sequence()+"//type->"+pendingInboundMessage.type()));
                         log.warn("ack->"+pendingInboundMessage.ack()+"->mid->"+pendingInboundMessage.messageId()+"->type->"+pendingInboundMessage.type());
                         log.warn("connectionId->"+pendingInboundMessage.connectionId()+"<>"+pendingInboundMessage.source().toString());
                         PendingOutboundMessage outboundMessage = new PendingOutboundMessage();
-                        outboundMessage.ack(true);
-                        outboundMessage.connectionId(10);
+                        outboundMessage.ack(false);
+                        outboundMessage.connectionId(pendingInboundMessage.connectionId());
                         outboundMessage.messageId(13);
                         outboundMessage.type(1);
-                        outboundMessage.sequence(encrypt(4));
+                        outboundMessage.sequence(4);
                         outboundMessage.payload(pendingInboundMessage.payload());
-                        this.datagramChannel.send(outboundMessage.message(),pendingInboundMessage.source());
+                        if(secured){
+                            this.datagramChannel.send(ByteBuffer.wrap(encrypt(outboundMessage.message())),pendingInboundMessage.source());
+                        }else{
+                            this.datagramChannel.send(ByteBuffer.wrap(outboundMessage.message()),pendingInboundMessage.source());
+                        }
                     }
                     else{
                         Thread.sleep(100);
@@ -127,13 +144,10 @@ public class UDPService implements Runnable, Serviceable {
         httpCaller.get(config.getAsJsonObject(configHeader).get("path").getAsString(),headers);
         this.datagramChannel.close();
     }
-    private byte[] encrypt(int sequence) throws IllegalBlockSizeException, BadPaddingException{
-        ByteBuffer buffer = ByteBuffer.allocate(4);
-        buffer.putInt(sequence);
-        return encrypt.doFinal(buffer.array());
+    private byte[] encrypt(byte[] data) throws IllegalBlockSizeException, BadPaddingException{
+        return encrypt.doFinal(data);
     }
-    private int decrypt(byte[] sequence) throws IllegalBlockSizeException, BadPaddingException{
-        ByteBuffer buffer = ByteBuffer.wrap(decrypt.doFinal(sequence));
-        return buffer.getInt(0);
+    private byte[] decrypt(byte[] data) throws IllegalBlockSizeException, BadPaddingException{
+        return decrypt.doFinal(data);
     }
 }

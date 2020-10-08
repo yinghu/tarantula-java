@@ -500,12 +500,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     SecretKey secretKey = new SecretKeySpec(key,DeploymentServiceProvider.SERVER_KEY_SPEC);
                     Cipher encrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
                     encrypt.init(Cipher.ENCRYPT_MODE,secretKey,iv);
-                    UDPSessionService udpSessionService = new UDPSessionService(occ.server(),pendingData,encrypt);
-                    udpSessionService.start();
-                    serverPushEvent.eventService(udpSessionService);
                     Cipher decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
                     decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
-                    serverPushEvent.cipher(decrypt);
+                    UDPSessionService udpSessionService = new UDPSessionService(occ.server(),pendingData,encrypt,decrypt);
+                    udpSessionService.start();
+                    serverPushEvent.eventService(udpSessionService);
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }

@@ -5,13 +5,13 @@ namespace GameClustering
 {
     public class InboundMessage
     {
-        public const int SequenceSize = 16;
+        //public const int SequenceSize = 16;
         public const long AckPos = 0;
         public const long TypePos = 1;
         public const long MessageIdPos = 5;
         public const long ConnectionIdPos = 9;
         public const long SequencePos = 17;
-        public const long PayloadPos = SequencePos+SequenceSize;
+        public const long PayloadPos = 21;//SequencePos+SequenceSize;
         
         private readonly MemoryStream _memoryStream;
         public InboundMessage(byte[] buffer)
@@ -49,12 +49,16 @@ namespace GameClustering
             return BitConverter.ToInt32(messageId, 0);
         }
 
-        public byte[] Sequence()
+        public int Sequence()
         {
             _memoryStream.Position = SequencePos;
-            var sequence = new byte[SequenceSize];
-            _memoryStream.Read(sequence, 0, SequenceSize);
-            return sequence;
+            var  sequence = new byte[4];
+            _memoryStream.Read(sequence, 0, 4);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(sequence);
+            }
+            return BitConverter.ToInt32(sequence, 0);
         }
 
         public long ConnectionId()

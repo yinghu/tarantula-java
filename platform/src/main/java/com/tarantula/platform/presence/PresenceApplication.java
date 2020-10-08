@@ -68,7 +68,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             //}
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
             //this.deploymentServiceProvider.onConnection()
-            //this.context.postOffice().onConnection(connection.server()).send(connection.server().sequence()+"/"+12,"presence".getBytes());
+            this.context.postOffice().onConnection(connection.server()).send(connection.server().sequence()+"/"+12,"presence".getBytes());
         }
         //public lobby access by page number
         else if(session.action().equals("onLobbyList")){

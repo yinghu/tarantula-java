@@ -43,9 +43,9 @@ namespace GameClustering
             message.Ack(ack);
             message.Type(type);
             message.MessageId(_messageId++);
-            message.Sequence(EncryptSequence(sequence));
+            message.Sequence(sequence);
             message.Payload(payload);
-            var outMessage = message.Message();
+            var outMessage = _connection.Secured?Encrypt(message.Message()):message.Message();
             message.Close();
             var bytes = await _udpClient.SendAsync(outMessage,outMessage.Length); 
             return bytes>0;
@@ -55,17 +55,16 @@ namespace GameClustering
             var ret = await _udpClient.ReceiveAsync();
             if (ret.Buffer.Length > 0)
             {
-               var inboundMessage = new InboundMessage(ret.Buffer);
-               if(_handlers.TryGetValue(inboundMessage.Type(),out var handler)){
-                   Debug.Log("sequence->"+DecryptSequence(inboundMessage.Sequence()));
+                var inboundMessage = new InboundMessage(_connection.Secured? Decrypt(ret.Buffer):ret.Buffer);
+                if(_handlers.TryGetValue(inboundMessage.Type(),out var handler)){
                    handler.Invoke(inboundMessage);
                    inboundMessage.Close();
-               }
-               else
-               {
+                }
+                else
+                {
                    Debug.Log("NO HANDLER REGISTERED->"+inboundMessage.Type());
-               }
-            }
+                }
+            }    
             else
             {
                 Debug.Log("NO MESSAGE");
@@ -82,34 +81,24 @@ namespace GameClustering
             _handlers.Remove(type);
         }
 
-        private byte[] EncryptSequence(int sequence)
+        private byte[] Encrypt(byte[] data)
         {
             using (var stream = new MemoryStream())
-            { 
-                var seq = BitConverter.GetBytes(sequence);
-                if (BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(seq);
-                }
+            {
                 var cryptStream = new CryptoStream(stream, _encrypt, CryptoStreamMode.Write);
-                cryptStream.Write(seq, 0, seq.Length);
+                cryptStream.Write(data, 0, data.Length);
                 cryptStream.FlushFinalBlock();
                 return stream.ToArray();
             }
         }
-        private int DecryptSequence(byte[] sequence)
+        private byte[] Decrypt(byte[] data)
         {
             using (var stream = new MemoryStream())
             {
                 var cryptStream = new CryptoStream(stream, _decrypt, CryptoStreamMode.Write);
-                cryptStream.Write(sequence, 0, sequence.Length);
+                cryptStream.Write(data, 0, data.Length);
                 cryptStream.FlushFinalBlock();
-                var seq = stream.ToArray();
-                if (BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(seq);
-                }
-                return BitConverter.ToInt32(seq, 0);
+                return stream.ToArray();
             }
         }
     }

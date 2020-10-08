@@ -6,7 +6,9 @@ import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
 import com.tarantula.platform.service.ConnectionEventService;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -25,11 +27,13 @@ public class UDPSessionService implements ConnectionEventService {
 
     private Thread receiver;
     private final Cipher encrypt;
+    private final Cipher decrypt;
     private final AtomicInteger messageId;
-    public UDPSessionService(Connection connection,ConcurrentLinkedDeque<PendingInboundMessage> pendingData,Cipher cipher){
+    public UDPSessionService(Connection connection,ConcurrentLinkedDeque<PendingInboundMessage> pendingData,Cipher encrypt,Cipher decrypt){
         this.connection = connection;
         this.pendingData = pendingData;
-        this.encrypt = cipher;
+        this.encrypt = encrypt;
+        this.decrypt = decrypt;
         messageId = new AtomicInteger(0);
     }
 
@@ -95,14 +99,26 @@ public class UDPSessionService implements ConnectionEventService {
             while (true){
                 ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE);
                 SocketAddress sc = datagramChannel.receive(buffer);
-                PendingInboundMessage pendingInboundMessage = new PendingInboundMessage(connection.serverId(),buffer,sc);
-                if(pendingInboundMessage.ack()){
-                    continue;
+                if(connection.secured()){
+                    buffer.flip();
+                    byte[] payload = new byte[buffer.limit()];
+                    buffer.get(payload);
+                    PendingInboundMessage pendingInboundMessage = new PendingInboundMessage(connection.serverId(),ByteBuffer.wrap(payload),sc);
+                    if(pendingInboundMessage.ack()){
+                        continue;
+                    }
+                    pendingData.offer(pendingInboundMessage);
                 }
-                pendingData.offer(pendingInboundMessage);
+                else{
+                    PendingInboundMessage pendingInboundMessage = new PendingInboundMessage(connection.serverId(),buffer,sc);
+                    if(pendingInboundMessage.ack()){
+                        continue;
+                    }
+                    pendingData.offer(pendingInboundMessage);
+                }
             }
         }catch (Exception ex){
-            //ex.printStackTrace();
+            ex.printStackTrace();
         }
     }
 
@@ -115,15 +131,19 @@ public class UDPSessionService implements ConnectionEventService {
             //label sequence/type
             String[] params = label.split(Recoverable.PATH_SEPARATOR);
             pendingOutboundMessage.type(Integer.parseInt(params[1]));
-            ByteBuffer seq = ByteBuffer.allocate(4);
-            seq.putInt(Integer.parseInt(params[0]));
-            pendingOutboundMessage.sequence(encrypt.doFinal(seq.array()));
+            pendingOutboundMessage.sequence(Integer.parseInt(params[0]));
             pendingOutboundMessage.messageId(messageId.incrementAndGet());
             pendingOutboundMessage.payload(payload);
-            ByteBuffer out = pendingOutboundMessage.message();
+            ByteBuffer out = connection.secured()?ByteBuffer.wrap(encrypt(pendingOutboundMessage.message())):ByteBuffer.wrap(pendingOutboundMessage.message());
             datagramChannel.write(out);
         }catch (Exception ex){
             ex.printStackTrace();
         }
+    }
+    private byte[] encrypt(byte[] data) throws IllegalBlockSizeException, BadPaddingException {
+        return encrypt.doFinal(data);
+    }
+    private byte[] decrypt(byte[] data) throws IllegalBlockSizeException, BadPaddingException{
+        return decrypt.doFinal(data);
     }
 }

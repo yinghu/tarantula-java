@@ -78,7 +78,8 @@ namespace GameClustering
                         {
                             Type =  (string)pc.SelectToken("type"),
                             Host = (string)pc.SelectToken("host"),
-                            Port = (int)pc.SelectToken("port")
+                            Port = (int)pc.SelectToken("port"),
+                            Secured = (bool)pc.SelectToken("secured")
                         };
                         Messenger = new UdpMessenger();
                         Messenger.Connect(_connection,Convert.FromBase64String((string)jo.SelectToken("serverKey")));
