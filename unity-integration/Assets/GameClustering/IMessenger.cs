@@ -1,13 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace GameClustering
 {
     public interface IMessenger
     {
         void Connect(Connection connection);
-        Task ReceiveAsync();
+        Task ListenAsync();
         Task<bool> SendAsync(OutboundMessage message);
-        void RegisterMessageHandler(int type,IMessageHandler messageHandler);
+        void RegisterMessageHandler(int type,Action<InboundMessage> messageHandler);
         void UnregisterMessageHandler(int type);
     }
 }

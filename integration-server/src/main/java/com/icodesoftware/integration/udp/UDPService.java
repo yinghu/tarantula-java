@@ -80,7 +80,7 @@ public class UDPService implements Runnable, Serviceable {
                         outboundMessage.ack(true);
                         outboundMessage.connectionId(10);
                         outboundMessage.messageId(13);
-                        outboundMessage.type(5);
+                        outboundMessage.type(1);
                         outboundMessage.payload(pendingInboundMessage.payload());
                         this.datagramChannel.send(outboundMessage.message(),pendingInboundMessage.source());
                     }

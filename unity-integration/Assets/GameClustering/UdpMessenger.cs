@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -8,16 +9,17 @@ namespace GameClustering
     public class UdpMessenger : IMessenger
     {
         private UdpClient _udpClient;
-        private readonly Dictionary<int, IMessageHandler> _handlers;
-
+        private readonly Dictionary<int, Action<InboundMessage>> _handlers;
+        private Connection _connection;
         public UdpMessenger()
         {
-            _handlers = new Dictionary<int, IMessageHandler>();
+            _handlers = new Dictionary<int, Action<InboundMessage>>();
         }
 
         public void Connect(Connection connection)
         {
-            _udpClient = new UdpClient(connection.Host,connection.Port);
+            _connection = connection;
+            _udpClient = new UdpClient(_connection.Host,_connection.Port);
         }
         
         public async Task<bool> SendAsync(OutboundMessage outboundMessage)
@@ -27,13 +29,17 @@ namespace GameClustering
             return bytes>0;
         }
         
-        public async Task ReceiveAsync(){
+        public async Task ListenAsync(){
             var ret = await _udpClient.ReceiveAsync();
             if (ret.Buffer.Length > 0)
             {
                var inboundMessage = new InboundMessage(ret.Buffer);
                if(_handlers.TryGetValue(inboundMessage.Type(),out var handler)){
-                   handler.Handle(inboundMessage);
+                   handler.Invoke(inboundMessage);
+               }
+               else
+               {
+                   Debug.Log("NO HANDLER REGISTERED->"+inboundMessage.Type());
                }
             }
             else
@@ -42,7 +48,7 @@ namespace GameClustering
             }
         }
 
-        public void RegisterMessageHandler(int type,IMessageHandler messageHandler)
+        public void RegisterMessageHandler(int type,Action<InboundMessage> messageHandler)
         {
             _handlers[type] = messageHandler;
         }

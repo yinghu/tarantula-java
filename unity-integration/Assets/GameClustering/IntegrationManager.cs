@@ -31,9 +31,6 @@ namespace GameClustering
         private void Bootstrap()
         {
             _httpCaller = new HttpCaller(gecHost);
-            //_udpCaller = new UdpCaller();
-            //_udpCaller.Connect("10.0.0.234",16393);
-            //_live = true;
             Debug.Log("Started manager");
         }
 
@@ -128,22 +125,20 @@ namespace GameClustering
                 return false;
             }
         }
-
-        public async Task<bool> OnUDPSocketMessage(){
+        
+        public async Task OnMessage(){
             try
             {
-                //do receive loop
                 while(_live)
                 {
-                    await Messenger.ReceiveAsync();
-                    //ParseInboundMessage(msg);
+                    await Messenger.ListenAsync();
                 }    
-                return false;
+                //return false;
             }
             catch(Exception ex)
             {
                 Debug.Log(ex.Message);
-                return false;
+                //return false;
             }   
         }
         

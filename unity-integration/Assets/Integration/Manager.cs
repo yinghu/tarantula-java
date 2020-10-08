@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using GameClustering;
 using UnityEngine;
 
@@ -25,8 +23,21 @@ namespace Integration
             }
             Debug.Log(integrationManager.Presence.SystemId);
             Debug.Log(integrationManager.Presence.Token);
-            //await integrationManager.Service(this);
-            //Debug.Log(integrationManager.Presence.ServerKey);
+            integrationManager.Messenger.RegisterMessageHandler(1, mg =>
+            {
+                Debug.Log("MESSAGE->"+mg.MessageId());
+                Debug.Log("CONNECTION->"+mg.ConnectionId());
+            });
+            await integrationManager.OnMessage();
+        }
+
+        private async void Update()
+        {
+        }
+
+        public async void SendAsync()
+        {
+            var integrationManager = IntegrationManager.Instance;
             var key = Convert.FromBase64String(integrationManager.Presence.ServerKey);
             var m = new MemoryStream(InboundMessage.SequenceSize);
             var seq = BitConverter.GetBytes(-798);
@@ -57,33 +68,6 @@ namespace Integration
             Debug.Log("m->"+seq1.Length);
             outboundMessage.Sequence(seq1);
             await integrationManager.Messenger.SendAsync(outboundMessage);
-            //var decrypt = rijAlg.CreateDecryptor(rijAlg.Key, key);
-            //var ret = decrypt.TransformFinalBlock(payload, 0, payload.Length);
-            //Debug.Log(Encoding.UTF8.GetString(ret));
-            //var mx = new MemoryStream(InboundMessage.SequenceSize);
-            //var cm = new CryptoStream(m,decrypt,CryptoStreamMode.Read);
-            //cm.Flush();
-            //cm.FlushFinalBlock();
-            //var ret = m.ToArray();
-            //if (BitConverter.IsLittleEndian)
-            //{
-                //Array.Reverse(ret);
-            //}
-            //Debug.Log("MK->"+BitConverter.ToInt32(ret,0));
-            //var inboundMessage = new InboundMessage(outboundMessage.Message());
-            //Debug.Log("ack->"+inboundMessage.Ack());
-            //Debug.Log("tid->"+inboundMessage.Type());
-            //Debug.Log("mid->"+inboundMessage.MessageId());
-            //Debug.Log("cid->"+inboundMessage.ConnectionId());
-            //Debug.Log("Payload->" + Encoding.UTF8.GetString(inboundMessage.Payload()));
-            //outboundMessage.Close();
-            //inboundMessage.Close();
-            //StartCoroutine(Send());
-            //await integrationManager.OnUDPSocketMessage();
-        }
-
-        private async void Update()
-        {
         }
     }
 }
