@@ -1,9 +1,10 @@
 ﻿using System;
 using System.IO;
+using UnityEngine;
 
 namespace GameClustering
 {
-    public class InboundMessage
+    public class InboundMessage : IDisposable
     {
         //public const int SequenceSize = 16;
         public const long AckPos = 0;
@@ -14,6 +15,7 @@ namespace GameClustering
         public const long PayloadPos = 21;//SequencePos+SequenceSize;
         
         private readonly MemoryStream _memoryStream;
+        private bool _disposed;
         public InboundMessage(byte[] buffer)
         {
             _memoryStream = new MemoryStream(buffer);
@@ -80,9 +82,21 @@ namespace GameClustering
             _memoryStream.Read(payload, 0, payload.Length);
             return payload;
         }
-        public void Close()
+
+        public void Dispose() => Dispose(true);
+        protected virtual void Dispose(bool disposing)
         {
-            _memoryStream.Close();
+            Debug.Log("release resource 1");
+            if (_disposed)
+            {
+                return;
+            }
+            if (disposing)
+            {
+                _memoryStream?.Dispose();
+            }
+            _disposed = true;
         }
+        ~InboundMessage() => Dispose(false);
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
-using GameClustering;
+﻿using GameClustering;
 using UnityEngine;
 
 namespace Integration
@@ -27,11 +23,12 @@ namespace Integration
             Debug.Log(_integrationManager.Presence.SystemId);
             Debug.Log(_integrationManager.Presence.Token);
             Debug.Log(_integrationManager.Presence.Ticket);
-            _integrationManager.Messenger.RegisterMessageHandler(1, mg =>
+            _integrationManager.Messenger.RegisterMessageHandler(1, buffer =>
             {
-                Debug.Log("MESSAGE ID->"+mg.MessageId());
-                Debug.Log("CONNECTION ID->"+mg.ConnectionId());
-                Debug.Log("PAYLOAD->"+Encoding.UTF8.GetString(mg.Payload()));
+                Debug.Log("point->" + buffer.GetFloat());
+                Debug.Log("str->" + buffer.GetUTFString());
+                Debug.Log("point->" + buffer.GetFloat());
+                Debug.Log("str->" + buffer.GetUTFString());
             });
             await _integrationManager.OnMessage();
         }
@@ -42,8 +39,14 @@ namespace Integration
 
         public async void SendAsync()
         {
-            var payload = Encoding.UTF8.GetBytes("Hello123456789");
-            await _integrationManager.Messenger.SendAsync(1,5,false,payload);
+            using (var buffer = new DataBuffer())
+            {
+                buffer.PutFloat(12.98f);
+                buffer.PutUTFString("Hello");
+                buffer.PutFloat(3.56f);
+                buffer.PutUTFString("pop");
+                await _integrationManager.Messenger.SendAsync(1, 5, false, buffer);
+            }
         }
     }
 }

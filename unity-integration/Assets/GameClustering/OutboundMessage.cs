@@ -1,13 +1,15 @@
 ﻿using System;
 using System.IO;
+using UnityEngine;
 
 namespace GameClustering
 {
-    public class OutboundMessage
+    public class OutboundMessage : IDisposable
     {
         public const int MessageSize = 512;
         
         private readonly MemoryStream _memoryStream;
+        private bool _disposed;
         private int _payloadSize;
         public OutboundMessage(){
             _memoryStream = new MemoryStream(new byte[MessageSize]);
@@ -76,9 +78,20 @@ namespace GameClustering
             _memoryStream.Read(payload, 0, payload.Length);
             return payload;
         }
-        public void Close()
+        public void Dispose() => Dispose(true);
+        protected virtual void Dispose(bool disposing)
         {
-            _memoryStream.Close();
+            Debug.Log("release resource 2");
+            if (_disposed)
+            {
+                return;
+            }
+            if (disposing)
+            {
+                _memoryStream?.Dispose();
+            }
+            _disposed = true;
         }
+        ~OutboundMessage() => Dispose(false);
     }
 }

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using UnityEngine;
 
 namespace GameClustering
 {
-    public class DataBuffer
+    public class DataBuffer : IDisposable
     {
         private readonly MemoryStream _memoryStream;
-        
+        private bool _disposed;
         public DataBuffer()
         {
             _memoryStream = new MemoryStream();
@@ -77,10 +78,20 @@ namespace GameClustering
             return _memoryStream.ToArray();
         }
 
-        public void Close()
+        public void Dispose() => Dispose(true);
+        protected virtual void Dispose(bool disposing)
         {
-            _memoryStream.Close();
+            Debug.Log("release resource 3");
+            if (_disposed)
+            {
+                return;
+            }
+            if (disposing)
+            {
+                _memoryStream?.Dispose();
+            }
+            _disposed = true;
         }
-
+        ~DataBuffer() => Dispose(false);
     }
 }

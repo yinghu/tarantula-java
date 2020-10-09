@@ -11,14 +11,14 @@ namespace GameClustering
     public class UdpMessenger : IMessenger
     {
         private UdpClient _udpClient;
-        private readonly Dictionary<int, Action<InboundMessage>> _handlers;
+        private readonly Dictionary<int, Action<DataBuffer>> _handlers;
         private Connection _connection;
         private ICryptoTransform _encrypt;
         private ICryptoTransform _decrypt;
         private int _messageId;
         public UdpMessenger()
         {
-            _handlers = new Dictionary<int, Action<InboundMessage>>();
+            _handlers = new Dictionary<int, Action<DataBuffer>>();
         }
 
         public void Connect(Connection connection,byte[] serverKey)
@@ -36,33 +36,39 @@ namespace GameClustering
             _udpClient = new UdpClient(_connection.Host,_connection.Port);
         }
         
-        public async Task<bool> SendAsync(int type,int sequence,bool ack,byte[] payload)
+        public async Task<bool> SendAsync(int type,int sequence,bool ack,DataBuffer payload)
         {
-            var message = new OutboundMessage();
-            message.ConnectionId(_connection.ConnectionId);
-            message.Ack(ack);
-            message.Type(type);
-            message.MessageId(_messageId++);
-            message.Sequence(sequence);
-            message.Payload(payload);
-            var outMessage = _connection.Secured?Encrypt(message.Message()):message.Message();
-            message.Close();
-            var bytes = await _udpClient.SendAsync(outMessage,outMessage.Length); 
-            return bytes>0;
+            using (var message = new OutboundMessage())
+            {
+                message.ConnectionId(_connection.ConnectionId);
+                message.Ack(ack);
+                message.Type(type);
+                message.MessageId(_messageId++);
+                message.Sequence(sequence);
+                message.Payload(payload.ToArray());
+                var outMessage = _connection.Secured ? Encrypt(message.Message()) : message.Message();
+                var bytes = await _udpClient.SendAsync(outMessage, outMessage.Length);
+                return bytes > 0;
+            }
         }
 
         public async Task ListenAsync(){
             var ret = await _udpClient.ReceiveAsync();
             if (ret.Buffer.Length > 0)
             {
-                var inboundMessage = new InboundMessage(_connection.Secured? Decrypt(ret.Buffer):ret.Buffer);
-                if(_handlers.TryGetValue(inboundMessage.Type(),out var handler)){
-                   handler.Invoke(inboundMessage);
-                   inboundMessage.Close();
-                }
-                else
+                using (var inboundMessage = new InboundMessage(_connection.Secured ? Decrypt(ret.Buffer) : ret.Buffer))
                 {
-                   Debug.Log("NO HANDLER REGISTERED->"+inboundMessage.Type());
+                    if (_handlers.TryGetValue(inboundMessage.Type(), out var handler))
+                    {
+                        using (var buffer = new DataBuffer(inboundMessage.Payload()))
+                        {
+                            handler.Invoke(buffer);    
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("NO HANDLER REGISTERED->" + inboundMessage.Type());
+                    }
                 }
             }    
             else
@@ -71,7 +77,7 @@ namespace GameClustering
             }
         }
 
-        public void RegisterMessageHandler(int type,Action<InboundMessage> messageHandler)
+        public void RegisterMessageHandler(int type,Action<DataBuffer> messageHandler)
         {
             _handlers[type] = messageHandler;
         }

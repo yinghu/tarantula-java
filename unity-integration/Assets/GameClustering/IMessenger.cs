@@ -7,8 +7,8 @@ namespace GameClustering
     {
         void Connect(Connection connection,byte[] key);
         Task ListenAsync();
-        Task<bool> SendAsync(int type,int sequence,bool ack,byte[] payload);
-        void RegisterMessageHandler(int type,Action<InboundMessage> messageHandler);
+        Task<bool> SendAsync(int type,int sequence,bool ack,DataBuffer payload);
+        void RegisterMessageHandler(int type,Action<DataBuffer> messageHandler);
         void UnregisterMessageHandler(int type);
     }
 }
