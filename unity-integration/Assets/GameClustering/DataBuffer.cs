@@ -9,16 +9,30 @@ namespace GameClustering
     {
         private readonly MemoryStream _memoryStream;
         private bool _disposed;
+        private readonly bool _writeMode;
         public DataBuffer()
         {
             _memoryStream = new MemoryStream();
+            _writeMode = true;
         }
         public DataBuffer(byte[] data)
         {
             _memoryStream = new MemoryStream(data);
         }
+
+        public void PutVector3(Vector3 vector3)
+        {
+            CheckMode();
+        }
+
+        public Vector3 GetVector3()
+        {
+            return new Vector3();
+        }
+
         public void PutByte(byte b)
         {
+            CheckMode();
             _memoryStream.WriteByte(b);
         }
         public byte GetByte()
@@ -28,6 +42,7 @@ namespace GameClustering
 
         public void PutFloat(float f)
         {
+            CheckMode();
             var bytes = BitConverter.GetBytes(f);
             if (BitConverter.IsLittleEndian)
             {
@@ -49,6 +64,7 @@ namespace GameClustering
 
         public void PutUTFString(string utf)
         {
+            CheckMode();
             var str = Encoding.UTF8.GetBytes(utf);
             var bytes = BitConverter.GetBytes(str.Length);
             if (BitConverter.IsLittleEndian)
@@ -76,6 +92,14 @@ namespace GameClustering
         public byte[] ToArray()
         {
             return _memoryStream.ToArray();
+        }
+
+        private void CheckMode()
+        {
+            if (!_writeMode)
+            {
+                throw new InvalidOperationException("write operation not allowed in read mode");
+            }
         }
 
         public void Dispose() => Dispose(true);
