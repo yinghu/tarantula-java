@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\GameClustering\Connection.cs" />
+     <Compile Include="Assets\GameClustering\DataBuffer.cs" />
      <Compile Include="Assets\GameClustering\Device.cs" />
      <Compile Include="Assets\GameClustering\Header.cs" />
      <Compile Include="Assets\GameClustering\HttpCaller.cs" />

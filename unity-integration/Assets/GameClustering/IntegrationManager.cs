@@ -72,6 +72,12 @@ namespace GameClustering
                 {
                     var pt = jo.SelectToken("presence");
                     var pc = jo.SelectToken("connection");
+                    Presence = new Presence
+                    {
+                        SystemId = (string)pt.SelectToken("systemId"),
+                        Token = (string)pt.SelectToken("token"),
+                        Ticket = (string)pt.SelectToken("ticket"),
+                    };
                     if (pc != null)
                     {
                         _connection = new Connection
@@ -85,16 +91,9 @@ namespace GameClustering
                         Messenger.Connect(_connection,Convert.FromBase64String((string)jo.SelectToken("serverKey")));
                         _live = true;
                     }
-                    Presence = new Presence
-                    {
-                        SystemId = (string)pt.SelectToken("systemId"),
-                        Token = (string)pt.SelectToken("token"),
-                        Ticket = (string)pt.SelectToken("ticket"),
-                        ServerKey = pc != null? (string)jo.SelectToken("serverKey"):null
-                    };
                 }
                 Debug.Log(response);
-                return true;
+                return suc;
             }
             catch(Exception ex)
             {
@@ -116,12 +115,8 @@ namespace GameClustering
                 var response = await _httpCaller.GetJson(caller, "/service/action", headers);
                 var jo = JObject.Parse(response);
                 var suc = (bool)jo.SelectToken("successful");
-                if (suc)
-                {
-                    Presence.ServerKey = (string)jo.SelectToken("serverKey");
-                }
                 Debug.Log(response);
-                return true;
+                return suc;
             }
             catch (Exception ex)
             {

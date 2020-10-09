@@ -91,11 +91,11 @@ public class UDPService implements Runnable, Serviceable {
                         log.warn("ack->"+pendingInboundMessage.ack()+"->mid->"+pendingInboundMessage.messageId()+"->type->"+pendingInboundMessage.type());
                         log.warn("connectionId->"+pendingInboundMessage.connectionId()+"<>"+pendingInboundMessage.source().toString());
                         PendingOutboundMessage outboundMessage = new PendingOutboundMessage();
-                        outboundMessage.ack(false);
+                        outboundMessage.ack(pendingInboundMessage.ack());
                         outboundMessage.connectionId(pendingInboundMessage.connectionId());
-                        outboundMessage.messageId(13);
-                        outboundMessage.type(1);
-                        outboundMessage.sequence(4);
+                        outboundMessage.messageId(pendingInboundMessage.messageId());
+                        outboundMessage.type(pendingInboundMessage.type());
+                        outboundMessage.sequence(pendingInboundMessage.sequence());
                         outboundMessage.payload(pendingInboundMessage.payload());
                         if(secured){
                             this.datagramChannel.send(ByteBuffer.wrap(encrypt(outboundMessage.message())),pendingInboundMessage.source());
