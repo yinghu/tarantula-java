@@ -6,6 +6,9 @@ namespace Integration
     public class Manager : MonoBehaviour
     {
         private IntegrationManager _integrationManager;
+        private  float _smooth = 5.0f;
+        private  float _tiltAngle = 60.0f;
+       
         private async void Start()
         {
             _integrationManager = IntegrationManager.Instance;
@@ -29,12 +32,23 @@ namespace Integration
                 Debug.Log("str->" + buffer.GetUTFString());
                 Debug.Log("point->" + buffer.GetFloat());
                 Debug.Log("str->" + buffer.GetUTFString());
+                var v = buffer.GetVector3();
+                Debug.Log("X:"+v.x);
+                Debug.Log("Y:"+v.y);
+                Debug.Log("Z:"+v.z);
             });
             await _integrationManager.OnMessage();
         }
 
-        private void Update()
+        private async void Update()
         {
+            var tiltAroundZ = Input.GetAxis("Horizontal") * _tiltAngle;
+            var tiltAroundX = Input.GetAxis("Vertical") * _tiltAngle;
+
+            // Rotate the cube by converting the angles into a quaternion.
+            var target = Quaternion.Euler(tiltAroundX, 0, tiltAroundZ);
+            var updates = Quaternion.Slerp(transform.rotation, target,  Time.deltaTime * _smooth);
+            //await   _integrationManager.Messenger.SendAsync()
         }
 
         public async void SendAsync()
@@ -45,6 +59,7 @@ namespace Integration
                 buffer.PutUTFString("Hello");
                 buffer.PutFloat(3.56f);
                 buffer.PutUTFString("pop");
+                buffer.PutVector3(transform.position);
                 await _integrationManager.Messenger.SendAsync(1, 5, false, buffer);
             }
         }

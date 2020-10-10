@@ -23,11 +23,39 @@ namespace GameClustering
         public void PutVector3(Vector3 vector3)
         {
             CheckMode();
+            WriteFloat(vector3.x);
+            WriteFloat(vector3.y);
+            WriteFloat(vector3.z);
         }
 
         public Vector3 GetVector3()
         {
-            return new Vector3();
+            return new Vector3
+            {
+                x = GetFloat(),
+                y = GetFloat(),
+                z = GetFloat()
+            };
+        }
+
+        public void PutQuaternion(Quaternion quaternion)
+        {
+            CheckMode();
+            WriteFloat(quaternion.w);
+            WriteFloat(quaternion.x);
+            WriteFloat(quaternion.y);
+            WriteFloat(quaternion.z);
+        }
+
+        public Quaternion GetQuaternion()
+        {
+            return new Quaternion
+            {
+                w = GetFloat(),
+                x = GetFloat(),
+                y = GetFloat(),
+                z = GetFloat() 
+            };
         }
 
         public void PutByte(byte b)
@@ -43,12 +71,7 @@ namespace GameClustering
         public void PutFloat(float f)
         {
             CheckMode();
-            var bytes = BitConverter.GetBytes(f);
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes);
-            }
-            _memoryStream.Write(bytes,0,4);
+            WriteFloat(f);
         }
 
         public float GetFloat()
@@ -88,10 +111,20 @@ namespace GameClustering
             _memoryStream.Read(str, 0, sz);
             return Encoding.UTF8.GetString(str);
         }
-
+        
         public byte[] ToArray()
         {
             return _memoryStream.ToArray();
+        }
+
+        private void WriteFloat(float f)
+        {
+            var bytes = BitConverter.GetBytes(f);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
+            _memoryStream.Write(bytes,0,4);
         }
 
         private void CheckMode()
