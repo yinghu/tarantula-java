@@ -19,13 +19,27 @@ namespace GameClustering
         {
             _memoryStream = new MemoryStream(data);
         }
+        public void PutVector2(Vector2 vector2)
+        {
+            CheckMode();
+            WritePrimitiveBytes(BitConverter.GetBytes(vector2.x));
+            WritePrimitiveBytes(BitConverter.GetBytes(vector2.y));
+        }
 
+        public Vector2 GetVector2()
+        {
+            return new Vector2
+            {
+                x = GetFloat(),
+                y = GetFloat()
+            };
+        }
         public void PutVector3(Vector3 vector3)
         {
             CheckMode();
-            WriteFloat(vector3.x);
-            WriteFloat(vector3.y);
-            WriteFloat(vector3.z);
+            WritePrimitiveBytes(BitConverter.GetBytes(vector3.x));
+            WritePrimitiveBytes(BitConverter.GetBytes(vector3.y));
+            WritePrimitiveBytes(BitConverter.GetBytes(vector3.z));
         }
 
         public Vector3 GetVector3()
@@ -38,15 +52,26 @@ namespace GameClustering
             };
         }
 
-        public void PutQuaternion(Quaternion quaternion)
+        public void PutVector4(Vector4 vector4)
         {
             CheckMode();
-            WriteFloat(quaternion.w);
-            WriteFloat(quaternion.x);
-            WriteFloat(quaternion.y);
-            WriteFloat(quaternion.z);
+            WritePrimitiveBytes(BitConverter.GetBytes(vector4.w));
+            WritePrimitiveBytes(BitConverter.GetBytes(vector4.x));
+            WritePrimitiveBytes(BitConverter.GetBytes(vector4.y));
+            WritePrimitiveBytes(BitConverter.GetBytes(vector4.z));
         }
 
+        public Vector4 GetVector4()
+        {
+            return new Vector4
+            {
+                w = GetFloat(),
+                x = GetFloat(),
+                y = GetFloat(),
+                z = GetFloat() 
+            };
+        }
+        
         public Quaternion GetQuaternion()
         {
             return new Quaternion
@@ -57,7 +82,33 @@ namespace GameClustering
                 z = GetFloat() 
             };
         }
+        public void PutQuaternion(Quaternion quaternion)
+        {
+            CheckMode();
+            WritePrimitiveBytes(BitConverter.GetBytes(quaternion.w));
+            WritePrimitiveBytes(BitConverter.GetBytes(quaternion.x));
+            WritePrimitiveBytes(BitConverter.GetBytes(quaternion.y));
+            WritePrimitiveBytes(BitConverter.GetBytes(quaternion.z));
+        }
 
+        public void PutColor(Color color)
+        {
+            CheckMode();
+            WritePrimitiveBytes(BitConverter.GetBytes(color.r));
+            WritePrimitiveBytes(BitConverter.GetBytes(color.g));
+            WritePrimitiveBytes(BitConverter.GetBytes(color.b));
+            WritePrimitiveBytes(BitConverter.GetBytes(color.a));
+        }
+        public Color GetColor()
+        {
+            return new Color
+            {
+                r = GetFloat(),
+                g = GetFloat(),
+                b = GetFloat(),
+                a = GetFloat() 
+            };
+        }
         public void PutByte(byte b)
         {
             CheckMode();
@@ -67,11 +118,26 @@ namespace GameClustering
         {
             return (byte) _memoryStream.ReadByte();
         }
+        public void PutInt(int i)
+        {
+            CheckMode();
+            WritePrimitiveBytes(BitConverter.GetBytes(i));
+        }
 
+        public int GetInt()
+        {
+            var bytes = new byte[4];
+            _memoryStream.Read(bytes, 0, 4);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
+            return BitConverter.ToInt32(bytes, 0);
+        }
         public void PutFloat(float f)
         {
             CheckMode();
-            WriteFloat(f);
+            WritePrimitiveBytes(BitConverter.GetBytes(f));
         }
 
         public float GetFloat()
@@ -85,7 +151,7 @@ namespace GameClustering
             return BitConverter.ToSingle(bytes, 0);
         }
 
-        public void PutUTFString(string utf)
+        public void PutUTF8String(string utf)
         {
             CheckMode();
             var str = Encoding.UTF8.GetBytes(utf);
@@ -97,7 +163,7 @@ namespace GameClustering
             _memoryStream.Write(bytes,0,4);
             _memoryStream.Write(str,0,str.Length);
         }
-        public string GetUTFString()
+        public string GetUTF8String()
         {
             var bytes = new byte[4];
             _memoryStream.Read(bytes, 0, 4);
@@ -117,14 +183,13 @@ namespace GameClustering
             return _memoryStream.ToArray();
         }
 
-        private void WriteFloat(float f)
+        private void WritePrimitiveBytes(byte[] bytes)
         {
-            var bytes = BitConverter.GetBytes(f);
             if (BitConverter.IsLittleEndian)
             {
                 Array.Reverse(bytes);
             }
-            _memoryStream.Write(bytes,0,4);
+            _memoryStream.Write(bytes,0,bytes.Length);
         }
 
         private void CheckMode()
