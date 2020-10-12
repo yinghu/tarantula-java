@@ -4,6 +4,7 @@ import com.google.gson.JsonParser;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
 import com.icodesoftware.service.DeploymentServiceProvider;
@@ -22,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,6 +36,7 @@ public class UDPService implements Runnable, Serviceable {
     private final String address;
     private final int port;
     private final ConcurrentLinkedDeque<PendingInboundMessage> mQueue;
+    private final ConcurrentHashMap<Integer, MessageHandler> mHandlers;
     private ExecutorService executorService;
     private HttpCaller httpCaller;
     private String configHeader;
@@ -46,6 +49,7 @@ public class UDPService implements Runnable, Serviceable {
         this.address = config.getAsJsonObject("connection").get("host").getAsString();
         this.port = config.getAsJsonObject("connection").get("port").getAsInt();;
         mQueue = new ConcurrentLinkedDeque<>();
+        mHandlers = new ConcurrentHashMap<>();
         configHeader = config.get("tarantula").getAsString();
         secured = config.getAsJsonObject("connection").get("secured").getAsBoolean();
         httpCaller = new HttpCaller(config.getAsJsonObject(configHeader).get("url").getAsString());
@@ -60,7 +64,6 @@ public class UDPService implements Runnable, Serviceable {
                 if(secured){
                     buffer.flip();
                     byte[] data = new byte[buffer.limit()];
-                    log.warn("LIMIT->"+data.length);
                     buffer.get(data,0,data.length);
                     ByteBuffer _buffer = ByteBuffer.wrap(decrypt(data));
                     PendingInboundMessage inboundMessage = new PendingInboundMessage("",_buffer,src);
@@ -86,21 +89,23 @@ public class UDPService implements Runnable, Serviceable {
                 try{
                     PendingInboundMessage pendingInboundMessage = mQueue.poll();
                     if(pendingInboundMessage!=null){
-                        log.warn(new String(pendingInboundMessage.payload()));
-                        log.warn("SEQUENCE->"+(pendingInboundMessage.sequence()+"//type->"+pendingInboundMessage.type()));
-                        log.warn("ack->"+pendingInboundMessage.ack()+"->mid->"+pendingInboundMessage.messageId()+"->type->"+pendingInboundMessage.type());
-                        log.warn("connectionId->"+pendingInboundMessage.connectionId()+"<>"+pendingInboundMessage.source().toString());
-                        PendingOutboundMessage outboundMessage = new PendingOutboundMessage();
-                        outboundMessage.ack(pendingInboundMessage.ack());
-                        outboundMessage.connectionId(pendingInboundMessage.connectionId());
-                        outboundMessage.messageId(pendingInboundMessage.messageId());
-                        outboundMessage.type(pendingInboundMessage.type());
-                        outboundMessage.sequence(pendingInboundMessage.sequence());
-                        outboundMessage.payload(pendingInboundMessage.payload());
-                        if(secured){
-                            this.datagramChannel.send(ByteBuffer.wrap(encrypt(outboundMessage.message())),pendingInboundMessage.source());
-                        }else{
-                            this.datagramChannel.send(ByteBuffer.wrap(outboundMessage.message()),pendingInboundMessage.source());
+                        MessageHandler messageHandler = mHandlers.get(pendingInboundMessage.type());
+                        if(messageHandler!=null){
+                            messageHandler.onMessage(pendingInboundMessage);
+                        }
+                        else{//disconnect on no handler available
+                            PendingOutboundMessage outboundMessage = new PendingOutboundMessage();
+                            outboundMessage.ack(pendingInboundMessage.ack());
+                            outboundMessage.connectionId(pendingInboundMessage.connectionId());
+                            outboundMessage.messageId(pendingInboundMessage.messageId());
+                            outboundMessage.type(pendingInboundMessage.type());
+                            outboundMessage.sequence(pendingInboundMessage.sequence());
+                            outboundMessage.payload(pendingInboundMessage.payload());
+                            if(secured){
+                                this.datagramChannel.send(ByteBuffer.wrap(encrypt(outboundMessage.message())),pendingInboundMessage.source());
+                            }else{
+                                this.datagramChannel.send(ByteBuffer.wrap(outboundMessage.message()),pendingInboundMessage.source());
+                            }
                         }
                     }
                     else{

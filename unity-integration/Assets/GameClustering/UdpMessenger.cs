@@ -11,14 +11,14 @@ namespace GameClustering
     public class UdpMessenger : IMessenger
     {
         private UdpClient _udpClient;
-        private readonly Dictionary<int, Action<DataBuffer>> _handlers;
+        private readonly Dictionary<CallbackKey, Action<DataBuffer>> _handlers;
         private Connection _connection;
         private ICryptoTransform _encrypt;
         private ICryptoTransform _decrypt;
         private int _messageId;
         public UdpMessenger()
         {
-            _handlers = new Dictionary<int, Action<DataBuffer>>();
+            _handlers = new Dictionary<CallbackKey, Action<DataBuffer>>();
         }
 
         public void Connect(Connection connection,byte[] serverKey)
@@ -58,7 +58,8 @@ namespace GameClustering
             {
                 using (var inboundMessage = new InboundMessage(_connection.Secured ? Decrypt(ret.Buffer) : ret.Buffer))
                 {
-                    if (_handlers.TryGetValue(inboundMessage.Type(), out var handler))
+                    var callbackKey = new CallbackKey(inboundMessage.Type(),inboundMessage.Sequence());
+                    if (_handlers.TryGetValue(callbackKey, out var handler))
                     {
                         using (var buffer = new DataBuffer(inboundMessage.Payload()))
                         {
@@ -67,24 +68,24 @@ namespace GameClustering
                     }
                     else
                     {
-                        Debug.Log("NO HANDLER REGISTERED->" + inboundMessage.Type());
+                        Debug.Log("NO HANDLER REGISTERED->" + inboundMessage.Type()+"/"+inboundMessage.Sequence());
                     }
                 }
             }    
             else
             {
-                Debug.Log("NO MESSAGE");
+                Debug.Log("NO INBOUND MESSAGE");
             }
         }
 
-        public void RegisterMessageHandler(int type,Action<DataBuffer> messageHandler)
+        public void RegisterMessageHandler(int type,int sequence,Action<DataBuffer> messageHandler)
         {
-            _handlers[type] = messageHandler;
+            _handlers[new CallbackKey(type,sequence)] = messageHandler;
         }
         
-        public void UnregisterMessageHandler(int type)
+        public void UnregisterMessageHandler(int type,int sequence)
         {
-            _handlers.Remove(type);
+            _handlers.Remove(new CallbackKey(type,sequence));
         }
 
         private byte[] Encrypt(byte[] data)
