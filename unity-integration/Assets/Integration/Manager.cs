@@ -1,12 +1,31 @@
 ﻿using GameClustering;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Integration
 {
     public class Manager : MonoBehaviour
     {
         private IntegrationManager _integrationManager;
-       
+        public GameObject bPlay;
+        public GameObject bExit;
+        private static bool _created;
+
+        private void Awake()
+        {
+            DontDestroyOnLoad(gameObject);
+            if (_created)
+            { 
+                Destroy(gameObject);
+            }
+            else
+            {
+                _created = true;
+            }
+            bPlay.SetActive(true);
+            bExit.SetActive(false);
+        }
+
         private async void Start()
         {
             _integrationManager = IntegrationManager.Instance;
@@ -26,18 +45,17 @@ namespace Integration
             await _integrationManager.OnMessage();
         }
         
-        public async void SendAsync()
+        public  void Play()
         {
-            using (var buffer = new DataBuffer())
-            {
-                buffer.PutFloat(12.98f);
-                buffer.PutUTF8String("Hello");
-                buffer.PutFloat(3.56f);
-                buffer.PutUTF8String("pop");
-                buffer.PutVector3(transform.position);
-                await _integrationManager.Messenger.SendAsync(1, 1, false, buffer);
-                await _integrationManager.Messenger.SendAsync(1, 2, false, buffer);
-            }
+            SceneManager.LoadScene("GamePlay");
+            bPlay.SetActive(false);
+            bExit.SetActive(true);
+        }
+        public  void Exit()
+        {
+            SceneManager.LoadScene("Main");
+            bExit.SetActive(false);
+            bPlay.SetActive(true);
         }
     }
 }

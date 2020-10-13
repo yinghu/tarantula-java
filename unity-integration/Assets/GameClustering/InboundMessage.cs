@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using UnityEngine;
 
 namespace GameClustering
 {
@@ -86,7 +85,6 @@ namespace GameClustering
         public void Dispose() => Dispose(true);
         protected virtual void Dispose(bool disposing)
         {
-            Debug.Log("release resource 1");
             if (_disposed)
             {
                 return;

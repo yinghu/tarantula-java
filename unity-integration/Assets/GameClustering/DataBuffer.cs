@@ -203,7 +203,6 @@ namespace GameClustering
         public void Dispose() => Dispose(true);
         protected virtual void Dispose(bool disposing)
         {
-            Debug.Log("release resource 3");
             if (_disposed)
             {
                 return;
