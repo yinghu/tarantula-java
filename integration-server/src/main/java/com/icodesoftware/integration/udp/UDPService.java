@@ -94,6 +94,7 @@ public class UDPService implements Runnable, Serviceable {
                             messageHandler.onMessage(pendingInboundMessage);
                         }
                         else{//disconnect on no handler available
+                            log.warn("message->"+pendingInboundMessage.type()+"/"+pendingInboundMessage.sequence());
                             PendingOutboundMessage outboundMessage = new PendingOutboundMessage();
                             outboundMessage.ack(pendingInboundMessage.ack());
                             outboundMessage.connectionId(pendingInboundMessage.connectionId());

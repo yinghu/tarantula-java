@@ -12,7 +12,7 @@ namespace Integration
         {
             IntegrationManager.Instance.Messenger.RegisterMessageHandler(1,sequence, (buffer) =>
             {
-                _enabled = !enabled;
+                _enabled = !_enabled;
                 Debug.Log("CallId ->"+buffer.GetInt()+"//"+_enabled);
             });
         }
