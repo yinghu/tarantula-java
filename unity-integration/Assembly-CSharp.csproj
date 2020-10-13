@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\GameClustering\CallbackKey.cs" />
+     <Compile Include="Assets\GameClustering\ClusteringObject.cs" />
      <Compile Include="Assets\GameClustering\Connection.cs" />
      <Compile Include="Assets\GameClustering\DataBuffer.cs" />
      <Compile Include="Assets\GameClustering\Device.cs" />
@@ -70,6 +71,7 @@
      <Compile Include="Assets\GameClustering\OutboundMessage.cs" />
      <Compile Include="Assets\GameClustering\Presence.cs" />
      <Compile Include="Assets\GameClustering\UdpMessenger.cs" />
+     <Compile Include="Assets\Integration\CubeRun.cs" />
      <Compile Include="Assets\Integration\Manager.cs" />
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>C:/development/gameenginecluster/unity-integration/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>

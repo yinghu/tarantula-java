@@ -1,0 +1,24 @@
+﻿using GameClustering;
+using UnityEngine;
+
+namespace Integration
+{
+    public class CubeRun : MonoBehaviour
+    {
+        public int sequence;
+        private bool _enabled;
+
+        private void Start()
+        {
+            IntegrationManager.Instance.Messenger.RegisterMessageHandler(1,sequence, (buffer) =>
+            {
+                _enabled = !enabled;
+            });
+        }
+
+        private void Update()
+        {
+            if (_enabled) transform.Rotate(0,3,0);
+        }
+    }
+}
