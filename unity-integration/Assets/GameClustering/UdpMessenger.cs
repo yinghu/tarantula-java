@@ -24,15 +24,19 @@ namespace GameClustering
         public void Connect(Connection connection,byte[] serverKey)
         {
             _connection = connection;
-            var rijAlg = new RijndaelManaged()
+            if (_connection.Secured)
             {
-                Key = serverKey,
-                Padding = PaddingMode.PKCS7,
-                Mode = CipherMode.CBC,
-                IV = serverKey
-            };
-            _encrypt = rijAlg.CreateEncryptor();
-            _decrypt = rijAlg.CreateDecryptor();
+                var rijAlg = new RijndaelManaged()
+                {
+                    Key = serverKey,
+                    Padding = PaddingMode.PKCS7,
+                    Mode = CipherMode.CBC,
+                    IV = serverKey
+                };
+                _encrypt = rijAlg.CreateEncryptor();
+                _decrypt = rijAlg.CreateDecryptor();
+            }
+
             _udpClient = new UdpClient(_connection.Host,_connection.Port);
         }
         

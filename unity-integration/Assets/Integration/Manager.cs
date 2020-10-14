@@ -1,6 +1,8 @@
 ﻿using GameClustering;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 
 namespace Integration
 {
@@ -9,6 +11,7 @@ namespace Integration
         private IntegrationManager _integrationManager;
         public GameObject bPlay;
         public GameObject bExit;
+        public TMP_Text bText;
         private static bool _created;
 
         private void Awake()
@@ -31,17 +34,20 @@ namespace Integration
             _integrationManager = IntegrationManager.Instance;
             if (!await _integrationManager.Index(this))
             {
-                Debug.Log("INDEX FAILED");    
+                Debug.Log("INDEX FAILED"); 
+                bText.text = _integrationManager.Exception.Message;
             }
 
             if (!await _integrationManager.Device(this))
             {
                 Debug.Log("DEVICE FAILED");
+                bText.text = _integrationManager.Exception.Message;
             }
+            bText.text = _integrationManager.Presence.SystemId;
             await _integrationManager.Service(this);
-            Debug.Log(_integrationManager.Presence.SystemId);
-            Debug.Log(_integrationManager.Presence.Token);
-            Debug.Log(_integrationManager.Presence.Ticket);
+            //Debug.Log(_integrationManager.Presence.SystemId);
+            //Debug.Log(_integrationManager.Presence.Token);
+            //Debug.Log(_integrationManager.Presence.Ticket);
             await _integrationManager.OnMessage();
         }
         

@@ -14,6 +14,7 @@ namespace GameClustering
         public string gecHost = "localhost:8090";
         private HttpCaller _httpCaller;
         public IMessenger Messenger { private set; get; }
+        public Exception Exception { private set; get; }
         private bool _live;
         private string _deviceId;
         private static IntegrationManager _instance;
@@ -49,9 +50,9 @@ namespace GameClustering
                 return true;
             }
             catch(Exception ex)
-            {
-               Debug.Log(ex.Message);
-               return false;
+            { 
+                Exception = ex;
+                return false;
             }
         }
         
@@ -97,7 +98,7 @@ namespace GameClustering
             }
             catch(Exception ex)
             {
-                Debug.Log(ex.Message);
+                Exception = ex;
                 return false;
             }
         }
@@ -120,7 +121,7 @@ namespace GameClustering
             }
             catch (Exception ex)
             {
-                Debug.Log(ex.Message);
+                Exception = ex;
                 return false;
             }
         }
@@ -131,13 +132,11 @@ namespace GameClustering
                 while(_live)
                 {
                     await Messenger.ListenAsync();
-                }    
-                //return false;
+                }
             }
             catch(Exception ex)
             {
-                Debug.Log(ex.Message);
-                //return false;
+                Exception = ex;
             }   
         }
         

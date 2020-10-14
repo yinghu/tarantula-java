@@ -61,16 +61,15 @@ public class UDPService implements Runnable, Serviceable {
             try{
                 ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE*2);
                 SocketAddress src = this.datagramChannel.receive(buffer);
+                buffer.flip();
+                byte[] data = new byte[buffer.limit()];
+                buffer.get(data,0,data.length);
                 if(secured){
-                    buffer.flip();
-                    byte[] data = new byte[buffer.limit()];
-                    buffer.get(data,0,data.length);
-                    ByteBuffer _buffer = ByteBuffer.wrap(decrypt(data));
-                    PendingInboundMessage inboundMessage = new PendingInboundMessage("",_buffer,src);
+                    PendingInboundMessage inboundMessage = new PendingInboundMessage("",ByteBuffer.wrap(decrypt(data)),src);
                     mQueue.offer(inboundMessage);
                 }
                 else{
-                    PendingInboundMessage inboundMessage = new PendingInboundMessage("",buffer,src);
+                    PendingInboundMessage inboundMessage = new PendingInboundMessage("",ByteBuffer.wrap(data),src);
                     mQueue.offer(inboundMessage);
                 }
             }catch (Exception ex){
@@ -94,7 +93,8 @@ public class UDPService implements Runnable, Serviceable {
                             messageHandler.onMessage(pendingInboundMessage);
                         }
                         else{//disconnect on no handler available
-                            log.warn("message->"+pendingInboundMessage.type()+"/"+pendingInboundMessage.sequence());
+                            log.warn("t/s->"+pendingInboundMessage.type()+"/"+pendingInboundMessage.sequence());
+                            log.warn("m->"+new String(pendingInboundMessage.payload()));
                             PendingOutboundMessage outboundMessage = new PendingOutboundMessage();
                             outboundMessage.ack(pendingInboundMessage.ack());
                             outboundMessage.connectionId(pendingInboundMessage.connectionId());
