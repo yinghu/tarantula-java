@@ -76,7 +76,7 @@ public class ServerPushEvent extends Data implements Event {
         //process message
         try{
             //Connection connection = cMap.get(pendingInboundMessage.connectionId());
-            //System.out.println("CID-->111-"+pendingInboundMessage.connectionId());
+            System.out.println("TIMESTAMP--->"+pendingInboundMessage.timestamp());
             //cMap.forEach((k,v)->{
                 //System.out.println("CID-->222-"+v.connectionId());
                 //v.update(pendingInboundMessage.type(),pendingInboundMessage.payload());

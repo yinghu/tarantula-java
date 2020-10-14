@@ -31,6 +31,7 @@ namespace Integration
 
         private async void Start()
         {
+            bText.text = "Start";
             _integrationManager = IntegrationManager.Instance;
             if (!await _integrationManager.Index(this))
             {

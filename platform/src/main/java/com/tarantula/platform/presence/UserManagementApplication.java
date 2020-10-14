@@ -237,7 +237,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         }
     }
     private void onSession(OnSession access, Session session){
-        this.context.log("SESSION->"+access.systemId(),OnLog.WARN);
         if(access.successful()){
             PresenceContext ptx = new PresenceContext("onLogin");
             ptx.presence= access;

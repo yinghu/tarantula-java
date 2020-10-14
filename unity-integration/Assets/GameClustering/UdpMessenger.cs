@@ -49,6 +49,7 @@ namespace GameClustering
                 message.Type(type);
                 message.MessageId(_messageId++);
                 message.Sequence(sequence);
+                message.Timestamp(100);
                 message.Payload(payload.ToArray());
                 var outMessage = _connection.Secured ? Encrypt(message.Message()) : message.Message();
                 var bytes = await _udpClient.SendAsync(outMessage, outMessage.Length);

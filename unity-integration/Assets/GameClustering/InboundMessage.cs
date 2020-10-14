@@ -5,13 +5,13 @@ namespace GameClustering
 {
     public class InboundMessage : IDisposable
     {
-        //public const int SequenceSize = 16;
         public const long AckPos = 0;
         public const long TypePos = 1;
         public const long MessageIdPos = 5;
         public const long ConnectionIdPos = 9;
         public const long SequencePos = 17;
-        public const long PayloadPos = 21;//SequencePos+SequenceSize;
+        public const long TimestampPos = 21;
+        public const long PayloadPos = 29;
         
         private readonly MemoryStream _memoryStream;
         private bool _disposed;
@@ -73,7 +73,17 @@ namespace GameClustering
             }
             return BitConverter.ToInt64(connectionId, 0);
         }
-
+        public long Timestamp()
+        {
+            _memoryStream.Position = TimestampPos;
+            var timestamp = new byte[8];
+            _memoryStream.Read(timestamp, 0, 8);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(timestamp);
+            }
+            return BitConverter.ToInt64(timestamp, 0);
+        }
         public byte[] Payload()
         {
             _memoryStream.Position = PayloadPos;

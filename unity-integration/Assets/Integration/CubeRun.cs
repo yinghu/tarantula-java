@@ -1,4 +1,5 @@
 ﻿using GameClustering;
+using TMPro;
 using UnityEngine;
 
 namespace Integration
@@ -7,13 +8,13 @@ namespace Integration
     {
         public int sequence;
         private bool _enabled = true;
-
+        public TMP_Text bText;
         private void Start()
         {
             IntegrationManager.Instance.Messenger.RegisterMessageHandler(1,sequence, (buffer) =>
             {
                 _enabled = !_enabled;
-                Debug.Log("CallId ->"+buffer.GetInt()+"//"+_enabled);
+                bText.text= ("CallId ->"+buffer.GetInt()+"//"+_enabled);
             });
         }
 

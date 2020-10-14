@@ -64,14 +64,8 @@ public class UDPService implements Runnable, Serviceable {
                 buffer.flip();
                 byte[] data = new byte[buffer.limit()];
                 buffer.get(data,0,data.length);
-                if(secured){
-                    PendingInboundMessage inboundMessage = new PendingInboundMessage("",ByteBuffer.wrap(decrypt(data)),src);
-                    mQueue.offer(inboundMessage);
-                }
-                else{
-                    PendingInboundMessage inboundMessage = new PendingInboundMessage("",ByteBuffer.wrap(data),src);
-                    mQueue.offer(inboundMessage);
-                }
+                PendingInboundMessage inboundMessage = new PendingInboundMessage("",secured?ByteBuffer.wrap(decrypt(data)):ByteBuffer.wrap(data),src);
+                mQueue.offer(inboundMessage);
             }catch (Exception ex){
                 //ignore
                 ex.printStackTrace();
@@ -93,14 +87,15 @@ public class UDPService implements Runnable, Serviceable {
                             messageHandler.onMessage(pendingInboundMessage);
                         }
                         else{//disconnect on no handler available
-                            log.warn("t/s->"+pendingInboundMessage.type()+"/"+pendingInboundMessage.sequence());
-                            log.warn("m->"+new String(pendingInboundMessage.payload()));
+                            //log.warn("t/s->"+pendingInboundMessage.type()+"/"+pendingInboundMessage.sequence());
+                            log.warn("TIMESTAMP->"+pendingInboundMessage.timestamp());
                             PendingOutboundMessage outboundMessage = new PendingOutboundMessage();
                             outboundMessage.ack(pendingInboundMessage.ack());
                             outboundMessage.connectionId(pendingInboundMessage.connectionId());
                             outboundMessage.messageId(pendingInboundMessage.messageId());
                             outboundMessage.type(pendingInboundMessage.type());
                             outboundMessage.sequence(pendingInboundMessage.sequence());
+                            outboundMessage.timestamp(pendingInboundMessage.timestamp());
                             outboundMessage.payload(pendingInboundMessage.payload());
                             if(secured){
                                 this.datagramChannel.send(ByteBuffer.wrap(encrypt(outboundMessage.message())),pendingInboundMessage.source());

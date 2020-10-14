@@ -27,6 +27,9 @@ public class PendingOutboundMessage {
     public void sequence(int sequence){
         message.putInt(PendingInboundMessage.SEQ_POS,sequence);
     }
+    public void timestamp(long timestamp){
+        message.putLong(PendingInboundMessage.TIMESTAMP_POS,timestamp);
+    }
     public void payload(byte[] payload){
         message.position(PendingInboundMessage.PAYLOAD_POS);
         message.put(payload);

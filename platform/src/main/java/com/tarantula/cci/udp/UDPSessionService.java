@@ -133,6 +133,7 @@ public class UDPSessionService implements ConnectionEventService {
             pendingOutboundMessage.type(Integer.parseInt(params[1]));
             pendingOutboundMessage.sequence(Integer.parseInt(params[0]));
             pendingOutboundMessage.messageId(messageId.incrementAndGet());
+            pendingOutboundMessage.timestamp(200);
             pendingOutboundMessage.payload(payload);
             ByteBuffer out = connection.secured()?ByteBuffer.wrap(encrypt(pendingOutboundMessage.message())):ByteBuffer.wrap(pendingOutboundMessage.message());
             datagramChannel.write(out);
