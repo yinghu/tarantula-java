@@ -99,23 +99,14 @@ public class UDPSessionService implements ConnectionEventService {
             while (true){
                 ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE);
                 SocketAddress sc = datagramChannel.receive(buffer);
-                if(connection.secured()){
-                    buffer.flip();
-                    byte[] payload = new byte[buffer.limit()];
-                    buffer.get(payload,0,payload.length);
-                    PendingInboundMessage pendingInboundMessage = new PendingInboundMessage(connection.serverId(),ByteBuffer.wrap(decrypt(payload)),sc);
-                    if(pendingInboundMessage.ack()){
-                        continue;
-                    }
-                    pendingData.offer(pendingInboundMessage);
+                buffer.flip();
+                byte[] payload = new byte[buffer.limit()];
+                buffer.get(payload,0,payload.length);
+                PendingInboundMessage pendingInboundMessage = new PendingInboundMessage(connection.serverId(),connection.secured()?ByteBuffer.wrap(decrypt(payload)):ByteBuffer.wrap(payload),sc);
+                if(pendingInboundMessage.ack()){
+                    continue;
                 }
-                else{
-                    PendingInboundMessage pendingInboundMessage = new PendingInboundMessage(connection.serverId(),buffer,sc);
-                    if(pendingInboundMessage.ack()){
-                        continue;
-                    }
-                    pendingData.offer(pendingInboundMessage);
-                }
+                pendingData.offer(pendingInboundMessage);
             }
         }catch (Exception ex){
             ex.printStackTrace();
