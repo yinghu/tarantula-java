@@ -34,7 +34,7 @@ namespace GameClustering
         {
             _httpCaller = new HttpCaller(gecHost);
             _deviceId = SystemInfo.deviceUniqueIdentifier;
-            Debug.Log("Started manager");
+            Debug.Log("Started integration manager");
         }
 
         public async Task<bool> Index(MonoBehaviour caller)

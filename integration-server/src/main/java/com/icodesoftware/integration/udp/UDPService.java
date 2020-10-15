@@ -3,6 +3,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.integration.JoinMessageHandler;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.PendingInboundMessage;
@@ -53,6 +54,8 @@ public class UDPService implements Runnable, Serviceable {
         configHeader = config.get("tarantula").getAsString();
         secured = config.getAsJsonObject("connection").get("secured").getAsBoolean();
         httpCaller = new HttpCaller(config.getAsJsonObject(configHeader).get("url").getAsString());
+        JoinMessageHandler joinMessageHandler = new JoinMessageHandler(this);
+        mHandlers.put(joinMessageHandler.type(),joinMessageHandler);
     }
     @Override
     public void run(){
@@ -144,6 +147,18 @@ public class UDPService implements Runnable, Serviceable {
         };
         httpCaller.get(config.getAsJsonObject(configHeader).get("path").getAsString(),headers);
         this.datagramChannel.close();
+    }
+    public boolean send(PendingOutboundMessage outboundMessage,SocketAddress source){
+        try{
+            if(secured){
+                this.datagramChannel.send(ByteBuffer.wrap(encrypt(outboundMessage.message())),source);
+            }else{
+                this.datagramChannel.send(ByteBuffer.wrap(outboundMessage.message()),source);
+            }
+            return true;
+        }catch (Exception ex){
+            return false;
+        }
     }
     private byte[] encrypt(byte[] data) throws IllegalBlockSizeException, BadPaddingException{
         return encrypt.doFinal(data);

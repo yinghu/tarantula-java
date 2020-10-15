@@ -66,6 +66,7 @@ namespace GameClustering
                     var callbackKey = new CallbackKey(inboundMessage.Type(),inboundMessage.Sequence());
                     if (_handlers.TryGetValue(callbackKey, out var handler))
                     {
+                        Debug.Log("timestamp->"+inboundMessage.Timestamp());
                         using (var buffer = new DataBuffer(inboundMessage.Payload()))
                         {
                             handler.Invoke(buffer);    

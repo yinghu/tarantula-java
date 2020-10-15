@@ -35,25 +35,22 @@ namespace Integration
             _integrationManager = IntegrationManager.Instance;
             if (!await _integrationManager.Index(this))
             {
-                Debug.Log("INDEX FAILED"); 
                 bText.text = _integrationManager.Exception.Message;
             }
-
             if (!await _integrationManager.Device(this))
             {
-                Debug.Log("DEVICE FAILED");
                 bText.text = _integrationManager.Exception.Message;
             }
             bText.text = _integrationManager.Presence.SystemId;
             await _integrationManager.Service(this);
-            //Debug.Log(_integrationManager.Presence.SystemId);
-            //Debug.Log(_integrationManager.Presence.Token);
-            //Debug.Log(_integrationManager.Presence.Ticket);
             await _integrationManager.OnMessage();
         }
         
-        public  void Play()
+        public  async void Play()
         {
+            var buffer = new DataBuffer();
+            buffer.PutUTF8String(_integrationManager.Presence.Ticket);
+            await _integrationManager.Messenger.SendAsync(0, 0, true, buffer);
             SceneManager.LoadScene("GamePlay");
             bPlay.SetActive(false);
             bExit.SetActive(true);
