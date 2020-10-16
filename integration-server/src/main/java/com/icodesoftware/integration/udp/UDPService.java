@@ -6,6 +6,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.JoinMessageHandler;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.MessageHandler;
+import com.icodesoftware.protocol.PayloadBuffer;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
 import com.icodesoftware.service.DeploymentServiceProvider;
@@ -159,6 +160,13 @@ public class UDPService implements Runnable, Serviceable {
         }catch (Exception ex){
             return false;
         }
+    }
+    public boolean validateTicket(byte[] payload){
+        PayloadBuffer buffer = new PayloadBuffer(payload);
+        log.warn("STUB->"+buffer.getInt());
+        log.warn("login->"+buffer.getUTF8());
+        log.warn("ticket->"+buffer.getUTF8());
+        return true;
     }
     private byte[] encrypt(byte[] data) throws IllegalBlockSizeException, BadPaddingException{
         return encrypt.doFinal(data);

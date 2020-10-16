@@ -20,9 +20,10 @@ namespace GameClustering
         private static IntegrationManager _instance;
 
         public Presence Presence { get; private set; }
+        public bool Authenticated => Presence != null;
         private Connection _connection;
 
-            [RuntimeInitializeOnLoadMethod]
+        [RuntimeInitializeOnLoadMethod]
         private static void _Init(){
             _instance = Resources.Load<IntegrationManager>("IntegrationManager");
             _instance.Bootstrap();    
@@ -78,6 +79,8 @@ namespace GameClustering
                         SystemId = (string)pt.SelectToken("systemId"),
                         Token = (string)pt.SelectToken("token"),
                         Ticket = (string)pt.SelectToken("ticket"),
+                        Login =  (string)pt.SelectToken("login"),
+                        Stub = (int)pt.SelectToken("stub")
                     };
                     if (pc != null)
                     {
@@ -97,6 +100,31 @@ namespace GameClustering
                 return suc;
             }
             catch(Exception ex)
+            {
+                Exception = ex;
+                return false;
+            }
+        }
+
+        public async Task<bool> Logout(MonoBehaviour caller)
+        {
+            try
+            {
+                var headers = new[]
+                {
+                    new Header {Name = Header.TarantulaTag, Value = "presence/lobby"},
+                    new Header {Name = Header.TarantulaToken, Value = Presence.Token},
+                    new Header {Name = Header.TarantulaAction, Value = "onAbsence"}
+                };
+                var response = await _httpCaller.GetJson(caller, "/service/action", headers);
+                var jo = JObject.Parse(response);
+                var suc = (bool)jo.SelectToken("successful");
+                Debug.Log(response);
+                Presence = null;
+                
+                return suc;
+            }
+            catch (Exception ex)
             {
                 Exception = ex;
                 return false;

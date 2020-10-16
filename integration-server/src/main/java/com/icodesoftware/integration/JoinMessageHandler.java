@@ -2,6 +2,7 @@ package com.icodesoftware.integration;
 
 import com.icodesoftware.integration.udp.UDPService;
 import com.icodesoftware.protocol.MessageHandler;
+import com.icodesoftware.protocol.PayloadBuffer;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
 
@@ -26,6 +27,7 @@ public class JoinMessageHandler implements MessageHandler {
         pendingOutboundMessage.messageId(pendingInboundMessage.messageId());
         pendingOutboundMessage.type(pendingInboundMessage.type());
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
+        this.udpService.validateTicket(pendingInboundMessage.payload());
         pendingOutboundMessage.payload("hello".getBytes());
         this.udpService.send(pendingOutboundMessage,pendingInboundMessage.source());
     }
