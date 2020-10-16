@@ -7,26 +7,25 @@ import com.icodesoftware.protocol.PendingOutboundMessage;
 /**
  * Created by yinghu lu on 10/7/2020.
  */
-public class JoinMessageHandler implements MessageHandler {
+public class EchoMessageHandler implements MessageHandler {
     private final GameChannelService gameChannelService;
-    public JoinMessageHandler(GameChannelService udpService){
+    public EchoMessageHandler(GameChannelService udpService){
         this.gameChannelService = udpService;
     }
     @Override
     public int type() {
-        return JOIN;
+        return ECHO;
     }
 
     @Override
     public void onMessage(PendingInboundMessage pendingInboundMessage) {
         PendingOutboundMessage pendingOutboundMessage = new PendingOutboundMessage();
-        pendingOutboundMessage.ack(true);
+        pendingOutboundMessage.ack(pendingInboundMessage.ack());
         pendingOutboundMessage.timestamp(pendingInboundMessage.timestamp());
         pendingOutboundMessage.messageId(pendingInboundMessage.messageId());
         pendingOutboundMessage.type(pendingInboundMessage.type());
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
-        this.gameChannelService.validateTicket(pendingInboundMessage.payload());
-        pendingOutboundMessage.payload("hello".getBytes());
+        pendingOutboundMessage.payload(pendingInboundMessage.payload());
         this.gameChannelService.send(pendingOutboundMessage,pendingInboundMessage.source());
     }
 }

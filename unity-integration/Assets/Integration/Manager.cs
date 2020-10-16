@@ -1,5 +1,4 @@
-﻿using System;
-using GameClustering;
+﻿using GameClustering;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -47,22 +46,21 @@ namespace Integration
             {
                 return;
             }
-            _integrationManager.Messenger.UnregisterMessageHandler(0,0);
+            _integrationManager.Messenger.UnregisterMessageHandler(MessageType.Join,0);
             SceneManager.LoadScene("GamePlay");
         }
 
         public  async void Play()
         {
-            _integrationManager.Messenger.RegisterMessageHandler(0,0, (buff) =>
+            _integrationManager.Messenger.RegisterMessageHandler(MessageType.Join,0, buff=>
             {
                 _playing = true;
             });
             var buffer = new DataBuffer();
-            buffer.PutInt(100);
+            buffer.PutInt(_integrationManager.Presence.Stub);
             buffer.PutUTF8String(_integrationManager.Presence.Login);
             buffer.PutUTF8String(_integrationManager.Presence.Ticket);
-            Debug.Log("TK->"+_integrationManager.Presence.Ticket);
-            await _integrationManager.Messenger.SendAsync(0, 0, true, buffer);
+            await _integrationManager.Messenger.SendAsync(MessageType.Join, 0, true, buffer);
         }
         public async void Exit()
         {

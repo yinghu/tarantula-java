@@ -3,14 +3,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.integration.EchoMessageHandler;
+import com.icodesoftware.integration.GameChannel;
+import com.icodesoftware.integration.GameChannelService;
 import com.icodesoftware.integration.JoinMessageHandler;
+import com.icodesoftware.integration.channel.PushEventChannel;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.PayloadBuffer;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
 import com.icodesoftware.service.DeploymentServiceProvider;
-import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.HttpCaller;
 
 import javax.crypto.BadPaddingException;
@@ -31,7 +34,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-public class UDPService implements Runnable, Serviceable {
+public class UDPService implements Runnable, GameChannelService {
     private static TarantulaLogger log = JDKLogger.getLogger(UDPService.class);
 
     private DatagramChannel datagramChannel;
@@ -39,6 +42,7 @@ public class UDPService implements Runnable, Serviceable {
     private final int port;
     private final ConcurrentLinkedDeque<PendingInboundMessage> mQueue;
     private final ConcurrentHashMap<Integer, MessageHandler> mHandlers;
+    private final ConcurrentHashMap<Long, GameChannel> mChannels;
     private ExecutorService executorService;
     private HttpCaller httpCaller;
     private String configHeader;
@@ -52,11 +56,14 @@ public class UDPService implements Runnable, Serviceable {
         this.port = config.getAsJsonObject("connection").get("port").getAsInt();;
         mQueue = new ConcurrentLinkedDeque<>();
         mHandlers = new ConcurrentHashMap<>();
+        mChannels = new ConcurrentHashMap<>();
         configHeader = config.get("tarantula").getAsString();
         secured = config.getAsJsonObject("connection").get("secured").getAsBoolean();
         httpCaller = new HttpCaller(config.getAsJsonObject(configHeader).get("url").getAsString());
         JoinMessageHandler joinMessageHandler = new JoinMessageHandler(this);
         mHandlers.put(joinMessageHandler.type(),joinMessageHandler);
+        EchoMessageHandler echoMessageHandler = new EchoMessageHandler(this);
+        mHandlers.put(echoMessageHandler.type(),echoMessageHandler);
     }
     @Override
     public void run(){
@@ -86,27 +93,9 @@ public class UDPService implements Runnable, Serviceable {
                 try{
                     PendingInboundMessage pendingInboundMessage = mQueue.poll();
                     if(pendingInboundMessage!=null){
-                        MessageHandler messageHandler = mHandlers.get(pendingInboundMessage.type());
-                        if(messageHandler!=null){
-                            messageHandler.onMessage(pendingInboundMessage);
-                        }
-                        else{//disconnect on no handler available
-                            //log.warn("t/s->"+pendingInboundMessage.type()+"/"+pendingInboundMessage.sequence());
-                            log.warn("TIMESTAMP->"+pendingInboundMessage.timestamp());
-                            PendingOutboundMessage outboundMessage = new PendingOutboundMessage();
-                            outboundMessage.ack(pendingInboundMessage.ack());
-                            outboundMessage.connectionId(pendingInboundMessage.connectionId());
-                            outboundMessage.messageId(pendingInboundMessage.messageId());
-                            outboundMessage.type(pendingInboundMessage.type());
-                            outboundMessage.sequence(pendingInboundMessage.sequence());
-                            outboundMessage.timestamp(pendingInboundMessage.timestamp());
-                            outboundMessage.payload(pendingInboundMessage.payload());
-                            if(secured){
-                                this.datagramChannel.send(ByteBuffer.wrap(encrypt(outboundMessage.message())),pendingInboundMessage.source());
-                            }else{
-                                this.datagramChannel.send(ByteBuffer.wrap(outboundMessage.message()),pendingInboundMessage.source());
-                            }
-                        }
+                        log.warn("CID->"+pendingInboundMessage.connectionId());
+                        GameChannel gameChannel = mChannels.get(pendingInboundMessage.connectionId());
+                        gameChannel.onMessage(pendingInboundMessage);
                     }
                     else{
                         Thread.sleep(100);
@@ -132,6 +121,8 @@ public class UDPService implements Runnable, Serviceable {
         if(!pc.get("successful").getAsBoolean()){
             throw new RuntimeException(pc.get("message").getAsString());
         }
+        PushEventChannel pushEventChannel = new PushEventChannel(pc.get("connectionId").getAsLong(),this);
+        mChannels.put(pushEventChannel.channelId(),pushEventChannel);
         byte[] key = Base64.getDecoder().decode(pc.get("serverKey").getAsString());
         IvParameterSpec iv = new IvParameterSpec(key);
         SecretKey secretKey = new SecretKeySpec(key,DeploymentServiceProvider.SERVER_KEY_SPEC);
@@ -162,11 +153,29 @@ public class UDPService implements Runnable, Serviceable {
         }
     }
     public boolean validateTicket(byte[] payload){
-        PayloadBuffer buffer = new PayloadBuffer(payload);
-        log.warn("STUB->"+buffer.getInt());
-        log.warn("login->"+buffer.getUTF8());
-        log.warn("ticket->"+buffer.getUTF8());
-        return true;
+        try{
+            PayloadBuffer buffer = new PayloadBuffer(payload);
+            int stub = buffer.getInt();
+            String login = buffer.getUTF8();
+            String ticket = buffer.getUTF8();
+            String[] headers = new String[]{
+                    Session.TARANTULA_TAG,"index/user",
+                    Session.TARANTULA_MAGIC_KEY,login,
+                    Session.TARANTULA_ACTION,"onTicket"
+            };
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("stub",stub);
+            jsonObject.addProperty("accessKey",ticket);
+            String resp = httpCaller.post("user/action",jsonObject.toString().getBytes(),headers);
+            log.warn(resp);
+            return true;
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return false;
+        }
+    }
+    public MessageHandler messageHandler(int type){
+        return this.mHandlers.get(type);
     }
     private byte[] encrypt(byte[] data) throws IllegalBlockSizeException, BadPaddingException{
         return encrypt.doFinal(data);

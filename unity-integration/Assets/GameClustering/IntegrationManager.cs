@@ -35,7 +35,6 @@ namespace GameClustering
         {
             _httpCaller = new HttpCaller(gecHost);
             _deviceId = SystemInfo.deviceUniqueIdentifier;
-            Debug.Log("Started integration manager");
         }
 
         public async Task<bool> Index(MonoBehaviour caller)
@@ -70,34 +69,36 @@ namespace GameClustering
                 var response = await _httpCaller.PostJson(caller,"/user/action",headers,json);
                 var jo = JObject.Parse(response);
                 var suc = (bool)jo.SelectToken("successful");
-                if (suc)
+                if (!suc)
                 {
-                    var pt = jo.SelectToken("presence");
-                    var pc = jo.SelectToken("connection");
-                    Presence = new Presence
-                    {
-                        SystemId = (string)pt.SelectToken("systemId"),
-                        Token = (string)pt.SelectToken("token"),
-                        Ticket = (string)pt.SelectToken("ticket"),
-                        Login =  (string)pt.SelectToken("login"),
-                        Stub = (int)pt.SelectToken("stub")
-                    };
-                    if (pc != null)
-                    {
-                        _connection = new Connection
-                        {
-                            Type =  (string)pc.SelectToken("type"),
-                            Host = (string)pc.SelectToken("host"),
-                            Port = (int)pc.SelectToken("port"),
-                            Secured = (bool)pc.SelectToken("secured")
-                        };
-                        Messenger = new UdpMessenger();
-                        Messenger.Connect(_connection,Convert.FromBase64String((string)jo.SelectToken("serverKey")));
-                        _live = true;
-                    }
+                    return false;
                 }
-                Debug.Log(response);
-                return suc;
+                var pt = jo.SelectToken("presence");
+                var pc = jo.SelectToken("connection");
+                Presence = new Presence
+                {
+                    SystemId = (string)pt.SelectToken("systemId"),
+                    Token = (string)pt.SelectToken("token"),
+                    Ticket = (string)pt.SelectToken("ticket"),
+                    Login =  (string)pt.SelectToken("login"),
+                    Stub = (int)pt.SelectToken("stub")
+                };
+                if (pc == null)
+                {
+                    return true;
+                }
+                _connection = new Connection
+                {
+                    ConnectionId = (long)pc.SelectToken("connectionId"),
+                    Type =  (string)pc.SelectToken("type"),
+                    Host = (string)pc.SelectToken("host"),
+                    Port = (int)pc.SelectToken("port"),
+                    Secured = (bool)pc.SelectToken("secured")
+                };
+                Messenger = new UdpMessenger();
+                Messenger.Connect(_connection,Convert.FromBase64String((string)jo.SelectToken("serverKey")));
+                _live = true;
+                return true;
             }
             catch(Exception ex)
             {
@@ -119,9 +120,7 @@ namespace GameClustering
                 var response = await _httpCaller.GetJson(caller, "/service/action", headers);
                 var jo = JObject.Parse(response);
                 var suc = (bool)jo.SelectToken("successful");
-                Debug.Log(response);
                 Presence = null;
-                
                 return suc;
             }
             catch (Exception ex)
@@ -143,9 +142,7 @@ namespace GameClustering
                 };
                 var response = await _httpCaller.GetJson(caller, "/service/action", headers);
                 var jo = JObject.Parse(response);
-                var suc = (bool)jo.SelectToken("successful");
-                Debug.Log(response);
-                return suc;
+                return (bool)jo.SelectToken("successful");
             }
             catch (Exception ex)
             {

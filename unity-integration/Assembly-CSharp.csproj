@@ -63,11 +63,11 @@
      <Compile Include="Assets\GameClustering\Device.cs" />
      <Compile Include="Assets\GameClustering\Header.cs" />
      <Compile Include="Assets\GameClustering\HttpCaller.cs" />
-     <Compile Include="Assets\GameClustering\IMessageHandler.cs" />
      <Compile Include="Assets\GameClustering\IMessenger.cs" />
      <Compile Include="Assets\GameClustering\InboundMessage.cs" />
      <Compile Include="Assets\GameClustering\IntegrationManager.cs" />
      <Compile Include="Assets\GameClustering\KeyValidator.cs" />
+     <Compile Include="Assets\GameClustering\MessageType.cs" />
      <Compile Include="Assets\GameClustering\OutboundMessage.cs" />
      <Compile Include="Assets\GameClustering\Presence.cs" />
      <Compile Include="Assets\GameClustering\UdpMessenger.cs" />

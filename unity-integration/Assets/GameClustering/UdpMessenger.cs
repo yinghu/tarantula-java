@@ -36,8 +36,11 @@ namespace GameClustering
                 _encrypt = rijAlg.CreateEncryptor();
                 _decrypt = rijAlg.CreateDecryptor();
             }
-
             _udpClient = new UdpClient(_connection.Host,_connection.Port);
+            _handlers[new CallbackKey(MessageType.Ack,0)] = buffer =>
+            {
+                Debug.Log("Processing ack->");
+            };
         }
         
         public async Task<bool> SendAsync(int type,int sequence,bool ack,DataBuffer payload)
@@ -49,7 +52,7 @@ namespace GameClustering
                 message.Type(type);
                 message.MessageId(_messageId++);
                 message.Sequence(sequence);
-                message.Timestamp(1000);
+                message.Timestamp(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
                 message.Payload(payload.ToArray());
                 var outMessage = _connection.Secured ? Encrypt(message.Message()) : message.Message();
                 var bytes = await _udpClient.SendAsync(outMessage, outMessage.Length);
@@ -66,7 +69,7 @@ namespace GameClustering
                     var callbackKey = new CallbackKey(inboundMessage.Type(),inboundMessage.Sequence());
                     if (_handlers.TryGetValue(callbackKey, out var handler))
                     {
-                        Debug.Log("timestamp->"+inboundMessage.Timestamp());
+                        Debug.Log("timestamp->"+(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()-inboundMessage.Timestamp()));
                         using (var buffer = new DataBuffer(inboundMessage.Payload()))
                         {
                             handler.Invoke(buffer);    

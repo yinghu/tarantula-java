@@ -9,7 +9,7 @@ import com.icodesoftware.protocol.PendingInboundMessage;
 public class AckMessageHandler implements MessageHandler {
     @Override
     public int type() {
-        return 0;
+        return ACK;
     }
 
     @Override

@@ -11,7 +11,7 @@ namespace Integration
         public TMP_Text bText;
         private void Start()
         {
-            IntegrationManager.Instance.Messenger.RegisterMessageHandler(1,sequence, (buffer) =>
+            IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Echo,sequence, (buffer) =>
             {
                 _enabled = !_enabled;
                 bText.text= ("CallId ->"+buffer.GetInt()+"//"+_enabled);
