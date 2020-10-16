@@ -13,34 +13,28 @@ namespace Integration
         public GameObject bPlay;
         public GameObject bExit;
         public TMP_Text bText;
-        private static bool _created;
         private bool _playing;
         private void Awake()
         {
-            DontDestroyOnLoad(gameObject);
-            if (_created)
-            { 
-                Destroy(gameObject);
-            }
-            else
-            {
-                _created = true;
-            }
-            bPlay.SetActive(true);
-            bExit.SetActive(false);
+            _playing = false;
         }
 
         private async void Start()
         {
-            bText.text = "Start";
             _integrationManager = IntegrationManager.Instance;
+            if (!_integrationManager.Authenticated)
+            {
+                return;
+            }
             if (!await _integrationManager.Index(this))
             {
                 bText.text = _integrationManager.Exception.Message;
+                return;
             }
             if (!await _integrationManager.Device(this))
             {
                 bText.text = _integrationManager.Exception.Message;
+                return;
             }
             bText.text = _integrationManager.Presence.SystemId;
             await _integrationManager.Service(this);
@@ -54,8 +48,6 @@ namespace Integration
                 return;
             }
             _integrationManager.Messenger.UnregisterMessageHandler(0,0);
-            bPlay.SetActive(false);
-            bExit.SetActive(true);
             SceneManager.LoadScene("GamePlay");
         }
 
@@ -74,10 +66,11 @@ namespace Integration
         }
         public async void Exit()
         {
-            await _integrationManager.Logout(this);
+            if (!await _integrationManager.Logout(this))
+            {
+                return;
+            }
             _playing = false;
-            bExit.SetActive(false);
-            bPlay.SetActive(true);
         }
     }
 }

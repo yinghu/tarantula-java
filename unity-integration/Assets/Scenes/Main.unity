@@ -371,7 +371,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: EXIT
+  m_Text: Logout
 --- !u!222 &678838512
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -453,7 +453,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 2.165e-42, y: 1.02e-43, z: 7.1940026e+28, w: 0}
+  m_BoundingSphereOverride: {x: 2.75226e+23, y: 6.691824e+31, z: 1.5764511e+13, w: 1.786278e+25}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -561,7 +561,7 @@ GameObject:
   - component: {fileID: 775606223}
   - component: {fileID: 775606222}
   m_Layer: 5
-  m_Name: Exit
+  m_Name: Logout
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -674,7 +674,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -79, y: -600}
+  m_AnchoredPosition: {x: -75, y: 96}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &963194225

@@ -1,5 +1,6 @@
 ﻿using GameClustering;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Integration
 {
@@ -15,6 +16,11 @@ namespace Integration
             buffer2.PutInt(2);
             await integrationManager.Messenger.SendAsync(1, 2, false, buffer2);
             Debug.Log("Shooting ...");
+        }
+
+        public void Exit()
+        {
+            SceneManager.LoadScene("Main");
         }
     }
 }

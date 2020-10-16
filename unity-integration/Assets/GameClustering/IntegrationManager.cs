@@ -20,7 +20,7 @@ namespace GameClustering
         private static IntegrationManager _instance;
 
         public Presence Presence { get; private set; }
-        public bool Authenticated => Presence != null;
+        public bool Authenticated => Presence == null;
         private Connection _connection;
 
         [RuntimeInitializeOnLoadMethod]
