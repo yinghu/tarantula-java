@@ -11,6 +11,8 @@ import java.net.SocketAddress;
  */
 public interface GameChannelService extends Serviceable {
     boolean validateTicket(byte[] payload);
+    int sessionId();
+    GameChannel gameChannel(long connectionId);
     MessageHandler messageHandler(int type);
     boolean send(PendingOutboundMessage outboundMessage, SocketAddress source);
 }

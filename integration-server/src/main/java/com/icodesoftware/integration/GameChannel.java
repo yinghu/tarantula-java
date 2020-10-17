@@ -8,4 +8,5 @@ import com.icodesoftware.protocol.PendingInboundMessage;
 public interface GameChannel {
     long channelId();
     void onMessage(PendingInboundMessage pendingInboundMessage);
+
 }

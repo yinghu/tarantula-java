@@ -3,6 +3,7 @@ package com.icodesoftware.integration.channel;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.GameChannel;
 import com.icodesoftware.integration.GameChannelService;
+import com.icodesoftware.integration.JoinMessageHandler;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.PendingInboundMessage;
@@ -21,12 +22,15 @@ public class PushEventChannel implements GameChannel {
     private final long channelId;
     private final GameChannelService gameChannelService;
     private final ConcurrentHashMap<Integer, SocketAddress> mSockets;
-    private final AtomicInteger sessionId;
+
+    private final MessageHandler joinMessageHandler;
+    private final MessageHandler ackMessageHandler;
     public PushEventChannel(final long channelId,final GameChannelService gameChannelService){
         this.channelId = channelId;
         this.gameChannelService = gameChannelService;
         this.mSockets = new ConcurrentHashMap<>();
-        this.sessionId = new AtomicInteger(0);
+        this.joinMessageHandler = this.gameChannelService.messageHandler(MessageHandler.JOIN);
+        this.ackMessageHandler = this.gameChannelService.messageHandler(MessageHandler.ACK);
     }
     @Override
     public long channelId() {
@@ -35,13 +39,23 @@ public class PushEventChannel implements GameChannel {
 
     @Override
     public void onMessage(PendingInboundMessage pendingInboundMessage) {
-        log.warn("SESSION ID->"+pendingInboundMessage.sessionId());
-        MessageHandler messageHandler = gameChannelService.messageHandler(pendingInboundMessage.type());
-        if(messageHandler!=null){
-            messageHandler.onMessage(pendingInboundMessage);
+        if(pendingInboundMessage.type()!=MessageHandler.JOIN
+                &&mSockets.containsKey(pendingInboundMessage.sessionId())
+                &&mSockets.get(pendingInboundMessage.sessionId()).equals(pendingInboundMessage.source())){
+            MessageHandler messageHandler = gameChannelService.messageHandler(pendingInboundMessage.type());
+            if(messageHandler!=null){
+                messageHandler.onMessage(pendingInboundMessage);
+                if(pendingInboundMessage.ack()){
+                    ackMessageHandler.onMessage(pendingInboundMessage);
+                }
+            }
+            else{
+                log.warn("no message handler registered ->"+pendingInboundMessage.type());
+            }
         }
         else{
-            log.warn("no message handler registered ->"+pendingInboundMessage.type());
+             joinMessageHandler.onMessage(pendingInboundMessage);
         }
     }
+
 }

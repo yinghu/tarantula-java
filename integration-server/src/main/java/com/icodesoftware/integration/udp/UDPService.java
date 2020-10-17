@@ -3,10 +3,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.integration.EchoMessageHandler;
-import com.icodesoftware.integration.GameChannel;
-import com.icodesoftware.integration.GameChannelService;
-import com.icodesoftware.integration.JoinMessageHandler;
+import com.icodesoftware.integration.*;
 import com.icodesoftware.integration.channel.PushEventChannel;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.MessageHandler;
@@ -32,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class UDPService implements Runnable, GameChannelService {
@@ -50,7 +48,12 @@ public class UDPService implements Runnable, GameChannelService {
     private Cipher encrypt;
     private Cipher decrypt;
     private boolean secured;
+    private int gameChannels;
+    private AtomicInteger sessionId;
+    private JsonParser parser;
     public UDPService(JsonObject config){
+        sessionId = new AtomicInteger(0);
+        parser = new JsonParser();
         this.config = config;
         this.address = config.getAsJsonObject("connection").get("host").getAsString();
         this.port = config.getAsJsonObject("connection").get("port").getAsInt();;
@@ -59,15 +62,22 @@ public class UDPService implements Runnable, GameChannelService {
         mChannels = new ConcurrentHashMap<>();
         configHeader = config.get("tarantula").getAsString();
         secured = config.getAsJsonObject("connection").get("secured").getAsBoolean();
+        gameChannels = config.getAsJsonObject(configHeader).get("channels").getAsInt();
         httpCaller = new HttpCaller(config.getAsJsonObject(configHeader).get("url").getAsString());
+        AckMessageHandler ackMessageHandler = new AckMessageHandler(this);
+        mHandlers.put(ackMessageHandler.type(),ackMessageHandler);
         JoinMessageHandler joinMessageHandler = new JoinMessageHandler(this);
         mHandlers.put(joinMessageHandler.type(),joinMessageHandler);
         EchoMessageHandler echoMessageHandler = new EchoMessageHandler(this);
         mHandlers.put(echoMessageHandler.type(),echoMessageHandler);
+        RelayMessageHandler relayMessageHandler = new RelayMessageHandler(this);
+        mHandlers.put(relayMessageHandler.type(),relayMessageHandler);
+        LeaveMessageHandler leaveMessageHandler = new LeaveMessageHandler(this);
+        mHandlers.put(leaveMessageHandler.type(),leaveMessageHandler);
     }
     @Override
     public void run(){
-        log.warn("WAITING FOR MESSAGE ...");
+        log.warn("WAITING FOR MESSAGE ..."+gameChannels);
         while (true){
             try{
                 ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE*2);
@@ -113,7 +123,6 @@ public class UDPService implements Runnable, GameChannelService {
         };
         config.getAsJsonObject("connection").addProperty("serverId",serverId);
         config.getAsJsonObject("connection").getAsJsonObject("server").addProperty("serverId",serverId);
-        JsonParser parser = new JsonParser();
         String resp = httpCaller.post(config.getAsJsonObject(configHeader).get("path").getAsString(),config.getAsJsonObject("connection").toString().getBytes(),headers);
         log.warn("RESP->"+resp);
         JsonObject pc = parser.parse(resp).getAsJsonObject();
@@ -166,12 +175,18 @@ public class UDPService implements Runnable, GameChannelService {
             jsonObject.addProperty("stub",stub);
             jsonObject.addProperty("accessKey",ticket);
             String resp = httpCaller.post("user/action",jsonObject.toString().getBytes(),headers);
-            log.warn(resp);
-            return true;
+            JsonObject ret = parser.parse(resp).getAsJsonObject();
+            return ret.get("successful").getAsBoolean();
         }catch (Exception ex){
             ex.printStackTrace();
             return false;
         }
+    }
+    public GameChannel gameChannel(long connectionId){
+        return mChannels.get(connectionId);
+    }
+    public int sessionId(){
+        return sessionId.incrementAndGet();
     }
     public MessageHandler messageHandler(int type){
         return this.mHandlers.get(type);
