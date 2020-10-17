@@ -135,11 +135,11 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         }
         else if(session.action().equals("onTicket")){//validate client web socket connection
             if(this.context.validator().validateTicket(session.systemId(),acc.stub(),(String)acc.property(OnAccess.ACCESS_KEY))){
-                OnSession onSession = this.context.validator().token(session.systemId(),acc.stub());//web socket request
-                onSession.successful(true);
+                //OnSession onSession = this.context.validator().token(session.systemId(),acc.stub());//web socket request
+                //onSession.successful(true);
                 PresenceContext ptx = new PresenceContext();
                 ptx.successful(true);
-                ptx.presence = onSession;
+                //ptx.presence = onSession;
                 session.write(this.builder.create().toJson(ptx).getBytes(),this.descriptor.responseLabel()+"?onTicket");
             }
             else{

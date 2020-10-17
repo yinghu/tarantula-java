@@ -21,7 +21,7 @@ namespace GameClustering
 
         public Presence Presence { get; private set; }
         public bool Authenticated => Presence == null;
-        private Connection _connection;
+        
 
         [RuntimeInitializeOnLoadMethod]
         private static void _Init(){
@@ -87,7 +87,7 @@ namespace GameClustering
                 {
                     return true;
                 }
-                _connection = new Connection
+                var connection = new Connection
                 {
                     ConnectionId = (long)pc.SelectToken("connectionId"),
                     Type =  (string)pc.SelectToken("type"),
@@ -96,7 +96,7 @@ namespace GameClustering
                     Secured = (bool)pc.SelectToken("secured")
                 };
                 Messenger = new UdpMessenger();
-                Messenger.Connect(_connection,Convert.FromBase64String((string)jo.SelectToken("serverKey")));
+                Messenger.Connect(connection,Convert.FromBase64String((string)jo.SelectToken("serverKey")));
                 _live = true;
                 return true;
             }
@@ -130,7 +130,7 @@ namespace GameClustering
             }
         }
 
-        public async Task<bool> Service(MonoBehaviour caller)
+        public async Task<bool> Ticket(MonoBehaviour caller)
         {
             try
             {
@@ -138,11 +138,15 @@ namespace GameClustering
                 {
                     new Header {Name = Header.TarantulaTag, Value = "presence/lobby"},
                     new Header {Name = Header.TarantulaToken, Value = Presence.Token},
-                    new Header {Name = Header.TarantulaAction, Value = "onPresence"}
+                    new Header {Name = Header.TarantulaAction, Value = "onTicket"}
                 };
                 var response = await _httpCaller.GetJson(caller, "/service/action", headers);
+                Debug.Log(response);
                 var jo = JObject.Parse(response);
-                return (bool)jo.SelectToken("successful");
+                var suc = (bool)jo.SelectToken("successful");
+                Presence.Ticket = (string)(jo.SelectToken("presence").SelectToken("ticket"));
+                Debug.Log(Presence.Ticket);
+                return suc;
             }
             catch (Exception ex)
             {

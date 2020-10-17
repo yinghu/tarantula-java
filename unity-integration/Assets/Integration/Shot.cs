@@ -1,4 +1,5 @@
-﻿using GameClustering;
+﻿using System;
+using GameClustering;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -6,6 +7,13 @@ namespace Integration
 {
     public class Shot : MonoBehaviour
     {
+        private bool _leaving;
+
+        private void Start()
+        {
+            _leaving = false;
+        }
+
         public async void Roll()
         {
             var integrationManager = IntegrationManager.Instance;
@@ -18,9 +26,26 @@ namespace Integration
             Debug.Log("Shooting ...");
         }
 
-        public void Exit()
+        private void Update()
         {
+            if (!_leaving)
+            {
+                return;
+            }
+            IntegrationManager.Instance.Messenger.UnregisterMessageHandler(MessageType.Leave,3);
             SceneManager.LoadScene("Main");
+        }
+
+        public async void Exit()
+        {
+            var integrationManager = IntegrationManager.Instance;
+            integrationManager.Messenger.RegisterMessageHandler(MessageType.Leave,3, ibuffer =>
+            {
+                _leaving = true;
+            });
+            var buffer = new DataBuffer();
+            buffer.PutInt(1);
+            await integrationManager.Messenger.SendAsync(MessageType.Leave, 3, false,buffer);
         }
     }
 }

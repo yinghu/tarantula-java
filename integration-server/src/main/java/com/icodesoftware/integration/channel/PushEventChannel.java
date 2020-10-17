@@ -36,7 +36,14 @@ public class PushEventChannel implements GameChannel {
     public long channelId() {
         return channelId;
     }
-
+    public void join(int sessionId,SocketAddress socketAddress){
+        mSockets.put(sessionId,socketAddress);
+    }
+    public void leave(int sessionId,SocketAddress socketAddress){
+        if(mSockets.contains(sessionId)&&mSockets.get(sessionId).equals(socketAddress)){
+            mSockets.remove(sessionId);
+        }
+    }
     @Override
     public void onMessage(PendingInboundMessage pendingInboundMessage) {
         if(pendingInboundMessage.type()!=MessageHandler.JOIN
@@ -53,8 +60,11 @@ public class PushEventChannel implements GameChannel {
                 log.warn("no message handler registered ->"+pendingInboundMessage.type());
             }
         }
-        else{
+        else if(pendingInboundMessage.type()==MessageHandler.JOIN){
              joinMessageHandler.onMessage(pendingInboundMessage);
+        }
+        else{
+            log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type());
         }
     }
 

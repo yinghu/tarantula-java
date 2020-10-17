@@ -51,7 +51,7 @@ namespace GameClustering
                 message.Ack(ack);
                 message.Type(type);
                 message.MessageId(_messageId++);
-                message.SessionId(505);
+                message.SessionId(_connection.SessionId);
                 message.Sequence(sequence);
                 message.Timestamp(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
                 message.Payload(payload.ToArray());
@@ -70,6 +70,14 @@ namespace GameClustering
                     var callbackKey = new CallbackKey(inboundMessage.Type(),inboundMessage.Sequence());
                     if (_handlers.TryGetValue(callbackKey, out var handler))
                     {
+                        if (inboundMessage.Type() == MessageType.Join)
+                        {
+                            _connection.SessionId = inboundMessage.SessionId();
+                        }
+                        else if (inboundMessage.Type() == MessageType.Leave)
+                        {
+                            _connection.SessionId = 0;
+                        }
                         Debug.Log("timestamp->"+(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()-inboundMessage.Timestamp()));
                         using (var buffer = new DataBuffer(inboundMessage.Payload()))
                         {
@@ -97,7 +105,7 @@ namespace GameClustering
         {
             _handlers.Remove(new CallbackKey(type,sequence));
         }
-
+        
         private byte[] Encrypt(byte[] data)
         {
             using (var stream = new MemoryStream())

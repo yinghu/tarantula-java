@@ -26,8 +26,13 @@ public class JoinMessageHandler implements MessageHandler {
         pendingOutboundMessage.type(pendingInboundMessage.type());
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
         if(this.gameChannelService.validateTicket(pendingInboundMessage.payload())){
-            pendingOutboundMessage.sessionId(gameChannelService.sessionId());
-            pendingOutboundMessage.payload("ok".getBytes());
+            int sessionId = gameChannelService.sessionId();
+            pendingOutboundMessage.sessionId(sessionId);
+            pendingOutboundMessage.payload("accepted".getBytes());
+            gameChannelService.gameChannel(pendingInboundMessage.connectionId()).join(sessionId,pendingInboundMessage.source());
+        }
+        else{
+            pendingOutboundMessage.payload("rejected".getBytes());
         }
         this.gameChannelService.send(pendingOutboundMessage,pendingInboundMessage.source());
     }

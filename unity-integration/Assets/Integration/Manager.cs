@@ -36,7 +36,7 @@ namespace Integration
                 return;
             }
             bText.text = _integrationManager.Presence.SystemId;
-            await _integrationManager.Service(this);
+            //await _integrationManager.Service(this);
             await _integrationManager.OnMessage();
         }
 
@@ -56,6 +56,7 @@ namespace Integration
             {
                 _playing = true;
             });
+            await _integrationManager.Ticket(this);
             var buffer = new DataBuffer();
             buffer.PutInt(_integrationManager.Presence.Stub);
             buffer.PutUTF8String(_integrationManager.Presence.Login);

@@ -2,6 +2,7 @@ package com.tarantula.platform.presence;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
+import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.TokenValidatorProvider;
@@ -61,14 +62,14 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             pc.access = user(session.systemId());
             pc.account = account(pc.access.primary()?session.systemId():pc.access.owner());
             pc.subscription = membership(pc.access.primary()?session.systemId():pc.access.owner());
-            //if(this.connection!=null){
-                //pc.connection = this.connection;
-                //byte[] key = this.deploymentServiceProvider.serverKey(this.connection);
-                //pc.serverKey = Base64.getEncoder().encodeToString(key);
-            //}
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
-            //this.deploymentServiceProvider.onConnection()
-            this.context.postOffice().onConnection(connection.server()).send(connection.server().sequence()+"/"+12,"presence".getBytes());
+            //this.context.postOffice().onConnection(connection.server()).send(connection.server().sequence()+"/"+ MessageHandler.ACK,"presence".getBytes());
+        }
+        else if(session.action().equals("onTicket")){
+            PresenceContext pc = new PresenceContext(session.action());
+            pc.presence= new OnSessionTrack(session.systemId());
+            pc.presence.ticket(this.context.validator().ticket(session.systemId(),session.stub()));
+            session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
         }
         //public lobby access by page number
         else if(session.action().equals("onLobbyList")){
