@@ -23,6 +23,7 @@ public class EchoMessageHandler implements MessageHandler {
         pendingOutboundMessage.ack(pendingInboundMessage.ack());
         pendingOutboundMessage.timestamp(pendingInboundMessage.timestamp());
         pendingOutboundMessage.messageId(pendingInboundMessage.messageId());
+        pendingOutboundMessage.sessionId(pendingInboundMessage.sessionId());
         pendingOutboundMessage.type(pendingInboundMessage.type());
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
         pendingOutboundMessage.payload(pendingInboundMessage.payload());

@@ -119,6 +119,7 @@ public class UDPSessionService implements ConnectionEventService {
             PendingOutboundMessage pendingOutboundMessage = new PendingOutboundMessage();
             pendingOutboundMessage.ack(false);
             pendingOutboundMessage.connectionId(connection.connectionId());
+            pendingOutboundMessage.sessionId(101);
             //label sequence/type
             String[] params = label.split(Recoverable.PATH_SEPARATOR);
             pendingOutboundMessage.type(Integer.parseInt(params[1]));

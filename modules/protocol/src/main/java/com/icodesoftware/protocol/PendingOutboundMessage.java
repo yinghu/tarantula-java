@@ -24,8 +24,11 @@ public class PendingOutboundMessage {
     public void connectionId(long connectionId){
         message.putLong(PendingInboundMessage.CONNECTION_ID_POS,connectionId);
     }
+    public void sessionId(int sessionId){
+        message.putInt(PendingInboundMessage.SESSION_ID_POD,sessionId);
+    }
     public void sequence(int sequence){
-        message.putInt(PendingInboundMessage.SEQ_POS,sequence);
+        message.putInt(PendingInboundMessage.SEQUENCE_POS,sequence);
     }
     public void timestamp(long timestamp){
         message.putLong(PendingInboundMessage.TIMESTAMP_POS,timestamp);

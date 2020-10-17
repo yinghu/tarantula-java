@@ -93,7 +93,6 @@ public class UDPService implements Runnable, GameChannelService {
                 try{
                     PendingInboundMessage pendingInboundMessage = mQueue.poll();
                     if(pendingInboundMessage!=null){
-                        log.warn("CID->"+pendingInboundMessage.connectionId());
                         GameChannel gameChannel = mChannels.get(pendingInboundMessage.connectionId());
                         gameChannel.onMessage(pendingInboundMessage);
                     }

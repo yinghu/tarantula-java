@@ -51,6 +51,7 @@ namespace GameClustering
                 message.Ack(ack);
                 message.Type(type);
                 message.MessageId(_messageId++);
+                message.SessionId(505);
                 message.Sequence(sequence);
                 message.Timestamp(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
                 message.Payload(payload.ToArray());

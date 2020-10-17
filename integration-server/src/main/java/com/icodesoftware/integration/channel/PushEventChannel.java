@@ -7,6 +7,10 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.PendingInboundMessage;
 
+import java.net.SocketAddress;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Created by yinghu lu on 10/16/2020.
  */
@@ -16,10 +20,13 @@ public class PushEventChannel implements GameChannel {
 
     private final long channelId;
     private final GameChannelService gameChannelService;
-
+    private final ConcurrentHashMap<Integer, SocketAddress> mSockets;
+    private final AtomicInteger sessionId;
     public PushEventChannel(final long channelId,final GameChannelService gameChannelService){
         this.channelId = channelId;
         this.gameChannelService = gameChannelService;
+        this.mSockets = new ConcurrentHashMap<>();
+        this.sessionId = new AtomicInteger(0);
     }
     @Override
     public long channelId() {
@@ -28,6 +35,7 @@ public class PushEventChannel implements GameChannel {
 
     @Override
     public void onMessage(PendingInboundMessage pendingInboundMessage) {
+        log.warn("SESSION ID->"+pendingInboundMessage.sessionId());
         MessageHandler messageHandler = gameChannelService.messageHandler(pendingInboundMessage.type());
         if(messageHandler!=null){
             messageHandler.onMessage(pendingInboundMessage);

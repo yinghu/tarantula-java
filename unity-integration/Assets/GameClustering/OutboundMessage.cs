@@ -41,7 +41,16 @@ namespace GameClustering
             _memoryStream.Position = InboundMessage.MessageIdPos;
             _memoryStream.Write(bytes,0,4);
         }
-        
+        public void SessionId(int sessionId)
+        {
+            var bytes = BitConverter.GetBytes(sessionId);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
+            _memoryStream.Position = InboundMessage.SessionIdPos;
+            _memoryStream.Write(bytes,0,4);
+        }
         public void ConnectionId(long connectionId)
         {
             var bytes = BitConverter.GetBytes(connectionId);
