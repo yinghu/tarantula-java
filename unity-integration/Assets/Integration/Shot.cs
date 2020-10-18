@@ -18,10 +18,10 @@ namespace Integration
             var integrationManager = IntegrationManager.Instance;
             var buffer1 = new DataBuffer();
             buffer1.PutInt(1);
-            await integrationManager.Messenger.SendAsync(MessageType.Relay, 1, false, buffer1);
+            await integrationManager.Messenger.SendAsync(MessageType.Relay, 1, true, buffer1);
             var buffer2 = new DataBuffer();
             buffer2.PutInt(2);
-            await integrationManager.Messenger.SendAsync(MessageType.Relay, 2, false, buffer2);
+            await integrationManager.Messenger.SendAsync(MessageType.Relay, 2, true, buffer2);
             Debug.Log("Shooting ...");
         }
 
@@ -38,13 +38,11 @@ namespace Integration
         public async void Exit()
         {
             var integrationManager = IntegrationManager.Instance;
-            integrationManager.Messenger.RegisterMessageHandler(MessageType.Leave,3, ibuffer =>
+            integrationManager.Messenger.RegisterMessageHandler(MessageType.Leave,3, buffer =>
             {
                 _leaving = true;
             });
-            var buffer = new DataBuffer();
-            buffer.PutInt(1);
-            await integrationManager.Messenger.SendAsync(MessageType.Leave, 3, false,buffer);
+            await integrationManager.Messenger.SendAsync(MessageType.Leave, 3, false);
         }
     }
 }

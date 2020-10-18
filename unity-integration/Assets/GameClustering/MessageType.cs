@@ -9,5 +9,7 @@
         public const int Leave = 4;
         public const int Spawn = 5;
         public const int Ping = 6;
+        public const int Pong = 7;
+        public const int Vote = 8;
     }
 }

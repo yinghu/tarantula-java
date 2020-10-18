@@ -71,6 +71,7 @@ namespace Integration
                 return;
             }
             _playing = false;
+            _integrationManager.Messenger.Disconnect();
         }
     }
 }

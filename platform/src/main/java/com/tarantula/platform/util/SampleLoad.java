@@ -108,16 +108,9 @@ public class SampleLoad {
 
     }
     public static void main(String[] args) throws Exception{
-        //SampleLoad sampleLoad = new SampleLoad("http://10.0.0.234:8090",null,50000);
-        //sampleLoad._init();
-        //sampleLoad.register();
-        FIFOBuffer<String> fifoBuffer = new FIFOBuffer<>(10,new String[10]);
-        for(int i=0; i<11;i++){
-            fifoBuffer.push("name-"+i);
-        }
-        fifoBuffer.list(new ArrayList<>()).forEach((s)->{
-            System.out.println(s);
-        });
+        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.234:8090",null,50000);
+        sampleLoad._init();
+        sampleLoad.register();
     }
 
 }

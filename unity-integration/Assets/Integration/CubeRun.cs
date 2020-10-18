@@ -25,6 +25,11 @@ namespace Integration
                 _speed = buffer.GetFloat();
                 Debug.Log("SPEED->"+_speed);
             });
+            IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (buffer) =>
+            {
+                _speed = buffer.GetFloat();
+                Debug.Log("SPAWN->"+_speed);
+            });
         }
 
         private void Update()
@@ -43,6 +48,7 @@ namespace Integration
             var buffer2 = new DataBuffer();
             buffer2.PutFloat(_speed.Equals(3)?6:3);
             await IntegrationManager.Instance.Messenger.SendAsync(MessageType.Echo, sequence, false, buffer2);
+            await IntegrationManager.Instance.Messenger.SendAsync(MessageType.Spawn, sequence, false, buffer2);
         }
     }
 }

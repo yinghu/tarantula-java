@@ -1,4 +1,4 @@
-package com.tarantula.platform.util;
+package com.icodesoftware.util;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ public class FIFOBuffer<T> {
     private transient int tail;
     private transient int overflow;
 
-    public FIFOBuffer(int size,T[] tlist){
+    public FIFOBuffer(int size, T[] tlist){
         buffer =  tlist;
         header = 0;
         tail = 0;

@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
 /**
  * Created by yinghu lu on 9/28/2020.
  */
-public class PendingInboundMessageTest{
+public class DataBufferTest {
 
     @BeforeClass
     public void setUp() {

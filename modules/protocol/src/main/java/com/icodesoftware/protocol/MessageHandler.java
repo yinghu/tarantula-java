@@ -11,6 +11,8 @@ public interface MessageHandler {
     int LEAVE = 4;
     int SPAWN = 5;
     int PING = 6;
+    int PONG = 7;
+    int VOTE = 8;
     int type();
     void onMessage(PendingInboundMessage pendingInboundMessage);
 }

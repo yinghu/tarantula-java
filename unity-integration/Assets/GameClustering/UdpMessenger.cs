@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Threading;
@@ -14,6 +13,7 @@ namespace GameClustering
     {
         private UdpClient _udpClient;
         private readonly Dictionary<CallbackKey, Action<DataBuffer>> _handlers;
+        private readonly Dictionary<int, byte[]> _pendingMessages;
         private Connection _connection;
         private ICryptoTransform _encrypt;
         private ICryptoTransform _decrypt;
@@ -21,6 +21,7 @@ namespace GameClustering
         public UdpMessenger()
         {
             _handlers = new Dictionary<CallbackKey, Action<DataBuffer>>();
+            _pendingMessages = new Dictionary<int, byte[]>();
         }
 
         public void Connect(Connection connection,byte[] serverKey)
@@ -41,10 +42,28 @@ namespace GameClustering
             _udpClient = new UdpClient(_connection.Host,_connection.Port);
             _handlers[new CallbackKey(MessageType.Ack,0)] = buffer =>
             {
-                Debug.Log("Processing ack->");
+                foreach (var mid in _pendingMessages.Keys)
+                {
+                    Debug.Log("Processing ack->"+mid);
+                }
+            };
+            _handlers[new CallbackKey(MessageType.Ping,0)] = async buffer =>
+            {
+                Debug.Log("Processing ping->");
+                await SendAsync(MessageType.Pong, 0, false);
             };
         }
-        
+
+        public void Disconnect()
+        {
+            _udpClient.Close();
+        }
+
+        public async Task<bool> SendAsync(int type, int sequence, bool ack)
+        {
+            return await SendAsync(type, sequence, ack, null);
+        }
+
         public async Task<bool> SendAsync(int type,int sequence,bool ack,DataBuffer payload)
         {
             using (var message = new OutboundMessage())
@@ -52,13 +71,21 @@ namespace GameClustering
                 message.ConnectionId(_connection.ConnectionId);
                 message.Ack(ack);//cache if ack = true
                 message.Type(type);
-                message.MessageId(_messageId++);
+                var messageId = Interlocked.Increment(ref _messageId);
+                message.MessageId(messageId);
                 message.SessionId(_connection.SessionId);
                 message.Sequence(sequence);
                 message.Timestamp(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-                message.Payload(payload.ToArray());
+                if (payload != null)
+                {
+                    message.Payload(payload.ToArray());
+                }
                 var outMessage = _connection.Secured ? Encrypt(message.Message()) : message.Message();
                 var bytes = await _udpClient.SendAsync(outMessage, outMessage.Length);
+                if (ack)
+                {
+                    _pendingMessages[messageId] = outMessage;
+                }
                 return bytes > 0;
             }
         }
@@ -84,7 +111,7 @@ namespace GameClustering
         {
             _handlers.Remove(new CallbackKey(type,sequence));
         }
-
+        
         private void ProcessMessage(byte[] data)
         {
             using (var inboundMessage = new InboundMessage(_connection.Secured ? Decrypt(data) : data))
