@@ -8,5 +8,6 @@
         public const int Relay = 3;
         public const int Leave = 4;
         public const int Spawn = 5;
+        public const int Ping = 6;
     }
 }

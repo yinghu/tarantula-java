@@ -10,6 +10,7 @@ public interface MessageHandler {
     int RELAY = 3;
     int LEAVE = 4;
     int SPAWN = 5;
+    int PING = 6;
     int type();
     void onMessage(PendingInboundMessage pendingInboundMessage);
 }

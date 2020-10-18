@@ -7,6 +7,7 @@ import com.icodesoftware.integration.JoinMessageHandler;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.PendingInboundMessage;
+import com.icodesoftware.protocol.PendingOutboundMessage;
 
 import java.net.SocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,6 +67,11 @@ public class PushEventChannel implements GameChannel {
         else{
             log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type());
         }
+    }
+    public void send(PendingOutboundMessage pendingOutboundMessage){
+        this.mSockets.forEach((k,v)->{
+            this.gameChannelService.send(pendingOutboundMessage,v);
+        });
     }
 
 }

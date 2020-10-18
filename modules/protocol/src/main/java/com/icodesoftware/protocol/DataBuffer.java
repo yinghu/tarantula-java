@@ -5,14 +5,14 @@ import java.nio.ByteBuffer;
 /**
  * Created by yinghu lu on 10/15/2020.
  */
-public class PayloadBuffer {
+public class DataBuffer {
     private ByteBuffer byteBuffer;
     private boolean writeMode;
-    public PayloadBuffer(){
-        byteBuffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE);
+    public DataBuffer(){
+        byteBuffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE-PendingInboundMessage.PAYLOAD_POS);
         this.writeMode = true;
     }
-    public PayloadBuffer(byte[] payload){
+    public DataBuffer(byte[] payload){
         byteBuffer = ByteBuffer.wrap(payload);
     }
     public void putUTF8(String str){
@@ -28,6 +28,16 @@ public class PayloadBuffer {
         byteBuffer.get(str);
         return new String(str);
     }
+    public void putByte(byte b){
+        if(!writeMode){
+            throw new UnsupportedOperationException();
+        }
+        byteBuffer.put(b);
+    }
+    public int getByte(){
+        return byteBuffer.get();
+    }
+
     public void putInt(int i){
         if(!writeMode){
             throw new UnsupportedOperationException();

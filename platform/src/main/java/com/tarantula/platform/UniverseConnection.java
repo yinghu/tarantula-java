@@ -11,6 +11,7 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     private String type;
     private String serverId;
     private long connectionId;
+    private int sessionId;
     private int sequence;
     private boolean secured;
     private String protocol;
@@ -56,6 +57,12 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     }
     public void connectionId(long connectionId){
         this.connectionId = connectionId;
+    }
+    public int sessionId(){
+        return sessionId;
+    }
+    public void sessionId(int sessionId){
+        this.sessionId = sessionId;
     }
     @Override
     public boolean secured() {
@@ -129,12 +136,13 @@ public class UniverseConnection extends ResponseHeader implements Connection {
         this.properties.put("disabled",this.disabled);
         this.properties.put("hasServer",server!=null);
         if(server!=null){
-            this.properties.put("stype",this.type);
-            this.properties.put("ssecured",this.secured);
-            this.properties.put("sprotocol",this.protocol);
-            this.properties.put("shost",this.host);
-            this.properties.put("sport",this.port);
-            this.properties.put("spath",this.path);
+            this.properties.put("stype",this.server.type());
+            this.properties.put("ssecured",this.server.secured());
+            this.properties.put("sprotocol",this.server.protocol());
+            this.properties.put("shost",this.server.host());
+            this.properties.put("sport",this.server.port());
+            this.properties.put("spath",this.server.path());
+            this.properties.put("ssessionId",this.server.sessionId());
         }
         return this.properties;
     }
@@ -159,6 +167,7 @@ public class UniverseConnection extends ResponseHeader implements Connection {
             server.host((String)properties.get("shost"));
             server.port(((Number)properties.get("sport")).intValue());
             server.path((String)properties.get("spath"));
+            server.sessionId(((Number)properties.get("ssessionId")).intValue());
         }
     }
     public int getFactoryId() {

@@ -1,10 +1,12 @@
 package com.tarantula.cci.udp;
 
 
+import com.google.api.client.util.DateTime;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
 import com.tarantula.platform.service.ConnectionEventService;
+import com.tarantula.platform.util.SystemUtil;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -13,6 +15,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -97,7 +100,7 @@ public class UDPSessionService implements ConnectionEventService {
     private void run() {
         try{
             while (true){
-                ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE);
+                ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE*2);
                 SocketAddress sc = datagramChannel.receive(buffer);
                 buffer.flip();
                 byte[] payload = new byte[buffer.limit()];
@@ -115,17 +118,22 @@ public class UDPSessionService implements ConnectionEventService {
 
     @Override
     public void publish(byte[] payload,String label,Connection connection) {
+        String[] params = label.split(Recoverable.PATH_SEPARATOR);
+        int type = Integer.parseInt(params[0]);
+        int seq = Integer.parseInt(params[1]);
+        boolean ack = params.length==3?Boolean.parseBoolean(params[2]):false;
+        send(payload,type,seq,ack,connection);
+    }
+    private void send(byte[] payload,int type,int sequence,boolean ack,Connection connection){
         try{
             PendingOutboundMessage pendingOutboundMessage = new PendingOutboundMessage();
-            pendingOutboundMessage.ack(false);
+            pendingOutboundMessage.ack(ack);
             pendingOutboundMessage.connectionId(connection.connectionId());
-            pendingOutboundMessage.sessionId(101);
-            //label sequence/type
-            String[] params = label.split(Recoverable.PATH_SEPARATOR);
-            pendingOutboundMessage.type(Integer.parseInt(params[1]));
-            pendingOutboundMessage.sequence(Integer.parseInt(params[0]));
+            pendingOutboundMessage.sessionId(0);
+            pendingOutboundMessage.type(type);
+            pendingOutboundMessage.sequence(sequence);
             pendingOutboundMessage.messageId(messageId.incrementAndGet());
-            pendingOutboundMessage.timestamp(200);
+            pendingOutboundMessage.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
             pendingOutboundMessage.payload(payload);
             ByteBuffer out = connection.secured()?ByteBuffer.wrap(encrypt(pendingOutboundMessage.message())):ByteBuffer.wrap(pendingOutboundMessage.message());
             datagramChannel.write(out);

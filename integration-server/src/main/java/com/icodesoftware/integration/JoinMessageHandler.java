@@ -1,7 +1,7 @@
 package com.icodesoftware.integration;
 
 import com.icodesoftware.protocol.MessageHandler;
-import com.icodesoftware.protocol.PayloadBuffer;
+import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
 
@@ -26,7 +26,7 @@ public class JoinMessageHandler implements MessageHandler {
         pendingOutboundMessage.messageId(pendingInboundMessage.messageId());
         pendingOutboundMessage.type(pendingInboundMessage.type());
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
-        PayloadBuffer data = new PayloadBuffer();
+        DataBuffer data = new DataBuffer();
         if(this.gameChannelService.validateTicket(pendingInboundMessage.payload())){
             int sessionId = gameChannelService.sessionId();
             pendingOutboundMessage.sessionId(sessionId);

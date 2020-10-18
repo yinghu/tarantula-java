@@ -15,6 +15,9 @@ public interface Connection extends Recoverable {
     long connectionId();
     void connectionId(long connectionId);
 
+    int sessionId();
+    void sessionId(int sessionId);
+
     int sequence();
     void sequence(int sequence);
 

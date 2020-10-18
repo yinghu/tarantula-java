@@ -2,18 +2,15 @@ package com.tarantula.platform.presence;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
+import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.*;
-
 import com.tarantula.platform.util.*;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.util.ArrayList;
-import java.util.Base64;
 
 
 /**
@@ -63,7 +60,10 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             pc.account = account(pc.access.primary()?session.systemId():pc.access.owner());
             pc.subscription = membership(pc.access.primary()?session.systemId():pc.access.owner());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
-            //this.context.postOffice().onConnection(connection.server()).send(connection.server().sequence()+"/"+ MessageHandler.ACK,"presence".getBytes());
+            DataBuffer payloadBuffer = new DataBuffer();
+            payloadBuffer.putUTF8("hello");
+            payloadBuffer.putUTF8("pop");
+            this.context.postOffice().onConnection(connection.server()).send(MessageHandler.ECHO+"/1/false",payloadBuffer.toArray());
         }
         else if(session.action().equals("onTicket")){
             PresenceContext pc = new PresenceContext(session.action());
@@ -85,7 +85,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             }else{
                 session.write(toMessage("no lobby data",false).toString().getBytes(),this.descriptor.responseLabel());
             }
-
         }
         else if(session.action().equals("onAddEmail")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -235,7 +234,8 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         this.context.log("Server->"+c.server().host(),OnLog.WARN);
         this.connection = c;
         c.registerInboundMessageListener((code,d)->{
-            this.context.log("MSG->"+code+"<><><><>"+new String(d).trim(),OnLog.WARN);
+            DataBuffer dataBuffer = new DataBuffer(d);
+            this.context.log("MSG->"+code+"<><><><>"+dataBuffer.getUTF8()+"/"+dataBuffer.getUTF8(),OnLog.WARN);
         });
     }
 }

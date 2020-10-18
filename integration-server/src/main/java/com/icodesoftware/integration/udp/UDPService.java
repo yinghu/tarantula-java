@@ -7,7 +7,7 @@ import com.icodesoftware.integration.*;
 import com.icodesoftware.integration.channel.PushEventChannel;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.MessageHandler;
-import com.icodesoftware.protocol.PayloadBuffer;
+import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
 import com.icodesoftware.service.DeploymentServiceProvider;
@@ -162,7 +162,7 @@ public class UDPService implements Runnable, GameChannelService {
     }
     public boolean validateTicket(byte[] payload){
         try{
-            PayloadBuffer buffer = new PayloadBuffer(payload);
+            DataBuffer buffer = new DataBuffer(payload);
             int stub = buffer.getInt();
             String login = buffer.getUTF8();
             String ticket = buffer.getUTF8();
