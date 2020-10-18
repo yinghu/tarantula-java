@@ -25,10 +25,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.Base64;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -42,6 +39,7 @@ public class UDPService implements Runnable, GameChannelService {
     private final ConcurrentHashMap<Integer, MessageHandler> mHandlers;
     private final ConcurrentHashMap<Long, GameChannel> mChannels;
     private ExecutorService executorService;
+    private ScheduledExecutorService scheduledExecutorService;
     private HttpCaller httpCaller;
     private String configHeader;
     private JsonObject config;
@@ -74,10 +72,14 @@ public class UDPService implements Runnable, GameChannelService {
         mHandlers.put(relayMessageHandler.type(),relayMessageHandler);
         LeaveMessageHandler leaveMessageHandler = new LeaveMessageHandler(this);
         mHandlers.put(leaveMessageHandler.type(),leaveMessageHandler);
+        PongMessageHandler pongMessageHandler = new PongMessageHandler(this);
+        mHandlers.put(pongMessageHandler.type(),pongMessageHandler);
+        SpawnMessageHandler spawnMessageHandler = new SpawnMessageHandler(this);
+        mHandlers.put(spawnMessageHandler.type(),spawnMessageHandler);
     }
     @Override
     public void run(){
-        log.warn("WAITING FOR MESSAGE ..."+gameChannels);
+        log.warn("WAITING FOR MESSAGE ON CHANNELS ["+gameChannels+"]");
         while (true){
             try{
                 ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE*2);
@@ -94,6 +96,7 @@ public class UDPService implements Runnable, GameChannelService {
         }
     }
     public void start() throws Exception{
+        scheduledExecutorService = Executors.newScheduledThreadPool(1);
         this.datagramChannel = DatagramChannel.open();
         InetSocketAddress iAdd = new InetSocketAddress(address,port);
         this.datagramChannel.bind(iAdd);
@@ -138,6 +141,11 @@ public class UDPService implements Runnable, GameChannelService {
         encrypt.init(Cipher.ENCRYPT_MODE,secretKey,iv);
         decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
         decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
+        mChannels.forEach((k,v)->{
+            scheduledExecutorService.scheduleAtFixedRate(()->{
+                v.ping();
+            },5000,5000,TimeUnit.MILLISECONDS);
+        });
     }
     public void shutdown() throws Exception{
         String[] headers = new String[]{

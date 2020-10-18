@@ -14,4 +14,5 @@ public interface GameChannel {
     void join(int sessionId, SocketAddress socketAddress);
     void leave(int sessionId, SocketAddress socketAddress);
     void send(PendingOutboundMessage pendingOutboundMessage);
+    void ping();
 }

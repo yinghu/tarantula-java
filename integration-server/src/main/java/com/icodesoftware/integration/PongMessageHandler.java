@@ -6,19 +6,19 @@ import com.icodesoftware.protocol.PendingInboundMessage;
 /**
  * Created by yinghu lu on 10/7/2020.
  */
-public class PingMessageHandler implements MessageHandler {
+public class PongMessageHandler implements MessageHandler {
     private final GameChannelService gameChannelService;
-    public PingMessageHandler(GameChannelService gameService){
+    public PongMessageHandler(GameChannelService gameService){
         this.gameChannelService = gameService;
     }
 
     @Override
     public int type() {
-        return ACK;
+        return PONG;
     }
 
     @Override
     public void onMessage(PendingInboundMessage pendingInboundMessage) {
-
+        System.out.println("PONG FROM ->"+pendingInboundMessage.connectionId());
     }
 }

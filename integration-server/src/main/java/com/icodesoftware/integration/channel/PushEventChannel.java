@@ -3,7 +3,6 @@ package com.icodesoftware.integration.channel;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.GameChannel;
 import com.icodesoftware.integration.GameChannelService;
-import com.icodesoftware.integration.JoinMessageHandler;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.PendingInboundMessage;
@@ -22,26 +21,28 @@ public class PushEventChannel implements GameChannel {
 
     private final long channelId;
     private final GameChannelService gameChannelService;
-    private final ConcurrentHashMap<Integer, SocketAddress> mSockets;
+    private final ConcurrentHashMap<Integer, RemoteSession> mSockets;
 
     private final MessageHandler joinMessageHandler;
     private final MessageHandler ackMessageHandler;
+    private final MessageHandler pingMessageHandler;
     public PushEventChannel(final long channelId,final GameChannelService gameChannelService){
         this.channelId = channelId;
         this.gameChannelService = gameChannelService;
         this.mSockets = new ConcurrentHashMap<>();
         this.joinMessageHandler = this.gameChannelService.messageHandler(MessageHandler.JOIN);
         this.ackMessageHandler = this.gameChannelService.messageHandler(MessageHandler.ACK);
+        this.pingMessageHandler = this.gameChannelService.messageHandler(MessageHandler.PING);
     }
     @Override
     public long channelId() {
         return channelId;
     }
     public void join(int sessionId,SocketAddress socketAddress){
-        mSockets.put(sessionId,socketAddress);
+        mSockets.put(sessionId,new RemoteSession(socketAddress));
     }
     public void leave(int sessionId,SocketAddress socketAddress){
-        if(mSockets.contains(sessionId)&&mSockets.get(sessionId).equals(socketAddress)){
+        if(mSockets.containsKey(sessionId)&&mSockets.get(sessionId).socketAddress.equals(socketAddress)){
             mSockets.remove(sessionId);
         }
     }
@@ -54,7 +55,11 @@ public class PushEventChannel implements GameChannel {
             if(messageHandler!=null){
                 messageHandler.onMessage(pendingInboundMessage);
                 if(pendingInboundMessage.ack()){
-                    ackMessageHandler.onMessage(pendingInboundMessage);
+                    PendingOutboundMessage ack = new PendingOutboundMessage();
+                    ack.type(MessageHandler.ACK);
+                    ack.sequence(0);
+                    gameChannelService.send(ack,pendingInboundMessage.source());
+                    //ackMessageHandler.onMessage(pendingInboundMessage);
                 }
             }
             else{
@@ -70,8 +75,15 @@ public class PushEventChannel implements GameChannel {
     }
     public void send(PendingOutboundMessage pendingOutboundMessage){
         this.mSockets.forEach((k,v)->{
-            this.gameChannelService.send(pendingOutboundMessage,v);
+            this.gameChannelService.send(pendingOutboundMessage,v.socketAddress);
         });
     }
-
+    public void ping(){
+        PendingOutboundMessage pendingOutboundMessage = new PendingOutboundMessage();
+        pendingOutboundMessage.type(MessageHandler.PING);
+        pendingOutboundMessage.sequence(0);
+        mSockets.forEach((k,v)->{
+            this.gameChannelService.send(pendingOutboundMessage,v.socketAddress);
+        });
+    }
 }
