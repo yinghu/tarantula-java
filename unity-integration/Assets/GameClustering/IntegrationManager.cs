@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -22,7 +23,6 @@ namespace GameClustering
         public Presence Presence { get; private set; }
         public bool Authenticated => Presence == null;
         
-
         [RuntimeInitializeOnLoadMethod]
         private static void _Init(){
             _instance = Resources.Load<IntegrationManager>("IntegrationManager");
@@ -166,7 +166,7 @@ namespace GameClustering
             catch(Exception ex)
             {
                 Exception = ex;
-            }   
+            }
         }
         
     }

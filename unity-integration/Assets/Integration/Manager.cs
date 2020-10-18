@@ -54,6 +54,7 @@ namespace Integration
         {
             _integrationManager.Messenger.RegisterMessageHandler(MessageType.Join,0, buff=>
             {
+                Debug.Log(buff.GetUTF8String());
                 _playing = true;
             });
             await _integrationManager.Ticket(this);

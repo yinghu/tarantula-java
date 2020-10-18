@@ -56,6 +56,7 @@ public class PayloadBuffer {
         return byteBuffer.getLong();
     }
     public byte[] toArray(){
+        byteBuffer.flip();
         byte[] _payload = new byte[byteBuffer.limit()];
         byteBuffer.position(0);
         byteBuffer.get(_payload);

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -65,30 +67,7 @@ namespace GameClustering
             var ret = await _udpClient.ReceiveAsync();
             if (ret.Buffer.Length > 0)
             {
-                using (var inboundMessage = new InboundMessage(_connection.Secured ? Decrypt(ret.Buffer) : ret.Buffer))
-                {
-                    var callbackKey = new CallbackKey(inboundMessage.Type(),inboundMessage.Sequence());
-                    if (_handlers.TryGetValue(callbackKey, out var handler))
-                    {
-                        if (inboundMessage.Type() == MessageType.Join)
-                        {
-                            _connection.SessionId = inboundMessage.SessionId();
-                        }
-                        else if (inboundMessage.Type() == MessageType.Leave)
-                        {
-                            _connection.SessionId = 0;
-                        }
-                        Debug.Log("timestamp->"+(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()-inboundMessage.Timestamp()));
-                        using (var buffer = new DataBuffer(inboundMessage.Payload()))
-                        {
-                            handler.Invoke(buffer);    
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log("NO HANDLER REGISTERED->" + inboundMessage.Type()+"/"+inboundMessage.Sequence());
-                    }
-                }
+                ProcessMessage(ret.Buffer);
             }    
             else
             {
@@ -105,7 +84,35 @@ namespace GameClustering
         {
             _handlers.Remove(new CallbackKey(type,sequence));
         }
-        
+
+        private void ProcessMessage(byte[] data)
+        {
+            using (var inboundMessage = new InboundMessage(_connection.Secured ? Decrypt(data) : data))
+            {
+                var callbackKey = new CallbackKey(inboundMessage.Type(),inboundMessage.Sequence());
+                if (_handlers.TryGetValue(callbackKey, out var handler))
+                {
+                    if (inboundMessage.Type() == MessageType.Join)
+                    {
+                        _connection.SessionId = inboundMessage.SessionId();
+                    }
+                    else if (inboundMessage.Type() == MessageType.Leave)
+                    {
+                        _connection.SessionId = 0;
+                    }
+                    Debug.Log("timestamp->"+(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()-inboundMessage.Timestamp()));
+                    using (var buffer = new DataBuffer(inboundMessage.Payload()))
+                    {
+                        handler.Invoke(buffer);    
+                    }
+                }
+                else
+                {
+                    Debug.Log("NO HANDLER REGISTERED->" + inboundMessage.Type()+"/"+inboundMessage.Sequence());
+                }
+            }        
+        }
+
         private byte[] Encrypt(byte[] data)
         {
             using (var stream = new MemoryStream())

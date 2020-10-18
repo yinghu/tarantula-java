@@ -9,6 +9,7 @@ public interface MessageHandler {
     int ECHO = 2;
     int RELAY = 3;
     int LEAVE = 4;
+    int SPAWN = 5;
     int type();
     void onMessage(PendingInboundMessage pendingInboundMessage);
 }
