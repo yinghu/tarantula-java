@@ -50,7 +50,7 @@ namespace GameClustering
             using (var message = new OutboundMessage())
             {
                 message.ConnectionId(_connection.ConnectionId);
-                message.Ack(ack);
+                message.Ack(ack);//cache if ack = true
                 message.Type(type);
                 message.MessageId(_messageId++);
                 message.SessionId(_connection.SessionId);
