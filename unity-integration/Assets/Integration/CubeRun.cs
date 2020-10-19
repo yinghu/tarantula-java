@@ -1,5 +1,4 @@
 ﻿using GameClustering;
-using TMPro;
 using UnityEngine;
 
 namespace Integration
@@ -8,7 +7,6 @@ namespace Integration
     {
         public int sequence;
         private bool _enabled = true;
-        public TMP_Text bText;
         private float _timer;
         private float _speed;
         private void Start()
@@ -18,17 +16,14 @@ namespace Integration
             IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Relay,sequence, (buffer) =>
             {
                 _enabled = !_enabled;
-                bText.text= ("CallId ->"+buffer.GetInt()+"//"+_enabled);
             });
             IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Echo,sequence, (buffer) =>
             {
                 _speed = buffer.GetFloat();
-                Debug.Log("SPEED->"+_speed);
             });
             IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (buffer) =>
             {
                 _speed = buffer.GetFloat();
-                Debug.Log("SPAWN->"+_speed);
             });
         }
 
@@ -40,7 +35,7 @@ namespace Integration
         private async void FixedUpdate()
         {
             _timer += Time.deltaTime;
-            if (_timer < 3)
+            if (_timer < 0.5)
             {
                 return;
             }
@@ -48,7 +43,7 @@ namespace Integration
             var buffer2 = new DataBuffer();
             buffer2.PutFloat(_speed.Equals(3)?6:3);
             await IntegrationManager.Instance.Messenger.SendAsync(MessageType.Echo, sequence, false, buffer2);
-            await IntegrationManager.Instance.Messenger.SendAsync(MessageType.Spawn, sequence, false, buffer2);
+            await IntegrationManager.Instance.Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer2);
         }
     }
 }

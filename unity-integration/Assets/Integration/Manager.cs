@@ -9,8 +9,7 @@ namespace Integration
     public class Manager : MonoBehaviour
     {
         private IntegrationManager _integrationManager;
-        public GameObject bPlay;
-        public GameObject bExit;
+       
         public TMP_Text bText;
         private bool _playing;
         private void Awake()
@@ -37,7 +36,9 @@ namespace Integration
             }
             bText.text = _integrationManager.Presence.SystemId;
             //await _integrationManager.Service(this);
+            Debug.Log("STARTED MANAGER");
             await _integrationManager.OnMessage();
+            Debug.Log("ENDED MANAGER");
         }
 
         private void Update()
@@ -54,8 +55,7 @@ namespace Integration
         {
             _integrationManager.Messenger.RegisterMessageHandler(MessageType.Join,0, buff=>
             {
-                Debug.Log(buff.GetUTF8String());
-                _playing = true;
+                _playing = buff.GetUTF8String().Equals("accepted");
             });
             await _integrationManager.Ticket(this);
             var buffer = new DataBuffer();

@@ -19,6 +19,6 @@ public class PongMessageHandler implements MessageHandler {
 
     @Override
     public void onMessage(PendingInboundMessage pendingInboundMessage) {
-        System.out.println("PONG FROM ->"+pendingInboundMessage.connectionId());
+        //System.out.println("PONG FROM ->"+pendingInboundMessage.connectionId());
     }
 }

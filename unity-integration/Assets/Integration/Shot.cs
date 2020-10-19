@@ -1,4 +1,5 @@
 ﻿using GameClustering;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,7 +8,8 @@ namespace Integration
     public class Shot : MonoBehaviour
     {
         private bool _leaving;
-
+        public TMP_Text aText;
+        public TMP_Text bText;
         private void Start()
         {
             _leaving = false;
@@ -22,7 +24,12 @@ namespace Integration
             var buffer2 = new DataBuffer();
             buffer2.PutInt(2);
             await integrationManager.Messenger.SendAsync(MessageType.Relay, 2, true, buffer2);
-            Debug.Log("Shooting ...");
+        }
+
+        public void Check()
+        {
+            aText.text = "ACK->"+IntegrationManager.Instance.Messenger.PendingMessages();
+            bText.text = "BYTES->"+IntegrationManager.Instance.Messenger.TotalBytes();
         }
 
         private void Update()

@@ -12,5 +12,8 @@ namespace GameClustering
         Task<bool> SendAsync(int type,int sequence,bool ack);
         void RegisterMessageHandler(int type,int sequence,Action<DataBuffer> messageHandler);
         void UnregisterMessageHandler(int type,int sequence);
+
+        int PendingMessages();
+        int TotalBytes();
     }
 }

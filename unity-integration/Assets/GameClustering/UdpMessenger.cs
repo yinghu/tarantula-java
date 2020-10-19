@@ -18,6 +18,7 @@ namespace GameClustering
         private ICryptoTransform _encrypt;
         private ICryptoTransform _decrypt;
         private int _messageId;
+        private int _totalBytes;
         public UdpMessenger()
         {
             _handlers = new Dictionary<CallbackKey, Action<DataBuffer>>();
@@ -42,14 +43,14 @@ namespace GameClustering
             _udpClient = new UdpClient(_connection.Host,_connection.Port);
             _handlers[new CallbackKey(MessageType.Ack,0)] = buffer =>
             {
-                foreach (var mid in _pendingMessages.Keys)
+                var sz = buffer.GetInt();
+                for (var i = 0; i < sz; i++)
                 {
-                    Debug.Log("Processing ack->"+mid);
+                    _pendingMessages.Remove(buffer.GetInt());
                 }
             };
             _handlers[new CallbackKey(MessageType.Ping,0)] = async buffer =>
             {
-                Debug.Log("Processing ping->");
                 await SendAsync(MessageType.Pong, 0, false);
             };
         }
@@ -71,8 +72,12 @@ namespace GameClustering
                 message.ConnectionId(_connection.ConnectionId);
                 message.Ack(ack);//cache if ack = true
                 message.Type(type);
-                var messageId = Interlocked.Increment(ref _messageId);
-                message.MessageId(messageId);
+                var messageId = 0;
+                if (ack)
+                {
+                    messageId = Interlocked.Increment(ref _messageId);
+                    message.MessageId(messageId);
+                }
                 message.SessionId(_connection.SessionId);
                 message.Sequence(sequence);
                 message.Timestamp(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
@@ -86,6 +91,7 @@ namespace GameClustering
                 {
                     _pendingMessages[messageId] = outMessage;
                 }
+                _totalBytes += bytes;
                 return bytes > 0;
             }
         }
@@ -111,7 +117,17 @@ namespace GameClustering
         {
             _handlers.Remove(new CallbackKey(type,sequence));
         }
-        
+
+        public int PendingMessages()
+        {
+            return _pendingMessages.Count;
+        }
+
+        public int TotalBytes()
+        {
+            return _totalBytes;
+        }
+
         private void ProcessMessage(byte[] data)
         {
             using (var inboundMessage = new InboundMessage(_connection.Secured ? Decrypt(data) : data))
@@ -127,7 +143,7 @@ namespace GameClustering
                     {
                         _connection.SessionId = 0;
                     }
-                    Debug.Log("timestamp->"+(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()-inboundMessage.Timestamp()));
+                    //Debug.Log("timestamp->"+(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()-inboundMessage.Timestamp()));
                     using (var buffer = new DataBuffer(inboundMessage.Payload()))
                     {
                         handler.Invoke(buffer);    

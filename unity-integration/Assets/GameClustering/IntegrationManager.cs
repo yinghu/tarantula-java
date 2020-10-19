@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -46,7 +45,7 @@ namespace GameClustering
                     new Header{ Name = Header.TarantulaAction ,Value = "onIndex"}
                 };
                 var response = await _httpCaller.GetJson(caller,"/user/action",headers);
-                Debug.Log(response);
+                //Debug.Log(response);
                 return true;
             }
             catch(Exception ex)
@@ -121,6 +120,7 @@ namespace GameClustering
                 var jo = JObject.Parse(response);
                 var suc = (bool)jo.SelectToken("successful");
                 Presence = null;
+                _live = false;
                 return suc;
             }
             catch (Exception ex)
@@ -141,11 +141,11 @@ namespace GameClustering
                     new Header {Name = Header.TarantulaAction, Value = "onTicket"}
                 };
                 var response = await _httpCaller.GetJson(caller, "/service/action", headers);
-                Debug.Log(response);
+                //Debug.Log(response);
                 var jo = JObject.Parse(response);
                 var suc = (bool)jo.SelectToken("successful");
                 Presence.Ticket = (string)(jo.SelectToken("presence").SelectToken("ticket"));
-                Debug.Log(Presence.Ticket);
+                //Debug.Log(Presence.Ticket);
                 return suc;
             }
             catch (Exception ex)

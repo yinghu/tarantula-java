@@ -32,7 +32,9 @@ public class JoinMessageHandler implements MessageHandler {
             pendingOutboundMessage.sessionId(sessionId);
             data.putUTF8("accepted");
             pendingOutboundMessage.payload(data.toArray());
-            gameChannelService.gameChannel(pendingInboundMessage.connectionId()).join(sessionId,pendingInboundMessage.source());
+            GameChannel gameChannel = gameChannelService.gameChannel(pendingInboundMessage.connectionId());
+            gameChannel.join(sessionId,pendingInboundMessage.source());
+            gameChannel.ack(sessionId,pendingInboundMessage.messageId(),pendingInboundMessage.source());
         }
         else{
             data.putUTF8("rejected");

@@ -4,13 +4,16 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.GameChannel;
 import com.icodesoftware.integration.GameChannelService;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.PendingInboundMessage;
 import com.icodesoftware.protocol.PendingOutboundMessage;
+import com.icodesoftware.util.FIFOBuffer;
 
 import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by yinghu lu on 10/16/2020.
@@ -50,16 +53,12 @@ public class PushEventChannel implements GameChannel {
     public void onMessage(PendingInboundMessage pendingInboundMessage) {
         if(pendingInboundMessage.type()!=MessageHandler.JOIN
                 &&mSockets.containsKey(pendingInboundMessage.sessionId())
-                &&mSockets.get(pendingInboundMessage.sessionId()).equals(pendingInboundMessage.source())){
+                &&mSockets.get(pendingInboundMessage.sessionId()).socketAddress.equals(pendingInboundMessage.source())){
             MessageHandler messageHandler = gameChannelService.messageHandler(pendingInboundMessage.type());
             if(messageHandler!=null){
                 messageHandler.onMessage(pendingInboundMessage);
                 if(pendingInboundMessage.ack()){
-                    PendingOutboundMessage ack = new PendingOutboundMessage();
-                    ack.type(MessageHandler.ACK);
-                    ack.sequence(0);
-                    gameChannelService.send(ack,pendingInboundMessage.source());
-                    //ackMessageHandler.onMessage(pendingInboundMessage);
+                    ack(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),pendingInboundMessage.source());
                 }
             }
             else{
@@ -67,11 +66,25 @@ public class PushEventChannel implements GameChannel {
             }
         }
         else if(pendingInboundMessage.type()==MessageHandler.JOIN){
-             joinMessageHandler.onMessage(pendingInboundMessage);
+            joinMessageHandler.onMessage(pendingInboundMessage);
         }
         else{
             log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type());
         }
+    }
+    public void ack(int sessionId,int messageId,SocketAddress source){
+        PendingOutboundMessage ack = new PendingOutboundMessage();
+        ack.type(MessageHandler.ACK);
+        ack.sequence(0);
+        DataBuffer dataBuffer = new DataBuffer();
+        RemoteSession remoteSession = mSockets.get(sessionId);
+        FIFOBuffer<Integer> buffer = remoteSession.ackBuffer;
+        buffer.push(messageId);
+        List<Integer> alist = buffer.list(new ArrayList<>());
+        dataBuffer.putInt(alist.size());
+        alist.forEach((mid)->{dataBuffer.putInt(mid);});
+        ack.payload(dataBuffer.toArray());
+        gameChannelService.send(ack,source);
     }
     public void send(PendingOutboundMessage pendingOutboundMessage){
         this.mSockets.forEach((k,v)->{
