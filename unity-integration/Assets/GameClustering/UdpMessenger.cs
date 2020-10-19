@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Threading;
@@ -19,10 +20,13 @@ namespace GameClustering
         private ICryptoTransform _decrypt;
         private int _messageId;
         private int _totalBytes;
+        private bool _live;
+        private IPEndPoint _remote;
         public UdpMessenger()
         {
             _handlers = new Dictionary<CallbackKey, Action<DataBuffer>>();
             _pendingMessages = new Dictionary<int, byte[]>();
+            _live = false;
         }
 
         public void Connect(Connection connection,byte[] serverKey)
@@ -40,6 +44,7 @@ namespace GameClustering
                 _encrypt = rijAlg.CreateEncryptor();
                 _decrypt = rijAlg.CreateDecryptor();
             }
+            _remote = new IPEndPoint(IPAddress.Parse(_connection.Host),_connection.Port);
             _udpClient = new UdpClient(_connection.Host,_connection.Port);
             _handlers[new CallbackKey(MessageType.Ack,0)] = buffer =>
             {
@@ -53,10 +58,12 @@ namespace GameClustering
             {
                 await SendAsync(MessageType.Pong, 0, false);
             };
+            _live = true;
         }
 
         public void Disconnect()
         {
+            _live = false;
             _udpClient.Close();
         }
 
@@ -106,6 +113,30 @@ namespace GameClustering
             {
                 Debug.Log("NO INBOUND MESSAGE");
             }
+        }
+
+        public void Listen()
+        {
+            while (_live)
+            {
+                try
+                {
+                    var available = _udpClient.Available;
+                    if (available > 0)
+                    {
+                        var bytes = _udpClient.Receive(ref _remote);
+                        ProcessMessage(bytes);
+                    }
+                    else
+                    {
+                        Thread.Sleep(50);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.Log(ex.Message); 
+                }
+            }    
         }
 
         public void RegisterMessageHandler(int type,int sequence,Action<DataBuffer> messageHandler)

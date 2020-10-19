@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -21,8 +22,10 @@ namespace GameClustering
 
         public Presence Presence { get; private set; }
         public bool Authenticated => Presence == null;
-        
-        [RuntimeInitializeOnLoadMethod]
+
+        private Thread _thread;
+
+            [RuntimeInitializeOnLoadMethod]
         private static void _Init(){
             _instance = Resources.Load<IntegrationManager>("IntegrationManager");
             _instance.Bootstrap();    
@@ -97,6 +100,8 @@ namespace GameClustering
                 Messenger = new UdpMessenger();
                 Messenger.Connect(connection,Convert.FromBase64String((string)jo.SelectToken("serverKey")));
                 _live = true;
+                _thread = new Thread(Messenger.Listen);
+                _thread.Start();
                 return true;
             }
             catch(Exception ex)

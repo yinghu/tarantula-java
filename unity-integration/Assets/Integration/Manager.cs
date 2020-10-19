@@ -35,10 +35,6 @@ namespace Integration
                 return;
             }
             bText.text = _integrationManager.Presence.SystemId;
-            //await _integrationManager.Service(this);
-            Debug.Log("STARTED MANAGER");
-            await _integrationManager.OnMessage();
-            Debug.Log("ENDED MANAGER");
         }
 
         private void Update()
