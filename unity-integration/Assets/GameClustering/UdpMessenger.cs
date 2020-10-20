@@ -108,20 +108,7 @@ namespace GameClustering
                 return bytes > 0;
             }
         }
-
-        public async Task ListenAsync(){
-            var ret = await _udpClient.ReceiveAsync();
-            if (ret.Buffer.Length > 0)
-            {
-                _totalInbound++;
-                ProcessMessage(ret.Buffer);
-            }    
-            else
-            {
-                Debug.Log("NO INBOUND MESSAGE");
-            }
-        }
-
+        
         public void Listen()
         {
             while (_live)

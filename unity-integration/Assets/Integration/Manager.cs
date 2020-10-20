@@ -54,13 +54,18 @@ namespace Integration
                 if (!await _integrationManager.Device(this))
                 {
                     bText.text = _integrationManager.Exception.Message;
+                    return;
                 }
             }
             _integrationManager.Messenger.RegisterMessageHandler(MessageType.Join,0, buff=>
             {
                 _playing = buff.GetUTF8String().Equals("accepted");
             });
-            await _integrationManager.Ticket(this);
+            if (!await _integrationManager.Ticket(this))
+            {
+                bText.text = "no ticket";
+                return;
+            }
             var buffer = new DataBuffer();
             buffer.PutInt(_integrationManager.Presence.Stub);
             buffer.PutUTF8String(_integrationManager.Presence.Login);

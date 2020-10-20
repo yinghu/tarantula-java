@@ -16,7 +16,7 @@ namespace GameClustering
         private HttpCaller _httpCaller;
         public IMessenger Messenger { private set; get; }
         public Exception Exception { private set; get; }
-        private bool _live;
+       
         private string _deviceId;
         private static IntegrationManager _instance;
 
@@ -99,7 +99,6 @@ namespace GameClustering
                 };
                 Messenger = new UdpMessenger();
                 Messenger.Connect(connection,Convert.FromBase64String((string)jo.SelectToken("serverKey")));
-                _live = true;
                 _thread = new Thread(Messenger.Listen);
                 _thread.Start();
                 return true;
@@ -125,7 +124,6 @@ namespace GameClustering
                 var jo = JObject.Parse(response);
                 var suc = (bool)jo.SelectToken("successful");
                 Presence = null;
-                _live = false;
                 return suc;
             }
             catch (Exception ex)
@@ -146,11 +144,9 @@ namespace GameClustering
                     new Header {Name = Header.TarantulaAction, Value = "onTicket"}
                 };
                 var response = await _httpCaller.GetJson(caller, "/service/action", headers);
-                //Debug.Log(response);
                 var jo = JObject.Parse(response);
                 var suc = (bool)jo.SelectToken("successful");
                 Presence.Ticket = (string)(jo.SelectToken("presence").SelectToken("ticket"));
-                //Debug.Log(Presence.Ticket);
                 return suc;
             }
             catch (Exception ex)
@@ -159,20 +155,6 @@ namespace GameClustering
                 return false;
             }
         }
-        
-        public async Task OnMessage(){
-            try
-            {
-                while(_live)
-                {
-                    await Messenger.ListenAsync();
-                }
-            }
-            catch(Exception ex)
-            {
-                Exception = ex;
-            }
-        }
-        
+
     }
 }
