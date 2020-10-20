@@ -15,6 +15,8 @@ namespace GameClustering
         void UnregisterMessageHandler(int type,int sequence);
 
         int PendingMessages();
+        int TotalOutbound();
+        int TotalInbound();
         int TotalBytes();
     }
 }

@@ -8,28 +8,39 @@ namespace Integration
     public class Shot : MonoBehaviour
     {
         private bool _leaving;
+        private float _timer;
         public TMP_Text aText;
         public TMP_Text bText;
+        public TMP_Text cText;
+        public TMP_Text dText;
+        public TMP_Text eText;
+        public TMP_Text fText;
         private void Start()
         {
             _leaving = false;
+            _timer = 0;
         }
 
         public async void Roll()
         {
             var integrationManager = IntegrationManager.Instance;
-            var buffer1 = new DataBuffer();
-            buffer1.PutInt(1);
-            await integrationManager.Messenger.SendAsync(MessageType.Relay, 1, true, buffer1);
-            var buffer2 = new DataBuffer();
-            buffer2.PutInt(2);
-            await integrationManager.Messenger.SendAsync(MessageType.Relay, 2, true, buffer2);
+            for (var i = 1; i < 11; i++)
+            {
+                var buffer1 = new DataBuffer();
+                buffer1.PutInt(1);
+                await integrationManager.Messenger.SendAsync(MessageType.Relay, i, true, buffer1);
+            }
         }
 
         public void Check()
         {
             aText.text = "ACK->"+IntegrationManager.Instance.Messenger.PendingMessages();
-            bText.text = "BYTES->"+IntegrationManager.Instance.Messenger.TotalBytes();
+            var _i = IntegrationManager.Instance.Messenger.TotalInbound();
+            var _O = IntegrationManager.Instance.Messenger.TotalOutbound();
+            bText.text = "IN->"+_i;
+            cText.text = "OUT->"+_O;
+            dText.text = "BYTES->"+IntegrationManager.Instance.Messenger.TotalBytes();
+            fText.text = "RATE->"+((_i+_O)/_timer);
         }
 
         private void Update()
@@ -40,6 +51,12 @@ namespace Integration
             }
             IntegrationManager.Instance.Messenger.UnregisterMessageHandler(MessageType.Leave,3);
             SceneManager.LoadScene("Main");
+        }
+
+        private void FixedUpdate()
+        {
+            _timer += Time.deltaTime;
+            eText.text = "TIMER->" + _timer;
         }
 
         public async void Exit()

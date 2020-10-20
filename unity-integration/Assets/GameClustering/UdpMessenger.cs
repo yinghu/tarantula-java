@@ -19,6 +19,8 @@ namespace GameClustering
         private ICryptoTransform _encrypt;
         private ICryptoTransform _decrypt;
         private int _messageId;
+        private int _totalOutbound;
+        private int _totalInbound;
         private int _totalBytes;
         private bool _live;
         private IPEndPoint _remote;
@@ -64,6 +66,9 @@ namespace GameClustering
         public void Disconnect()
         {
             _live = false;
+            _totalOutbound = 0;
+            _totalInbound = 0;
+            _pendingMessages.Clear();
             _udpClient.Close();
         }
 
@@ -98,6 +103,7 @@ namespace GameClustering
                 {
                     _pendingMessages[messageId] = outMessage;
                 }
+                _totalOutbound++;
                 _totalBytes += bytes;
                 return bytes > 0;
             }
@@ -107,6 +113,7 @@ namespace GameClustering
             var ret = await _udpClient.ReceiveAsync();
             if (ret.Buffer.Length > 0)
             {
+                _totalInbound++;
                 ProcessMessage(ret.Buffer);
             }    
             else
@@ -125,6 +132,8 @@ namespace GameClustering
                     if (available > 0)
                     {
                         var bytes = _udpClient.Receive(ref _remote);
+                        _totalInbound++;
+                        _totalBytes += available;
                         ProcessMessage(bytes);
                     }
                     else
@@ -152,6 +161,16 @@ namespace GameClustering
         public int PendingMessages()
         {
             return _pendingMessages.Count;
+        }
+
+        public int TotalOutbound()
+        {
+            return _totalOutbound;
+        }
+
+        public int TotalInbound()
+        {
+            return _totalInbound;
         }
 
         public int TotalBytes()

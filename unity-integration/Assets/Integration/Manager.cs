@@ -20,7 +20,7 @@ namespace Integration
         private async void Start()
         {
             _integrationManager = IntegrationManager.Instance;
-            if (!_integrationManager.Authenticated)
+            if (_integrationManager.Authenticated)
             {
                 return;
             }
@@ -49,6 +49,13 @@ namespace Integration
 
         public  async void Play()
         {
+            if (!_integrationManager.Authenticated)
+            {
+                if (!await _integrationManager.Device(this))
+                {
+                    bText.text = _integrationManager.Exception.Message;
+                }
+            }
             _integrationManager.Messenger.RegisterMessageHandler(MessageType.Join,0, buff=>
             {
                 _playing = buff.GetUTF8String().Equals("accepted");
@@ -66,6 +73,7 @@ namespace Integration
             {
                 return;
             }
+            bText.text = "play again";
             _playing = false;
             _integrationManager.Messenger.Disconnect();
         }
