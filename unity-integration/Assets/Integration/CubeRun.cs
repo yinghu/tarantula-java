@@ -9,6 +9,7 @@ namespace Integration
         private bool _enabled = true;
         private float _timer;
         private float _speed;
+        private int _retryId;
         private void Start()
         {
             _timer = 0;
@@ -31,15 +32,21 @@ namespace Integration
         private async void FixedUpdate()
         {
             _timer += Time.deltaTime;//0.02ca
-            if (_timer < 0.05)
+            if (_timer < 0.15)
             {
                 return;
             }
             _timer = 0;
+            if (_retryId > 0)
+            {
+                await IntegrationManager.Instance.Messenger.RetryAsync(_retryId, true);
+                _retryId = 0;
+                return;
+            }
             var buffer2 = new DataBuffer();
             var f = _speed < 25 ? (_speed + 1) : 3;
             buffer2.PutFloat(f);
-            await IntegrationManager.Instance.Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer2);
+            _retryId = await IntegrationManager.Instance.Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer2);
         }
     }
 }

@@ -22,6 +22,7 @@ namespace GameClustering
         private int _totalOutbound;
         private int _totalInbound;
         private int _totalBytes;
+        private int _totalRetries;
         private bool _live;
         private IPEndPoint _remote;
         public UdpMessenger()
@@ -72,12 +73,12 @@ namespace GameClustering
             _udpClient.Close();
         }
 
-        public async Task<bool> SendAsync(int type, int sequence, bool ack)
+        public async Task<int> SendAsync(int type, int sequence, bool ack)
         {
             return await SendAsync(type, sequence, ack, null);
         }
 
-        public async Task<bool> SendAsync(int type,int sequence,bool ack,DataBuffer payload)
+        public async Task<int> SendAsync(int type,int sequence,bool ack,DataBuffer payload)
         {
             using (var message = new OutboundMessage())
             {
@@ -99,16 +100,31 @@ namespace GameClustering
                 }
                 var outMessage = _connection.Secured ? Encrypt(message.Message()) : message.Message();
                 var bytes = await _udpClient.SendAsync(outMessage, outMessage.Length);
-                if (ack)
+                if (ack && bytes > 0)
                 {
                     _pendingMessages[messageId] = outMessage;
                 }
                 _totalOutbound++;
                 _totalBytes += bytes;
-                return bytes > 0;
+                return messageId;
             }
         }
-        
+
+        public async Task<bool> RetryAsync(int messageId,bool removing)
+        {
+            if (!_pendingMessages.TryGetValue(messageId, out var outMessage))
+            {
+                return false;
+            }
+            await _udpClient.SendAsync(outMessage, outMessage.Length);
+            if (removing)
+            {
+                _pendingMessages.Remove(messageId);    
+            }
+            _totalRetries++;
+            return true;
+        }
+
         public void Listen()
         {
             while (_live)
@@ -163,6 +179,11 @@ namespace GameClustering
         public int TotalBytes()
         {
             return _totalBytes;
+        }
+
+        public int TotalRetries()
+        {
+            return _totalRetries;
         }
 
         private void ProcessMessage(byte[] data)

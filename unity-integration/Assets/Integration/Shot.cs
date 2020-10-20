@@ -15,6 +15,7 @@ namespace Integration
         public TMP_Text dText;
         public TMP_Text eText;
         public TMP_Text fText;
+        public TMP_Text gText;
         private void Start()
         {
             _leaving = false;
@@ -41,6 +42,7 @@ namespace Integration
             cText.text = "OUT->"+_O;
             dText.text = "BYTES->"+IntegrationManager.Instance.Messenger.TotalBytes();
             fText.text = "RATE->"+((_i+_O)/_timer);
+            gText.text = "RETRIES->" + IntegrationManager.Instance.Messenger.TotalRetries();
         }
 
         private void Update()
