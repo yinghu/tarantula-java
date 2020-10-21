@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -13,8 +13,8 @@ namespace GameClustering
     public class UdpMessenger : IMessenger
     {
         private UdpClient _udpClient;
-        private readonly Dictionary<CallbackKey, Action<DataBuffer>> _handlers;
-        private readonly Dictionary<int, byte[]> _pendingMessages;
+        private readonly ConcurrentDictionary<CallbackKey, Action<DataBuffer>> _handlers;
+        private readonly ConcurrentDictionary<int, PendingMessage> _pendingMessages;
         private Connection _connection;
         private ICryptoTransform _encrypt;
         private ICryptoTransform _decrypt;
@@ -27,8 +27,8 @@ namespace GameClustering
         private IPEndPoint _remote;
         public UdpMessenger()
         {
-            _handlers = new Dictionary<CallbackKey, Action<DataBuffer>>();
-            _pendingMessages = new Dictionary<int, byte[]>();
+            _handlers = new ConcurrentDictionary<CallbackKey, Action<DataBuffer>>();
+            _pendingMessages = new ConcurrentDictionary<int, PendingMessage>();
             _live = false;
         }
 
@@ -54,7 +54,7 @@ namespace GameClustering
                 var sz = buffer.GetInt();
                 for (var i = 0; i < sz; i++)
                 {
-                    _pendingMessages.Remove(buffer.GetInt());
+                    _pendingMessages.TryRemove(buffer.GetInt(),out var removed);
                 }
             };
             _handlers[new CallbackKey(MessageType.Ping,0)] = async buffer =>
@@ -93,7 +93,8 @@ namespace GameClustering
                 }
                 message.SessionId(_connection.SessionId);
                 message.Sequence(sequence);
-                message.Timestamp(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                message.Timestamp(timestamp);
                 if (payload != null)
                 {
                     message.Payload(payload.ToArray());
@@ -102,7 +103,7 @@ namespace GameClustering
                 var bytes = await _udpClient.SendAsync(outMessage, outMessage.Length);
                 if (ack && bytes > 0)
                 {
-                    _pendingMessages[messageId] = outMessage;
+                    _pendingMessages[messageId] = new PendingMessage {Data = outMessage, Timestamp = timestamp, Retries = 2};
                 }
                 _totalOutbound++;
                 _totalBytes += bytes;
@@ -110,16 +111,16 @@ namespace GameClustering
             }
         }
 
-        public async Task<bool> RetryAsync(int messageId,bool removing)
+        public async Task<bool> RetryAsync(int messageId)
         {
             if (!_pendingMessages.TryGetValue(messageId, out var outMessage))
             {
                 return false;
             }
-            await _udpClient.SendAsync(outMessage, outMessage.Length);
-            if (removing)
+            await _udpClient.SendAsync(outMessage.Data, outMessage.Data.Length);
+            if (--outMessage.Retries<=0)
             {
-                _pendingMessages.Remove(messageId);    
+                _pendingMessages.TryRemove(messageId, out var removed);
             }
             _totalRetries++;
             return true;
@@ -158,7 +159,7 @@ namespace GameClustering
         
         public void UnregisterMessageHandler(int type,int sequence)
         {
-            _handlers.Remove(new CallbackKey(type,sequence));
+            _handlers.TryRemove(new CallbackKey(type,sequence),out var removed);
         }
 
         public int PendingMessages()

@@ -39,7 +39,7 @@ namespace Integration
             _timer = 0;
             if (_retryId > 0)
             {
-                await IntegrationManager.Instance.Messenger.RetryAsync(_retryId, true);
+                await IntegrationManager.Instance.Messenger.RetryAsync(_retryId);
                 _retryId = 0;
                 return;
             }
