@@ -16,20 +16,28 @@ namespace Integration
         public TMP_Text eText;
         public TMP_Text fText;
         public TMP_Text gText;
+        private int[] _pendingShot;
         private void Start()
         {
             _leaving = false;
             _timer = 0;
+            _pendingShot = new int[10];
         }
 
         public async void Roll()
         {
             var integrationManager = IntegrationManager.Instance;
+            foreach (var mid in _pendingShot)
+            {
+                await integrationManager.Messenger.RetryAsync(mid, true);
+            }
             for (var i = 1; i < 11; i++)
             {
-                var buffer1 = new DataBuffer();
-                buffer1.PutInt(1);
-                await integrationManager.Messenger.SendAsync(MessageType.Relay, i, true, buffer1);
+                using (var buffer1 = new DataBuffer())
+                {
+                    buffer1.PutInt(1);
+                    _pendingShot[i-1]=await integrationManager.Messenger.SendAsync(MessageType.Relay, i, true, buffer1);
+                }
             }
         }
 

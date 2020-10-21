@@ -103,8 +103,9 @@ public class UDPService implements Runnable, GameChannelService {
         executorService = Executors.newFixedThreadPool(3);
         executorService.execute(()->{
             while (true){
+                PendingInboundMessage pendingInboundMessage = mQueue.poll();
                 try{
-                    PendingInboundMessage pendingInboundMessage = mQueue.poll();
+                    //PendingInboundMessage pendingInboundMessage = mQueue.poll();
                     if(pendingInboundMessage!=null){
                         GameChannel gameChannel = mChannels.get(pendingInboundMessage.connectionId());
                         gameChannel.onMessage(pendingInboundMessage);
@@ -113,6 +114,7 @@ public class UDPService implements Runnable, GameChannelService {
                         Thread.sleep(100);
                     }
                 }catch (Exception ex){
+                    log.warn("Pending message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type());
                     ex.printStackTrace();
                 }
             }

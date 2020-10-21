@@ -66,11 +66,14 @@ namespace Integration
                 bText.text = "no ticket";
                 return;
             }
-            var buffer = new DataBuffer();
-            buffer.PutInt(_integrationManager.Presence.Stub);
-            buffer.PutUTF8String(_integrationManager.Presence.Login);
-            buffer.PutUTF8String(_integrationManager.Presence.Ticket);
-            await _integrationManager.Messenger.SendAsync(MessageType.Join, 0, true, buffer);
+
+            using (var buffer = new DataBuffer())
+            {
+                buffer.PutInt(_integrationManager.Presence.Stub);
+                buffer.PutUTF8String(_integrationManager.Presence.Login);
+                buffer.PutUTF8String(_integrationManager.Presence.Ticket);
+                await _integrationManager.Messenger.SendAsync(MessageType.Join, 0, true, buffer);
+            }
         }
         public async void Exit()
         {

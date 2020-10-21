@@ -43,10 +43,12 @@ namespace Integration
                 _retryId = 0;
                 return;
             }
-            var buffer2 = new DataBuffer();
-            var f = _speed < 25 ? (_speed + 1) : 3;
-            buffer2.PutFloat(f);
-            _retryId = await IntegrationManager.Instance.Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer2);
+            using (var buffer2 = new DataBuffer())
+            {
+                var f = _speed < 25 ? (_speed + 1) : 3;
+                buffer2.PutFloat(f);
+                _retryId = await IntegrationManager.Instance.Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer2);
+            }
         }
     }
 }
