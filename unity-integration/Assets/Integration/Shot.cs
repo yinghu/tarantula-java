@@ -63,7 +63,7 @@ namespace Integration
             _timer += Time.fixedDeltaTime;
             _timeout += Time.fixedDeltaTime;
             eText.text = "TIMER->" + _timer;
-            if (_timeout < 0.1) //100 ms
+            if (_timeout < 0.2) //200 ms
             {
                 return;
             }

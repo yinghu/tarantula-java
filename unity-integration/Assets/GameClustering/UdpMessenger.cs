@@ -25,6 +25,7 @@ namespace GameClustering
         private int _totalRetries;
         private bool _live;
         private readonly long _timeout;
+        private readonly int _waitingTimeout;
         private IPEndPoint _remote;
         public UdpMessenger()
         {
@@ -32,6 +33,7 @@ namespace GameClustering
             _pendingMessages = new ConcurrentDictionary<int, PendingMessage>();
             _live = false;
             _timeout = 200;
+            _waitingTimeout = 1;
         }
 
         public void Connect(Connection connection,byte[] serverKey)
@@ -124,13 +126,10 @@ namespace GameClustering
                 {
                     continue;
                 }
-                retries++;
                 await _udpClient.SendAsync(retry.Data, retry.Data.Length);
+                retries++;
+                retry.Timestamp = timestamp;
                 retry.Retries--;
-                //if (retry.Retries < 0)
-                //{
-                    //_pendingMessages.TryRemove(kv.Key, out var ignore);
-                //}
             }
             _totalRetries += retries;
             return retries;
@@ -152,7 +151,7 @@ namespace GameClustering
                     }
                     else
                     {
-                        Thread.Sleep(50);
+                        Thread.Sleep(_waitingTimeout);
                     }
                 }
                 catch (Exception ex)
@@ -196,7 +195,7 @@ namespace GameClustering
         {
             return _totalRetries;
         }
-
+        
         private void ProcessMessage(byte[] data)
         {
             using (var inboundMessage = new InboundMessage(_connection.Secured ? Decrypt(data) : data))
