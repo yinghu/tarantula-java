@@ -120,17 +120,17 @@ namespace GameClustering
             foreach (var kv in _pendingMessages)
             {
                 var retry = kv.Value;
-                if (timestamp - retry.Timestamp < _timeout)
+                if (timestamp - retry.Timestamp < _timeout || retry.Retries < 0)
                 {
                     continue;
                 }
                 retries++;
                 await _udpClient.SendAsync(retry.Data, retry.Data.Length);
                 retry.Retries--;
-                if (retry.Retries <= 0)
-                {
-                    _pendingMessages.TryRemove(kv.Key, out var ignore);
-                }
+                //if (retry.Retries < 0)
+                //{
+                    //_pendingMessages.TryRemove(kv.Key, out var ignore);
+                //}
             }
             _totalRetries += retries;
             return retries;
