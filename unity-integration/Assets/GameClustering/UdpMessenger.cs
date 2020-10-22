@@ -24,12 +24,14 @@ namespace GameClustering
         private int _totalBytes;
         private int _totalRetries;
         private bool _live;
+        private readonly long _timeout;
         private IPEndPoint _remote;
         public UdpMessenger()
         {
             _handlers = new ConcurrentDictionary<CallbackKey, Action<DataBuffer>>();
             _pendingMessages = new ConcurrentDictionary<int, PendingMessage>();
             _live = false;
+            _timeout = 200;
         }
 
         public void Connect(Connection connection,byte[] serverKey)
@@ -111,19 +113,27 @@ namespace GameClustering
             }
         }
 
-        public async Task<bool> RetryAsync(int messageId)
+        public async Task<int> RetryAsync()
         {
-            if (!_pendingMessages.TryGetValue(messageId, out var outMessage))
+            var retries = 0;
+            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            foreach (var kv in _pendingMessages)
             {
-                return false;
+                var retry = kv.Value;
+                if (timestamp - retry.Timestamp < _timeout)
+                {
+                    continue;
+                }
+                retries++;
+                await _udpClient.SendAsync(retry.Data, retry.Data.Length);
+                retry.Retries--;
+                if (retry.Retries <= 0)
+                {
+                    _pendingMessages.TryRemove(kv.Key, out var ignore);
+                }
             }
-            await _udpClient.SendAsync(outMessage.Data, outMessage.Data.Length);
-            if (--outMessage.Retries<=0)
-            {
-                _pendingMessages.TryRemove(messageId, out var removed);
-            }
-            _totalRetries++;
-            return true;
+            _totalRetries += retries;
+            return retries;
         }
 
         public void Listen()
@@ -202,7 +212,6 @@ namespace GameClustering
                     {
                         _connection.SessionId = 0;
                     }
-                    //Debug.Log("timestamp->"+(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()-inboundMessage.Timestamp()));
                     using (var buffer = new DataBuffer(inboundMessage.Payload()))
                     {
                         handler.Invoke(buffer);    

@@ -16,7 +16,7 @@ namespace Integration
         public TMP_Text eText;
         public TMP_Text fText;
         public TMP_Text gText;
-        
+        private float _timeout;
         private void Start()
         {
             _leaving = false;
@@ -58,10 +58,16 @@ namespace Integration
             SceneManager.LoadScene("Main");
         }
 
-        private void FixedUpdate()
+        private async void FixedUpdate()
         {
-            _timer += Time.deltaTime;
+            _timer += Time.fixedDeltaTime;
+            _timeout += Time.fixedDeltaTime;
             eText.text = "TIMER->" + _timer;
+            if (_timeout < 0.1) //100 ms
+            {
+                return;
+            }
+            await IntegrationManager.Instance.Messenger.RetryAsync();
         }
 
         public async void Exit()
