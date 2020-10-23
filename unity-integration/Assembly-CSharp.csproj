@@ -69,6 +69,7 @@
      <Compile Include="Assets\GameClustering\KeyValidator.cs" />
      <Compile Include="Assets\GameClustering\MessageType.cs" />
      <Compile Include="Assets\GameClustering\OutboundMessage.cs" />
+     <Compile Include="Assets\GameClustering\PendingAck.cs" />
      <Compile Include="Assets\GameClustering\PendingMessage.cs" />
      <Compile Include="Assets\GameClustering\Presence.cs" />
      <Compile Include="Assets\GameClustering\UdpMessenger.cs" />

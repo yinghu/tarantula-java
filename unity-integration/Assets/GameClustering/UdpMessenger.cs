@@ -15,9 +15,9 @@ namespace GameClustering
         private UdpClient _udpClient;
         private readonly ConcurrentDictionary<CallbackKey, Action<DataBuffer>> _handlers;
         private readonly ConcurrentDictionary<int, PendingMessage> _pendingMessages;
+        private readonly PendingAck _pendingAck;
         private Connection _connection;
-        private ICryptoTransform _encrypt;
-        private ICryptoTransform _decrypt;
+        private Rijndael _cipher;
         private int _messageId;
         private int _totalOutbound;
         private int _totalInbound;
@@ -31,6 +31,7 @@ namespace GameClustering
         {
             _handlers = new ConcurrentDictionary<CallbackKey, Action<DataBuffer>>();
             _pendingMessages = new ConcurrentDictionary<int, PendingMessage>();
+            _pendingAck = new PendingAck(20);
             _live = false;
             _timeout = 200;
             _waitingTimeout = 1;
@@ -41,15 +42,13 @@ namespace GameClustering
             _connection = connection;
             if (_connection.Secured)
             {
-                var rijAlg = new RijndaelManaged()
+                _cipher = new RijndaelManaged()
                 {
                     Key = serverKey,
                     Padding = PaddingMode.PKCS7,
                     Mode = CipherMode.CBC,
                     IV = serverKey
                 };
-                _encrypt = rijAlg.CreateEncryptor();
-                _decrypt = rijAlg.CreateDecryptor();
             }
             _remote = new IPEndPoint(IPAddress.Parse(_connection.Host),_connection.Port);
             _udpClient = new UdpClient(_connection.Host,_connection.Port);
@@ -203,6 +202,11 @@ namespace GameClustering
                 var callbackKey = new CallbackKey(inboundMessage.Type(),inboundMessage.Sequence());
                 if (_handlers.TryGetValue(callbackKey, out var handler))
                 {
+                    if (inboundMessage.Ack())
+                    {
+                        Ack(inboundMessage.MessageId());
+                    }
+
                     if (inboundMessage.Type() == MessageType.Join)
                     {
                         _connection.SessionId = inboundMessage.SessionId();
@@ -227,20 +231,36 @@ namespace GameClustering
         {
             using (var stream = new MemoryStream())
             {
-                var cryptStream = new CryptoStream(stream, _encrypt, CryptoStreamMode.Write);
+                var cryptStream = new CryptoStream(stream, _cipher.CreateEncryptor(), CryptoStreamMode.Write);
                 cryptStream.Write(data, 0, data.Length);
                 cryptStream.FlushFinalBlock();
                 return stream.ToArray();
             }
         }
+        
         private byte[] Decrypt(byte[] data)
         {
             using (var stream = new MemoryStream())
             {
-                var cryptStream = new CryptoStream(stream, _decrypt, CryptoStreamMode.Write);
+                var cryptStream = new CryptoStream(stream, _cipher.CreateDecryptor(), CryptoStreamMode.Write);
                 cryptStream.Write(data, 0, data.Length);
                 cryptStream.FlushFinalBlock();
                 return stream.ToArray();
+            }
+        }
+
+        private  void Ack(int messageId)
+        {
+            using (var buffer = new DataBuffer())
+            {
+                _pendingAck.Push(messageId);
+                var list = _pendingAck.List();
+                buffer.PutInt(list.Count);
+                foreach (var mid in list)
+                {
+                    buffer.PutInt(mid);
+                }
+                Task.FromResult(SendAsync(MessageType.Ack, 0, false, buffer));
             }
         }
     }
