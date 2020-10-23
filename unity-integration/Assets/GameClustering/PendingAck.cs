@@ -20,38 +20,36 @@ namespace GameClustering
                 _buffer[i] = 0;
             }
         }
-        public  int Push(int t){
-            if(_tail<_overflow) {
+        
+        public  void Push(int t){
+            if (_tail < _overflow)
+            {
                 _buffer[_tail++] = t;
             }
-            else{//overflow
-                if(_header > 0){ //remove segment
-                    _tail = _overflow-_header;
-                    for(var i = 0;i <_tail; i++){
+            else
+            {
+                //overflow
+                if (_header > 0)
+                {
+                    //remove segment
+                    _tail = _overflow - _header;
+                    for (var i = 0; i < _tail; i++)
+                    {
                         _buffer[i] = _buffer[_header++];
                     }
                     _header = 0;
                     _buffer[_tail++] = t;
                 }
-                else{//remove first
-                    for(var i=0;i<_overflow-1;i++){
-                        _buffer[i] = _buffer[i+1];
+                else
+                {
+                    //remove first
+                    for (var i = 0; i < _overflow - 1; i++)
+                    {
+                        _buffer[i] = _buffer[i + 1];
                     }
-                    _buffer[_overflow-1] = t;
+                    _buffer[_overflow - 1] = t;
                 }
             }
-            return _tail;
-        }
-        
-        public  int Pop(){
-            var pt = _buffer[_header];
-            if (pt <= 0)
-            {
-                return pt;
-            }
-            _header++;
-            _header = _header == _overflow? 0 : _header;
-            return pt;
         }
         
         public List<int> List(){
@@ -59,7 +57,7 @@ namespace GameClustering
             for(var i = 0; i < _overflow; i++){
                 if(_buffer[i] != 0){
                     list.Add(_buffer[i]);
-                }//clone origial one
+                }
             }
             return list;
         }

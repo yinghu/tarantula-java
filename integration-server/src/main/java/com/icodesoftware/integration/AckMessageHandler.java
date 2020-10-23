@@ -21,11 +21,11 @@ public class AckMessageHandler implements MessageHandler {
     @Override
     public void onMessage(PendingInboundMessage pendingInboundMessage) {
         DataBuffer buffer = new DataBuffer(pendingInboundMessage.payload());
+        int sid = pendingInboundMessage.sessionId();
         var sz = buffer.getInt();
         for (int i = 0; i < sz; i++)
         {
-            //System.out.println("Ack Id->"+buffer.getInt());
+            gameChannelService.gameChannel(pendingInboundMessage.connectionId()).ack(sid,buffer.getInt());
         }
-        //System.out.println("ACK END");
     }
 }
