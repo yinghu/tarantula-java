@@ -4,13 +4,14 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.GameChannel;
 import com.icodesoftware.integration.GameChannelService;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.protocol.DataBuffer;
-import com.icodesoftware.protocol.MessageHandler;
-import com.icodesoftware.protocol.PendingInboundMessage;
-import com.icodesoftware.protocol.PendingOutboundMessage;
+import com.icodesoftware.protocol.*;
 import com.icodesoftware.util.FIFOBuffer;
 
+import javax.print.DocFlavor;
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,19 +26,19 @@ public class PushEventChannel implements GameChannel {
     private final long channelId;
     private final GameChannelService gameChannelService;
     private final ConcurrentHashMap<Integer, RemoteSession> mSession;
-    private final ConcurrentHashMap<PendingMessageIndex,PendingOutboundMessage> mIndex;
+    private final ConcurrentHashMap<PendingMessageIndex, PendingMessage> mMessage;
 
     private final MessageHandler joinMessageHandler;
-    private final MessageHandler ackMessageHandler;
-    private final MessageHandler pingMessageHandler;
+    //private final MessageHandler ackMessageHandler;
+    //private final MessageHandler pingMessageHandler;
     public PushEventChannel(final long channelId,final GameChannelService gameChannelService){
         this.channelId = channelId;
         this.gameChannelService = gameChannelService;
         this.mSession = new ConcurrentHashMap<>();
-        this.mIndex = new ConcurrentHashMap<>();
+        this.mMessage = new ConcurrentHashMap<>();
         this.joinMessageHandler = this.gameChannelService.messageHandler(MessageHandler.JOIN);
-        this.ackMessageHandler = this.gameChannelService.messageHandler(MessageHandler.ACK);
-        this.pingMessageHandler = this.gameChannelService.messageHandler(MessageHandler.PING);
+        //this.ackMessageHandler = this.gameChannelService.messageHandler(MessageHandler.ACK);
+        //this.pingMessageHandler = this.gameChannelService.messageHandler(MessageHandler.PING);
     }
     @Override
     public long channelId() {
@@ -52,7 +53,7 @@ public class PushEventChannel implements GameChannel {
         }
     }
     @Override
-    public void onMessage(PendingInboundMessage pendingInboundMessage) {
+    public void onMessage(InboundMessage pendingInboundMessage) {
         if(pendingInboundMessage.type()!=MessageHandler.JOIN
                 &&mSession.containsKey(pendingInboundMessage.sessionId())
                 &&mSession.get(pendingInboundMessage.sessionId()).socketAddress.equals(pendingInboundMessage.source())){
@@ -75,7 +76,7 @@ public class PushEventChannel implements GameChannel {
         }
     }
     public void ack(int sessionId,int messageId,SocketAddress source){
-        PendingOutboundMessage ack = new PendingOutboundMessage();
+        OutboundMessage ack = new OutboundMessage();
         ack.type(MessageHandler.ACK);
         ack.sequence(0);
         DataBuffer dataBuffer = new DataBuffer();
@@ -89,19 +90,41 @@ public class PushEventChannel implements GameChannel {
         gameChannelService.send(ack,source);
     }
     public void ack(int sessionId,int messageId){
-        log.warn("ACK->"+sessionId+"///"+messageId);
+        PendingMessage removed = mMessage.get(new PendingMessageIndex(sessionId,messageId));
+        if(removed!=null){
+            log.warn("ACK->"+sessionId+"///"+messageId+"//"+removed.retries);
+        }
     }
-    public void send(PendingOutboundMessage pendingOutboundMessage){
+    public void relay(int messageId,boolean ack,OutboundMessage pendingOutboundMessage){
         this.mSession.forEach((k,v)->{
-            this.gameChannelService.send(pendingOutboundMessage,v.socketAddress);
+            ByteBuffer resp = this.gameChannelService.send(pendingOutboundMessage,v.socketAddress);
+            if(ack){
+                mMessage.put(new PendingMessageIndex(k,messageId),new PendingMessage(resp,toUTCMilliseconds(),2));
+            }
         });
     }
     public void ping(){
-        PendingOutboundMessage pendingOutboundMessage = new PendingOutboundMessage();
+        OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.type(MessageHandler.PING);
         pendingOutboundMessage.sequence(0);
         mSession.forEach((k,v)->{
             this.gameChannelService.send(pendingOutboundMessage,v.socketAddress);
         });
+    }
+    public void retry(){
+        this.mMessage.forEach((k,v)->{
+            RemoteSession session = mSession.get(k.sessionId);
+            if(session!=null){
+                v.data.flip();
+                this.gameChannelService.retry(v.data,session.socketAddress);
+                v.retries--;
+            }
+        });
+    }
+    public void pending(int sessionId, int messageId, ByteBuffer pending){
+        mMessage.put(new PendingMessageIndex(sessionId,messageId),new PendingMessage(pending,toUTCMilliseconds(),2));
+    }
+    private static long toUTCMilliseconds(){
+        return LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 }

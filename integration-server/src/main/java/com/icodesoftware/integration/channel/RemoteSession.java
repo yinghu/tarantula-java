@@ -12,6 +12,6 @@ public class RemoteSession {
     public final FIFOBuffer ackBuffer;
     public RemoteSession(final  SocketAddress socketAddress){
         this.socketAddress = socketAddress;
-        this.ackBuffer = new FIFOBuffer(10,new Integer[10]);
+        this.ackBuffer = new FIFOBuffer(20,new Integer[20]);
     }
 }

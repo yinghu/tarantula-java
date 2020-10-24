@@ -8,8 +8,8 @@ import com.icodesoftware.integration.channel.PushEventChannel;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.DataBuffer;
-import com.icodesoftware.protocol.PendingInboundMessage;
-import com.icodesoftware.protocol.PendingOutboundMessage;
+import com.icodesoftware.protocol.InboundMessage;
+import com.icodesoftware.protocol.OutboundMessage;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.HttpCaller;
 
@@ -35,7 +35,7 @@ public class UDPService implements Runnable, GameChannelService {
     private DatagramChannel datagramChannel;
     private final String address;
     private final int port;
-    private final ConcurrentLinkedDeque<PendingInboundMessage> mQueue;
+    private final ConcurrentLinkedDeque<InboundMessage> mQueue;
     private final ConcurrentHashMap<Integer, MessageHandler> mHandlers;
     private final ConcurrentHashMap<Long, GameChannel> mChannels;
     private ExecutorService executorService;
@@ -82,12 +82,12 @@ public class UDPService implements Runnable, GameChannelService {
         log.warn("WAITING FOR MESSAGE ON CHANNELS ["+gameChannels+"]");
         while (true){
             try{
-                ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE*2);
+                ByteBuffer buffer = ByteBuffer.allocate(OutboundMessage.MESSAGE_SIZE*2);
                 SocketAddress src = this.datagramChannel.receive(buffer);
                 buffer.flip();
                 byte[] data = new byte[buffer.limit()];
                 buffer.get(data,0,data.length);
-                PendingInboundMessage inboundMessage = new PendingInboundMessage("",secured?ByteBuffer.wrap(decrypt(data)):ByteBuffer.wrap(data),src);
+                InboundMessage inboundMessage = new InboundMessage("",secured?ByteBuffer.wrap(decrypt(data)):ByteBuffer.wrap(data),src);
                 mQueue.offer(inboundMessage);
             }catch (Exception ex){
                 //ignore
@@ -103,7 +103,7 @@ public class UDPService implements Runnable, GameChannelService {
         executorService = Executors.newFixedThreadPool(3);
         executorService.execute(()->{
             while (true){
-                PendingInboundMessage pendingInboundMessage = mQueue.poll();
+                InboundMessage pendingInboundMessage = mQueue.poll();
                 try{
                     //PendingInboundMessage pendingInboundMessage = mQueue.poll();
                     if(pendingInboundMessage!=null){
@@ -144,9 +144,8 @@ public class UDPService implements Runnable, GameChannelService {
         decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
         decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
         mChannels.forEach((k,v)->{
-            scheduledExecutorService.scheduleAtFixedRate(()->{
-                v.ping();
-            },5000,5000,TimeUnit.MILLISECONDS);
+            scheduledExecutorService.scheduleAtFixedRate(()->v.ping(),5000,5000,TimeUnit.MILLISECONDS);
+            scheduledExecutorService.scheduleAtFixedRate(()->v.retry(),100,100,TimeUnit.MILLISECONDS);
         });
     }
     public void shutdown() throws Exception{
@@ -158,14 +157,18 @@ public class UDPService implements Runnable, GameChannelService {
         httpCaller.get(config.getAsJsonObject(configHeader).get("path").getAsString(),headers);
         this.datagramChannel.close();
     }
-    public boolean send(PendingOutboundMessage outboundMessage,SocketAddress source){
+    public ByteBuffer send(OutboundMessage outboundMessage,SocketAddress source){
         try{
-            if(secured){
-                this.datagramChannel.send(ByteBuffer.wrap(encrypt(outboundMessage.message())),source);
-            }else{
-                this.datagramChannel.send(ByteBuffer.wrap(outboundMessage.message()),source);
-            }
-            return true;
+            ByteBuffer outMessage = secured?ByteBuffer.wrap(encrypt(outboundMessage.message())):ByteBuffer.wrap(outboundMessage.message());
+            int bytes = this.datagramChannel.send(outMessage,source);
+            return bytes>0?outMessage:null;
+        }catch (Exception ex){
+            return null;
+        }
+    }
+    public boolean retry(ByteBuffer pendingMessage,SocketAddress source){
+        try{
+            return this.datagramChannel.send(pendingMessage,source)>0;
         }catch (Exception ex){
             return false;
         }

@@ -2,7 +2,9 @@ package com.icodesoftware.integration;
 
 import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.MessageHandler;
-import com.icodesoftware.protocol.PendingInboundMessage;
+import com.icodesoftware.protocol.InboundMessage;
+
+import java.nio.ByteBuffer;
 
 /**
  * Created by yinghu lu on 10/7/2020.
@@ -19,7 +21,7 @@ public class AckMessageHandler implements MessageHandler {
     }
 
     @Override
-    public void onMessage(PendingInboundMessage pendingInboundMessage) {
+    public void onMessage(InboundMessage pendingInboundMessage) {
         DataBuffer buffer = new DataBuffer(pendingInboundMessage.payload());
         int sid = pendingInboundMessage.sessionId();
         var sz = buffer.getInt();

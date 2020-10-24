@@ -1,8 +1,8 @@
 package com.icodesoftware.integration;
 
 import com.icodesoftware.protocol.MessageHandler;
-import com.icodesoftware.protocol.PendingInboundMessage;
-import com.icodesoftware.protocol.PendingOutboundMessage;
+import com.icodesoftware.protocol.InboundMessage;
+import com.icodesoftware.protocol.OutboundMessage;
 
 /**
  * Created by yinghu lu on 10/7/2020.
@@ -19,8 +19,8 @@ public class RelayMessageHandler implements MessageHandler {
     }
 
     @Override
-    public void onMessage(PendingInboundMessage pendingInboundMessage) {
-        PendingOutboundMessage pendingOutboundMessage = new PendingOutboundMessage();
+    public void onMessage(InboundMessage pendingInboundMessage) {
+        OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.ack(pendingInboundMessage.ack());
         pendingOutboundMessage.timestamp(pendingInboundMessage.timestamp());
         pendingOutboundMessage.messageId(pendingInboundMessage.messageId());
@@ -28,6 +28,6 @@ public class RelayMessageHandler implements MessageHandler {
         pendingOutboundMessage.type(pendingInboundMessage.type());
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
         pendingOutboundMessage.payload(pendingInboundMessage.payload());
-        this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).send(pendingOutboundMessage);
+        this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).relay(pendingInboundMessage.messageId(),pendingInboundMessage.ack(),pendingOutboundMessage);
     }
 }

@@ -10,4 +10,13 @@ public class PendingMessageIndex {
         this.sessionId = sessionId;
         this.messageId = messageId;
     }
+    @Override
+    public int hashCode(){
+        return sessionId+messageId;
+    }
+    @Override
+    public boolean equals(Object obj){
+        PendingMessageIndex pendingMessageIndex = (PendingMessageIndex)obj;
+        return sessionId==pendingMessageIndex.sessionId&&messageId==pendingMessageIndex.messageId;
+    }
 }
