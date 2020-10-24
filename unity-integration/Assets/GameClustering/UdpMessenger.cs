@@ -15,7 +15,7 @@ namespace GameClustering
         private UdpClient _udpClient;
         private readonly ConcurrentDictionary<CallbackKey, Action<DataBuffer>> _handlers;
         private readonly ConcurrentDictionary<int, PendingMessage> _pendingMessages;
-        private readonly ConcurrentDictionary<int, int> _pendingRetries;
+        private readonly ConcurrentDictionary<int, int> _pendingGateways;
         private readonly PendingAck _pendingAck;
         private Connection _connection;
         private Rijndael _cipher;
@@ -27,16 +27,18 @@ namespace GameClustering
         private bool _live;
         private readonly long _timeout;
         private readonly int _waitingTimeout;
+        private readonly int _pendingCount;
         private IPEndPoint _remote;
         public UdpMessenger()
         {
             _handlers = new ConcurrentDictionary<CallbackKey, Action<DataBuffer>>();
             _pendingMessages = new ConcurrentDictionary<int, PendingMessage>();
-            _pendingRetries = new ConcurrentDictionary<int, int>();
+            _pendingGateways = new ConcurrentDictionary<int, int>();
             _pendingAck = new PendingAck(20);
             _live = false;
             _timeout = 200;
             _waitingTimeout = 1;
+            _pendingCount = 5;
         }
 
         public void Connect(Connection connection,byte[] serverKey)
@@ -133,7 +135,7 @@ namespace GameClustering
                 retry.Retries--;
             }
             _totalRetries += retries;
-            ClearRetries();
+            ClearPendingGateways();
             return retries;
         }
 
@@ -221,12 +223,12 @@ namespace GameClustering
 
                     if (inboundMessage.Ack())
                     {
-                        var ret = _pendingRetries.AddOrUpdate(inboundMessage.MessageId(), 0, (k, v) => 1);
+                        var ret = _pendingGateways.AddOrUpdate(inboundMessage.MessageId(), 0, (k, v) => 1);
                         if (ret > 0)
                         {
                             return;
                         }
-                        _pendingRetries.TryUpdate(inboundMessage.MessageId(), 1, 0);
+                        _pendingGateways.TryUpdate(inboundMessage.MessageId(), 1, 0);
                     }
                     using (var buffer = new DataBuffer(inboundMessage.Payload()))
                     {
@@ -240,11 +242,14 @@ namespace GameClustering
             }        
         }
 
-        private void ClearRetries()
+        private void ClearPendingGateways()
         {
-            foreach (var kv in _pendingRetries)
+            foreach (var messageId in _pendingGateways.Keys)
             {
-                
+                if (_pendingGateways.AddOrUpdate(messageId, 0, (k, v) => v + 1) > _pendingCount)
+                {
+                    _pendingGateways.TryRemove(messageId, out var ignore);
+                }
             }    
         }
 
