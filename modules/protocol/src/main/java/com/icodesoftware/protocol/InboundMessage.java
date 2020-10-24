@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 /**
  * Created by yinghu lu on 9/24/2020.
  */
-public class PendingInboundMessage {
+public class InboundMessage {
 
     public static int ACK_POS = 0;
     public static int TYPE_POS = 1;
@@ -21,7 +21,7 @@ public class PendingInboundMessage {
     private final ByteBuffer message;
     private final SocketAddress source;
 
-    public PendingInboundMessage(String serverId, ByteBuffer message,SocketAddress source){
+    public InboundMessage(String serverId, ByteBuffer message, SocketAddress source){
         this.serverId = serverId;
         this.message = message;
         this.source = source;

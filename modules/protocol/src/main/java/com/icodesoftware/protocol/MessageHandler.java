@@ -14,5 +14,5 @@ public interface MessageHandler {
     int PONG = 7;
     int VOTE = 8;
     int type();
-    void onMessage(PendingInboundMessage pendingInboundMessage);
+    void onMessage(InboundMessage pendingInboundMessage);
 }

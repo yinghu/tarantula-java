@@ -3,7 +3,7 @@ package com.tarantula.platform.service.deployment;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.protocol.PendingInboundMessage;
+import com.icodesoftware.protocol.InboundMessage;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.tarantula.cci.udp.UDPSessionService;
@@ -73,7 +73,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private AtomicBoolean onAccessIndex;
 
-    private ConcurrentLinkedDeque<PendingInboundMessage> pendingData;
+    private ConcurrentLinkedDeque<InboundMessage> pendingData;
     //private ConcurrentHashMap<Long,Connection> connections;
     private ExecutorService udpPool;
     private int workSize;
@@ -402,7 +402,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 udpPool.execute(()->{
                     while (true){
                         try{
-                            PendingInboundMessage pending = pendingData.poll();
+                            InboundMessage pending = pendingData.poll();
                             if(pending!=null){
                                 ServerPushEvent pushEvent = pushRegistry.get(pending.serverId);
                                 pushEvent.onMessage(pending);

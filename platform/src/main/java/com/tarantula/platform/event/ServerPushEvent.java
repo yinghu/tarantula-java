@@ -4,13 +4,11 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Event;
-import com.icodesoftware.protocol.PendingInboundMessage;
+import com.icodesoftware.protocol.InboundMessage;
 import com.icodesoftware.service.EventService;
 import com.tarantula.platform.service.ConnectionEventService;
 
-import javax.crypto.Cipher;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -72,7 +70,7 @@ public class ServerPushEvent extends Data implements Event {
     public void removeConnection(long connectionId){
         cMap.remove(connectionId);
     }
-    public void onMessage(PendingInboundMessage pendingInboundMessage){
+    public void onMessage(InboundMessage pendingInboundMessage){
         //process message
         try{
             //Connection connection = cMap.get(pendingInboundMessage.connectionId());

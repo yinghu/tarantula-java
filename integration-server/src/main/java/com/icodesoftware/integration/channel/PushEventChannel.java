@@ -90,10 +90,7 @@ public class PushEventChannel implements GameChannel {
         gameChannelService.send(ack,source);
     }
     public void ack(int sessionId,int messageId){
-        PendingMessage removed = mMessage.get(new PendingMessageIndex(sessionId,messageId));
-        if(removed!=null){
-            log.warn("ACK->"+sessionId+"///"+messageId+"//"+removed.retries);
-        }
+        mMessage.remove(new PendingMessageIndex(sessionId,messageId));
     }
     public void relay(int messageId,boolean ack,OutboundMessage pendingOutboundMessage){
         this.mSession.forEach((k,v)->{

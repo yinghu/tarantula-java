@@ -38,7 +38,7 @@ namespace GameClustering
             _live = false;
             _timeout = 200;
             _waitingTimeout = 1;
-            _pendingCount = 5;
+            _pendingCount = 10;
         }
 
         public void Connect(Connection connection,byte[] serverKey)
@@ -207,11 +207,6 @@ namespace GameClustering
                 var callbackKey = new CallbackKey(inboundMessage.Type(),inboundMessage.Sequence());
                 if (_handlers.TryGetValue(callbackKey, out var handler))
                 {
-                    if (inboundMessage.Ack())
-                    {
-                        Ack(inboundMessage.MessageId());
-                    }
-
                     if (inboundMessage.Type() == MessageType.Join)
                     {
                         _connection.SessionId = inboundMessage.SessionId();
@@ -220,9 +215,9 @@ namespace GameClustering
                     {
                         _connection.SessionId = 0;
                     }
-
                     if (inboundMessage.Ack())
                     {
+                        Ack(inboundMessage.MessageId());
                         var ret = _pendingGateways.AddOrUpdate(inboundMessage.MessageId(), 0, (k, v) => 1);
                         if (ret > 0)
                         {
@@ -237,7 +232,7 @@ namespace GameClustering
                 }
                 else
                 {
-                    Debug.Log("NO HANDLER REGISTERED->" + inboundMessage.Type()+"/"+inboundMessage.Sequence());
+                    Debug.Log("NO HANDLER REGISTERED->" + inboundMessage.Type()+"/"+inboundMessage.Sequence()+"/"+inboundMessage.MessageId());
                 }
             }        
         }

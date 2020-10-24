@@ -4,8 +4,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
-import com.icodesoftware.protocol.PendingInboundMessage;
-import com.icodesoftware.protocol.PendingOutboundMessage;
+import com.icodesoftware.protocol.InboundMessage;
+import com.icodesoftware.protocol.OutboundMessage;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.HttpCaller;
 
@@ -44,12 +44,12 @@ public class ServerPushSimulator {
                 ByteBuffer buffer = ByteBuffer.allocate(512);
                 SocketAddress sc = datagramChannel.receive(buffer);
                 cipher.init(Cipher.DECRYPT_MODE,secretKey);
-                PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("2",buffer,sc);
+                InboundMessage pendingInboundMessage = new InboundMessage("2",buffer,sc);
                 //cipher.init(Cipher.DECRYPT_MODE,secretKey);
                 //byte[] ret = cipher.doFinal(pendingInboundMessage.sequence());
                 //ByteBuffer seq = ByteBuffer.wrap(ret);
                 //System.out.println(sc.toString()+">>"+seq.getInt(0)+"<><><>"+pendingInboundMessage.ack()+"<><>>"+pendingInboundMessage.type()+"<><>"+new String(pendingInboundMessage.payload()).trim());
-                PendingOutboundMessage msg = new PendingOutboundMessage();
+                OutboundMessage msg = new OutboundMessage();
                 msg.type(13);
                 msg.sequence(pendingInboundMessage.sequence());
                 msg.connectionId(3);

@@ -9,7 +9,7 @@ public class DataBuffer {
     private ByteBuffer byteBuffer;
     private boolean writeMode;
     public DataBuffer(){
-        byteBuffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE-PendingInboundMessage.PAYLOAD_POS);
+        byteBuffer = ByteBuffer.allocate(OutboundMessage.MESSAGE_SIZE- InboundMessage.PAYLOAD_POS);
         this.writeMode = true;
     }
     public DataBuffer(byte[] payload){

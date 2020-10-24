@@ -4,8 +4,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
-import com.icodesoftware.protocol.PendingInboundMessage;
-import com.icodesoftware.protocol.PendingOutboundMessage;
+import com.icodesoftware.protocol.InboundMessage;
+import com.icodesoftware.protocol.OutboundMessage;
 import com.icodesoftware.util.HttpCaller;
 
 import javax.crypto.SecretKey;
@@ -37,12 +37,12 @@ public class GameServerSimulator {
         Thread t = new Thread(()->{
             try {
                 for(int i=0;i<100;i++) {
-                    ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE);
+                    ByteBuffer buffer = ByteBuffer.allocate(OutboundMessage.MESSAGE_SIZE);
                     SocketAddress sc = datagramChannel.receive(buffer);
-                    PendingInboundMessage pendingInboundMessage = new PendingInboundMessage("", buffer,sc);
+                    InboundMessage pendingInboundMessage = new InboundMessage("", buffer,sc);
                     System.out.println(sc.toString() + "" + new String(pendingInboundMessage.payload()));
 
-                    PendingOutboundMessage out = new PendingOutboundMessage();
+                    OutboundMessage out = new OutboundMessage();
                     out.sequence(pendingInboundMessage.sequence());
                     out.payload("killer".getBytes());
                     out.connectionId(pendingInboundMessage.connectionId());

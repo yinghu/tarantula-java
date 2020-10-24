@@ -1,10 +1,8 @@
 package com.tarantula.cci.udp;
 
-
-import com.google.api.client.util.DateTime;
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.PendingInboundMessage;
-import com.icodesoftware.protocol.PendingOutboundMessage;
+import com.icodesoftware.protocol.InboundMessage;
+import com.icodesoftware.protocol.OutboundMessage;
 import com.tarantula.platform.service.ConnectionEventService;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -26,13 +24,13 @@ public class UDPSessionService implements ConnectionEventService {
 
     private DatagramChannel datagramChannel;
     private final Connection connection;
-    private final ConcurrentLinkedDeque<PendingInboundMessage> pendingData;
+    private final ConcurrentLinkedDeque<InboundMessage> pendingData;
 
     private Thread receiver;
     private final Cipher encrypt;
     private final Cipher decrypt;
     private final AtomicInteger messageId;
-    public UDPSessionService(Connection connection,ConcurrentLinkedDeque<PendingInboundMessage> pendingData,Cipher encrypt,Cipher decrypt){
+    public UDPSessionService(Connection connection,ConcurrentLinkedDeque<InboundMessage> pendingData,Cipher encrypt,Cipher decrypt){
         this.connection = connection;
         this.pendingData = pendingData;
         this.encrypt = encrypt;
@@ -100,12 +98,12 @@ public class UDPSessionService implements ConnectionEventService {
     private void run() {
         try{
             while (true){
-                ByteBuffer buffer = ByteBuffer.allocate(PendingOutboundMessage.MESSAGE_SIZE*2);
+                ByteBuffer buffer = ByteBuffer.allocate(OutboundMessage.MESSAGE_SIZE*2);
                 SocketAddress sc = datagramChannel.receive(buffer);
                 buffer.flip();
                 byte[] payload = new byte[buffer.limit()];
                 buffer.get(payload,0,payload.length);
-                PendingInboundMessage pendingInboundMessage = new PendingInboundMessage(connection.serverId(),connection.secured()?ByteBuffer.wrap(decrypt(payload)):ByteBuffer.wrap(payload),sc);
+                InboundMessage pendingInboundMessage = new InboundMessage(connection.serverId(),connection.secured()?ByteBuffer.wrap(decrypt(payload)):ByteBuffer.wrap(payload),sc);
                 if(pendingInboundMessage.ack()){
                     continue;
                 }
@@ -126,7 +124,7 @@ public class UDPSessionService implements ConnectionEventService {
     }
     private void send(byte[] payload,int type,int sequence,boolean ack,Connection connection){
         try{
-            PendingOutboundMessage pendingOutboundMessage = new PendingOutboundMessage();
+            OutboundMessage pendingOutboundMessage = new OutboundMessage();
             pendingOutboundMessage.ack(ack);
             pendingOutboundMessage.connectionId(connection.connectionId());
             pendingOutboundMessage.sessionId(0);
