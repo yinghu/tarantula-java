@@ -15,6 +15,7 @@ namespace GameClustering
         private UdpClient _udpClient;
         private readonly ConcurrentDictionary<CallbackKey, Action<DataBuffer>> _handlers;
         private readonly ConcurrentDictionary<int, PendingMessage> _pendingMessages;
+        private readonly ConcurrentDictionary<int, int> _pendingRetries;
         private readonly PendingAck _pendingAck;
         private Connection _connection;
         private Rijndael _cipher;
@@ -31,6 +32,7 @@ namespace GameClustering
         {
             _handlers = new ConcurrentDictionary<CallbackKey, Action<DataBuffer>>();
             _pendingMessages = new ConcurrentDictionary<int, PendingMessage>();
+            _pendingRetries = new ConcurrentDictionary<int, int>();
             _pendingAck = new PendingAck(20);
             _live = false;
             _timeout = 200;
@@ -131,6 +133,7 @@ namespace GameClustering
                 retry.Retries--;
             }
             _totalRetries += retries;
+            ClearRetries();
             return retries;
         }
 
@@ -215,6 +218,16 @@ namespace GameClustering
                     {
                         _connection.SessionId = 0;
                     }
+
+                    if (inboundMessage.Ack())
+                    {
+                        var ret = _pendingRetries.AddOrUpdate(inboundMessage.MessageId(), 0, (k, v) => 1);
+                        if (ret > 0)
+                        {
+                            return;
+                        }
+                        _pendingRetries.TryUpdate(inboundMessage.MessageId(), 1, 0);
+                    }
                     using (var buffer = new DataBuffer(inboundMessage.Payload()))
                     {
                         handler.Invoke(buffer);    
@@ -225,6 +238,14 @@ namespace GameClustering
                     Debug.Log("NO HANDLER REGISTERED->" + inboundMessage.Type()+"/"+inboundMessage.Sequence());
                 }
             }        
+        }
+
+        private void ClearRetries()
+        {
+            foreach (var kv in _pendingRetries)
+            {
+                
+            }    
         }
 
         private byte[] Encrypt(byte[] data)

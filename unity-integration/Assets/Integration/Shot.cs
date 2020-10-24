@@ -21,6 +21,7 @@ namespace Integration
         {
             _leaving = false;
             _timer = 0;
+            _timeout = 0;
         }
 
         public async void Roll()
@@ -63,10 +64,11 @@ namespace Integration
             _timer += Time.fixedDeltaTime;
             _timeout += Time.fixedDeltaTime;
             eText.text = "TIMER->" + _timer;
-            if (_timeout < 0.2) //200 ms
+            if (_timeout < 0.1) //100 ms
             {
                 return;
             }
+            _timeout = 0;
             await IntegrationManager.Instance.Messenger.RetryAsync();
         }
 
