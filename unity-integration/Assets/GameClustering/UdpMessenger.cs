@@ -186,6 +186,11 @@ namespace GameClustering
             _connection.SessionId = 0;
         }
 
+        public int Sequence()
+        {
+            return Interlocked.Increment(ref _messageId);
+        }
+
         public int PendingMessages()
         {
             return _pendingMessages.Count;

@@ -11,5 +11,6 @@
         public const int Ping = 6;
         public const int Pong = 7;
         public const int Vote = 8;
+        public const int Sync = 9;
     }
 }

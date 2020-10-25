@@ -81,6 +81,8 @@ public class UDPService implements Runnable, GameChannelService {
         mHandlers.put(pongMessageHandler.type(),pongMessageHandler);
         SpawnMessageHandler spawnMessageHandler = new SpawnMessageHandler(this);
         mHandlers.put(spawnMessageHandler.type(),spawnMessageHandler);
+        SyncMessageHandler syncMessageHandler = new SyncMessageHandler(this);
+        mHandlers.put(syncMessageHandler.type(),syncMessageHandler);
     }
     @Override
     public void run(){

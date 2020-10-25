@@ -14,7 +14,6 @@ namespace Integration
             _timer = 0;
             _speed = 3;
             IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Relay,sequence, (sessionId,buffer) =>
-         
             {
                 _enabled = !_enabled;
             });
@@ -41,7 +40,8 @@ namespace Integration
             {
                 var f = _speed < 25 ? (_speed+1) :(3);
                 buffer2.PutFloat(f);
-                await IntegrationManager.Instance.Messenger.SendAsync(MessageType.Spawn, sequence, false, buffer2);
+                buffer2.PutInt(IntegrationManager.Instance.Messenger.Sequence());
+                await IntegrationManager.Instance.Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer2);
             }
         }
     }
