@@ -133,7 +133,7 @@ namespace GameClustering
             }
         }
 
-        public async Task<bool> Ticket(MonoBehaviour caller)
+        private async Task<bool> Ticket(MonoBehaviour caller)
         {
             try
             {
@@ -154,6 +154,22 @@ namespace GameClustering
                 Exception = ex;
                 return false;
             }
+        }
+
+        public async Task<bool> Join(MonoBehaviour caller)
+        {
+            if (!await Ticket(caller))
+            {
+                return false;
+            }
+            using (var buffer = new DataBuffer())
+            {
+                buffer.PutInt(Presence.Stub);
+                buffer.PutUTF8String(Presence.Login);
+                buffer.PutUTF8String(Presence.Ticket);
+                await Messenger.SendAsync(MessageType.Join, 0, true, buffer);
+            }
+            return true;
         }
 
     }

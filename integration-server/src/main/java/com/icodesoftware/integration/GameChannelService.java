@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 public interface GameChannelService extends Serviceable {
     boolean validateTicket(byte[] payload);
     int sessionId();
+    int[] messageIdRange();
     GameChannel gameChannel(long connectionId);
     MessageHandler messageHandler(int type);
     ByteBuffer send(OutboundMessage outboundMessage, SocketAddress source);

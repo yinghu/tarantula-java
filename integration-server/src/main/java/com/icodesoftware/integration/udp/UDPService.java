@@ -48,9 +48,12 @@ public class UDPService implements Runnable, GameChannelService {
     private boolean secured;
     private int gameChannels;
     private AtomicInteger sessionId;
+    private AtomicInteger messageId;
+    private int messageIdOffset = 100000;
     private JsonParser parser;
     public UDPService(JsonObject config){
         sessionId = new AtomicInteger(0);
+        messageId = new AtomicInteger(1);
         parser = new JsonParser();
         this.config = config;
         this.address = config.getAsJsonObject("connection").get("host").getAsString();
@@ -103,9 +106,8 @@ public class UDPService implements Runnable, GameChannelService {
         executorService = Executors.newFixedThreadPool(3);
         executorService.execute(()->{
             while (true){
-                InboundMessage pendingInboundMessage = mQueue.poll();
                 try{
-                    //PendingInboundMessage pendingInboundMessage = mQueue.poll();
+                    InboundMessage pendingInboundMessage = mQueue.poll();
                     if(pendingInboundMessage!=null){
                         GameChannel gameChannel = mChannels.get(pendingInboundMessage.connectionId());
                         gameChannel.onMessage(pendingInboundMessage);
@@ -114,7 +116,6 @@ public class UDPService implements Runnable, GameChannelService {
                         Thread.sleep(100);
                     }
                 }catch (Exception ex){
-                    log.warn("Pending message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type());
                     ex.printStackTrace();
                 }
             }
@@ -201,13 +202,24 @@ public class UDPService implements Runnable, GameChannelService {
     public int sessionId(){
         return sessionId.incrementAndGet();
     }
+    public int[] messageIdRange(){
+        int[] mid = new int[2];
+        int end = messageId.addAndGet(messageIdOffset);
+        mid[0]=end-messageIdOffset;
+        mid[1]=end-1;
+        return mid;
+    }
     public MessageHandler messageHandler(int type){
         return this.mHandlers.get(type);
     }
     private byte[] encrypt(byte[] data) throws IllegalBlockSizeException, BadPaddingException{
-        return encrypt.doFinal(data);
+        synchronized (encrypt){
+            return encrypt.doFinal(data);
+        }
     }
     private byte[] decrypt(byte[] data) throws IllegalBlockSizeException, BadPaddingException{
-        return decrypt.doFinal(data);
+        synchronized (decrypt){
+            return decrypt.doFinal(data);
+        }
     }
 }

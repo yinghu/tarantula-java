@@ -61,18 +61,9 @@ namespace Integration
             {
                 _playing = buff.GetUTF8String().Equals("accepted");
             });
-            if (!await _integrationManager.Ticket(this))
+            if (!await _integrationManager.Join(this))
             {
-                bText.text = "no ticket";
-                return;
-            }
-
-            using (var buffer = new DataBuffer())
-            {
-                buffer.PutInt(_integrationManager.Presence.Stub);
-                buffer.PutUTF8String(_integrationManager.Presence.Login);
-                buffer.PutUTF8String(_integrationManager.Presence.Ticket);
-                await _integrationManager.Messenger.SendAsync(MessageType.Join, 0, true, buffer);
+                bText.text = _integrationManager.Exception.Message;
             }
         }
         public async void Exit()

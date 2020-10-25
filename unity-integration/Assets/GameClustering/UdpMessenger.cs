@@ -160,7 +160,7 @@ namespace GameClustering
                 }
                 catch (Exception ex)
                 {
-                    Debug.Log(ex.Message); 
+                    Debug.Log(ex.StackTrace); 
                 }
             }    
         }
