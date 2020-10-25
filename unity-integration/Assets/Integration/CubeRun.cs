@@ -13,12 +13,12 @@ namespace Integration
         {
             _timer = 0;
             _speed = 3;
-            IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Relay,sequence, (buffer) =>
+            IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Relay,sequence, (sessionId,buffer) =>
          
             {
                 _enabled = !_enabled;
             });
-            IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (buffer) =>
+            IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId,buffer) =>
             {
                 _speed = buffer.GetFloat();
             });

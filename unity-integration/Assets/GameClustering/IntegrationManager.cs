@@ -7,9 +7,14 @@ using UnityEngine;
 
 namespace GameClustering
 {
+    public delegate void OnJoinedEvent(int sessionId);
+    public delegate void OnLeftEvent(int sessionId);
+    
     [CreateAssetMenu(fileName = "IntegrationManager", menuName = "GameClustering/IntegrationManager", order = 1)]
     public class IntegrationManager : ScriptableObject
     {
+        public event OnJoinedEvent OnJoinedEvent;
+        public event OnLeftEvent OnLeftEvent;
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
 
         public string gecHost = "localhost:8090";
@@ -101,6 +106,20 @@ namespace GameClustering
                 Messenger.Connect(connection,Convert.FromBase64String((string)jo.SelectToken("serverKey")));
                 _thread = new Thread(Messenger.Listen);
                 _thread.Start();
+                Messenger.RegisterMessageHandler(MessageType.Join,0, (sessionId,buffer) =>
+                {
+                    var joined = buffer.GetUTF8String().Equals("accepted");
+                    if (joined)
+                    {
+                        Messenger.Join(sessionId,new []{buffer.GetInt(),buffer.GetInt()});
+                    }
+                    OnJoinedEvent?.Invoke(sessionId);    
+                });
+                Messenger.RegisterMessageHandler(MessageType.Leave,0, (sessionId,buffer) =>
+                {
+                    Messenger.Leave();
+                    OnLeftEvent?.Invoke(sessionId);
+                });
                 return true;
             }
             catch(Exception ex)
@@ -169,6 +188,12 @@ namespace GameClustering
                 buffer.PutUTF8String(Presence.Ticket);
                 await Messenger.SendAsync(MessageType.Join, 0, true, buffer);
             }
+            return true;
+        }
+
+        public async Task<bool> Leave()
+        {
+            await Messenger.SendAsync(MessageType.Leave, 0, true);
             return true;
         }
 

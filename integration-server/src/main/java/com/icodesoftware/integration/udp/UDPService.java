@@ -49,11 +49,13 @@ public class UDPService implements Runnable, GameChannelService {
     private int gameChannels;
     private AtomicInteger sessionId;
     private AtomicInteger messageId;
+    private AtomicInteger reservedMessageId;
     private int messageIdOffset = 100000;
     private JsonParser parser;
     public UDPService(JsonObject config){
         sessionId = new AtomicInteger(0);
         messageId = new AtomicInteger(1);
+        reservedMessageId = new AtomicInteger(Integer.MIN_VALUE);
         parser = new JsonParser();
         this.config = config;
         this.address = config.getAsJsonObject("connection").get("host").getAsString();
@@ -201,6 +203,9 @@ public class UDPService implements Runnable, GameChannelService {
     }
     public int sessionId(){
         return sessionId.incrementAndGet();
+    }
+    public int messageId(){
+        return reservedMessageId.incrementAndGet();
     }
     public int[] messageIdRange(){
         int[] mid = new int[2];

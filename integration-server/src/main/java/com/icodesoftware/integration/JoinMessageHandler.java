@@ -25,7 +25,8 @@ public class JoinMessageHandler implements MessageHandler {
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.ack(true);
         pendingOutboundMessage.timestamp(pendingInboundMessage.timestamp());
-        pendingOutboundMessage.messageId(pendingInboundMessage.messageId());
+        int messageId = gameChannelService.messageId();
+        pendingOutboundMessage.messageId(messageId);
         pendingOutboundMessage.type(pendingInboundMessage.type());
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
         DataBuffer data = new DataBuffer();
@@ -40,12 +41,14 @@ public class JoinMessageHandler implements MessageHandler {
             pendingOutboundMessage.payload(data.toArray());
             gameChannel.join(sessionId,pendingInboundMessage.source());
             gameChannel.ack(sessionId,pendingInboundMessage.messageId(),pendingInboundMessage.source());
-            gameChannel.relay(pendingInboundMessage.messageId(),true,pendingOutboundMessage);
+            ByteBuffer pending = gameChannelService.send(pendingOutboundMessage,pendingInboundMessage.source());
+            gameChannel.pending(sessionId,messageId,pending);
         }
         else{
             data.putUTF8("rejected");
             pendingOutboundMessage.payload(data.toArray());
             ByteBuffer resp = this.gameChannelService.send(pendingOutboundMessage,pendingInboundMessage.source());
+            //gameChannel.ack(sessionId,pendingInboundMessage.messageId(),pendingInboundMessage.source());
             gameChannel.pending(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),resp);
         }
     }

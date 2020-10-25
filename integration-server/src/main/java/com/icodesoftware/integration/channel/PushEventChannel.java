@@ -70,15 +70,18 @@ public class PushEventChannel implements GameChannel {
             joinMessageHandler.onMessage(pendingInboundMessage);
         }
         else{
-            log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type());
+            log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId());
         }
     }
     public void ack(int sessionId,int messageId,SocketAddress source){
+        RemoteSession remoteSession = mSession.get(sessionId);
+        if(remoteSession==null){
+            return;
+        }
         OutboundMessage ack = new OutboundMessage();
         ack.type(MessageHandler.ACK);
         ack.sequence(0);
         DataBuffer dataBuffer = new DataBuffer();
-        RemoteSession remoteSession = mSession.get(sessionId);
         FIFOBuffer<Integer> buffer = remoteSession.ackBuffer;
         buffer.push(messageId);
         List<Integer> alist = buffer.list(new ArrayList<>());

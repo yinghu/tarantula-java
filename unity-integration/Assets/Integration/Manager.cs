@@ -43,7 +43,7 @@ namespace Integration
             {
                 return;
             }
-            _integrationManager.Messenger.UnregisterMessageHandler(MessageType.Join,0);
+            _integrationManager.OnJoinedEvent -= Join;
             SceneManager.LoadScene("GamePlay");
         }
 
@@ -57,10 +57,7 @@ namespace Integration
                     return;
                 }
             }
-            _integrationManager.Messenger.RegisterMessageHandler(MessageType.Join,0, buff=>
-            {
-                _playing = buff.GetUTF8String().Equals("accepted");
-            });
+            _integrationManager.OnJoinedEvent += Join;
             if (!await _integrationManager.Join(this))
             {
                 bText.text = _integrationManager.Exception.Message;
@@ -75,6 +72,11 @@ namespace Integration
             bText.text = "play again";
             _playing = false;
             _integrationManager.Messenger.Disconnect();
+        }
+
+        private void Join(int sessionId)
+        {
+            _playing = true;
         }
     }
 }

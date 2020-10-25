@@ -13,7 +13,7 @@ namespace GameClustering
     public class UdpMessenger : IMessenger
     {
         private UdpClient _udpClient;
-        private readonly ConcurrentDictionary<CallbackKey, Action<DataBuffer>> _handlers;
+        private readonly ConcurrentDictionary<CallbackKey, Action<int,DataBuffer>> _handlers;
         private readonly ConcurrentDictionary<int, PendingMessage> _pendingMessages;
         private readonly ConcurrentDictionary<int, int> _pendingGateways;
         private readonly PendingAck _pendingAck;
@@ -31,7 +31,7 @@ namespace GameClustering
         private IPEndPoint _remote;
         public UdpMessenger()
         {
-            _handlers = new ConcurrentDictionary<CallbackKey, Action<DataBuffer>>();
+            _handlers = new ConcurrentDictionary<CallbackKey, Action<int,DataBuffer>>();
             _pendingMessages = new ConcurrentDictionary<int, PendingMessage>();
             _pendingGateways = new ConcurrentDictionary<int, int>();
             _pendingAck = new PendingAck(20);
@@ -56,7 +56,7 @@ namespace GameClustering
             }
             _remote = new IPEndPoint(IPAddress.Parse(_connection.Host),_connection.Port);
             _udpClient = new UdpClient(_connection.Host,_connection.Port);
-            _handlers[new CallbackKey(MessageType.Ack,0)] = buffer =>
+            _handlers[new CallbackKey(MessageType.Ack,0)] = (sessionId,buffer) =>
             {
                 var sz = buffer.GetInt();
                 for (var i = 0; i < sz; i++)
@@ -64,7 +64,7 @@ namespace GameClustering
                     _pendingMessages.TryRemove(buffer.GetInt(),out var removed);
                 }
             };
-            _handlers[new CallbackKey(MessageType.Ping,0)] = async buffer =>
+            _handlers[new CallbackKey(MessageType.Ping,0)] = async (sessionId,buffer) =>
             {
                 await SendAsync(MessageType.Pong, 0, false);
             };
@@ -165,7 +165,7 @@ namespace GameClustering
             }    
         }
 
-        public void RegisterMessageHandler(int type,int sequence,Action<DataBuffer> messageHandler)
+        public void RegisterMessageHandler(int type,int sequence,Action<int,DataBuffer> messageHandler)
         {
             _handlers[new CallbackKey(type,sequence)] = messageHandler;
         }
@@ -173,6 +173,17 @@ namespace GameClustering
         public void UnregisterMessageHandler(int type,int sequence)
         {
             _handlers.TryRemove(new CallbackKey(type,sequence),out var removed);
+        }
+
+        public void Join(int sessionId,int[] messageIdRange)
+        {
+            _connection.SessionId = sessionId;
+            Interlocked.Add(ref _messageId,messageIdRange[0]);
+        }
+
+        public void Leave()
+        {
+            _connection.SessionId = 0;
         }
 
         public int PendingMessages()
@@ -207,14 +218,6 @@ namespace GameClustering
                 var callbackKey = new CallbackKey(inboundMessage.Type(),inboundMessage.Sequence());
                 if (_handlers.TryGetValue(callbackKey, out var handler))
                 {
-                    if (inboundMessage.Type() == MessageType.Join)
-                    {
-                        _connection.SessionId = inboundMessage.SessionId();
-                    }
-                    else if (inboundMessage.Type() == MessageType.Leave)
-                    {
-                        _connection.SessionId = 0;
-                    }
                     if (inboundMessage.Ack())
                     {
                         Ack(inboundMessage.MessageId());
@@ -227,7 +230,7 @@ namespace GameClustering
                     }
                     using (var buffer = new DataBuffer(inboundMessage.Payload()))
                     {
-                        handler.Invoke(buffer);    
+                        handler.Invoke(inboundMessage.SessionId(),buffer);    
                     }
                 }
                 else

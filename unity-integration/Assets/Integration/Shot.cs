@@ -55,7 +55,7 @@ namespace Integration
             {
                 return;
             }
-            IntegrationManager.Instance.Messenger.UnregisterMessageHandler(MessageType.Leave,3);
+            IntegrationManager.Instance.OnLeftEvent -= Leave;
             SceneManager.LoadScene("Main");
         }
 
@@ -75,11 +75,13 @@ namespace Integration
         public async void Exit()
         {
             var integrationManager = IntegrationManager.Instance;
-            integrationManager.Messenger.RegisterMessageHandler(MessageType.Leave,3, buffer =>
-            {
-                _leaving = true;
-            });
-            await integrationManager.Messenger.SendAsync(MessageType.Leave, 3, false);
+            integrationManager.OnLeftEvent += Leave;
+            await integrationManager.Leave();
+        }
+
+        private void Leave(int sessionId)
+        {
+            _leaving = true;
         }
     }
 }
