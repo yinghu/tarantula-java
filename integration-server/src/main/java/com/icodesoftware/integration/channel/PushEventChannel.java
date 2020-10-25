@@ -10,6 +10,7 @@ import com.icodesoftware.util.FIFOBuffer;
 import javax.print.DocFlavor;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -29,23 +30,20 @@ public class PushEventChannel implements GameChannel {
     private final ConcurrentHashMap<PendingMessageIndex, PendingMessage> mMessage;
 
     private final MessageHandler joinMessageHandler;
-    //private final MessageHandler ackMessageHandler;
-    //private final MessageHandler pingMessageHandler;
+
     public PushEventChannel(final long channelId,final GameChannelService gameChannelService){
         this.channelId = channelId;
         this.gameChannelService = gameChannelService;
         this.mSession = new ConcurrentHashMap<>();
         this.mMessage = new ConcurrentHashMap<>();
         this.joinMessageHandler = this.gameChannelService.messageHandler(MessageHandler.JOIN);
-        //this.ackMessageHandler = this.gameChannelService.messageHandler(MessageHandler.ACK);
-        //this.pingMessageHandler = this.gameChannelService.messageHandler(MessageHandler.PING);
     }
     @Override
     public long channelId() {
         return channelId;
     }
     public void join(int sessionId,SocketAddress socketAddress){
-        mSession.put(sessionId,new RemoteSession(socketAddress));
+        mSession.put(sessionId,new RemoteSession(socketAddress,toUTCMilliseconds()));
     }
     public void leave(int sessionId,SocketAddress socketAddress){
         if(mSession.containsKey(sessionId)&&mSession.get(sessionId).socketAddress.equals(socketAddress)){
@@ -105,8 +103,18 @@ public class PushEventChannel implements GameChannel {
         pendingOutboundMessage.type(MessageHandler.PING);
         pendingOutboundMessage.sequence(0);
         mSession.forEach((k,v)->{
+            if(checkExpired(v.lastPong.get())){
+                //kickoff
+                log.warn("kick off->"+k);
+            }
             this.gameChannelService.send(pendingOutboundMessage,v.socketAddress);
         });
+    }
+    public void pong(int sessionId){
+        RemoteSession remoteSession = mSession.get(sessionId);
+        if(remoteSession!=null){
+            remoteSession.lastPong.set(toUTCMilliseconds());
+        }
     }
     public void retry(){
         this.mMessage.forEach((k,v)->{
@@ -120,6 +128,10 @@ public class PushEventChannel implements GameChannel {
     }
     public void pending(int sessionId, int messageId, ByteBuffer pending){
         mMessage.put(new PendingMessageIndex(sessionId,messageId),new PendingMessage(pending,toUTCMilliseconds(),2));
+    }
+    private boolean checkExpired(long timestamp){
+        LocalDateTime lastAccess = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC);
+        return lastAccess.plusSeconds(10).isBefore(LocalDateTime.now());
     }
     private static long toUTCMilliseconds(){
         return LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli();

@@ -19,6 +19,9 @@ public class PongMessageHandler implements MessageHandler {
 
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
-        //System.out.println("PONG FROM ->"+pendingInboundMessage.connectionId());
+        GameChannel gameChannel = gameChannelService.gameChannel(pendingInboundMessage.connectionId());
+        if(gameChannel!=null){
+            gameChannel.pong(pendingInboundMessage.sessionId());
+        }
     }
 }

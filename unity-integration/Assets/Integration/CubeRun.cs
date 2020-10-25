@@ -14,6 +14,7 @@ namespace Integration
             _timer = 0;
             _speed = 3;
             IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Relay,sequence, (buffer) =>
+         
             {
                 _enabled = !_enabled;
             });

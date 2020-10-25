@@ -19,6 +19,7 @@ public interface GameChannel {
     void ack(int sessionId,int messageId,SocketAddress source);
     void ack(int sessionId,int messageId);
     void ping();
+    void pong(int sessionId);
     void retry();
     void pending(int sessionId, int messageId, ByteBuffer pending);
 }

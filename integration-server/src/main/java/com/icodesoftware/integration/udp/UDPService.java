@@ -144,8 +144,8 @@ public class UDPService implements Runnable, GameChannelService {
         decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
         decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
         mChannels.forEach((k,v)->{
-            scheduledExecutorService.scheduleAtFixedRate(()->v.ping(),5000,5000,TimeUnit.MILLISECONDS);
-            scheduledExecutorService.scheduleAtFixedRate(()->v.retry(),200,200,TimeUnit.MILLISECONDS);
+            scheduledExecutorService.scheduleAtFixedRate(()->v.ping(),1000,3000,TimeUnit.MILLISECONDS);
+            scheduledExecutorService.scheduleAtFixedRate(()->v.retry(),1000,200,TimeUnit.MILLISECONDS);
         });
     }
     public void shutdown() throws Exception{
