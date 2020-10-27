@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
  */
 public class JoinMessageHandler extends AbstractMessageHandler {
 
+
     public JoinMessageHandler(GameChannelService udpService){
         super(udpService);
     }
@@ -40,7 +41,7 @@ public class JoinMessageHandler extends AbstractMessageHandler {
             pendingOutboundMessage.payload(data.toArray());
             gameChannel.join(sessionId,pendingInboundMessage.source());
             gameChannel.ack(sessionId,pendingInboundMessage.messageId(),pendingInboundMessage.source());
-            OnJoinedMessageHandler onJoinedMessageHandler = new OnJoinedMessageHandler(gameChannelService);
+            OnJoinedMessageHandler onJoinedMessageHandler = new OnJoinedMessageHandler(gameChannelService,sessionId);
             onJoinedMessageHandler.onMessage(pendingInboundMessage);
             ByteBuffer pending = gameChannelService.send(pendingOutboundMessage,pendingInboundMessage.source());
             gameChannel.pending(sessionId,messageId,pending,onJoinedMessageHandler);

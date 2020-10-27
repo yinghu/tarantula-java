@@ -70,7 +70,7 @@ public class PushEventChannel implements GameChannel {
             joinMessageHandler.onMessage(pendingInboundMessage);
         }
         else{
-            //log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId());
+            log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId());
         }
     }
     public void ack(int sessionId,int messageId,SocketAddress source){
@@ -79,6 +79,7 @@ public class PushEventChannel implements GameChannel {
             return;
         }
         OutboundMessage ack = new OutboundMessage();
+        ack.ack(false);
         ack.type(MessageHandler.ACK);
         ack.sequence(0);
         DataBuffer dataBuffer = new DataBuffer();

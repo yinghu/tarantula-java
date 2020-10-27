@@ -76,6 +76,7 @@ namespace Integration
 
         private void Join(int sessionId)
         {
+            Debug.Log("Session id->"+sessionId);
             _playing = true;
         }
     }

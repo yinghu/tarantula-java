@@ -127,7 +127,6 @@ namespace GameClustering
                 Messenger.RegisterMessageHandler(MessageType.OnLeft,0, (sessionId,buffer) =>
                 {
                     OnLeftEvent?.Invoke(sessionId);
-                    Debug.Log("ON-LEFT->"+sessionId);
                 });
                 return true;
             }
