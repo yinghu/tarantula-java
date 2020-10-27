@@ -1,18 +1,17 @@
 package com.icodesoftware.integration;
 
 import com.icodesoftware.protocol.DataBuffer;
-import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.InboundMessage;
 
-import java.nio.ByteBuffer;
+
 
 /**
  * Created by yinghu lu on 10/7/2020.
  */
-public class AckMessageHandler implements MessageHandler {
-    private final GameChannelService gameChannelService;
+public class AckMessageHandler extends AbstractMessageHandler {
+
     public AckMessageHandler(GameChannelService gameService){
-        this.gameChannelService = gameService;
+        super(gameService);
     }
 
     @Override

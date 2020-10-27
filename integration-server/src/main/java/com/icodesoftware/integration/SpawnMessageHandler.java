@@ -1,16 +1,14 @@
 package com.icodesoftware.integration;
 
-import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.InboundMessage;
 import com.icodesoftware.protocol.OutboundMessage;
 
 /**
  * Created by yinghu lu on 10/7/2020.
  */
-public class SpawnMessageHandler implements MessageHandler {
-    private final GameChannelService gameChannelService;
+public class SpawnMessageHandler extends AbstractMessageHandler {
     public SpawnMessageHandler(GameChannelService gameService){
-        this.gameChannelService = gameService;
+        super(gameService);
     }
 
     @Override

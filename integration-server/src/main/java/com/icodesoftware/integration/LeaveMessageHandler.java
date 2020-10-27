@@ -1,16 +1,17 @@
 package com.icodesoftware.integration;
 
-import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.InboundMessage;
 import com.icodesoftware.protocol.OutboundMessage;
+
+import java.nio.ByteBuffer;
 
 /**
  * Created by yinghu lu on 10/7/2020.
  */
-public class LeaveMessageHandler implements MessageHandler {
-    private final GameChannelService gameChannelService;
+public class LeaveMessageHandler extends AbstractMessageHandler {
+
     public LeaveMessageHandler(GameChannelService gameService){
-        this.gameChannelService = gameService;
+        super(gameService);
     }
 
     @Override
@@ -21,12 +22,17 @@ public class LeaveMessageHandler implements MessageHandler {
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
-        pendingOutboundMessage.ack(true);
+        pendingOutboundMessage.ack(pendingInboundMessage.ack());
         pendingOutboundMessage.timestamp(pendingInboundMessage.timestamp());
         pendingOutboundMessage.messageId(pendingInboundMessage.messageId());
         pendingOutboundMessage.type(pendingInboundMessage.type());
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
-        gameChannelService.gameChannel(pendingInboundMessage.connectionId()).leave(pendingInboundMessage.sessionId(),pendingInboundMessage.source());
-        this.gameChannelService.send(pendingOutboundMessage,pendingInboundMessage.source());
+        GameChannel gameChannel = gameChannelService.gameChannel(pendingInboundMessage.connectionId());
+        gameChannel.leave(pendingInboundMessage.sessionId(),pendingInboundMessage.source());
+        OnLeftMessageHandler onLeftMessageHandler = new OnLeftMessageHandler(gameChannelService);
+        onLeftMessageHandler.onMessage(pendingInboundMessage);
+        ByteBuffer pending = gameChannelService.send(pendingOutboundMessage,pendingInboundMessage.source());
+        onLeftMessageHandler.relay();
+        gameChannel.pending(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),pending,onLeftMessageHandler);
     }
 }

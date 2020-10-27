@@ -22,6 +22,7 @@ namespace Integration
             _leaving = false;
             _timer = 0;
             _timeout = 0;
+            IntegrationManager.Instance.OnLeftEvent += Leave;
         }
 
         public async void Roll()
@@ -75,7 +76,6 @@ namespace Integration
         public async void Exit()
         {
             var integrationManager = IntegrationManager.Instance;
-            integrationManager.OnLeftEvent += Leave;
             await integrationManager.Leave();
         }
 

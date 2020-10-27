@@ -4,17 +4,17 @@ namespace GameClustering
 {
     public class ClusteringObject : MonoBehaviour
     {
-        private const float FlashRate = 0.02f;
+        private const float FlashRate = 0.02f;//200ms
         private IntegrationManager _integrationManager;
         private float _flashRate;
         private void Start()
         {
-            _flashRate = FlashRate; //200ms
+            _flashRate = FlashRate; 
             _integrationManager = IntegrationManager.Instance;
             _integrationManager.Messenger.RegisterMessageHandler(MessageType.Sync,1, (sessionId, buffer) =>
             {
                 var q = buffer.GetQuaternion();
-                Debug.Log("SYNC->"+q.w+"//"+q.x+"//"+q.y+"//"+q.z);
+                //Debug.Log("SYNC->"+q.w+"//"+q.x+"//"+q.y+"//"+q.z);
             });
         }
 

@@ -1,6 +1,7 @@
 package com.icodesoftware.integration;
 
 import com.icodesoftware.protocol.InboundMessage;
+import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.OutboundMessage;
 
 import java.net.SocketAddress;
@@ -21,5 +22,6 @@ public interface GameChannel {
     void ping();
     void pong(int sessionId);
     void retry();
+    void pending(int sessionId, int messageId, ByteBuffer pending, MessageHandler callback);
     void pending(int sessionId, int messageId, ByteBuffer pending);
 }

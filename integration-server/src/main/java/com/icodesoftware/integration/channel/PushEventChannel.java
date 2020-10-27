@@ -57,10 +57,10 @@ public class PushEventChannel implements GameChannel {
                 &&mSession.get(pendingInboundMessage.sessionId()).socketAddress.equals(pendingInboundMessage.source())){
             MessageHandler messageHandler = gameChannelService.messageHandler(pendingInboundMessage.type());
             if(messageHandler!=null){
-                messageHandler.onMessage(pendingInboundMessage);
                 if(pendingInboundMessage.ack()){
                     ack(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),pendingInboundMessage.source());
                 }
+                messageHandler.onMessage(pendingInboundMessage);
             }
             else{
                 log.warn("no message handler registered ->"+pendingInboundMessage.type());
@@ -70,7 +70,7 @@ public class PushEventChannel implements GameChannel {
             joinMessageHandler.onMessage(pendingInboundMessage);
         }
         else{
-            log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId());
+            //log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId());
         }
     }
     public void ack(int sessionId,int messageId,SocketAddress source){
@@ -91,7 +91,10 @@ public class PushEventChannel implements GameChannel {
         gameChannelService.send(ack,source);
     }
     public void ack(int sessionId,int messageId){
-        mMessage.remove(new PendingMessageIndex(sessionId,messageId));
+        PendingMessage pendingMessage = mMessage.remove(new PendingMessageIndex(sessionId,messageId));
+        if(pendingMessage!=null&&pendingMessage.callback!=null){
+            pendingMessage.callback.relay();
+        }
     }
     public void relay(int messageId,boolean ack,OutboundMessage pendingOutboundMessage){
         this.mSession.forEach((k,v)->{
@@ -128,6 +131,9 @@ public class PushEventChannel implements GameChannel {
                 v.retries--;
             }
         });
+    }
+    public void pending(int sessionId, int messageId, ByteBuffer pending,MessageHandler callback){
+        mMessage.put(new PendingMessageIndex(sessionId,messageId),new PendingMessage(pending,toUTCMilliseconds(),2,callback));
     }
     public void pending(int sessionId, int messageId, ByteBuffer pending){
         mMessage.put(new PendingMessageIndex(sessionId,messageId),new PendingMessage(pending,toUTCMilliseconds(),2));

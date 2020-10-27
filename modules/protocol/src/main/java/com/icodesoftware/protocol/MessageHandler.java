@@ -16,6 +16,10 @@ public interface MessageHandler {
     int VOTE = 8;
     int SYNC = 9;
 
+    int ON_JOINED = 10;
+    int ON_LEFT = 11;
+
     int type();
     void onMessage(InboundMessage pendingInboundMessage);
+    void relay();
 }

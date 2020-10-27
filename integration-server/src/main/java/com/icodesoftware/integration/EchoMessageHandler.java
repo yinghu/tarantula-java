@@ -1,16 +1,15 @@
 package com.icodesoftware.integration;
 
-import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.InboundMessage;
 import com.icodesoftware.protocol.OutboundMessage;
 
 /**
  * Created by yinghu lu on 10/7/2020.
  */
-public class EchoMessageHandler implements MessageHandler {
-    private final GameChannelService gameChannelService;
+public class EchoMessageHandler extends AbstractMessageHandler {
+
     public EchoMessageHandler(GameChannelService udpService){
-        this.gameChannelService = udpService;
+        super(udpService);
     }
     @Override
     public int type() {

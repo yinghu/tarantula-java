@@ -15,6 +15,7 @@ namespace GameClustering
     {
         public event OnJoinedEvent OnJoinedEvent;
         public event OnLeftEvent OnLeftEvent;
+        
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
 
         public string gecHost = "localhost:8090";
@@ -113,12 +114,20 @@ namespace GameClustering
                     {
                         Messenger.Join(sessionId,new []{buffer.GetInt(),buffer.GetInt()});
                     }
-                    OnJoinedEvent?.Invoke(sessionId);    
+                });
+                Messenger.RegisterMessageHandler(MessageType.OnJoined,0, (sessionId,buffer) =>
+                {
+                    OnJoinedEvent?.Invoke(sessionId);
                 });
                 Messenger.RegisterMessageHandler(MessageType.Leave,0, (sessionId,buffer) =>
                 {
                     Messenger.Leave();
                     OnLeftEvent?.Invoke(sessionId);
+                });
+                Messenger.RegisterMessageHandler(MessageType.OnLeft,0, (sessionId,buffer) =>
+                {
+                    OnLeftEvent?.Invoke(sessionId);
+                    Debug.Log("ON-LEFT->"+sessionId);
                 });
                 return true;
             }

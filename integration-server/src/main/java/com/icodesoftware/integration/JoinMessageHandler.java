@@ -1,6 +1,5 @@
 package com.icodesoftware.integration;
 
-import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.InboundMessage;
 import com.icodesoftware.protocol.OutboundMessage;
@@ -10,10 +9,10 @@ import java.nio.ByteBuffer;
 /**
  * Created by yinghu lu on 10/7/2020.
  */
-public class JoinMessageHandler implements MessageHandler {
-    private final GameChannelService gameChannelService;
+public class JoinMessageHandler extends AbstractMessageHandler {
+
     public JoinMessageHandler(GameChannelService udpService){
-        this.gameChannelService = udpService;
+        super(udpService);
     }
     @Override
     public int type() {
@@ -41,8 +40,10 @@ public class JoinMessageHandler implements MessageHandler {
             pendingOutboundMessage.payload(data.toArray());
             gameChannel.join(sessionId,pendingInboundMessage.source());
             gameChannel.ack(sessionId,pendingInboundMessage.messageId(),pendingInboundMessage.source());
+            OnJoinedMessageHandler onJoinedMessageHandler = new OnJoinedMessageHandler(gameChannelService);
+            onJoinedMessageHandler.onMessage(pendingInboundMessage);
             ByteBuffer pending = gameChannelService.send(pendingOutboundMessage,pendingInboundMessage.source());
-            gameChannel.pending(sessionId,messageId,pending);
+            gameChannel.pending(sessionId,messageId,pending,onJoinedMessageHandler);
         }
         else{
             data.putUTF8("rejected");
