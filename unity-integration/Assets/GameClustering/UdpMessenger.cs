@@ -76,6 +76,8 @@ namespace GameClustering
             _live = false;
             _totalOutbound = 0;
             _totalInbound = 0;
+            _totalBytes = 0;
+            _totalRetries = 0;
             _pendingMessages.Clear();
             _udpClient.Close();
         }
@@ -112,8 +114,8 @@ namespace GameClustering
                 {
                     _pendingMessages[messageId] = new PendingMessage {Data = outMessage, Timestamp = timestamp, Retries = 2};
                 }
-                _totalOutbound++;
-                _totalBytes += bytes;
+                _totalOutbound = Interlocked.Increment(ref _totalOutbound);
+                _totalBytes = Interlocked.Add(ref _totalBytes, bytes);
                 return messageId;
             }
         }
@@ -134,7 +136,8 @@ namespace GameClustering
                 retry.Timestamp = timestamp;
                 retry.Retries--;
             }
-            _totalRetries += retries;
+
+            _totalRetries = Interlocked.Add(ref _totalRetries, retries);
             ClearPendingGateways();
             return retries;
         }
@@ -149,8 +152,8 @@ namespace GameClustering
                     if (available > 0)
                     {
                         var bytes = _udpClient.Receive(ref _remote);
-                        _totalInbound++;
-                        _totalBytes += available;
+                        _totalInbound = Interlocked.Increment(ref _totalInbound);
+                        _totalBytes = Interlocked.Add(ref _totalBytes, available);
                         ProcessMessage(bytes);
                     }
                     else
@@ -278,11 +281,14 @@ namespace GameClustering
             }
         }
 
-        private  void Ack(int messageId)
+        public void Ack()
         {
+            if (_connection.SessionId <= 0)
+            {
+                return;
+            }
             using (var buffer = new DataBuffer())
             {
-                _pendingAck.Push(messageId);
                 var list = _pendingAck.List();
                 buffer.PutInt(list.Count);
                 foreach (var mid in list)
@@ -290,7 +296,12 @@ namespace GameClustering
                     buffer.PutInt(mid);
                 }
                 Task.FromResult(SendAsync(MessageType.Ack, 0, false, buffer));
-            }
+            }    
+        }
+        private  void Ack(int messageId)
+        {
+            _pendingAck.Push(messageId);
+            Ack();    
         }
     }
 }

@@ -12,6 +12,7 @@ namespace GameClustering
         Task<int> SendAsync(int type,int sequence,bool ack,DataBuffer payload);
         Task<int> SendAsync(int type,int sequence,bool ack);
         Task<int> RetryAsync();
+        void Ack();
         void RegisterMessageHandler(int type,int sequence,Action<int,DataBuffer> messageHandler);
         void UnregisterMessageHandler(int type,int sequence);
 

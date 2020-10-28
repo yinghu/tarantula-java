@@ -7,7 +7,6 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.util.FIFOBuffer;
 
-import javax.print.DocFlavor;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.time.Instant;
@@ -70,7 +69,7 @@ public class PushEventChannel implements GameChannel {
             joinMessageHandler.onMessage(pendingInboundMessage);
         }
         else{
-            log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId());
+            log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId()+"/"+pendingInboundMessage.sessionId());
         }
     }
     public void ack(int sessionId,int messageId,SocketAddress source){
@@ -109,13 +108,15 @@ public class PushEventChannel implements GameChannel {
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.type(MessageHandler.PING);
         pendingOutboundMessage.sequence(0);
+        ArrayList<Integer> kickOff = new ArrayList<>();
         mSession.forEach((k,v)->{
             if(checkExpired(v.lastPong.get())){
-                //kickoff
-                log.warn("kick off->"+k);
+                kickOff.add(k);
+                log.warn("kick off ->"+k);
             }
             this.gameChannelService.send(pendingOutboundMessage,v.socketAddress);
         });
+        kickOff.forEach((k)->mSession.remove(k));
     }
     public void pong(int sessionId){
         RemoteSession remoteSession = mSession.get(sessionId);

@@ -113,6 +113,7 @@ namespace GameClustering
                     if (joined)
                     {
                         Messenger.Join(sessionId,new []{buffer.GetInt(),buffer.GetInt()});
+                        Messenger.Ack();
                     }
                 });
                 Messenger.RegisterMessageHandler(MessageType.OnJoined,0, (sessionId,buffer) =>
