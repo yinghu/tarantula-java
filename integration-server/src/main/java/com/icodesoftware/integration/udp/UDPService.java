@@ -150,7 +150,7 @@ public class UDPService implements Runnable, GameChannelService {
         decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
         mChannels.forEach((k,v)->{
             scheduledExecutorService.scheduleAtFixedRate(()->v.ping(),1000,1000,TimeUnit.MILLISECONDS);
-            scheduledExecutorService.scheduleAtFixedRate(()->v.retry(),1000,100,TimeUnit.MILLISECONDS);
+            scheduledExecutorService.scheduleAtFixedRate(()->v.retry(),1000,250,TimeUnit.MILLISECONDS);
         });
     }
     public void shutdown() throws Exception{
