@@ -31,9 +31,4 @@ public class OnJoinedMessageHandler extends AbstractMessageHandler {
         outboundMessage.type(ON_JOINED);
         outboundMessage.sequence(pendingInboundMessage.sequence());
     }
-    public void relay(){
-        System.out.println("on joined->"+sessionId);
-        super.relay();
-    }
-
 }

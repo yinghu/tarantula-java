@@ -15,6 +15,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by yinghu lu on 10/16/2020.
@@ -42,7 +43,7 @@ public class PushEventChannel implements GameChannel {
         return channelId;
     }
     public void join(int sessionId,SocketAddress socketAddress){
-        mSession.put(sessionId,new RemoteSession(socketAddress,toUTCMilliseconds()));
+        mSession.put(sessionId,new RemoteSession(socketAddress));
     }
     public void leave(int sessionId,SocketAddress socketAddress){
         if(mSession.containsKey(sessionId)&&mSession.get(sessionId).socketAddress.equals(socketAddress)){
@@ -69,7 +70,7 @@ public class PushEventChannel implements GameChannel {
             joinMessageHandler.onMessage(pendingInboundMessage);
         }
         else{
-            log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId()+"/"+pendingInboundMessage.sessionId());
+            //log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId()+"/"+pendingInboundMessage.sessionId());
         }
     }
     public void ack(int sessionId,int messageId,SocketAddress source){
@@ -108,29 +109,32 @@ public class PushEventChannel implements GameChannel {
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.type(MessageHandler.PING);
         pendingOutboundMessage.sequence(0);
-        ArrayList<Integer> kickOff = new ArrayList<>();
         mSession.forEach((k,v)->{
-            if(checkExpired(v.lastPong.get())){
-                kickOff.add(k);
-                log.warn("kick off ->"+k);
+            if(v.pingPong.incrementAndGet()<5){
+                this.gameChannelService.send(pendingOutboundMessage,v.socketAddress);
+            }else{
+                mSession.remove(k);
+                log.warn("session kicked off ->"+k);
             }
-            this.gameChannelService.send(pendingOutboundMessage,v.socketAddress);
         });
-        kickOff.forEach((k)->mSession.remove(k));
     }
     public void pong(int sessionId){
         RemoteSession remoteSession = mSession.get(sessionId);
         if(remoteSession!=null){
-            remoteSession.lastPong.set(toUTCMilliseconds());
+            remoteSession.pingPong.decrementAndGet();
         }
     }
     public void retry(){
         this.mMessage.forEach((k,v)->{
             RemoteSession session = mSession.get(k.sessionId);
-            if(session!=null){
+            if(session!=null&&checkExpired(v.timestamp,100)){
+                //log.warn("RETRY->"+v.retries+"/"+(toUTCMilliseconds()-v.timestamp)+"<>"+k.toString());
                 v.data.flip();
                 this.gameChannelService.retry(v.data,session.socketAddress);
                 v.retries--;
+                if(v.retries<0){
+                    mMessage.remove(k);
+                }
             }
         });
     }
@@ -140,9 +144,8 @@ public class PushEventChannel implements GameChannel {
     public void pending(int sessionId, int messageId, ByteBuffer pending){
         mMessage.put(new PendingMessageIndex(sessionId,messageId),new PendingMessage(pending,toUTCMilliseconds(),2));
     }
-    private boolean checkExpired(long timestamp){
-        LocalDateTime lastAccess = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC);
-        return lastAccess.plusSeconds(10).isBefore(LocalDateTime.now());
+    private boolean checkExpired(long timestamp,long pms){
+        return toUTCMilliseconds()-timestamp>=pms;
     }
     private static long toUTCMilliseconds(){
         return LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli();

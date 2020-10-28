@@ -115,6 +115,10 @@ namespace GameClustering
                         Messenger.Join(sessionId,new []{buffer.GetInt(),buffer.GetInt()});
                         Messenger.Ack();
                     }
+                    else
+                    {
+                        //rejected response
+                    }
                 });
                 Messenger.RegisterMessageHandler(MessageType.OnJoined,0, (sessionId,buffer) =>
                 {
@@ -128,6 +132,10 @@ namespace GameClustering
                 Messenger.RegisterMessageHandler(MessageType.OnLeft,0, (sessionId,buffer) =>
                 {
                     OnLeftEvent?.Invoke(sessionId);
+                });
+                Messenger.RegisterMessageHandler(MessageType.OnKickedOff,0, (sesionId, buffer) =>
+                {
+                    Debug.Log("KICKED OFF->"+sesionId);
                 });
                 return true;
             }

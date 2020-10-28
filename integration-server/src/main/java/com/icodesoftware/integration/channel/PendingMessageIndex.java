@@ -19,4 +19,8 @@ public class PendingMessageIndex {
         PendingMessageIndex pendingMessageIndex = (PendingMessageIndex)obj;
         return sessionId==pendingMessageIndex.sessionId&&messageId==pendingMessageIndex.messageId;
     }
+    @Override
+    public String toString(){
+        return sessionId+"<>"+messageId;
+    }
 }
