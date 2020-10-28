@@ -127,8 +127,8 @@ public class PushEventChannel implements GameChannel {
     public void retry(){
         this.mMessage.forEach((k,v)->{
             RemoteSession session = mSession.get(k.sessionId);
-            if(session!=null&&checkExpired(v.timestamp,100)){
-                //log.warn("RETRY->"+v.retries+"/"+(toUTCMilliseconds()-v.timestamp)+"<>"+k.toString());
+            if(session!=null&&checkExpired(v.timestamp,500)){
+                log.warn("RETRY->"+v.retries+"/"+(toUTCMilliseconds()-v.timestamp)+"<>"+k.toString());
                 v.data.flip();
                 this.gameChannelService.retry(v.data,session.socketAddress);
                 v.retries--;

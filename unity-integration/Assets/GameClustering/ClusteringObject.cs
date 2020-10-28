@@ -4,7 +4,7 @@ namespace GameClustering
 {
     public class ClusteringObject : MonoBehaviour
     {
-        private const float FlashRate = 0.2f;//200ms
+        private const float FlashRate = 0.5f;//200ms
         private IntegrationManager _integrationManager;
         private float _flashRate;
         private void Start()
