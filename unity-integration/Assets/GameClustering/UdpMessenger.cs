@@ -114,8 +114,8 @@ namespace GameClustering
                 {
                     _pendingMessages[messageId] = new PendingMessage {Data = outMessage, Timestamp = timestamp, Retries = 2};
                 }
-                _totalOutbound = Interlocked.Increment(ref _totalOutbound);
-                _totalBytes = Interlocked.Add(ref _totalBytes, bytes);
+                _totalOutbound++;
+                _totalBytes += bytes;
                 return messageId;
             }
         }
@@ -137,7 +137,7 @@ namespace GameClustering
                 retry.Retries--;
             }
 
-            _totalRetries = Interlocked.Add(ref _totalRetries, retries);
+            _totalRetries += retries;
             ClearPendingGateways();
             return retries;
         }
@@ -152,8 +152,8 @@ namespace GameClustering
                     if (available > 0)
                     {
                         var bytes = _udpClient.Receive(ref _remote);
-                        _totalInbound = Interlocked.Increment(ref _totalInbound);
-                        _totalBytes = Interlocked.Add(ref _totalBytes, available);
+                        _totalInbound++;
+                        _totalBytes += available;
                         ProcessMessage(bytes);
                     }
                     else
