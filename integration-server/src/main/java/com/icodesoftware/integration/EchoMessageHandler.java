@@ -2,6 +2,7 @@ package com.icodesoftware.integration;
 
 import com.icodesoftware.protocol.InboundMessage;
 import com.icodesoftware.protocol.OutboundMessage;
+import com.icodesoftware.protocol.PendingMessage;
 
 /**
  * Created by yinghu lu on 10/7/2020.
@@ -26,6 +27,6 @@ public class EchoMessageHandler extends AbstractMessageHandler {
         pendingOutboundMessage.type(pendingInboundMessage.type());
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
         pendingOutboundMessage.payload(pendingInboundMessage.payload());
-        this.gameChannelService.send(pendingOutboundMessage,pendingInboundMessage.source());
+        this.gameChannelService.pendingMessage(new PendingMessage(pendingOutboundMessage,pendingInboundMessage.source()));
     }
 }

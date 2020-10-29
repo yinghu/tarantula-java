@@ -88,11 +88,7 @@ public class UDPService implements Runnable, GameChannelService {
             try{
                 ByteBuffer buffer = ByteBuffer.allocate(OutboundMessage.MESSAGE_SIZE*2);
                 SocketAddress src = this.datagramChannel.receive(buffer);
-                buffer.flip();
-                byte[] data = new byte[buffer.limit()];
-                buffer.get(data,0,data.length);
-                InboundMessage inboundMessage = new InboundMessage("",secured?ByteBuffer.wrap(decrypt(data)):ByteBuffer.wrap(data),src);
-                mQueue.offer(new PendingMessage(inboundMessage));
+                mQueue.offer(new PendingMessage(buffer,src));
             }catch (Exception ex){
                 //ignore
                 ex.printStackTrace();
@@ -110,9 +106,26 @@ public class UDPService implements Runnable, GameChannelService {
                 try{
                     PendingMessage pendingMessage = mQueue.poll();
                     if(pendingMessage!=null){
-                        if(pendingMessage.inbound){
-                            GameChannel gameChannel = mChannels.get(pendingMessage.inboundMessage.connectionId());
-                            gameChannel.onMessage(pendingMessage.inboundMessage);
+                        if(pendingMessage.pendingType == PendingMessage.INBOUND){
+                            ByteBuffer buffer = pendingMessage.data;
+                            buffer.flip();
+                            byte[] data = new byte[buffer.limit()];
+                            buffer.get(data,0,data.length);
+                            InboundMessage inboundMessage = new InboundMessage("",secured?ByteBuffer.wrap(decrypt(data)):ByteBuffer.wrap(data),pendingMessage.source);
+                            GameChannel gameChannel = mChannels.get(inboundMessage.connectionId());
+                            gameChannel.onMessage(inboundMessage);
+                        }
+                        else if(pendingMessage.pendingType == PendingMessage.OUTBOUND){
+                            //send outbound message
+                            ByteBuffer out = send(pendingMessage.outboundMessage,pendingMessage.source);
+                            if(pendingMessage.ack&&out!=null){
+                                GameChannel gameChannel = mChannels.get(pendingMessage.connectionId);
+                                gameChannel.pending(pendingMessage.sessionId,pendingMessage.messageId,out);
+                            }
+                        }
+                        else if(pendingMessage.pendingType == PendingMessage.RETRY){
+                            //send retry
+                            retry(pendingMessage.data,pendingMessage.source);
                         }
                     }
                     else{
@@ -161,7 +174,10 @@ public class UDPService implements Runnable, GameChannelService {
         httpCaller.get(config.getAsJsonObject(configHeader).get("path").getAsString(),headers);
         this.datagramChannel.close();
     }
-    public ByteBuffer send(OutboundMessage outboundMessage,SocketAddress source){
+    public void pendingMessage(PendingMessage pendingMessage){
+        mQueue.offer(pendingMessage);
+    }
+    private ByteBuffer send(OutboundMessage outboundMessage,SocketAddress source){
         try{
             ByteBuffer outMessage = secured?ByteBuffer.wrap(encrypt(outboundMessage.message())):ByteBuffer.wrap(outboundMessage.message());
             int bytes = this.datagramChannel.send(outMessage,source);
@@ -171,7 +187,7 @@ public class UDPService implements Runnable, GameChannelService {
             return null;
         }
     }
-    public boolean retry(ByteBuffer pendingMessage,SocketAddress source){
+    private boolean retry(ByteBuffer pendingMessage,SocketAddress source){
         try{
             return this.datagramChannel.send(pendingMessage,source)>0;
         }catch (Exception ex){
