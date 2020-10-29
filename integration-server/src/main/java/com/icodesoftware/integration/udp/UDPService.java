@@ -6,10 +6,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.*;
 import com.icodesoftware.integration.channel.PushEventChannel;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.protocol.MessageHandler;
-import com.icodesoftware.protocol.DataBuffer;
-import com.icodesoftware.protocol.InboundMessage;
-import com.icodesoftware.protocol.OutboundMessage;
+import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.HttpCaller;
 
@@ -35,7 +32,7 @@ public class UDPService implements Runnable, GameChannelService {
     private DatagramChannel datagramChannel;
     private final String address;
     private final int port;
-    private final ConcurrentLinkedDeque<InboundMessage> mQueue;
+    private final ConcurrentLinkedDeque<PendingMessage> mQueue;
     private final ConcurrentHashMap<Integer, MessageHandler> mHandlers;
     private final ConcurrentHashMap<Long, GameChannel> mChannels;
     private ExecutorService executorService;
@@ -95,7 +92,7 @@ public class UDPService implements Runnable, GameChannelService {
                 byte[] data = new byte[buffer.limit()];
                 buffer.get(data,0,data.length);
                 InboundMessage inboundMessage = new InboundMessage("",secured?ByteBuffer.wrap(decrypt(data)):ByteBuffer.wrap(data),src);
-                mQueue.offer(inboundMessage);
+                mQueue.offer(new PendingMessage(inboundMessage));
             }catch (Exception ex){
                 //ignore
                 ex.printStackTrace();
@@ -111,10 +108,12 @@ public class UDPService implements Runnable, GameChannelService {
         executorService.execute(()->{
             while (true){
                 try{
-                    InboundMessage pendingInboundMessage = mQueue.poll();
-                    if(pendingInboundMessage!=null){
-                        GameChannel gameChannel = mChannels.get(pendingInboundMessage.connectionId());
-                        gameChannel.onMessage(pendingInboundMessage);
+                    PendingMessage pendingMessage = mQueue.poll();
+                    if(pendingMessage!=null){
+                        if(pendingMessage.inbound){
+                            GameChannel gameChannel = mChannels.get(pendingMessage.inboundMessage.connectionId());
+                            gameChannel.onMessage(pendingMessage.inboundMessage);
+                        }
                     }
                     else{
                         Thread.sleep(100);

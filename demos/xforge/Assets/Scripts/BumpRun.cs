@@ -17,4 +17,7 @@ public class BumpRun : MonoSmoke{
     void OnCollisionExit(Collision collision){
         
     }
+    void OnJoined(){
+        
+    }
 }
