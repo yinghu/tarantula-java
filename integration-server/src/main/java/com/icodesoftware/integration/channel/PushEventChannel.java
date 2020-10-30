@@ -9,13 +9,11 @@ import com.icodesoftware.util.FIFOBuffer;
 
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by yinghu lu on 10/16/2020.
@@ -28,6 +26,7 @@ public class PushEventChannel implements GameChannel {
     private final GameChannelService gameChannelService;
     private final ConcurrentHashMap<Integer, RemoteSession> mSession;
     private final ConcurrentHashMap<PendingMessageIndex, PendingMessage> mMessage;
+    private final ConcurrentHashMap<Integer,Boolean> mIndex;
 
     private final MessageHandler joinMessageHandler;
 
@@ -36,6 +35,7 @@ public class PushEventChannel implements GameChannel {
         this.gameChannelService = gameChannelService;
         this.mSession = new ConcurrentHashMap<>();
         this.mMessage = new ConcurrentHashMap<>();
+        this.mIndex = new ConcurrentHashMap<>();
         this.joinMessageHandler = this.gameChannelService.messageHandler(MessageHandler.JOIN);
     }
     @Override
@@ -57,10 +57,15 @@ public class PushEventChannel implements GameChannel {
                 &&mSession.get(pendingInboundMessage.sessionId()).socketAddress.equals(pendingInboundMessage.source())){
             MessageHandler messageHandler = gameChannelService.messageHandler(pendingInboundMessage.type());
             if(messageHandler!=null){
-                if(pendingInboundMessage.ack()){
-                    ack(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),pendingInboundMessage.source());
+                if(!pendingInboundMessage.ack()){
+                    messageHandler.onMessage(pendingInboundMessage);
                 }
-                messageHandler.onMessage(pendingInboundMessage);
+                else{
+                    ack(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),pendingInboundMessage.source());
+                    if(mIndex.putIfAbsent(pendingInboundMessage.messageId(),true)==null){
+                       messageHandler.onMessage(pendingInboundMessage);
+                    }
+                }
             }
             else{
                 log.warn("no message handler registered ->"+pendingInboundMessage.type());
@@ -70,7 +75,7 @@ public class PushEventChannel implements GameChannel {
             joinMessageHandler.onMessage(pendingInboundMessage);
         }
         else{
-            //log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId()+"/"+pendingInboundMessage.sessionId());
+            log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId()+"/"+pendingInboundMessage.sessionId());
         }
     }
     public void ack(int sessionId,int messageId,SocketAddress source){
@@ -103,7 +108,7 @@ public class PushEventChannel implements GameChannel {
                 this.gameChannelService.pendingMessage(new PendingMessage(pendingOutboundMessage,v.socketAddress));
             }
             else{
-                this.gameChannelService.pendingMessage(new PendingMessage(pendingOutboundMessage,v.socketAddress,channelId,k,messageId,ack));
+                this.gameChannelService.pendingMessage(new PendingMessage(pendingOutboundMessage,v.socketAddress,channelId,k,messageId,true,null));
             }
         });
     }
@@ -143,9 +148,6 @@ public class PushEventChannel implements GameChannel {
 
     public void pending(int sessionId, int messageId, ByteBuffer pending,MessageHandler callback){
         mMessage.put(new PendingMessageIndex(sessionId,messageId),new PendingMessage(pending,toUTCMilliseconds(),2,callback));
-    }
-    public void pending(int sessionId, int messageId, ByteBuffer pending){
-        mMessage.put(new PendingMessageIndex(sessionId,messageId),new PendingMessage(pending,toUTCMilliseconds(),2));
     }
     private boolean checkExpired(long timestamp,long pms){
         return toUTCMilliseconds()-timestamp>=pms;

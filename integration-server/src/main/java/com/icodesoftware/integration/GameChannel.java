@@ -23,5 +23,5 @@ public interface GameChannel {
     void pong(int sessionId);
     void retry();
     void pending(int sessionId, int messageId, ByteBuffer pending, MessageHandler callback);
-    void pending(int sessionId, int messageId, ByteBuffer pending);
+    //void pending(int sessionId, int messageId, ByteBuffer pending);
 }

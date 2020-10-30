@@ -120,7 +120,7 @@ public class UDPService implements Runnable, GameChannelService {
                             ByteBuffer out = send(pendingMessage.outboundMessage,pendingMessage.source);
                             if(pendingMessage.ack&&out!=null){
                                 GameChannel gameChannel = mChannels.get(pendingMessage.connectionId);
-                                gameChannel.pending(pendingMessage.sessionId,pendingMessage.messageId,out);
+                                gameChannel.pending(pendingMessage.sessionId,pendingMessage.messageId,out,pendingMessage.callback);
                             }
                         }
                         else if(pendingMessage.pendingType == PendingMessage.RETRY){
@@ -174,8 +174,18 @@ public class UDPService implements Runnable, GameChannelService {
         httpCaller.get(config.getAsJsonObject(configHeader).get("path").getAsString(),headers);
         this.datagramChannel.close();
     }
-    public void pendingMessage(PendingMessage pendingMessage){
+    public ByteBuffer pendingMessage(PendingMessage pendingMessage){
         mQueue.offer(pendingMessage);
+        return null;
+    }
+    public ByteBuffer pendingMessage(OutboundMessage outboundMessage,SocketAddress source){
+        try {
+            ByteBuffer outMessage = secured ? ByteBuffer.wrap(encrypt(outboundMessage.message())) : ByteBuffer.wrap(outboundMessage.message());
+            mQueue.offer(new PendingMessage(outMessage,source));
+            return outMessage;
+        }catch (Exception ex){
+            return null;
+        }
     }
     private ByteBuffer send(OutboundMessage outboundMessage,SocketAddress source){
         try{
