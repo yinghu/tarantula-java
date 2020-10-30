@@ -18,14 +18,13 @@ public class PendingMessage {
     public int pendingType;
     public SocketAddress source;
 
-    public PendingMessage(ByteBuffer data,long timestamp,int retries){
+    //retry cache
+    public PendingMessage(ByteBuffer data,long timestamp,int retries,MessageHandler callback){
         this.data = data;
         this.timestamp = timestamp;
         this.retries = retries;
-    }
-    public PendingMessage(ByteBuffer data,long timestamp,int retries,MessageHandler callback){
-        this(data,timestamp,retries);
         this.callback = callback;
+        this.pendingType = OUTBOUND;
     }
     //inbound/outbound
     public PendingMessage(ByteBuffer inboundMessage,SocketAddress source,int pendingType){
