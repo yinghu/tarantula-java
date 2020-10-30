@@ -88,7 +88,7 @@ public class UDPService implements Runnable, GameChannelService {
             try{
                 ByteBuffer buffer = ByteBuffer.allocate(OutboundMessage.MESSAGE_SIZE*2);
                 SocketAddress src = this.datagramChannel.receive(buffer);
-                mQueue.offer(new PendingMessage(buffer,src));
+                mQueue.offer(new PendingMessage(buffer,src,PendingMessage.INBOUND));
             }catch (Exception ex){
                 //ignore
                 ex.printStackTrace();
@@ -117,15 +117,7 @@ public class UDPService implements Runnable, GameChannelService {
                         }
                         else if(pendingMessage.pendingType == PendingMessage.OUTBOUND){
                             //send outbound message
-                            ByteBuffer out = send(pendingMessage.outboundMessage,pendingMessage.source);
-                            if(pendingMessage.ack&&out!=null){
-                                GameChannel gameChannel = mChannels.get(pendingMessage.connectionId);
-                                gameChannel.pending(pendingMessage.sessionId,pendingMessage.messageId,out,pendingMessage.callback);
-                            }
-                        }
-                        else if(pendingMessage.pendingType == PendingMessage.RETRY){
-                            //send retry
-                            retry(pendingMessage.data,pendingMessage.source);
+                            send(pendingMessage.data,pendingMessage.source);
                         }
                     }
                     else{
@@ -174,30 +166,20 @@ public class UDPService implements Runnable, GameChannelService {
         httpCaller.get(config.getAsJsonObject(configHeader).get("path").getAsString(),headers);
         this.datagramChannel.close();
     }
-    public ByteBuffer pendingMessage(PendingMessage pendingMessage){
-        mQueue.offer(pendingMessage);
-        return null;
+
+    public void pendingMessage(ByteBuffer pendingMessage,SocketAddress source){
+        mQueue.offer(new PendingMessage(pendingMessage,source,PendingMessage.OUTBOUND));
     }
     public ByteBuffer pendingMessage(OutboundMessage outboundMessage,SocketAddress source){
         try {
             ByteBuffer outMessage = secured ? ByteBuffer.wrap(encrypt(outboundMessage.message())) : ByteBuffer.wrap(outboundMessage.message());
-            mQueue.offer(new PendingMessage(outMessage,source));
+            mQueue.offer(new PendingMessage(outMessage,source,PendingMessage.OUTBOUND));
             return outMessage;
         }catch (Exception ex){
             return null;
         }
     }
-    private ByteBuffer send(OutboundMessage outboundMessage,SocketAddress source){
-        try{
-            ByteBuffer outMessage = secured?ByteBuffer.wrap(encrypt(outboundMessage.message())):ByteBuffer.wrap(outboundMessage.message());
-            int bytes = this.datagramChannel.send(outMessage,source);
-            return bytes>0?outMessage:null;
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
-    }
-    private boolean retry(ByteBuffer pendingMessage,SocketAddress source){
+    private boolean send(ByteBuffer pendingMessage,SocketAddress source){
         try{
             return this.datagramChannel.send(pendingMessage,source)>0;
         }catch (Exception ex){

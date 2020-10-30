@@ -27,6 +27,6 @@ public class EchoMessageHandler extends AbstractMessageHandler {
         pendingOutboundMessage.type(pendingInboundMessage.type());
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
         pendingOutboundMessage.payload(pendingInboundMessage.payload());
-        this.gameChannelService.pendingMessage(new PendingMessage(pendingOutboundMessage,pendingInboundMessage.source()));
+        //this.gameChannelService.pendingMessage(new PendingMessage(pendingOutboundMessage,pendingInboundMessage.source()));
     }
 }

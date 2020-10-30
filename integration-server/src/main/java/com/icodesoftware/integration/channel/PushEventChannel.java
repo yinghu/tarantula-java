@@ -26,7 +26,7 @@ public class PushEventChannel implements GameChannel {
     private final GameChannelService gameChannelService;
     private final ConcurrentHashMap<Integer, RemoteSession> mSession;
     private final ConcurrentHashMap<PendingMessageIndex, PendingMessage> mMessage;
-    private final ConcurrentHashMap<Integer,Boolean> mIndex;
+    private final ConcurrentHashMap<Integer,LocalDateTime> mIndex;
 
     private final MessageHandler joinMessageHandler;
 
@@ -62,7 +62,7 @@ public class PushEventChannel implements GameChannel {
                 }
                 else{
                     ack(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),pendingInboundMessage.source());
-                    if(mIndex.putIfAbsent(pendingInboundMessage.messageId(),true)==null){
+                    if(mIndex.putIfAbsent(pendingInboundMessage.messageId(),LocalDateTime.now(ZoneOffset.UTC))==null){
                        messageHandler.onMessage(pendingInboundMessage);
                     }
                 }
@@ -94,7 +94,7 @@ public class PushEventChannel implements GameChannel {
         dataBuffer.putInt(alist.size());
         alist.forEach((mid)->{dataBuffer.putInt(mid);});
         ack.payload(dataBuffer.toArray());
-        gameChannelService.pendingMessage(new PendingMessage(ack,source));
+        gameChannelService.pendingMessage(ack,source);
     }
     public void ack(int sessionId,int messageId){
         PendingMessage pendingMessage = mMessage.remove(new PendingMessageIndex(sessionId,messageId));
@@ -105,10 +105,11 @@ public class PushEventChannel implements GameChannel {
     public void relay(int messageId,boolean ack,OutboundMessage pendingOutboundMessage){
         this.mSession.forEach((k,v)->{
             if(!ack){
-                this.gameChannelService.pendingMessage(new PendingMessage(pendingOutboundMessage,v.socketAddress));
+                this.gameChannelService.pendingMessage(pendingOutboundMessage,v.socketAddress);
             }
             else{
-                this.gameChannelService.pendingMessage(new PendingMessage(pendingOutboundMessage,v.socketAddress,channelId,k,messageId,true,null));
+                ByteBuffer outMessage = this.gameChannelService.pendingMessage(pendingOutboundMessage,v.socketAddress);
+                //retry index
             }
         });
     }
@@ -118,7 +119,7 @@ public class PushEventChannel implements GameChannel {
         pendingOutboundMessage.sequence(0);
         mSession.forEach((k,v)->{
             if(v.pingPong.incrementAndGet()<5){
-                this.gameChannelService.pendingMessage(new PendingMessage(pendingOutboundMessage,v.socketAddress));
+                this.gameChannelService.pendingMessage(pendingOutboundMessage,v.socketAddress);
             }else{
                 mSession.remove(k);
                 log.warn("session kicked off ->"+k);
@@ -137,7 +138,7 @@ public class PushEventChannel implements GameChannel {
             if(session!=null&&checkExpired(v.timestamp,500)){
                 v.timestamp = toUTCMilliseconds();
                 v.data.flip();
-                this.gameChannelService.pendingMessage(new PendingMessage(v.data,v.source));
+                this.gameChannelService.pendingMessage(v.data,v.source);
                 v.retries--;
                 if(v.retries<0){
                     mMessage.remove(k);

@@ -18,8 +18,7 @@ public interface GameChannelService extends Serviceable {
     int[] messageIdRange();
     GameChannel gameChannel(long connectionId);
     MessageHandler messageHandler(int type);
-    ByteBuffer pendingMessage(PendingMessage pendingMessage);
 
-    ByteBuffer pendingMessage(OutboundMessage outboundMessage, SocketAddress source);
-    //boolean retry(ByteBuffer pendingMessage,SocketAddress source);
+    ByteBuffer pendingMessage(OutboundMessage outboundMessage,SocketAddress source);
+    void pendingMessage(ByteBuffer outboundMessage,SocketAddress source);
 }
