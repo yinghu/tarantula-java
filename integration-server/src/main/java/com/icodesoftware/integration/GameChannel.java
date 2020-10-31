@@ -16,11 +16,14 @@ public interface GameChannel {
 
     void join(int sessionId, SocketAddress socketAddress);
     void leave(int sessionId, SocketAddress socketAddress);
-    void relay(int messageId,boolean ack,OutboundMessage pendingOutboundMessage);
+    void relay(int messageId,boolean ack,MessageHandler messageHandler,OutboundMessage pendingOutboundMessage);
+
     void ack(int sessionId,int messageId,SocketAddress source);
     void ack(int sessionId,int messageId);
+
     void ping();
     void pong(int sessionId);
+
     void retry();
     void pending(int sessionId, int messageId, ByteBuffer pending, MessageHandler callback);
 }

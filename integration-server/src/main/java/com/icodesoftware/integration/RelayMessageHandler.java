@@ -26,6 +26,6 @@ public class RelayMessageHandler extends AbstractMessageHandler {
         pendingOutboundMessage.type(pendingInboundMessage.type());
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
         pendingOutboundMessage.payload(pendingInboundMessage.payload());
-        this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).relay(pendingInboundMessage.messageId(),pendingInboundMessage.ack(),pendingOutboundMessage);
+        this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).relay(pendingInboundMessage.messageId(),pendingInboundMessage.ack(),null,pendingOutboundMessage);
     }
 }

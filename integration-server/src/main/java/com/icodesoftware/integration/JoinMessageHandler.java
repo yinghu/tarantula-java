@@ -44,14 +44,16 @@ public class JoinMessageHandler extends AbstractMessageHandler {
             gameChannel.ack(sessionId,pendingInboundMessage.messageId(),pendingInboundMessage.source());
             OnJoinedMessageHandler onJoinedMessageHandler = new OnJoinedMessageHandler(gameChannelService,sessionId);
             onJoinedMessageHandler.onMessage(pendingInboundMessage);
-            ByteBuffer outMessage = gameChannelService.pendingMessage(pendingOutboundMessage,pendingInboundMessage.source());
+            ByteBuffer outMessage = gameChannelService.encode(pendingOutboundMessage);
             gameChannel.pending(sessionId,messageId,outMessage,onJoinedMessageHandler);
+            gameChannelService.pendingOutbound(outMessage,pendingInboundMessage.source());
         }
         else{
             data.putUTF8("rejected");
             pendingOutboundMessage.payload(data.toArray());
             //PendingMessage pendingMessage = new PendingMessage(pendingOutboundMessage,pendingInboundMessage.source(),pendingInboundMessage.connectionId(),0,messageId,true);
-            gameChannelService.pendingMessage(pendingOutboundMessage,pendingInboundMessage.source());
+            ByteBuffer outMessage = gameChannelService.encode(pendingOutboundMessage);
+            gameChannelService.pendingOutbound(outMessage,pendingInboundMessage.source());
             //ByteBuffer resp = this.gameChannelService.send(pendingOutboundMessage,pendingInboundMessage.source());
             //gameChannel.ack(sessionId,pendingInboundMessage.messageId(),pendingInboundMessage.source());
             //gameChannel.pending(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),resp);

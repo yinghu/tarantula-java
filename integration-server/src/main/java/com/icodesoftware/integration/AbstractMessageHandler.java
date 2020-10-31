@@ -13,13 +13,14 @@ abstract public class AbstractMessageHandler implements MessageHandler {
     protected long connectionId;
     protected int messageId;
     protected boolean ack;
+    protected MessageHandler callback;
     public AbstractMessageHandler(final GameChannelService gameChannelService){
         this.gameChannelService = gameChannelService;
     }
     @Override
     public void relay() {
         if(outboundMessage!=null){
-            this.gameChannelService.gameChannel(connectionId).relay(messageId,ack,outboundMessage);
+            this.gameChannelService.gameChannel(connectionId).relay(messageId,ack,callback,outboundMessage);
         }
     }
 }

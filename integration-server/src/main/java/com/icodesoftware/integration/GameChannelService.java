@@ -2,7 +2,6 @@ package com.icodesoftware.integration;
 
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.OutboundMessage;
-import com.icodesoftware.protocol.PendingMessage;
 import com.icodesoftware.service.Serviceable;
 
 import java.net.SocketAddress;
@@ -19,6 +18,6 @@ public interface GameChannelService extends Serviceable {
     GameChannel gameChannel(long connectionId);
     MessageHandler messageHandler(int type);
 
-    ByteBuffer pendingMessage(OutboundMessage outboundMessage,SocketAddress source);
-    void pendingMessage(ByteBuffer outboundMessage,SocketAddress source);
+    ByteBuffer encode(OutboundMessage outboundMessage);
+    void pendingOutbound(ByteBuffer outboundMessage,SocketAddress source);
 }

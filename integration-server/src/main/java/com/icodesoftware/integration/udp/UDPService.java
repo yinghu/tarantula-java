@@ -143,8 +143,6 @@ public class UDPService implements Runnable, GameChannelService {
         if(!pc.get("successful").getAsBoolean()){
             throw new RuntimeException(pc.get("message").getAsString());
         }
-        PushEventChannel pushEventChannel = new PushEventChannel(pc.get("connectionId").getAsLong(),this);
-        mChannels.put(pushEventChannel.channelId(),pushEventChannel);
         byte[] key = Base64.getDecoder().decode(pc.get("serverKey").getAsString());
         IvParameterSpec iv = new IvParameterSpec(key);
         SecretKey secretKey = new SecretKeySpec(key,DeploymentServiceProvider.SERVER_KEY_SPEC);
@@ -152,6 +150,8 @@ public class UDPService implements Runnable, GameChannelService {
         encrypt.init(Cipher.ENCRYPT_MODE,secretKey,iv);
         decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
         decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
+        PushEventChannel pushEventChannel = new PushEventChannel(pc.get("connectionId").getAsLong(),this);
+        mChannels.put(pushEventChannel.channelId(),pushEventChannel);
         mChannels.forEach((k,v)->{
             scheduledExecutorService.scheduleAtFixedRate(()->v.ping(),1000,1000,TimeUnit.MILLISECONDS);
             scheduledExecutorService.scheduleAtFixedRate(()->v.retry(),1000,250,TimeUnit.MILLISECONDS);
@@ -167,14 +167,12 @@ public class UDPService implements Runnable, GameChannelService {
         this.datagramChannel.close();
     }
 
-    public void pendingMessage(ByteBuffer pendingMessage,SocketAddress source){
+    public void pendingOutbound(ByteBuffer pendingMessage,SocketAddress source){
         mQueue.offer(new PendingMessage(pendingMessage,source,PendingMessage.OUTBOUND));
     }
-    public ByteBuffer pendingMessage(OutboundMessage outboundMessage,SocketAddress source){
+    public ByteBuffer encode(OutboundMessage outboundMessage){
         try {
-            ByteBuffer outMessage = secured ? ByteBuffer.wrap(encrypt(outboundMessage.message())) : ByteBuffer.wrap(outboundMessage.message());
-            mQueue.offer(new PendingMessage(outMessage,source,PendingMessage.OUTBOUND));
-            return outMessage;
+            return secured ? ByteBuffer.wrap(encrypt(outboundMessage.message())) : ByteBuffer.wrap(outboundMessage.message());
         }catch (Exception ex){
             return null;
         }

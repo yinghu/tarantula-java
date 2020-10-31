@@ -31,8 +31,9 @@ public class LeaveMessageHandler extends AbstractMessageHandler {
         gameChannel.leave(pendingInboundMessage.sessionId(),pendingInboundMessage.source());
         OnLeftMessageHandler onLeftMessageHandler = new OnLeftMessageHandler(gameChannelService);
         onLeftMessageHandler.onMessage(pendingInboundMessage);
-        //ByteBuffer pending = gameChannelService.send(pendingOutboundMessage,pendingInboundMessage.source());
+        ByteBuffer pending = gameChannelService.encode(pendingOutboundMessage);
+        gameChannel.pending(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),pending,onLeftMessageHandler);
+        gameChannelService.pendingOutbound(pending,pendingInboundMessage.source());
         onLeftMessageHandler.relay();
-        //gameChannel.pending(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),pending,onLeftMessageHandler);
     }
 }

@@ -22,6 +22,7 @@ namespace Integration
             _integrationManager = IntegrationManager.Instance;
             if (_integrationManager.Authenticated)
             {
+                bText.text = "game over";
                 return;
             }
             if (!await _integrationManager.Index(this))
