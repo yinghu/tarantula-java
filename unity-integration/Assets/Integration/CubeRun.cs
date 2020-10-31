@@ -41,7 +41,7 @@ namespace Integration
                 var f = _speed < 25 ? (_speed+1) :(3);
                 buffer2.PutFloat(f);
                 buffer2.PutInt(IntegrationManager.Instance.Messenger.Sequence());
-                await IntegrationManager.Instance.Messenger.SendAsync(MessageType.Spawn, sequence, false, buffer2);
+                await IntegrationManager.Instance.Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer2);
             }
         }
     }
