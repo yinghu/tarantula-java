@@ -170,9 +170,9 @@ public class UDPService implements Runnable, GameChannelService {
     public void pendingOutbound(ByteBuffer pendingMessage,SocketAddress source){
         mQueue.offer(new PendingMessage(pendingMessage,source,PendingMessage.OUTBOUND));
     }
-    public ByteBuffer encode(OutboundMessage outboundMessage){
+    public byte[] encode(OutboundMessage outboundMessage){
         try {
-            return secured ? ByteBuffer.wrap(encrypt(outboundMessage.message())) : ByteBuffer.wrap(outboundMessage.message());
+            return secured ? (encrypt(outboundMessage.message())) : (outboundMessage.message());
         }catch (Exception ex){
             return null;
         }

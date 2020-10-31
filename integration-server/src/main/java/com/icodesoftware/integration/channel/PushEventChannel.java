@@ -44,7 +44,7 @@ public class PushEventChannel implements GameChannel {
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.type(MessageHandler.PING);
         pendingOutboundMessage.sequence(0);
-        ping = gameChannelService.encode(pendingOutboundMessage).array();
+        ping = gameChannelService.encode(pendingOutboundMessage);
     }
     @Override
     public long channelId() {
@@ -105,7 +105,7 @@ public class PushEventChannel implements GameChannel {
         dataBuffer.putInt(alist.size());
         alist.forEach((mid)->{dataBuffer.putInt(mid);});
         ack.payload(dataBuffer.toArray());
-        gameChannelService.pendingOutbound(gameChannelService.encode(ack),source);
+        gameChannelService.pendingOutbound(ByteBuffer.wrap(gameChannelService.encode(ack)),source);
     }
     public void ack(int sessionId,int messageId){
         PendingMessage pendingMessage = mMessage.remove(new PendingMessageIndex(sessionId,messageId));
@@ -114,14 +114,15 @@ public class PushEventChannel implements GameChannel {
         }
     }
     public void relay(int messageId,boolean ack,MessageHandler messageHandler,OutboundMessage pendingOutboundMessage){
-        ByteBuffer outMessage = gameChannelService.encode(pendingOutboundMessage);
+        byte[] outMessage = gameChannelService.encode(pendingOutboundMessage);
         this.mSession.forEach((k,v)->{
             if(!ack){
-                this.gameChannelService.pendingOutbound(outMessage,v.socketAddress);
+                this.gameChannelService.pendingOutbound(ByteBuffer.wrap(outMessage),v.socketAddress);
             }
             else{
-                pending(k,messageId,outMessage,messageHandler);
-                this.gameChannelService.pendingOutbound(outMessage,v.socketAddress);
+                ByteBuffer pending = ByteBuffer.wrap(outMessage);
+                pending(k,messageId,pending,messageHandler);
+                this.gameChannelService.pendingOutbound(pending,v.socketAddress);
             }
         });
     }
