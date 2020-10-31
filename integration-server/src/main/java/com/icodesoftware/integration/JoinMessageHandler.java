@@ -62,7 +62,6 @@ public class JoinMessageHandler extends AbstractMessageHandler {
             pendingOutboundMessage.payload(data.toArray());
             //PendingMessage pendingMessage = new PendingMessage(pendingOutboundMessage,pendingInboundMessage.source(),pendingInboundMessage.connectionId(),0,messageId,true);
             ByteBuffer outMessage = ByteBuffer.wrap(gameChannelService.encode(pendingOutboundMessage));
-
             gameChannelService.pendingOutbound(outMessage,pendingInboundMessage.source());
             //ByteBuffer resp = this.gameChannelService.send(pendingOutboundMessage,pendingInboundMessage.source());
             //gameChannel.ack(sessionId,pendingInboundMessage.messageId(),pendingInboundMessage.source());

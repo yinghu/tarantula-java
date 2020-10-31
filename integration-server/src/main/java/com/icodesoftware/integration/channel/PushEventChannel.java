@@ -12,7 +12,6 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +28,7 @@ public class PushEventChannel implements GameChannel {
     private final ConcurrentHashMap<Integer, RemoteSession> mSession;
     private final ConcurrentHashMap<PendingMessageIndex, PendingMessage> mMessage;
     private final ConcurrentHashMap<Integer,LocalDateTime> mIndex;
-    private final ConcurrentHashMap<SocketAddress,LocalDateTime> jIndex;
+    private final ConcurrentHashMap<SocketAddress,PendingSession> jIndex;
 
     private final MessageHandler joinMessageHandler;
     private final byte[] ping;
@@ -52,7 +51,7 @@ public class PushEventChannel implements GameChannel {
         return channelId;
     }
     public void join(int sessionId,int[] messageRange,SocketAddress socketAddress){
-        mSession.put(sessionId,new RemoteSession(messageRange,socketAddress));
+        mSession.put(sessionId,new RemoteSession(messageRange,socketAddress,jIndex.get(socketAddress).ackBuffer));
     }
     public void leave(int sessionId,SocketAddress socketAddress){
         if(mSession.containsKey(sessionId)&&mSession.get(sessionId).socketAddress.equals(socketAddress)){
@@ -62,9 +61,7 @@ public class PushEventChannel implements GameChannel {
     }
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
-        if(pendingInboundMessage.type()!=MessageHandler.JOIN
-                &&mSession.containsKey(pendingInboundMessage.sessionId())
-                &&mSession.get(pendingInboundMessage.sessionId()).socketAddress.equals(pendingInboundMessage.source())){
+        if(mSession.containsKey(pendingInboundMessage.sessionId()) && mSession.get(pendingInboundMessage.sessionId()).validate(pendingInboundMessage.source())){
             MessageHandler messageHandler = gameChannelService.messageHandler(pendingInboundMessage.type());
             if(messageHandler!=null){
                 if(!pendingInboundMessage.ack()){
@@ -81,13 +78,14 @@ public class PushEventChannel implements GameChannel {
                 log.warn("no message handler registered ->"+pendingInboundMessage.type());
             }
         }
-        else if(pendingInboundMessage.type()==MessageHandler.JOIN){
-            if(jIndex.putIfAbsent(pendingInboundMessage.source(),LocalDateTime.now(ZoneOffset.UTC))==null){
-                joinMessageHandler.onMessage(pendingInboundMessage);
-            }
+        else if(pendingInboundMessage.type()==MessageHandler.JOIN && jIndex.putIfAbsent(pendingInboundMessage.source(),new PendingSession())==null){
+            joinMessageHandler.onMessage(pendingInboundMessage);
+        }
+        else if(pendingInboundMessage.type()==MessageHandler.ACK && jIndex.containsKey(pendingInboundMessage.source())){
+            log.warn("ACK->"+pendingInboundMessage.source());
         }
         else{
-            //log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId()+"/"+pendingInboundMessage.sessionId());
+            log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId()+"/"+pendingInboundMessage.sessionId());
         }
     }
     public void ack(int sessionId,int messageId,SocketAddress source){

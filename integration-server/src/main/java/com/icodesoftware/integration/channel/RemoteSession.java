@@ -1,7 +1,6 @@
 package com.icodesoftware.integration.channel;
 
 import com.icodesoftware.util.FIFOBuffer;
-
 import java.net.SocketAddress;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,10 +12,14 @@ public class RemoteSession {
     public final FIFOBuffer ackBuffer;
     public final AtomicInteger pingPong;
     public final int[] messageRange;
-    public RemoteSession(final int[] messageRange,final  SocketAddress socketAddress){
+
+    public RemoteSession(final int[] messageRange,final  SocketAddress socketAddress,final FIFOBuffer<Integer> ackBuffer){
         this.socketAddress = socketAddress;
-        this.ackBuffer = new FIFOBuffer(20,new Integer[20]);
+        this.ackBuffer = ackBuffer;
         this.pingPong = new AtomicInteger(0);
         this.messageRange = new int[]{messageRange[0],messageRange[1]};
+    }
+    public boolean validate(SocketAddress socketAddress){
+        return this.socketAddress.equals(socketAddress);
     }
 }

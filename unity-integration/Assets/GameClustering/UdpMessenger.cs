@@ -283,10 +283,6 @@ namespace GameClustering
 
         public void Ack()
         {
-            if (_connection.SessionId <= 0)
-            {
-                return;
-            }
             using (var buffer = new DataBuffer())
             {
                 var list = _pendingAck.List();
