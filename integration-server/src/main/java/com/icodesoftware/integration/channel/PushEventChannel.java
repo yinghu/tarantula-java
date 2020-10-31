@@ -3,6 +3,7 @@ package com.icodesoftware.integration.channel;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.GameChannel;
 import com.icodesoftware.integration.GameChannelService;
+import com.icodesoftware.integration.OnKickedOffMessageHandler;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.util.FIFOBuffer;
@@ -50,8 +51,8 @@ public class PushEventChannel implements GameChannel {
     public long channelId() {
         return channelId;
     }
-    public void join(int sessionId,SocketAddress socketAddress){
-        mSession.put(sessionId,new RemoteSession(socketAddress));
+    public void join(int sessionId,int[] messageRange,SocketAddress socketAddress){
+        mSession.put(sessionId,new RemoteSession(messageRange,socketAddress));
     }
     public void leave(int sessionId,SocketAddress socketAddress){
         if(mSession.containsKey(sessionId)&&mSession.get(sessionId).socketAddress.equals(socketAddress)){
@@ -86,7 +87,7 @@ public class PushEventChannel implements GameChannel {
             }
         }
         else{
-            log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId()+"/"+pendingInboundMessage.sessionId());
+            //log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId()+"/"+pendingInboundMessage.sessionId());
         }
     }
     public void ack(int sessionId,int messageId,SocketAddress source){
@@ -127,17 +128,27 @@ public class PushEventChannel implements GameChannel {
         });
     }
     public void ping(){
+        ArrayList<Integer> kickOff = new ArrayList<>();
         mSession.forEach((k,v)->{
             if(v.pingPong.incrementAndGet()<5){
                 this.gameChannelService.pendingOutbound(ByteBuffer.wrap(ping),v.socketAddress);
             }else{
+                kickOff.add(k);
                 mSession.remove(k);
-                log.warn("session kicked off ->"+k);
+                jIndex.remove(v.socketAddress);
             }
         });
-        //mIndex.forEach((k,v)->{
-            //log.warn("index->"+v.format(DateTimeFormatter.ISO_DATE_TIME));
-        //});
+        kickOff.forEach((k)->{
+            OnKickedOffMessageHandler kickedOffMessageHandler = new OnKickedOffMessageHandler(this.gameChannelService,k,channelId);
+            kickedOffMessageHandler.onMessage(null);
+            kickedOffMessageHandler.relay();
+        });
+        kickOff.clear();
+        mIndex.forEach((k,v)->{
+            if(v.plusSeconds(10).isBefore(LocalDateTime.now(ZoneOffset.UTC))){
+                mIndex.remove(k);
+            }
+        });
     }
     public void pong(int sessionId){
         RemoteSession remoteSession = mSession.get(sessionId);

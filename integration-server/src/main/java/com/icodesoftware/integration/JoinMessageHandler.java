@@ -1,11 +1,11 @@
 package com.icodesoftware.integration;
 
-import com.icodesoftware.protocol.DataBuffer;
-import com.icodesoftware.protocol.InboundMessage;
-import com.icodesoftware.protocol.OutboundMessage;
-import com.icodesoftware.protocol.PendingMessage;
+import com.icodesoftware.protocol.*;
+import com.icodesoftware.util.FIFOBuffer;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by yinghu lu on 10/7/2020.
@@ -40,7 +40,7 @@ public class JoinMessageHandler extends AbstractMessageHandler {
             data.putInt(mid[0]);
             data.putInt(mid[1]);
             pendingOutboundMessage.payload(data.toArray());
-            gameChannel.join(sessionId,pendingInboundMessage.source());
+            gameChannel.join(sessionId,mid,pendingInboundMessage.source());
             gameChannel.ack(sessionId,pendingInboundMessage.messageId(),pendingInboundMessage.source());
             OnJoinedMessageHandler onJoinedMessageHandler = new OnJoinedMessageHandler(gameChannelService,sessionId);
             onJoinedMessageHandler.onMessage(pendingInboundMessage);
@@ -49,10 +49,20 @@ public class JoinMessageHandler extends AbstractMessageHandler {
             gameChannelService.pendingOutbound(outMessage,pendingInboundMessage.source());
         }
         else{
+            OutboundMessage ack = new OutboundMessage();
+            ack.ack(false);
+            ack.type(MessageHandler.ACK);
+            ack.sequence(0);
+            DataBuffer dataBuffer = new DataBuffer();
+            dataBuffer.putInt(1);
+            dataBuffer.putInt(pendingInboundMessage.messageId());
+            ack.payload(dataBuffer.toArray());
+            gameChannelService.pendingOutbound(ByteBuffer.wrap(gameChannelService.encode(ack)),pendingInboundMessage.source());
             data.putUTF8("rejected");
             pendingOutboundMessage.payload(data.toArray());
             //PendingMessage pendingMessage = new PendingMessage(pendingOutboundMessage,pendingInboundMessage.source(),pendingInboundMessage.connectionId(),0,messageId,true);
             ByteBuffer outMessage = ByteBuffer.wrap(gameChannelService.encode(pendingOutboundMessage));
+
             gameChannelService.pendingOutbound(outMessage,pendingInboundMessage.source());
             //ByteBuffer resp = this.gameChannelService.send(pendingOutboundMessage,pendingInboundMessage.source());
             //gameChannel.ack(sessionId,pendingInboundMessage.messageId(),pendingInboundMessage.source());
