@@ -133,9 +133,10 @@ namespace GameClustering
                 {
                     OnLeftEvent?.Invoke(sessionId);
                 });
-                Messenger.RegisterMessageHandler(MessageType.OnKickedOff,0, (sesionId, buffer) =>
+                Messenger.RegisterMessageHandler(MessageType.OnKickedOff,0, async (sessionId, buffer) =>
                 {
-                    Debug.Log("KICKED OFF->"+sesionId);
+                    await Leave();
+                    Debug.Log("KICKED OFF->"+sessionId);
                 });
                 return true;
             }

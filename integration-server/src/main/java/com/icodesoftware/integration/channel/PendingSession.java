@@ -3,6 +3,7 @@ package com.icodesoftware.integration.channel;
 import com.icodesoftware.util.FIFOBuffer;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by yinghu lu on 10/31/2020.
@@ -10,12 +11,13 @@ import java.nio.ByteBuffer;
 public class PendingSession {
     public final FIFOBuffer<Integer> ackBuffer;
     public int messageId;
-    public ByteBuffer pending;
-
+    public ByteBuffer data;
+    public long timestamp;
     public int retries;
-
+    public AtomicBoolean pending;
     public PendingSession(){
         ackBuffer = new FIFOBuffer(20,new Integer[20]);
         retries = 2;
+        pending = new AtomicBoolean(false);
     }
 }

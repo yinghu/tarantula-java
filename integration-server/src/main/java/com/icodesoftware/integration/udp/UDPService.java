@@ -121,7 +121,7 @@ public class UDPService implements Runnable, GameChannelService {
                         }
                     }
                     else{
-                        Thread.sleep(100);
+                        Thread.sleep(10);
                     }
                 }catch (Exception ex){
                     ex.printStackTrace();
