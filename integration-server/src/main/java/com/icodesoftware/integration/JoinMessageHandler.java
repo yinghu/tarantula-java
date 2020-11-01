@@ -1,11 +1,9 @@
 package com.icodesoftware.integration;
 
 import com.icodesoftware.protocol.*;
-import com.icodesoftware.util.FIFOBuffer;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+
 
 /**
  * Created by yinghu lu on 10/7/2020.
@@ -60,12 +58,9 @@ public class JoinMessageHandler extends AbstractMessageHandler {
             gameChannelService.pendingOutbound(ByteBuffer.wrap(gameChannelService.encode(ack)),pendingInboundMessage.source());
             data.putUTF8("rejected");
             pendingOutboundMessage.payload(data.toArray());
-            //PendingMessage pendingMessage = new PendingMessage(pendingOutboundMessage,pendingInboundMessage.source(),pendingInboundMessage.connectionId(),0,messageId,true);
             ByteBuffer outMessage = ByteBuffer.wrap(gameChannelService.encode(pendingOutboundMessage));
+            gameChannel.pending(pendingInboundMessage.source(),messageId,outMessage);
             gameChannelService.pendingOutbound(outMessage,pendingInboundMessage.source());
-            //ByteBuffer resp = this.gameChannelService.send(pendingOutboundMessage,pendingInboundMessage.source());
-            //gameChannel.ack(sessionId,pendingInboundMessage.messageId(),pendingInboundMessage.source());
-            //gameChannel.pending(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),resp);
         }
     }
 }

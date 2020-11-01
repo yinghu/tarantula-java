@@ -81,8 +81,17 @@ public class PushEventChannel implements GameChannel {
         else if(pendingInboundMessage.type()==MessageHandler.JOIN && jIndex.putIfAbsent(pendingInboundMessage.source(),new PendingSession())==null){
             joinMessageHandler.onMessage(pendingInboundMessage);
         }
-        else if(pendingInboundMessage.type()==MessageHandler.ACK && jIndex.containsKey(pendingInboundMessage.source())){
-            log.warn("ACK->"+pendingInboundMessage.source());
+        else if(pendingInboundMessage.type()==MessageHandler.ACK && jIndex.containsKey(pendingInboundMessage.source())) {
+            PendingSession pendingSession = jIndex.get(pendingInboundMessage.source());
+            if (pendingSession != null) {
+                DataBuffer buffer = new DataBuffer(pendingInboundMessage.payload());
+                var sz = buffer.getInt();
+                for (int i = 0; i < sz; i++) {
+                    if(pendingSession.messageId == buffer.getInt()){
+                        jIndex.remove(pendingInboundMessage.source());
+                    }
+                }
+            }
         }
         else{
             log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId()+"/"+pendingInboundMessage.sessionId());
@@ -167,10 +176,20 @@ public class PushEventChannel implements GameChannel {
                 }
             }
         });
+        this.jIndex.forEach((k,v)->{
+
+        });
     }
 
     public void pending(int sessionId, int messageId, ByteBuffer pending,MessageHandler callback){
         mMessage.put(new PendingMessageIndex(sessionId,messageId),new PendingMessage(pending,toUTCMilliseconds(),2,callback));
+    }
+    public void pending(SocketAddress socketAddress,int messageId,ByteBuffer pending){
+        PendingSession pendingSession = jIndex.get(socketAddress);
+        if(pendingSession!=null){
+            pendingSession.messageId = messageId;
+            pendingSession.pending = pending;
+        }
     }
     private boolean checkExpired(long timestamp,long pms){
         return toUTCMilliseconds()-timestamp>=pms;

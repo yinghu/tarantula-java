@@ -117,7 +117,7 @@ namespace GameClustering
                     }
                     else
                     {
-                        //rejected response
+                        Debug.Log("session rejected");
                     }
                 });
                 Messenger.RegisterMessageHandler(MessageType.OnJoined,0, (sessionId,buffer) =>

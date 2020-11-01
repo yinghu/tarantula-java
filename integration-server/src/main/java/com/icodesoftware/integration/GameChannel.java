@@ -26,4 +26,5 @@ public interface GameChannel {
 
     void retry();
     void pending(int sessionId, int messageId, ByteBuffer pending, MessageHandler callback);
+    void pending(SocketAddress socketAddress,int messageId,ByteBuffer pending);
 }
