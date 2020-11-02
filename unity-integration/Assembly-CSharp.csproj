@@ -73,9 +73,14 @@
      <Compile Include="Assets\GameClustering\PendingMessage.cs" />
      <Compile Include="Assets\GameClustering\Presence.cs" />
      <Compile Include="Assets\GameClustering\UdpMessenger.cs" />
+     <Compile Include="Assets\Integration\Collide\Collide.cs" />
      <Compile Include="Assets\Integration\CubeRun.cs" />
+     <Compile Include="Assets\Integration\Exit.cs" />
      <Compile Include="Assets\Integration\Manager.cs" />
+     <Compile Include="Assets\Integration\Move\Move.cs" />
+     <Compile Include="Assets\Integration\Play\Play.cs" />
      <Compile Include="Assets\Integration\Shot.cs" />
+     <Compile Include="Assets\Integration\Spawn\Spawn.cs" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
      <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />
@@ -640,9 +645,6 @@
  <Reference Include="System.Xml.Serialization">
  <HintPath>C:/development/unity3d/2019.2.17f1/Editor/Data/NetStandard/compat/2.0.0/shims/netfx/System.Xml.Serialization.dll</HintPath>
  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Assets\Integration\Spawn" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
