@@ -80,6 +80,7 @@
      <Compile Include="Assets\Integration\Move\Move.cs" />
      <Compile Include="Assets\Integration\Play\Play.cs" />
      <Compile Include="Assets\Integration\Shot.cs" />
+     <Compile Include="Assets\Integration\Spawn\Bump.cs" />
      <Compile Include="Assets\Integration\Spawn\Spawn.cs" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
      <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
