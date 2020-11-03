@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections;
+using System.Collections.Concurrent;
 using GameClustering;
 using UnityEngine;
 
@@ -27,7 +28,7 @@ namespace Integration.Spawn
         {
             if (_targets.TryDequeue(out var pt))
             {
-                Instantiate(bump, pt, Quaternion.identity, arena);
+                StartCoroutine(OnSpawn(pt));
             }
 
             if (!Input.GetMouseButtonDown(0))
@@ -49,6 +50,12 @@ namespace Integration.Spawn
             //Debug.Log("PT->"+hit.point.x+"->"+hit.point.y+">>"+hit.point.z);
             //Instantiate(bump, hit.point, Quaternion.identity, arena);
         }
-        
+
+        private IEnumerator OnSpawn(Vector3 target)
+        {
+            Instantiate(bump, target, Quaternion.identity, arena);
+            yield return null;
+        }
+
     }
 }
