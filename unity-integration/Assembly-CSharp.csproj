@@ -78,6 +78,7 @@
      <Compile Include="Assets\Integration\Exit.cs" />
      <Compile Include="Assets\Integration\Manager.cs" />
      <Compile Include="Assets\Integration\Move\Move.cs" />
+     <Compile Include="Assets\Integration\Move\Player.cs" />
      <Compile Include="Assets\Integration\Play\Play.cs" />
      <Compile Include="Assets\Integration\Shot.cs" />
      <Compile Include="Assets\Integration\Spawn\Bump.cs" />
