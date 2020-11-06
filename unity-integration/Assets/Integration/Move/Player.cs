@@ -30,7 +30,7 @@ namespace Integration.Move
             using (var buffer = new DataBuffer())
             {
                 buffer.PutVector3(target);
-                await _integrationManager.Messenger.SendAsync(MessageType.Relay, 1, false, buffer);
+                await _integrationManager.Messenger.SendAsync(MessageType.Relay, 1, true, buffer);
             }
         }
 
