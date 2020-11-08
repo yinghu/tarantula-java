@@ -544,6 +544,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void removeServerPushEvent(String serverId){
         this.deploymentServiceProvider.distributionCallback().releaseServerPushEvent(serverId);
     }
+    public void ackServerPushEvent(String serverId){
+        this.deploymentServiceProvider.distributionCallback().ackServerPushEvent(serverId);
+    }
     public void upload(String fileName,byte[] content){
         this.tarantulaContext._writeContent(fileName,content);
     }

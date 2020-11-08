@@ -98,7 +98,7 @@ public class UDPSessionService implements ConnectionEventService {
 
     private void run() {
         try{
-            send("{}".getBytes(),MessageHandler.SERVER_PUSH,100,false,connection);
+            //send("{}".getBytes(),MessageHandler.SERVER_PUSH,100,false,connection);
             while (true){
                 ByteBuffer buffer = ByteBuffer.allocate(OutboundMessage.MESSAGE_SIZE*2);
                 SocketAddress sc = datagramChannel.receive(buffer);

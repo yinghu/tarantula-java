@@ -553,6 +553,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             });
         }));
     }
+    public void ackServerPushEvent(String serverId){
+        log.warn("ack serverid->"+serverId);
+    }
     public void registerOnConnectionListener(Connection.Listener listener){
         pushRegistry.forEach((k,v)->{
             Connection connection = this.builder.create().fromJson(new String(v.payload()), Connection.class);

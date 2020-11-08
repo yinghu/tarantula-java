@@ -91,6 +91,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
         void registerServerPushEvent(Event event);
         void releaseServerPushEvent(String serverId);
+        void ackServerPushEvent(String serverId);
         void syncServerPushEvent(String memberId);
         Connection onConnection(String typeId,Connection connection);
 

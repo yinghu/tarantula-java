@@ -44,6 +44,9 @@ public class UDPService implements Runnable, GameChannelService {
     private Cipher decrypt;
     private boolean secured;
     private int gameChannels;
+    private String serverId;
+    private String accessKey;
+    private String path;
     private AtomicInteger sessionId;
     private AtomicInteger messageId;
     private AtomicInteger reservedMessageId;
@@ -114,13 +117,8 @@ public class UDPService implements Runnable, GameChannelService {
                             byte[] data = new byte[buffer.limit()];
                             buffer.get(data,0,data.length);
                             InboundMessage inboundMessage = new InboundMessage("",secured?ByteBuffer.wrap(decrypt(data)):ByteBuffer.wrap(data),pendingMessage.source);
-                            if(inboundMessage.type()!=MessageHandler.SERVER_PUSH){
-                                GameChannel gameChannel = mChannels.get(inboundMessage.connectionId());
-                                gameChannel.onMessage(inboundMessage);
-                            }
-                            else{
-                                log.warn("Server push event->");
-                            }
+                            GameChannel gameChannel = mChannels.get(inboundMessage.connectionId());
+                            gameChannel.onMessage(inboundMessage);
                         }
                         else if(pendingMessage.pendingType == PendingMessage.OUTBOUND){
                             //send outbound message
@@ -136,16 +134,17 @@ public class UDPService implements Runnable, GameChannelService {
             }
         });
         httpCaller._init();
-        String serverId = UUID.randomUUID().toString();
+        this.serverId = UUID.randomUUID().toString();
+        this.accessKey = config.getAsJsonObject(configHeader).get("accessKey").getAsString();
         String[] headers = new String[]{
-                Session.TARANTULA_ACCESS_KEY,config.getAsJsonObject(configHeader).get("accessKey").getAsString(),
+                Session.TARANTULA_ACCESS_KEY,accessKey,
                 Session.TARANTULA_ACTION,"onStart",
                 Session.TARANTULA_SERVER_ID,serverId
         };
         config.getAsJsonObject("connection").addProperty("serverId",serverId);
         config.getAsJsonObject("connection").getAsJsonObject("server").addProperty("serverId",serverId);
-        String resp = httpCaller.post(config.getAsJsonObject(configHeader).get("path").getAsString(),config.getAsJsonObject("connection").toString().getBytes(),headers);
-        log.warn("RESP->"+resp);
+        this.path = config.getAsJsonObject(configHeader).get("path").getAsString();
+        String resp = httpCaller.post(this.path,config.getAsJsonObject("connection").toString().getBytes(),headers);
         JsonObject pc = parser.parse(resp).getAsJsonObject();
         if(!pc.get("successful").getAsBoolean()){
             throw new RuntimeException(pc.get("message").getAsString());
@@ -163,6 +162,7 @@ public class UDPService implements Runnable, GameChannelService {
             scheduledExecutorService.scheduleAtFixedRate(()->v.ping(),1000,1000,TimeUnit.MILLISECONDS);
             scheduledExecutorService.scheduleAtFixedRate(()->v.retry(),1000,250,TimeUnit.MILLISECONDS);
         });
+        scheduledExecutorService.scheduleAtFixedRate(()->ack(),1000,5000,TimeUnit.MILLISECONDS);
     }
     public void shutdown() throws Exception{
         String[] headers = new String[]{
@@ -173,7 +173,19 @@ public class UDPService implements Runnable, GameChannelService {
         httpCaller.get(config.getAsJsonObject(configHeader).get("path").getAsString(),headers);
         this.datagramChannel.close();
     }
-
+    private void ack(){
+        try{
+            String[] headers = new String[]{
+                    Session.TARANTULA_ACCESS_KEY,config.getAsJsonObject(configHeader).get("accessKey").getAsString(),
+                    Session.TARANTULA_ACTION,"onAck",
+                    Session.TARANTULA_SERVER_ID,serverId
+            };
+            String resp = httpCaller.get(path,headers);
+            log.warn(resp);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
     public void pendingOutbound(ByteBuffer pendingMessage,SocketAddress source){
         mQueue.offer(new PendingMessage(pendingMessage,source,PendingMessage.OUTBOUND));
     }

@@ -12,23 +12,28 @@ public class Main {
     static {//set log manager
         System.setProperty("java.util.logging.manager","com.icodesoftware.logging.TarantulaLogManager");
     }
-    public static void main(String[] args) throws Exception{
-        JsonParser jsonParser = new JsonParser();
-        File f = new File("/etc/tarantula/udp.conf");
-        JsonObject config;
-        if(f.exists()){
-            config = jsonParser.parse(new InputStreamReader(new FileInputStream(f))).getAsJsonObject();
+    public static void main(String[] args){
+        try{
+            JsonParser jsonParser = new JsonParser();
+            File f = new File("/etc/tarantula/udp.conf");
+            JsonObject config;
+            if(f.exists()){
+                config = jsonParser.parse(new InputStreamReader(new FileInputStream(f))).getAsJsonObject();
+            }
+            else{
+                config = jsonParser.parse(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("udp.conf"))).getAsJsonObject();
+            }
+            UDPService udpReceiver = new UDPService(config);
+            udpReceiver.start();
+            Thread t = new Thread(udpReceiver,"udp-service");
+            t.start();
+            Runtime.getRuntime().addShutdownHook(new Thread(()->{
+                try{udpReceiver.shutdown();}catch (Exception ex){}
+                TarantulaLogManager.shutdown();//shutdown log manager
+            }));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            System.exit(-1);
         }
-        else{
-            config = jsonParser.parse(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("udp.conf"))).getAsJsonObject();
-        }
-        UDPService udpReceiver = new UDPService(config);
-        udpReceiver.start();
-        Thread t = new Thread(udpReceiver,"udp-service");
-        t.start();
-        Runtime.getRuntime().addShutdownHook(new Thread(()->{
-            try{udpReceiver.shutdown();}catch (Exception ex){}
-            TarantulaLogManager.shutdown();//shutdown log manager
-        }));
     }
 }

@@ -12,7 +12,6 @@ import com.tarantula.platform.util.ConnectionDeserializer;
 import com.tarantula.platform.util.ConnectionSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
-import java.awt.color.ICC_Profile;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,41 +40,37 @@ public class PushEventHandler implements RequestHandler {
             String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
             String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
             byte[] _payload = exchange.payload();
-            if(action.equals("onStart")){
+            String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
+            if(typeId==null){
+                throw new RuntimeException("Illegal access");
+            }
+            if(action.equals("onAck")){
+                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"ack",true));
+                deployService.ackServerPushEvent(serverId);
+            }
+            else if(action.equals("onStart")){
                 JsonObject resp = new JsonObject();
-                String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
-                if(typeId!=null){
-                    resp.addProperty("typeId",typeId);
-                    resp.addProperty("successful",true);
-                    Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
-                    resp.addProperty("serverKey",Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
-                    resp.addProperty("connectionId",connection.server().connectionId());
-                    resp.addProperty("sequence",connection.server().sequence());
-                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
-                    pushEvent.typeId(typeId);
-                    deployService.addServerPushEvent(pushEvent);
-                }
-                else{
-                    resp.addProperty("successful",false);
-                    resp.addProperty("message","invalid access key");
-                    log.warn("Invalid access key");
-                }
+                resp.addProperty("typeId",typeId);
+                resp.addProperty("successful",true);
+                Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
+                resp.addProperty("serverKey",Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
+                resp.addProperty("connectionId",connection.server().connectionId());
+                resp.addProperty("sequence",connection.server().sequence());
+                ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
+                pushEvent.typeId(typeId);
+                deployService.addServerPushEvent(pushEvent);
                 exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
             }
             else if(action.equals("onStop")){
-                if(this.tokenValidatorProvider.validateAccessKey(accessKey)!=null){
-                    deployService.removeServerPushEvent(serverId);
-                    _hex.forEach((k,v)->{//removed session if any
-                        if(v.id().equals(serverId)){
-                            _hex.remove(k);
-                        }
-                    });
-                }
-                else{
-                    log.warn("Invalid ticket");
-                }
+                deployService.removeServerPushEvent(serverId);
+                _hex.forEach((k,v)->{//removed session if any
+                    if(v.id().equals(serverId)){
+                        _hex.remove(k);
+                    }
+                });
                 exchange.onEvent(new ResponsiveEvent("","",_payload,"start",true));
             }
+
             //start of socket connection methods
             else if(action.equals("onTicket")){
                 byte[] et;
@@ -117,7 +112,7 @@ public class PushEventHandler implements RequestHandler {
         }catch (Exception ex){
             ex.printStackTrace();
             _hex.remove(exchange.id()); //removed cache on any errors
-            exchange.onError(ex,"Bad request");
+            exchange.onError(ex,ex.getMessage());
         }
     }
 

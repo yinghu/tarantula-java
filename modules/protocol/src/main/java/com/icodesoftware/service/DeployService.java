@@ -36,6 +36,7 @@ public interface DeployService extends ServiceProvider {
     boolean shutdownGameCluster(String gameClusterKey);
 
     void addServerPushEvent(Event serverPushEvent);
+    void ackServerPushEvent(String serverId);
     void removeServerPushEvent(String serverId);
 
     void syncServerPushEvent();
