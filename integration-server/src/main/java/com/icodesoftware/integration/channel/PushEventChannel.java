@@ -31,6 +31,7 @@ public class PushEventChannel implements GameChannel {
     private final ConcurrentHashMap<SocketAddress,PendingSession> jIndex;
 
     private final MessageHandler joinMessageHandler;
+    private final MessageHandler dischargeMessageHandler;
     private final byte[] ping;
 
     public PushEventChannel(final long channelId,final GameChannelService gameChannelService){
@@ -41,6 +42,7 @@ public class PushEventChannel implements GameChannel {
         this.mIndex = new ConcurrentHashMap<>();
         this.jIndex = new ConcurrentHashMap<>();
         this.joinMessageHandler = this.gameChannelService.messageHandler(MessageHandler.JOIN);
+        this.dischargeMessageHandler = this.gameChannelService.messageHandler(MessageHandler.DISCHARGE);
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.type(MessageHandler.PING);
         pendingOutboundMessage.sequence(0);
@@ -75,7 +77,7 @@ public class PushEventChannel implements GameChannel {
                 }
             }
             else{
-                log.warn("no message handler registered ->"+pendingInboundMessage.type());
+                dischargeMessageHandler.onMessage(pendingInboundMessage);
             }
         }
         else if(pendingInboundMessage.type()==MessageHandler.JOIN && jIndex.putIfAbsent(pendingInboundMessage.source(),new PendingSession())==null){
@@ -93,9 +95,9 @@ public class PushEventChannel implements GameChannel {
                 }
             }
         }
-        //else{
-            //log.warn("Discharging message->"+pendingInboundMessage.connectionId()+"/"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId()+"/"+pendingInboundMessage.sessionId());
-        //}
+        else{
+            dischargeMessageHandler.onMessage(pendingInboundMessage);
+        }
     }
     public void ack(int sessionId,int messageId,SocketAddress source){
         RemoteSession remoteSession = mSession.get(sessionId);

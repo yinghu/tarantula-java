@@ -80,6 +80,8 @@ public class UDPService implements Runnable, GameChannelService {
         mHandlers.put(spawnMessageHandler.type(),spawnMessageHandler);
         SyncMessageHandler syncMessageHandler = new SyncMessageHandler(this);
         mHandlers.put(syncMessageHandler.type(),syncMessageHandler);
+        DischargeMessageHandler dischargeMessageHandler = new DischargeMessageHandler(this);
+        mHandlers.put(dischargeMessageHandler.type(),dischargeMessageHandler);
     }
     @Override
     public void run(){

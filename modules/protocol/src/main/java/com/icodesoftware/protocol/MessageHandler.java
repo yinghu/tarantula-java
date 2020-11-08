@@ -20,6 +20,8 @@ public interface MessageHandler {
     int ON_LEFT = 11;
     int ON_KICKED_OFF = 12;
 
+    int DISCHARGE = 100;
+
     int type();
     void onMessage(InboundMessage pendingInboundMessage);
     void relay();
