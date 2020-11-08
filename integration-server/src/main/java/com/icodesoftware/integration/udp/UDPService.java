@@ -114,8 +114,13 @@ public class UDPService implements Runnable, GameChannelService {
                             byte[] data = new byte[buffer.limit()];
                             buffer.get(data,0,data.length);
                             InboundMessage inboundMessage = new InboundMessage("",secured?ByteBuffer.wrap(decrypt(data)):ByteBuffer.wrap(data),pendingMessage.source);
-                            GameChannel gameChannel = mChannels.get(inboundMessage.connectionId());
-                            gameChannel.onMessage(inboundMessage);
+                            if(inboundMessage.type()!=MessageHandler.SERVER_PUSH){
+                                GameChannel gameChannel = mChannels.get(inboundMessage.connectionId());
+                                gameChannel.onMessage(inboundMessage);
+                            }
+                            else{
+                                log.warn("Server push event->");
+                            }
                         }
                         else if(pendingMessage.pendingType == PendingMessage.OUTBOUND){
                             //send outbound message

@@ -2,6 +2,7 @@ package com.tarantula.cci.udp;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.InboundMessage;
+import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.OutboundMessage;
 import com.tarantula.platform.service.ConnectionEventService;
 import com.tarantula.platform.util.SystemUtil;
@@ -97,6 +98,7 @@ public class UDPSessionService implements ConnectionEventService {
 
     private void run() {
         try{
+            send("{}".getBytes(),MessageHandler.SERVER_PUSH,100,false,connection);
             while (true){
                 ByteBuffer buffer = ByteBuffer.allocate(OutboundMessage.MESSAGE_SIZE*2);
                 SocketAddress sc = datagramChannel.receive(buffer);

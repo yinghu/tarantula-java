@@ -21,6 +21,7 @@ public interface MessageHandler {
     int ON_KICKED_OFF = 12;
 
     int DISCHARGE = 100;
+    int SERVER_PUSH = 200;
 
     int type();
     void onMessage(InboundMessage pendingInboundMessage);
