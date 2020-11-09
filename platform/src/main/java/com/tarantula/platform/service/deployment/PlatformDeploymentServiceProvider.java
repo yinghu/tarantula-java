@@ -554,7 +554,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }));
     }
     public void ackServerPushEvent(String serverId){
-        log.warn("ack serverid->"+serverId);
+        log.warn("ack->"+serverId);
+        ServerPushEvent serverPushEvent = pushRegistry.get(serverId);
+        serverPushEvent.ack();
     }
     public void registerOnConnectionListener(Connection.Listener listener){
         pushRegistry.forEach((k,v)->{

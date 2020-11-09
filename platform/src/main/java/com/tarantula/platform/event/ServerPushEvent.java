@@ -9,6 +9,8 @@ import com.icodesoftware.service.EventService;
 import com.tarantula.platform.service.ConnectionEventService;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -17,17 +19,20 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServerPushEvent extends Data implements Event {
 
     private ConcurrentHashMap<Long, Connection> cMap = new ConcurrentHashMap<>();
+    private LocalDateTime lastAck;
     public ServerPushEvent(){
-
+        lastAck = LocalDateTime.now(ZoneOffset.UTC);
     }
 
     public ServerPushEvent(String source, String sessionId,String serverId,byte[] payload){
+        this();
         this.source = source;
         this.sessionId = sessionId;
         this.trackId = serverId;
         this.payload = payload;
     }
     public ServerPushEvent(String source, String sessionId,String serverId,String clientId,String typeId,byte[] payload){
+        this();
         this.source = source;
         this.sessionId = sessionId;
         this.trackId = serverId;
@@ -92,6 +97,9 @@ public class ServerPushEvent extends Data implements Event {
     }
     public void clear(){
 
+    }
+    public void ack(){
+        lastAck = LocalDateTime.now(ZoneOffset.UTC);
     }
     @Override
     public String toString(){
