@@ -6,6 +6,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.protocol.InboundMessage;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
+import com.tarantula.cci.udp.PendingServerPushMessage;
 import com.tarantula.cci.udp.UDPSessionService;
 import com.tarantula.cci.webhook.WebhookSessionService;
 import com.tarantula.cci.websocket.WebSocketSessionService;
@@ -73,7 +74,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private AtomicBoolean onAccessIndex;
 
-    private ConcurrentLinkedDeque<InboundMessage> pendingData;
+    private ConcurrentLinkedDeque<PendingServerPushMessage> pendingData;
     //private ConcurrentHashMap<Long,Connection> connections;
     private ExecutorService udpPool;
     private int workSize;
@@ -402,13 +403,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 udpPool.execute(()->{
                     while (true){
                         try{
-                            InboundMessage pending = pendingData.poll();
+                            PendingServerPushMessage pending = pendingData.poll();
                             if(pending!=null){
-                                ServerPushEvent pushEvent = pushRegistry.get(pending.serverId);
-                                pushEvent.onMessage(pending);
+                                if(!pending.ack()){
+                                    if(pending.retry()){
+                                        pendingData.offer(pending);
+                                    }
+                                }
                             }
                             else{
-                                Thread.sleep(100);
+                                Thread.sleep(50);
                             }
                         }catch (Exception ex){
                             ex.printStackTrace();
@@ -521,6 +525,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             serverPushEvent.addConnection(occ);
             pushRegistry.put(occ.serverId(),serverPushEvent);//serverId cache
             this.wListeners.forEach((l) -> {
+                log.warn(l.typeId()+"<>"+serverPushEvent.typeId());
                 if(l.typeId().equals(serverPushEvent.typeId())){
                     l.onState(occ);
                 }
@@ -554,7 +559,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }));
     }
     public void ackServerPushEvent(String serverId){
-        log.warn("ack->"+serverId);
+        //log.warn("ack->"+serverId);
         ServerPushEvent serverPushEvent = pushRegistry.get(serverId);
         serverPushEvent.ack();
     }

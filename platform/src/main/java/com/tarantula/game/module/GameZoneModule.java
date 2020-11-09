@@ -3,6 +3,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.game.*;
 import com.tarantula.game.service.GameServiceProvider;
@@ -142,19 +143,25 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         else{
             this.context.log("no connection->",OnLog.WARN);
         }
-        this.context.postOffice().onConnection(connection).send("100/14","hello".getBytes());
+        DataBuffer payloadBuffer = new DataBuffer();
+        payloadBuffer.putUTF8("game");
+        payloadBuffer.putUTF8("lobby");
+        this.context.postOffice().onConnection(connection).send("1/true",payloadBuffer.toArray());
     }
     @Override
     public void onTimer(com.icodesoftware.Module.OnUpdate update){
         //mZone.onTimer((c,u,d)->{
             if(connection!=null&&!connection.disabled()){
-                update.on(connection,"100/16",(this.context.descriptor().name()+"->"+(count++)).getBytes());
+                DataBuffer payloadBuffer = new DataBuffer();
+                payloadBuffer.putUTF8("timer");
+                payloadBuffer.putUTF8("data");
+                //update.on(connection,"100/true",payloadBuffer.toArray());
             }
         //});
     }
     @Override
     public String label() {
-        return "game";
+        return "game-lobby";
     }
 
 

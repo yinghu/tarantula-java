@@ -85,6 +85,8 @@ public class UDPService implements Runnable, GameChannelService {
         mHandlers.put(syncMessageHandler.type(),syncMessageHandler);
         DischargeMessageHandler dischargeMessageHandler = new DischargeMessageHandler(this);
         mHandlers.put(dischargeMessageHandler.type(),dischargeMessageHandler);
+        ServerPushMessageHandler serverPushMessageHandler = new ServerPushMessageHandler(this);
+        mHandlers.put(serverPushMessageHandler.type(),serverPushMessageHandler);
     }
     @Override
     public void run(){
@@ -176,12 +178,11 @@ public class UDPService implements Runnable, GameChannelService {
     private void ack(){
         try{
             String[] headers = new String[]{
-                    Session.TARANTULA_ACCESS_KEY,config.getAsJsonObject(configHeader).get("accessKey").getAsString(),
+                    Session.TARANTULA_ACCESS_KEY,accessKey,
                     Session.TARANTULA_ACTION,"onAck",
                     Session.TARANTULA_SERVER_ID,serverId
             };
-            String resp = httpCaller.get(path,headers);
-            log.warn(resp);
+            httpCaller.get(path,headers);
         }catch (Exception ex){
             ex.printStackTrace();
         }

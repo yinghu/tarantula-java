@@ -12,8 +12,10 @@
         public const int Pong = 7;
         public const int Vote = 8;
         public const int Sync = 9;
+        
         public const int OnJoined = 10;
         public const int OnLeft = 11;
         public const int OnKickedOff = 12;
+        public const int ServerPush = 200;
     }
 }

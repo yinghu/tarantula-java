@@ -32,6 +32,7 @@ public class PushEventChannel implements GameChannel {
 
     private final MessageHandler joinMessageHandler;
     private final MessageHandler dischargeMessageHandler;
+    private final MessageHandler serverPushMessageHandler;
     private final byte[] ping;
 
     public PushEventChannel(final long channelId,final GameChannelService gameChannelService){
@@ -43,6 +44,7 @@ public class PushEventChannel implements GameChannel {
         this.jIndex = new ConcurrentHashMap<>();
         this.joinMessageHandler = this.gameChannelService.messageHandler(MessageHandler.JOIN);
         this.dischargeMessageHandler = this.gameChannelService.messageHandler(MessageHandler.DISCHARGE);
+        this.serverPushMessageHandler = this.gameChannelService.messageHandler(MessageHandler.SERVER_PUSH);
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.type(MessageHandler.PING);
         pendingOutboundMessage.sequence(0);
@@ -95,7 +97,11 @@ public class PushEventChannel implements GameChannel {
                 }
             }
         }
+        else if(pendingInboundMessage.type()==MessageHandler.SERVER_PUSH && mIndex.putIfAbsent(pendingInboundMessage.messageId(),LocalDateTime.now(ZoneOffset.UTC))==null){
+            this.serverPushMessageHandler.onMessage(pendingInboundMessage);
+        }
         else{
+            log.warn("discharge->"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId()+"/"+pendingInboundMessage.source().toString());
             dischargeMessageHandler.onMessage(pendingInboundMessage);
         }
     }

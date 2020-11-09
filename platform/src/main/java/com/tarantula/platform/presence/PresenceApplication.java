@@ -63,7 +63,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             DataBuffer payloadBuffer = new DataBuffer();
             payloadBuffer.putUTF8("hello");
             payloadBuffer.putUTF8("pop");
-            this.context.postOffice().onConnection(connection.server()).send(MessageHandler.ECHO+"/1/false",payloadBuffer.toArray());
+            this.context.postOffice().onConnection(connection.server()).send("1/true",payloadBuffer.toArray());
         }
         else if(session.action().equals("onTicket")){
             PresenceContext pc = new PresenceContext(session.action());

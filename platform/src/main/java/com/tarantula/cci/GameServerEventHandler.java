@@ -40,73 +40,52 @@ public class GameServerEventHandler implements RequestHandler {
             String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
             String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
             byte[] _payload = exchange.payload();
-            if(action.equals("onStart")){//start game server
+            String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
+            if(typeId==null){
+                throw new RuntimeException("Illegal access");
+            }
+            if(action.equals("onAck")){
+                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"ack",true));
+                deployService.ackServerPushEvent(serverId);
+            }
+            else if(action.equals("onStart")){//start game server
                 JsonObject resp = new JsonObject();
-                String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
-                if(typeId!=null){
-                    resp.addProperty("typeId",typeId);
-                    resp.addProperty("successful",true);
-                    Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
-                    resp.addProperty("serverKey", Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
-                    resp.addProperty("connectionId",connection.connectionId());
-                    resp.addProperty("sequence",connection.sequence());
-                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
-                    pushEvent.typeId(typeId);
-                    deployService.addServerPushEvent(pushEvent);
-                }
-                else{
-                    resp.addProperty("successful",false);
-                    resp.addProperty("message","Invalid access key");
-                    log.warn("Invalid access key on start");
-                }
+                resp.addProperty("typeId",typeId);
+                resp.addProperty("successful",true);
+                Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
+                resp.addProperty("serverKey", Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
+                resp.addProperty("connectionId",connection.connectionId());
+                resp.addProperty("sequence",connection.sequence());
+                ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
+                pushEvent.typeId(typeId);
+                deployService.addServerPushEvent(pushEvent);
                 exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
             }
             else if(action.equals("onConnect")){//client connections
-                String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
-                byte[] ret;
-                if(typeId!=null){
-                    Connection connection = this.builder.create().fromJson(new String(_payload),Connection.class);
-                    Connection room = this.deploymentServiceProvider.distributionCallback().onConnection(typeId,connection);
-                    ret = this.builder.create().toJson(room).getBytes();
-                }
-                else{
-                    log.warn("Invalid ticket on room");
-                    ret = "".getBytes();
-                }
+                Connection connection = this.builder.create().fromJson(new String(_payload),Connection.class);
+                Connection room = this.deploymentServiceProvider.distributionCallback().onConnection(typeId,connection);
+                byte[]   ret = this.builder.create().toJson(room).getBytes();
                 exchange.onEvent(new ResponsiveEvent("","",ret,"room",true));
             }
             else if(action.equals("onDisconnect")){
-                String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
-                byte[] ret;
-                if(typeId!=null){
-                    Connection connection = this.builder.create().fromJson(new String(_payload),Connection.class);
-                    Connection room = this.deploymentServiceProvider.distributionCallback().onConnection(typeId,connection);
-                    ret = this.builder.create().toJson(room).getBytes();
-                }
-                else{
-                    log.warn("Invalid ticket on room");
-                    ret = "".getBytes();
-                }
+                Connection connection = this.builder.create().fromJson(new String(_payload),Connection.class);
+                Connection room = this.deploymentServiceProvider.distributionCallback().onConnection(typeId,connection);
+                byte[] ret = this.builder.create().toJson(room).getBytes();
                 exchange.onEvent(new ResponsiveEvent("","",ret,"room",true));
             }
             else if(action.equals("onStop")){//stop the game server
-                if(tokenValidatorProvider.validateGameClusterAccessKey(accessKey)!=null){
-                    deployService.removeServerPushEvent(serverId);
-                    _hex.forEach((k,v)->{//removed session if any
-                        if(v.id().equals(serverId)){
-                            _hex.remove(k);
-                        }
-                    });
-                }
-                else{
-                    log.warn("Invalid ticket on stop");
-                }
+                deployService.removeServerPushEvent(serverId);
+                _hex.forEach((k,v)->{//removed session if any
+                    if(v.id().equals(serverId)){
+                        _hex.remove(k);
+                    }
+                });
                 exchange.onEvent(new ResponsiveEvent("","",_payload,"stop",true));
             }
         }catch (Exception ex){
             ex.printStackTrace();
-            //_hex.remove(exchange.id()); //removed cache on any errors
-            exchange.onError(ex,"Bad request");
+            _hex.remove(exchange.id()); //removed cache on any errors
+            exchange.onError(ex,ex.getMessage());
         }
     }
 
