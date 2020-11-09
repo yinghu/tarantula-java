@@ -42,7 +42,7 @@ public class PendingServerPushMessage {
                 }
             }
         }catch (Exception ex){
-            ex.printStackTrace();
+            //timeout
         }
         return acked;
     }
@@ -51,7 +51,11 @@ public class PendingServerPushMessage {
         if(retries<0){
             return false;
         }
-        try{ udpSessionService.send(data); }catch (Exception e){e.printStackTrace();}
-        return true;
+        try{
+            udpSessionService.send(data);
+            return true;
+        }catch (Exception e){
+            return true;//discharge
+        }
     }
 }

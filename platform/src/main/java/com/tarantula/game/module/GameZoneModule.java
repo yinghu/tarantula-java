@@ -155,13 +155,13 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
                 DataBuffer payloadBuffer = new DataBuffer();
                 payloadBuffer.putUTF8("timer");
                 payloadBuffer.putUTF8("data");
-                //update.on(connection,"100/true",payloadBuffer.toArray());
+                update.on(connection,"100/true",payloadBuffer.toArray());
             }
         //});
     }
     @Override
     public String label() {
-        return "game-lobby";
+        return this.context.descriptor().typeId();
     }
 
 

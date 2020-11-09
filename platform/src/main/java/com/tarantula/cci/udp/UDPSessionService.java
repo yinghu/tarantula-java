@@ -129,9 +129,13 @@ public class UDPSessionService implements ConnectionEventService {
         }
     }
     private byte[] encrypt(byte[] data) throws IllegalBlockSizeException, BadPaddingException {
-        return encrypt.doFinal(data);
+        synchronized (encrypt){
+            return encrypt.doFinal(data);
+        }
     }
     public byte[] decrypt(byte[] data) throws IllegalBlockSizeException, BadPaddingException{
-        return decrypt.doFinal(data);
+        synchronized (decrypt){
+            return decrypt.doFinal(data);
+        }
     }
 }
