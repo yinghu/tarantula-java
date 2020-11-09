@@ -61,6 +61,9 @@ public class PushEventHandler implements RequestHandler {
                 deployService.addServerPushEvent(pushEvent);
                 exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
             }
+            else if(action.equals("onConnection")){
+                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"onConnection",true));
+            }
             else if(action.equals("onStop")){
                 deployService.removeServerPushEvent(serverId);
                 _hex.forEach((k,v)->{//removed session if any

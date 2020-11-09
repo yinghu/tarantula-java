@@ -601,11 +601,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.tarantulaContext.tarantulaCluster().deployService().sync(key);
         }
     }
-    //dedicated server methods
+    //register/cache connection
     public Connection onConnection(String typeId,Connection connection){
         this.tarantulaContext.integrationCluster().index(typeId,this.builder.create().toJson(connection).getBytes());
         return connection;
     }
+    //use connection
     public Connection onConnection(String typeId,Connection.InboundMessageListener listener){
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         byte[] ret = icp.firstIndex(typeId);
@@ -617,44 +618,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         pushRegistry.get(connection.serverId()).addConnection(connection);
         return connection;
     }
-    /**
-    public void onStartedConnection(String serverId,byte[] started){
-        String _serverId = serverId+"_v";
-        this.tarantulaContext.integrationCluster().set(_serverId.getBytes(),started);
-    }
-    public void onUpdatedConnection(String serverId,byte[] updated){
+    public Connection onConnection(String typeId){
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
-        byte[] sub = icp.get(serverId.getBytes());
-        if (sub != null) {
-            ConnectionStateEvent connectionStateEvent = new ConnectionStateEvent(new String(sub),serverId,false);
-            connectionStateEvent.payload(updated);
-            integrationEventService.publish(connectionStateEvent);
+        byte[] ret = icp.firstIndex(typeId);
+        if(ret==null){
+            return null;
         }
-        else{
-            log.warn("Server connection not existed ->"+serverId);
-        }
+        Connection connection = this.builder.create().fromJson(new String(ret),Connection.class);
+        pushRegistry.get(connection.serverId()).addConnection(connection);
+        return connection;
     }
-    public byte[] onStartedConnection(String serverId){
-        String _serverId = serverId+"_v";
-        return this.tarantulaContext.integrationCluster().remove(_serverId.getBytes());
-    }
-    public void onEndedConnection(String serverId,byte[] ended) {
-        ClusterProvider icp = this.tarantulaContext.integrationCluster();
-        byte[] sub = icp.remove(serverId.getBytes());
-        if (sub != null) {
-            ConnectionStateEvent connectionStateEvent = new ConnectionStateEvent(new String(sub),serverId,true);
-            connectionStateEvent.payload(ended);
-            integrationEventService.publish(connectionStateEvent);
-        }
-        else{
-            log.warn("Server connection not existed ->"+serverId);
-        }
-    }
-    public void onEndedConnection(String serverId){
-        ClusterProvider icp = this.tarantulaContext.integrationCluster();
-        icp.remove(serverId.getBytes());
-    }**/
-    //end of dedicated server methods
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         if(deployService.enableGameCluster(gameCluster.distributionKey())){

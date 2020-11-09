@@ -165,6 +165,7 @@ public class UDPService implements Runnable, GameChannelService {
             scheduledExecutorService.scheduleAtFixedRate(()->v.retry(),1000,250,TimeUnit.MILLISECONDS);
         });
         scheduledExecutorService.scheduleAtFixedRate(()->ack(),1000,5000,TimeUnit.MILLISECONDS);
+        //register room
     }
     public void shutdown() throws Exception{
         String[] headers = new String[]{
