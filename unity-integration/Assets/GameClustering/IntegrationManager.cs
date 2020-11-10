@@ -215,5 +215,30 @@ namespace GameClustering
             return true;
         }
 
+        public async Task<bool> Lobby(MonoBehaviour caller)
+        {
+            try
+            {
+                var headers = new[]
+                {
+                    new Header {Name = Header.TarantulaTag, Value = "presence/lobby"},
+                    new Header {Name = Header.TarantulaToken, Value = Presence.Token},
+                    new Header {Name = Header.TarantulaAction, Value = "onLobbyList"}
+                };
+                var page = new Payload{Headers = new []{new Header{ Name = "page",Value = "1"}}};
+                var json = JsonConvert.SerializeObject(page,JsonSerializerSettings);
+                var response = await _httpCaller.PostJson(caller, "/service/action", headers,json);
+                Debug.Log(response);
+                var jo = JObject.Parse(response);
+                var suc = (bool)jo.SelectToken("successful");
+                return suc;
+            }
+            catch (Exception ex)
+            {
+                Exception = ex;
+                return false;
+            }    
+        }
+
     }
 }

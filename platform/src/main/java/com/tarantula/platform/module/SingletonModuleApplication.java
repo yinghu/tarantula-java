@@ -6,7 +6,6 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.event.FastPlayEvent;
 
-import java.security.SecureRandom;
 import java.util.concurrent.ScheduledFuture;
 
 /**

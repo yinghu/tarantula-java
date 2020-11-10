@@ -49,6 +49,12 @@ namespace Integration
             SceneManager.LoadScene(_sceneName);
         }
 
+        public async void Lobby()
+        {
+            Debug.Log("LOBBY");
+            await _integrationManager.Lobby(this);
+        }
+
         public  async void Play()
         {
             if (!_integrationManager.Authenticated)

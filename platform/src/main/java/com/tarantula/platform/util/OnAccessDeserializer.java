@@ -41,8 +41,8 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
                 JsonArray alist = ve.getAsJsonArray();
                 alist.forEach((a)->{//key value pair
                     JsonObject nv = a.getAsJsonObject();
-                    String _k = toLowercaseAtFirst(nv.get("name").getAsString());
-                    JsonPrimitive jp = nv.get("value").getAsJsonPrimitive();
+                    String _k = toLowercaseAtFirst(nv.get("Name").getAsString());
+                    JsonPrimitive jp = nv.get("Value").getAsJsonPrimitive();
                     if(jp.isString()){
                         access.property(_k,jp.getAsString());
                         _setProperty(access,_k,jp.getAsString());

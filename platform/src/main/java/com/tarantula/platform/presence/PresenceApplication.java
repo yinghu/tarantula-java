@@ -59,10 +59,10 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             pc.account = account(pc.access.primary()?session.systemId():pc.access.owner());
             pc.subscription = membership(pc.access.primary()?session.systemId():pc.access.owner());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
-            DataBuffer payloadBuffer = new DataBuffer();
-            payloadBuffer.putUTF8("hello");
-            payloadBuffer.putUTF8("pop");
-            this.context.postOffice().onConnection(connection.server()).send("1/true",payloadBuffer.toArray());
+            //DataBuffer payloadBuffer = new DataBuffer();
+            //payloadBuffer.putUTF8("hello");
+            //payloadBuffer.putUTF8("pop");
+            //this.context.postOffice().onConnection(connection.server()).send("1/true",payloadBuffer.toArray());
         }
         else if(session.action().equals("onTicket")){
             PresenceContext pc = new PresenceContext(session.action());
@@ -72,8 +72,9 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         }
         //public lobby access by page number
         else if(session.action().equals("onLobbyList")){
+            //this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            int page = ((Number)onAccess.property("page")).intValue();
+            int page = Integer.parseInt(onAccess.property("page").toString());
             LiveGame liveGame = liveGameContext.onIndex(page);
             if(liveGame!=null){
                 liveGame.lobbyList = new ArrayList<>();

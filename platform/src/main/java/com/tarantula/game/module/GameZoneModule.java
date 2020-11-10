@@ -128,21 +128,11 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
     }
     @Override
     public void onConnection(Connection connection){
-        //if(this.connection==null){
-            //this.connection = connection.copy();
-            //return;
-        //}
         this.connection = connection;
-        Connection c = this.deploymentServiceProvider.onConnection(this.context.descriptor().typeId(),this);
+        //Connection c = this.deploymentServiceProvider.onConnection(this.context.descriptor().typeId(),this);
         connection.registerInboundMessageListener((t,d)->{
             this.context.log("PAYLOAD->"+new String(d), OnLog.WARN);
         });
-        if(c!=null){
-            this.context.log("connection->"+connection.serverId()+"//"+c.sequence(),OnLog.WARN);
-        }
-        else{
-            this.context.log("no connection->",OnLog.WARN);
-        }
         DataBuffer payloadBuffer = new DataBuffer();
         payloadBuffer.putUTF8("game");
         payloadBuffer.putUTF8("lobby");
@@ -155,7 +145,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
                 DataBuffer payloadBuffer = new DataBuffer();
                 payloadBuffer.putUTF8("timer");
                 payloadBuffer.putUTF8("data");
-                update.on(connection,"100/true",payloadBuffer.toArray());
+                //update.on(connection,"100/true",payloadBuffer.toArray());
             }
         //});
     }

@@ -526,7 +526,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             serverPushEvent.addConnection(occ);
             pushRegistry.put(occ.serverId(),serverPushEvent);//serverId cache
             this.wListeners.forEach((l) -> {
-                log.warn(l.typeId()+"<>"+serverPushEvent.typeId());
                 if(l.typeId().equals(serverPushEvent.typeId())){
                     l.onState(occ);
                 }
