@@ -131,7 +131,7 @@ namespace Integration
             }
             bText.text = "play again";
             _playing = false;
-            _integrationManager.Messenger.Disconnect();
+            //_integrationManager.Messenger.Disconnect();
         }
 
         private void Join(int sessionId)

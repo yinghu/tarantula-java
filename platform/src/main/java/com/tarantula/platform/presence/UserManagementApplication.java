@@ -12,7 +12,6 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -35,8 +34,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     private DataStore pDatastore;
     private DataStore aDatastore;
     private DataStore sDatastore;
-
-    private Connection connection;
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
@@ -133,13 +130,10 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 session.write(this.builder.create().toJson(new ResponseHeader("onToken", "invalid token", false)).getBytes(),this.descriptor.responseLabel());
             }
         }
-        else if(session.action().equals("onTicket")){//validate client web socket connection
+        else if(session.action().equals("onTicket")){//validate game server connection
             if(this.context.validator().validateTicket(session.systemId(),acc.stub(),(String)acc.property(OnAccess.ACCESS_KEY))){
-                //OnSession onSession = this.context.validator().token(session.systemId(),acc.stub());//web socket request
-                //onSession.successful(true);
                 PresenceContext ptx = new PresenceContext();
                 ptx.successful(true);
-                //ptx.presence = onSession;
                 session.write(this.builder.create().toJson(ptx).getBytes(),this.descriptor.responseLabel()+"?onTicket");
             }
             else{
@@ -243,15 +237,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             List<Lobby> lobbyList = new ArrayList();
             lobbyList.add(this.context.lobby(this.lobbyId));
             ptx.lobbyList=(lobbyList);
-            if(this.connection!=null){
-                Connection conn = this.deploymentServiceProvider.onConnection(this.typeId());
-                if(conn!=null){
-                    conn.connectionId(connection.connectionId());
-                }
-                ptx.connection = conn;
-                byte[] key = this.deploymentServiceProvider.serverKey(this.connection);
-                ptx.serverKey = Base64.getEncoder().encodeToString(key);
-            }
             session.write(this.builder.create().toJson(ptx).getBytes(),this.descriptor.responseLabel());
             session.systemId(access.systemId());
             session.stub(access.stub());
@@ -295,14 +280,5 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         jms.addProperty("successful",suc);
         jms.addProperty("message",msg);
         return jms;
-    }
-    @Override
-    public String typeId(){
-        return "presence";
-    }
-    @Override
-    public void onState(Connection c) {
-        this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"]",OnLog.WARN);
-        this.connection = c;
     }
 }

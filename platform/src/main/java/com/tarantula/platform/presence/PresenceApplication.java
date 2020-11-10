@@ -10,6 +10,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.util.*;
 
 import java.util.ArrayList;
+import java.util.Base64;
 
 
 /**
@@ -59,15 +60,22 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             pc.account = account(pc.access.primary()?session.systemId():pc.access.owner());
             pc.subscription = membership(pc.access.primary()?session.systemId():pc.access.owner());
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
-            //DataBuffer payloadBuffer = new DataBuffer();
-            //payloadBuffer.putUTF8("hello");
-            //payloadBuffer.putUTF8("pop");
-            //this.context.postOffice().onConnection(connection.server()).send("1/true",payloadBuffer.toArray());
         }
-        else if(session.action().equals("onTicket")){
+        else if(session.action().equals("onConnection")){
             PresenceContext pc = new PresenceContext(session.action());
-            pc.presence= new OnSessionTrack(session.systemId());
-            pc.presence.ticket(this.context.validator().ticket(session.systemId(),session.stub()));
+            pc.successful(false);
+            if(this.connection!=null){
+                Connection conn = this.deploymentServiceProvider.onConnection(this.typeId());
+                if(conn!=null){
+                    conn.connectionId(connection.connectionId());
+                    pc.connection = conn;
+                    byte[] key = this.deploymentServiceProvider.serverKey(this.connection);
+                    pc.serverKey = Base64.getEncoder().encodeToString(key);
+                    pc.presence= new OnSessionTrack(session.systemId());
+                    pc.presence.ticket(this.context.validator().ticket(session.systemId(),session.stub()));
+                    pc.successful(true);
+                }
+            }
             session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
         }
         //public lobby access by page number

@@ -54,8 +54,8 @@ namespace GameClustering
                     new Header{ Name = Header.TarantulaAction ,Value = "onIndex"}
                 };
                 var response = await _httpCaller.GetJson(caller,"/user/action",headers);
-                //Debug.Log(response);
-                return true;
+                var jo = JObject.Parse(response);
+                return  (bool)jo.SelectToken("successful");
             }
             catch(Exception ex)
             { 
@@ -82,7 +82,6 @@ namespace GameClustering
                     return false;
                 }
                 var pt = jo.SelectToken("presence");
-                var pc = jo.SelectToken("connection");
                 Presence = new Presence
                 {
                     SystemId = (string)pt.SelectToken("systemId"),
@@ -91,53 +90,6 @@ namespace GameClustering
                     Login =  (string)pt.SelectToken("login"),
                     Stub = (int)pt.SelectToken("stub")
                 };
-                if (pc == null)
-                {
-                    return true;
-                }
-                var connection = new Connection
-                {
-                    ConnectionId = (long)pc.SelectToken("connectionId"),
-                    Type =  (string)pc.SelectToken("type"),
-                    Host = (string)pc.SelectToken("host"),
-                    Port = (int)pc.SelectToken("port"),
-                    Secured = (bool)pc.SelectToken("secured")
-                };
-                Messenger = new UdpMessenger();
-                Messenger.Connect(connection,Convert.FromBase64String((string)jo.SelectToken("serverKey")));
-                _thread = new Thread(Messenger.Listen);
-                _thread.Start();
-                Messenger.RegisterMessageHandler(MessageType.Join,0, (sessionId,buffer) =>
-                {
-                    var joined = buffer.GetUTF8String().Equals("accepted");
-                    if (joined)
-                    {
-                        Messenger.Join(sessionId,new []{buffer.GetInt(),buffer.GetInt()});
-                        Messenger.Ack();
-                    }
-                    else
-                    {
-                        Debug.Log("session rejected");
-                    }
-                });
-                Messenger.RegisterMessageHandler(MessageType.OnJoined,0, (sessionId,buffer) =>
-                {
-                    OnJoinedEvent?.Invoke(sessionId);
-                });
-                Messenger.RegisterMessageHandler(MessageType.Leave,0, (sessionId,buffer) =>
-                {
-                    Messenger.Leave();
-                    OnLeftEvent?.Invoke(sessionId);
-                });
-                Messenger.RegisterMessageHandler(MessageType.OnLeft,0, (sessionId,buffer) =>
-                {
-                    OnLeftEvent?.Invoke(sessionId);
-                });
-                Messenger.RegisterMessageHandler(MessageType.OnKickedOff,0, async (sessionId, buffer) =>
-                {
-                    await Leave();
-                    Debug.Log("KICKED OFF->"+sessionId);
-                });
                 return true;
             }
             catch(Exception ex)
@@ -170,7 +122,7 @@ namespace GameClustering
             }
         }
 
-        private async Task<bool> Ticket(MonoBehaviour caller)
+        private async Task<bool> Connect(MonoBehaviour caller)
         {
             try
             {
@@ -178,13 +130,64 @@ namespace GameClustering
                 {
                     new Header {Name = Header.TarantulaTag, Value = "presence/lobby"},
                     new Header {Name = Header.TarantulaToken, Value = Presence.Token},
-                    new Header {Name = Header.TarantulaAction, Value = "onTicket"}
+                    new Header {Name = Header.TarantulaAction, Value = "onConnection"}
                 };
                 var response = await _httpCaller.GetJson(caller, "/service/action", headers);
                 var jo = JObject.Parse(response);
                 var suc = (bool)jo.SelectToken("successful");
-                Presence.Ticket = (string)(jo.SelectToken("presence").SelectToken("ticket"));
-                return suc;
+                if (!suc)
+                {
+                    Exception = new Exception("No connection");
+                    return false;
+                }
+                Presence.Ticket = (string)jo.SelectToken("presence").SelectToken("ticket");
+                var pc = jo.SelectToken("connection");
+                var connection = new Connection
+                {
+                    ConnectionId = (long)pc.SelectToken("connectionId"),
+                    Type =  (string)pc.SelectToken("type"),
+                    Host = (string)pc.SelectToken("host"),
+                    Port = (int)pc.SelectToken("port"),
+                    Secured = (bool)pc.SelectToken("secured")
+                };
+                Messenger = new UdpMessenger();
+                Messenger.Connect(connection,Convert.FromBase64String((string)jo.SelectToken("serverKey")));
+                _thread = new Thread(Messenger.Listen);
+                _thread.Start();
+                Messenger.RegisterMessageHandler(MessageType.Join,0, (sessionId,buffer) =>
+                {
+                    var joined = buffer.GetUTF8String().Equals("accepted");
+                    if (joined)
+                    {
+                        Messenger.Join(sessionId,new []{buffer.GetInt(),buffer.GetInt()});
+                        Messenger.Ack();
+                    }
+                    else
+                    {
+                        Debug.Log("session rejected");
+                    }
+                });
+                Messenger.RegisterMessageHandler(MessageType.OnJoined,0, (sessionId,buffer) =>
+                {
+                    OnJoinedEvent?.Invoke(sessionId);
+                });
+                Messenger.RegisterMessageHandler(MessageType.Leave,0, (sessionId,buffer) =>
+                {
+                    Messenger.Leave();
+                    Messenger.Disconnect();
+                    OnLeftEvent?.Invoke(sessionId);
+                });
+                Messenger.RegisterMessageHandler(MessageType.OnLeft,0, (sessionId,buffer) =>
+                {
+                    Messenger.Disconnect();
+                    OnLeftEvent?.Invoke(sessionId);
+                });
+                Messenger.RegisterMessageHandler(MessageType.OnKickedOff,0, async (sessionId, buffer) =>
+                {
+                    await Leave();
+                    Debug.Log("KICKED OFF->"+sessionId);
+                });
+                return true;
             }
             catch (Exception ex)
             {
@@ -195,7 +198,7 @@ namespace GameClustering
 
         public async Task<bool> Join(MonoBehaviour caller)
         {
-            if (!await Ticket(caller))
+            if (!await Connect(caller))
             {
                 return false;
             }
