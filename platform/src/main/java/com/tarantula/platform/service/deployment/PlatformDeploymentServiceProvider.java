@@ -603,7 +603,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     //register/cache connection
     public Connection onConnection(String typeId,Connection connection){
-        this.tarantulaContext.integrationCluster().index(typeId,this.builder.create().toJson(connection).getBytes());
+        connection.connectionId(this.integrationCluster.sequence());
+        this.integrationCluster.index(typeId,this.builder.create().toJson(connection).getBytes());
+        log.warn("add connection->"+connection.connectionId());
         return connection;
     }
     //use connection
@@ -690,7 +692,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         key = new byte[KEY_SIZE];
         secureRandom.nextBytes(key);
-        //SecretKey secretKey = new SecretKeySpec(key, SERVER_KEY_SPEC);
         connection.server().connectionId(integrationCluster.sequence());
         connection.connectionId(connection.server().connectionId());
         connection.server().sequence(secureRandom.nextInt());

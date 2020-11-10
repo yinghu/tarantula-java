@@ -59,9 +59,13 @@ public class PushEventHandler implements RequestHandler {
                 ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
                 pushEvent.typeId(typeId);
                 deployService.addServerPushEvent(pushEvent);
+                for(int i=0;i<connection.maxConnections();i++){
+                    this.deploymentServiceProvider.distributionCallback().onConnection(typeId,connection);
+                }
                 exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
             }
             else if(action.equals("onConnection")){
+
                 exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"onConnection",true));
             }
             else if(action.equals("onStop")){

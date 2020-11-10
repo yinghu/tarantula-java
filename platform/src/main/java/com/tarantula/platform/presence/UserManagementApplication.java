@@ -244,7 +244,11 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             lobbyList.add(this.context.lobby(this.lobbyId));
             ptx.lobbyList=(lobbyList);
             if(this.connection!=null){
-                ptx.connection = this.deploymentServiceProvider.onConnection(this.typeId());
+                Connection conn = this.deploymentServiceProvider.onConnection(this.typeId());
+                if(conn!=null){
+                    conn.connectionId(connection.connectionId());
+                }
+                ptx.connection = conn;
                 byte[] key = this.deploymentServiceProvider.serverKey(this.connection);
                 ptx.serverKey = Base64.getEncoder().encodeToString(key);
             }
