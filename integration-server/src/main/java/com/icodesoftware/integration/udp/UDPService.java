@@ -1,6 +1,7 @@
 package com.icodesoftware.integration.udp;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.*;
@@ -164,8 +165,7 @@ public class UDPService implements Runnable, GameChannelService {
             scheduledExecutorService.scheduleAtFixedRate(()->v.ping(),1000,1000,TimeUnit.MILLISECONDS);
             scheduledExecutorService.scheduleAtFixedRate(()->v.retry(),1000,250,TimeUnit.MILLISECONDS);
         });
-        scheduledExecutorService.scheduleAtFixedRate(()->ack(),1000,5000,TimeUnit.MILLISECONDS);
-        //register room
+        scheduledExecutorService.scheduleAtFixedRate(()->ack(),5000,5000,TimeUnit.MILLISECONDS);
     }
     public void shutdown() throws Exception{
         String[] headers = new String[]{
@@ -188,6 +188,21 @@ public class UDPService implements Runnable, GameChannelService {
             ex.printStackTrace();
         }
     }
+    public long addConnection(){
+        try{
+            String[] headers = new String[]{
+                    Session.TARANTULA_ACCESS_KEY,accessKey,
+                    Session.TARANTULA_ACTION,"onConnection",
+                    Session.TARANTULA_SERVER_ID,serverId
+            };
+            JsonObject jsonObject = parser.parse(httpCaller.get(path,headers)).getAsJsonObject();
+            return jsonObject.get("connectionId").getAsLong();
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return -1;
+        }
+    }
+
     public void pendingOutbound(ByteBuffer pendingMessage,SocketAddress source){
         mQueue.offer(new PendingMessage(pendingMessage,source,PendingMessage.OUTBOUND));
     }

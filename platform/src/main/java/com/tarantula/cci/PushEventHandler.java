@@ -6,6 +6,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.UniverseConnection;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
 import com.tarantula.platform.util.ConnectionDeserializer;
@@ -60,13 +61,13 @@ public class PushEventHandler implements RequestHandler {
                 pushEvent.typeId(typeId);
                 deployService.addServerPushEvent(pushEvent);
                 for(int i=0;i<connection.maxConnections();i++){
-                    this.deploymentServiceProvider.distributionCallback().onConnection(typeId,connection);
+                    this.deploymentServiceProvider.distributionCallback().addConnection(typeId,connection);
                 }
                 exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
             }
             else if(action.equals("onConnection")){
-
-                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"onConnection",true));
+                Connection connection = this.deploymentServiceProvider.distributionCallback().addConnection(serverId);
+                exchange.onEvent(new ResponsiveEvent("","",builder.create().toJson(connection).getBytes(),"onConnection",true));
             }
             else if(action.equals("onStop")){
                 deployService.removeServerPushEvent(serverId);
@@ -127,11 +128,11 @@ public class PushEventHandler implements RequestHandler {
     public void start() throws Exception {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        this.builder.registerTypeAdapter(Connection.class,new ConnectionSerializer());
+        this.builder.registerTypeAdapter(UniverseConnection.class,new ConnectionSerializer());
         this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
-        log.info("TCP Push event handler started");
+        log.info("Server push event handler started");
     }
 
     @Override

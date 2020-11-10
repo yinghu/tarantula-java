@@ -63,13 +63,13 @@ public class GameServerEventHandler implements RequestHandler {
             }
             else if(action.equals("onConnect")){//client connections
                 Connection connection = this.builder.create().fromJson(new String(_payload),Connection.class);
-                Connection room = this.deploymentServiceProvider.distributionCallback().onConnection(typeId,connection);
+                Connection room = this.deploymentServiceProvider.distributionCallback().addConnection(typeId,connection);
                 byte[]   ret = this.builder.create().toJson(room).getBytes();
                 exchange.onEvent(new ResponsiveEvent("","",ret,"room",true));
             }
             else if(action.equals("onDisconnect")){
                 Connection connection = this.builder.create().fromJson(new String(_payload),Connection.class);
-                Connection room = this.deploymentServiceProvider.distributionCallback().onConnection(typeId,connection);
+                Connection room = this.deploymentServiceProvider.distributionCallback().addConnection(typeId,connection);
                 byte[] ret = this.builder.create().toJson(room).getBytes();
                 exchange.onEvent(new ResponsiveEvent("","",ret,"room",true));
             }

@@ -496,6 +496,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             ServerPushEvent serverPushEvent = (ServerPushEvent)event;
             Connection occ = this.builder.create().fromJson(new String(serverPushEvent.payload()), Connection.class);
             occ.disabled(false);
+            serverPushEvent.connection(occ);
             log.warn("add server push->"+occ.connectionId()+"//"+occ.sequence());
             if(occ.server().type().equals(Connection.UDP)){
                 try{
@@ -602,9 +603,17 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     //register/cache connection
-    public Connection onConnection(String typeId,Connection connection){
+    public Connection addConnection(String typeId,Connection connection){
         connection.connectionId(this.integrationCluster.sequence());
         this.integrationCluster.index(typeId,this.builder.create().toJson(connection).getBytes());
+        log.warn("add connection->"+connection.connectionId());
+        return connection;
+    }
+    public Connection addConnection(String serverId){
+        ServerPushEvent serverPushEvent = pushRegistry.get(serverId);
+        Connection connection = serverPushEvent.connection();
+        connection.connectionId(this.integrationCluster.sequence());
+        this.integrationCluster.index(serverPushEvent.typeId(),this.builder.create().toJson(connection).getBytes());
         log.warn("add connection->"+connection.connectionId());
         return connection;
     }

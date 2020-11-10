@@ -1,5 +1,6 @@
 package com.icodesoftware.integration;
 
+import com.icodesoftware.Connection;
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.OutboundMessage;
 import com.icodesoftware.service.Serviceable;
@@ -20,5 +21,5 @@ public interface GameChannelService extends Serviceable {
 
     byte[] encode(OutboundMessage outboundMessage);
     void pendingOutbound(ByteBuffer outboundMessage,SocketAddress source);
-    //void addConnection();
+    long addConnection();
 }

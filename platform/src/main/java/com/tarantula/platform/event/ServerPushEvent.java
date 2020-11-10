@@ -6,6 +6,7 @@ import com.icodesoftware.Connection;
 import com.icodesoftware.Event;
 import com.icodesoftware.protocol.InboundMessage;
 import com.icodesoftware.service.EventService;
+import com.tarantula.platform.UniverseConnection;
 import com.tarantula.platform.service.ConnectionEventService;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ public class ServerPushEvent extends Data implements Event {
 
     private ConcurrentHashMap<Long, Connection> cMap = new ConcurrentHashMap<>();
     private LocalDateTime lastAck;
+    private Connection connection;
     public ServerPushEvent(){
         lastAck = LocalDateTime.now(ZoneOffset.UTC);
     }
@@ -112,4 +114,18 @@ public class ServerPushEvent extends Data implements Event {
     public void write(byte[] message,String label){ }
     @Override
     public void write(byte[] payload,String label,boolean closed){ }
+    public void connection(Connection connection){
+        this.connection = connection;
+    }
+    public Connection connection(){
+        UniverseConnection conn = new UniverseConnection();
+        conn.host(this.connection.host());
+        conn.port(this.connection.port());
+        conn.type(this.connection.type());
+        conn.path(this.connection.path());
+        conn.secured(this.connection.secured());
+        conn.protocol(this.connection.protocol());
+        conn.serverId(this.connection.serverId());
+        return conn;
+    }
 }

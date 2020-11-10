@@ -61,6 +61,7 @@ public class PushEventChannel implements GameChannel {
         if(mSession.containsKey(sessionId)&&mSession.get(sessionId).socketAddress.equals(socketAddress)){
             mSession.remove(sessionId);
             jIndex.remove(socketAddress);
+            gameChannelService.addConnection();
         }
     }
     @Override
@@ -151,6 +152,7 @@ public class PushEventChannel implements GameChannel {
                 kickOff.add(k);
                 mSession.remove(k);
                 jIndex.remove(v.socketAddress);
+                gameChannelService.addConnection();
             }
         });
         kickOff.forEach((k)->{
