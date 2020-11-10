@@ -12,6 +12,7 @@ public class GameObject extends ResponseHeader {
     public Stub stub;
     public Connection connection;
     public String ticket;
+    public String serverKey;
     public JsonObject toJson(){
         JsonObject jo = new JsonObject();
         jo.addProperty("successful",successful);
@@ -19,16 +20,15 @@ public class GameObject extends ResponseHeader {
             jo.addProperty("message",message);
         }
         jo.addProperty("ticket",ticket);
+        jo.addProperty("serverKey",serverKey);
         jo.add("stub",stub.toJson());
         if(connection!=null){
             JsonObject jp = new JsonObject();
             jp.addProperty("type",connection.type());
             jp.addProperty("serverId",connection.serverId());
             jp.addProperty("secured",connection.secured());
-            jp.addProperty("protocol",connection.protocol());
-            jp.addProperty("subProtocol",connection.subProtocol());
+            jp.addProperty("connectionId",connection.connectionId());
             jp.addProperty("host",connection.host());
-            jp.addProperty("path",connection.path());
             jp.addProperty("port",connection.port());
             jo.add("connection",jp);
         }

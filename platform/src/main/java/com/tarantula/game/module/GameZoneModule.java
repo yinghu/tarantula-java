@@ -11,6 +11,7 @@ import com.tarantula.game.Rating;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
 
+import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 /**
  * updated by yinghu lu on 6/9/2020.
@@ -39,8 +40,10 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         GameObject gameObject = new GameObject();
         gameObject.successful(true);
         gameObject.ticket = this.context.validator().ticket(session.systemId(),session.stub());
+        byte[] key = this.deploymentServiceProvider.serverKey(connection);
+        gameObject.serverKey = Base64.getEncoder().encodeToString(key);
         gameObject.stub = stub;
-        //gameObject.connection = connection;
+        gameObject.connection = connection;
         mStub.put(session.systemId(),stub);
         session.write(gameObject.toJson().toString().getBytes(),label());
         //onUpdate.on(stub.roomId,"{}".getBytes());

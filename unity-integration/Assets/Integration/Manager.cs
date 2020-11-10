@@ -49,13 +49,7 @@ namespace Integration
             SceneManager.LoadScene(_sceneName);
         }
 
-        public async void Lobby()
-        {
-            Debug.Log("LOBBY");
-            await _integrationManager.Lobby(this);
-        }
-
-        public  async void Play()
+        public async void Play()
         {
             if (!_integrationManager.Authenticated)
             {
@@ -66,6 +60,21 @@ namespace Integration
                 }
             }
             _sceneName = "GamePlay";
+            _integrationManager.OnJoinedEvent += Join;
+            await _integrationManager.Lobby(this);
+        }
+
+        public  async void Roll()
+        {
+            if (!_integrationManager.Authenticated)
+            {
+                if (!await _integrationManager.Device(this))
+                {
+                    bText.text = _integrationManager.Exception.Message;
+                    return;
+                }
+            }
+            _sceneName = "Roll";
             _integrationManager.OnJoinedEvent += Join;
             if (!await _integrationManager.Join(this))
             {

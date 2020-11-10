@@ -59,19 +59,14 @@ public class GameServerEventHandler implements RequestHandler {
                 ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
                 pushEvent.typeId(typeId);
                 deployService.addServerPushEvent(pushEvent);
+                for(int i=0;i<connection.maxConnections();i++){
+                    this.deploymentServiceProvider.distributionCallback().addConnection(typeId,connection);
+                }
                 exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
             }
-            else if(action.equals("onConnect")){//client connections
-                Connection connection = this.builder.create().fromJson(new String(_payload),Connection.class);
-                Connection room = this.deploymentServiceProvider.distributionCallback().addConnection(typeId,connection);
-                byte[]   ret = this.builder.create().toJson(room).getBytes();
-                exchange.onEvent(new ResponsiveEvent("","",ret,"room",true));
-            }
-            else if(action.equals("onDisconnect")){
-                Connection connection = this.builder.create().fromJson(new String(_payload),Connection.class);
-                Connection room = this.deploymentServiceProvider.distributionCallback().addConnection(typeId,connection);
-                byte[] ret = this.builder.create().toJson(room).getBytes();
-                exchange.onEvent(new ResponsiveEvent("","",ret,"room",true));
+            else if(action.equals("onConnection")){
+                Connection connection = this.deploymentServiceProvider.distributionCallback().addConnection(serverId);
+                exchange.onEvent(new ResponsiveEvent("","",builder.create().toJson(connection).getBytes(),"onConnection",true));
             }
             else if(action.equals("onStop")){//stop the game server
                 deployService.removeServerPushEvent(serverId);

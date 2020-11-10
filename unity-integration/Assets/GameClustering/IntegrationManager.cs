@@ -150,43 +150,7 @@ namespace GameClustering
                     Port = (int)pc.SelectToken("port"),
                     Secured = (bool)pc.SelectToken("secured")
                 };
-                Messenger = new UdpMessenger();
-                Messenger.Connect(connection,Convert.FromBase64String((string)jo.SelectToken("serverKey")));
-                _thread = new Thread(Messenger.Listen);
-                _thread.Start();
-                Messenger.RegisterMessageHandler(MessageType.Join,0, (sessionId,buffer) =>
-                {
-                    var joined = buffer.GetUTF8String().Equals("accepted");
-                    if (joined)
-                    {
-                        Messenger.Join(sessionId,new []{buffer.GetInt(),buffer.GetInt()});
-                        Messenger.Ack();
-                    }
-                    else
-                    {
-                        Debug.Log("session rejected");
-                    }
-                });
-                Messenger.RegisterMessageHandler(MessageType.OnJoined,0, (sessionId,buffer) =>
-                {
-                    OnJoinedEvent?.Invoke(sessionId);
-                });
-                Messenger.RegisterMessageHandler(MessageType.Leave,0, (sessionId,buffer) =>
-                {
-                    Messenger.Leave();
-                    Messenger.Disconnect();
-                    OnLeftEvent?.Invoke(sessionId);
-                });
-                Messenger.RegisterMessageHandler(MessageType.OnLeft,0, (sessionId,buffer) =>
-                {
-                    Messenger.Disconnect();
-                    OnLeftEvent?.Invoke(sessionId);
-                });
-                Messenger.RegisterMessageHandler(MessageType.OnKickedOff,0, async (sessionId, buffer) =>
-                {
-                    await Leave();
-                    Debug.Log("KICKED OFF->"+sessionId);
-                });
+                Connect(connection, (string) jo.SelectToken("serverKey"));
                 return true;
             }
             catch (Exception ex)
@@ -194,6 +158,47 @@ namespace GameClustering
                 Exception = ex;
                 return false;
             }
+        }
+
+        private void Connect(Connection connection,string serverKey)
+        {
+            Messenger = new UdpMessenger();
+            Messenger.Connect(connection,Convert.FromBase64String(serverKey));
+            _thread = new Thread(Messenger.Listen);
+            _thread.Start();
+            Messenger.RegisterMessageHandler(MessageType.Join,0, (sessionId,buffer) =>
+            {
+                var joined = buffer.GetUTF8String().Equals("accepted");
+                if (joined)
+                {
+                    Messenger.Join(sessionId,new []{buffer.GetInt(),buffer.GetInt()});
+                    Messenger.Ack();
+                }
+                else
+                {
+                    Debug.Log("session rejected");
+                }
+            });
+            Messenger.RegisterMessageHandler(MessageType.OnJoined,0, (sessionId,buffer) =>
+            {
+                OnJoinedEvent?.Invoke(sessionId);
+            });
+            Messenger.RegisterMessageHandler(MessageType.Leave,0, (sessionId,buffer) =>
+            {
+                Messenger.Leave();
+                Messenger.Disconnect();
+                OnLeftEvent?.Invoke(sessionId);
+            });
+            Messenger.RegisterMessageHandler(MessageType.OnLeft,0, (sessionId,buffer) =>
+            {
+                Messenger.Disconnect();
+                OnLeftEvent?.Invoke(sessionId);
+            });
+            Messenger.RegisterMessageHandler(MessageType.OnKickedOff,0, async (sessionId, buffer) =>
+            {
+                await Leave();
+                Debug.Log("KICKED OFF->"+sessionId);
+            });    
         }
 
         public async Task<bool> Join(MonoBehaviour caller)
@@ -224,17 +229,39 @@ namespace GameClustering
             {
                 var headers = new[]
                 {
-                    new Header {Name = Header.TarantulaTag, Value = "presence/lobby"},
+                    new Header {Name = Header.TarantulaTag, Value = "game/mmk"},
                     new Header {Name = Header.TarantulaToken, Value = Presence.Token},
-                    new Header {Name = Header.TarantulaAction, Value = "onLobbyList"}
+                    new Header {Name = Header.TarantulaAction, Value = "onPlay"}
                 };
-                var page = new Payload{Headers = new []{new Header{ Name = "page",Value = "1"}}};
-                var json = JsonConvert.SerializeObject(page,JsonSerializerSettings);
-                var response = await _httpCaller.PostJson(caller, "/service/action", headers,json);
+                //var page = new Payload{Headers = new []{new Header{ Name = "page",Value = "1"}}};
+                //var json = JsonConvert.SerializeObject(page,JsonSerializerSettings);
+                var response = await _httpCaller.GetJson(caller, "/service/action", headers);
                 Debug.Log(response);
                 var jo = JObject.Parse(response);
                 var suc = (bool)jo.SelectToken("successful");
-                return suc;
+                if (!suc)
+                {
+                    return false;
+                }
+                var pc = jo.SelectToken("connection");
+                var connection = new Connection
+                {
+                    ConnectionId = (long)pc.SelectToken("connectionId"),
+                    Type =  (string)pc.SelectToken("type"),
+                    Host = (string)pc.SelectToken("host"),
+                    Port = (int)pc.SelectToken("port"),
+                    Secured = (bool)pc.SelectToken("secured")
+                };
+                Presence.Ticket = (string)jo.SelectToken("ticket");
+                Connect(connection,(string) jo.SelectToken("serverKey"));
+                using (var buffer = new DataBuffer())
+                {
+                    buffer.PutInt(Presence.Stub);
+                    buffer.PutUTF8String(Presence.Login);
+                    buffer.PutUTF8String(Presence.Ticket);
+                    await Messenger.SendAsync(MessageType.Join, 0, true, buffer);
+                }
+                return true;
             }
             catch (Exception ex)
             {
