@@ -148,10 +148,15 @@ public class UDPService implements Runnable, GameChannelService {
         config.getAsJsonObject("connection").getAsJsonObject("server").addProperty("serverId",serverId);
         this.path = config.getAsJsonObject(configHeader).get("path").getAsString();
         String resp = httpCaller.post(this.path,config.getAsJsonObject("connection").toString().getBytes(),headers);
+        log.warn(resp);
         JsonObject pc = parser.parse(resp).getAsJsonObject();
         if(!pc.get("successful").getAsBoolean()){
             throw new RuntimeException(pc.get("message").getAsString());
         }
+        pc.getAsJsonArray("connections").forEach((c)->{
+            PushEventChannel _pc = new PushEventChannel(c.getAsLong(),this);
+            mChannels.put(_pc.channelId(),_pc);
+        });
         byte[] key = Base64.getDecoder().decode(pc.get("serverKey").getAsString());
         IvParameterSpec iv = new IvParameterSpec(key);
         SecretKey secretKey = new SecretKeySpec(key,DeploymentServiceProvider.SERVER_KEY_SPEC);

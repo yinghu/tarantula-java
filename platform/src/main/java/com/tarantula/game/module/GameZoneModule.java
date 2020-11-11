@@ -43,7 +43,10 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         byte[] key = this.deploymentServiceProvider.serverKey(connection);
         gameObject.serverKey = Base64.getEncoder().encodeToString(key);
         gameObject.stub = stub;
-        gameObject.connection = connection;
+        Connection con = this.deploymentServiceProvider.onConnection(label());
+        if(con!=null){
+            gameObject.connection = con;
+        }
         mStub.put(session.systemId(),stub);
         session.write(gameObject.toJson().toString().getBytes(),label());
         //onUpdate.on(stub.roomId,"{}".getBytes());
