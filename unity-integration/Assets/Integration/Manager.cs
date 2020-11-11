@@ -59,7 +59,7 @@ namespace Integration
                     return;
                 }
             }
-            _sceneName = "GamePlay";
+            _sceneName = "Game";
             _integrationManager.OnJoinedEvent += Join;
             await _integrationManager.Lobby(this);
         }
