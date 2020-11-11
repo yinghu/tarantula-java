@@ -135,7 +135,6 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
     @Override
     public void onConnection(Connection connection){
         this.connection = connection;
-        //Connection c = this.deploymentServiceProvider.onConnection(this.context.descriptor().typeId(),this);
         connection.registerInboundMessageListener((t,d)->{
             this.context.log("PAYLOAD->"+new String(d), OnLog.WARN);
         });
