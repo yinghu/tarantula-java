@@ -23,7 +23,7 @@ public class PushEventChannel implements GameChannel {
 
     private static TarantulaLogger log = JDKLogger.getLogger(PushEventChannel.class);
 
-    private final long channelId;
+    private long channelId;
     private final GameChannelService gameChannelService;
     private final ConcurrentHashMap<Integer, RemoteSession> mSession;
     private final ConcurrentHashMap<PendingMessageIndex, PendingMessage> mMessage;
@@ -34,6 +34,8 @@ public class PushEventChannel implements GameChannel {
     private final MessageHandler dischargeMessageHandler;
     private final MessageHandler serverPushMessageHandler;
     private final byte[] ping;
+
+    private Listener listener;
 
     public PushEventChannel(final long channelId,final GameChannelService gameChannelService){
         this.channelId = channelId;
@@ -61,7 +63,7 @@ public class PushEventChannel implements GameChannel {
         if(mSession.containsKey(sessionId)&&mSession.get(sessionId).socketAddress.equals(socketAddress)){
             mSession.remove(sessionId);
             jIndex.remove(socketAddress);
-            gameChannelService.addConnection();
+            this.listener.onChannelClosed(this);
         }
     }
     @Override
@@ -152,7 +154,6 @@ public class PushEventChannel implements GameChannel {
                 kickOff.add(k);
                 mSession.remove(k);
                 jIndex.remove(v.socketAddress);
-                gameChannelService.addConnection();
             }
         });
         kickOff.forEach((k)->{
@@ -210,6 +211,12 @@ public class PushEventChannel implements GameChannel {
             pendingSession.timestamp = toUTCMilliseconds();
             pendingSession.pending.set(true);
         }
+    }
+    public void registerListener(Listener listener){
+        this.listener = listener;
+    }
+    public void reset(long channelId){
+        this.channelId = channelId;
     }
     private boolean checkExpired(long timestamp,long pms){
         return toUTCMilliseconds()-timestamp>=pms;

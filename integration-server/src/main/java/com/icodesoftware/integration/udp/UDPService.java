@@ -1,7 +1,6 @@
 package com.icodesoftware.integration.udp;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.*;
@@ -27,7 +26,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class UDPService implements Runnable, GameChannelService {
+public class UDPService implements Runnable, GameChannelService, GameChannel.Listener {
     private static TarantulaLogger log = JDKLogger.getLogger(UDPService.class);
 
     private DatagramChannel datagramChannel;
@@ -155,6 +154,7 @@ public class UDPService implements Runnable, GameChannelService {
         }
         pc.getAsJsonArray("connections").forEach((c)->{
             PushEventChannel _pc = new PushEventChannel(c.getAsLong(),this);
+            _pc.registerListener(this);
             mChannels.put(_pc.channelId(),_pc);
         });
         byte[] key = Base64.getDecoder().decode(pc.get("serverKey").getAsString());
@@ -165,6 +165,7 @@ public class UDPService implements Runnable, GameChannelService {
         decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
         decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
         PushEventChannel pushEventChannel = new PushEventChannel(pc.get("connectionId").getAsLong(),this);
+        pushEventChannel.registerListener(this);
         mChannels.put(pushEventChannel.channelId(),pushEventChannel);
         mChannels.forEach((k,v)->{
             scheduledExecutorService.scheduleAtFixedRate(()->v.ping(),1000,1000,TimeUnit.MILLISECONDS);
@@ -193,7 +194,7 @@ public class UDPService implements Runnable, GameChannelService {
             ex.printStackTrace();
         }
     }
-    public long addConnection(){
+    private long addConnection(){
         try{
             String[] headers = new String[]{
                     Session.TARANTULA_ACCESS_KEY,accessKey,
@@ -275,5 +276,14 @@ public class UDPService implements Runnable, GameChannelService {
         synchronized (decrypt){
             return decrypt.doFinal(data);
         }
+    }
+
+    @Override
+    public void onChannelClosed(GameChannel channelClosed) {
+        //GameChannel gc = this.mChannels.remove(channelClosed.channelId());
+        long cid = addConnection();
+        GameChannel gc = new PushEventChannel(cid,this);
+        gc.registerListener(this);
+        mChannels.put(gc.channelId(),gc);
     }
 }

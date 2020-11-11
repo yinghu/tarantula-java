@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
  * Created by yinghu lu on 10/16/2020.
  */
 public interface GameChannel {
+
     long channelId();
     void onMessage(InboundMessage pendingInboundMessage);
 
@@ -27,4 +28,12 @@ public interface GameChannel {
     void retry();
     void pending(int sessionId, int messageId, ByteBuffer pending, MessageHandler callback);
     void pending(SocketAddress socketAddress,int messageId,ByteBuffer pending);
+
+    void registerListener(Listener listener);
+    void reset(long channelId);
+
+    interface Listener{
+        void onChannelClosed(GameChannel channelClosed);
+    }
+
 }
