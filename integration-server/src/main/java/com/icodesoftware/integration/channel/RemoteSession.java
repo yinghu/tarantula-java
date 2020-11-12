@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class RemoteSession {
     public final SocketAddress socketAddress;
-    public final FIFOBuffer ackBuffer;
+    public final FIFOBuffer<Integer> ackBuffer;
     public final AtomicInteger pingPong;
     public final int[] messageRange;
 

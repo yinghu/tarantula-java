@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.protocol.DataBuffer;
+import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.game.*;
 import com.tarantula.game.service.GameServiceProvider;
@@ -38,7 +39,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         stub.tag = this.context.descriptor().tag();
         stub.owner(session.systemId());
         GameObject gameObject = new GameObject();
-        gameObject.successful(true);
+        gameObject.successful(false);
         gameObject.ticket = this.context.validator().ticket(session.systemId(),session.stub());
         byte[] key = this.deploymentServiceProvider.serverKey(connection);
         gameObject.serverKey = Base64.getEncoder().encodeToString(key);
@@ -46,10 +47,16 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         Connection con = this.deploymentServiceProvider.onConnection(label());
         if(con!=null){
             gameObject.connection = con;
+            gameObject.successful(true);
         }
         mStub.put(session.systemId(),stub);
         session.write(gameObject.toJson().toString().getBytes(),label());
-        //onUpdate.on(stub.roomId,"{}".getBytes());
+        if(gameObject.successful()){
+        DataBuffer push = new DataBuffer();
+            push.putLong(con.connectionId());
+            push.putUTF8(session.systemId());
+            onUpdate.on(this.connection, MessageHandler.JOIN+"/true",push.toArray());
+        }
     }
     @Override
     public boolean onRequest(Session session, byte[] payload, com.icodesoftware.Module.OnUpdate update) throws Exception {
@@ -138,18 +145,14 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         connection.registerInboundMessageListener((t,d)->{
             this.context.log("PAYLOAD->"+new String(d), OnLog.WARN);
         });
-        DataBuffer payloadBuffer = new DataBuffer();
-        payloadBuffer.putUTF8("game");
-        payloadBuffer.putUTF8("lobby");
-        this.context.postOffice().onConnection(connection).send("1/true",payloadBuffer.toArray());
     }
     @Override
     public void onTimer(com.icodesoftware.Module.OnUpdate update){
         //mZone.onTimer((c,u,d)->{
             if(connection!=null&&!connection.disabled()){
                 DataBuffer payloadBuffer = new DataBuffer();
+                payloadBuffer.putLong(100);
                 payloadBuffer.putUTF8("timer");
-                payloadBuffer.putUTF8("data");
                 //update.on(connection,"100/true",payloadBuffer.toArray());
             }
         //});

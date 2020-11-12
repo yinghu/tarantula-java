@@ -20,8 +20,8 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     private ScheduledFuture scheduledFuture;
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
-        if(this.module.onRequest(session,payload,((cid,uid,delta) ->{
-            this.serviceProvider.registerPostOffice().onConnection(cid).send(this.module.label()+"#"+uid,delta);
+        if(this.module.onRequest(session,payload,((connection,label,delta) ->{
+            this.serviceProvider.registerPostOffice().onConnection(connection).send(label,delta);
         }))){
             //clean up on leave if any
         }

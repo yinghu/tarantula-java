@@ -405,10 +405,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                         try{
                             PendingServerPushMessage pending = pendingData.poll();
                             if(pending!=null){
-                                if(!pending.ack()){
-                                    if(pending.retry()){
-                                        pendingData.offer(pending);
-                                    }
+                                pending.ack();
+                                if(pending.retry()){
+                                    pendingData.offer(pending);
                                 }
                             }
                             else{
