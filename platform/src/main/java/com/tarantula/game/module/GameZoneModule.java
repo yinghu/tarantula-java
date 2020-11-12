@@ -23,9 +23,10 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
     private Zone mZone;
     private ConcurrentHashMap<String, Stub> mStub = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Room> mRoom = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,Connection> mPush = new ConcurrentHashMap<>();
     private GsonBuilder builder;
     private GameServiceProvider gameServiceProvider;
-    private Connection connection;
+
     private int DEFAULT_LEVEL_COUNT = 3;
     private int DEFAULT_LEVEL_UP_BASE = 1000;
     private DeploymentServiceProvider deploymentServiceProvider;
@@ -40,23 +41,24 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         stub.owner(session.systemId());
         GameObject gameObject = new GameObject();
         gameObject.successful(false);
-        gameObject.ticket = this.context.validator().ticket(session.systemId(),session.stub());
-        byte[] key = this.deploymentServiceProvider.serverKey(connection);
-        gameObject.serverKey = Base64.getEncoder().encodeToString(key);
-        gameObject.stub = stub;
         Connection con = this.deploymentServiceProvider.onConnection(label());
         if(con!=null){
             gameObject.connection = con;
             gameObject.successful(true);
         }
-        mStub.put(session.systemId(),stub);
-        session.write(gameObject.toJson().toString().getBytes(),label());
         if(gameObject.successful()){
-        DataBuffer push = new DataBuffer();
+            Connection connection = mPush.get(con.serverId());
+            gameObject.ticket = this.context.validator().ticket(session.systemId(),session.stub());
+            byte[] key = this.deploymentServiceProvider.serverKey(connection);
+            gameObject.serverKey = Base64.getEncoder().encodeToString(key);
+            gameObject.stub = stub;
+            mStub.put(session.systemId(),stub);
+            DataBuffer push = new DataBuffer();
             push.putLong(con.connectionId());
             push.putUTF8(session.systemId());
-            onUpdate.on(this.connection, MessageHandler.JOIN+"/true",push.toArray());
+            onUpdate.on(connection, MessageHandler.JOIN+"/true",push.toArray());
         }
+        session.write(gameObject.toJson().toString().getBytes(),label());
     }
     @Override
     public boolean onRequest(Session session, byte[] payload, com.icodesoftware.Module.OnUpdate update) throws Exception {
@@ -141,20 +143,20 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
     }
     @Override
     public void onConnection(Connection connection){
-        this.connection = connection;
-        connection.registerInboundMessageListener((t,d)->{
-            this.context.log("PAYLOAD->"+new String(d), OnLog.WARN);
-        });
+        mPush.put(connection.serverId(),connection);
+        //connection.registerInboundMessageListener((t,d)->{
+            //this.context.log("PAYLOAD->"+new String(d), OnLog.WARN);
+        //});
     }
     @Override
     public void onTimer(com.icodesoftware.Module.OnUpdate update){
         //mZone.onTimer((c,u,d)->{
-            if(connection!=null&&!connection.disabled()){
-                DataBuffer payloadBuffer = new DataBuffer();
-                payloadBuffer.putLong(100);
-                payloadBuffer.putUTF8("timer");
+            //if(connection!=null&&!connection.disabled()){
+                //DataBuffer payloadBuffer = new DataBuffer();
+                //payloadBuffer.putLong(100);
+                //payloadBuffer.putUTF8("timer");
                 //update.on(connection,"100/true",payloadBuffer.toArray());
-            }
+            //}
         //});
     }
     @Override

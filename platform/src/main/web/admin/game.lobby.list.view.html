@@ -424,7 +424,6 @@
         <div class="w3-container w3-center tx-margin-top-8">
             <select class="w3-select w3-border w3-round tx-text-10" id="tx-play-mode" style="height:36px;width: 260px;">
                 <option value="0">Offline Mode</option>
-                <option value="2">Dedicated Mode</option>
                 <option value="1">Integrated Mode</option>
             </select>              
         </div>
@@ -591,11 +590,8 @@
         if(pm == 'Offline'){
             document.querySelector('#tx-play-mode').options[0].selected=true; 
         }
-        else if(pm == 'Dedicated'){
-            document.querySelector('#tx-play-mode').options[1].selected=true;
-        }
         else if(pm == 'Integrated'){
-            document.querySelector('#tx-play-mode').options[2].selected=true;
+            document.querySelector('#tx-play-mode').options[1].selected=true;
         }
         document.querySelector('#tx-lobby-list-edit').style.display='block';
     };

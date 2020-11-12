@@ -28,7 +28,7 @@ public class Room implements Connection.InboundMessageListener{
     static final long TIMER_DELTA = 1000; //1 SECOND
     static final int CONNECTION_RETRIES = 3; //1 SECOND
 
-    public static final int DEDICATED_MODE = 2;
+
     public static final int INTEGRATED_MODE = 1;
     public static final int OFF_LINE_MODE = 0;
 
@@ -68,6 +68,7 @@ public class Room implements Connection.InboundMessageListener{
         initialTime = PENDING_TIME;
         return _stub;
     }
+
     public synchronized boolean leave(Stub stub){
         if(state>PENDING_JOIN){
             return false;

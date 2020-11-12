@@ -29,7 +29,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     private static int SOLO_CAPACITY = 1;
     public long roundDuration =60000;
     public long overtime = Room.PENDING_TIME;
-    public int playMode = Room.DEDICATED_MODE;
+    public int playMode = Room.INTEGRATED_MODE;
     public ConcurrentHashMap<String,Room> roomIndex;
     public ConcurrentHashMap<String,Stub> stubIndex;
     public DeploymentServiceProvider deploymentServiceProvider;
@@ -278,10 +278,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         //this.label = klist[2];
     }
     public String toPlayMode(){
-        if(playMode == Room.DEDICATED_MODE){
-            return "Dedicated";
-        }
-        else if(playMode==Room.INTEGRATED_MODE){
+        if(playMode==Room.INTEGRATED_MODE){
             return "Integrated";
         }
         else{
