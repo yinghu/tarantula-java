@@ -208,13 +208,13 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             return -1;
         }
     }
-    private void update(){
+    private void update(long connectionId){
         try{
             String[] headers = new String[]{
                     Session.TARANTULA_ACCESS_KEY,accessKey,
                     Session.TARANTULA_ACTION,"onUpdate",
                     Session.TARANTULA_SERVER_ID,serverId,
-                    Session.TARANTULA_CONNECTION_ID,"1"
+                    Session.TARANTULA_CONNECTION_ID,""+connectionId
             };
             String resp = (httpCaller.post(path,"{}".getBytes(),headers));
             log.warn(resp);
@@ -294,6 +294,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     @Override
     public void onChannelClosed(GameChannel channelClosed) {
         //GameChannel gc = this.mChannels.remove(channelClosed.channelId());
+        update(channelClosed.channelId());
         long cid = addConnection();
         GameChannel gc = new PushEventChannel(cid,this);
         gc.registerListener(this);

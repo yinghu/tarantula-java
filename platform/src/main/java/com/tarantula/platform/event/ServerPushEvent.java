@@ -77,14 +77,14 @@ public class ServerPushEvent extends Data implements Event {
     public void removeConnection(long connectionId){
         cMap.remove(connectionId);
     }
-    public void onMessage(InboundMessage pendingInboundMessage){
+    public void onMessage(long connectionId,byte[] payload){
         //process message
         try{
             //Connection connection = cMap.get(pendingInboundMessage.connectionId());
-            System.out.println("TIMESTAMP--->"+pendingInboundMessage.timestamp());
-            System.out.println("SESSION ID--->"+pendingInboundMessage.sessionId());
-            Connection connection = cMap.get(pendingInboundMessage.connectionId());
-            connection.update(pendingInboundMessage.type(),pendingInboundMessage.payload());
+            System.out.println("payload--->"+new String(payload));
+            //System.out.println("SESSION ID--->"+pendingInboundMessage.sessionId());
+            //Connection connection = cMap.get(pendingInboundMessage.connectionId());
+            //connection.update(pendingInboundMessage.type(),pendingInboundMessage.payload());
         }catch (Exception ex){
             ex.printStackTrace();
         }

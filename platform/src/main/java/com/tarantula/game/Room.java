@@ -100,6 +100,9 @@ public class Room implements Connection.InboundMessageListener{
             this.pQueue.offer(stub);
             this.stubs[i] = stub;
         }
+        if(online){
+            this.connection = this.roomListener.onConnection(this);
+        }
     }
     public void start(RoomListener roomListener){
         this.initialTime = PENDING_TIME;

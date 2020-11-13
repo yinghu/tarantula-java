@@ -149,8 +149,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     }
     @Override
     public Connection onConnection(Room room){
-        String cType = playMode==Room.INTEGRATED_MODE?"tarantula":descriptor.typeId();
-        return deploymentServiceProvider.onConnection(cType,room);
+       return deploymentServiceProvider.onConnection(descriptor.typeId(),room);
     }
     @Override
     public void onConnecting(Room room){

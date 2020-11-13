@@ -29,7 +29,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
     private int DEFAULT_LEVEL_COUNT = 3;
     private int DEFAULT_LEVEL_UP_BASE = 1000;
     private DeploymentServiceProvider deploymentServiceProvider;
-    private int count;
+
     @Override
     public void onJoin(Session session, com.icodesoftware.Module.OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp or offline play mode
@@ -40,7 +40,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         stub.owner(session.systemId());
         GameObject gameObject = new GameObject();
         gameObject.successful(false);
-        Connection con = this.deploymentServiceProvider.onConnection(label());
+        Connection con = room.connection();
         if(con!=null){
             gameObject.connection = con;
             gameObject.successful(true);
@@ -172,6 +172,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
 
     public void onUpdated(Configurable zone) {
         mZone.reset((Zone)zone);
+        this.context.log("Play mode->"+mZone.playMode,OnLog.WARN);
         mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
     }
     private JsonObject toMessage(String msg,boolean successful){
