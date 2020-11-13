@@ -11,7 +11,6 @@ import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
-
 import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 /**

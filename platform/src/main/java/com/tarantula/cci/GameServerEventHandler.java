@@ -40,6 +40,7 @@ public class GameServerEventHandler implements RequestHandler {
             String action = exchange.header(Session.TARANTULA_ACTION);
             String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
             String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
+            //long connectionId = exchange.header(Session.TARANTULA_CONNECTION_ID);
             byte[] _payload = exchange.payload();
             String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
             if(typeId==null){
@@ -71,6 +72,9 @@ public class GameServerEventHandler implements RequestHandler {
             else if(action.equals("onConnection")){
                 Connection connection = this.deploymentServiceProvider.distributionCallback().addConnection(serverId);
                 exchange.onEvent(new ResponsiveEvent("","",builder.create().toJson(connection).getBytes(),"onConnection",true));
+            }
+            else if(action.equals("onUpdate")){
+                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"onConnection",true));
             }
             else if(action.equals("onStop")){//stop the game server
                 deployService.removeServerPushEvent(serverId);
