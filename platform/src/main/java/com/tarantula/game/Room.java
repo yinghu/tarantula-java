@@ -3,7 +3,6 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.Connection;
-import com.icodesoftware.protocol.DataBuffer;
 import com.tarantula.platform.statistics.StatsDelta;
 
 import java.io.ByteArrayInputStream;
@@ -28,7 +27,6 @@ public class Room implements Connection.InboundMessageListener{
 
     static final long PENDING_TIME = 5000;//5 SECONDS
     static final long TIMER_DELTA = 1000; //1 SECOND
-    static final int CONNECTION_RETRIES = 3; //1 SECOND
 
 
     public static final int INTEGRATED_MODE = 1;
@@ -40,7 +38,6 @@ public class Room implements Connection.InboundMessageListener{
     private int  rankUpBase;
     private Arena arena;
     private Connection connection;
-    private int retries;
     private long initialTime;
     private long duration;
     private long overtime;
@@ -62,10 +59,12 @@ public class Room implements Connection.InboundMessageListener{
         _stub.rating = rating;
         if(totalJoined==capacity){
             state = INITIALIZING;
+            roomListener.onInitializing(this);
         }
         else{
             roomListener.onWaiting(this);
             state =  PENDING_JOIN;
+            roomListener.onJoining(this);
         }
         initialTime = PENDING_TIME;
         return _stub;
@@ -110,7 +109,6 @@ public class Room implements Connection.InboundMessageListener{
         this.initialTime = PENDING_TIME;
         this.overtime = PENDING_TIME;
         this.round++;
-        this.retries = CONNECTION_RETRIES;
         this.totalJoined=0;
         this.state = WAITING;
         this.connection = null;
@@ -149,81 +147,55 @@ public class Room implements Connection.InboundMessageListener{
     }
 
 
-    public synchronized void onTimer(Module.OnUpdate update){
-        //DataBuffer dataBuffer = new DataBuffer();
-        //dataBuffer.putLong(connection.connectionId());
-        //dataBuffer.putUTF8(roomId);
+    public synchronized PendingUpdate onTimer(){
+        if(state==WAITING){
+            return null;
+        }
         switch (state){
-            case WAITING:
-                break;
             case PENDING_JOIN:
                 initialTime -=TIMER_DELTA;
                 if(initialTime<=0){
                     initialTime = PENDING_TIME;
                 }
-                //update.on(connection,"100/true",dataBuffer.toArray());
                 break;
             case INITIALIZING:
                 initialTime -=TIMER_DELTA;
-                if(initialTime>=0){
-                    //update.on(connection,"100/true",dataBuffer.toArray());
-                    if(online&&this.connection==null){//fetch connection per timer loop
-                        this.connection = this.roomListener.onConnection(this);
-                        if(this.connection!=null){
-                            this.roomListener.onConnecting(this);
-                        }
-                    }
-                }
-                else{
-                    if(!online){//offline mode
-                        state = STARTING;
-                        //update.on(connection,"100/true",dataBuffer.toArray());
-                    }else{
-                        if(this.connection!=null){//go to
-                            state = STARTING;
-                            //update.on(connection,"100/true",dataBuffer.toArray());
-                        }
-                        else{
-                            retries--;
-                            if(retries<=0){
-                                state = TIMEOUT; //timeout without available connection
-                            }else{
-                                initialTime = PENDING_TIME;
-                            }
-                        }
-                    }
+                if(initialTime<0){
+                    state = STARTING;
+                    this.roomListener.onStarting(this);
                 }
                 break;
             case STARTING:
                 duration -=TIMER_DELTA;
                 if(duration<=0){//goes to overtime
                     state = OVERTIME;
-                    //update.on(connection,"100/true",dataBuffer.toArray());
+                    this.roomListener.onOverTiming(this);
                 }
                 break;
             case OVERTIME:
                 overtime -=TIMER_DELTA;
                 if(overtime<=0){
                     state = ENDING;
+                    this.roomListener.onEnding(this);
                 }
                 break;
             case ENDING:
-                //update.on(connection,"100/true",dataBuffer.toArray());
                 state = PENDING_END;
                 initialTime = PENDING_TIME;
                 break;
             case TIMEOUT:
                 state = WAITING;
-                //update.on(connection,"100/true",dataBuffer.toArray());
                 roomListener.onTimeout(this);
                 break;
             case PENDING_END:
                 initialTime -=TIMER_DELTA;
                 if(initialTime<=0){//delay 5 seconds to wait for game server result
                     state = WAITING;
-                    roomListener.onEnding(this);
+                    roomListener.onEnded(this);
                 }
+                break;
         }
+        return null;
     }
 
     @Override
@@ -242,29 +214,4 @@ public class Room implements Connection.InboundMessageListener{
             }
         });
     }
-    /**
-    public void onEnded(byte[] ended) {
-        this.end();
-        JsonParser jp = new JsonParser();
-        InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(ended));
-        JsonObject j = jp.parse(inr).getAsJsonObject();
-        j.entrySet().forEach((e)->{
-            if(e.getKey().equals("gains")){
-                e.getValue().getAsJsonArray().forEach((st)->{
-                    JsonObject jo = st.getAsJsonObject();
-                    Stub stub = stubs[jo.get("seat").getAsInt()];
-                    stub.stats = new StatsDelta(jo.get("name").getAsString(),jo.get("value").getAsDouble());
-                    this.roomListener.onUpdating(stub);
-                });
-            }
-            if(e.getKey().equals("ratings")){
-                e.getValue().getAsJsonArray().forEach((st)->{
-                    JsonObject jo = st.getAsJsonObject();
-                    Stub stub = stubs[jo.get("seat").getAsInt()];
-                    stub.rank = jo.get("rank").getAsInt();
-                    stub.pxp = jo.get("xp").getAsDouble();
-                });
-            }
-        });
-    }**/
 }

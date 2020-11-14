@@ -8,6 +8,8 @@
         public string Login { set; get; }
         public int Stub { set; get; }
 
+        public string Lobby { set; get; }
+
 
     }
 }

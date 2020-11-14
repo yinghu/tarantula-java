@@ -22,6 +22,9 @@ public interface MessageHandler {
 
     int DISCHARGE = 100;
     int SERVER_PUSH = 200;
+    int GAME_SPEC = 201;
+    int GAME_START = 202;
+    int GAME_END = 203;
 
     int type();
     void onMessage(InboundMessage pendingInboundMessage);

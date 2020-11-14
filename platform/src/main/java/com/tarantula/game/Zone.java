@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.protocol.DataBuffer;
+import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.ServiceContext;
@@ -115,7 +117,10 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     }
     public void onTimer(Module.OnUpdate update){
         rList.forEach((r)->{
-            r.onTimer(update);
+            PendingUpdate delta = r.onTimer();
+            if(delta!=null){
+                update.on(r.connection(),delta.label,delta.pending.toArray());
+            }
         });
     }
 
@@ -128,7 +133,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         return GamePortableRegistry.ZONE_CID;
     }
 
-    //@Override
+    @Override
     public void onWaiting(Room room) {
         if(room.totalJoined()>0){
             pendingMatch[room.arena().level].offer(room);
@@ -149,40 +154,34 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     }
     @Override
     public Connection onConnection(Room room){
-       return deploymentServiceProvider.onConnection(descriptor.typeId(),room);
+       Connection connection = this.deploymentServiceProvider.onConnection(descriptor.typeId(),room);
+       if(connection!=null){
+           DataBuffer spec = new DataBuffer();
+           spec.putLong(connection.connectionId());
+           spec.putUTF8(roomSetting(room));
+           this.deploymentServiceProvider.registerPostOffice().onConnection(connection).send(MessageHandler.GAME_SPEC+"/true",spec.toArray());
+       }
+       return connection;
     }
     @Override
-    public void onConnecting(Room room){
-        //this.deploymentServiceProvider.onStartedConnection(room.connection().serverId(),roomSetting(room));
+    public void onJoining(Room room){
+
     }
     @Override
-    public byte[] onStarting(Room room){
-        JsonObject jsonObject = new JsonObject();
-        Arena match = room.arena();
-        jsonObject.addProperty("level",match.level);
-        jsonObject.addProperty("arena",match.name());
-        jsonObject.addProperty("capacity",room.capacity());
-        jsonObject.addProperty("duration",room.duration()/1000);
-        jsonObject.addProperty("overtime",room.overtime()/1000);
-        jsonObject.addProperty("totalJoined",room.totalJoined());
-        jsonObject.addProperty("state",room.state());
-        JsonArray ja = new JsonArray();
-        for(Stub p : room.playerList()){
-            JsonObject jb = new JsonObject();
-            jb.addProperty("owner",p.owner());
-            jb.addProperty("seat",p.seat);
-            ja.add(jb);
-        }
-        jsonObject.add("playerList",ja);
-        if(room.connection()!= null) {
-            Connection connection = room.connection();
-            JsonObject jcc = new JsonObject();
-            jcc.addProperty("serverId", connection.serverId());
-            jcc.addProperty("host",connection.host());
-            jcc.addProperty("port",connection.port());
-            jsonObject.add("connection", jcc);
-        }
-        return jsonObject.toString().getBytes();
+    public void onInitializing(Room room){
+
+    }
+    @Override
+    public void onStarting(Room room){
+
+    }
+    @Override
+    public void onOverTiming(Room room){
+
+    }
+    @Override
+    public void onEnded(Room room){
+
     }
     @Override
     public void onUpdating(Stub stub){
@@ -215,7 +214,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         rQueue.addLast(room);
     }
     //room setting on online play mode
-    private byte[] roomSetting(Room room){
+    private String roomSetting(Room room){
         JsonObject jo = new JsonObject();
         Arena match = room.arena();
         jo.addProperty("level",match.level);
@@ -233,7 +232,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
             ja.add(jb);
         }
         jo.add("playerList",ja);
-        return jo.toString().getBytes();
+        return jo.toString();
     }
     @Override
     public Map<String,Object> toMap(){

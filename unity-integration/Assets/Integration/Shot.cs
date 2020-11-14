@@ -76,7 +76,7 @@ namespace Integration
         public async void Exit()
         {
             var integrationManager = IntegrationManager.Instance;
-            await integrationManager.Leave();
+            await integrationManager.Leave(this);
         }
 
         private void Leave(int sessionId)

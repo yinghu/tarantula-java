@@ -19,6 +19,7 @@ namespace GameClustering
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
 
         public string gecHost = "localhost:8090";
+        public string typeId = "game";
         private HttpCaller _httpCaller;
         public IMessenger Messenger { private set; get; }
         public Exception Exception { private set; get; }
@@ -194,9 +195,9 @@ namespace GameClustering
                 Messenger.Disconnect();
                 OnLeftEvent?.Invoke(sessionId);
             });
-            Messenger.RegisterMessageHandler(MessageType.OnKickedOff,0, async (sessionId, buffer) =>
+            Messenger.RegisterMessageHandler(MessageType.OnKickedOff,0,  (sessionId, buffer) =>
             {
-                await Leave();
+                //await Leave();
                 Debug.Log("KICKED OFF->"+sessionId);
             });    
         }
@@ -217,9 +218,17 @@ namespace GameClustering
             return true;
         }
 
-        public async Task<bool> Leave()
+        public async Task<bool> Leave(MonoBehaviour caller)
         {
             await Messenger.SendAsync(MessageType.Leave, 0, true);
+            var headers = new[]
+            {
+                new Header {Name = Header.TarantulaTag, Value = Presence.Lobby},
+                new Header {Name = Header.TarantulaToken, Value = Presence.Token},
+                new Header {Name = Header.TarantulaAction, Value = "onLeave"}
+            };
+            var response = await _httpCaller.GetJson(caller, "/service/action", headers);
+            Debug.Log(response);
             return true;
         }
 
@@ -229,7 +238,7 @@ namespace GameClustering
             {
                 var headers = new[]
                 {
-                    new Header {Name = Header.TarantulaTag, Value = "game/mmk"},
+                    new Header {Name = Header.TarantulaTag, Value = typeId+"/mmk"},
                     new Header {Name = Header.TarantulaToken, Value = Presence.Token},
                     new Header {Name = Header.TarantulaAction, Value = "onPlay"}
                 };
@@ -243,6 +252,7 @@ namespace GameClustering
                 {
                     return false;
                 }
+                Presence.Lobby = (string)jo.SelectToken("stub").SelectToken("tag");
                 var pc = jo.SelectToken("connection");
                 var connection = new Connection
                 {
