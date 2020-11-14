@@ -134,15 +134,11 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     }
 
     @Override
-    public void onWaiting(Room room) {
-        if(room.totalJoined()>0){
-            pendingMatch[room.arena().level].offer(room);
-        }else{
-            rQueue.addFirst(room);//add first join queue
-        }
+    public void onJoining(Room room){
+        pendingMatch[room.arena().level].offer(room);
     }
     @Override
-    public void onLeaving(Stub stub){
+    public void onLeaving(Room room,Stub stub){
         stubIndex.computeIfPresent(stub.owner(),(k,v)->{
             if(v.roomId.equals(stub.roomId)){
                 return null;//remove
@@ -151,9 +147,14 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
                 return v;//keep
             }
         });
+        if(room.totalJoined()>0){
+            pendingMatch[room.arena().level].offer(room);
+        }else{
+            rQueue.addFirst(room);//add first join queue
+        }
     }
     @Override
-    public Connection onConnection(Room room){
+    public Connection onConnecting(Room room){
        Connection connection = this.deploymentServiceProvider.onConnection(descriptor.typeId(),room);
        if(connection!=null){
            DataBuffer spec = new DataBuffer();
@@ -164,43 +165,56 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
        return connection;
     }
     @Override
-    public void onJoining(Room room){
-
-    }
-    @Override
     public void onInitializing(Room room){
-
+        //System.out.println("initial");
     }
     @Override
     public void onStarting(Room room){
-
+        //System.out.println("starting");
     }
     @Override
     public void onOverTiming(Room room){
-
+        //System.out.println("overtime");
+    }
+    public void onEnding(Room room) {
+        //System.out.println("ending");
     }
     @Override
     public void onEnded(Room room){
-
+        //System.out.println("ended");
     }
-    @Override
+
     public void onUpdating(Stub stub){
         Statistics.Entry statistics = this.gameServiceProvider.statistics(stub.owner()).entry(stub.stats.name);
         statistics.update(stub.stats.value).update();
         this.gameServiceProvider.leaderBoard(statistics.name()).onAllBoard(statistics);
     }
+
     @Override
     public void onTimeout(Room room){
-        room.start(this);
+        for(Stub stub : room.playerList()){
+            if(stub.owner()==null){
+                continue;
+            }
+            stubIndex.computeIfPresent(stub.owner(),(k,v)->{
+                if(v.roomId.equals(stub.roomId)){
+                    return null;//remove
+                }
+                else{
+                    return v;//keep
+                }
+            });
+        }
+        room.reset();
         rQueue.addLast(room);
     }
-    @Override
-    public void onEnding(Room room) {
+
+    public void _onEnding(Room room) {
         if(!room.offline()){
             //this.deploymentServiceProvider.onEndedConnection(room.connection().serverId());
         }
         for(Stub sb : room.playerList()){
-            this.onLeaving(sb);
+            this.onLeaving(room,sb);
             Rating rating = sb.rating;//gameServiceProvider.rating(sb.owner());
             rating.update(sb,room.rankUpBase(),room.arena().xp);
             rating.update();

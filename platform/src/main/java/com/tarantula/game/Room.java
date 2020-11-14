@@ -3,6 +3,9 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.Connection;
+import com.icodesoftware.Module;
+import com.icodesoftware.protocol.DataBuffer;
+import com.icodesoftware.protocol.MessageHandler;
 import com.tarantula.platform.statistics.StatsDelta;
 
 import java.io.ByteArrayInputStream;
@@ -10,7 +13,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.UUID;
 
-import com.icodesoftware.Module;
 /**
  * Updated by yinghu lu on 6/11/2020.
  */
@@ -27,7 +29,6 @@ public class Room implements Connection.InboundMessageListener{
 
     static final long PENDING_TIME = 5000;//5 SECONDS
     static final long TIMER_DELTA = 1000; //1 SECOND
-
 
     public static final int INTEGRATED_MODE = 1;
     public static final int OFF_LINE_MODE = 0;
@@ -62,7 +63,6 @@ public class Room implements Connection.InboundMessageListener{
             roomListener.onInitializing(this);
         }
         else{
-            roomListener.onWaiting(this);
             state =  PENDING_JOIN;
             roomListener.onJoining(this);
         }
@@ -74,12 +74,11 @@ public class Room implements Connection.InboundMessageListener{
         if(state>PENDING_JOIN){
             return false;
         }
-        roomListener.onLeaving(stub);
         totalJoined--;
         state = totalJoined>0?PENDING_JOIN:WAITING;
         pQueue.offer(stub);
         //NOTE : the room still keeps the initial level setting to play
-        roomListener.onWaiting(this);
+        roomListener.onLeaving(this,stub);
         return true;
     }
     private synchronized boolean end(){
@@ -101,8 +100,8 @@ public class Room implements Connection.InboundMessageListener{
             this.pQueue.offer(stub);
             this.stubs[i] = stub;
         }
-        if(online){
-            this.connection = this.roomListener.onConnection(this);
+        if(online&&connection==null){
+            this.connection = this.roomListener.onConnecting(this);
         }
     }
     public void start(RoomListener roomListener){
@@ -118,6 +117,15 @@ public class Room implements Connection.InboundMessageListener{
         this.stubs = new Stub[0];
         if(roomListener!=null){
             this.roomListener = roomListener;
+        }
+    }
+    public void reset(){
+        totalJoined = 0;
+        this.stubs = new Stub[this.capacity];
+        for(int i=0;i<this.capacity;i++){
+            Stub stub = new Stub(i,roomId);
+            this.pQueue.offer(stub);
+            this.stubs[i] = stub;
         }
     }
     public int round(){
@@ -151,11 +159,12 @@ public class Room implements Connection.InboundMessageListener{
         if(state==WAITING){
             return null;
         }
+        PendingUpdate pendingUpdate = null;
         switch (state){
             case PENDING_JOIN:
                 initialTime -=TIMER_DELTA;
                 if(initialTime<=0){
-                    initialTime = PENDING_TIME;
+                    state = TIMEOUT;
                 }
                 break;
             case INITIALIZING:
@@ -163,6 +172,10 @@ public class Room implements Connection.InboundMessageListener{
                 if(initialTime<0){
                     state = STARTING;
                     this.roomListener.onStarting(this);
+                    DataBuffer dataBuffer = new DataBuffer();
+                    dataBuffer.putLong(connection.connectionId());
+                    dataBuffer.putUTF8("starting");
+                    pendingUpdate = new PendingUpdate(MessageHandler.GAME_END+"/true",dataBuffer);
                 }
                 break;
             case STARTING:
@@ -177,6 +190,10 @@ public class Room implements Connection.InboundMessageListener{
                 if(overtime<=0){
                     state = ENDING;
                     this.roomListener.onEnding(this);
+                    DataBuffer dataBuffer = new DataBuffer();
+                    dataBuffer.putLong(connection.connectionId());
+                    dataBuffer.putUTF8("ending");
+                    pendingUpdate = new PendingUpdate(MessageHandler.GAME_END+"/true",dataBuffer);
                 }
                 break;
             case ENDING:
@@ -192,10 +209,14 @@ public class Room implements Connection.InboundMessageListener{
                 if(initialTime<=0){//delay 5 seconds to wait for game server result
                     state = WAITING;
                     roomListener.onEnded(this);
+                    DataBuffer dataBuffer = new DataBuffer();
+                    dataBuffer.putLong(connection.connectionId());
+                    dataBuffer.putUTF8("ended");
+                    pendingUpdate = new PendingUpdate(MessageHandler.GAME_END+"/true",dataBuffer);
                 }
                 break;
         }
-        return null;
+        return pendingUpdate;
     }
 
     @Override
@@ -209,7 +230,7 @@ public class Room implements Connection.InboundMessageListener{
                     JsonObject jo = st.getAsJsonObject();
                     Stub stub = stubs[jo.get("seat").getAsInt()];
                     stub.stats = new StatsDelta(jo.get("name").getAsString(),jo.get("value").getAsDouble());
-                    this.roomListener.onUpdating(stub);
+                    //this.roomListener.onUpdating(stub);
                 });
             }
         });

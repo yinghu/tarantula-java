@@ -146,6 +146,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         config.getAsJsonObject("connection").addProperty("serverId",serverId);
         config.getAsJsonObject("connection").getAsJsonObject("server").addProperty("serverId",serverId);
         this.path = config.getAsJsonObject(configHeader).get("path").getAsString();
+        messageIdRange();
         String resp = httpCaller.post(this.path,config.getAsJsonObject("connection").toString().getBytes(),headers);
         log.warn(resp);
         JsonObject pc = parser.parse(resp).getAsJsonObject();

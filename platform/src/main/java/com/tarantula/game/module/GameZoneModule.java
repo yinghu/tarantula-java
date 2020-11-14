@@ -87,11 +87,17 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         }
         else if(session.action().equals("onLeave")){
             Stub stub = mStub.get(session.systemId());
-            Room room = mRoom.get(stub.roomId);
-            boolean left = room.leave(stub);
-            session.instanceId(stub.roomId);
-            session.write(toMessage("onLeave",left).toString().getBytes(),label());
-            return left;
+            if(stub!=null){
+                Room room = mRoom.get(stub.roomId);
+                boolean left = room.leave(stub);
+                session.instanceId(stub.roomId);
+                session.write(toMessage("onLeave",left).toString().getBytes(),label());
+                return left;
+            }
+            else{
+                session.write(toMessage("onLeave",false).toString().getBytes(),label());
+                return true;
+            }
         }
         else if(session.action().equals("onPlay")){
             //by passing match-making routing

@@ -46,6 +46,7 @@ public class PendingServerPushMessage {
             udpSessionService.send(data);
             return true;
         }catch (Exception ex){
+            ex.printStackTrace();
             return false;
         }
     }

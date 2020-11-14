@@ -104,7 +104,7 @@ public class PushEventChannel implements GameChannel {
             this.serverPushMessageHandler.onMessage(pendingInboundMessage);
         }
         else{
-            //log.warn("discharge->"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId()+"/"+pendingInboundMessage.source().toString());
+            log.warn("discharge->"+pendingInboundMessage.type()+"/"+pendingInboundMessage.messageId()+"/"+pendingInboundMessage.source().toString());
             dischargeMessageHandler.onMessage(pendingInboundMessage);
         }
     }
