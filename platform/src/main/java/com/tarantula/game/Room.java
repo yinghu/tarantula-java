@@ -3,12 +3,14 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.Connection;
+import com.icodesoftware.protocol.DataBuffer;
 import com.tarantula.platform.statistics.StatsDelta;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.UUID;
+
 import com.icodesoftware.Module;
 /**
  * Updated by yinghu lu on 6/11/2020.
@@ -148,6 +150,9 @@ public class Room implements Connection.InboundMessageListener{
 
 
     public synchronized void onTimer(Module.OnUpdate update){
+        //DataBuffer dataBuffer = new DataBuffer();
+        //dataBuffer.putLong(connection.connectionId());
+        //dataBuffer.putUTF8(roomId);
         switch (state){
             case WAITING:
                 break;
@@ -156,12 +161,12 @@ public class Room implements Connection.InboundMessageListener{
                 if(initialTime<=0){
                     initialTime = PENDING_TIME;
                 }
-                //update.on("",roomId+"?onTimer",new Countdown(initialTime,state,totalJoined).toJson().toString().getBytes());
+                //update.on(connection,"100/true",dataBuffer.toArray());
                 break;
             case INITIALIZING:
                 initialTime -=TIMER_DELTA;
                 if(initialTime>=0){
-                    //update.on("",roomId+"?onTimer",new Countdown(initialTime,state,totalJoined).toJson().toString().getBytes());
+                    //update.on(connection,"100/true",dataBuffer.toArray());
                     if(online&&this.connection==null){//fetch connection per timer loop
                         this.connection = this.roomListener.onConnection(this);
                         if(this.connection!=null){
@@ -172,11 +177,11 @@ public class Room implements Connection.InboundMessageListener{
                 else{
                     if(!online){//offline mode
                         state = STARTING;
-                        //update.on("",roomId+"?onStart",this.roomListener.onStarting(this));
+                        //update.on(connection,"100/true",dataBuffer.toArray());
                     }else{
                         if(this.connection!=null){//go to
                             state = STARTING;
-                            //update.on("",roomId+"?onStart",this.roomListener.onStarting(this));
+                            //update.on(connection,"100/true",dataBuffer.toArray());
                         }
                         else{
                             retries--;
@@ -193,29 +198,23 @@ public class Room implements Connection.InboundMessageListener{
                 duration -=TIMER_DELTA;
                 if(duration<=0){//goes to overtime
                     state = OVERTIME;
-                    //update.on("",roomId+"?onOvertime",new Countdown(overtime,state,totalJoined).toJson().toString().getBytes());
+                    //update.on(connection,"100/true",dataBuffer.toArray());
                 }
-                //else if(!dedicated){
-                    //update.on(oid+"?onTimer",new Countdown(duration,state,totalJoined).toJson().toString().getBytes());
-                //}
                 break;
             case OVERTIME:
                 overtime -=TIMER_DELTA;
                 if(overtime<=0){
                     state = ENDING;
                 }
-                //else if(!dedicated){
-                    //update.on(oid+"?onTimer",new Countdown(overtime,state,totalJoined).toJson().toString().getBytes());
-                //}
                 break;
             case ENDING:
-                //update.on("",roomId+"?onEnd",new Countdown(overtime,state,totalJoined).toJson().toString().getBytes());
+                //update.on(connection,"100/true",dataBuffer.toArray());
                 state = PENDING_END;
                 initialTime = PENDING_TIME;
                 break;
             case TIMEOUT:
                 state = WAITING;
-                //update.on("",roomId+"?onEnd",new Countdown(overtime,state,totalJoined).toJson().toString().getBytes());
+                //update.on(connection,"100/true",dataBuffer.toArray());
                 roomListener.onTimeout(this);
                 break;
             case PENDING_END:

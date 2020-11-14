@@ -26,15 +26,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class UDPSessionService implements ConnectionEventService {
 
     private DatagramSocket datagramChannel;
-    private final Connection connection;
+    private final Connection serverConnection;
     private final ConcurrentLinkedDeque<PendingServerPushMessage> pendingData;
     private final ConcurrentHashMap<Integer,Boolean> pendingAck;
 
     private final Cipher encrypt;
     private final Cipher decrypt;
     private final AtomicInteger messageId;
+
     public UDPSessionService(Connection connection,ConcurrentLinkedDeque<PendingServerPushMessage> pendingData,Cipher encrypt,Cipher decrypt){
-        this.connection = connection;
+        this.serverConnection = connection;
         this.pendingData = pendingData;
         this.encrypt = encrypt;
         this.decrypt = decrypt;
@@ -85,7 +86,7 @@ public class UDPSessionService implements ConnectionEventService {
     @Override
     public void start() throws Exception {
         this.datagramChannel = new DatagramSocket();
-        this.datagramChannel.connect(new InetSocketAddress(connection.host(),connection.port()));
+        this.datagramChannel.connect(new InetSocketAddress(serverConnection.host(),serverConnection.port()));
     }
 
     @Override
@@ -123,7 +124,7 @@ public class UDPSessionService implements ConnectionEventService {
             pendingOutboundMessage.messageId(messageId);
             pendingOutboundMessage.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
             pendingOutboundMessage.payload(payload);
-            byte[] out = connection.secured()?(encrypt(pendingOutboundMessage.message())):(pendingOutboundMessage.message());
+            byte[] out = serverConnection.secured()?(encrypt(pendingOutboundMessage.message())):(pendingOutboundMessage.message());
             DatagramPacket datagramPacket = new DatagramPacket(out,out.length);
             datagramChannel.send(datagramPacket);
             return datagramPacket;
@@ -144,7 +145,7 @@ public class UDPSessionService implements ConnectionEventService {
     }
     public void ack(byte[] payload){
         try{
-            InboundMessage pendingInboundMessage = new InboundMessage("",connection.secured()? ByteBuffer.wrap(decrypt(payload)):ByteBuffer.wrap(payload),null);
+            InboundMessage pendingInboundMessage = new InboundMessage("",serverConnection.secured()? ByteBuffer.wrap(decrypt(payload)):ByteBuffer.wrap(payload),null);
             if(pendingInboundMessage.type()== MessageHandler.ACK){
                 DataBuffer dataBuffer = new DataBuffer(pendingInboundMessage.payload());
                 int sz = dataBuffer.getInt();

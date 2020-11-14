@@ -142,21 +142,20 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
     }
     @Override
     public void onConnection(Connection connection){
-        mPush.put(connection.serverId(),connection);
-        //connection.registerInboundMessageListener((t,d)->{
-            //this.context.log("PAYLOAD->"+new String(d), OnLog.WARN);
-        //});
+        if(connection.disabled()){
+            mPush.remove(connection.serverId());
+        }
+        else {
+            mPush.put(connection.serverId(),connection);
+        }
     }
     @Override
     public void onTimer(com.icodesoftware.Module.OnUpdate update){
-        //mZone.onTimer((c,u,d)->{
-            //if(connection!=null&&!connection.disabled()){
-                //DataBuffer payloadBuffer = new DataBuffer();
-                //payloadBuffer.putLong(100);
-                //payloadBuffer.putUTF8("timer");
-                //update.on(connection,"100/true",payloadBuffer.toArray());
-            //}
-        //});
+        mZone.onTimer((connection,label,data)->{
+            if(mPush.containsKey(connection.serverId())){
+                update.on(connection,label,data);
+            }
+        });
     }
     @Override
     public String label() {
