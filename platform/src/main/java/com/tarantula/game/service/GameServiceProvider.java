@@ -12,6 +12,7 @@ import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.leaderboard.LeaderBoardSync;
 
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -32,6 +33,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
     private EventService publisher;
     private String dest;
+    private String subscription;
     private ClusterProvider integrationCluster;
 
     private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
@@ -82,6 +84,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
                 }
             }
         }
+        zone.subscription = this.subscription;
         return zone;
     }
     public LeaderBoard leaderBoard(String category){
@@ -106,6 +109,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         this.dataStore = serviceContext.dataStore(NAME.replace("-","_"),serviceContext.partitionNumber());//typeId_service
         this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
         this.dest = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).subscription();
+        this.subscription = UUID.randomUUID().toString();
         serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).addEventListener(NAME,(e)->{
             LeaderBoardEntry update = new LeaderBoardEntry(e.index(),e.name(),e.version(),e.owner(),e.balance(),e.timestamp());
             LeaderBoardSync ldb = this._leaderBoard(update.category());
@@ -113,6 +117,10 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             return false;
         });
         integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
+        this.publisher = integrationCluster.subscribe(subscription,(e)->{
+            logger.warn("event->"+e.toString());
+            return false;
+        });
         logger.info("Game service provider ["+ NAME+"] started");
     }
     @Override

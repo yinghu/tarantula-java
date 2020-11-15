@@ -25,6 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * updated by yinghu lu on 6/9/2020.
  */
 public class Zone extends RecoverableObject implements RoomListener, DataStore.Updatable,Configurable{
+    public String subscription;
     public List<Arena> arenas = new ArrayList<>();
     public String name;
     public int capacity =1;
@@ -238,6 +239,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         jo.addProperty("overtime",room.overtime()/1000);
         jo.addProperty("totalJoined",room.totalJoined());
         jo.addProperty("roomId",room.roomId);
+        jo.addProperty("zoneId",subscription);
         JsonArray ja = new JsonArray();
         for(Stub p : room.playerList()){
             JsonObject jb = new JsonObject();
