@@ -7,6 +7,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.event.GameUpdateEvent;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
 import com.tarantula.platform.util.ConnectionDeserializer;
@@ -42,6 +43,7 @@ public class GameServerEventHandler implements RequestHandler {
             String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
             String connectionId = exchange.header(Session.TARANTULA_CONNECTION_ID);
             String zoneId = exchange.header(Session.TARANTULA_ZONE_ID);
+            String roomId = exchange.header(Session.TARANTULA_ROOM_ID);
             byte[] _payload = exchange.payload();
             String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
             if(typeId==null){
@@ -79,9 +81,10 @@ public class GameServerEventHandler implements RequestHandler {
                 resp.addProperty("serverId",serverId);
                 resp.addProperty("connectionId",connectionId);
                 resp.addProperty("zoneId",zoneId);
+                resp.addProperty("roomId",roomId);
                 exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"onConnection",true));
                 //publish event to zone subscription/trackId
-                //eventService.publish();
+                eventService.publish(new GameUpdateEvent(zoneId,roomId));
             }
             else if(action.equals("onStop")){//stop the game server
                 deployService.removeServerPushEvent(serverId);

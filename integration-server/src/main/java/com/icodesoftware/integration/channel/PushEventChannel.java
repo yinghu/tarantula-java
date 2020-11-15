@@ -1,6 +1,7 @@
 package com.icodesoftware.integration.channel;
 
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.integration.Game;
 import com.icodesoftware.integration.GameChannel;
 import com.icodesoftware.integration.GameChannelService;
 import com.icodesoftware.integration.OnKickedOffMessageHandler;
@@ -24,7 +25,7 @@ public class PushEventChannel implements GameChannel {
     private static TarantulaLogger log = JDKLogger.getLogger(PushEventChannel.class);
 
     private final long channelId;
-    private String zoneId;
+
     private final GameChannelService gameChannelService;
     private final ConcurrentHashMap<Integer, RemoteSession> mSession;
     private final ConcurrentHashMap<PendingMessageIndex, PendingMessage> mMessage;
@@ -36,6 +37,7 @@ public class PushEventChannel implements GameChannel {
     private final MessageHandler serverPushMessageHandler;
     private final byte[] ping;
 
+    private Game game;
     private Listener listener;
 
     public PushEventChannel(final long channelId,final GameChannelService gameChannelService){
@@ -57,7 +59,9 @@ public class PushEventChannel implements GameChannel {
     public long channelId() {
         return channelId;
     }
-
+    public String zoneId(){
+        return game.zoneId();
+    }
     public void join(int sessionId,int[] messageRange,SocketAddress socketAddress){
         mSession.put(sessionId,new RemoteSession(messageRange,socketAddress,jIndex.get(socketAddress).ackBuffer));
     }
@@ -79,7 +83,8 @@ public class PushEventChannel implements GameChannel {
                 else{
                     ack(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),pendingInboundMessage.source());
                     if(mIndex.putIfAbsent(pendingInboundMessage.messageId(),LocalDateTime.now(ZoneOffset.UTC))==null){
-                       messageHandler.onMessage(pendingInboundMessage);
+                        game.onMessage(pendingInboundMessage);
+                        messageHandler.onMessage(pendingInboundMessage);
                     }
                 }
             }
@@ -213,6 +218,9 @@ public class PushEventChannel implements GameChannel {
             pendingSession.timestamp = toUTCMilliseconds();
             pendingSession.pending.set(true);
         }
+    }
+    public void onGame(Game game){
+        this.game = game;
     }
     public void registerListener(Listener listener){
         this.listener = listener;

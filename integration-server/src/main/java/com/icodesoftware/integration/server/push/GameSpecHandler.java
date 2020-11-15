@@ -1,7 +1,9 @@
 package com.icodesoftware.integration.server.push;
 
 import com.icodesoftware.integration.AbstractMessageHandler;
+import com.icodesoftware.integration.GameChannel;
 import com.icodesoftware.integration.GameChannelService;
+import com.icodesoftware.integration.game.Echo;
 import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.InboundMessage;
 
@@ -26,9 +28,11 @@ public class GameSpecHandler extends AbstractMessageHandler {
         int capacity = dataBuffer.getInt();
         long dur = dataBuffer.getLong();
         long ovt = dataBuffer.getLong();
-        String name = dataBuffer.getUTF8();
+        String roomId = dataBuffer.getUTF8();
         String zoneId = dataBuffer.getUTF8();
         long connectionId = dataBuffer.getLong();
         System.out.println(zoneId+"///"+connectionId);
+        GameChannel gameChannel = gameChannelService.gameChannel(connectionId);
+        gameChannel.onGame(new Echo(zoneId,roomId,gameChannelService));
     }
 }

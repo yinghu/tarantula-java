@@ -37,6 +37,7 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int CONNECTION_STATE_EVENT_CID = 21;
 
+    public static final int GAME_UPDATE_EVENT_CID = 22;
 
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
@@ -70,22 +71,21 @@ public class PortableEventRegistry implements PortableFactory {
             case ON_DEPLOY_EVENT_CID:
                 _ins = new OnDeployEvent();
                 break;
-
             case SERVICE_ACTION_EVENT_CID:
                 _ins = new ServiceActionEvent();
                 break;
             case APPLICATION_SERVICE_EVENT_CID:
                 _ins = new ApplicationServiceEvent();
                 break;
-
             case MAP_STORE_SYNC_EVENT_CID:
                 _ins = new MapStoreSyncEvent();
                 break;
-
             case SERVER_PUSH_EVENT_CID:
                 _ins = new ServerPushEvent();
                 break;
-
+            case GAME_UPDATE_EVENT_CID:
+                _ins = new GameUpdateEvent();
+                break;
             case MODULE_RESET_EVENT_CID:
                 _ins = new ModuleResetEvent();
                 break;

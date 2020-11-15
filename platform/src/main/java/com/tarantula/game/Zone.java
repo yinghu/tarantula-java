@@ -235,7 +235,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         dataBuffer.putInt(room.capacity());
         dataBuffer.putLong(room.duration());
         dataBuffer.putLong(room.overtime());
-        dataBuffer.putUTF8(match.name());
+        dataBuffer.putUTF8(room.roomId);
         dataBuffer.putUTF8(subscription);
         return dataBuffer;
     }

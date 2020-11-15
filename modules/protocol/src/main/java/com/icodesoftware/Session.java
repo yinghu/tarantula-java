@@ -19,6 +19,7 @@ public interface Session extends OnApplication {
     String TARANTULA_SERVER_ID ="Tarantula-server-id";
     String TARANTULA_CONNECTION_ID ="Tarantula-connection-id";
     String TARANTULA_ZONE_ID ="Tarantula-zone-id";
+    String TARANTULA_ROOM_ID ="Tarantula-room-id";
 
     String TARANTULA_TOKEN ="Tarantula-token";
     String TARANTULA_ACCESS_KEY ="Tarantula-access-key";

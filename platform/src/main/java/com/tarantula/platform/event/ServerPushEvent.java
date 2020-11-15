@@ -4,7 +4,6 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Event;
-import com.icodesoftware.protocol.InboundMessage;
 import com.icodesoftware.service.EventService;
 import com.tarantula.platform.UniverseConnection;
 import com.tarantula.platform.service.ConnectionEventService;
