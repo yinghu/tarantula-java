@@ -12,20 +12,23 @@ import java.io.IOException;
 public class GameUpdateEvent extends Data implements Event {
 
     public GameUpdateEvent(){}
-    public GameUpdateEvent(String zoneId,String roomId){
+    public GameUpdateEvent(String zoneId,String roomId,byte[] payload){
         this.destination = zoneId;
         this.trackId = roomId;
+        this.payload = payload;
     }
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeUTF("1",destination);
         portableWriter.writeUTF("2",trackId);
+        portableWriter.writeByteArray("3",payload);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         this.destination = portableReader.readUTF("1");
         this.trackId = portableReader.readUTF("2");
+        this.payload = portableReader.readByteArray("3");
     }
     @Override
     public int getFactoryId(){

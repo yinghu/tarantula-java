@@ -84,7 +84,7 @@ public class GameServerEventHandler implements RequestHandler {
                 resp.addProperty("roomId",roomId);
                 exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"onConnection",true));
                 //publish event to zone subscription/trackId
-                eventService.publish(new GameUpdateEvent(zoneId,roomId));
+                eventService.publish(new GameUpdateEvent(zoneId,roomId,_payload));
             }
             else if(action.equals("onStop")){//stop the game server
                 deployService.removeServerPushEvent(serverId);
