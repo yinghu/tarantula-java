@@ -7,8 +7,8 @@ import com.icodesoftware.protocol.InboundMessage;
  */
 public class PongMessageHandler extends AbstractMessageHandler {
 
-    public PongMessageHandler(GameChannelService gameService){
-        super(gameService);
+    public PongMessageHandler(GameChannelService gameChannelService){
+        super(gameChannelService);
     }
 
     @Override

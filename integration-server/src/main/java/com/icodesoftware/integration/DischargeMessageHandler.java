@@ -7,8 +7,8 @@ import com.icodesoftware.protocol.InboundMessage;
  */
 public class DischargeMessageHandler extends AbstractMessageHandler {
 
-    public DischargeMessageHandler(GameChannelService udpService){
-        super(udpService);
+    public DischargeMessageHandler(GameChannelService gameChannelService){
+        super(gameChannelService);
     }
     @Override
     public int type() {

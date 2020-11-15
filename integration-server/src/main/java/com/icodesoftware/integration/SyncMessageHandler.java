@@ -8,8 +8,8 @@ import com.icodesoftware.protocol.OutboundMessage;
  */
 public class SyncMessageHandler extends AbstractMessageHandler {
 
-    public SyncMessageHandler(GameChannelService gameService){
-        super(gameService);
+    public SyncMessageHandler(GameChannelService gameChannelService){
+        super(gameChannelService);
     }
 
     @Override

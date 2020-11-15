@@ -11,8 +11,8 @@ import java.nio.ByteBuffer;
 public class JoinMessageHandler extends AbstractMessageHandler {
 
 
-    public JoinMessageHandler(GameChannelService udpService){
-        super(udpService);
+    public JoinMessageHandler(GameChannelService gameChannelService){
+        super(gameChannelService);
     }
     @Override
     public int type() {

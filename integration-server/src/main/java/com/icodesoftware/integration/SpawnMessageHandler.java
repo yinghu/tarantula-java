@@ -7,8 +7,8 @@ import com.icodesoftware.protocol.OutboundMessage;
  * Created by yinghu lu on 10/7/2020.
  */
 public class SpawnMessageHandler extends AbstractMessageHandler {
-    public SpawnMessageHandler(GameChannelService gameService){
-        super(gameService);
+    public SpawnMessageHandler(GameChannelService gameChannelService){
+        super(gameChannelService);
     }
 
     @Override

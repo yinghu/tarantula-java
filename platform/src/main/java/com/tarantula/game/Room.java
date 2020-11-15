@@ -3,7 +3,6 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.Connection;
-import com.icodesoftware.Module;
 import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.MessageHandler;
 import com.tarantula.platform.statistics.StatsDelta;
@@ -165,6 +164,10 @@ public class Room implements Connection.InboundMessageListener{
                 initialTime -=TIMER_DELTA;
                 if(initialTime<=0){
                     state = TIMEOUT;
+                    DataBuffer dataBuffer = new DataBuffer();
+                    dataBuffer.putLong(connection.connectionId());
+                    dataBuffer.putUTF8("ending");
+                    pendingUpdate = new PendingUpdate(MessageHandler.GAME_JOIN_TIMEOUT+"/true",dataBuffer);
                 }
                 break;
             case INITIALIZING:
@@ -175,7 +178,7 @@ public class Room implements Connection.InboundMessageListener{
                     DataBuffer dataBuffer = new DataBuffer();
                     dataBuffer.putLong(connection.connectionId());
                     dataBuffer.putUTF8("starting");
-                    pendingUpdate = new PendingUpdate(MessageHandler.GAME_END+"/true",dataBuffer);
+                    pendingUpdate = new PendingUpdate(MessageHandler.GAME_START+"/true",dataBuffer);
                 }
                 break;
             case STARTING:
@@ -193,7 +196,7 @@ public class Room implements Connection.InboundMessageListener{
                     DataBuffer dataBuffer = new DataBuffer();
                     dataBuffer.putLong(connection.connectionId());
                     dataBuffer.putUTF8("ending");
-                    pendingUpdate = new PendingUpdate(MessageHandler.GAME_END+"/true",dataBuffer);
+                    pendingUpdate = new PendingUpdate(MessageHandler.GAME_CLOSE+"/true",dataBuffer);
                 }
                 break;
             case ENDING:

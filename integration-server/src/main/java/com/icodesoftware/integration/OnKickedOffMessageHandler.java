@@ -11,8 +11,8 @@ public class OnKickedOffMessageHandler extends AbstractMessageHandler {
 
     private int sessionId;
 
-    public OnKickedOffMessageHandler(GameChannelService gameService,int sessionId,long connectionId){
-        super(gameService);
+    public OnKickedOffMessageHandler(GameChannelService gameChannelService,int sessionId,long connectionId){
+        super(gameChannelService);
         this.sessionId = sessionId;
         this.ack = true;
         this.connectionId = connectionId;

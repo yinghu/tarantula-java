@@ -10,8 +10,8 @@ import java.nio.ByteBuffer;
  */
 public class LeaveMessageHandler extends AbstractMessageHandler {
 
-    public LeaveMessageHandler(GameChannelService gameService){
-        super(gameService);
+    public LeaveMessageHandler(GameChannelService gameChannelService){
+        super(gameChannelService);
     }
 
     @Override

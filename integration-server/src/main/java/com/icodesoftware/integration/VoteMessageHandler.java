@@ -7,8 +7,8 @@ import com.icodesoftware.protocol.InboundMessage;
  */
 public class VoteMessageHandler extends AbstractMessageHandler {
 
-    public VoteMessageHandler(GameChannelService gameService){
-        super(gameService);
+    public VoteMessageHandler(GameChannelService gameChannelService){
+        super(gameChannelService);
     }
 
     @Override

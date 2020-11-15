@@ -52,10 +52,6 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
             gameObject.serverKey = Base64.getEncoder().encodeToString(key);
             gameObject.stub = stub;
             mStub.put(session.systemId(),stub);
-            DataBuffer push = new DataBuffer();
-            push.putLong(con.connectionId());
-            push.putUTF8(session.systemId());
-            onUpdate.on(connection, MessageHandler.JOIN+"/true",push.toArray());
         }
         session.write(gameObject.toJson().toString().getBytes(),label());
     }

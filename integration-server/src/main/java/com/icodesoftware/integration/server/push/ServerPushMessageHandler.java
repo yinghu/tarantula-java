@@ -1,5 +1,7 @@
-package com.icodesoftware.integration;
+package com.icodesoftware.integration.server.push;
 
+import com.icodesoftware.integration.AbstractMessageHandler;
+import com.icodesoftware.integration.GameChannelService;
 import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.InboundMessage;
 import com.icodesoftware.protocol.MessageHandler;
@@ -17,8 +19,8 @@ public class ServerPushMessageHandler extends AbstractMessageHandler {
 
     private FIFOBuffer<Integer> ackBuffer;
 
-    public ServerPushMessageHandler(GameChannelService udpService){
-        super(udpService);
+    public ServerPushMessageHandler(GameChannelService gameChannelService){
+        super(gameChannelService);
         ackBuffer =  new FIFOBuffer(20,new Integer[20]);
     }
     @Override
@@ -41,7 +43,17 @@ public class ServerPushMessageHandler extends AbstractMessageHandler {
             ack.payload(dataBuffer.toArray());
             gameChannelService.pendingOutbound(ByteBuffer.wrap(gameChannelService.encode(ack)), pendingInboundMessage.source());
         }
-        DataBuffer dataBuffer = new DataBuffer(pendingInboundMessage.payload());
-        System.out.println("SERVER PUSH->"+pendingInboundMessage.sequence()+">>>"+pendingInboundMessage.messageId()+">>"+dataBuffer.getLong()+">>"+dataBuffer.getUTF8());
+        int seq = pendingInboundMessage.sequence();
+        System.out.println("SEQ->"+seq);
+        MessageHandler push = gameChannelService.messageHandler(seq);
+        if(push!=null){
+            push.onMessage(pendingInboundMessage);
+        }
+        else{
+            MessageHandler discharge = gameChannelService.messageHandler(MessageHandler.DISCHARGE);
+            discharge.onMessage(pendingInboundMessage);
+        }
+        //DataBuffer dataBuffer = new DataBuffer(pendingInboundMessage.payload());
+        //System.out.println("SERVER PUSH->"+pendingInboundMessage.sequence()+">>>"+pendingInboundMessage.messageId()+">>"+dataBuffer.getLong()+">>"+dataBuffer.getUTF8());
     }
 }

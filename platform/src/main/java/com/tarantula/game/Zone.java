@@ -158,9 +158,8 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     public Connection onConnecting(Room room){
        Connection connection = this.deploymentServiceProvider.onConnection(descriptor.typeId(),room);
        if(connection!=null){
-           DataBuffer spec = new DataBuffer();
+           DataBuffer spec = roomSetting(room);
            spec.putLong(connection.connectionId());
-           spec.putUTF8(roomSetting(room));
            this.deploymentServiceProvider.registerPostOffice().onConnection(connection).send(MessageHandler.GAME_SPEC+"/true",spec.toArray());
        }
        return connection;
@@ -229,26 +228,16 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         rQueue.addLast(room);
     }
     //room setting on online play mode
-    private String roomSetting(Room room){
-        JsonObject jo = new JsonObject();
+    private DataBuffer roomSetting(Room room){
+        DataBuffer dataBuffer = new DataBuffer();
         Arena match = room.arena();
-        jo.addProperty("level",match.level);
-        jo.addProperty("arena",match.name());
-        jo.addProperty("capacity",room.capacity());
-        jo.addProperty("duration",room.duration()/1000);
-        jo.addProperty("overtime",room.overtime()/1000);
-        jo.addProperty("totalJoined",room.totalJoined());
-        jo.addProperty("roomId",room.roomId);
-        jo.addProperty("zoneId",subscription);
-        JsonArray ja = new JsonArray();
-        for(Stub p : room.playerList()){
-            JsonObject jb = new JsonObject();
-            jb.addProperty("owner",p.owner());
-            jb.addProperty("seat",p.seat);
-            ja.add(jb);
-        }
-        jo.add("playerList",ja);
-        return jo.toString();
+        dataBuffer.putInt(match.level);
+        dataBuffer.putInt(room.capacity());
+        dataBuffer.putLong(room.duration());
+        dataBuffer.putLong(room.overtime());
+        dataBuffer.putUTF8(match.name());
+        dataBuffer.putUTF8(subscription);
+        return dataBuffer;
     }
     @Override
     public Map<String,Object> toMap(){

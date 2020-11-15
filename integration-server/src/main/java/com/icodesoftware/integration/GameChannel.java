@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 public interface GameChannel {
 
     long channelId();
+
     void onMessage(InboundMessage pendingInboundMessage);
 
     void join(int sessionId,int[] messageRange, SocketAddress socketAddress);
@@ -30,10 +31,10 @@ public interface GameChannel {
     void pending(SocketAddress socketAddress,int messageId,ByteBuffer pending);
 
     void registerListener(Listener listener);
-    void reset(long channelId);
 
     interface Listener{
         void onChannelClosed(GameChannel channelClosed);
+        void onChannelUpdated(GameChannel channelUpdated);
     }
 
 }

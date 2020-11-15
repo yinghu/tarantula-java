@@ -8,8 +8,8 @@ import com.icodesoftware.protocol.OutboundMessage;
  */
 public class EchoMessageHandler extends AbstractMessageHandler {
 
-    public EchoMessageHandler(GameChannelService udpService){
-        super(udpService);
+    public EchoMessageHandler(GameChannelService gameChannelService){
+        super(gameChannelService);
     }
     @Override
     public int type() {

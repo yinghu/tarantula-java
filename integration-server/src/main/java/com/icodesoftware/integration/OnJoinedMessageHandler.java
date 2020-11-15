@@ -8,8 +8,8 @@ import com.icodesoftware.protocol.OutboundMessage;
  */
 public class OnJoinedMessageHandler extends AbstractMessageHandler {
     private final int sessionId;
-    public OnJoinedMessageHandler(GameChannelService gameService,int sessionId){
-        super(gameService);
+    public OnJoinedMessageHandler(GameChannelService gameChannelService,int sessionId){
+        super(gameChannelService);
         this.sessionId = sessionId;
         this.ack = true;
     }

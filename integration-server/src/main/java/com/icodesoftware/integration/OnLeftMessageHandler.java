@@ -7,8 +7,8 @@ import com.icodesoftware.protocol.OutboundMessage;
  * Created by yinghu lu on 10/7/2020.
  */
 public class OnLeftMessageHandler extends AbstractMessageHandler {
-    public OnLeftMessageHandler(GameChannelService gameService){
-        super(gameService);
+    public OnLeftMessageHandler(GameChannelService gameChannelService){
+        super(gameChannelService);
     }
 
     @Override

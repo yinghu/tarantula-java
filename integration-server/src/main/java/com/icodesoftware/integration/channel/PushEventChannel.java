@@ -23,7 +23,8 @@ public class PushEventChannel implements GameChannel {
 
     private static TarantulaLogger log = JDKLogger.getLogger(PushEventChannel.class);
 
-    private long channelId;
+    private final long channelId;
+    private String zoneId;
     private final GameChannelService gameChannelService;
     private final ConcurrentHashMap<Integer, RemoteSession> mSession;
     private final ConcurrentHashMap<PendingMessageIndex, PendingMessage> mMessage;
@@ -56,6 +57,7 @@ public class PushEventChannel implements GameChannel {
     public long channelId() {
         return channelId;
     }
+
     public void join(int sessionId,int[] messageRange,SocketAddress socketAddress){
         mSession.put(sessionId,new RemoteSession(messageRange,socketAddress,jIndex.get(socketAddress).ackBuffer));
     }
@@ -215,9 +217,7 @@ public class PushEventChannel implements GameChannel {
     public void registerListener(Listener listener){
         this.listener = listener;
     }
-    public void reset(long channelId){
-        this.channelId = channelId;
-    }
+
     private boolean checkExpired(long timestamp,long pms){
         return toUTCMilliseconds()-timestamp>=pms;
     }
