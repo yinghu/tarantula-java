@@ -1,4 +1,5 @@
-﻿using Integration.Move;
+﻿using GameClustering;
+using Integration.Move;
 using UnityEngine;
 
 namespace Integration.Game
@@ -6,11 +7,12 @@ namespace Integration.Game
     public class Board : MonoBehaviour
     {
         private Camera _mainCamera;
-        public Player player;
-
+        public Player[] players;
+        private int _seat;
         private void Start()
         {
             _mainCamera = Camera.main;
+            _seat = IntegrationManager.Instance.Presence.Seat;
         }
 
         private void Update()
@@ -24,7 +26,7 @@ namespace Integration.Game
             {
                 return;
             }
-            player.Move(hit.point);
+            players[_seat].Move(hit.point);
         }
     }
 }

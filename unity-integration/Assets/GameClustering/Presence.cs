@@ -9,7 +9,7 @@
         public int Stub { set; get; }
 
         public string Lobby { set; get; }
-
+        public int Seat { set; get; }
 
     }
 }

@@ -6,6 +6,7 @@ namespace Integration.Move
 {
     public class Player : MonoBehaviour
     {
+        public int sequence = 1;
         private Vector3 _target;
         private const float Speed = 3f;
         private Vector3 _end;
@@ -17,7 +18,7 @@ namespace Integration.Move
             _end = _target;
             _queue = new ConcurrentQueue<Vector3>();
             _integrationManager = IntegrationManager.Instance;
-            _integrationManager.Messenger.RegisterMessageHandler(MessageType.Relay,1, (sessionId, buffer) =>
+            _integrationManager.Messenger.RegisterMessageHandler(MessageType.Relay,sequence, (sessionId, buffer) =>
             {
                 _queue.Enqueue(buffer.GetVector3());
             });
@@ -29,7 +30,7 @@ namespace Integration.Move
             using (var buffer = new DataBuffer())
             {
                 buffer.PutVector3(target);
-                await _integrationManager.Messenger.SendAsync(MessageType.Relay, 1, true, buffer);
+                await _integrationManager.Messenger.SendAsync(MessageType.Relay, sequence, true, buffer);
             }
         }
 

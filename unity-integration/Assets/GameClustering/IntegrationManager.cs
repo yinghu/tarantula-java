@@ -253,6 +253,7 @@ namespace GameClustering
                     return false;
                 }
                 Presence.Lobby = (string)jo.SelectToken("stub").SelectToken("tag");
+                Presence.Seat = (int)jo.SelectToken("stub").SelectToken("seat");
                 var pc = jo.SelectToken("connection");
                 var connection = new Connection
                 {
