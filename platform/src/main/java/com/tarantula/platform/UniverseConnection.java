@@ -20,7 +20,6 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     private String path;
     private int maxConnections;
     private Connection server;
-    private InboundMessageListener listener;
 
     public UniverseConnection(){
 
@@ -191,10 +190,5 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     public void server(Connection connection){
         this.server = connection;
     }
-    public void registerInboundMessageListener(InboundMessageListener listener){
-        this.listener = listener;
-    }
-    public void update(int code,byte[] payload){
-        listener.onUpdated(code,payload);
-    }
+
 }

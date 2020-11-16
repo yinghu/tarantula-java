@@ -3,8 +3,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.protocol.DataBuffer;
-import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.game.*;
 import com.tarantula.game.service.GameServiceProvider;
@@ -16,13 +14,11 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * updated by yinghu lu on 6/9/2020.
  */
-public class GameZoneModule implements Module,Configurable.Listener,Connection.InboundMessageListener{
+public class GameZoneModule implements Module,Configurable.Listener{
 
     private ApplicationContext context;
     private Zone mZone;
     private ConcurrentHashMap<String, Stub> mStub = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, Room> mRoom = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String,Connection> mPush = new ConcurrentHashMap<>();
     private GsonBuilder builder;
     private GameServiceProvider gameServiceProvider;
 
@@ -46,7 +42,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
             gameObject.successful(true);
         }
         if(gameObject.successful()){
-            Connection connection = mPush.get(con.serverId());
+            Connection connection = room.connection();
             gameObject.ticket = this.context.validator().ticket(session.systemId(),session.stub());
             byte[] key = this.deploymentServiceProvider.serverKey(connection);
             gameObject.serverKey = Base64.getEncoder().encodeToString(key);
@@ -59,7 +55,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
     public boolean onRequest(Session session, byte[] payload, com.icodesoftware.Module.OnUpdate update) throws Exception {
         if(session.action().equals("onUpdated")){
             Stub stub = mStub.get(session.systemId());
-            Room room = mRoom.get(stub.roomId);
+            Room room = gameServiceProvider.getRoom(stub.roomId);
             if(room.offline()){
                 //this.context.log(new String(payload),OnLog.WARN);
                 room.onUpdated(10,payload);
@@ -71,7 +67,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         }
         else if(session.action().equals("onEnded")){
             Stub stub = mStub.get(session.systemId());
-            Room room = mRoom.get(stub.roomId);
+            Room room = gameServiceProvider.getRoom(stub.roomId);
             if(room.offline()){
                 //this.context.log(new String(payload),OnLog.WARN);
                 //room.onEnded(payload);
@@ -84,7 +80,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         else if(session.action().equals("onLeave")){
             Stub stub = mStub.get(session.systemId());
             if(stub!=null){
-                Room room = mRoom.get(stub.roomId);
+                Room room = gameServiceProvider.getRoom(stub.roomId);
                 boolean left = room.leave(stub);
                 session.instanceId(stub.roomId);
                 session.write(toMessage("onLeave",left).toString().getBytes(),label());
@@ -131,7 +127,6 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
             }
             mZone.update();
         }
-        mZone.roomIndex = this.mRoom;
         mZone.stubIndex = this.mStub;
         mZone.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         mZone.gameServiceProvider = this.gameServiceProvider;
@@ -145,16 +140,16 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
     @Override
     public void onConnection(Connection connection){
         if(connection.disabled()){
-            mPush.remove(connection.serverId());
+            //mPush.remove(connection.serverId());
         }
         else {
-            mPush.put(connection.serverId(),connection);
+            //mPush.put(connection.serverId(),connection);
         }
     }
     @Override
     public void onTimer(com.icodesoftware.Module.OnUpdate update){
         mZone.onTimer((connection,label,data)->{
-            if(mPush.containsKey(connection.serverId())){
+            if(deploymentServiceProvider.valid(connection)){
                 update.on(connection,label,data);
             }
         });
@@ -181,10 +176,5 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.I
         jsonObject.addProperty("successful",successful);
         jsonObject.addProperty("message",msg);
         return jsonObject;
-    }
-
-    @Override
-    public void onUpdated(int code,byte[] updated) {
-        this.context.log(new String(updated).trim(),OnLog.WARN);
     }
 }

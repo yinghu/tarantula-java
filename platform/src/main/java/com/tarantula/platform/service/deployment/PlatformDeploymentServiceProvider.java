@@ -74,7 +74,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private AtomicBoolean onAccessIndex;
 
     private ConcurrentLinkedDeque<PendingServerPushMessage> pendingData;
-    //private ConcurrentHashMap<Long,Connection> connections;
+
     private ExecutorService udpPool;
     private int workSize;
     @Override
@@ -521,7 +521,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             else{
                 serverPushEvent.eventService(this.integrationEventService);
             }
-            serverPushEvent.addConnection(occ);
+            ///serverPushEvent.addConnection(occ);
             pushRegistry.put(occ.serverId(),serverPushEvent);//serverId cache
             this.wListeners.forEach((l) -> {
                 if(l.typeId().equals(serverPushEvent.typeId())){
@@ -615,17 +615,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return connection;
     }
     //use connection
-    public Connection onConnection(String typeId,Connection.InboundMessageListener listener){
-        ClusterProvider icp = this.tarantulaContext.integrationCluster();
-        byte[] ret = icp.firstIndex(typeId);
-        if(ret==null){
-            return null;
-        }
-        Connection connection = this.builder.create().fromJson(new String(ret),Connection.class);
-        connection.registerInboundMessageListener(listener);
-        pushRegistry.get(connection.serverId()).addConnection(connection);
-        return connection;
-    }
     public Connection onConnection(String typeId){
         ClusterProvider icp = this.tarantulaContext.integrationCluster();
         byte[] ret = icp.firstIndex(typeId);
@@ -633,8 +622,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return null;
         }
         Connection connection = this.builder.create().fromJson(new String(ret),Connection.class);
-        pushRegistry.get(connection.serverId()).addConnection(connection);
+        //pushRegistry.get(connection.serverId()).addConnection(connection);
         return connection;
+    }
+    public boolean valid(Connection connection){
+        return pushRegistry.containsKey(connection.serverId());
     }
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();

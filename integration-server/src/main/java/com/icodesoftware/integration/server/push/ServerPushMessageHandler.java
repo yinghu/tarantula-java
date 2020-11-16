@@ -44,7 +44,7 @@ public class ServerPushMessageHandler extends AbstractMessageHandler {
             gameChannelService.pendingOutbound(ByteBuffer.wrap(gameChannelService.encode(ack)), pendingInboundMessage.source());
         }
         int seq = pendingInboundMessage.sequence();
-        System.out.println("SEQ->"+seq);
+        System.out.println("SEQ/CID->"+seq+"///"+pendingInboundMessage.connectionId());
         MessageHandler push = gameChannelService.messageHandler(seq);
         if(push!=null){
             push.onMessage(pendingInboundMessage);
@@ -53,7 +53,5 @@ public class ServerPushMessageHandler extends AbstractMessageHandler {
             MessageHandler discharge = gameChannelService.messageHandler(MessageHandler.DISCHARGE);
             discharge.onMessage(pendingInboundMessage);
         }
-        //DataBuffer dataBuffer = new DataBuffer(pendingInboundMessage.payload());
-        //System.out.println("SERVER PUSH->"+pendingInboundMessage.sequence()+">>>"+pendingInboundMessage.messageId()+">>"+dataBuffer.getLong()+">>"+dataBuffer.getUTF8());
     }
 }

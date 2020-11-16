@@ -11,14 +11,13 @@ import com.tarantula.platform.service.ConnectionEventService;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by yinghu on 7/25//2020.
  */
 public class ServerPushEvent extends Data implements Event {
 
-    private ConcurrentHashMap<Long, Connection> cMap = new ConcurrentHashMap<>();
+
     private LocalDateTime lastAck;
     private Connection connection;
     public ServerPushEvent(){
@@ -70,24 +69,7 @@ public class ServerPushEvent extends Data implements Event {
     public EventService eventService(){
         return this.eventService;
     }
-    public void addConnection(Connection connection){
-        cMap.put(connection.connectionId(),connection);
-    }
-    public void removeConnection(long connectionId){
-        cMap.remove(connectionId);
-    }
-    public void onMessage(long connectionId,byte[] payload){
-        //process message
-        try{
-            //Connection connection = cMap.get(pendingInboundMessage.connectionId());
-            System.out.println("payload--->"+new String(payload));
-            //System.out.println("SESSION ID--->"+pendingInboundMessage.sessionId());
-            //Connection connection = cMap.get(pendingInboundMessage.connectionId());
-            //connection.update(pendingInboundMessage.type(),pendingInboundMessage.payload());
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-    }
+
     public void onMessage(byte[] payload,String label,Connection connection){
         ((ConnectionEventService)eventService).publish(payload,label,connection);
     }

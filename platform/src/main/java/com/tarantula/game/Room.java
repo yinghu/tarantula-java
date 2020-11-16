@@ -1,21 +1,16 @@
 package com.tarantula.game;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.icodesoftware.Connection;
 import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.MessageHandler;
-import com.tarantula.platform.statistics.StatsDelta;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.UUID;
 
 /**
  * Updated by yinghu lu on 6/11/2020.
  */
-public class Room implements Connection.InboundMessageListener{
+public class Room{
 
     static final int WAITING = 0; //waiting for first join
     static final int PENDING_JOIN = 1; //waiting after first join
@@ -99,9 +94,10 @@ public class Room implements Connection.InboundMessageListener{
             this.pQueue.offer(stub);
             this.stubs[i] = stub;
         }
-        if(online&&connection==null){
-            this.connection = this.roomListener.onConnecting(this);
+        if(!online){
+            return;
         }
+        this.connection = roomListener.onConnecting(this);
     }
     public void start(RoomListener roomListener){
         this.initialTime = PENDING_TIME;
@@ -222,8 +218,10 @@ public class Room implements Connection.InboundMessageListener{
         return pendingUpdate;
     }
 
-    @Override
+
     public void onUpdated(int code,byte[] updated) {
+        //System.out.println("UPDATED->"+roomId);
+        /**
         JsonParser jp = new JsonParser();
         InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(updated));
         JsonObject j = jp.parse(inr).getAsJsonObject();
@@ -236,6 +234,6 @@ public class Room implements Connection.InboundMessageListener{
                     //this.roomListener.onUpdating(stub);
                 });
             }
-        });
+        });**/
     }
 }

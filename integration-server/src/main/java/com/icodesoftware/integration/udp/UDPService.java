@@ -221,8 +221,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
                     Session.TARANTULA_ROOM_ID,roomId,
                     Session.TARANTULA_ZONE_ID,zoneId
             };
-            String resp = (httpCaller.post(path,payload,headers));
-            log.warn(resp);
+            httpCaller.post(path,payload,headers);
         }catch (Exception ex){
             ex.printStackTrace();
         }

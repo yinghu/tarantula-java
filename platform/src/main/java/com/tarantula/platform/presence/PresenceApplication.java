@@ -2,7 +2,6 @@ package com.tarantula.platform.presence;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.TokenValidatorProvider;
@@ -241,9 +240,5 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"]",OnLog.WARN);
         this.context.log("Server->"+c.server().host(),OnLog.WARN);
         this.connection = c;
-        c.registerInboundMessageListener((code,d)->{
-            DataBuffer dataBuffer = new DataBuffer(d);
-            this.context.log("MSG->"+code+"<><><><>"+dataBuffer.getUTF8()+"/"+dataBuffer.getUTF8(),OnLog.WARN);
-        });
     }
 }

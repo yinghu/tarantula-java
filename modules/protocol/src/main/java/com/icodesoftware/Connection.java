@@ -45,14 +45,14 @@ public interface Connection extends Recoverable {
     Connection server();
     void server(Connection connection);
 
-    default void registerInboundMessageListener(InboundMessageListener listener){}
-    default void update(int code,byte[] payload){}
+    //default void registerInboundMessageListener(InboundMessageListener listener){}
+    //default void update(int code,byte[] payload){}
 
     interface Listener{
         String typeId();
         void onState(Connection connection);
     }
-    interface InboundMessageListener{
-        void onUpdated(int code,byte[] updated);
-    }
+    //interface InboundMessageListener{
+        //void onUpdated(int code,byte[] updated);
+    //}
 }

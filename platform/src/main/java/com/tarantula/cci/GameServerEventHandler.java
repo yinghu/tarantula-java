@@ -41,7 +41,6 @@ public class GameServerEventHandler implements RequestHandler {
             String action = exchange.header(Session.TARANTULA_ACTION);
             String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
             String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
-            String connectionId = exchange.header(Session.TARANTULA_CONNECTION_ID);
             String zoneId = exchange.header(Session.TARANTULA_ZONE_ID);
             String roomId = exchange.header(Session.TARANTULA_ROOM_ID);
             byte[] _payload = exchange.payload();
@@ -77,12 +76,7 @@ public class GameServerEventHandler implements RequestHandler {
                 exchange.onEvent(new ResponsiveEvent("","",builder.create().toJson(connection).getBytes(),"onConnection",true));
             }
             else if(action.equals("onUpdate")){
-                JsonObject resp = new JsonObject();
-                resp.addProperty("serverId",serverId);
-                resp.addProperty("connectionId",connectionId);
-                resp.addProperty("zoneId",zoneId);
-                resp.addProperty("roomId",roomId);
-                exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"onConnection",true));
+                exchange.onEvent(new ResponsiveEvent("","", "{}".getBytes(),"onConnection",true));
                 //publish event to zone subscription/trackId
                 eventService.publish(new GameUpdateEvent(zoneId,roomId,_payload));
             }

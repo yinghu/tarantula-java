@@ -33,7 +33,6 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     public long roundDuration =60000;
     public long overtime = Room.PENDING_TIME;
     public int playMode = Room.INTEGRATED_MODE;
-    public ConcurrentHashMap<String,Room> roomIndex;
     public ConcurrentHashMap<String,Stub> stubIndex;
     public DeploymentServiceProvider deploymentServiceProvider;
     public GameServiceProvider gameServiceProvider;
@@ -71,7 +70,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
                 matched= new Room();
                 matched.start(this);
                 rList.add(matched);
-                roomIndex.put(matched.roomId,matched);
+                gameServiceProvider.addRoom(matched);
             }
             synchronized (this) {
                 Arena _ma = aMap.get(rating.xpLevel).copy();
@@ -89,7 +88,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
             room= new Room();
             room.start(this);
             rList.add(room);
-            roomIndex.put(room.roomId,room);
+            gameServiceProvider.addRoom(room);
         }
         synchronized (this){
             Arena _ma = this.aMap.get(rating.xpLevel).copy();
@@ -113,7 +112,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
             room.start(this);
             rQueue.offer(room);
             rList.add(room);
-            roomIndex.put(room.roomId,room);
+            gameServiceProvider.addRoom(room);
         }
     }
     public void onTimer(Module.OnUpdate update){
@@ -156,13 +155,19 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     }
     @Override
     public Connection onConnecting(Room room){
-       Connection connection = this.deploymentServiceProvider.onConnection(descriptor.typeId(),room);
-       if(connection!=null){
+        Connection connection;
+        if(room.connection()==null||(!deploymentServiceProvider.valid(room.connection()))){
+            connection = this.deploymentServiceProvider.onConnection(descriptor.typeId());
+        }
+        else{
+            connection = room.connection();
+        }
+        if(connection!=null){
            DataBuffer spec = roomSetting(room);
            spec.putLong(connection.connectionId());
            this.deploymentServiceProvider.registerPostOffice().onConnection(connection).send(MessageHandler.GAME_SPEC+"/true",spec.toArray());
-       }
-       return connection;
+        }
+        return connection;
     }
     @Override
     public void onInitializing(Room room){

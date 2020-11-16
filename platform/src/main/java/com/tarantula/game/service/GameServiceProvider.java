@@ -31,9 +31,12 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private DataStore dataStore;
 
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,Room> roomIndex = new ConcurrentHashMap<>();
+
     private EventService publisher;
     private String dest;
     private String subscription;
+
     private ClusterProvider integrationCluster;
 
     private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
@@ -70,7 +73,6 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         this.dataStore.createIfAbsent(deltaStatistics,true);
         return deltaStatistics;
     }
-
     public Zone zone(Descriptor descriptor){//application id
         Zone zone = new Zone();
         zone.distributionKey(descriptor.distributionKey());
@@ -86,6 +88,12 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         }
         zone.subscription = this.subscription;
         return zone;
+    }
+    public void addRoom(Room room){
+        roomIndex.put(room.roomId,room);
+    }
+    public Room getRoom(String roomId){
+        return roomIndex.get(roomId);
     }
     public LeaderBoard leaderBoard(String category){
         return _leaderBoard(category);
@@ -118,8 +126,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         });
         integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.publisher = integrationCluster.subscribe(subscription,(e)->{
-            logger.warn("event->"+e.toString());
-
+            Room room = roomIndex.get(e.trackId());
+            room.onUpdated(1,e.payload());
             return false;
         });
         logger.info("Game service provider ["+ NAME+"] started");
