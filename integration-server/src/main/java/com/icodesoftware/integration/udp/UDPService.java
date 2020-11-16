@@ -99,7 +99,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             try{
                 ByteBuffer buffer = ByteBuffer.allocate(OutboundMessage.MESSAGE_SIZE*2);
                 SocketAddress src = this.datagramChannel.receive(buffer);
-                mQueue.offer(new PendingMessage(buffer,src,PendingMessage.INBOUND));
+                mQueue.offer(new PendingMessage(buffer,src));
             }catch (Exception ex){
                 //ignore
                 ex.printStackTrace();
@@ -127,8 +127,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
                             gameChannel.onMessage(inboundMessage);
                         }
                         else if(pendingMessage.pendingType == PendingMessage.OUTBOUND){
-                            //send outbound message
-                            send(pendingMessage.data,pendingMessage.source);
+                            pendingMessage.runnable.run();
                         }
                     }
                     else{
@@ -229,7 +228,9 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         }
     }
     public void pendingOutbound(ByteBuffer pendingMessage,SocketAddress source){
-        mQueue.offer(new PendingMessage(pendingMessage,source,PendingMessage.OUTBOUND));
+        mQueue.offer(new PendingMessage(()->{
+            send(pendingMessage,source);
+        }));
     }
     public byte[] encode(OutboundMessage outboundMessage){
         try {
@@ -305,6 +306,8 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         mChannels.put(gc.channelId(),gc);
     }
     public void onUpdate(Game game,byte[] payload){
-        update(game.zoneId(),game.roomId(),payload);
+        mQueue.offer(new PendingMessage(()->{
+            update(game.zoneId(),game.roomId(),payload);
+        }));
     }
 }

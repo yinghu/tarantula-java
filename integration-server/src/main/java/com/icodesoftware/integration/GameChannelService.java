@@ -19,6 +19,7 @@ public interface GameChannelService extends Serviceable {
     MessageHandler messageHandler(int type);
 
     byte[] encode(OutboundMessage outboundMessage);
+
     void pendingOutbound(ByteBuffer outboundMessage,SocketAddress source);
 
     void onUpdate(Game game,byte[] payload);

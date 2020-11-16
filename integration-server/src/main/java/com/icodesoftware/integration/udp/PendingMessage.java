@@ -1,4 +1,6 @@
-package com.icodesoftware.protocol;
+package com.icodesoftware.integration.udp;
+
+import com.icodesoftware.protocol.MessageHandler;
 
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -17,9 +19,9 @@ public class PendingMessage {
     public MessageHandler callback;
     public int pendingType;
     public SocketAddress source;
-
+    public Runnable runnable;
     //retry cache
-    public PendingMessage(ByteBuffer data,long timestamp,int retries,MessageHandler callback){
+    public PendingMessage(ByteBuffer data, long timestamp, int retries, MessageHandler callback){
         this.data = data;
         this.timestamp = timestamp;
         this.retries = retries;
@@ -27,10 +29,14 @@ public class PendingMessage {
         this.pendingType = OUTBOUND;
     }
     //inbound/outbound
-    public PendingMessage(ByteBuffer inboundMessage,SocketAddress source,int pendingType){
+    public PendingMessage(ByteBuffer inboundMessage, SocketAddress source){
         this.data = inboundMessage;
         this.source = source;
-        this.pendingType = pendingType;
+        this.pendingType = INBOUND;
+    }
+    public PendingMessage(Runnable runnable){
+        this.runnable = runnable;
+        this.pendingType = OUTBOUND;
     }
 
 
