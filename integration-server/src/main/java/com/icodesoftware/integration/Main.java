@@ -4,9 +4,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.logging.TarantulaLogManager;
 import com.icodesoftware.integration.udp.UDPService;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+
+import java.io.*;
 
 public class Main {
     static {//set log manager
@@ -22,6 +21,19 @@ public class Main {
             }
             else{
                 config = jsonParser.parse(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("udp.conf"))).getAsJsonObject();
+            }
+            try{
+                File fp = new File("/etc/tarantula/ip.txt");
+                if(fp.exists()){
+                    //read line
+                    BufferedReader reader = new BufferedReader(new FileReader(fp));
+                    String endpointIp = reader.readLine();
+                    config.getAsJsonObject("connection").addProperty("host",endpointIp);
+                    config.getAsJsonObject("connection").getAsJsonObject("server").addProperty("host",endpointIp);
+                    reader.close();
+                }
+            }catch (Exception ex){
+                //throw new RuntimeException("No endpoint IP found from /etc/tarantula/ip.txt");
             }
             UDPService udpReceiver = new UDPService(config);
             udpReceiver.start();

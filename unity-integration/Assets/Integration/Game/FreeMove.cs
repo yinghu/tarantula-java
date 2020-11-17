@@ -14,9 +14,11 @@ namespace Integration.Game
         private ConcurrentQueue<Vector3> _queue;
         private IntegrationManager _integrationManager;
         private float _timer;
+        private float _delta;
         private void Start()
         {
             _timer = 0.5f;
+            _delta = 1;
             _target = transform.position;
             _end = _target;
             _queue = new ConcurrentQueue<Vector3>();
@@ -54,12 +56,16 @@ namespace Integration.Game
             }
             _timer = 0.5f;
             var cur = transform.position;
-            var left = new Vector3(cur.x+1,cur.y,cur.z);
+            var left = new Vector3(cur.x+(_delta),cur.y,cur.z);
             await Move(left);
         }
-        private void OnCollisionEnter(Collision other)
+
+        private void OnTriggerEnter(Collider other)
         {
-            Debug.Log(other.gameObject.tag);
+            if (other.gameObject.CompareTag("pvx"))
+            {
+                _delta *= -1;
+            }
         }
     }
 }

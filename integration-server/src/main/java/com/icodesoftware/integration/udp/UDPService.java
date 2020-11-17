@@ -94,7 +94,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     }
     @Override
     public void run(){
-        log.warn("WAITING FOR MESSAGE ON CHANNELS ["+gameChannels+"]");
+        log.warn("WAITING FOR MESSAGE ON CHANNELS ["+gameChannels+"] ON ["+address+"]");
         while (true){
             try{
                 ByteBuffer buffer = ByteBuffer.allocate(OutboundMessage.MESSAGE_SIZE*2);
