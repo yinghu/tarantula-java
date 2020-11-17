@@ -127,10 +127,25 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3335569375951093904, guid: 4720c143044f1e14bb5f8e1691710f7c,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3335569375951093907, guid: 4720c143044f1e14bb5f8e1691710f7c,
         type: 3}
       propertyPath: m_Name
       value: FreeObject
+      objectReference: {fileID: 0}
+    - target: {fileID: 3335569375951093908, guid: 4720c143044f1e14bb5f8e1691710f7c,
+        type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3335569375951093908, guid: 4720c143044f1e14bb5f8e1691710f7c,
+        type: 3}
+      propertyPath: m_UseGravity
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3335569375951093911, guid: 4720c143044f1e14bb5f8e1691710f7c,
         type: 3}
@@ -286,7 +301,7 @@ GameObject:
   - component: {fileID: 228534281}
   m_Layer: 0
   m_Name: Cube (2)
-  m_TagString: Untagged
+  m_TagString: pvx
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -927,10 +942,30 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3335569375951093904, guid: 4720c143044f1e14bb5f8e1691710f7c,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3335569375951093907, guid: 4720c143044f1e14bb5f8e1691710f7c,
         type: 3}
       propertyPath: m_Name
       value: FreeObject (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3335569375951093908, guid: 4720c143044f1e14bb5f8e1691710f7c,
+        type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3335569375951093908, guid: 4720c143044f1e14bb5f8e1691710f7c,
+        type: 3}
+      propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3335569375951093909, guid: 4720c143044f1e14bb5f8e1691710f7c,
+        type: 3}
+      propertyPath: sequence
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3335569375951093911, guid: 4720c143044f1e14bb5f8e1691710f7c,
         type: 3}
@@ -1003,7 +1038,7 @@ GameObject:
   - component: {fileID: 1195518062}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: pvx
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1194,7 +1229,7 @@ GameObject:
   - component: {fileID: 1278758535}
   m_Layer: 0
   m_Name: Cube (1)
-  m_TagString: Untagged
+  m_TagString: pvx
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1286,7 +1321,7 @@ GameObject:
   - component: {fileID: 1851000584}
   m_Layer: 0
   m_Name: Cube (3)
-  m_TagString: Untagged
+  m_TagString: pvx
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
