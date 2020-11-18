@@ -109,6 +109,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     public void start() throws Exception{
         scheduledExecutorService = Executors.newScheduledThreadPool(1);
         this.datagramChannel = DatagramChannel.open();
+        log.warn("UDP->"+address+":"+port);
         InetSocketAddress iAdd = new InetSocketAddress(address,port);
         this.datagramChannel.bind(iAdd);
         executorService = Executors.newFixedThreadPool(3);
