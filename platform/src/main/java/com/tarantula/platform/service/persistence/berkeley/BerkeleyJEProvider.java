@@ -530,8 +530,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 }
                 if(v==null){//if no record on cluster, create record on database
                     v = mapStoreListener.onCreating(metadata1,akey,t);
-                }
-                if(v!=null){
+                    if(v==null){
+                        return false;
+                    }
                     if(_set(k,v)){
                         mapStoreListener.onDistributing(metadata1,k,v);//set cluster
                     }
