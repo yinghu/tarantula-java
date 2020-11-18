@@ -60,7 +60,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         reservedMessageId = new AtomicInteger(Integer.MIN_VALUE);
         parser = new JsonParser();
         this.config = config;
-        this.address = config.getAsJsonObject("connection").get("host").getAsString();
+        this.address = config.getAsJsonObject("connection").get("binding").getAsString();
         this.port = config.getAsJsonObject("connection").get("port").getAsInt();;
         mQueue = new ConcurrentLinkedDeque<>();
         mHandlers = new ConcurrentHashMap<>();
