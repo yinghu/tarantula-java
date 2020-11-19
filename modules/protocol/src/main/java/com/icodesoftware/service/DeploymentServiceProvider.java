@@ -19,7 +19,6 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
     //GAME SERVER/PUSH SERVER APIs
     Connection onConnection(String typeId);
-    boolean valid(Connection connection);
     byte[] serverKey(Connection connection);
     void registerOnConnectionListener(Connection.Listener listener);
     //END OF GAME SERVER/PUSH SERVER APIs

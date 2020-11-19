@@ -148,7 +148,11 @@ public class Room{
     public Connection connection(){
         return this.connection;
     }
-
+    public synchronized void connectionClosed(Connection closed){
+        if(connection!=null&&closed.serverId().equals(connection.serverId())){
+            connection.disabled(true);
+        }
+    }
 
     public synchronized PendingUpdate onTimer(){
         if(state==WAITING){

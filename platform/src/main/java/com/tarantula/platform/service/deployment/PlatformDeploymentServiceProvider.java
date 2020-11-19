@@ -622,12 +622,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return null;
         }
         Connection connection = this.builder.create().fromJson(new String(ret),Connection.class);
-        //pushRegistry.get(connection.serverId()).addConnection(connection);
         return connection;
     }
-    public boolean valid(Connection connection){
-        return pushRegistry.containsKey(connection.serverId());
-    }
+
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         if(deployService.enableGameCluster(gameCluster.distributionKey())){

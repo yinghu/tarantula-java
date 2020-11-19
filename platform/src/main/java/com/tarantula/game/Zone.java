@@ -155,8 +155,9 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     }
     @Override
     public Connection onConnecting(Room room){
+        System.out.println("reset room connection");
         Connection connection;
-        if(room.connection()==null||(!deploymentServiceProvider.valid(room.connection()))){
+        if(room.connection()==null||room.connection().disabled()){
             connection = this.deploymentServiceProvider.onConnection(descriptor.typeId());
         }
         else{

@@ -95,6 +95,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     public Room getRoom(String roomId){
         return roomIndex.get(roomId);
     }
+
     public LeaderBoard leaderBoard(String category){
         return _leaderBoard(category);
     }
@@ -157,4 +158,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         publisher.publish(new LeaderBoardGlobalEvent(dest,NAME,entry));
     }
 
+
+    public void onClosed(Connection connection) {
+        roomIndex.forEach((k,r)->r.connectionClosed(connection));
+    }
 }

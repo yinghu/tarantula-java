@@ -43,6 +43,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
         }
         if(gameObject.successful()){
             Connection connection = room.connection();
+            this.context.log(connection.disabled()+"///"+connection.serverId(),OnLog.WARN);
             gameObject.ticket = this.context.validator().ticket(session.systemId(),session.stub());
             byte[] key = this.deploymentServiceProvider.serverKey(connection);
             gameObject.serverKey = Base64.getEncoder().encodeToString(key);
@@ -141,6 +142,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
     public void onConnection(Connection connection){
         if(connection.disabled()){
             //mPush.remove(connection.serverId());
+            this.gameServiceProvider.onClosed(connection);
         }
         else {
             //mPush.put(connection.serverId(),connection);
@@ -149,9 +151,9 @@ public class GameZoneModule implements Module,Configurable.Listener{
     @Override
     public void onTimer(com.icodesoftware.Module.OnUpdate update){
         mZone.onTimer((connection,label,data)->{
-            if(deploymentServiceProvider.valid(connection)){
+            //if(deploymentServiceProvider.valid(connection)){
                 update.on(connection,label,data);
-            }
+            //}
         });
     }
     @Override
