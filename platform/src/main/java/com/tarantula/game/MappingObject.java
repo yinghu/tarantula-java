@@ -3,18 +3,16 @@ package com.tarantula.game;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
 
-import java.util.Map;
 
 public class MappingObject extends RecoverableObject {
 
+    private final static String _KEY = "_key";
 
-    @Override
-    public Map<String,Object> toMap(){
-        return this.properties;
+    public byte[] toBinary(){
+        return (byte[])this.properties.get(_KEY);
     }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.properties.putAll(properties);
+    public void fromBinary(byte[] payload){
+        this.properties.put(_KEY,payload);
     }
     @Override
     public int getFactoryId() {

@@ -90,7 +90,12 @@ public class RecoverableObject implements Recoverable {
     public void fromMap(Map<String,Object> properties){
         properties.forEach((String k,Object v)->this.properties.put(k,v));
     }
-
+    public byte[] toBinary(){
+        return SystemUtil.toJson(toMap());
+    }
+    public void fromBinary(byte[] payload){
+        fromMap(SystemUtil.toMap(payload));
+    }
     public boolean backup(){
         return false;
     }

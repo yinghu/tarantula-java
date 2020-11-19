@@ -123,7 +123,7 @@ public class MysqlShardingProvider implements ShardingProvider {
 
     public <T extends Recoverable> byte[] create(Metadata metadata, String key, T t){
         if(!enabled){
-            return SystemUtil.toJson(t.toMap());
+            return t.toBinary();//SystemUtil.toJson(t.toMap());
         }
         try{
             Map<String,Object> data = t.toMap();

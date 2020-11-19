@@ -558,11 +558,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 byte[] key = akey.getBytes();
                 byte[] value;
                 if((value=_get(key))!=null){//from local
-                    t.fromMap(SystemUtil.toMap(value));
+                    t.fromBinary(value);
                     return true;
                 }
                 if((value=mapStoreListener.onRecovering(metadata1,key))!=null){//from cluster
-                    t.fromMap(SystemUtil.toMap(value));
+                    t.fromBinary(value);
                     _set(key,value);
                     return true;
                 }
@@ -570,8 +570,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 if(c==null){
                     return false;
                 }
-                _set(key,SystemUtil.toJson(c.toMap()));
-                t.fromMap(c.toMap());
+                _set(key,t.toBinary());
+                t.fromBinary(t.toBinary());
                 return true;
             }catch (Exception ex){
                 log.error("error on load",ex);

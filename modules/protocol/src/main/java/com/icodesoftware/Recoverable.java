@@ -23,6 +23,9 @@ public interface Recoverable extends Distributable {
     Map<String,Object> toMap();
     void fromMap(Map<String,Object> properties);
 
+    byte[] toBinary();
+    void fromBinary(byte[] payload);
+
     boolean disabled();
     void disabled(boolean disabled);
 

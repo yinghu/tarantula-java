@@ -93,7 +93,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = okey.getBytes();
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
-            byte[] value = SystemUtil.toJson(t.toMap());
+            byte[] value = t.toBinary();//SystemUtil.toJson(t.toMap());
             boolean suc = _put(dso,key,value);
             if(suc){
                 //do backup and replication
@@ -128,16 +128,16 @@ public class PartitionDataStore extends ReplicatedDataStore{
         DataStoreOnPartition dos = this.partitions[SystemUtil.partition(_kn,partition)];
         byte[] ix = _get(dos,_kn);//from local
         if(ix!=null){
-            indexSet.fromMap(SystemUtil.toMap(ix));
+            indexSet.fromBinary(ix);//SystemUtil.toMap(ix));
         }
         else{
             ix = mapStoreListener.onRecovering(dos.metadata,_kn);//from cluster
             if(ix!=null){
-                indexSet.fromMap(SystemUtil.toMap(ix));
+                indexSet.fromBinary(ix);//fromMap(SystemUtil.toMap(ix));
             }
         }
         indexSet.keySet.add(okey);
-        byte[] _vn = SystemUtil.toJson(indexSet.toMap());
+        byte[] _vn = indexSet.toBinary();//SystemUtil.toJson(indexSet.toMap());
         boolean suc = _put(dos,_kn,_vn);
         if(suc){
             //do backup and replication
@@ -166,7 +166,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = akey.getBytes();
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            byte[] value = SystemUtil.toJson(t.toMap());
+            byte[] value = t.toBinary();//SystemUtil.toJson(t.toMap());
             if(_put(dso,key,value)){
                 if(t.backup()){
                     this.mapStoreListener.onUpdating(dso.metadata,akey,t);
@@ -209,7 +209,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 v = mapStoreListener.onRecovering(dso.metadata,key);//from cluster
             }
             if(v==null){
-                byte[] vx = SystemUtil.toJson(t.toMap());
+                byte[] vx = t.toBinary();//SystemUtil.toJson(t.toMap());
                 if(_put(dso,key,vx)) {
                     if(t.backup()){
                         this.mapStoreListener.onCreating(dso.metadata,akey,t);
@@ -230,7 +230,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             else{
                 if(loading){
-                    t.fromMap(SystemUtil.toMap(v));
+                    t.fromBinary(v);//fromMap(SystemUtil.toMap(v));
                 }
                 return false;
             }
@@ -259,8 +259,8 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 }
                 _put(dso,key,value);
             }
-            Map<String,Object> _map = SystemUtil.toMap(value);
-            t.fromMap(_map);
+            //Map<String,Object> _map = SystemUtil.toMap(value);
+            t.fromBinary(value);//fromMap(_map);
             return true;
         }catch (Exception ex){
             log.error("Error on load",ex);
@@ -310,7 +310,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 }
             }
             IndexSet indexSet = new IndexSet();
-            indexSet.fromMap(SystemUtil.toMap(edgeList));
+            indexSet.fromBinary(edgeList);//fromMap(SystemUtil.toMap(edgeList));
             for(String b: indexSet.keySet){
                 T t = query.create();
                 byte[] v;
@@ -322,7 +322,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                     }
                 }
                 if(v!=null){
-                    t.fromMap(SystemUtil.toMap(v));
+                    t.fromBinary(v);//fromMap(SystemUtil.toMap(v));
                     t.distributionKey(b);
                     if(!stream.on(t)){
                         break;

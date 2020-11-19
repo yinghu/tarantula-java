@@ -30,7 +30,7 @@ public class KeyValueDataStoreModule implements Module {
                 MappingObject mo = new MappingObject();
                 mo.distributionKey(session.systemId());
                 mo.label(session.name());
-                mo.fromMap(SystemUtil.toMap(payload));
+                mo.fromBinary(payload);
                 boolean suc = dataStore.update(mo);
                 ResponseHeader resp = new ResponseHeader("onSet","Saved on key ["+key+"]",suc);
                 session.write(builder.create().toJson(resp).getBytes(),label());
@@ -43,7 +43,7 @@ public class KeyValueDataStoreModule implements Module {
             mo.label(session.name());
             byte[] v = null;
             if(dataStore.load(mo)){
-                v = SystemUtil.toJson(mo.toMap());
+                v = mo.toBinary();
             }
             session.write(v!=null?v:"{}".getBytes(),label());
         }
