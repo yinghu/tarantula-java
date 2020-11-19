@@ -18,6 +18,8 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     private String host;
     private int port;
     private String path;
+    private int messageId;
+    private int messageIdOffset;
     private int maxConnections;
     private Connection server;
 
@@ -109,6 +111,19 @@ public class UniverseConnection extends ResponseHeader implements Connection {
         return this.port;
     }
 
+    public int messageId(){
+        return messageId;
+    }
+    public int messageIdOffset(){
+        return messageIdOffset;
+    }
+    public void messageId(int messageId){
+        this.messageId = messageId;
+    }
+    public void messageIdOffset(int messageIdOffset){
+        this.messageIdOffset = messageIdOffset;
+    }
+
     @Override
     public void port(int port) {
         this.port = port;
@@ -133,6 +148,8 @@ public class UniverseConnection extends ResponseHeader implements Connection {
         this.properties.put("path",this.path);
         this.properties.put("maxConnections",maxConnections);
         this.properties.put("disabled",this.disabled);
+        this.properties.put("messageId",this.messageId);
+        this.properties.put("messageIdOffset",this.messageIdOffset);
         this.properties.put("hasServer",server!=null);
         if(server!=null){
             this.properties.put("stype",this.server.type());
@@ -158,6 +175,8 @@ public class UniverseConnection extends ResponseHeader implements Connection {
         this.path = (String)properties.get("path");
         this.maxConnections = ((Number)properties.get("maxConnections")).intValue();
         this.disabled = (boolean)properties.get("disabled");
+        this.messageId = ((Number)properties.get("messageId")).intValue();
+        this.messageIdOffset = ((Number)properties.get("messageIdOffset")).intValue();
         if((Boolean) properties.get("hasServer")){
             server = new UniverseConnection();
             server.type((String) properties.get("stype"));
@@ -167,6 +186,8 @@ public class UniverseConnection extends ResponseHeader implements Connection {
             server.port(((Number)properties.get("sport")).intValue());
             server.path((String)properties.get("spath"));
             server.sessionId(((Number)properties.get("ssessionId")).intValue());
+            server.messageId(this.messageId);
+            server.messageIdOffset(this.messageIdOffset);
         }
     }
     public int getFactoryId() {

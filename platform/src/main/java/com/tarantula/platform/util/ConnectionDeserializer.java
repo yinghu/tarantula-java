@@ -14,7 +14,10 @@ public class ConnectionDeserializer implements JsonDeserializer<Connection> {
         Connection desc = toConnection(jo);
         if(jo.has("server")){
             JsonObject server = jo.getAsJsonObject("server");
-            desc.server(toConnection(server));
+            Connection scc = toConnection(server);
+            scc.messageId(desc.messageId());
+            scc.messageIdOffset(desc.messageIdOffset());
+            desc.server(scc);
         }
         return desc;
     }
@@ -49,6 +52,12 @@ public class ConnectionDeserializer implements JsonDeserializer<Connection> {
         }
         if(jo.has("maxConnections")){
             desc.maxConnections(jo.get("maxConnections").getAsInt());
+        }
+        if(jo.has("messageId")){
+            desc.messageId(jo.get("messageId").getAsInt());
+        }
+        if(jo.has("messageIdOffset")){
+            desc.messageIdOffset(jo.get("messageIdOffset").getAsInt());
         }
         return desc;
     }

@@ -495,7 +495,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             Connection occ = this.builder.create().fromJson(new String(serverPushEvent.payload()), Connection.class);
             occ.disabled(false);
             serverPushEvent.connection(occ);
-            log.warn("add server push->"+occ.connectionId()+"//"+occ.sequence());
+            log.warn("add server push->"+occ.connectionId()+"//"+occ.sequence()+"//"+occ.messageId()+"//"+occ.messageIdOffset());
             if(occ.server().type().equals(Connection.UDP)){
                 try{
                     byte[] key = tarantulaContext.integrationCluster().get(occ.serverId().getBytes());

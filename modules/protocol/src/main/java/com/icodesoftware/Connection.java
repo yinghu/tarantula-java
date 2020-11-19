@@ -39,6 +39,12 @@ public interface Connection extends Recoverable {
     String path();
     void path(String path);
 
+    int messageId();
+    int messageIdOffset();
+
+    void messageId(int messageId);
+    void messageIdOffset(int messageIdOffset);
+
     int maxConnections();
     void maxConnections(int maxConnections);
 

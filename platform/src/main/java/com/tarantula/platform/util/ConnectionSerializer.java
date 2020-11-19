@@ -21,7 +21,8 @@ public class ConnectionSerializer implements JsonSerializer<Connection> {
         jsonObject.addProperty("port",connection.port());
         jsonObject.addProperty("path",connection.path());
         jsonObject.addProperty("maxConnections",connection.maxConnections());
-
+        jsonObject.addProperty("messageId",connection.messageId());
+        jsonObject.addProperty("messageIdOffset",connection.messageIdOffset());
         if(connection.server()!=null){
             JsonObject server = new JsonObject();
             Connection sc = connection.server();

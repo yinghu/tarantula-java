@@ -45,14 +45,14 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     private Cipher encrypt;
     private Cipher decrypt;
     private boolean secured;
-    private int gameChannels;
+
     private String serverId;
     private String accessKey;
     private String path;
     private AtomicInteger sessionId;
     private AtomicInteger messageId;
     private AtomicInteger reservedMessageId;
-    private int messageIdOffset = 100000;
+    private int messageIdOffset;
     private JsonParser parser;
     public UDPService(JsonObject config){
         sessionId = new AtomicInteger(0);
@@ -65,9 +65,9 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         mQueue = new ConcurrentLinkedDeque<>();
         mHandlers = new ConcurrentHashMap<>();
         mChannels = new ConcurrentHashMap<>();
-        configHeader = config.get("tarantula").getAsString();
+        configHeader = config.getAsJsonObject("tarantula").get("name").getAsString();
+        messageIdOffset = config.getAsJsonObject("tarantula").get("messageIdOffset").getAsInt();
         secured = config.getAsJsonObject("connection").get("secured").getAsBoolean();
-        gameChannels = config.getAsJsonObject(configHeader).get("channels").getAsInt();
         httpCaller = new HttpCaller(config.getAsJsonObject(configHeader).get("url").getAsString());
         AckMessageHandler ackMessageHandler = new AckMessageHandler(this);
         mHandlers.put(ackMessageHandler.type(),ackMessageHandler);
@@ -94,7 +94,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     }
     @Override
     public void run(){
-        log.warn("WAITING FOR MESSAGE ON CHANNELS ["+gameChannels+"] ON ["+address+"]");
+        log.warn("WAITING FOR INBOUND MESSAGES ON ["+address+":"+port+"]");
         while (true){
             try{
                 ByteBuffer buffer = ByteBuffer.allocate(OutboundMessage.MESSAGE_SIZE*2);
@@ -109,7 +109,6 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     public void start() throws Exception{
         scheduledExecutorService = Executors.newScheduledThreadPool(1);
         this.datagramChannel = DatagramChannel.open();
-        log.warn("UDP->"+address+":"+port);
         InetSocketAddress iAdd = new InetSocketAddress(address,port);
         this.datagramChannel.bind(iAdd);
         executorService = Executors.newFixedThreadPool(3);
@@ -150,8 +149,11 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         config.getAsJsonObject("connection").addProperty("serverId",serverId);
         config.getAsJsonObject("connection").getAsJsonObject("server").addProperty("serverId",serverId);
         this.path = config.getAsJsonObject(configHeader).get("path").getAsString();
-        messageIdRange();
-        String resp = httpCaller.post(this.path,config.getAsJsonObject("connection").toString().getBytes(),headers);
+        int end = reservedMessageId.addAndGet(messageIdOffset);
+        JsonObject conn = config.getAsJsonObject("connection");
+        conn.addProperty("messageId",end-messageIdOffset);
+        conn.addProperty("messageIdOffset",end-1);
+        String resp = httpCaller.post(this.path,conn.toString().getBytes(),headers);
         log.warn(resp);
         JsonObject pc = parser.parse(resp).getAsJsonObject();
         if(!pc.get("successful").getAsBoolean()){
@@ -172,11 +174,14 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         PushEventChannel pushEventChannel = new PushEventChannel(pc.get("connectionId").getAsLong(),this);
         pushEventChannel.registerListener(this);
         mChannels.put(pushEventChannel.channelId(),pushEventChannel);
+        long pingTimeout = config.getAsJsonObject("tarantula").get("pingTimeout").getAsLong();
+        long retryTimeout = config.getAsJsonObject("tarantula").get("retryTimeout").getAsLong();
+        long ackTimeout = config.getAsJsonObject("tarantula").get("ackTimeout").getAsLong();
         mChannels.forEach((k,v)->{
-            scheduledExecutorService.scheduleAtFixedRate(()->v.ping(),1000,1000,TimeUnit.MILLISECONDS);
-            scheduledExecutorService.scheduleAtFixedRate(()->v.retry(),1000,250,TimeUnit.MILLISECONDS);
+            scheduledExecutorService.scheduleAtFixedRate(()->v.ping(),pingTimeout,pingTimeout,TimeUnit.MILLISECONDS);
+            scheduledExecutorService.scheduleAtFixedRate(()->v.retry(),retryTimeout,retryTimeout,TimeUnit.MILLISECONDS);
         });
-        scheduledExecutorService.scheduleAtFixedRate(()->ack(),5000,5000,TimeUnit.MILLISECONDS);
+        scheduledExecutorService.scheduleAtFixedRate(()->ack(),ackTimeout,ackTimeout,TimeUnit.MILLISECONDS);
     }
     public void shutdown() throws Exception{
         String[] headers = new String[]{
