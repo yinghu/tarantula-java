@@ -49,12 +49,15 @@ public class Room{
     }
 
     public synchronized Stub join(Rating rating){
+        if(online&&connection==null){
+            this.roomListener.onTimeout(this);
+            return null;
+        }
         totalJoined++;
         Stub _stub = pQueue.poll();
         _stub.rating = rating;
         if(totalJoined==capacity){
             state = INITIALIZING;
-            roomListener.onInitializing(this);
         }
         else{
             state =  PENDING_JOIN;
@@ -164,39 +167,27 @@ public class Room{
                 initialTime -=TIMER_DELTA;
                 if(initialTime<=0){
                     state = TIMEOUT;
-                    DataBuffer dataBuffer = new DataBuffer();
-                    dataBuffer.putLong(connection.connectionId());
-                    dataBuffer.putUTF8("ending");
-                    pendingUpdate = new PendingUpdate(MessageHandler.GAME_JOIN_TIMEOUT+"/true",dataBuffer);
                 }
                 break;
             case INITIALIZING:
                 initialTime -=TIMER_DELTA;
                 if(initialTime<0){
                     state = STARTING;
-                    this.roomListener.onStarting(this);
-                    DataBuffer dataBuffer = new DataBuffer();
-                    dataBuffer.putLong(connection.connectionId());
-                    dataBuffer.putUTF8("starting");
-                    pendingUpdate = new PendingUpdate(MessageHandler.GAME_START+"/true",dataBuffer);
+                    pendingUpdate = this.roomListener.onStarting(this);
                 }
                 break;
             case STARTING:
                 duration -=TIMER_DELTA;
                 if(duration<=0){//goes to overtime
                     state = OVERTIME;
-                    this.roomListener.onOverTiming(this);
+                    pendingUpdate = this.roomListener.onOverTiming(this);
                 }
                 break;
             case OVERTIME:
                 overtime -=TIMER_DELTA;
                 if(overtime<=0){
                     state = ENDING;
-                    this.roomListener.onEnding(this);
-                    DataBuffer dataBuffer = new DataBuffer();
-                    dataBuffer.putLong(connection.connectionId());
-                    dataBuffer.putUTF8("ending");
-                    pendingUpdate = new PendingUpdate(MessageHandler.GAME_CLOSE+"/true",dataBuffer);
+                    pendingUpdate = this.roomListener.onEnding(this);
                 }
                 break;
             case ENDING:
@@ -205,39 +196,26 @@ public class Room{
                 break;
             case TIMEOUT:
                 state = WAITING;
-                roomListener.onTimeout(this);
+                pendingUpdate = roomListener.onTimeout(this);
                 break;
             case PENDING_END:
                 initialTime -=TIMER_DELTA;
                 if(initialTime<=0){//delay 5 seconds to wait for game server result
                     state = WAITING;
-                    roomListener.onEnded(this);
-                    DataBuffer dataBuffer = new DataBuffer();
-                    dataBuffer.putLong(connection.connectionId());
-                    dataBuffer.putUTF8("ended");
-                    pendingUpdate = new PendingUpdate(MessageHandler.GAME_END+"/true",dataBuffer);
+                    pendingUpdate = roomListener.onEnded(this);
                 }
                 break;
         }
         return pendingUpdate;
     }
 
-
-    public void onUpdated(int code,byte[] updated) {
-        //System.out.println("UPDATED->"+roomId);
-        /**
-        JsonParser jp = new JsonParser();
-        InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(updated));
-        JsonObject j = jp.parse(inr).getAsJsonObject();
-        j.entrySet().forEach((e)->{
-            if(e.getKey().equals("gains")){
-                e.getValue().getAsJsonArray().forEach((st)->{
-                    JsonObject jo = st.getAsJsonObject();
-                    Stub stub = stubs[jo.get("seat").getAsInt()];
-                    stub.stats = new StatsDelta(jo.get("name").getAsString(),jo.get("value").getAsDouble());
-                    //this.roomListener.onUpdating(stub);
-                });
-            }
-        });**/
+    @Override
+    public int hashCode(){
+        return roomId.hashCode();
     }
+    @Override
+    public boolean equals(Object obj){
+        return roomId.equals(((Room)obj).roomId);
+    }
+    public void onUpdated(byte[] payload){}
 }

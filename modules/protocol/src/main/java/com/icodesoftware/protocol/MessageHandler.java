@@ -25,9 +25,12 @@ public interface MessageHandler {
     int SERVER_PUSH = 200;
     int GAME_SPEC = 201;
     int GAME_START = 202;
+
     int GAME_CLOSE = 203;
     int GAME_END = 204;
-    int GAME_JOIN_TIMEOUT = 205;
+
+    int GAME_JOIN_TIMEOUT = 305;
+    int GAME_OVERTIME = 306;
 
     int type();
     void onMessage(InboundMessage pendingInboundMessage);

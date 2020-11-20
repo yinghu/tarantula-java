@@ -32,24 +32,21 @@ public class GameZoneModule implements Module,Configurable.Listener{
         Rating rating = this.gameServiceProvider.rating(session.systemId());
         Room room = session.accessMode()==Session.OFF_LINE_MODE?mZone.solo(rating):mZone.match(rating);
         Stub stub = room.join(rating);
+        if(stub==null){
+            session.write(toMessage("no room available",false).toString().getBytes(),label());
+            return;
+        }
         stub.tag = this.context.descriptor().tag();
         stub.owner(session.systemId());
         GameObject gameObject = new GameObject();
-        gameObject.successful(false);
-        Connection con = room.connection();
-        if(con!=null){
-            gameObject.connection = con;
-            gameObject.successful(true);
-        }
-        if(gameObject.successful()){
-            Connection connection = room.connection();
-            this.context.log(connection.disabled()+"///"+connection.serverId(),OnLog.WARN);
-            gameObject.ticket = this.context.validator().ticket(session.systemId(),session.stub());
-            byte[] key = this.deploymentServiceProvider.serverKey(connection);
-            gameObject.serverKey = Base64.getEncoder().encodeToString(key);
-            gameObject.stub = stub;
-            mStub.put(session.systemId(),stub);
-        }
+        gameObject.successful(true);
+        gameObject.connection = room.connection();
+        Connection connection = room.connection();
+        gameObject.ticket = this.context.validator().ticket(session.systemId(),session.stub());
+        byte[] key = this.deploymentServiceProvider.serverKey(connection);
+        gameObject.serverKey = Base64.getEncoder().encodeToString(key);
+        gameObject.stub = stub;
+        mStub.put(session.systemId(),stub);
         session.write(gameObject.toJson().toString().getBytes(),label());
     }
     @Override
@@ -59,7 +56,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
             Room room = gameServiceProvider.getRoom(stub.roomId);
             if(room.offline()){
                 //this.context.log(new String(payload),OnLog.WARN);
-                room.onUpdated(10,payload);
+                room.onUpdated(payload);
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
             }
             else{
@@ -88,7 +85,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
                 return left;
             }
             else{
-                session.write(toMessage("onLeave",false).toString().getBytes(),label());
+                session.write(toMessage("no room joined",false).toString().getBytes(),label());
                 return true;
             }
         }

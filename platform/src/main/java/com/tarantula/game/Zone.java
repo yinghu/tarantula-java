@@ -28,7 +28,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     public String subscription;
     public List<Arena> arenas = new ArrayList<>();
     public String name;
-    public int capacity =1;
+    public int capacity = 1;
     private static int SOLO_CAPACITY = 1;
     public long roundDuration =60000;
     public long overtime = Room.PENDING_TIME;
@@ -136,6 +136,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     @Override
     public void onJoining(Room room){
         pendingMatch[room.arena().level].offer(room);
+
     }
     @Override
     public void onLeaving(Room room,Stub stub){
@@ -147,15 +148,13 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
                 return v;//keep
             }
         });
-        if(room.totalJoined()>0){
-            pendingMatch[room.arena().level].offer(room);
-        }else{
+        if(room.totalJoined()==0){
+            pendingMatch[room.arena().level].remove(room);
             rQueue.addFirst(room);//add first join queue
         }
     }
     @Override
     public Connection onConnecting(Room room){
-        System.out.println("reset room connection");
         Connection connection;
         if(room.connection()==null||room.connection().disabled()){
             connection = this.deploymentServiceProvider.onConnection(descriptor.typeId());
@@ -170,34 +169,46 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         }
         return connection;
     }
-    @Override
-    public void onInitializing(Room room){
-        //System.out.println("initial");
-    }
-    @Override
-    public void onStarting(Room room){
-        //System.out.println("starting");
-    }
-    @Override
-    public void onOverTiming(Room room){
-        //System.out.println("overtime");
-    }
-    public void onEnding(Room room) {
-        //System.out.println("ending");
-    }
-    @Override
-    public void onEnded(Room room){
-        //System.out.println("ended");
-    }
-
-    public void onUpdating(Stub stub){
-        Statistics.Entry statistics = this.gameServiceProvider.statistics(stub.owner()).entry(stub.stats.name);
-        statistics.update(stub.stats.value).update();
-        this.gameServiceProvider.leaderBoard(statistics.name()).onAllBoard(statistics);
-    }
 
     @Override
-    public void onTimeout(Room room){
+    public PendingUpdate onStarting(Room room){
+        //game started
+        DataBuffer dataBuffer = new DataBuffer();
+        dataBuffer.putLong(room.connection().connectionId());
+        dataBuffer.putUTF8("starting");
+        return new PendingUpdate(MessageHandler.GAME_START+"/true",dataBuffer);
+    }
+    @Override
+    public PendingUpdate onOverTiming(Room room){
+        DataBuffer dataBuffer = new DataBuffer();
+        dataBuffer.putLong(room.connection().connectionId());
+        dataBuffer.putUTF8("overtime");
+        return new PendingUpdate(MessageHandler.GAME_OVERTIME+"/true",dataBuffer);
+    }
+    public PendingUpdate onEnding(Room room) {
+        DataBuffer dataBuffer = new DataBuffer();
+        dataBuffer.putLong(room.connection().connectionId());
+        dataBuffer.putUTF8("ending");
+        return  new PendingUpdate(MessageHandler.GAME_CLOSE+"/true",dataBuffer);
+    }
+    @Override
+    public PendingUpdate onEnded(Room room){
+        clearRoom(room);
+        DataBuffer dataBuffer = new DataBuffer();
+        dataBuffer.putLong(room.connection().connectionId());
+        dataBuffer.putUTF8("ended");
+        return new PendingUpdate(MessageHandler.GAME_END+"/true",dataBuffer);
+    }
+
+    @Override
+    public PendingUpdate onTimeout(Room room){
+        clearRoom(room);
+        DataBuffer dataBuffer = new DataBuffer();
+        dataBuffer.putLong(room.connection().connectionId());
+        dataBuffer.putUTF8("ending");
+        return new PendingUpdate(MessageHandler.GAME_JOIN_TIMEOUT+"/true",dataBuffer);
+    }
+    private void clearRoom(Room room){
         for(Stub stub : room.playerList()){
             if(stub.owner()==null){
                 continue;
@@ -211,26 +222,8 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
                 }
             });
         }
+        pendingMatch[room.arena().level].remove(room);
         room.reset();
-        rQueue.addLast(room);
-    }
-
-    public void _onEnding(Room room) {
-        if(!room.offline()){
-            //this.deploymentServiceProvider.onEndedConnection(room.connection().serverId());
-        }
-        for(Stub sb : room.playerList()){
-            this.onLeaving(room,sb);
-            Rating rating = sb.rating;//gameServiceProvider.rating(sb.owner());
-            rating.update(sb,room.rankUpBase(),room.arena().xp);
-            rating.update();
-            if(sb.rank==1){
-                Statistics.Entry stat = this.gameServiceProvider.statistics(sb.owner()).entry("wc");
-                stat.update(1).update();
-                gameServiceProvider.leaderBoard("wc").onAllBoard(stat);
-            }
-        }
-        room.start(this);
         rQueue.addLast(room);
     }
     //room setting on online play mode
