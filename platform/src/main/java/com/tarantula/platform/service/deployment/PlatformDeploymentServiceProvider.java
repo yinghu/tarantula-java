@@ -77,6 +77,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private ExecutorService udpPool;
     private int workSize;
+    private long metricsFreshRate;
+    private static long TIMER = 10000;
     @Override
     public void start() throws Exception {
         this.secureRandom = new SecureRandom();
@@ -349,6 +351,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public void setup(ServiceContext serviceContext){
         this.tarantulaContext = (TarantulaContext)serviceContext;
+        this.metricsFreshRate = this.tarantulaContext.metricsUpdateIntervalMinutes*1000*60;
         this.integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.integrationEventService = integrationCluster.publisher();
         try{
@@ -730,17 +733,29 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     @Override
     public long initialDelay() {
-        return this.tarantulaContext.metricsUpdateIntervalMinutes*1000*60;
+        return TIMER;
     }
 
     @Override
     public long delay() {
-        return this.tarantulaContext.metricsUpdateIntervalMinutes*1000*60;
+        return TIMER;
     }
 
     @Override
     public void run() {
-        this.tarantulaContext.metrics().summary((e)->e.update());
+        pushRegistry.forEach((k,e)->{
+            if(!e.check()){
+                log.warn("Server push event ack timeout->["+k+"]");
+                this.tarantulaContext.schedule(new OneTimeRunner(1000,()->{
+                    this.tarantulaContext.integrationCluster().deployService().removeServerPushEvent(k);
+                }));
+            }
+        });
+        metricsFreshRate -= TIMER;
+        if(metricsFreshRate<=0){
+            metricsFreshRate = this.tarantulaContext.metricsUpdateIntervalMinutes*1000*60;
+            this.tarantulaContext.metrics().summary((e)->e.update());
+        }
     }
     //metrics update call
     public void onUpdated(String key,double value){

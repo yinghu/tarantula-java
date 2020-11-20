@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 
 namespace Integration.Game
 {
@@ -13,7 +14,7 @@ namespace Integration.Game
 
         private void Update()
         {
-            _rigidbody.AddForce(transform.forward*10);
+            _rigidbody.AddForce(transform.forward*500);
         }
     }
 }

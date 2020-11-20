@@ -136,7 +136,6 @@ namespace GameClustering
                 retry.Timestamp = timestamp;
                 retry.Retries--;
             }
-
             _totalRetries += retries;
             ClearPendingGateways();
             return retries;

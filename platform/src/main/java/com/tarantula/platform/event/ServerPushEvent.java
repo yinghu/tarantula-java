@@ -11,6 +11,7 @@ import com.tarantula.platform.service.ConnectionEventService;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by yinghu on 7/25//2020.
@@ -18,10 +19,10 @@ import java.time.ZoneOffset;
 public class ServerPushEvent extends Data implements Event {
 
 
-    private LocalDateTime lastAck;
+    private AtomicBoolean lastAck;
     private Connection connection;
     public ServerPushEvent(){
-        lastAck = LocalDateTime.now(ZoneOffset.UTC);
+        lastAck = new AtomicBoolean(true);
     }
 
     public ServerPushEvent(String source, String sessionId,String serverId,byte[] payload){
@@ -77,7 +78,10 @@ public class ServerPushEvent extends Data implements Event {
 
     }
     public void ack(){
-        lastAck = LocalDateTime.now(ZoneOffset.UTC);
+        lastAck.set(true);
+    }
+    public boolean check(){
+        return lastAck.getAndSet(false);
     }
     @Override
     public String toString(){

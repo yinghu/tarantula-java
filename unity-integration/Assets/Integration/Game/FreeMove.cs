@@ -15,6 +15,7 @@ namespace Integration.Game
         private IntegrationManager _integrationManager;
         private float _timer;
         private float _delta;
+        public GameObject bullet;
         private void Start()
         {
             _timer = 0.5f;
@@ -31,7 +32,7 @@ namespace Integration.Game
 
         private async Task Move(Vector3 target)
         {
-            _end = target;
+            //_end = target;
             using (var buffer = new DataBuffer())
             {
                 buffer.PutVector3(target);
@@ -41,10 +42,12 @@ namespace Integration.Game
 
         private void Update()
         {
-            if (_queue.TryDequeue(out var pos))
+            if (!_queue.TryDequeue(out var pos))
             {
-                _end = pos;
+                return;
             }
+            _end = pos;
+            Instantiate(bullet,transform.position, Quaternion.identity);
         }
         private async void FixedUpdate()
         {

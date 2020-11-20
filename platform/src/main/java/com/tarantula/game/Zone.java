@@ -203,6 +203,9 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     @Override
     public PendingUpdate onTimeout(Room room){
         clearRoom(room);
+        if(room.connection()==null||room.connection().disabled()){
+            return null;
+        }
         DataBuffer dataBuffer = new DataBuffer();
         dataBuffer.putLong(room.connection().connectionId());
         dataBuffer.putUTF8("ending");

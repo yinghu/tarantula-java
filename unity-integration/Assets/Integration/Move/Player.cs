@@ -26,7 +26,6 @@ namespace Integration.Move
 
         public async void Move(Vector3 target)
         {
-            _end = target;
             using (var buffer = new DataBuffer())
             {
                 buffer.PutVector3(target);
