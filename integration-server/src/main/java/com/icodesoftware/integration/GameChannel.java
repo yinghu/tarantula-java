@@ -35,7 +35,6 @@ public interface GameChannel {
 
     interface Listener{
         void onChannelClosed(GameChannel channelClosed);
-        //void onChannelUpdated(GameChannel channelUpdated,byte[] payload);
     }
 
 }

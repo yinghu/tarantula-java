@@ -30,6 +30,7 @@ public class OnKickedOffMessageHandler extends AbstractMessageHandler {
         outboundMessage.sessionId(sessionId);
         messageId = gameChannelService.messageId();
         outboundMessage.messageId(messageId);
+        outboundMessage.sequence(0);
         outboundMessage.type(MessageHandler.ON_KICKED_OFF);
     }
 }

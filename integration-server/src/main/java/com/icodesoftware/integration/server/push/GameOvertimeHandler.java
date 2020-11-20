@@ -8,15 +8,15 @@ import com.icodesoftware.protocol.OutboundMessage;
 /**
  * Created by yinghu lu on 10/7/2020.
  */
-public class GameJoinTimeoutHandler extends AbstractMessageHandler {
+public class GameOvertimeHandler extends AbstractMessageHandler {
 
-    public GameJoinTimeoutHandler(GameChannelService gameChannelService){
+    public GameOvertimeHandler(GameChannelService gameChannelService){
         super(gameChannelService);
     }
 
     @Override
     public int type() {
-        return GAME_JOIN_TIMEOUT;
+        return GAME_OVERTIME;
     }
 
     @Override
@@ -25,7 +25,7 @@ public class GameJoinTimeoutHandler extends AbstractMessageHandler {
         messageId = pendingInboundMessage.messageId();
         ack = true;
         outboundMessage = new OutboundMessage();
-        outboundMessage.type(GAME_JOIN_TIMEOUT);
+        outboundMessage.type(GAME_OVERTIME);
         outboundMessage.sequence(0);
         outboundMessage.messageId(messageId);
         outboundMessage.ack(ack);

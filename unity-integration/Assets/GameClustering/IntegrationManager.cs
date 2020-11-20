@@ -199,7 +199,27 @@ namespace GameClustering
             {
                 //await Leave();
                 Debug.Log("KICKED OFF->"+sessionId);
-            });    
+            });
+            Messenger.RegisterMessageHandler(MessageType.GameJoinTimeout,0, (sessionId, buffer) =>
+            {
+                Debug.Log("JOIN TIMEOUT->"+sessionId);
+            });
+            Messenger.RegisterMessageHandler(MessageType.GameStart,0, (sessionId, buffer) =>
+            {
+                Debug.Log("GAME START->"+sessionId);
+            });
+            Messenger.RegisterMessageHandler(MessageType.GameOvertime,0, (sessionId, buffer) =>
+            {
+                Debug.Log("GAME overtime->"+sessionId);
+            });
+            Messenger.RegisterMessageHandler(MessageType.GameClose,0, (sessionId, buffer) =>
+            {
+                Debug.Log("GAME close->"+sessionId);
+            });
+            Messenger.RegisterMessageHandler(MessageType.GameEnd,0, (sessionId, buffer) =>
+            {
+                Debug.Log("GAME end->"+sessionId);
+            });
         }
 
         public async Task<bool> Join(MonoBehaviour caller)

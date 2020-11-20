@@ -31,7 +31,6 @@ public class GameSpecHandler extends AbstractMessageHandler {
         String roomId = dataBuffer.getUTF8();
         String zoneId = dataBuffer.getUTF8();
         long connectionId = dataBuffer.getLong();
-        System.out.println(zoneId+"///"+connectionId);
         GameChannel gameChannel = gameChannelService.gameChannel(connectionId);
         gameChannel.onGame(new Echo(zoneId,roomId,gameChannelService));
     }

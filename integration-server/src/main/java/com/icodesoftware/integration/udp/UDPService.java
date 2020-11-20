@@ -5,6 +5,7 @@ import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.*;
 import com.icodesoftware.integration.channel.PushEventChannel;
+import com.icodesoftware.integration.server.push.GameJoinTimeoutHandler;
 import com.icodesoftware.integration.server.push.GameSpecHandler;
 import com.icodesoftware.integration.server.push.ServerPushMessageHandler;
 import com.icodesoftware.logging.JDKLogger;
@@ -89,8 +90,6 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         mHandlers.put(dischargeMessageHandler.type(),dischargeMessageHandler);
         ServerPushMessageHandler serverPushMessageHandler = new ServerPushMessageHandler(this);
         mHandlers.put(serverPushMessageHandler.type(),serverPushMessageHandler);
-        GameSpecHandler gameSpecHandler = new GameSpecHandler(this);
-        mHandlers.put(gameSpecHandler.type(),gameSpecHandler);
     }
     @Override
     public void run(){

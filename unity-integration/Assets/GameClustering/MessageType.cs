@@ -16,6 +16,12 @@
         public const int OnJoined = 10;
         public const int OnLeft = 11;
         public const int OnKickedOff = 12;
-        public const int ServerPush = 200;
+        
+        public const int GameStart = 202;
+        public const int GameClose = 203;
+        public const int GameEnd = 204;
+
+        public const int GameJoinTimeout = 305;
+        public const int GameOvertime = 306;
     }
 }
