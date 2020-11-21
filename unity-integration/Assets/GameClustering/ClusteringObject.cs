@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using UnityEngine;
 
 namespace GameClustering
@@ -10,6 +11,7 @@ namespace GameClustering
 
         protected void _Start()
         {
+           _integrationManager = IntegrationManager.Instance;
            _queue = new ConcurrentQueue<Vector3>();
            Debug.Log("START");
         }
@@ -17,6 +19,11 @@ namespace GameClustering
         private void Update()
         {
             
+        }
+
+        protected void _Register(int type,int sequence,Action<int,DataBuffer> action)
+        {
+            _integrationManager.Messenger.RegisterMessageHandler(type,sequence,action);
         }
     }
 }
