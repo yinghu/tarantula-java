@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using GameClustering;
 using UnityEngine;
@@ -47,7 +48,7 @@ namespace Integration.Game
                 return;
             }
             _end = pos;
-            Instantiate(bullet,transform.position, Quaternion.identity);
+            StartCoroutine(FireBullet());
         }
         private async void FixedUpdate()
         {
@@ -69,6 +70,13 @@ namespace Integration.Game
             {
                 _delta *= -1;
             }
+        }
+
+        private IEnumerator FireBullet()
+        {
+            var shot = Instantiate(bullet,transform.position, Quaternion.identity);
+            yield return new WaitForSeconds(1);
+            Destroy(shot);
         }
     }
 }
