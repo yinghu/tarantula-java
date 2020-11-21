@@ -74,8 +74,6 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         mHandlers.put(ackMessageHandler.type(),ackMessageHandler);
         JoinMessageHandler joinMessageHandler = new JoinMessageHandler(this);
         mHandlers.put(joinMessageHandler.type(),joinMessageHandler);
-        EchoMessageHandler echoMessageHandler = new EchoMessageHandler(this);
-        mHandlers.put(echoMessageHandler.type(),echoMessageHandler);
         RelayMessageHandler relayMessageHandler = new RelayMessageHandler(this);
         mHandlers.put(relayMessageHandler.type(),relayMessageHandler);
         LeaveMessageHandler leaveMessageHandler = new LeaveMessageHandler(this);

@@ -10,5 +10,5 @@ public interface Game {
 
     String zoneId();
     String roomId();
-    MessageHandler onMessage(InboundMessage inboundMessage);
+    MessageHandler onAction(InboundMessage inboundMessage);
 }

@@ -32,20 +32,19 @@ namespace GameClustering
 
         private Thread _thread;
 
-            [RuntimeInitializeOnLoadMethod]
+        [RuntimeInitializeOnLoadMethod]
         private static void _Init(){
             _instance = Resources.Load<IntegrationManager>("IntegrationManager");
             _instance.Bootstrap();    
         }
 
         public static IntegrationManager Instance => _instance;
-        
+
         private void Bootstrap()
         {
             _httpCaller = new HttpCaller(gecHost);
             _deviceId = SystemInfo.deviceUniqueIdentifier;
         }
-
         public async Task<bool> Index(MonoBehaviour caller)
         {
             try{

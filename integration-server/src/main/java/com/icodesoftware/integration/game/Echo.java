@@ -14,7 +14,7 @@ public class Echo extends AbstractGame {
     }
 
     @Override
-    public MessageHandler onMessage(InboundMessage inboundMessage){
+    public MessageHandler onAction(InboundMessage inboundMessage){
         gameChannelService.onUpdate(this,"{}".getBytes());
         return null;
     }

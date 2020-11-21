@@ -76,15 +76,17 @@ public class PushEventChannel implements GameChannel {
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
         if(mSession.containsKey(pendingInboundMessage.sessionId()) && mSession.get(pendingInboundMessage.sessionId()).validate(pendingInboundMessage.source())){
+            if(pendingInboundMessage.ack()){//early ack to avoid retry from remote
+                ack(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),pendingInboundMessage.source());
+            }
             MessageHandler messageHandler = gameChannelService.messageHandler(pendingInboundMessage.type());
             if(messageHandler!=null){
                 if(!pendingInboundMessage.ack()){
                     messageHandler.onMessage(pendingInboundMessage);
                 }
                 else{
-                    ack(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),pendingInboundMessage.source());
                     if(mIndex.putIfAbsent(pendingInboundMessage.messageId(),LocalDateTime.now(ZoneOffset.UTC))==null){
-                        game.onMessage(pendingInboundMessage);
+                        game.onAction(pendingInboundMessage);
                         messageHandler.onMessage(pendingInboundMessage);
                     }
                 }

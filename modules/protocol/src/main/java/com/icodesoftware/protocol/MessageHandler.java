@@ -7,20 +7,19 @@ public interface MessageHandler {
 
     int ACK = 0;
     int JOIN = 1;
-    int ECHO = 2;
-    int RELAY = 3;
-    int LEAVE = 4;
-    int SPAWN = 5;
-    int PING = 6;
-    int PONG = 7;
-    int VOTE = 8;
-    int SYNC = 9;
-    int GAME = 10;
+    int RELAY = 2;
+    int LEAVE = 3;
+    int SPAWN = 4;
+    int PING = 5;
+    int PONG = 6;
+    int VOTE = 7;
+    int SYNC = 8;
+    int ACTION = 9;
 
     int ON_JOINED = 100;
     int ON_LEFT = 101;
     int ON_KICKED_OFF = 102;
-
+    int ON_ACTION = 103;
 
     int SERVER_PUSH = 200;
     int GAME_SPEC = 201;

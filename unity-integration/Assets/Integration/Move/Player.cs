@@ -1,26 +1,30 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections.Generic;
 using GameClustering;
 using UnityEngine;
 
 namespace Integration.Move
 {
-    public class Player : MonoBehaviour
+    public class Player : ClusteringObject
     {
         public int sequence = 1;
         private Vector3 _target;
         private const float Speed = 3f;
         private Vector3 _end;
-        private ConcurrentQueue<Vector3> _queue;
+        private Queue<Vector3> _queue;
         private IntegrationManager _integrationManager;
         private void Start()
         {
+            _Start();
             _target = transform.position;
             _end = _target;
-            _queue = new ConcurrentQueue<Vector3>();
+            _queue = new Queue<Vector3>();
             _integrationManager = IntegrationManager.Instance;
             _integrationManager.Messenger.RegisterMessageHandler(MessageType.Relay,sequence, (sessionId, buffer) =>
             {
-                _queue.Enqueue(buffer.GetVector3());
+                lock (_queue)
+                { 
+                    _queue.Enqueue(buffer.GetVector3());
+                }
             });
         }
 
@@ -35,9 +39,13 @@ namespace Integration.Move
 
         private void Update()
         {
-            if (_queue.TryDequeue(out var pos))
+            lock (_queue)
             {
-                _end = pos;
+                if (_queue.Count == 0)
+                {
+                    return;
+                }
+                _end = _queue.Dequeue();
             }
         }
 
