@@ -166,17 +166,20 @@ namespace GameClustering
             Messenger.Connect(connection,Convert.FromBase64String(serverKey));
             _thread = new Thread(Messenger.Listen);
             _thread.Start();
-            Messenger.RegisterMessageHandler(MessageType.Join,0, (sessionId,buffer) =>
+            Messenger.RegisterMessageHandler(MessageType.Join,0, (sessionId,data) =>
             {
-                var joined = buffer.GetUTF8String().Equals("accepted");
-                if (joined)
+                using (var buffer = new DataBuffer(data))
                 {
-                    Messenger.Join(sessionId,new []{buffer.GetInt(),buffer.GetInt()});
-                    Messenger.Ack();
-                }
-                else
-                {
-                    Debug.Log("session rejected");
+                    var joined = buffer.GetUTF8String().Equals("accepted");
+                    if (joined)
+                    {
+                        Messenger.Join(sessionId, new[] {buffer.GetInt(), buffer.GetInt()});
+                        Messenger.Ack();
+                    }
+                    else
+                    {
+                        Debug.Log("session rejected");
+                    }
                 }
             });
             Messenger.RegisterMessageHandler(MessageType.OnJoined,0, (sessionId,buffer) =>

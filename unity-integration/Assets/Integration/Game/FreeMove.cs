@@ -25,9 +25,12 @@ namespace Integration.Game
             _end = _target;
             _queue = new ConcurrentQueue<Vector3>();
             _integrationManager = IntegrationManager.Instance;
-            _integrationManager.Messenger.RegisterMessageHandler(MessageType.Relay,sequence, (sessionId, buffer) =>
+            _integrationManager.Messenger.RegisterMessageHandler(MessageType.Relay,sequence, (sessionId, data) =>
             {
-                _queue.Enqueue(buffer.GetVector3());
+                using (var buffer = new DataBuffer(data))
+                {
+                    _queue.Enqueue(buffer.GetVector3());
+                }
             });
         }
 
@@ -37,7 +40,7 @@ namespace Integration.Game
             using (var buffer = new DataBuffer())
             {
                 buffer.PutVector3(target);
-                await _integrationManager.Messenger.SendAsync(MessageType.Relay, sequence, true, buffer);
+                await _integrationManager.Messenger.SendAsync(MessageType.Relay, sequence, true, buffer.ToArray());
             }
         }
 

@@ -17,9 +17,12 @@ namespace Integration
             {
                 _enabled = !_enabled;
             });
-            IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId,buffer) =>
+            IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId,data) =>
             {
-                _speed = buffer.GetFloat();
+                using (var buffer = new DataBuffer(data))
+                {
+                    _speed = buffer.GetFloat();
+                }
             });
         }
 

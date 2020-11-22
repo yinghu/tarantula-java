@@ -13,7 +13,7 @@ namespace GameClustering
     public class UdpMessenger : IMessenger
     {
         private UdpClient _udpClient;
-        private readonly ConcurrentDictionary<CallbackKey, Action<int,DataBuffer>> _handlers;
+        private readonly ConcurrentDictionary<CallbackKey, Action<int,byte[]>> _handlers;
         private readonly ConcurrentDictionary<int, PendingMessage> _pendingMessages;
         private readonly ConcurrentDictionary<int, int> _pendingGateways;
         private readonly PendingAck _pendingAck;
@@ -31,7 +31,7 @@ namespace GameClustering
         private IPEndPoint _remote;
         public UdpMessenger()
         {
-            _handlers = new ConcurrentDictionary<CallbackKey, Action<int,DataBuffer>>();
+            _handlers = new ConcurrentDictionary<CallbackKey, Action<int,byte[]>>();
             _pendingMessages = new ConcurrentDictionary<int, PendingMessage>();
             _pendingGateways = new ConcurrentDictionary<int, int>();
             _pendingAck = new PendingAck(20);
@@ -56,12 +56,15 @@ namespace GameClustering
             }
             _remote = new IPEndPoint(IPAddress.Parse(_connection.Host),_connection.Port);
             _udpClient = new UdpClient(_connection.Host,_connection.Port);
-            _handlers[new CallbackKey(MessageType.Ack,0)] = (sessionId,buffer) =>
+            _handlers[new CallbackKey(MessageType.Ack,0)] = (sessionId,data) =>
             {
-                var sz = buffer.GetInt();
-                for (var i = 0; i < sz; i++)
+                using (var buffer = new DataBuffer(data))
                 {
-                    _pendingMessages.TryRemove(buffer.GetInt(),out var removed);
+                    var sz = buffer.GetInt();
+                    for (var i = 0; i < sz; i++)
+                    {
+                        _pendingMessages.TryRemove(buffer.GetInt(), out var removed);
+                    }
                 }
             };
             _handlers[new CallbackKey(MessageType.Ping,0)] = async (sessionId,buffer) =>
@@ -84,10 +87,15 @@ namespace GameClustering
 
         public async Task<int> SendAsync(int type, int sequence, bool ack)
         {
-            return await SendAsync(type, sequence, ack, null);
+            return await SendAsync(type, sequence, ack, new byte[0]);
         }
 
         public async Task<int> SendAsync(int type,int sequence,bool ack,DataBuffer payload)
+        {
+            return await SendAsync(type, sequence, ack, payload.ToArray());
+        }
+
+        public async Task<int> SendAsync(int type, int sequence, bool ack, byte[] payload)
         {
             using (var message = new OutboundMessage())
             {
@@ -104,9 +112,9 @@ namespace GameClustering
                 message.Sequence(sequence);
                 var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 message.Timestamp(timestamp);
-                if (payload != null)
+                if (payload == null || payload.Length > 0)
                 {
-                    message.Payload(payload.ToArray());
+                    message.Payload(payload);
                 }
                 var outMessage = _connection.Secured ? Encrypt(message.Message()) : message.Message();
                 var bytes = await _udpClient.SendAsync(outMessage, outMessage.Length);
@@ -167,7 +175,7 @@ namespace GameClustering
             }    
         }
 
-        public void RegisterMessageHandler(int type,int sequence,Action<int,DataBuffer> messageHandler)
+        public void RegisterMessageHandler(int type,int sequence,Action<int,byte[]> messageHandler)
         {
             _handlers[new CallbackKey(type,sequence)] = messageHandler;
         }
@@ -235,10 +243,7 @@ namespace GameClustering
                         }
                         _pendingGateways.TryUpdate(inboundMessage.MessageId(), 1, 0);
                     }
-                    using (var buffer = new DataBuffer(inboundMessage.Payload()))
-                    {
-                        handler.Invoke(inboundMessage.SessionId(),buffer);    
-                    }
+                    handler.Invoke(inboundMessage.SessionId(),inboundMessage.Payload());
                 }
                 else
                 {

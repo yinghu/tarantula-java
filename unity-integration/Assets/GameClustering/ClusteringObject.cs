@@ -8,7 +8,7 @@ namespace GameClustering
     {
         private IntegrationManager _integrationManager;
         private ConcurrentQueue<Vector3> _queue;
-
+        public int sequence;
         protected void _Start()
         {
            _integrationManager = IntegrationManager.Instance;
@@ -21,7 +21,7 @@ namespace GameClustering
             
         }
 
-        protected void _Register(int type,int sequence,Action<int,DataBuffer> action)
+        protected void _Register(int type,Action<int,byte[]> action)
         {
             _integrationManager.Messenger.RegisterMessageHandler(type,sequence,action);
         }

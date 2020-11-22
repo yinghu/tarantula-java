@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using GameClustering;
+﻿using GameClustering;
 using UnityEngine;
 
 namespace Integration.Move
 {
     public class Player : ClusteringObject
     {
-        public int sequence = 1;
+        
         private Vector3 _target;
         private const float Speed = 3f;
         private Vector3 _end;
@@ -17,9 +16,13 @@ namespace Integration.Move
             _Start();
             _target = transform.position;
             _end = _target;
-            _Register(MessageType.Relay,sequence,(sessionId, buffer) =>
+            _Register(MessageType.Relay,(sessionId, data) =>
             {
-                _end = buffer.GetVector3();
+                using (var buffer = new DataBuffer(data))
+                {
+                    _end = buffer.GetVector3();
+                    _end.y = 1;
+                }
             });
             _integrationManager = IntegrationManager.Instance;
         }

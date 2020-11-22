@@ -16,10 +16,13 @@ namespace Integration.Spawn
         {
             _targets = new ConcurrentQueue<Vector3>();
             _integrationManager = IntegrationManager.Instance;
-            _integrationManager.Messenger.RegisterMessageHandler(MessageType.Spawn,1, (sessionId,buffer) =>
+            _integrationManager.Messenger.RegisterMessageHandler(MessageType.Spawn,1, (sessionId, data) =>
             {
-                var target = buffer.GetVector3();
-                _targets.Enqueue(target);
+                using (var buffer = new DataBuffer(data))
+                {
+                    var target = buffer.GetVector3();
+                    _targets.Enqueue(target);
+                }
                 //Instantiate(bump, target, Quaternion.identity, arena);
             });
         }
