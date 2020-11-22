@@ -16,15 +16,15 @@ namespace Integration.Move
             _Start();
             _target = transform.position;
             _end = _target;
-            _Register(MessageType.Relay,(sessionId, data) =>
+            _integrationManager = IntegrationManager.Instance;
+            _integrationManager.Messenger.RegisterMessageHandler(MessageType.Relay,sequence,(sessionId, data) =>
             {
-                using (var buffer = new DataBuffer(data))
+                Dispatch(data, buffer =>
                 {
                     _end = buffer.GetVector3();
                     _end.y = 1;
-                }
+                });
             });
-            _integrationManager = IntegrationManager.Instance;
         }
 
         public async void Move(Vector3 target)

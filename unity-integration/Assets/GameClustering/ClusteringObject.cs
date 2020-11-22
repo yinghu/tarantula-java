@@ -1,29 +1,37 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using UnityEngine;
 
 namespace GameClustering
 {
     public class ClusteringObject : MonoBehaviour
     {
-        private IntegrationManager _integrationManager;
-        private ConcurrentQueue<Vector3> _queue;
+        private Action<DataBuffer> _action;
+        private byte[] _data;
         public int sequence;
         protected void _Start()
         {
-           _integrationManager = IntegrationManager.Instance;
-           _queue = new ConcurrentQueue<Vector3>();
-           Debug.Log("START");
+            _action = null;
+            _data = null;
+            Debug.Log("START");
         }
 
         private void Update()
         {
-            
+            if (_action == null)
+            {
+                return;
+            }
+            using (var buffer = new DataBuffer(_data))
+            {
+                _action.Invoke(buffer);
+            }
+            _action = null;
         }
-
-        protected void _Register(int type,Action<int,byte[]> action)
+        //dispatch call from messaging thread into unity main thread. 
+        protected void Dispatch(byte[] data,Action<DataBuffer> action)
         {
-            _integrationManager.Messenger.RegisterMessageHandler(type,sequence,action);
+            _data = data;
+            _action = action;
         }
     }
 }
