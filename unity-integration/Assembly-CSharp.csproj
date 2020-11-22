@@ -72,6 +72,7 @@
      <Compile Include="Assets\GameClustering\Payload.cs" />
      <Compile Include="Assets\GameClustering\PendingAck.cs" />
      <Compile Include="Assets\GameClustering\PendingMessage.cs" />
+     <Compile Include="Assets\GameClustering\PostOffice.cs" />
      <Compile Include="Assets\GameClustering\Presence.cs" />
      <Compile Include="Assets\GameClustering\UdpMessenger.cs" />
      <Compile Include="Assets\Integration\Collide\Collide.cs" />
