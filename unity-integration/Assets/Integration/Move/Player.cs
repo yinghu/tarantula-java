@@ -7,7 +7,7 @@ namespace Integration.Move
     {
         
         private Vector3 _target;
-        private const float Speed = 3f;
+        private const float Speed = 6f;
         private Vector3 _end;
       
         private IntegrationManager _integrationManager;
@@ -19,7 +19,7 @@ namespace Integration.Move
             _integrationManager = IntegrationManager.Instance;
             _integrationManager.Messenger.RegisterMessageHandler(MessageType.Relay,sequence,(sessionId, data) =>
             {
-                Dispatch(data, buffer =>
+                MessageContext.Instance.Execute(data, buffer =>
                 {
                     _end = buffer.GetVector3();
                     _end.y = 1;
