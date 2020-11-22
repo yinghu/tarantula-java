@@ -63,7 +63,7 @@ public class Room{
             state =  PENDING_JOIN;
             roomListener.onJoining(this);
         }
-        initialTime = PENDING_TIME;
+        initialTime = PENDING_TIME*2;
         return _stub;
     }
 

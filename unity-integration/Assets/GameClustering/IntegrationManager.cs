@@ -29,6 +29,7 @@ namespace GameClustering
 
         public Presence Presence { get; private set; }
         public bool Authenticated => Presence != null;
+        public int SessionId { get; private set; }
 
         private Thread _thread;
 
@@ -173,6 +174,7 @@ namespace GameClustering
                     var joined = buffer.GetUTF8String().Equals("accepted");
                     if (joined)
                     {
+                        SessionId = sessionId;
                         Messenger.Join(sessionId, new[] {buffer.GetInt(), buffer.GetInt()});
                         Messenger.Ack();
                     }

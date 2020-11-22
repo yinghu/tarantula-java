@@ -1,5 +1,6 @@
 ﻿using GameClustering;
 using Integration.Move;
+using TMPro;
 using UnityEngine;
 
 namespace Integration.Game
@@ -9,10 +10,12 @@ namespace Integration.Game
         private Camera _mainCamera;
         public Player[] players;
         private int _seat;
+        public TMP_Text bText;
         private void Start()
         {
             _mainCamera = Camera.main;
             _seat = IntegrationManager.Instance.Presence.Seat;
+            bText.text = ">>"+IntegrationManager.Instance.SessionId;
         }
 
         private void Update()

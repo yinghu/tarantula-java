@@ -25,7 +25,10 @@ namespace GameClustering
             {
                 return;
             }
-            mainCaller.Caller.Invoke(new DataBuffer(mainCaller.Data));
+            using (var buffer = new DataBuffer(mainCaller.Data))
+            {
+                mainCaller.Caller.Invoke(buffer);    
+            }
         }
         
         public static MessageContext Instance => _instance;

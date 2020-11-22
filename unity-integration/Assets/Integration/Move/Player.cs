@@ -10,16 +10,16 @@ namespace Integration.Move
         private const float Speed = 6f;
         private Vector3 _end;
       
-        private IntegrationManager _integrationManager;
+       
         private void Start()
         {
-            _Start();
+            StartClusteringObject();
             _target = transform.position;
             _end = _target;
-            _integrationManager = IntegrationManager.Instance;
-            _integrationManager.Messenger.RegisterMessageHandler(MessageType.Relay,sequence,(sessionId, data) =>
+           
+            Messenger.RegisterMessageHandler(MessageType.Relay,sequence,(sessionId, data) =>
             {
-                MessageContext.Instance.Execute(data, buffer =>
+                MainThread.Execute(data, buffer =>
                 {
                     _end = buffer.GetVector3();
                     _end.y = 1;
@@ -32,7 +32,7 @@ namespace Integration.Move
             using (var buffer = new DataBuffer())
             {
                 buffer.PutVector3(target);
-                await _integrationManager.Messenger.SendAsync(MessageType.Relay, sequence, true, buffer);
+                await Messenger.SendAsync(MessageType.Relay, sequence, true, buffer);
             }
         }
         

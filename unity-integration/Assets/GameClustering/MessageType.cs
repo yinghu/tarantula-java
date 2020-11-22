@@ -17,6 +17,7 @@
         public const int OnLeft = 101;
         public const int OnKickedOff = 102;
         public const int OnAction = 103;
+        public const int OnSync = 104;
         
         public const int GameStart = 202;
         public const int GameClose = 203;

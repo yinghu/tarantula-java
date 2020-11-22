@@ -20,6 +20,7 @@ public interface MessageHandler {
     int ON_LEFT = 101;
     int ON_KICKED_OFF = 102;
     int ON_ACTION = 103;
+    int ON_SYNC = 104;
 
     int SERVER_PUSH = 200;
     int GAME_SPEC = 201;
