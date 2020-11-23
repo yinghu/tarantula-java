@@ -51,7 +51,7 @@ namespace Integration.Game
                 return;
             }
             _end = pos;
-            StartCoroutine(FireBullet());
+            //StartCoroutine(FireBullet());
         }
         private async void FixedUpdate()
         {

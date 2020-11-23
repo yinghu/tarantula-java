@@ -1,4 +1,5 @@
-﻿using GameClustering;
+﻿using System.Collections;
+using GameClustering;
 using UnityEngine;
 
 namespace Integration.Move
@@ -9,8 +10,8 @@ namespace Integration.Move
         private Vector3 _target;
         private const float Speed = 6f;
         private Vector3 _end;
-      
-       
+        public GameObject bullet;
+        private float _timer;
         private void Start()
         {
             StartClusteringObject(buffer =>
@@ -19,13 +20,20 @@ namespace Integration.Move
             });
             _target = transform.position;
             _end = _target;
-           
+            _timer = 0.5f;
             Messenger.RegisterMessageHandler(MessageType.Relay,sequence,(sessionId, data) =>
             {
                 MainThread.Execute(data, buffer =>
                 {
                     _end = buffer.GetVector3();
                     _end.y = 1;
+                });
+            });
+            Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId, data) =>
+            {
+                MainThread.Execute(data, buffer =>
+                {
+                    StartCoroutine(FireBullet());
                 });
             });
         }
@@ -39,9 +47,22 @@ namespace Integration.Move
             }
         }
         
-        private void FixedUpdate()
+        private async void FixedUpdate()
         {
             transform.position = Vector3.Lerp(transform.position, _end, Speed*Time.fixedDeltaTime);
+            _timer -= Time.fixedDeltaTime;
+            if (_timer > 0)
+            {
+                return;
+            }
+            _timer = 0.5f;
+            await Messenger.SendAsync(MessageType.Spawn, sequence, true);
+        }
+        private IEnumerator FireBullet()
+        {
+            var shot = Instantiate(bullet,transform.position, Quaternion.identity);
+            yield return new WaitForSeconds(1);
+            Destroy(shot);
         }
     }
     

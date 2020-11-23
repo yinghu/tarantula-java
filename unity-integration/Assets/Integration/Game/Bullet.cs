@@ -14,7 +14,7 @@ namespace Integration.Game
 
         private void Update()
         {
-            _rigidbody.AddForce(transform.forward*500);
+            _rigidbody.AddForce(transform.forward*1000);
         }
     }
 }
