@@ -13,7 +13,10 @@ namespace Integration.Move
        
         private void Start()
         {
-            StartClusteringObject();
+            StartClusteringObject(buffer =>
+            {
+                _end = buffer.GetVector3();
+            });
             _target = transform.position;
             _end = _target;
            

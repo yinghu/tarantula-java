@@ -22,11 +22,12 @@ public class SyncMessageHandler extends AbstractMessageHandler {
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.ack(pendingInboundMessage.ack());
         pendingOutboundMessage.timestamp(pendingInboundMessage.timestamp());
-        pendingOutboundMessage.messageId(pendingInboundMessage.messageId());
+        int mid = this.gameChannelService.messageId();
+        pendingOutboundMessage.messageId(mid);
         pendingOutboundMessage.sessionId(pendingInboundMessage.sessionId());
         pendingOutboundMessage.type(pendingInboundMessage.type());
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
         pendingOutboundMessage.payload(pendingInboundMessage.payload());
-        this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).relay(pendingInboundMessage.messageId(),pendingInboundMessage.ack(),null,pendingOutboundMessage);
+        this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).relay(mid,pendingInboundMessage.ack(),null,pendingOutboundMessage);
     }
 }

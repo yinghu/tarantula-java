@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace GameClustering
 {
@@ -7,22 +8,22 @@ namespace GameClustering
        
         public int sequence;
         private IntegrationManager _integrationManager;
-        protected async void StartClusteringObject()
+        protected async void StartClusteringObject(Action<DataBuffer> onSync)
         {
             _integrationManager = IntegrationManager.Instance;
-            Messenger.RegisterMessageHandler(MessageType.Sync,sequence, async (sessionId,data) =>
+            Messenger.RegisterMessageHandler(MessageType.Sync,sequence,  (sessionId,data) =>
             {
                 if (sessionId == _integrationManager.SessionId)
                 {
                     return;
                 }
-                using (var buffer = new DataBuffer())
+                MainThread.Execute(async buffer =>
                 {
                     buffer.PutVector3(transform.position);
-                    await Messenger.SendAsync(MessageType.Relay, sequence, true, buffer);
-                }   
+                    await Messenger.SendAsync(MessageType.OnSync, sequence, true, buffer);
+                });
             });
-            Messenger.RegisterMessageHandler(MessageType.Relay,sequence, (sessionId, data) =>
+            Messenger.RegisterMessageHandler(MessageType.OnSync,sequence, (sessionId, data) =>
             {
                 if (sessionId == _integrationManager.SessionId)
                 {
@@ -30,7 +31,7 @@ namespace GameClustering
                 }
                 MainThread.Execute(data, buffer =>
                 {
-                    transform.position = buffer.GetVector3();
+                    onSync?.Invoke(buffer);
                 });    
             });
             await Messenger.SendAsync(MessageType.Sync, sequence, true);
