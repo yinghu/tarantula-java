@@ -79,8 +79,8 @@
      <Compile Include="Assets\Integration\Game\Board.cs" />
      <Compile Include="Assets\Integration\Game\Bullet.cs" />
      <Compile Include="Assets\Integration\Game\FreeMove.cs" />
+     <Compile Include="Assets\Integration\Game\Player.cs" />
      <Compile Include="Assets\Integration\Manager.cs" />
-     <Compile Include="Assets\Integration\Player.cs" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
      <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />

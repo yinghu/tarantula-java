@@ -6,20 +6,33 @@ namespace Integration.Game
 {
     public class Board : MonoBehaviour
     {
+        public int sequence;
         public Camera mainCamera;
         public Player[] players;
         private int _seat;
         public TMP_Text bText;
+        public GameObject freeMove;
+        private IntegrationManager _integrationManager;
+        private Vector3 _lastPosition;
         private void Start()
         {
-            
-            _seat = IntegrationManager.Instance.Presence.Seat;
+            _lastPosition = freeMove.transform.position;
+            _integrationManager = IntegrationManager.Instance;
+            _integrationManager.Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId, data) =>
+                {
+                    MessageContext.Instance.Execute(data, buffer =>
+                    {
+                        var fm = Instantiate(freeMove,_lastPosition,Quaternion.identity);
+                        fm.GetComponent<FreeMove>().Setup(buffer.GetInt(),sessionId==_integrationManager.SessionId);
+                    });    
+                });
+            _seat = _integrationManager.Presence.Seat;
             //if (_seat % 2 == 1)
             //{
                 //var pos = mainCamera.transform.rotation;
                 //mainCamera.transform.Rotate(pos.x, pos.y, pos.z + 180);
             //}
-            bText.text = ">>"+IntegrationManager.Instance.SessionId;
+            bText.text = ">>"+_integrationManager.SessionId;
         }
 
         private void Update()
@@ -33,7 +46,17 @@ namespace Integration.Game
             {
                 return;
             }
+            _lastPosition = hit.point;
             players[_seat].Move(hit.point);
+        }
+
+        public async void OnFreeMove()
+        {
+            using (var buffer = new DataBuffer())
+            {
+                buffer.PutInt(_integrationManager.Messenger.Sequence());
+                await _integrationManager.Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer);
+            }
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using GameClustering;
 using UnityEngine;
@@ -8,11 +7,12 @@ namespace Integration.Game
 {
     public class FreeMove : MonoBehaviour
     {
-        public int sequence = 3;
+        private int _sequence;
+        private bool _master;
         private Vector3 _target;
         private const float Speed = 3f;
         private Vector3 _end;
-        private ConcurrentQueue<Vector3> _queue;
+       
         private IntegrationManager _integrationManager;
         private float _timer;
         private float _delta;
@@ -23,15 +23,8 @@ namespace Integration.Game
             _delta = 1;
             _target = transform.position;
             _end = _target;
-            _queue = new ConcurrentQueue<Vector3>();
             _integrationManager = IntegrationManager.Instance;
-            _integrationManager.Messenger.RegisterMessageHandler(MessageType.Relay,sequence, (sessionId, data) =>
-            {
-                using (var buffer = new DataBuffer(data))
-                {
-                    _queue.Enqueue(buffer.GetVector3());
-                }
-            });
+           
         }
 
         private async Task Move(Vector3 target)
@@ -40,17 +33,13 @@ namespace Integration.Game
             using (var buffer = new DataBuffer())
             {
                 buffer.PutVector3(target);
-                await _integrationManager.Messenger.SendAsync(MessageType.Relay, sequence, true, buffer.ToArray());
+                await _integrationManager.Messenger.SendAsync(MessageType.Relay, _sequence, true, buffer.ToArray());
             }
         }
 
         private void Update()
         {
-            if (!_queue.TryDequeue(out var pos))
-            {
-                return;
-            }
-            _end = pos;
+            
             //StartCoroutine(FireBullet());
         }
         private async void FixedUpdate()
@@ -62,8 +51,12 @@ namespace Integration.Game
                 return;
             }
             _timer = 0.5f;
+            if (!_master)
+            {
+                return;
+            }
             var cur = transform.position;
-            var left = new Vector3(cur.x+(_delta),cur.y,cur.z);
+            var left = new Vector3(cur.x + (_delta), cur.y, cur.z);
             await Move(left);
         }
 
@@ -80,6 +73,19 @@ namespace Integration.Game
             var shot = Instantiate(bullet,transform.position, Quaternion.identity);
             yield return new WaitForSeconds(1);
             Destroy(shot);
+        }
+
+        public void Setup(int sequence, bool master)
+        {
+            _sequence = sequence;
+            _master = master;
+            IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Relay,_sequence, (sessionId, data) =>
+            {
+                MessageContext.Instance.Execute(data, buffer =>
+                {
+                    _end = buffer.GetVector3();
+                });
+            });
         }
     }
 }
