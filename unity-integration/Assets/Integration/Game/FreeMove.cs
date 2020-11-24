@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using GameClustering;
 using UnityEngine;
 
@@ -16,7 +15,6 @@ namespace Integration.Game
         private IntegrationManager _integrationManager;
         private float _timer;
         private float _delta;
-        public GameObject bullet;
         private void Start()
         {
             _timer = 0.5f;
@@ -35,12 +33,6 @@ namespace Integration.Game
                 buffer.PutVector3(target);
                 await _integrationManager.Messenger.SendAsync(MessageType.Relay, _sequence, true, buffer.ToArray());
             }
-        }
-
-        private void Update()
-        {
-            
-            //StartCoroutine(FireBullet());
         }
         private async void FixedUpdate()
         {
@@ -67,14 +59,7 @@ namespace Integration.Game
                 _delta *= -1;
             }
         }
-
-        private IEnumerator FireBullet()
-        {
-            var shot = Instantiate(bullet,transform.position, Quaternion.identity);
-            yield return new WaitForSeconds(1);
-            Destroy(shot);
-        }
-
+        
         public void Setup(int sequence, bool master)
         {
             _sequence = sequence;
