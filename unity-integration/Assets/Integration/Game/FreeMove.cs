@@ -4,15 +4,13 @@ using UnityEngine;
 
 namespace Integration.Game
 {
-    public class FreeMove : MonoBehaviour
+    public class FreeMove : ClusteringObject
     {
-        private int _sequence;
-        private bool _master;
+        
         private Vector3 _target;
         private const float Speed = 3f;
         private Vector3 _end;
-       
-        private IntegrationManager _integrationManager;
+        
         private float _timer;
         private float _delta;
         private void Start()
@@ -21,7 +19,6 @@ namespace Integration.Game
             _delta = 1;
             _target = transform.position;
             _end = _target;
-            _integrationManager = IntegrationManager.Instance;
            
         }
 
@@ -31,7 +28,7 @@ namespace Integration.Game
             using (var buffer = new DataBuffer())
             {
                 buffer.PutVector3(target);
-                await _integrationManager.Messenger.SendAsync(MessageType.Relay, _sequence, true, buffer.ToArray());
+                await Messenger.SendAsync(MessageType.Relay, sequence, true, buffer.ToArray());
             }
         }
         private async void FixedUpdate()
@@ -43,7 +40,7 @@ namespace Integration.Game
                 return;
             }
             _timer = 0.5f;
-            if (!_master)
+            if (!master)
             {
                 return;
             }
@@ -60,13 +57,13 @@ namespace Integration.Game
             }
         }
         
-        public void Setup(int sequence, bool master)
+        public void Setup(int oid, bool owner)
         {
-            _sequence = sequence;
-            _master = master;
-            IntegrationManager.Instance.Messenger.RegisterMessageHandler(MessageType.Relay,_sequence, (sessionId, data) =>
+            sequence = oid;
+            master = owner;
+            Messenger.RegisterMessageHandler(MessageType.Relay,sequence, (sessionId, data) =>
             {
-                MessageContext.Instance.Execute(data, buffer =>
+                MainThread.Execute(data, buffer =>
                 {
                     _end = buffer.GetVector3();
                 });

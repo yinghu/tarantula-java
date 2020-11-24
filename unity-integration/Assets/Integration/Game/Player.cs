@@ -16,6 +16,10 @@ namespace Integration.Game
         {
             StartClusteringObject(buffer =>
             {
+                buffer.PutVector3(transform.position);    
+            },
+            buffer =>
+            {
                 _end = buffer.GetVector3();
             });
             _target = transform.position;

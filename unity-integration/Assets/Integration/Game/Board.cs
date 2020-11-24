@@ -1,41 +1,62 @@
-﻿using GameClustering;
+﻿using System.Collections.Generic;
+using GameClustering;
 using TMPro;
 using UnityEngine;
 
 namespace Integration.Game
 {
-    public class Board : MonoBehaviour
+    public class Board : ClusteringObject
     {
-        public int sequence;
         public Camera mainCamera;
         public Player[] players;
         private int _seat;
         public TMP_Text bText;
         public GameObject freeMove;
-        private IntegrationManager _integrationManager;
         private Vector3 _lastPosition;
-        private void Start()
+        private List<GameObject> _gameObjects;
+        private  void Start()
         {
-            _lastPosition = freeMove.transform.position;
-            _integrationManager = IntegrationManager.Instance;
-            _integrationManager.Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId, data) =>
+            StartClusteringObject(buffer =>
+            {
+                buffer.PutInt(_gameObjects.Count);
+                _gameObjects.ForEach(gmo =>
                 {
-                    MessageContext.Instance.Execute(data, buffer =>
-                    {
-                        var oid = buffer.GetInt();
-                        var pos = buffer.GetVector3();
-                        pos.y = freeMove.transform.position.y;
-                        var fm = Instantiate(freeMove,pos,Quaternion.identity);
-                        fm.GetComponent<FreeMove>().Setup(oid,sessionId==_integrationManager.SessionId);
-                    });    
+                    buffer.PutInt(gmo.GetComponent<FreeMove>().sequence);
                 });
-            _seat = _integrationManager.Presence.Seat;
+            }, buffer =>
+            {
+                var sz = buffer.GetInt();
+                for (var i = 0; i < sz; i++)
+                {
+                    var gm = Instantiate(freeMove);
+                    gm.GetComponent<FreeMove>().Setup(buffer.GetInt(),false);
+                }
+            });
+            _gameObjects = new List<GameObject>();
+            _lastPosition = freeMove.transform.position;
+            Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId, data) =>
+            {
+                MessageContext.Instance.Execute(data, buffer =>
+                {
+                    var oid = buffer.GetInt();
+                    var pos = buffer.GetVector3();
+                    pos.y = freeMove.transform.position.y;
+                    var fm = Instantiate(freeMove,pos,Quaternion.identity);
+                    var fmc = fm.GetComponent<FreeMove>();
+                    fmc.Setup(oid,sessionId==Manager.SessionId);
+                    if (fmc.master)
+                    {
+                        _gameObjects.Add(fm);
+                    }
+                });    
+            });
+            _seat = Manager.Presence.Seat;
             //if (_seat % 2 == 1)
             //{
                 //var pos = mainCamera.transform.rotation;
                 //mainCamera.transform.Rotate(pos.x, pos.y, pos.z + 180);
             //}
-            bText.text = ">>"+_integrationManager.SessionId;
+            bText.text = "SessionId->"+Manager.SessionId;
         }
 
         private void Update()
@@ -57,9 +78,9 @@ namespace Integration.Game
         {
             using (var buffer = new DataBuffer())
             {
-                buffer.PutInt(_integrationManager.Messenger.Sequence());
+                buffer.PutInt(Messenger.Sequence());
                 buffer.PutVector3(_lastPosition);
-                await _integrationManager.Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer);
+                await Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer);
             }
         }
     }
