@@ -22,8 +22,11 @@ namespace Integration.Game
                 {
                     MessageContext.Instance.Execute(data, buffer =>
                     {
-                        var fm = Instantiate(freeMove,_lastPosition,Quaternion.identity);
-                        fm.GetComponent<FreeMove>().Setup(buffer.GetInt(),sessionId==_integrationManager.SessionId);
+                        var oid = buffer.GetInt();
+                        var pos = buffer.GetVector3();
+                        pos.y = freeMove.transform.position.y;
+                        var fm = Instantiate(freeMove,pos,Quaternion.identity);
+                        fm.GetComponent<FreeMove>().Setup(oid,sessionId==_integrationManager.SessionId);
                     });    
                 });
             _seat = _integrationManager.Presence.Seat;
@@ -55,6 +58,7 @@ namespace Integration.Game
             using (var buffer = new DataBuffer())
             {
                 buffer.PutInt(_integrationManager.Messenger.Sequence());
+                buffer.PutVector3(_lastPosition);
                 await _integrationManager.Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer);
             }
         }
