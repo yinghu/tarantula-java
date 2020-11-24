@@ -2,7 +2,7 @@
 using GameClustering;
 using UnityEngine;
 
-namespace Integration.Move
+namespace Integration
 {
     public class Player : ClusteringObject
     {

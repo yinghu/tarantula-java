@@ -1,5 +1,4 @@
 ﻿using GameClustering;
-using Integration.Move;
 using TMPro;
 using UnityEngine;
 
@@ -15,11 +14,11 @@ namespace Integration.Game
         {
             
             _seat = IntegrationManager.Instance.Presence.Seat;
-            if (_seat % 2 == 1)
-            {
-                var pos = mainCamera.transform.rotation;
-                mainCamera.transform.Rotate(pos.x, pos.y, pos.z + 180);
-            }
+            //if (_seat % 2 == 1)
+            //{
+                //var pos = mainCamera.transform.rotation;
+                //mainCamera.transform.Rotate(pos.x, pos.y, pos.z + 180);
+            //}
             bText.text = ">>"+IntegrationManager.Instance.SessionId;
         }
 
