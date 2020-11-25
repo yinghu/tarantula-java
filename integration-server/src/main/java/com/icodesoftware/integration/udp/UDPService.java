@@ -5,13 +5,12 @@ import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.*;
 import com.icodesoftware.integration.channel.PushEventChannel;
-import com.icodesoftware.integration.server.push.GameJoinTimeoutHandler;
-import com.icodesoftware.integration.server.push.GameSpecHandler;
 import com.icodesoftware.integration.server.push.ServerPushMessageHandler;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.HttpCaller;
+import com.icodesoftware.util.TarantulaThreadFactory;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -54,6 +53,8 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     private AtomicInteger messageId;
     private AtomicInteger reservedMessageId;
     private int messageIdOffset;
+    private int schedulingPoolSize;
+    private int poolSize;
     private JsonParser parser;
     public UDPService(JsonObject config){
         sessionId = new AtomicInteger(0);
@@ -68,6 +69,8 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         mChannels = new ConcurrentHashMap<>();
         configHeader = config.getAsJsonObject("tarantula").get("name").getAsString();
         messageIdOffset = config.getAsJsonObject("tarantula").get("messageIdOffset").getAsInt();
+        schedulingPoolSize = config.getAsJsonObject("tarantula").get("schedulingPoolSize").getAsInt();
+        poolSize = config.getAsJsonObject("tarantula").get("messagingPoolSize").getAsInt();
         secured = config.getAsJsonObject("connection").get("secured").getAsBoolean();
         httpCaller = new HttpCaller(config.getAsJsonObject(configHeader).get("url").getAsString());
         AckMessageHandler ackMessageHandler = new AckMessageHandler(this);
@@ -106,37 +109,39 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         }
     }
     public void start() throws Exception{
-        scheduledExecutorService = Executors.newScheduledThreadPool(1);
+        scheduledExecutorService = Executors.newScheduledThreadPool(schedulingPoolSize,new TarantulaThreadFactory("scheduling"));
         this.datagramChannel = DatagramChannel.open();
         InetSocketAddress iAdd = new InetSocketAddress(address,port);
         this.datagramChannel.bind(iAdd);
-        executorService = Executors.newFixedThreadPool(3);
-        executorService.execute(()->{
-            while (true){
-                try{
-                    PendingMessage pendingMessage = mQueue.poll();
-                    if(pendingMessage!=null){
-                        if(pendingMessage.pendingType == PendingMessage.INBOUND){
-                            ByteBuffer buffer = pendingMessage.data;
-                            buffer.flip();
-                            byte[] data = new byte[buffer.limit()];
-                            buffer.get(data,0,data.length);
-                            InboundMessage inboundMessage = new InboundMessage("",secured?ByteBuffer.wrap(decrypt(data)):ByteBuffer.wrap(data),pendingMessage.source);
-                            GameChannel gameChannel = mChannels.get(inboundMessage.connectionId());
-                            gameChannel.onMessage(inboundMessage);
+        executorService = Executors.newFixedThreadPool(poolSize,new TarantulaThreadFactory("messaging"));
+        for(int i=0;i<poolSize;i++){
+            executorService.execute(()->{
+                while (true){
+                    try{
+                        PendingMessage pendingMessage = mQueue.poll();
+                        if(pendingMessage!=null){
+                            if(pendingMessage.pendingType == PendingMessage.INBOUND){
+                                ByteBuffer buffer = pendingMessage.data;
+                                buffer.flip();
+                                byte[] data = new byte[buffer.limit()];
+                                buffer.get(data,0,data.length);
+                                InboundMessage inboundMessage = new InboundMessage("",secured?ByteBuffer.wrap(decrypt(data)):ByteBuffer.wrap(data),pendingMessage.source);
+                                GameChannel gameChannel = mChannels.get(inboundMessage.connectionId());
+                                gameChannel.onMessage(inboundMessage);
+                            }
+                            else if(pendingMessage.pendingType == PendingMessage.OUTBOUND){
+                                pendingMessage.runnable.run();
+                            }
                         }
-                        else if(pendingMessage.pendingType == PendingMessage.OUTBOUND){
-                            pendingMessage.runnable.run();
+                        else{
+                            Thread.sleep(10);
                         }
+                    }catch (Exception ex){
+                        ex.printStackTrace();
                     }
-                    else{
-                        Thread.sleep(10);
-                    }
-                }catch (Exception ex){
-                    ex.printStackTrace();
                 }
-            }
-        });
+            });
+        }
         httpCaller._init();
         this.serverId = UUID.randomUUID().toString();
         this.accessKey = config.getAsJsonObject(configHeader).get("accessKey").getAsString();
