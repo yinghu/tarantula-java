@@ -6,8 +6,6 @@ namespace Integration.Game
 {
     public class Player : ClusteringObject
     {
-        
-        private Vector3 _target;
         private const float Speed = 6f;
         private Vector3 _end;
         public GameObject bullet;
@@ -22,8 +20,7 @@ namespace Integration.Game
             {
                 _end = buffer.GetVector3();
             });
-            _target = transform.position;
-            _end = _target;
+            _end = transform.position;
             _timer = 0.5f;
             Messenger.RegisterMessageHandler(MessageType.Relay,sequence,(sessionId, data) =>
             {

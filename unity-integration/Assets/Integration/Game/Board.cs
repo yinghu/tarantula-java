@@ -7,6 +7,7 @@ namespace Integration.Game
 {
     public class Board : ClusteringObject
     {
+        public CameraAdapter cameraAdapter;
         public Camera mainCamera;
         public Player[] players;
         private int _seat;
@@ -72,8 +73,8 @@ namespace Integration.Game
             }
             _lastPosition = hit.point;
             players[_seat].Move(hit.point);
+            cameraAdapter.Adapt(hit.point);
         }
-
         public async void OnFreeMove()
         {
             using (var buffer = new DataBuffer())
