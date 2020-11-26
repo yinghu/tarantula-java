@@ -8,7 +8,7 @@ namespace Integration.Game
     {
         
         private Vector3 _target;
-        private const float Speed = 3f;
+        private const float Speed = 6f;
         private Vector3 _end;
         
         private float _timer;
