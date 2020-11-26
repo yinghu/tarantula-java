@@ -150,7 +150,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                         cin = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(name));
                         ret = cin.readAllBytes();
                     }catch (Exception ex3){
-                        log.warn("Resource ["+name+"] not existed",ex3);
+                        log.warn("Resource ["+name+"] not existed");
                     }
                     finally {
                         if(cin!=null){
