@@ -1,8 +1,6 @@
 package com.tarantula.game;
 
 import com.icodesoftware.Connection;
-import com.icodesoftware.protocol.DataBuffer;
-import com.icodesoftware.protocol.MessageHandler;
 
 import java.util.ArrayDeque;
 import java.util.UUID;
@@ -16,10 +14,11 @@ public class Room{
     static final int PENDING_JOIN = 1; //waiting after first join
     static final int INITIALIZING = 2; //starting game on full join
     static final int STARTING = 3; //battling
-    static final int OVERTIME = 4; //waiting for ending
-    static final int ENDING = 5; //ending game
-    static final int TIMEOUT = 6; //end without connection
-    static final int PENDING_END = 7;
+    static final int CLOSING = 4;
+    static final int OVERTIME = 5; //waiting for ending
+    static final int ENDING = 6; //ending game
+    static final int TIMEOUT = 7; //end without connection
+    static final int PENDING_END = 8;
 
     static final long PENDING_TIME = 5000;//5 SECONDS
     static final long TIMER_DELTA = 1000; //1 SECOND
@@ -28,6 +27,7 @@ public class Room{
     public static final int OFF_LINE_MODE = 0;
 
     private int capacity;
+    private int joinsOnStart;
     private int totalJoined;
     private boolean online;
     private int  rankUpBase;
@@ -56,14 +56,17 @@ public class Room{
         totalJoined++;
         Stub _stub = pQueue.poll();
         _stub.rating = rating;
-        if(totalJoined==capacity){
+        if(totalJoined==joinsOnStart){
             state = INITIALIZING;
+            initialTime = PENDING_TIME;
         }
-        else{
-            state =  PENDING_JOIN;
+        else if(state==WAITING){
+            state = PENDING_JOIN;
+            initialTime = PENDING_TIME*6;
+        }
+        if(totalJoined<capacity){
             roomListener.onJoining(this);
         }
-        initialTime = PENDING_TIME*6;
         return _stub;
     }
 
@@ -84,8 +87,9 @@ public class Room{
         }
         return true;
     }
-    public void reset(int capacity,long duration,boolean online,int rankUpBase,Arena arena){
+    public void reset(int capacity,int joinsOnStart,long duration,boolean online,int rankUpBase,Arena arena){
         this.capacity = capacity;
+        this.joinsOnStart = joinsOnStart;
         this.duration = duration;
         this.online = online;
         this.arena = arena;
@@ -140,6 +144,9 @@ public class Room{
     public int capacity(){
         return this.capacity;
     }
+    public int joinsOnStart(){
+        return joinsOnStart;
+    }
     public int rankUpBase(){
         return this.rankUpBase;
     }
@@ -178,8 +185,17 @@ public class Room{
                 break;
             case STARTING:
                 duration -=TIMER_DELTA;
-                if(duration<=0){//goes to overtime
+                if(duration<=0){//goes to closing time
+                    state = CLOSING;
+                    overtime = PENDING_TIME;
+                    pendingUpdate = this.roomListener.onClosing(this);
+                }
+                break;
+            case CLOSING:
+                overtime -= TIMER_DELTA;
+                if(overtime<=0){
                     state = OVERTIME;
+                    overtime = PENDING_TIME;
                     pendingUpdate = this.roomListener.onOverTiming(this);
                 }
                 break;

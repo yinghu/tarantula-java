@@ -265,6 +265,10 @@ public class AdminRoleModule implements Module {
                 Zone zone = gameLobby.zone;
                 zone.name = onAccess.name();
                 zone.capacity = ((Number)onAccess.property("capacity")).intValue();
+                zone.joinsOnStart = ((Number)onAccess.property("joinsOnStart")).intValue();
+                if(zone.joinsOnStart>zone.capacity){
+                    zone.joinsOnStart = zone.capacity;
+                }
                 zone.roundDuration = ((Number)onAccess.property("duration")).intValue()*60000;
                 zone.playMode = ((Number)onAccess.property("playMode")).intValue();
                 int lmit = ((Number)onAccess.property("levelLimit")).intValue();
@@ -298,11 +302,16 @@ public class AdminRoleModule implements Module {
                             pu.xp = a.xp;
                             pu.level = a.level;
                             pu.capacity = a.capacity;
+                            pu.joinsOnStart = a.joinsOnStart;
                             pu.duration = a.duration;
                             pu.disabled(a.disabled());
                             a.name(onAccess.name());
                             a.xp = ((Number)onAccess.property("xp")).intValue();
                             a.capacity = ((Number)onAccess.property("capacity")).intValue();
+                            a.joinsOnStart = ((Number)onAccess.property("joinsOnStart")).intValue();
+                            if(a.joinsOnStart>a.capacity){
+                                a.joinsOnStart = a.capacity;
+                            }
                             a.duration = ((Number)onAccess.property("duration")).intValue()*60000;
                             a.disabled(disabled);
                             updated = true;
@@ -328,6 +337,7 @@ public class AdminRoleModule implements Module {
                             ap.level = pu.level;
                             ap.xp = pu.xp;
                             ap.capacity = pu.capacity;
+                            ap.joinsOnStart = pu.joinsOnStart;
                             ap.duration = pu.duration;
                             ap.name(pu.name());
                             ap.disabled(pu.disabled());
@@ -340,6 +350,7 @@ public class AdminRoleModule implements Module {
                         a.xp = ((Number)onAccess.property("xp")).intValue();
                         a.level = index;
                         a.capacity = ((Number)onAccess.property("capacity")).intValue();
+                        a.joinsOnStart = ((Number)onAccess.property("joinsOnStart")).intValue();
                         a.duration = ((Number)onAccess.property("duration")).intValue()*60000;
                         a.disabled((Boolean)onAccess.property("disabled"));
                         zone.arenas.add(a);

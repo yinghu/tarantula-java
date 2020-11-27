@@ -168,6 +168,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
     public void onUpdated(Configurable zone) {
         mZone.reset((Zone)zone);
         this.context.log("Play mode->"+mZone.playMode,OnLog.WARN);
+        this.context.log("joinsOnStart->"+mZone.joinsOnStart,OnLog.WARN);
         mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
     }
     private JsonObject toMessage(String msg,boolean successful){

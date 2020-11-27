@@ -10,6 +10,7 @@ public class Arena extends OnApplicationHeader {
     public int level;
     public int xp;
     public int capacity;
+    public int joinsOnStart;
     public long duration;
     public Arena(){}
     public Arena(String bucket,String oid,int level){
@@ -23,6 +24,7 @@ public class Arena extends OnApplicationHeader {
         this.properties.put("level",level);
         this.properties.put("xp",xp);
         this.properties.put("capacity",capacity);
+        this.properties.put("joinsOnStart",joinsOnStart);
         this.properties.put("duration",duration);
         this.properties.put("disabled",disabled);
         return this.properties;
@@ -33,6 +35,7 @@ public class Arena extends OnApplicationHeader {
         this.level = ((Number)properties.get("level")).intValue();
         this.xp = ((Number)properties.get("xp")).intValue();
         this.capacity = ((Number)properties.getOrDefault("capacity",0)).intValue();
+        this.joinsOnStart = ((Number)properties.getOrDefault("joinsOnStart",capacity)).intValue();
         this.duration = ((Number)properties.getOrDefault("duration",0)).longValue();
         this.disabled = (boolean)properties.get("disabled");
     }
@@ -70,6 +73,7 @@ public class Arena extends OnApplicationHeader {
         _cp.level = this.level;
         _cp.xp = this.xp;
         _cp.capacity = this.capacity;
+        _cp.joinsOnStart = this.joinsOnStart;
         _cp.duration = this.duration;
         _cp.name = this.name;
         return _cp;

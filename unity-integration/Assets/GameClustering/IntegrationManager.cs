@@ -212,6 +212,10 @@ namespace GameClustering
             {
                 Debug.Log("GAME START->"+sessionId);
             });
+            Messenger.RegisterMessageHandler(MessageType.GameClosing,0, (sessionId, buffer) =>
+            {
+                Debug.Log("GAME Closing->"+sessionId);
+            });
             Messenger.RegisterMessageHandler(MessageType.GameOvertime,0, (sessionId, buffer) =>
             {
                 Debug.Log("GAME overtime->"+sessionId);

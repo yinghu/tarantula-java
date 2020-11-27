@@ -6,6 +6,7 @@ namespace Integration.Game
 {
     public class Player : ClusteringObject
     {
+        
         private const float Speed = 6f;
         private Vector3 _end;
         public GameObject bullet;

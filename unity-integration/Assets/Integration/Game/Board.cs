@@ -39,15 +39,24 @@ namespace Integration.Game
             {
                 MessageContext.Instance.Execute(data, buffer =>
                 {
-                    var oid = buffer.GetInt();
-                    var pos = buffer.GetVector3();
-                    pos.y = freeMove.transform.position.y;
-                    var fm = Instantiate(freeMove,pos,Quaternion.identity);
-                    var fmc = fm.GetComponent<FreeMove>();
-                    fmc.Setup(oid,sessionId==Manager.SessionId);
-                    if (fmc.master)
+                    var opt = buffer.GetInt();
+                    switch (opt)
                     {
-                        _gameObjects.Add(fm);
+                        case 1:
+                            var oid = buffer.GetInt();
+                            var pos = buffer.GetVector3();
+                            pos.y = freeMove.transform.position.y;
+                            var fm = Instantiate(freeMove, pos, Quaternion.identity);
+                            var fmc = fm.GetComponent<FreeMove>();
+                            fmc.Setup(oid, sessionId == Manager.SessionId);
+                            if (fmc.master)
+                            {
+                                _gameObjects.Add(fm);
+                            }
+                            break;
+                        case 2:
+                            //spawn something else
+                            break;
                     }
                 });    
             });
@@ -79,6 +88,7 @@ namespace Integration.Game
         {
             using (var buffer = new DataBuffer())
             {
+                buffer.PutInt(1);
                 buffer.PutInt(Messenger.Sequence());
                 buffer.PutVector3(_lastPosition);
                 await Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer);

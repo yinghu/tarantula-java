@@ -14,6 +14,7 @@ public class GameLobby {
         jsonObject.addProperty("tag",lobby.tag());
         jsonObject.addProperty("rank",lobby.accessRank());
         jsonObject.addProperty("capacity",zone.capacity);
+        jsonObject.addProperty("joinsOnStart",zone.joinsOnStart);
         jsonObject.addProperty("duration",zone.roundDuration/60000);
         jsonObject.addProperty("playMode",zone.toPlayMode());
         jsonObject.addProperty("levelLimit",zone.levelLimit>0?zone.levelLimit:lobby.capacity());
@@ -25,6 +26,7 @@ public class GameLobby {
             jd.addProperty("level",a.level);
             jd.addProperty("xp",a.xp);
             jd.addProperty("capacity",a.capacity);
+            jd.addProperty("joinsOnStart",a.joinsOnStart);
             jd.addProperty("duration",a.duration/60000);
             jd.addProperty("disabled",a.disabled());
             jds.add(jd);

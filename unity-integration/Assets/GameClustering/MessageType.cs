@@ -20,8 +20,9 @@
         public const int OnSync = 104;
         
         public const int GameStart = 202;
-        public const int GameClose = 203;
-        public const int GameEnd = 204;
+        public const int GameClosing = 203;
+        public const int GameClose = 204;
+        public const int GameEnd = 205;
 
         public const int GameJoinTimeout = 305;
         public const int GameOvertime = 306;

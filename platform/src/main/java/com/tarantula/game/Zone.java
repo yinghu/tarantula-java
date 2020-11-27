@@ -33,6 +33,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     public long roundDuration =60000;
     public long overtime = Room.PENDING_TIME;
     public int playMode = Room.INTEGRATED_MODE;
+    public int joinsOnStart = 1;
     public ConcurrentHashMap<String,Stub> stubIndex;
     public DeploymentServiceProvider deploymentServiceProvider;
     public GameServiceProvider gameServiceProvider;
@@ -74,7 +75,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
             }
             synchronized (this) {
                 Arena _ma = aMap.get(rating.xpLevel).copy();
-                matched.reset(_ma.capacity>0?_ma.capacity:this.capacity,_ma.duration>0?_ma.duration:this.roundDuration, playMode != Room.OFF_LINE_MODE, levelLimit, _ma);
+                matched.reset(_ma.capacity>0?_ma.capacity:this.capacity,_ma.joinsOnStart>0?_ma.joinsOnStart:this.joinsOnStart,_ma.duration>0?_ma.duration:this.roundDuration, playMode != Room.OFF_LINE_MODE, levelLimit, _ma);
             }
             return matched;
         }
@@ -92,7 +93,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         }
         synchronized (this){
             Arena _ma = this.aMap.get(rating.xpLevel).copy();
-            room.reset(SOLO_CAPACITY,_ma.duration>0?_ma.duration:this.roundDuration,false,levelLimit,_ma);
+            room.reset(SOLO_CAPACITY,SOLO_CAPACITY,_ma.duration>0?_ma.duration:this.roundDuration,false,levelLimit,_ma);
         }
         return room;
     }
@@ -179,6 +180,15 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         return new PendingUpdate(MessageHandler.GAME_START+"/true",dataBuffer);
     }
     @Override
+    public PendingUpdate onClosing(Room room){
+        //game closing
+        pendingMatch[room.arena().level].remove(room);
+        DataBuffer dataBuffer = new DataBuffer();
+        dataBuffer.putLong(room.connection().connectionId());
+        dataBuffer.putUTF8("closing");
+        return new PendingUpdate(MessageHandler.GAME_CLOSING+"/true",dataBuffer);
+    }
+    @Override
     public PendingUpdate onOverTiming(Room room){
         DataBuffer dataBuffer = new DataBuffer();
         dataBuffer.putLong(room.connection().connectionId());
@@ -250,11 +260,13 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         this.properties.put("5",name);
         this.properties.put("6",this.timestamp);
         this.properties.put("7",this.levelLimit);
+        this.properties.put("8",this.joinsOnStart);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.capacity = ((Number)properties.getOrDefault("1",capacity)).intValue();
+        this.joinsOnStart = ((Number)properties.getOrDefault("8",capacity)).intValue();
         this.roundDuration = ((Number)properties.getOrDefault("2",roundDuration)).longValue();
         this.overtime = ((Number)properties.getOrDefault("3",overtime)).longValue();
         this.playMode = ((Number)properties.getOrDefault("4",playMode)).intValue();
@@ -294,6 +306,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",true);
         jsonObject.addProperty("capacity",capacity);
+        jsonObject.addProperty("joinsOnStart",joinsOnStart);
         jsonObject.addProperty("duration",roundDuration/60000);
         jsonObject.addProperty("playMode",toPlayMode());
         JsonArray jds = new JsonArray();
@@ -342,6 +355,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         synchronized (this){//update local zone copy
             this.name = updated.name;
             this.capacity = updated.capacity;
+            this.joinsOnStart = updated.joinsOnStart;
             this.roundDuration = updated.roundDuration;
             this.playMode = updated.playMode;
             this.levelLimit = updated.levelLimit;

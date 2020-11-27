@@ -62,6 +62,9 @@ public class ServerPushMessageHandler extends AbstractMessageHandler {
             case GAME_START:
                 onGameStart(pendingInboundMessage);
                 break;
+            case GAME_CLOSING:
+                onGameClosing(pendingInboundMessage);
+                break;
             case GAME_CLOSE:
                 onGameClose(pendingInboundMessage);
                 break;
@@ -86,6 +89,11 @@ public class ServerPushMessageHandler extends AbstractMessageHandler {
     }
     private void onGameStart(InboundMessage inboundMessage){
         GameStartHandler gameJoinTimeoutHandler = new GameStartHandler(this.gameChannelService);
+        gameJoinTimeoutHandler.onMessage(inboundMessage);
+        gameJoinTimeoutHandler.relay();
+    }
+    private void onGameClosing(InboundMessage inboundMessage){
+        GameClosingHandler gameJoinTimeoutHandler = new GameClosingHandler(this.gameChannelService);
         gameJoinTimeoutHandler.onMessage(inboundMessage);
         gameJoinTimeoutHandler.relay();
     }
