@@ -35,6 +35,7 @@ public class Room{
     private Connection connection;
     private long initialTime;
     private long duration;
+    private long closingDuration;
     private long overtime;
     public String roomId;
     private int round;
@@ -51,6 +52,9 @@ public class Room{
     public synchronized Stub join(Rating rating){
         if(online&&connection==null){
             this.roomListener.onTimeout(this);
+            return null;
+        }
+        if(state>=CLOSING){
             return null;
         }
         totalJoined++;
@@ -91,6 +95,7 @@ public class Room{
         this.capacity = capacity;
         this.joinsOnStart = joinsOnStart;
         this.duration = duration;
+        this.closingDuration = 60000;
         this.online = online;
         this.arena = arena;
         this.rankUpBase = rankUpBase;
@@ -187,13 +192,12 @@ public class Room{
                 duration -=TIMER_DELTA;
                 if(duration<=0){//goes to closing time
                     state = CLOSING;
-                    overtime = PENDING_TIME;
                     pendingUpdate = this.roomListener.onClosing(this);
                 }
                 break;
             case CLOSING:
-                overtime -= TIMER_DELTA;
-                if(overtime<=0){
+                closingDuration -= TIMER_DELTA;
+                if(closingDuration<=0){
                     state = OVERTIME;
                     overtime = PENDING_TIME;
                     pendingUpdate = this.roomListener.onOverTiming(this);

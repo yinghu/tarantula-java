@@ -5,7 +5,7 @@ namespace GameClustering
 {
     public class ClusteringObject : MonoBehaviour
     {
-       
+        public int typeId;
         public int sequence;
         public bool master;
         protected async void StartClusteringObject(Action<DataBuffer> outboundSync,Action<DataBuffer> onSync)

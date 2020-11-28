@@ -33,7 +33,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
         Room room = session.accessMode()==Session.OFF_LINE_MODE?mZone.solo(rating):mZone.match(rating);
         Stub stub = room.join(rating);
         if(stub==null){
-            session.write(toMessage("no room available",false).toString().getBytes(),label());
+            session.write(toMessage("no room available,please try later",false).toString().getBytes(),label());
             return;
         }
         stub.tag = this.context.descriptor().tag();
