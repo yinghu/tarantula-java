@@ -914,7 +914,7 @@ MonoBehaviour:
   bText: {fileID: 262091534}
   freeMove: {fileID: 3335569375951093907, guid: 4720c143044f1e14bb5f8e1691710f7c,
     type: 3}
-  players:
+  types:
   - {fileID: 1062142694984116038, guid: 0f85182f09fddf74b96816cfcad60851, type: 3}
   - {fileID: 4490919980339737137, guid: e8b38770f8a1d4040ab33e985cf3e6a6, type: 3}
 --- !u!1 &844913535

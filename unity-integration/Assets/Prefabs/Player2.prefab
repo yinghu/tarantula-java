@@ -123,6 +123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f17929e3f0f4273bd31243d02fda399, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  typeId: 1
   sequence: 3
   master: 0
   bullet: {fileID: 5691957396206501052, guid: f8bee96247221874bb943879106e8cae, type: 3}

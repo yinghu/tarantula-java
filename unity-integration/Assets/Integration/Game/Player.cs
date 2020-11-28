@@ -13,9 +13,10 @@ namespace Integration.Game
         private float _timer;
         private void Start()
         {
-            StartClusteringObject(buffer =>
+            StartClusteringObject(async buffer =>
             {
-                buffer.PutVector3(transform.position);    
+                buffer.PutVector3(transform.position);
+                await Messenger.SendAsync(MessageType.OnSync, sequence, true, buffer);
             },
             buffer =>
             {

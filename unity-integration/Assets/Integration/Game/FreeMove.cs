@@ -57,9 +57,9 @@ namespace Integration.Game
             }
         }
         
-        public override void Setup(int tid,int oid, bool owner)
+        public override void Setup(int oid, bool owner)
         {
-            base.Setup(tid,oid,owner);
+            base.Setup(oid,owner);
             Messenger.RegisterMessageHandler(MessageType.Relay,sequence, (sessionId, data) =>
             {
                 MainThread.Execute(data, buffer =>

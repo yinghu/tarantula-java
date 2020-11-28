@@ -10,17 +10,15 @@ namespace GameClustering
         public bool master;
         protected async void StartClusteringObject(Action<DataBuffer> outboundSync,Action<DataBuffer> onSync)
         {
-            
             Messenger.RegisterMessageHandler(MessageType.Sync,sequence,  (sessionId,data) =>
             {
                 if (sessionId == Manager.SessionId)
                 {
                     return;
                 }
-                MainThread.Execute(async buffer =>
+                MainThread.Execute( buffer =>
                 {
                     outboundSync?.Invoke(buffer);
-                    await Messenger.SendAsync(MessageType.OnSync, sequence, true, buffer);
                 });
             });
             Messenger.RegisterMessageHandler(MessageType.OnSync,sequence, (sessionId, data) =>
@@ -41,9 +39,8 @@ namespace GameClustering
         protected static MessageContext MainThread => MessageContext.Instance;
         protected static IntegrationManager Manager => IntegrationManager.Instance;
 
-        public virtual void Setup(int objType,int objId,bool owner)
+        public virtual void Setup(int objId,bool owner)
         {
-            typeId = objType;
             sequence = objId;
             master = owner;
         }

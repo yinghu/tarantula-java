@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3335569375951093908}
   - component: {fileID: 3335569375951093909}
   m_Layer: 0
-  m_Name: FreeObject
+  m_Name: FreeMove
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -122,5 +122,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 041c64f6e8ef409982bfdcb684833804, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sequence: 3
-  bullet: {fileID: 5691957396206501052, guid: f8bee96247221874bb943879106e8cae, type: 3}
+  typeId: 100
+  sequence: 0
+  master: 0
