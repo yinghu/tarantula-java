@@ -11,6 +11,7 @@ import java.util.Map;
 public class Stub extends RecoverableObject {
 
     public String roomId;
+    public int capacity;
     public int seat;
     public String tag;
 
@@ -37,6 +38,7 @@ public class Stub extends RecoverableObject {
         jo.addProperty("owner",owner);
         jo.addProperty("seat",seat);
         jo.addProperty("roomId",roomId);
+        jo.addProperty("capacity",capacity);
         jo.addProperty("tag",tag);
         jo.addProperty("rank",rating.rank);
         jo.addProperty("level",rating.xpLevel);

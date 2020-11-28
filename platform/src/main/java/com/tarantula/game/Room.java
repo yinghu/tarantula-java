@@ -103,6 +103,7 @@ public class Room{
         this.stubs = new Stub[this.capacity];
         for(int i=0;i<this.capacity;i++){
             Stub stub = new Stub(i,roomId);
+            stub.capacity = this.capacity;
             this.pQueue.offer(stub);
             this.stubs[i] = stub;
         }
@@ -131,6 +132,7 @@ public class Room{
         this.stubs = new Stub[this.capacity];
         for(int i=0;i<this.capacity;i++){
             Stub stub = new Stub(i,roomId);
+            stub.capacity = this.capacity;
             this.pQueue.offer(stub);
             this.stubs[i] = stub;
         }

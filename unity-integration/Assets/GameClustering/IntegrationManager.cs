@@ -282,6 +282,7 @@ namespace GameClustering
                 }
                 Presence.Lobby = (string)jo.SelectToken("stub").SelectToken("tag");
                 Presence.Seat = (int)jo.SelectToken("stub").SelectToken("seat");
+                Presence.Capacity = (int)jo.SelectToken("stub").SelectToken("capacity");
                 var pc = jo.SelectToken("connection");
                 var connection = new Connection
                 {

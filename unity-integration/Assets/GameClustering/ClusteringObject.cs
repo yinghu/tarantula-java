@@ -40,5 +40,12 @@ namespace GameClustering
         protected static IMessenger Messenger => IntegrationManager.Instance.Messenger;
         protected static MessageContext MainThread => MessageContext.Instance;
         protected static IntegrationManager Manager => IntegrationManager.Instance;
+
+        public virtual void Setup(int objType,int objId,bool owner)
+        {
+            typeId = objType;
+            sequence = objId;
+            master = owner;
+        }
     }
 }

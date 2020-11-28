@@ -9,20 +9,24 @@ namespace Integration.Game
     {
         public CameraAdapter cameraAdapter;
         public Camera mainCamera;
-        public Player[] players;
+        private Player[] _players;
         private int _seat;
         public TMP_Text bText;
         public GameObject freeMove;
+        public GameObject[] players;
         private Vector3 _lastPosition;
         private List<GameObject> _gameObjects;
-        private  void Start()
+        private async void Start()
         {
+         
             StartClusteringObject(buffer =>
             {
                 buffer.PutInt(_gameObjects.Count);
                 _gameObjects.ForEach(gmo =>
                 {
-                    buffer.PutInt(gmo.GetComponent<FreeMove>().sequence);
+                    var fm = gmo.GetComponent<ClusteringObject>();
+                    buffer.PutInt(fm.typeId);
+                    buffer.PutInt(fm.sequence);
                 });
             }, buffer =>
             {
@@ -30,7 +34,7 @@ namespace Integration.Game
                 for (var i = 0; i < sz; i++)
                 {
                     var gm = Instantiate(freeMove);
-                    gm.GetComponent<FreeMove>().Setup(buffer.GetInt(),false);
+                    gm.GetComponent<ClusteringObject>().Setup(buffer.GetInt(),buffer.GetInt(),false);
                 }
             });
             _gameObjects = new List<GameObject>();
@@ -47,20 +51,32 @@ namespace Integration.Game
                             var pos = buffer.GetVector3();
                             pos.y = freeMove.transform.position.y;
                             var fm = Instantiate(freeMove, pos, Quaternion.identity);
-                            var fmc = fm.GetComponent<FreeMove>();
-                            fmc.Setup(oid, sessionId == Manager.SessionId);
+                            var fmc = fm.GetComponent<ClusteringObject>();
+                            fmc.Setup(1,oid, sessionId == Manager.SessionId);
                             if (fmc.master)
                             {
                                 _gameObjects.Add(fm);
                             }
                             break;
                         case 2:
-                            //spawn something else
+                            //spawn player
+                            var pid = buffer.GetInt();
+                            var player = Instantiate(players[Manager.Presence.Seat]).GetComponent<Player>();
+                            player.Setup(2,pid,sessionId==Manager.SessionId);
+                            _players[Manager.Presence.Seat] = player;
                             break;
                     }
                 });    
             });
             _seat = Manager.Presence.Seat;
+            _players = new Player[Manager.Presence.Capacity];
+            using (var buffer = new DataBuffer())
+            {
+                buffer.PutInt(2);
+                buffer.PutInt(Messenger.Sequence());
+                //buffer.PutVector3(_lastPosition);
+                await Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer);
+            }
             //if (_seat % 2 == 1)
             //{
                 //var pos = mainCamera.transform.rotation;
@@ -81,7 +97,7 @@ namespace Integration.Game
                 return;
             }
             _lastPosition = hit.point;
-            players[_seat].Move(hit.point);
+            _players[_seat].Move(hit.point);
             cameraAdapter.Adapt(hit.point);
         }
         public async void OnFreeMove()

@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 665d1e2eafe14f468bd68aea130ca6ec, type: 3}
   m_Name: IntegrationManager
   m_EditorClassIdentifier: 
-  gecHost: http://10.0.0.234:8090
+  gecHost: http://10.0.0.6:8090
   typeId: game

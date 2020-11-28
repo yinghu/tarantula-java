@@ -10,6 +10,7 @@
 
         public string Lobby { set; get; }
         public int Seat { set; get; }
+        public int Capacity { set; get; }
 
     }
 }
