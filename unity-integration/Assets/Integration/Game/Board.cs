@@ -12,45 +12,58 @@ namespace Integration.Game
         private Player[] _players;
         private int _seat;
         public TMP_Text bText;
-        public GameObject freeMove;
         public GameObject[] types;
         private Vector3 _lastPosition;
         private List<GameObject> _gameObjects;
         private async void Start()
         {
          
-            StartClusteringObject(async buffer =>
+            StartClusteringObject(  buffer =>
             {
-                buffer.PutInt(_gameObjects.Count);
-                _gameObjects.ForEach(gmo =>
+                _gameObjects.ForEach(async gmo =>
                 {
-                    var fm = gmo.GetComponent<ClusteringObject>();
-                    buffer.PutInt(fm.typeId);
-                    buffer.PutInt(fm.sequence);
+                    using (var batchBuffer = new DataBuffer())
+                    {
+                        var fm = gmo.GetComponent<ClusteringObject>();
+                        batchBuffer.PutInt(fm.typeId);
+                        batchBuffer.PutInt(fm.sequence);
+                        batchBuffer.PutVector3(fm.transform.position);
+                        await Messenger.SendAsync(MessageType.OnSync, sequence, true, batchBuffer);
+                    }
                 });
-                await Messenger.SendAsync(MessageType.OnSync, sequence,true,buffer);
             }, buffer =>
             {
-                var sz = buffer.GetInt();
-                for (var i = 0; i < sz; i++)
-                {
-                    var tid = buffer.GetInt();
-                    var gm = Instantiate(freeMove);
-                    gm.GetComponent<ClusteringObject>().Setup(buffer.GetInt(),false);
-                }
+                var tid = buffer.GetInt();
+                var oid = buffer.GetInt();
+                var gm = Instantiate(types[tid],buffer.GetVector3(),Quaternion.identity);
+                gm.GetComponent<ClusteringObject>().Setup(oid,false);
             });
             _gameObjects = new List<GameObject>();
-            _lastPosition = freeMove.transform.position;
+            _lastPosition = types[2].transform.position;
             Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId, data) =>
             {
                 MessageContext.Instance.Execute(data, buffer =>
                 {
-                    var opt = buffer.GetInt();
-                    switch (opt)
+                    var tid = buffer.GetInt();
+                    switch (tid)
                     {
+                        case 0:
                         case 1:
+                            //spawn player
+                            var pid = buffer.GetInt();
+                            var pm = Instantiate(types[tid]);
+                            var player = pm.GetComponent<Player>();
+                            player.Setup(pid,sessionId==Manager.SessionId);
+                            if (player.master)
+                            {
+                                _players[tid] = player;
+                                _gameObjects.Add(pm);
+                            }
+                            break;
+                        case 2:
                             var oid = buffer.GetInt();
                             var pos = buffer.GetVector3();
+                            var freeMove = types[2];
                             pos.y = freeMove.transform.position.y;
                             var fm = Instantiate(freeMove, pos, Quaternion.identity);
                             var fmc = fm.GetComponent<ClusteringObject>();
@@ -60,18 +73,6 @@ namespace Integration.Game
                                 _gameObjects.Add(fm);
                             }
                             break;
-                        case 2:
-                            //spawn player
-                            var pid = buffer.GetInt();
-                            var pm = Instantiate(types[Manager.Presence.Seat]);
-                            var player = pm.GetComponent<Player>();
-                            player.Setup(pid,sessionId==Manager.SessionId);
-                            _players[Manager.Presence.Seat] = player;
-                            if (player.master)
-                            {
-                                _gameObjects.Add(pm);
-                            }
-                            break;
                     }
                 });    
             });
@@ -79,7 +80,7 @@ namespace Integration.Game
             _players = new Player[Manager.Presence.Capacity];
             using (var buffer = new DataBuffer())
             {
-                buffer.PutInt(2);
+                buffer.PutInt(_seat);
                 buffer.PutInt(Messenger.Sequence());
                 await Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer);
             }
@@ -110,7 +111,7 @@ namespace Integration.Game
         {
             using (var buffer = new DataBuffer())
             {
-                buffer.PutInt(1);
+                buffer.PutInt(2);
                 buffer.PutInt(Messenger.Sequence());
                 buffer.PutVector3(_lastPosition);
                 await Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer);

@@ -182,7 +182,7 @@ namespace GameClustering
         {
             return _memoryStream.ToArray();
         }
-
+        
         private void WritePrimitiveBytes(byte[] bytes)
         {
             if (BitConverter.IsLittleEndian)
