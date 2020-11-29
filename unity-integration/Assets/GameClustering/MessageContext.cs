@@ -53,10 +53,10 @@ namespace GameClustering
         
         public static MessageContext Instance => _instance;
 
-        public void Execute(byte[] data, Action<DataBuffer> action)
+        public void Execute(byte[] data,Action<DataBuffer> action)
         {
             lock (_lock)
-            { 
+            {
                 _queue.Enqueue(new MainCaller {Data = data, Caller = action});
             }
         }
@@ -73,6 +73,6 @@ namespace GameClustering
     {
         public byte[] Data { set; get; }
         public Action<DataBuffer> Caller { set; get; }
-
+        
     }
 }

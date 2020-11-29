@@ -14,6 +14,7 @@ namespace Integration.Game
         public TMP_Text bText;
         public GameObject[] types;
         private Vector3 _lastPosition;
+        private const int FreeMoveTypeId = 4;
         private List<GameObject> _gameObjects;
         private async void Start()
         {
@@ -37,9 +38,9 @@ namespace Integration.Game
                 var oid = buffer.GetInt();
                 var gm = Instantiate(types[tid],buffer.GetVector3(),Quaternion.identity);
                 gm.GetComponent<ClusteringObject>().Setup(oid,false);
-            });
+            }); 
             _gameObjects = new List<GameObject>();
-            _lastPosition = types[2].transform.position;
+            _lastPosition = types[FreeMoveTypeId].transform.position;
             Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId, data) =>
             {
                 MessageContext.Instance.Execute(data, buffer =>
@@ -49,6 +50,8 @@ namespace Integration.Game
                     {
                         case 0:
                         case 1:
+                        case 2:
+                        case 3:
                             //spawn player
                             var pid = buffer.GetInt();
                             var pm = Instantiate(types[tid]);
@@ -60,10 +63,10 @@ namespace Integration.Game
                                 _gameObjects.Add(pm);
                             }
                             break;
-                        case 2:
+                        case FreeMoveTypeId:
                             var oid = buffer.GetInt();
                             var pos = buffer.GetVector3();
-                            var freeMove = types[2];
+                            var freeMove = types[tid];
                             pos.y = freeMove.transform.position.y;
                             var fm = Instantiate(freeMove, pos, Quaternion.identity);
                             var fmc = fm.GetComponent<ClusteringObject>();
@@ -111,7 +114,7 @@ namespace Integration.Game
         {
             using (var buffer = new DataBuffer())
             {
-                buffer.PutInt(2);
+                buffer.PutInt(FreeMoveTypeId);
                 buffer.PutInt(Messenger.Sequence());
                 buffer.PutVector3(_lastPosition);
                 await Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer);
