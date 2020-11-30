@@ -10,6 +10,7 @@ namespace Integration.Game
         private const float Speed = 6f;
         private Vector3 _end;
         public GameObject bullet;
+        public Transform firePoint;
         private float _timer;
         private void Start()
         {
@@ -64,7 +65,7 @@ namespace Integration.Game
         }
         private IEnumerator FireBullet()
         {
-            var shot = Instantiate(bullet,transform.position, Quaternion.identity);
+            var shot = Instantiate(bullet,firePoint.position, Quaternion.identity);
             yield return new WaitForSeconds(1);
             Destroy(shot);
         }

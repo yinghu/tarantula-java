@@ -126,3 +126,4 @@ MonoBehaviour:
   sequence: 0
   master: 0
   bullet: {fileID: 5691957396206501052, guid: f8bee96247221874bb943879106e8cae, type: 3}
+  firePoint: {fileID: 342174683233878189}
