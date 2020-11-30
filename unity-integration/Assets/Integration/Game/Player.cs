@@ -54,6 +54,7 @@ namespace Integration.Game
         {
             transform.position = Vector3.Lerp(transform.position, _end, Speed*Time.fixedDeltaTime);
             _timer -= Time.fixedDeltaTime;
+            transform.LookAt(_end);
             if (_timer > 0)
             {
                 return;

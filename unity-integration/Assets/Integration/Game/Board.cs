@@ -14,7 +14,7 @@ namespace Integration.Game
         public TMP_Text bText;
         public GameObject[] types;
         private Vector3 _lastPosition;
-        private const int FreeMoveTypeId = 4;
+        private const int FreeMoveTypeId = 5;
         private List<GameObject> _gameObjects;
         private async void Start()
         {
@@ -52,6 +52,7 @@ namespace Integration.Game
                         case 1:
                         case 2:
                         case 3:
+                        case 4:
                             //spawn player
                             var pid = buffer.GetInt();
                             var pm = Instantiate(types[tid]);
