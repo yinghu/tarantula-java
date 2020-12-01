@@ -80,8 +80,8 @@ namespace Integration.Game
                     }
                 });    
             });
-            _seat = Manager.Presence.Seat;
-            _players = new Player[Manager.Presence.Capacity];
+            _seat = Manager.Room.Seat;
+            _players = new Player[Manager.Room.Capacity];
             using (var buffer = new DataBuffer())
             {
                 buffer.PutInt(_seat);

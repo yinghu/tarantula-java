@@ -28,6 +28,7 @@ namespace GameClustering
         private static IntegrationManager _instance;
 
         public Presence Presence { get; private set; }
+        public Room Room { get; private set; }
         public bool Authenticated => Presence != null;
         public int SessionId { get; private set; }
 
@@ -251,7 +252,7 @@ namespace GameClustering
             await Messenger.SendAsync(MessageType.Leave, 0, true);
             var headers = new[]
             {
-                new Header {Name = Header.TarantulaTag, Value = Presence.Lobby},
+                new Header {Name = Header.TarantulaTag, Value = Room.Tag},
                 new Header {Name = Header.TarantulaToken, Value = Presence.Token},
                 new Header {Name = Header.TarantulaAction, Value = "onLeave"}
             };
@@ -280,9 +281,14 @@ namespace GameClustering
                 {
                     return false;
                 }
-                Presence.Lobby = (string)jo.SelectToken("stub").SelectToken("tag");
-                Presence.Seat = (int)jo.SelectToken("stub").SelectToken("seat");
-                Presence.Capacity = (int)jo.SelectToken("stub").SelectToken("capacity");
+
+                Room = new Room
+                {
+                    Id = (string) jo.SelectToken("stub").SelectToken("roomId"),
+                    Tag = (string) jo.SelectToken("stub").SelectToken("tag"),
+                    Seat = (int)jo.SelectToken("stub").SelectToken("seat"),
+                    Capacity = (int)jo.SelectToken("stub").SelectToken("capacity")
+                };
                 var pc = jo.SelectToken("connection");
                 var connection = new Connection
                 {
