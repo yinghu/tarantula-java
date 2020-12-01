@@ -6,25 +6,22 @@ namespace Integration.Game
 {
     public class FreeMove : ClusteringObject
     {
-        
-        private Vector3 _target;
         private const float Speed = 6f;
         private Vector3 _end;
         
         private float _timer;
         private float _delta;
+        private Board _board;
         private void Start()
         {
-            _timer = 0.5f;
-            _delta = 1;
-            _target = transform.position;
-            _end = _target;
-           
+            _timer = 1f;
+            _delta = Random.Range(-10, 10)>=0?2:-2;
+            _end = transform.position;
+            _board = FindObjectOfType<Board>();
         }
 
         private async Task Move(Vector3 target)
         {
-            //_end = target;
             using (var buffer = new DataBuffer())
             {
                 buffer.PutVector3(target);
@@ -39,22 +36,27 @@ namespace Integration.Game
             {
                 return;
             }
-            _timer = 0.5f;
+            _timer = 1f;
             if (!master)
             {
                 return;
             }
             var cur = transform.position;
-            var left = new Vector3(cur.x + (_delta), cur.y, cur.z);
+            var left = new Vector3(cur.x + _delta, cur.y, cur.z);
             await Move(left);
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.CompareTag("pvx"))
+            if (!other.gameObject.CompareTag("pvx"))
             {
-                _delta *= -1;
+                return;
             }
+            if (!master || !_board.Remove(sequence))
+            {
+                return;
+            }
+            Messenger.SendAsync(MessageType.Destroy, sequence, true);
         }
         
         public override void Setup(int oid, bool owner)
@@ -65,6 +67,13 @@ namespace Integration.Game
                 MainThread.Execute(data, buffer =>
                 {
                     _end = buffer.GetVector3();
+                });
+            });
+            Messenger.RegisterMessageHandler(MessageType.Destroy,sequence, (sessionId, data) =>
+            {
+                MainThread.Execute(data, buffer =>
+                {
+                    DestroyImmediate(gameObject);    
                 });
             });
         }

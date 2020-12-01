@@ -85,6 +85,8 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         mHandlers.put(pongMessageHandler.type(),pongMessageHandler);
         SpawnMessageHandler spawnMessageHandler = new SpawnMessageHandler(this);
         mHandlers.put(spawnMessageHandler.type(),spawnMessageHandler);
+        DestroyMessageHandler destroyMessageHandler = new DestroyMessageHandler(this);
+        mHandlers.put(destroyMessageHandler.type(),destroyMessageHandler);
         SyncMessageHandler syncMessageHandler = new SyncMessageHandler(this);
         mHandlers.put(syncMessageHandler.type(),syncMessageHandler);
         OnSyncMessageHandler onSyncMessageHandler = new OnSyncMessageHandler(this);

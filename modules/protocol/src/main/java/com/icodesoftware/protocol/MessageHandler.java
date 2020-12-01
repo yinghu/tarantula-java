@@ -15,6 +15,7 @@ public interface MessageHandler {
     int VOTE = 7;
     int SYNC = 8;
     int ACTION = 9;
+    int DESTROY = 10;
 
     int ON_JOINED = 100;
     int ON_LEFT = 101;

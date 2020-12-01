@@ -16,13 +16,13 @@ namespace Integration.Game
         public GameObject[] types;
         private Vector3 _lastPosition;
         private const int FreeMoveTypeId = 4;
-        private List<GameObject> _gameObjects;
+        private Dictionary<int,GameObject> _gameObjects;
         
         private async void Start()
         {
-            StartClusteringObject(  buffer =>
+            StartClusteringObject(  async buffer =>
             {
-                _gameObjects.ForEach(async gmo =>
+                foreach (var gmo in _gameObjects.Values)
                 {
                     using (var batchBuffer = new DataBuffer())
                     {
@@ -32,15 +32,15 @@ namespace Integration.Game
                         batchBuffer.PutVector3(fm.transform.position);
                         await Messenger.SendAsync(MessageType.OnSync, sequence, true, batchBuffer);
                     }
-                });
+                }
             }, buffer =>
             {
                 var tid = buffer.GetInt();
                 var oid = buffer.GetInt();
                 var gm = Instantiate(types[tid],buffer.GetVector3(),Quaternion.identity);
                 gm.GetComponent<ClusteringObject>().Setup(oid,false);
-            }); 
-            _gameObjects = new List<GameObject>();
+            });
+            _gameObjects = new Dictionary<int, GameObject>();
             _lastPosition = types[FreeMoveTypeId].transform.position;
             Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId, data) =>
             {
@@ -61,7 +61,7 @@ namespace Integration.Game
                             if (player.master)
                             {
                                 _players[tid] = player;
-                                _gameObjects.Add(pm);
+                                _gameObjects[pid] = pm;
                             }
                             break;
                         case FreeMoveTypeId:
@@ -74,7 +74,7 @@ namespace Integration.Game
                             fmc.Setup(oid, sessionId == Manager.SessionId);
                             if (fmc.master)
                             {
-                                _gameObjects.Add(fm);
+                                _gameObjects[oid] = fm;
                             }
                             break;
                     }
@@ -121,6 +121,11 @@ namespace Integration.Game
                 buffer.PutVector3(_lastPosition);
                 await Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer);
             }
+        }
+
+        public bool Remove(int oid)
+        {
+            return _gameObjects.Remove(oid);
         }
     }
 }
