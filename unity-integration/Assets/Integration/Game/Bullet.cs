@@ -5,16 +5,19 @@ namespace Integration.Game
 {
     public class Bullet : MonoBehaviour
     {
-        private Rigidbody _rigidbody;
-
-        private void Start()
-        {
-            _rigidbody = GetComponent<Rigidbody>();
-        }
-
+        private const float Speed = 0.15f;
+        private Vector3 _shootDirection;
+        
         private void Update()
         {
-            _rigidbody.AddForce(transform.forward*1000);
+            
+            transform.Translate(_shootDirection * Speed);
+        }
+
+        public void Fire(Vector3 origin,Vector3 shootDirection)
+        {
+            transform.position = origin;
+            _shootDirection = shootDirection;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using GameClustering;
 using TMPro;
 using UnityEngine;
@@ -14,11 +15,11 @@ namespace Integration.Game
         public TMP_Text bText;
         public GameObject[] types;
         private Vector3 _lastPosition;
-        private const int FreeMoveTypeId = 5;
+        private const int FreeMoveTypeId = 4;
         private List<GameObject> _gameObjects;
+        
         private async void Start()
         {
-         
             StartClusteringObject(  buffer =>
             {
                 _gameObjects.ForEach(async gmo =>
@@ -52,7 +53,6 @@ namespace Integration.Game
                         case 1:
                         case 2:
                         case 3:
-                        case 4:
                             //spawn player
                             var pid = buffer.GetInt();
                             var pm = Instantiate(types[tid]);
@@ -96,7 +96,7 @@ namespace Integration.Game
             bText.text = "SessionId->"+Manager.SessionId;
         }
 
-        private void Update()
+        private async void Update()
         {
             if (!Input.GetMouseButtonDown(0))
             {
@@ -110,8 +110,9 @@ namespace Integration.Game
             _lastPosition = hit.point;
             _players[_seat].Move(hit.point);
             cameraAdapter.Adapt(hit.point);
+            await OnFreeMove();
         }
-        public async void OnFreeMove()
+        private async Task OnFreeMove()
         {
             using (var buffer = new DataBuffer())
             {

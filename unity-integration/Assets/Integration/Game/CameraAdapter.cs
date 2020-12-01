@@ -31,13 +31,13 @@ namespace Integration.Game
             }
             _end.y = pos.y;
             _end.z = point.z + (_zOffset);
-            if (_end.z < -19.5f)
+            if (_end.z < -21.7f)
             {
-                _end.z = -19.5f;
+                _end.z = -21.7f;
             }
-            else if (_end.z > -11.0f)
+            else if (_end.z > -13.4f)
             {
-                _end.z = -11.0f;
+                _end.z = -13.4f;
             }
         }
         private void FixedUpdate()

@@ -12,6 +12,8 @@ namespace Integration.Game
         public GameObject bullet;
         public Transform firePoint;
         private float _timer;
+
+        
         private void Start()
         {
             StartClusteringObject(async buffer =>
@@ -23,7 +25,7 @@ namespace Integration.Game
             {
                 _end = buffer.GetVector3();
             });
-            _end = transform.position;
+            _end = new Vector3(0,1,0);
             _timer = 0.5f;
             Messenger.RegisterMessageHandler(MessageType.Relay,sequence,(sessionId, data) =>
             {
@@ -65,7 +67,9 @@ namespace Integration.Game
         }
         private IEnumerator FireBullet()
         {
-            var shot = Instantiate(bullet,firePoint.position, Quaternion.identity);
+            var shot = Instantiate(bullet);
+            var ray = new Ray(firePoint.position,transform.forward);
+            shot.GetComponent<Bullet>().Fire(ray.origin,ray.GetPoint(10f));
             yield return new WaitForSeconds(1);
             Destroy(shot);
         }
