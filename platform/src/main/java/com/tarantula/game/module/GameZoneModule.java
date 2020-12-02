@@ -1,12 +1,14 @@
 package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.game.*;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.Rating;
+import com.tarantula.platform.statistics.StatsDelta;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
 import java.util.Base64;
@@ -54,25 +56,27 @@ public class GameZoneModule implements Module,Configurable.Listener{
         if(session.action().equals("onUpdated")){
             Stub stub = mStub.get(session.systemId());
             Room room = gameServiceProvider.getRoom(stub.roomId);
-            if(room.offline()){
-                //this.context.log(new String(payload),OnLog.WARN);
+            if(room!=null){
+                StatsDelta delta = toDelta(payload);
                 room.onUpdated(payload);
+                Statistics statistics = gameServiceProvider.statistics(session.systemId());
+                statistics.entry(delta.name).update(delta.value).update();
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
             }
             else{
-                session.write(toMessage("only offline mode can commit onUpdated by player",false).toString().getBytes(),label());
+                session.write(toMessage("no room joined",false).toString().getBytes(),label());
             }
         }
         else if(session.action().equals("onEnded")){
             Stub stub = mStub.get(session.systemId());
             Room room = gameServiceProvider.getRoom(stub.roomId);
-            if(room.offline()){
+            if(room!=null){
                 //this.context.log(new String(payload),OnLog.WARN);
                 //room.onEnded(payload);
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
             }
             else{
-                session.write(toMessage("only offline mode can commit onEnded by player",false).toString().getBytes(),label());
+                session.write(toMessage("no room joined",false).toString().getBytes(),label());
             }
         }
         else if(session.action().equals("onLeave")){
@@ -176,5 +180,10 @@ public class GameZoneModule implements Module,Configurable.Listener{
         jsonObject.addProperty("successful",successful);
         jsonObject.addProperty("message",msg);
         return jsonObject;
+    }
+    private StatsDelta toDelta(byte[] data){
+        JsonParser parser = new JsonParser();
+        JsonObject jo = parser.parse(new String(data)).getAsJsonObject();
+        return new StatsDelta(jo.get("Name").getAsString(),jo.get("Delta").getAsDouble());
     }
 }
