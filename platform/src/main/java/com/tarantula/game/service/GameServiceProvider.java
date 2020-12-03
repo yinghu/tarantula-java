@@ -128,7 +128,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.publisher = integrationCluster.subscribe(subscription,(e)->{
             Room room = roomIndex.get(e.trackId());
-            room.onUpdated(e.payload());
+            room.onUpdated(e.stub(),e.payload());
             return false;
         });
         logger.info("Game service provider ["+ NAME+"] started");
@@ -152,7 +152,6 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private double probability(double rating1,double rating2) {
         return 1.0 * 1.0 / (1 + 1.0 * (Math.pow(10, 1.0 * (rating1 - rating2) / 400)));
     }
-
     @Override
     public void onUpdated(LeaderBoard.Entry entry) {
         publisher.publish(new LeaderBoardGlobalEvent(dest,NAME,entry));

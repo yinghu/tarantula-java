@@ -8,6 +8,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.game.*;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.Rating;
+import com.tarantula.platform.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.statistics.StatsDelta;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
@@ -57,11 +58,13 @@ public class GameZoneModule implements Module,Configurable.Listener{
             Stub stub = mStub.get(session.systemId());
             Room room = gameServiceProvider.getRoom(stub.roomId);
             if(room!=null){
-                StatsDelta delta = toDelta(payload);
-                room.onUpdated(payload);
-                Statistics statistics = gameServiceProvider.statistics(session.systemId());
-                statistics.entry(delta.name).update(delta.value).update();
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
+                StatsDelta delta = toDelta(payload);
+                Statistics statistics = gameServiceProvider.statistics(session.systemId());
+                Statistics.Entry entry = statistics.entry(delta.name);
+                entry.update(delta.value).update();
+                LeaderBoard ldb = gameServiceProvider.leaderBoard(delta.name);
+                ldb.onAllBoard(entry);
             }
             else{
                 session.write(toMessage("no room joined",false).toString().getBytes(),label());
@@ -72,7 +75,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
             Room room = gameServiceProvider.getRoom(stub.roomId);
             if(room!=null){
                 //this.context.log(new String(payload),OnLog.WARN);
-                //room.onEnded(payload);
+                //room.onUpdated(payload);
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
             }
             else{

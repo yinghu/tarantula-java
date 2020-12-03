@@ -39,7 +39,7 @@ public class StatisticsModule implements Module {
                 ldb.total().rank((r,e)->{
                     view.board.add(new LeaderBoardView.EntryView(r,e.owner(),e.value(),e.timestamp()));
                 });
-                session.write(this.builder.create().toJson(ldb).getBytes(),label());
+                session.write(this.builder.create().toJson(view).getBytes(),label());
             }
             else{
                 throw new UnsupportedOperationException(session.action());

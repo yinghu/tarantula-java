@@ -22,5 +22,5 @@ public interface GameChannelService extends Serviceable {
 
     void pendingOutbound(ByteBuffer outboundMessage,SocketAddress source);
 
-    void onUpdate(Game game,byte[] payload);
+    void onUpdate(Game game,int type,byte[] payload);
 }

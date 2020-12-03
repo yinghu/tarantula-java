@@ -224,14 +224,15 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             return -1;
         }
     }
-    private void update(String zoneId,String roomId,byte[] payload){
+    private void update(String zoneId,String roomId,int type,byte[] payload){
         try{
             String[] headers = new String[]{
                     Session.TARANTULA_ACCESS_KEY,accessKey,
                     Session.TARANTULA_ACTION,"onUpdate",
                     Session.TARANTULA_SERVER_ID,serverId,
                     Session.TARANTULA_ROOM_ID,roomId,
-                    Session.TARANTULA_ZONE_ID,zoneId
+                    Session.TARANTULA_ZONE_ID,zoneId,
+                    Session.TARANTULA_NAME,""+type
             };
             httpCaller.post(path,payload,headers);
         }catch (Exception ex){
@@ -316,9 +317,9 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         gc.registerListener(this);
         mChannels.put(gc.channelId(),gc);
     }
-    public void onUpdate(Game game,byte[] payload){
+    public void onUpdate(Game game,int type,byte[] payload){
         mQueue.offer(new PendingMessage(()->{
-            update(game.zoneId(),game.roomId(),payload);
+            update(game.zoneId(),game.roomId(),type,payload);
         }));
     }
 }
