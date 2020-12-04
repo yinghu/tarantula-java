@@ -287,7 +287,8 @@ namespace GameClustering
                     Id = (string) jo.SelectToken("stub").SelectToken("roomId"),
                     Tag = (string) jo.SelectToken("stub").SelectToken("tag"),
                     Seat = (int)jo.SelectToken("stub").SelectToken("seat"),
-                    Capacity = (int)jo.SelectToken("stub").SelectToken("capacity")
+                    Capacity = (int)jo.SelectToken("stub").SelectToken("capacity"),
+                    Arena = (string) jo.SelectToken("stub").SelectToken("arena")
                 };
                 var pc = jo.SelectToken("connection");
                 var connection = new Connection

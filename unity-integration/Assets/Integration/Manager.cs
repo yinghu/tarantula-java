@@ -3,7 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
 namespace Integration
 {
     public class Manager : MonoBehaviour
@@ -12,7 +11,7 @@ namespace Integration
        
         public TMP_Text bText;
         private bool _playing;
-        private string _sceneName;
+        
         private void Awake()
         {
             _playing = false;
@@ -46,7 +45,7 @@ namespace Integration
                 return;
             }
             _integrationManager.OnJoinedEvent -= Join;
-            SceneManager.LoadScene(_sceneName);
+            SceneManager.LoadScene(_integrationManager.Room.Arena);
         }
 
         public async void Play()
@@ -59,79 +58,10 @@ namespace Integration
                     return;
                 }
             }
-            _sceneName = "Game";
             _integrationManager.OnJoinedEvent += Join;
             await _integrationManager.Lobby(this);
         }
 
-        public  async void Roll()
-        {
-            if (!_integrationManager.Authenticated)
-            {
-                if (!await _integrationManager.Device(this))
-                {
-                    bText.text = _integrationManager.Exception.Message;
-                    return;
-                }
-            }
-            _sceneName = "Roll";
-            _integrationManager.OnJoinedEvent += Join;
-            if (!await _integrationManager.Join(this))
-            {
-                bText.text = _integrationManager.Exception.Message;
-            }
-        }
-        public  async void Spawn()
-        {
-            if (!_integrationManager.Authenticated)
-            {
-                if (!await _integrationManager.Device(this))
-                {
-                    bText.text = _integrationManager.Exception.Message;
-                    return;
-                }
-            }
-            _sceneName = "Spawn";
-            _integrationManager.OnJoinedEvent += Join;
-            if (!await _integrationManager.Join(this))
-            {
-                bText.text = _integrationManager.Exception.Message;
-            }
-        }
-        public  async void Move()
-        {
-            if (!_integrationManager.Authenticated)
-            {
-                if (!await _integrationManager.Device(this))
-                {
-                    bText.text = _integrationManager.Exception.Message;
-                    return;
-                }
-            }
-            _sceneName = "Move";
-            _integrationManager.OnJoinedEvent += Join;
-            if (!await _integrationManager.Join(this))
-            {
-                bText.text = _integrationManager.Exception.Message;
-            }
-        }
-        public  async void Collide()
-        {
-            if (!_integrationManager.Authenticated)
-            {
-                if (!await _integrationManager.Device(this))
-                {
-                    bText.text = _integrationManager.Exception.Message;
-                    return;
-                }
-            }
-            _sceneName = "Collide";
-            _integrationManager.OnJoinedEvent += Join;
-            if (!await _integrationManager.Join(this))
-            {
-                bText.text = _integrationManager.Exception.Message;
-            }
-        }
         public async void Exit()
         {
             if (!await _integrationManager.Logout(this))

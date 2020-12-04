@@ -104,6 +104,7 @@ public class Room{
         for(int i=0;i<this.capacity;i++){
             Stub stub = new Stub(i,roomId);
             stub.capacity = this.capacity;
+            stub.arena = this.arena.name();
             this.pQueue.offer(stub);
             this.stubs[i] = stub;
         }
