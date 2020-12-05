@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gecHost: http://10.0.0.234:8090
   typeId: game
+  blocking: 0

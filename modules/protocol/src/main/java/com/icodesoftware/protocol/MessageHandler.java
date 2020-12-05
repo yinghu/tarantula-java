@@ -29,6 +29,7 @@ public interface MessageHandler {
     int GAME_CLOSING = 203;
     int GAME_CLOSE = 204;
     int GAME_END = 205;
+    int GAME_UPDATE = 206;
 
     int GAME_JOIN_TIMEOUT = 305;
     int GAME_OVERTIME = 306;

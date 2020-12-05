@@ -224,6 +224,9 @@ public class PushEventChannel implements GameChannel {
     public void onGame(Game game){
         this.game = game;
     }
+    public Game onGame(){
+        return this.game;
+    }
     public void registerListener(Listener listener){
         this.listener = listener;
     }

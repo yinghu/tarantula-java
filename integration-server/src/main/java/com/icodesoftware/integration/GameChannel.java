@@ -31,6 +31,7 @@ public interface GameChannel {
     void pending(SocketAddress socketAddress,int messageId,ByteBuffer pending);
 
     void onGame(Game game);
+    Game onGame();
     void registerListener(Listener listener);
 
     interface Listener{

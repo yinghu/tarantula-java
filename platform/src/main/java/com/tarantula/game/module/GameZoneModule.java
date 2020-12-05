@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.game.*;
 import com.tarantula.game.service.GameServiceProvider;
@@ -58,6 +59,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
             Stub stub = mStub.get(session.systemId());
             Room room = gameServiceProvider.getRoom(stub.roomId);
             if(room!=null){
+                //room.onUpdated();
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
                 StatsDelta delta = toDelta(payload);
                 Statistics statistics = gameServiceProvider.statistics(session.systemId());

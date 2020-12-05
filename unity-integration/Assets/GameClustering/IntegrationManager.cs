@@ -20,6 +20,7 @@ namespace GameClustering
 
         public string gecHost = "localhost:8090";
         public string typeId = "game";
+        public bool blocking = false;
         private HttpCaller _httpCaller;
         public IMessenger Messenger { private set; get; }
         public Exception Exception { private set; get; }
@@ -166,7 +167,7 @@ namespace GameClustering
         {
             Messenger = new UdpMessenger();
             Messenger.Connect(connection,Convert.FromBase64String(serverKey));
-            _thread = new Thread(Messenger.Listen);
+            _thread = blocking?new Thread(Messenger.Listen):new Thread(Messenger.ListenAsync);
             _thread.Start();
             Messenger.RegisterMessageHandler(MessageType.Join,0, (sessionId,data) =>
             {

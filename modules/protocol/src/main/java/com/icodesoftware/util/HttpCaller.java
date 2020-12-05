@@ -23,11 +23,6 @@ public class HttpCaller {
     private HttpClient client;
     private String host;
 
-    //public static String TARANTULA_PAYLOAD_SIZE ="Tarantula-payload-size";
-    //public static String TARANTULA_ACTION ="Tarantula-action";
-    //public static String TARANTULA_TAG ="Tarantula-tag";
-    //public static String TARANTULA_SERVER_ID ="Tarantula-server-id";
-    //public static String TARANTULA_ACCESS_KEY ="Tarantula-access-key";
 
     public HttpCaller(String host){
         this.host = host;
