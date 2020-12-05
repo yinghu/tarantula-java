@@ -32,6 +32,7 @@ public interface GameChannel {
 
     void onGame(Game game);
     Game onGame();
+    int totalRetries();
     void registerListener(Listener listener);
 
     interface Listener{

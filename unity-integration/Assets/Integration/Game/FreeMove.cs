@@ -12,9 +12,11 @@ namespace Integration.Game
         private float _timer;
         private float _delta;
         private Board _board;
+        private bool _sent;
         private void Start()
         {
-            _timer = 1f;
+            _sent = false;
+            _timer = 0.5f;
             _delta = Random.Range(-10, 10)>=0?2:-2;
             _end = transform.position;
             _board = FindObjectOfType<Board>();
@@ -24,6 +26,7 @@ namespace Integration.Game
         {
             using (var buffer = new DataBuffer())
             {
+                _sent = true;
                 buffer.PutVector3(target);
                 await Messenger.SendAsync(MessageType.Relay, sequence, true, buffer.ToArray());
             }
@@ -36,8 +39,8 @@ namespace Integration.Game
             {
                 return;
             }
-            _timer = 1f;
-            if (!master)
+            _timer = 0.5f;
+            if (!master||_sent)
             {
                 return;
             }
@@ -67,6 +70,7 @@ namespace Integration.Game
                 MainThread.Execute(data, buffer =>
                 {
                     _end = buffer.GetVector3();
+                    _sent = false;
                 });
             });
             Messenger.RegisterMessageHandler(MessageType.Destroy,sequence, (sessionId, data) =>

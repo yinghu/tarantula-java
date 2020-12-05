@@ -40,6 +40,7 @@ public class PushEventChannel implements GameChannel {
 
     private Game game;
     private Listener listener;
+    private int totalRetries;
 
     public PushEventChannel(final long channelId,final GameChannelService gameChannelService){
         this.channelId = channelId;
@@ -184,12 +185,14 @@ public class PushEventChannel implements GameChannel {
         }
     }
     public void retry(){
+        int[] _retries = {0};
         this.mMessage.forEach((k,v)->{
             RemoteSession session = mSession.get(k.sessionId);
             if(session!=null&&checkExpired(v.timestamp,500)){
                 v.timestamp = toUTCMilliseconds();
                 v.data.flip();
                 this.gameChannelService.pendingOutbound(v.data,v.source);
+                _retries[0]++;
                 v.retries--;
                 if(v.retries<0){
                     mMessage.remove(k);
@@ -201,14 +204,18 @@ public class PushEventChannel implements GameChannel {
                 v.timestamp = toUTCMilliseconds();
                 v.data.flip();
                 this.gameChannelService.pendingOutbound(v.data,k);
+                _retries[0]++;
                 v.retries--;
                 if(v.retries<0){
                     jIndex.remove(k);
                 }
             }
         });
+        totalRetries += _retries[0];
     }
-
+    public int totalRetries(){
+        return totalRetries;
+    }
     public void pending(int sessionId, int messageId, ByteBuffer pending,MessageHandler callback){
         mMessage.put(new PendingMessageIndex(sessionId,messageId),new PendingMessage(pending,toUTCMilliseconds(),2,callback));
     }

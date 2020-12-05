@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using GameClustering;
 using TMPro;
@@ -125,7 +126,8 @@ namespace Integration.Game
             _outbound = Messenger.TotalOutbound();
             var rate2 = Messenger.TotalInbound() - _inbound;
             _inbound = Messenger.TotalInbound();
-
+            //ThreadPool.GetMinThreads(out var w,out var io);
+            //Debug.Log("POOL->"+w+"////"+io);
             bText.text = "Retries->" + Messenger.TotalRetries() +
                          "\nPending->" + Messenger.PendingMessages() +
                          "\nOutbound->" + Messenger.TotalOutbound() +

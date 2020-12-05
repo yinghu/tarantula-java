@@ -184,7 +184,12 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         long retryTimeout = config.getAsJsonObject("tarantula").get("retryTimeout").getAsLong();
         long ackTimeout = config.getAsJsonObject("tarantula").get("ackTimeout").getAsLong();
         mChannels.forEach((k,v)->{
-            scheduledExecutorService.scheduleAtFixedRate(()->v.ping(),pingTimeout,pingTimeout,TimeUnit.MILLISECONDS);
+            scheduledExecutorService.scheduleAtFixedRate(()->{
+                v.ping();
+                if(v.totalRetries()>0){
+                    log.warn("total retries-"+v.totalRetries());
+                }
+            },pingTimeout,pingTimeout,TimeUnit.MILLISECONDS);
             scheduledExecutorService.scheduleAtFixedRate(()->v.retry(),retryTimeout,retryTimeout,TimeUnit.MILLISECONDS);
         });
         scheduledExecutorService.scheduleAtFixedRate(()->ack(),ackTimeout,ackTimeout,TimeUnit.MILLISECONDS);

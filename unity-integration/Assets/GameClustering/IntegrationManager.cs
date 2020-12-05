@@ -47,6 +47,8 @@ namespace GameClustering
         {
             _httpCaller = new HttpCaller(gecHost);
             _deviceId = SystemInfo.deviceUniqueIdentifier;
+            ThreadPool.SetMinThreads(1, 1);
+            ThreadPool.SetMaxThreads(4, 4);
         }
         public async Task<bool> Index(MonoBehaviour caller)
         {
