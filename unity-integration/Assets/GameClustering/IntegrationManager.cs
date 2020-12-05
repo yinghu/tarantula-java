@@ -34,7 +34,7 @@ namespace GameClustering
         public int SessionId { get; private set; }
 
         private Thread _thread;
-
+        private Thread _retryThread;
         [RuntimeInitializeOnLoadMethod]
         private static void _Init(){
             _instance = Resources.Load<IntegrationManager>("IntegrationManager");
@@ -169,6 +169,8 @@ namespace GameClustering
             Messenger.Connect(connection,Convert.FromBase64String(serverKey));
             _thread = blocking?new Thread(Messenger.Listen):new Thread(Messenger.ListenAsync);
             _thread.Start();
+            _retryThread = new Thread(Messenger.RetryAsync);
+            _retryThread.Start();
             Messenger.RegisterMessageHandler(MessageType.Join,0, (sessionId,data) =>
             {
                 using (var buffer = new DataBuffer(data))

@@ -172,25 +172,36 @@ namespace GameClustering
             return Send(type, sequence, ack, new byte[0]);
         }
 
-        public async Task<int> RetryAsync()
+        public async void RetryAsync()
         {
-            var retries = 0;
-            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            foreach (var kv in _pendingMessages)
+            while (_live)
             {
-                var retry = kv.Value;
-                if (timestamp - retry.Timestamp < _timeout || retry.Retries < 0)
+                try
                 {
-                    continue;
+                    Thread.Sleep((int)_timeout);
+                    var retries = 0;
+                    var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    foreach (var kv in _pendingMessages)
+                    {
+                        var retry = kv.Value;
+                        if (timestamp - retry.Timestamp < _timeout || retry.Retries < 0)
+                        {
+                            continue;
+                        }
+
+                        await _udpClient.SendAsync(retry.Data, retry.Data.Length);
+                        retries++;
+                        retry.Timestamp = timestamp;
+                        retry.Retries--;
+                    }
+                    _totalRetries += retries;
+                    ClearPendingGateways();
                 }
-                await _udpClient.SendAsync(retry.Data, retry.Data.Length);
-                retries++;
-                retry.Timestamp = timestamp;
-                retry.Retries--;
+                catch (Exception ex)
+                {
+                    Debug.Log(ex.StackTrace);
+                }
             }
-            _totalRetries += retries;
-            ClearPendingGateways();
-            return retries;
         }
         
         public async void ListenAsync()

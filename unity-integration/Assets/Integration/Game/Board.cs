@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GameClustering;
 using TMPro;
@@ -17,7 +18,9 @@ namespace Integration.Game
         private Vector3 _lastPosition;
         private const int FreeMoveTypeId = 4;
         private Dictionary<int,GameObject> _gameObjects;
-        
+
+        private int _outbound;
+        private int _inbound;
         private async void Start()
         {
             StartClusteringObject(  async buffer =>
@@ -94,6 +97,9 @@ namespace Integration.Game
                 //mainCamera.transform.Rotate(pos.x, pos.y, pos.z + 180);
             //}
             bText.text = "SessionId->"+Manager.SessionId;
+            _outbound = Messenger.TotalOutbound();
+            _inbound = Messenger.TotalInbound();
+            InvokeRepeating(nameof(Print), 1.0f, 1.0f);
         }
 
         private async void Update()
@@ -112,6 +118,23 @@ namespace Integration.Game
             cameraAdapter.Adapt(hit.point);
             await OnFreeMove();
         }
+
+        private void Print()
+        {
+            var rate1 = Messenger.TotalOutbound() - _outbound;
+            _outbound = Messenger.TotalOutbound();
+            var rate2 = Messenger.TotalInbound() - _inbound;
+            _inbound = Messenger.TotalInbound();
+
+            bText.text = "Retries->" + Messenger.TotalRetries() +
+                         "\nPending->" + Messenger.PendingMessages() +
+                         "\nOutbound->" + Messenger.TotalOutbound() +
+                         "\nOutbound->" + Messenger.TotalInbound() +
+                         "\nBytes->" + Messenger.TotalBytes() +
+                         "\nOutbound Rate->" + rate1 + 
+                         "\nInbound Rate->" + rate2;
+        }
+
         private async Task OnFreeMove()
         {
             using (var buffer = new DataBuffer())
