@@ -165,7 +165,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         }
         if(connection!=null){
            DataBuffer spec = roomSetting(room);
-           spec.putLong(connection.connectionId());
+           //spec.putLong(connection.connectionId());
            this.deploymentServiceProvider.registerPostOffice().onConnection(connection).send(MessageHandler.GAME_SPEC+"/true",spec.toArray());
         }
         return connection;
@@ -175,7 +175,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     public PendingUpdate onStarting(Room room){
         //game started
         DataBuffer dataBuffer = new DataBuffer();
-        dataBuffer.putLong(room.connection().connectionId());
+        //dataBuffer.putLong(room.connection().connectionId());
         dataBuffer.putUTF8("starting");
         return new PendingUpdate(MessageHandler.GAME_START+"/true",dataBuffer);
     }
@@ -184,20 +184,20 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         //game closing
         pendingMatch[room.arena().level].remove(room);
         DataBuffer dataBuffer = new DataBuffer();
-        dataBuffer.putLong(room.connection().connectionId());
+        //dataBuffer.putLong(room.connection().connectionId());
         dataBuffer.putUTF8("closing");
         return new PendingUpdate(MessageHandler.GAME_CLOSING+"/true",dataBuffer);
     }
     @Override
     public PendingUpdate onOverTiming(Room room){
         DataBuffer dataBuffer = new DataBuffer();
-        dataBuffer.putLong(room.connection().connectionId());
+        //dataBuffer.putLong(room.connection().connectionId());
         dataBuffer.putUTF8("overtime");
         return new PendingUpdate(MessageHandler.GAME_OVERTIME+"/true",dataBuffer);
     }
     public PendingUpdate onEnding(Room room) {
         DataBuffer dataBuffer = new DataBuffer();
-        dataBuffer.putLong(room.connection().connectionId());
+        //dataBuffer.putLong(room.connection().connectionId());
         dataBuffer.putUTF8("ending");
         return  new PendingUpdate(MessageHandler.GAME_CLOSE+"/true",dataBuffer);
     }
@@ -205,7 +205,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     public PendingUpdate onEnded(Room room){
         clearRoom(room);
         DataBuffer dataBuffer = new DataBuffer();
-        dataBuffer.putLong(room.connection().connectionId());
+        //dataBuffer.putLong(room.connection().connectionId());
         dataBuffer.putUTF8("ended");
         return new PendingUpdate(MessageHandler.GAME_END+"/true",dataBuffer);
     }
@@ -217,7 +217,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
             return null;
         }
         DataBuffer dataBuffer = new DataBuffer();
-        dataBuffer.putLong(room.connection().connectionId());
+        //dataBuffer.putLong(room.connection().connectionId());
         dataBuffer.putUTF8("ending");
         return new PendingUpdate(MessageHandler.GAME_JOIN_TIMEOUT+"/true",dataBuffer);
     }

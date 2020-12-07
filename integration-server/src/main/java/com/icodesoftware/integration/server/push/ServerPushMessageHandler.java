@@ -54,7 +54,7 @@ public class ServerPushMessageHandler extends AbstractMessageHandler {
             gameChannelService.pendingOutbound(ByteBuffer.wrap(gameChannelService.encode(ack)), pendingInboundMessage.source());
         }
         int seq = pendingInboundMessage.sequence();
-        log.warn("Server push->["+seq+"] from ["+pendingInboundMessage.source()+"]");
+        log.warn("Server push->["+seq+"] from ["+pendingInboundMessage.source()+"]["+pendingInboundMessage.connectionId()+"]");
         switch (seq){
             case GAME_SPEC:
                 gameSpecHandler.onMessage(pendingInboundMessage);

@@ -9,8 +9,8 @@ import com.icodesoftware.protocol.MessageHandler;
  */
 public class Echo extends AbstractGame {
 
-    public Echo(String zoneId,String roomId,GameChannelService gameChannelService){
-        super(zoneId,roomId,gameChannelService);
+    public Echo(GameChannelService gameChannelService){
+        super(gameChannelService);
     }
 
     @Override

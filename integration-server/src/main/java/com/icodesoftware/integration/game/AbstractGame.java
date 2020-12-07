@@ -2,6 +2,7 @@ package com.icodesoftware.integration.game;
 
 import com.icodesoftware.integration.Game;
 import com.icodesoftware.integration.GameChannelService;
+import com.icodesoftware.protocol.DataBuffer;
 
 
 /**
@@ -13,9 +14,7 @@ abstract public class AbstractGame implements Game {
     protected String roomId;
     protected GameChannelService gameChannelService;
 
-    public AbstractGame(String zoneId,String roomId,GameChannelService gameChannelService){
-        this.zoneId = zoneId;
-        this.roomId = roomId;
+    public AbstractGame(GameChannelService gameChannelService){
         this.gameChannelService = gameChannelService;
     }
 
@@ -28,4 +27,18 @@ abstract public class AbstractGame implements Game {
         return roomId;
     }
 
+    public void onSpec(DataBuffer dataBuffer){
+        int level = dataBuffer.getInt();
+        int capacity = dataBuffer.getInt();
+        long dur = dataBuffer.getLong();
+        long ovt = dataBuffer.getLong();
+        roomId = dataBuffer.getUTF8();
+        zoneId = dataBuffer.getUTF8();
+    }
+    public void onStart(){}
+    public void onClosing(){}
+    public void onClose(){}
+    public void onEnd(){}
+    public void onOvertime(){}
+    public void onJoinTimeout(){}
 }

@@ -22,6 +22,7 @@ namespace Integration.Game
 
         private int _outbound;
         private int _inbound;
+        private int _timer;
         private async void Start()
         {
             StartClusteringObject(  async buffer =>
@@ -100,6 +101,7 @@ namespace Integration.Game
             bText.text = "SessionId->"+Manager.SessionId;
             _outbound = Messenger.TotalOutbound();
             _inbound = Messenger.TotalInbound();
+            _timer = 1;
             InvokeRepeating(nameof(Print), 1.0f, 1.0f);
         }
 
@@ -122,19 +124,19 @@ namespace Integration.Game
 
         private void Print()
         {
+            _timer++;
             var rate1 = Messenger.TotalOutbound() - _outbound;
             _outbound = Messenger.TotalOutbound();
             var rate2 = Messenger.TotalInbound() - _inbound;
             _inbound = Messenger.TotalInbound();
-            //ThreadPool.GetMinThreads(out var w,out var io);
-            //Debug.Log("POOL->"+w+"////"+io);
             bText.text = "Retries->" + Messenger.TotalRetries() +
                          "\nPending->" + Messenger.PendingMessages() +
                          "\nOutbound->" + Messenger.TotalOutbound() +
-                         "\nOutbound->" + Messenger.TotalInbound() +
-                         "\nBytes->" + Messenger.TotalBytes() +
+                         "\nInbound->" + Messenger.TotalInbound() +
+                         "\nTotal Bytes->" + Messenger.TotalBytes() +
                          "\nOutbound Rate->" + rate1 + 
-                         "\nInbound Rate->" + rate2;
+                         "\nInbound Rate->" + rate2 +
+                         "\nTimer->"+_timer;
         }
 
         private async Task OnFreeMove()
