@@ -5,7 +5,6 @@ import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.*;
 import com.icodesoftware.integration.channel.PushEventChannel;
-import com.icodesoftware.integration.game.Echo;
 import com.icodesoftware.integration.server.push.ServerPushMessageHandler;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.*;
@@ -56,6 +55,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     private int messageIdOffset;
     private int schedulingPoolSize;
     private int poolSize;
+    private String application;
     private JsonParser parser;
     public UDPService(JsonObject config){
         sessionId = new AtomicInteger(0);
@@ -72,6 +72,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         messageIdOffset = config.getAsJsonObject("tarantula").get("messageIdOffset").getAsInt();
         schedulingPoolSize = config.getAsJsonObject("tarantula").get("schedulingPoolSize").getAsInt();
         poolSize = config.getAsJsonObject("tarantula").get("messagingPoolSize").getAsInt();
+        application = config.getAsJsonObject("tarantula").get("application").getAsString();
         secured = config.getAsJsonObject("connection").get("secured").getAsBoolean();
         httpCaller = new HttpCaller(config.getAsJsonObject(configHeader).get("url").getAsString());
         AckMessageHandler ackMessageHandler = new AckMessageHandler(this);
@@ -169,7 +170,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         pc.getAsJsonArray("connections").forEach((c)->{
             PushEventChannel _pc = new PushEventChannel(c.getAsLong(),this);
             _pc.registerListener(this);
-            _pc.onGame(new Echo(this));
+            _pc.onGame(createGame());
             mChannels.put(_pc.channelId(),_pc);
         });
         byte[] key = Base64.getDecoder().decode(pc.get("serverKey").getAsString());
@@ -181,7 +182,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
         PushEventChannel pushEventChannel = new PushEventChannel(pc.get("connectionId").getAsLong(),this);
         pushEventChannel.registerListener(this);
-        pushEventChannel.onGame(new Echo(this));
+        pushEventChannel.onGame(createGame());
         mChannels.put(pushEventChannel.channelId(),pushEventChannel);
         long pingTimeout = config.getAsJsonObject("tarantula").get("pingTimeout").getAsLong();
         long retryTimeout = config.getAsJsonObject("tarantula").get("retryTimeout").getAsLong();
@@ -317,13 +318,19 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             return decrypt.doFinal(data);
         }
     }
-
+    private Game createGame(){
+        try {
+            return (Game)Class.forName(application).getConstructor(GameChannelService.class).newInstance(this);
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
     @Override
     public void onChannelClosed(GameChannel channelClosed) {
         long cid = addConnection();
         GameChannel gc = new PushEventChannel(cid,this);
         gc.registerListener(this);
-        gc.onGame(new Echo(this));
+        gc.onGame(createGame());
         mChannels.put(gc.channelId(),gc);
     }
     public void onUpdate(Game game,int type,byte[] payload){

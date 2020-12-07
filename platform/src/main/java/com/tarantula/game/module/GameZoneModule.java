@@ -57,9 +57,9 @@ public class GameZoneModule implements Module,Configurable.Listener{
     public boolean onRequest(Session session, byte[] payload, com.icodesoftware.Module.OnUpdate update) throws Exception {
         if(session.action().equals("onUpdated")){
             Stub stub = mStub.get(session.systemId());
-            Room room = gameServiceProvider.getRoom(stub.roomId);
-            if(room!=null){
-                //room.onUpdated();
+            Room room;
+            if(stub!=null&&(room=gameServiceProvider.getRoom(stub.roomId))!=null){
+                room.onUpdated(1,payload);
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
                 StatsDelta delta = toDelta(payload);
                 Statistics statistics = gameServiceProvider.statistics(session.systemId());
@@ -74,10 +74,10 @@ public class GameZoneModule implements Module,Configurable.Listener{
         }
         else if(session.action().equals("onEnded")){
             Stub stub = mStub.get(session.systemId());
-            Room room = gameServiceProvider.getRoom(stub.roomId);
-            if(room!=null){
+            Room room;
+            if(stub!=null&&(room=gameServiceProvider.getRoom(stub.roomId))!=null){
                 //this.context.log(new String(payload),OnLog.WARN);
-                //room.onUpdated(payload);
+                room.onUpdated(1,payload);
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
             }
             else{
