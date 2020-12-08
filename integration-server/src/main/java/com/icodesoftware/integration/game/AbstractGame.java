@@ -1,8 +1,10 @@
 package com.icodesoftware.integration.game;
 
+import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.Game;
 import com.icodesoftware.integration.GameChannel;
 import com.icodesoftware.integration.GameChannelService;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.DataBuffer;
 
 
@@ -10,7 +12,7 @@ import com.icodesoftware.protocol.DataBuffer;
  * Created by yinghu lu on 11/15/2020.
  */
 abstract public class AbstractGame implements Game {
-
+    protected TarantulaLogger log = JDKLogger.getLogger(AbstractGame.class);
     protected String zoneId;
     protected String roomId;
     protected GameChannelService gameChannelService;

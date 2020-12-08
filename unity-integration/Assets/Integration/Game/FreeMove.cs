@@ -29,6 +29,7 @@ namespace Integration.Game
                 _sent = true;
                 buffer.PutVector3(target);
                 await Messenger.SendAsync(MessageType.Relay, sequence, true, buffer.ToArray());
+                await Messenger.SendAsync(MessageType.Action, sequence, true);
             }
         }
         private async void FixedUpdate()
@@ -72,6 +73,10 @@ namespace Integration.Game
                     _end = buffer.GetVector3();
                     _sent = false;
                 });
+            });
+            Messenger.RegisterMessageHandler(MessageType.OnAction,sequence, (sessionId, data) =>
+            {
+                Debug.Log("on action");
             });
             Messenger.RegisterMessageHandler(MessageType.Destroy,sequence, (sessionId, data) =>
             {

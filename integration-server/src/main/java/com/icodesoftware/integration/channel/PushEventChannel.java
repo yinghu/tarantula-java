@@ -85,7 +85,6 @@ public class PushEventChannel implements GameChannel {
                 }
                 else{
                     if(mIndex.putIfAbsent(pendingInboundMessage.messageId(),LocalDateTime.now(ZoneOffset.UTC))==null){
-                        //game.onAction(pendingInboundMessage);
                         messageHandler.onMessage(pendingInboundMessage);
                     }
                 }
@@ -152,6 +151,18 @@ public class PushEventChannel implements GameChannel {
                 this.gameChannelService.pendingOutbound(pending,v.socketAddress);
             }
         });
+    }
+    public void relay(int sessionId,int messageId,boolean ack,MessageHandler messageHandler,OutboundMessage pendingOutboundMessage){
+        byte[] outMessage = gameChannelService.encode(pendingOutboundMessage);
+        RemoteSession remoteSession = mSession.get(sessionId);
+        if(!ack){
+            this.gameChannelService.pendingOutbound(ByteBuffer.wrap(outMessage),remoteSession.socketAddress);
+        }
+        else{
+            ByteBuffer pending = ByteBuffer.wrap(outMessage);
+            pending(sessionId,messageId,pending,messageHandler);
+            this.gameChannelService.pendingOutbound(pending,remoteSession.socketAddress);
+        }
     }
     public void ping(){
         ArrayList<Integer> kickOff = new ArrayList<>();
