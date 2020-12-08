@@ -13,10 +13,9 @@ import java.nio.ByteBuffer;
 public interface GameChannel {
 
     long channelId();
-    String zoneId();
     void onMessage(InboundMessage pendingInboundMessage);
 
-    void join(int sessionId,int[] messageRange, SocketAddress socketAddress);
+    void join(int seat,int sessionId,int[] messageRange, SocketAddress socketAddress);
     void leave(int sessionId, SocketAddress socketAddress);
     void relay(int messageId,boolean ack,MessageHandler messageHandler,OutboundMessage pendingOutboundMessage);
 

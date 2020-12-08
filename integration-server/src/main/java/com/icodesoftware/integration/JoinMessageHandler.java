@@ -30,7 +30,8 @@ public class JoinMessageHandler extends AbstractMessageHandler {
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
         DataBuffer data = new DataBuffer();
         GameChannel gameChannel = gameChannelService.gameChannel(pendingInboundMessage.connectionId());
-        if(this.gameChannelService.validateTicket(pendingInboundMessage.payload())){
+        DataBuffer buffer = new DataBuffer(pendingInboundMessage.payload());
+        if(this.gameChannelService.validateTicket(buffer.getInt(),buffer.getUTF8(),buffer.getUTF8())){
             int sessionId = gameChannelService.sessionId();
             int[] mid = gameChannelService.messageIdRange();
             pendingOutboundMessage.sessionId(sessionId);
@@ -38,7 +39,7 @@ public class JoinMessageHandler extends AbstractMessageHandler {
             data.putInt(mid[0]);
             data.putInt(mid[1]);
             pendingOutboundMessage.payload(data.toArray());
-            gameChannel.join(sessionId,mid,pendingInboundMessage.source());
+            gameChannel.join(buffer.getInt(),sessionId,mid,pendingInboundMessage.source());
             gameChannel.ack(sessionId,pendingInboundMessage.messageId(),pendingInboundMessage.source());
             OnJoinedMessageHandler onJoinedMessageHandler = new OnJoinedMessageHandler(gameChannelService,sessionId);
             onJoinedMessageHandler.onMessage(pendingInboundMessage);

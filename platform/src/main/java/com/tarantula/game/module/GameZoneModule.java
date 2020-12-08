@@ -4,12 +4,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.game.*;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.Rating;
-import com.tarantula.platform.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.statistics.StatsDelta;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
@@ -59,8 +57,8 @@ public class GameZoneModule implements Module,Configurable.Listener{
             Stub stub = mStub.get(session.systemId());
             Room room;
             if(stub!=null&&(room=gameServiceProvider.getRoom(stub.roomId))!=null){
-                room.onUpdated(1,payload);
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
+                //room.onUpdated("onUpdated",payload);
                 StatsDelta delta = toDelta(payload);
                 Statistics statistics = gameServiceProvider.statistics(session.systemId());
                 Statistics.Entry entry = statistics.entry(delta.name);
@@ -77,7 +75,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
             Room room;
             if(stub!=null&&(room=gameServiceProvider.getRoom(stub.roomId))!=null){
                 //this.context.log(new String(payload),OnLog.WARN);
-                room.onUpdated(1,payload);
+                room.onUpdated("onEnded",payload);
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
             }
             else{

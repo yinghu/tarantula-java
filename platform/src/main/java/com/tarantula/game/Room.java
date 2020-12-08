@@ -240,7 +240,7 @@ public class Room{
     public boolean equals(Object obj){
         return roomId.equals(((Room)obj).roomId);
     }
-    public void onUpdated(int type,byte[] payload){
-        //System.out.println(type+">"+new String(payload));
+    public void onUpdated(String action,byte[] payload){
+        System.out.println(action+">"+new String(payload));
     }
 }

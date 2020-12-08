@@ -24,7 +24,10 @@ namespace Integration
         public async void OnExit()
         {
             var integrationManager = IntegrationManager.Instance;
-            await integrationManager.Leave(this);
+            if (await integrationManager.Leave(this))
+            {
+                Debug.Log("Left room");
+            }
         }
         private void Leave(int sessionId)
         {

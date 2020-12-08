@@ -11,7 +11,8 @@ import java.nio.ByteBuffer;
  * Created by yinghu lu on 10/16/2020.
  */
 public interface GameChannelService extends Serviceable {
-    boolean validateTicket(byte[] payload);
+
+    boolean validateTicket(int stub,String login,String ticket);
     int sessionId();
     int messageId();
     int[] messageIdRange();
@@ -22,5 +23,5 @@ public interface GameChannelService extends Serviceable {
 
     void pendingOutbound(ByteBuffer outboundMessage,SocketAddress source);
 
-    void onUpdate(Game game,int type,byte[] payload);
+    void onUpdate(Game game,String type,byte[] payload);
 }

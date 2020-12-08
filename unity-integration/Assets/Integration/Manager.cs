@@ -59,7 +59,10 @@ namespace Integration
                 }
             }
             _integrationManager.OnJoinedEvent += Join;
-            await _integrationManager.Lobby(this);
+            if (!await _integrationManager.Join(this))
+            {
+                bText.text = _integrationManager.Exception.Message;
+            }
         }
 
         public async void Exit()

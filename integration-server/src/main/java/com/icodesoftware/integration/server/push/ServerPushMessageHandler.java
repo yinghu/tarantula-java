@@ -111,6 +111,5 @@ public class ServerPushMessageHandler extends AbstractMessageHandler {
         GameEndHandler gameJoinTimeoutHandler = new GameEndHandler(this.gameChannelService);
         gameJoinTimeoutHandler.onMessage(inboundMessage);
         gameJoinTimeoutHandler.relay();
-        //gameChannelService.onUpdate();
     }
 }

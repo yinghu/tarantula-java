@@ -61,11 +61,9 @@ public class PushEventChannel implements GameChannel {
     public long channelId() {
         return channelId;
     }
-    public String zoneId(){
-        return game.zoneId();
-    }
-    public void join(int sessionId,int[] messageRange,SocketAddress socketAddress){
-        mSession.put(sessionId,new RemoteSession(messageRange,socketAddress,jIndex.get(socketAddress).ackBuffer));
+
+    public void join(int seat,int sessionId,int[] messageRange,SocketAddress socketAddress){
+        mSession.put(sessionId,new RemoteSession(seat,messageRange,socketAddress,jIndex.get(socketAddress).ackBuffer));
     }
     public void leave(int sessionId,SocketAddress socketAddress){
         if(mSession.containsKey(sessionId)&&mSession.get(sessionId).socketAddress.equals(socketAddress)){
@@ -87,7 +85,7 @@ public class PushEventChannel implements GameChannel {
                 }
                 else{
                     if(mIndex.putIfAbsent(pendingInboundMessage.messageId(),LocalDateTime.now(ZoneOffset.UTC))==null){
-                        game.onAction(pendingInboundMessage);
+                        //game.onAction(pendingInboundMessage);
                         messageHandler.onMessage(pendingInboundMessage);
                     }
                 }

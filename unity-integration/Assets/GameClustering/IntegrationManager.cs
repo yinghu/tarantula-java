@@ -235,23 +235,7 @@ namespace GameClustering
                 Debug.Log("GAME end->"+sessionId);
             });
         }
-
-        public async Task<bool> Join(MonoBehaviour caller)
-        {
-            if (!await Connect(caller))
-            {
-                return false;
-            }
-            using (var buffer = new DataBuffer())
-            {
-                buffer.PutInt(Presence.Stub);
-                buffer.PutUTF8String(Presence.Login);
-                buffer.PutUTF8String(Presence.Ticket);
-                await Messenger.SendAsync(MessageType.Join, 0, true, buffer);
-            }
-            return true;
-        }
-
+        
         public async Task<bool> Leave(MonoBehaviour caller)
         {
             await Messenger.SendAsync(MessageType.Leave, 0, true);
@@ -262,11 +246,17 @@ namespace GameClustering
                 new Header {Name = Header.TarantulaAction, Value = "onLeave"}
             };
             var response = await _httpCaller.GetJson(caller, "/service/action", headers);
-            Debug.Log(response);
-            return true;
+            var jo = JObject.Parse(response);
+            var suc = (bool)jo.SelectToken("successful");
+            if (suc)
+            {
+                return true;
+            }
+            Exception = new Exception((string)jo.SelectToken("message"));
+            return false;
         }
 
-        public async Task<bool> Lobby(MonoBehaviour caller)
+        public async Task<bool> Join(MonoBehaviour caller)
         {
             try
             {
@@ -284,6 +274,7 @@ namespace GameClustering
                 var suc = (bool)jo.SelectToken("successful");
                 if (!suc)
                 {
+                    Exception = new Exception((string)jo.SelectToken("message"));
                     return false;
                 }
 
@@ -311,6 +302,7 @@ namespace GameClustering
                     buffer.PutInt(Presence.Stub);
                     buffer.PutUTF8String(Presence.Login);
                     buffer.PutUTF8String(Presence.Ticket);
+                    buffer.PutInt(Room.Seat);
                     await Messenger.SendAsync(MessageType.Join, 0, true, buffer);
                 }
                 return true;

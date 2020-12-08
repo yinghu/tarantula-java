@@ -128,7 +128,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.publisher = integrationCluster.subscribe(subscription,(e)->{
             Room room = roomIndex.get(e.trackId());
-            room.onUpdated(e.stub(),e.payload());
+            room.onUpdated(e.action(),e.payload());
             return false;
         });
         logger.info("Game service provider ["+ NAME+"] started");

@@ -138,7 +138,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
                             }
                         }
                         else{
-                            Thread.sleep(10);
+                            Thread.sleep(5);
                         }
                     }catch (Exception ex){
                         ex.printStackTrace();
@@ -170,7 +170,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         pc.getAsJsonArray("connections").forEach((c)->{
             PushEventChannel _pc = new PushEventChannel(c.getAsLong(),this);
             _pc.registerListener(this);
-            _pc.onGame(createGame());
+            _pc.onGame(createGame(_pc));
             mChannels.put(_pc.channelId(),_pc);
         });
         byte[] key = Base64.getDecoder().decode(pc.get("serverKey").getAsString());
@@ -182,7 +182,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
         PushEventChannel pushEventChannel = new PushEventChannel(pc.get("connectionId").getAsLong(),this);
         pushEventChannel.registerListener(this);
-        pushEventChannel.onGame(createGame());
+        pushEventChannel.onGame(createGame(pushEventChannel));
         mChannels.put(pushEventChannel.channelId(),pushEventChannel);
         long pingTimeout = config.getAsJsonObject("tarantula").get("pingTimeout").getAsLong();
         long retryTimeout = config.getAsJsonObject("tarantula").get("retryTimeout").getAsLong();
@@ -233,7 +233,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             return -1;
         }
     }
-    private void update(String zoneId,String roomId,int type,byte[] payload){
+    private void update(String zoneId,String roomId,String type,byte[] payload){
         try{
             String[] headers = new String[]{
                     Session.TARANTULA_ACCESS_KEY,accessKey,
@@ -241,7 +241,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
                     Session.TARANTULA_SERVER_ID,serverId,
                     Session.TARANTULA_ROOM_ID,roomId,
                     Session.TARANTULA_ZONE_ID,zoneId,
-                    Session.TARANTULA_NAME,""+type
+                    Session.TARANTULA_NAME,type
             };
             httpCaller.post(path,payload,headers);
         }catch (Exception ex){
@@ -267,12 +267,8 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             return false;
         }
     }
-    public boolean validateTicket(byte[] payload){
+    public boolean validateTicket(int stub,String login,String ticket){
         try{
-            DataBuffer buffer = new DataBuffer(payload);
-            int stub = buffer.getInt();
-            String login = buffer.getUTF8();
-            String ticket = buffer.getUTF8();
             String[] headers = new String[]{
                     Session.TARANTULA_TAG,"index/user",
                     Session.TARANTULA_MAGIC_KEY,login,
@@ -318,9 +314,9 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             return decrypt.doFinal(data);
         }
     }
-    private Game createGame(){
+    private Game createGame(GameChannel gameChannel){
         try {
-            return (Game)Class.forName(application).getConstructor(GameChannelService.class).newInstance(this);
+            return (Game)Class.forName(application).getConstructor(GameChannelService.class,GameChannel.class).newInstance(this,gameChannel);
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -330,10 +326,10 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         long cid = addConnection();
         GameChannel gc = new PushEventChannel(cid,this);
         gc.registerListener(this);
-        gc.onGame(createGame());
+        gc.onGame(createGame(gc));
         mChannels.put(gc.channelId(),gc);
     }
-    public void onUpdate(Game game,int type,byte[] payload){
+    public void onUpdate(Game game,String type,byte[] payload){
         mQueue.offer(new PendingMessage(()->{
             update(game.zoneId(),game.roomId(),type,payload);
         }));

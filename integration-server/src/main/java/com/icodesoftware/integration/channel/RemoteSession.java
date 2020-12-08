@@ -12,8 +12,10 @@ public class RemoteSession {
     public final FIFOBuffer<Integer> ackBuffer;
     public final AtomicInteger pingPong;
     public final int[] messageRange;
+    public final int seat;
 
-    public RemoteSession(final int[] messageRange,final  SocketAddress socketAddress,final FIFOBuffer<Integer> ackBuffer){
+    public RemoteSession(final int seat,final int[] messageRange,final  SocketAddress socketAddress,final FIFOBuffer<Integer> ackBuffer){
+        this.seat = seat;
         this.socketAddress = socketAddress;
         this.ackBuffer = ackBuffer;
         this.pingPong = new AtomicInteger(0);
