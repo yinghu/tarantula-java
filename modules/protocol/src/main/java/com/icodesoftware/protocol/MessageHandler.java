@@ -7,21 +7,23 @@ public interface MessageHandler {
 
     int ACK = 0;
     int JOIN = 1;
-    int MOVE = 2;
-    int LEAVE = 3;
-    int SPAWN = 4;
-    int PING = 5;
-    int PONG = 6;
-    int COLLISION = 7;
-    int SYNC = 8;
-    int ACTION = 9;
-    int DESTROY = 10;
+    int LEAVE = 2;
+    int PING = 3;
+    int PONG = 4;
+    int SYNC = 5;
+    int MOVE = 6;
+    int SPAWN = 7;
+    int COLLISION = 8;
+    int DESTROY = 9;
+
+    int ACTION = 10;
 
     int ON_JOINED = 100;
     int ON_LEFT = 101;
     int ON_KICKED_OFF = 102;
     int ON_ACTION = 103;
     int ON_SYNC = 104;
+    int ON_COLLISION = 105;
 
     int SERVER_PUSH = 200;
     int GAME_SPEC = 201;

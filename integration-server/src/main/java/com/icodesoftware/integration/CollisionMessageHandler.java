@@ -1,6 +1,8 @@
 package com.icodesoftware.integration;
 
 import com.icodesoftware.protocol.InboundMessage;
+import com.icodesoftware.protocol.MessageHandler;
+import com.icodesoftware.protocol.OutboundMessage;
 
 /**
  * Created by yinghu lu on 10/7/2020.
@@ -18,6 +20,13 @@ public class CollisionMessageHandler extends AbstractMessageHandler {
 
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
-        System.out.println("hit->");
+        OutboundMessage outboundMessage = new OutboundMessage();
+        outboundMessage.ack(pendingInboundMessage.ack());
+        outboundMessage.type(MessageHandler.ON_COLLISION);
+        outboundMessage.sequence(pendingInboundMessage.sequence());
+        int mid = gameChannelService.messageId();
+        
+        outboundMessage.messageId(mid);
+        gameChannelService.gameChannel(pendingInboundMessage.connectionId()).relay(mid,pendingInboundMessage.ack(),null,outboundMessage);
     }
 }
