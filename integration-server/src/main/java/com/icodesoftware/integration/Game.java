@@ -10,7 +10,7 @@ public interface Game {
 
     String zoneId();
     String roomId();
-
+    boolean started();
     void onAction(InboundMessage inboundMessage);
 
 

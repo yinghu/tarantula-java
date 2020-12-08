@@ -29,5 +29,6 @@ public class GameStartHandler extends AbstractMessageHandler {
         outboundMessage.sequence(0);
         outboundMessage.messageId(messageId);
         outboundMessage.ack(ack);
+        this.gameChannelService.gameChannel(connectionId).onGame().onStart();
     }
 }

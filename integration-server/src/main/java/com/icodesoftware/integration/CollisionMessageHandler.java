@@ -5,19 +5,19 @@ import com.icodesoftware.protocol.InboundMessage;
 /**
  * Created by yinghu lu on 10/7/2020.
  */
-public class VoteMessageHandler extends AbstractMessageHandler {
+public class CollisionMessageHandler extends AbstractMessageHandler {
 
-    public VoteMessageHandler(GameChannelService gameChannelService){
+    public CollisionMessageHandler(GameChannelService gameChannelService){
         super(gameChannelService);
     }
 
     @Override
     public int type() {
-        return VOTE;
+        return COLLISION;
     }
 
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
-
+        System.out.println("hit->");
     }
 }

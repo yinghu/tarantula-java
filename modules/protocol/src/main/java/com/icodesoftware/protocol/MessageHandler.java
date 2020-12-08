@@ -7,12 +7,12 @@ public interface MessageHandler {
 
     int ACK = 0;
     int JOIN = 1;
-    int RELAY = 2;
+    int MOVE = 2;
     int LEAVE = 3;
     int SPAWN = 4;
     int PING = 5;
     int PONG = 6;
-    int VOTE = 7;
+    int COLLISION = 7;
     int SYNC = 8;
     int ACTION = 9;
     int DESTROY = 10;

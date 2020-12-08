@@ -79,8 +79,8 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         mHandlers.put(ackMessageHandler.type(),ackMessageHandler);
         JoinMessageHandler joinMessageHandler = new JoinMessageHandler(this);
         mHandlers.put(joinMessageHandler.type(),joinMessageHandler);
-        RelayMessageHandler relayMessageHandler = new RelayMessageHandler(this);
-        mHandlers.put(relayMessageHandler.type(),relayMessageHandler);
+        MoveMessageHandler moveMessageHandler = new MoveMessageHandler(this);
+        mHandlers.put(moveMessageHandler.type(),moveMessageHandler);
         LeaveMessageHandler leaveMessageHandler = new LeaveMessageHandler(this);
         mHandlers.put(leaveMessageHandler.type(),leaveMessageHandler);
         PongMessageHandler pongMessageHandler = new PongMessageHandler(this);
@@ -89,6 +89,8 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         mHandlers.put(spawnMessageHandler.type(),spawnMessageHandler);
         DestroyMessageHandler destroyMessageHandler = new DestroyMessageHandler(this);
         mHandlers.put(destroyMessageHandler.type(),destroyMessageHandler);
+        CollisionMessageHandler collisionMessageHandler = new CollisionMessageHandler(this);
+        mHandlers.put(collisionMessageHandler.type(),collisionMessageHandler);
         SyncMessageHandler syncMessageHandler = new SyncMessageHandler(this);
         mHandlers.put(syncMessageHandler.type(),syncMessageHandler);
         OnSyncMessageHandler onSyncMessageHandler = new OnSyncMessageHandler(this);

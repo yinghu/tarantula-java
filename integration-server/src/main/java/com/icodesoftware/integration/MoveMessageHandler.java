@@ -6,14 +6,14 @@ import com.icodesoftware.protocol.OutboundMessage;
 /**
  * Created by yinghu lu on 10/7/2020.
  */
-public class RelayMessageHandler extends AbstractMessageHandler {
-     public RelayMessageHandler(GameChannelService gameChannelService){
+public class MoveMessageHandler extends AbstractMessageHandler {
+     public MoveMessageHandler(GameChannelService gameChannelService){
         super(gameChannelService);
     }
 
     @Override
     public int type() {
-        return RELAY;
+        return MOVE;
     }
 
     @Override

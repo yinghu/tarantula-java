@@ -4,12 +4,12 @@
     {
         public const int Ack = 0;
         public const int Join = 1;
-        public const int Relay = 2;
+        public const int Move = 2;
         public const int Leave = 3;
         public const int Spawn = 4;
         public const int Ping = 5;
         public const int Pong = 6;
-        public const int Vote = 7;
+        public const int Collision = 7;
         public const int Sync = 8;
         public const int Action = 9;
         public const int Destroy = 10;

@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 public interface GameChannel {
 
     long channelId();
+
     void onMessage(InboundMessage pendingInboundMessage);
 
     void join(int seat,int sessionId,int[] messageRange, SocketAddress socketAddress);

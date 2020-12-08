@@ -15,6 +15,7 @@ abstract public class AbstractGame implements Game {
     protected TarantulaLogger log = JDKLogger.getLogger(AbstractGame.class);
     protected String zoneId;
     protected String roomId;
+    protected boolean started;
     protected GameChannelService gameChannelService;
     protected GameChannel gameChannel;
 
@@ -32,6 +33,9 @@ abstract public class AbstractGame implements Game {
         return roomId;
     }
 
+    public boolean started(){
+        return this.started;
+    }
 
     public void onSpec(DataBuffer dataBuffer){
         int level = dataBuffer.getInt();
@@ -42,7 +46,8 @@ abstract public class AbstractGame implements Game {
         zoneId = dataBuffer.getUTF8();
     }
     public void onStart(){
-        this.gameChannelService.onUpdate(this,"onStart","{}".getBytes());
+        this.started = true;
+        //this.gameChannelService.onUpdate(this,"onStart","{}".getBytes());
     }
     public void onClosing(){
         this.gameChannelService.onUpdate(this,"onClosing","{}".getBytes());

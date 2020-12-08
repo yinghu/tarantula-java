@@ -28,7 +28,7 @@ namespace Integration.Game
             {
                 _sent = true;
                 buffer.PutVector3(target);
-                await Messenger.SendAsync(MessageType.Relay, sequence, true, buffer.ToArray());
+                await Messenger.SendAsync(MessageType.Move, sequence, true, buffer.ToArray());
                 await Messenger.SendAsync(MessageType.Action, sequence, true);
             }
         }
@@ -50,7 +50,7 @@ namespace Integration.Game
             await Move(left);
         }
 
-        private void OnTriggerEnter(Collider other)
+        private async void OnTriggerEnter(Collider other)
         {
             if (!other.gameObject.CompareTag("pvx"))
             {
@@ -60,13 +60,14 @@ namespace Integration.Game
             {
                 return;
             }
-            Messenger.SendAsync(MessageType.Destroy, sequence, true);
+            await Messenger.SendAsync(MessageType.Destroy, sequence, true);
+            await Messenger.SendAsync(MessageType.Collision, sequence, false);
         }
         
         public override void Setup(int oid, bool owner)
         {
             base.Setup(oid,owner);
-            Messenger.RegisterMessageHandler(MessageType.Relay,sequence, (sessionId, data) =>
+            Messenger.RegisterMessageHandler(MessageType.Move,sequence, (sessionId, data) =>
             {
                 MainThread.Execute(data, buffer =>
                 {
@@ -76,7 +77,7 @@ namespace Integration.Game
             });
             Messenger.RegisterMessageHandler(MessageType.OnAction,sequence, (sessionId, data) =>
             {
-                Debug.Log("on action");
+                //Debug.Log("on action");
             });
             Messenger.RegisterMessageHandler(MessageType.Destroy,sequence, (sessionId, data) =>
             {

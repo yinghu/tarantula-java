@@ -28,7 +28,7 @@ namespace Integration.Game
             _end = new Vector3(0,1,0);
             _timer = 0.5f;
             _sent = false;
-            Messenger.RegisterMessageHandler(MessageType.Relay,sequence,(sessionId, data) =>
+            Messenger.RegisterMessageHandler(MessageType.Move,sequence,(sessionId, data) =>
             {
                 MainThread.Execute(data, buffer =>
                 {
@@ -56,7 +56,7 @@ namespace Integration.Game
             {
                 _sent = true;
                 buffer.PutVector3(target);
-                await Messenger.SendAsync(MessageType.Relay, sequence, true, buffer);
+                await Messenger.SendAsync(MessageType.Move, sequence, true, buffer);
             }
         }
         
