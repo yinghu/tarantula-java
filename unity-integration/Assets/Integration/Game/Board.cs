@@ -21,6 +21,7 @@ namespace Integration.Game
         private int _outbound;
         private int _inbound;
         private int _timer;
+        private bool _started;
         private async void Start()
         {
             StartClusteringObject(  async buffer =>
@@ -100,12 +101,14 @@ namespace Integration.Game
             _outbound = Messenger.TotalOutbound();
             _inbound = Messenger.TotalInbound();
             _timer = 1;
+            Manager.OnGameStartEvent += OnGameStart;
+            Manager.OnGameClosingEvent += OnGameClosing;
             InvokeRepeating(nameof(Print), 1.0f, 1.0f);
         }
 
         private async void Update()
         {
-            if (!Input.GetMouseButtonDown(0))
+            if (!Input.GetMouseButtonDown(0)||!_started)
             {
                 return;
             }
@@ -151,6 +154,22 @@ namespace Integration.Game
         public bool Remove(int oid)
         {
             return _gameObjects.Remove(oid);
+        }
+
+        private void OnGameStart()
+        {
+            Debug.Log("game start");
+            _started = true;
+        }
+        private void OnGameClosing()
+        {
+            Debug.Log("game closing");
+            
+        }
+        private void OnDestroy()
+        {
+            Manager.OnGameStartEvent -= OnGameStart;
+            Manager.OnGameClosingEvent -= OnGameClosing;
         }
     }
 }

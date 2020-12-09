@@ -7,14 +7,19 @@ using UnityEngine;
 
 namespace GameClustering
 {
-    public delegate void OnJoinedEvent(int sessionId);
-    public delegate void OnLeftEvent(int sessionId);
+    public delegate void OnSessionEvent(int sessionId);
+
+    public delegate void OnGameEvent();
     
     [CreateAssetMenu(fileName = "IntegrationManager", menuName = "GameClustering/IntegrationManager", order = 1)]
     public class IntegrationManager : ScriptableObject
     {
-        public event OnJoinedEvent OnJoinedEvent;
-        public event OnLeftEvent OnLeftEvent;
+        public event OnSessionEvent OnJoinedEvent;
+        public event OnSessionEvent OnLeftEvent;
+        
+        public event OnGameEvent OnGameStartEvent;
+
+        public event OnGameEvent OnGameClosingEvent;
         
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
 
@@ -217,10 +222,12 @@ namespace GameClustering
             Messenger.RegisterMessageHandler(MessageType.GameStart,0, (sessionId, buffer) =>
             {
                 Debug.Log("GAME START->"+sessionId);
+                OnGameStartEvent?.Invoke();
             });
             Messenger.RegisterMessageHandler(MessageType.GameClosing,0, (sessionId, buffer) =>
             {
                 Debug.Log("GAME Closing->"+sessionId);
+                OnGameClosingEvent?.Invoke();
             });
             Messenger.RegisterMessageHandler(MessageType.GameOvertime,0, (sessionId, buffer) =>
             {
