@@ -20,6 +20,7 @@
         public const int OnAction = 103;
         public const int OnSync = 104;
         public const int OnCollision = 105;
+        public const int OnSpawn = 106;
         
         public const int GameStart = 202;
         public const int GameClosing = 203;

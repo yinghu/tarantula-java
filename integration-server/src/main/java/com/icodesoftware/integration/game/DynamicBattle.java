@@ -25,4 +25,5 @@ public class DynamicBattle extends AbstractGame {
         outboundMessage.messageId(gameChannelService.messageId());
         gameChannel.relay(inboundMessage.sessionId(),mid,true,null,outboundMessage);
     }
+
 }

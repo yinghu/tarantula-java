@@ -4,8 +4,12 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.Game;
 import com.icodesoftware.integration.GameChannel;
 import com.icodesoftware.integration.GameChannelService;
+import com.icodesoftware.integration.channel.RemoteSession;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.DataBuffer;
+import com.icodesoftware.protocol.InboundMessage;
+import com.icodesoftware.protocol.MessageHandler;
+import com.icodesoftware.protocol.OutboundMessage;
 
 
 /**
@@ -36,6 +40,18 @@ abstract public class AbstractGame implements Game {
     public boolean started(){
         return this.started;
     }
+    public void onJoin(RemoteSession remoteSession){
+        log.warn("join->"+remoteSession.seat);
+    }
+    public void onCollision(InboundMessage inboundMessage){
+        OutboundMessage outboundMessage = new OutboundMessage();
+        outboundMessage.ack(inboundMessage.ack());
+        outboundMessage.type(MessageHandler.ON_COLLISION);
+        outboundMessage.sequence(inboundMessage.sequence());
+        int mid = gameChannelService.messageId();
+        outboundMessage.messageId(mid);
+        gameChannel.relay(mid,inboundMessage.ack(),null,outboundMessage);
+    }
 
     public void onSpec(DataBuffer dataBuffer){
         int level = dataBuffer.getInt();
@@ -47,7 +63,6 @@ abstract public class AbstractGame implements Game {
     }
     public void onStart(){
         this.started = true;
-        //this.gameChannelService.onUpdate(this,"onStart","{}".getBytes());
     }
     public void onClosing(){
         this.gameChannelService.onUpdate(this,"onClosing","{}".getBytes());

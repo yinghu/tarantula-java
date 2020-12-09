@@ -12,7 +12,7 @@ namespace Integration.Game
         public GameObject bullet;
         public Transform firePoint;
         private float _timer;
-        private bool _sent;
+        
         
         private void Start()
         {
@@ -27,12 +27,12 @@ namespace Integration.Game
             });
             _end = new Vector3(0,1,0);
             _timer = 0.5f;
-            _sent = false;
+           
             Messenger.RegisterMessageHandler(MessageType.Move,sequence,(sessionId, data) =>
             {
                 MainThread.Execute(data, buffer =>
                 {
-                    _sent = false;
+                    
                     _end = buffer.GetVector3();
                     _end.y = 1;
                 });
@@ -48,13 +48,10 @@ namespace Integration.Game
 
         public async void Move(Vector3 target)
         {
-            if (_sent)
-            {
-                return;
-            }
+            
             using (var buffer = new DataBuffer())
             {
-                _sent = true;
+                
                 buffer.PutVector3(target);
                 await Messenger.SendAsync(MessageType.Move, sequence, true, buffer);
             }

@@ -60,6 +60,7 @@ public class PushEventChannel implements GameChannel {
 
     public void join(int seat,int sessionId,int[] messageRange,SocketAddress socketAddress){
         mSession.put(sessionId,new RemoteSession(seat,messageRange,socketAddress,jIndex.get(socketAddress).ackBuffer));
+        game.onJoin(mSession.get(sessionId));
     }
     public void leave(int sessionId,SocketAddress socketAddress){
         if(mSession.containsKey(sessionId)&&mSession.get(sessionId).socketAddress.equals(socketAddress)){
@@ -238,6 +239,9 @@ public class PushEventChannel implements GameChannel {
     }
     public Game onGame(){
         return this.game;
+    }
+    public boolean started(){
+        return game!=null&&game.started();
     }
     public void registerListener(Listener listener){
         this.listener = listener;

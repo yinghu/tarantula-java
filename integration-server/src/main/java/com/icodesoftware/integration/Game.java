@@ -1,5 +1,6 @@
 package com.icodesoftware.integration;
 
+import com.icodesoftware.integration.channel.RemoteSession;
 import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.InboundMessage;
 
@@ -13,7 +14,10 @@ public interface Game {
     boolean started();
     void onAction(InboundMessage inboundMessage);
 
+    void onCollision(InboundMessage inboundMessage);
+    void onJoin(RemoteSession remoteSession);
 
+    //server push event callbacks
     void onSpec(DataBuffer dataBuffer);
     void onStart();
     void onClosing();
