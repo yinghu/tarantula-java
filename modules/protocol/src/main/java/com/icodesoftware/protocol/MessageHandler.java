@@ -24,6 +24,7 @@ public interface MessageHandler {
     int ON_ACTION = 103;
     int ON_SYNC = 104;
     int ON_COLLISION = 105;
+    int ON_SPAWN = 106;
 
     int SERVER_PUSH = 200;
     int GAME_SPEC = 201;
