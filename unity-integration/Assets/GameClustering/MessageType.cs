@@ -12,7 +12,8 @@
         public const int Spawn = 7;
         public const int Collision = 8;
         public const int Destroy = 9;
-        public const int Action = 10;
+        public const int Load = 10;
+        public const int Action = 11;
         
         public const int OnJoined = 100;
         public const int OnLeft = 101;

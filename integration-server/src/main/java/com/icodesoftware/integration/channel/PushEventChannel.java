@@ -60,7 +60,7 @@ public class PushEventChannel implements GameChannel {
 
     public void join(int seat,int sessionId,int[] messageRange,SocketAddress socketAddress){
         mSession.put(sessionId,new RemoteSession(seat,messageRange,socketAddress,jIndex.get(socketAddress).ackBuffer));
-        game.onJoin(mSession.get(sessionId));
+        game.onJoin(sessionId,mSession.get(sessionId));
     }
     public void leave(int sessionId,SocketAddress socketAddress){
         if(mSession.containsKey(sessionId)&&mSession.get(sessionId).socketAddress.equals(socketAddress)){

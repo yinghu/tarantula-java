@@ -46,6 +46,10 @@ namespace Integration.Game
             });
             _gameObjects = new Dictionary<int, GameObject>();
             _lastPosition = types[FreeMoveTypeId].transform.position;
+            Messenger.RegisterMessageHandler(MessageType.OnSpawn,sequence, (sessionId, data) =>
+            {
+                Debug.Log("on spawn->"+sessionId);
+            });
             Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId, data) =>
             {
                 MessageContext.Instance.Execute(data, buffer =>
@@ -103,6 +107,7 @@ namespace Integration.Game
             _timer = 1;
             Manager.OnGameStartEvent += OnGameStart;
             Manager.OnGameClosingEvent += OnGameClosing;
+            await Messenger.SendAsync(MessageType.Load, sequence, true);
             InvokeRepeating(nameof(Print), 1.0f, 1.0f);
         }
 

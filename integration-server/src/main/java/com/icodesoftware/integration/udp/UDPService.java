@@ -97,6 +97,8 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         mHandlers.put(collisionMessageHandler.type(),collisionMessageHandler);
         SyncMessageHandler syncMessageHandler = new SyncMessageHandler(this);
         mHandlers.put(syncMessageHandler.type(),syncMessageHandler);
+        LoadMessageHandler loadMessageHandler = new LoadMessageHandler(this);
+        mHandlers.put(loadMessageHandler.type(),loadMessageHandler);
         OnSyncMessageHandler onSyncMessageHandler = new OnSyncMessageHandler(this);
         mHandlers.put(onSyncMessageHandler.type(),onSyncMessageHandler);
         DischargeMessageHandler dischargeMessageHandler = new DischargeMessageHandler(this);

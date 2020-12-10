@@ -15,8 +15,8 @@ public interface Game {
     void onAction(InboundMessage inboundMessage);
 
     void onCollision(InboundMessage inboundMessage);
-    void onJoin(RemoteSession remoteSession);
-
+    void onJoin(int sessionId,RemoteSession remoteSession);
+    void onLoad(InboundMessage inboundMessage);
     //server push event callbacks
     void onSpec(DataBuffer dataBuffer);
     void onStart();

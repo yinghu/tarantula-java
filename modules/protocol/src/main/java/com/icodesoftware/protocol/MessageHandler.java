@@ -15,8 +15,8 @@ public interface MessageHandler {
     int SPAWN = 7;
     int COLLISION = 8;
     int DESTROY = 9;
-
-    int ACTION = 10;
+    int LOAD = 10;
+    int ACTION = 11;
 
     int ON_JOINED = 100;
     int ON_LEFT = 101;

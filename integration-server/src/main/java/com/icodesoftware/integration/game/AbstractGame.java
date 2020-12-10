@@ -40,8 +40,26 @@ abstract public class AbstractGame implements Game {
     public boolean started(){
         return this.started;
     }
-    public void onJoin(RemoteSession remoteSession){
-        log.warn("join->"+remoteSession.seat);
+    public void onJoin(int sessionId,RemoteSession remoteSession){
+        log.warn("join->"+remoteSession.seat+"/"+sessionId);
+        //OutboundMessage outboundMessage = new OutboundMessage();
+        //outboundMessage.type(MessageHandler.ON_SPAWN);
+        //outboundMessage.sequence(1);
+        //outboundMessage.ack(true);
+        //outboundMessage.sessionId(sessionId);
+        //int mid = gameChannelService.messageId();
+        //gameChannel.relay(mid,true,null,outboundMessage);
+    }
+    public void onLoad(InboundMessage inboundMessage){
+        log.warn("load->"+inboundMessage.sessionId());
+        OutboundMessage outboundMessage = new OutboundMessage();
+        outboundMessage.type(MessageHandler.ON_SPAWN);
+        outboundMessage.sequence(inboundMessage.sequence());
+        outboundMessage.ack(true);
+        outboundMessage.sessionId(inboundMessage.sessionId());
+        int mid = gameChannelService.messageId();
+        outboundMessage.messageId(mid);
+        gameChannel.relay(mid,true,null,outboundMessage);
     }
     public void onCollision(InboundMessage inboundMessage){
         OutboundMessage outboundMessage = new OutboundMessage();
