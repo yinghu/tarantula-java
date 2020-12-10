@@ -32,11 +32,19 @@ public class GameZoneModule implements Module,Configurable.Listener{
     public void onJoin(Session session, com.icodesoftware.Module.OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp or offline play mode
         Rating rating = this.gameServiceProvider.rating(session.systemId());
-        Room room = session.accessMode()==Session.OFF_LINE_MODE?mZone.solo(rating):mZone.match(rating);
-        Stub stub = room.join(rating);
+        Stub stub = mStub.get(session.systemId());
+        Room room;
         if(stub==null){
-            session.write(toMessage("no room available,please try later",false).toString().getBytes(),label());
-            return;
+            room = session.accessMode()==Session.OFF_LINE_MODE?mZone.solo(rating):mZone.match(rating);
+            stub = room.join(rating);
+            if(stub==null){
+                session.write(toMessage("no room available,please try later",false).toString().getBytes(),label());
+                return;
+            }
+        }
+        else{
+            room = gameServiceProvider.getRoom(stub.roomId);
+            room.rejoin(stub);
         }
         stub.tag = this.context.descriptor().tag();
         stub.owner(session.systemId());
@@ -60,11 +68,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
                 //room.onUpdated("onUpdated",payload);
                 StatsDelta delta = toDelta(payload);
-                Statistics statistics = gameServiceProvider.statistics(session.systemId());
-                Statistics.Entry entry = statistics.entry(delta.name);
-                entry.update(delta.value).update();
-                LeaderBoard ldb = gameServiceProvider.leaderBoard(delta.name);
-                ldb.onAllBoard(entry);
+                mZone.onStatistics(session.systemId(),delta.name,delta.value);
             }
             else{
                 session.write(toMessage("no room joined",false).toString().getBytes(),label());

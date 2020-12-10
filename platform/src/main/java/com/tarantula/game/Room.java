@@ -1,5 +1,7 @@
 package com.tarantula.game;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.icodesoftware.Connection;
 
 import java.util.ArrayDeque;
@@ -60,6 +62,7 @@ public class Room{
         totalJoined++;
         Stub _stub = pQueue.poll();
         _stub.rating = rating;
+        _stub.totalJoined = totalJoined;
         if(totalJoined==joinsOnStart){
             state = INITIALIZING;
             initialTime = PENDING_TIME;
@@ -72,6 +75,10 @@ public class Room{
             roomListener.onJoining(this);
         }
         return _stub;
+    }
+    public synchronized void rejoin(Stub stub){
+        stub.started = state>=STARTING;
+        stub.totalJoined = totalJoined;
     }
 
     public synchronized boolean leave(Stub stub){
@@ -144,7 +151,6 @@ public class Room{
     public Stub[] playerList(){
         return this.stubs;
     }
-    public int state(){ return this.state;}
     public int totalJoined(){return this.totalJoined;}
     public boolean offline(){
         return !this.online;
@@ -242,5 +248,9 @@ public class Room{
     }
     public void onUpdated(String action,byte[] payload){
         System.out.println(action+">"+new String(payload));
+        JsonObject jsonObject = new JsonParser().parse(new String(payload)).getAsJsonObject();
+        int seat = jsonObject.get("seat").getAsInt();
+        Stub stub = stubs[seat];
+        roomListener.onStatistics(stub.owner(),jsonObject.get("name").getAsString(),jsonObject.get("value").getAsDouble());
     }
 }

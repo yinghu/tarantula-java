@@ -291,7 +291,8 @@ namespace GameClustering
                     Tag = (string) jo.SelectToken("stub").SelectToken("tag"),
                     Seat = (int)jo.SelectToken("stub").SelectToken("seat"),
                     Capacity = (int)jo.SelectToken("stub").SelectToken("capacity"),
-                    Arena = (string) jo.SelectToken("stub").SelectToken("arena")
+                    Arena = (string) jo.SelectToken("stub").SelectToken("arena"),
+                    Started = (bool)jo.SelectToken("stub").SelectToken("started")
                 };
                 var pc = jo.SelectToken("connection");
                 var connection = new Connection

@@ -393,4 +393,12 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         }
         this.listener.onUpdated(zone);
     }
+
+    public void onStatistics(String systemId,String category,double delta){
+        Statistics statistics = gameServiceProvider.statistics(systemId);
+        Statistics.Entry entry = statistics.entry(category);
+        entry.update(delta).update();
+        LeaderBoard ldb = gameServiceProvider.leaderBoard(category);
+        ldb.onAllBoard(entry);
+    }
 }

@@ -55,10 +55,11 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     private int messageIdOffset;
     private int schedulingPoolSize;
     private int poolSize;
-    long pingTimeout;
-    long retryTimeout;
-    long ackTimeout;
-
+    private long pingTimeout;
+    private long retryTimeout;
+    private long ackTimeout;
+    private int retryCount;
+    private long retryInterval;
     private String application;
     private JsonParser parser;
     public UDPService(JsonObject config){
@@ -76,6 +77,8 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         messageIdOffset = config.getAsJsonObject("tarantula").get("messageIdOffset").getAsInt();
         schedulingPoolSize = config.getAsJsonObject("tarantula").get("schedulingPoolSize").getAsInt();
         poolSize = config.getAsJsonObject("tarantula").get("messagingPoolSize").getAsInt();
+        retryCount = config.getAsJsonObject("tarantula").get("retryCount").getAsInt();
+        retryInterval = config.getAsJsonObject("tarantula").get("retryInterval").getAsLong();
         application = config.getAsJsonObject("tarantula").get("application").getAsString();
         secured = config.getAsJsonObject("connection").get("secured").getAsBoolean();
         httpCaller = new HttpCaller(config.getAsJsonObject(configHeader).get("url").getAsString());
@@ -185,12 +188,12 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
         decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
         pc.getAsJsonArray("connections").forEach((c)->{
-            PushEventChannel _pc = new PushEventChannel(c.getAsLong(),this);
+            PushEventChannel _pc = new PushEventChannel(c.getAsLong(),this,retryCount,this.retryInterval);
             _pc.registerListener(this);
             _pc.onGame(createGame(_pc));
             mChannels.put(_pc.channelId(),_pc);
         });
-        PushEventChannel pushEventChannel = new PushEventChannel(pc.get("connectionId").getAsLong(),this);
+        PushEventChannel pushEventChannel = new PushEventChannel(pc.get("connectionId").getAsLong(),this,retryCount,this.retryInterval);
         pushEventChannel.registerListener(this);
         pushEventChannel.onGame(createGame(pushEventChannel));
         mChannels.put(pushEventChannel.channelId(),pushEventChannel);
@@ -328,7 +331,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     @Override
     public void onChannelClosed(GameChannel channelClosed) {
         long cid = addConnection();
-        GameChannel gc = new PushEventChannel(cid,this);
+        GameChannel gc = new PushEventChannel(cid,this,retryCount,this.retryInterval);
         gc.registerListener(this);
         gc.onGame(createGame(gc));
         mChannels.put(gc.channelId(),gc);

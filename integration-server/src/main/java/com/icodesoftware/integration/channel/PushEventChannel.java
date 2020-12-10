@@ -37,10 +37,14 @@ public class PushEventChannel implements GameChannel {
     private Game game;
     private Listener listener;
     private int totalRetries;
+    private final int retryCount;
+    private final long retryInterval;
 
-    public PushEventChannel(final long channelId,final GameChannelService gameChannelService){
+    public PushEventChannel(final long channelId,final GameChannelService gameChannelService,final int retryCount,final long retryInterval){
         this.channelId = channelId;
         this.gameChannelService = gameChannelService;
+        this.retryCount = retryCount;
+        this.retryInterval = retryInterval;
         this.mSession = new ConcurrentHashMap<>();
         this.mMessage = new ConcurrentHashMap<>();
         this.mIndex = new ConcurrentHashMap<>();
@@ -194,7 +198,7 @@ public class PushEventChannel implements GameChannel {
         int[] _retries = {0};
         this.mMessage.forEach((k,v)->{
             RemoteSession session = mSession.get(k.sessionId);
-            if(session!=null&&checkExpired(v.timestamp,500)){
+            if(session!=null&&checkExpired(v.timestamp,retryInterval)){
                 v.timestamp = toUTCMilliseconds();
                 v.data.flip();
                 this.gameChannelService.pendingOutbound(v.data,v.source);
@@ -206,7 +210,7 @@ public class PushEventChannel implements GameChannel {
             }
         });
         this.jIndex.forEach((k,v)->{
-            if(v.pending.get()&&checkExpired(v.timestamp,500)){
+            if(v.pending.get()&&checkExpired(v.timestamp,retryInterval)){
                 v.timestamp = toUTCMilliseconds();
                 v.data.flip();
                 this.gameChannelService.pendingOutbound(v.data,k);
@@ -223,7 +227,7 @@ public class PushEventChannel implements GameChannel {
         return totalRetries;
     }
     public void pending(int sessionId, int messageId, ByteBuffer pending,MessageHandler callback){
-        mMessage.put(new PendingMessageIndex(sessionId,messageId),new PendingMessage(pending,toUTCMilliseconds(),2,callback));
+        mMessage.put(new PendingMessageIndex(sessionId,messageId),new PendingMessage(pending,toUTCMilliseconds(),retryCount,callback));
     }
     public void pending(SocketAddress socketAddress,int messageId,ByteBuffer pending){
         PendingSession pendingSession = jIndex.get(socketAddress);

@@ -15,4 +15,6 @@ public interface RoomListener {
 
     void onLeaving(Room room,Stub stub);
 
+    void onStatistics(String systemId,String category,double delta);
+
 }

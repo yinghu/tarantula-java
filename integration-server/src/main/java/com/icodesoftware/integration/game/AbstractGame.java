@@ -1,5 +1,6 @@
 package com.icodesoftware.integration.game;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.Game;
 import com.icodesoftware.integration.GameChannel;
@@ -49,6 +50,11 @@ abstract public class AbstractGame implements Game {
         //outboundMessage.sessionId(sessionId);
         //int mid = gameChannelService.messageId();
         //gameChannel.relay(mid,true,null,outboundMessage);
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("seat",remoteSession.seat);
+        jsonObject.addProperty("name","kills");
+        jsonObject.addProperty("value",6);
+        gameChannelService.onUpdate(this,"onStats",jsonObject.toString().getBytes());
     }
     public void onLoad(InboundMessage inboundMessage){
         log.warn("load->"+inboundMessage.sessionId());
@@ -89,7 +95,11 @@ abstract public class AbstractGame implements Game {
         this.gameChannelService.onUpdate(this,"onClose","{}".getBytes());
     }
     public void onEnd(){
-        this.gameChannelService.onUpdate(this,"onEnd","{}".getBytes());
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("seat",0);
+        jsonObject.addProperty("name","kills");
+        jsonObject.addProperty("value",6);
+        gameChannelService.onUpdate(this,"onEnd",jsonObject.toString().getBytes());
     }
     public void onOvertime(){
         this.gameChannelService.onUpdate(this,"onOvertime","{}".getBytes());

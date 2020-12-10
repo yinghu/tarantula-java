@@ -15,6 +15,8 @@ public class Stub extends RecoverableObject {
     public int seat;
     public String tag;
     public String arena;
+    public int totalJoined;
+    public boolean started;
     public int rank; //rank of game 1 basis
     public double pxp; //percentage of game xp 100 basis
     public StatsDelta stats;
@@ -41,6 +43,8 @@ public class Stub extends RecoverableObject {
         jo.addProperty("capacity",capacity);
         jo.addProperty("tag",tag);
         jo.addProperty("arena",arena);
+        jo.addProperty("started",started);
+        jo.addProperty("totalJoined",totalJoined);
         jo.addProperty("rank",rating.rank);
         jo.addProperty("level",rating.xpLevel);
         return jo;

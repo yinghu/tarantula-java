@@ -89,6 +89,7 @@ namespace Integration.Game
                 });    
             });
             _seat = Manager.Room.Seat;
+            _started = Manager.Room.Started;
             _players = new Player[Manager.Room.Capacity];
             using (var buffer = new DataBuffer())
             {
