@@ -29,6 +29,7 @@ public class GameEndHandler extends AbstractMessageHandler {
         outboundMessage.sequence(0);
         outboundMessage.messageId(messageId);
         outboundMessage.ack(ack);
+        relay();
         this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).onGame().onEnd();
     }
 }

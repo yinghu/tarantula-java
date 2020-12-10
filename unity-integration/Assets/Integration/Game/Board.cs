@@ -10,6 +10,7 @@ namespace Integration.Game
     {
         public CameraAdapter cameraAdapter;
         public Camera mainCamera;
+        public Exit exit;
         private Player[] _players;
         private int _seat;
         public TMP_Text bText;
@@ -108,6 +109,7 @@ namespace Integration.Game
             _timer = 1;
             Manager.OnGameStartEvent += OnGameStart;
             Manager.OnGameClosingEvent += OnGameClosing;
+            Manager.OnGameEndEvent += OnGameEnd;
             await Messenger.SendAsync(MessageType.Load, sequence, true);
             InvokeRepeating(nameof(Print), 1.0f, 1.0f);
         }
@@ -172,10 +174,16 @@ namespace Integration.Game
             Debug.Log("game closing");
             
         }
+        private void OnGameEnd()
+        {
+            Debug.Log("game end");
+            exit.ExitOnEnd();
+        }
         private void OnDestroy()
         {
             Manager.OnGameStartEvent -= OnGameStart;
             Manager.OnGameClosingEvent -= OnGameClosing;
+            Manager.OnGameEndEvent -= OnGameEnd;
         }
     }
 }

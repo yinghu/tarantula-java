@@ -36,7 +36,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     private final int port;
     private final ConcurrentLinkedDeque<PendingMessage> mQueue;
     private final ConcurrentHashMap<Integer, MessageHandler> mHandlers;
-    private final ConcurrentHashMap<Long, GameChannel> mChannels;
+    private final ConcurrentHashMap<Long, GameChannelBinding> mChannels;
     private ExecutorService executorService;
     private ScheduledExecutorService scheduledExecutorService;
     private HttpCaller httpCaller;
@@ -79,6 +79,9 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         poolSize = config.getAsJsonObject("tarantula").get("messagingPoolSize").getAsInt();
         retryCount = config.getAsJsonObject("tarantula").get("retryCount").getAsInt();
         retryInterval = config.getAsJsonObject("tarantula").get("retryInterval").getAsLong();
+        pingTimeout = config.getAsJsonObject("tarantula").get("pingTimeout").getAsLong();
+        retryTimeout = config.getAsJsonObject("tarantula").get("retryTimeout").getAsLong();
+        ackTimeout = config.getAsJsonObject("tarantula").get("ackTimeout").getAsLong();
         application = config.getAsJsonObject("tarantula").get("application").getAsString();
         secured = config.getAsJsonObject("connection").get("secured").getAsBoolean();
         httpCaller = new HttpCaller(config.getAsJsonObject(configHeader).get("url").getAsString());
@@ -143,8 +146,10 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
                                 byte[] data = new byte[buffer.limit()];
                                 buffer.get(data,0,data.length);
                                 InboundMessage inboundMessage = new InboundMessage("",secured?ByteBuffer.wrap(decrypt(data)):ByteBuffer.wrap(data),pendingMessage.source);
-                                GameChannel gameChannel = mChannels.get(inboundMessage.connectionId());
-                                gameChannel.onMessage(inboundMessage);
+                                GameChannelBinding binding = mChannels.get(inboundMessage.connectionId());
+                                if(binding!=null){
+                                    binding.gameChannel.onMessage(inboundMessage);
+                                }
                             }
                             else if(pendingMessage.pendingType == PendingMessage.OUTBOUND){
                                 pendingMessage.runnable.run();
@@ -189,21 +194,21 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
         pc.getAsJsonArray("connections").forEach((c)->{
             PushEventChannel _pc = new PushEventChannel(c.getAsLong(),this,retryCount,this.retryInterval);
-            _pc.registerListener(this);
             _pc.onGame(createGame(_pc));
-            mChannels.put(_pc.channelId(),_pc);
+            _pc.onGame().registerGameChannelListener(this);
+            GameChannelBinding binding = new GameChannelBinding(_pc);
+            binding.pingSchedule = scheduledExecutorService.scheduleAtFixedRate(()->_pc.ping(),pingTimeout,pingTimeout,TimeUnit.MILLISECONDS);
+            binding.retrySchedule = scheduledExecutorService.scheduleAtFixedRate(()->_pc.retry(),retryTimeout,retryTimeout,TimeUnit.MILLISECONDS);
+            mChannels.put(_pc.channelId(),binding);
         });
         PushEventChannel pushEventChannel = new PushEventChannel(pc.get("connectionId").getAsLong(),this,retryCount,this.retryInterval);
-        pushEventChannel.registerListener(this);
         pushEventChannel.onGame(createGame(pushEventChannel));
-        mChannels.put(pushEventChannel.channelId(),pushEventChannel);
-        pingTimeout = config.getAsJsonObject("tarantula").get("pingTimeout").getAsLong();
-        retryTimeout = config.getAsJsonObject("tarantula").get("retryTimeout").getAsLong();
-        ackTimeout = config.getAsJsonObject("tarantula").get("ackTimeout").getAsLong();
-        mChannels.forEach((k,v)->{
-            scheduledExecutorService.scheduleAtFixedRate(()-> v.ping(),pingTimeout,pingTimeout,TimeUnit.MILLISECONDS);
-            scheduledExecutorService.scheduleAtFixedRate(()->v.retry(),retryTimeout,retryTimeout,TimeUnit.MILLISECONDS);
-        });
+        pushEventChannel.onGame().registerGameChannelListener(this);
+        GameChannelBinding mbinding = new GameChannelBinding(pushEventChannel);
+        mbinding.pingSchedule = scheduledExecutorService.scheduleAtFixedRate(()->pushEventChannel.ping(),pingTimeout,pingTimeout,TimeUnit.MILLISECONDS);
+        mbinding.retrySchedule = scheduledExecutorService.scheduleAtFixedRate(()->pushEventChannel.retry(),retryTimeout,retryTimeout,TimeUnit.MILLISECONDS);
+        mChannels.put(pushEventChannel.channelId(),mbinding);
+
         scheduledExecutorService.scheduleAtFixedRate(()->ack(),ackTimeout,ackTimeout,TimeUnit.MILLISECONDS);
     }
     public void shutdown() throws Exception{
@@ -293,7 +298,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         }
     }
     public GameChannel gameChannel(long connectionId){
-        return mChannels.get(connectionId);
+        return mChannels.get(connectionId).gameChannel;
     }
     public int sessionId(){
         return sessionId.incrementAndGet();
@@ -330,13 +335,18 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     }
     @Override
     public void onChannelClosed(GameChannel channelClosed) {
+        channelClosed.close();
+        GameChannelBinding removed = mChannels.remove(channelClosed.channelId());
+        removed.retrySchedule.cancel(true);
+        removed.pingSchedule.cancel(true);
         long cid = addConnection();
         GameChannel gc = new PushEventChannel(cid,this,retryCount,this.retryInterval);
-        gc.registerListener(this);
         gc.onGame(createGame(gc));
-        mChannels.put(gc.channelId(),gc);
-        scheduledExecutorService.scheduleAtFixedRate(()->gc.ping(),pingTimeout,pingTimeout,TimeUnit.MILLISECONDS);
-        scheduledExecutorService.scheduleAtFixedRate(()->gc.retry(),retryTimeout,retryTimeout,TimeUnit.MILLISECONDS);
+        gc.onGame().registerGameChannelListener(this);
+        GameChannelBinding binding = new GameChannelBinding(gc);
+        binding.pingSchedule = scheduledExecutorService.scheduleAtFixedRate(()->gc.ping(),pingTimeout,pingTimeout,TimeUnit.MILLISECONDS);
+        binding.retrySchedule = scheduledExecutorService.scheduleAtFixedRate(()->gc.retry(),retryTimeout,retryTimeout,TimeUnit.MILLISECONDS);
+        mChannels.put(gc.channelId(),binding);
     }
     public void onUpdate(Game game,String type,byte[] payload){
         mQueue.offer(new PendingMessage(()->{

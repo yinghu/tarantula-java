@@ -1,4 +1,5 @@
-﻿using GameClustering;
+﻿using System.Threading.Tasks;
+using GameClustering;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -28,7 +29,18 @@ namespace Integration
             {
                 Debug.Log("Left room");
             }
+            else
+            {
+                Debug.Log("end room");
+                _leaving = true;
+            }
         }
+
+        public void ExitOnEnd()
+        {
+            _leaving = true;
+        }
+
         private void Leave(int sessionId)
         {
             _leaving = true;

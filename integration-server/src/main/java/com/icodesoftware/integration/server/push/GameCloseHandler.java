@@ -29,5 +29,6 @@ public class GameCloseHandler extends AbstractMessageHandler {
         outboundMessage.sequence(0);
         outboundMessage.messageId(messageId);
         outboundMessage.ack(ack);
+        this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).onGame().onClose();
     }
 }

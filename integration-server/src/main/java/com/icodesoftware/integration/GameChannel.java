@@ -33,10 +33,17 @@ public interface GameChannel {
     void onGame(Game game);
     Game onGame();
     int totalRetries();
-    void registerListener(Listener listener);
+
+    void onSession(int sessionId,OnSession onSession);
+    void onSession(OnSession onSession);
+
+    void close();
 
     interface Listener{
         void onChannelClosed(GameChannel channelClosed);
+    }
+    interface OnSession{
+        void execute(GameSession gameSession);
     }
 
 }

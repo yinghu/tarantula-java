@@ -453,6 +453,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 240475181}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &240475183 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8533344724567963596, guid: 84e65a6ce56950840b886811a326e4ef,
+    type: 3}
+  m_PrefabInstance: {fileID: 240475181}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bae3c30c56f4a438d4918b026be1bf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &262091532
 GameObject:
   m_ObjectHideFlags: 0
@@ -911,6 +923,7 @@ MonoBehaviour:
   master: 0
   cameraAdapter: {fileID: 189602511}
   mainCamera: {fileID: 189602509}
+  exit: {fileID: 240475183}
   bText: {fileID: 262091534}
   types:
   - {fileID: 1062142694984116038, guid: 0f85182f09fddf74b96816cfcad60851, type: 3}

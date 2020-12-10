@@ -12,11 +12,19 @@ public interface Game {
     String zoneId();
     String roomId();
     boolean started();
+
+    //customized game event callback
     void onAction(InboundMessage inboundMessage);
 
+
+    //predefined game event callbacks
     void onCollision(InboundMessage inboundMessage);
     void onJoin(int sessionId,RemoteSession remoteSession);
+    void onLeave(int sessionId);
     void onLoad(InboundMessage inboundMessage);
+
+
+
     //server push event callbacks
     void onSpec(DataBuffer dataBuffer);
     void onStart();
@@ -25,4 +33,6 @@ public interface Game {
     void onEnd();
     void onOvertime();
     void onJoinTimeout();
+
+    void registerGameChannelListener(GameChannel.Listener listener);
 }

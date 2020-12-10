@@ -35,7 +35,6 @@ public class PushEventChannel implements GameChannel {
     private final byte[] ping;
 
     private Game game;
-    private Listener listener;
     private int totalRetries;
     private final int retryCount;
     private final long retryInterval;
@@ -70,8 +69,9 @@ public class PushEventChannel implements GameChannel {
         if(mSession.containsKey(sessionId)&&mSession.get(sessionId).socketAddress.equals(socketAddress)){
             mSession.remove(sessionId);
             jIndex.remove(socketAddress);
-            this.listener.onChannelClosed(this);
+            //this.listener.onChannelClosed(this);
         }
+        game.onLeave(sessionId);
     }
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
@@ -174,6 +174,7 @@ public class PushEventChannel implements GameChannel {
                 kickOff.add(k);
                 mSession.remove(k);
                 jIndex.remove(v.socketAddress);
+                game.onLeave(k);
             }
         });
         kickOff.forEach((k)->{
@@ -244,11 +245,20 @@ public class PushEventChannel implements GameChannel {
     public Game onGame(){
         return this.game;
     }
+    public void onSession(int sessionId,OnSession onSession){
+        RemoteSession gs = mSession.get(sessionId);
+        if(gs!=null){
+            onSession.execute(gs);
+        }
+    }
+    public void onSession(OnSession onSession){
+        mSession.forEach((k,v)->onSession.execute(v));
+    }
     public boolean started(){
         return game!=null&&game.started();
     }
-    public void registerListener(Listener listener){
-        this.listener = listener;
+    public void close(){
+        mSession.clear();
     }
 
     private boolean checkExpired(long timestamp,long pms){

@@ -18,6 +18,6 @@ public class OnCollisionMessageHandler extends AbstractMessageHandler {
 
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
-        System.out.println("hit->");
+
     }
 }

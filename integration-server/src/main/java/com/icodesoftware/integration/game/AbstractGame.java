@@ -23,7 +23,7 @@ abstract public class AbstractGame implements Game {
     protected boolean started;
     protected GameChannelService gameChannelService;
     protected GameChannel gameChannel;
-
+    protected GameChannel.Listener listener;
     public AbstractGame(GameChannelService gameChannelService, GameChannel gameChannel){
         this.gameChannelService = gameChannelService;
         this.gameChannel = gameChannel;
@@ -50,11 +50,9 @@ abstract public class AbstractGame implements Game {
         //outboundMessage.sessionId(sessionId);
         //int mid = gameChannelService.messageId();
         //gameChannel.relay(mid,true,null,outboundMessage);
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("seat",remoteSession.seat);
-        jsonObject.addProperty("name","kills");
-        jsonObject.addProperty("value",6);
-        gameChannelService.onUpdate(this,"onStats",jsonObject.toString().getBytes());
+    }
+    public void onLeave(int sessionId){
+        log.warn("leave->"+sessionId);
     }
     public void onLoad(InboundMessage inboundMessage){
         log.warn("load->"+inboundMessage.sessionId());
@@ -66,6 +64,13 @@ abstract public class AbstractGame implements Game {
         int mid = gameChannelService.messageId();
         outboundMessage.messageId(mid);
         gameChannel.relay(mid,true,null,outboundMessage);
+        gameChannel.onSession(inboundMessage.sessionId(),(session)->{
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("seat",session.seat());
+            jsonObject.addProperty("name","kills");
+            jsonObject.addProperty("value",6);
+            gameChannelService.onUpdate(this,"onStats",jsonObject.toString().getBytes());
+        });
     }
     public void onCollision(InboundMessage inboundMessage){
         OutboundMessage outboundMessage = new OutboundMessage();
@@ -89,22 +94,27 @@ abstract public class AbstractGame implements Game {
         this.started = true;
     }
     public void onClosing(){
-        this.gameChannelService.onUpdate(this,"onClosing","{}".getBytes());
+
     }
     public void onClose(){
-        this.gameChannelService.onUpdate(this,"onClose","{}".getBytes());
+        gameChannel.onSession((session)->{
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("seat",session.seat());
+            jsonObject.addProperty("name","kills");
+            jsonObject.addProperty("value",6);
+            gameChannelService.onUpdate(this,"onClose",jsonObject.toString().getBytes());
+        });
     }
     public void onEnd(){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("seat",0);
-        jsonObject.addProperty("name","kills");
-        jsonObject.addProperty("value",6);
-        gameChannelService.onUpdate(this,"onEnd",jsonObject.toString().getBytes());
+        this.listener.onChannelClosed(gameChannel);
     }
     public void onOvertime(){
-        this.gameChannelService.onUpdate(this,"onOvertime","{}".getBytes());
+
     }
     public void onJoinTimeout(){
-        this.gameChannelService.onUpdate(this,"onJoinTimeout","{}".getBytes());
+
+    }
+    public void registerGameChannelListener(GameChannel.Listener listener){
+        this.listener = listener;
     }
 }
