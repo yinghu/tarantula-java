@@ -1,11 +1,11 @@
-package com.tarantula.platform.util;
+package com.icodesoftware.util;
 
-import com.tarantula.platform.service.RNG;
+import com.icodesoftware.service.RNG;
 
 import java.security.SecureRandom;
 
 /**
- * updated by yinghu lu on 10/7/2018.
+ * updated by yinghu lu on 12/11/2020.
  */
 public class JvmRNG extends SecureRandom implements RNG{
 

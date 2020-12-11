@@ -18,7 +18,7 @@ public class MoveMessageHandler extends AbstractMessageHandler {
 
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
-         if(checkStarted(pendingInboundMessage.connectionId())){
+         //if(checkStarted(pendingInboundMessage.connectionId())){
              OutboundMessage pendingOutboundMessage = new OutboundMessage();
              pendingOutboundMessage.ack(pendingInboundMessage.ack());
              pendingOutboundMessage.timestamp(pendingInboundMessage.timestamp());
@@ -28,6 +28,6 @@ public class MoveMessageHandler extends AbstractMessageHandler {
              pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
              pendingOutboundMessage.payload(pendingInboundMessage.payload());
              this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).relay(pendingInboundMessage.messageId(), pendingInboundMessage.ack(), null, pendingOutboundMessage);
-         }
+         //}
      }
 }

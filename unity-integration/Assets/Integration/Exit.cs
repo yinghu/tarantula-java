@@ -29,11 +29,6 @@ namespace Integration
             {
                 Debug.Log("Left room");
             }
-            else
-            {
-                Debug.Log("end room");
-                _leaving = true;
-            }
         }
 
         public void ExitOnEnd()

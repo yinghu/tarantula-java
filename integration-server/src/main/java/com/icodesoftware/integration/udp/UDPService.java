@@ -18,10 +18,12 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.*;
@@ -31,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class UDPService implements Runnable, GameChannelService, GameChannel.Listener {
     private static TarantulaLogger log = JDKLogger.getLogger(UDPService.class);
 
-    private DatagramChannel datagramChannel;
+    private DatagramSocket datagramChannel;
     private final String address;
     private final int port;
     private final ConcurrentLinkedDeque<PendingMessage> mQueue;
@@ -119,20 +121,25 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         log.warn("WAITING FOR INBOUND MESSAGES ON ["+address+":"+port+"] At ["+serverId+"]");
         while (true){
             try{
-                ByteBuffer buffer = ByteBuffer.allocate(OutboundMessage.MESSAGE_SIZE*2);
-                SocketAddress src = this.datagramChannel.receive(buffer);
-                mQueue.offer(new PendingMessage(buffer,src));
+                DatagramPacket buffer = new DatagramPacket(new byte[OutboundMessage.MESSAGE_SIZE*2],OutboundMessage.MESSAGE_SIZE*2);
+                this.datagramChannel.receive(buffer);
+                byte[] payload = Arrays.copyOf(buffer.getData(),buffer.getLength());
+                mQueue.offer(new PendingMessage(payload,buffer.getSocketAddress()));
             }catch (Exception ex){
                 //ignore
                 ex.printStackTrace();
+                //try{Thread.sleep(50);}catch (Exception exx){}
             }
         }
     }
     public void start() throws Exception{
         scheduledExecutorService = Executors.newScheduledThreadPool(schedulingPoolSize,new TarantulaThreadFactory("scheduling"));
-        this.datagramChannel = DatagramChannel.open();
-        InetSocketAddress iAdd = new InetSocketAddress(address,port);
-        this.datagramChannel.bind(iAdd);
+        this.datagramChannel = new DatagramSocket(null);
+        InetSocketAddress addr = new InetSocketAddress(address,port);
+        this.datagramChannel.bind(addr);
+        //this.datagramChannel.setReceiveBufferSize(OutboundMessage.MESSAGE_SIZE*2);
+        //this.datagramChannel.setSendBufferSize(OutboundMessage.MESSAGE_SIZE*2);
+        //this.datagramChannel.setSoTimeout(1000);
         executorService = Executors.newFixedThreadPool(poolSize,new TarantulaThreadFactory("messaging"));
         for(int i=0;i<poolSize;i++){
             executorService.execute(()->{
@@ -141,11 +148,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
                         PendingMessage pendingMessage = mQueue.poll();
                         if(pendingMessage!=null){
                             if(pendingMessage.pendingType == PendingMessage.INBOUND){
-                                ByteBuffer buffer = pendingMessage.data;
-                                buffer.flip();
-                                byte[] data = new byte[buffer.limit()];
-                                buffer.get(data,0,data.length);
-                                InboundMessage inboundMessage = new InboundMessage("",secured?ByteBuffer.wrap(decrypt(data)):ByteBuffer.wrap(data),pendingMessage.source);
+                                InboundMessage inboundMessage = new InboundMessage("",secured?ByteBuffer.wrap(decrypt(pendingMessage.data)):ByteBuffer.wrap(pendingMessage.data),pendingMessage.source);
                                 GameChannelBinding binding = mChannels.get(inboundMessage.connectionId());
                                 if(binding!=null){
                                     binding.gameChannel.onMessage(inboundMessage);
@@ -261,7 +264,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             ex.printStackTrace();
         }
     }
-    public void pendingOutbound(ByteBuffer pendingMessage,SocketAddress source){
+    public void pendingOutbound(byte[] pendingMessage,SocketAddress source){
         mQueue.offer(new PendingMessage(()->send(pendingMessage,source)));
     }
     public byte[] encode(OutboundMessage outboundMessage){
@@ -272,11 +275,12 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             return null;
         }
     }
-    private boolean send(ByteBuffer pendingMessage,SocketAddress source){
+    private void send(byte[] pendingMessage,SocketAddress source){
         try{
-            return this.datagramChannel.send(pendingMessage,source)>0;
+            DatagramPacket packet = new DatagramPacket(pendingMessage,pendingMessage.length,source);
+            this.datagramChannel.send(packet);
         }catch (Exception ex){
-            return false;
+
         }
     }
     public boolean validateTicket(int stub,String login,String ticket){

@@ -3,8 +3,6 @@ package com.icodesoftware.integration;
 import com.icodesoftware.protocol.InboundMessage;
 import com.icodesoftware.protocol.OutboundMessage;
 
-import java.nio.ByteBuffer;
-
 /**
  * Created by yinghu lu on 10/7/2020.
  */
@@ -31,7 +29,7 @@ public class LeaveMessageHandler extends AbstractMessageHandler {
         gameChannel.leave(pendingInboundMessage.sessionId(),pendingInboundMessage.source());
         OnLeftMessageHandler onLeftMessageHandler = new OnLeftMessageHandler(gameChannelService);
         onLeftMessageHandler.onMessage(pendingInboundMessage);
-        ByteBuffer pending = ByteBuffer.wrap(gameChannelService.encode(pendingOutboundMessage));
+        byte[] pending = (gameChannelService.encode(pendingOutboundMessage));
         gameChannel.pending(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),pending,onLeftMessageHandler);
         gameChannelService.pendingOutbound(pending,pendingInboundMessage.source());
         onLeftMessageHandler.relay();

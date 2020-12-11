@@ -51,7 +51,7 @@ public class ServerPushMessageHandler extends AbstractMessageHandler {
             dataBuffer.putInt(alist.size());
             alist.forEach((a)-> dataBuffer.putInt(a));
             ack.payload(dataBuffer.toArray());
-            gameChannelService.pendingOutbound(ByteBuffer.wrap(gameChannelService.encode(ack)), pendingInboundMessage.source());
+            gameChannelService.pendingOutbound((gameChannelService.encode(ack)), pendingInboundMessage.source());
         }
         int seq = pendingInboundMessage.sequence();
         log.warn("Server push->["+seq+"] from ["+pendingInboundMessage.source()+"]["+pendingInboundMessage.connectionId()+"]");

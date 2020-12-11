@@ -9,7 +9,6 @@ import com.icodesoftware.protocol.*;
 import com.icodesoftware.util.FIFOBuffer;
 
 import java.net.SocketAddress;
-import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -132,7 +131,7 @@ public class PushEventChannel implements GameChannel {
         dataBuffer.putInt(alist.size());
         alist.forEach((mid)->{dataBuffer.putInt(mid);});
         ack.payload(dataBuffer.toArray());
-        gameChannelService.pendingOutbound(ByteBuffer.wrap(gameChannelService.encode(ack)),source);
+        gameChannelService.pendingOutbound(gameChannelService.encode(ack),source);
     }
     public void ack(int sessionId,int messageId){
         PendingMessage pendingMessage = mMessage.remove(new PendingMessageIndex(sessionId,messageId));
@@ -143,33 +142,25 @@ public class PushEventChannel implements GameChannel {
     public void relay(int messageId,boolean ack,MessageHandler messageHandler,OutboundMessage pendingOutboundMessage){
         byte[] outMessage = gameChannelService.encode(pendingOutboundMessage);
         this.mSession.forEach((k,v)->{
-            if(!ack){
-                this.gameChannelService.pendingOutbound(ByteBuffer.wrap(outMessage),v.socketAddress);
+            if(ack){
+                pending(k,messageId,outMessage,messageHandler);
             }
-            else{
-                ByteBuffer pending = ByteBuffer.wrap(outMessage);
-                pending(k,messageId,pending,messageHandler);
-                this.gameChannelService.pendingOutbound(pending,v.socketAddress);
-            }
+            this.gameChannelService.pendingOutbound(outMessage,v.socketAddress);
         });
     }
     public void relay(int sessionId,int messageId,boolean ack,MessageHandler messageHandler,OutboundMessage pendingOutboundMessage){
         byte[] outMessage = gameChannelService.encode(pendingOutboundMessage);
         RemoteSession remoteSession = mSession.get(sessionId);
-        if(!ack){
-            this.gameChannelService.pendingOutbound(ByteBuffer.wrap(outMessage),remoteSession.socketAddress);
+        if(ack){
+            pending(sessionId,messageId,outMessage,messageHandler);
         }
-        else{
-            ByteBuffer pending = ByteBuffer.wrap(outMessage);
-            pending(sessionId,messageId,pending,messageHandler);
-            this.gameChannelService.pendingOutbound(pending,remoteSession.socketAddress);
-        }
+        this.gameChannelService.pendingOutbound(outMessage,remoteSession.socketAddress);
     }
     public void ping(){
         ArrayList<Integer> kickOff = new ArrayList<>();
         mSession.forEach((k,v)->{
             if(v.pingPong.incrementAndGet()<5){
-                this.gameChannelService.pendingOutbound(ByteBuffer.wrap(ping),v.socketAddress);
+                this.gameChannelService.pendingOutbound((ping),v.socketAddress);
             }else{
                 kickOff.add(k);
                 mSession.remove(k);
@@ -201,7 +192,6 @@ public class PushEventChannel implements GameChannel {
             RemoteSession session = mSession.get(k.sessionId);
             if(session!=null&&checkExpired(v.timestamp,retryInterval)){
                 v.timestamp = toUTCMilliseconds();
-                v.data.flip();
                 this.gameChannelService.pendingOutbound(v.data,v.source);
                 _retries[0]++;
                 v.retries--;
@@ -213,7 +203,6 @@ public class PushEventChannel implements GameChannel {
         this.jIndex.forEach((k,v)->{
             if(v.pending.get()&&checkExpired(v.timestamp,retryInterval)){
                 v.timestamp = toUTCMilliseconds();
-                v.data.flip();
                 this.gameChannelService.pendingOutbound(v.data,k);
                 _retries[0]++;
                 v.retries--;
@@ -227,10 +216,10 @@ public class PushEventChannel implements GameChannel {
     public int totalRetries(){
         return totalRetries;
     }
-    public void pending(int sessionId, int messageId, ByteBuffer pending,MessageHandler callback){
+    public void pending(int sessionId, int messageId, byte[] pending,MessageHandler callback){
         mMessage.put(new PendingMessageIndex(sessionId,messageId),new PendingMessage(pending,toUTCMilliseconds(),retryCount,callback));
     }
-    public void pending(SocketAddress socketAddress,int messageId,ByteBuffer pending){
+    public void pending(SocketAddress socketAddress,int messageId,byte[] pending){
         PendingSession pendingSession = jIndex.get(socketAddress);
         if(pendingSession!=null){
             pendingSession.messageId = messageId;

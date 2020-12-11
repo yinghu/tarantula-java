@@ -16,7 +16,7 @@ namespace Integration.Game
         private void Start()
         {
             _sent = false;
-            _timer = 0.5f;
+            _timer = 0.25f;
             _delta = Random.Range(-10, 10)>=0?2:-2;
             _end = transform.position;
             _board = FindObjectOfType<Board>();
@@ -40,7 +40,7 @@ namespace Integration.Game
             {
                 return;
             }
-            _timer = 0.5f;
+            _timer = 0.25f;
             if (!master||_sent)
             {
                 return;

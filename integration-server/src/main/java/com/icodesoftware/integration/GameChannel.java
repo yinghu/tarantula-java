@@ -27,8 +27,8 @@ public interface GameChannel {
     void pong(int sessionId);
 
     void retry();
-    void pending(int sessionId, int messageId, ByteBuffer pending, MessageHandler callback);
-    void pending(SocketAddress socketAddress,int messageId,ByteBuffer pending);
+    void pending(int sessionId, int messageId, byte[] pending, MessageHandler callback);
+    void pending(SocketAddress socketAddress,int messageId,byte[] pending);
 
     void onGame(Game game);
     Game onGame();

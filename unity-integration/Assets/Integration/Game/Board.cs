@@ -22,7 +22,7 @@ namespace Integration.Game
         private int _outbound;
         private int _inbound;
         private int _timer;
-        private bool _started;
+     
         private async void Start()
         {
             StartClusteringObject(  async buffer =>
@@ -90,7 +90,6 @@ namespace Integration.Game
                 });    
             });
             _seat = Manager.Room.Seat;
-            _started = Manager.Room.Started;
             _players = new Player[Manager.Room.Capacity];
             using (var buffer = new DataBuffer())
             {
@@ -116,7 +115,7 @@ namespace Integration.Game
 
         private async void Update()
         {
-            if (!Input.GetMouseButtonDown(0)||!_started)
+            if (!Input.GetMouseButtonDown(0))
             {
                 return;
             }
@@ -167,7 +166,6 @@ namespace Integration.Game
         private void OnGameStart()
         {
             Debug.Log("game start");
-            _started = true;
         }
         private void OnGameClosing()
         {
@@ -177,6 +175,7 @@ namespace Integration.Game
         private void OnGameEnd()
         {
             Debug.Log("game end");
+            Messenger.Disconnect();
             exit.ExitOnEnd();
         }
         private void OnDestroy()

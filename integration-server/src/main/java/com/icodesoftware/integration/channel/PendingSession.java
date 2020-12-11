@@ -2,7 +2,6 @@ package com.icodesoftware.integration.channel;
 
 import com.icodesoftware.util.FIFOBuffer;
 
-import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -11,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class PendingSession {
     public final FIFOBuffer<Integer> ackBuffer;
     public int messageId;
-    public ByteBuffer data;
+    public byte[] data;
     public long timestamp;
     public int retries;
     public AtomicBoolean pending;

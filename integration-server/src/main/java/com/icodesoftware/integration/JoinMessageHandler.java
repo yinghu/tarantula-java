@@ -2,8 +2,6 @@ package com.icodesoftware.integration;
 
 import com.icodesoftware.protocol.*;
 
-import java.nio.ByteBuffer;
-
 
 /**
  * Created by yinghu lu on 10/7/2020.
@@ -43,7 +41,7 @@ public class JoinMessageHandler extends AbstractMessageHandler {
             gameChannel.ack(sessionId,pendingInboundMessage.messageId(),pendingInboundMessage.source());
             OnJoinedMessageHandler onJoinedMessageHandler = new OnJoinedMessageHandler(gameChannelService,sessionId);
             onJoinedMessageHandler.onMessage(pendingInboundMessage);
-            ByteBuffer outMessage = ByteBuffer.wrap(gameChannelService.encode(pendingOutboundMessage));
+            byte[] outMessage = (gameChannelService.encode(pendingOutboundMessage));
             gameChannel.pending(sessionId,messageId,outMessage,onJoinedMessageHandler);
             gameChannelService.pendingOutbound(outMessage,pendingInboundMessage.source());
         }
@@ -56,10 +54,10 @@ public class JoinMessageHandler extends AbstractMessageHandler {
             dataBuffer.putInt(1);
             dataBuffer.putInt(pendingInboundMessage.messageId());
             ack.payload(dataBuffer.toArray());
-            gameChannelService.pendingOutbound(ByteBuffer.wrap(gameChannelService.encode(ack)),pendingInboundMessage.source());
+            gameChannelService.pendingOutbound((gameChannelService.encode(ack)),pendingInboundMessage.source());
             data.putUTF8("rejected");
             pendingOutboundMessage.payload(data.toArray());
-            ByteBuffer outMessage = ByteBuffer.wrap(gameChannelService.encode(pendingOutboundMessage));
+            byte[] outMessage = (gameChannelService.encode(pendingOutboundMessage));
             gameChannel.pending(pendingInboundMessage.source(),messageId,outMessage);
             gameChannelService.pendingOutbound(outMessage,pendingInboundMessage.source());
         }

@@ -1,9 +1,9 @@
-package com.tarantula.platform.service;
+package com.icodesoftware.service;
 
 /**
- * Updated by yinghu lu on 10/7/2018.
+ * Updated by yinghu lu on 12/11/2020
  */
-public interface RNG{
+public interface RNG {
 
     void onIdle();
 
