@@ -7,6 +7,10 @@ public class GameRating {
     public int rank;
     public double xp;
 
+    public GameRating(int seat){
+        this.seat = seat;
+    }
+
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("seat",seat);

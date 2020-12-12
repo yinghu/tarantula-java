@@ -40,6 +40,10 @@ abstract public class AbstractGame implements Game {
     }
     public void onJoin(int sessionId,RemoteSession remoteSession){
         log.warn("join->"+remoteSession.seat+"/"+sessionId);
+        gameObject.update(remoteSession.seat).rank=1;
+        gameObject.update(remoteSession.seat).xp=100;
+        gameObject.update(new GameStatsDelta(remoteSession.seat,"kills",1));
+        gameObject.update(new GameStatsDelta(remoteSession.seat,"winnings",1));
         //OutboundMessage outboundMessage = new OutboundMessage();
         //outboundMessage.type(MessageHandler.ON_SPAWN);
         //outboundMessage.sequence(1);
@@ -62,11 +66,7 @@ abstract public class AbstractGame implements Game {
         outboundMessage.messageId(mid);
         gameChannel.relay(mid,true,null,outboundMessage);
         gameChannel.onSession(inboundMessage.sessionId(),(session)->{
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("seat",session.seat());
-            jsonObject.addProperty("name","kills");
-            jsonObject.addProperty("value",6);
-            gameChannelService.onUpdate(this,"onStats",jsonObject.toString().getBytes());
+            gameChannelService.onUpdate(this,"onStats",gameObject.toJson().toString().getBytes());
         });
     }
     public void onCollision(InboundMessage inboundMessage){
@@ -77,6 +77,11 @@ abstract public class AbstractGame implements Game {
         int mid = gameChannelService.messageId();
         outboundMessage.messageId(mid);
         gameChannel.relay(mid,inboundMessage.ack(),null,outboundMessage);
+        gameChannel.onSession(inboundMessage.sessionId(),(session)->{
+            gameObject.update(session.seat()).xp +=100;
+            gameObject.update(new GameStatsDelta(session.seat(),"hits",1));
+            gameChannelService.onUpdate(this,"onCollision",gameObject.toJson().toString().getBytes());
+        });
     }
 
     public void onSpec(DataBuffer dataBuffer){
@@ -86,6 +91,7 @@ abstract public class AbstractGame implements Game {
         long ovt = dataBuffer.getLong();
         roomId = dataBuffer.getUTF8();
         zoneId = dataBuffer.getUTF8();
+        this.gameObject = new GameObject(capacity);
     }
     public void onStart(){
         this.started = true;
@@ -94,13 +100,7 @@ abstract public class AbstractGame implements Game {
 
     }
     public void onClose(){
-        gameChannel.onSession((session)->{
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("seat",session.seat());
-            jsonObject.addProperty("name","kills");
-            jsonObject.addProperty("value",6);
-            gameChannelService.onUpdate(this,"onClose",jsonObject.toString().getBytes());
-        });
+        gameChannelService.onUpdate(this,"onClose",gameObject.toJson().toString().getBytes());
     }
     public void onEnd(){
         this.listener.onChannelClosed(gameChannel);

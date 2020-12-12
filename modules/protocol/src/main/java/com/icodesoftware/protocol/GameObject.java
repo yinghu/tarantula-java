@@ -3,27 +3,35 @@ package com.icodesoftware.protocol;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GameObject {
 
-    public List<GameStatsDelta> gameStatsDeltaList;
-    public GameRating[] gameRatings;
+    private ConcurrentHashMap<String,GameStatsDelta> gameStatsDeltaMap;
+    private GameRating[] gameRatings;
     public GameObject(int capacity){
-        gameStatsDeltaList = new ArrayList<>();
+        gameStatsDeltaMap = new ConcurrentHashMap<>();
         gameRatings = new GameRating[capacity];
-    }
-    public void setup(DataBuffer spec){
-
     }
     public GameObject(){
 
     }
+    public GameRating update(int seat){
+        if(gameRatings[seat]==null){
+            gameRatings[seat]=new GameRating(seat);
+        }
+        return gameRatings[seat];
+    }
+    public void update(GameStatsDelta delta){
+        GameStatsDelta ex = gameStatsDeltaMap.putIfAbsent(delta.toString(),delta);
+        if(ex!=null){
+            ex.delta = ex.delta+delta.delta;
+        }
+    }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         JsonArray jo = new JsonArray();
-        gameStatsDeltaList.forEach((g)->jo.add(g.toJson()));
+        gameStatsDeltaMap.forEach((k,g)->jo.add(g.toJson()));
         jsonObject.add("stats",jo);
         JsonArray jr = new JsonArray();
         for(int i=0;i<gameRatings.length;i++){
@@ -36,7 +44,7 @@ public class GameObject {
     }
     public static GameObject toGameObject(JsonObject payload){
         GameObject gameObject = new GameObject();
-        gameObject.gameStatsDeltaList = new ArrayList<>();
+        //gameObject.gameStatsDeltaList = new ArrayList<>();
 
         return gameObject;
     }

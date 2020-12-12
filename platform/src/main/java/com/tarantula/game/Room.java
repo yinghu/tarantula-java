@@ -1,5 +1,6 @@
 package com.tarantula.game;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.Connection;
@@ -250,8 +251,12 @@ public class Room{
     public void onUpdated(String action,byte[] payload){
         System.out.println(action+">"+new String(payload));
         JsonObject jsonObject = new JsonParser().parse(new String(payload)).getAsJsonObject();
-        int seat = jsonObject.get("seat").getAsInt();
-        Stub stub = stubs[seat];
-        roomListener.onStatistics(stub.owner(),jsonObject.get("name").getAsString(),jsonObject.get("value").getAsDouble());
+        JsonArray stats = jsonObject.getAsJsonArray("stats");
+        stats.forEach((j)->{
+            JsonObject js = j.getAsJsonObject();
+            int seat = js.get("seat").getAsInt();
+            Stub stub = stubs[seat];
+            roomListener.onStatistics(stub.owner(),js.get("category").getAsString(),js.get("delta").getAsDouble());
+        });
     }
 }
