@@ -39,6 +39,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     public GameServiceProvider gameServiceProvider;
     public Descriptor descriptor;
     public int levelLimit;
+    public int levelUpBase;
     private CopyOnWriteArrayList<Room> rList = new CopyOnWriteArrayList<>();
 
     private ConcurrentLinkedDeque<Room>[] pendingMatch;
@@ -391,5 +392,10 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         entry.update(delta).update();
         LeaderBoard ldb = gameServiceProvider.leaderBoard(category);
         ldb.onAllBoard(entry);
+    }
+    public void onRating(Stub stub,int rankUpBase){
+        Rating rating = this.gameServiceProvider.rating(stub.owner());
+        rating.update(stub,rankUpBase,levelUpBase);
+        rating.update();
     }
 }

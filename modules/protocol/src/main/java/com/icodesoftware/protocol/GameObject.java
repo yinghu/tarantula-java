@@ -8,13 +8,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameObject {
 
     private ConcurrentHashMap<String,GameStatsDelta> gameStatsDeltaMap;
+    private ConcurrentHashMap<Integer,GameItem> gameItemMap;
     private GameRating[] gameRatings;
     public GameObject(int capacity){
         gameStatsDeltaMap = new ConcurrentHashMap<>();
         gameRatings = new GameRating[capacity];
+        gameItemMap = new ConcurrentHashMap<>();
     }
-    public GameObject(){
-
+    public void gameItem(GameItem gameItem){
+        gameItemMap.put(gameItem.sequence,gameItem);
+    }
+    public GameItem gameItem(int sequence){
+        return gameItemMap.get(sequence);
     }
     public GameRating update(int seat){
         if(gameRatings[seat]==null){
@@ -40,12 +45,9 @@ public class GameObject {
             }
         }
         jsonObject.add("ratings",jr);
+        JsonArray jg = new JsonArray();
+        gameItemMap.forEach((k,v)->jg.add(v.toJson()));
+        jsonObject.add("items",jg);
         return jsonObject;
-    }
-    public static GameObject toGameObject(JsonObject payload){
-        GameObject gameObject = new GameObject();
-        //gameObject.gameStatsDeltaList = new ArrayList<>();
-
-        return gameObject;
     }
 }

@@ -37,7 +37,7 @@ namespace Integration.Game
                     _end.y = 1;
                 });
             });
-            Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId, data) =>
+            Messenger.RegisterMessageHandler(MessageType.OnAction,sequence, (sessionId, data) =>
             {
                 MainThread.Execute(data, buffer =>
                 {
@@ -67,7 +67,7 @@ namespace Integration.Game
                 return;
             }
             _timer = 0.5f;
-            await Messenger.SendAsync(MessageType.Spawn, sequence, true);
+            await Messenger.SendAsync(MessageType.Action, sequence, true);
         }
         private IEnumerator FireBullet()
         {

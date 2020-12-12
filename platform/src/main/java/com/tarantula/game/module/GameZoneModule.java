@@ -115,6 +115,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
         String gz = this.context.descriptor().typeId().replace("-lobby","-service");
         this.gameServiceProvider = this.context.serviceProvider(gz);
         mZone = this.gameServiceProvider.zone(this.context.descriptor());
+        mZone.levelUpBase = DEFAULT_LEVEL_UP_BASE;
         if(mZone.arenas.size()==0) {
             //create arenas using capacity of descriptor
             mZone.capacity=1;

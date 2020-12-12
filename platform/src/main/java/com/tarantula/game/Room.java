@@ -251,12 +251,25 @@ public class Room{
     public void onUpdated(String action,byte[] payload){
         System.out.println(action+">"+new String(payload));
         JsonObject jsonObject = new JsonParser().parse(new String(payload)).getAsJsonObject();
-        JsonArray stats = jsonObject.getAsJsonArray("stats");
-        stats.forEach((j)->{
-            JsonObject js = j.getAsJsonObject();
-            int seat = js.get("seat").getAsInt();
-            Stub stub = stubs[seat];
-            roomListener.onStatistics(stub.owner(),js.get("category").getAsString(),js.get("delta").getAsDouble());
-        });
+        if(action.equals("onStats")){
+            JsonArray stats = jsonObject.getAsJsonArray("stats");
+            stats.forEach((j)->{
+                JsonObject js = j.getAsJsonObject();
+                int seat = js.get("seat").getAsInt();
+                Stub stub = stubs[seat];
+                roomListener.onStatistics(stub.owner(),js.get("category").getAsString(),js.get("delta").getAsDouble());
+            });
+        }
+        else if(action.equals("onClose")){
+            JsonArray ratings = jsonObject.getAsJsonArray("ratings");
+            ratings.forEach((j)->{
+                JsonObject js = j.getAsJsonObject();
+                int seat = js.get("seat").getAsInt();
+                Stub stub = stubs[seat];
+                stub.rank = js.get("rank").getAsInt();
+                stub.pxp = js.get("xp").getAsDouble();
+                roomListener.onRating(stub,rankUpBase);
+            });
+        }
     }
 }

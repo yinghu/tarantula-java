@@ -297,6 +297,8 @@ namespace GameClustering
                     Arena = (string) jo.SelectToken("stub").SelectToken("arena"),
                     Started = (bool)jo.SelectToken("stub").SelectToken("started")
                 };
+                Presence.Rank = (int) jo.SelectToken("stub").SelectToken("rank");
+                Presence.Xp = (double) jo.SelectToken("stub").SelectToken("xp");
                 var pc = jo.SelectToken("connection");
                 var connection = new Connection
                 {

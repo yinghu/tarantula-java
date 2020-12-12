@@ -1,6 +1,5 @@
 package com.icodesoftware.integration.game;
 
-import com.google.gson.JsonObject;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.integration.Game;
 import com.icodesoftware.integration.GameChannel;
@@ -41,7 +40,7 @@ abstract public class AbstractGame implements Game {
     public void onJoin(int sessionId,RemoteSession remoteSession){
         log.warn("join->"+remoteSession.seat+"/"+sessionId);
         gameObject.update(remoteSession.seat).rank=1;
-        gameObject.update(remoteSession.seat).xp=100;
+        gameObject.update(remoteSession.seat).xp=0;
         gameObject.update(new GameStatsDelta(remoteSession.seat,"kills",1));
         gameObject.update(new GameStatsDelta(remoteSession.seat,"winnings",1));
         //OutboundMessage outboundMessage = new OutboundMessage();
@@ -69,7 +68,13 @@ abstract public class AbstractGame implements Game {
             gameChannelService.onUpdate(this,"onStats",gameObject.toJson().toString().getBytes());
         });
     }
+    public void onSpawn(InboundMessage inboundMessage){
+        DataBuffer dataBuffer = new DataBuffer(inboundMessage.payload());
+        gameObject.gameItem(new GameItem(dataBuffer.getInt(),dataBuffer.getInt(),inboundMessage.sessionId()));
+    }
     public void onCollision(InboundMessage inboundMessage){
+        GameItem gameItem = gameObject.gameItem(inboundMessage.sequence());
+        gameItem.votes.incrementAndGet();
         OutboundMessage outboundMessage = new OutboundMessage();
         outboundMessage.ack(inboundMessage.ack());
         outboundMessage.type(MessageHandler.ON_COLLISION);
@@ -80,7 +85,7 @@ abstract public class AbstractGame implements Game {
         gameChannel.onSession(inboundMessage.sessionId(),(session)->{
             gameObject.update(session.seat()).xp +=100;
             gameObject.update(new GameStatsDelta(session.seat(),"hits",1));
-            gameChannelService.onUpdate(this,"onCollision",gameObject.toJson().toString().getBytes());
+            gameChannelService.onUpdate(this,"onStats",gameObject.toJson().toString().getBytes());
         });
     }
 

@@ -7,5 +7,9 @@
         public string Ticket { set; get; }
         public string Login { set; get; }
         public int Stub { set; get; }
+
+        public int Rank { set; get; }
+
+        public double Xp { set; get; }
     }
 }

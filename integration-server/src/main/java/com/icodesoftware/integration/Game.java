@@ -22,7 +22,7 @@ public interface Game {
     void onJoin(int sessionId,RemoteSession remoteSession);
     void onLeave(int sessionId);
     void onLoad(InboundMessage inboundMessage);
-
+    void onSpawn(InboundMessage inboundMessage);
 
 
     //server push event callbacks
