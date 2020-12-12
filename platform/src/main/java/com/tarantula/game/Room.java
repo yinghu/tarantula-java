@@ -137,6 +137,7 @@ public class Room{
     }
     public void reset(){
         totalJoined = 0;
+        state = WAITING;
         this.stubs = new Stub[this.capacity];
         for(int i=0;i<this.capacity;i++){
             Stub stub = new Stub(i,roomId);

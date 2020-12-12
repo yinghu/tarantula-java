@@ -5,7 +5,7 @@ import com.icodesoftware.Connection;
 import com.tarantula.platform.ResponseHeader;
 
 /**
- * Created by yinghu lu on 4/14/2020.
+ * Updated by yinghu lu on 12/11/2020.
  */
 public class GameObject extends ResponseHeader {
 

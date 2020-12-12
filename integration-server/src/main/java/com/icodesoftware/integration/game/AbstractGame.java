@@ -12,7 +12,6 @@ import com.icodesoftware.protocol.InboundMessage;
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.OutboundMessage;
 
-
 /**
  * Created by yinghu lu on 11/15/2020.
  */
