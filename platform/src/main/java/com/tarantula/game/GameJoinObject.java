@@ -7,7 +7,7 @@ import com.tarantula.platform.ResponseHeader;
 /**
  * Updated by yinghu lu on 12/11/2020.
  */
-public class GameObject extends ResponseHeader {
+public class GameJoinObject extends ResponseHeader {
 
     public Stub stub;
     public Connection connection;

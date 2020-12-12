@@ -1,14 +1,29 @@
 package com.tarantula.platform.util;
 
+import com.tarantula.game.Room;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import java.util.Properties;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedDeque;
+
 public class Email {
 
     public static void main(String[] args) throws Exception{
         //Email.send("yinghu_lu@hotmail.com","validation code: 4567");
+        ConcurrentLinkedDeque<Room> rq = new ConcurrentLinkedDeque<>();
+        Room r1 = new Room();
+        r1.roomId = UUID.randomUUID().toString()+"-1";
+        Room r2 = new Room();
+        r2.roomId = UUID.randomUUID().toString()+"-2";
+        rq.offer(r1);
+        rq.offer(r1);
+        rq.offer(r2);
+        rq.remove(r1);
+        System.out.println(rq.poll().roomId);
     }
     public static boolean send(String to,String text){
 

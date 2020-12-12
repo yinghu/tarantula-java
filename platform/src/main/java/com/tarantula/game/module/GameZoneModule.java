@@ -48,7 +48,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
         }
         stub.tag = this.context.descriptor().tag();
         stub.owner(session.systemId());
-        GameObject gameObject = new GameObject();
+        GameJoinObject gameObject = new GameJoinObject();
         gameObject.successful(true);
         gameObject.connection = room.connection();
         Connection connection = room.connection();
@@ -63,10 +63,8 @@ public class GameZoneModule implements Module,Configurable.Listener{
     public boolean onRequest(Session session, byte[] payload, com.icodesoftware.Module.OnUpdate update) throws Exception {
         if(session.action().equals("onUpdated")){
             Stub stub = mStub.get(session.systemId());
-            Room room;
-            if(stub!=null&&(room=gameServiceProvider.getRoom(stub.roomId))!=null){
+            if(stub!=null){
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
-                //room.onUpdated("onUpdated",payload);
                 StatsDelta delta = toDelta(payload);
                 mZone.onStatistics(session.systemId(),delta.name,delta.value);
             }
@@ -76,10 +74,8 @@ public class GameZoneModule implements Module,Configurable.Listener{
         }
         else if(session.action().equals("onEnded")){
             Stub stub = mStub.get(session.systemId());
-            Room room;
-            if(stub!=null&&(room=gameServiceProvider.getRoom(stub.roomId))!=null){
+            if(stub!=null){
                 //this.context.log(new String(payload),OnLog.WARN);
-                room.onUpdated("onEnded",payload);
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
             }
             else{

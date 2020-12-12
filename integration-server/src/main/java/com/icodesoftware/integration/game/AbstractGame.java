@@ -7,10 +7,7 @@ import com.icodesoftware.integration.GameChannel;
 import com.icodesoftware.integration.GameChannelService;
 import com.icodesoftware.integration.channel.RemoteSession;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.protocol.DataBuffer;
-import com.icodesoftware.protocol.InboundMessage;
-import com.icodesoftware.protocol.MessageHandler;
-import com.icodesoftware.protocol.OutboundMessage;
+import com.icodesoftware.protocol.*;
 
 /**
  * Created by yinghu lu on 11/15/2020.
@@ -23,6 +20,7 @@ abstract public class AbstractGame implements Game {
     protected GameChannelService gameChannelService;
     protected GameChannel gameChannel;
     protected GameChannel.Listener listener;
+    protected GameObject gameObject;
     public AbstractGame(GameChannelService gameChannelService, GameChannel gameChannel){
         this.gameChannelService = gameChannelService;
         this.gameChannel = gameChannel;

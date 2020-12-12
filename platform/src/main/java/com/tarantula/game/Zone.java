@@ -137,7 +137,6 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     @Override
     public void onJoining(Room room){
         pendingMatch[room.arena().level].offer(room);
-
     }
     @Override
     public void onLeaving(Room room,Stub stub){
@@ -223,17 +222,9 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     }
     private void clearRoom(Room room){
         for(Stub stub : room.playerList()){
-            if(stub.owner()==null){
-                continue;
+            if(stub.owner()!=null){
+                stubIndex.remove(stub.owner());
             }
-            stubIndex.computeIfPresent(stub.owner(),(k,v)->{
-                if(v.roomId.equals(stub.roomId)){
-                    return null;//remove
-                }
-                else{
-                    return v;//keep
-                }
-            });
         }
         pendingMatch[room.arena().level].remove(room);
         room.reset();
