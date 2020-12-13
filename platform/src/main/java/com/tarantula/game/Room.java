@@ -78,6 +78,9 @@ public class Room{
         return _stub;
     }
     public synchronized boolean rejoin(Stub stub){
+        if(state>=CLOSING){
+            return false;
+        }
         stub.started = state>=STARTING;
         stub.totalJoined = totalJoined;
         return connection!=null&&(!connection.disabled());
@@ -92,12 +95,6 @@ public class Room{
         pQueue.offer(stub);
         //NOTE : the room still keeps the initial level setting to play
         roomListener.onLeaving(this,stub);
-        return true;
-    }
-    private synchronized boolean end(){
-        if(state==STARTING||state==OVERTIME){
-            state = ENDING;
-        }
         return true;
     }
     public void reset(int capacity,int joinsOnStart,long duration,boolean online,int rankUpBase,Arena arena){
@@ -147,7 +144,9 @@ public class Room{
             this.pQueue.offer(stub);
             this.stubs[i] = stub;
         }
-        connection.disabled(connectionRemoved);
+        if(connection!=null){
+            connection.disabled(connectionRemoved);
+        }
     }
     public int round(){
         return round;

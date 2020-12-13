@@ -277,6 +277,11 @@ namespace GameClustering
             return Interlocked.Increment(ref _messageId);
         }
 
+        public Connection Connection()
+        {
+            return _connection;
+        }
+
         public int PendingMessages()
         {
             return _pendingMessages.Count;

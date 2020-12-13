@@ -144,9 +144,11 @@ namespace Integration.Game
                          "\nTotal Bytes->" + Messenger.TotalBytes() +
                          "\nOutbound Rate->" + rate1 +
                          "\nInbound Rate->" + rate2 +
-                         "\nTimer->" + _timer + 
-                         "\nRank->" + Manager.Presence.Rank + 
-                         "\nXP->" + Manager.Presence.Xp;
+                         "\nTimer->" + _timer +
+                         "\nRank->" + Manager.Presence.Rank +
+                         "\nLevel->" + Manager.Presence.Level +
+                         "\nXP->" + Manager.Presence.Xp +
+                         "\nConnectionId->" + Messenger.Connection().ConnectionId;
         }
 
         private async Task OnFreeMove()

@@ -33,18 +33,18 @@ public class GameZoneModule implements Module,Configurable.Listener{
         //match arena with service rank/xp or offline play mode
         Rating rating = this.gameServiceProvider.rating(session.systemId());
         Stub stub = mStub.get(session.systemId());
-        Room room;
+        Room room =null;
+        if(stub!=null){
+            room = gameServiceProvider.getRoom(stub.roomId);
+            if(!room.rejoin(stub)){
+                mStub.remove(session.systemId());
+                stub = null;
+            }
+        }
         if(stub==null){
             room = session.accessMode()==Session.OFF_LINE_MODE?mZone.solo(rating):mZone.match(rating);
             stub = room.join(rating);
             if(stub==null){
-                session.write(toMessage("no room available,please try later",false).toString().getBytes(),label());
-                return;
-            }
-        }
-        else{
-            room = gameServiceProvider.getRoom(stub.roomId);
-            if(!room.rejoin(stub)){
                 session.write(toMessage("no room available,please try later",false).toString().getBytes(),label());
                 return;
             }

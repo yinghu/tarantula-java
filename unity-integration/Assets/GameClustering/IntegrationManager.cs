@@ -295,6 +295,7 @@ namespace GameClustering
                 };
                 Presence.Rank = (int) jo.SelectToken("stub").SelectToken("rank");
                 Presence.Xp = (double) jo.SelectToken("stub").SelectToken("xp");
+                Presence.Level =(int) jo.SelectToken("stub").SelectToken("level");
                 var pc = jo.SelectToken("connection");
                 var connection = new Connection
                 {

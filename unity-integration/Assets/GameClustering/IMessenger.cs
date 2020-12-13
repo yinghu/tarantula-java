@@ -27,7 +27,7 @@ namespace GameClustering
         void Join(int sessionId,int[] messageIdRange);
         void Leave();
         int Sequence();
-
+        Connection Connection();
         int PendingMessages();
         int TotalOutbound();
         int TotalInbound();

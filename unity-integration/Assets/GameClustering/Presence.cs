@@ -9,7 +9,7 @@
         public int Stub { set; get; }
 
         public int Rank { set; get; }
-
+        public int Level { set; get; }
         public double Xp { set; get; }
     }
 }
