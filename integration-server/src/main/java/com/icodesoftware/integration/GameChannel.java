@@ -37,7 +37,7 @@ public interface GameChannel {
     void onSession(int sessionId,OnSession onSession);
     void onSession(OnSession onSession);
 
-    void close();
+    void clear();
 
     interface Listener{
         void onChannelClosed(GameChannel channelClosed);

@@ -19,6 +19,10 @@ public class SyncMessageHandler extends AbstractMessageHandler {
 
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
+        GameChannel _gameChannel = gameChannelService.gameChannel(pendingInboundMessage.connectionId());
+        if(!_gameChannel.onGame().onSync(pendingInboundMessage)){
+            return;
+        }
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.ack(pendingInboundMessage.ack());
         pendingOutboundMessage.timestamp(pendingInboundMessage.timestamp());
@@ -28,6 +32,6 @@ public class SyncMessageHandler extends AbstractMessageHandler {
         pendingOutboundMessage.type(pendingInboundMessage.type());
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
         pendingOutboundMessage.payload(pendingInboundMessage.payload());
-        this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).relay(mid,pendingInboundMessage.ack(),null,pendingOutboundMessage);
+        _gameChannel.relay(mid,pendingInboundMessage.ack(),null,pendingOutboundMessage);
     }
 }

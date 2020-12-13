@@ -18,19 +18,21 @@ public interface Game {
 
 
     //predefined game event callbacks
-    void onCollision(InboundMessage inboundMessage);
     void onJoin(int sessionId,RemoteSession remoteSession);
     void onLeave(int sessionId);
     void onLoad(InboundMessage inboundMessage);
-    void onSpawn(InboundMessage inboundMessage);
 
+    boolean onSpawn(InboundMessage inboundMessage);
+    boolean onCollision(InboundMessage inboundMessage);
+    boolean onDestroy(InboundMessage inboundMessage);
+    boolean onMove(InboundMessage inboundMessage);
+    boolean onSync(InboundMessage inboundMessage);
 
     //server push event callbacks
     void onSpec(DataBuffer dataBuffer);
     void onStart();
     void onClosing();
     void onClose();
-    void onEnd();
     void onOvertime();
     void onJoinTimeout();
 

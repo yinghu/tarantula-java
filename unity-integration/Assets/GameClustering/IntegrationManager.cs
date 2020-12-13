@@ -21,7 +21,7 @@ namespace GameClustering
 
         public event OnGameEvent OnGameClosingEvent;
 
-        public event OnGameEvent OnGameEndEvent;
+        public event OnGameEvent OnGameCloseEvent;
         
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
 
@@ -238,11 +238,7 @@ namespace GameClustering
             Messenger.RegisterMessageHandler(MessageType.GameClose,0, (sessionId, buffer) =>
             {
                 Debug.Log("GAME close->"+sessionId);
-            });
-            Messenger.RegisterMessageHandler(MessageType.GameEnd,0, (sessionId, buffer) =>
-            {
-                Debug.Log("GAME end->"+sessionId);
-                OnGameEndEvent?.Invoke();
+                OnGameCloseEvent?.Invoke();
             });
         }
         

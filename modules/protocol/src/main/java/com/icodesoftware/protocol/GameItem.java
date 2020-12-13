@@ -11,13 +11,13 @@ public class GameItem {
     public int typeId;
     public int sequence;
     public int sessionId;
-    public AtomicInteger votes;
+    public AtomicInteger collisions;
 
     public GameItem(int typeId,int sequence,int sessionId){
         this.typeId = typeId;
         this.sequence = sequence;
         this.sessionId = sessionId;
-        this.votes = new AtomicInteger(0);
+        this.collisions = new AtomicInteger(0);
     }
 
     public JsonObject toJson(){
@@ -25,7 +25,7 @@ public class GameItem {
         jsonObject.addProperty("typeId",typeId);
         jsonObject.addProperty("sequence",sequence);
         jsonObject.addProperty("sessionId",sessionId);
-        jsonObject.addProperty("votes",votes.get());
+        jsonObject.addProperty("collisions",collisions.get());
         return jsonObject;
     }
 }

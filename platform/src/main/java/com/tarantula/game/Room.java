@@ -53,7 +53,7 @@ public class Room{
     }
 
     public synchronized Stub join(Rating rating){
-        if(online&&connection==null){
+        if(online&&(connection==null||connection.disabled())){
             this.roomListener.onTimeout(this);
             return null;
         }
@@ -77,9 +77,10 @@ public class Room{
         }
         return _stub;
     }
-    public synchronized void rejoin(Stub stub){
+    public synchronized boolean rejoin(Stub stub){
         stub.started = state>=STARTING;
         stub.totalJoined = totalJoined;
+        return connection!=null&&(!connection.disabled());
     }
 
     public synchronized boolean leave(Stub stub){
@@ -136,7 +137,7 @@ public class Room{
             this.roomListener = roomListener;
         }
     }
-    public void reset(){
+    public void reset(boolean connectionRemoved){
         totalJoined = 0;
         state = WAITING;
         this.stubs = new Stub[this.capacity];
@@ -146,6 +147,7 @@ public class Room{
             this.pQueue.offer(stub);
             this.stubs[i] = stub;
         }
+        connection.disabled(connectionRemoved);
     }
     public int round(){
         return round;
@@ -249,7 +251,7 @@ public class Room{
         return roomId.equals(((Room)obj).roomId);
     }
     public void onUpdated(String action,byte[] payload){
-        System.out.println(action+">"+new String(payload));
+        //System.out.println(action+">"+new String(payload));
         JsonObject jsonObject = new JsonParser().parse(new String(payload)).getAsJsonObject();
         if(action.equals("onStats")){
             JsonArray stats = jsonObject.getAsJsonArray("stats");

@@ -11,7 +11,6 @@ import com.icodesoftware.protocol.OutboundMessage;
 import com.icodesoftware.util.FIFOBuffer;
 
 import java.net.SocketAddress;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,9 +67,6 @@ public class ServerPushMessageHandler extends AbstractMessageHandler {
             case GAME_CLOSE:
                 onGameClose(pendingInboundMessage);
                 break;
-            case GAME_END:
-                onGameEnd(pendingInboundMessage);
-                break;
             case GAME_JOIN_TIMEOUT:
                 onGameJoinTimeout(pendingInboundMessage);
                 break;
@@ -106,9 +102,5 @@ public class ServerPushMessageHandler extends AbstractMessageHandler {
         GameCloseHandler gameJoinTimeoutHandler = new GameCloseHandler(this.gameChannelService);
         gameJoinTimeoutHandler.onMessage(inboundMessage);
         gameJoinTimeoutHandler.relay();
-    }
-    private void onGameEnd(InboundMessage inboundMessage){
-        GameEndHandler gameJoinTimeoutHandler = new GameEndHandler(this.gameChannelService);
-        gameJoinTimeoutHandler.onMessage(inboundMessage);
     }
 }

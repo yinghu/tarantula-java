@@ -43,13 +43,6 @@ abstract public class AbstractGame implements Game {
         gameObject.update(remoteSession.seat).xp=0;
         gameObject.update(new GameStatsDelta(remoteSession.seat,"kills",1));
         gameObject.update(new GameStatsDelta(remoteSession.seat,"winnings",1));
-        //OutboundMessage outboundMessage = new OutboundMessage();
-        //outboundMessage.type(MessageHandler.ON_SPAWN);
-        //outboundMessage.sequence(1);
-        //outboundMessage.ack(true);
-        //outboundMessage.sessionId(sessionId);
-        //int mid = gameChannelService.messageId();
-        //gameChannel.relay(mid,true,null,outboundMessage);
     }
     public void onLeave(int sessionId){
         log.warn("leave->"+sessionId);
@@ -68,26 +61,31 @@ abstract public class AbstractGame implements Game {
             gameChannelService.onUpdate(this,"onStats",gameObject.toJson().toString().getBytes());
         });
     }
-    public void onSpawn(InboundMessage inboundMessage){
+    public boolean onSpawn(InboundMessage inboundMessage){
         DataBuffer dataBuffer = new DataBuffer(inboundMessage.payload());
         gameObject.gameItem(new GameItem(dataBuffer.getInt(),dataBuffer.getInt(),inboundMessage.sessionId()));
+        return true;
     }
-    public void onCollision(InboundMessage inboundMessage){
+    public boolean onCollision(InboundMessage inboundMessage){
         GameItem gameItem = gameObject.gameItem(inboundMessage.sequence());
-        gameItem.votes.incrementAndGet();
-        OutboundMessage outboundMessage = new OutboundMessage();
-        outboundMessage.ack(inboundMessage.ack());
-        outboundMessage.type(MessageHandler.ON_COLLISION);
-        outboundMessage.sequence(inboundMessage.sequence());
-        int mid = gameChannelService.messageId();
-        outboundMessage.messageId(mid);
-        gameChannel.relay(mid,inboundMessage.ack(),null,outboundMessage);
+        gameItem.collisions.incrementAndGet();
         gameChannel.onSession(inboundMessage.sessionId(),(session)->{
             gameObject.update(session.seat()).xp +=100;
             gameObject.update(new GameStatsDelta(session.seat(),"hits",1));
             gameChannelService.onUpdate(this,"onStats",gameObject.toJson().toString().getBytes());
         });
+        return true;
     }
+    public boolean onDestroy(InboundMessage inboundMessage){
+        return true;
+    }
+    public boolean onMove(InboundMessage inboundMessage){
+        return true;
+    }
+    public boolean onSync(InboundMessage inboundMessage){
+        return true;
+    }
+
 
     public void onSpec(DataBuffer dataBuffer){
         int level = dataBuffer.getInt();
@@ -106,8 +104,6 @@ abstract public class AbstractGame implements Game {
     }
     public void onClose(){
         gameChannelService.onUpdate(this,"onClose",gameObject.toJson().toString().getBytes());
-    }
-    public void onEnd(){
         this.listener.onChannelClosed(gameChannel);
     }
     public void onOvertime(){

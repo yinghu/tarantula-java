@@ -108,7 +108,7 @@ namespace Integration.Game
             _timer = 1;
             Manager.OnGameStartEvent += OnGameStart;
             Manager.OnGameClosingEvent += OnGameClosing;
-            Manager.OnGameEndEvent += OnGameEnd;
+            Manager.OnGameCloseEvent += OnGameEnd;
             await Messenger.SendAsync(MessageType.Load, sequence, true);
             InvokeRepeating(nameof(Print), 1.0f, 1.0f);
         }
@@ -184,7 +184,7 @@ namespace Integration.Game
         {
             Manager.OnGameStartEvent -= OnGameStart;
             Manager.OnGameClosingEvent -= OnGameClosing;
-            Manager.OnGameEndEvent -= OnGameEnd;
+            Manager.OnGameCloseEvent -= OnGameEnd;
         }
     }
 }

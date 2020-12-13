@@ -18,7 +18,9 @@ public class SpawnMessageHandler extends AbstractMessageHandler {
 
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
-        this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).onGame().onSpawn(pendingInboundMessage);
+        if(!this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).onGame().onSpawn(pendingInboundMessage)){
+            return;
+        }
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.ack(pendingInboundMessage.ack());
         pendingOutboundMessage.timestamp(pendingInboundMessage.timestamp());

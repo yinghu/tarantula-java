@@ -175,7 +175,6 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     public PendingUpdate onStarting(Room room){
         //game started
         DataBuffer dataBuffer = new DataBuffer();
-        //dataBuffer.putLong(room.connection().connectionId());
         dataBuffer.putUTF8("starting");
         return new PendingUpdate(MessageHandler.GAME_START+"/true",dataBuffer);
     }
@@ -184,51 +183,44 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         //game closing
         pendingMatch[room.arena().level].remove(room);
         DataBuffer dataBuffer = new DataBuffer();
-        //dataBuffer.putLong(room.connection().connectionId());
         dataBuffer.putUTF8("closing");
         return new PendingUpdate(MessageHandler.GAME_CLOSING+"/true",dataBuffer);
     }
     @Override
     public PendingUpdate onOverTiming(Room room){
         DataBuffer dataBuffer = new DataBuffer();
-        //dataBuffer.putLong(room.connection().connectionId());
         dataBuffer.putUTF8("overtime");
         return new PendingUpdate(MessageHandler.GAME_OVERTIME+"/true",dataBuffer);
     }
     public PendingUpdate onEnding(Room room) {
         DataBuffer dataBuffer = new DataBuffer();
-        //dataBuffer.putLong(room.connection().connectionId());
-        dataBuffer.putUTF8("ending");
+        dataBuffer.putUTF8("close");
         return  new PendingUpdate(MessageHandler.GAME_CLOSE+"/true",dataBuffer);
     }
     @Override
     public PendingUpdate onEnded(Room room){
-        clearRoom(room);
-        DataBuffer dataBuffer = new DataBuffer();
-        //dataBuffer.putLong(room.connection().connectionId());
-        dataBuffer.putUTF8("ended");
-        return new PendingUpdate(MessageHandler.GAME_END+"/true",dataBuffer);
+        clearRoom(room,true);
+        return null;
     }
 
     @Override
     public PendingUpdate onTimeout(Room room){
-        clearRoom(room);
+        clearRoom(room,false);
         if(room.connection()==null||room.connection().disabled()){
             return null;
         }
         DataBuffer dataBuffer = new DataBuffer();
-        //dataBuffer.putLong(room.connection().connectionId());
         dataBuffer.putUTF8("ending");
         return new PendingUpdate(MessageHandler.GAME_JOIN_TIMEOUT+"/true",dataBuffer);
     }
-    private void clearRoom(Room room){
+    private void clearRoom(Room room,boolean ended){
         for(Stub stub : room.playerList()){
             if(stub.owner()!=null){
                 stubIndex.remove(stub.owner());
             }
         }
         pendingMatch[room.arena().level].remove(room);
-        room.reset();
+        room.reset(ended);
         rQueue.addLast(room);
     }
     //room setting on online play mode

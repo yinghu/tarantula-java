@@ -339,10 +339,14 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     }
     @Override
     public void onChannelClosed(GameChannel channelClosed) {
-        channelClosed.close();
-        GameChannelBinding removed = mChannels.remove(channelClosed.channelId());
-        removed.retrySchedule.cancel(true);
-        removed.pingSchedule.cancel(true);
+        scheduledExecutorService.schedule(()->{
+            log.warn("game channel removed->"+channelClosed.channelId());
+            channelClosed.clear();
+            GameChannelBinding removed = mChannels.remove(channelClosed.channelId());
+            removed.retrySchedule.cancel(true);
+            removed.pingSchedule.cancel(true);
+        },ackTimeout,TimeUnit.MILLISECONDS);
+
         long cid = addConnection();
         GameChannel gc = new PushEventChannel(cid,this,retryCount,this.retryInterval);
         gc.onGame(createGame(gc));

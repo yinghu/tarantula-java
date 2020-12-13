@@ -246,7 +246,7 @@ public class PushEventChannel implements GameChannel {
     public boolean started(){
         return game!=null&&game.started();
     }
-    public void close(){
+    public void clear(){
         mSession.clear();
     }
 

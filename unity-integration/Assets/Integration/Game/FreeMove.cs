@@ -29,7 +29,6 @@ namespace Integration.Game
                 _sent = true;
                 buffer.PutVector3(target);
                 await Messenger.SendAsync(MessageType.Move, sequence, true, buffer.ToArray());
-                //await Messenger.SendAsync(MessageType.Action, sequence, true);
             }
         }
         private async void FixedUpdate()
@@ -60,7 +59,6 @@ namespace Integration.Game
             {
                 return;
             }
-            //await Messenger.SendAsync(MessageType.Destroy, sequence, true);
             await Messenger.SendAsync(MessageType.Collision, sequence, true);
         }
         
@@ -75,12 +73,9 @@ namespace Integration.Game
                     _sent = false;
                 });
             });
-            Messenger.RegisterMessageHandler(MessageType.OnCollision,sequence, (sessionId, data) =>
+            Messenger.RegisterMessageHandler(MessageType.OnCollision,sequence, async (sessionId, data) =>
             {
-                MainThread.Execute(data, buffer =>
-                {
-                    DestroyImmediate(gameObject);    
-                });
+                await Messenger.SendAsync(MessageType.Destroy, sequence, true);
             });
             Messenger.RegisterMessageHandler(MessageType.Destroy,sequence, (sessionId, data) =>
             {

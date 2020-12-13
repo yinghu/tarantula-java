@@ -44,7 +44,10 @@ public class GameZoneModule implements Module,Configurable.Listener{
         }
         else{
             room = gameServiceProvider.getRoom(stub.roomId);
-            room.rejoin(stub);
+            if(!room.rejoin(stub)){
+                session.write(toMessage("no room available,please try later",false).toString().getBytes(),label());
+                return;
+            }
         }
         stub.tag = this.context.descriptor().tag();
         stub.owner(session.systemId());
@@ -146,7 +149,6 @@ public class GameZoneModule implements Module,Configurable.Listener{
     @Override
     public void onConnection(Connection connection){
         if(connection.disabled()){
-            //mPush.remove(connection.serverId());
             this.gameServiceProvider.onClosed(connection);
         }
         else {

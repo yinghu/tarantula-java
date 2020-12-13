@@ -18,6 +18,10 @@ public class DestroyMessageHandler extends AbstractMessageHandler {
 
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
+        GameChannel _gameChannel = gameChannelService.gameChannel(pendingInboundMessage.connectionId());
+        if(!_gameChannel.onGame().onDestroy(pendingInboundMessage)){
+            return;
+        }
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.ack(pendingInboundMessage.ack());
         pendingOutboundMessage.timestamp(pendingInboundMessage.timestamp());
@@ -26,6 +30,6 @@ public class DestroyMessageHandler extends AbstractMessageHandler {
         pendingOutboundMessage.type(pendingInboundMessage.type());
         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
         pendingOutboundMessage.payload(pendingInboundMessage.payload());
-        this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).relay(pendingInboundMessage.messageId(),pendingInboundMessage.ack(),null,pendingOutboundMessage);
+        _gameChannel.relay(pendingInboundMessage.messageId(),pendingInboundMessage.ack(),null,pendingOutboundMessage);
     }
 }
