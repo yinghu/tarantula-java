@@ -47,7 +47,7 @@ public class Stub extends RecoverableObject {
         jo.addProperty("totalJoined",totalJoined);
         jo.addProperty("rank",rating.rank);
         jo.addProperty("xp",rating.xp);
-        jo.addProperty("level",rating.xpLevel);
+        jo.addProperty("level",rating.level);
         return jo;
     }
 

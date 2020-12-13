@@ -63,10 +63,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
                 break;
             }
         }
-        if(matched!=null){
-            return matched;
-        }
-        else{
+        if(matched==null){
             matched = rQueue.poll();
             if(matched==null){
                 matched= new Room();
@@ -78,8 +75,8 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
                 Arena _ma = aMap.get(rating.xpLevel).copy();
                 matched.reset(_ma.capacity>0?_ma.capacity:this.capacity,_ma.joinsOnStart>0?_ma.joinsOnStart:this.joinsOnStart,_ma.duration>0?_ma.duration:this.roundDuration, playMode != Room.OFF_LINE_MODE, levelLimit, _ma);
             }
-            return matched;
         }
+        return matched;
     }
     public Room solo(Rating rating){//always single player offline mode
         if(rating.xpLevel>levelLimit){//downgrade xp level and rank up after this round
