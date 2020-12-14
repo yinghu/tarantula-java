@@ -21,6 +21,7 @@ public class GameClosingHandler extends AbstractMessageHandler {
 
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
+        gameChannelService.gameChannel(pendingInboundMessage.connectionId()).onGame().onClosing();
         connectionId = pendingInboundMessage.connectionId();
         messageId = pendingInboundMessage.messageId();
         ack = true;

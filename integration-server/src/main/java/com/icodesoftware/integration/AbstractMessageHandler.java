@@ -17,9 +17,6 @@ abstract public class AbstractMessageHandler implements MessageHandler {
     public AbstractMessageHandler(final GameChannelService gameChannelService){
         this.gameChannelService = gameChannelService;
     }
-    protected boolean checkStarted(long connectionId){
-        return this.gameChannelService.gameChannel(connectionId).started();
-    }
     @Override
     public void relay() {
         if(outboundMessage!=null){

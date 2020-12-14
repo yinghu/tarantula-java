@@ -21,6 +21,7 @@ public class GameStartHandler extends AbstractMessageHandler {
 
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
+        this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).onGame().onStart();
         connectionId = pendingInboundMessage.connectionId();
         messageId = pendingInboundMessage.messageId();
         ack = true;
@@ -29,6 +30,5 @@ public class GameStartHandler extends AbstractMessageHandler {
         outboundMessage.sequence(0);
         outboundMessage.messageId(messageId);
         outboundMessage.ack(ack);
-        this.gameChannelService.gameChannel(connectionId).onGame().onStart();
     }
 }

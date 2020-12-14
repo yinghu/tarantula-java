@@ -47,9 +47,9 @@ namespace Integration.Game
             });
             _gameObjects = new Dictionary<int, GameObject>();
             _lastPosition = types[FreeMoveTypeId].transform.position;
-            Messenger.RegisterMessageHandler(MessageType.OnSpawn,sequence, (sessionId, data) =>
+            Messenger.RegisterMessageHandler(MessageType.OnLoad,sequence, (sessionId, data) =>
             {
-                Debug.Log("on spawn->"+sessionId);
+                Debug.Log("on load->"+sessionId);
             });
             Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId, data) =>
             {
@@ -109,6 +109,7 @@ namespace Integration.Game
             Manager.OnGameStartEvent += OnGameStart;
             Manager.OnGameClosingEvent += OnGameClosing;
             Manager.OnGameCloseEvent += OnGameEnd;
+            Manager.OnGameJoinTimeout += OnGameEnd;
             await Messenger.SendAsync(MessageType.Load, sequence, true);
             InvokeRepeating(nameof(Print), 1.0f, 1.0f);
         }
@@ -187,6 +188,7 @@ namespace Integration.Game
             Manager.OnGameStartEvent -= OnGameStart;
             Manager.OnGameClosingEvent -= OnGameClosing;
             Manager.OnGameCloseEvent -= OnGameEnd;
+            Manager.OnGameJoinTimeout -= OnGameEnd;
         }
     }
 }

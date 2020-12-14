@@ -12,8 +12,8 @@ import com.icodesoftware.protocol.OutboundMessage;
 public class DynamicBattle extends AbstractGame {
 
 
-    public DynamicBattle(GameChannelService gameChannelService, GameChannel gameChannel){
-        super(gameChannelService,gameChannel);
+    public DynamicBattle(GameChannelService gameChannelService, GameChannel gameChannel,int maxSessionsPerChannel){
+        super(gameChannelService,gameChannel,maxSessionsPerChannel);
     }
     public void onAction(InboundMessage inboundMessage){
         //log.warn(inboundMessage.type()+"///"+inboundMessage.sessionId());

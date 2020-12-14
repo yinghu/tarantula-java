@@ -68,7 +68,6 @@ public class PushEventChannel implements GameChannel {
         if(mSession.containsKey(sessionId)&&mSession.get(sessionId).socketAddress.equals(socketAddress)){
             mSession.remove(sessionId);
             jIndex.remove(socketAddress);
-            //this.listener.onChannelClosed(this);
         }
         game.onLeave(sessionId);
     }
@@ -243,11 +242,12 @@ public class PushEventChannel implements GameChannel {
     public void onSession(OnSession onSession){
         mSession.forEach((k,v)->onSession.execute(v));
     }
-    public boolean started(){
-        return game!=null&&game.started();
-    }
+
     public void clear(){
         mSession.clear();
+        mMessage.clear();
+        jIndex.clear();
+        mIndex.clear();
     }
 
     private boolean checkExpired(long timestamp,long pms){

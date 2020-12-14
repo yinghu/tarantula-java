@@ -63,6 +63,8 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     private final int retryCount;
     private final long retryInterval;
     private final String application;
+    private final int maxConnections;
+    private final int maxSessionsPerChannel;
     private final JsonParser parser;
     public UDPService(JsonObject config){
         sessionId = new AtomicInteger(0);
@@ -85,6 +87,8 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         retryTimeout = config.getAsJsonObject("tarantula").get("retryTimeout").getAsLong();
         ackTimeout = config.getAsJsonObject("tarantula").get("ackTimeout").getAsLong();
         application = config.getAsJsonObject("tarantula").get("application").getAsString();
+        maxConnections = config.getAsJsonObject("tarantula").get("maxConnections").getAsInt();
+        maxSessionsPerChannel = config.getAsJsonObject("tarantula").get("maxSessionsPerChannel").getAsInt();
         secured = config.getAsJsonObject("connection").get("secured").getAsBoolean();
         httpCaller = new HttpCaller(config.getAsJsonObject(configHeader).get("url").getAsString());
         AckMessageHandler ackMessageHandler = new AckMessageHandler(this);
@@ -180,6 +184,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         this.path = config.getAsJsonObject(configHeader).get("path").getAsString();
         int end = reservedMessageId.addAndGet(messageIdOffset);
         JsonObject conn = config.getAsJsonObject("connection");
+        conn.addProperty("maxConnections",maxConnections);//replace default maxConnections
         conn.addProperty("messageId",end-messageIdOffset);
         conn.addProperty("messageIdOffset",end-1);
         String resp = httpCaller.post(this.path,conn.toString().getBytes(),headers);
@@ -332,7 +337,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     }
     private Game createGame(GameChannel gameChannel){
         try {
-            return (Game)Class.forName(application).getConstructor(GameChannelService.class,GameChannel.class).newInstance(this,gameChannel);
+            return (Game)Class.forName(application).getConstructor(GameChannelService.class,GameChannel.class,int.class).newInstance(this,gameChannel,maxSessionsPerChannel);
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -355,6 +360,12 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         binding.pingSchedule = scheduledExecutorService.scheduleAtFixedRate(()->gc.ping(),pingTimeout,pingTimeout,TimeUnit.MILLISECONDS);
         binding.retrySchedule = scheduledExecutorService.scheduleAtFixedRate(()->gc.retry(),retryTimeout,retryTimeout,TimeUnit.MILLISECONDS);
         mChannels.put(gc.channelId(),binding);
+    }
+    public void onChannelReset(GameChannel channelReset){
+        scheduledExecutorService.schedule(()->{
+            log.warn("game channel reset->"+channelReset.channelId());
+            channelReset.clear();
+        },ackTimeout,TimeUnit.MILLISECONDS);
     }
     public void onUpdate(Game game,String type,byte[] payload){
         mQueue.offer(new PendingMessage(()->{

@@ -21,6 +21,7 @@ public class GameOvertimeHandler extends AbstractMessageHandler {
 
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
+        gameChannelService.gameChannel(pendingInboundMessage.connectionId()).onGame().onOvertime();
         connectionId = pendingInboundMessage.connectionId();
         messageId = pendingInboundMessage.messageId();
         ack = true;

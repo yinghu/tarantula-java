@@ -20,9 +20,10 @@ abstract public class AbstractGame implements Game {
     protected GameChannel gameChannel;
     protected GameChannel.Listener listener;
     protected GameObject gameObject;
-    public AbstractGame(GameChannelService gameChannelService, GameChannel gameChannel){
+    public AbstractGame(GameChannelService gameChannelService, GameChannel gameChannel,int maxSessionsPerChannel){
         this.gameChannelService = gameChannelService;
         this.gameChannel = gameChannel;
+        this.gameObject = new GameObject(maxSessionsPerChannel);
     }
 
     @Override
@@ -50,7 +51,7 @@ abstract public class AbstractGame implements Game {
     public void onLoad(InboundMessage inboundMessage){
         log.warn("load->"+inboundMessage.sessionId());
         OutboundMessage outboundMessage = new OutboundMessage();
-        outboundMessage.type(MessageHandler.ON_SPAWN);
+        outboundMessage.type(MessageHandler.ON_LOAD);
         outboundMessage.sequence(inboundMessage.sequence());
         outboundMessage.ack(true);
         outboundMessage.sessionId(inboundMessage.sessionId());
@@ -94,23 +95,24 @@ abstract public class AbstractGame implements Game {
         long ovt = dataBuffer.getLong();
         roomId = dataBuffer.getUTF8();
         zoneId = dataBuffer.getUTF8();
-        this.gameObject = new GameObject(capacity);
     }
     public void onStart(){
         this.started = true;
     }
     public void onClosing(){
-
+        log.warn("closing");
     }
     public void onClose(){
         gameChannelService.onUpdate(this,"onClose",gameObject.toJson().toString().getBytes());
         this.listener.onChannelClosed(gameChannel);
     }
     public void onOvertime(){
-
+        log.warn("overtime");
     }
     public void onJoinTimeout(){
-
+        log.warn("join timeout");
+        //do kick out
+        this.listener.onChannelReset(gameChannel);
     }
     public void registerGameChannelListener(GameChannel.Listener listener){
         this.listener = listener;

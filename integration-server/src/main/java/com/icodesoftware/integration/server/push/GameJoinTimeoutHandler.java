@@ -21,6 +21,7 @@ public class GameJoinTimeoutHandler extends AbstractMessageHandler {
 
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
+        gameChannelService.gameChannel(pendingInboundMessage.connectionId()).onGame().onJoinTimeout();
         connectionId = pendingInboundMessage.connectionId();
         messageId = pendingInboundMessage.messageId();
         ack = true;

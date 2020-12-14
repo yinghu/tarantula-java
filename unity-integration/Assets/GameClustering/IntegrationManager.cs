@@ -22,6 +22,8 @@ namespace GameClustering
         public event OnGameEvent OnGameClosingEvent;
 
         public event OnGameEvent OnGameCloseEvent;
+
+        public event OnGameEvent OnGameJoinTimeout;
         
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
 
@@ -220,6 +222,7 @@ namespace GameClustering
             Messenger.RegisterMessageHandler(MessageType.GameJoinTimeout,0, (sessionId, buffer) =>
             {
                 Debug.Log("JOIN TIMEOUT->"+sessionId);
+                OnGameJoinTimeout?.Invoke();
             });
             Messenger.RegisterMessageHandler(MessageType.GameStart,0, (sessionId, buffer) =>
             {
