@@ -6,14 +6,14 @@ namespace Integration.Game
 {
     public class Player : ClusteringObject
     {
-        
+
         private const float Speed = 6f;
         private Vector3 _end;
         public GameObject bullet;
         public Transform firePoint;
         private float _timer;
-        
-        
+        public bool GameStart { set; get; }
+
         private void Start()
         {
             StartClusteringObject(async buffer =>
@@ -56,9 +56,14 @@ namespace Integration.Game
                 await Messenger.SendAsync(MessageType.Move, sequence, true, buffer);
             }
         }
-        
+
         private async void FixedUpdate()
         {
+            if (!GameStart)
+            {
+                return;
+            }
+
             transform.position = Vector3.Lerp(transform.position, _end, Speed*Time.fixedDeltaTime);
             _timer -= Time.fixedDeltaTime;
             transform.LookAt(_end);

@@ -223,13 +223,10 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     //room setting on online play mode
     private DataBuffer roomSetting(Room room){
         DataBuffer dataBuffer = new DataBuffer();
-        Arena match = room.arena();
-        dataBuffer.putInt(match.level);
-        dataBuffer.putInt(room.capacity());
-        dataBuffer.putLong(room.duration());
-        dataBuffer.putLong(room.overtime());
-        dataBuffer.putUTF8(room.roomId);
         dataBuffer.putUTF8(subscription);
+        dataBuffer.putUTF8(room.roomId);
+        dataBuffer.putInt(room.arena().level);
+        dataBuffer.putInt(room.capacity());
         return dataBuffer;
     }
     @Override

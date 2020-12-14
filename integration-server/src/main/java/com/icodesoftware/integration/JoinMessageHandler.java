@@ -33,7 +33,7 @@ public class JoinMessageHandler extends AbstractMessageHandler {
             int sessionId = gameChannelService.sessionId();
             int[] mid = gameChannelService.messageIdRange();
             pendingOutboundMessage.sessionId(sessionId);
-            data.putUTF8("accepted");
+            data.putByte((byte)1);
             data.putInt(mid[0]);
             data.putInt(mid[1]);
             pendingOutboundMessage.payload(data.toArray());
@@ -55,7 +55,7 @@ public class JoinMessageHandler extends AbstractMessageHandler {
             dataBuffer.putInt(pendingInboundMessage.messageId());
             ack.payload(dataBuffer.toArray());
             gameChannelService.pendingOutbound((gameChannelService.encode(ack)),pendingInboundMessage.source());
-            data.putUTF8("rejected");
+            data.putByte((byte)0);
             pendingOutboundMessage.payload(data.toArray());
             byte[] outMessage = (gameChannelService.encode(pendingOutboundMessage));
             gameChannel.pending(pendingInboundMessage.source(),messageId,outMessage);

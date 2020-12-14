@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.Connection;
+import com.icodesoftware.protocol.DataBuffer;
 
 import java.util.ArrayDeque;
 import java.util.UUID;
@@ -63,7 +64,6 @@ public class Room{
         totalJoined++;
         Stub _stub = pQueue.poll();
         _stub.rating = rating;
-        _stub.totalJoined = totalJoined;
         if(totalJoined==joinsOnStart){
             state = INITIALIZING;
             initialTime = PENDING_TIME;
@@ -81,8 +81,6 @@ public class Room{
         if(state>=CLOSING){
             return false;
         }
-        stub.started = state>=STARTING;
-        stub.totalJoined = totalJoined;
         return connection!=null&&(!connection.disabled());
     }
 
@@ -154,18 +152,14 @@ public class Room{
     public Stub[] playerList(){
         return this.stubs;
     }
-    public int totalJoined(){return this.totalJoined;}
+    public synchronized int totalJoined(){
+        return this.totalJoined;
+    }
     public boolean offline(){
         return !this.online;
     }
     public int capacity(){
         return this.capacity;
-    }
-    public int joinsOnStart(){
-        return joinsOnStart;
-    }
-    public int rankUpBase(){
-        return this.rankUpBase;
     }
     public long duration(){
         return this.duration;

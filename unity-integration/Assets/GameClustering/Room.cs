@@ -6,10 +6,6 @@
         public string Tag { set; get; }
         public int Capacity { set; get; }
         public int Seat { set; get; }
-        
         public string Arena { set; get; }
-
-        public bool Started { set; get; }
-
     }
 }

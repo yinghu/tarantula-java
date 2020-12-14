@@ -29,7 +29,7 @@ namespace GameClustering
 
         public string gecHost = "localhost:8090";
         public string typeId = "game";
-        public bool blocking = false;
+        public bool blocking;
         private HttpCaller _httpCaller;
         public IMessenger Messenger { private set; get; }
         public Exception Exception { private set; get; }
@@ -186,7 +186,7 @@ namespace GameClustering
             {
                 using (var buffer = new DataBuffer(data))
                 {
-                    var joined = buffer.GetUTF8String().Equals("accepted");
+                    var joined = buffer.GetByte()==1;
                     if (joined)
                     {
                         SessionId = sessionId;
@@ -293,8 +293,7 @@ namespace GameClustering
                     Tag = (string) jo.SelectToken("stub").SelectToken("tag"),
                     Seat = (int)jo.SelectToken("stub").SelectToken("seat"),
                     Capacity = (int)jo.SelectToken("stub").SelectToken("capacity"),
-                    Arena = (string) jo.SelectToken("stub").SelectToken("arena"),
-                    Started = (bool)jo.SelectToken("stub").SelectToken("started")
+                    Arena = (string) jo.SelectToken("stub").SelectToken("arena")
                 };
                 Presence.Rank = (int) jo.SelectToken("stub").SelectToken("rank");
                 Presence.Xp = (double) jo.SelectToken("stub").SelectToken("xp");

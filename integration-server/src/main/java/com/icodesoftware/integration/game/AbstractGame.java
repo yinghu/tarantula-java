@@ -15,6 +15,8 @@ abstract public class AbstractGame implements Game {
     protected TarantulaLogger log = JDKLogger.getLogger(AbstractGame.class);
     protected String zoneId;
     protected String roomId;
+    protected int capacity;
+    protected int level;
     protected boolean started;
     protected GameChannelService gameChannelService;
     protected GameChannel gameChannel;
@@ -57,6 +59,9 @@ abstract public class AbstractGame implements Game {
         outboundMessage.sessionId(inboundMessage.sessionId());
         int mid = gameChannelService.messageId();
         outboundMessage.messageId(mid);
+        DataBuffer dataBuffer = new DataBuffer();
+        dataBuffer.putByte(started?(byte)1:0);
+        outboundMessage.payload(dataBuffer.toArray());
         gameChannel.relay(mid,true,null,outboundMessage);
         gameChannel.onSession(inboundMessage.sessionId(),(session)->{
             gameChannelService.onUpdate(this,"onStats",gameObject.toJson().toString().getBytes());
@@ -89,12 +94,10 @@ abstract public class AbstractGame implements Game {
 
 
     public void onSpec(DataBuffer dataBuffer){
-        int level = dataBuffer.getInt();
-        int capacity = dataBuffer.getInt();
-        long dur = dataBuffer.getLong();
-        long ovt = dataBuffer.getLong();
         roomId = dataBuffer.getUTF8();
         zoneId = dataBuffer.getUTF8();
+        level = dataBuffer.getInt();
+        capacity = dataBuffer.getInt();
     }
     public void onStart(){
         this.started = true;

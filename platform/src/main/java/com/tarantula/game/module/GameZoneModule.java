@@ -157,11 +157,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
     }
     @Override
     public void onTimer(com.icodesoftware.Module.OnUpdate update){
-        mZone.onTimer((connection,label,data)->{
-            //if(deploymentServiceProvider.valid(connection)){
-                update.on(connection,label,data);
-            //}
-        });
+        mZone.onTimer((connection,label,data)->update.on(connection,label,data));
     }
     @Override
     public String label() {

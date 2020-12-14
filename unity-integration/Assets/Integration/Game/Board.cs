@@ -22,7 +22,7 @@ namespace Integration.Game
         private int _outbound;
         private int _inbound;
         private int _timer;
-     
+        private bool _started;
         private async void Start()
         {
             StartClusteringObject(  async buffer =>
@@ -49,7 +49,10 @@ namespace Integration.Game
             _lastPosition = types[FreeMoveTypeId].transform.position;
             Messenger.RegisterMessageHandler(MessageType.OnLoad,sequence, (sessionId, data) =>
             {
-                Debug.Log("on load->"+sessionId);
+                var buffer = new DataBuffer(data);
+                _started = buffer.GetByte() == 1;
+                _players[_seat].GameStart = _started;
+                Debug.Log("on load->"+sessionId+">>>"+_started);
             });
             Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId, data) =>
             {
@@ -116,6 +119,11 @@ namespace Integration.Game
 
         private async void Update()
         {
+            if (!_started)
+            {
+                return;
+            }
+
             if (!Input.GetMouseButtonDown(0))
             {
                 return;
@@ -171,6 +179,8 @@ namespace Integration.Game
         private void OnGameStart()
         {
             Debug.Log("game start");
+            _started = true;
+            _players[_seat].GameStart = true;
         }
         private void OnGameClosing()
         {
