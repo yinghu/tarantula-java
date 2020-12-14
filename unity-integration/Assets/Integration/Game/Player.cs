@@ -59,7 +59,7 @@ namespace Integration.Game
 
         private async void FixedUpdate()
         {
-            if (!GameStart)
+            if (master&&!GameStart)
             {
                 return;
             }
