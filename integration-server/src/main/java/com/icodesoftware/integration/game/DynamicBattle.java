@@ -16,7 +16,6 @@ public class DynamicBattle extends AbstractGame {
         super(gameChannelService,gameChannel,maxSessionsPerChannel);
     }
     public void onAction(InboundMessage inboundMessage){
-        //log.warn(inboundMessage.type()+"///"+inboundMessage.sessionId());
         OutboundMessage outboundMessage = new OutboundMessage();
         outboundMessage.type(MessageHandler.ON_ACTION);
         outboundMessage.sequence(inboundMessage.sequence());

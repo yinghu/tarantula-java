@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.Connection;
-import com.icodesoftware.protocol.DataBuffer;
 
 import java.util.ArrayDeque;
 import java.util.UUID;
