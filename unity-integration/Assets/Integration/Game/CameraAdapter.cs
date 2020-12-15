@@ -4,6 +4,10 @@ namespace Integration.Game
 {
     public class CameraAdapter : MonoBehaviour
     {
+        public float xRight = -7.4f;
+        public float xLeft = 7.4f;
+        public float zTop = -21.7f;
+        public float zBottom = -13.4f;
         
         private const float Speed = 2f;
         private Vector3 _end;
@@ -21,23 +25,23 @@ namespace Integration.Game
         {
             var pos = transform.position;
             _end.x = point.x + (_xOffset);
-            if (_end.x < -7.4f)
+            if (_end.x < xRight)
             {
-                _end.x = -7.4f;
+                _end.x = xRight;
             }
-            else if (_end.x > 7.4f)
+            else if (_end.x > xLeft)
             {
-                _end.x = 7.4f;
+                _end.x = xLeft;
             }
             _end.y = pos.y;
             _end.z = point.z + (_zOffset);
-            if (_end.z < -21.7f)
+            if (_end.z < zTop)
             {
-                _end.z = -21.7f;
+                _end.z = zTop;
             }
-            else if (_end.z > -13.4f)
+            else if (_end.z > zBottom)
             {
-                _end.z = -13.4f;
+                _end.z = zBottom;
             }
         }
         private void FixedUpdate()

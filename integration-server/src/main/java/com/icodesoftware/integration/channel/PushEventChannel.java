@@ -178,6 +178,7 @@ public class PushEventChannel implements GameChannel {
                 mIndex.remove(k);
             }
         });
+        game.onGameLoop();
     }
     public void pong(int sessionId){
         RemoteSession remoteSession = mSession.get(sessionId);

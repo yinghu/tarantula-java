@@ -34,6 +34,7 @@ namespace Integration.Game
                 {
                     
                     _end = buffer.GetVector3();
+                    Debug.Log(_end.ToString());
                     _end.y = 1;
                 });
             });
@@ -57,7 +58,7 @@ namespace Integration.Game
             }
         }
 
-        private async void FixedUpdate()
+        private  void FixedUpdate()
         {
             if (master&&!GameStart)
             {
@@ -72,7 +73,7 @@ namespace Integration.Game
                 return;
             }
             _timer = 0.5f;
-            await Messenger.SendAsync(MessageType.Action, sequence, true);
+            //await Messenger.SendAsync(MessageType.Action, sequence, true);
         }
         private IEnumerator FireBullet()
         {

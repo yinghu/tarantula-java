@@ -23,9 +23,10 @@ namespace Integration.Game
         private int _inbound;
         private int _timer;
         private bool _started;
+
         private async void Start()
         {
-            StartClusteringObject(  async buffer =>
+            StartClusteringObject(async buffer =>
             {
                 foreach (var gmo in _gameObjects.Values)
                 {
@@ -42,19 +43,19 @@ namespace Integration.Game
             {
                 var tid = buffer.GetInt();
                 var oid = buffer.GetInt();
-                var gm = Instantiate(types[tid],buffer.GetVector3(),Quaternion.identity);
-                gm.GetComponent<ClusteringObject>().Setup(oid,false);
+                var gm = Instantiate(types[tid], buffer.GetVector3(), Quaternion.identity);
+                gm.GetComponent<ClusteringObject>().Setup(oid, false);
             });
             _gameObjects = new Dictionary<int, GameObject>();
             _lastPosition = types[FreeMoveTypeId].transform.position;
-            Messenger.RegisterMessageHandler(MessageType.OnLoad,sequence, (sessionId, data) =>
+            Messenger.RegisterMessageHandler(MessageType.OnLoad, sequence, (sessionId, data) =>
             {
                 var buffer = new DataBuffer(data);
                 _started = buffer.GetByte() == 1;
                 _players[_seat].GameStart = _started;
-                Debug.Log("on load->"+sessionId+">>>"+_started);
+                Debug.Log("on load->" + sessionId + ">>>" + _started);
             });
-            Messenger.RegisterMessageHandler(MessageType.Spawn,sequence, (sessionId, data) =>
+            Messenger.RegisterMessageHandler(MessageType.Spawn, sequence, (sessionId, data) =>
             {
                 MessageContext.Instance.Execute(data, buffer =>
                 {
@@ -69,12 +70,13 @@ namespace Integration.Game
                             var pid = buffer.GetInt();
                             var pm = Instantiate(types[tid]);
                             var player = pm.GetComponent<Player>();
-                            player.Setup(pid,sessionId==Manager.SessionId);
+                            player.Setup(pid, sessionId == Manager.SessionId);
                             if (player.master)
                             {
                                 _players[tid] = player;
                                 _gameObjects[pid] = pm;
                             }
+
                             break;
                         case FreeMoveTypeId:
                             var oid = buffer.GetInt();
@@ -88,9 +90,10 @@ namespace Integration.Game
                             {
                                 _gameObjects[oid] = fm;
                             }
+
                             break;
                     }
-                });    
+                });
             });
             _seat = Manager.Room.Seat;
             _players = new Player[Manager.Room.Capacity];
@@ -100,12 +103,13 @@ namespace Integration.Game
                 buffer.PutInt(Messenger.Sequence());
                 await Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer);
             }
+
             //if (_seat % 2 == 1)
             //{
-                //var pos = mainCamera.transform.rotation;
-                //mainCamera.transform.Rotate(pos.x, pos.y, pos.z + 180);
+            //var pos = mainCamera.transform.rotation;
+            //mainCamera.transform.Rotate(pos.x, pos.y, pos.z + 180);
             //}
-            bText.text = "SessionId->"+Manager.SessionId;
+            bText.text = "SessionId->" + Manager.SessionId;
             _outbound = Messenger.TotalOutbound();
             _inbound = Messenger.TotalInbound();
             _timer = 1;
@@ -113,11 +117,18 @@ namespace Integration.Game
             Manager.OnGameClosingEvent += OnGameClosing;
             Manager.OnGameCloseEvent += OnGameEnd;
             Manager.OnGameJoinTimeout += OnGameEnd;
-            await Messenger.SendAsync(MessageType.Load, sequence, true);
+            using (var buffer = new DataBuffer())
+            {
+                buffer.PutFloat(cameraAdapter.xLeft);
+                buffer.PutFloat(cameraAdapter.xRight);
+                buffer.PutFloat(cameraAdapter.zTop);
+                buffer.PutFloat(cameraAdapter.zBottom);
+                await Messenger.SendAsync(MessageType.Load, sequence, true,buffer);
+            }
             InvokeRepeating(nameof(Print), 1.0f, 1.0f);
         }
 
-        private async void Update()
+        private void Update()
         {
             if (!_started)
             {
@@ -136,7 +147,7 @@ namespace Integration.Game
             _lastPosition = hit.point;
             _players[_seat].Move(hit.point);
             cameraAdapter.Adapt(hit.point);
-            await OnFreeMove();
+            //await OnFreeMove();
         }
 
         private void Print()

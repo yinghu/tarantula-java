@@ -37,4 +37,6 @@ public interface Game {
     void onJoinTimeout();
 
     void registerGameChannelListener(GameChannel.Listener listener);
+
+    void onGameLoop();
 }

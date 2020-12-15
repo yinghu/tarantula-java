@@ -65,6 +65,17 @@ public class DataBuffer {
     public long getLong(){
         return byteBuffer.getLong();
     }
+    public void putVector3(Vector3 vector3){
+        if(!writeMode){
+            throw new UnsupportedOperationException();
+        }
+        byteBuffer.putFloat(vector3.x);
+        byteBuffer.putFloat(vector3.y);
+        byteBuffer.putFloat(vector3.z);
+    }
+    public Vector3 getVector3(){
+        return new Vector3(byteBuffer.getFloat(),byteBuffer.getFloat(),byteBuffer.getFloat());
+    }
     public byte[] toArray(){
         byteBuffer.flip();
         byte[] _payload = new byte[byteBuffer.limit()];
