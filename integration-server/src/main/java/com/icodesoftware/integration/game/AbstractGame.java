@@ -65,6 +65,7 @@ abstract public class AbstractGame implements Game {
         dataBuffer.putByte(started?(byte)1:0);
         outboundMessage.payload(dataBuffer.toArray());
         gameChannel.relay(mid,true,null,outboundMessage);
+
         gameChannel.onSession(inboundMessage.sessionId(),(session)->{
             gameChannelService.onUpdate(this,"onStats",gameObject.toJson().toString().getBytes());
         });
@@ -85,6 +86,20 @@ abstract public class AbstractGame implements Game {
         return true;
     }
     public boolean onDestroy(InboundMessage inboundMessage){
+        GameItem gameItem = gameObject.items().remove(inboundMessage.sequence());
+        OutboundMessage outboundMessage = new OutboundMessage();
+        outboundMessage.type(MessageHandler.SPAWN);
+        outboundMessage.ack(true);
+        outboundMessage.sequence(1);
+        int mid = gameChannelService.messageId();
+        outboundMessage.messageId(mid);
+        DataBuffer dataBuffer = new DataBuffer();
+        dataBuffer.putInt(gameItem.typeId);
+        int seq = gameChannelService.messageId();
+        dataBuffer.putInt(seq);
+        outboundMessage.payload(dataBuffer.toArray());
+        gameObject.gameItem(new GameItem(gameItem.typeId,seq,0));
+        gameChannel.relay(mid,true,null,outboundMessage);
         return true;
     }
     public boolean onMove(InboundMessage inboundMessage){
@@ -123,18 +138,36 @@ abstract public class AbstractGame implements Game {
         this.listener.onChannelReset(gameChannel);
     }
     public void onGameLoop(){
+        gameObject.items().forEach((s,g)->{
+            //log.warn("game loop->"+g.typeId+"/"+g.sequence);
+            if(g.typeId==4){
+                OutboundMessage outboundMessage = new OutboundMessage();
+                outboundMessage.type(MessageHandler.MOVE);
+                outboundMessage.ack(true);
+                outboundMessage.sequence(g.sequence);
+                int mid = gameChannelService.messageId();
+                outboundMessage.messageId(mid);
+                DataBuffer dataBuffer = new DataBuffer();
+                Vector3 next = new Vector3(g.lastPosition.x+2,0,0);
+                g.lastPosition = next;
+                dataBuffer.putVector3(next);
+                outboundMessage.payload(dataBuffer.toArray());
+                gameChannel.relay(mid,true,null,outboundMessage);
+            }
+        });
         //log.warn("game loop");
-        OutboundMessage outboundMessage = new OutboundMessage();
-        outboundMessage.type(MessageHandler.SPAWN);
-        outboundMessage.ack(true);
-        outboundMessage.sequence(1);
-        int mid = gameChannelService.messageId();
-        outboundMessage.messageId(mid);
-        DataBuffer dataBuffer = new DataBuffer();
-        dataBuffer.putInt(4);
-        dataBuffer.putInt(gameChannelService.messageId());
-        outboundMessage.payload(dataBuffer.toArray());
-        gameChannel.relay(mid,true,null,outboundMessage);
+
+        //OutboundMessage outboundMessage = new OutboundMessage();
+        //outboundMessage.type(MessageHandler.SPAWN);
+        //outboundMessage.ack(true);
+        //outboundMessage.sequence(1);
+        //int mid = gameChannelService.messageId();
+        //outboundMessage.messageId(mid);
+        //DataBuffer dataBuffer = new DataBuffer();
+        //dataBuffer.putInt(4);
+        //dataBuffer.putInt(gameChannelService.messageId());
+        //outboundMessage.payload(dataBuffer.toArray());
+        //gameChannel.relay(mid,true,null,outboundMessage);
     }
     public void registerGameChannelListener(GameChannel.Listener listener){
         this.listener = listener;

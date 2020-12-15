@@ -3,6 +3,7 @@ package com.icodesoftware.protocol;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameObject {
@@ -20,6 +21,9 @@ public class GameObject {
     }
     public GameItem gameItem(int sequence){
         return gameItemMap.get(sequence);
+    }
+    public Map<Integer,GameItem> items(){
+        return gameItemMap;
     }
     public GameRating update(int seat){
         if(gameRatings[seat]==null){

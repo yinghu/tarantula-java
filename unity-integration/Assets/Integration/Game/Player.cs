@@ -32,9 +32,7 @@ namespace Integration.Game
             {
                 MainThread.Execute(data, buffer =>
                 {
-                    
                     _end = buffer.GetVector3();
-                    Debug.Log(_end.ToString());
                     _end.y = 1;
                 });
             });
