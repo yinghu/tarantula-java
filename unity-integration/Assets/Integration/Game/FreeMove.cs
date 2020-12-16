@@ -1,30 +1,21 @@
-﻿using System.Threading.Tasks;
-using GameClustering;
+﻿using GameClustering;
 using UnityEngine;
 
 namespace Integration.Game
 {
     public class FreeMove : ClusteringObject
     {
-        private const float Speed = 6f;
+        private  float _speed = 6f;
         private Vector3 _end;
        
         private void Start()
         {
             _end = transform.position;
         }
-
-        private async Task Move(Vector3 target)
-        {
-            using (var buffer = new DataBuffer())
-            {
-                buffer.PutVector3(target);
-                await Messenger.SendAsync(MessageType.Move, sequence, true, buffer.ToArray());
-            }
-        }
+        
         private  void FixedUpdate()
         {
-            transform.position = Vector3.Lerp(transform.position, _end, Speed*Time.fixedDeltaTime);
+            transform.position = Vector3.Lerp(transform.position, _end, _speed*Time.fixedDeltaTime);
         }
 
         private async void OnTriggerEnter(Collider other)
@@ -44,6 +35,7 @@ namespace Integration.Game
                 MainThread.Execute(data, buffer =>
                 {
                     _end = buffer.GetVector3();
+                    _speed = buffer.GetFloat();
                 });
             });
             Messenger.RegisterMessageHandler(MessageType.OnCollision,sequence, async (sessionId, data) =>

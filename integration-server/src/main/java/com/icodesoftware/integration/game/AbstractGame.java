@@ -151,6 +151,7 @@ abstract public class AbstractGame implements Game {
                 Vector3 next = new Vector3(g.lastPosition.x+2,0,0);
                 g.lastPosition = next;
                 dataBuffer.putVector3(next);
+                dataBuffer.putFloat(6.0f);
                 outboundMessage.payload(dataBuffer.toArray());
                 gameChannel.relay(mid,true,null,outboundMessage);
             }
