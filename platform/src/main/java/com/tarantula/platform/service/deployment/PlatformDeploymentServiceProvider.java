@@ -607,6 +607,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         connection.connectionId(this.integrationCluster.sequence());
         this.integrationCluster.index(typeId,this.builder.create().toJson(connection).getBytes());
         log.warn("add connection->"+connection.connectionId());
+        this.integrationCluster.deployService().addConnection(typeId,connection);
+        this.integrationCluster.deployService().getConnection(typeId);
         return connection;
     }
     public Connection addConnection(String serverId){

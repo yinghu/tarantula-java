@@ -5,7 +5,9 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.Member;
 import com.hazelcast.spi.*;
 import com.icodesoftware.*;
+import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.Batch;
+import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
@@ -18,6 +20,8 @@ import com.tarantula.platform.util.SystemUtil;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -584,6 +588,13 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
     public void serverPushEventSync(String memberId){
         this.deploymentServiceProvider.distributionCallback().syncServerPushEvent(memberId);//dispatch task
+    }
+    public void addConnection(String typeId,Connection connection){
+        log.warn("add connection->"+typeId);
+    }
+    public Connection getConnection(String typeId){
+        log.warn("get connection->"+typeId);
+        return null;
     }
     public void sync(String key){
         this.deploymentServiceProvider.distributionCallback().syncKey(key);

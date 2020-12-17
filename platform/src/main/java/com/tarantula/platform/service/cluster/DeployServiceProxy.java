@@ -5,10 +5,7 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Event;
-import com.icodesoftware.OnAccess;
-import com.icodesoftware.OnView;
+import com.icodesoftware.*;
 import com.icodesoftware.service.Batch;
 import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.ServiceContext;
@@ -400,6 +397,32 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             }
         }
         //return expected==0;
+    }
+    public void addConnection(String typeId,Connection connection){
+        NodeEngine nodeEngine = getNodeEngine();
+        AddConnectionOperation operation = new AddConnectionOperation(typeId,connection);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(typeId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,partitionId);
+        final Future<Void> future = builder.invoke();
+        try {
+            future.get(5, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+            //return null;
+        }
+    }
+    public Connection getConnection(String typeId){
+        NodeEngine nodeEngine = getNodeEngine();
+        GetConnectionOperation operation = new GetConnectionOperation(typeId);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(typeId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,partitionId);
+        final Future<Connection> future = builder.invoke();
+        try {
+            return future.get(5, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+            return null;
+        }
     }
     public boolean upload(String fileName,byte[] content){
         NodeEngine nodeEngine = getNodeEngine();
