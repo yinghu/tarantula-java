@@ -136,6 +136,11 @@ namespace GameClustering
             }
         }
 
+        public async Task<bool> BlindJoin(MonoBehaviour caller)
+        {
+            return await Connect(caller);
+        }
+
         private async Task<bool> Connect(MonoBehaviour caller)
         {
             try
@@ -147,6 +152,7 @@ namespace GameClustering
                     new Header {Name = Header.TarantulaAction, Value = "onConnection"}
                 };
                 var response = await _httpCaller.GetJson(caller, "/service/action", headers);
+                Debug.Log(response);
                 var jo = JObject.Parse(response);
                 var suc = (bool)jo.SelectToken("successful");
                 if (!suc)
@@ -164,7 +170,21 @@ namespace GameClustering
                     Port = (int)pc.SelectToken("port"),
                     Secured = (bool)pc.SelectToken("secured")
                 };
+                
                 Connect(connection, (string) jo.SelectToken("serverKey"));
+                Room = new Room
+                {
+                    Seat = 0,
+                    Arena = "level1"
+                };
+                using (var buffer = new DataBuffer())
+                {
+                    buffer.PutInt(Presence.Stub);
+                    buffer.PutUTF8String(Presence.Login);
+                    buffer.PutUTF8String(Presence.Ticket);
+                    buffer.PutInt(Room.Seat);
+                    await Messenger.SendAsync(MessageType.Join, 0, true, buffer);
+                }
                 return true;
             }
             catch (Exception ex)
@@ -265,7 +285,7 @@ namespace GameClustering
             return false;
         }
 
-        public async Task<bool> Join(MonoBehaviour caller)
+        public async Task<bool> MatchJoin(MonoBehaviour caller)
         {
             try
             {

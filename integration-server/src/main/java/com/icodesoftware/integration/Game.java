@@ -11,7 +11,6 @@ public interface Game {
 
     String zoneId();
     String roomId();
-    boolean started();
 
     //customized game event callback
     void onAction(InboundMessage inboundMessage);

@@ -66,7 +66,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             if(this.connection!=null){
                 Connection conn = this.deploymentServiceProvider.onConnection(this.typeId());
                 if(conn!=null){
-                    conn.connectionId(connection.connectionId());
+                    //conn.connectionId(connection.connectionId());
                     pc.connection = conn;
                     byte[] key = this.deploymentServiceProvider.serverKey(this.connection);
                     pc.serverKey = Base64.getEncoder().encodeToString(key);

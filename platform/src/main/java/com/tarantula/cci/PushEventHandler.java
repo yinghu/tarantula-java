@@ -1,6 +1,7 @@
 package com.tarantula.cci;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
@@ -60,9 +61,12 @@ public class PushEventHandler implements RequestHandler {
                 ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
                 pushEvent.typeId(typeId);
                 deployService.addServerPushEvent(pushEvent);
+                JsonArray cids = new JsonArray();
                 for(int i=0;i<connection.maxConnections();i++){
                     this.deploymentServiceProvider.distributionCallback().addConnection(typeId,connection);
+                    cids.add(connection.connectionId());
                 }
+                resp.add("connections",cids);
                 exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
             }
             else if(action.equals("onConnection")){

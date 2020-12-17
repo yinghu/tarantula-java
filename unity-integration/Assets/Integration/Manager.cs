@@ -48,7 +48,7 @@ namespace Integration
             SceneManager.LoadScene(_integrationManager.Room.Arena);
         }
 
-        public async void Play()
+        public async void MatchMaking()
         {
             if (!_integrationManager.Authenticated)
             {
@@ -59,7 +59,24 @@ namespace Integration
                 }
             }
             _integrationManager.OnJoinedEvent += Join;
-            if (!await _integrationManager.Join(this))
+            if (!await _integrationManager.MatchJoin(this))
+            {
+                bText.text = _integrationManager.Exception.Message;
+            }
+        }
+
+        public async void BlindJoin()
+        {
+            if (!_integrationManager.Authenticated)
+            {
+                if (!await _integrationManager.Device(this))
+                {
+                    bText.text = _integrationManager.Exception.Message;
+                    return;
+                }
+            }
+            _integrationManager.OnJoinedEvent += Join;
+            if (!await _integrationManager.BlindJoin(this))
             {
                 bText.text = _integrationManager.Exception.Message;
             }
