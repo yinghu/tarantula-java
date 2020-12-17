@@ -9,10 +9,10 @@ namespace GameClustering
         public const long TypePos = 1;
         public const long MessageIdPos = 5;
         public const long ConnectionIdPos = 9;
-        public const long SequencePos = 17;
-        public const long SessionIdPos = 21;
-        public const long TimestampPos = 25;
-        public const long PayloadPos = 33;
+        public const long SequencePos = 13;
+        public const long SessionIdPos = 17;
+        public const long TimestampPos = 21;
+        public const long PayloadPos = 29;
         
         private readonly MemoryStream _memoryStream;
         private bool _disposed;
@@ -73,16 +73,16 @@ namespace GameClustering
             return BitConverter.ToInt32(sequence, 0);
         }
 
-        public long ConnectionId()
+        public int ConnectionId()
         {
             _memoryStream.Position = ConnectionIdPos;
-            var connectionId = new byte[8];
-            _memoryStream.Read(connectionId, 0, 8);
+            var connectionId = new byte[4];
+            _memoryStream.Read(connectionId, 0, 4);
             if (BitConverter.IsLittleEndian)
             {
                 Array.Reverse(connectionId);
             }
-            return BitConverter.ToInt64(connectionId, 0);
+            return BitConverter.ToInt32(connectionId, 0);
         }
         public long Timestamp()
         {

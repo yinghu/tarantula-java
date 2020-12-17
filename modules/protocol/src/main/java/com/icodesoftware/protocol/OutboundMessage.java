@@ -21,8 +21,8 @@ public class OutboundMessage {
     public void messageId(int messageId){
         message.putInt(InboundMessage.MESSAGE_ID_POS,messageId);
     }
-    public void connectionId(long connectionId){
-        message.putLong(InboundMessage.CONNECTION_ID_POS,connectionId);
+    public void connectionId(int connectionId){
+        message.putInt(InboundMessage.CONNECTION_ID_POS,connectionId);
     }
     public void sessionId(int sessionId){
         message.putInt(InboundMessage.SESSION_ID_POD,sessionId);

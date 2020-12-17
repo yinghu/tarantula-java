@@ -38,7 +38,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     private final int port;
     private final ConcurrentLinkedDeque<PendingMessage> mQueue;
     private final ConcurrentHashMap<Integer, MessageHandler> mHandlers;
-    private final ConcurrentHashMap<Long, GameChannelBinding> mChannels;
+    private final ConcurrentHashMap<Integer, GameChannelBinding> mChannels;
     private ExecutorService executorService;
     private ScheduledExecutorService scheduledExecutorService;
     private final HttpCaller httpCaller;
@@ -201,7 +201,8 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
         decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
         pc.getAsJsonArray("connections").forEach((c)->{
-            PushEventChannel _pc = new PushEventChannel(c.getAsLong(),this,retryCount,this.retryInterval);
+            log.warn("Add channel->"+c);
+            PushEventChannel _pc = new PushEventChannel(c.getAsInt(),this,retryCount,this.retryInterval);
             _pc.onGame(createGame(_pc));
             _pc.onGame().registerGameChannelListener(this);
             GameChannelBinding binding = new GameChannelBinding(_pc);
@@ -209,7 +210,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             binding.retrySchedule = scheduledExecutorService.scheduleAtFixedRate(()->_pc.retry(),retryTimeout,retryTimeout,TimeUnit.MILLISECONDS);
             mChannels.put(_pc.channelId(),binding);
         });
-        PushEventChannel pushEventChannel = new PushEventChannel(pc.get("connectionId").getAsLong(),this,retryCount,this.retryInterval);
+        PushEventChannel pushEventChannel = new PushEventChannel(pc.get("connectionId").getAsInt(),this,retryCount,this.retryInterval);
         pushEventChannel.onGame(createGame(pushEventChannel));
         pushEventChannel.onGame().registerGameChannelListener(this);
         GameChannelBinding mbinding = new GameChannelBinding(pushEventChannel);
@@ -240,7 +241,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             ex.printStackTrace();
         }
     }
-    private long addConnection(){
+    private int addConnection(){
         try{
             String[] headers = new String[]{
                     Session.TARANTULA_ACCESS_KEY,accessKey,
@@ -248,7 +249,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
                     Session.TARANTULA_SERVER_ID,serverId
             };
             JsonObject jsonObject = parser.parse(httpCaller.get(path,headers)).getAsJsonObject();
-            return jsonObject.get("connectionId").getAsLong();
+            return jsonObject.get("connectionId").getAsInt();
         }catch (Exception ex){
             ex.printStackTrace();
             return -1;
@@ -306,7 +307,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             return false;
         }
     }
-    public GameChannel gameChannel(long connectionId){
+    public GameChannel gameChannel(int connectionId){
         return mChannels.get(connectionId).gameChannel;
     }
     public int sessionId(){
@@ -352,7 +353,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             removed.pingSchedule.cancel(true);
         },ackTimeout,TimeUnit.MILLISECONDS);
 
-        long cid = addConnection();
+        int cid = addConnection();
         GameChannel gc = new PushEventChannel(cid,this,retryCount,this.retryInterval);
         gc.onGame(createGame(gc));
         gc.onGame().registerGameChannelListener(this);

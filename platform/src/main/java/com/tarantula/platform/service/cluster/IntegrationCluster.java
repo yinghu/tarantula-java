@@ -30,7 +30,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private final String bucket;
     private final String INDEX_MAP = "integration.recoverable.index.Key";
     private final String VALUE_MAP = "integration.recoverable.data.Value";
-    private final String SEQUENCE = "integration.recoverable.data.Sequence";
     private HazelcastInstance _cluster;
 
     private final ConcurrentHashMap<String,ITopic<Event>> topicList = new ConcurrentHashMap<>();
@@ -49,7 +48,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private MultiMap<String, byte[]> mIndex;
     private Map<byte[],byte[]> vMap;
-    private IAtomicLong vSequence;
 
     private String memberId;
     private DeployService deployService;
@@ -99,7 +97,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.tarantulaContext._integrationInstanceStarted.await();
         mIndex = this._cluster.getMultiMap(INDEX_MAP);
         vMap = this._cluster.getMap(VALUE_MAP);
-        vSequence = this._cluster.getAtomicLong(SEQUENCE);
         AccessIndexService accessIndexService =_cluster.getDistributedObject(AccessIndexService.NAME,AccessIndexService.NAME);
         this.tarantulaContext.serviceProvider(accessIndexService);
         this.memberId = this._cluster.getCluster().getLocalMember().getUuid();
@@ -244,9 +241,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public byte[] remove(byte[] key){
         return vMap.remove(key);
     }
-    public long sequence(){
-        return vSequence.incrementAndGet();
-    }
+
     public EventService subscribe(String topic, EventListener callback){
         this.eventSubscribers.computeIfAbsent(topic,(t)->{
             EventSubscriber eventSubscriber = new EventSubscriber();

@@ -51,7 +51,7 @@ namespace GameClustering
             _memoryStream.Position = InboundMessage.SessionIdPos;
             _memoryStream.Write(bytes,0,4);
         }
-        public void ConnectionId(long connectionId)
+        public void ConnectionId(int connectionId)
         {
             var bytes = BitConverter.GetBytes(connectionId);
             if (BitConverter.IsLittleEndian)
@@ -59,7 +59,7 @@ namespace GameClustering
                 Array.Reverse(bytes);
             }
             _memoryStream.Position = InboundMessage.ConnectionIdPos;
-            _memoryStream.Write(bytes,0,8);
+            _memoryStream.Write(bytes,0,4);
         }
         
         public void Sequence(int sequence)

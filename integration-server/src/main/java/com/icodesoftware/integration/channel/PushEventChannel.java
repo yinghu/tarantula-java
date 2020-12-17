@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PushEventChannel implements GameChannel {
 
-    private final long channelId;
+    private final int channelId;
 
     private final GameChannelService gameChannelService;
     private final ConcurrentHashMap<Integer, RemoteSession> mSession;
@@ -38,7 +38,7 @@ public class PushEventChannel implements GameChannel {
     private final int retryCount;
     private final long retryInterval;
 
-    public PushEventChannel(final long channelId,final GameChannelService gameChannelService,final int retryCount,final long retryInterval){
+    public PushEventChannel(final int channelId,final GameChannelService gameChannelService,final int retryCount,final long retryInterval){
         this.channelId = channelId;
         this.gameChannelService = gameChannelService;
         this.retryCount = retryCount;
@@ -56,7 +56,7 @@ public class PushEventChannel implements GameChannel {
         ping = gameChannelService.encode(pendingOutboundMessage);
     }
     @Override
-    public long channelId() {
+    public int channelId() {
         return channelId;
     }
 

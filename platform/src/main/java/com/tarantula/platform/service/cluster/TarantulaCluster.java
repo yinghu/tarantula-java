@@ -73,19 +73,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     public int scope(){
         return Distributable.DATA_SCOPE;
     }
-    //public boolean onPartition(byte[] key){
-        //throw new UnsupportedOperationException("on partition not support on data cluster");
-        //return this.cluster.getPartitionService().getPartition(key).getOwner().getUuid().equals(this.memberId);
-    //}
-    //public int partitionCount(){
-        //return partitionCount;
-    //}
-    //public int size(){
-        //return this._hazel.getCluster().getMembers().size();
-    //}
-    public long sequence(){
-        return this._tarantulaContext.integrationCluster().sequence();
-    }
+
     public EventService publisher(){
         return this._tarantulaContext.integrationCluster().publisher();
     }

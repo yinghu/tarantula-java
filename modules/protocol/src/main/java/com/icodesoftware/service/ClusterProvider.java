@@ -36,7 +36,7 @@ public interface ClusterProvider extends Serviceable {
     void set(Metadata metadata, byte[] key, byte[] value);
     byte[] get(byte[] key);
     <T extends Recoverable> boolean load(T t);
-    long sequence();
+    //long sequence();
 
     void set(byte[] key,byte[] value);
     void index(String index,byte[] key);

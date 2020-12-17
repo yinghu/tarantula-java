@@ -10,7 +10,7 @@ public class UniverseConnection extends ResponseHeader implements Connection {
 
     private String type;
     private String serverId;
-    private long connectionId;
+    private int connectionId;
     private int sessionId;
     private int sequence;
     private boolean secured;
@@ -53,10 +53,10 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     public void sequence(int sequence){
         this.sequence = sequence;
     }
-    public long connectionId(){
+    public int connectionId(){
         return this.connectionId;
     }
-    public void connectionId(long connectionId){
+    public void connectionId(int connectionId){
         this.connectionId = connectionId;
     }
     public int sessionId(){
@@ -166,7 +166,7 @@ public class UniverseConnection extends ResponseHeader implements Connection {
     public void fromMap(Map<String,Object> properties){
         this.type = (String)properties.get("type");
         this.serverId = (String)properties.get("serverId");
-        this.connectionId = ((Number)properties.get("connectionId")).longValue();
+        this.connectionId = ((Number)properties.get("connectionId")).intValue();
         this.sequence = ((Number)properties.get("sequence")).intValue();
         this.secured =(Boolean)properties.get("secured");
         this.protocol = (String)properties.get("protocol");

@@ -164,7 +164,7 @@ namespace GameClustering
                 var pc = jo.SelectToken("connection");
                 var connection = new Connection
                 {
-                    ConnectionId = (long)pc.SelectToken("connectionId"),
+                    ConnectionId = (int)pc.SelectToken("connectionId"),
                     Type =  (string)pc.SelectToken("type"),
                     Host = (string)pc.SelectToken("host"),
                     Port = (int)pc.SelectToken("port"),
@@ -321,7 +321,7 @@ namespace GameClustering
                 var pc = jo.SelectToken("connection");
                 var connection = new Connection
                 {
-                    ConnectionId = (long)pc.SelectToken("connectionId"),
+                    ConnectionId = (int)pc.SelectToken("connectionId"),
                     Type =  (string)pc.SelectToken("type"),
                     Host = (string)pc.SelectToken("host"),
                     Port = (int)pc.SelectToken("port"),

@@ -11,7 +11,7 @@ import java.net.SocketAddress;
  */
 public interface GameChannel {
 
-    long channelId();
+    int channelId();
 
     void onMessage(InboundMessage pendingInboundMessage);
 

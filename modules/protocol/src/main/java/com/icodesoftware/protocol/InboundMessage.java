@@ -12,10 +12,10 @@ public class InboundMessage {
     public static int TYPE_POS = 1;
     public static int MESSAGE_ID_POS = 5;
     public static int CONNECTION_ID_POS = 9;
-    public static int SEQUENCE_POS = 17;
-    public static int SESSION_ID_POD = 21;
-    public static int TIMESTAMP_POS = 25;
-    public static int PAYLOAD_POS = 33;
+    public static int SEQUENCE_POS = 13;
+    public static int SESSION_ID_POD = 17;
+    public static int TIMESTAMP_POS = 21;
+    public static int PAYLOAD_POS = 29;
 
     public final String serverId;
     private final ByteBuffer message;
@@ -38,8 +38,8 @@ public class InboundMessage {
     public int type(){
         return message.getInt(TYPE_POS);
     }
-    public long connectionId(){
-        return message.getLong(CONNECTION_ID_POS);
+    public int connectionId(){
+        return message.getInt(CONNECTION_ID_POS);
     }
     public int sessionId(){
         return message.getInt(SESSION_ID_POD);

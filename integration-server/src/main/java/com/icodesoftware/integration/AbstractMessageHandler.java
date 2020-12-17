@@ -10,7 +10,7 @@ abstract public class AbstractMessageHandler implements MessageHandler {
 
     protected final GameChannelService gameChannelService;
     protected OutboundMessage outboundMessage;
-    protected long connectionId;
+    protected int connectionId;
     protected int messageId;
     protected boolean ack;
     protected MessageHandler callback;

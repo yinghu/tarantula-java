@@ -79,6 +79,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private int workSize;
     private long metricsFreshRate;
     private static long TIMER = 10000;
+    private int connectionId = 1;
     @Override
     public void start() throws Exception {
         this.secureRandom = new SecureRandom();
@@ -604,7 +605,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     //register/cache connection
     public Connection addConnection(String typeId,Connection connection){
-        connection.connectionId(this.integrationCluster.sequence());
+        connection.connectionId(this.connectionId++);
         this.integrationCluster.index(typeId,this.builder.create().toJson(connection).getBytes());
         log.warn("add connection->"+connection.connectionId());
         this.integrationCluster.deployService().addConnection(typeId,connection);
@@ -614,7 +615,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public Connection addConnection(String serverId){
         ServerPushEvent serverPushEvent = pushRegistry.get(serverId);
         Connection connection = serverPushEvent.connection();
-        connection.connectionId(this.integrationCluster.sequence());
+        connection.connectionId(this.connectionId++);
         this.integrationCluster.index(serverPushEvent.typeId(),this.builder.create().toJson(connection).getBytes());
         log.warn("add connection->"+connection.connectionId());
         return connection;
@@ -692,7 +693,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         key = new byte[KEY_SIZE];
         secureRandom.nextBytes(key);
-        connection.server().connectionId(integrationCluster.sequence());
+        //connection.server().connectionId(integrationCluster.sequence());
         connection.connectionId(connection.server().connectionId());
         connection.server().sequence(secureRandom.nextInt());
         this.tarantulaContext.integrationCluster().set(connection.serverId().getBytes(),key);

@@ -30,7 +30,7 @@ public class ConnectionDeserializer implements JsonDeserializer<Connection> {
             desc.serverId(jo.get("serverId").getAsString());
         }
         if(jo.has("connectionId")){
-            desc.connectionId(jo.get("connectionId").getAsLong());
+            desc.connectionId(jo.get("connectionId").getAsInt());
         }
         if(jo.has("sequence")){
             desc.sequence(jo.get("sequence").getAsInt());

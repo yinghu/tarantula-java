@@ -16,7 +16,7 @@ public interface GameChannelService extends Serviceable {
     int sessionId();
     int messageId();
     int[] messageIdRange();
-    GameChannel gameChannel(long connectionId);
+    GameChannel gameChannel(int connectionId);
     MessageHandler messageHandler(int type);
 
     byte[] encode(OutboundMessage outboundMessage);
