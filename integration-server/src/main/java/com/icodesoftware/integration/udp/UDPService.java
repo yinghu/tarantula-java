@@ -54,6 +54,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     private final AtomicInteger sessionId;
     private final AtomicInteger messageId;
     private final AtomicInteger reservedMessageId;
+    private final AtomicInteger connectionId;
     private final int messageIdOffset;
     private final int schedulingPoolSize;
     private final int poolSize;
@@ -69,6 +70,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     public UDPService(JsonObject config){
         sessionId = new AtomicInteger(0);
         messageId = new AtomicInteger(1);
+        connectionId = new AtomicInteger(1);
         reservedMessageId = new AtomicInteger(Integer.MIN_VALUE);
         parser = new JsonParser();
         this.config = config;
@@ -184,9 +186,11 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
         this.path = config.getAsJsonObject(configHeader).get("path").getAsString();
         int end = reservedMessageId.addAndGet(messageIdOffset);
         JsonObject conn = config.getAsJsonObject("connection");
+        conn.getAsJsonObject("server").addProperty("connectionId",connectionId.getAndAdd(maxConnections));
         conn.addProperty("maxConnections",maxConnections);//replace default maxConnections
         conn.addProperty("messageId",end-messageIdOffset);
         conn.addProperty("messageIdOffset",end-1);
+        log.warn(conn.toString());
         String resp = httpCaller.post(this.path,conn.toString().getBytes(),headers);
         log.warn(resp);
         JsonObject pc = parser.parse(resp).getAsJsonObject();
@@ -210,6 +214,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             binding.retrySchedule = scheduledExecutorService.scheduleAtFixedRate(()->_pc.retry(),retryTimeout,retryTimeout,TimeUnit.MILLISECONDS);
             mChannels.put(_pc.channelId(),binding);
         });
+        log.warn("Add master channel->"+pc.get("connectionId").getAsInt());
         PushEventChannel pushEventChannel = new PushEventChannel(pc.get("connectionId").getAsInt(),this,retryCount,this.retryInterval);
         pushEventChannel.onGame(createGame(pushEventChannel));
         pushEventChannel.onGame().registerGameChannelListener(this);

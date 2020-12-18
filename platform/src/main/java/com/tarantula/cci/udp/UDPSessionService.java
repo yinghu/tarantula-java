@@ -40,7 +40,7 @@ public class UDPSessionService implements ConnectionEventService {
         this.encrypt = encrypt;
         this.decrypt = decrypt;
         messageId = new AtomicInteger(connection.messageId());
-        System.out.println("mid->"+connection.messageId()+">>"+connection.messageIdOffset());
+        //System.out.println("mid->"+connection.messageId()+">>"+connection.messageIdOffset());
         pendingAck = new ConcurrentHashMap<>();
     }
 

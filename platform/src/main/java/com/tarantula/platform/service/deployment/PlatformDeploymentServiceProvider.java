@@ -79,7 +79,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private int workSize;
     private long metricsFreshRate;
     private static long TIMER = 10000;
-    private int connectionId = 1;
+
     @Override
     public void start() throws Exception {
         this.secureRandom = new SecureRandom();
@@ -499,7 +499,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             Connection occ = this.builder.create().fromJson(new String(serverPushEvent.payload()), Connection.class);
             occ.disabled(false);
             serverPushEvent.connection(occ);
-            log.warn("add server push->"+occ.connectionId()+"//"+occ.sequence()+"//"+occ.messageId()+"//"+occ.messageIdOffset());
+            log.warn("add server push->"+occ.connectionId()+"//"+occ.sequence()+"//"+occ.messageId()+"//"+occ.messageIdOffset()+"//"+serverPushEvent.payload().length);
             if(occ.server().type().equals(Connection.UDP)){
                 try{
                     byte[] key = tarantulaContext.integrationCluster().get(occ.serverId().getBytes());
@@ -605,20 +605,19 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     //register/cache connection
     public Connection addConnection(String typeId,Connection connection){
-        connection.connectionId(this.connectionId++);
-        this.integrationCluster.index(typeId,this.builder.create().toJson(connection).getBytes());
-        log.warn("add connection->"+connection.connectionId());
-        this.integrationCluster.deployService().addConnection(typeId,connection);
-        this.integrationCluster.deployService().getConnection(typeId);
+        byte[] bytes = connection.toBinary();
+        this.integrationCluster.index(typeId,bytes);
+        log.warn("add connection->"+ connection.connectionId()+"<<>>"+bytes.length);
+        //this.integrationCluster.deployService().addConnection(typeId,connection);
+        //this.integrationCluster.deployService().getConnection(typeId);
         return connection;
     }
     public Connection addConnection(String serverId){
         ServerPushEvent serverPushEvent = pushRegistry.get(serverId);
-        Connection connection = serverPushEvent.connection();
-        connection.connectionId(this.connectionId++);
-        this.integrationCluster.index(serverPushEvent.typeId(),this.builder.create().toJson(connection).getBytes());
-        log.warn("add connection->"+connection.connectionId());
-        return connection;
+        Connection client = serverPushEvent.connection();
+        this.integrationCluster.index(serverPushEvent.typeId(),client.toBinary());
+        log.warn("add connection->"+client.connectionId());
+        return client;
     }
     //use connection
     public Connection onConnection(String typeId){
@@ -627,7 +626,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(ret==null){
             return null;
         }
-        Connection connection = this.builder.create().fromJson(new String(ret),Connection.class);
+        Connection connection = new ClientConnection();
+        connection.fromBinary(ret);
         return connection;
     }
 

@@ -5,12 +5,11 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Event;
 import com.icodesoftware.service.EventService;
+import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.UniverseConnection;
 import com.tarantula.platform.service.ConnectionEventService;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -103,13 +102,11 @@ public class ServerPushEvent extends Data implements Event {
         this.connection = connection;
     }
     public Connection connection(){
-        UniverseConnection conn = new UniverseConnection();
+        ClientConnection conn = new ClientConnection();
         conn.host(this.connection.host());
         conn.port(this.connection.port());
         conn.type(this.connection.type());
-        conn.path(this.connection.path());
         conn.secured(this.connection.secured());
-        conn.protocol(this.connection.protocol());
         conn.serverId(this.connection.serverId());
         return conn;
     }

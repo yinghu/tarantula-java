@@ -2,7 +2,7 @@ package com.tarantula.platform;
 
 import com.icodesoftware.Connection;
 
-import java.util.Map;
+import com.icodesoftware.protocol.DataBuffer;
 
 /**
  * Created by yinghu lu on 12/17/2020.
@@ -46,57 +46,57 @@ public class ClientConnection extends ResponseHeader implements Connection {
 
     @Override
     public int connectionId() {
-        return 0;
+        return connectionId;
     }
 
     @Override
     public void connectionId(int connectionId) {
-
+        this.connectionId = connectionId;
     }
 
     @Override
     public int sessionId() {
-        return 0;
+        return this.sessionId;
     }
 
     @Override
-    public void sessionId(int i) {
-
+    public void sessionId(int sessionId) {
+        this.sessionId = sessionId;
     }
 
     @Override
     public int sequence() {
-        return 0;
+        return sequence;
     }
 
     @Override
-    public void sequence(int i) {
-
+    public void sequence(int sequence) {
+        this.sequence = sequence;
     }
 
     @Override
     public boolean secured() {
-        return false;
+        return secured;
     }
 
     @Override
-    public void secured(boolean b) {
-
+    public void secured(boolean secured) {
+        this.secured = secured;
     }
 
     @Override
     public String protocol() {
-        return null;
+        return this.protocol;
     }
 
     @Override
-    public void protocol(String s) {
-
+    public void protocol(String protocol) {
+        this.protocol = protocol;
     }
 
     @Override
     public String subProtocol() {
-        return null;
+        return "tarantula-service";
     }
 
     @Override
@@ -106,37 +106,37 @@ public class ClientConnection extends ResponseHeader implements Connection {
 
     @Override
     public String host() {
-        return null;
+        return host;
     }
 
     @Override
-    public void host(String s) {
-
+    public void host(String host) {
+        this.host = host;
     }
 
     @Override
     public int port() {
-        return 0;
+        return port;
     }
 
     @Override
-    public void port(int i) {
-
+    public void port(int port) {
+        this.port = port;
     }
 
     @Override
     public String path() {
-        return null;
+        return path;
     }
 
     @Override
-    public void path(String s) {
-
+    public void path(String path) {
+        this.path = path;
     }
 
     @Override
     public int messageId() {
-        return 0;
+        return messageId;
     }
 
     @Override
@@ -145,32 +145,53 @@ public class ClientConnection extends ResponseHeader implements Connection {
     }
 
     @Override
-    public void messageId(int i) {
-
+    public void messageId(int messageId) {
+        this.messageId = messageId;
     }
 
     @Override
-    public void messageIdOffset(int i) {
-
+    public void messageIdOffset(int messageIdOffset) {
+        this.messageIdOffset = messageIdOffset;
     }
 
     @Override
     public int maxConnections() {
-        return 0;
+        return maxConnections;
     }
 
     @Override
-    public void maxConnections(int i) {
-
+    public void maxConnections(int maxConnections) {
+        this.maxConnections = maxConnections;
     }
 
     @Override
     public Connection server() {
-        return null;
+        return server;
     }
 
     @Override
     public void server(Connection connection) {
-
+        this.server = connection;
+    }
+    @Override
+    public byte[] toBinary(){
+        DataBuffer dataBuffer = new DataBuffer();
+        dataBuffer.putUTF8(type);
+        dataBuffer.putInt(connectionId);
+        dataBuffer.putUTF8(serverId);
+        dataBuffer.putUTF8(host);
+        dataBuffer.putInt(port);
+        dataBuffer.putByte(secured?(byte)1:0);
+        return dataBuffer.toArray();
+    }
+    @Override
+    public void fromBinary(byte[] payload){
+        DataBuffer dataBuffer = new DataBuffer(payload);
+        this.type = dataBuffer.getUTF8();
+        this.connectionId = dataBuffer.getInt();
+        this.serverId = dataBuffer.getUTF8();
+        this.host = dataBuffer.getUTF8();
+        this.port = dataBuffer.getInt();
+        this.secured = dataBuffer.getByte()==1;
     }
 }
