@@ -118,6 +118,6 @@ public class MatchMakingModule implements Module, Lobby.Listener,Connection.OnCo
     @Override
     public byte[] onConnection() {
         this.context.log("connection setup",OnLog.WARN);
-        return "{}".getBytes();
+        return "{mmm}".getBytes();
     }
 }
