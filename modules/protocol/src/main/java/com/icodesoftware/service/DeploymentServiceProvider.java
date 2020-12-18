@@ -18,9 +18,13 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     String NAME = "DeploymentServiceProvider";
 
     //GAME SERVER/PUSH SERVER APIs
+    //Connection onConnection(String typeId);
     Connection onConnection(String typeId);
+    byte[] onRemoteConnection(String typeId);
     byte[] serverKey(Connection connection);
-    void registerOnConnectionListener(Connection.Listener listener);
+    void registerOnConnectionListener(Connection.OnConnectionListener listener);
+    void registerOnConnectionStateListener(Connection.OnStateListener listener);
+
     //END OF GAME SERVER/PUSH SERVER APIs
 
     /**
@@ -95,8 +99,8 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void syncServerPushEvent(String memberId);
 
         Connection addConnection(String typeId,Connection connection);
-        Connection addConnection(String serverId);
-
+        Connection addConnection(String serverId,int connectionId);
+        byte[] getConnection(String typeId);
 
         void stopAccessIndex();
         void startAccessIndex();

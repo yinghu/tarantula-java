@@ -3,22 +3,22 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.service.DeploymentServiceProvider;
+import com.tarantula.game.GameJoinObject;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.util.ConnectionSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * updated by yinghu lu on 6/7/2020.
  */
-public class
-
-
-
-MatchMakingModule implements Module, Lobby.Listener {
+public class MatchMakingModule implements Module, Lobby.Listener,Connection.OnConnectionListener {
 
     private ApplicationContext context;
+    private DeploymentServiceProvider deploymentServiceProvider;
     private ConcurrentHashMap<Integer,Descriptor> mZone;
     private GameServiceProvider gameServiceProvider;
     private GsonBuilder builder;
@@ -36,6 +36,10 @@ MatchMakingModule implements Module, Lobby.Listener {
                 session.write(this.builder.create().toJson(response).getBytes(),label());
             }
         }
+        else if(session.action().equals("onConnection")){
+            byte[] connection = this.deploymentServiceProvider.onRemoteConnection(lobbyId);
+            session.write(connection,this.lobbyId);
+        }
         else{
             throw new UnsupportedOperationException(session.action());
         }
@@ -45,6 +49,7 @@ MatchMakingModule implements Module, Lobby.Listener {
     @Override
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
+        this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         mZone = new ConcurrentHashMap<>();//max matching level
@@ -52,14 +57,24 @@ MatchMakingModule implements Module, Lobby.Listener {
         lobbyId = this.context.descriptor().typeId().replace("service","lobby");
         listLobby().addListener(this);
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
+        this.deploymentServiceProvider.registerOnConnectionListener(this);
         context.log("Started match making module on ->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 
     @Override
     public String label() {
-        return "matchmaking";
+        return this.lobbyId;
     }
-
+    @Override
+    public void onConnection(Connection connection){
+        this.context.log("connection on game center",OnLog.WARN);
+        if(connection.disabled()){
+            this.gameServiceProvider.onClosed(connection);
+        }
+        //else {
+            //mPush.put(connection.serverId(),connection);
+        //}
+    }
     @Override
     public void on(Descriptor descriptor) {
         this.context.log("Lobby Updated->"+descriptor.disabled()+"//"+descriptor.accessRank(), OnLog.WARN);
@@ -93,5 +108,16 @@ MatchMakingModule implements Module, Lobby.Listener {
             context.log("Add lobby ->"+mZone.get(i).tag()+" ->rank ["+mZone.get(i).accessRank()+"]",OnLog.WARN);
         }
         return lobby;
+    }
+
+    @Override
+    public String typeId() {
+        return lobbyId;
+    }
+
+    @Override
+    public byte[] onConnection() {
+        this.context.log("connection setup",OnLog.WARN);
+        return "{}".getBytes();
     }
 }

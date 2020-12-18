@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.UniverseConnection;
 import com.tarantula.platform.event.ResponsiveEvent;
@@ -41,6 +42,7 @@ public class PushEventHandler implements RequestHandler {
             String action = exchange.header(Session.TARANTULA_ACTION);
             String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
             String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
+            String connectionId = exchange.header(Session.TARANTULA_CONNECTION_ID);
             byte[] _payload = exchange.payload();
             String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
             if(typeId==null){
@@ -62,15 +64,15 @@ public class PushEventHandler implements RequestHandler {
                 pushEvent.typeId(typeId);
                 deployService.addServerPushEvent(pushEvent);
                 JsonArray cids = new JsonArray();
-                for(int i=0;i<connection.maxConnections();i++){
-                    this.deploymentServiceProvider.distributionCallback().addConnection(typeId,connection);
-                    cids.add(connection.connectionId());
+                for(int i=1;i<=connection.maxConnections();i++){
+                    Connection conn = this.deploymentServiceProvider.distributionCallback().addConnection(typeId,toClientConnection(connection,connection.connectionId()+i));
+                    cids.add(conn.connectionId());
                 }
                 resp.add("connections",cids);
                 exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
             }
             else if(action.equals("onConnection")){
-                Connection connection = this.deploymentServiceProvider.distributionCallback().addConnection(serverId);
+                Connection connection = this.deploymentServiceProvider.distributionCallback().addConnection(serverId,Integer.parseInt(connectionId));
                 exchange.onEvent(new ResponsiveEvent("","",builder.create().toJson(connection).getBytes(),"onConnection",true));
             }
             else if(action.equals("onStop")){
@@ -165,5 +167,15 @@ public class PushEventHandler implements RequestHandler {
     }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
+    }
+    private Connection toClientConnection(Connection connection,int connectionId){
+        Connection conn = new ClientConnection();
+        conn.type(connection.type());
+        conn.serverId(connection.serverId());
+        conn.host(connection.host());
+        conn.port(connection.port());
+        conn.secured(connection.secured());
+        conn.connectionId(connectionId);
+        return conn;
     }
 }

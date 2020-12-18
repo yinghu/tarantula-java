@@ -36,7 +36,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         if(SERVER_PUSH_INTERVAL>0){
             this.scheduledFuture = this.context.schedule(this);
         }
-        this.serviceProvider.registerOnConnectionListener(this);
+        this.serviceProvider.registerOnConnectionStateListener(this);
         module.setup(context);
     }
     @Override
@@ -98,7 +98,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     }
     @Override
     public void onState(Connection c) {
-        this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"]",OnLog.WARN);
+        this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"//"+descriptor.typeId()+"]",OnLog.WARN);
         this.module.onConnection(c);
     }
 }

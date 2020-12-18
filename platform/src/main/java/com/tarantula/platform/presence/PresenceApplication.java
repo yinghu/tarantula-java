@@ -44,7 +44,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                 //this.context.dataStore("presence").create(ob);
             }
         });
-        this.deploymentServiceProvider.registerOnConnectionListener(this);
+        this.deploymentServiceProvider.registerOnConnectionStateListener(this);
         this.context.log("Presence application started on ["+descriptor.tag()+"]",OnLog.INFO);
     }
 

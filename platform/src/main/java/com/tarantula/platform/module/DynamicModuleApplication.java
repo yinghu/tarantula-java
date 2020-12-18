@@ -46,7 +46,7 @@ public class DynamicModuleApplication extends TarantulaApplicationHeader impleme
             module = this.serviceProvider.module(this.descriptor);
             this.SERVER_PUSH_INTERVAL = descriptor.timerOnModule();
             if(this.SERVER_PUSH_INTERVAL>0){
-                this.serviceProvider.registerOnConnectionListener(this);
+                this.serviceProvider.registerOnConnectionStateListener(this);
                 this.timerSchedule = this.context.schedule(this);
             }
             module.setup(context);

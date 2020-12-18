@@ -1,13 +1,19 @@
 package com.tarantula.platform;
 
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Connection;
 
 import com.icodesoftware.protocol.DataBuffer;
+import com.tarantula.platform.service.cluster.PortableRegistry;
+
+import java.io.IOException;
 
 /**
  * Created by yinghu lu on 12/17/2020.
  */
-public class ClientConnection extends ResponseHeader implements Connection {
+public class ClientConnection extends ResponseHeader implements Connection, Portable {
 
     protected String type;
     protected String serverId;
@@ -193,5 +199,31 @@ public class ClientConnection extends ResponseHeader implements Connection {
         this.host = dataBuffer.getUTF8();
         this.port = dataBuffer.getInt();
         this.secured = dataBuffer.getByte()==1;
+    }
+    public int getFactoryId() {
+        return PortableRegistry.OID;
+    }
+
+    public int getClassId() {
+        return PortableRegistry.CLIENT_CONNECTION_CID;
+    }
+    @Override
+    public void writePortable(PortableWriter portableWriter) throws IOException {
+        portableWriter.writeUTF("1",type);
+        portableWriter.writeInt("2",connectionId);
+        portableWriter.writeUTF("3",serverId);
+        portableWriter.writeUTF("4",host);
+        portableWriter.writeInt("5",port);
+        portableWriter.writeBoolean("6",secured);
+    }
+
+    @Override
+    public void readPortable(PortableReader portableReader) throws IOException {
+        this.type = portableReader.readUTF("1");
+        this.connectionId = portableReader.readInt("2");
+        this.serverId = portableReader.readUTF("3");
+        this.host = portableReader.readUTF("4");
+        this.port = portableReader.readInt("5");
+        this.secured = portableReader.readBoolean("6");
     }
 }

@@ -51,9 +51,12 @@ public interface Connection extends Recoverable {
     Connection server();
     void server(Connection connection);
 
-    interface Listener{
+    interface OnStateListener{
         String typeId();
         void onState(Connection connection);
     }
-
+    interface OnConnectionListener{
+        String typeId();
+        byte[] onConnection();
+    }
 }

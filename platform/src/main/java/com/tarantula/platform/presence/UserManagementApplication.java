@@ -98,7 +98,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 }
             }
         });
-        this.deploymentServiceProvider.registerOnConnectionListener(this);
+        this.deploymentServiceProvider.registerOnConnectionStateListener(this);
         this.context.log("User management application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
     }
     @Override

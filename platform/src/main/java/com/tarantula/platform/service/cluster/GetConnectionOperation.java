@@ -4,7 +4,6 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
-import com.icodesoftware.Connection;
 
 import java.io.IOException;
 
@@ -14,7 +13,7 @@ import java.io.IOException;
 public class GetConnectionOperation extends Operation implements PartitionAwareOperation {
 
     //private boolean result;
-    private Connection connection;
+    private byte[] connection;
     private String typeId;
 
     public GetConnectionOperation() {
@@ -38,7 +37,6 @@ public class GetConnectionOperation extends Operation implements PartitionAwareO
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(typeId);
-
     }
 
     @Override

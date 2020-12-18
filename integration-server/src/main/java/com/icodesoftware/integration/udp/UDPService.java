@@ -251,7 +251,8 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
             String[] headers = new String[]{
                     Session.TARANTULA_ACCESS_KEY,accessKey,
                     Session.TARANTULA_ACTION,"onConnection",
-                    Session.TARANTULA_SERVER_ID,serverId
+                    Session.TARANTULA_SERVER_ID,serverId,
+                    Session.TARANTULA_CONNECTION_ID,""+connectionId.incrementAndGet()
             };
             JsonObject jsonObject = parser.parse(httpCaller.get(path,headers)).getAsJsonObject();
             return jsonObject.get("connectionId").getAsInt();

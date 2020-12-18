@@ -398,25 +398,13 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         //return expected==0;
     }
-    public void addConnection(String typeId,Connection connection){
-        NodeEngine nodeEngine = getNodeEngine();
-        AddConnectionOperation operation = new AddConnectionOperation(typeId,connection);
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(typeId);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,partitionId);
-        final Future<Void> future = builder.invoke();
-        try {
-            future.get(5, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            future.cancel(true);
-            //return null;
-        }
-    }
-    public Connection getConnection(String typeId){
+
+    public byte[] getConnection(String typeId){
         NodeEngine nodeEngine = getNodeEngine();
         GetConnectionOperation operation = new GetConnectionOperation(typeId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(typeId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,partitionId);
-        final Future<Connection> future = builder.invoke();
+        final Future<byte[]> future = builder.invoke();
         try {
             return future.get(5, TimeUnit.SECONDS);
         } catch (Exception e) {

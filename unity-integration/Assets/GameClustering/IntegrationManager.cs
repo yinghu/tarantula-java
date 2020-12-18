@@ -147,12 +147,13 @@ namespace GameClustering
             {
                 var headers = new[]
                 {
-                    new Header {Name = Header.TarantulaTag, Value = "presence/lobby"},
+                    new Header {Name = Header.TarantulaTag, Value = typeId+"/mmk"},
                     new Header {Name = Header.TarantulaToken, Value = Presence.Token},
                     new Header {Name = Header.TarantulaAction, Value = "onConnection"}
                 };
                 var response = await _httpCaller.GetJson(caller, "/service/action", headers);
                 Debug.Log(response);
+                /**
                 var jo = JObject.Parse(response);
                 var suc = (bool)jo.SelectToken("successful");
                 if (!suc)
@@ -169,7 +170,7 @@ namespace GameClustering
                     Host = (string)pc.SelectToken("host"),
                     Port = (int)pc.SelectToken("port"),
                     Secured = (bool)pc.SelectToken("secured")
-                };
+                };    
                 
                 Connect(connection, (string) jo.SelectToken("serverKey"));
                 Room = new Room
@@ -184,7 +185,7 @@ namespace GameClustering
                     buffer.PutUTF8String(Presence.Ticket);
                     buffer.PutInt(Room.Seat);
                     await Messenger.SendAsync(MessageType.Join, 0, true, buffer);
-                }
+                }**/
                 return true;
             }
             catch (Exception ex)

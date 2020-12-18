@@ -48,7 +48,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ConcurrentHashMap<String,InstanceRegistry.Listener> rListeners = new ConcurrentHashMap<>();
     private CopyOnWriteArrayList<OnLobby.Listener> oListeners = new CopyOnWriteArrayList<>();
 
-    private CopyOnWriteArrayList<Connection.Listener> wListeners = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<Connection.OnStateListener> wListeners = new CopyOnWriteArrayList<>();
 
     //callback on access index service
     private CopyOnWriteArrayList<AccessIndexService.Listener> aListeners = new CopyOnWriteArrayList<>();
@@ -74,6 +74,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private AtomicBoolean onAccessIndex;
 
     private ConcurrentLinkedDeque<PendingServerPushMessage> pendingData;
+    private ConcurrentHashMap<String,Connection.OnConnectionListener> cCallbacks = new ConcurrentHashMap<>();
 
     private ExecutorService udpPool;
     private int workSize;
@@ -565,7 +566,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         ServerPushEvent serverPushEvent = pushRegistry.get(serverId);
         serverPushEvent.ack();
     }
-    public void registerOnConnectionListener(Connection.Listener listener){
+    public void registerOnConnectionStateListener(Connection.OnStateListener listener){
         pushRegistry.forEach((k,v)->{
             Connection connection = this.builder.create().fromJson(new String(v.payload()), Connection.class);
             if(v.typeId().equals(listener.typeId())){
@@ -573,6 +574,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         });
         wListeners.add(listener);
+    }
+    public void registerOnConnectionListener(Connection.OnConnectionListener listener){
+        this.cCallbacks.put(listener.typeId(),listener);
     }
     public List<Configuration> configuration(){
         ArrayList<Configuration> clist = new ArrayList<>();
@@ -608,15 +612,17 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         byte[] bytes = connection.toBinary();
         this.integrationCluster.index(typeId,bytes);
         log.warn("add connection->"+ connection.connectionId()+"<<>>"+bytes.length);
-        //this.integrationCluster.deployService().addConnection(typeId,connection);
-        //this.integrationCluster.deployService().getConnection(typeId);
         return connection;
     }
-    public Connection addConnection(String serverId){
+    public Connection addConnection(String serverId,int connectionId){
         ServerPushEvent serverPushEvent = pushRegistry.get(serverId);
+        if(serverPushEvent==null){
+            return null;
+        }
         Connection client = serverPushEvent.connection();
+        client.connectionId(connectionId);
         this.integrationCluster.index(serverPushEvent.typeId(),client.toBinary());
-        log.warn("add connection->"+client.connectionId());
+        log.warn("add connection->"+client.connectionId()+"<><><><><>"+client.toBinary().length);
         return client;
     }
     //use connection
@@ -630,7 +636,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         connection.fromBinary(ret);
         return connection;
     }
-
+    public byte[] onRemoteConnection(String typeId){
+        return this.integrationCluster.deployService().getConnection(typeId);
+    }
+    public byte[] getConnection(String typeId){
+        log.warn("create room->");
+        return cCallbacks.get(typeId).onConnection();
+        //ServerPushEvent serverPushEvent = pushRegistry.get()
+        //Connection connection = onConnection(typeId);
+        //return "{}".getBytes();
+    }
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         if(deployService.enableGameCluster(gameCluster.distributionKey())){

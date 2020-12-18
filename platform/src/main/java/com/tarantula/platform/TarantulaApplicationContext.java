@@ -18,7 +18,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class TarantulaApplicationContext implements ApplicationContext, EventListener, Connection.Listener{
+public class TarantulaApplicationContext implements ApplicationContext, EventListener, Connection.OnStateListener{
 
     private Descriptor _descriptor;
 	private TarantulaApplication application;

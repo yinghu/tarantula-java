@@ -34,6 +34,8 @@ public class PortableRegistry extends AbstractRecoverableListener{
 
     public static final int ON_VIEW_OID = 28;
 
+    public static final int CLIENT_CONNECTION_CID = 29;
+
     //START 100 working with EVENT PORTABLE on same OID
     public static final int SINGLETON_FORWARD_CID = PortableEventRegistry.SINGLETON_FORWARD_CID;
 
@@ -110,6 +112,10 @@ public class PortableRegistry extends AbstractRecoverableListener{
             case ON_CONNECTION_CID:
                 _ins = new UniverseConnection();
                 break;
+            case CLIENT_CONNECTION_CID:
+                _ins = new ClientConnection();
+                break;
+
             default:
                 throw new IllegalArgumentException("Not supported event type");
 		}
