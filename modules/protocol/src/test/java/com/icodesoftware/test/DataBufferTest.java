@@ -1,5 +1,6 @@
 package com.icodesoftware.test;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.protocol.DataBuffer;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -27,5 +28,15 @@ public class DataBufferTest {
         Assert.assertTrue(out.getUTF8().equals("pop"));
         Assert.assertTrue(new String(out.getByteArray()).equals("12345"));
     }
-
+    @Test(groups = { "data buffer" })
+    public void payloadSizeTest(){
+        JsonObject jsonObject = new JsonObject();
+        DataBuffer buffer = new DataBuffer();
+        jsonObject.addProperty("1",5);
+        jsonObject.addProperty("2","test");
+        buffer.putInt(5);
+        buffer.putUTF8("test");
+        Assert.assertTrue(buffer.toArray().length==12);
+        Assert.assertTrue(jsonObject.toString().length()==18);
+    }
 }
