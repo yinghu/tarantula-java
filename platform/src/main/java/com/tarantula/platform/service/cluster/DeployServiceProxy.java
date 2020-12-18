@@ -399,9 +399,9 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         //return expected==0;
     }
 
-    public byte[] getConnection(String typeId){
+    public byte[] getConnection(String typeId,byte[] payload){
         NodeEngine nodeEngine = getNodeEngine();
-        GetConnectionOperation operation = new GetConnectionOperation(typeId);
+        GetConnectionOperation operation = new GetConnectionOperation(typeId,payload);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(typeId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,partitionId);
         final Future<byte[]> future = builder.invoke();

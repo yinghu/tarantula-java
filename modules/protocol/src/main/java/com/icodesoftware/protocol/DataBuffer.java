@@ -38,6 +38,19 @@ public class DataBuffer {
         return byteBuffer.get();
     }
 
+    public void putByteArray(byte[] b){
+        if(!writeMode){
+            throw new UnsupportedOperationException();
+        }
+        byteBuffer.putInt(b.length);
+        byteBuffer.put(b);
+    }
+    public byte[] getByteArray(){
+        byte[] ret = new byte[byteBuffer.getInt()];
+        byteBuffer.get(ret);
+        return ret;
+    }
+
     public void putInt(int i){
         if(!writeMode){
             throw new UnsupportedOperationException();
@@ -46,6 +59,15 @@ public class DataBuffer {
     }
     public int getInt(){
         return byteBuffer.getInt();
+    }
+    public void putShort(short i){
+        if(!writeMode){
+            throw new UnsupportedOperationException();
+        }
+        byteBuffer.putShort(i);
+    }
+    public short getShort(){
+        return byteBuffer.getShort();
     }
     public void putFloat(float i){
         if(!writeMode){
@@ -64,6 +86,15 @@ public class DataBuffer {
     }
     public long getLong(){
         return byteBuffer.getLong();
+    }
+    public void putDouble(double i){
+        if(!writeMode){
+            throw new UnsupportedOperationException();
+        }
+        byteBuffer.putDouble(i);
+    }
+    public double getDouble(){
+        return byteBuffer.getDouble();
     }
     public void putVector3(Vector3 vector3){
         if(!writeMode){

@@ -18,6 +18,7 @@ public class GameJoinObject extends ResponseHeader {
         jo.addProperty("successful",successful);
         if(!successful){
             jo.addProperty("message",message);
+            return jo;
         }
         jo.addProperty("ticket",ticket);
         jo.addProperty("serverKey",serverKey);

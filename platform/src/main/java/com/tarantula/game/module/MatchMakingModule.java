@@ -3,6 +3,7 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.game.GameJoinObject;
 import com.tarantula.game.service.GameServiceProvider;
@@ -37,7 +38,13 @@ public class MatchMakingModule implements Module, Lobby.Listener,Connection.OnCo
             }
         }
         else if(session.action().equals("onConnection")){
-            byte[] connection = this.deploymentServiceProvider.onRemoteConnection(lobbyId);
+            Rating rating = this.gameServiceProvider.rating(session.systemId());
+            int mix = rating.rank>maxRank?maxRank:rating.rank;
+            //Descriptor lobby = mZone.get(mix);
+            DataBuffer buffer = new DataBuffer();
+            buffer.putUTF8("test");
+            buffer.putInt(3);
+            byte[] connection = this.deploymentServiceProvider.onRemoteConnection(lobbyId,buffer.toArray());
             session.write(connection,this.lobbyId);
         }
         else{
@@ -67,7 +74,6 @@ public class MatchMakingModule implements Module, Lobby.Listener,Connection.OnCo
     }
     @Override
     public void onConnection(Connection connection){
-        this.context.log("connection on game center",OnLog.WARN);
         if(connection.disabled()){
             this.gameServiceProvider.onClosed(connection);
         }
@@ -116,8 +122,12 @@ public class MatchMakingModule implements Module, Lobby.Listener,Connection.OnCo
     }
 
     @Override
-    public byte[] onConnection() {
-        this.context.log("connection setup",OnLog.WARN);
-        return "{mmm}".getBytes();
+    public byte[] onConnection(byte[] payload) {
+        DataBuffer buffer = new DataBuffer(payload);
+        this.context.log("connection setup->"+buffer.getUTF8()+"/"+buffer.getInt(),OnLog.WARN);
+        GameJoinObject joinObject = new GameJoinObject();
+        joinObject.successful(false);
+        joinObject.message("feature disabled");
+        return joinObject.toJson().toString().getBytes();
     }
 }

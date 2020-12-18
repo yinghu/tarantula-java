@@ -20,11 +20,12 @@ public class DataBufferTest {
         payloadBuffer.putUTF8("hello");
         payloadBuffer.putInt(15);
         payloadBuffer.putUTF8("pop");
-        Assert.assertTrue(payloadBuffer.toArray().length==20);
+        payloadBuffer.putByteArray("12345".getBytes());
         DataBuffer out = new DataBuffer(payloadBuffer.toArray());
         Assert.assertTrue(out.getUTF8().equals("hello"));
         Assert.assertTrue(out.getInt()==15);
         Assert.assertTrue(out.getUTF8().equals("pop"));
+        Assert.assertTrue(new String(out.getByteArray()).equals("12345"));
     }
 
 }

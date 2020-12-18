@@ -20,7 +20,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //GAME SERVER/PUSH SERVER APIs
     //Connection onConnection(String typeId);
     Connection onConnection(String typeId);
-    byte[] onRemoteConnection(String typeId);
+    byte[] onRemoteConnection(String typeId,byte[] payload);
     byte[] serverKey(Connection connection);
     void registerOnConnectionListener(Connection.OnConnectionListener listener);
     void registerOnConnectionStateListener(Connection.OnStateListener listener);
@@ -100,7 +100,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
         Connection addConnection(String typeId,Connection connection);
         Connection addConnection(String serverId,int connectionId);
-        byte[] getConnection(String typeId);
+        byte[] getConnection(String typeId,byte[] payload);
 
         void stopAccessIndex();
         void startAccessIndex();

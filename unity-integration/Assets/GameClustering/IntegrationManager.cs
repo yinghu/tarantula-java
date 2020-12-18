@@ -153,12 +153,11 @@ namespace GameClustering
                 };
                 var response = await _httpCaller.GetJson(caller, "/service/action", headers);
                 Debug.Log(response);
-                /**
                 var jo = JObject.Parse(response);
                 var suc = (bool)jo.SelectToken("successful");
                 if (!suc)
                 {
-                    Exception = new Exception("No connection");
+                    Exception = new Exception((string)jo.SelectToken("message"));
                     return false;
                 }
                 Presence.Ticket = (string)jo.SelectToken("presence").SelectToken("ticket");
@@ -185,7 +184,7 @@ namespace GameClustering
                     buffer.PutUTF8String(Presence.Ticket);
                     buffer.PutInt(Room.Seat);
                     await Messenger.SendAsync(MessageType.Join, 0, true, buffer);
-                }**/
+                }
                 return true;
             }
             catch (Exception ex)

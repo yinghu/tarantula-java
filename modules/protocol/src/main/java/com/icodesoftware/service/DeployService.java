@@ -36,7 +36,7 @@ public interface DeployService extends ServiceProvider {
     void ackServerPushEvent(String serverId);
     void removeServerPushEvent(String serverId);
 
-    byte[] getConnection(String typeId);
+    byte[] getConnection(String typeId,byte[] payload);
 
     void syncServerPushEvent();
     boolean addServerPushEvent(String memberId,Event serverPushEvent);

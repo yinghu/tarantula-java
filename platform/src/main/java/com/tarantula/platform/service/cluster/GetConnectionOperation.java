@@ -15,17 +15,18 @@ public class GetConnectionOperation extends Operation implements PartitionAwareO
     //private boolean result;
     private byte[] connection;
     private String typeId;
-
+    private byte[] payload;
     public GetConnectionOperation() {
     }
 
-    public GetConnectionOperation(String typeId) {
+    public GetConnectionOperation(String typeId,byte[] payload) {
         this.typeId = typeId;
+        this.payload = payload;
     }
     @Override
     public void run() throws Exception {
         ClusterDeployService ais = this.getService();
-        connection = ais.getConnection(typeId);
+        connection = ais.getConnection(typeId,payload);
     }
 
     @Override
@@ -37,12 +38,14 @@ public class GetConnectionOperation extends Operation implements PartitionAwareO
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(typeId);
+        out.writeByteArray(payload);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         this.typeId = in.readUTF();
+        this.payload = in.readByteArray();
     }
 
 }
