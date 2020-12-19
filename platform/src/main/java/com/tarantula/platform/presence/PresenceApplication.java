@@ -45,6 +45,9 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             }
         });
         this.deploymentServiceProvider.registerOnConnectionStateListener(this);
+        this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.STATISTICS_DELTA_CID,(a)->{
+            this.context.log("stats delta received",OnLog.WARN);
+        });
         this.context.log("Presence application started on ["+descriptor.tag()+"]",OnLog.INFO);
     }
 
@@ -240,5 +243,10 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"]",OnLog.WARN);
         this.context.log("Server->"+c.server().host(),OnLog.WARN);
         this.connection = c;
+    }
+    @Override
+    public boolean onEvent(Event event){
+        this.context.log("remote event",OnLog.WARN);
+        return true;
     }
 }

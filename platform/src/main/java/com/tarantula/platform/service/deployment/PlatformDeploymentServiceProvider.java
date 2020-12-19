@@ -810,7 +810,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         public OnTag onTag(String tag){
            return (dkey,t)->{
                String key = t.key().asString();
-               byte[] payload = SystemUtil.toJson(t.toMap());
+               byte[] payload = t.toBinary();//SystemUtil.toJson(t.toMap());
                RoutingKey routingKey = integrationEventService.routingKey(dkey,tag);
                MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),t.owner(),t.getFactoryId(),t.getClassId(),key!=null?key:"",payload);
                integrationEventService.publish(mapStoreSyncEvent);
@@ -819,7 +819,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         public OnApplication onApplication(String applicationId){
             return (dkey,t)->{
                 String key = t.key().asString();
-                byte[] payload = SystemUtil.toJson(t.toMap());
+                byte[] payload = t.toBinary();//SystemUtil.toJson(t.toMap());
                 RoutingKey routingKey = integrationEventService.instanceRoutingKey(applicationId,dkey);
                 MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),t.owner(),t.getFactoryId(),t.getClassId(),key!=null?key:"",payload);
                 integrationEventService.publish(mapStoreSyncEvent);

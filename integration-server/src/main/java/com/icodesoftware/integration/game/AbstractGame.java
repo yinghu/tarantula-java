@@ -110,8 +110,8 @@ abstract public class AbstractGame implements Game {
 
 
     public void onSpec(DataBuffer dataBuffer){
-        roomId = dataBuffer.getUTF8();
         zoneId = dataBuffer.getUTF8();
+        roomId = dataBuffer.getUTF8();
         level = dataBuffer.getInt();
         capacity = dataBuffer.getInt();
     }

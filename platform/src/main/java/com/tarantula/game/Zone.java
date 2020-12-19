@@ -12,6 +12,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.RecoverableObject;
+import com.tarantula.platform.statistics.StatsDelta;
 import com.tarantula.platform.util.SystemUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -378,6 +379,8 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         entry.update(delta).update();
         LeaderBoard ldb = gameServiceProvider.leaderBoard(category);
         ldb.onAllBoard(entry);
+        StatsDelta statsDelta = new StatsDelta(category,delta);
+        this.deploymentServiceProvider.registerPostOffice().onTag(Presence.LOBBY_TAG).send(systemId,statsDelta);
     }
     public void onRating(Stub stub,int rankUpBase){
         Rating rating = this.gameServiceProvider.rating(stub.owner());

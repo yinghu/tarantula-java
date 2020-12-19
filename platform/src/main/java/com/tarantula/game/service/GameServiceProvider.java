@@ -131,7 +131,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             room.onUpdated(e.action(),e.payload());
             return false;
         });
-        logger.info("Game service provider ["+ NAME+"] started");
+        logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]");
     }
     @Override
     public void atMidnight(){

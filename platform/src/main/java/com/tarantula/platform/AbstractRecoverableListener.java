@@ -3,14 +3,13 @@ package com.tarantula.platform;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.RecoverableListener;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Updated by yinghu lu on 8/23/2019.
+ * Updated by yinghu lu on 12/18/2020
  */
 public abstract class AbstractRecoverableListener implements RecoverableListener {
 
@@ -22,7 +21,7 @@ public abstract class AbstractRecoverableListener implements RecoverableListener
         OnFilter onFilter = oMap.get(classId);
         if(onFilter!=null){
             Recoverable recoverable = this.create(classId);
-            recoverable.fromMap(SystemUtil.toMap(value));
+            recoverable.fromBinary((value));
             recoverable.distributionKey(key);
             onFilter.onUpdated(recoverable);
         }

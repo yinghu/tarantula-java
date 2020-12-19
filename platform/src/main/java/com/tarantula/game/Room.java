@@ -243,7 +243,6 @@ public class Room{
         return roomId.equals(((Room)obj).roomId);
     }
     public void onUpdated(String action,byte[] payload){
-        //System.out.println(action+">"+new String(payload));
         JsonObject jsonObject = new JsonParser().parse(new String(payload)).getAsJsonObject();
         if(action.equals("onStats")){
             JsonArray stats = jsonObject.getAsJsonArray("stats");
