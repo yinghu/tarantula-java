@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * updated by yinghu lu on 6/9/2020.
  */
-public class GameZoneModule implements Module,Configurable.Listener{
+public class GameZoneModule implements Module,Configurable.Listener,Connection.OnConnectionListener{
 
     private ApplicationContext context;
     private Zone mZone;
@@ -31,7 +31,9 @@ public class GameZoneModule implements Module,Configurable.Listener{
     @Override
     public void onJoin(Session session, com.icodesoftware.Module.OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp or offline play mode
-        Rating rating = this.gameServiceProvider.rating(session.systemId());
+        //this.context.log(new String(session.payload()),OnLog.WARN);
+        Rating rating = new Rating();
+        rating.fromBinary(session.payload());
         Stub stub = mStub.get(session.systemId());
         Room room =null;
         if(stub!=null){
@@ -144,6 +146,7 @@ public class GameZoneModule implements Module,Configurable.Listener{
         mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
         mZone.registerListener(this);
         deploymentServiceProvider.register(mZone);
+        this.deploymentServiceProvider.registerOnConnectionListener(this);
         context.log("Game lobby started->"+this.mZone.descriptor.tag(),OnLog.WARN);
     }
     @Override
@@ -173,8 +176,8 @@ public class GameZoneModule implements Module,Configurable.Listener{
 
     public void onUpdated(Configurable zone) {
         mZone.reset((Zone)zone);
-        this.context.log("Play mode->"+mZone.playMode,OnLog.WARN);
-        this.context.log("joinsOnStart->"+mZone.joinsOnStart,OnLog.WARN);
+        //this.context.log("Play mode->"+mZone.playMode,OnLog.WARN);
+        //this.context.log("joinsOnStart->"+mZone.joinsOnStart,OnLog.WARN);
         mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
     }
     private JsonObject toMessage(String msg,boolean successful){
@@ -187,5 +190,16 @@ public class GameZoneModule implements Module,Configurable.Listener{
         JsonParser parser = new JsonParser();
         JsonObject jo = parser.parse(new String(data)).getAsJsonObject();
         return new StatsDelta(jo.get("Name").getAsString(),jo.get("Delta").getAsDouble());
+    }
+
+    @Override
+    public String lobbyTag() {
+        return this.context.descriptor().tag();
+    }
+
+    @Override
+    public byte[] onConnection(byte[] bytes) {
+        //this.context.log(new String(bytes),OnLog.WARN);
+        return toMessage("feature disabled",false).toString().getBytes();
     }
 }

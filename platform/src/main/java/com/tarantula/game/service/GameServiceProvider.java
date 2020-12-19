@@ -36,7 +36,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private EventService publisher;
     private String dest;
     private String subscription;
-
+    private String statisticsTag;
     private ClusterProvider integrationCluster;
 
     private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
@@ -44,7 +44,12 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     public GameServiceProvider(String name){
         NAME = name;
     }
-
+    public void statisticsTag(String statTag){
+        this.statisticsTag = statTag;
+    }
+    public String statisticsTag(){
+        return statisticsTag;
+    }
     public Rating rating(String systemId){
         return rMap.computeIfAbsent(systemId,(k)->{
             Rating rating = new Rating();

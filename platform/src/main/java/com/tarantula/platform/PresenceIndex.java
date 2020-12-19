@@ -47,7 +47,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public Response onPlay(Session session,Descriptor desc){
         Response resp = null;
         if(this.transact(desc.entryCost()*(-1))){
-            fastJoin(session,desc,new byte[0]);
+            fastJoin(session,desc,session.payload());
         }
         else{
             resp = new ResponseHeader("onPlay",false,Response.INSUFFICIENT_BALANCE,"not enough balance","error");

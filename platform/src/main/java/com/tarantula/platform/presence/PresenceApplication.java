@@ -45,9 +45,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             }
         });
         this.deploymentServiceProvider.registerOnConnectionStateListener(this);
-        this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.STATISTICS_DELTA_CID,(a)->{
-            this.context.log("stats delta received",OnLog.WARN);
-        });
         this.context.log("Presence application started on ["+descriptor.tag()+"]",OnLog.INFO);
     }
 

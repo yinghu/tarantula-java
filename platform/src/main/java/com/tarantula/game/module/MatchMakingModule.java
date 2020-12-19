@@ -3,20 +3,17 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.service.DeploymentServiceProvider;
-import com.tarantula.game.GameJoinObject;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.util.ConnectionSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * updated by yinghu lu on 6/7/2020.
  */
-public class MatchMakingModule implements Module, Lobby.Listener,Connection.OnConnectionListener {
+public class MatchMakingModule implements Module, Lobby.Listener {
 
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
@@ -32,6 +29,7 @@ public class MatchMakingModule implements Module, Lobby.Listener,Connection.OnCo
             Rating rating = this.gameServiceProvider.rating(session.systemId());
             int mix = rating.rank>maxRank?maxRank:rating.rank;
             Descriptor lobby = mZone.get(mix);
+            session.payload(rating.toBinary());
             Response response = context.presence(session.systemId()).onPlay(session,lobby);
             if(response!=null){
                 session.write(this.builder.create().toJson(response).getBytes(),label());
@@ -40,11 +38,8 @@ public class MatchMakingModule implements Module, Lobby.Listener,Connection.OnCo
         else if(session.action().equals("onConnection")){
             Rating rating = this.gameServiceProvider.rating(session.systemId());
             int mix = rating.rank>maxRank?maxRank:rating.rank;
-            //Descriptor lobby = mZone.get(mix);
-            DataBuffer buffer = new DataBuffer();
-            buffer.putUTF8("test");
-            buffer.putInt(3);
-            byte[] connection = this.deploymentServiceProvider.onRemoteConnection(lobbyId,buffer.toArray());
+            Descriptor lobby = mZone.get(mix);
+            byte[] connection = this.deploymentServiceProvider.onRemoteConnection(lobbyId,lobby.tag(),rating.toBinary());
             session.write(connection,this.lobbyId);
         }
         else{
@@ -64,7 +59,7 @@ public class MatchMakingModule implements Module, Lobby.Listener,Connection.OnCo
         lobbyId = this.context.descriptor().typeId().replace("service","lobby");
         listLobby().addListener(this);
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
-        this.deploymentServiceProvider.registerOnConnectionListener(this);
+        //this.deploymentServiceProvider.registerOnConnectionListener(this);
         context.log("Started match making module on ->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 
@@ -114,20 +109,5 @@ public class MatchMakingModule implements Module, Lobby.Listener,Connection.OnCo
             context.log("Add lobby ->"+mZone.get(i).tag()+" ->rank ["+mZone.get(i).accessRank()+"]",OnLog.WARN);
         }
         return lobby;
-    }
-
-    @Override
-    public String typeId() {
-        return lobbyId;
-    }
-
-    @Override
-    public byte[] onConnection(byte[] payload) {
-        DataBuffer buffer = new DataBuffer(payload);
-        this.context.log("connection setup->"+buffer.getUTF8()+"/"+buffer.getInt(),OnLog.WARN);
-        GameJoinObject joinObject = new GameJoinObject();
-        joinObject.successful(false);
-        joinObject.message("feature disabled");
-        return joinObject.toJson().toString().getBytes();
     }
 }

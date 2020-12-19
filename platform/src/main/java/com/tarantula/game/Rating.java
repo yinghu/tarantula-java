@@ -26,7 +26,7 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
         this.label = "Rating";
     }
 
-    public void update(Stub stub,int rankUpBase,int levelUpBase){
+    public void update(Stub stub){
         if(stub.rank==0){
             return;
         }
@@ -40,13 +40,13 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
         }
         lxp += dxp;
         xp += dxp;
-        int _xpLevel = (int)lxp/levelUpBase;
+        int _xpLevel = (int)lxp/stub.levelUpBase;
         if(_xpLevel>xpLevel){
             _xpLevel = _xpLevel-xpLevel;//xplevel delta
             xpLevel = xpLevel +(_xpLevel);//
             level = level+(_xpLevel);//add level jump delta
         }
-        if(xpLevel-rankUpBase>0){//rank up if level pass the base
+        if(xpLevel-stub.rankUpBase>0){//rank up if level pass the base
             rank++;
             //reset next level from 1 - 10 and rank up again
             xpLevel = 1;

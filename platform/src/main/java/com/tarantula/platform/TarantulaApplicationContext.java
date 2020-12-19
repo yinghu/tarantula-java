@@ -190,7 +190,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public Presence presence(String systemId){ //always available on cluster scope if access is active
         return this.tarantulaContext.tokenValidatorProvider().presence(systemId);
     }
-
     public void absence(Session session){
         this.validator.offSession(session.systemId(),session.stub());
     }
@@ -207,7 +206,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
             MapStoreSyncEvent msc = (MapStoreSyncEvent)event;
             RecoverableListener rc = this.rMap.get(msc.accessMode);
             if(rc!=null){
-                rc.onUpdated(msc.stub(),msc.index,msc.payload());
+                rc.onUpdated(msc.stub(),msc.systemId,msc.index,msc.payload());
             }
             else{
                 this.application.onEvent(event);

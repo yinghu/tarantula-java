@@ -1,6 +1,7 @@
 package com.tarantula.game;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.protocol.DataBuffer;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.statistics.StatsDelta;
 
@@ -17,6 +18,8 @@ public class Stub extends RecoverableObject {
     public String arena;
     public int rank; //rank of game 1 basis
     public double pxp; //percentage of game xp 100 basis
+    public int rankUpBase;
+    public int levelUpBase;
     public StatsDelta stats;
     public Rating rating;
 
@@ -48,14 +51,21 @@ public class Stub extends RecoverableObject {
     }
 
     @Override
-    public Map<String,Object> toMap(){
-        //this.properties.put("totalJoined",totalJoined);
-        return this.properties;
+    public byte[] toBinary(){
+        DataBuffer dataBuffer = new DataBuffer();
+        dataBuffer.putInt(rank);
+        dataBuffer.putDouble(pxp);
+        dataBuffer.putInt(rankUpBase);
+        dataBuffer.putInt(levelUpBase);
+        return dataBuffer.toArray();
     }
     @Override
-    public void fromMap(Map<String,Object> properties){
-        //this.totalJoined =((Number)properties.get("totalJoined")).intValue();
-        //this.xp = ((Number)properties.get("xp")).doubleValue();
+    public void fromBinary(byte[] payload){
+        DataBuffer buffer = new DataBuffer(payload);
+        this.rank = buffer.getInt();
+        this.pxp = buffer.getDouble();
+        this.rankUpBase = buffer.getInt();
+        this.levelUpBase = buffer.getInt();
     }
     @Override
     public int getFactoryId() {

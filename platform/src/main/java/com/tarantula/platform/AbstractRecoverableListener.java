@@ -17,11 +17,12 @@ public abstract class AbstractRecoverableListener implements RecoverableListener
     private ConcurrentHashMap<Integer,OnFilter> oMap = new ConcurrentHashMap<>();
 
     @Override
-    public void onUpdated(int classId,String key, byte[] value) {
+    public void onUpdated(int classId,String owner,String key, byte[] value) {
         OnFilter onFilter = oMap.get(classId);
         if(onFilter!=null){
             Recoverable recoverable = this.create(classId);
             recoverable.fromBinary((value));
+            recoverable.owner(owner);
             recoverable.distributionKey(key);
             onFilter.onUpdated(recoverable);
         }

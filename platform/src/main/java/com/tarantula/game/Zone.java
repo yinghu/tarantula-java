@@ -374,17 +374,13 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     }
 
     public void onStatistics(String systemId,String category,double delta){
-        Statistics statistics = gameServiceProvider.statistics(systemId);
-        Statistics.Entry entry = statistics.entry(category);
-        entry.update(delta).update();
-        LeaderBoard ldb = gameServiceProvider.leaderBoard(category);
-        ldb.onAllBoard(entry);
         StatsDelta statsDelta = new StatsDelta(category,delta);
-        this.deploymentServiceProvider.registerPostOffice().onTag(Presence.LOBBY_TAG).send(systemId,statsDelta);
+        statsDelta.owner(systemId);
+        this.deploymentServiceProvider.registerPostOffice().onTag(gameServiceProvider.statisticsTag()).send(systemId,statsDelta);
     }
     public void onRating(Stub stub,int rankUpBase){
-        Rating rating = this.gameServiceProvider.rating(stub.owner());
-        rating.update(stub,rankUpBase,levelUpBase);
-        rating.update();
+        stub.rankUpBase = rankUpBase;
+        stub.levelUpBase = levelUpBase;
+        this.deploymentServiceProvider.registerPostOffice().onTag(gameServiceProvider.statisticsTag()).send(stub.owner(),stub);
     }
 }

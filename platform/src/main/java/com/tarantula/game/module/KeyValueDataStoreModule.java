@@ -8,7 +8,6 @@ import com.tarantula.game.MappingObject;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.util.ResponseSerializer;
-import com.tarantula.platform.util.SystemUtil;
 
 
 public class KeyValueDataStoreModule implements Module {
