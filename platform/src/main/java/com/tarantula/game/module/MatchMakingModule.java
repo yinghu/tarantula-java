@@ -3,7 +3,6 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.ResponseHeader;
@@ -16,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MatchMakingModule implements Module, Lobby.Listener {
 
     private ApplicationContext context;
-    private DeploymentServiceProvider deploymentServiceProvider;
     private ConcurrentHashMap<Integer,Descriptor> mZone;
     private GameServiceProvider gameServiceProvider;
     private GsonBuilder builder;
@@ -30,17 +28,11 @@ public class MatchMakingModule implements Module, Lobby.Listener {
             int mix = rating.rank>maxRank?maxRank:rating.rank;
             Descriptor lobby = mZone.get(mix);
             session.payload(rating.toBinary());
+            //this.context.log("ACCESS MODE->"+session.accessMode(),OnLog.WARN);
             Response response = context.presence(session.systemId()).onPlay(session,lobby);
             if(response!=null){
                 session.write(this.builder.create().toJson(response).getBytes(),label());
             }
-        }
-        else if(session.action().equals("onConnection")){
-            Rating rating = this.gameServiceProvider.rating(session.systemId());
-            int mix = rating.rank>maxRank?maxRank:rating.rank;
-            Descriptor lobby = mZone.get(mix);
-            this.deploymentServiceProvider.onRemoteConnection(lobbyId,lobby.tag(),rating.toBinary());
-            //session.write(connection,this.lobbyId);
         }
         else{
             throw new UnsupportedOperationException(session.action());
@@ -51,7 +43,6 @@ public class MatchMakingModule implements Module, Lobby.Listener {
     @Override
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
-        this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         mZone = new ConcurrentHashMap<>();//max matching level

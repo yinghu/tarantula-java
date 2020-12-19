@@ -36,7 +36,7 @@ public interface Session extends OnApplication {
     int FAST_PLAY_MODE = 2;
     int INVITATION_PLAY_MODE = 4;
     int OFF_LINE_MODE = 3;
-
+    int GLOBAL_PLAY_MODE = 5;
 
     String source();
     void source(String source);

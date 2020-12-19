@@ -135,65 +135,7 @@ namespace GameClustering
                 return false;
             }
         }
-
-        public async Task<bool> BlindJoin(MonoBehaviour caller)
-        {
-            return await Connect(caller);
-        }
-
-        private async Task<bool> Connect(MonoBehaviour caller)
-        {
-            try
-            {
-                var headers = new[]
-                {
-                    new Header {Name = Header.TarantulaTag, Value = typeId+"/mmk"},
-                    new Header {Name = Header.TarantulaToken, Value = Presence.Token},
-                    new Header {Name = Header.TarantulaAction, Value = "onConnection"}
-                };
-                var response = await _httpCaller.GetJson(caller, "/service/action", headers);
-                Debug.Log(response);
-                var jo = JObject.Parse(response);
-                var suc = (bool)jo.SelectToken("successful");
-                if (!suc)
-                {
-                    Exception = new Exception((string)jo.SelectToken("message"));
-                    return false;
-                }
-                Presence.Ticket = (string)jo.SelectToken("presence").SelectToken("ticket");
-                var pc = jo.SelectToken("connection");
-                var connection = new Connection
-                {
-                    ConnectionId = (int)pc.SelectToken("connectionId"),
-                    Type =  (string)pc.SelectToken("type"),
-                    Host = (string)pc.SelectToken("host"),
-                    Port = (int)pc.SelectToken("port"),
-                    Secured = (bool)pc.SelectToken("secured")
-                };    
-                
-                Connect(connection, (string) jo.SelectToken("serverKey"));
-                Room = new Room
-                {
-                    Seat = 0,
-                    Arena = "level1"
-                };
-                using (var buffer = new DataBuffer())
-                {
-                    buffer.PutInt(Presence.Stub);
-                    buffer.PutUTF8String(Presence.Login);
-                    buffer.PutUTF8String(Presence.Ticket);
-                    buffer.PutInt(Room.Seat);
-                    await Messenger.SendAsync(MessageType.Join, 0, true, buffer);
-                }
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Exception = ex;
-                return false;
-            }
-        }
-
+        
         private void Connect(Connection connection,string serverKey)
         {
             Messenger = new UdpMessenger();
@@ -285,7 +227,7 @@ namespace GameClustering
             return false;
         }
 
-        public async Task<bool> MatchJoin(MonoBehaviour caller)
+        public async Task<bool> Join(MonoBehaviour caller,bool global)
         {
             try
             {
@@ -293,6 +235,7 @@ namespace GameClustering
                 {
                     new Header {Name = Header.TarantulaTag, Value = typeId+"/mmk"},
                     new Header {Name = Header.TarantulaToken, Value = Presence.Token},
+                    new Header {Name = Header.TarantulaAccessMode,Value = global?"5":"2"},
                     new Header {Name = Header.TarantulaAction, Value = "onPlay"}
                 };
                 //var page = new Payload{Headers = new []{new Header{ Name = "page",Value = "1"}}};

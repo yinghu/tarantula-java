@@ -1,6 +1,7 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.*;
+import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.EventService;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;
@@ -13,6 +14,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     private double balance;
     private int counter;
     private EventService eventService;
+    private DeploymentServiceProvider deploymentServiceProvider;
     public PresenceIndex(double initialBalance){
         this();
         this.balance = initialBalance;
@@ -41,13 +43,17 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public void registerEventService(EventService eventService){
         this.eventService = eventService;
     }
-    public Response onPlay(Session session, Descriptor descriptor, RoutingKey routingKey){
-        return onPlay(session,descriptor);
+    public void registerDeploymentServiceProvider(DeploymentServiceProvider deploymentServiceProvider){
+        this.deploymentServiceProvider = deploymentServiceProvider;
     }
     public Response onPlay(Session session,Descriptor desc){
         Response resp = null;
         if(this.transact(desc.entryCost()*(-1))){
-            fastJoin(session,desc,session.payload());
+            if(session.accessMode()==Session.GLOBAL_PLAY_MODE){
+                this.deploymentServiceProvider.onRemoteConnection(session,desc);
+            }else{
+                fastJoin(session,desc,session.payload());
+            }
         }
         else{
             resp = new ResponseHeader("onPlay",false,Response.INSUFFICIENT_BALANCE,"not enough balance","error");
@@ -63,7 +69,6 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         fe.accessMode(session.accessMode());
         fe.balance(desc.entryCost());
         fe.ticket(session.ticket());
-        //fe.forwarding(true);
         fe.payload(payload);
         RoutingKey rk = this.eventService.routingKey(session.systemId(),desc.tag());//route to player node
         fe.destination(rk.route());//node/tag/partition

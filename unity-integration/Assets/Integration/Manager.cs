@@ -59,7 +59,7 @@ namespace Integration
                 }
             }
             _integrationManager.OnJoinedEvent += Join;
-            if (!await _integrationManager.MatchJoin(this))
+            if (!await _integrationManager.Join(this,false))
             {
                 bText.text = _integrationManager.Exception.Message;
             }
@@ -76,7 +76,7 @@ namespace Integration
                 }
             }
             _integrationManager.OnJoinedEvent += Join;
-            if (!await _integrationManager.BlindJoin(this))
+            if (!await _integrationManager.Join(this,true))
             {
                 bText.text = _integrationManager.Exception.Message;
             }

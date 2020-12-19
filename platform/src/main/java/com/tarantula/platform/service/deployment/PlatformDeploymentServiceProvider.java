@@ -73,7 +73,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private AtomicBoolean onAccessIndex;
 
-    private ConcurrentLinkedDeque<PendingServerPushMessage> pendingData;
+    private ConcurrentLinkedDeque<PendingMessage> pendingData;
     private ConcurrentHashMap<String,Connection.OnConnectionListener> cCallbacks = new ConcurrentHashMap<>();
 
     private ExecutorService udpPool;
@@ -407,11 +407,17 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 udpPool.execute(()->{
                     while (true){
                         try{
-                            PendingServerPushMessage pending = pendingData.poll();
-                            if(pending!=null){
-                                pending.ack();
-                                if(pending.retry()){
-                                    pendingData.offer(pending);
+                            PendingMessage pendingMessage = pendingData.poll();
+                            if(pendingMessage!=null){
+                                if(pendingMessage.outbound){
+                                    PendingServerPushMessage pending = pendingMessage.pendingServerPushMessage;
+                                    pending.ack();
+                                    if(pending.retry()){
+                                        pendingData.offer(pendingMessage);
+                                    }
+                                }
+                                else{
+                                    pendingMessage.runnable.run();
                                 }
                             }
                             else{
@@ -636,11 +642,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         connection.fromBinary(ret);
         return connection;
     }
-    public void onRemoteConnection(String typeId,String lobbyTag,byte[] payload){
-        this.integrationCluster.deployService().getConnection(typeId,lobbyTag,payload);
+    public void onRemoteConnection(Session session,Descriptor descriptor){
+        this.integrationCluster.deployService().getConnection(descriptor.typeId(),descriptor.tag(),session);
     }
-    public void getConnection(String lobbyTag,byte[] payload){
-        cCallbacks.get(lobbyTag).onConnection(payload);
+    public void getConnection(String lobbyTag,Session session){
+        ((Event)session).eventService(this.integrationEventService);
+        pendingData.offer(new PendingMessage(()-> cCallbacks.get(lobbyTag).onConnection(session)));
     }
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
@@ -661,7 +668,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     public <T extends OnAccess> T createGameCluster(String owner,String name){
-        return (T)this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name);
+        return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name);
     }
     public <T extends OnAccess> T gameCluster(String key){
         GameCluster gc = new GameCluster();

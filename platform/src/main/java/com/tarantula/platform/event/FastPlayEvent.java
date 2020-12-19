@@ -14,6 +14,12 @@ public class FastPlayEvent extends Data implements Event {
     public FastPlayEvent(){
 
     }
+    public FastPlayEvent(String systemId,int stub, SessionForward forward){
+        this();
+        this.systemId = systemId;
+        this.stub = stub;
+        this.forward = forward;
+    }
     public FastPlayEvent(String applicationId, SessionForward forward){
         this();
         this.applicationId = applicationId;

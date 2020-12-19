@@ -4,6 +4,9 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
+import com.icodesoftware.Session;
+import com.tarantula.platform.event.FastPlayEvent;
+import com.tarantula.platform.event.SessionForward;
 
 import java.io.IOException;
 
@@ -12,21 +15,20 @@ import java.io.IOException;
  */
 public class GetConnectionOperation extends Operation implements PartitionAwareOperation {
 
-    //private boolean result;
-    ///private byte[] connection;
     private String lobbyTag;
-    private byte[] payload;
+    private Session session;
+
     public GetConnectionOperation() {
     }
 
-    public GetConnectionOperation(String lobbyTag,byte[] payload) {
+    public GetConnectionOperation(String lobbyTag, Session session) {
         this.lobbyTag = lobbyTag;
-        this.payload = payload;
+        this.session = session;
     }
     @Override
     public void run() throws Exception {
         ClusterDeployService ais = this.getService();
-        ais.getConnection(lobbyTag,payload);
+        ais.getConnection(lobbyTag,session);
     }
 
     @Override
@@ -38,14 +40,19 @@ public class GetConnectionOperation extends Operation implements PartitionAwareO
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(lobbyTag);
-        out.writeByteArray(payload);
+        out.writeUTF(session.systemId());
+        out.writeInt(session.stub());
+        out.writeUTF(session.source());
+        out.writeUTF(session.sessionId());
+        out.writeByteArray(session.payload());
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         this.lobbyTag = in.readUTF();
-        this.payload = in.readByteArray();
+        session = new FastPlayEvent(in.readUTF(),in.readInt(),new SessionForward(in.readUTF(),in.readUTF()));
+        session.payload(in.readByteArray());
     }
 
 }

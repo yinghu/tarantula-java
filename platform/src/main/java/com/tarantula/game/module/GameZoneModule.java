@@ -198,9 +198,11 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
     }
 
     @Override
-    public void onConnection(byte[] bytes) {
-        this.context.log(new String(bytes),OnLog.WARN);
-        //join and send back
-        //toMessage("feature disabled",false).toString().getBytes();
+    public void onConnection(Session session) {
+        try{
+            this.onJoin(session,(c,l,d)->{});
+        }catch (Exception ex){
+            session.write(toMessage(ex.getMessage(),false).toString().getBytes(),label());
+        }
     }
 }

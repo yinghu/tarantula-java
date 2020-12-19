@@ -5,6 +5,7 @@ import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.InboundMessage;
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.OutboundMessage;
+import com.tarantula.platform.PendingMessage;
 import com.tarantula.platform.service.ConnectionEventService;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -27,14 +28,14 @@ public class UDPSessionService implements ConnectionEventService {
 
     private DatagramSocket datagramChannel;
     private final Connection serverConnection;
-    private final ConcurrentLinkedDeque<PendingServerPushMessage> pendingData;
+    private final ConcurrentLinkedDeque<PendingMessage> pendingData;
     private final ConcurrentHashMap<Integer,Boolean> pendingAck;
 
     private final Cipher encrypt;
     private final Cipher decrypt;
     private final AtomicInteger messageId;
 
-    public UDPSessionService(Connection connection,ConcurrentLinkedDeque<PendingServerPushMessage> pendingData,Cipher encrypt,Cipher decrypt){
+    public UDPSessionService(Connection connection, ConcurrentLinkedDeque<PendingMessage> pendingData, Cipher encrypt, Cipher decrypt){
         this.serverConnection = connection;
         this.pendingData = pendingData;
         this.encrypt = encrypt;
@@ -111,7 +112,7 @@ public class UDPSessionService implements ConnectionEventService {
         DatagramPacket data = send(payload,seq,ack,_mid,connection);
         if(ack&&data!=null){
             pendingAck.put(_mid,true);
-            pendingData.offer(new PendingServerPushMessage(this,data,_mid));
+            pendingData.offer(new PendingMessage(new PendingServerPushMessage(this,data,_mid)));
         }
     }
     private DatagramPacket send(byte[] payload,int sequence,boolean ack,int messageId,Connection connection){
