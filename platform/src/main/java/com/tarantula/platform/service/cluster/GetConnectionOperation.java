@@ -13,7 +13,7 @@ import java.io.IOException;
 public class GetConnectionOperation extends Operation implements PartitionAwareOperation {
 
     //private boolean result;
-    private byte[] connection;
+    ///private byte[] connection;
     private String lobbyTag;
     private byte[] payload;
     public GetConnectionOperation() {
@@ -26,12 +26,12 @@ public class GetConnectionOperation extends Operation implements PartitionAwareO
     @Override
     public void run() throws Exception {
         ClusterDeployService ais = this.getService();
-        connection = ais.getConnection(lobbyTag,payload);
+        ais.getConnection(lobbyTag,payload);
     }
 
     @Override
     public Object getResponse() {
-        return connection;
+        return null;
     }
 
     @Override

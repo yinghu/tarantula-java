@@ -636,11 +636,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         connection.fromBinary(ret);
         return connection;
     }
-    public byte[] onRemoteConnection(String typeId,String lobbyTag,byte[] payload){
-        return this.integrationCluster.deployService().getConnection(typeId,lobbyTag,payload);
+    public void onRemoteConnection(String typeId,String lobbyTag,byte[] payload){
+        this.integrationCluster.deployService().getConnection(typeId,lobbyTag,payload);
     }
-    public byte[] getConnection(String lobbyTag,byte[] payload){
-        return cCallbacks.get(lobbyTag).onConnection(payload);
+    public void getConnection(String lobbyTag,byte[] payload){
+        cCallbacks.get(lobbyTag).onConnection(payload);
     }
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();

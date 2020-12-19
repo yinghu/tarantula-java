@@ -1034,7 +1034,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: MatchMaking
+  m_Text: LocalJoin
 --- !u!222 &1133029070
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1240,7 +1240,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: BlindJoin
+  m_Text: GlobalJoin
 --- !u!222 &1230560611
 CanvasRenderer:
   m_ObjectHideFlags: 0

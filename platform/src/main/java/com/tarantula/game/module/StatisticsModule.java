@@ -85,6 +85,6 @@ public class StatisticsModule implements Module {
 
     @Override
     public String label() {
-        return "stats";
+        return this.context.descriptor().typeId();
     }
 }

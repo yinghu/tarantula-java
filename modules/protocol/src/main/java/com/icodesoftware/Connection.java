@@ -57,6 +57,6 @@ public interface Connection extends Recoverable {
     }
     interface OnConnectionListener{
         String lobbyTag();
-        byte[] onConnection(byte[] payload);
+        void onConnection(byte[] payload);
     }
 }

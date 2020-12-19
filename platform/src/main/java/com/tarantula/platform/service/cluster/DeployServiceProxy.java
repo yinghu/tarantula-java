@@ -399,17 +399,17 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         //return expected==0;
     }
 
-    public byte[] getConnection(String typeId,String lobbyTag,byte[] payload){
+    public void getConnection(String typeId,String lobbyTag,byte[] payload){
         NodeEngine nodeEngine = getNodeEngine();
         GetConnectionOperation operation = new GetConnectionOperation(lobbyTag,payload);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(typeId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,partitionId);
-        final Future<byte[]> future = builder.invoke();
+        final Future<Void> future = builder.invoke();
         try {
-            return future.get(5, TimeUnit.SECONDS);
+            future.get(5, TimeUnit.SECONDS);
         } catch (Exception e) {
             future.cancel(true);
-            return null;
+            //return null;
         }
     }
     public boolean upload(String fileName,byte[] content){

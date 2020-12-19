@@ -39,8 +39,8 @@ public class MatchMakingModule implements Module, Lobby.Listener {
             Rating rating = this.gameServiceProvider.rating(session.systemId());
             int mix = rating.rank>maxRank?maxRank:rating.rank;
             Descriptor lobby = mZone.get(mix);
-            byte[] connection = this.deploymentServiceProvider.onRemoteConnection(lobbyId,lobby.tag(),rating.toBinary());
-            session.write(connection,this.lobbyId);
+            this.deploymentServiceProvider.onRemoteConnection(lobbyId,lobby.tag(),rating.toBinary());
+            //session.write(connection,this.lobbyId);
         }
         else{
             throw new UnsupportedOperationException(session.action());
@@ -59,23 +59,14 @@ public class MatchMakingModule implements Module, Lobby.Listener {
         lobbyId = this.context.descriptor().typeId().replace("service","lobby");
         listLobby().addListener(this);
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
-        //this.deploymentServiceProvider.registerOnConnectionListener(this);
         context.log("Started match making module on ->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 
     @Override
     public String label() {
-        return this.lobbyId;
+        return this.context.descriptor().typeId();
     }
-    @Override
-    public void onConnection(Connection connection){
-        if(connection.disabled()){
-            this.gameServiceProvider.onClosed(connection);
-        }
-        //else {
-            //mPush.put(connection.serverId(),connection);
-        //}
-    }
+
     @Override
     public void on(Descriptor descriptor) {
         this.context.log("Lobby Updated->"+descriptor.disabled()+"//"+descriptor.accessRank(), OnLog.WARN);
