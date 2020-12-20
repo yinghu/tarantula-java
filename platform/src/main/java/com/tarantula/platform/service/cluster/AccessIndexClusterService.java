@@ -76,6 +76,13 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
     }
     public void enable(){
         this.deploymentServiceProvider.distributionCallback().startAccessIndex();
+        /**
+        for(DataStoreOnPartition ds : dataStoreOnPartitions){
+            ds.dataStore.backup().list((k,v)-> {
+                log.warn(new String(k));
+                return true;
+            });
+        }**/
     }
     public void disable(){
         this.deploymentServiceProvider.distributionCallback().stopAccessIndex();

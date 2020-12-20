@@ -584,6 +584,22 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         public byte[] get(byte[] key){
             return _get(key);
         }
+        public void list(Binary binary){
+            Cursor cursor = berkeleyStore.openCursor(null,null);
+            DatabaseEntry _key = new DatabaseEntry();
+            DatabaseEntry _value = new DatabaseEntry();
+            try{
+                while (cursor.getNext(_key, _value,LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+                    if(!binary.on(_key.getData(),_value.getData())){
+                        break;
+                    }
+                }
+            } catch (Exception ex) {
+                log.error("",ex);
+            } finally {
+                cursor.close();
+            }
+        }
         @Override
         public <T extends Recoverable> List<T> list(RecoverableFactory<T> query) {
             throw new UnsupportedOperationException();

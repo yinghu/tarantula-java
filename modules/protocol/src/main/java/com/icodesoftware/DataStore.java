@@ -35,6 +35,7 @@ public interface DataStore {
     interface Backup{
         void set(byte[] key,byte[] value);
         byte[] get(byte[] key);
+        void list(Binary binary);
     }
 
     interface Listener{
@@ -44,6 +45,9 @@ public interface DataStore {
 
     interface Stream<T extends Recoverable>{
         boolean on(T t);
+    }
+    interface Binary{
+        boolean on(byte[] key,byte[] value);
     }
 
     interface Updatable{

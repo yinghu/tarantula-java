@@ -4,9 +4,7 @@ import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.TarantulaLogger;
-import com.sleepycat.je.Database;
-import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.OperationStatus;
+import com.sleepycat.je.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.IndexSet;
 
@@ -285,6 +283,24 @@ public class PartitionDataStore extends ReplicatedDataStore{
     public byte[] get(byte[] key){
         int pt = SystemUtil.partition(key,partition);
         return _get(this.partitions[pt],key);
+    }
+    public void list(Binary binary){
+        for(DataStoreOnPartition dso : partitions){
+            Cursor cursor = dso.database.openCursor(null,null);
+            DatabaseEntry _key = new DatabaseEntry();
+            DatabaseEntry _value = new DatabaseEntry();
+            try{
+                while (cursor.getNext(_key, _value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+                    if(!binary.on(_key.getData(),_value.getData())){
+                        break;
+                    }
+                }
+            } catch (Exception ex) {
+                log.error("",ex);
+            } finally {
+                cursor.close();
+            }
+        }
     }
     @Override
     public <T extends Recoverable> List<T> list(RecoverableFactory<T> query) {

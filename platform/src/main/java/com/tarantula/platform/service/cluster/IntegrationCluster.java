@@ -90,7 +90,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             EventSubscriptionWorker ese = new EventSubscriptionWorker(this,eventSubscribers,replicationQueue);
             this.inboundEventPool.execute(ese);
         }
-        //config.getCPSubsystemConfig().setCPMemberCount(3);
         config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         this.config.getListenerConfigs().add(new ListenerConfig(this));
         _cluster = Hazelcast.newHazelcastInstance(this.config);
