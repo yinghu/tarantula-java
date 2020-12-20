@@ -53,7 +53,6 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
             lxp = 0;
         }
     }
-
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",rank);

@@ -74,6 +74,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         fe.destination(rk.route());//node/tag/partition
         this.eventService.publish(fe);
     }
+    /**
     public Response onPlay(Session session,OnAccess onAccess,Descriptor desc){
         Response resp = null;
         if(this.transact(desc.entryCost() * (-1))){
@@ -104,10 +105,10 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         }
         return resp;
     }
-
     private int partitionFromInstanceId(String tid){
         return Integer.parseInt(tid.substring(tid.lastIndexOf(Recoverable.PATH_SEPARATOR)+1));
     }
+     **/
     @Override
     public int getFactoryId() {
         return PresencePortableRegistry.OID;

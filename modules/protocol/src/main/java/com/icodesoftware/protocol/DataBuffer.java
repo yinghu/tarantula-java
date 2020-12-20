@@ -12,6 +12,10 @@ public class DataBuffer {
         byteBuffer = ByteBuffer.allocate(OutboundMessage.MESSAGE_SIZE- InboundMessage.PAYLOAD_POS);
         this.writeMode = true;
     }
+    public DataBuffer(int size){
+        byteBuffer = ByteBuffer.allocate(size);
+        this.writeMode = true;
+    }
     public DataBuffer(byte[] payload){
         byteBuffer = ByteBuffer.wrap(payload);
     }
