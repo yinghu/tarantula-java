@@ -24,6 +24,15 @@ public class Email {
         rq.offer(r2);
         rq.remove(r1);
         System.out.println(rq.poll().roomId);
+
+        byte[][] b = new byte[2][];
+        b[0]="1".getBytes();
+        b[1]="2".getBytes();
+        //b[3]="3".getBytes();
+
+        for(byte[] v : b){
+            System.out.println(new String(v));
+        }
     }
     public static boolean send(String to,String text){
 

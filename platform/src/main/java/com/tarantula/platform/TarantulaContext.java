@@ -53,6 +53,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     public AtomicBoolean node_started;
 
+    public static CountDownLatch _syc_finished;
+
 
 	private static final String CONFIG_DATA = "hazelcast-bucket.xml";
     private static final String CONFIG_INTEGRATION = "hazelcast-integration.xml";
@@ -148,6 +150,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         _storageStarted = new CountDownLatch(1);
         _deployServiceStarted = new CountDownLatch(2);
         _systemServiceStarted = new CountDownLatch(1);
+        _syc_finished = new CountDownLatch(1);
         node_started = new AtomicBoolean(false);
 
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
@@ -482,6 +485,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         });
     }
     public void _registerNode(){
+ 	    log.warn("SYNC->"+this.accessIndexService().syncStart());
+ 	    try{_syc_finished.await();}catch (Exception ex){}
         AccessIndex bid = this.accessIndexService().get(node.bucketName);
         if(bid==null){
             bid = this.accessIndexService().set(node.bucketName);
