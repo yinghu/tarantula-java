@@ -102,14 +102,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.subscribe(this.memberId,this);
         this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);
         this.recoverService = this._cluster.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
-        //this.tarantulaContext.tarantulaCluster().subscribe(this.memberId,this);
         new ServiceBootstrap(this.tarantulaContext._deployServiceStarted,this.tarantulaContext._storageStarted,new StorageServiceBootstrap(this.tarantulaContext),"data-store-starter",true).start();
         new ServiceBootstrap(this.tarantulaContext._storageStarted,this.tarantulaContext._systemServiceStarted,new SystemServiceBootstrap(this.tarantulaContext),"system-service-starter",true).start();
         this.metricsListener = (k,v)->{};
-        //_start.set(true);
-        //for(PartitionState p: partitionStates){
-            //this.tarantulaContext.dataStoreProvider().onBucket(p.partition,p.opening?BucketReceiver.OPEN:BucketReceiver.CLOSE);
-        //}
     }
     public void shutdown() throws Exception {
         try{

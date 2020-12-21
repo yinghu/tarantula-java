@@ -1,6 +1,5 @@
 package com.tarantula.platform.service.cluster;
 
-
 import java.util.*;
 
 import com.hazelcast.config.Config;
@@ -15,16 +14,12 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.util.SystemUtil;
 
-
-
 public class TarantulaCluster extends TarantulaApplicationHeader implements ClusterProvider, EventService,LifecycleListener{
 
     private static JDKLogger log = JDKLogger.getLogger(TarantulaCluster.class);
     private final Config config;
 	private HazelcastInstance _hazel;
 	private final TarantulaContext _tarantulaContext;
-
-    //private int partitionCount;
 
     private String bucket;
     private final String INDEX_MAP = "tarantula.recoverable.index.Key";
