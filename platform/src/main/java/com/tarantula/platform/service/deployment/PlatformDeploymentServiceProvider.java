@@ -724,10 +724,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void startAccessIndex(){
         onAccessIndex.set(true);
         aListeners.forEach((a)->a.onStart());
-        this.tarantulaContext.masterDataStore().backup().list((k,v)->{
-            log.warn(new String(k));
-            return true;
-        });
     }
     public void registerAccessIndexListener(AccessIndexService.Listener listener){
         if(onAccessIndex.get()){
