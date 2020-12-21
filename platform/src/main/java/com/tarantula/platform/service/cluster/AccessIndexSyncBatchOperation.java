@@ -3,6 +3,7 @@ package com.tarantula.platform.service.cluster;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
+import com.tarantula.platform.service.ReplicationData;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -29,9 +30,11 @@ public class AccessIndexSyncBatchOperation extends Operation {
     @Override
     public void run() throws Exception {
         AccessIndexClusterService cds = this.getService();
+        ReplicationData[] data = new ReplicationData[length];
         for(int i=0;i<length;i++){
-            cds.replicate(cds.getPartitionId(keys[i]),keys[i],values[i]);
+            data[i]=new ReplicationData(keys[i],values[i]);
         }
+        cds.replicateAsBatch(data);
     }
 
     @Override

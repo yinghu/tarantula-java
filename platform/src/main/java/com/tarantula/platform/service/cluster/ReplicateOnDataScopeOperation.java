@@ -3,7 +3,6 @@ package com.tarantula.platform.service.cluster;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
-import com.tarantula.platform.service.ReplicationData;
 
 import java.io.IOException;
 
@@ -12,24 +11,27 @@ import java.io.IOException;
  */
 public class ReplicateOnDataScopeOperation extends Operation {
 
+    private String source;
+    private int partition;
+    private byte[] key;
+    private byte[] value;
 
-
-    private ReplicationData[] batch;
 
     public ReplicateOnDataScopeOperation() {
     }
 
 
     public ReplicateOnDataScopeOperation(String source,int partition, byte[] key, byte[] value) {
-        this.batch = new ReplicationData[]{new ReplicationData(source,partition,key,value)};
+        this.source = source;
+        this.partition = partition;
+        this.key = key;
+        this.value = value;
     }
-    public ReplicateOnDataScopeOperation(ReplicationData[] batch) {
-        this.batch = batch;
-    }
+
     @Override
     public void run() throws Exception {
         ClusterRecoverService cis = this.getService();
-        cis.replicateAsBatch(batch);
+        cis.replicate(source,partition,key,value);
     }
 
     @Override
@@ -40,21 +42,18 @@ public class ReplicateOnDataScopeOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeInt(batch.length);
-        for(ReplicationData d : batch){
-            out.writeUTF(d.source);
-            out.writeInt(d.partition);
-            out.writeByteArray(d.key);
-            out.writeByteArray(d.value);
-        }
+        out.writeUTF(source);
+        out.writeInt(partition);
+        out.writeByteArray(key);
+        out.writeByteArray(value);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        batch = new ReplicationData[in.readInt()];
-        for(int i=0;i<batch.length;i++){
-            batch[i]=new ReplicationData(in.readUTF(),in.readInt(),in.readByteArray(),in.readByteArray());
-        }
+        source = in.readUTF();
+        partition = in.readInt();
+        key = in.readByteArray();
+        value = in.readByteArray();
     }
 }

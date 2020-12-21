@@ -94,7 +94,6 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
             byte[][] values = new byte[10][];
             for(DataStoreOnPartition ds : dataStoreOnPartitions){
                 ds.dataStore.backup().list((k,v)-> {
-                    log.warn("key=>"+new String(k)+"<><><>"+ds.partition);
                     if(batch[0] == 10){
                         log.warn("Batch->"+batch[0]);
                         this.tarantulaContext.accessIndexService().sync(10,keys,values,memberId);
@@ -129,18 +128,20 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
         int partition = this.nodeEngine.getPartitionService().getPartitionId(accessKey);
         return this.dataStoreOnPartitions[partition];
     }
-    public int getPartitionId(byte[] key){
+    private int getPartitionId(byte[] key){
         return this.nodeEngine.getPartitionService().getPartitionId(key);
     }
     public void replicate(int partition,byte[] key,byte[] value){
-        log.warn("Replicating ["+new String(key)+"]->"+partition+"<><><>"+new String(value));
-        //this.dataStoreOnPartitions[partition].dataStore.backup().set(key,value);
+        //log.warn("Replicating ["+new String(key)+"]->"+partition+"<><><>"+new String(value));
+        this.dataStoreOnPartitions[partition].dataStore.backup().set(key,value);
     }
     public void syncEnd(){
         TarantulaContext._syc_finished.countDown();
     }
     public void replicateAsBatch(ReplicationData[] batch){
+        log.warn("Batch size->"+batch.length);
         for(ReplicationData d : batch){
+            d.partition = getPartitionId(d.key);
             replicate(d.partition,d.key,d.value);
         }
     }

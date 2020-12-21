@@ -21,7 +21,7 @@ public interface AccessIndexService extends ServiceProvider {
     byte[] recover(int partition,byte[] key);
 
     int syncStart();
-    void sync(int partition,byte[][] keys,byte[][] values,String memberId);
+    void sync(int size,byte[][] keys,byte[][] values,String memberId);
     void syncEnd(String memberId);
 
     interface Listener{

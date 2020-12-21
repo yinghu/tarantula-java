@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.HttpCaller;
 
-import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -108,7 +107,7 @@ public class SampleLoad {
 
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.234:8090",null,50000);
+        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.234:8090",null,5000);
         sampleLoad._init();
         sampleLoad.register();
     }
