@@ -87,6 +87,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     public int retries; //event retries
     public long retryInterval; //event retry interval time
+    public int recoverBatchSize = 10;
 
     public int operationRetries;
     public long operationRejectInterval;
@@ -150,7 +151,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         _storageStarted = new CountDownLatch(1);
         _deployServiceStarted = new CountDownLatch(2);
         _systemServiceStarted = new CountDownLatch(1);
-        _syc_finished = new CountDownLatch(1);
         node_started = new AtomicBoolean(false);
 
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
@@ -485,8 +485,11 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         });
     }
     public void _registerNode(){
- 	    log.warn("SYNC->"+this.accessIndexService().syncStart());
- 	    try{_syc_finished.await();}catch (Exception ex){}
+ 	    _syc_finished = new CountDownLatch(2);
+ 	    this.accessIndexService().syncStart();
+        this.integrationCluster.recoverService().syncStart(dataStoreMaster);
+        log.warn("Waiting for data sync from access index and "+dataStoreMaster);
+        try{_syc_finished.await();}catch (Exception ex){}
         AccessIndex bid = this.accessIndexService().get(node.bucketName);
         if(bid==null){
             bid = this.accessIndexService().set(node.bucketName);

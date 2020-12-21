@@ -5,6 +5,7 @@ import com.hazelcast.spi.AbstractDistributedObject;
 
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
+import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
 
@@ -100,6 +101,40 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                     //goes to next node if failed
                 }
             }
+        }
+    }
+    public int syncStart(String source){
+        NodeEngine nodeEngine = getNodeEngine();
+        DataStoreSyncStartOperation operation = new DataStoreSyncStartOperation(nodeEngine.getLocalMember().getUuid(),source);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<Integer> future = builder.invoke();
+            return future.get(5,TimeUnit.SECONDS); //retry if timeout
+        } catch (Exception e) {
+            //throw ExceptionUtil.rethrow(e);
+            return 0;
+        }
+    }
+    public void sync(int partition,byte[][] keys,byte[][] values,String memberId,String source){
+        NodeEngine nodeEngine = getNodeEngine();
+        DataStoreSyncBatchOperation operation = new DataStoreSyncBatchOperation(partition,keys,values,source);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
+        try {
+            final Future<Void> future = builder.invoke();
+            future.get(5,TimeUnit.SECONDS); //retry if timeout
+        } catch (Exception e) {
+            //throw ExceptionUtil.rethrow(e);
+        }
+    }
+    public void syncEnd(String memberId){
+        NodeEngine nodeEngine = getNodeEngine();
+        DataStoreSyncEndOperation operation = new DataStoreSyncEndOperation();
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
+        try {
+            final Future<Void> future = builder.invoke();
+            future.get(5,TimeUnit.SECONDS); //retry if timeout
+        } catch (Exception e) {
+            //throw ExceptionUtil.rethrow(e);
         }
     }
 }

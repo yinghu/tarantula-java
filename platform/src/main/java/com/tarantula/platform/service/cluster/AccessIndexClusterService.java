@@ -77,12 +77,6 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
     }
     public void enable(){
         this.deploymentServiceProvider.distributionCallback().startAccessIndex();
-        //for(DataStoreOnPartition ds : dataStoreOnPartitions){
-            //ds.dataStore.backup().list((k,v)-> {
-                //log.warn(new String(k));
-                //return true;
-            //});
-        //}
     }
     public void disable(){
         this.deploymentServiceProvider.distributionCallback().stopAccessIndex();
@@ -90,12 +84,11 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
     public int sync(String memberId){
         new Thread(()->{
             int[] batch = {0};
-            byte[][] keys = new byte[10][];
-            byte[][] values = new byte[10][];
+            byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
+            byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
             for(DataStoreOnPartition ds : dataStoreOnPartitions){
                 ds.dataStore.backup().list((k,v)-> {
-                    if(batch[0] == 10){
-                        log.warn("Batch->"+batch[0]);
+                    if(batch[0] == tarantulaContext.recoverBatchSize){
                         this.tarantulaContext.accessIndexService().sync(10,keys,values,memberId);
                         batch[0] = 0;
                     }
@@ -105,7 +98,6 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
                     return true;
                 });
             }
-            log.warn("Last batch->"+batch[0]);
             //last batch
             this.tarantulaContext.accessIndexService().sync(batch[0],keys,values,memberId);
             this.tarantulaContext.accessIndexService().syncEnd(memberId);
@@ -139,7 +131,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
         TarantulaContext._syc_finished.countDown();
     }
     public void replicateAsBatch(ReplicationData[] batch){
-        log.warn("Batch size->"+batch.length);
+        //log.warn("Batch size->"+batch.length);
         for(ReplicationData d : batch){
             d.partition = getPartitionId(d.key);
             replicate(d.partition,d.key,d.value);

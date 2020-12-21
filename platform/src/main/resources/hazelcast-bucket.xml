@@ -55,6 +55,9 @@
         <service enabled="true">
             <name>RecoverService</name>
             <class-name>com.tarantula.platform.service.cluster.ClusterRecoverService</class-name>
+            <properties>
+                <property name="tarantula-scope">1</property>
+            </properties>
         </service>
     </services>
     <partition-group enabled="true" group-type="HOST_AWARE" />
