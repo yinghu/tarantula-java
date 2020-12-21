@@ -83,23 +83,25 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
     }
     public int sync(String memberId){
         new Thread(()->{
-            int[] batch = {0};
-            byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
-            byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
-            for(DataStoreOnPartition ds : dataStoreOnPartitions){
-                ds.dataStore.backup().list((k,v)-> {
-                    if(batch[0] == tarantulaContext.recoverBatchSize){
-                        this.tarantulaContext.accessIndexService().sync(10,keys,values,memberId);
-                        batch[0] = 0;
-                    }
-                    keys[batch[0]]=k;
-                    values[batch[0]]=v;
-                    batch[0]++;
-                    return true;
-                });
+            if(!memberId.equals(nodeEngine.getLocalMember().getUuid())){
+                int[] batch = {0};
+                byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
+                byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
+                for(DataStoreOnPartition ds : dataStoreOnPartitions){
+                    ds.dataStore.backup().list((k,v)-> {
+                        if(batch[0] == tarantulaContext.recoverBatchSize){
+                            this.tarantulaContext.accessIndexService().sync(10,keys,values,memberId);
+                            batch[0] = 0;
+                        }
+                        keys[batch[0]]=k;
+                        values[batch[0]]=v;
+                        batch[0]++;
+                        return true;
+                    });
+                }
+                //last batch
+                this.tarantulaContext.accessIndexService().sync(batch[0],keys,values,memberId);
             }
-            //last batch
-            this.tarantulaContext.accessIndexService().sync(batch[0],keys,values,memberId);
             this.tarantulaContext.accessIndexService().syncEnd(memberId);
         }).start();
         return nodeEngine.getPartitionService().getPartitionCount();

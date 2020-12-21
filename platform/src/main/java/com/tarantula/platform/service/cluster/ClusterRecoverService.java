@@ -56,21 +56,23 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     public int syncStart(String memberId,String source){
         RecoverService recoverService = scope==1?tarantulaContext.tarantulaCluster().recoverService():tarantulaContext.integrationCluster().recoverService();
         new Thread(()->{
-            int[] batch={0};
-            byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
-            byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
-            this.tarantulaContext.dataStore(source,this.tarantulaContext.partitionNumber()).backup().list((k,v)->{
-                if(batch[0] == tarantulaContext.recoverBatchSize){
-                    recoverService.sync(batch[0],keys,values,memberId,source);
-                    batch[0] = 0;
-                }
-                keys[batch[0]]=k;
-                values[batch[0]]=v;
-                batch[0]++;
-                return true;
-            });
-            //last batch
-            recoverService.sync(batch[0],keys,values,memberId,source);
+            if(!memberId.equals(nodeEngine.getLocalMember().getUuid())){
+                int[] batch={0};
+                byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
+                byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
+                this.tarantulaContext.dataStore(source,this.tarantulaContext.partitionNumber()).backup().list((k,v)->{
+                    if(batch[0] == tarantulaContext.recoverBatchSize){
+                        recoverService.sync(batch[0],keys,values,memberId,source);
+                        batch[0] = 0;
+                    }
+                    keys[batch[0]]=k;
+                    values[batch[0]]=v;
+                    batch[0]++;
+                    return true;
+                });
+                //last batch
+                recoverService.sync(batch[0],keys,values,memberId,source);
+            }
             recoverService.syncEnd(memberId);
         }).start();
         return this.tarantulaContext.partitionNumber();

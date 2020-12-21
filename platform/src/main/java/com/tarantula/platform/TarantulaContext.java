@@ -106,7 +106,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     public String dataStoreDir;
 
-    public int bootstrapRetries = 1 ;
     public String dataStoreMaster;
 
     public boolean dataStoreDailyBackup;
