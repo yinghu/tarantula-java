@@ -302,6 +302,39 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
         }
     }
+    public void list(RecoverableFactory<Recoverable> query,Binary binary){
+        try {
+            String akey = (query.distributionKey() + Recoverable.PATH_SEPARATOR + query.label());
+            byte[] owner = akey.getBytes();
+            DataStoreOnPartition dso = partitions[SystemUtil.partition(owner,partition)];
+            byte[] edgeList;
+            if((edgeList=_get(dso,owner))==null){//from local
+                edgeList = mapStoreListener.onRecovering(dso.metadata,owner);//from cluster
+                if(edgeList==null){
+                    return;
+                }
+            }
+            IndexSet indexSet = new IndexSet();
+            indexSet.fromBinary(edgeList);//fromMap(SystemUtil.toMap(edgeList));
+            for(String b: indexSet.keySet){
+                byte[] v;
+                byte[] ka = b.getBytes();
+                DataStoreOnPartition dwso = partitions[SystemUtil.partition(ka,partition)];
+                if((v=_get(dwso,ka))==null){//from local
+                    if((v = mapStoreListener.onRecovering(dwso.metadata,ka))!=null){//from cluster
+                        _put(dwso,ka,v);//set local
+                    }
+                }
+                if(v!=null){
+                    if(!binary.on(ka,v)){
+                        break;
+                    }
+                }
+            }
+        }catch (Exception ex){
+            log.error("Error on list",ex);
+        }
+    }
     @Override
     public <T extends Recoverable> List<T> list(RecoverableFactory<T> query) {
         List<T> alist = new ArrayList<>();

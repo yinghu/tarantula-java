@@ -36,6 +36,7 @@ public interface DataStore {
         void set(byte[] key,byte[] value);
         byte[] get(byte[] key);
         void list(Binary binary);
+        void list(RecoverableFactory<Recoverable> query,Binary binary);
     }
 
     interface Listener{

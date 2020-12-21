@@ -11,6 +11,9 @@ public interface DeployService extends ServiceProvider {
 
     Batch query(String batchId,int count);
 
+
+
+
     boolean addLobby(Descriptor lobby);
     boolean addView(OnView onView);
 
@@ -49,7 +52,5 @@ public interface DeployService extends ServiceProvider {
     boolean updateModule(Descriptor descriptor);
 
     boolean sync(String key);
-    byte[] load(String dataSource,byte[] key);
-
 
 }

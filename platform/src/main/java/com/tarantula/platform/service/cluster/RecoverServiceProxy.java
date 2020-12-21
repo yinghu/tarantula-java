@@ -5,7 +5,7 @@ import com.hazelcast.spi.AbstractDistributedObject;
 
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
-import com.icodesoftware.service.AccessIndexService;
+import com.hazelcast.util.ExceptionUtil;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
 
@@ -56,7 +56,50 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     public void shutdown() throws Exception {
 
     }
-
+    public boolean queryStart(String source,String dataStore,int factoryId,int classId,String[] params){
+        NodeEngine nodeEngine = getNodeEngine();
+        DataStoreQueryStartOperation operation = new DataStoreQueryStartOperation(nodeEngine.getLocalMember().getUuid(),source,dataStore,factoryId,classId,params);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<Boolean> future = builder.invoke();
+            return future.get(); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
+    public void query(String memberId,String source,byte[] key,byte[] value){
+        NodeEngine nodeEngine = getNodeEngine();
+        DataStoreQueryStreamOperation operation = new DataStoreQueryStreamOperation(source,key,value);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
+        try {
+            final Future<Void> future = builder.invoke();
+            future.get(5,TimeUnit.SECONDS); //retry if timeout
+        } catch (Exception e) {
+            //throw ExceptionUtil.rethrow(e);
+        }
+    }
+    public void queryEnd(String memberId,String source){
+        NodeEngine nodeEngine = getNodeEngine();
+        DataStoreQueryEndOperation operation = new DataStoreQueryEndOperation(source);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
+        try {
+            final Future<Void> future = builder.invoke();
+            future.get(5,TimeUnit.SECONDS); //retry if timeout
+        } catch (Exception e) {
+            //throw ExceptionUtil.rethrow(e);
+        }
+    }
+    public byte[] load(String dataSource,byte[] key){
+        NodeEngine nodeEngine = getNodeEngine();
+        LoadOperation operation = new LoadOperation(dataSource,key);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<byte[]> future = builder.invoke();
+            return future.get(); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
     @Override
     public byte[] recover(String source, byte[] key) {
         NodeEngine nodeEngine = getNodeEngine();

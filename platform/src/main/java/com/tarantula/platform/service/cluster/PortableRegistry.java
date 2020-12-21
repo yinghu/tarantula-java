@@ -1,10 +1,13 @@
 package com.tarantula.platform.service.cluster;
 
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.RecoverableFactory;
+import com.icodesoftware.RecoverableRegistry;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.event.SessionForward;
 import com.tarantula.platform.service.AccessKey;
+import com.tarantula.platform.service.deployment.LobbyQuery;
 import com.tarantula.platform.service.persistence.*;
 
 public class PortableRegistry extends AbstractRecoverableListener{
@@ -125,5 +128,14 @@ public class PortableRegistry extends AbstractRecoverableListener{
     @Override
     public int registryId() {
         return OID;
+    }
+    public <T extends Recoverable> RecoverableFactory<T> query(int registerId, String[] params){
+        RecoverableFactory<T> _fac = null;
+        switch (registerId){
+            case LOBBY_CID:
+                _fac = (RecoverableFactory<T>) new LobbyQuery(params[0]);
+                break;
+        }
+        return _fac;
     }
 }

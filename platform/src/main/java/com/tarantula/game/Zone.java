@@ -8,6 +8,7 @@ import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.AssociateKey;
@@ -355,16 +356,16 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         this.listener = listener;
     }
     public void update(ServiceContext serviceContext){
-        DeployService deployService = serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService();
+        RecoverService deployService = serviceContext.clusterProvider(Distributable.DATA_SCOPE).recoverService();
         Zone zone = new Zone();
         zone.distributionKey(descriptor.distributionKey());
         byte[] _data = deployService.load(this.dataStore.name(),zone.distributionKey().getBytes());
-        zone.fromMap(SystemUtil.toMap(_data));
+        zone.fromBinary(_data);
         for(int i=1;i<descriptor.capacity()+1;i++){
             Arena a = new Arena(zone.bucket(),zone.oid(),i);
             _data = deployService.load(dataStore.name(),a.distributionKey().getBytes());
             if(_data!=null){
-                a.fromMap(SystemUtil.toMap(_data));
+                a.fromBinary(_data);
                 if(!a.disabled()){//skip disabled
                     zone.arenas.add(a);
                 }

@@ -5,6 +5,7 @@ import com.icodesoftware.Distributable;
 import com.icodesoftware.Property;
 import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.util.SystemUtil;
@@ -81,9 +82,9 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
     }
     @Override
     public void update(ServiceContext serviceContext){
-        DeployService rsp = serviceContext.clusterProvider(Distributable.DATA_SCOPE).deployService();
+        RecoverService rsp = serviceContext.clusterProvider(Distributable.DATA_SCOPE).recoverService();
         byte[] _data = rsp.load(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.distributionKey().getBytes());
-        this.fromMap(SystemUtil.toMap(_data));
-        this._listeners.forEach((a)->{a.onUpdated(this);});
+        this.fromBinary((_data));
+        this._listeners.forEach((a)->a.onUpdated(this));
     }
 }

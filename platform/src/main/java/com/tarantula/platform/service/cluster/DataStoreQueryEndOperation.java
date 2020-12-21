@@ -7,42 +7,39 @@ import com.hazelcast.spi.Operation;
 import java.io.IOException;
 
 /**
- * updated by yinghu lu on 7/10/2020.
+ * created by yinghu lu on 5/15/2020.
  */
-public class LoadOperation extends Operation {
+public class DataStoreQueryEndOperation extends Operation {
 
     private String source;
-    private byte[] key;
-    private byte[] value;
 
-    public LoadOperation() {
+    public DataStoreQueryEndOperation() {
     }
-    public LoadOperation(String source, byte[] key) {
+
+
+    public DataStoreQueryEndOperation(String source) {
         this.source = source;
-        this.key = key;
     }
     @Override
     public void run() throws Exception {
-        ClusterRecoverService cis = this.getService();
-        value = cis.load(source,key);
+        ClusterRecoverService cds = this.getService();
+        cds.queryEnd(source);
     }
 
     @Override
     public Object getResponse() {
-        return this.value;
+        return null;
     }
 
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeUTF(this.source);
-        out.writeByteArray(key);
+        out.writeUTF(source);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         this.source = in.readUTF();
-        this.key = in.readByteArray();
     }
 }

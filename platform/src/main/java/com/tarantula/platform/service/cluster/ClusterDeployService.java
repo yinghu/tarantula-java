@@ -592,7 +592,4 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void sync(String key){
         this.deploymentServiceProvider.distributionCallback().syncKey(key);
     }
-    public byte[] load(String source,byte[] key){
-        return this.tarantulaContext.dataStore(source,tarantulaContext.partitionNumber()).backup().get(key);
-    }
 }

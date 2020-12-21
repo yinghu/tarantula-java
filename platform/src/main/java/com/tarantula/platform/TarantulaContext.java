@@ -434,7 +434,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public <T extends Recoverable> T query(String key,T t){
         Batch batch = this.tarantulaCluster.deployService().query(t.getClassId(),new String[]{key});
         if(batch.size()>0){
-            t.fromMap(SystemUtil.toMap(batch.payload()));
+            t.fromBinary(batch.payload());
             t.distributionKey(batch.batchKey());
         }
         return t;
@@ -451,7 +451,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             for(int i=batch.count()+1;i<batch.size();i++){
                 Batch bx = this.tarantulaCluster.deployService().query(batch.batchId(),i);
                 T scx = factory.create();
-                scx.fromMap(SystemUtil.toMap(bx.payload()));
+                scx.fromBinary(bx.payload());
                 scx.distributionKey(bx.batchKey());
                 _slist.add(scx);
                 scx.owner(factory.distributionKey());
@@ -509,7 +509,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         this.integrationCluster.registerMetricsListener(this);
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
-
     }
     public boolean deployServiceProvider(ServiceProvider serviceProvider){
         try{

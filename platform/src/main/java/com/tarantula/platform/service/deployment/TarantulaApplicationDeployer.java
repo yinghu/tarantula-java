@@ -4,6 +4,7 @@ import java.util.*;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.Serviceable;
 import com.tarantula.platform.*;
+import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class TarantulaApplicationDeployer implements Serviceable {
 
@@ -33,6 +34,12 @@ public class TarantulaApplicationDeployer implements Serviceable {
 			OnLobby _ob = this.context.configure(c);
 			this.context.deploymentService().register(_ob);
 		}
+		String callId = this.context.deploymentService().distributionCallback().registerQueryCallback((k,v)->{
+			System.out.println(new String(k));
+		},()->{
+			System.out.println("end query");
+		});
+		this.context.tarantulaCluster().recoverService().queryStart(callId,context.dataStoreMaster, PortableRegistry.OID,PortableRegistry.LOBBY_CID,new String[]{bucketId});
 	}
 
 	public void shutdown() throws Exception {

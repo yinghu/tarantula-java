@@ -75,7 +75,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private ConcurrentLinkedDeque<PendingMessage> pendingData;
     private ConcurrentHashMap<String,Connection.OnConnectionListener> cCallbacks = new ConcurrentHashMap<>();
-
+    private ConcurrentHashMap<String,QueryCallbacks> qCallbacks = new ConcurrentHashMap<>();
     private ExecutorService udpPool;
     private int workSize;
     private long metricsFreshRate;
@@ -791,6 +791,17 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             Configurable configurable = vMap.get(key);
             configurable.update(new ServiceContextProxy(this.tarantulaContext));
         }
+    }
+    public String registerQueryCallback(RecoverService.QueryCallback queryCallback, RecoverService.QueryEndCallback queryEndCallback){
+        String callId = UUID.randomUUID().toString();
+        qCallbacks.put(callId,new QueryCallbacks(queryCallback,queryEndCallback));
+        return callId;
+    }
+    public RecoverService.QueryCallback queryCallback(String source){
+        return qCallbacks.get(source).queryCallback;
+    }
+    public RecoverService.QueryEndCallback queryEndCallback(String source){
+        return qCallbacks.get(source).queryEndCallback;
     }
     private class PostOfficeSession implements PostOffice{
 

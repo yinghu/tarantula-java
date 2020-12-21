@@ -4,7 +4,9 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
+import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.RecoverService;
 import com.tarantula.platform.service.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
@@ -17,12 +19,14 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
 
     private NodeEngine nodeEngine;
     private TarantulaContext tarantulaContext;
+    private DeploymentServiceProvider deploymentServiceProvider;
     private int scope;
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.nodeEngine = nodeEngine;
         this.scope = Integer.parseInt(properties.getProperty("tarantula-scope"));
         tarantulaContext = TarantulaContext.getInstance();
+        deploymentServiceProvider = tarantulaContext.deploymentService();
         log.warn("Cluster Recover Service Started on scope ["+scope+"]");
     }
 
@@ -84,5 +88,24 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     }
     public void syncEnd(){
         TarantulaContext._syc_finished.countDown();
+    }
+
+    public boolean queryStart(String memberId,String source,String dataStore,int factoryId,int classId,String[] params){
+        RecoverableFactory fac = this.tarantulaContext.recoverableRegistry(factoryId).query(classId,params);
+        RecoverService recoverService = scope==1?tarantulaContext.tarantulaCluster().recoverService():tarantulaContext.integrationCluster().recoverService();
+        new Thread(()->{
+            this.tarantulaContext.dataStore(dataStore,tarantulaContext.partitionNumber()).backup().list(fac,(k,v)->{
+                recoverService.query(memberId,source,k,v);
+                return true;
+            });
+            recoverService.queryEnd(memberId,source);
+        }).start();
+        return fac!=null;
+    }
+    public void query(String source,byte[] key,byte[] value){
+        this.deploymentServiceProvider.distributionCallback().queryCallback(source).on(key,value);
+    }
+    public void queryEnd(String source){
+        this.deploymentServiceProvider.distributionCallback().queryEndCallback(source).on();
     }
 }
