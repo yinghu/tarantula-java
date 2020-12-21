@@ -39,7 +39,7 @@ public class TarantulaApplicationDeployer implements Serviceable {
 		},()->{
 			System.out.println("end query");
 		});
-		this.context.tarantulaCluster().recoverService().queryStart(callId,context.dataStoreMaster, PortableRegistry.OID,PortableRegistry.LOBBY_CID,new String[]{bucketId});
+		this.context.integrationCluster().recoverService().queryStart(callId,context.dataStoreMaster, PortableRegistry.OID,PortableRegistry.LOBBY_CID,new String[]{bucketId});
 	}
 
 	public void shutdown() throws Exception {
