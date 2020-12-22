@@ -13,7 +13,7 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * Developer: YINGHU LU
- * Updated : 02/15/2019
+ * Updated : 12/21/2020
  */
 public class ApplicationRegistry implements ApplicationAllocator{
 
