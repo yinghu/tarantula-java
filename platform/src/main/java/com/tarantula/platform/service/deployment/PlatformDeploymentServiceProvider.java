@@ -682,13 +682,21 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public Lobby lobby(String typeId){
         //DataStore mds = this.tarantulaContext.masterDataStore();
-        List<LobbyDescriptor> lbl = this.tarantulaContext.query(PortableRegistry.OID,new LobbyQuery(this.tarantulaContext.bucketId()),new String[]{this.tarantulaContext.bucketId(),typeId});
-        if(lbl.size()==0){
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.bucketId(),typeId);
+        byte[] v = this.tarantulaContext.tarantulaCluster().recoverService().load(tarantulaContext.dataStoreMaster,lobbyTypeIdIndex.key().asString().getBytes());
+        if(v==null){
             return null;
         }
-        LobbyDescriptor lb = lbl.get(0);
+        lobbyTypeIdIndex.fromBinary(v);
+        v = this.tarantulaContext.tarantulaCluster().recoverService().load(this.tarantulaContext.dataStoreMaster,lobbyTypeIdIndex.index().getBytes());
+        if(v==null){
+            return null;
+        }
+        LobbyDescriptor lb = new LobbyDescriptor();
+        lb.fromBinary(v);
+        lb.distributionKey(lobbyTypeIdIndex.index());
         Lobby lobby = new DefaultLobby(lb);
-        List<DeploymentDescriptor> apps = this.tarantulaContext.query(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey(),"all"});
+        List<DeploymentDescriptor> apps = this.tarantulaContext.query(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey()});
         apps.forEach((a)->{
             lobby.addEntry(a);
         });

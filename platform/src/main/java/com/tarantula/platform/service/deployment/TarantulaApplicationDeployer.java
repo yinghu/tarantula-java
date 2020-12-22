@@ -60,10 +60,10 @@ public class TarantulaApplicationDeployer implements Serviceable {
 			T t = factory.create();
 			t.fromBinary(v);
 			t.distributionKey(new String(k));
-			tlist.add(t);
-		},()->{
-			_lock.countDown();
-		});
+			if(!t.disabled()){
+				tlist.add(t);
+			}
+		},()-> _lock.countDown());
 		recoverService.queryStart(cid,context.dataStoreMaster,factoryId,factory.registryId(),params);
 		_lock.await();
 		this.context.deploymentService().distributionCallback().removeQueryCallback(cid);

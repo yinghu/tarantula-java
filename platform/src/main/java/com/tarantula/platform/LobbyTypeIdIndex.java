@@ -22,7 +22,7 @@ public class LobbyTypeIdIndex extends RecoverableObject {
     public LobbyTypeIdIndex(String bucketId,String typeId,String index,String owner){
         this.bucket = bucketId;
         this.label =  typeId;
-        this.index = index;
+        this.index = index;//lobby id
         this.owner = owner;//game cluster id
     }
     @Override
