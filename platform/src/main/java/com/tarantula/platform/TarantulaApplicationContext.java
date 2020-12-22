@@ -7,6 +7,7 @@ import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.BucketReceiver;
+import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.service.deployment.ApplicationContextProxy;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -149,7 +150,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public void setupOnInstanceRegistry(){
         if(!started.getAndSet(true)){
             try{
-                List<OnInstance> olist = this.tarantulaContext.query(new String[]{this._instance.distributionKey()},new OnInstanceQuery(this._instance.distributionKey()));
+                List<OnInstance> olist = this.tarantulaContext.query(PortableRegistry.OID,new OnInstanceQuery(this._instance.distributionKey()),new String[]{this._instance.distributionKey()});
                 olist.forEach((a)->{
                     a.instanceId(this._instance.distributionKey());
                     if(a.joined()){

@@ -283,14 +283,14 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         if(this._lobbyMapping.containsKey(typeId)){
             return;
         }
-        List<LobbyDescriptor> bList = this.query(new String[]{this.bucketId(),typeId},new LobbyQuery(this.bucketId()));
+        List<LobbyDescriptor> bList = this.query(PortableRegistry.OID,new LobbyQuery(this.bucketId()),new String[]{this.bucketId(),typeId});
         bList.forEach((d)->{
             if(d.typeId().equals(typeId)){
                 this.setLobby(d);//
                 LobbyConfiguration lc = new LobbyConfiguration();
                 lc.descriptor = d;
-                lc.applications = this.query(new String[]{d.distributionKey()},new ApplicationQuery(d.distributionKey()));
-                lc.views = this.query(new String[]{d.distributionKey()},new OnViewQuery(d.distributionKey()));
+                lc.applications = this.query(PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()});
+                lc.views = this.query(PortableRegistry.OID,new OnViewQuery(d.distributionKey()),new String[]{d.distributionKey()});
                 this.configureViews(lc);
                 try{
                     OnLobby ob = this.configure(lc);
@@ -336,7 +336,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	        return;
         }
         try{
-            List<DeploymentDescriptor> apps = this.query(new String[]{lb.descriptor().distributionKey()},new ApplicationQuery(lb.descriptor().distributionKey()));
+            List<DeploymentDescriptor> apps = this.query(PortableRegistry.OID,new ApplicationQuery(lb.descriptor().distributionKey()),new String[]{lb.descriptor().distributionKey()});
             apps.forEach((a)->{
                 if(a.distributionKey().equals(applicationId)){
                     try{setApplicationManager(a,lb);}catch (Exception exx){
@@ -439,7 +439,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         }
         return t;
     }
-    public <T extends Recoverable> List<T> query(String[] params,RecoverableFactory<T> factory){
+    public <T extends Recoverable> List<T> _query(String[] params,RecoverableFactory<T> factory){
  	    List<T> _slist = new ArrayList<>();
         Batch batch = this.tarantulaCluster.deployService().query(factory.registryId(),params);
         if(batch.size()>0){
@@ -615,5 +615,26 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         }catch (Exception ex){
             log.error("error on content write",ex);
         }
+    }
+    public  <T extends Recoverable> List<T> query(int factoryId,RecoverableFactory<T> factory,String[] params){
+        RecoverService recoverService = tarantulaCluster.recoverService();
+ 	    List<T> tlist = new ArrayList<>();
+        CountDownLatch _lock = new CountDownLatch(1);
+        String cid = this.deploymentService().distributionCallback().registerQueryCallback((k,v)->{
+            System.out.println(new String(v));
+            T t = factory.create();
+            t.fromBinary(v);
+            t.distributionKey(new String(k));
+            tlist.add(t);
+        },()->{
+            _lock.countDown();
+            System.out.println("end query");
+        });
+        recoverService.queryStart(cid,dataStoreMaster,factoryId,factory.registryId(),params);
+        try {
+            _lock.await();
+        }catch (Exception ex){}
+        this.deploymentService().distributionCallback().removeQueryCallback(cid);
+        return tlist;
     }
 }

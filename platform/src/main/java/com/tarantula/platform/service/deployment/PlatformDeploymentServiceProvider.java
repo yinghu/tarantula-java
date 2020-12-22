@@ -14,6 +14,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
+import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.util.*;
 
 import javax.crypto.Cipher;
@@ -681,13 +682,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public Lobby lobby(String typeId){
         //DataStore mds = this.tarantulaContext.masterDataStore();
-        List<LobbyDescriptor> lbl = this.tarantulaContext.query(new String[]{this.tarantulaContext.bucketId(),typeId},new LobbyQuery(this.tarantulaContext.bucketId()));
+        List<LobbyDescriptor> lbl = this.tarantulaContext.query(PortableRegistry.OID,new LobbyQuery(this.tarantulaContext.bucketId()),new String[]{this.tarantulaContext.bucketId(),typeId});
         if(lbl.size()==0){
             return null;
         }
         LobbyDescriptor lb = lbl.get(0);
         Lobby lobby = new DefaultLobby(lb);
-        List<DeploymentDescriptor> apps = this.tarantulaContext.query(new String[]{lb.distributionKey(),"all"},new ApplicationQuery(lb.distributionKey()));
+        List<DeploymentDescriptor> apps = this.tarantulaContext.query(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey(),"all"});
         apps.forEach((a)->{
             lobby.addEntry(a);
         });

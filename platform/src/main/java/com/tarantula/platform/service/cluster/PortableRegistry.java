@@ -7,10 +7,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.event.SessionForward;
 import com.tarantula.platform.service.AccessKey;
-import com.tarantula.platform.service.deployment.ApplicationConfigurationQuery;
-import com.tarantula.platform.service.deployment.ApplicationQuery;
-import com.tarantula.platform.service.deployment.LobbyQuery;
-import com.tarantula.platform.service.deployment.OnViewQuery;
+import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.persistence.*;
 
 public class PortableRegistry extends AbstractRecoverableListener{
@@ -146,6 +143,12 @@ public class PortableRegistry extends AbstractRecoverableListener{
                 break;
             case APPLICATION_DESCRIPTOR_CID:
                 _fac = new ApplicationQuery(params[0]);
+                break;
+            case INSTANCE_INDEX_CID:
+                _fac = new InstanceRegistryQuery(params[0]);
+                break;
+            case ON_INSTANCE_CID:
+                _fac = new OnInstanceQuery(params[0]);
                 break;
         }
         return _fac;
