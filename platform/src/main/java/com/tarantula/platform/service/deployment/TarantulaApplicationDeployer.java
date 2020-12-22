@@ -1,4 +1,5 @@
 package com.tarantula.platform.service.deployment;
+
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -69,7 +70,7 @@ public class TarantulaApplicationDeployer implements Serviceable {
 		this.context.deploymentService().distributionCallback().removeQueryCallback(cid);
 		return tlist;
 	}
-	private List<LobbyDescriptor> deployFromLocal(String bucketId){
+	private List<LobbyDescriptor> deployFromLocal(String bucketId) throws Exception{
 		RecoverableFactory query = new LobbyQuery(bucketId);
 		DataStore dataStore = this.context.masterDataStore();
 		List<String> dxml = loadFromLocal();
@@ -102,7 +103,7 @@ public class TarantulaApplicationDeployer implements Serviceable {
 		});
 		return blist;
 	}
-	private List<String> loadFromLocal(){
+	private List<String> loadFromLocal() throws Exception{
 		List<String> dlist = this.systemDeploy();
 		File f = new File("../deploy");
 		if(f.exists()){
@@ -114,20 +115,16 @@ public class TarantulaApplicationDeployer implements Serviceable {
 		}
 		return dlist;
 	}
-	private List<String> systemDeploy(){
+	private List<String> systemDeploy() throws Exception{
 		ArrayList<String> arrayList = new ArrayList<>();
-		try{
-			JarFile file = new JarFile("../lib/gec-platform-"+context.platformVersion+".jar");
-			Enumeration e = file.entries();
-			while (e.hasMoreElements()) {
-				JarEntry je = (JarEntry) e.nextElement();
-				String name = je.getName();
-				if(name.startsWith("application")&&name.endsWith(".xml")){
-					arrayList.add(name);
-				}
+		JarFile file = new JarFile("../lib/gec-platform-"+context.platformVersion+".jar");
+		Enumeration e = file.entries();
+		while (e.hasMoreElements()) {
+			JarEntry je = (JarEntry) e.nextElement();
+			String name = je.getName();
+			if(name.startsWith("application")&&name.endsWith(".xml")){
+				arrayList.add(name);
 			}
-		}catch (Exception ex){
-			ex.printStackTrace();
 		}
 		return arrayList;
 	}
