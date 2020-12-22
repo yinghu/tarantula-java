@@ -3,12 +3,15 @@ package com.tarantula.platform.service.cluster;
 import com.icodesoftware.Countable;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.protocol.DataBuffer;
 import com.tarantula.platform.*;
 
 import java.util.Map;
 
 public class PartitionIndex extends NoReplicationObject implements DataStore.Updatable, Countable {
 
+    private int start = 0;
+    private int end = 0;
     public PartitionIndex(){
 
     }
@@ -19,7 +22,18 @@ public class PartitionIndex extends NoReplicationObject implements DataStore.Upd
         this.version = initialSeed;
     }
     public synchronized int count(int delta){
-        return (version=version+delta);
+        if(end-start>0){
+            int ct = start;
+            start++;
+            return ct;
+        }
+        start = version;
+        end = start+10;
+        version = end;
+        this.update();
+        int ct = start;
+        start++;
+        return ct;
     }
     @Override
     public Map<String,Object> toMap(){
@@ -29,6 +43,17 @@ public class PartitionIndex extends NoReplicationObject implements DataStore.Upd
     @Override
     public void fromMap(Map<String,Object> properties){
         this.version = ((Number)properties.getOrDefault("1",1000)).intValue();
+    }
+    @Override
+    public byte[] toBinary() {
+        DataBuffer dataBuffer = new DataBuffer();
+        dataBuffer.putInt(version);
+        return dataBuffer.toArray();
+    }
+    @Override
+    public void fromBinary(byte[] payload){
+        DataBuffer dataBuffer = new DataBuffer(payload);
+        version = dataBuffer.getInt();
     }
 
     public int getClassId() {
