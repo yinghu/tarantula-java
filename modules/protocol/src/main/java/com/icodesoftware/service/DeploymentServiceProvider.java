@@ -113,6 +113,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         String registerQueryCallback(RecoverService.QueryCallback queryCallback, RecoverService.QueryEndCallback queryEndCallback);
         RecoverService.QueryCallback queryCallback(String source);
         RecoverService.QueryEndCallback queryEndCallback(String source);
+        void removeQueryCallback(String callId);
     }
 
 }

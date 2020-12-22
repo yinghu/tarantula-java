@@ -803,6 +803,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public RecoverService.QueryEndCallback queryEndCallback(String source){
         return qCallbacks.get(source).queryEndCallback;
     }
+    public void removeQueryCallback(String callId){
+        qCallbacks.remove(callId);
+    }
     private class PostOfficeSession implements PostOffice{
 
         public OnConnection onConnection(Connection connection){

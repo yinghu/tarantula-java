@@ -439,8 +439,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         }
         return t;
     }
-    public <T extends Recoverable> List<T> query(String[] params, RecoverableFactory<T> factory){
-        List<T> _slist = new ArrayList<>();
+    public <T extends Recoverable> List<T> query(String[] params,RecoverableFactory<T> factory){
+ 	    List<T> _slist = new ArrayList<>();
         Batch batch = this.tarantulaCluster.deployService().query(factory.registryId(),params);
         if(batch.size()>0){
             T sc = factory.create();
