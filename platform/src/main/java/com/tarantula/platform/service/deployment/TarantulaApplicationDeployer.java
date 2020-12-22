@@ -19,16 +19,15 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 public class TarantulaApplicationDeployer implements Serviceable {
 
 	private final TarantulaContext context;
-	private RecoverService recoverService;
 	public TarantulaApplicationDeployer(final TarantulaContext context ){
 		this.context = context;
 	}
 
 	public void start() throws Exception {
 		this.context._registerNode();
-		recoverService = this.context.tarantulaCluster().recoverService();
+		RecoverService recoverService = this.context.tarantulaCluster().recoverService();
 		String bucketId = this.context.bucketId();
-		List<LobbyDescriptor> bList = query(PortableRegistry.OID,new LobbyQuery(bucketId),new String[]{bucketId});
+		List<LobbyDescriptor> bList = query(recoverService,PortableRegistry.OID,new LobbyQuery(bucketId),new String[]{bucketId});
 		if(bList.isEmpty()){
 			bList = deployFromLocal(bucketId);
 		}
@@ -41,11 +40,11 @@ public class TarantulaApplicationDeployer implements Serviceable {
 		});
 		Collections.sort(configurations,new LobbyComparator());
 		for(LobbyConfiguration c:configurations){//may load from cluster or data store or local files
-			c.configurations = query(PortableRegistry.OID,new ApplicationConfigurationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
+			c.configurations = query(recoverService,PortableRegistry.OID,new ApplicationConfigurationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
 			this.context.configureConfigurations(c);
-			c.views = query(PortableRegistry.OID,new OnViewQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
+			c.views = query(recoverService,PortableRegistry.OID,new OnViewQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
 			this.context.configureViews(c);//deploy views
-			c.applications = query(PortableRegistry.OID,new ApplicationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
+			c.applications = query(recoverService,PortableRegistry.OID,new ApplicationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
 			OnLobby _ob = this.context.configure(c);
 			this.context.deploymentService().register(_ob);
 		}
@@ -54,7 +53,7 @@ public class TarantulaApplicationDeployer implements Serviceable {
 	public void shutdown() throws Exception {
 		
 	}
-	private <T extends Recoverable> List<T> query(int factoryId,RecoverableFactory<T> factory,String[] params) throws Exception{
+	private <T extends Recoverable> List<T> query(RecoverService recoverService,int factoryId,RecoverableFactory<T> factory,String[] params) throws Exception{
 		List<T> tlist = new ArrayList<>();
 		CountDownLatch _lock = new CountDownLatch(1);
 		String cid = this.context.deploymentService().distributionCallback().registerQueryCallback((k,v)->{

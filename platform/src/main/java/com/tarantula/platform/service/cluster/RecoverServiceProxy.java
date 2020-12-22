@@ -75,7 +75,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             final Future<Void> future = builder.invoke();
             future.get(5,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
-            //throw ExceptionUtil.rethrow(e);
+            throw ExceptionUtil.rethrow(e);
         }
     }
     public void queryEnd(String memberId,String source){
@@ -86,7 +86,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             final Future<Void> future = builder.invoke();
             future.get(5,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
-            //throw ExceptionUtil.rethrow(e);
+            throw ExceptionUtil.rethrow(e);
         }
     }
     public byte[] load(String dataSource,byte[] key){

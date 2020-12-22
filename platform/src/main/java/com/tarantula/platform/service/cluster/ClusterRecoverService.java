@@ -50,11 +50,9 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
 
     }
     public byte[] load(String source,byte[] key){
-        //log.warn("Recovering ["+new String(key)+"]from ["+source+"]");
         return this.tarantulaContext.dataStore(source,tarantulaContext.partitionNumber()).backup().get(key);
     }
     public void replicate(String source,byte[] key,byte[] value){
-        //log.warn("Replicating ["+new String(key)+"]from ["+source+"]["+new String(value)+"]");
         this.tarantulaContext.dataStore(source,tarantulaContext.partitionNumber()).backup().set(key,value);
     }
     public int syncStart(String memberId,String source){
