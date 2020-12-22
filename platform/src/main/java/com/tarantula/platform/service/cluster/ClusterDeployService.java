@@ -14,7 +14,6 @@ import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ClusterDeployService implements ManagedService, RemoteService, MembershipAwareService {
@@ -23,7 +22,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
     private NodeEngine nodeEngine;
     private TarantulaContext tarantulaContext;
-    private ConcurrentHashMap<String,BatchCache> _cache = new ConcurrentHashMap<>();
     private DeploymentServiceProvider deploymentServiceProvider;
     private int scope;
     private GsonBuilder builder;
@@ -235,15 +233,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void memberAttributeChanged(MemberAttributeServiceEvent memberAttributeServiceEvent) {
     }
 
-
-    private static class BatchCache{
-        public List<Recoverable> cache;
-        public String batchId;
-        public BatchCache(String batchId,List<Recoverable> cache){
-            this.batchId = batchId;
-            this.cache = cache;
-        }
-    }
     public boolean enableGameCluster(String gameClusterId){
         GameCluster gameCluster = new GameCluster();
         gameCluster.distributionKey(gameClusterId);

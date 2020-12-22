@@ -57,14 +57,12 @@ public class TarantulaApplicationDeployer implements Serviceable {
 		List<T> tlist = new ArrayList<>();
 		CountDownLatch _lock = new CountDownLatch(1);
 		String cid = this.context.deploymentService().distributionCallback().registerQueryCallback((k,v)->{
-			System.out.println(new String(v));
 			T t = factory.create();
 			t.fromBinary(v);
 			t.distributionKey(new String(k));
 			tlist.add(t);
 		},()->{
 			_lock.countDown();
-			System.out.println("end query");
 		});
 		recoverService.queryStart(cid,context.dataStoreMaster,factoryId,factory.registryId(),params);
 		_lock.await();
