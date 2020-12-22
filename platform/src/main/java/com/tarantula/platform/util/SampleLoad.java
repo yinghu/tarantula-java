@@ -85,7 +85,7 @@ public class SampleLoad {
                 pool.execute(()->{
                     try{
                         long st = System.currentTimeMillis();
-                        httpCaller.index();
+                        //httpCaller.index();
                         httpCaller.post("user/action",jsonObject.toString().getBytes(),headers);
                         long ed = System.currentTimeMillis()-st;
                         timeRun.addAndGet(ed);
@@ -107,7 +107,7 @@ public class SampleLoad {
 
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.6:8090",null,10);
+        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.30:8090",null,50000);
         sampleLoad._init();
         sampleLoad.register();
     }

@@ -86,6 +86,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
     }
     public int sync(String memberId){
         new Thread(()->{
+            int[] total={0};
             if(!memberId.equals(nodeEngine.getLocalMember().getUuid())){
                 int[] batch = {0};
                 byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
@@ -99,6 +100,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
                         keys[batch[0]]=k;
                         values[batch[0]]=v;
                         batch[0]++;
+                        total[0]++;
                         return true;
                     });
                 }
@@ -106,6 +108,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
                 this.tarantulaContext.accessIndexService().sync(batch[0],keys,values,memberId);
             }
             this.tarantulaContext.accessIndexService().syncEnd(memberId);
+            log.warn("Total records ["+total[0]+"] synced to ["+memberId+"]");
         }).start();
         return nodeEngine.getPartitionService().getPartitionCount();
     }
