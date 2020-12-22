@@ -29,7 +29,7 @@ public class DataBufferTest {
         Assert.assertTrue(new String(out.getByteArray()).equals("12345"));
     }
     @Test(groups = { "data buffer" })
-    public void payloadSizeTest(){
+    public void payloadDefaultSizeTest(){
         JsonObject jsonObject = new JsonObject();
         DataBuffer buffer = new DataBuffer();
         jsonObject.addProperty("1",5);
@@ -38,5 +38,11 @@ public class DataBufferTest {
         buffer.putUTF8("test");
         Assert.assertTrue(buffer.toArray().length==12);
         Assert.assertTrue(jsonObject.toString().length()==18);
+    }
+    @Test(groups = { "data buffer" })
+    public void payloadSizeTest(){
+        DataBuffer buffer = new DataBuffer(4);
+        buffer.putShort((short) 5);
+        Assert.assertTrue(buffer.toArray().length==2);
     }
 }

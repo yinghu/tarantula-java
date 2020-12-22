@@ -1,7 +1,6 @@
 package com.tarantula.platform.service.cluster;
 
 import com.hazelcast.core.DistributedObject;
-import com.hazelcast.core.Member;
 import com.hazelcast.spi.*;
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.DataStore;
@@ -69,7 +68,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
         if(dso.dataStore.load(_try)){
             return null;
         }
-        int pid = localKey.count(1);
+        int pid = localKey.sequence();
         AccessIndex accessIndex = new AccessIndexTrack(accessKey,dso.partitionIndex.bucket(),dso.partitionIndex.label(),pid);
         return dso.dataStore.createIfAbsent(accessIndex,false)?accessIndex:null;
     }
@@ -87,6 +86,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
     public int sync(String memberId){
         new Thread(()->{
             int[] total={0};
+            long st = System.currentTimeMillis();
             if(!memberId.equals(nodeEngine.getLocalMember().getUuid())){
                 int[] batch = {0};
                 byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
@@ -108,19 +108,19 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
                 this.tarantulaContext.accessIndexService().sync(batch[0],keys,values,memberId);
             }
             this.tarantulaContext.accessIndexService().syncEnd(memberId);
-            log.warn("Total records ["+total[0]+"] synced to ["+memberId+"]");
+            log.warn("Total records ["+total[0]+"] synced to ["+memberId+"] timed (seconds) ["+((System.currentTimeMillis()-st)/1000)+"]");
         }).start();
         return nodeEngine.getPartitionService().getPartitionCount();
     }
     public void setup() {
         this.deploymentServiceProvider = this.tarantulaContext.deploymentServiceProvider();
         masterStore = this.tarantulaContext.masterDataStore();
-        localKey = new PartitionIndex(masterStore.bucket(),masterStore.node()+"-partition-id","",1000);
+        localKey = new PartitionIndex(masterStore.bucket(),masterStore.node()+"-partition-id",1000);
         localKey.dataStore(masterStore);
         masterStore.createIfAbsent(localKey,true);
         for(DataStoreOnPartition dso : dataStoreOnPartitions){
             dso.dataStore = this.tarantulaContext.dataStore(dso.name);
-            dso.partitionIndex = new PartitionIndex(this.masterStore.bucket(),this.masterStore.node(),dso.name,1000);
+            dso.partitionIndex = new PartitionIndex(this.masterStore.bucket(),this.masterStore.node(),1000);
         }
         log.warn("Access index service is ready on ["+nodeEngine.getLocalMember().getUuid()+"]");
     }
@@ -132,21 +132,18 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
         return this.nodeEngine.getPartitionService().getPartitionId(key);
     }
     public void replicate(int partition,byte[] key,byte[] value){
-        //log.warn("Replicating ["+new String(key)+"]->"+partition+"<><><>"+new String(value));
         this.dataStoreOnPartitions[partition].dataStore.backup().set(key,value);
     }
     public void syncEnd(){
         TarantulaContext._syc_finished.countDown();
     }
     public void replicateAsBatch(ReplicationData[] batch){
-        //log.warn("Batch size->"+batch.length);
         for(ReplicationData d : batch){
             d.partition = getPartitionId(d.key);
             replicate(d.partition,d.key,d.value);
         }
     }
     public byte[] recover(int partition,byte[] key){
-        //log.warn("Recovering from ["+partition+"]->"+new String(key));
         return this.dataStoreOnPartitions[partition].dataStore.backup().get(key);
     }
 }

@@ -1,6 +1,5 @@
 package com.tarantula.platform.service.cluster;
 
-import com.icodesoftware.Countable;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.protocol.DataBuffer;
@@ -8,20 +7,19 @@ import com.tarantula.platform.*;
 
 import java.util.Map;
 
-public class PartitionIndex extends NoReplicationObject implements DataStore.Updatable, Countable {
+public class PartitionIndex extends NoReplicationObject implements DataStore.Updatable {
 
     private int start = 0;
     private int end = 0;
     public PartitionIndex(){
 
     }
-    public PartitionIndex(String bucket,String label,String index,int initialSeed){
+    public PartitionIndex(String bucket,String label,int initialSeed){
         this.bucket = bucket;
         this.label = label;
-        this.index = index;
         this.version = initialSeed;
     }
-    public synchronized int count(int delta){
+    public synchronized int sequence(){
         if(end-start>0){
             int ct = start;
             start++;
@@ -46,7 +44,7 @@ public class PartitionIndex extends NoReplicationObject implements DataStore.Upd
     }
     @Override
     public byte[] toBinary() {
-        DataBuffer dataBuffer = new DataBuffer();
+        DataBuffer dataBuffer = new DataBuffer(4);
         dataBuffer.putInt(version);
         return dataBuffer.toArray();
     }
