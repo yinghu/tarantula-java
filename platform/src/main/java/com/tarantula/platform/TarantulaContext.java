@@ -22,7 +22,7 @@ import com.tarantula.platform.service.persistence.Node;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.util.GoogleAuthCredentialsDeserializer;
 import com.tarantula.platform.util.StripePaymentCredentialsDeserializer;
-import com.tarantula.platform.util.SystemUtil;
+
 
 public class TarantulaContext implements Serviceable, ServiceContext, MetricsListener {
 
@@ -431,34 +431,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public RecoverableRegistry recoverableRegistry(int registryId){
  	    return fMap.get(registryId);
     }
-    public <T extends Recoverable> T query(String key,T t){
-        Batch batch = this.tarantulaCluster.deployService().query(t.getClassId(),new String[]{key});
-        if(batch.size()>0){
-            t.fromBinary(batch.payload());
-            t.distributionKey(batch.batchKey());
-        }
-        return t;
-    }
-    public <T extends Recoverable> List<T> _query(String[] params,RecoverableFactory<T> factory){
- 	    List<T> _slist = new ArrayList<>();
-        Batch batch = this.tarantulaCluster.deployService().query(factory.registryId(),params);
-        if(batch.size()>0){
-            T sc = factory.create();
-            sc.fromMap(SystemUtil.toMap(batch.payload()));
-            sc.distributionKey(batch.batchKey());
-            _slist.add(sc);
-            sc.owner(factory.distributionKey());
-            for(int i=batch.count()+1;i<batch.size();i++){
-                Batch bx = this.tarantulaCluster.deployService().query(batch.batchId(),i);
-                T scx = factory.create();
-                scx.fromBinary(bx.payload());
-                scx.distributionKey(bx.batchKey());
-                _slist.add(scx);
-                scx.owner(factory.distributionKey());
-            }
-        }
-        return _slist;
-    }
+
+
     public EndpointService endpointService(){
  	    return this.endpointService;
     }

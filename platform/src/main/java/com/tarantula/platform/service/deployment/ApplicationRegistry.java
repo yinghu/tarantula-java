@@ -32,6 +32,9 @@ public class ApplicationRegistry implements ApplicationAllocator{
 
     public void configure(){
         List<InstanceIndex> _rlist = query(PortableRegistry.OID,new InstanceRegistryQuery(deploymentDescriptor.distributionKey()),new String[]{deploymentDescriptor.distributionKey()});//this.tarantulaContext.tarantulaCluster.list(iq);
+        if(_rlist.isEmpty()){
+            _rlist = deployFromLocal(deploymentDescriptor);
+        }
         for(InstanceIndex ir : _rlist){
             this.eventDispatcher.onAvailable.put(ir.distributionKey(),ir);
         }
@@ -73,5 +76,25 @@ public class ApplicationRegistry implements ApplicationAllocator{
         }catch (Exception ex){}
         this.tarantulaContext.deploymentService().distributionCallback().removeQueryCallback(cid);
         return tlist;
+    }
+    private List<InstanceIndex> deployFromLocal(DeploymentDescriptor deploymentDescriptor){
+        ArrayList ilist = new ArrayList();
+        for(int i=0;i<deploymentDescriptor.instancesOnStartupPerPartition();i++){
+            for(int p = 0;p<tarantulaContext.platformRoutingNumber;p++){
+                InstanceIndex instanceRegistry = new InstanceIndex();
+                //instanceRegistry.bank(true);
+                instanceRegistry.capacity(deploymentDescriptor.capacity());
+                instanceRegistry.applicationId(deploymentDescriptor.distributionKey());
+                instanceRegistry.owner(deploymentDescriptor.distributionKey());
+                instanceRegistry.accessMode(Session.FAST_PLAY_MODE);
+                instanceRegistry.routingNumber(p);
+                instanceRegistry.bucket(dataStore.bucket());
+                instanceRegistry.oid(SystemUtil.oid());
+                if(dataStore.create(instanceRegistry)){
+                    ilist.add(instanceRegistry);
+                }
+            }
+        }
+        return ilist;
     }
 }

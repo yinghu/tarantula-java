@@ -147,10 +147,27 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
             }
         }
     }
+    private List<OnInstance> deployFromLocal(InstanceIndex instanceIndex){
+        DataStore dataStore = this.tarantulaContext.masterDataStore();
+        ArrayList<OnInstance> olist = new ArrayList<>();
+        for(int i=0;i<instanceIndex.capacity();i++){//pre-launch on instance
+            OnInstance _a = new OnInstanceTrack();
+            _a.instanceId(instanceIndex.distributionKey());
+            _a.owner(instanceIndex.distributionKey());
+            _a.onEdge(true);
+            if(dataStore.create(_a)){
+                olist.add(_a);
+            }
+        }
+        return olist;
+    }
     public void setupOnInstanceRegistry(){
         if(!started.getAndSet(true)){
             try{
                 List<OnInstance> olist = this.tarantulaContext.query(PortableRegistry.OID,new OnInstanceQuery(this._instance.distributionKey()),new String[]{this._instance.distributionKey()});
+                if(olist.isEmpty()){
+                    olist = deployFromLocal(_instance);
+                }
                 olist.forEach((a)->{
                     a.instanceId(this._instance.distributionKey());
                     if(a.joined()){

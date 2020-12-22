@@ -5,7 +5,6 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.Member;
 import com.hazelcast.spi.*;
 import com.icodesoftware.*;
-import com.icodesoftware.service.Batch;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
@@ -13,13 +12,10 @@ import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.util.ResponseSerializer;
-import com.tarantula.platform.util.SystemUtil;
 
-import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+
 
 public class ClusterDeployService implements ManagedService, RemoteService, MembershipAwareService {
 
@@ -61,205 +57,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
     @Override
     public void destroyDistributedObject(String s) {
-
-
-    }
-
-    public Batch query(int registryId, String[] params){
-        //log.warn("Query on->"+registryId+"/"+nodeEngine.getLocalMember().getAddress().toString());
-        BatchCache batchCache = onQuery(registryId,params);
-        BatchData batch = new BatchData();
-        batch.batchId = batchCache.batchId;
-        batch.count = 0;
-        batch.size = batchCache.cache.size();
-        if(batch.size>0){
-            Recoverable r = batchCache.cache.get(0);
-            batch.batchKey = r.distributionKey();
-            batch.payload = SystemUtil.toJson(r.toMap());
-        }
-        else{
-            batch.payload = new byte[0];
-        }
-        return batch;
-    }
-
-    public Batch query(String batchId,int count){
-        BatchCache batchCache = _cache.get(batchId);
-        BatchData batch = new BatchData();
-        batch.count = count;
-        batch.size = batchCache.cache.size();
-        Recoverable r = batchCache.cache.get(count);
-        if((count+1)==batch.size){
-            _cache.remove(batchId);//remove on last count
-        }
-        batch.batchKey = r.distributionKey();
-        batch.payload = SystemUtil.toJson(r.toMap());
-        return batch;
-    }
-    private BatchCache onQuery(int registryId,String[] params){
-        BatchCache batchCache = this.createQuery(registryId,params);
-        _cache.put(batchCache.batchId,batchCache);
-        return batchCache;
-    }
-    private BatchCache createQuery(int registryId,String[] params){
-        BatchCache batchCache = null;
-        DataStore dataStore = tarantulaContext.masterDataStore();
-        if(registryId==PortableRegistry.LOBBY_CID){
-            List blist = new ArrayList();
-            if(params.length>1){//
-                LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(params[0],params[1]);
-                dataStore.load(lobbyTypeIdIndex);
-                LobbyDescriptor lb = new LobbyDescriptor();
-                lb.distributionKey(lobbyTypeIdIndex.index());
-                dataStore.load(lb);
-                blist.add(lb);
-            }else{
-                RecoverableFactory query = new LobbyQuery(params[0]);
-                dataStore.list(query,(b)->{
-                    if(!b.disabled()){
-                        //log.warn("Lobby->"+b.toString());
-                        blist.add(b);
-                    }
-                    return true;
-                });
-                if(blist.isEmpty()){
-                    //load from local config
-                    log.warn("Initializing lobby list on ["+params[0]+"]");
-                    List<String> dxml = loadFromLocal();
-                    XMLParser xp = new XMLParser();
-                    dxml.forEach((xm)->{
-                        try{xp.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(xm));}catch (Exception ex){ex.printStackTrace();}
-                    });
-                    xp.configurations.forEach((c)->{
-                        c.descriptor.label(query.label());
-                        c.descriptor.onEdge(true);
-                        c.descriptor.owner(query.distributionKey());
-                        dataStore.create(c.descriptor);
-                        dataStore.create(new LobbyTypeIdIndex(params[0],c.descriptor.typeId(),c.descriptor.distributionKey(),""));
-                        blist.add(c.descriptor);
-                        c.applications.forEach((a)->{
-                            a.owner(c.descriptor.distributionKey());
-                            a.label(Application.LABEL);
-                            a.onEdge(true);
-                            dataStore.create(a);
-                        });
-                        c.views.forEach((v)->{
-                            v.owner(c.descriptor.distributionKey());
-                            dataStore.create(v);
-                        });
-                        c.configurations.forEach((cf)->{
-                            cf.owner(c.descriptor.distributionKey());
-                            dataStore.create(cf);
-                        });
-                    });
-                }
-            }
-            batchCache = new BatchCache(UUID.randomUUID().toString(),blist);
-        }
-        else if(registryId==PortableRegistry.INSTANCE_INDEX_CID){
-            List ilist = new ArrayList();
-            dataStore.list(new InstanceRegistryQuery(params[0]),(ix)->{
-                if(!ix.disabled()){
-                    ilist.add(ix);
-                }
-                return true;
-            });
-            if(ilist.isEmpty()){//create instance/house/statistics/listing per partition
-                DeploymentDescriptor deploymentDescriptor = new DeploymentDescriptor();
-                deploymentDescriptor.distributionKey(params[0]);
-                dataStore.load(deploymentDescriptor);
-                for(int i=0;i<deploymentDescriptor.instancesOnStartupPerPartition();i++){
-                    for(int p = 0;p<tarantulaContext.platformRoutingNumber;p++){
-                        InstanceIndex instanceRegistry = new InstanceIndex();
-                        //instanceRegistry.bank(true);
-                        instanceRegistry.capacity(deploymentDescriptor.capacity());
-                        instanceRegistry.applicationId(deploymentDescriptor.distributionKey());
-                        instanceRegistry.owner(deploymentDescriptor.distributionKey());
-                        instanceRegistry.accessMode(Session.FAST_PLAY_MODE);
-                        instanceRegistry.routingNumber(p);
-                        instanceRegistry.bucket(dataStore.bucket());
-                        instanceRegistry.oid(SystemUtil.oid());
-                        if(dataStore.create(instanceRegistry)){
-                            ilist.add(instanceRegistry);
-                        }
-                    }
-                }
-            }
-            batchCache = new BatchCache(UUID.randomUUID().toString(),ilist);
-        }
-        else if(registryId==PortableRegistry.ON_INSTANCE_CID){
-            List olist = dataStore.list(new OnInstanceQuery(params[0]));
-            if(olist.isEmpty()){//create on instances per instance
-                InstanceIndex ir = new InstanceIndex();
-                ir.distributionKey(params[0]);
-                if(dataStore.load(ir)){
-                    for(int i=0;i<ir.capacity();i++){//pre-launch on instance
-                        OnInstance _a = new OnInstanceTrack();
-                        _a.instanceId(ir.distributionKey());
-                        _a.owner(ir.distributionKey());
-                        _a.onEdge(true);
-                        if(dataStore.create(_a)){
-                            olist.add(_a);
-                        }
-                    }
-                }
-            }
-            batchCache = new BatchCache(UUID.randomUUID().toString(),olist);
-        }
-        else if(registryId==PortableRegistry.APPLICATION_CONFIGURATION_CID){
-            List alist = dataStore.list(new ApplicationConfigurationQuery(params[0]));
-            batchCache = new BatchCache(UUID.randomUUID().toString(),alist);
-        }
-        else if(registryId==PortableRegistry.ON_VIEW_OID){
-            List vlist = dataStore.list(new OnViewQuery(params[0]));
-            batchCache = new BatchCache(UUID.randomUUID().toString(),vlist);
-        }
-        else if(registryId== PortableRegistry.APPLICATION_DESCRIPTOR_CID){
-            List dlist = new ArrayList();
-            boolean loadAll = params.length==2;
-            dataStore.list(new ApplicationQuery(params[0]),(a)->{
-                if(loadAll){
-                    dlist.add(a);
-                }
-                else{
-                    if(!a.disabled()){
-                        dlist.add(a);
-                    }
-                }
-                return true;
-            });
-            batchCache = new BatchCache(UUID.randomUUID().toString(),dlist);
-        }
-        return batchCache;
-    }
-    private List<String> loadFromLocal(){
-        List<String> dlist = this.systemDeploy();
-        File f = new File("../deploy");
-        if(f.exists()){
-            for(String s : f.list()){
-                if(s.endsWith(".xml")){
-                    dlist.add(s);
-                }
-            }
-        }
-        return dlist;
-    }
-    private List<String> systemDeploy(){
-        ArrayList<String> arrayList = new ArrayList<>();
-        try{
-            JarFile file = new JarFile("../lib/gec-platform-"+tarantulaContext.platformVersion+".jar");
-            Enumeration e = file.entries();
-            while (e.hasMoreElements()) {
-                JarEntry je = (JarEntry) e.nextElement();
-                String name = je.getName();
-                if(name.startsWith("application")&&name.endsWith(".xml")){
-                    arrayList.add(name);
-                }
-            }
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return arrayList;
     }
     public boolean addLobby(Descriptor descriptor){
         DataStore ds = this.tarantulaContext.masterDataStore();

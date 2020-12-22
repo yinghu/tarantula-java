@@ -48,7 +48,6 @@ public class PortableRegistry extends AbstractRecoverableListener{
 
     public static final int APPLICATION_DESCRIPTOR_CID = PortableEventRegistry.APPLICATION_DESCRIPTOR_CID; //DEPLOY OBJECT
 
-    public static final int BATCH_CID = PortableEventRegistry.BATCH_CID;
 
 
     public static final int ACCESS_INDEX_CID = PortableEventRegistry.ACCESS_INDEX_CID;
@@ -109,9 +108,7 @@ public class PortableRegistry extends AbstractRecoverableListener{
             case APPLICATION_DESCRIPTOR_CID:
                 _ins = new DeploymentDescriptor();
                 break;
-            case BATCH_CID:
-                _ins = new BatchData();
-                break;
+
             case ON_CONNECTION_CID:
                 _ins = new UniverseConnection();
                 break;

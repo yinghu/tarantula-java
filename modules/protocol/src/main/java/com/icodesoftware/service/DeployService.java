@@ -7,9 +7,9 @@ public interface DeployService extends ServiceProvider {
 
     String NAME = "DeployService";
 
-    Batch query(int registryId,String[] params);
+    //Batch query(int registryId,String[] params);
 
-    Batch query(String batchId,int count);
+    //Batch query(String batchId,int count);
 
 
 

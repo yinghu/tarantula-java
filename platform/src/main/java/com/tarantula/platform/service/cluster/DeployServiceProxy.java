@@ -6,7 +6,6 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
 import com.icodesoftware.*;
-import com.icodesoftware.service.Batch;
 import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.ServiceContext;
 
@@ -58,30 +57,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
     public void shutdown() throws Exception {
 
     }
-    @Override
-    public Batch query(int registryId, String[] params){
-        NodeEngine nodeEngine = getNodeEngine();
-        DeployServiceQueryOperation operation = new DeployServiceQueryOperation(registryId,params);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Batch> future = builder.invoke();
-            return future.get(); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
-    @Override
-    public Batch query(String batchId,int count) {
-        NodeEngine nodeEngine = getNodeEngine();
-        DeployServiceGetOperation operation = new DeployServiceGetOperation(batchId,count);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Batch> future = builder.invoke();
-            return future.get(); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
+
     public boolean addLobby(Descriptor lobby){
         NodeEngine nodeEngine = getNodeEngine();
         AddLobbyOperation operation = new AddLobbyOperation(lobby);
