@@ -142,8 +142,8 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
     }
     public void replicateAsBatch(ReplicationData[] batch){
         for(ReplicationData d : batch){
-            d.partition = getPartitionId(d.key);
-            replicate(d.partition,d.key,d.value);
+            //d.partition = getPartitionId(d.key);
+            //replicate(d.partition,d.key,d.value);
         }
         total.addAndGet(batch.length);
     }
