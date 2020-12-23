@@ -14,6 +14,7 @@ import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Updated by yinghu lu on 6/18/2020
@@ -29,6 +30,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
     private PartitionIndex localKey;
     private TarantulaContext tarantulaContext;
     private DeploymentServiceProvider deploymentServiceProvider;
+    private AtomicInteger total = new AtomicInteger(0);
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.tarantulaContext = TarantulaContext.getInstance();
@@ -136,12 +138,14 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
     }
     public void syncEnd(){
         TarantulaContext._syc_finished.countDown();
+        log.warn("Total received ->"+total.get());
     }
     public void replicateAsBatch(ReplicationData[] batch){
         for(ReplicationData d : batch){
             d.partition = getPartitionId(d.key);
             replicate(d.partition,d.key,d.value);
         }
+        total.addAndGet(batch.length);
     }
     public byte[] recover(int partition,byte[] key){
         return this.dataStoreOnPartitions[partition].dataStore.backup().get(key);
