@@ -459,11 +459,13 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     public void _registerNode(){
  	    this.accessIndexService().disable();
- 	    _syc_finished = new CountDownLatch(2);
+ 	    _syc_finished = new CountDownLatch(1);
  	    this.accessIndexService().syncStart();
-        this.integrationCluster.recoverService().syncStart(dataStoreMaster);
+        //this.integrationCluster.recoverService().syncStart(dataStoreMaster);
         log.warn("Waiting for data sync from access index and "+dataStoreMaster);
-        try{_syc_finished.await();}catch (Exception ex){}
+        try{_syc_finished.await();}catch (Exception ex){
+            ex.printStackTrace();
+        }
         this.accessIndexService().enable();
         AccessIndex bid = this.accessIndexService().get(node.bucketName);
         if(bid==null){
