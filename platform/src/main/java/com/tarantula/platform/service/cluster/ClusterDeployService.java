@@ -267,12 +267,13 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         mds.update(gameCluster);
         return suc1&&suc2&&suc3;//make sure all disabled
     }
-    public GameCluster createGameCluster(String owner, String name){
+    public GameCluster createGameCluster(String owner, String name,String publishingId){
         GameCluster gameCluster = new GameCluster();
         try {
             DataStore mds = this.tarantulaContext.masterDataStore();
             gameCluster.property(GameCluster.NAME,name);
             gameCluster.property(GameCluster.OWNER,owner);
+            gameCluster.property(GameCluster.PUBLISHING_ID,publishingId);
             gameCluster.property(GameCluster.ACCESS_KEY,"mock access key");
             gameCluster.property(GameCluster.TIMESTAMP,0);
             gameCluster.property(GameCluster.DISABLED,true);
@@ -297,7 +298,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 }
                 //log.warn("Create named lobby type id->"+configuration.descriptor.typeId());
                 Descriptor descriptor = configuration.descriptor;
-                descriptor.owner(this.tarantulaContext.bucketId());
+                descriptor.owner(publishingId);
                 descriptor.label(LobbyDescriptor.LABEL);
                 descriptor.onEdge(true);
                 descriptor.resetEnabled(true);
@@ -340,9 +341,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         GameCluster gameCluster = new GameCluster();
         gameCluster.distributionKey(gameClusterKey);
         this.tarantulaContext.masterDataStore().load(gameCluster);
-        this.deploymentServiceProvider.distributionCallback().addLobby((String)gameCluster.property(GameCluster.GAME_DATA));
-        this.deploymentServiceProvider.distributionCallback().addLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
-        this.deploymentServiceProvider.distributionCallback().addLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
+        this.deploymentServiceProvider.distributionCallback().addGameCluster(gameCluster);
     }
     public void shutdownGameCluster(String gameClusterKey){
         GameCluster gameCluster = new GameCluster();
@@ -359,7 +358,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         this.deploymentServiceProvider.distributionCallback().removeApplication(typeId,applicationId);
     }
     public void launchModule(String typeId){
-        this.deploymentServiceProvider.distributionCallback().addLobby(typeId);
+        this.deploymentServiceProvider.distributionCallback().addLobby(typeId,"publishingId");
     }
     public void shutdownModule(String typeId){
         this.deploymentServiceProvider.distributionCallback().removeLobby(typeId);

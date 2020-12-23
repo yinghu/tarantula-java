@@ -16,4 +16,9 @@ public class LobbyConfiguration{
 	public List<OnView> views = new ArrayList<>();
 	public List<Configuration> configurations = new ArrayList<>();
 
+	public LobbyConfiguration(){}
+	public LobbyConfiguration(LobbyDescriptor lobbyDescriptor){
+		this.descriptor = lobbyDescriptor;
+	}
+
 }

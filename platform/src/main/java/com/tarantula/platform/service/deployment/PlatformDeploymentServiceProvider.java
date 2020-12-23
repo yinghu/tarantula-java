@@ -346,8 +346,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         });
     }
-    public void addLobby(String typeId){
-        this.tarantulaContext.setOnLobby(typeId,(ob)->{
+    public <T extends OnAccess> void addGameCluster(T gameCluster){
+        this.tarantulaContext.setGameClusterOnLobby((GameCluster)gameCluster,(ob)->this.register(ob));
+    }
+    public void addLobby(String typeId,String publishingId){
+        this.tarantulaContext.setOnLobby(typeId,publishingId,(ob)->{
             this.register(ob);
         });
     }
@@ -669,7 +672,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     public <T extends OnAccess> T createGameCluster(String owner,String name){
-        return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name);
+        AccessIndex accessIndex = this.tarantulaContext.accessIndexService().set(name);
+        if(accessIndex==null){
+            GameCluster gc = new GameCluster();
+            gc.successful(false);
+            gc.message("duplicated name ["+name+"]");
+            return (T)gc;
+        }
+        return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name,accessIndex.distributionKey());
     }
     public <T extends OnAccess> T gameCluster(String key){
         GameCluster gc = new GameCluster();
@@ -813,7 +823,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return qCallbacks.get(source).queryEndCallback;
     }
     public void removeQueryCallback(String callId){
-        //qCallbacks.remove(callId);
+        qCallbacks.remove(callId);
     }
     private class PostOfficeSession implements PostOffice{
 

@@ -127,9 +127,9 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
     }
 
-    public <T extends OnAccess> T createGameCluster(String owner, String name){
+    public <T extends OnAccess> T createGameCluster(String owner, String name,String publishingId){
         NodeEngine nodeEngine = getNodeEngine();
-        CreateGameClusterOperation operation = new CreateGameClusterOperation(owner,name);
+        CreateGameClusterOperation operation = new CreateGameClusterOperation(owner,name,publishingId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<T> future = builder.invoke();

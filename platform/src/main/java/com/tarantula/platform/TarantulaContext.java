@@ -279,11 +279,33 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public TokenValidatorProvider tokenValidatorProvider(){
  	    return this.tokenValidatorProvider;
     }
-    public synchronized void setOnLobby(String typeId,OnLobby.Listener listener){
+    public synchronized void setGameClusterOnLobby(GameCluster gameCluster,OnLobby.Listener listener){
+ 	    String publishingId = (String) gameCluster.property(GameCluster.PUBLISHING_ID);
+        List<LobbyDescriptor> bList = this.query(PortableRegistry.OID,new LobbyQuery(this.bucketId()),new String[]{publishingId});
+        List<LobbyConfiguration> configurations = new ArrayList<>();
+        bList.forEach((lb)->configurations.add(new LobbyConfiguration(lb)));
+        Collections.sort(configurations,new LobbyComparator());
+        configurations.forEach((c)->setOnLobby(c,listener));
+    }
+    private void setOnLobby(LobbyConfiguration lc,OnLobby.Listener listener){
+        if(this._lobbyMapping.containsKey(lc.descriptor.typeId)){
+            return;
+        }
+        LobbyDescriptor d = lc.descriptor;
+        this.setLobby(d);//
+        lc.applications = this.query(PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()});
+        lc.views = this.query(PortableRegistry.OID,new OnViewQuery(d.distributionKey()),new String[]{d.distributionKey()});
+        this.configureViews(lc);
+        try{
+            OnLobby ob = this.configure(lc);
+            listener.onLobby(ob);
+        }catch (Exception ex){ex.printStackTrace();}
+    }
+    public synchronized void setOnLobby(String typeId,String publishingId,OnLobby.Listener listener){
         if(this._lobbyMapping.containsKey(typeId)){
             return;
         }
-        List<LobbyDescriptor> bList = this.query(PortableRegistry.OID,new LobbyQuery(this.bucketId()),new String[]{this.bucketId(),typeId});
+        List<LobbyDescriptor> bList = this.query(PortableRegistry.OID,new LobbyQuery(this.bucketId()),new String[]{publishingId});
         bList.forEach((d)->{
             if(d.typeId().equals(typeId)){
                 this.setLobby(d);//
@@ -461,7 +483,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	    this.accessIndexService().disable();
  	    _syc_finished = new CountDownLatch(1);
  	    this.accessIndexService().syncStart();
-        //this.integrationCluster.recoverService().syncStart(dataStoreMaster);
         log.warn("Waiting for data sync from access index and "+dataStoreMaster);
         try{_syc_finished.await();}catch (Exception ex){
             ex.printStackTrace();

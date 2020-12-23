@@ -20,7 +20,7 @@ public interface DeployService extends ServiceProvider {
     boolean enableLobby(String typeId,boolean enabled);
 
     //GameCluster createGameCluster(String owner,String name);
-    <T extends OnAccess> T createGameCluster(String owner,String name);
+    <T extends OnAccess> T createGameCluster(String owner,String name,String publishingId);
     boolean enableGameCluster(String gameClusterId);
     boolean disableGameCluster(String gameClusterId);
 

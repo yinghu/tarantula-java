@@ -12,14 +12,11 @@ public class IndexSet extends RecoverableObject {
     public Set<String> keySet = new HashSet<>();
 
     public IndexSet(){
-        //this.binary = true;
     }
 
     public int getFactoryId() {
         return PortableRegistry.OID;
     }
-
-
 
     @Override
     public Map<String,Object> toMap(){
@@ -38,7 +35,6 @@ public class IndexSet extends RecoverableObject {
     public int getClassId() {
         return PortableRegistry.INDEX_SET_CID;
     }
-
 
     public Recoverable.Key key(){
         return new AssociateKey(this.bucket,this.oid,this.label);
