@@ -6,6 +6,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import com.icodesoftware.Account;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
@@ -47,6 +48,14 @@ public class TarantulaApplicationDeployer implements Serviceable {
 			c.applications = query(recoverService,PortableRegistry.OID,new ApplicationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
 			OnLobby _ob = this.context.configure(c);
 			this.context.deploymentService().register(_ob);
+		}
+		IndexSet indexSet = new IndexSet();
+		indexSet.distributionKey(this.context.bucketId());
+		indexSet.label(Account.GameClusterLabel);
+		if(this.context.masterDataStore().load(indexSet)){
+			indexSet.keySet.forEach((gc)->{
+				System.out.println(gc);
+			});
 		}
 	}
 

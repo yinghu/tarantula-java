@@ -286,6 +286,15 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         bList.forEach((lb)->configurations.add(new LobbyConfiguration(lb)));
         Collections.sort(configurations,new LobbyComparator());
         configurations.forEach((c)->setOnLobby(c,listener));
+        IndexSet indexSet = new IndexSet();
+        indexSet.distributionKey(this.bucketId());
+        indexSet.label(Account.GameClusterLabel);
+        indexSet.keySet.add(publishingId);
+        if(!this.masterDataStore().createIfAbsent(indexSet,true)){
+            indexSet.keySet.add(publishingId);
+            this.masterDataStore().update(indexSet);
+        }
+
     }
     private void setOnLobby(LobbyConfiguration lc,OnLobby.Listener listener){
         if(this._lobbyMapping.containsKey(lc.descriptor.typeId)){
