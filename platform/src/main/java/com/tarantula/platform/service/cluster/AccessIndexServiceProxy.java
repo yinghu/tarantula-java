@@ -125,6 +125,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             final Future<Void> future = builder.invoke();
             future.get(5,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
+            e.printStackTrace();
             //throw ExceptionUtil.rethrow(e);
         }
     }
@@ -136,6 +137,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             final Future<Void> future = builder.invoke();
             future.get(5,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
+            e.printStackTrace();
             //throw ExceptionUtil.rethrow(e);
         }
     }
