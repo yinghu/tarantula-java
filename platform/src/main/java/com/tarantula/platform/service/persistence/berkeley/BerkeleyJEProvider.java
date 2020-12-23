@@ -579,7 +579,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             }
         }
         public void set(byte[] key,byte[] value){
-            _set(key,value);
+            if(!_set(key,value)){
+                log.warn("failed to se key/value->"+new String(key));
+            }
         }
         public byte[] get(byte[] key){
             return _get(key);

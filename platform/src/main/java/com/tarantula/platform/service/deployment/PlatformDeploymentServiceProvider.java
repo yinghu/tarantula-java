@@ -813,7 +813,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return qCallbacks.get(source).queryEndCallback;
     }
     public void removeQueryCallback(String callId){
-        qCallbacks.remove(callId);
+        //qCallbacks.remove(callId);
     }
     private class PostOfficeSession implements PostOffice{
 
