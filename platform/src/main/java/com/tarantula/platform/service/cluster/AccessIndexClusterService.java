@@ -110,7 +110,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
                 this.tarantulaContext.accessIndexService().sync(batch[0],keys,values,memberId);
             }
             this.tarantulaContext.accessIndexService().syncEnd(memberId);
-            log.warn("Total records ["+total[0]+"] synced to ["+memberId+"] timed (seconds) ["+((System.currentTimeMillis()-st)/1000)+"]");
+            log.warn("Total access index records ["+total[0]+"] synced to ["+memberId+"] timed (seconds) ["+((System.currentTimeMillis()-st)/1000)+"]");
         }).start();
         return nodeEngine.getPartitionService().getPartitionCount();
     }
@@ -138,7 +138,7 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
     }
     public void syncEnd(){
         TarantulaContext._syc_finished.countDown();
-        log.warn("Total records received ["+total.get()+"] from master node");
+        log.warn("Total access index records received ["+total.get()+"] from master node");
     }
     public void replicateAsBatch(ReplicationData[] batch){
         for(ReplicationData d : batch){

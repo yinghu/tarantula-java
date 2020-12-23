@@ -281,7 +281,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     public synchronized void setGameClusterOnLobby(GameCluster gameCluster,OnLobby.Listener listener){
  	    String publishingId = (String) gameCluster.property(GameCluster.PUBLISHING_ID);
-        List<LobbyDescriptor> bList = this.query(PortableRegistry.OID,new LobbyQuery(this.bucketId()),new String[]{publishingId});
+        List<LobbyDescriptor> bList = this.query(PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId});
         List<LobbyConfiguration> configurations = new ArrayList<>();
         bList.forEach((lb)->configurations.add(new LobbyConfiguration(lb)));
         Collections.sort(configurations,new LobbyComparator());
@@ -289,12 +289,11 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         IndexSet indexSet = new IndexSet();
         indexSet.distributionKey(this.bucketId());
         indexSet.label(Account.GameClusterLabel);
-        indexSet.keySet.add(publishingId);
+        indexSet.keySet.add(gameCluster.distributionKey());
         if(!this.masterDataStore().createIfAbsent(indexSet,true)){
-            indexSet.keySet.add(publishingId);
+            indexSet.keySet.add(gameCluster.distributionKey());
             this.masterDataStore().update(indexSet);
         }
-
     }
     private void setOnLobby(LobbyConfiguration lc,OnLobby.Listener listener){
         if(this._lobbyMapping.containsKey(lc.descriptor.typeId)){
@@ -490,11 +489,12 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     public void _registerNode(){
  	    this.accessIndexService().disable();
- 	    _syc_finished = new CountDownLatch(1);
+ 	    _syc_finished = new CountDownLatch(2);
  	    this.accessIndexService().syncStart();
+ 	    this.tarantulaCluster.recoverService().syncStart(dataStoreMaster);
         log.warn("Waiting for data sync from access index and "+dataStoreMaster);
         try{_syc_finished.await();}catch (Exception ex){
-            ex.printStackTrace();
+            throw new RuntimeException(ex);
         }
         this.accessIndexService().enable();
         AccessIndex bid = this.accessIndexService().get(node.bucketName);

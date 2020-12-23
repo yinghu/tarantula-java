@@ -13,6 +13,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
 
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClusterRecoverService implements ManagedService, RemoteService {
     private static TarantulaLogger log = JDKLogger.getLogger(ClusterRecoverService.class);
@@ -21,6 +22,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     private TarantulaContext tarantulaContext;
     private DeploymentServiceProvider deploymentServiceProvider;
     private int scope;
+    private AtomicInteger total = new AtomicInteger(0);
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.nodeEngine = nodeEngine;
@@ -58,6 +60,8 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     public int syncStart(String memberId,String source){
         RecoverService recoverService = scope==1?tarantulaContext.tarantulaCluster().recoverService():tarantulaContext.integrationCluster().recoverService();
         new Thread(()->{
+            int[] total={0};
+            long st = System.currentTimeMillis();
             if(!memberId.equals(nodeEngine.getLocalMember().getUuid())){
                 int[] batch={0};
                 byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
@@ -70,12 +74,14 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                     keys[batch[0]]=k;
                     values[batch[0]]=v;
                     batch[0]++;
+                    total[0]++;
                     return true;
                 });
                 //last batch
                 recoverService.sync(batch[0],keys,values,memberId,source);
             }
             recoverService.syncEnd(memberId);
+            log.warn("Total records ["+total[0]+"] from ["+source+"] synced to ["+memberId+"] timed (seconds) ["+((System.currentTimeMillis()-st)/1000)+"]");
         }).start();
         return this.tarantulaContext.partitionNumber();
     }
@@ -83,9 +89,11 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         for(ReplicationData d : batch){
             replicate(d.source,d.key,d.value);
         }
+        total.addAndGet(batch.length);
     }
     public void syncEnd(){
         TarantulaContext._syc_finished.countDown();
+        log.warn("Total records received ["+total.get()+"] from master node");
     }
 
     public boolean queryStart(String memberId,String source,String dataStore,int factoryId,int classId,String[] params){

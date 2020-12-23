@@ -23,7 +23,9 @@ public class TarantulaApplicationDeployer implements Serviceable {
 	public TarantulaApplicationDeployer(final TarantulaContext context ){
 		this.context = context;
 	}
+	public void shutdown() throws Exception {
 
+	}
 	public void start() throws Exception {
 		this.context._registerNode();
 		RecoverService recoverService = this.context.tarantulaCluster().recoverService();
@@ -54,13 +56,23 @@ public class TarantulaApplicationDeployer implements Serviceable {
 		indexSet.label(Account.GameClusterLabel);
 		if(this.context.masterDataStore().load(indexSet)){
 			indexSet.keySet.forEach((gc)->{
-				System.out.println(gc);
+				deployGameCluster(gc);
 			});
 		}
 	}
-
-	public void shutdown() throws Exception {
-		
+	private void deployGameCluster(String gameClusterId){
+		try {
+			RecoverService recoverService = this.context.integrationCluster().recoverService();
+			byte[] ret = recoverService.load(context.dataStoreMaster,gameClusterId.getBytes());
+			GameCluster gameCluster = new GameCluster();
+			gameCluster.distributionKey(gameClusterId);
+			gameCluster.fromBinary(ret);
+			String publishingId = (String)gameCluster.property(GameCluster.PUBLISHING_ID);
+			List<LobbyDescriptor> bList = query(recoverService, PortableRegistry.OID, new LobbyQuery(publishingId), new String[]{publishingId});
+			bList.forEach((b)->System.out.println(b.typeId()));
+		}catch (Exception ex){
+			throw new RuntimeException(ex);
+		}
 	}
 	private <T extends Recoverable> List<T> query(RecoverService recoverService,int factoryId,RecoverableFactory<T> factory,String[] params) throws Exception{
 		List<T> tlist = new ArrayList<>();
