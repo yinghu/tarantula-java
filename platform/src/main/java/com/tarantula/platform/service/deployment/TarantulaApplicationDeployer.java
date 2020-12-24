@@ -63,7 +63,9 @@ public class TarantulaApplicationDeployer implements Serviceable {
 	private void deployGameCluster(String gameClusterId){
 		try {
 			RecoverService recoverService = this.context.integrationCluster().recoverService();
-			byte[] ret = recoverService.load(context.dataStoreMaster,gameClusterId.getBytes());
+			String memberId = recoverService.findDataNode(context.dataStoreMaster,gameClusterId.getBytes());
+			System.out.println(memberId);
+			byte[] ret = recoverService.load(memberId,context.dataStoreMaster,gameClusterId.getBytes());
 			GameCluster gameCluster = new GameCluster();
 			gameCluster.distributionKey(gameClusterId);
 			gameCluster.fromBinary(ret);
@@ -85,7 +87,7 @@ public class TarantulaApplicationDeployer implements Serviceable {
 				tlist.add(t);
 			}
 		},()-> _lock.countDown());
-		recoverService.queryStart(cid,context.dataStoreMaster,factoryId,factory.registryId(),params);
+		recoverService.queryStart(null,cid,context.dataStoreMaster,factoryId,factory.registryId(),params);
 		_lock.await();
 		this.context.deploymentService().distributionCallback().removeQueryCallback(cid);
 		return tlist;

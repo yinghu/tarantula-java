@@ -693,12 +693,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public Lobby lobby(String typeId){
         //DataStore mds = this.tarantulaContext.masterDataStore();
         LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.bucketId(),typeId);
-        byte[] v = this.tarantulaContext.tarantulaCluster().recoverService().load(tarantulaContext.dataStoreMaster,lobbyTypeIdIndex.key().asString().getBytes());
+        byte[] v = this.tarantulaContext.tarantulaCluster().recoverService().load(null,tarantulaContext.dataStoreMaster,lobbyTypeIdIndex.key().asString().getBytes());
         if(v==null){
             return null;
         }
         lobbyTypeIdIndex.fromBinary(v);
-        v = this.tarantulaContext.tarantulaCluster().recoverService().load(this.tarantulaContext.dataStoreMaster,lobbyTypeIdIndex.index().getBytes());
+        v = this.tarantulaContext.tarantulaCluster().recoverService().load(null,this.tarantulaContext.dataStoreMaster,lobbyTypeIdIndex.index().getBytes());
         if(v==null){
             return null;
         }

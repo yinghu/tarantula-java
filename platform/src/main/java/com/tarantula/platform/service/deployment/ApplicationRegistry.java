@@ -70,7 +70,7 @@ public class ApplicationRegistry implements ApplicationAllocator{
             _lock.countDown();
             System.out.println("end query");
         });
-        recoverService.queryStart(cid,tarantulaContext.dataStoreMaster,factoryId,factory.registryId(),params);
+        recoverService.queryStart(null,cid,tarantulaContext.dataStoreMaster,factoryId,factory.registryId(),params);
         try {
             _lock.await();
         }catch (Exception ex){}

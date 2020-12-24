@@ -632,7 +632,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             t.distributionKey(new String(k));
             tlist.add(t);
         },()-> _lock.countDown());
-        recoverService.queryStart(cid,dataStoreMaster,factoryId,factory.registryId(),params);
+        recoverService.queryStart(null,cid,dataStoreMaster,factoryId,factory.registryId(),params);
         try {
             _lock.await();
         }catch (Exception ex){}

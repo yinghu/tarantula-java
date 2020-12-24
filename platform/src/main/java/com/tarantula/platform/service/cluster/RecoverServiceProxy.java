@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.cluster;
 
 import com.hazelcast.core.Member;
+import com.hazelcast.nio.Address;
 import com.hazelcast.spi.AbstractDistributedObject;
 
 import com.hazelcast.spi.InvocationBuilder;
@@ -56,10 +57,31 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     public void shutdown() throws Exception {
 
     }
-    public boolean queryStart(String source,String dataStore,int factoryId,int classId,String[] params){
+    public String findDataNode(String source,byte[] key){
+        NodeEngine nodeEngine = getNodeEngine();
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        String ret = null;
+        FindDataNodeOperation operation = new FindDataNodeOperation(source,key);
+        for(Member m : mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+            final Future<String> future = builder.invoke();
+            try {
+                ret = future.get(5,TimeUnit.SECONDS);
+                if(ret!=null){
+                    break;
+                }
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return ret;
+    }
+    public boolean queryStart(String memberId,String source,String dataStore,int factoryId,int classId,String[] params){
         NodeEngine nodeEngine = getNodeEngine();
         DataStoreQueryStartOperation operation = new DataStoreQueryStartOperation(nodeEngine.getLocalMember().getUuid(),source,dataStore,factoryId,classId,params);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
+        Address targetNode = memberId!=null?nodeEngine.getClusterService().getMember(memberId).getAddress():nodeEngine.getMasterAddress();
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,targetNode);
         try {
             final Future<Boolean> future = builder.invoke();
             return future.get(); //retry if timeout
@@ -89,10 +111,11 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public byte[] load(String dataSource,byte[] key){
+    public byte[] load(String memberId,String dataSource,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();
         LoadOperation operation = new LoadOperation(dataSource,key);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
+        Address targetNode = memberId!=null?nodeEngine.getClusterService().getMember(memberId).getAddress():nodeEngine.getMasterAddress();
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,targetNode);
         try {
             final Future<byte[]> future = builder.invoke();
             return future.get(); //retry if timeout

@@ -83,7 +83,7 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
     @Override
     public void update(ServiceContext serviceContext){
         RecoverService rsp = serviceContext.clusterProvider(Distributable.DATA_SCOPE).recoverService();
-        byte[] _data = rsp.load(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.distributionKey().getBytes());
+        byte[] _data = rsp.load(null,DeploymentServiceProvider.DEPLOY_DATA_STORE,this.distributionKey().getBytes());
         this.fromBinary((_data));
         this._listeners.forEach((a)->a.onUpdated(this));
     }

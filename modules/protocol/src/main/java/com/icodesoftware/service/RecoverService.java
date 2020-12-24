@@ -3,15 +3,18 @@ package com.icodesoftware.service;
 public interface RecoverService extends ServiceProvider{
 
     String NAME = "RecoverService";
-
-    boolean queryStart(String source,String dataStore,int factorId,int classId,String[] params);
+    //operates master or member node
+    String findDataNode(String source,byte[] key);
+    byte[] load(String memberId,String dataSource,byte[] key);
+    boolean queryStart(String memberId,String source,String dataStore,int factorId,int classId,String[] params);
     void query(String memberId,String source,byte[] key,byte[] value);
     void queryEnd(String memberId,String source);
 
-    byte[] load(String dataSource,byte[] key);
+    //operates on other nodes
     byte[] recover(String source,byte[] key);
     void replicate(String source,int partition,byte[] key,byte[] value);
 
+    //operates on master node
     int syncStart(String source);
     void sync(int size,byte[][] keys,byte[][] values,String memberId,String source);
     void syncEnd(String memberId);

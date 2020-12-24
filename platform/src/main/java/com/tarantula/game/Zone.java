@@ -359,11 +359,11 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         RecoverService deployService = serviceContext.clusterProvider(Distributable.DATA_SCOPE).recoverService();
         Zone zone = new Zone();
         zone.distributionKey(descriptor.distributionKey());
-        byte[] _data = deployService.load(this.dataStore.name(),zone.distributionKey().getBytes());
+        byte[] _data = deployService.load(null,this.dataStore.name(),zone.distributionKey().getBytes());
         zone.fromBinary(_data);
         for(int i=1;i<descriptor.capacity()+1;i++){
             Arena a = new Arena(zone.bucket(),zone.oid(),i);
-            _data = deployService.load(dataStore.name(),a.distributionKey().getBytes());
+            _data = deployService.load(null,dataStore.name(),a.distributionKey().getBytes());
             if(_data!=null){
                 a.fromBinary(_data);
                 if(!a.disabled()){//skip disabled
