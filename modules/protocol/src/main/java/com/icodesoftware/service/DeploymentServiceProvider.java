@@ -88,6 +88,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //local callbacks on distributed operations
     interface DistributionCallback{
         <T extends OnAccess> void addGameCluster(T gameCluster);
+        <T extends OnAccess> void closeGameCluster(T gameCluster);
         void addLobby(String typeId,String publishingId);
         void removeLobby(String typeId);
         void addApplication(String typeId,String applicationId);

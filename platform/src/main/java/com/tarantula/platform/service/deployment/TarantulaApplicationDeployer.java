@@ -64,14 +64,19 @@ public class TarantulaApplicationDeployer implements Serviceable {
 		try {
 			RecoverService recoverService = this.context.integrationCluster().recoverService();
 			String memberId = recoverService.findDataNode(context.dataStoreMaster,gameClusterId.getBytes());
-			System.out.println(memberId);
+			if(memberId==null){
+				return;
+			}
 			byte[] ret = recoverService.load(memberId,context.dataStoreMaster,gameClusterId.getBytes());
 			GameCluster gameCluster = new GameCluster();
 			gameCluster.distributionKey(gameClusterId);
 			gameCluster.fromBinary(ret);
-			String publishingId = (String)gameCluster.property(GameCluster.PUBLISHING_ID);
-			List<LobbyDescriptor> bList = query(recoverService, PortableRegistry.OID, new LobbyQuery(publishingId), new String[]{publishingId});
-			bList.forEach((b)->System.out.println(b.typeId()));
+			if((boolean)gameCluster.property(GameCluster.DISABLED)){
+				return;
+			}
+			this.context.setGameClusterOnLobby(memberId,gameCluster,(o)->{
+				this.context.deploymentService().register(o);
+			});
 		}catch (Exception ex){
 			throw new RuntimeException(ex);
 		}

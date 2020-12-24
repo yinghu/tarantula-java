@@ -164,7 +164,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public void setupOnInstanceRegistry(){
         if(!started.getAndSet(true)){
             try{
-                List<OnInstance> olist = this.tarantulaContext.query(PortableRegistry.OID,new OnInstanceQuery(this._instance.distributionKey()),new String[]{this._instance.distributionKey()});
+                List<OnInstance> olist = this.tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new OnInstanceQuery(this._instance.distributionKey()),new String[]{this._instance.distributionKey()});
                 if(olist.isEmpty()){
                     olist = deployFromLocal(_instance);
                 }

@@ -1,7 +1,6 @@
 package com.tarantula.platform.service.deployment;
 
 import com.icodesoftware.*;
-import com.icodesoftware.service.RecoverService;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.ApplicationAllocator;
 import com.tarantula.platform.service.cluster.PortableRegistry;
@@ -9,7 +8,6 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Developer: YINGHU LU
@@ -31,7 +29,7 @@ public class ApplicationRegistry implements ApplicationAllocator{
     }
 
     public void configure(){
-        List<InstanceIndex> _rlist = query(PortableRegistry.OID,new InstanceRegistryQuery(deploymentDescriptor.distributionKey()),new String[]{deploymentDescriptor.distributionKey()});//this.tarantulaContext.tarantulaCluster.list(iq);
+        List<InstanceIndex> _rlist = tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new InstanceRegistryQuery(deploymentDescriptor.distributionKey()),new String[]{deploymentDescriptor.distributionKey()});//this.tarantulaContext.tarantulaCluster.list(iq);
         if(_rlist.isEmpty()){
             _rlist = deployFromLocal(deploymentDescriptor);
         }
@@ -56,27 +54,7 @@ public class ApplicationRegistry implements ApplicationAllocator{
             throw new RuntimeException("Cannot create instance registry");
         }
     }
-    private <T extends Recoverable> List<T> query(int factoryId, RecoverableFactory<T> factory, String[] params){
-        RecoverService recoverService = tarantulaContext.tarantulaCluster().recoverService();
-        List<T> tlist = new ArrayList<>();
-        CountDownLatch _lock = new CountDownLatch(1);
-        String cid = this.tarantulaContext.deploymentService().distributionCallback().registerQueryCallback((k,v)->{
-            System.out.println(new String(v));
-            T t = factory.create();
-            t.fromBinary(v);
-            t.distributionKey(new String(k));
-            tlist.add(t);
-        },()->{
-            _lock.countDown();
-            System.out.println("end query");
-        });
-        recoverService.queryStart(null,cid,tarantulaContext.dataStoreMaster,factoryId,factory.registryId(),params);
-        try {
-            _lock.await();
-        }catch (Exception ex){}
-        this.tarantulaContext.deploymentService().distributionCallback().removeQueryCallback(cid);
-        return tlist;
-    }
+
     private List<InstanceIndex> deployFromLocal(DeploymentDescriptor deploymentDescriptor){
         ArrayList ilist = new ArrayList();
         for(int i=0;i<deploymentDescriptor.instancesOnStartupPerPartition();i++){

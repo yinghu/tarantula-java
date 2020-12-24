@@ -340,16 +340,12 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void launchGameCluster(String gameClusterKey){
         GameCluster gameCluster = new GameCluster();
         gameCluster.distributionKey(gameClusterKey);
-        this.tarantulaContext.masterDataStore().load(gameCluster);
         this.deploymentServiceProvider.distributionCallback().addGameCluster(gameCluster);
     }
     public void shutdownGameCluster(String gameClusterKey){
         GameCluster gameCluster = new GameCluster();
         gameCluster.distributionKey(gameClusterKey);
-        this.tarantulaContext.masterDataStore().load(gameCluster);
-        this.deploymentServiceProvider.distributionCallback().removeLobby((String)gameCluster.property(GameCluster.GAME_DATA));
-        this.deploymentServiceProvider.distributionCallback().removeLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
-        this.deploymentServiceProvider.distributionCallback().removeLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
+        this.deploymentServiceProvider.distributionCallback().closeGameCluster(gameCluster);
     }
     public void launchApplication(String typeId,String applicationId){
         this.deploymentServiceProvider.distributionCallback().addApplication(typeId,applicationId);

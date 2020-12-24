@@ -347,7 +347,28 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
     }
     public <T extends OnAccess> void addGameCluster(T gameCluster){
-        this.tarantulaContext.setGameClusterOnLobby((GameCluster)gameCluster,(ob)->this.register(ob));
+        byte[] key = gameCluster.distributionKey().getBytes();
+        String memberId = this.tarantulaContext.integrationCluster().recoverService().findDataNode(this.tarantulaContext.dataStoreMaster,key);
+        if(memberId==null){
+            log.warn("No game cluster found ["+gameCluster.distributionKey()+"]");
+            return;
+        }
+        byte[] ret = this.tarantulaContext.integrationCluster().recoverService().load(memberId,this.tarantulaContext.dataStoreMaster,key);
+        gameCluster.fromBinary(ret);
+        this.tarantulaContext.setGameClusterOnLobby(memberId,(GameCluster)gameCluster,(ob)->this.register(ob));
+    }
+    public <T extends OnAccess> void closeGameCluster(T gameCluster){
+        byte[] key = gameCluster.distributionKey().getBytes();
+        String memberId = this.tarantulaContext.integrationCluster().recoverService().findDataNode(this.tarantulaContext.dataStoreMaster,key);
+        if(memberId==null){
+            log.warn("No game cluster found ["+gameCluster.distributionKey()+"]");
+            return;
+        }
+        byte[] ret = this.tarantulaContext.integrationCluster().recoverService().load(memberId,this.tarantulaContext.dataStoreMaster,key);
+        gameCluster.fromBinary(ret);
+        removeLobby((String)gameCluster.property(GameCluster.GAME_DATA));
+        removeLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
+        removeLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
     }
     public void addLobby(String typeId,String publishingId){
         this.tarantulaContext.setOnLobby(typeId,publishingId,(ob)->{
@@ -656,7 +677,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         if(deployService.enableGameCluster(gameCluster.distributionKey())){
-            return deployService.launchGameCluster(gameCluster.distributionKey());
+            return tarantulaContext.integrationCluster().deployService().launchGameCluster(gameCluster.distributionKey());
         }
         else{
             return false;
@@ -665,7 +686,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends OnAccess> boolean shutdownGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         if(deployService.disableGameCluster(gameCluster.distributionKey())){
-            return deployService.shutdownGameCluster(gameCluster.distributionKey());
+            return this.tarantulaContext.integrationCluster().deployService().shutdownGameCluster(gameCluster.distributionKey());
         }
         else{
             return false;
@@ -706,7 +727,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         lb.fromBinary(v);
         lb.distributionKey(lobbyTypeIdIndex.index());
         Lobby lobby = new DefaultLobby(lb);
-        List<DeploymentDescriptor> apps = this.tarantulaContext.query(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey()});
+        List<DeploymentDescriptor> apps = this.tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey()});
         apps.forEach((a)->{
             lobby.addEntry(a);
         });
