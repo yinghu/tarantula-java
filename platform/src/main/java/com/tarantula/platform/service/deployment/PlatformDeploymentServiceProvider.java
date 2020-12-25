@@ -204,7 +204,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         boolean suc = deployService.resetModule(descriptor);
         if(suc){
-            deployService.updateModule(descriptor);
+            this.integrationCluster.deployService().updateModule(descriptor);
         }
         return suc;
     }
