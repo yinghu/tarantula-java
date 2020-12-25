@@ -244,6 +244,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return false;
         }
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        //AccessIndex publishId = this.tarantulaContext.accessIndexService().set(descriptor.typeId());
         xmlParser.configurations.forEach((a)->{
             suc[0] = deployService.addLobby(a.descriptor);
             if(!suc[0]){
@@ -372,9 +373,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         removeLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
     }
     public void addLobby(String typeId,String publishingId){
-        this.tarantulaContext.setOnLobby(typeId,publishingId,(ob)->{
-            this.register(ob);
-        });
+        this.tarantulaContext.setOnLobby(typeId,publishingId,(ob)->this.register(ob));
     }
     @Override
     public void setup(ServiceContext serviceContext){

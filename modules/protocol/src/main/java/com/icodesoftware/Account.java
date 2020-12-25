@@ -5,6 +5,7 @@ public interface Account extends Access {
     String DataStore = "account";
     String UserLabel = "users";
     String GameClusterLabel = "games";
+    String ModuleLabel = "modules";
 
     int userCount(int delta);
     int gameClusterCount(int delta);

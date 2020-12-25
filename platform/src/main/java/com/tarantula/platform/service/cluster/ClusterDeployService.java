@@ -354,7 +354,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         this.deploymentServiceProvider.distributionCallback().removeApplication(typeId,applicationId);
     }
     public void launchModule(String typeId){
-        this.deploymentServiceProvider.distributionCallback().addLobby(typeId,"publishingId");
+        this.deploymentServiceProvider.distributionCallback().addLobby(typeId,this.tarantulaContext.bucketId());
     }
     public void shutdownModule(String typeId){
         this.deploymentServiceProvider.distributionCallback().removeLobby(typeId);
