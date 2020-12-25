@@ -6,7 +6,7 @@ public interface DeployService extends ServiceProvider {
 
     String NAME = "DeployService";
 
-    boolean addLobby(Descriptor lobby);
+    boolean addLobby(Descriptor lobby,String publishingId);
     boolean addView(OnView onView);
 
     String addApplication(Descriptor application);

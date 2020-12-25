@@ -313,7 +313,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         if(this._lobbyMapping.containsKey(typeId)){
             return;
         }
-        List<LobbyDescriptor> bList = this.queryFromDataMaster(PortableRegistry.OID,new LobbyQuery(this.bucketId()),new String[]{publishingId});
+        List<LobbyDescriptor> bList = this.queryFromDataMaster(PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId});
         bList.forEach((d)->{
             if(d.typeId().equals(typeId)){
                 this.setLobby(d);//
@@ -328,6 +328,14 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
                 }catch (Exception ex){ex.printStackTrace();}
             }
         });
+        IndexSet indexSet = new IndexSet();
+        indexSet.distributionKey(this.bucketId());
+        indexSet.label(Account.ModuleLabel);
+        indexSet.keySet.add(publishingId);
+        if(!this.masterDataStore().createIfAbsent(indexSet,true)){
+            indexSet.keySet.add(publishingId);
+            this.masterDataStore().update(indexSet);
+        }
     }
     public synchronized void unsetLobby(String typeId,Lobby.Listener listener){
         try{
@@ -630,12 +638,15 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             T t = factory.create();
             t.fromBinary(v);
             t.distributionKey(new String(k));
-            tlist.add(t);
+            if(!t.disabled()){
+                tlist.add(t);
+            }
         },()-> _lock.countDown());
         recoverService.queryStart(null,cid,dataStoreMaster,factoryId,factory.registryId(),params);
         try {
             _lock.await();
-        }catch (Exception ex){}
+        }catch (Exception ex){
+        }
         this.deploymentService().distributionCallback().removeQueryCallback(cid);
         return tlist;
     }

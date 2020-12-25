@@ -59,6 +59,14 @@ public class TarantulaApplicationDeployer implements Serviceable {
 				deployGameCluster(gc);
 			});
 		}
+		IndexSet moduleIndex = new IndexSet();
+		moduleIndex.distributionKey(this.context.bucketId());
+		moduleIndex.label(Account.ModuleLabel);
+		if(this.context.masterDataStore().load(moduleIndex)){
+			moduleIndex.keySet.forEach((gc)->{
+				System.out.println(gc);
+			});
+		}
 	}
 	private void deployGameCluster(String gameClusterId){
 		try {

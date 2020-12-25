@@ -12,6 +12,7 @@ import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.util.ResponseSerializer;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.*;
 
@@ -56,19 +57,20 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     @Override
     public void destroyDistributedObject(String s) {
     }
-    public boolean addLobby(Descriptor descriptor){
+    public boolean addLobby(Descriptor descriptor,String publishingId){
         DataStore ds = this.tarantulaContext.masterDataStore();
         LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.bucketId(),descriptor.typeId());
         if(!ds.createIfAbsent(lobbyTypeIdIndex,false)){
             return false;
         }
-        descriptor.owner(this.tarantulaContext.bucketId());
+        descriptor.owner(publishingId);
         descriptor.label(LobbyDescriptor.LABEL);
         descriptor.onEdge(true);
         descriptor.resetEnabled(true);
         descriptor.disabled(true);
         ds.create(descriptor);
         lobbyTypeIdIndex.index(descriptor.distributionKey());
+        lobbyTypeIdIndex.owner(publishingId);
         ds.update(lobbyTypeIdIndex);
         return descriptor.distributionKey()!=null;
         /**
@@ -354,7 +356,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         this.deploymentServiceProvider.distributionCallback().removeApplication(typeId,applicationId);
     }
     public void launchModule(String typeId){
-        this.deploymentServiceProvider.distributionCallback().addLobby(typeId,this.tarantulaContext.bucketId());
+        this.deploymentServiceProvider.distributionCallback().addLobby(typeId);
     }
     public void shutdownModule(String typeId){
         this.deploymentServiceProvider.distributionCallback().removeLobby(typeId);

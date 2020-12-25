@@ -244,28 +244,26 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return false;
         }
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
-        //AccessIndex publishId = this.tarantulaContext.accessIndexService().set(descriptor.typeId());
-        xmlParser.configurations.forEach((a)->{
-            suc[0] = deployService.addLobby(a.descriptor);
-            if(!suc[0]){
-                return;
+        LobbyConfiguration a = xmlParser.configurations.get(0);
+        AccessIndex publishId = this.tarantulaContext.accessIndexService().set(a.descriptor.typeId());
+        suc[0] = deployService.addLobby(a.descriptor,publishId.distributionKey());
+        if(!suc[0]){
+            return false;
+        }
+        a.applications.forEach((b)->{
+            b.codebase(descriptor.codebase());
+            b.moduleArtifact(descriptor.moduleArtifact());
+            b.moduleVersion(descriptor.moduleVersion());
+            if(b.singleton()){
+                b.applicationClassName("com.tarantula.platform.module.SingletonModuleApplication");
             }
-            a.applications.forEach((b)->{
-                b.codebase(descriptor.codebase());
-                b.moduleArtifact(descriptor.moduleArtifact());
-                b.moduleVersion(descriptor.moduleVersion());
-                if(b.singleton()){
-                    b.applicationClassName("com.tarantula.platform.module.SingletonModuleApplication");
-                }
-                else{
-                    b.applicationClassName("com.tarantula.platform.module.DynamicModuleApplication");
-                }
-                String x = deployService.addApplication(b);
-                if(x==null){
-                    log.warn("Failed to add application ->"+b.toString());
-                }
-            });
-            //skip view and configs
+            else{
+                b.applicationClassName("com.tarantula.platform.module.DynamicModuleApplication");
+            }
+            String x = deployService.addApplication(b);
+            if(x==null){
+                log.warn("Failed to add application ->"+b.toString());
+            }
         });
         return suc[0];
     }
@@ -372,8 +370,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         removeLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
         removeLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
     }
-    public void addLobby(String typeId,String publishingId){
-        this.tarantulaContext.setOnLobby(typeId,publishingId,(ob)->this.register(ob));
+    public void addLobby(String typeId){
+        AccessIndex accessIndex = this.tarantulaContext.accessIndexService().get(typeId);
+        this.tarantulaContext.setOnLobby(typeId,accessIndex.distributionKey(),(ob)->this.register(ob));
     }
     @Override
     public void setup(ServiceContext serviceContext){

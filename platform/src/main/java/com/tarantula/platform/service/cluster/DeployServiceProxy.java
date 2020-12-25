@@ -58,9 +58,9 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
 
     }
 
-    public boolean addLobby(Descriptor lobby){
+    public boolean addLobby(Descriptor lobby,String publishingId){
         NodeEngine nodeEngine = getNodeEngine();
-        AddLobbyOperation operation = new AddLobbyOperation(lobby);
+        AddLobbyOperation operation = new AddLobbyOperation(lobby,publishingId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Boolean> future = builder.invoke();

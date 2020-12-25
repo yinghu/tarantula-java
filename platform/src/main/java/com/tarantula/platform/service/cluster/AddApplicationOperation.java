@@ -10,7 +10,7 @@ import com.tarantula.platform.util.SystemUtil;
 import java.io.IOException;
 
 /**
- * updated by yinghu lu on 5/29/2019.
+ * updated by yinghu lu on 12/25/2020
  */
 public class AddApplicationOperation extends Operation {
 
@@ -40,13 +40,13 @@ public class AddApplicationOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeByteArray(SystemUtil.toJson(this.descriptor.toMap()));
+        out.writeByteArray(descriptor.toBinary());
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         this.descriptor = new DeploymentDescriptor();
-        this.descriptor.fromMap(SystemUtil.toMap(in.readByteArray()));
+        this.descriptor.fromBinary(in.readByteArray());
     }
 }

@@ -16,20 +16,21 @@ public class AddLobbyOperation extends Operation {
 
 
     private Descriptor descriptor;
-
+    private String publishingId;
     private boolean result;
 
     public AddLobbyOperation() {
     }
 
 
-    public AddLobbyOperation(Descriptor lobby) {
+    public AddLobbyOperation(Descriptor lobby,String publishingId) {
         this.descriptor = lobby;
+        this.publishingId = publishingId;
     }
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        this.result = cds.addLobby(this.descriptor);
+        this.result = cds.addLobby(this.descriptor,publishingId);
     }
 
     @Override
@@ -40,13 +41,15 @@ public class AddLobbyOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeByteArray(SystemUtil.toJson(this.descriptor.toMap()));
+        out.writeUTF(publishingId);
+        out.writeByteArray(this.descriptor.toBinary());
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
+        publishingId = in.readUTF();
         this.descriptor = new LobbyDescriptor();
-        this.descriptor.fromMap(SystemUtil.toMap(in.readByteArray()));
+        this.descriptor.fromBinary(in.readByteArray());
     }
 }
