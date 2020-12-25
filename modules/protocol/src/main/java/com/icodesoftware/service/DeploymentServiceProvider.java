@@ -18,7 +18,6 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     String NAME = "DeploymentServiceProvider";
 
     //GAME SERVER/PUSH SERVER APIs
-    //Connection onConnection(String typeId);
     Connection onConnection(String typeId);
     void onRemoteConnection(Session session,Descriptor descriptor);
     byte[] serverKey(Connection connection);

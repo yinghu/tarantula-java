@@ -3,6 +3,7 @@ package com.tarantula.cci;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeployService;
+import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.logging.JDKLogger;
@@ -21,9 +22,10 @@ public class UploadEventHandler implements RequestHandler {
     private static TarantulaLogger log = JDKLogger.getLogger(UploadEventHandler.class);
 
     private DeployService deployService;
+    private RecoverService recoverService;
     private TokenValidator tokenValidator;
-    private TokenValidatorProvider tokenValidatorProvider;
     private GsonBuilder builder;
+
     public UploadEventHandler(){
     }
     public String name(){
@@ -33,7 +35,7 @@ public class UploadEventHandler implements RequestHandler {
         try{
             String token = exchange.header(Session.TARANTULA_TOKEN);
             OnSession onSession = tokenValidator.validateToken(token);
-            if(tokenValidatorProvider.role(onSession.systemId()).accessControl()>= AccessControl.root.accessControl()) {
+            if(recoverService.checkAccessControl(onSession.systemId(),AccessControl.root)){
                 InputStream in = exchange.onStream();
                 String path = exchange.path();
                 log.warn(onSession.systemId() + " is uploading module [" + path + "]");
@@ -62,9 +64,10 @@ public class UploadEventHandler implements RequestHandler {
 
     }
     public void setup(ServiceContext tcx){
-        this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
+        TokenValidatorProvider tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.tokenValidator = tokenValidatorProvider.tokenValidator();
         this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
+        this.recoverService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).recoverService();
     }
     public boolean onEvent(Event event){
        return true;

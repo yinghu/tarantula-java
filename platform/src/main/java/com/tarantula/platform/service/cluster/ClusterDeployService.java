@@ -13,7 +13,6 @@ import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.util.ResponseSerializer;
 
-import java.lang.Module;
 import java.util.*;
 
 
@@ -184,13 +183,11 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             return false;
         }
         dataStore.list(new ApplicationQuery(lobbyTypeIdIndex.index()),(a)->{
-            //if(a.subtypeId().equals(descriptor.subtypeId())){
-                a.codebase(descriptor.codebase());
-                a.moduleArtifact(descriptor.moduleArtifact());
-                a.moduleVersion(descriptor.moduleVersion());
-                dataStore.update(a);
-                suc[0]=true;
-            //}
+            a.codebase(descriptor.codebase());
+            a.moduleArtifact(descriptor.moduleArtifact());
+            a.moduleVersion(descriptor.moduleVersion());
+            dataStore.update(a);
+            suc[0]=true;
             return true;
         });
         return suc[0];

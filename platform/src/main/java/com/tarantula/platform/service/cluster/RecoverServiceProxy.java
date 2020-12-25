@@ -7,6 +7,7 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;
+import com.icodesoftware.Access;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
 
@@ -56,6 +57,27 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     @Override
     public void shutdown() throws Exception {
 
+    }
+    public boolean checkAccessControl(String systemId, Access.Role role){
+        NodeEngine nodeEngine = getNodeEngine();
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        boolean ret = false;
+        CheckAccessControlOperation operation = new CheckAccessControlOperation(systemId,role);
+        for(Member m : mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+            final Future<Integer> future = builder.invoke();
+            try {
+                int flag = future.get(5,TimeUnit.SECONDS);
+                if(flag!=RecoverService.CHECK_SKIPPED){
+                    ret = flag == RecoverService.ROLE_MATCHED;
+                    break;
+                }
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return ret;
     }
     public String findDataNode(String source,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();
