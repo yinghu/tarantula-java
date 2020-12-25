@@ -28,7 +28,9 @@ public class SingletonApplicationManager extends DefaultApplication implements B
         if(dd.accessMode()!= Access.PRIVATE_ACCESS_MODE){
             for(int r=0;r<this.tarantulaContext.platformRoutingNumber;r++){
                 StringBuffer bs = new StringBuffer(this.tarantulaContext.dataBucketGroup).append(Recoverable.PATH_SEPARATOR).append(singleton.descriptor().tag()).append(Recoverable.PATH_SEPARATOR).append(r);
-                this.tarantulaContext.integrationCluster().registerBucketReceiver(new ApplicationBucketReceiver(bs.toString(),r,this,this));
+                String receiver = bs.toString();
+                this.singleton.log("Application registered with ["+receiver+"]",OnLog.WARN);
+                this.tarantulaContext.integrationCluster().registerBucketReceiver(new ApplicationBucketReceiver(receiver,r,this,this));
             }
         }
         else{

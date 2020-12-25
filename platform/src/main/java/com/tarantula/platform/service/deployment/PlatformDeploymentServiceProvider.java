@@ -309,10 +309,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
     }
     public boolean launchModule(String typeId){
-        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
+        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         boolean suc = deployService.enableLobby(typeId,true);
         if(suc){
-            deployService.launchModule(typeId);
+            this.integrationCluster.deployService().launchModule(typeId);
         }
         return suc;
     }
@@ -320,7 +320,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         boolean suc = deployService.enableLobby(typeId,false);
         if(suc){
-            deployService.shutdownModule(typeId);
+            this.integrationCluster.deployService().shutdownModule(typeId);
         }
         return suc;
     }
