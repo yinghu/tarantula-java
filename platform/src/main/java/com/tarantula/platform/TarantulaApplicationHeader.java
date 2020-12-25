@@ -20,7 +20,7 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
     }
 
     public void onError(Session session, Exception ex) {
-        //this.context.log(session.toString(),ex, OnLog.ERROR);
+        this.context.log(session.toString(),ex, OnLog.ERROR);
         String msg = ex.getMessage()!=null?ex.getMessage():"Unexpected error";
         session.write(this.builder.create().toJson(new ResponseHeader("onError",false,400,msg,"error")).getBytes(),"error");
     }

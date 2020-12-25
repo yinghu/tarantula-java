@@ -64,7 +64,7 @@ public class UploadEventHandler implements RequestHandler {
     public void setup(ServiceContext tcx){
         this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.tokenValidator = tokenValidatorProvider.tokenValidator();
-         this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
+        this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
     }
     public boolean onEvent(Event event){
        return true;

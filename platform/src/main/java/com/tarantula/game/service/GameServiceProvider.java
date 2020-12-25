@@ -81,6 +81,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     public Zone zone(Descriptor descriptor){//application id
         Zone zone = new Zone();
         zone.distributionKey(descriptor.distributionKey());
+        byte[] key = zone.key().asString().getBytes();
+        //String memberId = integrationCluster.recoverService().findDataNode(this.dataStore.name(),key);
         this.dataStore.createIfAbsent(zone,true);
         zone.dataStore(this.dataStore);
         for(int i=1;i<descriptor.capacity()+1;i++){

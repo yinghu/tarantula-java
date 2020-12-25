@@ -82,6 +82,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private long metricsFreshRate;
     private static long TIMER = 10000;
 
+
     @Override
     public void start() throws Exception {
         this.secureRandom = new SecureRandom();
@@ -846,6 +847,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void removeQueryCallback(String callId){
         qCallbacks.remove(callId);
     }
+
     private class PostOfficeSession implements PostOffice{
 
         public OnConnection onConnection(Connection connection){
