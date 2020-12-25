@@ -309,7 +309,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
     }
     public boolean launchModule(String typeId){
-        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         boolean suc = deployService.enableLobby(typeId,true);
         if(suc){
             deployService.launchModule(typeId);

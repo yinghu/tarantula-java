@@ -22,6 +22,7 @@ public class PortableRegistry extends AbstractRecoverableListener{
     public static final int ON_LOBBY_CID = 12;
 
     public static final int LOBBY_TYPE_ID_INDEX_CID = 13;
+    public static final int MODULE_INDEX_CID = 14;
 
     public static final int ACCESS_KEY = 16;
 
@@ -77,6 +78,9 @@ public class PortableRegistry extends AbstractRecoverableListener{
                 break;
             case LOBBY_TYPE_ID_INDEX_CID:
                 _ins = new LobbyTypeIdIndex();
+                break;
+            case MODULE_INDEX_CID:
+                _ins = new ModuleIndex();
                 break;
             case ON_VIEW_OID:
                 _ins = new OnViewTrack();

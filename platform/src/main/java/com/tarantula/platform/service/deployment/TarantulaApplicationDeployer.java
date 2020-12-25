@@ -70,10 +70,11 @@ public class TarantulaApplicationDeployer implements Serviceable {
 	}
 	private void deployModule(String publishingId){
 		try {
-			RecoverService recoverService = this.context.tarantulaCluster().recoverService();
-			List<LobbyDescriptor> blist = query(recoverService, PortableRegistry.OID, new LobbyQuery(publishingId), new String[]{publishingId});
+			RecoverService recoverService = this.context.integrationCluster().recoverService();
+			String memberId = recoverService.findDataNode(this.context.dataStoreMaster,publishingId.getBytes());
+			List<LobbyDescriptor> blist = this.context.queryFromIntegrationNode(memberId,PortableRegistry.OID, new LobbyQuery(publishingId), new String[]{publishingId});
 			blist.forEach((lb)->{
-				this.context.setOnLobby(lb,(ob)->this.context.deploymentService().register(ob));
+				this.context.setOnLobby(memberId,lb,(ob)->this.context.deploymentService().register(ob));
 			});
 		}catch (Exception ex){
 			ex.printStackTrace();

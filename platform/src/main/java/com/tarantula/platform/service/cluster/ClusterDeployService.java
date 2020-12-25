@@ -13,6 +13,7 @@ import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.util.ResponseSerializer;
 
+import java.lang.Module;
 import java.util.*;
 
 
@@ -62,6 +63,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         if(!ds.createIfAbsent(lobbyTypeIdIndex,false)){
             return false;
         }
+        ModuleIndex moduleIndex = new ModuleIndex();
+        moduleIndex.distributionKey(publishingId);
+        moduleIndex.index(descriptor.typeId());
+        ds.create(moduleIndex);
         descriptor.owner(publishingId);
         descriptor.label(LobbyDescriptor.LABEL);
         descriptor.onEdge(true);

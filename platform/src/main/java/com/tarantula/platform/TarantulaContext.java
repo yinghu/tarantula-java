@@ -309,14 +309,14 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             listener.onLobby(ob);
         }catch (Exception ex){ex.printStackTrace();}
     }
-    public synchronized void setOnLobby(LobbyDescriptor lobbyDescriptor,OnLobby.Listener listener){
+    public synchronized void setOnLobby(String memberId,LobbyDescriptor lobbyDescriptor,OnLobby.Listener listener){
  	    if(this._lobbyMapping.containsKey(lobbyDescriptor.typeId())){
  	        return;
         }
  	    this.setLobby(lobbyDescriptor);
         LobbyConfiguration lc = new LobbyConfiguration();
         lc.descriptor = lobbyDescriptor;
-        lc.applications = this.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(lobbyDescriptor.distributionKey()),new String[]{lobbyDescriptor.distributionKey()});
+        lc.applications = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(lobbyDescriptor.distributionKey()),new String[]{lobbyDescriptor.distributionKey()});
         //lc.views = this.queryFromDataMaster(PortableRegistry.OID,new OnViewQuery(lobbyDescriptor.distributionKey()),new String[]{lobbyDescriptor.distributionKey()});
         //this.configureViews(lc);
         try{
@@ -328,14 +328,16 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         if(this._lobbyMapping.containsKey(typeId)){
             return;
         }
-        List<LobbyDescriptor> bList = this.queryFromDataMaster(PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId});
+        String memberId = this.integrationCluster.recoverService().findDataNode(dataStoreMaster,publishingId.getBytes());
+        log.warn("query from member->"+memberId);
+        List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId});
         bList.forEach((d)->{
             this.setLobby(d);//
             LobbyConfiguration lc = new LobbyConfiguration();
             lc.descriptor = d;
-            lc.applications = this.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()});
-            lc.views = this.queryFromDataMaster(PortableRegistry.OID,new OnViewQuery(d.distributionKey()),new String[]{d.distributionKey()});
-            this.configureViews(lc);
+            lc.applications = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()});
+            //lc.views = this.queryFromIntegrationNode(PortableRegistry.OID,new OnViewQuery(d.distributionKey()),new String[]{d.distributionKey()});
+            //this.configureViews(lc);
             try{
                 OnLobby ob = this.configure(lc);
                 listener.onLobby(ob);

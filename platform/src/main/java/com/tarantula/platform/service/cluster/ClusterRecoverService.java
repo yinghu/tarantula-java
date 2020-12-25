@@ -8,6 +8,7 @@ import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.RecoverService;
+import com.tarantula.platform.LobbyTypeIdIndex;
 import com.tarantula.platform.service.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
@@ -53,6 +54,13 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     }
     public String onDataNode(String source,byte[] key){
         if(load(source,key)!=null){
+            return nodeEngine.getLocalMember().getUuid();
+        }
+        return null;
+    }
+    public String onModuleDataNode(String source,String typeId){
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.bucketId(),typeId);
+        if(load(source,lobbyTypeIdIndex.key().asString().getBytes())!=null){
             return nodeEngine.getLocalMember().getUuid();
         }
         return null;
