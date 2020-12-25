@@ -63,9 +63,20 @@ public class TarantulaApplicationDeployer implements Serviceable {
 		moduleIndex.distributionKey(this.context.bucketId());
 		moduleIndex.label(Account.ModuleLabel);
 		if(this.context.masterDataStore().load(moduleIndex)){
-			moduleIndex.keySet.forEach((gc)->{
-				System.out.println(gc);
+			moduleIndex.keySet.forEach((pc)->{
+				deployModule(pc);
 			});
+		}
+	}
+	private void deployModule(String publishingId){
+		try {
+			RecoverService recoverService = this.context.tarantulaCluster().recoverService();
+			List<LobbyDescriptor> blist = query(recoverService, PortableRegistry.OID, new LobbyQuery(publishingId), new String[]{publishingId});
+			blist.forEach((lb)->{
+				this.context.setOnLobby(lb,(ob)->this.context.deploymentService().register(ob));
+			});
+		}catch (Exception ex){
+			ex.printStackTrace();
 		}
 	}
 	private void deployGameCluster(String gameClusterId){

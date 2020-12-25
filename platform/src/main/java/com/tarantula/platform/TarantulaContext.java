@@ -309,24 +309,37 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             listener.onLobby(ob);
         }catch (Exception ex){ex.printStackTrace();}
     }
+    public synchronized void setOnLobby(LobbyDescriptor lobbyDescriptor,OnLobby.Listener listener){
+ 	    if(this._lobbyMapping.containsKey(lobbyDescriptor.typeId())){
+ 	        return;
+        }
+ 	    this.setLobby(lobbyDescriptor);
+        LobbyConfiguration lc = new LobbyConfiguration();
+        lc.descriptor = lobbyDescriptor;
+        lc.applications = this.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(lobbyDescriptor.distributionKey()),new String[]{lobbyDescriptor.distributionKey()});
+        //lc.views = this.queryFromDataMaster(PortableRegistry.OID,new OnViewQuery(lobbyDescriptor.distributionKey()),new String[]{lobbyDescriptor.distributionKey()});
+        //this.configureViews(lc);
+        try{
+            OnLobby ob = this.configure(lc);
+            listener.onLobby(ob);
+        }catch (Exception ex){ex.printStackTrace();}
+    }
     public synchronized void setOnLobby(String typeId,String publishingId,OnLobby.Listener listener){
         if(this._lobbyMapping.containsKey(typeId)){
             return;
         }
         List<LobbyDescriptor> bList = this.queryFromDataMaster(PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId});
         bList.forEach((d)->{
-            if(d.typeId().equals(typeId)){
-                this.setLobby(d);//
-                LobbyConfiguration lc = new LobbyConfiguration();
-                lc.descriptor = d;
-                lc.applications = this.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()});
-                lc.views = this.queryFromDataMaster(PortableRegistry.OID,new OnViewQuery(d.distributionKey()),new String[]{d.distributionKey()});
-                this.configureViews(lc);
-                try{
-                    OnLobby ob = this.configure(lc);
-                    listener.onLobby(ob);
-                }catch (Exception ex){ex.printStackTrace();}
-            }
+            this.setLobby(d);//
+            LobbyConfiguration lc = new LobbyConfiguration();
+            lc.descriptor = d;
+            lc.applications = this.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()});
+            lc.views = this.queryFromDataMaster(PortableRegistry.OID,new OnViewQuery(d.distributionKey()),new String[]{d.distributionKey()});
+            this.configureViews(lc);
+            try{
+                OnLobby ob = this.configure(lc);
+                listener.onLobby(ob);
+            }catch (Exception ex){ex.printStackTrace();}
         });
         IndexSet indexSet = new IndexSet();
         indexSet.distributionKey(this.bucketId());

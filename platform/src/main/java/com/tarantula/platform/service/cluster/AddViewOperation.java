@@ -41,7 +41,7 @@ public class AddViewOperation extends Operation {
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(onView.owner());
-        out.writeByteArray(SystemUtil.toJson(this.onView.toMap()));
+        out.writeByteArray(this.onView.toBinary());
     }
 
     @Override
@@ -49,6 +49,6 @@ public class AddViewOperation extends Operation {
         super.readInternal(in);
         this.onView = new OnViewTrack();
         this.onView.owner(in.readUTF());
-        this.onView.fromMap(SystemUtil.toMap(in.readByteArray()));
+        this.onView.fromBinary(in.readByteArray());
     }
 }

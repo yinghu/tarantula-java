@@ -12,7 +12,6 @@ import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.util.ResponseSerializer;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.*;
 
