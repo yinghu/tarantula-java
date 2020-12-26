@@ -12,7 +12,6 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.IndexSet;
-import com.tarantula.platform.LobbyTypeIdIndex;
 import com.tarantula.platform.service.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
