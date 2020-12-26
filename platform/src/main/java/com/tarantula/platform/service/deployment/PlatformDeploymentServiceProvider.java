@@ -651,7 +651,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public Connection addConnection(String typeId,Connection connection){
         byte[] bytes = connection.toBinary();
         this.integrationCluster.index(typeId,bytes);
-        log.warn("add connection->"+ connection.connectionId()+"<<>>"+bytes.length);
+        log.warn("add connection->["+ connection.connectionId()+"] on "+typeId);
         return connection;
     }
     public Connection addConnection(String serverId,int connectionId){
@@ -662,7 +662,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         Connection client = serverPushEvent.connection();
         client.connectionId(connectionId);
         this.integrationCluster.index(serverPushEvent.typeId(),client.toBinary());
-        log.warn("add connection->"+client.connectionId()+"<><><><><>"+client.toBinary().length);
+        log.warn("add connection->["+ client.connectionId()+"] on "+serverPushEvent.typeId());
         return client;
     }
     //use connection

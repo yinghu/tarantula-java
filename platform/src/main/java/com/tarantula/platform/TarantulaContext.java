@@ -234,11 +234,21 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
 	public OnLobby configure(LobbyConfiguration conf) throws Exception{
 		DefaultLobby lb = this.setLobby(conf.descriptor);
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(lb.descriptor().owner(),lb.descriptor().typeId());
-        masterDataStore().load(lobbyTypeIdIndex);//local node
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.bucketId(),lb.descriptor().typeId());
+        if(!masterDataStore().load(lobbyTypeIdIndex)){
+            //load from cluster
+            byte[] data = this.integrationCluster.recoverService().recover(dataStoreMaster,lobbyTypeIdIndex.key().asString().getBytes());
+            lobbyTypeIdIndex.fromBinary(data);
+        }
         GameCluster gameCluster = new GameCluster();
-        gameCluster.distributionKey(lobbyTypeIdIndex.owner);
-        masterDataStore().load(gameCluster);
+        if(conf.descriptor.resetEnabled&&conf.descriptor.deployCode>1){
+            gameCluster.distributionKey(lobbyTypeIdIndex.owner);
+            if(!masterDataStore().load(gameCluster)){
+                //load from cluster
+                byte[] data = this.integrationCluster.recoverService().recover(dataStoreMaster,gameCluster.key().asString().getBytes());
+                gameCluster.fromBinary(data);
+            }
+        }
         OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),lb.descriptor().deployCode(),lb.descriptor().resetEnabled(),false,lobbyTypeIdIndex.owner(),(String) gameCluster.property(GameCluster.OWNER));
 		Collections.sort(conf.applications, new DeploymentDescriptorComparator());//deploy by priority
         for (DeploymentDescriptor c : conf.applications) {

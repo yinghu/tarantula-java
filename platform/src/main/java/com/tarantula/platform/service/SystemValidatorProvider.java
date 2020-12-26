@@ -148,9 +148,10 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void onCheck(OnLobby onLobby){
         Subscription subscription = new Membership();
         subscription.distributionKey(onLobby.subscriptionId());
-        mdatastore.load(subscription);
-        oMap.put(onLobby.typeId(),onLobby);
-        log.warn(onLobby.toString()+" has been monitored under ->"+SystemUtil.fromUTCMilliseconds(subscription.endTimestamp()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        if(mdatastore.load(subscription)) {
+            oMap.put(onLobby.typeId(), onLobby);
+            log.warn(onLobby.toString() + " has been monitored under ->" + SystemUtil.fromUTCMilliseconds(subscription.endTimestamp()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        }
     }
     public boolean checkSubscription(String systemId){
         Subscription subscription = new Membership();
