@@ -8,6 +8,7 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;
 import com.icodesoftware.Access;
+import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
 
@@ -223,6 +224,51 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             future.get(5,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             //throw ExceptionUtil.rethrow(e);
+        }
+    }
+
+    public String[] listModules(){
+        NodeEngine nodeEngine = getNodeEngine();
+        ListModulesOperation operation = new ListModulesOperation();
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<String[]> future = builder.invoke();
+            return future.get(); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
+    public byte[] loadModuleJarFile(String fileName){
+        NodeEngine nodeEngine = getNodeEngine();
+        LoadModuleJarFileOperation operation = new LoadModuleJarFileOperation(fileName);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<byte[]> future = builder.invoke();
+            return future.get(); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
+    public byte[] loadModuleIndex(){
+        NodeEngine nodeEngine = getNodeEngine();
+        LoadModuleIndexOperation operation = new LoadModuleIndexOperation();
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<byte[]> future = builder.invoke();
+            return future.get(); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
+    public byte[] loadGameClusterIndex(){
+        NodeEngine nodeEngine = getNodeEngine();
+        LoadGameClusterIndexOperation operation = new LoadGameClusterIndexOperation();
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<byte[]> future = builder.invoke();
+            return future.get(); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
         }
     }
 }

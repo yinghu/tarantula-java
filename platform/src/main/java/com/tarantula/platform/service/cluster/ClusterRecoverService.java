@@ -5,11 +5,13 @@ import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.Access;
+import com.icodesoftware.Account;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.LobbyTypeIdIndex;
 import com.tarantula.platform.service.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
@@ -130,5 +132,23 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     }
     public void queryEnd(String source){
         this.deploymentServiceProvider.distributionCallback().queryEndCallback(source).on();
+    }
+    public String[] listModules(){
+        return this.tarantulaContext._listModuleContent();
+    }
+    public byte[] loadModuleJarFile(String fileName){
+        return this.tarantulaContext._readContent(fileName);
+    }
+    public byte[] loadModuleIndex(){
+        IndexSet indexSet = new IndexSet();
+        indexSet.distributionKey(this.tarantulaContext.bucketId());
+        indexSet.label(Account.ModuleLabel);
+        return this.tarantulaContext.masterDataStore().backup().get(indexSet.key().asString().getBytes());
+    }
+    public byte[] loadGameClusterIndex(){
+        IndexSet indexSet = new IndexSet();
+        indexSet.distributionKey(this.tarantulaContext.bucketId());
+        indexSet.label(Account.GameClusterLabel);
+        return this.tarantulaContext.masterDataStore().backup().get(indexSet.key().asString().getBytes());
     }
 }

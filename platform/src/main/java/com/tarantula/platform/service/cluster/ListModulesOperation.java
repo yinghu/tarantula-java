@@ -7,40 +7,33 @@ import com.hazelcast.spi.Operation;
 import java.io.IOException;
 
 /**
- * updated by yinghu lu on 7/10/2020.
+ * created by yinghu lu on 5/15/2020.
  */
-public class  DataSyncOperation extends Operation {
+public class ListModulesOperation extends Operation {
 
-    private String akey;
+    private String[] moduleList;
 
-
-    public DataSyncOperation() {
+    public ListModulesOperation() {
     }
 
-
-    public DataSyncOperation(String akey) {
-        this.akey = akey;
-    }
     @Override
     public void run() throws Exception {
-        ClusterDeployService cis = this.getService();
-        cis.sync(akey);
+        ClusterRecoverService cds = this.getService();
+        moduleList =  cds.listModules();
     }
 
     @Override
     public Object getResponse() {
-        return null;
+        return moduleList;
     }
 
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeUTF(akey);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.akey = in.readUTF();
     }
 }

@@ -1,8 +1,6 @@
 package com.tarantula.platform;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -520,6 +518,13 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         try{_syc_finished.await();}catch (Exception ex){
             throw new RuntimeException(ex);
         }
+        for(String s : this.integrationCluster.recoverService().listModules()){
+            log.warn("loading module file from master node ["+s+"]");
+            byte[] ret = this.integrationCluster.recoverService().loadModuleJarFile(s);
+            if(ret.length>0){
+                _writeContent(s,ret);
+            }
+        }
         this.accessIndexService().enable();
         AccessIndex bid = this.accessIndexService().get(node.bucketName);
         if(bid==null){
@@ -539,7 +544,11 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         this.integrationCluster.registerMetricsListener(this);
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
-    }
+        byte[] gameclusterIndex = this.integrationCluster.recoverService().loadGameClusterIndex();
+        byte[] moduleIndex = this.integrationCluster.recoverService().loadModuleIndex();
+        log.warn(new String(gameclusterIndex));
+        log.warn(new String(moduleIndex));
+ 	}
     public boolean deployServiceProvider(ServiceProvider serviceProvider){
         try{
             this.serviceProviders.computeIfAbsent(serviceProvider.name(),(sn)->{
@@ -646,6 +655,22 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             log.error("error on content write",ex);
         }
     }
+    public String[] _listModuleContent(){
+ 	    File file = new File(this.deployDir);
+        return file.list((d,f)->f.endsWith(".jar"));
+    }
+    public byte[] _readContent(String fileName){
+ 	    try{
+ 	        BufferedInputStream fin = new BufferedInputStream(new FileInputStream(this.deployDir+"/"+fileName));
+ 	        byte[] ret = fin.readAllBytes();
+ 	        fin.close();
+ 	        return ret;
+        }catch (Exception ex){
+ 	        log.error("error on read content",ex);
+ 	        return new byte[0];
+        }
+    }
+
     public <T extends Recoverable> List<T> queryFromDataMaster(int factoryId,RecoverableFactory<T> factory,String[] params,boolean includeDisabled){
         RecoverService recoverService = tarantulaCluster.recoverService();
  	    List<T> tlist = new ArrayList<>();

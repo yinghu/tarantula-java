@@ -25,6 +25,11 @@ public interface RecoverService extends ServiceProvider{
     void sync(int size,byte[][] keys,byte[][] values,String memberId,String source);
     void syncEnd(String memberId);
 
+    String[] listModules();
+    byte[] loadModuleJarFile(String name);
+    byte[] loadModuleIndex();
+    byte[] loadGameClusterIndex();
+
     interface QueryCallback{
         void on(byte[] key,byte[] value);
     }
