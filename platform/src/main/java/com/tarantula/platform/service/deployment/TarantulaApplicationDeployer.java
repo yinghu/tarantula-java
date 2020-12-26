@@ -51,17 +51,27 @@ public class TarantulaApplicationDeployer implements Serviceable {
 			OnLobby _ob = this.context.configure(c);
 			this.context.deploymentService().register(_ob);
 		}
+		byte[] gameClusterIndexData = this.context.integrationCluster().recoverService().loadGameClusterIndex();
 		IndexSet indexSet = new IndexSet();
 		indexSet.distributionKey(this.context.bucketId());
 		indexSet.label(Account.GameClusterLabel);
+		if(gameClusterIndexData!=null&&gameClusterIndexData.length>0){
+			indexSet.fromBinary(gameClusterIndexData);
+			this.context.masterDataStore().update(indexSet);
+		}
 		if(this.context.masterDataStore().load(indexSet)){
 			indexSet.keySet.forEach((gc)->{
 				deployGameCluster(gc);
 			});
 		}
+		byte[] moduleIndexData = this.context.integrationCluster().recoverService().loadModuleIndex();
 		IndexSet moduleIndex = new IndexSet();
 		moduleIndex.distributionKey(this.context.bucketId());
 		moduleIndex.label(Account.ModuleLabel);
+		if(moduleIndexData!=null&&moduleIndexData.length>0){
+			moduleIndex.fromBinary(moduleIndexData);
+			this.context.masterDataStore().update(moduleIndex);
+		}
 		if(this.context.masterDataStore().load(moduleIndex)){
 			moduleIndex.keySet.forEach((pc)->{
 				deployModule(pc);

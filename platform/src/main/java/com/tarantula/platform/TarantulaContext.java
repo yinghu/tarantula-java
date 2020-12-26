@@ -544,10 +544,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         this.integrationCluster.registerMetricsListener(this);
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
-        byte[] gameclusterIndex = this.integrationCluster.recoverService().loadGameClusterIndex();
-        byte[] moduleIndex = this.integrationCluster.recoverService().loadModuleIndex();
-        log.warn(new String(gameclusterIndex));
-        log.warn(new String(moduleIndex));
  	}
     public boolean deployServiceProvider(ServiceProvider serviceProvider){
         try{
