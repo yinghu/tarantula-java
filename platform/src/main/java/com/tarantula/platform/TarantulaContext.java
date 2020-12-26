@@ -389,14 +389,15 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	        return;
         }
         try{
-            List<DeploymentDescriptor> apps = this.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(lb.descriptor().distributionKey()),new String[]{lb.descriptor().distributionKey()});
-            apps.forEach((a)->{
-                if(a.distributionKey().equals(applicationId)){
-                    try{setApplicationManager(a,lb);}catch (Exception exx){
-                        throw new RuntimeException(exx);
-                    }
-                }
-            });
+            AccessIndex pk = this.accessIndexService().get(typeId);
+            String memberId = this.integrationCluster.recoverService().findDataNode(dataStoreMaster,pk.distributionKey().getBytes());
+            byte[] data = this.integrationCluster.recoverService().load(memberId,dataStoreMaster,applicationId.getBytes());
+            DeploymentDescriptor deploymentDescriptor = new DeploymentDescriptor();
+            deploymentDescriptor.distributionKey(applicationId);
+            deploymentDescriptor.fromBinary(data);
+            try{setApplicationManager(deploymentDescriptor,lb);}catch (Exception exx){
+                throw new RuntimeException(exx);
+            }
         } catch (Exception ex){
             log.error("error on setApplicationOnLobby",ex);
         }

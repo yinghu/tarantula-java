@@ -272,7 +272,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         String  suc = deployService.addApplication(descriptor);
         if(suc!=null&&launching){//launch if lobby on line
-            deployService.launchApplication(descriptor.typeId(),suc);
+            this.integrationCluster.deployService().launchApplication(descriptor.typeId(),suc);
         }
         return suc!=null;
     }
@@ -284,6 +284,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         String suc = deployService.enableApplication(applicationId,enabled);
         if(suc!=null){//return the lobby typeId
+            deployService = this.tarantulaContext.integrationCluster().deployService();
             return enabled?deployService.launchApplication(suc,applicationId):deployService.shutdownApplication(suc,applicationId);
         }
         return suc!=null;
