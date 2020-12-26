@@ -29,6 +29,7 @@ public interface RecoverService extends ServiceProvider{
     byte[] loadModuleJarFile(String name);
     byte[] loadModuleIndex();
     byte[] loadGameClusterIndex();
+    byte[] findTypeIdIndex(String typeId);
 
     interface QueryCallback{
         void on(byte[] key,byte[] value);

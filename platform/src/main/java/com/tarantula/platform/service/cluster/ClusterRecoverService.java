@@ -12,6 +12,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.IndexSet;
+import com.tarantula.platform.LobbyTypeIdIndex;
 import com.tarantula.platform.service.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
@@ -149,5 +150,9 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         indexSet.distributionKey(this.tarantulaContext.bucketId());
         indexSet.label(Account.GameClusterLabel);
         return this.tarantulaContext.masterDataStore().backup().get(indexSet.key().asString().getBytes());
+    }
+    public byte[] loadTypeIdIndex(String typeId){
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.bucketId(),typeId);
+        return this.tarantulaContext.masterDataStore().backup().get(lobbyTypeIdIndex.key().asString().getBytes());
     }
 }

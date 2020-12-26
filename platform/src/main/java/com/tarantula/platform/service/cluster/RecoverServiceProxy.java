@@ -271,4 +271,27 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             throw ExceptionUtil.rethrow(e);
         }
     }
+    @Override
+    public byte[] findTypeIdIndex(String typeId) {
+        NodeEngine nodeEngine = getNodeEngine();
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        byte[] ret = null;
+        for(Member m : mlist){
+            if(!m.localMember()){
+                FindTypeIdIndexOperation operation = new FindTypeIdIndexOperation(typeId);
+                InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+                final Future<byte[]> future = builder.invoke();
+                try {
+                    ret = future.get(5,TimeUnit.SECONDS);
+                    if(ret!=null){
+                        break;
+                    }
+                } catch (Exception e) {
+                    future.cancel(true);
+                    //goes to next node if failed
+                }
+            }
+        }
+        return ret;
+    }
 }

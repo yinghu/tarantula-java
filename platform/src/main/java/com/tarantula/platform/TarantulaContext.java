@@ -237,7 +237,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.bucketId(),lb.descriptor().typeId());
         if(!masterDataStore().load(lobbyTypeIdIndex)){
             //load from cluster
-            byte[] data = this.integrationCluster.recoverService().recover(dataStoreMaster,lobbyTypeIdIndex.key().asString().getBytes());
+            byte[] data = this.integrationCluster.recoverService().findTypeIdIndex(conf.descriptor.typeId);
             lobbyTypeIdIndex.fromBinary(data);
         }
         GameCluster gameCluster = new GameCluster();
