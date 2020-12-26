@@ -389,8 +389,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	        return;
         }
         try{
-            AccessIndex pk = this.accessIndexService().get(typeId);
-            String memberId = this.integrationCluster.recoverService().findDataNode(dataStoreMaster,pk.distributionKey().getBytes());
+            //LobbyTypeIdIndex pk = new LobbyTypeIdIndex()
+            String memberId = this.integrationCluster.recoverService().findDataNode(dataStoreMaster,applicationId.getBytes());
             byte[] data = this.integrationCluster.recoverService().load(memberId,dataStoreMaster,applicationId.getBytes());
             DeploymentDescriptor deploymentDescriptor = new DeploymentDescriptor();
             deploymentDescriptor.distributionKey(applicationId);
