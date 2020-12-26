@@ -143,7 +143,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         mZone.gameServiceProvider = this.gameServiceProvider;
         mZone.descriptor = this.context.descriptor();
         mZone.start();
-        mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
+        //mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
         mZone.registerListener(this);
         deploymentServiceProvider.register(mZone);
         this.deploymentServiceProvider.registerOnConnectionListener(this);
@@ -178,7 +178,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         mZone.reset((Zone)zone);
         //this.context.log("Play mode->"+mZone.playMode,OnLog.WARN);
         //this.context.log("joinsOnStart->"+mZone.joinsOnStart,OnLog.WARN);
-        mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
+        //mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
     }
     private JsonObject toMessage(String msg,boolean successful){
         JsonObject jsonObject = new JsonObject();

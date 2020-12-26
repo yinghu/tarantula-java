@@ -519,7 +519,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             throw new RuntimeException(ex);
         }
         for(String s : this.integrationCluster.recoverService().listModules()){
-            log.warn("loading module file from master node ["+s+"]");
+            log.warn("Loading module files from master node ["+s+"]");
             byte[] ret = this.integrationCluster.recoverService().loadModuleJarFile(s);
             if(ret.length>0){
                 _writeContent(s,ret);

@@ -88,7 +88,7 @@ public class MatchMakingModule implements Module, Lobby.Listener {
                     mZone.put(i,mZone.get(fi[0]));//fill header
                 }
             }
-            context.log("Add lobby ->"+mZone.get(i).tag()+" ->rank ["+mZone.get(i).accessRank()+"]",OnLog.WARN);
+            //context.log("Add lobby ->"+mZone.get(i).tag()+" ->rank ["+mZone.get(i).accessRank()+"]",OnLog.WARN);
         }
         return lobby;
     }
