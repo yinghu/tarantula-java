@@ -356,7 +356,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         this.listener = listener;
     }
     public void update(ServiceContext serviceContext){
-        RecoverService deployService = serviceContext.clusterProvider(Distributable.DATA_SCOPE).recoverService();
+        RecoverService deployService = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).recoverService();
         Zone zone = new Zone();
         zone.distributionKey(descriptor.distributionKey());
         byte[] _data = deployService.load(null,this.dataStore.name(),zone.distributionKey().getBytes());

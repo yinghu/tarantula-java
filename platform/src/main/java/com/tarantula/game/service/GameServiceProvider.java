@@ -82,17 +82,34 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         Zone zone = new Zone();
         zone.distributionKey(descriptor.distributionKey());
         byte[] key = zone.key().asString().getBytes();
-        //String memberId = integrationCluster.recoverService().findDataNode(this.dataStore.name(),key);
-        this.dataStore.createIfAbsent(zone,true);
-        zone.dataStore(this.dataStore);
-        for(int i=1;i<descriptor.capacity()+1;i++){
-            Arena a = new Arena(zone.bucket(),zone.oid(),i);
-            if(this.dataStore.load(a)){
-                if(!a.disabled()){//skip disabled
-                    zone.arenas.add(a);
+        String memberId = integrationCluster.recoverService().findDataNode(this.dataStore.name(),key);
+        if(memberId!=null){
+            byte[] data = integrationCluster.recoverService().load(memberId,this.dataStore.name(),key);
+            zone.fromBinary(data);
+            for(int i=1;i<descriptor.capacity()+1;i++){
+                Arena a = new Arena(zone.bucket(),zone.oid(),i);
+                data = integrationCluster.recoverService().load(memberId,this.dataStore.name(),a.key().asString().getBytes());
+                if(data!=null){
+                    a.fromBinary(data);
+                    if(!a.disabled()){//skip disabled
+                        zone.arenas.add(a);
+                    }
                 }
             }
         }
+        else{//create local zone
+            this.dataStore.createIfAbsent(zone,true);
+            zone.dataStore(this.dataStore);
+            for(int i=1;i<descriptor.capacity()+1;i++){
+                Arena a = new Arena(zone.bucket(),zone.oid(),i);
+                if(this.dataStore.load(a)){
+                    if(!a.disabled()){//skip disabled
+                        zone.arenas.add(a);
+                    }
+                }
+            }
+        }
+        zone.dataStore(this.dataStore);
         zone.subscription = this.subscription;
         return zone;
     }

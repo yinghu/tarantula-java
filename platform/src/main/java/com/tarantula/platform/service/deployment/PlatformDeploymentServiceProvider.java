@@ -634,7 +634,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public void configure(String key){
         if(vMap.containsKey(key)){
-            this.tarantulaContext.tarantulaCluster().deployService().sync(key);
+            this.tarantulaContext.integrationCluster().deployService().sync(key);
         }
     }
     //register/cache connection
