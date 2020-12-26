@@ -60,7 +60,9 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     boolean shutdownModule(String typeId);
 
     boolean createApplication(Descriptor descriptor,boolean launching);
-    boolean enableApplication(String applicationId,boolean enabled);
+    boolean enableApplication(String applicationId);
+    boolean disableApplication(String applicationId);
+
 
     //END OF Module API
 

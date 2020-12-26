@@ -16,8 +16,10 @@ public interface DeployService extends ServiceProvider {
 
 
     //update lobby or application to set disabled as true/false
-    String enableApplication(String applicationId,boolean enabled);
-    boolean enableLobby(String typeId,boolean enabled);
+    String enableApplication(String applicationId);
+    boolean enableLobby(String typeId);
+    String disableApplication(String applicationId);
+    boolean disableLobby(String typeId);
 
     //GameCluster createGameCluster(String owner,String name);
     <T extends OnAccess> T createGameCluster(String owner,String name,String publishingId);

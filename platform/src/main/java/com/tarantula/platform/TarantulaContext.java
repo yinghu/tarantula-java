@@ -281,7 +281,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     public synchronized void setGameClusterOnLobby(String memberId,GameCluster gameCluster,OnLobby.Listener listener){
  	    String publishingId = (String) gameCluster.property(GameCluster.PUBLISHING_ID);
-        List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId});
+        List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
         List<LobbyConfiguration> configurations = new ArrayList<>();
         bList.forEach((lb)->configurations.add(new LobbyConfiguration(lb)));
         Collections.sort(configurations,new LobbyComparator());
@@ -301,8 +301,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         }
         LobbyDescriptor d = lc.descriptor;
         this.setLobby(d);//
-        lc.applications = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()});
-        lc.views = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new OnViewQuery(d.distributionKey()),new String[]{d.distributionKey()});
+        lc.applications = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()},false);
+        lc.views = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new OnViewQuery(d.distributionKey()),new String[]{d.distributionKey()},false);
         this.configureViews(lc);
         try{
             OnLobby ob = this.configure(lc);
@@ -316,7 +316,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	    this.setLobby(lobbyDescriptor);
         LobbyConfiguration lc = new LobbyConfiguration();
         lc.descriptor = lobbyDescriptor;
-        lc.applications = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(lobbyDescriptor.distributionKey()),new String[]{lobbyDescriptor.distributionKey()});
+        lc.applications = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(lobbyDescriptor.distributionKey()),new String[]{lobbyDescriptor.distributionKey()},false);
         //lc.views = this.queryFromDataMaster(PortableRegistry.OID,new OnViewQuery(lobbyDescriptor.distributionKey()),new String[]{lobbyDescriptor.distributionKey()});
         //this.configureViews(lc);
         try{
@@ -330,12 +330,12 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         }
         String memberId = this.integrationCluster.recoverService().findDataNode(dataStoreMaster,publishingId.getBytes());
         log.warn("query from member->"+memberId);
-        List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId});
+        List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
         bList.forEach((d)->{
             this.setLobby(d);//
             LobbyConfiguration lc = new LobbyConfiguration();
             lc.descriptor = d;
-            lc.applications = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()});
+            lc.applications = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()},false);
             //lc.views = this.queryFromIntegrationNode(PortableRegistry.OID,new OnViewQuery(d.distributionKey()),new String[]{d.distributionKey()});
             //this.configureViews(lc);
             try{
@@ -646,7 +646,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             log.error("error on content write",ex);
         }
     }
-    public <T extends Recoverable> List<T> queryFromDataMaster(int factoryId,RecoverableFactory<T> factory,String[] params){
+    public <T extends Recoverable> List<T> queryFromDataMaster(int factoryId,RecoverableFactory<T> factory,String[] params,boolean includeDisabled){
         RecoverService recoverService = tarantulaCluster.recoverService();
  	    List<T> tlist = new ArrayList<>();
         CountDownLatch _lock = new CountDownLatch(1);
@@ -654,7 +654,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             T t = factory.create();
             t.fromBinary(v);
             t.distributionKey(new String(k));
-            if(!t.disabled()){
+            if(includeDisabled||!t.disabled()){
                 tlist.add(t);
             }
         },()-> _lock.countDown());
@@ -666,7 +666,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         this.deploymentService().distributionCallback().removeQueryCallback(cid);
         return tlist;
     }
-    public <T extends Recoverable> List<T> queryFromIntegrationNode(String memberId,int factoryId,RecoverableFactory<T> factory,String[] params){
+    public <T extends Recoverable> List<T> queryFromIntegrationNode(String memberId,int factoryId,RecoverableFactory<T> factory,String[] params,boolean includeDisabled){
         RecoverService recoverService = integrationCluster.recoverService();
         List<T> tlist = new ArrayList<>();
         CountDownLatch _lock = new CountDownLatch(1);
@@ -674,7 +674,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             T t = factory.create();
             t.fromBinary(v);
             t.distributionKey(new String(k));
-            if(!t.disabled()){
+            if(includeDisabled||!t.disabled()){
                 tlist.add(t);
             }
         },()-> _lock.countDown());

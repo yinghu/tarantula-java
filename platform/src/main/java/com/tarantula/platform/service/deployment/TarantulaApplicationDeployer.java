@@ -72,7 +72,7 @@ public class TarantulaApplicationDeployer implements Serviceable {
 		try {
 			RecoverService recoverService = this.context.integrationCluster().recoverService();
 			String memberId = recoverService.findDataNode(this.context.dataStoreMaster,publishingId.getBytes());
-			List<LobbyDescriptor> blist = this.context.queryFromIntegrationNode(memberId,PortableRegistry.OID, new LobbyQuery(publishingId), new String[]{publishingId});
+			List<LobbyDescriptor> blist = this.context.queryFromIntegrationNode(memberId,PortableRegistry.OID, new LobbyQuery(publishingId), new String[]{publishingId},false);
 			blist.forEach((lb)->{
 				this.context.setOnLobby(memberId,lb,(ob)->this.context.deploymentService().register(ob));
 			});

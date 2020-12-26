@@ -79,7 +79,7 @@ public class ApplicationManager extends DefaultApplication implements Scheduling
     @Override
     public void run() {
         if(timed&&(duration-=DELTA)<=0){
-            this.tarantulaContext.deploymentService().enableApplication(this.deploymentDescriptor.distributionKey(),false);
+            this.tarantulaContext.deploymentService().disableApplication(this.deploymentDescriptor.distributionKey());
         }
         else{
             for(InstanceManager im: managers){

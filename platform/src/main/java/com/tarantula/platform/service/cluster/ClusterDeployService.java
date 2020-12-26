@@ -76,35 +76,8 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         lobbyTypeIdIndex.owner(publishingId);
         ds.update(lobbyTypeIdIndex);
         return descriptor.distributionKey()!=null;
-        /**
-        if(descriptor.deployCode()<=0||descriptor.tag()==null){
-            return true;
-        }
-        //Add instance registry lobby
-        DeploymentDescriptor lobby = new DeploymentDescriptor();
-        lobby.typeId(descriptor.typeId());
-        lobby.subtypeId(descriptor.typeId()+"-lobby");
-        lobby.type("application");
-        lobby.category("lobby");
-        lobby.tag(descriptor.tag());//will ignore if the lobby tag is not provided
-        lobby.singleton(true);
-        lobby.deployPriority(15);
-        lobby.applicationClassName("com.tarantula.platform.playmode.GameLobbyApplication");
-        lobby.name(descriptor.name());
-        lobby.description(descriptor.description());
-        lobby.configurationName(descriptor.configurationName());
-        lobby.responseLabel(descriptor.responseLabel());
-        lobby.label(Application.LABEL);
-        lobby.owner(descriptor.distributionKey());
-        lobby.onEdge(true);
-        if(ds.create(lobby)){
-            return true;
-        }
-        else{
-            return false;
-        }**/
     }
-    public boolean enableLobby(String typeId,boolean enabled){
+    public boolean enableLobby(String typeId){
         DataStore ds = this.tarantulaContext.masterDataStore();
         LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),typeId);
         if(!ds.load(query)){
@@ -112,43 +85,49 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
         LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
         lobbyDescriptor.distributionKey(query.index());
-        if(ds.load(lobbyDescriptor)){
-            if(enabled&&lobbyDescriptor.disabled()){//enable opt
-                lobbyDescriptor.disabled(false);
-                ds.update(lobbyDescriptor);
-                return true;
-            }
-            else if((!enabled)&&(!lobbyDescriptor.disabled())){//disable opt
-                lobbyDescriptor.disabled(true);
-                ds.update(lobbyDescriptor);
-                return true;
-            }
-            else{//skip
-                return false;
-            }
-        }
-        else{
+        if(!ds.load(lobbyDescriptor)||!lobbyDescriptor.disabled()){
             return false;
         }
+        lobbyDescriptor.disabled(false);
+        ds.update(lobbyDescriptor);
+        return true;
     }
-    public String enableApplication(String applicationId,boolean enabled){
+    public boolean disableLobby(String typeId){
+        DataStore ds = this.tarantulaContext.masterDataStore();
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),typeId);
+        if(!ds.load(query)){
+            return false;
+        }
+        LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
+        lobbyDescriptor.distributionKey(query.index());
+        if(!ds.load(lobbyDescriptor)||lobbyDescriptor.disabled()){
+            return false;
+        }
+        lobbyDescriptor.disabled(true);
+        ds.update(lobbyDescriptor);
+        return true;
+    }
+    public String enableApplication(String applicationId){
         DataStore ds = this.tarantulaContext.masterDataStore();
         DeploymentDescriptor app = new DeploymentDescriptor();
         app.distributionKey(applicationId);
-        String typeId = null;
-        if(ds.load(app)){
-            if(enabled&&app.disabled()){//set disabled = false;
-                app.disabled(false);
-                ds.update(app);
-                typeId = app.typeId();
-            }
-            else if((!enabled)&&(!app.disabled())){//set disabled = true;
-                app.disabled(true);
-                ds.update(app);
-                typeId = app.typeId();
-            }
+        if(!ds.load(app)||!app.disabled()){
+            return null;
         }
-        return typeId;
+        app.disabled(false);
+        ds.update(app);
+        return app.typeId();
+    }
+    public String disableApplication(String applicationId){
+        DataStore ds = this.tarantulaContext.masterDataStore();
+        DeploymentDescriptor app = new DeploymentDescriptor();
+        app.distributionKey(applicationId);
+        if(!ds.load(app)||app.disabled()){
+            return null;
+        }
+        app.disabled(true);
+        ds.update(app);
+        return app.typeId();
     }
     public String addApplication(Descriptor descriptor){
         DataStore ds = this.tarantulaContext.masterDataStore();
@@ -246,9 +225,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
         String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
         String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
-        boolean suc1 =enableLobby(data,true);
-        boolean suc2 =enableLobby(lobby,true);
-        boolean suc3 =enableLobby(service,true);
+        boolean suc1 =enableLobby(data);
+        boolean suc2 =enableLobby(lobby);
+        boolean suc3 =enableLobby(service);
         gameCluster.property(GameCluster.DISABLED,false);
         mds.update(gameCluster);
         return suc1&&suc2&&suc3;//make sure all enabled
@@ -263,9 +242,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
         String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
         String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
-        boolean suc1 = enableLobby(data,false);
-        boolean suc2 = enableLobby(lobby,false);
-        boolean suc3 = enableLobby(service,false);
+        boolean suc1 = disableLobby(data);
+        boolean suc2 = disableLobby(lobby);
+        boolean suc3 = disableLobby(service);
         gameCluster.property(GameCluster.DISABLED,true);
         mds.update(gameCluster);
         return suc1&&suc2&&suc3;//make sure all disabled

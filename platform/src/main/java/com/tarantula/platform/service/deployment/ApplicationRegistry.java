@@ -29,7 +29,7 @@ public class ApplicationRegistry implements ApplicationAllocator{
     }
 
     public void configure(){
-        List<InstanceIndex> _rlist = tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new InstanceRegistryQuery(deploymentDescriptor.distributionKey()),new String[]{deploymentDescriptor.distributionKey()});//this.tarantulaContext.tarantulaCluster.list(iq);
+        List<InstanceIndex> _rlist = tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new InstanceRegistryQuery(deploymentDescriptor.distributionKey()),new String[]{deploymentDescriptor.distributionKey()},false);//this.tarantulaContext.tarantulaCluster.list(iq);
         if(_rlist.isEmpty()){
             _rlist = deployFromLocal(deploymentDescriptor);
         }

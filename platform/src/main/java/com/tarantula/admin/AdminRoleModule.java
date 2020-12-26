@@ -184,7 +184,7 @@ public class AdminRoleModule implements Module {
                 //do disable operation
                 GameLobby gameLobby = pending.gameLobbyList.get(index);
                 if(pending.page==index&&(!gameLobby.lobby.disabled())){//set to disable
-                    boolean suc = this.deploymentServiceProvider.enableApplication(gameLobby.lobby.distributionKey(),false);
+                    boolean suc = this.deploymentServiceProvider.disableApplication(gameLobby.lobby.distributionKey());
                     if(suc){
                         this.pendingLobby.remove(accessId);
                     }
@@ -206,7 +206,7 @@ public class AdminRoleModule implements Module {
             //do enable operation
             GameLobby gameLobby = pending.gameLobbyList.get(index);
             if(pending.page==index&&(gameLobby.lobby.disabled())){//set to enable
-                boolean suc = this.deploymentServiceProvider.enableApplication(gameLobby.lobby.distributionKey(),true);
+                boolean suc = this.deploymentServiceProvider.enableApplication(gameLobby.lobby.distributionKey());
                 if(suc){
                     this.pendingLobby.remove(accessId);
                 }

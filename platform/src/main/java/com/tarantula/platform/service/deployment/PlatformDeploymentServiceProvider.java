@@ -280,12 +280,21 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext.setApplicationOnLobby(typeId,applicationId);
     }
 
-    public boolean enableApplication(String applicationId,boolean enabled){
+    public boolean enableApplication(String applicationId){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
-        String suc = deployService.enableApplication(applicationId,enabled);
+        String suc = deployService.enableApplication(applicationId);
         if(suc!=null){//return the lobby typeId
             deployService = this.tarantulaContext.integrationCluster().deployService();
-            return enabled?deployService.launchApplication(suc,applicationId):deployService.shutdownApplication(suc,applicationId);
+            return deployService.launchApplication(suc,applicationId);
+        }
+        return suc!=null;
+    }
+    public boolean disableApplication(String applicationId){
+        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        String suc = deployService.disableApplication(applicationId);
+        if(suc!=null){//return the lobby typeId
+            deployService = this.tarantulaContext.integrationCluster().deployService();
+            return deployService.shutdownApplication(suc,applicationId);
         }
         return suc!=null;
     }
@@ -298,7 +307,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     ol.onLobby(onLobby);//removed lobby entry
                 });
                 rListeners.remove(d.tag()); //remove instance entry
-                this.tarantulaContext.tarantulaCluster().deployService().enableLobby(d.typeId(),false);
+                this.tarantulaContext.tarantulaCluster().deployService().disableLobby(d.typeId());
             }
             if(d.moduleName()!=null&&d.codebase()!=null){ //clean class loader if all apps removed on the class loader
                 DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.typeId());
@@ -311,7 +320,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public boolean launchModule(String typeId){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
-        boolean suc = deployService.enableLobby(typeId,true);
+        boolean suc = deployService.enableLobby(typeId);
         if(suc){
             this.integrationCluster.deployService().launchModule(typeId);
         }
@@ -319,7 +328,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public boolean shutdownModule(String typeId){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
-        boolean suc = deployService.enableLobby(typeId,false);
+        boolean suc = deployService.disableLobby(typeId);
         if(suc){
             this.integrationCluster.deployService().shutdownModule(typeId);
         }
@@ -727,7 +736,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         lb.fromBinary(v);
         lb.distributionKey(lobbyTypeIdIndex.index());
         Lobby lobby = new DefaultLobby(lb);
-        List<DeploymentDescriptor> apps = this.tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey()});
+        List<DeploymentDescriptor> apps = this.tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey()},true);
         apps.forEach((a)->{
             lobby.addEntry(a);
         });

@@ -27,7 +27,7 @@ public class EnableLobbyOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        this.result = cds.enableLobby(typeId,enabled);
+        this.result = enabled?cds.enableLobby(typeId):cds.disableLobby(typeId);
     }
 
     @Override

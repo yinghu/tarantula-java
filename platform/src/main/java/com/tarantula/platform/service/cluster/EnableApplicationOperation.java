@@ -28,7 +28,7 @@ public class EnableApplicationOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        this.result = cds.enableApplication(applicationId,enabled);
+        this.result = enabled?cds.enableApplication(applicationId):cds.disableApplication(applicationId);
     }
 
     @Override
