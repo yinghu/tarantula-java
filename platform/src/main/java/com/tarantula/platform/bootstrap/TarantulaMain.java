@@ -74,6 +74,7 @@ public class TarantulaMain {
 			}
 			TarantulaContext btx = TarantulaContext.getInstance();
 			TarantulaContext.memberDiscovery = (ScopedMemberDiscovery) Class.forName(override(overriding,"tarantula.member.discovery.name",_user,_config)).getConstructor().newInstance();
+			TarantulaContext.operationTimeout = Integer.parseInt(override(overriding,"tarantula.operation.timeout.seconds",_user,_config));
 			btx.platformVersion = override(overriding,"tarantula.platform.version",_user,_config);
 			btx.platformRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.routing.number",_user,_config));
 			btx.accessIndexRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.access.index.routing.number",_user,_config));
@@ -92,6 +93,8 @@ public class TarantulaMain {
 			btx.operationRejectInterval = Long.parseLong(override(overriding,"tarantula.operation.reject.interval.ms",_user,_config));
 		    btx.tarantulaServerValidator = override(overriding,"tarantula.service.authenticator.provider",_user,_config);
 		    btx.tarantulaDeploymentProvider = override(overriding,"tarantula.service.deployment.service.provider",_user,_config);
+		    btx.singleModuleApplication = override(overriding,"tarantula.service.deployment.module.singleton.application",_user,_config);
+			btx.moduleApplication = override(overriding,"tarantula.service.deployment.module.application",_user,_config);
 		    btx.deployDir  = override(overriding,"tarantula.service.deployment.dir",_user,_config);
 		    btx.maxActiveSessionNumber = Integer.parseInt(override(overriding,"tarantula.endpoint.session.max.number",_user,_config));
 			btx.tokenTimeout = Integer.parseInt(override(overriding,"tarantula.endpoint.session.timeout.m",_user,_config));

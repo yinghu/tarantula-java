@@ -8,6 +8,7 @@ import com.hazelcast.util.ExceptionUtil;;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.platform.TarantulaContext;
 
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -64,7 +65,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Boolean> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -75,7 +76,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Boolean> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -86,7 +87,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<String> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -97,7 +98,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Boolean> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -108,7 +109,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<String> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -119,7 +120,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Boolean> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -130,7 +131,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<String> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -142,7 +143,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Boolean> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -154,7 +155,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<T> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -165,7 +166,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Boolean> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -176,7 +177,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Boolean> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -187,7 +188,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<byte[]> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -201,7 +202,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(5, TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
@@ -219,7 +220,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(5, TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
@@ -237,7 +238,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(5, TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
@@ -255,7 +256,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(5, TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
@@ -273,7 +274,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(5, TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
@@ -291,7 +292,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(5, TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
@@ -309,7 +310,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(5, TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
@@ -330,7 +331,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(5, TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 //expected--;
             } catch (Exception e) {
                 future.cancel(true);
@@ -349,7 +350,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
                 final Future<Void> future = builder.invoke();
                 try {
-                    future.get(5, TimeUnit.SECONDS);
+                    future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                     expected--;
                 } catch (Exception e) {
                     future.cancel(true);
@@ -368,7 +369,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(5, TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 //expected--;
             } catch (Exception e) {
                 future.cancel(true);
@@ -386,7 +387,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(5, TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 //expected--;
             } catch (Exception e) {
                 future.cancel(true);
@@ -403,7 +404,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,partitionId);
         final Future<Void> future = builder.invoke();
         try {
-            future.get(5, TimeUnit.SECONDS);
+            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
         } catch (Exception e) {
             future.cancel(true);
             //return null;
@@ -418,7 +419,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(10, TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
@@ -433,7 +434,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Void> future = builder.invoke();
-            future.get(5,TimeUnit.SECONDS); //retry if timeout
+            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -447,7 +448,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(10, TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);

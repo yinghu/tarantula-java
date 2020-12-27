@@ -8,9 +8,9 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;
 import com.icodesoftware.Access;
-import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.platform.TarantulaContext;
 
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -68,7 +68,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
             final Future<Integer> future = builder.invoke();
             try {
-                int flag = future.get(5,TimeUnit.SECONDS);
+                int flag = future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 if(flag!=RecoverService.CHECK_SKIPPED){
                     ret = flag == RecoverService.ROLE_MATCHED;
                     break;
@@ -89,7 +89,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
             final Future<String> future = builder.invoke();
             try {
-                ret = future.get(5,TimeUnit.SECONDS);
+                ret = future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 if(ret!=null){
                     break;
                 }
@@ -107,7 +107,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,targetNode);
         try {
             final Future<Boolean> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -118,7 +118,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
         try {
             final Future<Void> future = builder.invoke();
-            future.get(5,TimeUnit.SECONDS); //retry if timeout
+            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -129,7 +129,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
         try {
             final Future<Void> future = builder.invoke();
-            future.get(5,TimeUnit.SECONDS); //retry if timeout
+            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -141,7 +141,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,targetNode);
         try {
             final Future<byte[]> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -157,7 +157,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
                 final Future<byte[]> future = builder.invoke();
                 try {
-                    ret = future.get(5,TimeUnit.SECONDS);
+                    ret = future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                     if(ret!=null){
                         break;
                     }
@@ -180,7 +180,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
                 final Future<Void> future = builder.invoke();
                 try {
-                    future.get(5, TimeUnit.SECONDS);
+                    future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                     maxReplicationNode--;
                     if(maxReplicationNode==0){
                         break;
@@ -198,7 +198,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Integer> future = builder.invoke();
-            return future.get(5,TimeUnit.SECONDS); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
             //return 0;
@@ -210,7 +210,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
         try {
             final Future<Void> future = builder.invoke();
-            future.get(5,TimeUnit.SECONDS); //retry if timeout
+            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -221,7 +221,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
         try {
             final Future<Void> future = builder.invoke();
-            future.get(5,TimeUnit.SECONDS); //retry if timeout
+            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -233,7 +233,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<String[]> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -244,7 +244,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<byte[]> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -255,7 +255,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<byte[]> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -266,7 +266,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<byte[]> future = builder.invoke();
-            return future.get(); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -282,7 +282,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
                 final Future<byte[]> future = builder.invoke();
                 try {
-                    ret = future.get(5,TimeUnit.SECONDS);
+                    ret = future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                     if(ret!=null){
                         break;
                     }

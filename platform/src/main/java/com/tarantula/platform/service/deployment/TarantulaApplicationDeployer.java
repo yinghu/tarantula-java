@@ -10,6 +10,7 @@ import com.icodesoftware.Account;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
+import com.icodesoftware.service.DeployCode;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.Serviceable;
@@ -147,6 +148,9 @@ public class TarantulaApplicationDeployer implements Serviceable {
 				a.owner(c.descriptor.distributionKey());
 				a.label(Application.LABEL);
 				a.onEdge(true);
+				if(c.descriptor.deployCode()== DeployCode.SYSTEM_MODULE||c.descriptor.deployCode()== DeployCode.APPLICATION_MODULE||c.descriptor.deployCode()== DeployCode.USER_MODULE){
+					a.applicationClassName(a.singleton()?this.context.singleModuleApplication:this.context.moduleApplication);
+				}
 				dataStore.create(a);
 			});
 			c.views.forEach((v)->{

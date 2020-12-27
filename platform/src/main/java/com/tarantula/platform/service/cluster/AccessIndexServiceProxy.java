@@ -9,6 +9,7 @@ import com.icodesoftware.AccessIndex;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.AccessIndexTrack;
+import com.tarantula.platform.TarantulaContext;
 
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -45,7 +46,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,partitionId);
         final Future<AccessIndex> future = builder.invoke();
         try {
-            return future.get(5, TimeUnit.SECONDS);
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
         } catch (Exception e) {
             future.cancel(true);
             return null;
@@ -62,7 +63,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,partitionId);
         final Future<AccessIndexTrack> future = builder.invoke();
         try {
-            return future.get(5,TimeUnit.SECONDS);
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
         } catch (Exception e) {
             future.cancel(true);
             return null;
@@ -78,7 +79,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(5, TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
@@ -96,7 +97,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
-                future.get(5, TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
@@ -111,7 +112,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Integer> future = builder.invoke();
-            return future.get(5,TimeUnit.SECONDS); //retry if timeout
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             //throw ExceptionUtil.rethrow(e);
             return 0;
@@ -123,7 +124,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
         try {
             final Future<Void> future = builder.invoke();
-            future.get(5,TimeUnit.SECONDS); //retry if timeout
+            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             e.printStackTrace();
             //throw ExceptionUtil.rethrow(e);
@@ -135,7 +136,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
         try {
             final Future<Void> future = builder.invoke();
-            future.get(5,TimeUnit.SECONDS); //retry if timeout
+            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
             e.printStackTrace();
             //throw ExceptionUtil.rethrow(e);
@@ -151,7 +152,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
                 InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
                 final Future<Void> future = builder.invoke();
                 try {
-                    future.get(5, TimeUnit.SECONDS);
+                    future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                     expected--;
                 } catch (Exception e) {
                     future.cancel(true);
@@ -171,7 +172,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
                 InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
                 final Future<byte[]> future = builder.invoke();
                 try {
-                    ret = future.get(5, TimeUnit.SECONDS);
+                    ret = future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                     if(ret!=null){
                         break;
                     }

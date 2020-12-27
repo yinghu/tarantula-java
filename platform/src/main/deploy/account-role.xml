@@ -18,7 +18,6 @@
                 <singleton>true</singleton>
                 <tag>role/account</tag>
                 <description>Tarantula Account Role Service</description>
-                <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.admin.AccountRoleModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <access-control>20</access-control>

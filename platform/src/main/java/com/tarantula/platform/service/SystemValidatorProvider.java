@@ -150,7 +150,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         subscription.distributionKey(onLobby.subscriptionId());
         if(mdatastore.load(subscription)) {
             oMap.put(onLobby.typeId(), onLobby);
-            log.warn(onLobby.toString() + " has been monitored under ->" + SystemUtil.fromUTCMilliseconds(subscription.endTimestamp()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            log.warn(onLobby.toString() + " has been monitored at expiration time ->" + SystemUtil.fromUTCMilliseconds(subscription.endTimestamp()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         }
     }
     public boolean checkSubscription(String systemId){

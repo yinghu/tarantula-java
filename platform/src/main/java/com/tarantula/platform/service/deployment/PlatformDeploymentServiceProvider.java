@@ -255,10 +255,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             b.moduleArtifact(descriptor.moduleArtifact());
             b.moduleVersion(descriptor.moduleVersion());
             if(b.singleton()){
-                b.applicationClassName("com.tarantula.platform.module.SingletonModuleApplication");
+                b.applicationClassName(this.tarantulaContext.singleModuleApplication);
             }
             else{
-                b.applicationClassName("com.tarantula.platform.module.DynamicModuleApplication");
+                b.applicationClassName(this.tarantulaContext.moduleApplication);
             }
             String x = deployService.addApplication(b);
             if(x==null){

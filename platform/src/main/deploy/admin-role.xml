@@ -18,7 +18,6 @@
                 <singleton>true</singleton>
                 <tag>role/admin</tag>
                 <description>Tarantula Admin Role Service</description>
-                <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.admin.AdminRoleModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>

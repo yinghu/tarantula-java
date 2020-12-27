@@ -18,7 +18,6 @@
                 <singleton>true</singleton>
                 <tag>role/sudo</tag>
                 <description>Tarantula Sudo Role Service</description>
-                <class-name>com.tarantula.platform.module.SingletonModuleApplication</class-name>
                 <module-name>com.tarantula.admin.SudoRoleModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>

@@ -1,6 +1,7 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.Descriptor;
+import com.icodesoftware.service.DeployCode;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.Map;
@@ -35,7 +36,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 
 
     protected int deployPriority;
-    protected int deployCode;
+    protected int deployCode = DeployCode.SYSTEM_APPLICATION;
 
     protected long timerOnModule;
     protected boolean logEnabled =true;

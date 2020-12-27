@@ -5,6 +5,7 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.Member;
 import com.hazelcast.spi.*;
 import com.icodesoftware.*;
+import com.icodesoftware.service.DeployCode;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
@@ -285,6 +286,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 descriptor.onEdge(true);
                 descriptor.resetEnabled(true);
                 descriptor.disabled(true);//pending launch
+                descriptor.deployCode(DeployCode.USER_GAME_CLUSTER);
                 mds.create(descriptor);
                 lobbyTypeIdIndex.index(descriptor.distributionKey());
                 lobbyTypeIdIndex.owner(gameCluster.distributionKey());
@@ -296,6 +298,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     a.typeId(descriptor.typeId());//replaced with named type id
                     a.subtypeId(a.subtypeId().replace("game",name));
                     a.tag(a.tag().replace("game",name));
+                    a.applicationClassName(a.singleton()?tarantulaContext.singleModuleApplication:tarantulaContext.moduleApplication);
                     mds.create(a);
                 });
             }

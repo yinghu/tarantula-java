@@ -80,6 +80,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     private TokenValidatorProvider tokenValidatorProvider;
     private DeploymentServiceProvider deploymentServiceProvider;
     public String deployDir;
+    public String singleModuleApplication;
+    public String moduleApplication;
 
     public  String eventThreadPoolSetting;
 
@@ -121,7 +123,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public String endpointIp ="localhost";
     public int endpointPort = 6393;
     public static ScopedMemberDiscovery memberDiscovery;
-
+    public static int operationTimeout = 5;
     public String authContext = "localhost";
     public boolean udpEndpointEnabled;
     public String udpReceiverThreadPoolSetting;
@@ -241,7 +243,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             lobbyTypeIdIndex.fromBinary(data);
         }
         GameCluster gameCluster = new GameCluster();
-        if(conf.descriptor.resetEnabled&&conf.descriptor.deployCode>1){
+        if(conf.descriptor.resetEnabled&&conf.descriptor.deployCode==DeployCode.USER_GAME_CLUSTER){
             gameCluster.distributionKey(lobbyTypeIdIndex.owner);
             if(!masterDataStore().load(gameCluster)){
                 //load from cluster
