@@ -55,7 +55,7 @@ namespace GameClustering
         private void Bootstrap()
         {
             _httpCaller = new HttpCaller(gecHost);
-            _deviceId = SystemInfo.deviceUniqueIdentifier;
+            _deviceId = Guid.NewGuid().ToString();//SystemInfo.deviceUniqueIdentifier;
             ThreadPool.SetMinThreads(1, 1);
             ThreadPool.SetMaxThreads(4, 4);
         }
