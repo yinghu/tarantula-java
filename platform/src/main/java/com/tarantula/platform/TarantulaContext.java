@@ -339,7 +339,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             return;
         }
         String memberId = this.integrationCluster.recoverService().findDataNode(dataStoreMaster,publishingId.getBytes());
-        log.warn("query from member->"+memberId);
         List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
         bList.forEach((d)->{
             this.setLobby(d);//

@@ -96,15 +96,15 @@ public class SudoRoleModule implements Module {
 
         else if(session.action().equals("onAddModule")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            this.context.log(acc.property(OnAccess.MODULE_CODE_BASE).toString(),OnLog.WARN);
-            this.context.log(acc.property(OnAccess.MODULE_ARTIFACT).toString(),OnLog.WARN);
-            this.context.log(acc.property(OnAccess.MODULE_VERSION).toString(),OnLog.WARN);
+            //this.context.log(acc.property(OnAccess.MODULE_CODE_BASE).toString(),OnLog.WARN);
+            //this.context.log(acc.property(OnAccess.MODULE_ARTIFACT).toString(),OnLog.WARN);
+            //this.context.log(acc.property(OnAccess.MODULE_VERSION).toString(),OnLog.WARN);
             DeploymentDescriptor desc = new DeploymentDescriptor();
             desc.codebase(acc.property(OnAccess.MODULE_CODE_BASE).toString());
             desc.moduleArtifact(acc.property(OnAccess.MODULE_ARTIFACT).toString());
             desc.moduleVersion(acc.property(OnAccess.MODULE_VERSION).toString());
-            boolean suc = this.deploymentServiceProvider.createModule(desc);
-            session.write(this.toMessage(suc?"module added":"module not added",suc).toString().getBytes(),label());
+            Response resp = this.deploymentServiceProvider.createModule(desc);
+            session.write(this.toMessage(resp.message(),resp.successful()).toString().getBytes(),label());
         }
         else if(session.action().equals("onLaunchModule")){//typeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);

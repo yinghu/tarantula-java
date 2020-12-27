@@ -228,27 +228,35 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             mp.reset();
         });
     }
-    public boolean createModule(Descriptor descriptor){
+    public Response createModule(Descriptor descriptor){
         DynamicModuleClassLoader mc = new DynamicModuleClassLoader(descriptor);
         XMLParser xmlParser = new XMLParser();
-        boolean[] suc = {true};
+        Response response = new ResponseHeader();
+        response.successful(false);
         mc.loadResource("descriptor.xml",(in)->{
             try{
                 xmlParser.parse(in);
+                response.successful(true);
             }catch (Exception ex){
                 log.warn("failed to parse descriptor.xml",ex);
-                suc[0] = false;
+                response.message(ex.getMessage());
             }
         });
-        if(!suc[0]){
-            return false;
+        if(!response.successful()){
+            return response;
         }
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         LobbyConfiguration a = xmlParser.configurations.get(0);
         AccessIndex publishId = this.tarantulaContext.accessIndexService().set(a.descriptor.typeId());
-        suc[0] = deployService.addLobby(a.descriptor,publishId.distributionKey());
-        if(!suc[0]){
-            return false;
+        if(publishId==null){
+            response.successful(false);
+            response.message("module already existed");
+            return response;
+        }
+        if(!deployService.addLobby(a.descriptor,publishId.distributionKey())){
+            response.successful(false);
+            response.message("cannot create module");
+            return response;
         }
         a.applications.forEach((b)->{
             b.codebase(descriptor.codebase());
@@ -265,7 +273,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 log.warn("Failed to add application ->"+b.toString());
             }
         });
-        return suc[0];
+        response.successful(true);
+        response.message("module created");
+        return response;
     }
 
     public boolean createApplication(Descriptor descriptor, boolean launching){

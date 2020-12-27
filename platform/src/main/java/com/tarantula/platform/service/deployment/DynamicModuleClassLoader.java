@@ -111,7 +111,7 @@ public class DynamicModuleClassLoader extends ClassLoader{
                 }
             }
         }catch (Exception ex){
-            throw new RuntimeException(name,ex);
+            throw new RuntimeException("module not existed",ex);
         }
     }
     private byte[] loadClassFromCodeBase(String name) throws ClassNotFoundException{

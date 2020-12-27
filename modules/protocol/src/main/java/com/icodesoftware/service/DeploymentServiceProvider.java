@@ -50,28 +50,25 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     PostOffice registerPostOffice();
     String resetCode(String key);
     String checkCode(String resetCode);
+    //end
 
-    //Module and application operation API
+    //Module operation APIs
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
-    boolean createModule(Descriptor descriptor);
+    Response createModule(Descriptor descriptor);
     boolean launchModule(String typeId);
     boolean resetModule(Descriptor descriptor);
     boolean shutdownModule(String typeId);
+    //end
 
+    //game cluster operation APIs
     boolean createApplication(Descriptor descriptor,boolean launching);
     boolean enableApplication(String applicationId);
     boolean disableApplication(String applicationId);
-
-
-    //END OF Module API
-
-    //GAME CLUSTER APIs
     <T extends OnAccess> T createGameCluster(String owner,String name);
     <T extends OnAccess> boolean launchGameCluster(T gameCluster);
     <T extends OnAccess> boolean shutdownGameCluster(T gameCluster);
     <T extends OnAccess> T gameCluster(String key);
-
     Lobby lobby(String typeId);
     //END OF CLUSTER
 
