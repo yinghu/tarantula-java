@@ -99,9 +99,9 @@ abstract public class AbstractGame implements Game {
         return true;
     }
     public boolean onMove(InboundMessage inboundMessage){
-        DataBuffer dataBuffer = new DataBuffer(inboundMessage.payload());
-        Vector3 _pos = dataBuffer.getVector3();
-        log.warn(_pos.toString());
+        //DataBuffer dataBuffer = new DataBuffer(inboundMessage.payload());
+        //Vector3 _pos = dataBuffer.getVector3();
+        //log.warn(_pos.toString());
         return true;
     }
     public boolean onSync(InboundMessage inboundMessage){

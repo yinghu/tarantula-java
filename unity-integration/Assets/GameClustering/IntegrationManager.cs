@@ -227,7 +227,7 @@ namespace GameClustering
             return false;
         }
 
-        public async Task<bool> Join(MonoBehaviour caller,bool global)
+        public async Task<bool> Join(MonoBehaviour caller,int accessMode)
         {
             try
             {
@@ -235,7 +235,7 @@ namespace GameClustering
                 {
                     new Header {Name = Header.TarantulaTag, Value = typeId+"/mmk"},
                     new Header {Name = Header.TarantulaToken, Value = Presence.Token},
-                    new Header {Name = Header.TarantulaAccessMode,Value = global?"5":"2"},
+                    new Header {Name = Header.TarantulaAccessMode,Value = accessMode+""},
                     new Header {Name = Header.TarantulaAction, Value = "onPlay"}
                 };
                 //var page = new Payload{Headers = new []{new Header{ Name = "page",Value = "1"}}};

@@ -59,7 +59,7 @@ namespace Integration
                 }
             }
             _integrationManager.OnJoinedEvent += Join;
-            if (!await _integrationManager.Join(this,false))
+            if (!await _integrationManager.Join(this,AccessMode.FastPlay))
             {
                 bText.text = _integrationManager.Exception.Message;
             }
@@ -76,7 +76,7 @@ namespace Integration
                 }
             }
             _integrationManager.OnJoinedEvent += Join;
-            if (!await _integrationManager.Join(this,true))
+            if (!await _integrationManager.Join(this,AccessMode.GameCenter))
             {
                 bText.text = _integrationManager.Exception.Message;
             }

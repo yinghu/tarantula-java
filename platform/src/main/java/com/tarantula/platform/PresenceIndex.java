@@ -49,7 +49,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public Response onPlay(Session session,Descriptor desc){
         Response resp = null;
         if(this.transact(desc.entryCost()*(-1))){
-            if(session.accessMode()==Session.GLOBAL_PLAY_MODE){
+            if(session.accessMode()==Session.GAME_CENTER_PLAY_MODE){
                 this.deploymentServiceProvider.onRemoteConnection(session,desc);
             }else{
                 fastJoin(session,desc,session.payload());

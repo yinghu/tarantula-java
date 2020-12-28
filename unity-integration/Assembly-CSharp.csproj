@@ -56,6 +56,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\GameClustering\AccessMode.cs" />
      <Compile Include="Assets\GameClustering\CallbackKey.cs" />
      <Compile Include="Assets\GameClustering\ClusteringObject.cs" />
      <Compile Include="Assets\GameClustering\Connection.cs" />
