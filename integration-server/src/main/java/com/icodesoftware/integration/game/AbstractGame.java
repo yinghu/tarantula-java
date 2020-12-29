@@ -73,6 +73,9 @@ abstract public class AbstractGame implements Game {
     }
     public boolean onCollision(InboundMessage inboundMessage){
         GameItem gameItem = gameObject.gameItem(inboundMessage.sequence());
+        if(gameItem==null){
+            return false;
+        }
         gameItem.collisions.incrementAndGet();
         gameChannel.onSession(inboundMessage.sessionId(),(session)->{
             gameObject.update(session.seat()).xp +=100;
@@ -83,6 +86,9 @@ abstract public class AbstractGame implements Game {
     }
     public boolean onDestroy(InboundMessage inboundMessage){
         GameItem gameItem = gameObject.items().remove(inboundMessage.sequence());
+        if(gameItem==null){
+            return false;
+        }
         OutboundMessage outboundMessage = new OutboundMessage();
         outboundMessage.type(MessageHandler.SPAWN);
         outboundMessage.ack(true);

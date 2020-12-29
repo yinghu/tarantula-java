@@ -126,6 +126,7 @@ namespace Integration.Game
                 await Messenger.SendAsync(MessageType.Load, sequence, true,buffer);
             }
             InvokeRepeating(nameof(Print), 1.0f, 1.0f);
+            Manager.OnJoinedEvent += OnJoin;
         }
 
         private void Update()
@@ -200,6 +201,7 @@ namespace Integration.Game
         }
         private void OnGameEnd()
         {
+            Manager.OnJoinedEvent -= OnJoin;
             Debug.Log("game end");
             Messenger.Disconnect();
             exit.ExitOnEnd();
@@ -210,6 +212,10 @@ namespace Integration.Game
             Manager.OnGameClosingEvent -= OnGameClosing;
             Manager.OnGameCloseEvent -= OnGameEnd;
             Manager.OnGameJoinTimeout -= OnGameEnd;
+        }
+        private void OnJoin(int sessionId)
+        {
+            Debug.Log("Session joined->"+sessionId);
         }
     }
 }

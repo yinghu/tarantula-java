@@ -337,24 +337,21 @@ namespace GameClustering
             using (var inboundMessage = new InboundMessage(_connection.Secured ? Decrypt(data) : data))
             {
                 var callbackKey = new CallbackKey(inboundMessage.Type(),inboundMessage.Sequence());
-                if (_handlers.TryGetValue(callbackKey, out var handler))
+                if (!_handlers.TryGetValue(callbackKey, out var handler))
                 {
-                    if (inboundMessage.Ack())
+                    return;
+                }
+                if (inboundMessage.Ack())
+                {
+                    Ack(inboundMessage.MessageId());
+                    var ret = _pendingGateways.AddOrUpdate(inboundMessage.MessageId(), 0, (k, v) => 1);
+                    if (ret > 0)
                     {
-                        Ack(inboundMessage.MessageId());
-                        var ret = _pendingGateways.AddOrUpdate(inboundMessage.MessageId(), 0, (k, v) => 1);
-                        if (ret > 0)
-                        {
-                            return;
-                        }
-                        _pendingGateways.TryUpdate(inboundMessage.MessageId(), 1, 0);
+                        return;
                     }
-                    handler.Invoke(inboundMessage.SessionId(),inboundMessage.Payload());
+                    _pendingGateways.TryUpdate(inboundMessage.MessageId(), 1, 0);
                 }
-                else
-                {
-                    Debug.Log("NO HANDLER REGISTERED->" + inboundMessage.Type()+"/"+inboundMessage.Sequence()+"/"+inboundMessage.MessageId());
-                }
+                handler.Invoke(inboundMessage.SessionId(),inboundMessage.Payload());
             }        
         }
         private void ClearPendingGateways()

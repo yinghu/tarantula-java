@@ -73,7 +73,9 @@ public class PushEventChannel implements GameChannel {
     }
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
-        if(mSession.containsKey(pendingInboundMessage.sessionId()) && mSession.get(pendingInboundMessage.sessionId()).validate(pendingInboundMessage.source())){
+        RemoteSession remoteSession = mSession.get(pendingInboundMessage.sessionId());
+        PendingSession pendingSession;
+        if(remoteSession!=null && remoteSession.validate(pendingInboundMessage.source())){
             if(pendingInboundMessage.ack()){//early ack to avoid retry from remote
                 ack(pendingInboundMessage.sessionId(),pendingInboundMessage.messageId(),pendingInboundMessage.source());
             }
@@ -95,15 +97,12 @@ public class PushEventChannel implements GameChannel {
         else if(pendingInboundMessage.type()==MessageHandler.JOIN && jIndex.putIfAbsent(pendingInboundMessage.source(),new PendingSession())==null){
             joinMessageHandler.onMessage(pendingInboundMessage);
         }
-        else if(pendingInboundMessage.type()==MessageHandler.ACK && jIndex.containsKey(pendingInboundMessage.source())) {
-            PendingSession pendingSession = jIndex.get(pendingInboundMessage.source());
-            if (pendingSession != null) {
-                DataBuffer buffer = new DataBuffer(pendingInboundMessage.payload());
-                var sz = buffer.getInt();
-                for (int i = 0; i < sz; i++) {
-                    if(pendingSession.messageId == buffer.getInt()){
-                        jIndex.remove(pendingInboundMessage.source());
-                    }
+        else if(pendingInboundMessage.type()==MessageHandler.ACK && (pendingSession = jIndex.get(pendingInboundMessage.source()))!=null){
+            DataBuffer buffer = new DataBuffer(pendingInboundMessage.payload());
+            var sz = buffer.getInt();
+            for (int i = 0; i < sz; i++) {
+                if(pendingSession.messageId == buffer.getInt()){
+                    jIndex.remove(pendingInboundMessage.source());
                 }
             }
         }
