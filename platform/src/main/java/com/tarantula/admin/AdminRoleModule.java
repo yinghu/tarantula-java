@@ -365,6 +365,9 @@ public class AdminRoleModule implements Module {
                 session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes(),label());
             }
         }
+        else if(session.action().equals("onAddService")){
+            session.write(payload,label());
+        }
         else if(session.action().equals("onLaunchGameCluster")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);

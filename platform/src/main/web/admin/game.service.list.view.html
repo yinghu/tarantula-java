@@ -49,6 +49,13 @@
             <span class="tx-text-12">Powered By ICodeSoftware</span>
         </div>
     </div>
+    <div class="w3-card-4 w3-border w3-round w3-white tx-lobby-checkout" id="tx-service-edit">
+        <div class="w3-panel w3-border-bottom w3-border-red">
+            <span id="tx-service-edit-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
+        
+            <span id="tx-service-edit-ok" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Confirm</span>     
+        </div>
+    </div>
 </div>
 <script>
     document.querySelector("#tx-game-service-list-message").innerHTML = TARA_API.query().gameClusterId;
@@ -69,5 +76,17 @@
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       
+    };
+    document.querySelector('#tx-add-service').onclick=()=>{
+        document.querySelector('#tx-service-edit').style.display = 'block';    
+    };
+    document.querySelector('#tx-service-edit-cancel').onclick=()=>{
+        document.querySelector('#tx-service-edit').style.display = 'none';    
+    };
+    document.querySelector('#tx-service-edit-ok').onclick=()=>{
+        TARA_API.onService(true,{serviceTag:'role/admin',command:'onAddService',accessId:TARA_API.query().gameClusterId},(resp)=>{
+            console.log(resp);    
+        });
+        //document.querySelector('#tx-service-edit').style.display = 'none';    
     };
 </script>

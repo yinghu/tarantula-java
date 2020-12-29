@@ -1,4 +1,32 @@
 package com.tarantula.platform.item;
 
-public class ItemPack {
+
+import com.tarantula.platform.presence.PresencePortableRegistry;
+
+import java.util.List;
+import java.util.Map;
+
+public class ItemPack extends Item{
+
+    public List<Item> itemList;
+
+    @Override
+    public Map<String,Object> toMap(){
+        super.toMap();
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        super.fromMap(properties);
+    }
+
+    public int getFactoryId() {
+        return PresencePortableRegistry.OID;
+    }
+
+
+    public int getClassId() {
+        return PresencePortableRegistry.ITEM_PACK_CID;
+    }
+
 }

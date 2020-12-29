@@ -1,9 +1,11 @@
 package com.icodesoftware;
 
-public interface Consumable {
+public interface Consumable extends Recoverable{
     String id();
     String name();
+    void name(String name);
     String description();
-    <T extends Object> void property(String name,T value);
-    <T extends Object> T property(String name);
+    void description(String description);
+    void property(String pName,Object pValue);
+    Object property(String pName);
 }
