@@ -50,10 +50,22 @@ namespace Integration.Game
             _lastPosition = types[FreeMoveTypeId].transform.position;
             Messenger.RegisterMessageHandler(MessageType.OnLoad, sequence, (sessionId, data) =>
             {
+                //var buffer = new DataBuffer(data);
+                //_started = buffer.GetByte() == 1;
+                //_players[_seat].GameStart = _started;
+                Debug.Log("on load->" + sessionId + ">>>");
+            });
+            Messenger.RegisterMessageHandler(MessageType.Load,sequence, (sessionId, data) =>
+            {
+                if (sessionId != Manager.SessionId)
+                {
+                    Messenger.SendAsync(MessageType.OnLoad,sequence,true);
+                    return;
+                }
                 var buffer = new DataBuffer(data);
                 _started = buffer.GetByte() == 1;
                 _players[_seat].GameStart = _started;
-                Debug.Log("on load->" + sessionId + ">>>" + _started);
+                Debug.Log("load->" + sessionId + ">>>" + _started);
             });
             Messenger.RegisterMessageHandler(MessageType.Spawn, sequence, (sessionId, data) =>
             {
@@ -117,14 +129,8 @@ namespace Integration.Game
             Manager.OnGameClosingEvent += OnGameClosing;
             Manager.OnGameCloseEvent += OnGameEnd;
             Manager.OnGameJoinTimeout += OnGameEnd;
-            using (var buffer = new DataBuffer())
-            {
-                buffer.PutFloat(cameraAdapter.xLeft);
-                buffer.PutFloat(cameraAdapter.xRight);
-                buffer.PutFloat(cameraAdapter.zTop);
-                buffer.PutFloat(cameraAdapter.zBottom);
-                await Messenger.SendAsync(MessageType.Load, sequence, true,buffer);
-            }
+            
+            await Messenger.SendAsync(MessageType.Load, sequence, true);
             InvokeRepeating(nameof(Print), 1.0f, 1.0f);
             Manager.OnJoinedEvent += OnJoin;
         }

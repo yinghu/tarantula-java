@@ -39,20 +39,18 @@ abstract public class AbstractGame implements Game {
 
     public void onJoin(int sessionId,RemoteSession remoteSession){
         log.warn("join->"+remoteSession.seat+"/"+sessionId);
-        gameObject.update(remoteSession.seat).rank=1;
-        gameObject.update(remoteSession.seat).xp=0;
-        gameObject.update(new GameStatsDelta(remoteSession.seat,"kills",1));
-        gameObject.update(new GameStatsDelta(remoteSession.seat,"winnings",1));
+        //gameObject.update(remoteSession.seat).rank=1;
+        //gameObject.update(remoteSession.seat).xp=0;
+        //gameObject.update(new GameStatsDelta(remoteSession.seat,"kills",1));
+        //gameObject.update(new GameStatsDelta(remoteSession.seat,"winnings",1));
     }
     public void onLeave(int sessionId){
         log.warn("leave->"+sessionId);
     }
     public void onLoad(InboundMessage inboundMessage){
         log.warn("load->"+inboundMessage.sessionId());
-        DataBuffer inbound = new DataBuffer(inboundMessage.payload());
-        log.warn("offset->"+inbound.getFloat()+"//"+inbound.getFloat()+"///"+inbound.getFloat()+"////"+inbound.getFloat());
         OutboundMessage outboundMessage = new OutboundMessage();
-        outboundMessage.type(MessageHandler.ON_LOAD);
+        outboundMessage.type(MessageHandler.LOAD);
         outboundMessage.sequence(inboundMessage.sequence());
         outboundMessage.ack(true);
         outboundMessage.sessionId(inboundMessage.sessionId());
@@ -67,6 +65,7 @@ abstract public class AbstractGame implements Game {
         });
     }
     public boolean onSpawn(InboundMessage inboundMessage){
+        log.warn("on spawn->");
         DataBuffer dataBuffer = new DataBuffer(inboundMessage.payload());
         gameObject.gameItem(new GameItem(dataBuffer.getInt(),dataBuffer.getInt(),inboundMessage.sessionId()));
         return true;
@@ -111,6 +110,7 @@ abstract public class AbstractGame implements Game {
         return true;
     }
     public boolean onSync(InboundMessage inboundMessage){
+        log.warn("on sync->"+inboundMessage.sequence()+"//"+inboundMessage.sessionId());
         return true;
     }
 
