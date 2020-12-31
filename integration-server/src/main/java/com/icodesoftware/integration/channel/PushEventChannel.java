@@ -148,11 +148,14 @@ public class PushEventChannel implements GameChannel {
     }
     public void relay(int sessionId,int messageId,boolean ack,MessageHandler messageHandler,OutboundMessage pendingOutboundMessage){
         byte[] outMessage = gameChannelService.encode(pendingOutboundMessage);
-        RemoteSession remoteSession = mSession.get(sessionId);
-        if(ack){
-            pending(sessionId,messageId,outMessage,messageHandler);
-        }
-        this.gameChannelService.pendingOutbound(outMessage,remoteSession.socketAddress);
+        this.mSession.forEach((k,v)->{
+            if(k!=sessionId){//excludes sender
+                if(ack){
+                    pending(k,messageId,outMessage,messageHandler);
+                }
+                this.gameChannelService.pendingOutbound(outMessage,v.socketAddress);
+            }
+        });
     }
     public void ping(){
         ArrayList<Integer> kickOff = new ArrayList<>();

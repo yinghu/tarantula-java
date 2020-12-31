@@ -24,7 +24,6 @@ public class OnJoinedMessageHandler extends AbstractMessageHandler {
         outboundMessage = new OutboundMessage();
         connectionId = pendingInboundMessage.connectionId();
         outboundMessage.ack(ack);
-        outboundMessage.timestamp(pendingInboundMessage.timestamp());
         messageId = gameChannelService.messageId();
         outboundMessage.messageId(messageId);
         outboundMessage.sessionId(sessionId);

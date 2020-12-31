@@ -72,16 +72,7 @@ namespace GameClustering
             _memoryStream.Position = InboundMessage.SequencePos;
             _memoryStream.Write(bytes,0,4);
         }
-        public void Timestamp(long timestamp)
-        {
-            var bytes = BitConverter.GetBytes(timestamp);
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes);
-            }
-            _memoryStream.Position = InboundMessage.TimestampPos;
-            _memoryStream.Write(bytes,0,8);
-        }
+        
         public void Payload(byte[] payload)
         {
             _memoryStream.Position = InboundMessage.PayloadPos;

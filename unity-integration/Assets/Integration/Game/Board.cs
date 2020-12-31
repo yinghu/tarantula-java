@@ -177,6 +177,7 @@ namespace Integration.Game
 
         private async Task OnFreeMove()
         {
+            
             using (var buffer = new DataBuffer())
             {
                 buffer.PutInt(FreeMoveTypeId);

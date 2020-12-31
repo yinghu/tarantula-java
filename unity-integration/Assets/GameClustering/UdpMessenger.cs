@@ -111,8 +111,6 @@ namespace GameClustering
                 }
                 message.SessionId(_connection.SessionId);
                 message.Sequence(sequence);
-                var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                message.Timestamp(timestamp);
                 if (payload == null || payload.Length > 0)
                 {
                     message.Payload(payload);
@@ -121,6 +119,7 @@ namespace GameClustering
                 var bytes = await _udpClient.SendAsync(outMessage, outMessage.Length);
                 if (ack && bytes > 0)
                 {
+                    var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                     _pendingMessages[messageId] = new PendingMessage {Data = outMessage, Timestamp = timestamp, Retries = 2};
                 }
                 _totalOutbound++;
@@ -149,8 +148,6 @@ namespace GameClustering
                 }
                 message.SessionId(_connection.SessionId);
                 message.Sequence(sequence);
-                var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                message.Timestamp(timestamp);
                 if (payload == null || payload.Length > 0)
                 {
                     message.Payload(payload);
@@ -159,6 +156,7 @@ namespace GameClustering
                 var bytes = _udpClient.Send(outMessage, outMessage.Length);
                 if (ack && bytes > 0)
                 {
+                    var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                     _pendingMessages[messageId] = new PendingMessage {Data = outMessage, Timestamp = timestamp, Retries = 2};
                 }
                 _totalOutbound++;

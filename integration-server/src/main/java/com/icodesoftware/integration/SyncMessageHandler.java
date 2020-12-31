@@ -25,7 +25,6 @@ public class SyncMessageHandler extends AbstractMessageHandler {
         }
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.ack(pendingInboundMessage.ack());
-        pendingOutboundMessage.timestamp(pendingInboundMessage.timestamp());
         int mid = this.gameChannelService.messageId();
         pendingOutboundMessage.messageId(mid);
         pendingOutboundMessage.sessionId(pendingInboundMessage.sessionId());

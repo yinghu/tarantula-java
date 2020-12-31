@@ -20,7 +20,6 @@ public class OnLoadMessageHandler extends AbstractMessageHandler {
     public void onMessage(InboundMessage pendingInboundMessage) {
          OutboundMessage pendingOutboundMessage = new OutboundMessage();
          pendingOutboundMessage.ack(pendingInboundMessage.ack());
-         pendingOutboundMessage.timestamp(pendingInboundMessage.timestamp());
          int mid = gameChannelService.messageId();
          pendingOutboundMessage.messageId(mid);
          pendingOutboundMessage.sessionId(pendingInboundMessage.sessionId());

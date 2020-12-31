@@ -14,8 +14,7 @@ public class InboundMessage {
     public static int CONNECTION_ID_POS = 9;
     public static int SEQUENCE_POS = 13;
     public static int SESSION_ID_POD = 17;
-    public static int TIMESTAMP_POS = 21;
-    public static int PAYLOAD_POS = 29;
+    public static int PAYLOAD_POS = 21;
 
     public final String serverId;
     private final ByteBuffer message;
@@ -46,9 +45,6 @@ public class InboundMessage {
     }
     public int sequence(){
         return message.getInt(SEQUENCE_POS);
-    }
-    public long timestamp(){
-        return message.getLong(TIMESTAMP_POS);
     }
     public byte[] payload(){
         byte[] payload = new byte[message.limit()-PAYLOAD_POS];

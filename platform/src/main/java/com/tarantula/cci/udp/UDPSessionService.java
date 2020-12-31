@@ -124,7 +124,6 @@ public class UDPSessionService implements ConnectionEventService {
             pendingOutboundMessage.type(MessageHandler.SERVER_PUSH);
             pendingOutboundMessage.sequence(sequence);//client message type
             pendingOutboundMessage.messageId(messageId);
-            pendingOutboundMessage.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
             pendingOutboundMessage.payload(payload);
             byte[] out = serverConnection.secured()?(encrypt(pendingOutboundMessage.message())):(pendingOutboundMessage.message());
             DatagramPacket datagramPacket = new DatagramPacket(out,out.length);

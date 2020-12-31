@@ -21,7 +21,6 @@ public class JoinMessageHandler extends AbstractMessageHandler {
     public void onMessage(InboundMessage pendingInboundMessage) {
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.ack(true);
-        pendingOutboundMessage.timestamp(pendingInboundMessage.timestamp());
         int messageId = gameChannelService.messageId();
         pendingOutboundMessage.messageId(messageId);
         pendingOutboundMessage.type(pendingInboundMessage.type());

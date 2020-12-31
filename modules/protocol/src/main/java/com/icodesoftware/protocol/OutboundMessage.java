@@ -30,9 +30,6 @@ public class OutboundMessage {
     public void sequence(int sequence){
         message.putInt(InboundMessage.SEQUENCE_POS,sequence);
     }
-    public void timestamp(long timestamp){
-        message.putLong(InboundMessage.TIMESTAMP_POS,timestamp);
-    }
     public void payload(byte[] payload){
         message.position(InboundMessage.PAYLOAD_POS);
         message.put(payload);

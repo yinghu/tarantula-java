@@ -23,7 +23,6 @@ public class OnLeftMessageHandler extends AbstractMessageHandler {
         connectionId = pendingInboundMessage.connectionId();
         ack = pendingInboundMessage.ack();
         outboundMessage.ack(ack);
-        outboundMessage.timestamp(pendingInboundMessage.timestamp());
         outboundMessage.messageId(messageId);
         outboundMessage.sessionId(pendingInboundMessage.sessionId());
         outboundMessage.type(ON_LEFT);

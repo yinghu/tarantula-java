@@ -23,7 +23,6 @@ public class SpawnMessageHandler extends AbstractMessageHandler {
         }
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.ack(pendingInboundMessage.ack());
-        pendingOutboundMessage.timestamp(pendingInboundMessage.timestamp());
         pendingOutboundMessage.messageId(pendingInboundMessage.messageId());
         pendingOutboundMessage.sessionId(pendingInboundMessage.sessionId());
         pendingOutboundMessage.type(pendingInboundMessage.type());

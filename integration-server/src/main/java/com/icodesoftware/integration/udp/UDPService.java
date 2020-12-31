@@ -126,7 +126,8 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     }
     @Override
     public void run(){
-        log.warn("WAITING FOR INBOUND MESSAGES ON ["+address+":"+port+"] At ["+serverId+"]");
+        String _app = application.substring(application.lastIndexOf(".")+1);
+        log.warn("Application ["+_app+"] running at ["+address+":"+port+"] At ["+serverId+"]");
         while (true){
             try{
                 DatagramPacket buffer = new DatagramPacket(new byte[OutboundMessage.MESSAGE_SIZE*2],OutboundMessage.MESSAGE_SIZE*2);
