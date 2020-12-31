@@ -140,6 +140,7 @@ abstract public class AbstractGame implements Game {
         this.listener.onChannelReset(gameChannel);
     }
     public void onGameLoop(){
+        /**
         gameObject.items().forEach((s,g)->{
             if(g.typeId==4){
                 OutboundMessage outboundMessage = new OutboundMessage();
@@ -156,7 +157,7 @@ abstract public class AbstractGame implements Game {
                 outboundMessage.payload(dataBuffer.toArray());
                 gameChannel.relay(mid,true,null,outboundMessage);
             }
-        });
+        });**/
     }
     public void registerGameChannelListener(GameChannel.Listener listener){
         this.listener = listener;

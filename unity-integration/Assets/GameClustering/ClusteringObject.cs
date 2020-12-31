@@ -11,7 +11,7 @@ namespace GameClustering
         public int sequence;
         //runtime assigned flag as the owner of the game object
         public bool master;
-        protected async void StartClusteringObject(Action<DataBuffer> outboundSync,Action<DataBuffer> onSync)
+        protected async void OnSync(Action<DataBuffer> outboundSync,Action<DataBuffer> inboundSync)
         {
             Messenger.RegisterMessageHandler(MessageType.Sync,sequence,  (sessionId,data) =>
             {
@@ -19,9 +19,10 @@ namespace GameClustering
                 {
                     return;
                 }
-                MainThread.Execute( buffer =>
+                MainThread.Execute( async buffer =>
                 {
-                    outboundSync?.Invoke(buffer);//push game status to remote 
+                    outboundSync?.Invoke(buffer);//push game status to remote
+                    await Messenger.SendAsync(MessageType.OnSync,sequence, true, buffer);
                 });
             });
             Messenger.RegisterMessageHandler(MessageType.OnSync,sequence, (sessionId, data) =>
@@ -32,7 +33,7 @@ namespace GameClustering
                 }
                 MainThread.Execute(data, buffer =>
                 {
-                    onSync?.Invoke(buffer);//update local game state
+                    inboundSync?.Invoke(buffer);//update local game state
                 });    
             });
             await Messenger.SendAsync(MessageType.Sync, sequence, true);

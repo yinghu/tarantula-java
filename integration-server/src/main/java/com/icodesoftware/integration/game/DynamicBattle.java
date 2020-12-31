@@ -26,8 +26,8 @@ public class DynamicBattle extends AbstractGame {
         int seq = gameChannelService.messageId();
         dataBuffer.putInt(seq);
         outboundMessage.payload(dataBuffer.toArray());
-        gameObject.gameItem(new GameItem(4,seq,0));
-        gameChannel.relay(mid,true,null,outboundMessage);
+        //gameObject.gameItem(new GameItem(4,seq,0));
+        //gameChannel.relay(mid,true,null,outboundMessage);
     }
     public void onAction(InboundMessage inboundMessage){
         OutboundMessage outboundMessage = new OutboundMessage();

@@ -16,10 +16,9 @@ namespace Integration.Game
 
         private void Start()
         {
-            StartClusteringObject(async buffer =>
+            OnSync( buffer =>
             {
                 buffer.PutVector3(transform.position);
-                await Messenger.SendAsync(MessageType.OnSync, sequence, true, buffer);
             },
             buffer =>
             {
