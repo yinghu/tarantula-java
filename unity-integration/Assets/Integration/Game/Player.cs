@@ -29,6 +29,10 @@ namespace Integration.Game
            
             Messenger.RegisterMessageHandler(MessageType.Move,sequence,(sessionId, data) =>
             {
+                if (sessionId == Manager.SessionId)
+                {
+                    return;
+                }
                 MainThread.Execute(data, buffer =>
                 {
                     _end = buffer.GetVector3();
@@ -46,10 +50,10 @@ namespace Integration.Game
 
         public async void Move(Vector3 target)
         {
-            
+            _end = target;
+            _end.y = 1;
             using (var buffer = new DataBuffer())
             {
-                
                 buffer.PutVector3(target);
                 await Messenger.SendAsync(MessageType.Move, sequence, true, buffer);
             }

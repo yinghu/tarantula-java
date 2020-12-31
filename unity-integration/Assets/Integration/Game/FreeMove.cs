@@ -10,6 +10,7 @@ namespace Integration.Game
        
         private void Start()
         {
+            
             _end = transform.position;
         }
         
