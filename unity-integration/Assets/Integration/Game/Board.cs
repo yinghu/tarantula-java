@@ -109,7 +109,13 @@ namespace Integration.Game
             using (var buffer = new DataBuffer())
             {
                 buffer.PutInt(_seat);
-                buffer.PutInt(Messenger.Sequence());
+                var seq = Messenger.Sequence();
+                var pm = Instantiate(types[_seat]);
+                var player = pm.GetComponent<Player>();
+                player.Setup(seq, true);
+                _players[_seat] = player;
+                _gameObjects[seq] = pm;
+                buffer.PutInt(seq);
                 await Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer);
             }
 
@@ -180,8 +186,12 @@ namespace Integration.Game
             
             using (var buffer = new DataBuffer())
             {
+                var oid = Messenger.Sequence();
+                var fm = Instantiate(types[FreeMoveTypeId],_lastPosition, Quaternion.identity);
+                var fmc = fm.GetComponent<ClusteringObject>();
+                fmc.Setup(oid, true);
                 buffer.PutInt(FreeMoveTypeId);
-                buffer.PutInt(Messenger.Sequence());
+                buffer.PutInt(oid);
                 buffer.PutVector3(_lastPosition);
                 await Messenger.SendAsync(MessageType.Spawn, sequence, true, buffer);
             }
