@@ -18,14 +18,18 @@ public class OnSyncMessageHandler extends AbstractMessageHandler {
 
     @Override
     public void onMessage(InboundMessage pendingInboundMessage) {
-         OutboundMessage pendingOutboundMessage = new OutboundMessage();
-         pendingOutboundMessage.ack(pendingInboundMessage.ack());
-         int mid = gameChannelService.messageId();
-         pendingOutboundMessage.messageId(mid);
-         pendingOutboundMessage.sessionId(pendingInboundMessage.sessionId());
-         pendingOutboundMessage.type(pendingInboundMessage.type());
-         pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
-         pendingOutboundMessage.payload(pendingInboundMessage.payload());
-         this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).relay(mid,pendingInboundMessage.ack(),null,pendingOutboundMessage);
+        GameChannel _gameChannel = gameChannelService.gameChannel(pendingInboundMessage.connectionId());
+        if(!_gameChannel.onGame().onSync(pendingInboundMessage)){
+            return;
+        }
+        OutboundMessage pendingOutboundMessage = new OutboundMessage();
+        pendingOutboundMessage.ack(pendingInboundMessage.ack());
+        int mid = gameChannelService.messageId();
+        pendingOutboundMessage.messageId(mid);
+        pendingOutboundMessage.sessionId(pendingInboundMessage.sessionId());
+        pendingOutboundMessage.type(pendingInboundMessage.type());
+        pendingOutboundMessage.sequence(pendingInboundMessage.sequence());
+        pendingOutboundMessage.payload(pendingInboundMessage.payload());
+        this.gameChannelService.gameChannel(pendingInboundMessage.connectionId()).relay(mid,pendingInboundMessage.ack(),null,pendingOutboundMessage);
     }
 }

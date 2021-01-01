@@ -55,4 +55,16 @@ public class DemoGame extends AbstractGame{
         gameChannel.relay(inboundMessage.sessionId(),inboundMessage.messageId(),true,null,pendingOutboundMessage);
         return false;
     }
+    public boolean onSync(InboundMessage inboundMessage){
+        OutboundMessage pendingOutboundMessage = new OutboundMessage();
+        pendingOutboundMessage.ack(inboundMessage.ack());
+        int mid = this.gameChannelService.messageId();
+        pendingOutboundMessage.messageId(mid);
+        pendingOutboundMessage.sessionId(inboundMessage.sessionId());
+        pendingOutboundMessage.type(inboundMessage.type());
+        pendingOutboundMessage.sequence(inboundMessage.sequence());
+        pendingOutboundMessage.payload(inboundMessage.payload());
+        gameChannel.relay(inboundMessage.sessionId(),mid,inboundMessage.ack(),null,pendingOutboundMessage);
+        return false;
+    }
 }

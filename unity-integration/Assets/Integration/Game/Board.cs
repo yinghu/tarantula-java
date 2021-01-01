@@ -190,6 +190,7 @@ namespace Integration.Game
                 var fm = Instantiate(types[FreeMoveTypeId],_lastPosition, Quaternion.identity);
                 var fmc = fm.GetComponent<ClusteringObject>();
                 fmc.Setup(oid, true);
+                _gameObjects[oid] = fm;
                 buffer.PutInt(FreeMoveTypeId);
                 buffer.PutInt(oid);
                 buffer.PutVector3(_lastPosition);
