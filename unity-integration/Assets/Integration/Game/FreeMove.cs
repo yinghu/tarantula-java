@@ -20,7 +20,7 @@ namespace Integration.Game
             {
                 _end = buffer.GetVector3();
             });
-            _timer = 0.5f;
+            _timer = 0.2f;
             _step = 1f;
             _direction = -1f;
             _end = transform.position;
@@ -34,22 +34,22 @@ namespace Integration.Game
             {
                 return;
             }
-            _timer = 0.5f;
+            _timer = 0.2f;
             _end.x += _step*_direction;
         }
 
         private async void OnTriggerEnter(Collider other)
         {
-            if (!master||!other.gameObject.CompareTag("pvx"))
+            if (!other.gameObject.CompareTag("pvx"))
             {
                 return;
             }
             _direction *= -1f;
-            using (var buffer = new DataBuffer())
-            {
-                buffer.PutFloat(_direction);
-                await Messenger.SendAsync(MessageType.Collision, sequence, true,buffer);
-            }
+            //using (var buffer = new DataBuffer())
+            //{
+                //buffer.PutFloat(_direction);
+                //await Messenger.SendAsync(MessageType.Collision, sequence, true,buffer);
+            //}
         }
         
         public override void Setup(int oid, bool owner)
