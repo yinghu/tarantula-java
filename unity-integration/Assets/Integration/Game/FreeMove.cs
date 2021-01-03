@@ -7,25 +7,49 @@ namespace Integration.Game
     {
         private  float _speed = 6f;
         private Vector3 _end;
-       
+        private float _timer;
+        private float _step;
+        private float _direction;
         private void Start()
         {
-            
+            OnSync( buffer =>
+            {
+                buffer.PutVector3(_end);
+            },
+            buffer =>
+            {
+                _end = buffer.GetVector3();
+            });
+            _timer = 0.5f;
+            _step = 1f;
+            _direction = -1f;
             _end = transform.position;
         }
         
         private  void FixedUpdate()
         {
             transform.position = Vector3.Lerp(transform.position, _end, _speed*Time.fixedDeltaTime);
+            _timer -= Time.fixedDeltaTime;
+            if (_timer > 0)
+            {
+                return;
+            }
+            _timer = 0.5f;
+            _end.x += _step*_direction;
         }
 
         private async void OnTriggerEnter(Collider other)
         {
-            if (!other.gameObject.CompareTag("pvx"))
+            if (!master||!other.gameObject.CompareTag("pvx"))
             {
                 return;
             }
-            await Messenger.SendAsync(MessageType.Collision, sequence, true);
+            _direction *= -1f;
+            using (var buffer = new DataBuffer())
+            {
+                buffer.PutFloat(_direction);
+                await Messenger.SendAsync(MessageType.Collision, sequence, true,buffer);
+            }
         }
         
         public override void Setup(int oid, bool owner)
@@ -39,15 +63,11 @@ namespace Integration.Game
                     _speed = buffer.GetFloat();
                 });
             });
-            Messenger.RegisterMessageHandler(MessageType.OnCollision,sequence, async (sessionId, data) =>
-            {
-                await Messenger.SendAsync(MessageType.Destroy, sequence, true);
-            });
-            Messenger.RegisterMessageHandler(MessageType.Destroy,sequence, (sessionId, data) =>
+            Messenger.RegisterMessageHandler(MessageType.OnCollision,sequence,  (sessionId, data) =>
             {
                 MainThread.Execute(data, buffer =>
                 {
-                    DestroyImmediate(gameObject);    
+                    _direction = buffer.GetFloat();
                 });
             });
         }

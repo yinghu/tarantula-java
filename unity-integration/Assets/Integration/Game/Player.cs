@@ -18,7 +18,7 @@ namespace Integration.Game
         {
             OnSync( buffer =>
             {
-                buffer.PutVector3(transform.position);
+                buffer.PutVector3(_end);
             },
             buffer =>
             {

@@ -67,4 +67,14 @@ public class DemoGame extends AbstractGame{
         gameChannel.relay(inboundMessage.sessionId(),mid,inboundMessage.ack(),null,pendingOutboundMessage);
         return false;
     }
+    public boolean onCollision(InboundMessage inboundMessage){
+        OutboundMessage outboundMessage = new OutboundMessage();
+        outboundMessage.ack(inboundMessage.ack());
+        outboundMessage.type(MessageHandler.ON_COLLISION);
+        outboundMessage.sequence(inboundMessage.sequence());
+        int mid = gameChannelService.messageId();
+        outboundMessage.messageId(mid);
+        gameChannel.relay(inboundMessage.sessionId(),mid,inboundMessage.ack(),null,outboundMessage);
+        return false;
+    }
 }
