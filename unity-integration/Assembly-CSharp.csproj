@@ -80,6 +80,7 @@
      <Compile Include="Assets\Integration\Exit.cs" />
      <Compile Include="Assets\Integration\Game\Board.cs" />
      <Compile Include="Assets\Integration\Game\Bullet.cs" />
+     <Compile Include="Assets\Integration\Game\Bump.cs" />
      <Compile Include="Assets\Integration\Game\CameraAdapter.cs" />
      <Compile Include="Assets\Integration\Game\FreeMove.cs" />
      <Compile Include="Assets\Integration\Game\Player.cs" />

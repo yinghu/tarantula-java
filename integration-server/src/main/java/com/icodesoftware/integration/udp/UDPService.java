@@ -69,7 +69,7 @@ public class UDPService implements Runnable, GameChannelService, GameChannel.Lis
     private final JsonParser parser;
     public UDPService(JsonObject config){
         sessionId = new AtomicInteger(0);
-        messageId = new AtomicInteger(1);
+        messageId = new AtomicInteger(100);
         connectionId = new AtomicInteger(1);
         reservedMessageId = new AtomicInteger(Integer.MIN_VALUE);
         parser = new JsonParser();

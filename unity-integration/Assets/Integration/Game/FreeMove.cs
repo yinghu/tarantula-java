@@ -51,7 +51,7 @@ namespace Integration.Game
             }
         }
 
-        private async void OnTriggerEnter(Collider other)
+        private void OnTriggerEnter(Collider other)
         {
             if (!other.gameObject.CompareTag("pvx"))
             {
