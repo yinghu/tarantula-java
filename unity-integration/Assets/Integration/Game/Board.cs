@@ -198,9 +198,9 @@ namespace Integration.Game
             }
         }
 
-        public bool Remove(int oid)
+        public void Remove(int oid)
         {
-            return _gameObjects.Remove(oid);
+            _gameObjects.Remove(oid);
         }
 
         private void OnGameStart()

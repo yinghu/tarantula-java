@@ -77,4 +77,14 @@ public class DemoGame extends AbstractGame{
         gameChannel.relay(inboundMessage.sessionId(),mid,inboundMessage.ack(),null,outboundMessage);
         return false;
     }
+    public boolean onDestroy(InboundMessage inboundMessage){
+        OutboundMessage outboundMessage = new OutboundMessage();
+        outboundMessage.ack(inboundMessage.ack());
+        outboundMessage.type(inboundMessage.type());
+        outboundMessage.sequence(inboundMessage.sequence());
+        int mid = gameChannelService.messageId();
+        outboundMessage.messageId(mid);
+        gameChannel.relay(inboundMessage.sessionId(),mid,inboundMessage.ack(),null,outboundMessage);
+        return false;
+    }
 }

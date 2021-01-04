@@ -36,6 +36,10 @@ namespace GameClustering
                     inboundSync?.Invoke(buffer);//update local game state
                 });    
             });
+            if (master)
+            {
+                return;
+            }
             await Messenger.SendAsync(MessageType.Sync, sequence, true);
         }
         

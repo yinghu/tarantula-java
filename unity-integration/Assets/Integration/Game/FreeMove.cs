@@ -5,11 +5,12 @@ namespace Integration.Game
 {
     public class FreeMove : ClusteringObject
     {
-        private  float _speed = 6f;
+        private  const float Speed = 3f;
         private Vector3 _end;
         private float _timer;
         private float _step;
         private float _direction;
+        private Board _board;
         private void Start()
         {
             OnSync( buffer =>
@@ -20,22 +21,32 @@ namespace Integration.Game
             {
                 _end = buffer.GetVector3();
             });
-            _timer = 0.2f;
+            _board = GameObject.Find("/Board").GetComponent<Board>();
+            _timer = 1f;
             _step = 1f;
             _direction = -1f;
             _end = transform.position;
         }
         
-        private  void FixedUpdate()
+        private async void FixedUpdate()
         {
-            transform.position = Vector3.Lerp(transform.position, _end, _speed*Time.fixedDeltaTime);
+            transform.position = Vector3.Lerp(transform.position, _end, Speed*Time.fixedDeltaTime);
+            if (!master)
+            {
+                return;
+            }
             _timer -= Time.fixedDeltaTime;
             if (_timer > 0)
             {
                 return;
             }
-            _timer = 0.2f;
+            _timer = 1f;
             _end.x += _step*_direction;
+            using (var buffer = new DataBuffer())
+            {
+                buffer.PutVector3(_end);
+                await Messenger.SendAsync(MessageType.OnSync, sequence, true, buffer);
+            }
         }
 
         private async void OnTriggerEnter(Collider other)
@@ -45,29 +56,23 @@ namespace Integration.Game
                 return;
             }
             _direction *= -1f;
-            //using (var buffer = new DataBuffer())
-            //{
-                //buffer.PutFloat(_direction);
-                //await Messenger.SendAsync(MessageType.Collision, sequence, true,buffer);
-            //}
+            if (!master)
+            {
+                return;
+            }
+            _board.Remove(sequence);
+            DestroyImmediate(gameObject);
+            await Messenger.SendAsync(MessageType.Destroy, sequence, true);
         }
         
         public override void Setup(int oid, bool owner)
         {
             base.Setup(oid,owner);
-            Messenger.RegisterMessageHandler(MessageType.Move,sequence, (sessionId, data) =>
+            Messenger.RegisterMessageHandler(MessageType.Destroy,sequence,  (sessionId, data) =>
             {
-                MainThread.Execute(data, buffer =>
+                MainThread.Execute(data,buffer =>
                 {
-                    _end = buffer.GetVector3();
-                    _speed = buffer.GetFloat();
-                });
-            });
-            Messenger.RegisterMessageHandler(MessageType.OnCollision,sequence,  (sessionId, data) =>
-            {
-                MainThread.Execute(data, buffer =>
-                {
-                    _direction = buffer.GetFloat();
+                    DestroyImmediate(gameObject);
                 });
             });
         }
