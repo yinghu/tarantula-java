@@ -1,4 +1,6 @@
-﻿using GameClustering;
+﻿using System.Collections;
+using System.Threading.Tasks;
+using GameClustering;
 using UnityEngine;
 
 namespace Integration.Game
@@ -61,8 +63,7 @@ namespace Integration.Game
                 return;
             }
             _board.Remove(sequence);
-            DestroyImmediate(gameObject);
-            await Messenger.SendAsync(MessageType.Destroy, sequence, true);
+            StartCoroutine(Kill());
         }
         
         public override void Setup(int oid, bool owner)
@@ -75,6 +76,13 @@ namespace Integration.Game
                     DestroyImmediate(gameObject);
                 });
             });
+        }
+
+        private IEnumerator Kill()
+        {
+            Task.FromResult(Messenger.SendAsync(MessageType.Destroy, sequence, true));
+            yield return new WaitForSeconds(0.1f);
+            Destroy(gameObject);
         }
     }
 }
