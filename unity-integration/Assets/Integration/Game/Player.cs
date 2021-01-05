@@ -84,6 +84,11 @@ namespace Integration.Game
             yield return new WaitForSeconds(1);
             Destroy(shot);
         }
+        private void OnTriggerEnter(Collider other)
+        {
+            Debug.Log("1>"+other.gameObject.tag);
+            Debug.Log("2>"+other.gameObject.name);
+        }
     }
     
 }

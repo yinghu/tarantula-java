@@ -1,6 +1,5 @@
 ﻿using GameClustering;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Integration.Game
 {
@@ -27,6 +26,8 @@ namespace Integration.Game
             });
             _prePos = transform.position;
             _curPos = _prePos;
+            _preQua = transform.rotation;
+            _curQua = _preQua;
         }
 
         private async void Update()
@@ -45,8 +46,11 @@ namespace Integration.Game
 
         private void FixedUpdate()
         {
-            _prePos = Vector3.Lerp(_prePos, _curPos, 10*Time.fixedDeltaTime);
-            transform.position = _prePos;
+            //_prePos = Vector3.Lerp(_prePos, _curPos, 10*Time.fixedDeltaTime);
+            //_curQua = Quaternion.Slerp(_preQua,_curQua,0.15f);
+            //transform.rotation = _curQua;
+            //transform.position = _prePos;
         }
+        
     }
 }
