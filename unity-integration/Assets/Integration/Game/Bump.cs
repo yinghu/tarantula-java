@@ -11,7 +11,6 @@ namespace Integration.Game
         private Vector3 _curPos;
         private Quaternion _curQua;
         
-
         private void Start()
         {
             OnSync( buffer =>
@@ -51,6 +50,15 @@ namespace Integration.Game
             //transform.rotation = _curQua;
             //transform.position = _prePos;
         }
-        
+
+        public void OnBump(bool isMaster)
+        {
+            if (isMaster)
+            {
+                gameObject.AddComponent<Rigidbody>();
+            }
+            //_collider.isTrigger = true;
+            Debug.Log("bumping->"+isMaster);
+        }
     }
 }

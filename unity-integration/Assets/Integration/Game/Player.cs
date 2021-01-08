@@ -86,8 +86,12 @@ namespace Integration.Game
         }
         private void OnTriggerEnter(Collider other)
         {
-            Debug.Log("1>"+other.gameObject.tag);
-            Debug.Log("2>"+other.gameObject.name);
+            if (!other.gameObject.CompareTag("foo"))
+            {
+                return;
+            }
+            var bump = other.gameObject.GetComponent<Bump>();
+            bump.OnBump(master);
         }
     }
     

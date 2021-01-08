@@ -6,7 +6,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.MessageHandler;
-import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
