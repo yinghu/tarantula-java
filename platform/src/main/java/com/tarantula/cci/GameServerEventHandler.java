@@ -8,7 +8,6 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.UniverseConnection;
 import com.tarantula.platform.event.GameUpdateEvent;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;

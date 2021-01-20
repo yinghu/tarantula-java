@@ -9,6 +9,7 @@ import java.util.Map;
 public class Item extends RecoverableObject implements Consumable {
 
     private String name;
+    private String category;
     private String description;
 
     @Override
@@ -25,6 +26,14 @@ public class Item extends RecoverableObject implements Consumable {
     }
 
     @Override
+    public String category() {
+        return category;
+    }
+    public void category(String category){
+        this.category = category;
+    }
+
+    @Override
     public String description() {
         return description;
     }
@@ -36,6 +45,7 @@ public class Item extends RecoverableObject implements Consumable {
     public Map<String,Object> toMap(){
         super.toMap();
         properties.put("name",name);
+        properties.put("category",category);
         properties.put("description",description);
         return this.properties;
     }
@@ -43,6 +53,7 @@ public class Item extends RecoverableObject implements Consumable {
     public void fromMap(Map<String,Object> properties){
         super.fromMap(properties);
         name = (String) properties.get("name");
+        category = (String) properties.get("category");
         description = (String) properties.get("description");
     }
 

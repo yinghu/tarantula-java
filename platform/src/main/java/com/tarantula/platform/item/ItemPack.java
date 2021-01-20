@@ -1,6 +1,5 @@
 package com.tarantula.platform.item;
 
-
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.List;
