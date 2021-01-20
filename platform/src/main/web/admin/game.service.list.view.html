@@ -78,7 +78,10 @@
         m3.style.display = 'none';       
     };
     document.querySelector('#tx-add-service').onclick=()=>{
-        document.querySelector('#tx-service-edit').style.display = 'block';    
+        document.querySelector('#tx-service-edit').style.display = 'block';  
+        TARA_API.onService(true,{serviceTag:'role/admin',command:'availableGameServiceList',accessId:TARA_API.query().gameClusterId},(resp)=>{
+            console.log(resp);    
+        });   
     };
     document.querySelector('#tx-service-edit-cancel').onclick=()=>{
         document.querySelector('#tx-service-edit').style.display = 'none';    

@@ -17,6 +17,7 @@ import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -366,7 +367,10 @@ public class AdminRoleModule implements Module {
             }
         }
         else if(session.action().equals("availableGameServiceList")){
-
+            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("game-service-list.json");
+            byte[] glist = in.readAllBytes();
+            in.close();
+            session.write(glist,label());
         }
         else if(session.action().equals("onAddService")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);

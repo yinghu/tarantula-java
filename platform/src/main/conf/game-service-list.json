@@ -1,3 +1,12 @@
 {
-
+  "game-service-list": [
+    {
+      "name": "item",
+      "module": "com.tarantula.game.module.ItemModule"
+    },
+    {
+      "name": "loot",
+      "module": "com.tarantula.game.module.LootModule"
+    }
+  ]
 }
