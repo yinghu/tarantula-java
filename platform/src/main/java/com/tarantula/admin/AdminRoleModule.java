@@ -7,6 +7,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.game.*;
+import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ResponseHeader;
@@ -377,9 +378,30 @@ public class AdminRoleModule implements Module {
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             GameCluster gameCluster = deploymentServiceProvider.gameCluster(accessId);
             String name = (String)gameCluster.property(GameCluster.NAME);
-            this.context.log(name,OnLog.WARN);
-            //this.deploymentServiceProvider.createApplication()
-            session.write(payload,label());
+            String typeId = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+            Lobby _lobby = this.deploymentServiceProvider.lobby(typeId);
+            boolean[] _existed = {false};
+            _lobby.entryList().forEach((e)->{
+                if(e.tag().equals(name+"/item")){
+                    _existed[0] = true;
+                }
+            });
+            if(_existed[0]){
+                _existed[0]=false;
+            }else {
+                DeploymentDescriptor desc = new DeploymentDescriptor();
+                desc.typeId(typeId);
+                desc.subtypeId(name + "-service-module");
+                desc.type("application");
+                desc.name("Items");
+                desc.category("service");
+                desc.tag(name + "/item");
+                desc.moduleName("com.tarantula.game.module.ItemModule");
+                desc.applicationClassName("com.tarantula.platform.module.SingletonModuleApplication");
+                desc.singleton(true);
+                _existed[0] = this.deploymentServiceProvider.createApplication(desc, true);
+            }
+            session.write(toMessage(_existed[0]?"created":"failed",_existed[0]).toString().getBytes(),label());
         }
         else if(session.action().equals("onLaunchGameCluster")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
