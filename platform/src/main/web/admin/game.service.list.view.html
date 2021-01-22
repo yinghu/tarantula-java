@@ -21,7 +21,7 @@
         <div class="w3-container">
             <span id='tx-service-list-name-0' class='w3-left tx-text-14 tx-margin-top-8'>Name</span>
             <span id='tx-service-list-tag-0' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
-            <span id="tx-service-list-api-0" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">API Test</span>
+            <span id="tx-service-list-api-0" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-service-action">API Test</span>
         
         </div>    
     </div>
@@ -29,7 +29,7 @@
         <div class="w3-container">
             <span id='tx-service-list-name-1' class='w3-left tx-text-14 tx-margin-top-8'>Name</span>
             <span id='tx-service-list-tag-1' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
-            <span id="tx-service-list-api-1" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">API Test</span>
+            <span id="tx-service-list-api-1" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-service-action">API Test</span>
         
         </div>    
     </div>
@@ -37,15 +37,14 @@
         <div class="w3-container">
             <span id='tx-service-list-name-2' class='w3-left tx-text-14 tx-margin-top-8'>Name</span>
             <span id='tx-service-list-tag-2' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
-            <span id="tx-service-list-api-2" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">API Test</span>
-        
+            <span id="tx-service-list-api-2" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-service-action">API Test</span>
         </div>    
     </div>
     <div id='tx-service-list-3' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
         <div class="w3-container">
             <span id='tx-service-list-name-3' class='w3-left tx-text-14 tx-margin-top-8'>Name</span>
             <span id='tx-service-list-tag-3' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
-            <span id="tx-service-list-api-3" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">API Test</span>
+            <span id="tx-service-list-api-3" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-service-action">API Test</span>
         </div>    
     </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -72,6 +71,7 @@
             resp.serviceList.forEach((a,i)=>{
                 document.querySelector('#tx-service-list-name-'+i).innerHTML=a.name;
                 document.querySelector('#tx-service-list-tag-'+i).innerHTML=a.tag;
+                document.querySelector('#tx-service-list-api-'+i).setAttribute('tx-service-api-view-id','api.service.'+a.name.toLowerCase());
                 document.querySelector('#tx-service-list-'+i).style.display='block';
             });
         }
@@ -99,4 +99,13 @@
         });
         //document.querySelector('#tx-service-edit').style.display = 'none';    
     };
+    document.querySelectorAll('.tx-service-action').forEach((a)=>{
+        a.onclick=()=>{
+            //console.log("loading api page->"+a.getAttribute('tx-service-api-view-id'));
+            //TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
+            TARA_API.query().popup='#tx-popup-api';
+            let vid = a.getAttribute('tx-service-api-view-id');
+            tx_view({viewId:vid,containerId:'#tx-popup-api'});    
+        }
+    });
 </script>

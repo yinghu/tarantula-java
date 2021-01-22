@@ -9,6 +9,11 @@ public class ItemPack extends Item{
 
     public List<Item> itemList;
 
+    public ItemPack(){
+        this.onEdge = true;
+        this.label = "ItemPack";
+    }
+
     @Override
     public Map<String,Object> toMap(){
         super.toMap();

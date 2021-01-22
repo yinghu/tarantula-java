@@ -12,6 +12,11 @@ public class Item extends RecoverableObject implements Consumable {
     private String category;
     private String description;
 
+    public Item(){
+        this.onEdge = true;
+        this.label = "Item";
+    }
+
     @Override
     public String id() {
         return this.distributionKey();

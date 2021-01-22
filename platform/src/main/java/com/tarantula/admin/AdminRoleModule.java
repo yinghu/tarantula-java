@@ -11,6 +11,7 @@ import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.item.Item;
 import com.tarantula.platform.presence.*;
 
 import com.tarantula.platform.service.Metrics;
@@ -402,6 +403,29 @@ public class AdminRoleModule implements Module {
                 _existed[0] = this.deploymentServiceProvider.createApplication(desc, true);
             }
             session.write(toMessage(_existed[0]?"created":"failed",_existed[0]).toString().getBytes(),label());
+        }
+        else if(session.action().equals("onAddItem")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
+            GameCluster gameCluster = deploymentServiceProvider.gameCluster(accessId);
+            String name = (String)gameCluster.property(GameCluster.NAME);
+            String dn = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+            Lobby _lobby = this.deploymentServiceProvider.lobby(dn);
+            DataStore dataStore = this.context.dataStore(dn.replace("-","_"));
+            String[] itemServiceId ={null};
+            _lobby.entryList().forEach((e)->{
+                if(e.tag().equals(name+"/item")){
+                    itemServiceId[0] = e.distributionKey();
+                }
+            });
+            if(itemServiceId[0]!=null){
+                Item item = new Item();
+                item.name("");
+                item.description("");
+                item.category("");
+                item.owner(itemServiceId[0]);
+                dataStore.create(item);
+            }
         }
         else if(session.action().equals("onLaunchGameCluster")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
