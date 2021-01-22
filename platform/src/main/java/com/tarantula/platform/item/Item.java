@@ -5,7 +5,6 @@ import com.icodesoftware.Consumable;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
-import java.nio.charset.Charset;
 import java.util.Map;
 
 public class Item extends RecoverableObject implements Consumable {
@@ -66,6 +65,7 @@ public class Item extends RecoverableObject implements Consumable {
     @Override
     public JsonObject toJson(){
         JsonObject json = new JsonObject();
+        json.addProperty("id",distributionKey());
         properties.forEach((k,v)->{
             if(v!=null&& (v instanceof String)){
                 json.addProperty(k,(String)v);

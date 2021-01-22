@@ -28,9 +28,31 @@
         </div>
     </div>
     <div class="w3-card-4 w3-border w3-round w3-white tx-lobby-checkout" id="tx-service-item-edit">
+        <div class="w3-panel w3-center tx-margin-bottom-8">
+            <label class="tx-text-12 tx-margin-right-4">Redeem Item Id</label>
+            <input id='tx-redeem-item-id' class="w3-input tx-text-12" type="text">    
+        </div>
         <div class="w3-panel w3-border-bottom w3-border-red">
             <span id="tx-service-item-edit-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
             <span id="tx-service-item-edit-ok" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Confirm</span>     
+        </div>
+    </div>
+    <div class="w3-card-4 w3-border w3-round w3-white tx-lobby-checkout" id="tx-service-add-item-edit">
+        <div class="w3-panel w3-center tx-margin-bottom-8">
+            <label class="tx-text-12 tx-margin-right-4">Item Name</label>
+            <input id='tx-add-item-name' class="w3-input tx-text-12" type="text">    
+        </div>
+        <div class="w3-panel w3-center tx-margin-bottom-8">
+            <label class="tx-text-12 tx-margin-right-4">Item Description</label>
+            <input id='tx-add-item-description' class="w3-input tx-text-12" type="text">    
+        </div>
+        <div class="w3-panel w3-center tx-margin-bottom-8">
+            <label class="tx-text-12 tx-margin-right-4">Item Category</label>
+            <input id='tx-add-item-category' class="w3-input tx-text-12" type="text">    
+        </div>
+        <div class="w3-panel w3-border-bottom w3-border-red">
+            <span id="tx-service-add-item-edit-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
+            <span id="tx-service-add-item-edit-ok" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Confirm</span>     
         </div>
     </div>
 </div>
@@ -51,9 +73,16 @@
         });    
     };
     document.querySelector('#tx-service-redeem-item').onclick=()=>{
-        TARA_API.onService(true,{serviceTag:TARA_API.query().serviceTag,command:'onRedeem',itemId:'abc'},(resp)=>{
+       document.querySelector('#tx-service-item-edit').style.display = 'block';    
+    };
+    document.querySelector('#tx-service-item-edit-ok').onclick=()=>{
+        let redeemId = document.querySelector('#tx-redeem-item-id').value; 
+        TARA_API.onService(true,{serviceTag:TARA_API.query().serviceTag,command:'onRedeem',itemId:redeemId},(resp)=>{
             console.log(resp);    
         });    
+    };
+    document.querySelector('#tx-service-item-edit-cancel').onclick=()=>{
+        document.querySelector('#tx-service-item-edit').style.display = 'none';     
     };
     document.querySelector('#tx-invalid-close').onclick=()=>{
         let m3 = document.querySelector(TARA_API.query().popup);

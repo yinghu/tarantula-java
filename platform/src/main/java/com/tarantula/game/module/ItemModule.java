@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.item.Item;
 import com.tarantula.platform.item.ItemQuery;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
@@ -25,7 +26,14 @@ public class ItemModule implements Module {
         }
         else if(session.action().equals("onRedeem")){
             OnAccess onAccess = builder.create().fromJson(new String(bytes),OnAccess.class);
-            this.context.log(onAccess.property("itemId").toString(),OnLog.WARN);
+            Item item = new Item();
+            item.distributionKey(onAccess.property("itemId").toString());
+            if(gameServiceProvider.dataStore().load(item)){
+                Item redeem = new Item();
+                redeem.fromMap(item.toMap());
+                redeem.owner(session.systemId());
+                itemDataStore.create(redeem);
+            }
             session.write(bytes,label());
         }
         else if(session.action().equals("onInventory")){
