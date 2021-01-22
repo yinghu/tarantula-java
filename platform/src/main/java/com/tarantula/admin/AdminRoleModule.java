@@ -12,6 +12,7 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.item.Item;
+import com.tarantula.platform.item.ItemQuery;
 import com.tarantula.platform.presence.*;
 
 import com.tarantula.platform.service.Metrics;
@@ -420,12 +421,19 @@ public class AdminRoleModule implements Module {
             });
             if(itemServiceId[0]!=null){
                 Item item = new Item();
-                item.name("");
-                item.description("");
-                item.category("");
+                item.name("robot");
+                item.description("robot");
+                item.category("play");
                 item.owner(itemServiceId[0]);
+                item.property("melee",2.5);
+                item.property("level",1);
                 dataStore.create(item);
             }
+            dataStore.list(new ItemQuery(itemServiceId[0]),(a)->{
+                this.context.log(a.toString(),OnLog.WARN);
+                return true;
+            });
+            session.write(payload,label());
         }
         else if(session.action().equals("onLaunchGameCluster")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
