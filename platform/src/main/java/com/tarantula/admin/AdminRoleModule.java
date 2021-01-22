@@ -429,10 +429,6 @@ public class AdminRoleModule implements Module {
                 item.property("level",1);
                 dataStore.create(item);
             }
-            dataStore.list(new ItemQuery(itemServiceId[0]),(a)->{
-                this.context.log(a.toString(),OnLog.WARN);
-                return true;
-            });
             session.write(payload,label());
         }
         else if(session.action().equals("onLaunchGameCluster")){

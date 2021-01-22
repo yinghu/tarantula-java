@@ -71,6 +71,7 @@
                 document.querySelector('#tx-service-list-name-'+i).innerHTML=a.name;
                 document.querySelector('#tx-service-list-tag-'+i).innerHTML=a.tag;
                 document.querySelector('#tx-service-list-api-'+i).setAttribute('tx-service-api-view-id','api.service.'+a.name.toLowerCase());
+                document.querySelector('#tx-service-list-api-'+i).setAttribute('tx-service-tag',a.tag);
                 document.querySelector('#tx-service-list-'+i).style.display='block';
             });
         }
@@ -103,6 +104,7 @@
             //console.log("loading api page->"+a.getAttribute('tx-service-api-view-id'));
             //TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
             TARA_API.query().popup='#tx-popup-api';
+            TARA_API.query().serviceTag = a.getAttribute('tx-service-tag');
             let vid = a.getAttribute('tx-service-api-view-id');
             tx_view({viewId:vid,containerId:'#tx-popup-api'});    
         }
