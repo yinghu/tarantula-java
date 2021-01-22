@@ -1,9 +1,11 @@
 package com.tarantula.platform.item;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Consumable;
 import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
+import java.nio.charset.Charset;
 import java.util.Map;
 
 public class Item extends RecoverableObject implements Consumable {
@@ -61,7 +63,22 @@ public class Item extends RecoverableObject implements Consumable {
         category = (String) properties.get("category");
         description = (String) properties.get("description");
     }
-
+    @Override
+    public JsonObject toJson(){
+        JsonObject json = new JsonObject();
+        properties.forEach((k,v)->{
+            if(v!=null&& (v instanceof String)){
+                json.addProperty(k,(String)v);
+            }
+            else if(v!=null&& (v instanceof Boolean)){
+                json.addProperty(k,(Boolean)v);
+            }
+            else if(v!=null&& (v instanceof Number)){
+                json.addProperty(k,(Number)v);
+            }
+        });
+        return json;
+    }
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
     }

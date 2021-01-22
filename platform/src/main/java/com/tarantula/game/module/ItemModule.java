@@ -53,25 +53,17 @@ public class ItemModule implements Module {
         JsonObject jsonObject = new JsonObject();
         JsonArray alist = new JsonArray();
         this.itemDataStore.list(new ItemQuery(systemId),(a)->{
-            JsonObject jo = new JsonObject();
-            jo.addProperty("name",a.name());
-            jo.addProperty("category",a.category());
-            jo.addProperty("id",a.id());
-            alist.add(jo);
+            alist.add(a.toJson());
             return true;
         });
-        jsonObject.add("items",alist);
+        jsonObject.add("inventory",alist);
         return jsonObject.toString().getBytes();
     }
     private byte[] toItems(){
         JsonObject jsonObject = new JsonObject();
         JsonArray alist = new JsonArray();
         this.gameServiceProvider.dataStore().list(new ItemQuery(this.context.descriptor().distributionKey()),(a)->{
-            JsonObject jo = new JsonObject();
-            jo.addProperty("name",a.name());
-            jo.addProperty("category",a.category());
-            jo.addProperty("id",a.id());
-            alist.add(jo);
+            alist.add(a.toJson());
             return true;
         });
         jsonObject.add("items",alist);
