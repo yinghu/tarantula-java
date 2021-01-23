@@ -96,13 +96,10 @@
     document.querySelector('#tx-service-edit-ok').onclick=()=>{
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onAddService',accessId:TARA_API.query().gameClusterId},(resp)=>{
             console.log(resp);    
-        });
-        //document.querySelector('#tx-service-edit').style.display = 'none';    
+        });   
     };
     document.querySelectorAll('.tx-service-action').forEach((a)=>{
         a.onclick=()=>{
-            //console.log("loading api page->"+a.getAttribute('tx-service-api-view-id'));
-            //TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
             TARA_API.query().popup='#tx-popup-api';
             TARA_API.query().serviceTag = a.getAttribute('tx-service-tag');
             let vid = a.getAttribute('tx-service-api-view-id');

@@ -12,7 +12,6 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.item.Item;
-import com.tarantula.platform.item.ItemQuery;
 import com.tarantula.platform.presence.*;
 
 import com.tarantula.platform.service.Metrics;
@@ -421,9 +420,9 @@ public class AdminRoleModule implements Module {
             });
             if(itemServiceId[0]!=null){
                 Item item = new Item();
-                item.name("robot");
-                item.description("robot");
-                item.category("play");
+                item.name(onAccess.property("name").toString());
+                item.description(onAccess.property("description").toString());
+                item.category(onAccess.property("category").toString());
                 item.owner(itemServiceId[0]);
                 item.property("melee",2.5);
                 item.property("level",1);

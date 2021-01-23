@@ -27,27 +27,45 @@
             <span class="tx-text-12">Powered By ICodeSoftware</span>
         </div>
     </div>
-    <div class="w3-card-4 w3-border w3-round w3-white tx-lobby-checkout" id="tx-service-item-edit">
-        <div class="w3-panel w3-center tx-margin-bottom-8">
-            <label class="tx-text-12 tx-margin-right-4">Redeem Item Id</label>
-            <input id='tx-redeem-item-id' class="w3-input tx-text-12" type="text">    
+    <div class="w3-card-4 w3-border w3-round w3-white tx-lobby-checkout" id="tx-service-redeem-item-edit">
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+            <div class="w3-display-topright w3-padding">
+                <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
+            </div>
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-cubes w3-text-yellow tx-margin-top-4" style="font-size:24px"></i></span>
+                <span class="tx-margin-left-8 tx-text-18">Redeem Item</span>
+            </div>
+        </div>
+        <div class="w3-panel tx-margin-bottom-8">
+            <label class="tx-text-12 tx-margin-left-4">Redeem Item Id:</label>
+            <input id='tx-redeem-item-id' class="w3-input tx-text-12" type="text" placeholder="redeem item id">    
         </div>
         <div class="w3-panel w3-border-bottom w3-border-red">
-            <span id="tx-service-item-edit-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
-            <span id="tx-service-item-edit-ok" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Confirm</span>     
+            <span id="tx-service-redeem-item-edit-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
+            <span id="tx-service-redeem-item-edit-ok" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Confirm</span>     
         </div>
     </div>
     <div class="w3-card-4 w3-border w3-round w3-white tx-lobby-checkout" id="tx-service-add-item-edit">
-        <div class="w3-panel w3-center tx-margin-bottom-8">
-            <label class="tx-text-12 tx-margin-right-4">Item Name</label>
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+            <div class="w3-display-topright w3-padding">
+                <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
+            </div>
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-cubes w3-text-yellow tx-margin-top-4" style="font-size:24px"></i></span>
+                <span class="tx-margin-left-8 tx-text-18">Add Item</span>
+            </div>
+        </div>
+        <div class="w3-panel  tx-margin-bottom-8">
+            <label class="tx-text-12 tx-margin-left-4">Item Name:</label>
             <input id='tx-add-item-name' class="w3-input tx-text-12" type="text">    
         </div>
-        <div class="w3-panel w3-center tx-margin-bottom-8">
-            <label class="tx-text-12 tx-margin-right-4">Item Description</label>
+        <div class="w3-panel  tx-margin-bottom-8">
+            <label class="tx-text-12 tx-margin-left-4">Item Description:</label>
             <input id='tx-add-item-description' class="w3-input tx-text-12" type="text">    
         </div>
-        <div class="w3-panel w3-center tx-margin-bottom-8">
-            <label class="tx-text-12 tx-margin-right-4">Item Category</label>
+        <div class="w3-panel tx-margin-bottom-8">
+            <label class="tx-text-12 tx-margin-left-4">Item Category:</label>
             <input id='tx-add-item-category' class="w3-input tx-text-12" type="text">    
         </div>
         <div class="w3-panel w3-border-bottom w3-border-red">
@@ -57,8 +75,15 @@
     </div>
 </div>
 <script>
-    document.querySelector('#tx-service-add-item').onclick=()=>{
-        TARA_API.onService(true,{serviceTag:'role/admin',command:'onAddItem',accessId:TARA_API.query().gameClusterId},(resp)=>{
+    document.querySelector('#tx-service-add-item-edit-ok').onclick=()=>{
+        let iname = document.querySelector('#tx-add-item-name').value;
+        let idesc = document.querySelector('#tx-add-item-description').value;
+        let icate = document.querySelector('#tx-add-item-category').value;
+        let payload ={serviceTag:'role/admin',command:'onAddItem',accessId:TARA_API.query().gameClusterId};
+        payload.name = iname;
+        payload.description = idesc;
+        payload.category = icate;
+        TARA_API.onService(true,payload,(resp)=>{
             console.log(resp);    
         });    
     };
@@ -73,16 +98,22 @@
         });    
     };
     document.querySelector('#tx-service-redeem-item').onclick=()=>{
-       document.querySelector('#tx-service-item-edit').style.display = 'block';    
+       document.querySelector('#tx-service-redeem-item-edit').style.display = 'block';    
     };
-    document.querySelector('#tx-service-item-edit-ok').onclick=()=>{
+    document.querySelector('#tx-service-add-item').onclick=()=>{
+       document.querySelector('#tx-service-add-item-edit').style.display = 'block';    
+    };
+    document.querySelector('#tx-service-add-item-edit-cancel').onclick=()=>{
+        document.querySelector('#tx-service-add-item-edit').style.display = 'none';     
+    };
+    document.querySelector('#tx-service-redeem-item-edit-ok').onclick=()=>{
         let redeemId = document.querySelector('#tx-redeem-item-id').value; 
         TARA_API.onService(true,{serviceTag:TARA_API.query().serviceTag,command:'onRedeem',itemId:redeemId},(resp)=>{
             console.log(resp);    
         });    
     };
-    document.querySelector('#tx-service-item-edit-cancel').onclick=()=>{
-        document.querySelector('#tx-service-item-edit').style.display = 'none';     
+    document.querySelector('#tx-service-redeem-item-edit-cancel').onclick=()=>{
+        document.querySelector('#tx-service-redeem-item-edit').style.display = 'none';     
     };
     document.querySelector('#tx-invalid-close').onclick=()=>{
         let m3 = document.querySelector(TARA_API.query().popup);
