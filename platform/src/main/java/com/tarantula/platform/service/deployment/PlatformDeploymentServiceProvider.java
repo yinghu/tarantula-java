@@ -1,6 +1,8 @@
 package com.tarantula.platform.service.deployment;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.*;
@@ -215,6 +217,21 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             log.error(mname,ex);
             throw new RuntimeException(ex);
         }
+    }
+    public Response exportModule(Descriptor descriptor){
+        DynamicModuleClassLoader mc = new DynamicModuleClassLoader(descriptor);
+        Response response = new ResponseHeader();
+        mc.loadResource("export.json",(in)->{
+            try{
+                JsonParser parser = new JsonParser();
+                JsonObject jo = parser.parse(new InputStreamReader(in)).getAsJsonObject();
+                response.message(jo.get("moduleId").getAsString());
+            }catch (Exception ex){
+                log.warn("failed to parse export.json",ex);
+                response.message(ex.getMessage());
+            }
+        });
+        return response;
     }
     public void updateModule(Descriptor descriptor){
         DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{

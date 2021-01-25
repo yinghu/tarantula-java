@@ -56,6 +56,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
     Response createModule(Descriptor descriptor);
+    Response exportModule(Descriptor descriptor);
     boolean launchModule(String typeId);
     boolean resetModule(Descriptor descriptor);
     boolean shutdownModule(String typeId);

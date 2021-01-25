@@ -93,15 +93,15 @@ public class SudoRoleModule implements Module {
         else if(session.action().equals("onFindDataStore")){
             session.write(toMessage("find data store",true).toString().getBytes(),label());
         }
-        else if(session.action().equals("onAddGameService")){
+        else if(session.action().equals("onExportModule")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
             DeploymentDescriptor desc = new DeploymentDescriptor();
+            desc.moduleId(acc.property(OnAccess.MODULE_ID).toString());
             desc.codebase(acc.property(OnAccess.MODULE_CODE_BASE).toString());
             desc.moduleArtifact(acc.property(OnAccess.MODULE_ARTIFACT).toString());
             desc.moduleVersion(acc.property(OnAccess.MODULE_VERSION).toString());
-            session.write(payload,label());
-            //Response resp = this.deploymentServiceProvider.createModule(desc);
-            //session.write(this.toMessage(resp.message(),resp.successful()).toString().getBytes(),label());
+            Response resp = this.deploymentServiceProvider.exportModule(desc);
+            session.write(this.toMessage(resp.message(),resp.successful()).toString().getBytes(),label());
         }
         else if(session.action().equals("onAddModule")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
