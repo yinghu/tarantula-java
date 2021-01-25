@@ -1,16 +1,14 @@
 package com.tarantula.admin;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.game.*;
-import com.tarantula.platform.DeploymentDescriptor;
-import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.IndexSet;
-import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.*;
 import com.tarantula.platform.item.Item;
 import com.tarantula.platform.presence.*;
 
@@ -23,6 +21,7 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -369,10 +368,8 @@ public class AdminRoleModule implements Module {
             }
         }
         else if(session.action().equals("availableGameServiceList")){
-            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("game-service-list.json");
-            byte[] glist = in.readAllBytes();
-            in.close();
-            session.write(glist,label());
+            List<ExposedGameService> alist = this.deploymentServiceProvider.gameServiceList();
+            session.write(toJson(alist),label());
         }
         else if(session.action().equals("onAddService")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -587,5 +584,17 @@ public class AdminRoleModule implements Module {
             return u;
         }
         return null;
+    }
+    private byte[] toJson(List<ExposedGameService> exposedGameServices){
+        JsonObject jsonObject = new JsonObject();
+        JsonArray array = new JsonArray();
+        exposedGameServices.forEach((es)->{
+            JsonObject jes = new JsonObject();
+            jes.addProperty("name",es.name());
+            jes.addProperty("description",es.property("description").toString());
+            array.add(jes);
+        });
+        jsonObject.add("gameServiceList",array);
+        return jsonObject.toString().getBytes();
     }
 }

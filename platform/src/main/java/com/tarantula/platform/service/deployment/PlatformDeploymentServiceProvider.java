@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.deployment;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.*;
@@ -23,6 +24,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.imageio.spi.RegisterableService;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -67,6 +69,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     //content cache ( web admin )
     private ConcurrentHashMap<String,byte[]> rMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,ExposedGameService> eMap = new ConcurrentHashMap<>();
 
     private TarantulaContext tarantulaContext;
     private GsonBuilder builder;
@@ -226,12 +229,26 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 JsonParser parser = new JsonParser();
                 JsonObject jo = parser.parse(new InputStreamReader(in)).getAsJsonObject();
                 response.message(jo.get("moduleId").getAsString());
+                jo.getAsJsonArray("exposedServiceList").forEach((es)->{
+                    JsonObject je = es.getAsJsonObject();
+                    ExposedGameService egs = new ExposedGameService();
+                    egs.name(je.get("name").getAsString());
+                    egs.property("description",je.get("description").getAsString());
+                    eMap.put(egs.name(),egs);
+                });
             }catch (Exception ex){
                 log.warn("failed to parse export.json",ex);
                 response.message(ex.getMessage());
             }
         });
         return response;
+    }
+    public <T extends OnAccess> List<T> gameServiceList(){
+        ArrayList<T> arrayList = new ArrayList<>();
+        eMap.forEach((k,es)->{
+            arrayList.add((T)es);
+        });
+        return arrayList;
     }
     public void updateModule(Descriptor descriptor){
         DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{

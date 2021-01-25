@@ -1,3 +1,15 @@
 {
-  "moduleId": "game-service-pack-10"
+  "moduleId": "game-service-pack",
+  "exposedServiceList": [
+    {
+      "name":"looting",
+      "description": "game looting service",
+      "moduleName": "com.tarantula.game.service.LootingModule"
+    },
+    {
+      "name":"tournament",
+      "description": "game tournament service",
+      "moduleName": "com.tarantula.game.service.TournamentModule"
+    }
+  ]
 }

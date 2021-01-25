@@ -70,7 +70,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     <T extends OnAccess> boolean launchGameCluster(T gameCluster);
     <T extends OnAccess> boolean shutdownGameCluster(T gameCluster);
     <T extends OnAccess> T gameCluster(String key);
-    //List<String> gameServiceList();
+    <T extends OnAccess> List<T> gameServiceList();
     Lobby lobby(String typeId);
     //END OF CLUSTER
 
