@@ -68,7 +68,9 @@
             <view type="reset.module">
                 <property name="moduleResourceFile">sudo/reset.module.view.html</property>
             </view>
-
+            <view type="add.game.service">
+                <property name="moduleResourceFile">sudo/add.game.service.view.html</property>
+            </view>
             <view type="configuration.list">
                 <property name="moduleResourceFile">sudo/configuration.list.view.html</property>
             </view>

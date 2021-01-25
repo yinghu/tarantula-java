@@ -11,6 +11,9 @@ public interface Descriptor extends Recoverable {
     void deployCode(int deployCode);
 
     //module code location that could be http endpoint, local file folder
+    String moduleId();
+    void moduleId(String moduleId);
+
     String codebase();
     void codebase(String codebase);
 

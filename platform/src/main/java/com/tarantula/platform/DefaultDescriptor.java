@@ -29,6 +29,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 
 	protected int capacity;
     protected String responseLabel;
+    protected String moduleId;
     protected String moduleArtifact;
     protected String moduleVersion;
     protected String codebase;
@@ -53,7 +54,12 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     protected boolean resetEnabled;
 
     public DefaultDescriptor(){}
-
+    public String moduleId(){
+        return this.moduleId!=null?moduleId:typeId;
+    }
+    public void moduleId(String moduleId){
+        this.moduleId = moduleId;
+    }
     public String moduleArtifact(){
         return this.moduleArtifact;
     }
@@ -270,6 +276,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         _props.put("accessRank",this.accessRank);
         _props.put("deployCode",this.deployCode);
         _props.put("deployPriority",this.deployPriority);
+        _props.put("moduleId",this.moduleId);
         _props.put("codebase",this.codebase);
         _props.put("moduleArtifact",this.moduleArtifact);
         _props.put("moduleVersion",this.moduleVersion);
@@ -310,6 +317,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         this.moduleVersion  = properties.get("moduleVersion")!=null?(String) properties.get("moduleVersion"):null;
         this.deployCode = properties.get("deployCode")!=null?((Number)properties.get("deployCode")).intValue():0;
         this.deployPriority = properties.get("deployPriority")!=null?((Number)properties.get("deployPriority")).intValue():0;
+        this.moduleId = properties.get("moduleId")!=null?(String)properties.get("moduleId"):typeId;//
         this.codebase =properties.get("codebase")!=null?(String)properties.get("codebase"):null;
         this.moduleName = properties.get("moduleName")!=null?(String)properties.get("moduleName"):null;
         this.timerOnModule =properties.get("timerOnModule")!=null?((Number)properties.get("timerOnModule")).longValue():50;

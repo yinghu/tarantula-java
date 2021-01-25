@@ -112,7 +112,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     public Module module(Descriptor descriptor){
         if(descriptor.codebase()!=null){
-            DynamicModuleClassLoader mc = cMap.computeIfAbsent(descriptor.typeId(),(k)-> {
+            DynamicModuleClassLoader mc = cMap.computeIfAbsent(descriptor.moduleId(),(k)-> {
                 DynamicModuleClassLoader _cl = new DynamicModuleClassLoader(descriptor);
                 _cl._load();
                 return _cl;
@@ -196,7 +196,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return flag==null?fromContext(name):fromModule(name,flag);
     }
     public void resource(Descriptor descriptor, String name, Module.OnResource onResource){
-        DynamicModuleClassLoader dyn = cMap.get(descriptor.typeId());
+        DynamicModuleClassLoader dyn = cMap.get(descriptor.moduleId());
         dyn.loadResource(name,onResource);
     }
     public boolean resetModule(Descriptor descriptor){
@@ -217,7 +217,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     public void updateModule(Descriptor descriptor){
-        DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.typeId(),(k,c)->{
+        DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{
             DynamicModuleClassLoader nmc = new DynamicModuleClassLoader(descriptor);
             nmc.proxies.addAll(c.proxies);
             c._clear();
@@ -320,7 +320,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 this.tarantulaContext.tarantulaCluster().deployService().disableLobby(d.typeId());
             }
             if(d.moduleName()!=null&&d.codebase()!=null){ //clean class loader if all apps removed on the class loader
-                DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.typeId());
+                DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.moduleId());
                 if(dynamicModuleClassLoader!=null){
                     log.warn("Module resource clear on ["+d.codebase()+"/"+d.moduleArtifact()+"/"+d.moduleVersion()+"/"+d.subtypeId()+"]");
                     dynamicModuleClassLoader._clear();
@@ -358,7 +358,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 rListeners.remove(d.tag());
             }
             if(d.moduleName()!=null&&d.codebase()!=null){ //clean class loader if all apps removed on the class loader
-                DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.typeId());
+                DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.moduleId());
                 if(dynamicModuleClassLoader!=null){
                     log.warn("Module resource clear on ["+d.codebase()+"/"+d.moduleArtifact()+"/"+d.moduleVersion()+"/"+d.subtypeId()+"]");
                     dynamicModuleClassLoader._clear();
@@ -954,7 +954,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         }
         private void _setup(){
-            DynamicModuleClassLoader moduleClassLoader = cMap.get(descriptor.typeId());
+            DynamicModuleClassLoader moduleClassLoader = cMap.get(descriptor.moduleId());
             this.module = moduleClassLoader.newModule(descriptor.moduleName());
         }
         @Override
@@ -967,7 +967,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         public void reset(){
             try{
-                DynamicModuleClassLoader moduleClassLoader = cMap.get(descriptor.typeId());
+                DynamicModuleClassLoader moduleClassLoader = cMap.get(descriptor.moduleId());
                 this.clear();//clear on old instance
                 this.module = moduleClassLoader.newModule(descriptor.moduleName());
                 this.module.setup(applicationContext);//inject the limited content to prevent unexpected calls from modules
