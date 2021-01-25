@@ -171,6 +171,9 @@ public class XMLParser extends DefaultHandler{
 			else if(tblock.equals("application-list")&&qname.equals("description")){
 				this.applicationDescriptor.description(value);
 			}
+            else if(tblock.equals("application-list")&&qname.equals("module-id")){
+                this.applicationDescriptor.moduleId(value);
+            }
             else if(tblock.equals("application-list")&&qname.equals("code-base")){
                 this.applicationDescriptor.codebase(value);
             }
