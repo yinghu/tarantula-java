@@ -74,6 +74,17 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
         AccessIndex accessIndex = new AccessIndexTrack(accessKey,dso.partitionIndex.bucket(),dso.partitionIndex.label(),pid);
         return dso.dataStore.createIfAbsent(accessIndex,false)?accessIndex:null;
     }
+    public AccessIndex setIfAbsent(String accessKey){
+        DataStoreOnPartition dso = this.onPartition(accessKey);
+        AccessIndex _try = new AccessIndexTrack(accessKey);
+        if(dso.dataStore.load(_try)){
+            return _try;
+        }
+        int pid = localKey.sequence();
+        AccessIndex accessIndex = new AccessIndexTrack(accessKey,dso.partitionIndex.bucket(),dso.partitionIndex.label(),pid);
+        dso.dataStore.createIfAbsent(accessIndex,true);
+        return accessIndex;
+    }
     public AccessIndex get(String accessKey){
         AccessIndex suc = new AccessIndexTrack(accessKey);
         DataStore dataStore = this.onPartition(accessKey).dataStore;

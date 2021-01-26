@@ -1,7 +1,6 @@
 package com.tarantula.platform.service.deployment;
 
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.*;
@@ -24,7 +23,6 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import javax.imageio.spi.RegisterableService;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -229,7 +227,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             try{
                 JsonParser parser = new JsonParser();
                 JsonObject jo = parser.parse(new InputStreamReader(in)).getAsJsonObject();
-                response.message(jo.get("moduleId").getAsString());
+                String _moduleId = jo.get(ExposedGameService.MODULE_ID).getAsString();
+                response.message(_moduleId);
                 jo.getAsJsonArray("exposedServiceList").forEach((es)->{
                     JsonObject je = es.getAsJsonObject();
                     ExposedGameService egs = new ExposedGameService();

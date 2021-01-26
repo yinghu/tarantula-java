@@ -53,6 +53,20 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         }
     }
     @Override
+    public AccessIndex setIfAbsent(String accessKey){
+        NodeEngine nodeEngine = getNodeEngine();
+        AccessIndexSetIfAbsentOperation operation = new AccessIndexSetIfAbsentOperation(accessKey);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(accessKey);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,partitionId);
+        final Future<AccessIndex> future = builder.invoke();
+        try {
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+            return null;
+        }
+    }
+    @Override
     public void setup(ServiceContext serviceContext){}
     public void waitForData(){}
     @Override
