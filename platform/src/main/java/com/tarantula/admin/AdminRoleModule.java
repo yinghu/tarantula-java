@@ -17,7 +17,6 @@ import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
-import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -379,22 +378,28 @@ public class AdminRoleModule implements Module {
             String typeId = (String)gameCluster.property(GameCluster.GAME_SERVICE);
             Lobby _lobby = this.deploymentServiceProvider.lobby(typeId);
             boolean[] _existed = {false};
+            String _serviceName = onAccess.property("serviceName").toString();
             _lobby.entryList().forEach((e)->{
-                if(e.tag().equals(name+"/item")){
+                if(e.tag().equals(name+"/"+_serviceName)){
                     _existed[0] = true;
                 }
             });
             if(_existed[0]){
                 _existed[0]=false;
             }else {
+                ExposedGameService exposedGameService = this.deploymentServiceProvider.gameService(_serviceName);
                 DeploymentDescriptor desc = new DeploymentDescriptor();
+                desc.moduleId(exposedGameService.property(ExposedGameService.MODULE_ID).toString());
                 desc.typeId(typeId);
                 desc.subtypeId(name + "-service-module");
                 desc.type("application");
-                desc.name("Items");
+                desc.name(_serviceName);
                 desc.category("service");
-                desc.tag(name + "/item");
-                desc.moduleName("com.tarantula.game.module.ItemModule");
+                desc.tag(name + "/"+_serviceName);
+                desc.codebase(exposedGameService.property(ExposedGameService.CODEBASE).toString());
+                desc.moduleArtifact(exposedGameService.property(ExposedGameService.ARTIFACT).toString());
+                desc.moduleVersion(exposedGameService.property(ExposedGameService.VERSION).toString());
+                desc.moduleName(exposedGameService.property(ExposedGameService.MODULE_NAME).toString());
                 desc.applicationClassName("com.tarantula.platform.module.SingletonModuleApplication");
                 desc.singleton(true);
                 _existed[0] = this.deploymentServiceProvider.createApplication(desc, true);

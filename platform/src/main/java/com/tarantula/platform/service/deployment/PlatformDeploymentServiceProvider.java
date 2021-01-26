@@ -232,8 +232,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 jo.getAsJsonArray("exposedServiceList").forEach((es)->{
                     JsonObject je = es.getAsJsonObject();
                     ExposedGameService egs = new ExposedGameService();
-                    egs.name(je.get("name").getAsString());
-                    egs.property("description",je.get("description").getAsString());
+                    egs.property(ExposedGameService.MODULE_ID,jo.get(ExposedGameService.MODULE_ID));
+                    egs.name(je.get(ExposedGameService.NAME).getAsString());
+                    egs.property(ExposedGameService.DESCRIPTION,je.get(ExposedGameService.DESCRIPTION).getAsString());
+                    egs.property(ExposedGameService.CODEBASE,descriptor.codebase());
+                    egs.property(ExposedGameService.ARTIFACT,descriptor.moduleArtifact());
+                    egs.property(ExposedGameService.VERSION,descriptor.moduleVersion());
+                    egs.property(ExposedGameService.MODULE_NAME,je.get(ExposedGameService.MODULE_NAME).getAsString());
                     eMap.put(egs.name(),egs);
                 });
             }catch (Exception ex){
@@ -249,6 +254,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             arrayList.add((T)es);
         });
         return arrayList;
+    }
+    public <T extends OnAccess> T gameService(String name){
+        return (T)eMap.get(name);
     }
     public void updateModule(Descriptor descriptor){
         DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{

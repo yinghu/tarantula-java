@@ -96,7 +96,6 @@ public class SudoRoleModule implements Module {
         else if(session.action().equals("onExportModule")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
             DeploymentDescriptor desc = new DeploymentDescriptor();
-            desc.moduleId(acc.property(OnAccess.MODULE_ID).toString());
             desc.codebase(acc.property(OnAccess.MODULE_CODE_BASE).toString());
             desc.moduleArtifact(acc.property(OnAccess.MODULE_ARTIFACT).toString());
             desc.moduleVersion(acc.property(OnAccess.MODULE_VERSION).toString());

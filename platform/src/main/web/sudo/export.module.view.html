@@ -13,10 +13,6 @@
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-export-module-message"></div>
     <div><!-- send form -->
         <div class="w3-panel">
-            <label class="tx-text-12">Module ID</label>
-            <input id ="tx-export-module-id" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='ModuleId'/>
-        </div>
-        <div class="w3-panel">
             <label class="tx-text-12">Codebase</label>
             <input id ="tx-export-module-codebase" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='Codebase'/>
         </div>
@@ -43,11 +39,10 @@
 </div>
 <script>
     document.querySelector('#tx-export-module').onclick=()=>{
-        let _i = document.querySelector('#tx-export-module-id').value; 
         let _c = document.querySelector('#tx-export-module-codebase').value;
         let _a = document.querySelector('#tx-export-module-artifact').value;
         let _v = document.querySelector('#tx-export-module-version').value;
-        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onExportModule',moduleId:_i,codebase:_c,moduleArtifact:_a,moduleVersion:_v},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onExportModule',codebase:_c,moduleArtifact:_a,moduleVersion:_v},(resp)=>{
             //console.log(resp);
             document.querySelector('#tx-export-module-message').innerHTML = resp.message;
         });

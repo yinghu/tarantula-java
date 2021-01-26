@@ -55,10 +55,34 @@
         </div>
     </div>
     <div class="w3-card-4 w3-border w3-round w3-white tx-lobby-checkout" id="tx-service-edit">
-        
-        <div class="w3-panel w3-border-bottom w3-border-red">
-            <span id="tx-service-edit-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
-            <span id="tx-service-edit-ok" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Confirm</span>     
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+            <div class="w3-display-topright w3-padding">
+                <span id='tx-service-edit-cancel'><i class="fa fa-close" style="font-size:12px"></i></span>            
+            </div>
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-cubes w3-text-yellow tx-margin-top-4" style="font-size:24px"></i></span>
+                <span class="tx-margin-left-8 tx-text-18">Choose Service</span>
+            </div>
+        </div>
+        <div class="w3-panel  tx-margin-bottom-8  w3-border-bottom w3-border-red" id="tx-game-service-0" style="display: none;">
+            <span class="tx-text-12 tx-margin-right-4" id='tx-game-service-name-0'>Looting</span>
+            <span id='tx-game-service-add-0' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-add-service">Add</span>    
+        </div>
+        <div class="w3-panel tx-margin-bottom-8 w3-border-bottom w3-border-red" id="tx-game-service-1" style="display: none;">
+            <span class="tx-text-12 tx-margin-right-4 w3-left" id='tx-game-service-name-1'>Tournament</span>
+            <span id='tx-game-service-add-1' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-add-service">Add</span>    
+        </div>
+        <div class="w3-panel  tx-margin-bottom-8 w3-border-bottom w3-border-red" id="tx-game-service-2" style="display: none;">
+            <span class="w3-left tx-text-12 tx-margin-right-4" id='tx-game-service-name-2'>Item</span>
+            <span id='tx-game-service-add-2' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-add-service">Add</span>    
+        </div>
+        <div class="w3-panel  tx-margin-bottom-8 w3-border-bottom w3-border-red" id="tx-game-service-3" style="display: none;">
+            <span class="tx-text-12 tx-margin-right-4" id='tx-game-service-name-3'>Jackpot</span>
+            <span id='tx-game-service-add-3' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-add-service">Add</span>    
+        </div>
+        <div class="w3-panel  tx-margin-bottom-8 w3-border-bottom w3-border-red" id="tx-game-service-4" style="display: none;">
+            <span class="tx-text-12 tx-margin-right-4" id='tx-game-service-name-4'>Loop</span>
+            <span id='tx-game-service-add-4' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-add-service">Add</span>    
         </div>
     </div>
 </div>
@@ -87,17 +111,24 @@
     document.querySelector('#tx-add-service').onclick=()=>{
         document.querySelector('#tx-service-edit').style.display = 'block';  
         TARA_API.onService(true,{serviceTag:'role/admin',command:'availableGameServiceList',accessId:TARA_API.query().gameClusterId},(resp)=>{
-            console.log(resp);    
+            resp.gameServiceList.forEach((a,i)=>{
+                document.querySelector('#tx-game-service-'+i).style.display = 'block';
+                document.querySelector('#tx-game-service-name-'+i).innerHTML=a.name;
+                document.querySelector('#tx-game-service-add-'+i).setAttribute('service-name',a.name);
+            });   
         });   
     };
     document.querySelector('#tx-service-edit-cancel').onclick=()=>{
         document.querySelector('#tx-service-edit').style.display = 'none';    
     };
-    document.querySelector('#tx-service-edit-ok').onclick=()=>{
-        TARA_API.onService(true,{serviceTag:'role/admin',command:'onAddService',accessId:TARA_API.query().gameClusterId},(resp)=>{
-            console.log(resp);    
-        });   
-    };
+    document.querySelectorAll('.tx-add-service').forEach((a)=>{
+        a.onclick=()=>{
+            let serviceName = a.getAttribute('service-name'); 
+            TARA_API.onService(true,{serviceTag:'role/admin',command:'onAddService',accessId:TARA_API.query().gameClusterId,serviceName:serviceName},(resp)=>{
+                console.log(resp);    
+            });   
+        }
+    });
     document.querySelectorAll('.tx-service-action').forEach((a)=>{
         a.onclick=()=>{
             TARA_API.query().popup='#tx-popup-api';
