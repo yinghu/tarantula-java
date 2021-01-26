@@ -51,6 +51,9 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int ACCESS_INDEX_CID = 107;
 
+    public static final int EXPOSED_GAME_SERVICE_CID = 108;
+
+
     public Portable create(int cid) {
         Portable _ins;
 		switch(cid){

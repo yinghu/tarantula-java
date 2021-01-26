@@ -396,9 +396,9 @@ public class AdminRoleModule implements Module {
                 desc.name(_serviceName);
                 desc.category("service");
                 desc.tag(name + "/"+_serviceName);
-                desc.codebase(exposedGameService.property(ExposedGameService.CODEBASE).toString());
-                desc.moduleArtifact(exposedGameService.property(ExposedGameService.ARTIFACT).toString());
-                desc.moduleVersion(exposedGameService.property(ExposedGameService.VERSION).toString());
+                desc.codebase(exposedGameService.property(ExposedGameService.MODULE_CODE_BASE).toString());
+                desc.moduleArtifact(exposedGameService.property(ExposedGameService.MODULE_ARTIFACT).toString());
+                desc.moduleVersion(exposedGameService.property(ExposedGameService.MODULE_VERSION).toString());
                 desc.moduleName(exposedGameService.property(ExposedGameService.MODULE_NAME).toString());
                 desc.applicationClassName("com.tarantula.platform.module.SingletonModuleApplication");
                 desc.singleton(true);

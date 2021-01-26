@@ -117,6 +117,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     public Module module(Descriptor descriptor){
         if(descriptor.codebase()!=null){
+            log.warn("creating module from ->"+descriptor.moduleId());
             DynamicModuleClassLoader mc = cMap.computeIfAbsent(descriptor.moduleId(),(k)-> {
                 DynamicModuleClassLoader _cl = new DynamicModuleClassLoader(descriptor);
                 _cl._load();
@@ -235,9 +236,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     egs.property(ExposedGameService.MODULE_ID,jo.get(ExposedGameService.MODULE_ID));
                     egs.name(je.get(ExposedGameService.NAME).getAsString());
                     egs.property(ExposedGameService.DESCRIPTION,je.get(ExposedGameService.DESCRIPTION).getAsString());
-                    egs.property(ExposedGameService.CODEBASE,descriptor.codebase());
-                    egs.property(ExposedGameService.ARTIFACT,descriptor.moduleArtifact());
-                    egs.property(ExposedGameService.VERSION,descriptor.moduleVersion());
+                    egs.property(ExposedGameService.MODULE_CODE_BASE,descriptor.codebase());
+                    egs.property(ExposedGameService.MODULE_ARTIFACT,descriptor.moduleArtifact());
+                    egs.property(ExposedGameService.MODULE_VERSION,descriptor.moduleVersion());
                     egs.property(ExposedGameService.MODULE_NAME,je.get(ExposedGameService.MODULE_NAME).getAsString());
                     eMap.put(egs.name(),egs);
                 });

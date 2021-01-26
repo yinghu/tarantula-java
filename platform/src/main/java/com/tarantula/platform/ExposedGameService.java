@@ -1,10 +1,32 @@
 package com.tarantula.platform;
 
-public class ExposedGameService extends OnApplicationHeader{
-    public final static String NAME="name";
-    public final static String DESCRIPTION = "description";
-    public final static String CODEBASE = "codebase";
-    public final static String ARTIFACT = "artifact";
-    public final static String VERSION = "version";
-    public final static String MODULE_NAME = "moduleName";
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
+import com.tarantula.platform.event.PortableEventRegistry;
+
+import java.io.IOException;
+
+public class ExposedGameService extends OnApplicationHeader implements Portable {
+
+    @Override
+    public int getFactoryId() {
+        return PortableEventRegistry.OID;
+    }
+
+    @Override
+    public int getClassId() {
+        return PortableEventRegistry.EXPOSED_GAME_SERVICE_CID;
+    }
+
+    @Override
+    public void writePortable(PortableWriter portableWriter) throws IOException {
+
+    }
+
+    @Override
+    public void readPortable(PortableReader portableReader) throws IOException {
+
+    }
+
 }

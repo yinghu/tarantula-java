@@ -16,10 +16,17 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
 
     String LOGIN = "login";
     String DEVICE_ID = "deviceId";
+
     String MODULE_ID = "moduleId";
     String MODULE_CODE_BASE = "codebase";
     String MODULE_ARTIFACT = "moduleArtifact";
     String MODULE_VERSION = "moduleVersion";
+    String MODULE_NAME = "moduleName";
+    String DESCRIPTION = "description";
+    String NAME = "name";
+
+
+
 
     Object property(String name);
     void property(String name,Object value);
