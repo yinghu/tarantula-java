@@ -26,7 +26,6 @@
 
         </application-list>
         <configuration-list>
-
                 <configuration tag="admin" type="setup">
                     <property name="maxGameClusterCount">10</property>
                     <property name="maxGameLobbyCount">10</property>
@@ -46,7 +45,6 @@
                     <property name="currency">USD</property>
                     <property name="durationMonths">1</property>
                 </configuration>
-
         </configuration-list>
         <view-list>
             <view type="create.game.cluster">

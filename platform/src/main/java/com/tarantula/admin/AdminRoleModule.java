@@ -389,18 +389,23 @@ public class AdminRoleModule implements Module {
             }else {
                 ExposedGameService exposedGameService = this.deploymentServiceProvider.gameService(_serviceName);
                 DeploymentDescriptor desc = new DeploymentDescriptor();
-                desc.moduleId(exposedGameService.property(ExposedGameService.MODULE_ID).toString());
                 desc.typeId(typeId);
                 desc.subtypeId(name + "-service-module");
                 desc.type("application");
                 desc.name(_serviceName);
                 desc.category("service");
                 desc.tag(name + "/"+_serviceName);
-                desc.index(exposedGameService.property(ExposedGameService.MODULE_INDEX).toString());
-                desc.codebase(exposedGameService.property(ExposedGameService.MODULE_CODE_BASE).toString());
-                desc.moduleArtifact(exposedGameService.property(ExposedGameService.MODULE_ARTIFACT).toString());
-                desc.moduleVersion(exposedGameService.property(ExposedGameService.MODULE_VERSION).toString());
-                desc.moduleName(exposedGameService.property(ExposedGameService.MODULE_NAME).toString());
+                if(exposedGameService!=null){
+                    desc.moduleId(exposedGameService.property(ExposedGameService.MODULE_ID).toString());
+                    desc.index(exposedGameService.property(ExposedGameService.MODULE_INDEX).toString());
+                    desc.codebase(exposedGameService.property(ExposedGameService.MODULE_CODE_BASE).toString());
+                    desc.moduleArtifact(exposedGameService.property(ExposedGameService.MODULE_ARTIFACT).toString());
+                    desc.moduleVersion(exposedGameService.property(ExposedGameService.MODULE_VERSION).toString());
+                    desc.moduleName(exposedGameService.property(ExposedGameService.MODULE_NAME).toString());
+                }
+                else{
+                    desc.moduleName("com.tarantula.game.module.ItemModule");
+                }
                 desc.applicationClassName("com.tarantula.platform.module.SingletonModuleApplication");
                 desc.singleton(true);
                 _existed[0] = this.deploymentServiceProvider.createApplication(desc, true);
@@ -600,6 +605,10 @@ public class AdminRoleModule implements Module {
             jes.addProperty("description",es.property("description").toString());
             array.add(jes);
         });
+        JsonObject jo = new JsonObject();
+        jo.addProperty("name","items");
+        jo.addProperty("description","item service");
+        array.add(jo);
         jsonObject.add("gameServiceList",array);
         return jsonObject.toString().getBytes();
     }
