@@ -126,6 +126,10 @@ public class SudoRoleModule implements Module {
             desc.moduleArtifact((String) access.property(OnAccess.MODULE_ARTIFACT));
             desc.moduleVersion((String)access.property(OnAccess.MODULE_VERSION));
             desc.codebase((String)access.property(OnAccess.MODULE_CODE_BASE));
+            AccessIndex index = this.accessIndexService.get(access.typeId());
+            if(index!=null){
+                desc.index(index.distributionKey());
+            }
             boolean suc  = this.deploymentServiceProvider.resetModule(desc);
             session.write(this.toMessage(suc?"module rest":"module not reset",suc).toString().getBytes(),label());
             //this.deploymentServiceProvider.distributionCallback().updateModule(desc);

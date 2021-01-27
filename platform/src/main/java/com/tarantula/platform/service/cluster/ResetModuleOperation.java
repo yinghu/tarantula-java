@@ -17,6 +17,7 @@ public class ResetModuleOperation extends Operation {
     private String codebase;
     private String artifact;
     private String version;
+    private String index;
     private boolean result;
 
     public ResetModuleOperation() {
@@ -28,6 +29,7 @@ public class ResetModuleOperation extends Operation {
         this.codebase = descriptor.codebase();
         this.artifact = descriptor.moduleArtifact();
         this.version = descriptor.moduleVersion();
+        this.index = descriptor.index();
     }
     @Override
     public void run() throws Exception {
@@ -37,6 +39,7 @@ public class ResetModuleOperation extends Operation {
         descriptor.codebase(codebase);
         descriptor.moduleArtifact(artifact);
         descriptor.moduleVersion(version);
+        descriptor.index(index);
         this.result = cds.resetModule(descriptor);
     }
 
@@ -52,6 +55,7 @@ public class ResetModuleOperation extends Operation {
         out.writeUTF(codebase);
         out.writeUTF(artifact);
         out.writeUTF(version);
+        out.writeUTF(index);
     }
 
     @Override
@@ -61,5 +65,6 @@ public class ResetModuleOperation extends Operation {
         this.codebase = in.readLine();
         this.artifact = in.readUTF();
         this.version = in.readUTF();
+        this.index = in.readUTF();
     }
 }

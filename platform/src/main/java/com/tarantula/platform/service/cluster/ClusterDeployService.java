@@ -172,7 +172,25 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         DataStore dataStore = this.tarantulaContext.masterDataStore();
         LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.bucketId(),descriptor.typeId());
         if(!dataStore.load(lobbyTypeIdIndex)){
-            return false;
+            if(descriptor.index()!=null){
+                IndexSet indexSet = new IndexSet();
+                indexSet.distributionKey(descriptor.index());
+                indexSet.label(ExposedGameService.INDEX_LABEL);
+                if(dataStore.load(indexSet)){
+                    indexSet.keySet.forEach((k)->{
+                        DeploymentDescriptor app = new DeploymentDescriptor();
+                        app.distributionKey(k);
+                        if(dataStore.load(app)){
+                            app.codebase(descriptor.codebase());
+                            app.moduleArtifact(descriptor.moduleArtifact());
+                            app.moduleVersion(descriptor.moduleVersion());
+                            dataStore.update(app);
+                            suc[0]=true;
+                        }
+                    });
+                }
+            }
+            return suc[0];
         }
         dataStore.list(new ApplicationQuery(lobbyTypeIdIndex.index()),(a)->{
             a.codebase(descriptor.codebase());
