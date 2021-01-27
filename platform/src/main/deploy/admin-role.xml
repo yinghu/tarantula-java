@@ -77,8 +77,8 @@
             <view type="api.service.statistics">
                 <property name="moduleResourceFile">admin/api.service.statistics.view.html</property>
             </view>
-            <view type="api.service.items">
-                <property name="moduleResourceFile">admin/api.service.items.view.html</property>
+            <view type="api.service.item">
+                <property name="moduleResourceFile">admin/api.service.item.view.html</property>
             </view>
             <view type="api.service.matchmaking">
                 <property name="moduleResourceFile">admin/api.service.matchmaking.view.html</property>
