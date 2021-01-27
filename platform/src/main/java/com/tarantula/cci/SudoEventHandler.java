@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
@@ -22,7 +23,7 @@ public class SudoEventHandler implements RequestHandler {
     private EventService eventService;
     private TokenValidatorProvider tokenValidator;
     private DeploymentServiceProvider deploymentServiceProvider;
-    private AccessIndexService accessIndexService;
+    private RecoverService recoverService;
     private String serverTopic;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
     private GsonBuilder builder;
@@ -37,6 +38,9 @@ public class SudoEventHandler implements RequestHandler {
         try{
             String token = exchange.header(Session.TARANTULA_TOKEN);
             OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
+            if(recoverService.checkAccessControl(onSession.systemId(), AccessControl.account)){
+
+            }
             String contentType = exchange.path().endsWith(".html")?"text/html":"text/javascript";
             byte[] ret = this.deploymentServiceProvider.resource(exchange.path().substring(1),null);
             if(ret.length==0){
@@ -68,7 +72,7 @@ public class SudoEventHandler implements RequestHandler {
     }
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
-        this.accessIndexService = tcx.accessIndexService();
+        this.recoverService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).recoverService();
         this.bucket = tcx.bucket();
         tokenValidator  = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);

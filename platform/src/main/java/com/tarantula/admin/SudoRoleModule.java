@@ -119,7 +119,7 @@ public class SudoRoleModule implements Module {
             boolean suc = this.deploymentServiceProvider.launchModule(access.typeId());
             session.write(this.toMessage(suc?"module launched":"module not launched",suc).toString().getBytes(),label());
         }
-        else if(session.action().equals("onResetModule")){//subtypeId
+        else if(session.action().equals("onResetModule")){//typeId or moduleId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Descriptor desc = new DeploymentDescriptor();
             desc.typeId(access.typeId());
@@ -132,7 +132,6 @@ public class SudoRoleModule implements Module {
             }
             boolean suc  = this.deploymentServiceProvider.resetModule(desc);
             session.write(this.toMessage(suc?"module rest":"module not reset",suc).toString().getBytes(),label());
-            //this.deploymentServiceProvider.distributionCallback().updateModule(desc);
         }
         else if(session.action().equals("onShutdownModule")){//typeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
