@@ -23,7 +23,6 @@
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
             </application>
-
         </application-list>
         <configuration-list>
                 <configuration tag="admin" type="setup">

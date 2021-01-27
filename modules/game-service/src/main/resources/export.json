@@ -4,12 +4,20 @@
     {
       "name":"looting",
       "description": "game looting service",
-      "moduleName": "com.tarantula.game.service.LootingModule"
+      "moduleName": "com.tarantula.game.service.LootingModule",
+      "accessControl": 0
     },
     {
       "name":"tournament",
       "description": "game tournament service",
-      "moduleName": "com.tarantula.game.service.TournamentModule"
+      "moduleName": "com.tarantula.game.service.TournamentModule",
+      "accessControl": 0
+    },
+    {
+      "name":"tournamentadmin",
+      "description": "game tournament admin service",
+      "moduleName": "com.tarantula.game.service.TournamentAdminModule",
+      "accessControl": 30
     }
   ]
 }

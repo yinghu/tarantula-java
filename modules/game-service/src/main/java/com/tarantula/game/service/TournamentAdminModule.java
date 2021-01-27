@@ -6,13 +6,12 @@ import com.icodesoftware.Module;
 import com.icodesoftware.OnLog;
 import com.icodesoftware.Session;
 
-public class TournamentModule implements Module {
+public class TournamentAdminModule implements Module {
 
     private ApplicationContext context;
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
-        this.context.log("test tournament call",OnLog.WARN);
         session.write(payload,label());
         return false;
     }
@@ -20,7 +19,7 @@ public class TournamentModule implements Module {
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
-        this.context.log("Tarantula Tournament Module Started->"+context.descriptor().distributionKey(), OnLog.WARN);
+        this.context.log("Tarantula Tournament Addmin Module Started->"+context.descriptor().distributionKey(), OnLog.WARN);
     }
 
     @Override

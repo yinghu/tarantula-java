@@ -240,6 +240,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     egs.property(ExposedGameService.MODULE_ARTIFACT,descriptor.moduleArtifact());
                     egs.property(ExposedGameService.MODULE_VERSION,descriptor.moduleVersion());
                     egs.property(ExposedGameService.MODULE_NAME,je.get(ExposedGameService.MODULE_NAME).getAsString());
+                    egs.property(ExposedGameService.ACCESS_CONTROL,je.get(ExposedGameService.ACCESS_CONTROL).getAsInt());
                     eMap.put(egs.name(),egs);
                 });
             }catch (Exception ex){
@@ -543,6 +544,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         rListeners.put(instanceRegistryListener.onLobby(),instanceRegistryListener);
     }
     private void update(OnView onView){
+        log.warn("updating view->"+onView.viewId());
         checkContent(onView);
         vMap.putIfAbsent(onView.viewId(),onView);
         //remove caches
@@ -559,11 +561,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         OnView _v = (OnView)vMap.get(onView.viewId());
         if(_v==null){
-            return deployService.addView(onView);
+            if(deployService.addView(onView)){
+                update(onView);
+            }
         }
         else{
-            return this.tarantulaContext.masterDataStore().update(onView);
+            this.tarantulaContext.masterDataStore().update(onView);
+            update(onView);
         }
+        return true;
     }
 
     private void register(InstanceRegistry registry){

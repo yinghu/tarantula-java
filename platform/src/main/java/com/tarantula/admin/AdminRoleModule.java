@@ -402,6 +402,7 @@ public class AdminRoleModule implements Module {
                     desc.moduleArtifact(exposedGameService.property(ExposedGameService.MODULE_ARTIFACT).toString());
                     desc.moduleVersion(exposedGameService.property(ExposedGameService.MODULE_VERSION).toString());
                     desc.moduleName(exposedGameService.property(ExposedGameService.MODULE_NAME).toString());
+                    desc.accessControl((Integer)exposedGameService.property(ExposedGameService.ACCESS_CONTROL));
                 }
                 else{
                     desc.moduleName("com.tarantula.game.module.ItemModule");

@@ -165,6 +165,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             return false;
         }
         view.owner(query.index());
+        log.warn(view.toString());
         return ds.create(view);
     }
     public boolean resetModule(Descriptor descriptor){
