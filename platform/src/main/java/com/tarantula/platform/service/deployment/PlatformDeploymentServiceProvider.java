@@ -544,7 +544,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         rListeners.put(instanceRegistryListener.onLobby(),instanceRegistryListener);
     }
     private void update(OnView onView){
-        log.warn("updating view->"+onView.viewId());
         checkContent(onView);
         vMap.putIfAbsent(onView.viewId(),onView);
         //remove caches
