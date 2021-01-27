@@ -128,7 +128,7 @@ public class SudoRoleModule implements Module {
             desc.codebase((String)access.property(OnAccess.MODULE_CODE_BASE));
             boolean suc  = this.deploymentServiceProvider.resetModule(desc);
             session.write(this.toMessage(suc?"module rest":"module not reset",suc).toString().getBytes(),label());
-            this.deploymentServiceProvider.distributionCallback().updateModule(desc);
+            //this.deploymentServiceProvider.distributionCallback().updateModule(desc);
         }
         else if(session.action().equals("onShutdownModule")){//typeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);

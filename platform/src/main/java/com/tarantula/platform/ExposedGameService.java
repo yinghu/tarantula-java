@@ -9,6 +9,7 @@ import java.io.IOException;
 
 public class ExposedGameService extends OnApplicationHeader implements Portable {
 
+    public static final String INDEX_LABEL = "IX";
     @Override
     public int getFactoryId() {
         return PortableEventRegistry.OID;

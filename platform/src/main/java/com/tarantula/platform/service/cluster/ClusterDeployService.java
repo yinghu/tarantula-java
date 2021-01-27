@@ -140,6 +140,18 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         descriptor.label(Application.LABEL);
         descriptor.onEdge(true);
         if(ds.create(descriptor)){
+            if(!descriptor.typeId().equals(descriptor.moduleId())){
+                //create index for moduleId
+                IndexSet indexSet = new IndexSet();
+                indexSet.distributionKey(descriptor.index());
+                indexSet.label(ExposedGameService.INDEX_LABEL);
+                indexSet.keySet.add(descriptor.distributionKey());
+                if(!ds.createIfAbsent(indexSet,true)){
+                    indexSet.keySet.add(descriptor.distributionKey());
+                    ds.update(indexSet);
+                }
+                //log.warn("create index->"+descriptor.moduleId()+"<><><>"+descriptor.index());
+            }
             return descriptor.distributionKey();
         }
         else {

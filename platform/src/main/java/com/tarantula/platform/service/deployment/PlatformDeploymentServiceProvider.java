@@ -115,7 +115,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     public Module module(Descriptor descriptor){
         if(descriptor.codebase()!=null){
-            log.warn("creating module from ->"+descriptor.moduleId());
             DynamicModuleClassLoader mc = cMap.computeIfAbsent(descriptor.moduleId(),(k)-> {
                 DynamicModuleClassLoader _cl = new DynamicModuleClassLoader(descriptor);
                 _cl._load();
@@ -229,10 +228,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 JsonObject jo = parser.parse(new InputStreamReader(in)).getAsJsonObject();
                 String _moduleId = jo.get(ExposedGameService.MODULE_ID).getAsString();
                 response.message(_moduleId);
+                AccessIndex accessIndex = this.tarantulaContext.accessIndexService().setIfAbsent(_moduleId);
                 jo.getAsJsonArray("exposedServiceList").forEach((es)->{
                     JsonObject je = es.getAsJsonObject();
                     ExposedGameService egs = new ExposedGameService();
-                    egs.property(ExposedGameService.MODULE_ID,jo.get(ExposedGameService.MODULE_ID));
+                    egs.property(ExposedGameService.MODULE_ID,_moduleId);
+                    egs.property(ExposedGameService.MODULE_INDEX,accessIndex.distributionKey());
                     egs.name(je.get(ExposedGameService.NAME).getAsString());
                     egs.property(ExposedGameService.DESCRIPTION,je.get(ExposedGameService.DESCRIPTION).getAsString());
                     egs.property(ExposedGameService.MODULE_CODE_BASE,descriptor.codebase());

@@ -52,6 +52,7 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
     public Descriptor copy() {
         DeploymentDescriptor _copy = new DeploymentDescriptor();
         _copy.moduleId(this.moduleId);
+        _copy.index(this.index);
         _copy.typeId(this.typeId);
         _copy.subtypeId(this.subtypeId);
         _copy.name(this.name);

@@ -396,6 +396,7 @@ public class AdminRoleModule implements Module {
                 desc.name(_serviceName);
                 desc.category("service");
                 desc.tag(name + "/"+_serviceName);
+                desc.index(exposedGameService.property(ExposedGameService.MODULE_INDEX).toString());
                 desc.codebase(exposedGameService.property(ExposedGameService.MODULE_CODE_BASE).toString());
                 desc.moduleArtifact(exposedGameService.property(ExposedGameService.MODULE_ARTIFACT).toString());
                 desc.moduleVersion(exposedGameService.property(ExposedGameService.MODULE_VERSION).toString());
