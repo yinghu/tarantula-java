@@ -1,7 +1,7 @@
 package com.tarantula.platform.statistics;
 
+import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.protocol.DataBuffer;
-import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 

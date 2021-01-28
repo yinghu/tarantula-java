@@ -1,4 +1,5 @@
 package com.tarantula.platform;
+import com.icodesoftware.util.RecoverableObject;
 
 abstract public class BackupObject extends RecoverableObject {
     @Override

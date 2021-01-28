@@ -1,6 +1,7 @@
 package com.tarantula.platform;
 import com.icodesoftware.Property;
 import com.tarantula.platform.service.cluster.PortableRegistry;
+import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Map;
 

@@ -1,6 +1,7 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.util.HashSet;

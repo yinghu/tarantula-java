@@ -3,7 +3,7 @@ package com.tarantula.platform;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.util.Map;
-
+import com.icodesoftware.util.RecoverableObject;
 /**
  * Created by yinghu lu on 12/25/2020.
  */

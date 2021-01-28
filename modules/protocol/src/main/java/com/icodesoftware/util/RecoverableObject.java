@@ -1,10 +1,9 @@
-package com.tarantula.platform;
+package com.icodesoftware.util;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -91,10 +90,10 @@ public class RecoverableObject implements Recoverable {
         properties.forEach((String k,Object v)->this.properties.put(k,v));
     }
     public byte[] toBinary(){
-        return SystemUtil.toJson(toMap());
+        return JsonUtil.toJson(toMap());
     }
     public void fromBinary(byte[] payload){
-        fromMap(SystemUtil.toMap(payload));
+        fromMap(JsonUtil.toMap(payload));
     }
     public boolean backup(){
         return false;
@@ -179,21 +178,10 @@ public class RecoverableObject implements Recoverable {
     }
     @Override
     public String toString(){
-        return new String(SystemUtil.toJson(this.toMap()));
+        return (JsonUtil.toJsonString(this.toMap()));
     }
+
     public JsonObject toJson(){
-        JsonObject jsonObject = new JsonObject();
-        this.properties.forEach((k,v)->{
-            if(v instanceof String){
-                jsonObject.addProperty(k,(String)v);
-            }
-            else if(v instanceof Number){
-                jsonObject.addProperty(k,(Number)v);
-            }
-            else if(v instanceof Boolean){
-                jsonObject.addProperty(k,(Boolean)v);
-            }
-        });
-        return jsonObject;
+        return JsonUtil.toJsonObject(this.properties);
     }
 }

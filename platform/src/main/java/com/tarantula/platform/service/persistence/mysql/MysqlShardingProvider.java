@@ -8,7 +8,8 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.service.persistence.Shard;
 import com.tarantula.platform.service.persistence.ShardingProvider;
-import com.tarantula.platform.util.SystemUtil;
+import com.icodesoftware.util.JsonUtil;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -131,7 +132,7 @@ public class MysqlShardingProvider implements ShardingProvider {
             try{
                 PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO "+metadata.source()+" VALUES(?,?,?,?)");
                 preparedStatement.setString(1,key);
-                String ret = SystemUtil.toJsonString(data);
+                String ret = JsonUtil.toJsonString(data);
                 preparedStatement.setString(2, ret);
                 preparedStatement.setInt(3,t.getClassId());
                 preparedStatement.setInt(4,t.getFactoryId());
@@ -167,7 +168,7 @@ public class MysqlShardingProvider implements ShardingProvider {
                     int f = rs.getInt("f");
                     RecoverableRegistry rgis = serviceContext.recoverableRegistry(f);
                     ret = (T)rgis.create(c);
-                    ret.fromMap(SystemUtil.toMap(_ret));
+                    ret.fromMap(JsonUtil.toMap(_ret));
                 }
                 rs.close();
                 preparedStatement.close();
@@ -186,13 +187,13 @@ public class MysqlShardingProvider implements ShardingProvider {
     @Override
     public <T extends Recoverable> byte[] update(Metadata metadata, String key, T t){
         if(!enabled){
-            return SystemUtil.toJson(t.toMap());
+            return JsonUtil.toJson(t.toMap());
         }
         try{
             Connection connection = shardList[metadata.partition()%shards].connection();
             try{
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE "+metadata.source()+" SET v=? WHERE k=?");
-                String ret = SystemUtil.toJsonString(t.toMap());
+                String ret = JsonUtil.toJsonString(t.toMap());
                 preparedStatement.setString(1,ret);
                 preparedStatement.setString(2,key);
                 preparedStatement.execute();

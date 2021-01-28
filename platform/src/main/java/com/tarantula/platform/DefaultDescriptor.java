@@ -2,8 +2,7 @@ package com.tarantula.platform;
 
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.service.DeployCode;
-import com.tarantula.platform.util.SystemUtil;
-
+import com.icodesoftware.util.JsonUtil;
 import java.util.Map;
 
 public class DefaultDescriptor extends DeploymentObject implements Descriptor {
@@ -197,7 +196,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     }
 	@Override
 	public String toString(){
-		return new String(SystemUtil.toJson(this.toMap()));
+		return new String(JsonUtil.toJson(this.toMap()));
 	}
 
 	public boolean singleton(){

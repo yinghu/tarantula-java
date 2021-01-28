@@ -244,7 +244,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         }
         GameCluster gameCluster = new GameCluster();
         if(conf.descriptor.resetEnabled&&conf.descriptor.deployCode==DeployCode.USER_GAME_CLUSTER){
-            gameCluster.distributionKey(lobbyTypeIdIndex.owner);
+            gameCluster.distributionKey(lobbyTypeIdIndex.owner());
             if(!masterDataStore().load(gameCluster)){
                 //load from cluster
                 byte[] data = this.integrationCluster.recoverService().recover(dataStoreMaster,gameCluster.key().asString().getBytes());

@@ -6,8 +6,8 @@ import com.hazelcast.nio.serialization.PortableWriter;
 
 import com.icodesoftware.Distributable;
 import com.icodesoftware.service.Metadata;
-import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.icodesoftware.util.RecoverableObject;
 
 import java.io.IOException;
 

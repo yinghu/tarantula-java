@@ -1,7 +1,7 @@
 package com.tarantula.platform;
 
 import com.tarantula.platform.service.cluster.PortableRegistry;
-
+import com.icodesoftware.util.RecoverableObject;
 import java.util.Map;
 
 public class LobbyTypeIdIndex extends RecoverableObject {

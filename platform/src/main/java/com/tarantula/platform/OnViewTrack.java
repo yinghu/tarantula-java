@@ -9,7 +9,7 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.io.IOException;
 import java.util.Map;
-
+import com.icodesoftware.util.RecoverableObject;
 /**
  * Updated by yinghu lu on 7/11/2020
  */

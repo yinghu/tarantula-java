@@ -1,4 +1,4 @@
-package com.tarantula.platform;
+package com.icodesoftware.util;
 
 
 import com.icodesoftware.Recoverable;
@@ -11,7 +11,7 @@ public class DistributionKey extends RecoverableObject implements Recoverable.Ke
     private String bucket;
     private String oid;
 
-    public DistributionKey(String bucket,String oid){
+    public DistributionKey(String bucket, String oid){
         this.bucket = bucket;
         this.oid = oid;
     }

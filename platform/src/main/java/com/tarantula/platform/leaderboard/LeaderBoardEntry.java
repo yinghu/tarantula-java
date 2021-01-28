@@ -3,11 +3,10 @@ package com.tarantula.platform.leaderboard;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Recoverable;
 import com.tarantula.platform.NaturalKey;
-import com.tarantula.platform.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.Map;
-
+import com.icodesoftware.util.RecoverableObject;
 /**
  * Updated by yinghu on 5/1/2020
  */

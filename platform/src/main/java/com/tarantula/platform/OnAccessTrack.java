@@ -2,8 +2,7 @@ package com.tarantula.platform;
 
 import com.icodesoftware.OnAccess;
 import com.tarantula.platform.presence.UserPortableRegistry;
-import com.tarantula.platform.util.SystemUtil;
-
+import com.icodesoftware.util.JsonUtil;
 import java.util.Map;
 
 
@@ -59,6 +58,6 @@ public class OnAccessTrack extends OnApplicationHeader implements OnAccess {
     }
     @Override
     public String toString(){
-        return new String(SystemUtil.toJson(properties));
+        return new String(JsonUtil.toJson(properties));
     }
 }

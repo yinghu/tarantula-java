@@ -1,10 +1,10 @@
 package com.tarantula.platform.leaderboard;
 
 import com.icodesoftware.LeaderBoard;
-import com.tarantula.platform.RecoverableObject;
+
 import java.util.Arrays;
 import java.util.HashMap;
-
+import com.icodesoftware.util.RecoverableObject;
 
 public class BoardSync extends RecoverableObject{
 

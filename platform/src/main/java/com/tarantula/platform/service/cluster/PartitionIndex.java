@@ -3,6 +3,7 @@ package com.tarantula.platform.service.cluster;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.protocol.DataBuffer;
+import com.icodesoftware.util.DistributionKey;
 import com.tarantula.platform.*;
 
 import java.util.Map;

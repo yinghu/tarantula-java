@@ -2,8 +2,7 @@ package com.tarantula.platform;
 
 import com.icodesoftware.Connection;
 import com.tarantula.platform.service.cluster.PortableRegistry;
-import com.tarantula.platform.util.SystemUtil;
-
+import com.icodesoftware.util.JsonUtil;
 import java.util.Map;
 
 public class UniverseConnection extends ClientConnection {
@@ -81,7 +80,7 @@ public class UniverseConnection extends ClientConnection {
         return new NaturalKey(this.serverId);
     }
     public String toString(){
-        return new String(SystemUtil.toJson(toMap()));
+        return new String(JsonUtil.toJson(toMap()));
     }
     public Connection server(){
         return server!=null?server:this;

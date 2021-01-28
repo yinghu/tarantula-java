@@ -2,7 +2,7 @@ package com.tarantula.platform.item;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Consumable;
-import com.tarantula.platform.RecoverableObject;
+import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.Map;

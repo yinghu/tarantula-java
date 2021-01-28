@@ -6,7 +6,7 @@ import com.icodesoftware.service.EventService;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;
 import java.util.Map;
-
+import com.icodesoftware.util.RecoverableObject;
 /**
  * Updated by yinghu on 4/30/2020
  */

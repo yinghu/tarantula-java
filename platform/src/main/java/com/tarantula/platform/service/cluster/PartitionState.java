@@ -1,9 +1,8 @@
 package com.tarantula.platform.service.cluster;
 
-
+import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.service.OnPartition;
 import com.tarantula.platform.IndexKey;
-import com.tarantula.platform.RecoverableObject;
 
 import java.util.Map;
 

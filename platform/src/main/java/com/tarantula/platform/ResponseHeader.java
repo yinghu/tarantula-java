@@ -1,6 +1,7 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.Response;
+import com.icodesoftware.util.RecoverableObject;
 
 /**
  * Updated by yinghu on 9/6/2019

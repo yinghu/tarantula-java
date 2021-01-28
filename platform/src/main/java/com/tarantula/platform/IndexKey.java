@@ -1,7 +1,7 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.Recoverable;
-
+import com.icodesoftware.util.RecoverableObject;
 /**
  * Created by yinghu lu on 8/23/19
  */

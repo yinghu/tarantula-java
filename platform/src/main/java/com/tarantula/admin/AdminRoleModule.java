@@ -16,7 +16,7 @@ import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
-
+import com.icodesoftware.util.JsonUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -507,13 +507,13 @@ public class AdminRoleModule implements Module {
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         ya.registerListener((cf)->{
             //reload monthly
-            this.context.log("UPDATE->"+SystemUtil.toJsonString(cf.toMap()),OnLog.WARN);
+            this.context.log("UPDATE->"+ JsonUtil.toJsonString(cf.toMap()),OnLog.WARN);
             Configuration c = (Configuration)cf;
             yearly =  new SubscriptionFee("yearlyAccess",c.property("description"),c.property("price"),c.property("currency"),Integer.parseInt(c.property("durationMonths")));
         });
         ma.registerListener((cf)->{
             //reload monthly
-            this.context.log("UPDATE->"+SystemUtil.toJsonString(cf.toMap()),OnLog.WARN);
+            this.context.log("UPDATE->"+JsonUtil.toJsonString(cf.toMap()),OnLog.WARN);
             Configuration c = (Configuration)cf;
             monthly = new SubscriptionFee("monthlyAccess",c.property("description"),c.property("price"),c.property("currency"),Integer.parseInt(c.property("durationMonths")));
         });

@@ -2,10 +2,9 @@ package com.tarantula.platform.presence;
 
 import com.icodesoftware.Recoverable;
 import com.tarantula.platform.IndexKey;
-import com.tarantula.platform.RecoverableObject;
 
 import java.util.Map;
-
+import com.icodesoftware.util.RecoverableObject;
 public class SubscriptionFee extends RecoverableObject {
 
     public static final String DataStore = "purchase";

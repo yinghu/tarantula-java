@@ -16,6 +16,7 @@ import com.tarantula.platform.bootstrap.TarantulaMain;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.util.SystemUtil;
+import com.icodesoftware.util.JsonUtil;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -180,7 +181,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             T t = query.create();
             byte[] v = vMap.get(k);
             if(v!=null){
-                t.fromMap(SystemUtil.toMap(v));
+                t.fromMap(JsonUtil.toMap(v));
                 t.distributionKey(new String(k));
                 if(!stream.on(t)){
                     break;
@@ -201,7 +202,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         byte[] k = t.key().asString().getBytes();
         byte[] v = get(k);
         if(v!=null){
-            t.fromMap(SystemUtil.toMap(v));
+            t.fromMap(JsonUtil.toMap(v));
             return true;
         }
         else{

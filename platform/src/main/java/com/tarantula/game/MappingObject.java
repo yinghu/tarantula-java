@@ -1,8 +1,7 @@
 package com.tarantula.game;
 
 import com.tarantula.platform.AssociateKey;
-import com.tarantula.platform.RecoverableObject;
-
+import com.icodesoftware.util.RecoverableObject;
 
 public class MappingObject extends RecoverableObject {
 

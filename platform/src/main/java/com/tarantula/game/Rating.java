@@ -3,8 +3,7 @@ package com.tarantula.game;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.tarantula.platform.AssociateKey;
-import com.tarantula.platform.RecoverableObject;
-
+import com.icodesoftware.util.RecoverableObject;
 import java.util.Map;
 /**
  * Updated by yinghu lu on 6/8/2020.

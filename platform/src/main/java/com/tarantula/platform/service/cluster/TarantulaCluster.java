@@ -9,10 +9,10 @@ import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.util.JsonUtil;
 
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
-import com.tarantula.platform.util.SystemUtil;
 
 public class TarantulaCluster extends TarantulaApplicationHeader implements ClusterProvider, EventService,LifecycleListener{
 
@@ -87,7 +87,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
             T t = query.create();
             byte[] v = vMap.get(k);
             if(v!=null){
-                t.fromMap(SystemUtil.toMap(v));
+                t.fromMap(JsonUtil.toMap(v));
                 t.distributionKey(new String(k));
                 if(!stream.on(t)){
                     break;
@@ -108,7 +108,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         byte[] k = t.key().asString().getBytes();
         byte[] v = get(k);
         if(v!=null){
-            t.fromMap(SystemUtil.toMap(v));
+            t.fromMap(JsonUtil.toMap(v));
             return true;
         }
         else{
