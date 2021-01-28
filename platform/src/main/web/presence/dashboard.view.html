@@ -737,17 +737,19 @@
         let _pg = lgn.getAttribute('live-game-page')/1;
         TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onLobbyList',page:_pg},(resp)=>{
             let lb;
+            let lp = document.querySelector('#live-game-list-play'); 
             for(lb=1;lb<11;lb++){
                 document.querySelector('#live-game-list-'+lb+'-0').innerHTML='';
                 document.querySelector('#live-game-list-'+lb+'-1').style.display='none';
                 document.querySelector('#live-game-list-'+lb+'-2').style.display='block';
             }
+            lp.style.display ='none';
             if(!resp.successful){
                 return;
             }
             document.querySelector('#live-game-list-name').innerHTML=resp.name;
-            document.querySelector('#live-game-list-play').setAttribute('game-view-id','play.game.'+resp.name.toLowerCase());
-            
+            lp.setAttribute('game-view-id','play.game.'+resp.name.toLowerCase());
+            lp.style.display ='block';
             let lbn = resp.name+'-lobby';
             resp.lobbyList.forEach((a,i)=>{
                 //listing live games 

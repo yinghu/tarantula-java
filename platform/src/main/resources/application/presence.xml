@@ -61,6 +61,9 @@
             <view type="game.cluster.price">
                 <property name="moduleResourceFile">presence/game.cluster.price.view.html</property>
             </view>
+            <view type="play.game.tictactoe">
+                <property name="moduleResourceFile">presence/play.game.tictactoe.view.html</property>
+            </view>
         </view-list>
     </lobby-context>
 </tarantula>
