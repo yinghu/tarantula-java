@@ -209,7 +209,7 @@
                         <span id='live-game-list-name' class="tx-text-18"></span>
                     </div>
                     <div class="w3-display-bottomright w3-padding">
-                        <span id='live-game-list-developer' class="tx-text-14">developer name</span>
+                        <span id='live-game-list-play' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-play">PLAY</span>
                     </div>
                 </div>
                 <div class="w3-container w3-border-bottom w3-border-red w3-padding">
@@ -591,6 +591,14 @@
     document.querySelector('#tx-live-game-next-list').onclick=()=>{
         _tx_lobby();
     };
+    document.querySelectorAll('.tx-game-play').forEach((a)=>{
+        a.onclick=()=>{
+            //TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
+            TARA_API.query().popup = '#tx-popup';
+            let gameView = a.getAttribute('game-view-id');
+            tx_view({viewId:gameView,containerId:'#tx-popup'});    
+        }
+    });
     _tx_account();
     function _tx_account(){
         TARA_API.onService(false,{serviceTag:'presence/lobby',command:'onPresence'},(resp)=>{
@@ -738,6 +746,8 @@
                 return;
             }
             document.querySelector('#live-game-list-name').innerHTML=resp.name;
+            document.querySelector('#live-game-list-play').setAttribute('game-view-id','play.game.'+resp.name.toLowerCase());
+            
             let lbn = resp.name+'-lobby';
             resp.lobbyList.forEach((a,i)=>{
                 //listing live games 
