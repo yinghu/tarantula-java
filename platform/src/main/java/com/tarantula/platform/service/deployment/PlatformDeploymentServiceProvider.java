@@ -543,7 +543,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerInstanceRegistryListener(InstanceRegistry.Listener instanceRegistryListener){
         rListeners.put(instanceRegistryListener.onLobby(),instanceRegistryListener);
     }
-    private void update(OnView onView){
+    public void updateView(OnView onView){
         checkContent(onView);
         vMap.putIfAbsent(onView.viewId(),onView);
         //remove caches
@@ -559,16 +559,18 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public boolean createView(OnView onView){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         OnView _v = (OnView)vMap.get(onView.viewId());
+        boolean updated;
         if(_v==null){
-            if(deployService.addView(onView)){
-                update(onView);
-            }
+            updated = deployService.addView(onView);
         }
         else{
             this.tarantulaContext.masterDataStore().update(onView);
-            update(onView);
+            updated = true;
         }
-        return true;
+        if(updated){
+            this.tarantulaContext.integrationCluster().deployService().updateView(onView);
+        }
+        return updated;
     }
 
     private void register(InstanceRegistry registry){
@@ -687,7 +689,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public void register(Configurable configurable){
         if(configurable instanceof OnView){
-            update((OnView)configurable);
+            updateView((OnView)configurable);
             return;
         }
         else if(configurable instanceof InstanceRegistry){

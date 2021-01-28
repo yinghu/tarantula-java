@@ -81,6 +81,24 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
+    public boolean updateView(OnView onView){
+        NodeEngine nodeEngine = getNodeEngine();
+        UpdateViewOperation operation = new UpdateViewOperation(onView);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int expected = mlist.size();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+        return expected==0;
+    }
     public String addApplication(Descriptor application){
         NodeEngine nodeEngine = getNodeEngine();
         AddApplicationOperation operation = new AddApplicationOperation(application);

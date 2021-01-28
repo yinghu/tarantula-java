@@ -167,6 +167,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         view.owner(query.index());
         return ds.create(view);
     }
+    public void updateView(OnView onView){
+        this.deploymentServiceProvider.distributionCallback().updateView(onView);
+    }
     public boolean resetModule(Descriptor descriptor){
         boolean[] suc ={false};
         DataStore dataStore = this.tarantulaContext.masterDataStore();

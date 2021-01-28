@@ -8,6 +8,7 @@ public interface DeployService extends ServiceProvider {
 
     boolean addLobby(Descriptor lobby,String publishingId);
     boolean addView(OnView onView);
+    boolean updateView(OnView onView);
 
     String addApplication(Descriptor application);
     boolean launchApplication(String typeId,String applicationId);
