@@ -78,6 +78,16 @@
                 <tag>game/stats</tag>
                 <module-name>com.tarantula.game.module.StatisticsModule</module-name>
             </application>
+            <application><!-- stats/leader board module-->
+                <type-id>game-service</type-id>
+                <subtype-id>game-service-module</subtype-id>
+                <name>Item</name>
+                <type>application</type>
+                <category>service</category>
+                <singleton>true</singleton>
+                <tag>game/item</tag>
+                <module-name>com.tarantula.game.module.ItemModule</module-name>
+            </application>
         </application-list>
     </lobby-context>
     <lobby-context>

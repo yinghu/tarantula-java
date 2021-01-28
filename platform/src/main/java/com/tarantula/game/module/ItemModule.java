@@ -50,7 +50,7 @@ public class ItemModule implements Module {
         String itemDs = this.context.descriptor().typeId().replace("-","_")+"_item";
         itemDataStore = this.context.dataStore(itemDs);
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
-        this.context.log("started item module->"+this.context.descriptor().distributionKey(), OnLog.WARN);
+        this.context.log("started item module->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 
     @Override

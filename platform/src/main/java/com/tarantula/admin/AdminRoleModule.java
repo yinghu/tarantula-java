@@ -606,10 +606,6 @@ public class AdminRoleModule implements Module {
             jes.addProperty("description",es.property("description").toString());
             array.add(jes);
         });
-        JsonObject jo = new JsonObject();
-        jo.addProperty("name","item");
-        jo.addProperty("description","item service");
-        array.add(jo);
         jsonObject.add("gameServiceList",array);
         return jsonObject.toString().getBytes();
     }
