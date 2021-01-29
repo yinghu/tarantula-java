@@ -35,18 +35,20 @@ public class UploadEventHandler implements RequestHandler {
         try{
             String token = exchange.header(Session.TARANTULA_TOKEN);
             OnSession onSession = tokenValidator.validateToken(token);
-            if(recoverService.checkAccessControl(onSession.systemId(),AccessControl.root)){
-                InputStream in = exchange.onStream();
-                String path = exchange.path();
-                log.warn(onSession.systemId() + " is uploading module [" + path + "]");
-                boolean suc = deployService.upload(path.substring(path.lastIndexOf("/") + 1),in.readAllBytes());
-                ResponseHeader resp = new ResponseHeader("upload",suc?"uploaded":"failed",suc);
-                exchange.onEvent(new ResponsiveEvent("", "",this.builder.create().toJson(resp).getBytes(), 0, "text/html", "", true));
+            if(!recoverService.checkAccessControl(onSession.systemId(),AccessControl.root)){
+                throw new RuntimeException("no access permission");
             }
-            else{
-                ResponseHeader resp = new ResponseHeader("upload","no permission operation",true);
-                exchange.onEvent(new ResponsiveEvent("", "", this.builder.create().toJson(resp).getBytes(), 0, "text/html", "", true));
-            }
+            InputStream in = exchange.onStream();
+            String path = exchange.path();
+            log.warn(onSession.systemId() + " is uploading module [" + path + "]");
+            boolean suc = deployService.upload(path.substring(path.lastIndexOf("/") + 1),in.readAllBytes());
+            ResponseHeader resp = new ResponseHeader("upload",suc?"uploaded":"failed",suc);
+            exchange.onEvent(new ResponsiveEvent("", "",this.builder.create().toJson(resp).getBytes(), 0, "text/html", "", true));
+            //}
+            //else{
+                //ResponseHeader resp = new ResponseHeader("upload","no permission operation",true);
+                //exchange.onEvent(new ResponsiveEvent("", "", this.builder.create().toJson(resp).getBytes(), 0, "text/html", "", true));
+            //}
         }catch (Exception ex){
             ex.printStackTrace();
             exchange.onError(ex,ex.getMessage());

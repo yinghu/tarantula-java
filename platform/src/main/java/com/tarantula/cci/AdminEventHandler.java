@@ -38,8 +38,8 @@ public class AdminEventHandler implements RequestHandler{
         try{
             String token = exchange.header(Session.TARANTULA_TOKEN);
             OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
-            if(recoverService.checkAccessControl(onSession.systemId(), AccessControl.account)){
-
+            if(!recoverService.checkAccessControl(onSession.systemId(), AccessControl.account)){
+                throw new RuntimeException("no access permission");
             }
             String contentType = exchange.path().endsWith(".html")?"text/html":"text/javascript";
             byte[] ret = this.deploymentServiceProvider.resource(exchange.path().substring(1),null);

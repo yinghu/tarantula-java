@@ -1,7 +1,6 @@
 package com.tarantula.cci;
 
 import com.icodesoftware.Event;
-import com.icodesoftware.OnView;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.logging.JDKLogger;
@@ -12,7 +11,6 @@ public class RootContentHandler implements RequestHandler {
 
     private static final JDKLogger log = JDKLogger.getLogger(RootContentHandler.class);
     private DeploymentServiceProvider deploymentServiceProvider;
-    //private OnView invalidView;
     public String name(){
         return "/";
     }
@@ -60,7 +58,6 @@ public class RootContentHandler implements RequestHandler {
 
     @Override
     public void start() throws Exception {
-        //this.invalidView = this.deploymentServiceProvider.onView(OnView.INVALID_VIEW_ID);
         log.info("Root content event handler started");
     }
 

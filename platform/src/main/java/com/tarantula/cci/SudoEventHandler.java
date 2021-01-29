@@ -19,7 +19,6 @@ public class SudoEventHandler implements RequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(SudoEventHandler.class);
 
-    private String bucket;
     private EventService eventService;
     private TokenValidatorProvider tokenValidator;
     private DeploymentServiceProvider deploymentServiceProvider;
@@ -38,8 +37,8 @@ public class SudoEventHandler implements RequestHandler {
         try{
             String token = exchange.header(Session.TARANTULA_TOKEN);
             OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
-            if(recoverService.checkAccessControl(onSession.systemId(), AccessControl.account)){
-
+            if(!recoverService.checkAccessControl(onSession.systemId(), AccessControl.account)){
+                throw new RuntimeException("no access permission");
             }
             String contentType = exchange.path().endsWith(".html")?"text/html":"text/javascript";
             byte[] ret = this.deploymentServiceProvider.resource(exchange.path().substring(1),null);
@@ -51,7 +50,7 @@ public class SudoEventHandler implements RequestHandler {
         }catch (Exception ex){
             ex.printStackTrace();
             _hex.remove(exchange.id()); //removed cache on any errors
-            exchange.onError(ex,"Bad request");
+            exchange.onError(ex,ex.getMessage());
         }
     }
 
@@ -73,7 +72,6 @@ public class SudoEventHandler implements RequestHandler {
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
         this.recoverService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).recoverService();
-        this.bucket = tcx.bucket();
         tokenValidator  = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }
