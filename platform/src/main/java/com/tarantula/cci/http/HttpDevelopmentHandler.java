@@ -5,7 +5,7 @@ import com.tarantula.platform.service.EndPoint;
 
 
 
-public class HttpDedicatedServerHandler extends HttpDispatcher {
+public class HttpDevelopmentHandler extends HttpDispatcher {
 
     @Override
     public void resource(EndPoint.Resource resource) {
@@ -14,6 +14,6 @@ public class HttpDedicatedServerHandler extends HttpDispatcher {
 
     @Override
     public String path() {
-        return "/dedicated";
+        return "/development";
     }
 }
