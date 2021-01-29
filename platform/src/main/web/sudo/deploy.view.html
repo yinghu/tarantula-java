@@ -49,8 +49,8 @@
         let _i = document.querySelector('#tx-view-id').value;
         let _n = document.querySelector('#tx-view-resource-name').value;
         TARA_API.onService(true,{serviceTag:'role/sudo',command:'onDeployView',typeId:_t,deployUrl:_c,viewId:_i,resourceName:_n},(resp)=>{
-            console.log(resp);
-            //document.querySelector('#tx-deploy-view-message').innerHTML = resp.message;        
+            //console.log(resp);
+            document.querySelector('#tx-deploy-view-message').innerHTML = resp.message;        
         });        
     };
     document.querySelector('#tx-deploy-view-close').onclick=()=>{

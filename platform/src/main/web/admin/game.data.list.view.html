@@ -5,7 +5,7 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-database" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">Data Store List</span>
+            <span class="tx-margin-left-8 tx-text-24">Data Store Service</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
@@ -57,6 +57,7 @@
     TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameDataList',accessId:TARA_API.query().gameClusterId},(resp)=>{
         if(resp.successful){
             console.log(resp);
+            TARA_API.query().tag = resp.tag;
             document.querySelector('#tx-data-store-0').innerHTML = resp.name;
             document.querySelector('#tx-data-store-1').innerHTML = resp.tag;
             document.querySelector('#tx-data-store-2').innerHTML = resp.dataStore;
@@ -68,6 +69,10 @@
             document.querySelector('#tx-game-data-list-message').innerHTML=resp.message;
         }       
     });
+    document.querySelector('#tx-data-store-api-0').onclick = ()=>{
+        TARA_API.query().popup='#tx-popup-api'; 
+        tx_view({viewId:'api.service.data',containerId:'#tx-popup-api'});
+    };
     document.querySelector('#tx-game-data-list-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";

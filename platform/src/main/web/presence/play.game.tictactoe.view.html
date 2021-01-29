@@ -19,8 +19,20 @@
     </div>
 </div>
 <script>
+    let _oswaldFamily = 'Oswald, Arial';
+    let _felipaFamily = 'Felipa, Arial';
     let _view = document.querySelector('#tx-game-tictactoe');
     let app = TGL.start(600,500,_view);
+    let message = new PIXI.Text("Hello Pixi!",{fontFamily:_oswaldFamily,fontSize:40,fill:'yellow'});
+    app.stage.addChild(message);
+    let rectangle = new PIXI.Graphics();
+    rectangle.lineStyle(4, 0xFF3300, 1);
+    rectangle.beginFill(0x66CCFF);
+    rectangle.drawRect(0, 0, 64, 64);
+    rectangle.endFill();
+    rectangle.x = 170;
+    rectangle.y = 170;
+    app.stage.addChild(rectangle);
     document.querySelector('#tx-tictactoe-close').onclick=()=>{
         TGL.shutdown();
         let m3 = document.querySelector(TARA_API.query().popup);

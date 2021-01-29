@@ -1,0 +1,64 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-api-data-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-sign-in" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">API SET/GET</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel  tx-margin-bottom-8">
+        <label class="tx-text-16 tx-margin-left-4">Key Name:</label>
+        <input id='tx-set-key-name' class="w3-input tx-text-16" type="text">    
+    </div>
+    <div class="w3-panel  tx-text-16">
+        <textarea id="tx-api-set-json-message">RESPONSE OUTPUT</textarea> 
+    </div>
+    <div class='w3-panel w3-border-bottom w3-border-red'>
+        <div class="w3-panel">
+            <span id="tx-api-get-json" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Get</span>     
+            <span id="tx-api-set-json" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Set</span>     
+        </div>
+    </div> 
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector('#tx-api-set-json').onclick=()=>{
+        let _k = document.querySelector('#tx-set-key-name').value;
+        let _v =  document.querySelector('#tx-api-set-json-message').value;
+        let headers =[];
+        headers.push({name:'Tarantula-tag',value:TARA_API.query().tag});
+        headers.push({name:'Tarantula-action',value:'onSet'});
+        headers.push({name:'Tarantula-name',value:_k});
+        headers.push({name:'Tarantula-token',value:TARA_API.query().token});
+        TARA_API.onPost('/service/action',headers,_v,(resp)=>{
+            document.querySelector('#tx-api-set-json-message').value = resp;
+        });
+    };
+    document.querySelector('#tx-api-get-json').onclick=()=>{
+        let _k = document.querySelector('#tx-set-key-name').value;
+        let headers =[];
+        headers.push({name:'Tarantula-tag',value:TARA_API.query().tag});
+        headers.push({name:'Tarantula-action',value:'onGet'});
+        headers.push({name:'Tarantula-name',value:_k});
+        headers.push({name:'Tarantula-token',value:TARA_API.query().token});
+        TARA_API.onGet('/service/action',headers,(resp)=>{
+            document.querySelector('#tx-api-set-json-message').value = resp;
+        });
+    };
+    document.querySelector('#tx-api-data-close').onclick=()=>{
+        let m3 = document.querySelector('#tx-popup-api');
+        m3.innerHTML="";
+        m3.style.display = 'none';       
+    };
+</script>

@@ -73,6 +73,9 @@
             <view type="game.cluster.test">
                 <property name="moduleResourceFile">admin/game.cluster.test.view.html</property>
             </view>
+            <view type="api.service.data">
+                <property name="moduleResourceFile">admin/api.service.data.view.html</property>
+            </view>
             <view type="api.service.statistics">
                 <property name="moduleResourceFile">admin/api.service.statistics.view.html</property>
             </view>
