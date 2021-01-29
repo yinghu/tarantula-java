@@ -145,7 +145,7 @@ public class DevelopmentEventHandler implements RequestHandler {
         this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
-        log.info("Development event handler started");
+        log.info("Development event handler started->"+System.getProperty("user.home"));
     }
 
     @Override
