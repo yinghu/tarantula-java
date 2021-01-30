@@ -15,7 +15,9 @@ import com.tarantula.platform.util.ConnectionDeserializer;
 import com.tarantula.platform.util.ConnectionSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
-import java.util.Base64;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,106 +32,27 @@ public class DevelopmentEventHandler implements RequestHandler {
     private String serverTopic;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
     private GsonBuilder builder;
-    private Connection endpoint;
-    private DeployService deployService;
-    private DeploymentServiceProvider deploymentServiceProvider;
+
     public String name(){
         return "/development";
     }
+
     public void onRequest(OnExchange exchange){
-        String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
-        String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
-        if(typeId==null){
-            throw new RuntimeException("Illegal access");
-        }
-        log.warn(exchange.path());
-    }
-    public void _onRequest(OnExchange exchange){
         try{
-            String action = exchange.header(Session.TARANTULA_ACTION);
             String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
-            String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
-            String connectionId = exchange.header(Session.TARANTULA_CONNECTION_ID);
-            byte[] _payload = exchange.payload();
             String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
             if(typeId==null){
                 throw new RuntimeException("Illegal access");
             }
-            if(action.equals("onAck")){
-                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"ack",true));
-                deployService.ackServerPushEvent(serverId);
-            }
-            else if(action.equals("onStart")){
-                JsonObject resp = new JsonObject();
-                resp.addProperty("typeId",typeId);
-                resp.addProperty("successful",true);
-                Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
-                resp.addProperty("serverKey",Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
-                resp.addProperty("connectionId",connection.server().connectionId());
-                resp.addProperty("sequence",connection.server().sequence());
-                ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
-                pushEvent.typeId(typeId);
-                deployService.addServerPushEvent(pushEvent);
-                JsonArray cids = new JsonArray();
-                for(int i=1;i<=connection.maxConnections();i++){
-                    Connection conn = this.deploymentServiceProvider.distributionCallback().addConnection(typeId,toClientConnection(connection,connection.connectionId()+i));
-                    cids.add(conn.connectionId());
-                }
-                resp.add("connections",cids);
-                exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
-            }
-            else if(action.equals("onConnection")){
-                Connection connection = this.deploymentServiceProvider.distributionCallback().addConnection(serverId,Integer.parseInt(connectionId));
-                exchange.onEvent(new ResponsiveEvent("","",builder.create().toJson(connection).getBytes(),"onConnection",true));
-            }
-            else if(action.equals("onStop")){
-                deployService.removeServerPushEvent(serverId);
-                _hex.forEach((k,v)->{//removed session if any
-                    if(v.id().equals(serverId)){
-                        _hex.remove(k);
-                    }
-                });
-                exchange.onEvent(new ResponsiveEvent("","",_payload,"start",true));
-            }
+            String _homeDir = System.getProperty("user.home");
+            String _file = exchange.path().replaceFirst("/development",_homeDir);
+            log.warn(_file);
+            InputStream inputStream = new FileInputStream(new File(_file));
+            byte[] _payload = inputStream.readAllBytes();
+            inputStream.close();
+            ResponsiveEvent responsiveEvent = new ResponsiveEvent("","",_payload,"start",true);
+            exchange.onEvent(responsiveEvent);
 
-            //start of socket connection methods
-            else if(action.equals("onTicket")){
-                byte[] et;
-                if(this.tokenValidatorProvider.validateAccessKey(accessKey)!=null){
-                    JsonObject jo = new JsonObject();
-                    jo.addProperty("ticket", tokenValidatorProvider.ticket(serverId,1,5));
-                    jo.addProperty("host",endpoint.host());
-                    jo.addProperty("port",endpoint.port());
-                    jo.addProperty("successful",true);
-                    et = jo.toString().getBytes();
-                }
-                else{
-                    ResponseHeader err = new ResponseHeader("onTicket","invalid access key",false);
-                    et = builder.create().toJson(err).getBytes();
-                }
-                exchange.onEvent(new ResponsiveEvent("","",et,"push",true));
-            }
-            else if(action.equals("onConnect")){//access key
-                if(tokenValidatorProvider.validateTicket(serverId,1,accessKey)){
-                    String sid = exchange.id();
-                    _hex.put(sid,exchange);
-                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,serverId,_payload);
-                    deployService.addServerPushEvent(pushEvent);
-                }
-                else{
-                    log.warn("Invalid ticket");
-                    exchange.close();
-                }
-            }
-            else if(action.equals("onDisconnect")){//no more access key check event from server socket
-                _hex.forEach((k,v)->{
-                    if(v.header(Session.TARANTULA_SERVER_ID).equals(serverId)){
-                        _hex.remove(k);
-                        deployService.removeServerPushEvent(serverId);
-                    }
-                });
-            }
-            //end of socket connection methods
         }catch (Exception ex){
             ex.printStackTrace();
             _hex.remove(exchange.id()); //removed cache on any errors
@@ -155,10 +78,7 @@ public class DevelopmentEventHandler implements RequestHandler {
 
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
-        this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
-        this.endpoint = tcx.endpoint();
         this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
-        this.deploymentServiceProvider = tcx.deploymentServiceProvider();
     }
     public  boolean onEvent(Event event){
         OnExchange hx = this._hex.get(event.sessionId());
@@ -174,15 +94,5 @@ public class DevelopmentEventHandler implements RequestHandler {
     }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
-    }
-    private Connection toClientConnection(Connection connection,int connectionId){
-        Connection conn = new ClientConnection();
-        conn.type(connection.type());
-        conn.serverId(connection.serverId());
-        conn.host(connection.host());
-        conn.port(connection.port());
-        conn.secured(connection.secured());
-        conn.connectionId(connectionId);
-        return conn;
     }
 }
