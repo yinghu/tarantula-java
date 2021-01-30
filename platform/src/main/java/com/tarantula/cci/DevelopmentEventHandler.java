@@ -26,7 +26,7 @@ public class DevelopmentEventHandler implements RequestHandler {
                 throw new RuntimeException("Illegal access");
             }
             String _file = exchange.path().replaceFirst("/development","");
-            log.warn("Downloading from developer->"+typeId);
+            log.warn("Downloading ["+_file+"] from developer->"+typeId);
             InputStream inputStream = new FileInputStream(new File(homeDir+_file));
             byte[] _payload = inputStream.readAllBytes();
             inputStream.close();
