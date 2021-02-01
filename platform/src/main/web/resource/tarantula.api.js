@@ -40,6 +40,11 @@ var TARA_API = (function(){
   let _query = function(){
       return qdata;
   };
+  let _resetView = function(viewId){
+    if(vmap.has(viewId)){
+        vmap.delete(viewId);
+    }
+  };
   let _view = function(viewId,callback){
     let v = vmap.get(viewId);
     if(v==null){  
@@ -362,6 +367,7 @@ var TARA_API = (function(){
       onIndex : _index, 
       onLobby : _lobbyList, 
       onView : _view,
+      resetView : _resetView,
       onResource : _resource,
       onUpload : _upload,
       onRegister : _subscribe,

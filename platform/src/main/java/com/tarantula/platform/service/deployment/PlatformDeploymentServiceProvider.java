@@ -72,7 +72,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private TarantulaContext tarantulaContext;
     private GsonBuilder builder;
 
-    private String contentTemDir;
+    //private String contentTemDir;
     private String contentDir;
 
     private AtomicBoolean onAccessIndex;
@@ -445,7 +445,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.integrationEventService = integrationCluster.publisher();
         try{
-            contentTemDir = this.tarantulaContext.deployDir+"/tem";
+            //contentTemDir = this.tarantulaContext.deployDir+"/tem";
             contentDir = this.tarantulaContext.deployDir+"/web";
             Path _path = Paths.get(this.tarantulaContext.deployDir);
             if(!Files.exists(_path)){
@@ -471,10 +471,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(!Files.exists(_web_sudo)){
                 Files.createDirectories(_web_sudo);
             }
-            Path _tem = Paths.get(contentTemDir);
-            if(!Files.exists(_tem)){
-                Files.createDirectories(_tem);
-            }
+            //Path _tem = Paths.get(contentTemDir);
+            //if(!Files.exists(_tem)){
+                //Files.createDirectories(_tem);
+            //}
 
         }catch (Exception ex){
             throw new RuntimeException(ex);
