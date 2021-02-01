@@ -12,7 +12,7 @@
     <repositories>
         <repository>
             <id>game-cluster-repo</id>
-            <url>http://192.168.1.6:8090/development</url>
+            <url>https://gameclustering.com/development</url>
         </repository>
     </repositories>
     <build>
