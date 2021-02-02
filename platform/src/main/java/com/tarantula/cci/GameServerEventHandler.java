@@ -90,7 +90,7 @@ public class GameServerEventHandler implements RequestHandler {
                         _hex.remove(k);
                     }
                 });
-                exchange.onEvent(new ResponsiveEvent("","",_payload,"stop",true));
+                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"stop",true));
             }
         }catch (Exception ex){
             ex.printStackTrace();

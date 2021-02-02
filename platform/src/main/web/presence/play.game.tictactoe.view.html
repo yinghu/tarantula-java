@@ -33,6 +33,10 @@
     rectangle.x = 170;
     rectangle.y = 170;
     app.stage.addChild(rectangle);
+    let payload ={serviceTag:'TicTacToe/mmk',command:'onPlay'}; 
+    TARA_API.onService(false,payload,(resp)=>{
+        console.log(resp);
+    });
     document.querySelector('#tx-tictactoe-close').onclick=()=>{
         TGL.shutdown();
         let m3 = document.querySelector(TARA_API.query().popup);
