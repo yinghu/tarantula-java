@@ -33,27 +33,14 @@
     rectangle.x = 170;
     rectangle.y = 170;
     app.stage.addChild(rectangle);
-    let payload ={serviceTag:'TicTacToe/mmk',command:'onPlay'}; 
-    let wsWorker;
-    TARA_API.onService(false,payload,(resp)=>{
-        console.log(resp);
-        let conn = resp.connection;
-        conn.protocol = conn.secured?'wss':'ws';
-        conn.path='tictactoe';
-        conn.ticket = resp.ticket;
-        let _url = TARA_API.toUrl(resp.connection);
-        console.log(_url);
-        wsWorker = new Worker('/resource/tarantula.web.socket.source.js');
-        wsWorker.onmessage = (e)=>{
-            console.log(e.data);        
-        };
-        wsWorker.postMessage({cmd:'start',url:_url,protocol:'tarantula-service'});
-        setInterval(() => {
-            wsWorker.postMessage({cmd:'send',data:{message:'hello'}});
-        }, 1000);
+    TARA_API.connect((message)=>{
+        console.log(message);        
     });
+    setInterval(() => {
+        TARA_API.send({message:'hello'});
+    }, 1000);
     document.querySelector('#tx-tictactoe-close').onclick=()=>{
-        wsWorker.postMessage({cmd:'close'});
+        TARA_API.disconnect();
         TGL.shutdown();
         let m3 = document.querySelector(TARA_API.query().popup);
         m3.innerHTML="";

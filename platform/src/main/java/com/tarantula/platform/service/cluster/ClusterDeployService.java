@@ -296,9 +296,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             mds.create(gameCluster);//create first and discharge if any errors on loop
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();
+            String typePrefix = name.toLowerCase();
             parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-basic-plan.xml"));
             for (LobbyConfiguration configuration : parser.configurations) {
-                configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",name.toLowerCase()));//lower case only typeId
+                configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",typePrefix));//lower case only typeId
                 if(configuration.descriptor.typeId().endsWith("-lobby")){
                     gameCluster.property(GameCluster.GAME_LOBBY,configuration.descriptor.typeId());
                 }
@@ -329,8 +330,8 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     a.label(Application.LABEL);
                     a.onEdge(true);
                     a.typeId(descriptor.typeId());//replaced with named type id
-                    a.subtypeId(a.subtypeId().replace("game",name));
-                    a.tag(a.tag().replace("game",name));
+                    a.subtypeId(a.subtypeId().replace("game",typePrefix));
+                    a.tag(a.tag().replace("game",typePrefix));
                     a.applicationClassName(a.singleton()?tarantulaContext.singleModuleApplication:tarantulaContext.moduleApplication);
                     mds.create(a);
                 });

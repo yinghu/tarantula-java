@@ -1,10 +1,10 @@
 var TARA_API = (function(){
         
-  const vmap = new Map(); 
-  const cMap = new Map();    
+  const vmap = new Map();    
   let presence = {};    
   let qdata ={};
   let lobbyList =[];
+  let wsWorker;
     
   let _parse = function(data){
     data.lobbyList.forEach(function(v){
@@ -12,11 +12,24 @@ var TARA_API = (function(){
     });
   };            
   let _toWebSocketUrl = function(connection){       
-      //use server connection config for web socket
-      console.log(connection);
-      return connection.protocol+'://'+connection.host+':'+connection.port+'/'+connection.path+'?connectionId='+connection.connectionId+'&accessKey='+connection.ticket+'&stub='+qdata.stub+'&systemId='+qdata.login;
+    //use server connection config for web socket
+    console.log(connection);
+    return connection.protocol+'://'+connection.host+':'+connection.port+'/'+connection.path+'?connectionId='+connection.connectionId+'&accessKey='+connection.ticket+'&stub='+qdata.stub+'&systemId='+qdata.login;
   };
- 
+  let _connect = function(messageListener){
+    let _url = _toWebSocketUrl(qdata.connection);
+    wsWorker = new Worker('/resource/tarantula.web.socket.source.js');
+    wsWorker.onmessage =(e)=>{
+        messageListener(e.data);
+    };
+    wsWorker.postMessage({cmd:'start',url:_url,protocol:'tarantula-service'});
+  };
+  let _send = function(message){
+    wsWorker.postMessage({cmd:'send',data:message});
+  };
+  let _disconnect = function(){
+    wsWorker.postMessage({cmd:'close'});
+  };
 
   let _lobbyList = function(){
       return lobbyList;
@@ -298,28 +311,7 @@ var TARA_API = (function(){
         aj.setRequestHeader('Tarantula-payload-size',_jp.length);
     }  
     post?aj.send(_jp):aj.send();
-  };
-  let _instance = function(payload,callback){
-    let _jp = JSON.stringify(payload);
-    let aj = new XMLHttpRequest();   
-    aj.responseType = 'text';
-    aj.onreadystatechange = function(){
-        if(aj.status === 200 && aj.readyState === 4){
-            let jsn = JSON.parse(aj.responseText);
-            callback(jsn);
-        }
-    };
-    aj.open("POST","/application/instance",true);
-    aj.setRequestHeader('Accept','application/json');
-    aj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    aj.setRequestHeader('Tarantula-tag',payload.serviceTag);
-    aj.setRequestHeader('Tarantula-token',presence.token);
-    aj.setRequestHeader('Tarantula-application-id',payload.applicationId);
-    aj.setRequestHeader('Tarantula-instance-id',payload.instanceId);
-    aj.setRequestHeader('Tarantula-action',payload.command);
-    aj.setRequestHeader('Tarantula-payload-size',_jp.length);  
-    aj.send(_jp);
-  };     
+  }; 
   let _logout = function(callback){   
     let payload = {serviceTag:'presence/lobby',command:'onAbsence',post:false};
     _service(false,payload,function(resp){
@@ -348,8 +340,9 @@ var TARA_API = (function(){
       onResetPassword : _resetPassword,
       onLogout : _logout,
       onService : _service,
-      onInstance : _instance,
-      toUrl :_toWebSocketUrl,
+      connect : _connect,
+      send : _send,
+      disconnect : _disconnect
   };
     
 })();

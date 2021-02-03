@@ -10,9 +10,11 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-invalid-message">
+    <div class="w3-panel w3-center w3-text-red tx-text-12">
         <p>Your request might have permission or techinical isssues. Contact our support team if you have questions.</p>
     </div> 
+    <div class="w3-panel w3-center w3-text-red tx-text-14" id="tx-invalid-message">
+    </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -23,6 +25,7 @@
     </div>
 </div>
 <script>
+    document.querySelector('#tx-invalid-message').innerHTML = TARA_API.query().message;
     document.querySelector('#tx-invalid-close').onclick=()=>{
         let m3 = document.querySelector(TARA_API.query().popup);
         m3.innerHTML="";

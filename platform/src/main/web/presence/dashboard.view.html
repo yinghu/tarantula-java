@@ -593,11 +593,25 @@
     };
     document.querySelectorAll('.tx-game-play').forEach((a)=>{
         a.onclick=()=>{
-            //TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
-            console.log(a.getAttribute('game-match-making'));
-            TARA_API.query().popup = '#tx-popup';
-            let gameView = a.getAttribute('game-view-id');
-            tx_view({viewId:gameView,containerId:'#tx-popup'});    
+            let _mmk = a.getAttribute('game-match-making');
+            let payload ={serviceTag:_mmk,command:'onPlay'}; 
+            TARA_API.onService(false,payload,(resp)=>{
+                if(resp.successful){
+                    let conn = resp.connection;
+                    conn.protocol = conn.secured?'wss':'ws';
+                    conn.path= a.getAttribute('game-path');
+                    conn.ticket = resp.ticket;
+                    TARA_API.query().connection = conn;
+                    TARA_API.query().popup = '#tx-popup';
+                    let gameView = a.getAttribute('game-view-id');
+                    tx_view({viewId:gameView,containerId:'#tx-popup'});
+                }
+                else{//goes to error page
+                    TARA_API.query().popup = '#tx-popup';
+                    TARA_API.query().message = resp.message;
+                    tx_view({viewId:'error',containerId:'#tx-popup'});
+                }
+            });    
         }
     });
     _tx_account();
@@ -751,6 +765,7 @@
             document.querySelector('#live-game-list-name').innerHTML=resp.name;
             lp.setAttribute('game-view-id','play.game.'+resp.name.toLowerCase());
             lp.setAttribute('game-match-making',resp.name+'/mmk');
+            lp.setAttribute('game-path',resp.name.toLowerCase());
             lp.style.display ='block';
             let lbn = resp.name+'-lobby';
             resp.lobbyList.forEach((a,i)=>{
