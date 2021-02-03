@@ -22,13 +22,14 @@ if(fs.existsSync('/etc/tarantula/ip.txt')){
 }
 conn.secured = wcc.protocol === 'https';
 conn.server.secured = conn.secured; 
+conn.path = 'tictactoe';
+conn.server.path = conn.path;
 conn.maxConnections = cfg.tarantula.maxConnections;
 console.log("configuring connection with ["+conn.host+":"+conn.port+"]["+conn.secured+"]");
 const http = require(wcc.protocol);
 const querystring = require('querystring');
 const {v1: uuidv1} = require('uuid');
 const cMap = new Map(); //web socket client mapping clientId => connection
-const pMap = new Map(); //server push event mapping label ==> updated payload
 var web;
 var serverId = uuidv1();
 if(wcc.protocol==='https'){
@@ -66,39 +67,15 @@ wsServer.on('request', function(request) {
     }
     validateOnTarantula(request.resource,(auth)=>{
         if(auth.successful){
+            console.log(auth);
             var connection = request.accept('tarantula-service', request.origin);
-            connection.precence = auth.presence;
             connection.clientId = uuidv1();
             cMap.set(connection.clientId,connection);
             connection.sendUTF(JSON.stringify({message:'accepted connection',clientId:connection.clientId}));
             connection.on('message', function(message) {
                 if (message.type === 'utf8') {
-                    var _pr = fromString(message.utf8Data);
-                    if(_pr.path){
-                        actionOnTarantula(connection,_pr);
-                    }
-                    else{//register server push event such as notification
-                        if(!pMap.has(_pr.label)){//register gameId as server push event
-                           pMap.set(_pr.label,{listeners:[]});
-                        }
-                        let pse = pMap.get(_pr.label);
-                        if(_pr.streaming){
-                            //register callback if streaming required otherwise send back per request
-                            if(_pr.action === 'onStart'){
-                                connection.gameId = _pr.label;
-                                //console.log('register on ['+_pr.label+'] from ['+connection.clientId+']');
-                                pse.listeners.push(connection.clientId);
-                                //connection.sendUTF(pse.payload);
-                            }
-                            else if(_pr.action ==='onStop'){
-                                let ix = pse.listeners.indexOf(connection.clientId);
-                                if(ix>=0){
-                                    //console.log('unregister on ['+_pr.label+'] from ['+connection.clientId+'/'+ix+']');
-                                    pse.listeners.splice(ix,1);
-                                }
-                            }
-                        }
-                    }
+                    console.log(message.utf8Data);
+                    connection.sendUTF('echo'+message.utf8Data);
                 }
                 else if (message.type === 'binary') {
                      //disconnect on binary payload
@@ -109,24 +86,14 @@ wsServer.on('request', function(request) {
                 
             });**/
             connection.on('error',function(err){
-                //console.log('Error on web socket connection');
+                console.log('Error on web socket connection->'+err);
                 cMap.delete(connection.clientId);
-                let pse = pMap.get(connection.gameId);
-                let ix = pse.listeners.indexOf(connection.clientId);
-                if(ix>=0){
-                    //console.log('unregister on ['+connection.gameId+'] from ['+connection.clientId+'/'+ix+']');
-                    pse.listeners.splice(ix,1);
-                }
+                
             });
             connection.on('close', function(reasonCode, description) {
                 cMap.delete(connection.clientId);
-                let pse = pMap.get(connection.gameId);
-                let ix = pse.listeners.indexOf(connection.clientId);
-                if(ix>=0){
-                    //console.log('unregister on ['+connection.gameId+'] from ['+connection.clientId+'/'+ix+']');
-                    pse.listeners.splice(ix,1);
-                }
-                //console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.gameId);
+                
+                console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.gameId);
             });
         }
         else{
@@ -195,8 +162,8 @@ function ackOnTarantula(){
             }
         });
         res.on('end', () => {
-            var ret = resp.join('');
-            console.log(ret);
+            //var ret = resp.join('');
+            //console.log(ret);
         });    
     });
     req.on('error', (e) => {
@@ -225,11 +192,7 @@ function stopOnTarantula(callback){
     });
     req.end();
 }
-function actionOnTarantula(conn,_payload){
-    _payload.token = conn.precence.token;
-    _payload.clientId = conn.clientId;
-    conn.streaming = _payload.streaming;
-}
+
 function validateOnTarantula(url,callback){
     var _payload = querystring.parse(url.substring(url.indexOf('?')+1));
     _payload.stub = _payload.stub/1;

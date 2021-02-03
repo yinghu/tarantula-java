@@ -617,11 +617,17 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     ex.printStackTrace();
                 }
             }
+            else if(occ.type().equals(Connection.WEB_SOCKET)){
+                try{
+                    WebSocketSessionService wss = new WebSocketSessionService(occ.server());
+                    wss.start();
+                    serverPushEvent.eventService(wss);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }
             else if(occ.type().equals(Connection.WEB_HOOK)){
                 serverPushEvent.eventService(new WebhookSessionService());
-            }
-            else if(occ.type().equals(Connection.WEB_SOCKET)){
-                serverPushEvent.eventService(new WebSocketSessionService());
             }
             else{
                 serverPushEvent.eventService(this.integrationEventService);

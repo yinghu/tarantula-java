@@ -5,34 +5,18 @@ var TARA_API = (function(){
   let presence = {};    
   let qdata ={};
   let lobbyList =[];
-  //let wsWorker ;
     
   let _parse = function(data){
     data.lobbyList.forEach(function(v){
         lobbyList.push(v);
     });
   };            
-  let _toWebSocketUrl = function(){       
+  let _toWebSocketUrl = function(connection){       
       //use server connection config for web socket
-      console.log(qdata.connection);
-      return qdata.connection.protocol+'://'+qdata.connection.host+':'+qdata.connection.port+'/'+qdata.connection.path+'?accessKey='+qdata.ticket+'&stub='+qdata.stub+'&systemId='+qdata.login;
+      console.log(connection);
+      return connection.protocol+'://'+connection.host+':'+connection.port+'/'+connection.path+'?connectionId='+connection.connectionId+'&accessKey='+connection.ticket+'&stub='+qdata.stub+'&systemId='+qdata.login;
   };
-  let _onmessage = function(e){
-      //dispatch data to callback registered by label
-      if(e.data.label&&cMap.has(e.data.label)){
-        var cb = cMap.get(e.data.label);
-        cb.call(null,e.data.payload);
-      }
-  };
-  let _addMessageListener = function (label,callback){
-      if(cMap.has(label)){
-        cMap.delete(label);
-      }
-      cMap.set(label,callback);
-  };  
-  let _sendMessage = function(msg){
-      //wsWorker.postMessage({cmd:'send',data:msg});
-  };
+ 
 
   let _lobbyList = function(){
       return lobbyList;
@@ -231,9 +215,6 @@ var TARA_API = (function(){
                 qdata.token = presence.token;
                 qdata.stub = presence.stub;
                 qdata.login = presence.login;
-                //wsWorker = new Worker('/resource/tarantula.web.socket.source.js');//move to login
-                //wsWorker.onmessage = _onmessage;
-                //wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});
                 _parse(p);
                 callback({successful:true});
             }else{
@@ -279,9 +260,6 @@ var TARA_API = (function(){
                 qdata.token = presence.token;
                 qdata.stub = presence.stub;
                 qdata.login = presence.login;
-                //wsWorker = new Worker('/resource/tarantula.web.socket.source.js');//move to login
-                //wsWorker.onmessage = _onmessage;
-                //wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});
                 _parse(p);
                 callback({successful:true});
             }else{
@@ -298,13 +276,7 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-payload-size',_ps.length);  
     aj.send(_ps);                
   };
-  let _connect = function(){
-    let payload = {serviceTag:'presence/lobby',command:'onTicket'};
-    _service(payload,function(resp){
-        qdata.ticket = resp.presence.ticket;
-        //wsWorker.postMessage({cmd:'start',url:_toWebSocketUrl(),protocol:'tarantula-service'});
-    });
-  };
+ 
 
   let _service = function(post,payload,callback){
     let _jp = JSON.stringify(payload);
@@ -355,7 +327,6 @@ var TARA_API = (function(){
         qdata ={};
         lobbyList.pop();
         vmap.clear();
-        //wsWorker.postMessage({cmd:'close'});
         callback(resp);
     });              
   };
@@ -378,9 +349,7 @@ var TARA_API = (function(){
       onLogout : _logout,
       onService : _service,
       onInstance : _instance,
-      onMessage: _addMessageListener,
-      send: _sendMessage,
-      connect :_connect,
+      toUrl :_toWebSocketUrl,
   };
     
 })();
