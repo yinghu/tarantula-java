@@ -6,14 +6,11 @@ const fs = require('fs');
 var  cfg;
 if (fs.existsSync('/etc/tarantula/ws.config')) {
     cfg = JSON.parse(fs.readFileSync('/etc/tarantula/ws.config','utf-8'));
-    console.log("using external configuration");
 }
 else{
     cfg = JSON.parse(fs.readFileSync('ws.config','utf-8'));
-    console.log("using default configuration");
 }
-var cfgname = cfg.tarantula.name;
-var wcc = cfg[cfgname];
+var wcc = cfg[cfg.tarantula.name];
 var conn = cfg.connection;
 if(fs.existsSync('/etc/tarantula/ip.txt')){
     conn.host = fs.readFileSync('/etc/tarantula/ip.txt','utf-8');//replace ip from ip.txt
@@ -25,7 +22,6 @@ conn.server.secured = conn.secured;
 conn.path = 'tictactoe';
 conn.server.path = conn.path;
 conn.maxConnections = cfg.tarantula.maxConnections;
-console.log("configuring connection with ["+conn.host+":"+conn.port+"]["+conn.secured+"]");
 const http = require(wcc.protocol);
 const querystring = require('querystring');
 const {v1: uuidv1} = require('uuid');
@@ -56,7 +52,6 @@ var wsServer = new WebSocketServer({
     autoAcceptConnections: false
 });
 function validateOrigin(origin) {
-    console.log("Origin->"+origin);
     return true;
 }
 
@@ -87,12 +82,10 @@ wsServer.on('request', function(request) {
             });**/
             connection.on('error',function(err){
                 console.log('Error on web socket connection->'+err);
-                cMap.delete(connection.clientId);
-                
+                cMap.delete(connection.clientId);       
             });
             connection.on('close', function(reasonCode, description) {
                 cMap.delete(connection.clientId);
-                
                 console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.gameId);
             });
         }
@@ -104,10 +97,24 @@ wsServer.on('request', function(request) {
 });
 
 exports.start=()=>{
-    startOnTarantula(()=>{
-        web.listen(conn.port,()=>{
-            console.log("Web socket is started on ["+conn.port+"] on TSL (HTTPS)["+(wcc.protocol==='https')+"]");
-        });
+    startOnTarantula((resp)=>{
+        if(resp.successful){
+            cfg.serverKey = resp.serverKey;
+            resp.connections.forEach(c => {//create rooms
+                console.log(c);
+            });
+            web.listen(conn.port,()=>{
+                console.log("Web socket is started on ["+conn.port+"] on TSL (HTTPS)["+(wcc.protocol==='https')+"]");
+            });
+            setInterval(ackOnTarantula,cfg.tarantula.ackTimeout);
+            connectOnTarantula(f=>{
+                console.log(f.connectionId);
+            });
+        }
+        else{
+            console.log("validation failed");
+            process.exit(1);
+        }
     })
 };
 
@@ -123,94 +130,54 @@ exports.stop=()=>{
 function startOnTarantula(callback){
     conn.serverId = serverId;
     var data = JSON.stringify(conn);
-    const headers = {Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Content-length':data.length,'Tarantula-access-key':wcc.accessKey,'Tarantula-server-id':serverId,'Tarantula-action':'onStart'};
-    const optsx ={rejectUnauthorized: false,secureProtocol: "TLSv1_2_method",hostname:wcc.host,port:wcc.port,path:'/'+wcc.path,method:'POST',headers:headers};
-    const req = http.request(optsx,(res)=>{
-        var resp=[];
-        res.on('data', (data) => {
-            for(var i = 0; i < data.length; ++i){
-                resp.push(String.fromCharCode(data[i]));
-            }
-        });
-        res.on('end', () => {
-            var ret = resp.join('');
-            console.log(ret);
-            var po = JSON.parse(ret);
-            if(!po.successful){
-                console.log("Illegal access server");
-                process.exit(1);
-            }
-            cfg.serverKey = po.serverKey;
-            callback();
-            setInterval(ackOnTarantula,cfg.tarantula.ackTimeout);
-        });    
-    });
-    req.on('error', (e) => {
-        console.log("Error->"+e.message);
-    });
-    req.write(data);
-    req.end();
+    const headers = {'Tarantula-access-key':wcc.accessKey,'Tarantula-server-id':serverId,'Tarantula-action':'onStart'};
+    postOnTarantula(wcc.path,headers,data,callback);
+}
+function connectOnTarantula(callback){
+    const headers = {'Tarantula-connection-id':(cfg.tarantula.maxConnections+1),'Tarantula-access-key':wcc.accessKey,'Tarantula-server-id':serverId,'Tarantula-action':'onConnection'};
+    getOnTarantula(wcc.path,headers,callback);
 }
 function ackOnTarantula(){
-    const headers = {Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Tarantula-access-key':wcc.accessKey,'Tarantula-server-id':serverId,'Tarantula-action':'onAck'};
-    const optsx ={rejectUnauthorized: false,secureProtocol: "TLSv1_2_method",hostname:wcc.host,port:wcc.port,path:'/'+wcc.path,method:'GET',headers:headers};
-    const req = http.request(optsx,(res)=>{
-        var resp=[];
-        res.on('data', (data) => {
-            for(var i = 0; i < data.length; ++i){
-                resp.push(String.fromCharCode(data[i]));
-            }
-        });
-        res.on('end', () => {
-            //var ret = resp.join('');
-            //console.log(ret);
-        });    
-    });
-    req.on('error', (e) => {
-        console.log("Error->"+e.message);
-    });
-    req.end();
+    const headers = {'Tarantula-access-key':wcc.accessKey,'Tarantula-server-id':serverId,'Tarantula-action':'onAck'};
+    getOnTarantula(wcc.path,headers,()=>{});
 }
+
 function stopOnTarantula(callback){
-    const headers = {Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Tarantula-access-key':wcc.accessKey,'Tarantula-server-id':serverId,'Tarantula-action':'onStop'};
-    const optsx ={rejectUnauthorized: false,secureProtocol: "TLSv1_2_method",hostname:wcc.host,port:wcc.port,path:'/'+wcc.path,method:'GET',headers:headers};
-    const req = http.request(optsx,(res)=>{
-        var resp=[];
-        res.on('data', (data) => {
-            for(var i = 0; i < data.length; ++i){
-                resp.push(String.fromCharCode(data[i]));
-            }
-        });
-        res.on('end', () => {
-            var ret = resp.join('');
-            console.log(ret);
-            callback();
-        });    
-    });
-    req.on('error', (e) => {
-        console.log("Error->"+e.message);
-    });
-    req.end();
+    const headers = {'Tarantula-access-key':wcc.accessKey,'Tarantula-server-id':serverId,'Tarantula-action':'onStop'};
+    getOnTarantula(wcc.path,headers,callback);
 }
 
 function validateOnTarantula(url,callback){
     var _payload = querystring.parse(url.substring(url.indexOf('?')+1));
     _payload.stub = _payload.stub/1;
     const data = JSON.stringify(_payload);
-    const headers = {Accept:'application/json','Content-type':'application/x-www-form-urlencoded','Content-length':data.length,'Tarantula-magic-key':_payload.systemId,'Tarantula-tag':'index/user','Tarantula-action':'onTicket'};
-    const optsx ={rejectUnauthorized: false,secureProtocol: "TLSv1_2_method",
+    const headers = {'Tarantula-magic-key':_payload.systemId,'Tarantula-tag':'index/user','Tarantula-action':'onTicket'};
+    postOnTarantula('/user/action',headers,data,(resp)=>{
+        resp.connectionId = _payload.connectionId;
+        callback(resp);
+    });
+}
+
+function postOnTarantula(path,headers,data,callback){
+    headers.Accept = 'application/json';
+    headers['Content-type'] = 'application/x-www-form-urlencoded';
+    headers['Content-length'] = data.length;
+    const optsx ={
+        rejectUnauthorized: false,
+        secureProtocol: "TLSv1_2_method",
         hostname:wcc.host,port:wcc.port,
-        path:'/user/action',method:'POST',
-        headers:headers};
+        path:path,method:'POST',
+        headers:headers
+    };
     const req = http.request(optsx,(res)=>{
-        var resp=[];
+        let resp=[];
         res.on('data', (data) => {
             for(var i = 0; i < data.length; ++i){
                 resp.push(String.fromCharCode(data[i]));
             }
         });
         res.on('end', () => {
-            callback(fromString(resp.join('')));
+            callback(JSON.parse(resp.join('')));
         });
     });
     req.on('error', (e) => {
@@ -219,7 +186,31 @@ function validateOnTarantula(url,callback){
     req.write(data);
     req.end();
 }
-function fromString(jstr){
-    return JSON.parse(jstr);
+
+function getOnTarantula(path,headers,callback){
+    headers.Accept = 'application/json';
+    headers['Content-type'] = 'application/x-www-form-urlencoded';
+    const optsx ={
+        rejectUnauthorized: false,
+        secureProtocol: "TLSv1_2_method",
+        hostname:wcc.host,port:wcc.port,
+        path:path,method:'GET',
+        headers:headers
+    };
+    const req = http.request(optsx,(res)=>{
+        let resp=[];
+        res.on('data', (data) => {
+            for(var i = 0; i < data.length; ++i){
+                resp.push(String.fromCharCode(data[i]));
+            }
+        });
+        res.on('end', () => {
+            callback(JSON.parse(resp.join('')));
+        });
+    });
+    req.on('error', (e) => {
+        console.log(e.message);
+    });
+    req.end();
 }
 

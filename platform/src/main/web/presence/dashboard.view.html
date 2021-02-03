@@ -594,6 +594,7 @@
     document.querySelectorAll('.tx-game-play').forEach((a)=>{
         a.onclick=()=>{
             //TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
+            console.log(a.getAttribute('game-match-making'));
             TARA_API.query().popup = '#tx-popup';
             let gameView = a.getAttribute('game-view-id');
             tx_view({viewId:gameView,containerId:'#tx-popup'});    
@@ -749,6 +750,7 @@
             }
             document.querySelector('#live-game-list-name').innerHTML=resp.name;
             lp.setAttribute('game-view-id','play.game.'+resp.name.toLowerCase());
+            lp.setAttribute('game-match-making',resp.name+'/mmk');
             lp.style.display ='block';
             let lbn = resp.name+'-lobby';
             resp.lobbyList.forEach((a,i)=>{
