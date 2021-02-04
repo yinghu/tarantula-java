@@ -30,6 +30,7 @@
     app.stage.addChild(send);
     
     TARA_API.connect((data)=>{
+        console.log(data);
         messageBox.text = data.payload.message;        
     });
 

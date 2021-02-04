@@ -25,7 +25,7 @@ conn.maxConnections = cfg.tarantula.maxConnections;
 const http = require(wcc.protocol);
 const querystring = require('querystring');
 const {v1: uuidv1} = require('uuid');
-const cMap = new Map(); //web socket client mapping clientId => connection
+const cMap = new Map(); //connectionId/game room mapping 
 var web;
 var serverId = uuidv1();
 if(wcc.protocol==='https'){
@@ -61,32 +61,29 @@ wsServer.on('request', function(request) {
       return;
     }
     validateOnTarantula(request.resource,(auth)=>{
-        if(auth.successful){
+        if(auth.successful&&cMap.has(auth.connectionId)){
             console.log(auth);
             var connection = request.accept('tarantula-service', request.origin);
-            connection.clientId = uuidv1();
-            cMap.set(connection.clientId,connection);
-            connection.sendUTF(JSON.stringify({message:'accepted connection',clientId:connection.clientId}));
+            connection.connectionId = auth.connectionId;
+            connection.player = auth.player;
+            let room = cMap.get(auth.connectionId);
+            room.join(connection);
             connection.on('message', function(message) {
                 if (message.type === 'utf8') {
-                    console.log(message.utf8Data);
-                    connection.sendUTF('echo'+message.utf8Data);
+                    let room = cMap.get(connection.connectionId);
+                    room.onMessage(connection,message.utf8Data);
                 }
                 else if (message.type === 'binary') {
                      //disconnect on binary payload
                 }
             });
-            /**
-            connection.on('frame',(fm)=>{
-                
-            });**/
             connection.on('error',function(err){
-                console.log('Error on web socket connection->'+err);
-                cMap.delete(connection.clientId);       
+                console.log('Error on web socket connection->'+err);       
             });
             connection.on('close', function(reasonCode, description) {
-                cMap.delete(connection.clientId);
-                console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.gameId);
+                let room = cMap.get(connection.connectionId);
+                room.leave(connection);
+                console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.connectionId);
             });
         }
         else{
@@ -100,15 +97,15 @@ exports.start=()=>{
     startOnTarantula((resp)=>{
         if(resp.successful){
             cfg.serverKey = resp.serverKey;
-            resp.connections.forEach(c => {//create rooms
-                console.log(c);
+            resp.connections.forEach(c => {
+                createRoom(c);
             });
             web.listen(conn.port,()=>{
                 console.log("Web socket is started on ["+conn.port+"] on TSL (HTTPS)["+(wcc.protocol==='https')+"]");
             });
             setInterval(ackOnTarantula,cfg.tarantula.ackTimeout);
             connectOnTarantula(f=>{
-                console.log(f.connectionId);
+                createRoom(f.connectionId);
             });
         }
         else{
@@ -126,7 +123,28 @@ exports.stop=()=>{
         process.exit(1);
     });
 };
-
+function createRoom(connectionId){
+    let room ={totalJoined:0,connections:[]};
+    room.join = (connection)=>{
+                let len = room.connections.push(connection);
+                connection.index = len-1;
+                connection.open = true;
+                room.totalJoined++;
+                connection.sendUTF(JSON.stringify({message:'accepted connection'}));
+            };
+    room.leave = (connection)=>{
+                room.connections[connection.index].open=true;
+                room.totalJoined--;
+            };
+    room.onMessage = (connection,message)=>{
+                room.connections.forEach(c=>{
+                    if(c.open){
+                        c.sendUTF('echo'+message);
+                    }
+                });
+            };           
+    cMap.set(connectionId,room);
+}
 function startOnTarantula(callback){
     conn.serverId = serverId;
     var data = JSON.stringify(conn);
@@ -153,7 +171,8 @@ function validateOnTarantula(url,callback){
     const data = JSON.stringify(_payload);
     const headers = {'Tarantula-magic-key':_payload.systemId,'Tarantula-tag':'index/user','Tarantula-action':'onTicket'};
     postOnTarantula('/user/action',headers,data,(resp)=>{
-        resp.connectionId = _payload.connectionId;
+        resp.connectionId = _payload.connectionId/1;
+        resp.player = _payload.systemId;
         callback(resp);
     });
 }
