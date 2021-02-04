@@ -22,7 +22,7 @@ self.onmessage = function(e){
 function _connect(){
     let _ws = new WebSocket(ci.url,ci.protocol);
     _ws.onopen=function(){
-        self.postMessage({label:'ws',action:'open',payload:{code:200,message:'web socket ready'}});
+        self.postMessage({label:'ws-open',payload:{code:200,message:'web socket ready'}});
     };
     _ws.onmessage=function(e){
         //format [label]{json string}
@@ -32,10 +32,10 @@ function _connect(){
         self.postMessage({label:lbl,payload:jsm});
     };
     _ws.onerror=function(e){
-        self.postMessage({label:'ws',action:'error',payload:{code:300,message:'web socket error'}});
+        self.postMessage({label:'ws-error',payload:{code:300,message:'web socket error'}});
     };
     _ws.onclose=function(e){
-        self.postMessage({label:'ws',action:'close',payload:{code:300,message:'web socket closed'}});
+        self.postMessage({label:'ws-close',payload:{code:300,message:'web socket closed'}});
     };
     return _ws;
 }

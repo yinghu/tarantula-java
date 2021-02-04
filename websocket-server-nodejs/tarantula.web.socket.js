@@ -130,16 +130,23 @@ function createRoom(connectionId){
                 connection.index = len-1;
                 connection.open = true;
                 room.totalJoined++;
-                connection.sendUTF(JSON.stringify({message:'accepted connection'}));
+                connection.sendUTF('join'+JSON.stringify({message:'joined',seat:connection.index,player:connection.player}));
             };
     room.leave = (connection)=>{
-                room.connections[connection.index].open=true;
+                room.connections[connection.index].open=false;
                 room.totalJoined--;
+                room.connections.forEach(c=>{
+                    if(c.open){
+                        c.sendUTF('left'+JSON.stringify({message:'left',seat:connection.index}));
+                    }
+                });
             };
     room.onMessage = (connection,message)=>{
                 room.connections.forEach(c=>{
                     if(c.open){
-                        c.sendUTF('echo'+message);
+                        let jms = JSON.parse(message);
+                        jms.sender = connection.index;
+                        c.sendUTF('echo'+JSON.stringify(jms));
                     }
                 });
             };           

@@ -28,9 +28,25 @@
     send.x = (window.innerWidth-64)/2;
     send.y = (window.innerHeight-64)/2;
     app.stage.addChild(send);
+
+    let i;
+    let seats =[];
+    for(i=0;i<4;i++){
+        let seat = text_seat('seat-'+i);
+        seat.container.x = 10;
+        seat.container.y = 100+i*70;
+        app.stage.addChild(seat.container);    
+        seats.push(seat);
+    }
     
     TARA_API.connect((data)=>{
         console.log(data);
+        if(data.label==='join'){
+            seats[data.payload.seat].caption.text= data.payload.player;    
+        }
+        else if(data.label==='left'){
+            seats[data.payload.seat].caption.text='left';
+        }
         messageBox.text = data.payload.message;        
     });
 
@@ -50,5 +66,19 @@
         container.addChild(rect);
         container.addChild(txt);
         return container;
+    }
+    function text_seat(cap){
+        let container = new PIXI.Container();
+        let rect = new PIXI.Graphics();
+        rect.lineStyle(4, 0xFF3300, 1);
+        rect.beginFill(0x66CCFF);
+        rect.drawRect(0, 0, 64, 64);
+        rect.endFill();
+        let txt = new PIXI.Text(cap,{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
+        txt.x = (64-txt.width)/2;
+        txt.y = (64-txt.height)/2;
+        container.addChild(rect);
+        container.addChild(txt);
+        return {container:container,caption:txt};
     }
 </script>
