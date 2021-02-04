@@ -602,9 +602,9 @@
                     conn.path= a.getAttribute('game-path');
                     conn.ticket = resp.ticket;
                     TARA_API.query().connection = conn;
-                    TARA_API.query().popup = '#tx-popup';
+                    TARA_API.query().popup = '#tx-popup-game';
                     let gameView = a.getAttribute('game-view-id');
-                    tx_view({viewId:gameView,containerId:'#tx-popup'});
+                    tx_view({viewId:gameView,containerId:'#tx-popup-game'});
                 }
                 else{//goes to error page
                     TARA_API.query().popup = '#tx-popup';

@@ -1,9 +1,9 @@
 //PIXI JS WRAPPER
 var TGL = (function(){
     var _tpx_app;
-    var _tpx_start = function(boardWidth,boardHeight,cview){
+    var _tpx_start = function(cview){
         PIXI.utils.skipHello();
-        let rps ={width:boardWidth,height:boardHeight,view: cview,antialiasing: true,backgroundColor : 0x006600};
+        let rps ={resizeTo: window,view: cview,antialiasing: true,backgroundColor : 0x006600};
         _tpx_app = new PIXI.Application(rps);
         return _tpx_app;
     };

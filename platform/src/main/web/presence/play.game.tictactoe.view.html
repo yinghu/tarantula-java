@@ -1,4 +1,4 @@
-<div class="w3-modal-content">
+<div class="tx-modal-content">
     <div class="w3-display-container w3-green w3-border-bottom w3-border-red tx-content-48">
         <div class="w3-display-topright w3-padding">
             <span id="tx-tictactoe-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
@@ -9,20 +9,11 @@
         </div>
     </div>
     <canvas id='tx-game-tictactoe'></canvas>
-    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
-        <div class="w3-display-topleft w3-padding">
-            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
-        </div>
-        <div class="w3-display-bottomright w3-padding">
-            <span class="tx-text-12">Powered By ICodeSoftware</span>
-        </div>
-    </div>
 </div>
 <script>
     let _oswaldFamily = 'Oswald, Arial';
     let _felipaFamily = 'Felipa, Arial';
-    let _view = document.querySelector('#tx-game-tictactoe');
-    let app = TGL.start(600,500,_view);
+    let app = TGL.start(document.querySelector('#tx-game-tictactoe'));
     let message = new PIXI.Text("Hello Pixi!",{fontFamily:_oswaldFamily,fontSize:40,fill:'yellow'});
     app.stage.addChild(message);
     let rectangle = new PIXI.Graphics();
@@ -30,11 +21,12 @@
     rectangle.beginFill(0x66CCFF);
     rectangle.drawRect(0, 0, 64, 64);
     rectangle.endFill();
-    rectangle.x = 170;
-    rectangle.y = 170;
+    rectangle.x = window.innerWidth-70;
+    rectangle.y = 70;
     app.stage.addChild(rectangle);
     TARA_API.connect((message)=>{
-        console.log(message);        
+        console.log(message);
+
     });
     setInterval(() => {
         TARA_API.send({message:'hello'});

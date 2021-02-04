@@ -29,8 +29,6 @@ function _connect(){
         var ix = e.data.indexOf('{');
         var lbl = e.data.substring(0,ix);
         var jsm = JSON.parse(e.data.substring(ix));
-        //console.log(lbl);
-        //console.log(jsm);
         self.postMessage({label:lbl,payload:jsm});
     };
     _ws.onerror=function(e){
