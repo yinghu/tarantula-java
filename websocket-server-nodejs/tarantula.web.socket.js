@@ -97,6 +97,7 @@ exports.start=()=>{
     startOnTarantula((resp)=>{
         if(resp.successful){
             cfg.serverKey = resp.serverKey;
+            createServerPushRoom(0);
             resp.connections.forEach(c => {
                 createRoom(c);
             });
@@ -123,6 +124,19 @@ exports.stop=()=>{
         process.exit(1);
     });
 };
+function createServerPushRoom(connectionId){
+    let room ={totalJoined:0,connections:[]};
+    room.join = (connection)=>{
+                console.log("server push enter->"+connection.connectionId);
+            };
+    room.leave = (connection)=>{
+                console.log("server push leave->"+connection.connectionId);
+            };
+    room.onMessage = (connection,message)=>{
+                console.log("server push message->"+message+" from "+connection.connectionId);
+            };           
+    cMap.set(connectionId,room);
+}
 function createRoom(connectionId){
     let room ={totalJoined:0,connections:[]};
     room.join = (connection)=>{
@@ -146,7 +160,7 @@ function createRoom(connectionId){
                     if(c.open){
                         let jms = JSON.parse(message);
                         jms.sender = connection.index;
-                        c.sendUTF('echo'+JSON.stringify(jms));
+                        c.sendUTF(jms.label+JSON.stringify(jms));
                     }
                 });
             };           

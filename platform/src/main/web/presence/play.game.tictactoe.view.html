@@ -22,7 +22,7 @@
     let messageQueue = ['A','B','C','D','E','F'];
     let send = text_button('SEND',()=>{
         let m = messageQueue.shift();
-        TARA_API.send({message:'Rotating->'+m});
+        TARA_API.send({label:'echo',message:'Rotating->'+m});
         messageQueue.push(m);
     });
     send.x = (window.innerWidth-64)/2;

@@ -1,17 +1,13 @@
 package com.tarantula.cci.websocket;
 
-import com.icodesoftware.Connection;
-import com.icodesoftware.Event;
-import com.icodesoftware.EventListener;
-import com.icodesoftware.RoutingKey;
+import com.icodesoftware.*;
+import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.service.ConnectionEventService;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
-import java.nio.ByteBuffer;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 
 /**
  * Created by yinghu lu on 9/25/2020.
@@ -20,10 +16,13 @@ public class WebSocketSessionService implements ConnectionEventService,WebSocket
 
     private Connection serverConnection;
     private WebSocket webSocket;
-    private StringBuffer buffer;
-    CompletableFuture<?> accumulatedMessage = new CompletableFuture<>();
-    public WebSocketSessionService(Connection serverConnection){
+    private TokenValidatorProvider tokenValidatorProvider;
+    private Presence presence;
+    private String serverLogin;
+    public WebSocketSessionService(Connection serverConnection,TokenValidatorProvider tokenValidatorProvider,String serverLogin){
         this.serverConnection = serverConnection;
+        this.tokenValidatorProvider = tokenValidatorProvider;
+        this.serverLogin = serverLogin;
     }
 
     @Override
@@ -31,17 +30,24 @@ public class WebSocketSessionService implements ConnectionEventService,WebSocket
 
     }
     public void publish(byte[] payload,String label, Connection connection){
-        System.out.println("outbound->"+label);
-        //(webSocket==null){
-            //try {
-                //String protocol = serverConnection.secured() ? "wss://" : "ws://";
-                //URI uri = new URI(protocol + serverConnection.host() + ":" + serverConnection.port()+"/"+serverConnection.path()+"?a=b");
-                //webSocket = HttpClient.newHttpClient().newWebSocketBuilder().header("origin",serverConnection.host()).subprotocols("tarantula-service").buildAsync(uri, this).join();
-            //}catch (Exception ex){
-                //ex.printStackTrace();
-           // }
-        //}
-        //webSocket.sendText(label,true);
+        System.out.println("outbound->"+label+">>"+serverConnection.connectionId());
+        if(webSocket==null){
+            try {
+                String ticket = tokenValidatorProvider.tokenValidator().ticket(serverLogin,presence.count(0));
+                String protocol = serverConnection.secured() ? "wss://" : "ws://";
+                StringBuffer query = new StringBuffer();
+                query.append("connectionId="+serverConnection.connectionId());
+                query.append("&accessKey="+ticket);
+                query.append("&stub="+presence.count(0));
+                query.append("&systemId=root");
+                URI uri = new URI(protocol + serverConnection.host() + ":" + serverConnection.port()+"/"+serverConnection.path()+"?"+ URLEncoder.encode(query.toString(),"UTF-8"));
+                //System.out.println(uri.toURL().getQuery());
+                webSocket = HttpClient.newHttpClient().newWebSocketBuilder().header("origin",serverConnection.host()).subprotocols("tarantula-service").buildAsync(uri, this).join();
+            }catch (Exception ex){
+                ex.printStackTrace();
+           }
+        }
+        webSocket.sendText(label,true);
     }
     @Override
     public String subscription() {
@@ -80,59 +86,10 @@ public class WebSocketSessionService implements ConnectionEventService,WebSocket
 
     @Override
     public void start() throws Exception {
-        //String protocol = serverConnection.secured()?"wss://":"ws://";
-        //URI uri = new URI(protocol+serverConnection.host()+":"+serverConnection.port());
-        //webSocket = HttpClient.newHttpClient().newWebSocketBuilder().buildAsync(uri,this).join();
-        buffer = new StringBuffer();
+        presence = this.tokenValidatorProvider.presence(serverLogin);
     }
-
     @Override
     public void shutdown() throws Exception {
 
-    }
-    @Override
-    public void onOpen(WebSocket webSocket) {
-        System.out.println("web socket-> open");
-    }
-
-    @Override
-    public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
-        // How do I return the CompletionStage object
-        webSocket.request(1);
-        buffer.append(data);
-        if(last){
-            System.out.println(buffer.toString());
-            buffer.setLength(0);
-            accumulatedMessage.complete(null);
-            CompletionStage<?> cf = accumulatedMessage;
-            accumulatedMessage = new CompletableFuture<>();
-            return cf;
-        }
-        return accumulatedMessage;
-    }
-    @Override
-    public CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer data, boolean last) {
-        // How do I return the CompletionStage object
-        webSocket.request(1);
-        System.out.println("received");
-        //buffer.append(data);
-        if(last){
-            System.out.println(buffer.toString());
-            buffer.setLength(0);
-            accumulatedMessage.complete(null);
-            CompletionStage<?> cf = accumulatedMessage;
-            accumulatedMessage = new CompletableFuture<>();
-            return cf;
-        }
-        return accumulatedMessage;
-    }
-    @Override
-    public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason){
-        System.out.println("web socket error->"+reason);
-        return null;
-    }
-    @Override
-    public void onError(WebSocket webSocket, Throwable error) {
-        System.out.println("web socket error->"+error.getMessage());
     }
 }

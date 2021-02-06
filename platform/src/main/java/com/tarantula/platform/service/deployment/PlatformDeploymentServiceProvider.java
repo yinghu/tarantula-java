@@ -619,7 +619,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             else if(occ.type().equals(Connection.WEB_SOCKET)){
                 try{
-                    WebSocketSessionService wss = new WebSocketSessionService(occ.server());
+                    AccessIndex _root = this.tarantulaContext.accessIndexService().get("root");
+                    WebSocketSessionService wss = new WebSocketSessionService(occ.server(),this.tarantulaContext.tokenValidatorProvider(),_root.distributionKey());
                     wss.start();
                     serverPushEvent.eventService(wss);
                 }catch (Exception ex){
