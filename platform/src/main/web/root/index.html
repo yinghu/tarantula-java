@@ -293,11 +293,60 @@
             });
         }
         function _api_script(p,callback) {
-            let exe = p.querySelector('script');
-            if(exe){
-                new Function(exe.textContent).call();
-                callback(exe);
-            }
+            let scripts = p.querySelectorAll('script');
+            let modules = [];
+            let pages = [];
+            scripts.forEach(exe=>{
+                if(exe.getAttribute('type')==='module'){
+                    modules.push(exe);        
+                }
+                else{
+                    pages.push(exe);
+                }
+            });
+            let acall = new Promise((suc,reject)=>{
+                let sz = modules.length;
+                if(sz==0){
+                    suc('ok');
+                }
+                modules.forEach(m=>{
+                    sz--;
+                    TARA_API.onResource({name:m.getAttribute('src'),type:'text/javascript'},(j)=>{
+                        let md = document.createElement('script');
+                        md.appendChild(document.createTextNode(j));   
+                        p.appendChild(md);
+                        if(sz==0){
+                            suc('ok');
+                        }
+                    });
+                });
+            });
+            acall.then(()=>{
+                pages.forEach(p=>{
+                    new Function(p.textContent).call();
+                    callback(p);
+                });
+            });
+            /**
+            scripts.forEach(exe => {
+                if(exe.getAttribute('type')==='module'){
+                    TARA_API.onResource({name:exe.getAttribute('src'),type:'text/javascript'},(j)=>{
+                        console.log(j);
+                        exe.appendChild(document.createTextNode(j));   
+                        console.log(exe);     
+                        document.head.appendChild(exe);
+                    });    
+                }
+                else{
+                    console.log("page");
+                    new Function(exe.textContent).call();
+                    callback(exe);    
+                }
+            });**/
+            //if(exe){
+                //new Function(exe.textContent).call();
+                //callback(exe);
+            //}
         }
         function tx_on_login(){
             let m3 = document.querySelector('#tx-popup');

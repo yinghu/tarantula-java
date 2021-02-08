@@ -1,7 +1,11 @@
 <div class="tx-modal-content">
     <canvas id='tx-game-tictactoe'></canvas>
 </div>
-<script>
+<script type='module' src="resource/tarantula.tictactoe.js"></script>
+<script type="text/javascript">
+    //import {TicTacToe} from './resource/tarantula.tictactoe.js';
+    let ttc = new TicTacToe('my ttc');
+    ttc.show_name();
     let _oswaldFamily = 'Oswald, Arial';
     let _felipaFamily = 'Felipa, Arial';
     let app = TGL.start(document.querySelector('#tx-game-tictactoe'));
