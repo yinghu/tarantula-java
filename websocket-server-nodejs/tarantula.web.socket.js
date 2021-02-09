@@ -138,7 +138,10 @@ function createServerPushRoom(connectionId){
             };
     room.onBinary = (connection,binary)=>{
         let msg = inboundMessage(binary);
-        console.log("server push binary->"+msg.connectionId+"/"+msg.sequence+" from "+connection.connectionId);
+        console.log("server push binary->"+JSON.stringify(msg)+" from "+connection.connectionId);
+        let sz = msg.payload.readInt32BE(0);
+        let m = Buffer.from(msg.payload.subarray(4)).toString('ascii');
+        console.log(sz+">>>>"+m);
     };            
     cMap.set(connectionId,room);
 }
@@ -261,8 +264,12 @@ function getOnTarantula(path,headers,callback){
 function inboundMessage(binary){
     let inboundMessage={};
     let buffer = Buffer.from(binary);
+    inboundMessage.ack = buffer.readUInt8(0)===1;
+    inboundMessage.type = buffer.readInt32BE(1);
+    inboundMessage.messageId = buffer.readInt32BE(5);
     inboundMessage.connectionId = buffer.readInt32BE(9);
     inboundMessage.sequence = buffer.readInt32BE(13);
+    inboundMessage.sessionId = buffer.readInt32BE(17);
     inboundMessage.payload = Buffer.from(buffer.subarray(21));
     return inboundMessage;
 }
