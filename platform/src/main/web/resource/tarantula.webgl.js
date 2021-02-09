@@ -9,6 +9,7 @@ var TGL = (function(){
     };
     var _tpx_shutdown = function(){
         _tpx_app.stage.removeChildren();
+        PIXI.Loader.shared.resources={};
         PIXI.utils.clearTextureCache();
         PIXI.utils.destroyTextureCache();
         _tpx_app.destroy(true);

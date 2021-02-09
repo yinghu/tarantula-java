@@ -74,7 +74,8 @@ wsServer.on('request', function(request) {
                     room.onMessage(connection,message.utf8Data);
                 }
                 else if (message.type === 'binary') {
-                     //disconnect on binary payload
+                    let room = cMap.get(connection.connectionId);
+                    room.onBinary(connection,message.binaryData);
                 }
             });
             connection.on('error',function(err){
@@ -134,7 +135,11 @@ function createServerPushRoom(connectionId){
             };
     room.onMessage = (connection,message)=>{
                 console.log("server push message->"+message+" from "+connection.connectionId);
-            };           
+            };
+    room.onBinary = (connection,binary)=>{
+        let msg = inboundMessage(binary);
+        console.log("server push binary->"+msg.connectionId+"/"+msg.sequence+" from "+connection.connectionId);
+    };            
     cMap.set(connectionId,room);
 }
 function createRoom(connectionId){
@@ -252,5 +257,13 @@ function getOnTarantula(path,headers,callback){
         console.log(e.message);
     });
     req.end();
+}
+function inboundMessage(binary){
+    let inboundMessage={};
+    let buffer = Buffer.from(binary);
+    inboundMessage.connectionId = buffer.readInt32BE(9);
+    inboundMessage.sequence = buffer.readInt32BE(13);
+    inboundMessage.payload = Buffer.from(buffer.subarray(21));
+    return inboundMessage;
 }
 

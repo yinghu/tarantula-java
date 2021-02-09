@@ -57,8 +57,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         pDatastore = this.context.dataStore(Presence.DataStore);
         aDatastore = this.context.dataStore(Account.DataStore);
         sDatastore = this.context.dataStore(OnSession.DataStore);
-
         DataStore mDatastore = this.context.dataStore(Subscription.DataStore);
+        accessIndexService.set("serverPush");
         AccessIndex accessIndex = accessIndexService.set(root);
         if(accessIndex!=null){
             Access user = createLogin(onAccess,accessIndex.distributionKey(),AccessControl.root.name(),false,"password",true);
