@@ -11,7 +11,8 @@
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class='w3-panel'>
-        <span class="w3-padding w3-left w3-text-red tx-text-12" id="tx-upload-view-message"></span>
+        <span class="w3-padding w3-left w3-text-red tx-text-12" id="tx-upload-view-message">
+        </span>
         <span class="w3-padding w3-right w3-text-orange tx-margin-right-16" id="tx-upload-view-spin">
             <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
         </span>
@@ -40,7 +41,7 @@
     </div>
 </div>
 <script>
-    document.querySelector("#tx-upload-view-message").innerHTML= 'Choose file to upload';
+    document.querySelector("#tx-upload-view-message").innerHTML= 'Choose file to upload (html,js,json,jar,png,jpeg)';
     document.querySelector("#tx-upload").style.display='none';
     document.querySelector("#tx-upload-view-spin").style.display='none';
     let _fd;  
@@ -58,11 +59,20 @@
     document.querySelector("#tx-upload").onclick=()=>{
         let sfx = _fd.name.split('.').pop();
         let ctype = 'text/html';
-        if(sfx == 'js'){
+        if(sfx === 'js'){
             ctype = 'text/javascript';
         }
-        else if(sfx == 'jar'){
+        else if(sfx === 'jar'){
             ctype = 'application/java-archive';
+        }
+        else if(sfx ==='json'){
+            ctype = 'application/json';
+        }
+        else if(sfx==='png'){
+            ctype = 'image/png';
+        }
+        else if(sfx==='jpg'||sfx==='jpeg'){
+            ctype = 'image/jpeg';
         }
         document.querySelector("#tx-upload-view-spin").style.display='block';
         TARA_API.onUpload(_data,_fd.name,ctype,(resp)=>{

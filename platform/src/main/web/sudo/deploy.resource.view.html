@@ -1,0 +1,52 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-deploy-resource-close"><i class="fa fa-close" style="font-size:12px"></i></span>
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">DEPLOY RESOURCE</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-deploy-resource-message"></div>
+    <div class="w3-panel w3-border-bottom w3-border-white">
+        <div class="w3-panel">
+            <label class="tx-text-12">Content URL</label>
+            <input id ="tx-resource-content-url" class="w3-input w3-round w3-border" type="text" placeholder='view content url'/>
+        </div>
+        <div class="w3-panel">
+            <label class="tx-text-12">Resource Name</label>
+            <input id ="tx-resource-name" class="w3-input w3-round w3-border" type="text" placeholder='resource name'/>
+        </div>
+        <div class="w3-panel">
+            <span id="tx-deploy-resource" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Deploy Resource</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector("#tx-deploy-resource-message").innerHTML= 'Create view';
+    document.querySelector('#tx-deploy-resource').onclick=()=>{
+        let _c = document.querySelector('#tx-resource-content-url').value;
+        let _n = document.querySelector('#tx-resource-name').value;
+        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onDeployResource',deployUrl:_c,resourceName:_n},(resp)=>{
+            console.log(resp);
+            //TARA_API.resetView(_i);
+            document.querySelector('#tx-deploy-resource-message').innerHTML = resp.message;
+        });
+    };
+    document.querySelector('#tx-deploy-resource-close').onclick=()=>{
+        let m3 = document.querySelector('#tx-popup');
+        m3.innerHTML="";
+        m3.style.display = 'none';
+    };
+</script>

@@ -311,14 +311,26 @@
                 }
                 modules.forEach(m=>{
                     sz--;
-                    TARA_API.onResource({name:m.getAttribute('src'),type:'text/javascript'},(j)=>{
+                    var head= document.querySelectorAll('head')[0];
+                    let loaded = document.querySelector('#'+m.getAttribute('tx-id'));
+                    if(loaded!==null){
+                        if(loaded.getAttribute('tx-version')!==m.getAttribute('tx-version')){
+                            //notify player to reload page
+                            console.log('reload page');
+                        }    
+                        suc('ok');
+                    }else{
                         let md = document.createElement('script');
-                        md.appendChild(document.createTextNode(j));   
-                        p.appendChild(md);
-                        if(sz==0){
-                            suc('ok');
-                        }
-                    });
+                        md.id = m.getAttribute('tx-id');
+                        md.setAttribute('tx-version',m.getAttribute('tx-version'));   
+                        head.appendChild(md);
+                        md.onload =()=>{
+                            if(sz==0){
+                                suc('ok');
+                            }
+                        };
+                        md.src=m.getAttribute('tx-src');
+                    }
                 });
             });
             acall.then(()=>{
@@ -327,26 +339,6 @@
                     callback(p);
                 });
             });
-            /**
-            scripts.forEach(exe => {
-                if(exe.getAttribute('type')==='module'){
-                    TARA_API.onResource({name:exe.getAttribute('src'),type:'text/javascript'},(j)=>{
-                        console.log(j);
-                        exe.appendChild(document.createTextNode(j));   
-                        console.log(exe);     
-                        document.head.appendChild(exe);
-                    });    
-                }
-                else{
-                    console.log("page");
-                    new Function(exe.textContent).call();
-                    callback(exe);    
-                }
-            });**/
-            //if(exe){
-                //new Function(exe.textContent).call();
-                //callback(exe);
-            //}
         }
         function tx_on_login(){
             let m3 = document.querySelector('#tx-popup');

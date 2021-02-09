@@ -445,7 +445,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.integrationEventService = integrationCluster.publisher();
         try{
-            //contentTemDir = this.tarantulaContext.deployDir+"/tem";
             contentDir = this.tarantulaContext.deployDir+"/web";
             Path _path = Paths.get(this.tarantulaContext.deployDir);
             if(!Files.exists(_path)){
@@ -454,6 +453,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             Path _web_root = Paths.get(this.tarantulaContext.deployDir+"/web/root");
             if(!Files.exists(_web_root)){
                 Files.createDirectories(_web_root);
+            }
+            Path _web_resource = Paths.get(this.tarantulaContext.deployDir+"/web/resource");
+            if(!Files.exists(_web_resource)){
+                Files.createDirectories(_web_resource);
             }
             Path _web_presence = Paths.get(this.tarantulaContext.deployDir+"/web/presence");
             if(!Files.exists(_web_presence)){
@@ -471,11 +474,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(!Files.exists(_web_sudo)){
                 Files.createDirectories(_web_sudo);
             }
-            //Path _tem = Paths.get(contentTemDir);
-            //if(!Files.exists(_tem)){
-                //Files.createDirectories(_tem);
-            //}
-
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -555,7 +553,31 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public OnView onView(String viewId){
         return (OnView)vMap.get(viewId);
     }
-
+    public boolean deployResource(String contentUrl,String resourceName){
+        File fn = new File(this.tarantulaContext.deployDir+"/"+resourceName);
+        if(!fn.exists()){
+            log.warn("Resource not existed->"+fn.getName());
+            return false;
+        }
+        return this.tarantulaContext.integrationCluster().deployService().updateResource(contentUrl,resourceName);
+    }
+    public void updateResource(String contentUrl,String resourceName){
+        try{
+            //content dir deployDir/web
+            File f = new File(this.tarantulaContext.deployDir+"/"+resourceName);
+            File fe = new File(contentDir+"/"+contentUrl+"/"+resourceName);
+            if(!fe.exists()||fe.lastModified()<f.lastModified()){
+                BufferedInputStream fin = new BufferedInputStream(new FileInputStream(f));
+                BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(fe));
+                fos.write(fin.readAllBytes());
+                fin.close();
+                fos.flush();
+                fos.close();
+            }
+        }catch (Exception ex){
+            log.error(contentUrl+"/"+resourceName,ex);
+        }
+    }
     public boolean createView(OnView onView){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         OnView _v = (OnView)vMap.get(onView.viewId());

@@ -42,6 +42,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     void configure(String key);
     OnView onView(String viewId);
     boolean createView(OnView onView);
+    boolean deployResource(String contentUrl,String resourceName);
     void registerOnLobbyListener(OnLobby.Listener onLobbyListener);
 
     byte[] resource(String name,String flag);
@@ -97,7 +98,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void removeApplication(String typeId,String applicationId);
         void updateModule(Descriptor descriptor);
         void updateView(OnView onView);
-
+        void updateResource(String contentUrl,String resourceName);
         void registerServerPushEvent(Event event);
         void releaseServerPushEvent(String serverId);
         void ackServerPushEvent(String serverId);

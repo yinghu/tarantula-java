@@ -381,7 +381,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void updateModule(Descriptor descriptor){
         this.deploymentServiceProvider.distributionCallback().updateModule(descriptor);
     }
-
+    public void updateResource(String contentUrl,String resourceName){
+        this.deploymentServiceProvider.distributionCallback().updateResource(contentUrl,resourceName);
+    }
     public void serverPushEventSync(String memberId){
         this.deploymentServiceProvider.distributionCallback().syncServerPushEvent(memberId);//dispatch task
     }
