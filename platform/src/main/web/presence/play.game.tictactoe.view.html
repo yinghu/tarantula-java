@@ -9,7 +9,16 @@
     let _oswaldFamily = 'Oswald, Arial';
     let _felipaFamily = 'Felipa, Arial';
     let app = TGL.start(document.querySelector('#tx-game-tictactoe'));
-    
+    const loader = PIXI.Loader.shared;
+    loader.add('robot','resource/robotQuest_icon.png').load(()=>{
+        let robot = new PIXI.Sprite(loader.resources['robot'].texture);
+        robot.width=100;
+        robot.height = 100;
+        robot.x = 120;
+        robot.y = 120;
+        app.stage.addChild(robot);    
+    });
+
     let messageBox = new PIXI.Text('',{fontFamily:_oswaldFamily,fontSize:40,fill:'yellow'});
     app.stage.addChild(messageBox);
     
