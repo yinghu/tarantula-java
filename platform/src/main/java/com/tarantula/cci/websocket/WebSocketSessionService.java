@@ -7,9 +7,6 @@ import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.HttpCaller;
 import com.tarantula.platform.service.ConnectionEventService;
 
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
 
@@ -37,13 +34,11 @@ public class WebSocketSessionService implements ConnectionEventService,WebSocket
         if(webSocket==null){
             try {
                 String ticket = tokenValidatorProvider.tokenValidator().ticket(serverLogin.distributionKey(),presence.count(0));
-                //String protocol = serverConnection.secured() ? "wss://" : "ws://";
                 StringBuffer query = new StringBuffer();
                 query.append("connectionId="+serverConnection.connectionId());
                 query.append("&accessKey="+ticket);
                 query.append("&stub="+presence.count(0));
                 query.append("&systemId="+serverLogin.owner());
-                //URI uri = new URI(protocol + serverConnection.host() + ":" + serverConnection.port()+"/"+serverConnection.path()+"?"+ URLEncoder.encode(query.toString(),"UTF-8"));
                 serverConnection.index(query.toString());
                 HttpCaller httpCaller = new HttpCaller("");
                 httpCaller._init();
@@ -105,6 +100,6 @@ public class WebSocketSessionService implements ConnectionEventService,WebSocket
     }
     @Override
     public void shutdown() throws Exception {
-
+        
     }
 }
