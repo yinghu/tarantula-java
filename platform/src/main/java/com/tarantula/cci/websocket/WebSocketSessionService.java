@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.OutboundMessage;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.util.HttpCaller;
 import com.tarantula.platform.service.ConnectionEventService;
 
 import java.net.URI;
@@ -36,14 +37,17 @@ public class WebSocketSessionService implements ConnectionEventService,WebSocket
         if(webSocket==null){
             try {
                 String ticket = tokenValidatorProvider.tokenValidator().ticket(serverLogin.distributionKey(),presence.count(0));
-                String protocol = serverConnection.secured() ? "wss://" : "ws://";
+                //String protocol = serverConnection.secured() ? "wss://" : "ws://";
                 StringBuffer query = new StringBuffer();
                 query.append("connectionId="+serverConnection.connectionId());
                 query.append("&accessKey="+ticket);
                 query.append("&stub="+presence.count(0));
                 query.append("&systemId="+serverLogin.owner());
-                URI uri = new URI(protocol + serverConnection.host() + ":" + serverConnection.port()+"/"+serverConnection.path()+"?"+ URLEncoder.encode(query.toString(),"UTF-8"));
-                webSocket = HttpClient.newHttpClient().newWebSocketBuilder().header("origin",serverConnection.host()).subprotocols("tarantula-service").buildAsync(uri, this).join();
+                //URI uri = new URI(protocol + serverConnection.host() + ":" + serverConnection.port()+"/"+serverConnection.path()+"?"+ URLEncoder.encode(query.toString(),"UTF-8"));
+                serverConnection.index(query.toString());
+                HttpCaller httpCaller = new HttpCaller("");
+                httpCaller._init();
+                webSocket = httpCaller.connect(serverConnection,this);//HttpClient.newHttpClient().newWebSocketBuilder().header("origin",serverConnection.host()).subprotocols("tarantula-service").buildAsync(uri, this).join();
             }catch (Exception ex){
                 ex.printStackTrace();
            }

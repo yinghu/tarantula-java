@@ -1,14 +1,17 @@
 package com.icodesoftware.util;
 
+import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.WebSocket;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
@@ -61,6 +64,17 @@ public class HttpCaller {
                 .build();
         HttpResponse<String> response = client.send(request,HttpResponse.BodyHandlers.ofString());
         return response.body();
+    }
+    public WebSocket connect(Connection serverConnection,WebSocket.Listener listener) throws Exception{
+        //String ticket = tokenValidatorProvider.tokenValidator().ticket(serverLogin.distributionKey(),presence.count(0));
+        String protocol = serverConnection.secured() ? "wss://" : "ws://";
+        //StringBuffer query = new StringBuffer();
+        //query.append("connectionId="+serverConnection.connectionId());
+        //query.append("&accessKey="+ticket);
+        //query.append("&stub="+presence.count(0));
+        //query.append("&systemId="+serverLogin.owner());
+        URI uri = new URI(protocol + serverConnection.host() + ":" + serverConnection.port()+"/"+serverConnection.path()+"?"+ URLEncoder.encode(serverConnection.index(),"UTF-8"));
+        return client.newWebSocketBuilder().header("origin",serverConnection.host()).subprotocols("tarantula-service").buildAsync(uri, listener).join();
     }
     private class _X509TrustManager implements X509TrustManager{
         private X509Certificate[] certificate;
