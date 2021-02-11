@@ -139,9 +139,14 @@ function createServerPushRoom(connectionId){
     room.onBinary = (connection,binary)=>{
         let msg = inboundMessage(binary);
         console.log("server push binary->"+JSON.stringify(msg)+" from "+connection.connectionId);
-        let sz = msg.payload.readInt32BE(0);
-        let m = Buffer.from(msg.payload.subarray(4)).toString('ascii');
-        console.log(sz+">>>>"+m);
+        if(msg.sequence === 204){
+            let _room = cMap.get(msg.connectionId);
+            _room.onEnd();        
+            cMap.delete(msg.connectionId);
+            connectOnTarantula(f=>{
+                createRoom(f.connectionId);
+            });    
+        }   
     };            
     cMap.set(connectionId,room);
 }
@@ -171,7 +176,10 @@ function createRoom(connectionId){
                         c.sendUTF(jms.label+JSON.stringify(jms));
                     }
                 });
-            };           
+            };   
+    room.onEnd = ()=>{
+                console.log("room ended->");
+            };        
     cMap.set(connectionId,room);
 }
 function startOnTarantula(callback){
@@ -181,7 +189,8 @@ function startOnTarantula(callback){
     postOnTarantula(wcc.path,headers,data,callback);
 }
 function connectOnTarantula(callback){
-    const headers = {'Tarantula-connection-id':(cfg.tarantula.maxConnections+1),'Tarantula-access-key':wcc.accessKey,'Tarantula-server-id':serverId,'Tarantula-action':'onConnection'};
+    cfg.tarantula.maxConnections++;
+    const headers = {'Tarantula-connection-id':cfg.tarantula.maxConnections,'Tarantula-access-key':wcc.accessKey,'Tarantula-server-id':serverId,'Tarantula-action':'onConnection'};
     getOnTarantula(wcc.path,headers,callback);
 }
 function ackOnTarantula(){
