@@ -25,7 +25,11 @@ public class ResourceEventHandler implements RequestHandler {
         String path = exchange.path();
         //load js API in resources/web, public access
         byte[] _load = this.deploymentServiceProvider.resource(path.substring(1),null);
-        exchange.onEvent(new ResponsiveEvent("","",_load,0,"text/javascript","",true));
+        String contentType = "text/javascript";
+        if(path.endsWith(".png")){
+            contentType = "image/png";
+        }
+        exchange.onEvent(new ResponsiveEvent("","",_load,0,contentType,"",true));
         deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
     }
     @Override
