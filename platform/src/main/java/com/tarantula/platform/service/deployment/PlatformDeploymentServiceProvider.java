@@ -150,7 +150,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     ret = cin.readAllBytes();
                     cin.close();
                 }catch (Exception ex1){
-                    //log.warn("Read resource ["+name+"] from backup");
                     try {if(cin!=null){cin.close();}}catch (Exception ex2){}
                     //read from backup
                     try{
@@ -573,6 +572,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 fin.close();
                 fos.flush();
                 fos.close();
+                rMap.remove(contentUrl+"/"+resourceName);//clear cache
             }
         }catch (Exception ex){
             log.error(contentUrl+"/"+resourceName,ex);

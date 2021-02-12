@@ -1,11 +1,11 @@
 class TicTacToe{
-    #name;
-    #score;
+    name;
+    score;
     constructor(name){
-        this.#name = name;
-        this.#score=100;    
+        this.name = name;
+        this.score=100;    
     }
     show_name() {
-        console.log(this.#name+"><"+this.#score);
+        console.log(this.name+">111<"+this.score);
     }
 }
