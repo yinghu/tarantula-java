@@ -142,7 +142,7 @@ function createServerPushRoom(connectionId){
         if(msg.sequence === 204){
             let _room = cMap.get(msg.connectionId);
             _room.onEnd();        
-            cMap.delete(msg.connectionId);
+            //cMap.delete(msg.connectionId);
             connectOnTarantula(f=>{
                 createRoom(f.connectionId);
             });    

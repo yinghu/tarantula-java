@@ -597,6 +597,7 @@
             let _mmk = a.getAttribute('game-match-making');
             let payload ={serviceTag:_mmk,command:'onPlay'}; 
             TARA_API.onService(false,payload,(resp)=>{
+                console.log(resp);
                 if(resp.successful){
                     let conn = resp.connection;
                     conn.protocol = conn.secured?'wss':'ws';
@@ -605,6 +606,7 @@
                     TARA_API.query().connection = conn;
                     TARA_API.query().popup = '#tx-popup-game';
                     let gameView = a.getAttribute('game-view-id');
+                    console.log(gameView);
                     tx_view({viewId:gameView,containerId:'#tx-popup-game'});
                 }
                 else{//goes to error page
