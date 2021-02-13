@@ -224,4 +224,26 @@ public class SystemUtil {
         }
         return sb.toString();
     }
+    public static String mimeType(String path){
+        String contentType = "text/html";
+        if(path.endsWith(".css")){
+            contentType = "text/css";
+        }
+        else if(path.endsWith(".html")){
+            contentType = "text/html";
+        }
+        else if(path.endsWith(".js")){
+            contentType = "text/javascript";
+        }
+        else if(path.endsWith(".png")){
+            contentType = "image/png";
+        }
+        else if(path.endsWith(".jpeg")){
+            contentType = "image/jpeg";
+        }
+        else if(path.endsWith(".jpg")){
+            contentType = "image/jpeg";
+        }
+        return contentType;
+    }
 }

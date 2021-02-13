@@ -66,7 +66,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ConcurrentHashMap<String,DynamicModuleClassLoader> cMap = new ConcurrentHashMap<>();
 
     //content cache ( web admin )
-    private ConcurrentHashMap<String,byte[]> rMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,Content> rMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,ExposedGameService> eMap = new ConcurrentHashMap<>();
 
     private TarantulaContext tarantulaContext;
@@ -128,7 +128,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return _internalModule(descriptor.moduleName());
         }
     }
-    private byte[] fromModule(String name,String flag){
+    private Content fromModule(String name,String flag){
         String rid = flag.split("=")[1].trim();
         DynamicModuleClassLoader dc = cMap.get(rid);
         byte[][] ret = {new byte[0]};
@@ -139,9 +139,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 log.warn("Resource ["+name+"] failed to load",ex);
             }
         });
-        return ret[0];
+        return new ContentMapping(ret[0],SystemUtil.mimeType(name),ret[0].length>0);
     }
-    private byte[] fromContext(String name){
+    private Content fromContext(String name){
         return rMap.computeIfAbsent(name,(rk)->{
                 byte[] ret = new byte[0];
                 BufferedInputStream cin=null;
@@ -164,7 +164,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                         }
                     }
                 }
-                return ret;
+                return new ContentMapping(ret,SystemUtil.mimeType(name),ret.length>0);
             }
         );
     }
@@ -193,7 +193,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             ex.printStackTrace();
         }
     }
-    public byte[] resource(String name,String flag){
+    public Content resource(String name,String flag){
         //log.warn("load resource ["+name+"] from ["+flag+"]");
         return flag==null?fromContext(name):fromModule(name,flag);
     }

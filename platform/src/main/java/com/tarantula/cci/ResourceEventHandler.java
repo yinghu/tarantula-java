@@ -2,6 +2,7 @@ package com.tarantula.cci;
 
 import com.icodesoftware.Event;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.service.Content;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.logging.JDKLogger;
@@ -24,12 +25,8 @@ public class ResourceEventHandler implements RequestHandler {
     public void onRequest(OnExchange exchange){
         String path = exchange.path();
         //load js API in resources/web, public access
-        byte[] _load = this.deploymentServiceProvider.resource(path.substring(1),null);
-        String contentType = "text/javascript";
-        if(path.endsWith(".png")){
-            contentType = "image/png";
-        }
-        exchange.onEvent(new ResponsiveEvent("","",_load,0,contentType,"",true));
+        Content _load = this.deploymentServiceProvider.resource(path.substring(1),null);
+        exchange.onEvent(new ResponsiveEvent("","",_load.data(),0,_load.type(),"",true));
         deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
     }
     @Override

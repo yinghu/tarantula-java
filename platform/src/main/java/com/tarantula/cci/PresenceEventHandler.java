@@ -41,12 +41,11 @@ public class PresenceEventHandler implements RequestHandler {
             if(!recoverService.checkAccessControl(onSession.systemId(), AccessControl.player)){
                 throw new RuntimeException("no access permission");
             }
-            String contentType = exchange.path().endsWith(".html")?"text/html":"text/javascript";
-            byte[] ret = this.deploymentServiceProvider.resource(exchange.path().substring(1),null);
-            if(ret.length==0){
+            Content ret = this.deploymentServiceProvider.resource(exchange.path().substring(1),null);
+            if(!ret.existed()){
                 ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile(),null);
             }
-            exchange.onEvent(new ResponsiveEvent("","",ret,0,contentType,"",true));
+            exchange.onEvent(new ResponsiveEvent("","",ret.data(),0,ret.type(),"",true));
             deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
         }catch (Exception ex){
             ex.printStackTrace();

@@ -24,7 +24,6 @@ public class SudoEventHandler implements RequestHandler {
     private DeploymentServiceProvider deploymentServiceProvider;
     private RecoverService recoverService;
     private String serverTopic;
-    private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
     private GsonBuilder builder;
     private OnView invalidView;
     public SudoEventHandler(){
@@ -40,16 +39,14 @@ public class SudoEventHandler implements RequestHandler {
             if(!recoverService.checkAccessControl(onSession.systemId(), AccessControl.account)){
                 throw new RuntimeException("no access permission");
             }
-            String contentType = exchange.path().endsWith(".html")?"text/html":"text/javascript";
-            byte[] ret = this.deploymentServiceProvider.resource(exchange.path().substring(1),null);
-            if(ret.length==0){
+            Content ret = this.deploymentServiceProvider.resource(exchange.path().substring(1),null);
+            if(!ret.existed()){
                 ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile(),null);
             }
-            exchange.onEvent(new ResponsiveEvent("","",ret,0,contentType,"",true));
+            exchange.onEvent(new ResponsiveEvent("","",ret.data(),0,ret.type(),"",true));
             deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
         }catch (Exception ex){
             ex.printStackTrace();
-            _hex.remove(exchange.id()); //removed cache on any errors
             exchange.onError(ex,ex.getMessage());
         }
     }
@@ -76,15 +73,7 @@ public class SudoEventHandler implements RequestHandler {
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }
     public  boolean onEvent(Event event){
-        OnExchange hx = this._hex.get(event.sessionId());
-        if(hx!=null){
-           if(hx.onEvent(event)){ //remove on true marked as closed connect or session
-               _hex.remove(event.sessionId());
-           }
-        }
-        else{
-           log.warn(event.toString()+" unexpected removed on server push");
-        }
+
         return true;
     }
     public void onCheck(){

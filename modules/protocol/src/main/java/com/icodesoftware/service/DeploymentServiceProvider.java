@@ -45,7 +45,8 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     boolean deployResource(String contentUrl,String resourceName);
     void registerOnLobbyListener(OnLobby.Listener onLobbyListener);
 
-    byte[] resource(String name,String flag);
+    //byte[] resource(String name,String flag);
+    Content resource(String name,String flag);
 
     //message publisher
     PostOffice registerPostOffice();
