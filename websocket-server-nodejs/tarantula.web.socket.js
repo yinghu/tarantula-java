@@ -179,6 +179,15 @@ function createRoom(connectionId){
             };   
     room.onEnd = ()=>{
                 console.log("room ended->");
+                room.connections.forEach(c=>{
+                    if(c.open){
+                        c.close();
+                        //let jms = {message:'game closed'};
+                        //jms.sender = c.index;
+                        //jms.label = 'close';
+                        //c.sendUTF(jms.label+jms);
+                    }
+                });
             };        
     cMap.set(connectionId,room);
 }

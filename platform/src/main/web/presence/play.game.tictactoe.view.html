@@ -60,6 +60,9 @@
         else if(data.label==='left'){
             seats[data.payload.seat].caption.text='left';
         }
+        else if(data.label==='close'){
+            TARA_API.disconnect();
+        }
         messageBox.text = data.payload.message;        
     });
 
