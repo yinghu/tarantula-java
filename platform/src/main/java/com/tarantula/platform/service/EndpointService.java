@@ -12,7 +12,7 @@ import java.util.HashMap;
  */
 public class EndpointService implements Serviceable,EndPoint.Resource{
 
-    TarantulaContext tarantulaContext;
+    private TarantulaContext tarantulaContext;
     private HashMap<String,RequestHandler> rMap = new HashMap<>();
     private final ArrayList<EndPoint> endPointList;
     private final PushEventHandler pushEventHandler;

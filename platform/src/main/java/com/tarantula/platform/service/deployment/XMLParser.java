@@ -217,14 +217,8 @@ public class XMLParser extends DefaultHandler{
                 if(pname.equals("flag")){
                     view.flag(value);
                 }
-                else if(pname.equals("contentBaseUrl")){
-                    view.contentBaseUrl(value);
-                }
-                else if(pname.equals("moduleFile")){
-                    view.moduleFile(value);
-                }
-                else if(pname.equals("moduleName")){
-                    view.moduleName(value);
+                else if(pname.equals("moduleContext")){
+                    view.moduleContext(value);
                 }
                 else if(pname.equals("moduleResourceFile")){
                     view.moduleResourceFile(value);
@@ -237,11 +231,12 @@ public class XMLParser extends DefaultHandler{
                 this.configuration.applications.add(this.applicationDescriptor);
             }
             else  if(tblock.equals("view-list")&&qname.equals("view")){
-                if(view.contentBaseUrl()==null){
-                    if(view.moduleResourceFile().contains("/")){
-                        view.contentBaseUrl(view.moduleResourceFile().split("/")[0]);
+                if(view.moduleContext()==null){
+                    int _mix = view.moduleResourceFile().lastIndexOf('/');
+                    if(_mix<0){
+                        view.moduleContext("root");
                     }else{
-                        view.contentBaseUrl("root");
+                        view.moduleContext(view.moduleResourceFile().substring(0,_mix));
                     }
                 }
                 this.configuration.views.add(view);

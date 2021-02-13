@@ -170,16 +170,21 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     private void checkContent(OnView onView){
         try{
-            //log.warn("CHECK VIEW->"+onView.toString());
-            boolean isRoot = !onView.moduleResourceFile().contains("/");
-            String rn = isRoot?onView.moduleResourceFile():(onView.moduleResourceFile().split("/")[1]);
-            //log.warn("CHECK 1->"+rn);
+            Path _web_resource = Paths.get(this.contentDir+"/"+onView.moduleContext());
+            if(!Files.exists(_web_resource)){
+                Files.createDirectories(_web_resource);
+            }
+            int ix = onView.moduleResourceFile().lastIndexOf('/');
+
+            String rn = ix<0?onView.moduleResourceFile():(onView.moduleResourceFile().substring(ix+1));
+            log.warn("CHECK 1->"+rn);
             File f = new File(this.tarantulaContext.deployDir+"/"+rn);
             if(!f.exists()){
                 return;
             }
-            String x = isRoot?(contentDir+"/"+onView.contentBaseUrl()+"/"+onView.moduleResourceFile()):(contentDir+"/"+onView.moduleResourceFile());
-            //log.warn("CHECK 2->"+x);
+            boolean isRoot = onView.moduleContext().startsWith("root");
+            String x = isRoot?(contentDir+"/"+onView.moduleContext()+"/"+onView.moduleResourceFile()):(contentDir+"/"+onView.moduleResourceFile());
+            log.warn("CHECK 2->"+x);
             File fe = new File(x);
             if(!fe.exists()||fe.lastModified()<f.lastModified()){
                 BufferedInputStream fin = new BufferedInputStream(new FileInputStream(f));
@@ -545,9 +550,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         vMap.putIfAbsent(onView.viewId(),onView);
         //remove caches
         rMap.remove(onView.moduleResourceFile());
-        if(onView.moduleFile()!=null){
-            rMap.remove(onView.moduleFile());
-        }
     }
     public OnView onView(String viewId){
         return (OnView)vMap.get(viewId);
@@ -578,7 +580,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             log.error(contentUrl+"/"+resourceName,ex);
         }
     }
-    public boolean createView(OnView onView){
+    public Response createView(OnView onView){
+        if(onView.moduleContext()==null||(!this.tarantulaContext.checkResource(onView))){
+            return new ResponseHeader("create view","view failed->"+onView.moduleContext(),false);
+        }
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         OnView _v = (OnView)vMap.get(onView.viewId());
         boolean updated;
@@ -592,7 +597,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(updated){
             this.tarantulaContext.integrationCluster().deployService().updateView(onView);
         }
-        return updated;
+        return new ResponseHeader("create view","view created");
     }
 
     private void register(InstanceRegistry registry){

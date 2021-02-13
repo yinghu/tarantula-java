@@ -15,9 +15,8 @@ import com.icodesoftware.util.RecoverableObject;
  */
 public class OnViewTrack extends RecoverableObject implements OnView, Portable {
 
-    protected String contentBaseUrl;
-    protected String moduleFile;
-    protected String moduleName;
+
+    protected String moduleContext;
     protected String moduleResourceFile;
     protected String viewId;
 
@@ -40,26 +39,13 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
         this.flag = flag;
     }
 
-    public String contentBaseUrl(){
-        return this.contentBaseUrl;
+    public String moduleContext(){
+        return this.moduleContext;
     }
-    public void contentBaseUrl(String contentBaseUrl){
-        this.contentBaseUrl = contentBaseUrl;
-    }
-
-    public String moduleFile(){
-        return this.moduleFile;
-    }
-    public void moduleFile(String moduleFile){
-        this.moduleFile = moduleFile;
+    public void moduleContext(String moduleContext){
+        this.moduleContext = moduleContext;
     }
 
-    public String moduleName(){
-        return this.moduleName;
-    }
-    public void moduleName(String moduleName){
-        this.moduleName = moduleName;
-    }
     public String moduleResourceFile(){
         return moduleResourceFile;
     }
@@ -71,20 +57,16 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
     public Map<String,Object> toMap(){
         this.properties.put("1",viewId);
         this.properties.put("2",flag);
-        this.properties.put("3",contentBaseUrl);
-        this.properties.put("5",moduleFile);
-        this.properties.put("6",moduleName);
-        this.properties.put("7",moduleResourceFile);
+        this.properties.put("4",moduleContext);
+        this.properties.put("5",moduleResourceFile);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.viewId = (String)properties.get("1");
         this.flag = (String)properties.get("2");
-        this.contentBaseUrl = (String)properties.get("3");
-        this.moduleFile = (String)properties.get("5");
-        this.moduleName = (String)properties.get("6");
-        this.moduleResourceFile = (String)properties.get("7");
+        this.moduleContext = (String)properties.get("4");
+        this.moduleResourceFile = (String)properties.get("5");
     }
     @Override
     public int getFactoryId() {
@@ -100,19 +82,15 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeUTF("1",viewId);
         portableWriter.writeUTF("2",flag);
-        portableWriter.writeUTF("3",this.contentBaseUrl);
-        portableWriter.writeUTF("5",this.moduleFile);
-        portableWriter.writeUTF("6",this.moduleName);
-        portableWriter.writeUTF("7",moduleResourceFile);
+        portableWriter.writeUTF("4",this.moduleContext);
+        portableWriter.writeUTF("5",moduleResourceFile);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         viewId = portableReader.readUTF("1");
         flag = portableReader.readUTF("2");
-        contentBaseUrl = portableReader.readUTF("3");
-        moduleFile = portableReader.readUTF("5");
-        moduleName = portableReader.readUTF("6");
+        moduleContext = portableReader.readUTF("4");
         moduleResourceFile= portableReader.readUTF("7");
     }
     public void distributionKey(String distributionKey){

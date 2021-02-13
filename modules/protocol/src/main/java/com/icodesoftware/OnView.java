@@ -14,15 +14,8 @@ public interface OnView extends Configurable {
     String flag();
     void flag(String flag);
 
-    String contentBaseUrl();
-    void contentBaseUrl(String contentBaseUrl);
-
-
-    String moduleFile();
-    void moduleFile(String moduleFile);
-
-    String moduleName();
-    void moduleName(String moduleName);
+    String moduleContext();
+    void moduleContext(String moduleContext);
 
     String moduleResourceFile();
     void moduleResourceFile(String moduleResourceFile);

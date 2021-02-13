@@ -160,15 +160,22 @@ public class SudoRoleModule implements Module {
             OnView onView = new OnViewTrack();
             onView.owner(onAccess.typeId());//associated with a lobby type Id
             onView.viewId((String)onAccess.property("viewId"));
-            if(onAccess.property("deployUrl").equals("root")){
-                onView.moduleResourceFile((String) onAccess.property("resourceName"));
+            String moduleContext = onAccess.property("deployUrl")!=null?(String) onAccess.property("deployUrl"):"root";
+            if(moduleContext.startsWith("root")){
+                int tix = moduleContext.lastIndexOf('/');
+                if(tix<0){
+                    onView.moduleResourceFile((String) onAccess.property("resourceName"));
+                }
+                else{
+                    onView.moduleResourceFile(moduleContext.substring(tix+1)+"/"+onAccess.property("resourceName"));
+                }
             }else{
                 String rname = onAccess.property("deployUrl")+"/"+onAccess.property("resourceName");
                 onView.moduleResourceFile(rname);
             }
-            onView.contentBaseUrl((String) onAccess.property("deployUrl"));
-            boolean suc = this.deploymentServiceProvider.createView(onView);
-            session.write(toMessage("view deployed",suc).toString().getBytes(),label());
+            onView.moduleContext(moduleContext);
+            Response suc = this.deploymentServiceProvider.createView(onView);
+            session.write(toMessage(suc.message(),suc.successful()).toString().getBytes(),label());
         }
         else if(session.action().equals("onDeployResource")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);

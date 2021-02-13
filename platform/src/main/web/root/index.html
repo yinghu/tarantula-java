@@ -265,21 +265,7 @@
         }
         function tx_view(setup){//set up format {viewId:"viewID",containerId:"#m1"}
             TARA_API.onView(setup.viewId,function(v){
-                //load js module if v.moduleFile 
-                if(v.moduleFile){
-                    TARA_API.onResource({name:v.moduleFile,flag:v.flag,type:'text/javascript'},function(j){
-                        if(!window[v.moduleName]){
-                            let md = document.createElement('script');
-                            md.appendChild(document.createTextNode(j));
-                            document.head.appendChild(md);
-                        }
-                        window[v.moduleName].setup(setup);    
-                        _view_load(v,setup.containerId);    
-                    });    
-                }
-                else{
-                    _view_load(v,setup.containerId);
-                }
+                _view_load(v,setup.containerId);
             });   
         }
         function _view_load(v,cid){

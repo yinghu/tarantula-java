@@ -18,11 +18,8 @@ public class OnViewSerializer implements JsonSerializer<OnView> {
         if(descriptor.flag()!=null){
             jo.addProperty("flag",descriptor.flag());
         }
-        if(descriptor.moduleFile()!=null){
-            jo.addProperty("moduleFile",descriptor.moduleFile());
-        }
-        if(descriptor.moduleName()!=null){
-            jo.addProperty("moduleName",descriptor.moduleName());
+        if(descriptor.moduleContext()!=null){
+            jo.addProperty("moduleContext",descriptor.moduleContext());
         }
         if(descriptor.moduleResourceFile()!=null){
             jo.addProperty("moduleResourceFile",descriptor.moduleResourceFile());

@@ -32,7 +32,7 @@
     exit.x = window.innerWidth-70;
     exit.y = 6;
     app.stage.addChild(exit);
-    let messageQueue = ['A','B','C','D','E','F'];
+    let messageQueue = ['A','B','C','D','E','F','G'];
     let send = text_button('SEND',()=>{
         let m = messageQueue.shift();
         TARA_API.send({label:'echo',message:'Rotating->'+m});

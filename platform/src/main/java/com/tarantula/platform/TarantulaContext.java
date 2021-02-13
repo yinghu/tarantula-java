@@ -717,4 +717,26 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         this.deploymentService().distributionCallback().removeQueryCallback(cid);
         return tlist;
     }
+    public boolean checkResource(OnView pending){
+ 	    try{
+ 	        int ix = pending.moduleResourceFile().lastIndexOf('/');
+ 	        String checkFile = ix<0?pending.moduleResourceFile():pending.moduleResourceFile().substring(ix+1);
+ 	        File rfile = new File(deployDir+"/"+checkFile);
+ 	        if(!rfile.exists()){
+ 	            log.warn("File not existed->"+checkFile);
+ 	            return false;
+            }
+            String moduleContext = pending.moduleContext();
+            if(moduleContext.startsWith("root")){
+                return true;
+            }
+            ix = moduleContext.indexOf('/');
+            if(ix<0){
+                return endpointService.requestHandler("/"+moduleContext)!=null;
+            }
+            return endpointService.requestHandler("/"+moduleContext.substring(0,ix))!=null;
+ 	    }catch (Exception ex){
+ 	        return false;
+        }
+    }
 }
