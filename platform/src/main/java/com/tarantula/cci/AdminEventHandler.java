@@ -12,18 +12,13 @@ import com.tarantula.platform.service.*;
 import com.tarantula.platform.util.OnAccessSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
-import java.util.UUID;
-
-
 public class AdminEventHandler implements RequestHandler{
 
     private static TarantulaLogger log = JDKLogger.getLogger(AdminEventHandler.class);
 
-    private EventService eventService;
     private TokenValidatorProvider tokenValidator;
     private DeploymentServiceProvider deploymentServiceProvider;
     private RecoverService recoverService;
-    private String serverTopic;
     private GsonBuilder builder;
     private OnView invalidView;
     public AdminEventHandler(){
@@ -36,7 +31,7 @@ public class AdminEventHandler implements RequestHandler{
         try{
             String token = exchange.header(Session.TARANTULA_TOKEN);
             OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
-            if(!recoverService.checkAccessControl(onSession.systemId(), AccessControl.account)){
+            if(!recoverService.checkAccessControl(onSession.systemId(), AccessControl.admin)){
                 throw new RuntimeException("no access permission");
             }
             Content ret = this.deploymentServiceProvider.resource(exchange.path().substring(1),null);
@@ -57,8 +52,6 @@ public class AdminEventHandler implements RequestHandler{
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
-        this.serverTopic = UUID.randomUUID().toString();
-        this.eventService.registerEventListener(this.serverTopic,this);
         this.invalidView = this.deploymentServiceProvider.onView(OnView.INVALID_VIEW_ID);
         log.info("Admin event handler started");
     }
@@ -68,7 +61,6 @@ public class AdminEventHandler implements RequestHandler{
 
     }
     public void setup(ServiceContext tcx){
-        this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
         this.recoverService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).recoverService();
         tokenValidator  = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
@@ -80,4 +72,5 @@ public class AdminEventHandler implements RequestHandler{
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
     }
+    public boolean deployable(){return true;}
 }

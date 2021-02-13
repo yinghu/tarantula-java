@@ -179,8 +179,8 @@ public class SudoRoleModule implements Module {
         }
         else if(session.action().equals("onDeployResource")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            boolean suc = this.deploymentServiceProvider.deployResource((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
-            session.write(toMessage(suc?"resource deployed":"failed to deploy",suc).toString().getBytes(),label());
+            Response suc = this.deploymentServiceProvider.deployResource((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
+            session.write(toMessage(suc.message(),suc.successful()).toString().getBytes(),label());
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");

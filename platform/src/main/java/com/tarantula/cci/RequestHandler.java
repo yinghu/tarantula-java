@@ -14,4 +14,5 @@ public interface RequestHandler extends EventListener, Serviceable {
     void onRequest(OnExchange exchange);
     void setup(ServiceContext tcx);
     default void onCheck(){}
+    default boolean deployable(){return false;}
 }

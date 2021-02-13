@@ -11,6 +11,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
+import com.tarantula.cci.RequestHandler;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
@@ -717,26 +718,34 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         this.deploymentService().distributionCallback().removeQueryCallback(cid);
         return tlist;
     }
-    public boolean checkResource(OnView pending){
+    public Response checkResource(OnView pending){
+ 	    Response response = new ResponseHeader();
  	    try{
  	        int ix = pending.moduleResourceFile().lastIndexOf('/');
  	        String checkFile = ix<0?pending.moduleResourceFile():pending.moduleResourceFile().substring(ix+1);
  	        File rfile = new File(deployDir+"/"+checkFile);
  	        if(!rfile.exists()){
  	            log.warn("File not existed->"+checkFile);
- 	            return false;
+ 	            response.message("file not existed->"+checkFile);
+ 	            return response;
             }
             String moduleContext = pending.moduleContext();
-            if(moduleContext.startsWith("root")){
-                return true;
+            String webContext = "/";
+ 	        if(!moduleContext.startsWith("root")){
+                ix = moduleContext.indexOf('/');
+                webContext = ix<0?"/"+moduleContext:"/"+moduleContext.substring(0,ix);
             }
-            ix = moduleContext.indexOf('/');
-            if(ix<0){
-                return endpointService.requestHandler("/"+moduleContext)!=null;
+            RequestHandler resource = endpointService.requestHandler(webContext);
+ 	        if(resource==null||!resource.deployable()){
+ 	            response.message(moduleContext+" not existed");
+ 	            return response;
             }
-            return endpointService.requestHandler("/"+moduleContext.substring(0,ix))!=null;
+            response.successful(true);
+            response.message("resource->"+moduleContext);
+            return response;
  	    }catch (Exception ex){
- 	        return false;
+ 	        response.message(ex.getMessage());
+ 	        return response;
         }
     }
 }

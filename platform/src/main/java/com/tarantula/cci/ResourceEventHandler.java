@@ -48,4 +48,5 @@ public class ResourceEventHandler implements RequestHandler {
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
     }
+    public boolean deployable(){return true;}
 }

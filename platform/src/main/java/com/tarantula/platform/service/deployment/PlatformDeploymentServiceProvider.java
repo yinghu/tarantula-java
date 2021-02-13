@@ -177,14 +177,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             int ix = onView.moduleResourceFile().lastIndexOf('/');
 
             String rn = ix<0?onView.moduleResourceFile():(onView.moduleResourceFile().substring(ix+1));
-            log.warn("CHECK 1->"+rn);
             File f = new File(this.tarantulaContext.deployDir+"/"+rn);
             if(!f.exists()){
                 return;
             }
             boolean isRoot = onView.moduleContext().startsWith("root");
             String x = isRoot?(contentDir+"/"+onView.moduleContext()+"/"+onView.moduleResourceFile()):(contentDir+"/"+onView.moduleResourceFile());
-            log.warn("CHECK 2->"+x);
             File fe = new File(x);
             if(!fe.exists()||fe.lastModified()<f.lastModified()){
                 BufferedInputStream fin = new BufferedInputStream(new FileInputStream(f));
@@ -554,17 +552,26 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public OnView onView(String viewId){
         return (OnView)vMap.get(viewId);
     }
-    public boolean deployResource(String contentUrl,String resourceName){
-        File fn = new File(this.tarantulaContext.deployDir+"/"+resourceName);
-        if(!fn.exists()){
-            log.warn("Resource not existed->"+fn.getName());
-            return false;
+    public Response deployResource(String contentUrl,String resourceName){
+        OnView view = new OnViewTrack();
+        view.moduleResourceFile(resourceName);
+        view.moduleContext(contentUrl);
+        Response response = this.tarantulaContext.checkResource(view);
+        if(!response.successful()){
+            return response;
         }
-        return this.tarantulaContext.integrationCluster().deployService().updateResource(contentUrl,resourceName);
+        boolean suc = this.tarantulaContext.integrationCluster().deployService().updateResource(contentUrl,resourceName);
+        response.successful(suc);
+        response.message(suc?"ok":"failed");
+        return  response;
     }
     public void updateResource(String contentUrl,String resourceName){
         try{
             //content dir deployDir/web
+            Path _path = Paths.get(this.contentDir+"/"+contentUrl);
+            if(!Files.exists(_path)){
+                Files.createDirectories(_path);
+            }
             File f = new File(this.tarantulaContext.deployDir+"/"+resourceName);
             File fe = new File(contentDir+"/"+contentUrl+"/"+resourceName);
             if(!fe.exists()||fe.lastModified()<f.lastModified()){
@@ -581,8 +588,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     public Response createView(OnView onView){
-        if(onView.moduleContext()==null||(!this.tarantulaContext.checkResource(onView))){
-            return new ResponseHeader("create view","view failed->"+onView.moduleContext(),false);
+        Response response = this.tarantulaContext.checkResource(onView);
+        if(!response.successful()){
+            return response;
         }
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         OnView _v = (OnView)vMap.get(onView.viewId());

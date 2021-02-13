@@ -48,4 +48,5 @@ public class RootContentHandler implements RequestHandler {
     public void shutdown() throws Exception {
 
     }
+    public boolean deployable(){return true;}
 }

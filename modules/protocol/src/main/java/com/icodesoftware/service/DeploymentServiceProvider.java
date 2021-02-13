@@ -42,7 +42,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     void configure(String key);
     OnView onView(String viewId);
     Response createView(OnView onView);
-    boolean deployResource(String contentUrl,String resourceName);
+    Response deployResource(String contentUrl,String resourceName);
     void registerOnLobbyListener(OnLobby.Listener onLobbyListener);
 
     Content resource(String name,String flag);
