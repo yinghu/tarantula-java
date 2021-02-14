@@ -635,7 +635,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             Connection occ = this.builder.create().fromJson(new String(serverPushEvent.payload()), Connection.class);
             occ.disabled(false);
             serverPushEvent.connection(occ);
-            log.warn("add server push->"+occ.connectionId()+"//"+occ.sequence()+"//"+occ.messageId()+"//"+occ.messageIdOffset()+"//"+serverPushEvent.payload().length);
+            //log.warn("add server push->"+occ.connectionId()+"//"+occ.sequence()+"//"+occ.messageId()+"//"+occ.messageIdOffset()+"//"+serverPushEvent.payload().length);
             if(occ.server().type().equals(Connection.UDP)){
                 try{
                     byte[] key = tarantulaContext.integrationCluster().get(occ.serverId().getBytes());
@@ -679,7 +679,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     public void releaseServerPushEvent(String serverId){
-        log.warn("remove server push->"+serverId);
+        //log.warn("remove server push->"+serverId);
         ServerPushEvent pes = pushRegistry.remove(serverId);
         if(pes!=null){
             this.integrationCluster.remove(serverId.getBytes());//remove key
@@ -754,7 +754,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public Connection addConnection(String typeId,Connection connection){
         byte[] bytes = connection.toBinary();
         this.integrationCluster.index(typeId,bytes);
-        log.warn("add connection->["+ connection.connectionId()+"] on "+typeId);
+        //log.warn("add connection->["+ connection.connectionId()+"] on "+typeId);
         return connection;
     }
     public Connection addConnection(String serverId,int connectionId){
@@ -765,7 +765,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         Connection client = serverPushEvent.connection();
         client.connectionId(connectionId);
         this.integrationCluster.index(serverPushEvent.typeId(),client.toBinary());
-        log.warn("add connection->["+ client.connectionId()+"] on "+serverPushEvent.typeId());
+        //log.warn("add connection->["+ client.connectionId()+"] on "+serverPushEvent.typeId());
         return client;
     }
     //use connection

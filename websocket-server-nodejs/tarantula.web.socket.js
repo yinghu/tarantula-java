@@ -83,7 +83,9 @@ wsServer.on('request', function(request) {
             });
             connection.on('close', function(reasonCode, description) {
                 let room = cMap.get(connection.connectionId);
-                room.leave(connection);
+                if(room){
+                    room.leave(connection);
+                }
                 console.log('Peer closed from /'+reasonCode+"/"+description+"/"+ connection.remoteAddress +'/'+connection.connectionId);
             });
         }
@@ -128,21 +130,21 @@ exports.stop=()=>{
 function createServerPushRoom(connectionId){
     let room ={totalJoined:0,connections:[]};
     room.join = (connection)=>{
-                console.log("server push enter->"+connection.connectionId);
+                //console.log("server push enter->"+connection.connectionId);
             };
     room.leave = (connection)=>{
-                console.log("server push leave->"+connection.connectionId);
+                //console.log("server push leave->"+connection.connectionId);
             };
     room.onMessage = (connection,message)=>{
-                console.log("server push message->"+message+" from "+connection.connectionId);
+                //console.log("server push message->"+message+" from "+connection.connectionId);
             };
     room.onBinary = (connection,binary)=>{
         let msg = inboundMessage(binary);
-        console.log("server push binary->"+JSON.stringify(msg)+" from "+connection.connectionId);
+        //console.log("server push binary->"+JSON.stringify(msg)+" from "+connection.connectionId);
         if(msg.sequence === 204){
             let _room = cMap.get(msg.connectionId);
             _room.onEnd();        
-            //cMap.delete(msg.connectionId);
+            cMap.delete(msg.connectionId);
             connectOnTarantula(f=>{
                 createRoom(f.connectionId);
             });    
@@ -178,14 +180,9 @@ function createRoom(connectionId){
                 });
             };   
     room.onEnd = ()=>{
-                console.log("room ended->");
                 room.connections.forEach(c=>{
                     if(c.open){
                         c.close();
-                        //let jms = {message:'game closed'};
-                        //jms.sender = c.index;
-                        //jms.label = 'close';
-                        //c.sendUTF(jms.label+jms);
                     }
                 });
             };        
