@@ -155,15 +155,28 @@ function createServerPushRoom(connectionId){
 function createRoom(connectionId){
     let room ={totalJoined:0,connections:[]};
     room.join = (connection)=>{
-                let len = room.connections.push(connection);
-                connection.index = len-1;
-                connection.open = true;
+                if(connection.player in room){
+                    let ix = room[connection.player];
+                    connection.index = ix;
+                    connection.open = true;
+                    room.connections[ix]=connection;        
+                }
+                else{
+                    let len = room.connections.push(connection);
+                    connection.index = len-1;
+                    connection.open = true;
+                }
                 room.totalJoined++;
-                connection.sendUTF('join'+JSON.stringify({message:'joined',seat:connection.index,player:connection.player}));
+                room.connections.forEach(c=>{
+                    if(c.open){
+                        c.sendUTF('join'+JSON.stringify({message:'joined',seat:connection.index,player:connection.player}));
+                    }
+                });
             };
     room.leave = (connection)=>{
                 room.connections[connection.index].open=false;
                 room.totalJoined--;
+                room[connection.player]=connection.index;
                 room.connections.forEach(c=>{
                     if(c.open){
                         c.sendUTF('left'+JSON.stringify({message:'left',seat:connection.index}));

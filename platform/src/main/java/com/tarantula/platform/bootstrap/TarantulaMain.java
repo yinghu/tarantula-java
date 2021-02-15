@@ -1,7 +1,6 @@
 package com.tarantula.platform.bootstrap;
 
 import java.io.*;
-import java.security.Security;
 import java.util.Properties;
 
 import com.icodesoftware.TarantulaLogger;
