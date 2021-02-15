@@ -140,7 +140,6 @@ function createServerPushRoom(connectionId){
             };
     room.onBinary = (connection,binary)=>{
         let msg = inboundMessage(binary);
-        //console.log("server push binary->"+JSON.stringify(msg)+" from "+connection.connectionId);
         if(msg.sequence === 204){
             let _room = cMap.get(msg.connectionId);
             _room.onEnd();        

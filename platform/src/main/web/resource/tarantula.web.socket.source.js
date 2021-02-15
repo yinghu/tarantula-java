@@ -7,7 +7,7 @@ self.onmessage = function(e){
             ws.send(JSON.stringify(sd.data));
         }
         else{
-            self.postMessage({label:'ws',action:'error',payload:{code:300,message:'connection already closed'}});
+            self.postMessage({label:'ws-error',payload:{code:300,message:'connection already closed'}});
         }
     }
     else if(sd.cmd === 'start'){
