@@ -165,7 +165,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             return false;
         }
         view.owner(query.index());
-        return ds.create(view);
+        if(!ds.createIfAbsent(view,false)){
+            ds.update(view);
+        }
+        return true;
     }
     public void updateView(OnView onView){
         this.deploymentServiceProvider.distributionCallback().updateView(onView);

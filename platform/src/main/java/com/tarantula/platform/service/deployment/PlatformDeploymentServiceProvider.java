@@ -72,7 +72,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private TarantulaContext tarantulaContext;
     private GsonBuilder builder;
 
-    //private String contentTemDir;
+
     private String contentDir;
 
     private AtomicBoolean onAccessIndex;
@@ -170,6 +170,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     private void checkContent(OnView onView){
         try{
+            //log.warn("update view->"+onView.toString());
             Path _web_resource = Paths.get(this.contentDir+"/"+onView.moduleContext());
             if(!Files.exists(_web_resource)){
                 Files.createDirectories(_web_resource);
@@ -545,9 +546,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public void updateView(OnView onView){
         checkContent(onView);
-        vMap.putIfAbsent(onView.viewId(),onView);
-        //remove caches
+        OnView removed = (OnView) vMap.remove(onView.viewId());
+        if(removed!=null){
+            rMap.remove(removed.moduleResourceFile());
+        }
         rMap.remove(onView.moduleResourceFile());
+        vMap.put(onView.viewId(),onView);
+        log.warn("View deployed->"+onView.toString());
     }
     public OnView onView(String viewId){
         return (OnView)vMap.get(viewId);
@@ -556,7 +561,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         OnView view = new OnViewTrack();
         view.moduleResourceFile(resourceName);
         view.moduleContext(contentUrl);
-        Response response = this.tarantulaContext.checkResource(view);
+        Response response = this.tarantulaContext.checkResource(view,"web");
         if(!response.successful()){
             return response;
         }
@@ -588,24 +593,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     public Response createView(OnView onView){
-        Response response = this.tarantulaContext.checkResource(onView);
+        Response response = this.tarantulaContext.checkResource(onView,"web");
         if(!response.successful()){
             return response;
         }
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
-        OnView _v = (OnView)vMap.get(onView.viewId());
-        boolean updated;
-        if(_v==null){
-            updated = deployService.addView(onView);
-        }
-        else{
-            this.tarantulaContext.masterDataStore().update(onView);
-            updated = true;
-        }
+        boolean updated = deployService.addView(onView);
         if(updated){
             this.tarantulaContext.integrationCluster().deployService().updateView(onView);
         }
-        return new ResponseHeader("create view","view created");
+        return new ResponseHeader("create/update view",updated?"view deployed->"+onView.moduleContext():"cannot create view",updated);
     }
 
     private void register(InstanceRegistry registry){

@@ -1,5 +1,4 @@
 class TicTacToe{
-    name;
     score;
     constructor(name){
         this.name = name;

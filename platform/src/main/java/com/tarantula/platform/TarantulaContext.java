@@ -718,7 +718,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         this.deploymentService().distributionCallback().removeQueryCallback(cid);
         return tlist;
     }
-    public Response checkResource(OnView pending){
+    public Response checkResource(OnView pending,String targetFolder){
  	    Response response = new ResponseHeader();
  	    try{
  	        int ix = pending.moduleResourceFile().lastIndexOf('/');
@@ -738,6 +738,11 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             RequestHandler resource = endpointService.requestHandler(webContext);
  	        if(resource==null||!resource.deployable()){
  	            response.message(moduleContext+" not existed");
+ 	            return response;
+            }
+ 	        File ft = new File(deployDir+"/"+targetFolder+"/"+pending.moduleResourceFile());
+ 	        if(ft.exists()&&ft.lastModified()>=rfile.lastModified()){
+ 	            response.message("File already has latest version");
  	            return response;
             }
             response.successful(true);
