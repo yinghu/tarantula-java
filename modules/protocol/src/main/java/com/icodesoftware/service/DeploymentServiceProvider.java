@@ -56,6 +56,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //Module operation APIs
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
+    Response deployModule(String contextUrl,String resourceName);
     Response createModule(Descriptor descriptor);
     Response exportModule(Descriptor descriptor);
     boolean launchModule(String typeId);
@@ -98,6 +99,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
         void removeApplication(String typeId,String applicationId);
         void updateModule(Descriptor descriptor);
         void updateView(OnView onView);
+        void updateModule(String contentUrl,String resourceName);
         void updateResource(String contentUrl,String resourceName);
         void registerServerPushEvent(Event event);
         void releaseServerPushEvent(String serverId);

@@ -58,7 +58,9 @@
             <view type="data.store.backup">
                 <property name="moduleResourceFile">sudo/data.store.backup.view.html</property>
             </view>
-
+            <view type="deploy.module">
+                <property name="moduleResourceFile">sudo/deploy.module.view.html</property>
+            </view>
             <view type="add.module">
                 <property name="moduleResourceFile">sudo/add.module.view.html</property>
             </view>

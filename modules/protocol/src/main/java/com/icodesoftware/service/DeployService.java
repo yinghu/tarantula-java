@@ -46,6 +46,7 @@ public interface DeployService extends ServiceProvider {
     boolean launchModule(String typeId);
     boolean shutdownModule(String typeId);
     boolean updateModule(Descriptor descriptor);
+    boolean deployModule(String context,String moduleFile);
 
     boolean sync(String key);
 

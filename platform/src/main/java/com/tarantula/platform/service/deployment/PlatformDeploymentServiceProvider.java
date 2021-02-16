@@ -263,6 +263,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends OnAccess> T gameService(String name){
         return (T)eMap.get(name);
     }
+    public Response deployModule(String contextUrl,String resourceName){
+        Response checked =  this.tarantulaContext.checkModule(contextUrl,resourceName);
+        if(!checked.successful()){
+            return checked;
+        }
+        boolean suc = this.tarantulaContext.integrationCluster().deployService().deployModule(contextUrl,resourceName);
+        checked.successful(suc);
+        checked.message(suc?"deployed->"+resourceName:"failed->"+resourceName);
+        return checked;
+    }
     public void updateModule(Descriptor descriptor){
         DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{
             DynamicModuleClassLoader nmc = new DynamicModuleClassLoader(descriptor);
@@ -552,7 +562,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         rMap.remove(onView.moduleResourceFile());
         vMap.put(onView.viewId(),onView);
-        log.warn("View deployed->"+onView.toString());
+        //log.warn("View deployed->"+onView.toString());
     }
     public OnView onView(String viewId){
         return (OnView)vMap.get(viewId);
@@ -587,6 +597,28 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 fos.flush();
                 fos.close();
                 rMap.remove(contentUrl+"/"+resourceName);//clear cache
+            }
+        }catch (Exception ex){
+            log.error(contentUrl+"/"+resourceName,ex);
+        }
+    }
+    public void updateModule(String contentUrl,String resourceName){
+        try{
+            //content dir deployDir/module
+            Path _path = Paths.get(this.tarantulaContext.deployDir+"/module/"+contentUrl);
+            if(!Files.exists(_path)){
+                Files.createDirectories(_path);
+            }
+            File f = new File(this.tarantulaContext.deployDir+"/"+resourceName);
+            File fe = new File(this.tarantulaContext.deployDir+"/module/"+contentUrl+"/"+resourceName);
+            if(!fe.exists()||fe.lastModified()<f.lastModified()){
+                BufferedInputStream fin = new BufferedInputStream(new FileInputStream(f));
+                BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(fe));
+                fos.write(fin.readAllBytes());
+                fin.close();
+                fos.flush();
+                fos.close();
+                //rMap.remove(contentUrl+"/"+resourceName);//clear cache
             }
         }catch (Exception ex){
             log.error(contentUrl+"/"+resourceName,ex);

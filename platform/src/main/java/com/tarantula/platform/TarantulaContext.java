@@ -748,7 +748,29 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             response.successful(true);
             response.message("resource->"+moduleContext);
             return response;
- 	    }catch (Exception ex){
+ 	    }catch (Exception ex) {
+            response.message(ex.getMessage());
+            return response;
+        }
+    }
+    public Response checkModule(String context,String moduleFile){
+        Response response = new ResponseHeader();
+        try{
+            File checkFile = new File(deployDir+"/"+moduleFile);
+            if(!checkFile.exists()){
+                log.warn("File not existed->"+checkFile);
+                response.message("file not existed->"+checkFile);
+                return response;
+            }
+            File ft = new File(deployDir+"/module/"+context+"/"+moduleFile);
+            if(ft.exists()&&ft.lastModified()>=checkFile.lastModified()){
+                response.message("File already has latest version");
+                return response;
+            }
+            response.successful(true);
+            response.message("module validated->"+moduleFile);
+            return response;
+        }catch (Exception ex){
  	        response.message(ex.getMessage());
  	        return response;
         }
