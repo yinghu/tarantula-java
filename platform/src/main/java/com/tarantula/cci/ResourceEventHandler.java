@@ -25,7 +25,7 @@ public class ResourceEventHandler implements RequestHandler {
     public void onRequest(OnExchange exchange){
         String path = exchange.path();
         //load js API in resources/web, public access
-        Content _load = this.deploymentServiceProvider.resource(path.substring(1),null);
+        Content _load = this.deploymentServiceProvider.resource(path.substring(1));
         exchange.onEvent(new ResponsiveEvent("","",_load.data(),0,_load.type(),"",true));
         deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
     }

@@ -214,10 +214,7 @@ public class XMLParser extends DefaultHandler{
                 this.applicationDescriptor.logEnabled(Boolean.parseBoolean(value));
             }
             else if(tblock.equals("view-list")&&qname.equals("property")){
-                if(pname.equals("flag")){
-                    view.flag(value);
-                }
-                else if(pname.equals("moduleContext")){
+                if(pname.equals("moduleContext")){
                     view.moduleContext(value);
                 }
                 else if(pname.equals("moduleResourceFile")){

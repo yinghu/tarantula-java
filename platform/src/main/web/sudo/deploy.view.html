@@ -14,19 +14,26 @@
     <div class="w3-panel w3-border-bottom w3-border-white">
         <div class="w3-panel">
             <label class="tx-text-12">Type Id</label>
-            <input id ="tx-view-type-id" class="w3-input w3-round w3-border" type="text" placeholder='view type id'/>
+            <select class="w3-select tx-text-14" name="option" id='tx-view-type-id'>
+                <option value="presence" selected>Presence (view context start with presence)</option>
+                <option value="sudo-role">Sudo (view context start with sudo)</option>
+                <option value="admin-role">Admin (view context start with admin)</option>
+                <option value="account-role">Account (view context start with account)</option>
+                <option value="index">Resource (view context start with resource)</option>
+                <option value="index">Index (view context start with root)</option>
+            </select>
         </div>
         <div class="w3-panel">
             <label class="tx-text-12">View Id</label>
-            <input id ="tx-view-id" class="w3-input w3-round w3-border" type="text" placeholder='view id'/>
+            <input id ="tx-view-id" class="w3-input w3-round w3-border tx-text-14" type="text" placeholder='view id'/>
         </div>
         <div class="w3-panel">
-            <label class="tx-text-12">View Context</label>
-            <input id ="tx-view-content-url" class="w3-input w3-round w3-border" type="text" placeholder='view context'/>
+            <label class="tx-text-12">View Context (eg : presence/game/tictactoe/v1 )</label>
+            <input id ="tx-view-content-url" class="w3-input w3-round w3-border tx-text-14" type="text" placeholder='view context'/>
         </div>
         <div class="w3-panel">
             <label class="tx-text-12">Resource Name</label>
-            <input id ="tx-view-resource-name" class="w3-input w3-round w3-border" type="text" placeholder='view resource'/>
+            <input id ="tx-view-resource-name" class="w3-input w3-round w3-border tx-text-14" type="text" placeholder='view resource'/>
         </div>
         <div class="w3-panel">
             <span id="tx-deploy-view" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Deploy View</span>     

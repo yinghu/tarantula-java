@@ -128,19 +128,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return _internalModule(descriptor.moduleName());
         }
     }
-    private Content fromModule(String name,String flag){
-        String rid = flag.split("=")[1].trim();
-        DynamicModuleClassLoader dc = cMap.get(rid);
-        byte[][] ret = {new byte[0]};
-        dc.loadResource(name,in -> {
-            try{
-                ret[0] = in.readAllBytes();
-            }catch (Exception ex){
-                log.warn("Resource ["+name+"] failed to load",ex);
-            }
-        });
-        return new ContentMapping(ret[0],SystemUtil.mimeType(name),ret[0].length>0);
-    }
+
     private Content fromContext(String name){
         return rMap.computeIfAbsent(name,(rk)->{
                 byte[] ret = new byte[0];
@@ -197,9 +185,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             ex.printStackTrace();
         }
     }
-    public Content resource(String name,String flag){
-        //log.warn("load resource ["+name+"] from ["+flag+"]");
-        return flag==null?fromContext(name):fromModule(name,flag);
+    public Content resource(String name){
+        //log.warn("load resource ["+name+"]");
+        return fromContext(name);
     }
     public void resource(Descriptor descriptor, String name, Module.OnResource onResource){
         DynamicModuleClassLoader dyn = cMap.get(descriptor.moduleId());

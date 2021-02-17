@@ -35,9 +35,9 @@ public class SudoEventHandler implements RequestHandler {
             if(!recoverService.checkAccessControl(onSession.systemId(), AccessControl.root)){
                 throw new RuntimeException("no access permission");
             }
-            Content ret = this.deploymentServiceProvider.resource(exchange.path().substring(1),null);
+            Content ret = this.deploymentServiceProvider.resource(exchange.path().substring(1));
             if(!ret.existed()){
-                ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile(),null);
+                ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile());
             }
             exchange.onEvent(new ResponsiveEvent("","",ret.data(),0,ret.type(),"",true));
             deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);

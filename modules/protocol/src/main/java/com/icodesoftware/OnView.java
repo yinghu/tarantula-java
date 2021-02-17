@@ -11,9 +11,6 @@ public interface OnView extends Configurable {
     String viewId();
     void viewId(String viewId);
 
-    String flag();
-    void flag(String flag);
-
     String moduleContext();
     void moduleContext(String moduleContext);
 

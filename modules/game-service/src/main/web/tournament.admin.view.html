@@ -1,21 +1,19 @@
 <div class="w3-modal-content">
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
         <div class="w3-display-topright w3-padding">
-            <span id="tx-invalid-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+            <span id="tx-api-test-tournament-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-exclamation-triangle" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">INVALID REQUEST</span>
+            <span class="tx-margin-left-8 tx-text-24">API Test Tournament</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-center w3-text-red tx-text-12">
         <p>Your request might have permission or techinical isssues. Contact our support team if you have questions.</p>
-    </div>
-    <div class="w3-panel w3-center w3-text-red tx-text-14" id="tx-request-view-message">
     </div> 
-    <div class="w3-panel w3-center w3-text-red tx-text-14" id="tx-invalid-message">
+    <div class="w3-panel w3-center w3-text-red tx-text-14" id="tx-api-test-tournament-message">
     </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
@@ -27,10 +25,8 @@
     </div>
 </div>
 <script>
-    document.querySelector('#tx-request-view-message').innerHTML = 'Request view id->'+TARA_API.query().viewId;
-    document.querySelector('#tx-invalid-message').innerHTML = TARA_API.query().message;
-    document.querySelector('#tx-invalid-close').onclick=()=>{
-        TARA_API.query().message='';
+    document.querySelector('#tx-api-test-tournament-message').innerHTML = 'Test tournament apis';
+    document.querySelector('#tx-api-test-tournament-close').onclick=()=>{
         let m3 = document.querySelector(TARA_API.query().popup);
         m3.innerHTML="";
         m3.style.display = 'none';       

@@ -21,7 +21,7 @@ public class RootContentHandler implements RequestHandler {
             if(path.equals("/")){
                 path = "/index.html";
             }
-            Content content = this.deploymentServiceProvider.resource("root"+path,exchange.query());
+            Content content = this.deploymentServiceProvider.resource("root"+path);
             byte[] _load = content.data();
             exchange.onEvent(new ResponsiveEvent("","",_load,0,content.type(),"",true));
             deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);

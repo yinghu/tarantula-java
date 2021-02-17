@@ -16,11 +16,10 @@ import com.icodesoftware.util.RecoverableObject;
 public class OnViewTrack extends RecoverableObject implements OnView, Portable {
 
 
-    protected String moduleContext;
-    protected String moduleResourceFile;
-    protected String viewId;
+    private String moduleContext;
+    private String moduleResourceFile;
+    private String viewId;
 
-    protected String flag;
 
     public OnViewTrack(){
         this.onEdge = true;
@@ -31,12 +30,6 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
     }
     public void viewId(String viewId){
         this.viewId = viewId;
-    }
-    public String flag(){
-        return this.flag;
-    }
-    public void flag(String flag){
-        this.flag = flag;
     }
 
     public String moduleContext(){
@@ -56,7 +49,6 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",viewId);
-        this.properties.put("2",flag);
         this.properties.put("4",moduleContext);
         this.properties.put("5",moduleResourceFile);
         return this.properties;
@@ -64,7 +56,6 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
     @Override
     public void fromMap(Map<String,Object> properties){
         this.viewId = (String)properties.get("1");
-        this.flag = (String)properties.get("2");
         this.moduleContext = (String)properties.get("4");
         this.moduleResourceFile = (String)properties.get("5");
     }
@@ -81,7 +72,6 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeUTF("1",viewId);
-        portableWriter.writeUTF("2",flag);
         portableWriter.writeUTF("4",this.moduleContext);
         portableWriter.writeUTF("5",moduleResourceFile);
     }
@@ -89,7 +79,6 @@ public class OnViewTrack extends RecoverableObject implements OnView, Portable {
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         viewId = portableReader.readUTF("1");
-        flag = portableReader.readUTF("2");
         moduleContext = portableReader.readUTF("4");
         moduleResourceFile= portableReader.readUTF("7");
     }

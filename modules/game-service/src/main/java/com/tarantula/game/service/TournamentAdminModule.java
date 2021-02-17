@@ -19,7 +19,7 @@ public class TournamentAdminModule implements Module {
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
-        this.context.log("Tarantula Tournament Addmin Module Started->"+context.descriptor().distributionKey(), OnLog.WARN);
+        this.context.log("Tarantula Tournament Admin Module Started->"+context.descriptor().distributionKey(), OnLog.WARN);
     }
 
     @Override

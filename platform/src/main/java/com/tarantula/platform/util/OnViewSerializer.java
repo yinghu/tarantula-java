@@ -15,9 +15,6 @@ public class OnViewSerializer implements JsonSerializer<OnView> {
     public JsonElement serialize(OnView descriptor, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = new JsonObject();
         jo.addProperty("viewId",descriptor.viewId());
-        if(descriptor.flag()!=null){
-            jo.addProperty("flag",descriptor.flag());
-        }
         if(descriptor.moduleContext()!=null){
             jo.addProperty("moduleContext",descriptor.moduleContext());
         }

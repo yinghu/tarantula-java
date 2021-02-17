@@ -43,6 +43,7 @@ var TARA_API = (function(){
     }
   };
   let _view = function(viewId,callback){
+    qdata.viewId = viewId;
     let v = vmap.get(viewId);
     if(v==null){  
         let aj = new XMLHttpRequest();   
@@ -57,7 +58,6 @@ var TARA_API = (function(){
         aj.open("GET","/view",true);
         aj.setRequestHeader('Accept','application/json');
         aj.setRequestHeader('Tarantula-view-id',viewId);
-        //aj.setRequestHeader('Tarantula-tag','index/lobby');
         aj.send();
     }
     else{
