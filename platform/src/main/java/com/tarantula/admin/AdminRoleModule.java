@@ -389,11 +389,11 @@ public class AdminRoleModule implements Module {
                 ExposedGameService exposedGameService = this.deploymentServiceProvider.gameService(_serviceName);
                 DeploymentDescriptor desc = new DeploymentDescriptor();
                 desc.typeId(typeId);
-                desc.subtypeId(name + "-service-module");
+                desc.subtypeId(name.toLowerCase() + "-service-module");
                 desc.type("application");
                 desc.name(_serviceName);
                 desc.category("service");
-                desc.tag(name + "/"+_serviceName);
+                desc.tag(name.toLowerCase() + "/"+_serviceName);
                 if(exposedGameService!=null){
                     desc.moduleId(exposedGameService.property(ExposedGameService.MODULE_ID).toString());
                     desc.index(exposedGameService.property(ExposedGameService.MODULE_INDEX).toString());
