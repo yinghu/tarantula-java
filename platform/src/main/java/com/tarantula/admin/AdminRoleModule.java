@@ -9,7 +9,6 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.game.*;
 import com.tarantula.platform.*;
-import com.tarantula.platform.item.Item;
 import com.tarantula.platform.presence.*;
 
 import com.tarantula.platform.service.Metrics;
@@ -427,6 +426,7 @@ public class AdminRoleModule implements Module {
                     itemServiceId[0] = e.distributionKey();
                 }
             });
+            /**
             if(itemServiceId[0]!=null){
                 Item item = new Item();
                 item.name(onAccess.property("name").toString());
@@ -436,7 +436,7 @@ public class AdminRoleModule implements Module {
                 item.property("melee",2.5);
                 item.property("level",1);
                 dataStore.create(item);
-            }
+            }**/
             session.write(payload,label());
         }
         else if(session.action().equals("onLaunchGameCluster")){

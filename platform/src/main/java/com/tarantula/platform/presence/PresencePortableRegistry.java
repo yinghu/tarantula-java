@@ -1,11 +1,9 @@
 package com.tarantula.platform.presence;
 
 import com.icodesoftware.Recoverable;
-import com.tarantula.platform.AbstractRecoverableListener;
+import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.event.PortableEventRegistry;
-import com.tarantula.platform.item.Item;
-import com.tarantula.platform.item.ItemPack;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.OnBalanceTrack;
 import com.tarantula.platform.PresenceIndex;
@@ -29,9 +27,6 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
     public static final int PURCHASE_CID = 6;
 
     public static final int STATISTICS_DELTA_CID = 7;
-
-    public static final int ITEM_CID = 8;
-    public static final int ITEM_PACK_CID = 9;
 
     public Recoverable create(int i) {
         Recoverable pt = null;
@@ -59,12 +54,6 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 break;
             case STATISTICS_DELTA_CID:
                 pt = new StatsDelta();
-                break;
-            case ITEM_CID:
-                pt = new Item();
-                break;
-            case ITEM_PACK_CID:
-                pt = new ItemPack();
                 break;
             default:
         }

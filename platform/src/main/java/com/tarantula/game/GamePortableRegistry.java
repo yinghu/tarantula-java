@@ -1,7 +1,7 @@
 package com.tarantula.game;
 
 import com.icodesoftware.Recoverable;
-import com.tarantula.platform.AbstractRecoverableListener;
+import com.icodesoftware.util.AbstractRecoverableListener;
 
 /**
  * Created by yinghu lu on 4/14/2020.

@@ -1,4 +1,4 @@
-package com.tarantula.platform;
+package com.icodesoftware.util;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
@@ -12,7 +12,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Updated by yinghu lu on 12/18/2020
  */
 public abstract class AbstractRecoverableListener implements RecoverableListener {
-
 
     private ConcurrentHashMap<Integer,OnFilter> oMap = new ConcurrentHashMap<>();
 

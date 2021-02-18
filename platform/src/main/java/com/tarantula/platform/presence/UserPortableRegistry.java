@@ -1,7 +1,7 @@
 package com.tarantula.platform.presence;
 
 import com.icodesoftware.Recoverable;
-import com.tarantula.platform.AbstractRecoverableListener;
+import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.OnAccessTrack;
 
 /**
