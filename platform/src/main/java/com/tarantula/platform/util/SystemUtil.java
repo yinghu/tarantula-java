@@ -244,6 +244,12 @@ public class SystemUtil {
         else if(path.endsWith(".jpg")){
             contentType = "image/jpeg";
         }
+        else if(path.endsWith("svg")){
+            contentType = "image/svg+xml";
+        }
+        else if(path.endsWith(".map")){
+            contentType = "application/octet-stream";
+        }
         return contentType;
     }
 }
