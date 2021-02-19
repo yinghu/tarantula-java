@@ -412,33 +412,6 @@ public class AdminRoleModule implements Module {
             }
             session.write(toMessage(_existed[0]?"created":"failed",_existed[0]).toString().getBytes(),label());
         }
-        else if(session.action().equals("onAddItem")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            GameCluster gameCluster = deploymentServiceProvider.gameCluster(accessId);
-            String name = (String)gameCluster.property(GameCluster.NAME);
-            String dn = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-            Lobby _lobby = this.deploymentServiceProvider.lobby(dn);
-            DataStore dataStore = this.context.dataStore(dn.replace("-","_"));
-            String[] itemServiceId ={null};
-            _lobby.entryList().forEach((e)->{
-                if(e.tag().equals(name+"/item")){
-                    itemServiceId[0] = e.distributionKey();
-                }
-            });
-            /**
-            if(itemServiceId[0]!=null){
-                Item item = new Item();
-                item.name(onAccess.property("name").toString());
-                item.description(onAccess.property("description").toString());
-                item.category(onAccess.property("category").toString());
-                item.owner(itemServiceId[0]);
-                item.property("melee",2.5);
-                item.property("level",1);
-                dataStore.create(item);
-            }**/
-            session.write(payload,label());
-        }
         else if(session.action().equals("onLaunchGameCluster")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);

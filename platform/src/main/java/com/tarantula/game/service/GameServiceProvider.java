@@ -157,9 +157,6 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         });
         logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]");
     }
-    //public DataStore dataStore(){
-        //return this.dataStore;
-    //}
     @Override
     public void atMidnight(){
         tMap.forEach((k,v)->{
