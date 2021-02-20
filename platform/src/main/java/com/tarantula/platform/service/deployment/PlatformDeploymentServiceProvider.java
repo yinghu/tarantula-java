@@ -989,7 +989,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
 
         public OnTopic onTopic(){
-            return (label,data)-> pushRegistry.forEach((k,v)-> v.write(data,label));
+            return (topic,data)->{
+                    
+            };
+            //return (label,data)-> pushRegistry.forEach((k,v)-> v.write(data,label));
         }
         public OnSMS onSMS(){
             return ((emailAddress, data) ->Email.send(emailAddress,data));
@@ -1001,7 +1004,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         public OnTag onTag(String tag){
            return (dkey,t)->{
                String key = t.key().asString();
-               byte[] payload = t.toBinary();//SystemUtil.toJson(t.toMap());
+               byte[] payload = t.toBinary();
                RoutingKey routingKey = integrationEventService.routingKey(dkey,tag);
                MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),t.owner(),t.getFactoryId(),t.getClassId(),key!=null?key:"",payload);
                integrationEventService.publish(mapStoreSyncEvent);
@@ -1010,7 +1013,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         public OnApplication onApplication(String applicationId){
             return (dkey,t)->{
                 String key = t.key().asString();
-                byte[] payload = t.toBinary();//SystemUtil.toJson(t.toMap());
+                byte[] payload = t.toBinary();
                 RoutingKey routingKey = integrationEventService.instanceRoutingKey(applicationId,dkey);
                 MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),t.owner(),t.getFactoryId(),t.getClassId(),key!=null?key:"",payload);
                 integrationEventService.publish(mapStoreSyncEvent);

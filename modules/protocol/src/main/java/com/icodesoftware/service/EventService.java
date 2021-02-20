@@ -7,9 +7,9 @@ import com.icodesoftware.RoutingKey;
 public interface EventService extends EventListener, Serviceable {
 
 	void publish(Event out);
-	String subscription();
     void retry(String retryKey);
 
+    //delegates topic subscribe
     void registerEventListener(String topic, EventListener callback);
 
     RoutingKey instanceRoutingKey(String applicationId, String instanceId);

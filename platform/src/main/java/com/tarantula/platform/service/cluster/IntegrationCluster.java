@@ -50,10 +50,10 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private MultiMap<String, byte[]> mIndex;
     private Map<byte[],byte[]> vMap;
 
-    private String memberId;
+    //private String memberId;
     private DeployService deployService;
     private RecoverService recoverService;
-    private ConcurrentHashMap<String, EventListener> eMap = new ConcurrentHashMap<>();
+    //private ConcurrentHashMap<String, EventListener> eMap = new ConcurrentHashMap<>();
 
     private MetricsListener metricsListener;
 
@@ -70,9 +70,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public String name(){
         return "IntegrationCluster";
     }
-    public String subscription(){
-        return this.memberId;
-    }
+    //public String subscription(){
+        //return this.memberId;
+    //}
     public String bucket(){
         return this.bucket;
     }
@@ -99,8 +99,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         vMap = this._cluster.getMap(VALUE_MAP);
         AccessIndexService accessIndexService =_cluster.getDistributedObject(AccessIndexService.NAME,AccessIndexService.NAME);
         this.tarantulaContext.serviceProvider(accessIndexService);
-        this.memberId = this._cluster.getCluster().getLocalMember().getUuid();
-        this.subscribe(this.memberId,this);
+        //this.memberId = this._cluster.getCluster().getLocalMember().getUuid();
+        //this.subscribe(this.memberId,this);
         this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);
         this.recoverService = this._cluster.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
         new ServiceBootstrap(this.tarantulaContext._deployServiceStarted,this.tarantulaContext._storageStarted,new StorageServiceBootstrap(this.tarantulaContext),"data-store-starter",true).start();
@@ -133,7 +133,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             log.warn("No destination message ->"+message.toString());
         }
     }
-
+    /**
     public String addEventListener(String registerId,EventListener e){
         if(registerId==null){
             String rid = UUID.randomUUID().toString();
@@ -147,8 +147,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
     public void removeEventListener(String registerId){
         eMap.remove(registerId);
-    }
-    @Override
+    }**/
+    /**
     public boolean onEvent(Event event) {
         EventListener e = eMap.get(event.trackId());
         if(e!=null){
@@ -158,7 +158,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
         }
         return false;
-    }
+    }**/
     public void retry(String retryKey) {
 
     }

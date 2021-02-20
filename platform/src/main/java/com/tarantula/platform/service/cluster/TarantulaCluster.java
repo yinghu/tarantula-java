@@ -28,7 +28,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     //cluster cache
     private MultiMap<String, byte[]> mIndex;
     private Map<byte[],byte[]> vMap;
-    private String memberId;
+    //private String memberId;
     private DeployService deployService;
     private RecoverService recoverService;
     //private ConcurrentHashMap<String,EventListener> eMap = new ConcurrentHashMap<>();
@@ -56,9 +56,9 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     public void registerEventListener(String topic, EventListener callback){
 
     }
-    public String subscription(){
-        return this.memberId;
-    }
+    //public String subscription(){
+        //return this.memberId;
+    //}
     public String name(){
         return "TarantulaCluster";
     }
@@ -141,7 +141,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         vMap = this._hazel.getMap(VALUE_MAP);
         this.deployService = this._hazel.getDistributedObject(DeployService.NAME,DeployService.NAME);
         this.recoverService = this._hazel.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
-        memberId = _hazel.getCluster().getLocalMember().getUuid();
+        //memberId = _hazel.getCluster().getLocalMember().getUuid();
     }
 
 	public void shutdown() throws Exception {
@@ -161,11 +161,6 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
 
     }
 
-    public String addEventListener(String registerId,EventListener e){
-        throw new UnsupportedOperationException();
-    }
-    public void removeEventListener(String registerId){
-    }
     public RoutingKey routingKey(String magicKey, String tag){
         return null;
     }

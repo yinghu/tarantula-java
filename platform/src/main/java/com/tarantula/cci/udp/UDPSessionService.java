@@ -7,7 +7,6 @@ import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.protocol.OutboundMessage;
 import com.tarantula.platform.PendingMessage;
 import com.tarantula.platform.service.ConnectionEventService;
-import com.tarantula.platform.util.SystemUtil;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -16,7 +15,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,18 +39,12 @@ public class UDPSessionService implements ConnectionEventService {
         this.encrypt = encrypt;
         this.decrypt = decrypt;
         messageId = new AtomicInteger(connection.messageId());
-        //System.out.println("mid->"+connection.messageId()+">>"+connection.messageIdOffset());
         pendingAck = new ConcurrentHashMap<>();
     }
 
     @Override
     public void publish(Event out) {
 
-    }
-
-    @Override
-    public String subscription() {
-        return null;
     }
 
     @Override

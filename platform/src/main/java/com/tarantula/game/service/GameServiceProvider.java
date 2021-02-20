@@ -7,6 +7,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.tarantula.platform.event.GameUpdateEvent;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.LeaderBoardEntry;
@@ -34,7 +35,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private ConcurrentHashMap<String,Room> roomIndex = new ConcurrentHashMap<>();
 
     private EventService publisher;
-    private String dest;
+
     private String subscription;
     private String statisticsTag;
     private ClusterProvider integrationCluster;
@@ -141,18 +142,21 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     public void setup(ServiceContext serviceContext) {
         this.dataStore = serviceContext.dataStore(NAME.replace("-","_"),serviceContext.partitionNumber());//typeId_service
         this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
-        this.dest = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).subscription();
         this.subscription = UUID.randomUUID().toString();
-        serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).addEventListener(NAME,(e)->{
-            LeaderBoardEntry update = new LeaderBoardEntry(e.index(),e.name(),e.version(),e.owner(),e.balance(),e.timestamp());
-            LeaderBoardSync ldb = this._leaderBoard(update.category());
-            ldb.onView(update);
+        integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
+        integrationCluster.subscribe(NAME,(e)->{
+            if(e instanceof LeaderBoardGlobalEvent){
+                LeaderBoardEntry update = new LeaderBoardEntry(e.index(),e.name(),e.version(),e.owner(),e.balance(),e.timestamp());
+                LeaderBoardSync ldb = this._leaderBoard(update.category());
+                ldb.onView(update);
+            }
             return false;
         });
-        integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
-        this.publisher = integrationCluster.subscribe(subscription,(e)->{
-            Room room = roomIndex.get(e.trackId());
-            room.onUpdated(e.action(),e.payload());
+        integrationCluster.subscribe(subscription,(e)->{
+            if(e instanceof GameUpdateEvent){
+                Room room = roomIndex.get(e.trackId());
+                room.onUpdated(e.action(),e.payload());
+            }
             return false;
         });
         logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]");
@@ -171,14 +175,14 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     @Override
     public void shutdown() throws Exception {
         logger.warn("shut down service->"+NAME);
-        integrationCluster.removeEventListener(NAME);
+        integrationCluster.unsubscribe(NAME);
     }
     private double probability(double rating1,double rating2) {
         return 1.0 * 1.0 / (1 + 1.0 * (Math.pow(10, 1.0 * (rating1 - rating2) / 400)));
     }
     @Override
     public void onUpdated(LeaderBoard.Entry entry) {
-        publisher.publish(new LeaderBoardGlobalEvent(dest,NAME,entry));
+        publisher.publish(new LeaderBoardGlobalEvent(NAME,NAME,entry));
     }
 
 

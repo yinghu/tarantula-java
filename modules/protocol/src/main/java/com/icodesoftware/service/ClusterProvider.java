@@ -15,10 +15,10 @@ public interface ClusterProvider extends Serviceable {
     String name();
     int scope();
     String bucket();
-    String subscription();
+    //String subscription();
 
-    String addEventListener(String registerId, EventListener eventListener);
-    void removeEventListener(String registerId);
+    //String addEventListener(String registerId, EventListener eventListener);
+    //void removeEventListener(String registerId);
 
     //EventListener Register
     EventService publisher();

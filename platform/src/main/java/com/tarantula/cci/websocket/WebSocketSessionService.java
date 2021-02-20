@@ -59,10 +59,7 @@ public class WebSocketSessionService implements ConnectionEventService,WebSocket
         pendingOutboundMessage.payload(payload);
         webSocket.sendBinary(ByteBuffer.wrap(pendingOutboundMessage.message()),true);
     }
-    @Override
-    public String subscription() {
-        return null;
-    }
+
 
     @Override
     public void retry(String retryKey) {

@@ -14,10 +14,7 @@ public class WebhookSessionService implements EventService {
 
     }
 
-    @Override
-    public String subscription() {
-        return null;
-    }
+
 
     @Override
     public void retry(String retryKey) {

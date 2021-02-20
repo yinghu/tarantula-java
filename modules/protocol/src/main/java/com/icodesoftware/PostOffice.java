@@ -3,18 +3,18 @@ package com.icodesoftware;
 public interface PostOffice {
 
     //app to client
-    OnTopic onTopic();
     OnConnection onConnection(Connection connection);
     OnEmail onEmail();
     OnSMS onSMS();
+
     //app to app
     OnTag onTag(String tag);
     OnApplication onApplication(String applicationId);
-
+    OnTopic onTopic();
 
     //send data to client on the notification topic
     interface OnTopic{
-        void send(String topic,byte[] data);
+        void send(String topic,Recoverable data);
     }
 
     //send data to client on the connection
