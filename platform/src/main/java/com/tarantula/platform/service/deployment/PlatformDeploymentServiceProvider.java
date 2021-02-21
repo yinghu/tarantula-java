@@ -69,6 +69,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ConcurrentHashMap<String,Content> rMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,ExposedGameService> eMap = new ConcurrentHashMap<>();
 
+    private ConcurrentHashMap<String,RecoverableListener> tMap = new ConcurrentHashMap<>();
+    private EventService publisher;
     private TarantulaContext tarantulaContext;
     private GsonBuilder builder;
 
@@ -485,6 +487,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void waitForData() {
         this.tarantulaContext.schedule(this);
         this.tarantulaContext.tarantulaCluster().deployService().syncServerPushEvent();
+        this.publisher = this.tarantulaContext.integrationCluster().subscribe(NAME,(e)->{
+            String tp = e.trackId();
+            RecoverableListener listener = tMap.get(tp);
+            if(listener!=null){
+                listener.onUpdated(e.stub(),e.trackId(),e.index(),e.payload());
+            }
+            return false;
+        });
         if(this.tarantulaContext.udpEndpointEnabled){
             TarantulaExecutorServiceFactory.createExecutorService(this.tarantulaContext.udpReceiverThreadPoolSetting,(pool, psize, rh)->{
                 this.udpPool = pool;
@@ -906,6 +916,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void issueDataStoreBackup(){
 
     }
+    public RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener){
+        tMap.put(topic,recoverableListener);
+        return recoverableListener;
+    }
+    public void unregisterRecoverableListener(String topic){
+        tMap.remove(topic);
+    }
     public void atMidnight(){
 
     }
@@ -990,9 +1007,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
         public OnTopic onTopic(){
             return (topic,data)->{
-                    
+                TopicMapStoreSyncEvent event = new TopicMapStoreSyncEvent(NAME,topic,data.getFactoryId(),data.getClassId(),data.key().asString(),data.toBinary());
+                publisher.publish(event);
             };
-            //return (label,data)-> pushRegistry.forEach((k,v)-> v.write(data,label));
         }
         public OnSMS onSMS(){
             return ((emailAddress, data) ->Email.send(emailAddress,data));

@@ -38,6 +38,8 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int GAME_UPDATE_EVENT_CID = 22;
 
+    public static final int TOPIC_MAP_STORE_SYNC_EVENT_CID = 23;
+
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
 
@@ -86,6 +88,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case GAME_UPDATE_EVENT_CID:
                 _ins = new GameUpdateEvent();
+                break;
+            case TOPIC_MAP_STORE_SYNC_EVENT_CID:
+                _ins = new TopicMapStoreSyncEvent();
                 break;
             case MODULE_RESET_EVENT_CID:
                 _ins = new ModuleResetEvent();
