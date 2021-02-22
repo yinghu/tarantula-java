@@ -1,9 +1,12 @@
 package com.icodesoftware;
 
 public interface Consumable extends Recoverable{
+
     String id();
+
     String name();
     void name(String name);
+
     String category();
     void category(String category);
 

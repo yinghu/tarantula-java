@@ -233,6 +233,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     egs.property(ExposedGameService.MODULE_ARTIFACT,descriptor.moduleArtifact());
                     egs.property(ExposedGameService.MODULE_VERSION,descriptor.moduleVersion());
                     egs.property(ExposedGameService.MODULE_NAME,je.get(ExposedGameService.MODULE_NAME).getAsString());
+                    egs.property(ExposedGameService.DEPLOY_PRIORITY,je.get(ExposedGameService.DEPLOY_PRIORITY).getAsInt());
                     egs.property(ExposedGameService.ACCESS_CONTROL,je.get(ExposedGameService.ACCESS_CONTROL).getAsInt());
                     eMap.put(egs.name(),egs);
                 });

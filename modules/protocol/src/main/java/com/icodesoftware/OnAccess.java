@@ -26,7 +26,7 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String DESCRIPTION = "description";
     String NAME = "name";
     String ACCESS_CONTROL = "accessControl";
-
+    String DEPLOY_PRIORITY = "deployPriority";
 
 
 

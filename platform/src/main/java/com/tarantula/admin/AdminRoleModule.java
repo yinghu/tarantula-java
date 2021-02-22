@@ -387,28 +387,26 @@ public class AdminRoleModule implements Module {
                 _existed[0]=false;
             }else {
                 ExposedGameService exposedGameService = this.deploymentServiceProvider.gameService(_serviceName);
-                DeploymentDescriptor desc = new DeploymentDescriptor();
-                desc.typeId(typeId);
-                desc.subtypeId(name.toLowerCase() + "-service-module");
-                desc.type("application");
-                desc.name(_serviceName);
-                desc.category("service");
-                desc.tag(name.toLowerCase() + "/"+_serviceName);
                 if(exposedGameService!=null){
+                    DeploymentDescriptor desc = new DeploymentDescriptor();
+                    desc.typeId(typeId);
+                    desc.subtypeId(name.toLowerCase() + "-service-module");
+                    desc.type("application");
+                    desc.name(_serviceName);
+                    desc.category("service");
+                    desc.tag(name.toLowerCase() + "/"+_serviceName);
                     desc.moduleId(exposedGameService.property(ExposedGameService.MODULE_ID).toString());
                     desc.index(exposedGameService.property(ExposedGameService.MODULE_INDEX).toString());
                     desc.codebase(exposedGameService.property(ExposedGameService.MODULE_CODE_BASE).toString());
                     desc.moduleArtifact(exposedGameService.property(ExposedGameService.MODULE_ARTIFACT).toString());
                     desc.moduleVersion(exposedGameService.property(ExposedGameService.MODULE_VERSION).toString());
                     desc.moduleName(exposedGameService.property(ExposedGameService.MODULE_NAME).toString());
+                    desc.deployPriority((Integer)exposedGameService.property(ExposedGameService.DEPLOY_PRIORITY));
                     desc.accessControl((Integer)exposedGameService.property(ExposedGameService.ACCESS_CONTROL));
+                    desc.applicationClassName("com.tarantula.platform.module.SingletonModuleApplication");
+                    desc.singleton(true);
+                    _existed[0] = this.deploymentServiceProvider.createApplication(desc, true);
                 }
-                else{
-                    desc.moduleName("com.tarantula.game.module.ItemModule");
-                }
-                desc.applicationClassName("com.tarantula.platform.module.SingletonModuleApplication");
-                desc.singleton(true);
-                _existed[0] = this.deploymentServiceProvider.createApplication(desc, true);
             }
             session.write(toMessage(_existed[0]?"created":"failed",_existed[0]).toString().getBytes(),label());
         }
