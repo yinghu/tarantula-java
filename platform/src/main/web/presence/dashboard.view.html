@@ -153,7 +153,7 @@
             </div>
             <div id='tx-game-cluster-next' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
                 <div  class='w3-container w3-padding'>
-                    <span id='tx-game-cluster-next-list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Next Game</span>    
+                    <span id='tx-game-cluster-next-list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Next Game</span>    
                 </div>
             </div>
             <div id='game-cluster-0' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
@@ -197,7 +197,7 @@
         <div id="tx-LiveGame" class="w3-container tx-pane" style="display:none;">
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <div  class='w3-container w3-padding'>
-                    <span id='tx-live-game-next-list' live-game-page='0' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Next Live Game</span>    
+                    <span id='tx-live-game-next-list' live-game-page='0' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Next Live Game</span>    
                 </div>
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
@@ -207,6 +207,11 @@
                     </div>
                     <div class="w3-display-bottomleft w3-padding">
                         <span id='live-game-list-name' class="tx-text-18"></span>
+                    </div>
+                    <div class="w3-display-topright w3-padding">
+                        <span id='live-game-inbox' view-id='live.game.inbox' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Inbox</span>
+                        <span id='live-game-inventory' view-id='live.game.inventory' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Inventory</span>
+                        <span id='live-game-rating' view-id='live.game.rating' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Rating</span>
                     </div>
                     <div class="w3-display-bottomright w3-padding">
                         <span id='live-game-list-play' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-play">PLAY</span>
@@ -485,13 +490,6 @@
         <div id="tx-Sudo" class="w3-container tx-pane" style="display:none;">
             <div id='tx-extension-open'>
                 <div class="w3-panel w3-border-bottom w3-border-red">
-                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">User Management Operations</span></div>
-                    <div class='w3-bar w3-white'>
-                        <span view-id='find.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Find User</span>
-                        <span view-id='ban.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Ban User</span>
-                    </div>            
-                </div>
-                <div class="w3-panel w3-border-bottom w3-border-red">
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Web View Operations</span></div>
                     <div class='w3-bar w3-white'>
                         <span view-id='deploy.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy View</span>
@@ -520,6 +518,13 @@
                         <span view-id='start.access.index' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Start Access Index</span>    
                         <span view-id='configuration.list' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Configuration List</span>  
                         <span view-id='create.labeled.key' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create key</span>
+                    </div>            
+                </div>
+                <div class="w3-panel w3-border-bottom w3-border-red">
+                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">User Management Operations</span></div>
+                    <div class='w3-bar w3-white'>
+                        <span view-id='find.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Find User Index</span>
+                        <span view-id='ban.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Ban User</span>
                     </div>            
                 </div>
             </div>
@@ -582,6 +587,14 @@
     document.querySelector('#tx-live-game-next-list').onclick=()=>{
         _tx_lobby();
     };
+    document.querySelectorAll('.tx-game-service-bar').forEach((a)=>{
+        a.onclick=()=>{
+            //TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
+            TARA_API.query().popup = '#tx-popup';
+            let vid = a.getAttribute('view-id');
+            tx_view({viewId:vid,containerId:'#tx-popup'});    
+        }
+    });
     document.querySelectorAll('.tx-game-play').forEach((a)=>{
         a.onclick=()=>{
             let _mmk = a.getAttribute('game-match-making');
