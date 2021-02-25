@@ -245,27 +245,4 @@ public class SudoRoleModule implements Module {
         jsonObject.add("configurations",clist);
         return jsonObject;
     }
-    private JsonObject toDataStoreCount(){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",true);
-        long cnt =0;
-        //for(int i=0;i<this.deploymentServiceProvider.clusterPartitionCount();i++){
-            //cnt += this.context.dataStore("p_"+i).count();
-        //}
-        jsonObject.add("AccessIndex",toJson("accessIndex",cnt));
-        jsonObject.add("User",toJson(Access.DataStore,this.context.dataStore(Access.DataStore).count()));
-        jsonObject.add("Session",toJson(OnSession.DataStore,this.context.dataStore(OnSession.DataStore).count()));
-        jsonObject.add("Account",toJson(Account.DataStore,this.context.dataStore(Account.DataStore).count()));
-        jsonObject.add("Presence",toJson(Presence.DataStore,this.context.dataStore(Presence.DataStore).count()));
-        jsonObject.add("Subscription",toJson(Subscription.DataStore,this.context.dataStore(Subscription.DataStore).count()));
-        jsonObject.add("Purchase",toJson(SubscriptionFee.DataStore,this.context.dataStore(SubscriptionFee.DataStore).count()));
-        jsonObject.add("System",toJson(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE).count()));
-        return jsonObject;
-    }
-    private JsonObject toJson(String ds,long count){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("name",ds);
-        jsonObject.addProperty("count",count);
-        return jsonObject;
-    }
 }
