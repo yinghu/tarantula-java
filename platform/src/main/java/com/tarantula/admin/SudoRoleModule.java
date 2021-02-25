@@ -3,6 +3,7 @@ package com.tarantula.admin;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.AccessIndexService;
@@ -39,10 +40,6 @@ public class SudoRoleModule implements Module {
             uDatastore.load(acc);
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes(),label());
         }
-        else if(session.action().equals("onDataStoreCountList")){
-            JsonObject jm = this.toDataStoreCount();
-            session.write(jm.toString().getBytes(),label());
-        }
         else if(session.action().equals("onCreateLabeledKey")){
             this.context.log(new String(payload),OnLog.WARN);
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -73,26 +70,6 @@ public class SudoRoleModule implements Module {
                 session.write(toMessage("["+login+"] not found",false).toString().getBytes(),label());
             }
         }
-        else if(session.action().equals("onSubscriptionList")){
-            DataStore mds = this.context.dataStore(Subscription.DataStore);
-            SubscriptionContext sct = new SubscriptionContext();
-            sct.subscriptionList = new ArrayList<>();
-            //mds.traverse((d,o,k,v)->{
-                //Subscription sub = new Membership();
-                //sub.distributionKey(new String(k));
-                //sub.fromMap(SystemUtil.toMap(v));
-                //sct.subscriptionList.add(sub);
-                //return true;
-            //});
-            session.write(sct.toJson().toString().getBytes(),this.label());
-        }
-        else if(session.action().equals("onBackupDataStore")){
-            this.deploymentServiceProvider.issueDataStoreBackup();
-            session.write(toMessage("backup commnad issued",true).toString().getBytes(),label());
-        }
-        else if(session.action().equals("onFindDataStore")){
-            session.write(toMessage("find data store",true).toString().getBytes(),label());
-        }
         else if(session.action().equals("onExportModule")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
             DeploymentDescriptor desc = new DeploymentDescriptor();
@@ -104,9 +81,6 @@ public class SudoRoleModule implements Module {
         }
         else if(session.action().equals("onAddModule")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            //this.context.log(acc.property(OnAccess.MODULE_CODE_BASE).toString(),OnLog.WARN);
-            //this.context.log(acc.property(OnAccess.MODULE_ARTIFACT).toString(),OnLog.WARN);
-            //this.context.log(acc.property(OnAccess.MODULE_VERSION).toString(),OnLog.WARN);
             DeploymentDescriptor desc = new DeploymentDescriptor();
             desc.codebase(acc.property(OnAccess.MODULE_CODE_BASE).toString());
             desc.moduleArtifact(acc.property(OnAccess.MODULE_ARTIFACT).toString());
@@ -187,6 +161,36 @@ public class SudoRoleModule implements Module {
             Response suc = this.deploymentServiceProvider.deployModule((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
             session.write(toMessage(suc.message(),suc.successful()).toString().getBytes(),label());
         }
+        else if(session.action().equals("onListDataStore")){
+            List<String> dlist = this.deploymentServiceProvider.listDataStore();
+            session.write(toJsonList(dlist).toString().getBytes(),label());
+        }
+        else if(session.action().equals("onLoadDataStore")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String dataStore = onAccess.property("dataStore").toString();
+            if(this.deploymentServiceProvider.validDataStore(dataStore)){
+                DataStore ds = this.context.dataStore(dataStore);
+                JsonArray list = new JsonArray();
+                JsonParser parser = new JsonParser();
+                ds.backup().list((k,v)->{
+                    JsonObject r = new JsonObject();
+                    r.addProperty("id",new String(k));
+                    r.add("payload",parser.parse(new String(v)));
+                    list.add(r);
+                    return true;
+                });
+                JsonObject ret = new JsonObject();
+                ret.add("resultRet",list);
+                session.write(ret.toString().getBytes(),label());
+            }else{
+                session.write(toMessage("data store not existed->"+dataStore,false).toString().getBytes(),label());
+            }
+
+        }
+        else if(session.action().equals("onBackupDataStore")){
+            this.deploymentServiceProvider.issueDataStoreBackup();
+            session.write(toMessage("backup commnad issued",true).toString().getBytes(),label());
+        }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");
         }
@@ -216,6 +220,16 @@ public class SudoRoleModule implements Module {
         jms.addProperty("message",msg);
         return jms;
     }
+    private JsonObject toJsonList(List<String> dataStoreList){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("successful",true);
+        JsonArray clist = new JsonArray();
+        dataStoreList.forEach((d)->{
+            clist.add(d);
+        });
+        jsonObject.add("list",clist);
+        return jsonObject;
+    }
     private JsonObject toJson(List<Configuration> configurations){
         JsonObject jsonObject = new JsonObject();
         JsonArray clist = new JsonArray();
@@ -238,14 +252,20 @@ public class SudoRoleModule implements Module {
         //for(int i=0;i<this.deploymentServiceProvider.clusterPartitionCount();i++){
             //cnt += this.context.dataStore("p_"+i).count();
         //}
-        jsonObject.addProperty("AccessIndex",cnt);
-        jsonObject.addProperty("User",this.context.dataStore(Access.DataStore).count());
-        jsonObject.addProperty("Session",this.context.dataStore(OnSession.DataStore).count());
-        jsonObject.addProperty("Account",this.context.dataStore(Account.DataStore).count());
-        jsonObject.addProperty("Presence",this.context.dataStore(Presence.DataStore).count());
-        jsonObject.addProperty("Subscription",this.context.dataStore(Subscription.DataStore).count());
-        jsonObject.addProperty("Purchase",this.context.dataStore(SubscriptionFee.DataStore).count());
-        jsonObject.addProperty("System",this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE).count());
+        jsonObject.add("AccessIndex",toJson("accessIndex",cnt));
+        jsonObject.add("User",toJson(Access.DataStore,this.context.dataStore(Access.DataStore).count()));
+        jsonObject.add("Session",toJson(OnSession.DataStore,this.context.dataStore(OnSession.DataStore).count()));
+        jsonObject.add("Account",toJson(Account.DataStore,this.context.dataStore(Account.DataStore).count()));
+        jsonObject.add("Presence",toJson(Presence.DataStore,this.context.dataStore(Presence.DataStore).count()));
+        jsonObject.add("Subscription",toJson(Subscription.DataStore,this.context.dataStore(Subscription.DataStore).count()));
+        jsonObject.add("Purchase",toJson(SubscriptionFee.DataStore,this.context.dataStore(SubscriptionFee.DataStore).count()));
+        jsonObject.add("System",toJson(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE).count()));
+        return jsonObject;
+    }
+    private JsonObject toJson(String ds,long count){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("name",ds);
+        jsonObject.addProperty("count",count);
         return jsonObject;
     }
 }

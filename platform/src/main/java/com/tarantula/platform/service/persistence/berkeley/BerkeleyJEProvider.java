@@ -29,10 +29,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.*;
 
 /**
  * Updated by yinghu lu on 6/28/2020.
@@ -69,6 +66,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     private ShardingProvider iShardingProvider;
     private ShardingProvider dShardingProvider;
+    private List<String> dataStoreList;
 
     @Override
     public void configure(Map<String, String> properties) {
@@ -125,6 +123,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public DataStore create(String name,int partition){
         return this.dMap.computeIfAbsent(name,(k)->{
+            dataStoreList.add(name);
             Database[] shards = new Database[partition];
             for(int i=0;i<partition;i++){
                 shards[i]=createDatabase(name+"_"+i,Distributable.DATA_SCOPE);
@@ -135,7 +134,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
 
     public List<String> list(){
-        return this.environment.getDatabaseNames();
+       return dataStoreList;
+    }
+    public boolean existed(String name){
+        return dMap.containsKey(name);
     }
     @Override
     public String name() {
@@ -207,6 +209,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             fo.writeUTF(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             fo.close();
         }
+        this.dataStoreList = new CopyOnWriteArrayList<>();
         EnvironmentConfig envConfig = new EnvironmentConfig();
         envConfig.setAllowCreate(true);
         envConfig.setSharedCache(true);

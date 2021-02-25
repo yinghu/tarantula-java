@@ -85,6 +85,8 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
     //data store backup operation API
     void issueDataStoreBackup();
+    List<String> listDataStore();
+    boolean validDataStore(String dataStore);
 
     RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener);
     void unregisterRecoverableListener(String topic);

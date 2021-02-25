@@ -917,6 +917,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void issueDataStoreBackup(){
 
     }
+    public List<String> listDataStore(){
+        return this.tarantulaContext.dataStoreProvider().list();
+    }
+    public boolean validDataStore(String dataStore){
+        return this.tarantulaContext.dataStoreProvider().existed(dataStore);
+    }
     public RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener){
         tMap.put(topic,recoverableListener);
         return recoverableListener;

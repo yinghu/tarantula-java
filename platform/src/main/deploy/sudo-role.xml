@@ -34,17 +34,14 @@
             <view type="deploy.resource">
                 <property name="moduleResourceFile">sudo/deploy.resource.view.html</property>
             </view>
-            <view type="find.data.store">
-                <property name="moduleResourceFile">sudo/find.data.store.view.html</property>
+            <view type="data.store.load">
+                <property name="moduleResourceFile">sudo/data.store.load.view.html</property>
             </view>
             <view type="find.user">
                 <property name="moduleResourceFile">sudo/find.user.view.html</property>
             </view>
             <view type="data.store.count.list">
                 <property name="moduleResourceFile">sudo/data.store.count.list.view.html</property>
-            </view>
-            <view type="subscription.list">
-                <property name="moduleResourceFile">sudo/subscription.list.view.html</property>
             </view>
             <view type="create.labeled.key">
                 <property name="moduleResourceFile">sudo/create.labeled.key.view.html</property>

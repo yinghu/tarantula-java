@@ -1,0 +1,45 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-data-store-load-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-sign-in" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Data Store Load</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-panel  tx-margin-bottom-8">
+        <label class="tx-text-16 tx-margin-left-4">Data Store Name</label>
+        <input id='tx-data-store-name' class="w3-input tx-text-16" type="text">    
+    </div>
+    <div class='w3-panel w3-border-bottom w3-border-red'>
+       <span id="tx-data-store-load" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Load</span>       
+    </div>
+    <div class="w3-panel  tx-text-16">
+        <div id="jsoneditor-data-store-load" style="width: 100%;"></div> 
+    </div> 
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-data-store-load"),{mode:'tree'},{});
+    document.querySelector('#tx-data-store-load').onclick=()=>{
+        let _c = document.querySelector('#tx-data-store-name').value;
+        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onLoadDataStore',dataStore:_c},(resp)=>{
+            editor.set(resp);                          
+        });    
+    };
+    document.querySelector('#tx-data-store-load-close').onclick=()=>{
+        editor.destroy();
+        let m3 = document.querySelector(TARA_API.query().popup);
+        m3.innerHTML="";
+        m3.style.display = 'none';       
+    };
+</script>
