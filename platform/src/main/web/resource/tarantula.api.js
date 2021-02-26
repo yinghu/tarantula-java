@@ -17,6 +17,10 @@ var TARA_API = (function(){
     return connection.protocol+'://'+connection.host+':'+connection.port+'/'+connection.path+'?connectionId='+connection.connectionId+'&accessKey='+connection.ticket+'&stub='+qdata.stub+'&systemId='+qdata.login;
   };
   let _connect = function(messageListener){
+    if(qdata.offline){
+        messageListener({label:'ws-offline',payload:{message:'offline play mode'}});
+        return;
+    }  
     let _url = _toWebSocketUrl(qdata.connection);
     wsWorker = new Worker('/resource/tarantula.web.socket.source.js');
     wsWorker.onmessage =(e)=>{
@@ -25,9 +29,15 @@ var TARA_API = (function(){
     wsWorker.postMessage({cmd:'start',url:_url,protocol:'tarantula-service'});
   };
   let _send = function(message){
+    if(qdata.offline){
+        return;
+    }
     wsWorker.postMessage({cmd:'send',data:message});
   };
   let _disconnect = function(){
+    if(qdata.offline){
+        return;
+    }
     wsWorker.postMessage({cmd:'close'});
   };
 

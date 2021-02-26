@@ -44,7 +44,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
             }
         }
         if(stub==null){
-            room = session.accessMode()==Session.OFF_LINE_MODE?mZone.solo(rating):mZone.match(rating);
+            room = mZone.playMode==Room.OFF_LINE_MODE?mZone.solo(rating):mZone.match(rating);
             stub = room.join(rating);
             if(stub==null){
                 session.write(toMessage("no room available,please try later",false).toString().getBytes(),label());
@@ -55,11 +55,14 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         stub.owner(session.systemId());
         GameJoinObject gameObject = new GameJoinObject();
         gameObject.successful(true);
-        gameObject.connection = room.connection();
-        Connection connection = room.connection();
-        gameObject.ticket = this.context.validator().ticket(session.systemId(),session.stub());
-        byte[] key = this.deploymentServiceProvider.serverKey(connection);
-        gameObject.serverKey = Base64.getEncoder().encodeToString(key);
+        gameObject.offline = mZone.playMode==Room.OFF_LINE_MODE;
+        if(!gameObject.offline){
+            gameObject.connection = room.connection();
+            Connection connection = room.connection();
+            gameObject.ticket = this.context.validator().ticket(session.systemId(),session.stub());
+            byte[] key = this.deploymentServiceProvider.serverKey(connection);
+            gameObject.serverKey = Base64.getEncoder().encodeToString(key);
+        }
         gameObject.stub = stub;
         mStub.put(session.systemId(),stub);
         session.write(gameObject.toJson().toString().getBytes(),label());
@@ -126,7 +129,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
             mZone.capacity=1;
             mZone.roundDuration = 60*1000;
             mZone.overtime = 5000;
-            mZone.playMode = Room.INTEGRATED_MODE;
+            mZone.playMode = Room.OFF_LINE_MODE;
             mZone.levelLimit = this.context.descriptor().capacity();
             for(int i=1;i<DEFAULT_LEVEL_COUNT+1;i++){
                 Arena arena = new Arena(mZone.bucket(),mZone.oid(),i);

@@ -602,11 +602,14 @@
             TARA_API.onService(false,payload,(resp)=>{
                 console.log(resp);
                 if(resp.successful){
-                    let conn = resp.connection;
-                    conn.protocol = conn.secured?'wss':'ws';
-                    conn.path= a.getAttribute('game-path');
-                    conn.ticket = resp.ticket;
-                    TARA_API.query().connection = conn;
+                    TARA_API.query().offline = resp.offline;
+                    if(!resp.offline){
+                        let conn = resp.connection;
+                        conn.protocol = conn.secured?'wss':'ws';
+                        conn.path= a.getAttribute('game-path');
+                        conn.ticket = resp.ticket;
+                        TARA_API.query().connection = conn;
+                    }
                     TARA_API.query().popup = '#tx-popup-game';
                     let gameView = a.getAttribute('game-view-id');
                     tx_view({viewId:gameView,containerId:'#tx-popup-game'});

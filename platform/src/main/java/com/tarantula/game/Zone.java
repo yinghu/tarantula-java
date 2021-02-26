@@ -117,7 +117,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     public void onTimer(Module.OnUpdate update){
         rList.forEach((r)->{
             PendingUpdate delta = r.onTimer();
-            if(delta!=null){
+            if(delta!=null&&(!r.offline())){
                 update.on(r.connection(),delta.label,delta.pending.toArray());
             }
         });
