@@ -1,9 +1,6 @@
 package com.tarantula.admin;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.AccessIndexService;
@@ -175,7 +172,7 @@ public class SudoRoleModule implements Module {
                 ds.backup().list((k,v)->{
                     JsonObject r = new JsonObject();
                     r.addProperty("id",new String(k));
-                    r.add("payload",parser.parse(new String(v)));
+                    r.add("payload",_parse(parser,k,v));
                     list.add(r);
                     return true;
                 });
@@ -213,7 +210,15 @@ public class SudoRoleModule implements Module {
     public String label() {
         return "admin-setup";
     }
-
+    private JsonElement _parse(JsonParser parser, byte[] k,byte[] payload){
+        try{
+            return parser.parse(new String(payload));
+        }catch (Exception ex){
+            this.context.log("KEY->"+new String(k),OnLog.WARN);
+            this.context.log("LOAD->"+new String(payload),OnLog.WARN);
+            return new JsonObject();
+        }
+    }
     private JsonObject toMessage(String msg,boolean suc){
         JsonObject jms = new JsonObject();
         jms.addProperty("successful",suc);

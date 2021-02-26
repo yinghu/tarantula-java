@@ -30,6 +30,10 @@
             <input id ="tx-game-cluster-name" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='game title name'/>
         </div> 
         <div class="w3-panel">
+            <label class="tx-text-12 tx-margin-right-4">Enable Tournament</label>
+            <input id='tx-game-cluster-enable-tournament' class="w3-check tx-text-12" type="checkbox">
+        </div>
+        <div class="w3-panel">
             <span id="tx-create-game-cluster" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Create Game Cluster</span>
         </div>
     </div> 
@@ -50,7 +54,8 @@
     document.querySelector('#tx-launch-game-cluster-form').style.display='none';
     document.querySelector('#tx-create-game-cluster').onclick=()=>{
         let _n = document.querySelector('#tx-game-cluster-name').value;
-        TARA_API.onService(true,{serviceTag:'role/admin',command:'onCreateGameCluster',name:_n},(resp)=>{
+        let _b = document.querySelector('#tx-game-cluster-enable-tournament').checked;
+        TARA_API.onService(true,{serviceTag:'role/admin',command:'onCreateGameCluster',name:_n,tournamentEnabled:_b},(resp)=>{
             if(resp.successful){
                 //goes to do lobby configurations
                 TARA_API.query().gameClusterId = resp.accessId;

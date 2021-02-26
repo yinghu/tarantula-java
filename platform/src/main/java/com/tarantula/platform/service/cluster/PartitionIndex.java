@@ -2,7 +2,6 @@ package com.tarantula.platform.service.cluster;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.util.DistributionKey;
 import com.tarantula.platform.*;
 
@@ -43,6 +42,7 @@ public class PartitionIndex extends NoReplicationObject implements DataStore.Upd
     public void fromMap(Map<String,Object> properties){
         this.version = ((Number)properties.getOrDefault("1",1000)).intValue();
     }
+    /**
     @Override
     public byte[] toBinary() {
         DataBuffer dataBuffer = new DataBuffer(4);
@@ -54,7 +54,7 @@ public class PartitionIndex extends NoReplicationObject implements DataStore.Upd
         DataBuffer dataBuffer = new DataBuffer(payload);
         version = dataBuffer.getInt();
     }
-
+    **/
     public int getClassId() {
         return PortableRegistry.PARTITION_INDEX_OID;
     }

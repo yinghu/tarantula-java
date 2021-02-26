@@ -33,24 +33,14 @@
     let editor = new JSONEditor(document.querySelector("#jsoneditor-api-service-data"),{mode:'code'},{});
     document.querySelector('#tx-api-service-set-json').onclick=()=>{
         let _k = document.querySelector('#tx-set-key-name').value;
-        let headers =[];
-        headers.push({name:'Tarantula-tag',value:TARA_API.query().serviceTag});
-        headers.push({name:'Tarantula-action',value:'onSet'});
-        headers.push({name:'Tarantula-name',value:_k});
-        headers.push({name:'Tarantula-token',value:TARA_API.query().token});
-        TARA_API.onPost('/service/action',headers,editor.get(),(resp)=>{
-            editor.set(JSON.parse(resp));
+        TARA_API.onSet(TARA_API.query().serviceTag,'onSet',_k,editor.get(),(resp)=>{
+            editor.set(resp);     
         });
     };
     document.querySelector('#tx-api-service-get-json').onclick=()=>{
         let _k = document.querySelector('#tx-set-key-name').value;
-        let headers =[];
-        headers.push({name:'Tarantula-tag',value:TARA_API.query().serviceTag});
-        headers.push({name:'Tarantula-action',value:'onGet'});
-        headers.push({name:'Tarantula-name',value:_k});
-        headers.push({name:'Tarantula-token',value:TARA_API.query().token});
-        TARA_API.onGet('/service/action',headers,(resp)=>{
-            editor.set(JSON.parse(resp));
+        TARA_API.onGet(TARA_API.query().serviceTag,'onGet',_k,(resp)=>{
+            editor.set(resp);
         });
     };
     document.querySelector('#tx-api-service-data-close').onclick=()=>{

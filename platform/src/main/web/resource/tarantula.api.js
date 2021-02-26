@@ -114,39 +114,23 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-action','onIndex');
     aj.send();               
   };       
-  let _getJson = (path,headers,callback)=>{
+  let _getJson = (serviceTag,command,key,callback)=>{
     let aj = new XMLHttpRequest();   
     aj.responseType = 'text';
     aj.onreadystatechange = function(){
         if(aj.status === 200 && aj.readyState === 4){
-            callback(aj.responseText);
+            callback(JSON.parse(aj.responseText));
         }
     };
-    aj.open("GET",path,true);
-    headers.forEach((nv)=>{
-        aj.setRequestHeader(nv.name,nv.value);    
-    });
-    aj.setRequestHeader('Accept','application/json');
-    aj.send();
-  };
-  let _postJson =(path,headers,payload,callback)=>{
-    let _ps = JSON.stringify(payload);
-    let aj = new XMLHttpRequest();   
-    aj.responseType = 'text';
-    aj.onreadystatechange = function(){
-        if(aj.status === 200 && aj.readyState === 4){
-            callback(aj.responseText);
-        }
-    };
-    aj.open("POST",path,true);
+    aj.open("GET","/service/action",true);
     aj.setRequestHeader('Accept','application/json');
     aj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    headers.forEach((nv)=>{
-        aj.setRequestHeader(nv.name,nv.value);    
-    });
-    aj.setRequestHeader('Tarantula-payload-size',_ps.length);  
-    aj.send(_ps);
-  }
+    aj.setRequestHeader('Tarantula-tag',serviceTag);
+    aj.setRequestHeader('Tarantula-token',presence.token);
+    aj.setRequestHeader('Tarantula-action',command);
+    aj.setRequestHeader('Tarantula-name',key);
+    aj.send();
+  };
   let _upload = function(payload,fname,ctype,callback){
     let aj = new XMLHttpRequest();   
     aj.responseType = 'text';
@@ -299,7 +283,7 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-payload-size',_ps.length);  
     aj.send(_ps);                
   };
-  let _setJson = function(serviceTag,command,payload,callback){
+  let _setJson = function(serviceTag,command,key,payload,callback){
     let _jp = JSON.stringify(payload);
     let aj = new XMLHttpRequest();   
     aj.responseType = 'text';
@@ -315,6 +299,7 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-tag',serviceTag);
     aj.setRequestHeader('Tarantula-token',presence.token);
     aj.setRequestHeader('Tarantula-action',command);
+    aj.setRequestHeader('Tarantula-name',key);
     aj.setRequestHeader('Tarantula-payload-size',_jp.length);  
     aj.send(_jp);
   }; 
@@ -353,8 +338,6 @@ var TARA_API = (function(){
   //export APIs     
   return {
       query : _query,
-      onGet : _getJson,
-      onPost : _postJson,
       onIndex : _index, 
       onLobby : _lobbyList, 
       onView : _view,
@@ -368,6 +351,7 @@ var TARA_API = (function(){
       onResetPassword : _resetPassword,
       onLogout : _logout,
       onService : _service,
+      onGet : _getJson,
       onSet : _setJson,
       connect : _connect,
       send : _send,
