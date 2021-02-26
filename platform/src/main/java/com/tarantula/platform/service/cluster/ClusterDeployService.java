@@ -286,7 +286,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         mds.update(gameCluster);
         return suc1&&suc2&&suc3;//make sure all disabled
     }
-    public GameCluster createGameCluster(String owner, String name,String publishingId){
+    public GameCluster createGameCluster(String owner, String name,boolean tournamentEnabled,String publishingId){
         GameCluster gameCluster = new GameCluster();
         try {
             DataStore mds = this.tarantulaContext.masterDataStore();
@@ -295,6 +295,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             gameCluster.property(GameCluster.PUBLISHING_ID,publishingId);
             gameCluster.property(GameCluster.ACCESS_KEY,"mock access key");
             gameCluster.property(GameCluster.TIMESTAMP,0);
+            gameCluster.property(GameCluster.TOURNAMENT_ENABLED,tournamentEnabled);
             gameCluster.property(GameCluster.DISABLED,true);
             mds.create(gameCluster);//create first and discharge if any errors on loop
             gameCluster.successful(true);
@@ -332,6 +333,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     a.owner(descriptor.distributionKey());
                     a.label(Application.LABEL);
                     a.onEdge(true);
+                    a.tournamentEnabled(tournamentEnabled);
                     a.typeId(descriptor.typeId());//replaced with named type id
                     a.subtypeId(a.subtypeId().replace("game",typePrefix));
                     a.tag(a.tag().replace("game",typePrefix));

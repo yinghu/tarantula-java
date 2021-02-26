@@ -16,20 +16,22 @@ public class CreateGameClusterOperation extends Operation {
     private GameCluster result;
     private String owner;
     private String name;
+    private boolean tournamentEnabled;
     private String publishingId;
     public CreateGameClusterOperation() {
     }
 
 
-    public CreateGameClusterOperation(String owner,String name,String publishingId) {
+    public CreateGameClusterOperation(String owner,String name,boolean tournamentEnabled,String publishingId) {
         this.owner = owner;
         this.name = name;
+        this.tournamentEnabled = tournamentEnabled;
         this.publishingId = publishingId;
     }
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        this.result = cds.createGameCluster(this.owner,this.name,this.publishingId);
+        this.result = cds.createGameCluster(this.owner,this.name,this.tournamentEnabled,this.publishingId);
     }
 
     @Override
@@ -42,6 +44,7 @@ public class CreateGameClusterOperation extends Operation {
         super.writeInternal(out);
         out.writeUTF(owner);
         out.writeUTF(name);
+        out.writeBoolean(tournamentEnabled);
         out.writeUTF(publishingId);
     }
 
@@ -50,6 +53,7 @@ public class CreateGameClusterOperation extends Operation {
         super.readInternal(in);
         this.owner = in.readUTF();
         this.name=in.readUTF();
+        this.tournamentEnabled = in.readBoolean();
         this.publishingId = in.readUTF();
     }
 }

@@ -19,6 +19,7 @@ public class GameCluster extends OnApplicationHeader implements Portable {
     public final static String TIMESTAMP = "8";
     public final static String DISABLED = "9";
     public final static String PUBLISHING_ID = "10";
+    public final static String TOURNAMENT_ENABLED = "11";
 
     @Override
     public int getClassId() {

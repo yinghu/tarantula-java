@@ -51,6 +51,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     protected long runtimeDurationOnInstance;
 
     protected boolean resetEnabled;
+    protected boolean tournamentEnabled;
 
     public DefaultDescriptor(){}
     public String moduleId(){
@@ -290,6 +291,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         _props.put("runtimeDuration",this.runtimeDuration);
         _props.put("runtimeDurationOnInstance",this.runtimeDurationOnInstance);
         _props.put("resetEnabled",this.resetEnabled);
+        _props.put("tournamentEnabled",this.tournamentEnabled);
         _props.put("index",this.index);
         return _props;
     }
@@ -329,6 +331,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         this.runtimeDuration = properties.get("runtimeDuration")!=null?((Number)properties.get("runtimeDuration")).longValue():0;
         this.runtimeDurationOnInstance = properties.get("runtimeDurationOnInstance")!=null?((Number)properties.get("runtimeDurationOnInstance")).longValue():0;
         this.resetEnabled = properties.get("resetEnabled")!=null?(boolean)properties.get("resetEnabled"):false;
+        this.tournamentEnabled = (boolean)properties.getOrDefault("tournamentEnabled",false);
         this.index = properties.get("index")!=null?(String)properties.get("index"):null;
     }
 
@@ -357,5 +360,11 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     }
     public void runtimeDurationOnInstance(long runtimeDurationOnInstance){
         this.runtimeDurationOnInstance = runtimeDurationOnInstance;
+    }
+    public boolean tournamentEnabled(){
+        return this.tournamentEnabled;
+    }
+    public void tournamentEnabled(boolean tournamentEnabled){
+        this.tournamentEnabled = tournamentEnabled;
     }
 }

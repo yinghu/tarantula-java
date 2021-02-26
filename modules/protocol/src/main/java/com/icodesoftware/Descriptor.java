@@ -112,6 +112,9 @@ public interface Descriptor extends Recoverable {
     boolean resetEnabled();
     void resetEnabled(boolean resetEnabled);
 
+    boolean tournamentEnabled();
+    void tournamentEnabled(boolean tournamentEnabled);
+
     default Descriptor copy(){
         return null;
     }
