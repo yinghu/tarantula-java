@@ -126,7 +126,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
             mZone.capacity=1;
             mZone.roundDuration = 60*1000;
             mZone.overtime = 5000;
-            mZone.playMode = Room.OFF_LINE_MODE;
+            mZone.playMode = Room.INTEGRATED_MODE;
             mZone.levelLimit = this.context.descriptor().capacity();
             for(int i=1;i<DEFAULT_LEVEL_COUNT+1;i++){
                 Arena arena = new Arena(mZone.bucket(),mZone.oid(),i);

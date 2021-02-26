@@ -29,7 +29,13 @@
     </div>
 </div>
 <script>
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-data-store-load"),{mode:'tree'},{});
+    const options ={
+        mode : 'tree',
+        onCreateMenu:(items, node)=>{
+            return [];
+        }
+    };
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-data-store-load"),options,{});
     document.querySelector('#tx-data-store-load').onclick=()=>{
         let _c = document.querySelector('#tx-data-store-name').value;
         TARA_API.onService(true,{serviceTag:'role/sudo',command:'onLoadDataStore',dataStore:_c},(resp)=>{

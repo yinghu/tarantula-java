@@ -27,7 +27,14 @@
     </div>
 </div>
 <script>
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-data-store-list"),{mode:'tree'},{});
+    const options ={
+        mode : 'tree',
+        onCreateMenu : (items, node)=>{
+            return [];
+        }
+    };
+    
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-data-store-list"),options,{});
     TARA_API.onService(false,{serviceTag:'role/sudo',command:'onListDataStore'},(resp)=>{
         editor.set(resp);                          
     });
@@ -41,4 +48,7 @@
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
+    function _log(){
+        console.log('open update page');
+    }
 </script>
