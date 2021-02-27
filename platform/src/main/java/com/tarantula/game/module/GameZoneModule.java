@@ -27,11 +27,14 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
     private int DEFAULT_LEVEL_COUNT = 3;
     private int DEFAULT_LEVEL_UP_BASE = 1000;
     private DeploymentServiceProvider deploymentServiceProvider;
-
     @Override
-    public void onJoin(Session session, com.icodesoftware.Module.OnUpdate onUpdate) throws Exception{
+    public void onJoin(Session session, Module.OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp or offline play mode
         //this.context.log(new String(session.payload()),OnLog.WARN);
+        if(mZone.descriptor.tournamentEnabled()){
+            session.write(toMessage("no tournament available,please try later",false).toString().getBytes(),label());
+            return;
+        }
         Rating rating = new Rating();
         rating.fromBinary(session.payload());
         Stub stub = mStub.get(session.systemId());
@@ -68,7 +71,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         session.write(gameObject.toJson().toString().getBytes(),label());
     }
     @Override
-    public boolean onRequest(Session session, byte[] payload, com.icodesoftware.Module.OnUpdate update) throws Exception {
+    public boolean onRequest(Session session, byte[] payload, Module.OnUpdate update) throws Exception {
         if(session.action().equals("onUpdated")){
             Stub stub = mStub.get(session.systemId());
             if(stub!=null){
@@ -150,7 +153,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         mZone.registerListener(this);
         deploymentServiceProvider.register(mZone);
         this.deploymentServiceProvider.registerOnConnectionListener(this);
-        context.log("Game lobby started->"+this.mZone.descriptor.tag(),OnLog.WARN);
+        context.log("Game lobby started with tournament enabled ["+context.descriptor().tournamentEnabled()+"] on tag=>"+this.mZone.descriptor.tag(),OnLog.WARN);
     }
     @Override
     public void onConnection(Connection connection){

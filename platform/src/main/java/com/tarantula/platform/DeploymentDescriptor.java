@@ -65,6 +65,7 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         _copy.capacity(this.capacity);
         _copy.accessRank(this.accessRank);
         _copy.timerOnModule(this.timerOnModule);
+        _copy.tournamentEnabled(this.tournamentEnabled);
         return _copy;
     }
     public DeploymentDescriptor deploy(String instanceId){
@@ -103,6 +104,7 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         ins.runtimeDuration(this.runtimeDuration);
         ins.runtimeDurationOnInstance(this.runtimeDurationOnInstance);
         ins.resetEnabled(this.resetEnabled);
+        ins.tournamentEnabled(this.tournamentEnabled);
         return ins;
     }
 }
