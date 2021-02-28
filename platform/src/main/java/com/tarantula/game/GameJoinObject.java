@@ -14,6 +14,7 @@ public class GameJoinObject extends ResponseHeader {
     public String ticket;
     public String serverKey;
     public boolean offline;
+    public boolean tournamentEnabled;
     public JsonObject toJson(){
         JsonObject jo = new JsonObject();
         jo.addProperty("successful",successful);
@@ -22,6 +23,7 @@ public class GameJoinObject extends ResponseHeader {
             return jo;
         }
         jo.addProperty("offline",offline);
+        jo.addProperty("tournamentEnabled",tournamentEnabled);
         jo.addProperty("ticket",ticket);
         jo.addProperty("serverKey",serverKey);
         jo.add("stub",stub.toJson());

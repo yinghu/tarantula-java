@@ -1,10 +1,7 @@
 package com.tarantula.game.service;
 
 import com.icodesoftware.*;
-import com.icodesoftware.service.ClusterProvider;
-import com.icodesoftware.service.EventService;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.ServiceProvider;
+import com.icodesoftware.service.*;
 import com.tarantula.game.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.event.GameUpdateEvent;
@@ -12,6 +9,7 @@ import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.leaderboard.LeaderBoardSync;
+import com.tarantula.platform.tournament.TournamentCreator;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener{
+public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider {
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
@@ -34,6 +32,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Room> roomIndex = new ConcurrentHashMap<>();
 
+    private ConcurrentHashMap<String,Tournament> tournamentIndex = new ConcurrentHashMap<>();
+    private Tournament.Creator creator;
     private EventService publisher;
 
     private String subscription;
@@ -159,6 +159,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             }
             return false;
         });
+        this.creator = new TournamentCreator();
         logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]");
     }
     @Override
@@ -188,5 +189,26 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     public void onClosed(Connection connection) {
         roomIndex.forEach((k,r)->r.connectionClosed(connection));
+    }
+
+    //tournament integration
+    @Override
+    public boolean register(String type, Tournament.Schedule schedule,Tournament.Listener listener) {
+        tournamentIndex.computeIfAbsent(type,(k)->{
+            Tournament tournament = this.creator.tournament(type);
+            tournament.registerListener(listener);
+            return tournament;
+        });
+        logger.warn("tournament registered->"+type);
+        return true;
+    }
+
+    @Override
+    public Tournament tournament(String type) {
+        return tournamentIndex.get(type);
+    }
+    @Override
+    public void registerCreator(Tournament.Creator creator){
+        this.creator = creator;
     }
 }
