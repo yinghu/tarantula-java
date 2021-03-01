@@ -5,8 +5,13 @@ import com.icodesoftware.Tournament;
 public class TournamentCreator implements Tournament.Creator {
 
     @Override
-    public Tournament tournament(String type) {
-        return new DefaultTournament(type,this);
+    public Tournament tournament(String type, Tournament.Schedule schedule) {
+        return new DefaultTournament(type,schedule,this);
+    }
+
+    @Override
+    public Tournament tournament() {
+        return new DefaultTournament();
     }
 
     @Override

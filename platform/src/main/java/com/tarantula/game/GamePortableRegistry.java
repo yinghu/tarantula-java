@@ -2,6 +2,7 @@ package com.tarantula.game;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
+import com.tarantula.game.service.GameServiceIndex;
 
 /**
  * Created by yinghu lu on 4/14/2020.
@@ -15,6 +16,8 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
     public static final int STUB_CID = 3;
     public static final int ARENA_CID = 4;
     public static final int MAPPING_OBJECT_CID = 5;
+    public static final int GAME_SERVICE_INDEX_CID = 6;
+
     @Override
     public int registryId() {
         return OID;
@@ -38,6 +41,9 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
                 break;
             case MAPPING_OBJECT_CID:
                 pt = new MappingObject();
+                break;
+            case GAME_SERVICE_INDEX_CID:
+                pt = new GameServiceIndex();
                 break;
             default:
         }

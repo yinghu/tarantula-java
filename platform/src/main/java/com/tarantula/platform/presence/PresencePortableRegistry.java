@@ -10,6 +10,9 @@ import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.statistics.StatisticsEntry;
 import com.tarantula.platform.statistics.StatsDelta;
+import com.tarantula.platform.tournament.DefaultTournament;
+import com.tarantula.platform.tournament.TournamentEntry;
+import com.tarantula.platform.tournament.TournamentInstance;
 
 /**
  * updated by yinghu lu on 5/1/2020.
@@ -27,6 +30,10 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
     public static final int PURCHASE_CID = 6;
 
     public static final int STATISTICS_DELTA_CID = 7;
+
+    public static final int TOURNAMENT_CID = 8;
+    public static final int TOURNAMENT_INSTANCE_CID = 9;
+    public static final int TOURNAMENT_ENTRY_CID = 10;
 
     public Recoverable create(int i) {
         Recoverable pt = null;
@@ -54,6 +61,15 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 break;
             case STATISTICS_DELTA_CID:
                 pt = new StatsDelta();
+                break;
+            case TOURNAMENT_CID:
+                pt = new DefaultTournament();
+                break;
+            case TOURNAMENT_INSTANCE_CID:
+                pt = new TournamentInstance();
+                break;
+            case TOURNAMENT_ENTRY_CID:
+                pt = new TournamentEntry();
                 break;
             default:
         }

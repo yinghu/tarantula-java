@@ -192,15 +192,31 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
 
     //tournament integration
+    public void reload(TournamentServiceProvider.TournamentReload reload){
+        GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournament");
+        dataStore.load(gameServiceIndex);
+        gameServiceIndex.keySet.forEach((tk)->{
+            Tournament tournament = creator.tournament();
+            tournament.distributionKey(tk);
+            if(dataStore.load(tournament)){
+                reload.onReload(tournament);
+            }
+        });
+    }
     @Override
-    public boolean register(String type, Tournament.Schedule schedule,Tournament.Listener listener) {
-        tournamentIndex.computeIfAbsent(type,(k)->{
-            Tournament tournament = this.creator.tournament(type);
+    public Tournament register(String type, Tournament.Schedule schedule,Tournament.Listener listener) {
+        return tournamentIndex.computeIfAbsent(type,(k)->{
+            Tournament tournament = this.creator.tournament(type,schedule);
             tournament.registerListener(listener);
+            dataStore.create(tournament);
+            GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournament");
+            gameServiceIndex.keySet.add(tournament.distributionKey());
+            if(!dataStore.createIfAbsent(gameServiceIndex,true)){
+                gameServiceIndex.keySet.add(tournament.distributionKey());
+                dataStore.update(gameServiceIndex);
+            }
             return tournament;
         });
-        logger.warn("tournament registered->"+type);
-        return true;
     }
 
     @Override

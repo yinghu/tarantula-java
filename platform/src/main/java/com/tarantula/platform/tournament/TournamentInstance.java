@@ -2,6 +2,7 @@ package com.tarantula.platform.tournament;
 
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,5 +37,14 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
             entries.add(v);
         });
         return entries;
+    }
+    @Override
+    public int getFactoryId() {
+        return PresencePortableRegistry.OID;
+    }
+
+    @Override
+    public int getClassId() {
+        return PresencePortableRegistry.TOURNAMENT_INSTANCE_CID;
     }
 }

@@ -6,9 +6,14 @@ import java.util.List;
 public interface Tournament extends Recoverable{
 
     String type();
+    LocalDateTime startTime();
+    LocalDateTime closeTime();
+    LocalDateTime endTime();
+
     Instance join(String systemId);
     void score(String systemId,OnInstance onInstance);
     void registerListener(Listener listener);
+    void registerCreator(Creator creator);
 
 
     interface Entry extends Recoverable{
@@ -32,13 +37,16 @@ public interface Tournament extends Recoverable{
         void onEnd(Instance instance);
     }
     interface Creator{
-        Tournament tournament(String type);
+        Tournament tournament(String type,Schedule schedule);
+        Tournament tournament();
         Instance instance();
         Entry entry(String systemId);
     }
     interface Schedule{
         LocalDateTime startTime();
+        LocalDateTime closeTime();
         LocalDateTime endTime();
+        int maxEntriesPerInstance();
         int instanceDurationInMinutes();
     }
     interface OnInstance{
