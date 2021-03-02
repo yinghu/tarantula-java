@@ -3,21 +3,38 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
+import com.tarantula.platform.util.SystemUtil;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TournamentInstance extends RecoverableObject implements Tournament.Instance {
 
     private ConcurrentHashMap<String, Tournament.Entry> entryIndex = new ConcurrentHashMap<>();
-    private String id ="t10001";
+
+    private int maxEntries;
+    private LocalDateTime start;
+    private LocalDateTime close;
+    private LocalDateTime end;
+
+    public TournamentInstance(int maxEntries,LocalDateTime start,LocalDateTime close,LocalDateTime end){
+        this();
+        this.maxEntries = maxEntries;
+        this.start =start;
+        this.close = close;
+        this.end = end;
+    }
     public TournamentInstance(){
+        this.onEdge = true;
+        this.label = Tournament.INSTANCE_LABEL;
     }
 
     @Override
     public String id() {
-        return id;
+        return this.distributionKey();
     }
 
     @Override
@@ -29,7 +46,31 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     public Tournament.Entry entry(String systemId) {
         return entryIndex.get(systemId);
     }
-
+    public int maxEntries(){
+        return maxEntries;
+    }
+    public LocalDateTime startTime(){
+        return start;
+    }
+    public LocalDateTime closeTime(){
+        return close;
+    }
+    public LocalDateTime endTime(){
+        return end;
+    }
+    public Map<String,Object> toMap(){
+        properties.put("1",maxEntries);
+        properties.put("2", SystemUtil.toUTCMilliseconds(start));
+        properties.put("3", SystemUtil.toUTCMilliseconds(close));
+        properties.put("4", SystemUtil.toUTCMilliseconds(end));
+        return properties;
+    }
+    public void fromMap(Map<String,Object> properties){
+        this.maxEntries = ((Number)properties.get("1")).intValue();
+        this.start = SystemUtil.fromUTCMilliseconds(((Number)properties.get("2")).longValue());
+        this.close = SystemUtil.fromUTCMilliseconds(((Number)properties.get("3")).longValue());
+        this.end = SystemUtil.fromUTCMilliseconds(((Number)properties.get("4")).longValue());
+    }
     @Override
     public List<Tournament.Entry> list() {
         ArrayList<Tournament.Entry> entries = new ArrayList<>();

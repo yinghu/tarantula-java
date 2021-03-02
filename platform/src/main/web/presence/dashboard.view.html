@@ -214,6 +214,8 @@
                         <span id='live-game-rating' view-id='live.game.rating' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Rating</span>
                     </div>
                     <div class="w3-display-bottomright w3-padding">
+                        <span id='live-game-list-play-tournament' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-play-tournament">TOURNAMENT</span>
+                   
                         <span id='live-game-list-play' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-play">PLAY</span>
                     </div>
                 </div>
@@ -780,7 +782,7 @@
                 //listing live games 
                 if(a.descriptor.typeId == lbn ){
                     a.applications.forEach((b)=>{
-                        //console.log(b);
+                        console.log(b);
                         document.querySelector('#live-game-list-'+b.accessRank+'-0').innerHTML = b.tag
                         document.querySelector('#live-game-list-'+b.accessRank+'-1').style.display='block';
                         document.querySelector('#live-game-list-'+b.accessRank+'-2').style.display='none';

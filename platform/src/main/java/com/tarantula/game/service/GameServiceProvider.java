@@ -11,6 +11,7 @@ import com.tarantula.platform.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.leaderboard.LeaderBoardSync;
 import com.tarantula.platform.tournament.TournamentCreator;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider {
+public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,SchedulingTask {
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
@@ -34,11 +35,13 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     private ConcurrentHashMap<String,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private Tournament.Creator creator;
+
     private EventService publisher;
 
     private String subscription;
     private String statisticsTag;
     private ClusterProvider integrationCluster;
+    private ServiceContext serviceContext;
 
     private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
 
@@ -140,6 +143,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     @Override
     public void setup(ServiceContext serviceContext) {
+        this.serviceContext = serviceContext;
         this.dataStore = serviceContext.dataStore(NAME.replace("-","_"),serviceContext.partitionNumber());//typeId_service
         this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
         this.subscription = UUID.randomUUID().toString();
@@ -159,7 +163,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             }
             return false;
         });
-        this.creator = new TournamentCreator();
+        this.creator = new TournamentCreator(this.dataStore);
+        this.serviceContext.schedule(this);
         logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]");
     }
     @Override
@@ -196,9 +201,9 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournament");
         dataStore.load(gameServiceIndex);
         gameServiceIndex.keySet.forEach((tk)->{
-            Tournament tournament = creator.tournament();
-            tournament.distributionKey(tk);
-            if(dataStore.load(tournament)){
+            Tournament tournament = creator.load(tk);
+            if(tournament!=null){
+                tournamentIndex.put(tournament.type(),tournament);
                 reload.onReload(tournament);
             }
         });
@@ -206,9 +211,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     @Override
     public Tournament register(String type, Tournament.Schedule schedule,Tournament.Listener listener) {
         return tournamentIndex.computeIfAbsent(type,(k)->{
-            Tournament tournament = this.creator.tournament(type,schedule);
+            Tournament tournament = this.creator.create(type,schedule);
             tournament.registerListener(listener);
-            dataStore.create(tournament);
             GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournament");
             gameServiceIndex.keySet.add(tournament.distributionKey());
             if(!dataStore.createIfAbsent(gameServiceIndex,true)){
@@ -226,5 +230,33 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     @Override
     public void registerCreator(Tournament.Creator creator){
         this.creator = creator;
+    }
+
+    @Override
+    public boolean oneTime() {
+        return false;
+    }
+
+    @Override
+    public long initialDelay() {
+        return 1000*60; //1 minutes
+    }
+
+    @Override
+    public long delay() {
+        return 1000*60;//1 minutes
+    }
+
+    @Override
+    public void run() {
+        LocalDateTime _now = LocalDateTime.now();
+        tournamentIndex.forEach((k,t)->{
+            if(_now.isBefore(t.startTime())){
+
+            }
+            t.listener().tournamentStarted(t);
+            t.listener().tournamentClosed(t);
+            t.listener().tournamentEnded(t);
+        });
     }
 }

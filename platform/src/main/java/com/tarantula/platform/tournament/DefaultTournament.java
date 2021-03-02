@@ -20,6 +20,7 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
     private Listener listener;
     private Creator creator;
     private ConcurrentHashMap<String,Instance> instanceIndex = new ConcurrentHashMap<>();
+
     public DefaultTournament(String type,Schedule schedule,Creator creator){
         this.type = type;
         this.startTime = schedule.startTime();
@@ -66,25 +67,33 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
     public LocalDateTime endTime() {
         return endTime;
     }
-
+    public int maxEntriesPerInstance(){
+        return maxEntriesPerInstance;
+    }
+    public int durationMinutesPerInstance(){
+        return durationMinutes;
+    }
 
 
     @Override
     public Instance join(String systemId) {
-        Instance instance = creator.instance();
-        instance.enter(creator.entry(systemId));
+        Instance instance = creator.create(this);
+        instance.enter(creator.create(systemId,instance));
         instanceIndex.put(instance.id(),instance);
         return instance;
     }
     @Override
     public void score(String systemId,OnInstance onInstance){
-        
+
     }
     @Override
     public void registerListener(Listener listener){
         this.listener = listener;
     }
     public void registerCreator(Creator creator){this.creator = creator;}
+    public Listener listener(){
+        return this.listener;
+    }
     @Override
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
@@ -94,4 +103,5 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
     public int getClassId() {
         return PresencePortableRegistry.TOURNAMENT_CID;
     }
+
 }

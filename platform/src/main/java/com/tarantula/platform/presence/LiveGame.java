@@ -48,6 +48,7 @@ public class LiveGame {
             jo.addProperty("tag",descriptor.tag());
             jo.addProperty("accessRank",descriptor.accessRank());
             jo.addProperty("applicationId",descriptor.distributionKey());
+            jo.addProperty("tournamentEnabled",descriptor.tournamentEnabled());
         }
         return jo;
     }
