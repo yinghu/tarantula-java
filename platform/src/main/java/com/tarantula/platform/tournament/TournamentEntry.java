@@ -12,9 +12,12 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     private String name;
     private String icon;
     private double score;
-    public TournamentEntry(String systemId){
+    private Tournament.Listener listener;
+
+    public TournamentEntry(String systemId, Tournament.Listener listener){
         this();
         this.systemId = systemId;
+        this.listener = listener;
     }
 
     public TournamentEntry(){
@@ -48,7 +51,11 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
 
     @Override
     public double score(double delta) {
-        return (score +=delta);
+        score = score+delta;
+        if(delta>0){
+            listener.onUpdate(this);
+        }
+        return score;
     }
     public Map<String,Object> toMap(){
         properties.put("1",systemId);

@@ -41,6 +41,16 @@
     send.y = (window.innerHeight-64)/2;
     app.stage.addChild(send);
 
+    let score = text_button('SCORE',()=>{
+        let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onScore'}; 
+        TARA_API.onService(true,cmd,(resp)=>{
+            console.log(resp);
+        });
+    });
+    score.x = (window.innerWidth-64)/3;
+    score.y = (window.innerHeight-64)/3;
+    app.stage.addChild(score);
+
     let i;
     let seats =[];
     for(i=0;i<4;i++){

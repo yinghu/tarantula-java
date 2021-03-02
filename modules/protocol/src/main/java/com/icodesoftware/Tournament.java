@@ -16,10 +16,6 @@ public interface Tournament extends Recoverable{
     int durationMinutesPerInstance();
 
     Instance join(String systemId);
-    void score(String systemId,OnInstance onInstance);
-    void registerListener(Listener listener);
-    void registerCreator(Creator creator);
-    Listener listener();
 
     interface Entry extends Recoverable{
         String systemId();
@@ -27,7 +23,6 @@ public interface Tournament extends Recoverable{
         void name(String name);
         String icon();
         void icon(String icon);
-
         double score(double delta);
     }
     interface Instance extends Recoverable{
@@ -41,13 +36,18 @@ public interface Tournament extends Recoverable{
         List<Entry> list();
     }
     interface Listener{
-        void tournamentStarted(Tournament tournament);
-        void tournamentClosed(Tournament tournament);
-        void tournamentEnded(Tournament tournament);
+        default void tournamentLoaded(Tournament tournament){}
+        default void tournamentStarted(Tournament tournament){}
+        default void tournamentClosed(Tournament tournament){}
+        default void tournamentEnded(Tournament tournament){}
 
-        void onStart(Instance instance);
-        void onClose(Instance instance);
-        void onEnd(Instance instance);
+        default void onLoad(Instance instance){}
+        default void onStart(Instance instance){}
+        default void onClose(Instance instance){}
+        default void onEnd(Instance instance){}
+
+        default void onCreate(Entry entry){}
+        default void onUpdate(Entry entry){}
     }
     interface Creator{
         Tournament create(String type,Schedule schedule);
@@ -62,7 +62,5 @@ public interface Tournament extends Recoverable{
         int maxEntriesPerInstance();
         int instanceDurationInMinutes();
     }
-    interface OnInstance{
-        void on(Entry entry);
-    }
+
 }

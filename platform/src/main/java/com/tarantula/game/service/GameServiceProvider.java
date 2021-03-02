@@ -14,6 +14,7 @@ import com.tarantula.platform.tournament.TournamentCreator;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
@@ -22,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,SchedulingTask {
+public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,SchedulingTask,Tournament.Listener {
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
@@ -34,6 +35,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private ConcurrentHashMap<String,Room> roomIndex = new ConcurrentHashMap<>();
 
     private ConcurrentHashMap<String,Tournament> tournamentIndex = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,Tournament.Instance> activeInstanceIndex = new ConcurrentHashMap<>();
+    private CopyOnWriteArrayList<Tournament.Listener> tournamentListeners = new CopyOnWriteArrayList<>();
     private Tournament.Creator creator;
 
     private EventService publisher;
@@ -163,7 +166,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             }
             return false;
         });
-        this.creator = new TournamentCreator(this.dataStore);
+        this.creator = new TournamentCreator(this.dataStore,this);
         this.serviceContext.schedule(this);
         logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]");
     }
@@ -197,22 +200,21 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
 
     //tournament integration
-    public void reload(TournamentServiceProvider.TournamentReload reload){
+    public void reload(){
         GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournament");
         dataStore.load(gameServiceIndex);
         gameServiceIndex.keySet.forEach((tk)->{
             Tournament tournament = creator.load(tk);
             if(tournament!=null){
                 tournamentIndex.put(tournament.type(),tournament);
-                reload.onReload(tournament);
+                this.tournamentLoaded(tournament);
             }
         });
     }
     @Override
-    public Tournament register(String type, Tournament.Schedule schedule,Tournament.Listener listener) {
+    public Tournament register(String type, Tournament.Schedule schedule) {
         return tournamentIndex.computeIfAbsent(type,(k)->{
             Tournament tournament = this.creator.create(type,schedule);
-            tournament.registerListener(listener);
             GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournament");
             gameServiceIndex.keySet.add(tournament.distributionKey());
             if(!dataStore.createIfAbsent(gameServiceIndex,true)){
@@ -228,10 +230,17 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         return tournamentIndex.get(type);
     }
     @Override
+    public Tournament.Instance instance(String instanceId){
+        return activeInstanceIndex.get(instanceId);
+    }
+    @Override
     public void registerCreator(Tournament.Creator creator){
         this.creator = creator;
     }
-
+    @Override
+    public void registerListener(Tournament.Listener listener){
+        this.tournamentListeners.add(listener);
+    }
     @Override
     public boolean oneTime() {
         return false;
@@ -249,14 +258,59 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     @Override
     public void run() {
-        LocalDateTime _now = LocalDateTime.now();
+        //LocalDateTime _now = LocalDateTime.now();
         tournamentIndex.forEach((k,t)->{
-            if(_now.isBefore(t.startTime())){
-
-            }
-            t.listener().tournamentStarted(t);
-            t.listener().tournamentClosed(t);
-            t.listener().tournamentEnded(t);
+            //this.tournamentStarted(t);
+            //this.tournamentClosed(t);
+            //this.tournamentEnded(t);
         });
+    }
+
+    @Override
+    public void tournamentLoaded(Tournament tournament) {
+        tournamentListeners.forEach(listener -> listener.tournamentLoaded(tournament));
+    }
+
+    @Override
+    public void tournamentStarted(Tournament tournament) {
+        tournamentListeners.forEach(listener -> listener.tournamentStarted(tournament));
+    }
+
+    @Override
+    public void tournamentClosed(Tournament tournament) {
+        tournamentListeners.forEach(listener -> listener.tournamentClosed(tournament));
+    }
+
+    @Override
+    public void tournamentEnded(Tournament tournament) {
+        tournamentListeners.forEach(listener -> listener.tournamentEnded(tournament));
+    }
+
+    @Override
+    public void onLoad(Tournament.Instance instance) {
+
+    }
+
+    @Override
+    public void onStart(Tournament.Instance instance) {
+        logger.warn("instance started->"+instance.id());
+        activeInstanceIndex.put(instance.id(),instance);
+        tournamentListeners.forEach(listener -> listener.onStart(instance));
+    }
+
+    @Override
+    public void onClose(Tournament.Instance instance) {
+
+    }
+
+    @Override
+    public void onEnd(Tournament.Instance instance) {
+
+    }
+    public void onCreate(Tournament.Entry entry){
+        logger.warn("entry created->"+entry.systemId());
+    }
+    public void onUpdate(Tournament.Entry entry){
+        logger.warn("entry updated->"+entry.score(0));
     }
 }

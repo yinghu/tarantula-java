@@ -69,6 +69,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         gameObject.stub = stub;
         if(mZone.descriptor.tournamentEnabled()){
             Tournament.Instance ins = gameServiceProvider.tournament("T100").join(session.systemId());
+            stub.tournamentId = ins.id();
             this.context.log(ins.id(),OnLog.WARN);
             this.context.log(ins.entry(session.systemId()).systemId(),OnLog.WARN);
         }
@@ -83,9 +84,17 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
                 session.write(toMessage(session.action(),true).toString().getBytes(),label());
                 StatsDelta delta = toDelta(payload);
                 mZone.onStatistics(session.systemId(),delta.name,delta.value);
-                gameServiceProvider.tournament("tp100").score(session.systemId(),(e)->{
-                    e.score(100);
-                });
+            }
+            else{
+                session.write(toMessage("no room joined",false).toString().getBytes(),label());
+            }
+        }
+        else if(session.action().equals("onScore")){
+            Stub stub = mStub.get(session.systemId());
+            if(stub!=null){
+                Tournament.Instance ins = gameServiceProvider.instance(stub.tournamentId);
+                ins.entry(session.systemId()).score(100);
+                session.write(payload,label());
             }
             else{
                 session.write(toMessage("no room joined",false).toString().getBytes(),label());

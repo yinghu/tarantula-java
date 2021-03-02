@@ -7,7 +7,6 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultTournament extends RecoverableObject implements Tournament {
 
@@ -19,9 +18,8 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
     private int durationMinutes;
     private Listener listener;
     private Creator creator;
-    private ConcurrentHashMap<String,Instance> instanceIndex = new ConcurrentHashMap<>();
 
-    public DefaultTournament(String type,Schedule schedule,Creator creator){
+    public DefaultTournament(String type,Schedule schedule,Creator creator,Listener listener){
         this.type = type;
         this.startTime = schedule.startTime();
         this.closeTime = schedule.closeTime();
@@ -29,6 +27,11 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
         this.maxEntriesPerInstance = schedule.maxEntriesPerInstance();
         this.durationMinutes = schedule.instanceDurationInMinutes();
         this.creator = creator;
+        this.listener = listener;
+    }
+    public DefaultTournament(Creator creator,Listener listener){
+        this.creator = creator;
+        this.listener = listener;
     }
     public DefaultTournament(){
     }
@@ -79,21 +82,10 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
     public Instance join(String systemId) {
         Instance instance = creator.create(this);
         instance.enter(creator.create(systemId,instance));
-        instanceIndex.put(instance.id(),instance);
+        listener.onStart(instance);
         return instance;
     }
-    @Override
-    public void score(String systemId,OnInstance onInstance){
 
-    }
-    @Override
-    public void registerListener(Listener listener){
-        this.listener = listener;
-    }
-    public void registerCreator(Creator creator){this.creator = creator;}
-    public Listener listener(){
-        return this.listener;
-    }
     @Override
     public int getFactoryId() {
         return PresencePortableRegistry.OID;

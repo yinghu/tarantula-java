@@ -20,7 +20,7 @@ public class Stub extends RecoverableObject {
     public int levelUpBase;
     public StatsDelta stats;
     public Rating rating;
-
+    public String tournamentId; //
     /**
      * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
      * rank - final result 1,2 rank xp = (1/rank)*100  1 - 100 2 50 ..

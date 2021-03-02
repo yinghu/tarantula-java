@@ -604,7 +604,9 @@
             TARA_API.onService(false,payload,(resp)=>{
                 console.log(resp);
                 if(resp.successful){
+                    TARA_API.query().stub = resp.stub;
                     TARA_API.query().offline = resp.offline;
+                    TARA_API.query().tournamentEnabled = resp.tournamentEnabled;
                     if(!resp.offline){
                         let conn = resp.connection;
                         conn.protocol = conn.secured?'wss':'ws';
