@@ -9,10 +9,11 @@ import com.icodesoftware.protocol.MessageHandler;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.statistics.StatsDelta;
-import com.tarantula.platform.util.SystemUtil;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -347,7 +348,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
                 this.dataStore.create(a);
             }
         });
-        this.timestamp = SystemUtil.toUTCMilliseconds(LocalDateTime.now());
+        this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         this.dataStore.update(this);
     }
     public void registerListener(Listener listener){

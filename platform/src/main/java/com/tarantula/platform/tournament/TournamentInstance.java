@@ -2,8 +2,8 @@ package com.tarantula.platform.tournament;
 
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.presence.PresencePortableRegistry;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TournamentInstance extends RecoverableObject implements Tournament.Instance {
 
     private ConcurrentHashMap<String, Tournament.Entry> entryIndex = new ConcurrentHashMap<>();
-
+    private Tournament.Status status = Tournament.Status.STARTED;
     private int maxEntries;
     private LocalDateTime start;
     private LocalDateTime close;
@@ -36,7 +36,10 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     public String id() {
         return this.distributionKey();
     }
-
+    @Override
+    public Tournament.Status status(){
+        return status;
+    }
     @Override
     public void enter(Tournament.Entry entry) {
         this.entryIndex.putIfAbsent(entry.systemId(),entry);
@@ -60,16 +63,16 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
     public Map<String,Object> toMap(){
         properties.put("1",maxEntries);
-        properties.put("2", SystemUtil.toUTCMilliseconds(start));
-        properties.put("3", SystemUtil.toUTCMilliseconds(close));
-        properties.put("4", SystemUtil.toUTCMilliseconds(end));
+        properties.put("2", TimeUtil.toUTCMilliseconds(start));
+        properties.put("3", TimeUtil.toUTCMilliseconds(close));
+        properties.put("4", TimeUtil.toUTCMilliseconds(end));
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
         this.maxEntries = ((Number)properties.get("1")).intValue();
-        this.start = SystemUtil.fromUTCMilliseconds(((Number)properties.get("2")).longValue());
-        this.close = SystemUtil.fromUTCMilliseconds(((Number)properties.get("3")).longValue());
-        this.end = SystemUtil.fromUTCMilliseconds(((Number)properties.get("4")).longValue());
+        this.start = TimeUtil.fromUTCMilliseconds(((Number)properties.get("2")).longValue());
+        this.close = TimeUtil.fromUTCMilliseconds(((Number)properties.get("3")).longValue());
+        this.end = TimeUtil.fromUTCMilliseconds(((Number)properties.get("4")).longValue());
     }
     @Override
     public List<Tournament.Entry> list() {

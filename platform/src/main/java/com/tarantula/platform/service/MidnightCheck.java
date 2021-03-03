@@ -1,8 +1,8 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.SchedulingTask;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.util.SystemUtil;
 
 public class MidnightCheck implements SchedulingTask {
 
@@ -24,7 +24,7 @@ public class MidnightCheck implements SchedulingTask {
     @Override
     public long delay() {
         //return 10*60*1000;
-        return SystemUtil.toMidnight();
+        return TimeUtil.toMidnight();
     }
 
     @Override

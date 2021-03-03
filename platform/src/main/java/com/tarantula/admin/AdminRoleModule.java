@@ -7,6 +7,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.*;
@@ -14,7 +15,6 @@ import com.tarantula.platform.presence.*;
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
-import com.tarantula.platform.util.SystemUtil;
 import com.icodesoftware.util.JsonUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -242,7 +242,7 @@ public class AdminRoleModule implements Module {
                         account.update(idx);
                     }
                     acc.gameClusterCount(1);
-                    acc.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
+                    acc.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
                     account.update(acc);
                     gc.message("Game cluster created successfully");
                 }
@@ -532,7 +532,7 @@ public class AdminRoleModule implements Module {
         mZone.roundDuration = 60*1000;
         mZone.overtime = 5000;
         mZone.playMode = Room.OFF_LINE_MODE;
-        mZone.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
+        mZone.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         mZone.dataStore(dataStore);
         dataStore.createIfAbsent(mZone,true);
         for(int i=1;i<maxGameLevelCount+1;i++){

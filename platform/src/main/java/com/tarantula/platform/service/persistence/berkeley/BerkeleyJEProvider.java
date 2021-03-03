@@ -8,13 +8,13 @@ import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
+import com.icodesoftware.util.TimeUtil;
 import com.sleepycat.je.*;
 import com.sleepycat.je.util.DbBackup;
 import com.sleepycat.je.util.LogVerificationReadableByteChannel;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.persistence.*;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -370,7 +370,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 backup.removeFileProtection(b);
             }
             LocalDateTime ed = LocalDateTime.now();
-            log.info("JE Berkeley finished incremental backup files/duration ["+bset.length+"/"+SystemUtil.durationUTCMilliseconds(st,ed)+"] at ["+ed.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)+"]");
+            log.info("JE Berkeley finished incremental backup files/duration ["+bset.length+"/"+ TimeUtil.durationUTCMilliseconds(st,ed)+"] at ["+ed.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)+"]");
             DataOutputStream fo = new DataOutputStream(new FileOutputStream(dPath+FileSystems.getDefault().getSeparator()+"last.dat"));
             fo.writeLong(backup.getLastFileInBackupSet());
             fo.writeLong(lastDir+1);
@@ -411,7 +411,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 backup.removeFileProtection(b);
             }
             LocalDateTime ed = LocalDateTime.now();
-            log.info("JE Berkeley full backup files/duration ["+bset.length+"/"+SystemUtil.durationUTCMilliseconds(st,ed)+"] finished at ["+ed.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)+"]");
+            log.info("JE Berkeley full backup files/duration ["+bset.length+"/"+TimeUtil.durationUTCMilliseconds(st,ed)+"] finished at ["+ed.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)+"]");
         }catch (Exception ex){
             log.error("full backup clashed",ex);
             throw new RuntimeException("backup crashed",ex);
@@ -452,7 +452,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 vc.close();
             }
             LocalDateTime ed = LocalDateTime.now();
-            log.info("JE Berkeley finished total recovered files /duration ["+rlist.size()+"/"+SystemUtil.durationUTCMilliseconds(st,ed)+"] at ["+ed.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)+"]");
+            log.info("JE Berkeley finished total recovered files /duration ["+rlist.size()+"/"+TimeUtil.durationUTCMilliseconds(st,ed)+"] at ["+ed.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)+"]");
 
         }catch (Exception ex){
             log.error("recover clashed",ex);

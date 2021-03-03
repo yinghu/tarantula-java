@@ -2,8 +2,9 @@ package com.tarantula.platform.tournament;
 
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.presence.PresencePortableRegistry;
-import com.tarantula.platform.util.SystemUtil;
+
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Map;
 public class DefaultTournament extends RecoverableObject implements Tournament {
 
     private String type;
+    private Status status = Status.SCHEDULED;
     private LocalDateTime startTime;
     private LocalDateTime closeTime;
     private LocalDateTime endTime;
@@ -39,25 +41,28 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
     public String type() {
         return type;
     }
-
+    @Override
+    public Status status(){
+        return status;
+    }
     @Override
     public LocalDateTime startTime() {
         return startTime;
     }
     public Map<String,Object> toMap(){
         properties.put("1",type);
-        properties.put("2", SystemUtil.toUTCMilliseconds(startTime));
-        properties.put("3", SystemUtil.toUTCMilliseconds(closeTime));
-        properties.put("4", SystemUtil.toUTCMilliseconds(endTime));
+        properties.put("2", TimeUtil.toUTCMilliseconds(startTime));
+        properties.put("3", TimeUtil.toUTCMilliseconds(closeTime));
+        properties.put("4", TimeUtil.toUTCMilliseconds(endTime));
         properties.put("5",maxEntriesPerInstance);
         properties.put("6",durationMinutes);
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
         this.type = (String)properties.get("1");
-        this.startTime = SystemUtil.fromUTCMilliseconds(((Number)properties.get("2")).longValue());
-        this.closeTime = SystemUtil.fromUTCMilliseconds(((Number)properties.get("3")).longValue());
-        this.endTime = SystemUtil.fromUTCMilliseconds(((Number)properties.get("4")).longValue());
+        this.startTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("2")).longValue());
+        this.closeTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("3")).longValue());
+        this.endTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("4")).longValue());
         this.maxEntriesPerInstance = ((Number)properties.get("5")).intValue();
         this.durationMinutes = ((Number)properties.get("6")).intValue();
     }
@@ -82,7 +87,7 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
     public Instance join(String systemId) {
         Instance instance = creator.create(this);
         instance.enter(creator.create(systemId,instance));
-        listener.onCreated(instance);
+        listener.onStarted(instance);
         return instance;
     }
 

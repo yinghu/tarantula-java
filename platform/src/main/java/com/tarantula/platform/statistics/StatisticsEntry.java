@@ -2,9 +2,9 @@ package com.tarantula.platform.statistics;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.ResourceKey;
 import com.tarantula.platform.presence.PresencePortableRegistry;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.time.temporal.IsoFields;
@@ -72,7 +72,7 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
 
     @Override
     public Statistics.Entry update(double delta) {
-        LocalDateTime lastUpdated = SystemUtil.fromUTCMilliseconds(timestamp);
+        LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
         LocalDateTime _now = LocalDateTime.now();
         if(_now.getYear()==lastUpdated.getYear()){//check in same year
             if(_now.getDayOfYear()==lastUpdated.getDayOfYear()){//same day update
@@ -94,7 +94,7 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
             yearly = delta;
         }
         total += delta;
-        timestamp = SystemUtil.toUTCMilliseconds(_now);
+        timestamp = TimeUtil.toUTCMilliseconds(_now);
         return this;
     }
     @Override

@@ -206,7 +206,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             Tournament tournament = creator.load(tk);
             if(tournament!=null){
                 tournamentIndex.put(tournament.type(),tournament);
-                this.tournamentLoaded(tournament);
+                this.tournamentStarted(tournament);
             }
         });
     }
@@ -266,12 +266,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
 
     @Override
-    public void tournamentLoaded(Tournament tournament) {
-        tournamentListeners.forEach(listener -> listener.tournamentLoaded(tournament));
-    }
-    @Override
-    public void tournamentCreated(Tournament tournament) {
-        tournamentListeners.forEach(listener -> listener.tournamentCreated(tournament));
+    public void tournamentScheduled(Tournament tournament) {
+        tournamentListeners.forEach(listener -> listener.tournamentScheduled(tournament));
     }
     @Override
     public void tournamentStarted(Tournament tournament) {
@@ -286,17 +282,6 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     @Override
     public void tournamentEnded(Tournament tournament) {
         tournamentListeners.forEach(listener -> listener.tournamentEnded(tournament));
-    }
-
-    @Override
-    public void onLoaded(Tournament.Instance instance) {
-
-    }
-    @Override
-    public void onCreated(Tournament.Instance instance) {
-        logger.warn("instance created->"+instance.id());
-        activeInstanceIndex.put(instance.id(),instance);
-        tournamentListeners.forEach(listener -> listener.onStarted(instance));
     }
     @Override
     public void onStarted(Tournament.Instance instance) {

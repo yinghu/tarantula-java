@@ -5,6 +5,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.util.PresenceContextSerializer;
@@ -67,13 +68,13 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             acc.trial(false);
             acc.subscribed(true);
             LocalDateTime loc = LocalDateTime.now();
-            acc.timestamp(SystemUtil.toUTCMilliseconds(loc));
+            acc.timestamp(TimeUtil.toUTCMilliseconds(loc));
             aDatastore.create(acc);
             Membership membership = new Membership();
             membership.distributionKey(user.distributionKey());
-            membership.startTimestamp(SystemUtil.toUTCMilliseconds(loc));
-            membership.endTimestamp(SystemUtil.toUTCMilliseconds(loc.plusMonths(12)));
-            membership.timestamp(SystemUtil.toUTCMilliseconds(loc));
+            membership.startTimestamp(TimeUtil.toUTCMilliseconds(loc));
+            membership.endTimestamp(TimeUtil.toUTCMilliseconds(loc.plusMonths(12)));
+            membership.timestamp(TimeUtil.toUTCMilliseconds(loc));
             mDatastore.create(membership);
         }
         this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ON_ACCESS_CID,(a)->{
@@ -85,7 +86,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
                 account.distributionKey(uadded.owner());
                 if(aDatastore.load(account)){
                     account.userCount(1);
-                    account.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
+                    account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
                     aDatastore.update(account);
                     IndexSet idx = new IndexSet();
                     idx.distributionKey(account.distributionKey());

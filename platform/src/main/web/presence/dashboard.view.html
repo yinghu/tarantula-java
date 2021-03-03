@@ -600,6 +600,7 @@
             let tournamentEnabled = a.getAttribute('tournament-enabled');
             if(tournamentEnabled){
                 let tournamentView = a.getAttribute('game-view-id')+'.tournament';
+                TARA_API.query().serviceTag = a.getAttribute('game-path')+'/tournament';
                 TARA_API.query().popup = '#tx-popup';
                 tx_view({viewId:tournamentView,containerId:'#tx-popup'});
             }else{

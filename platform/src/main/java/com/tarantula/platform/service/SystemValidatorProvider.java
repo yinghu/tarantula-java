@@ -3,6 +3,7 @@ package com.tarantula.platform.service;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.User;
@@ -89,7 +90,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public String accessKey(String label){
         AccessKey ck = new AccessKey();
-        long stmp =SystemUtil.toUTCMilliseconds(LocalDateTime.now());
+        long stmp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         ck.property(AccessKey.TIMESTAMP,stmp);
         ck.property(AccessKey.KEY_LABEL,label);
         if(deployDataStore.create(ck)){
@@ -110,7 +111,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public String gameClusterAccessKey(String gameClusterId){
         GameCluster gc = this.deploymentServiceProvider.gameCluster(gameClusterId);
-        long stmp =SystemUtil.toUTCMilliseconds(LocalDateTime.now());
+        long stmp =TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         gc.property(GameCluster.TIMESTAMP,stmp);
         gc.update();
         return SystemUtil.accessKey(messageDigest(),(String)gc.property(GameCluster.GAME_LOBBY),gameClusterId,stmp);
@@ -150,7 +151,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         subscription.distributionKey(onLobby.subscriptionId());
         if(mdatastore.load(subscription)) {
             oMap.put(onLobby.typeId(), onLobby);
-            log.warn(onLobby.toString() + " has been monitored at expiration time ->" + SystemUtil.fromUTCMilliseconds(subscription.endTimestamp()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            log.warn(onLobby.toString() + " has been monitored at expiration time ->" + TimeUtil.fromUTCMilliseconds(subscription.endTimestamp()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         }
     }
     public boolean checkSubscription(String systemId){
@@ -159,7 +160,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         if(!this.mdatastore.load(subscription)){
             return false;
         }
-        LocalDateTime end = SystemUtil.fromUTCMilliseconds(subscription.endTimestamp());
+        LocalDateTime end = TimeUtil.fromUTCMilliseconds(subscription.endTimestamp());
         return end.isAfter(LocalDateTime.now());
     }
     public int updateSubscription(String systemId,int months){
@@ -168,9 +169,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         if(!this.mdatastore.load(subscription)){
             return 0;
         }
-        LocalDateTime end = SystemUtil.fromUTCMilliseconds(subscription.endTimestamp());
-        subscription.endTimestamp(SystemUtil.toUTCMilliseconds(end.plusMonths(months)));
-        subscription.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
+        LocalDateTime end = TimeUtil.fromUTCMilliseconds(subscription.endTimestamp());
+        subscription.endTimestamp(TimeUtil.toUTCMilliseconds(end.plusMonths(months)));
+        subscription.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         int cnt = subscription.count(1);
         this.mdatastore.update(subscription);
         boolean suc = end.isAfter(LocalDateTime.now());
@@ -190,7 +191,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             Subscription subscription = new Membership();
             subscription.distributionKey(o.subscriptionId());
             if(this.mdatastore.load(subscription)){
-                LocalDateTime end = SystemUtil.fromUTCMilliseconds(subscription.endTimestamp());
+                LocalDateTime end = TimeUtil.fromUTCMilliseconds(subscription.endTimestamp());
                 if(end.isBefore(_curr)){
                     deploymentServiceProvider.shutdownModule(o.typeId());
                     rlist.add(k);
@@ -287,17 +288,17 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         acc.distributionKey(access.distributionKey());
         //acc.emailAddress(access.emailAddress());
         LocalDateTime loc = LocalDateTime.now();
-        acc.timestamp(SystemUtil.toUTCMilliseconds(loc));
+        acc.timestamp(TimeUtil.toUTCMilliseconds(loc));
         if(!adataStore.createIfAbsent(acc,true)){
-            acc.timestamp(SystemUtil.toUTCMilliseconds(loc));
+            acc.timestamp(TimeUtil.toUTCMilliseconds(loc));
             adataStore.update(acc);
         }
         if(t.accessControl()==AccessControl.admin.accessControl()){
             Membership mcc = new Membership();
             mcc.distributionKey(access.distributionKey());
-            mcc.startTimestamp(SystemUtil.toUTCMilliseconds(loc));
-            mcc.endTimestamp(SystemUtil.toUTCMilliseconds(loc.plusMonths(1)));
-            mcc.timestamp(SystemUtil.toUTCMilliseconds(loc));
+            mcc.startTimestamp(TimeUtil.toUTCMilliseconds(loc));
+            mcc.endTimestamp(TimeUtil.toUTCMilliseconds(loc.plusMonths(1)));
+            mcc.timestamp(TimeUtil.toUTCMilliseconds(loc));
             mdatastore.create(mcc);//create membership for admin role
             acc.trial(true);
             acc.subscribed(false);

@@ -8,7 +8,12 @@ public interface Tournament extends Recoverable{
     String INSTANCE_LABEL = "TIT";
     String ENTRY_LABEL = "TEE";
 
+    enum Status{
+        SCHEDULED,STARTED,CLOSED,ENDED
+    }
+
     String type();
+    Status status();
     LocalDateTime startTime();
     LocalDateTime closeTime();
     LocalDateTime endTime();
@@ -27,6 +32,7 @@ public interface Tournament extends Recoverable{
     }
     interface Instance extends Recoverable{
         String id();
+        Status status();
         int maxEntries();
         LocalDateTime startTime();
         LocalDateTime closeTime();
@@ -36,14 +42,11 @@ public interface Tournament extends Recoverable{
         List<Entry> list();
     }
     interface Listener{
-        default void tournamentLoaded(Tournament tournament){}
-        default void tournamentCreated(Tournament tournament){}
+        default void tournamentScheduled(Tournament tournament){}
         default void tournamentStarted(Tournament tournament){}
         default void tournamentClosed(Tournament tournament){}
         default void tournamentEnded(Tournament tournament){}
 
-        default void onLoaded(Instance instance){}
-        default void onCreated(Instance instance){}
         default void onStarted(Instance instance){}
         default void onClosed(Instance instance){}
         default void onEnded(Instance instance){}

@@ -4,12 +4,12 @@ import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.ServiceProvider;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.BucketReceiver;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.service.deployment.ApplicationContextProxy;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -74,7 +74,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                 oi.routingNumber(event.routingNumber());
                 oi.reset(this.application.descriptor().entryCost());
                 oi.accessMode(event.accessMode());
-                oi.timestamp(SystemUtil.toUTCMilliseconds(LocalDateTime.now()));
+                oi.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
                 oi.idle(true);
             }
         }

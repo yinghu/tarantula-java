@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.icodesoftware.Subscription;
+import com.icodesoftware.util.TimeUtil;
 
 import java.lang.reflect.Type;
 import java.time.format.DateTimeFormatter;
@@ -16,9 +17,9 @@ public class SubscriptionSerializer implements JsonSerializer<Subscription> {
 
     public JsonElement serialize(Subscription access, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = new JsonObject();
-        jo.addProperty("startTime",SystemUtil.fromUTCMilliseconds(access.startTimestamp()).format(DateTimeFormatter.ISO_DATE_TIME));
-        jo.addProperty("endTime",SystemUtil.fromUTCMilliseconds(access.endTimestamp()).format(DateTimeFormatter.ISO_DATE_TIME));
-        jo.addProperty("lastUpdated",SystemUtil.fromUTCMilliseconds(access.timestamp()).format(DateTimeFormatter.ISO_DATE_TIME));
+        jo.addProperty("startTime", TimeUtil.fromUTCMilliseconds(access.startTimestamp()).format(DateTimeFormatter.ISO_DATE_TIME));
+        jo.addProperty("endTime",TimeUtil.fromUTCMilliseconds(access.endTimestamp()).format(DateTimeFormatter.ISO_DATE_TIME));
+        jo.addProperty("lastUpdated",TimeUtil.fromUTCMilliseconds(access.timestamp()).format(DateTimeFormatter.ISO_DATE_TIME));
         jo.addProperty("updatedCount",access.count(0));
         return jo;
     }

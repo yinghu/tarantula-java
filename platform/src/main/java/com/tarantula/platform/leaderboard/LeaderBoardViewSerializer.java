@@ -1,7 +1,7 @@
 package com.tarantula.platform.leaderboard;
 
 import com.google.gson.*;
-import com.tarantula.platform.util.SystemUtil;
+import com.icodesoftware.util.TimeUtil;
 
 import java.lang.reflect.Type;
 import java.time.format.DateTimeFormatter;
@@ -24,7 +24,7 @@ public class LeaderBoardViewSerializer implements JsonSerializer<LeaderBoardView
                 b.addProperty("rank",e.rank);
                 b.addProperty("owner",e.owner);
                 b.addProperty("value",e.value);
-                b.addProperty("lastUpdated", SystemUtil.fromUTCMilliseconds(e.timestamp).format(DateTimeFormatter.ISO_DATE_TIME));
+                b.addProperty("lastUpdated", TimeUtil.fromUTCMilliseconds(e.timestamp).format(DateTimeFormatter.ISO_DATE_TIME));
                 blist.add(b);
 
         }

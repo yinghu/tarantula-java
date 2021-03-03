@@ -2,6 +2,7 @@ package com.tarantula.platform.util;
 
 import com.icodesoftware.OnSession;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.OnSessionTrack;
 
 import java.security.MessageDigest;
@@ -15,18 +16,7 @@ import java.util.UUID;
  */
 public class SystemUtil {
 
-    public static long toUTCMilliseconds(LocalDateTime dateTime){
-        return dateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
-    }
-    public static LocalDateTime fromUTCMilliseconds(long milliseconds){
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(milliseconds), ZoneOffset.UTC);
-    }
-    public static long durationUTCMilliseconds(LocalDateTime start,LocalDateTime end){
-        return Duration.between(start,end).toMillis();
-    }
-    public static long durationUTCInSeconds(LocalDateTime start,LocalDateTime end){
-        return Duration.between(start,end).toMillis()/1000;
-    }
+
     public static String toHexString(byte[] hash){
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < hash.length; i++){
@@ -40,7 +30,7 @@ public class SystemUtil {
     }
     public static String ticket(MessageDigest messageDigest, String systemId, int stub, int durationSeconds) {
         LocalDateTime _st = LocalDateTime.now().plusSeconds(durationSeconds);
-        long end = SystemUtil.toUTCMilliseconds(_st);
+        long end = TimeUtil.toUTCMilliseconds(_st);
         StringBuffer _ticket = new StringBuffer();
         _ticket.append("tarantula").append(" ").append(end).append(" ");
         messageDigest.reset();
@@ -60,7 +50,7 @@ public class SystemUtil {
         messageDigest.update(Integer.toHexString(stub).getBytes());
         messageDigest.update(Long.toHexString(end).getBytes());
         if(tlist[2].equals(SystemUtil.toHexString(messageDigest.digest()))){
-            LocalDateTime ending = SystemUtil.fromUTCMilliseconds(end);
+            LocalDateTime ending = TimeUtil.fromUTCMilliseconds(end);
             return ending.isAfter(LocalDateTime.now());
         }
         else{
@@ -74,7 +64,7 @@ public class SystemUtil {
         messageDigest.reset();
         messageDigest.update(systemId.getBytes());
         messageDigest.update(Integer.toHexString(stub).getBytes());
-        long start = SystemUtil.toUTCMilliseconds(LocalDateTime.now());
+        long start = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         messageDigest.update(Long.toHexString(start).getBytes());
         String hash = SystemUtil.toHexString(messageDigest.digest());
         String ticket = SystemUtil.ticket(messageDigest,systemId,stub,timeoutMinutes*60);//assign a ticket
@@ -148,12 +138,6 @@ public class SystemUtil {
         return buffer.substring(0,buffer.length()-1);
     }
 
-    public static long toMidnight(){
-        LocalTime mid = LocalTime.MIDNIGHT;
-        LocalDate date = LocalDate.now();
-        LocalDateTime end = LocalDateTime.of(date.plusDays(1),mid);
-        return Duration.between(LocalDateTime.now(),end).toMillis();
-    }
     public static String toCreditsString(double vc){
         if(vc>=1000000000){ // B level
             return String.format("%.2f%c",Double.valueOf(vc/1000000000).doubleValue(),'B');
@@ -186,11 +170,11 @@ public class SystemUtil {
         return UUID.randomUUID().toString().replace("-","");
     }
     public static boolean timeout(long end){
-        long dm = durationUTCInSeconds(LocalDateTime.now(),fromUTCMilliseconds(end));
+        long dm = TimeUtil.durationUTCInSeconds(LocalDateTime.now(),TimeUtil.fromUTCMilliseconds(end));
         return dm<=0;
     }
     public static String remainingTimeAsString(long end,int size){
-        long dm = durationUTCInSeconds(LocalDateTime.now(),fromUTCMilliseconds(end));
+        long dm = TimeUtil.durationUTCInSeconds(LocalDateTime.now(),TimeUtil.fromUTCMilliseconds(end));
         if(dm<=0){
             return "00:00:00";
         }
