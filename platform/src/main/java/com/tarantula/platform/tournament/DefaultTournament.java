@@ -82,7 +82,7 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
     public Instance join(String systemId) {
         Instance instance = creator.create(this);
         instance.enter(creator.create(systemId,instance));
-        listener.onStart(instance);
+        listener.onCreated(instance);
         return instance;
     }
 

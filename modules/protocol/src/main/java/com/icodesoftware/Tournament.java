@@ -37,17 +37,19 @@ public interface Tournament extends Recoverable{
     }
     interface Listener{
         default void tournamentLoaded(Tournament tournament){}
+        default void tournamentCreated(Tournament tournament){}
         default void tournamentStarted(Tournament tournament){}
         default void tournamentClosed(Tournament tournament){}
         default void tournamentEnded(Tournament tournament){}
 
-        default void onLoad(Instance instance){}
-        default void onStart(Instance instance){}
-        default void onClose(Instance instance){}
-        default void onEnd(Instance instance){}
+        default void onLoaded(Instance instance){}
+        default void onCreated(Instance instance){}
+        default void onStarted(Instance instance){}
+        default void onClosed(Instance instance){}
+        default void onEnded(Instance instance){}
 
-        default void onCreate(Entry entry){}
-        default void onUpdate(Entry entry){}
+        default void onCreated(Entry entry){}
+        default void onUpdated(Entry entry){}
     }
     interface Creator{
         Tournament create(String type,Schedule schedule);

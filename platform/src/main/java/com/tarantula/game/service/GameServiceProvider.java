@@ -11,7 +11,6 @@ import com.tarantula.platform.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.leaderboard.LeaderBoardSync;
 import com.tarantula.platform.tournament.TournamentCreator;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -270,7 +269,10 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     public void tournamentLoaded(Tournament tournament) {
         tournamentListeners.forEach(listener -> listener.tournamentLoaded(tournament));
     }
-
+    @Override
+    public void tournamentCreated(Tournament tournament) {
+        tournamentListeners.forEach(listener -> listener.tournamentCreated(tournament));
+    }
     @Override
     public void tournamentStarted(Tournament tournament) {
         tournamentListeners.forEach(listener -> listener.tournamentStarted(tournament));
@@ -287,30 +289,37 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
 
     @Override
-    public void onLoad(Tournament.Instance instance) {
+    public void onLoaded(Tournament.Instance instance) {
 
     }
-
     @Override
-    public void onStart(Tournament.Instance instance) {
+    public void onCreated(Tournament.Instance instance) {
+        logger.warn("instance created->"+instance.id());
+        activeInstanceIndex.put(instance.id(),instance);
+        tournamentListeners.forEach(listener -> listener.onStarted(instance));
+    }
+    @Override
+    public void onStarted(Tournament.Instance instance) {
         logger.warn("instance started->"+instance.id());
         activeInstanceIndex.put(instance.id(),instance);
-        tournamentListeners.forEach(listener -> listener.onStart(instance));
+        tournamentListeners.forEach(listener -> listener.onStarted(instance));
     }
 
     @Override
-    public void onClose(Tournament.Instance instance) {
+    public void onClosed(Tournament.Instance instance) {
 
     }
 
     @Override
-    public void onEnd(Tournament.Instance instance) {
+    public void onEnded(Tournament.Instance instance) {
 
     }
-    public void onCreate(Tournament.Entry entry){
+    @Override
+    public void onCreated(Tournament.Entry entry){
         logger.warn("entry created->"+entry.systemId());
     }
-    public void onUpdate(Tournament.Entry entry){
+    @Override
+    public void onUpdated(Tournament.Entry entry){
         logger.warn("entry updated->"+entry.score(0));
     }
 }

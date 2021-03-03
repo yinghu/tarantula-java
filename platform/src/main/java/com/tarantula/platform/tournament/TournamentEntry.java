@@ -53,7 +53,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     public double score(double delta) {
         score = score+delta;
         if(delta>0){
-            listener.onUpdate(this);
+            listener.onUpdated(this);
         }
         return score;
     }

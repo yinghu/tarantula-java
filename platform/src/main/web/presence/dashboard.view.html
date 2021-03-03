@@ -214,8 +214,6 @@
                         <span id='live-game-rating' view-id='live.game.rating' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Rating</span>
                     </div>
                     <div class="w3-display-bottomright w3-padding">
-                        <span id='live-game-list-play-tournament' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-play-tournament">TOURNAMENT</span>
-                   
                         <span id='live-game-list-play' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-play">PLAY</span>
                     </div>
                 </div>
@@ -599,31 +597,38 @@
     });
     document.querySelectorAll('.tx-game-play').forEach((a)=>{
         a.onclick=()=>{
-            let _mmk = a.getAttribute('game-match-making');
-            let payload ={serviceTag:_mmk,command:'onPlay'}; 
-            TARA_API.onService(false,payload,(resp)=>{
-                console.log(resp);
-                if(resp.successful){
-                    TARA_API.query().stub = resp.stub;
-                    TARA_API.query().offline = resp.offline;
-                    TARA_API.query().tournamentEnabled = resp.tournamentEnabled;
-                    if(!resp.offline){
-                        let conn = resp.connection;
-                        conn.protocol = conn.secured?'wss':'ws';
-                        conn.path= a.getAttribute('game-path');
-                        conn.ticket = resp.ticket;
-                        TARA_API.query().connection = conn;
+            let tournamentEnabled = a.getAttribute('tournament-enabled');
+            if(tournamentEnabled){
+                let tournamentView = a.getAttribute('game-view-id')+'.tournament';
+                TARA_API.query().popup = '#tx-popup';
+                tx_view({viewId:tournamentView,containerId:'#tx-popup'});
+            }else{
+                let _mmk = a.getAttribute('game-match-making');
+                let payload ={serviceTag:_mmk,command:'onPlay'}; 
+                TARA_API.onService(false,payload,(resp)=>{
+                    console.log(resp);
+                    if(resp.successful){
+                        TARA_API.query().stub = resp.stub;
+                        TARA_API.query().offline = resp.offline;
+                        TARA_API.query().tournamentEnabled = resp.tournamentEnabled;
+                        if(!resp.offline){
+                            let conn = resp.connection;
+                            conn.protocol = conn.secured?'wss':'ws';
+                            conn.path= a.getAttribute('game-path');
+                            conn.ticket = resp.ticket;
+                            TARA_API.query().connection = conn;
+                        }
+                        TARA_API.query().popup = '#tx-popup-game';
+                        let gameView = a.getAttribute('game-view-id');
+                        tx_view({viewId:gameView,containerId:'#tx-popup-game'});
                     }
-                    TARA_API.query().popup = '#tx-popup-game';
-                    let gameView = a.getAttribute('game-view-id');
-                    tx_view({viewId:gameView,containerId:'#tx-popup-game'});
-                }
-                else{//goes to error page
-                    TARA_API.query().popup = '#tx-popup';
-                    TARA_API.query().message = resp.message;
-                    tx_view({viewId:'error',containerId:'#tx-popup'});
-                }
-            });    
+                    else{//goes to error page
+                        TARA_API.query().popup = '#tx-popup';
+                        TARA_API.query().message = resp.message;
+                        tx_view({viewId:'error',containerId:'#tx-popup'});
+                    }
+                });
+            }    
         }
     });
     _tx_account();
@@ -785,6 +790,7 @@
                 if(a.descriptor.typeId == lbn ){
                     a.applications.forEach((b)=>{
                         console.log(b);
+                        lp.setAttribute('tournament-enabled',b.tournamentEnabled);
                         document.querySelector('#live-game-list-'+b.accessRank+'-0').innerHTML = b.tag
                         document.querySelector('#live-game-list-'+b.accessRank+'-1').style.display='block';
                         document.querySelector('#live-game-list-'+b.accessRank+'-2').style.display='none';
