@@ -335,6 +335,39 @@ var TARA_API = (function(){
         callback(resp);
     });              
   };
+  let _play = (payload,callback)=>{
+    //let _jp = JSON.stringify(payload);
+    let aj = new XMLHttpRequest();   
+    aj.responseType = 'text';
+    aj.onreadystatechange = ()=>{
+        if(aj.status === 200 && aj.readyState === 4){
+            let resp = JSON.parse(aj.responseText);
+            if(resp.successful){
+                qdata.stub = resp.stub;
+                qdata.offline = resp.offline;
+                qdata.tournamentEnabled = resp.tournamentEnabled;
+                if(!resp.offline){
+                    let conn = resp.connection;
+                    conn.protocol = conn.secured?'wss':'ws';
+                    conn.path= payload.gamePath;
+                    conn.ticket = resp.ticket;
+                    qdata.connection = conn;
+                }        
+            }
+            callback(resp);
+        }
+    };
+    aj.open("GET","/service/action",true);
+    aj.setRequestHeader('Accept','application/json');
+    aj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    aj.setRequestHeader('Tarantula-tag',payload.serviceTag);
+    aj.setRequestHeader('Tarantula-token',presence.token);
+    aj.setRequestHeader('Tarantula-action','onPlay');
+    if(payload.tournamentEnabled){
+        aj.setRequestHeader('Tarantula-instance-id',payload.tournamentId);
+    }  
+    aj.send();
+  };
   //export APIs     
   return {
       query : _query,
@@ -355,7 +388,8 @@ var TARA_API = (function(){
       onSet : _setJson,
       connect : _connect,
       send : _send,
-      disconnect : _disconnect
+      disconnect : _disconnect,
+      onPlay : _play
   };
     
 })();

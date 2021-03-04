@@ -22,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,SchedulingTask,Tournament.Listener {
+public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,Tournament.Listener {
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
@@ -166,7 +166,6 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             return false;
         });
         this.creator = new TournamentCreator(this.dataStore,this);
-        this.serviceContext.schedule(this);
         logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]");
     }
     @Override
@@ -205,7 +204,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         gameServiceIndex.keySet.forEach((tk)->{
             Tournament tournament = creator.load(tk);
             if(tournament!=null){
-                tournamentIndex.put(tournament.type(),tournament);
+                tournamentIndex.put(tournament.distributionKey(),tournament);
                 this.tournamentStarted(tournament);
             }
         });
@@ -239,30 +238,6 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     @Override
     public void registerListener(Tournament.Listener listener){
         this.tournamentListeners.add(listener);
-    }
-    @Override
-    public boolean oneTime() {
-        return false;
-    }
-
-    @Override
-    public long initialDelay() {
-        return 1000*60; //1 minutes
-    }
-
-    @Override
-    public long delay() {
-        return 1000*60;//1 minutes
-    }
-
-    @Override
-    public void run() {
-        //LocalDateTime _now = LocalDateTime.now();
-        tournamentIndex.forEach((k,t)->{
-            //this.tournamentStarted(t);
-            //this.tournamentClosed(t);
-            //this.tournamentEnded(t);
-        });
     }
 
     @Override

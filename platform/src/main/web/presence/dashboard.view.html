@@ -598,30 +598,33 @@
     document.querySelectorAll('.tx-game-play').forEach((a)=>{
         a.onclick=()=>{
             let tournamentEnabled = a.getAttribute('tournament-enabled');
+            let _mmk = a.getAttribute('game-match-making');
+            let _path = a.getAttribute('game-path');
+            let _gameView = a.getAttribute('game-view-id');    
             if(tournamentEnabled){
-                let tournamentView = a.getAttribute('game-view-id')+'.tournament';
-                TARA_API.query().serviceTag = a.getAttribute('game-path')+'/tournament';
+                let tournamentView = _gameView+'.tournament';
+                let payload ={serviceTag:_mmk,gamePath:_path,tournamentEnabled:true,viewId:_gameView}; 
+                TARA_API.query().payload = payload;
+                TARA_API.query().serviceTag = _path+'/tournament';
                 TARA_API.query().popup = '#tx-popup';
                 tx_view({viewId:tournamentView,containerId:'#tx-popup'});
             }else{
-                let _mmk = a.getAttribute('game-match-making');
-                let payload ={serviceTag:_mmk,command:'onPlay'}; 
-                TARA_API.onService(false,payload,(resp)=>{
+                let payload ={serviceTag:_mmk,gamePath:_path,tournamentEnabled:false}; 
+                TARA_API.onPlay(payload,(resp)=>{
                     console.log(resp);
                     if(resp.successful){
-                        TARA_API.query().stub = resp.stub;
-                        TARA_API.query().offline = resp.offline;
-                        TARA_API.query().tournamentEnabled = resp.tournamentEnabled;
-                        if(!resp.offline){
-                            let conn = resp.connection;
-                            conn.protocol = conn.secured?'wss':'ws';
-                            conn.path= a.getAttribute('game-path');
-                            conn.ticket = resp.ticket;
-                            TARA_API.query().connection = conn;
-                        }
-                        TARA_API.query().popup = '#tx-popup-game';
-                        let gameView = a.getAttribute('game-view-id');
-                        tx_view({viewId:gameView,containerId:'#tx-popup-game'});
+                        //TARA_API.query().stub = resp.stub;
+                        //TARA_API.query().offline = resp.offline;
+                        //TARA_API.query().tournamentEnabled = resp.tournamentEnabled;
+                        //if(!resp.offline){
+                            //let conn = resp.connection;
+                            ///conn.protocol = conn.secured?'wss':'ws';
+                            //conn.path= a.getAttribute('game-path');
+                            //conn.ticket = resp.ticket;
+                            ///TARA_API.query().connection = conn;
+                        //}
+                        TARA_API.query().gamePopup = '#tx-popup-game';
+                        tx_view({viewId:_gameView,containerId:'#tx-popup-game'});
                     }
                     else{//goes to error page
                         TARA_API.query().popup = '#tx-popup';

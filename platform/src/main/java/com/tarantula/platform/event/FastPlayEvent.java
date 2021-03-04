@@ -38,6 +38,7 @@ public class FastPlayEvent extends Data implements Event {
         out.writeUTF("1",this.systemId);
         out.writeUTF("2",this.destination);
         out.writeUTF("5",this.applicationId);
+        out.writeUTF("6",this.instanceId);
         out.writeUTF("7",this.owner);
         out.writeDouble("8",this.balance);
         out.writeInt("9",this.stub);
@@ -52,6 +53,7 @@ public class FastPlayEvent extends Data implements Event {
         this.systemId = in.readUTF("1");
         this.destination = in.readUTF("2");
         this.applicationId = in.readUTF("5");
+        this.instanceId = in.readUTF("6");
         this.owner = in.readUTF("7");
         this.balance = in.readDouble("8");
         this.stub = in.readInt("9");

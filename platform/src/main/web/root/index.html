@@ -272,7 +272,7 @@
         }
         function _view_load(v,cid){
             TARA_API.onResource({name:v.moduleResourceFile,flag:v.flag,type:'text/html'},function(h){
-                TARA_API.query().popup = cid;
+                //TARA_API.query().popup = cid;
                 let m0 = document.querySelector(cid);
                 m0.insertAdjacentHTML("afterbegin",h);   
                 _api_script(m0,function(exe){

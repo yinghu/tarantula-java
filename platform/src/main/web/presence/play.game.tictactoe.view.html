@@ -24,7 +24,7 @@
     let exit = text_button('EXIT',()=>{
         TARA_API.disconnect();
         TGL.shutdown();
-        let m3 = document.querySelector(TARA_API.query().popup);
+        let m3 = document.querySelector(TARA_API.query().gamePopup);
         m3.innerHTML="";
         m3.style.display = 'none';
     });
