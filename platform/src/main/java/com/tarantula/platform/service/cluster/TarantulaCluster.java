@@ -13,6 +13,7 @@ import com.icodesoftware.util.JsonUtil;
 
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.tournament.DistributionTournamentService;
 
 public class TarantulaCluster extends TarantulaApplicationHeader implements ClusterProvider, EventService,LifecycleListener{
 
@@ -47,6 +48,9 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     }
     public RecoverService recoverService(){
         return this.recoverService;
+    }
+    public <T extends ServiceProvider> T serviceProvider(String name){
+        return this._hazel.getDistributedObject(name,name);
     }
     public EventService subscribe(String topic, EventListener callback){
         return null;

@@ -59,6 +59,10 @@
                 <property name="tarantula-scope">1</property>
             </properties>
         </service>
+        <service enabled="true">
+            <name>DistributionTournamentService</name>
+            <class-name>com.tarantula.platform.service.cluster.TournamentClusterService</class-name>
+        </service>
     </services>
     <partition-group enabled="true" group-type="HOST_AWARE" />
 

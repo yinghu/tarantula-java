@@ -30,6 +30,8 @@ public interface ClusterProvider extends Serviceable {
     DeployService deployService();
     RecoverService recoverService();
 
+    <T extends ServiceProvider> T serviceProvider(String name);
+
     //CLUSTER KEY VALUE STORE WITH KEY INDEX
     <T extends Recoverable> List<T> list(RecoverableFactory<T> query);
     <T extends Recoverable> void list(RecoverableFactory<T> query, DataStore.Stream<T> stream);

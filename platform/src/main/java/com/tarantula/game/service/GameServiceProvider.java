@@ -9,8 +9,11 @@ import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.leaderboard.LeaderBoardSync;
+import com.tarantula.platform.tournament.DistributionTournamentService;
 import com.tarantula.platform.tournament.TournamentCreator;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -44,7 +47,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private String statisticsTag;
     private ClusterProvider integrationCluster;
     private ServiceContext serviceContext;
-
+    private DistributionTournamentService distributionTournamentService;
     private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
 
     public GameServiceProvider(String name){
@@ -165,8 +168,9 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             }
             return false;
         });
+        this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
         this.creator = new TournamentCreator(this.dataStore,this,this);
-        logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]");
+        logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]"+this.distributionTournamentService.name());
     }
     @Override
     public void atMidnight(){
@@ -204,6 +208,10 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         gameServiceIndex.keySet.forEach((tk)->{
             Tournament tournament = creator.load(tk);
             if(tournament!=null){
+                this.logger.warn("TOURNAMENT START TIME->"+tournament.startTime().format(DateTimeFormatter.ISO_DATE_TIME));
+                this.logger.warn("TOURNAMENT END TIME->"+tournament.endTime().format(DateTimeFormatter.ISO_DATE_TIME));
+                this.logger.warn("EXPIRED after->"+LocalDateTime.now().isAfter(tournament.endTime()));
+                this.logger.warn("EXPIRED before->"+tournament.endTime().isBefore(LocalDateTime.now()));
                 tournamentIndex.put(tournament.distributionKey(),tournament);
                 this.tournamentStarted(tournament);
             }
@@ -213,6 +221,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     public Tournament register(String type, Tournament.Schedule schedule) {
         return tournamentIndex.computeIfAbsent(type,(k)->{
             Tournament tournament = this.creator.create(type,schedule);
+            //TimeUtil.durationUTCMilliseconds()//now to start
             GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournament");
             gameServiceIndex.keySet.add(tournament.distributionKey());
             if(!dataStore.createIfAbsent(gameServiceIndex,true)){
