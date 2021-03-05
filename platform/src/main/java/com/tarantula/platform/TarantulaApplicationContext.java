@@ -352,7 +352,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
                 this.application.clear();
             }
         }
-
         this.application.onBucket(bucket,state);
     }
     public void resource(String name, Module.OnResource onResource){

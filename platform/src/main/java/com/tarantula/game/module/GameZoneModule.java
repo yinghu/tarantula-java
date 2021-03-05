@@ -70,8 +70,6 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         if(mZone.descriptor.tournamentEnabled()){
             Tournament.Instance ins = gameServiceProvider.tournament(session.instanceId()).join(session.systemId());
             stub.tournamentId = ins.id();
-            this.context.log(ins.id(),OnLog.WARN);
-            this.context.log(ins.entry(session.systemId()).systemId(),OnLog.WARN);
         }
         mStub.put(session.systemId(),stub);
         session.write(gameObject.toJson().toString().getBytes(),label());
@@ -93,8 +91,16 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
             Stub stub = mStub.get(session.systemId());
             if(stub!=null){
                 Tournament.Instance ins = gameServiceProvider.instance(stub.tournamentId);
-                ins.entry(session.systemId()).score(100);
-                session.write(payload,label());
+                JsonObject jsonObject = new JsonObject();
+                ins.update(session.systemId(),(e)->{
+                    double score = e.score(100);
+                    jsonObject.addProperty("systemId",e.systemId());
+                    jsonObject.addProperty("score",score);
+                    jsonObject.addProperty("name","player");
+                    jsonObject.addProperty("icon","player icon");
+                    jsonObject.addProperty("rank",1);
+                });
+                session.write(jsonObject.toString().getBytes(),label());
             }
             else{
                 session.write(toMessage("no room joined",false).toString().getBytes(),label());
@@ -196,7 +202,10 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         this.deploymentServiceProvider.release(mZone);
         this.context.log("clear->"+this.context.descriptor().name(),OnLog.WARN);
     }
-
+    @Override
+    public void onBucket(int bucket,int state){
+        this.context.log("Bucket->"+bucket+"/"+state,OnLog.WARN);
+    }
     public void onUpdated(Configurable zone) {
         mZone.reset((Zone)zone);
         //this.context.log("Play mode->"+mZone.playMode,OnLog.WARN);

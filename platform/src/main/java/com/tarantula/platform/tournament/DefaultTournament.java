@@ -1,6 +1,7 @@
 package com.tarantula.platform.tournament;
 
 import com.icodesoftware.Tournament;
+import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.presence.PresencePortableRegistry;
@@ -8,6 +9,8 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class DefaultTournament extends RecoverableObject implements Tournament {
 
@@ -20,6 +23,10 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
     private int durationMinutes;
     private Listener listener;
     private Creator creator;
+    private TournamentServiceProvider tournamentServiceProvider;
+
+    private ConcurrentLinkedDeque<Instance> pendingQueue = new ConcurrentLinkedDeque();
+    private ConcurrentHashMap<String,Entry> entryIndex = new ConcurrentHashMap<>();
 
     public DefaultTournament(String type,Schedule schedule,Creator creator,Listener listener){
         this.type = type;
@@ -85,9 +92,16 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
 
     @Override
     public Instance join(String systemId) {
-        Instance instance = creator.create(this);
+        Entry _entry = entryIndex.get(systemId);
+        if(_entry!=null){//rejoin
+            return tournamentServiceProvider.instance(_entry.owner());
+        }
+        Instance instance = pendingQueue.poll();
+        if(instance==null){
+            creator.create(this);
+            listener.onStarted(instance);
+        }
         instance.enter(creator.create(systemId,instance));
-        listener.onStarted(instance);
         return instance;
     }
 
@@ -100,5 +114,14 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
     public int getClassId() {
         return PresencePortableRegistry.TOURNAMENT_CID;
     }
-
+    //local methods
+    void tournamentServiceProvider(TournamentServiceProvider tournamentServiceProvider){
+        this.tournamentServiceProvider = tournamentServiceProvider;
+    }
+    void addTournamentInstance(Instance instance){
+        pendingQueue.add(instance);
+    }
+    void addTournamentEntry(Entry entry){
+        entryIndex.put(entry.systemId(),entry);
+    }
 }

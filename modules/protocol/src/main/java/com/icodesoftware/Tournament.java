@@ -29,6 +29,7 @@ public interface Tournament extends Recoverable{
         String icon();
         void icon(String icon);
         double score(double delta);
+        int rank();
     }
     interface Instance extends Recoverable{
         String id();
@@ -38,7 +39,7 @@ public interface Tournament extends Recoverable{
         LocalDateTime closeTime();
         LocalDateTime endTime();
         void enter(Entry entry);
-        Entry entry(String systemId);
+        void update(String systemId,OnEntry onEntry);
         List<Entry> list();
     }
     interface Listener{
@@ -66,6 +67,9 @@ public interface Tournament extends Recoverable{
         LocalDateTime endTime();
         int maxEntriesPerInstance();
         int instanceDurationInMinutes();
+    }
+    interface OnEntry{
+        void on(Entry entry);
     }
 
 }

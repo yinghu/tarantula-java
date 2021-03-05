@@ -9,14 +9,16 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
  */
 public class TournamentEntryQuery implements RecoverableFactory<TournamentEntry> {
 
-    String instanceId;
+    private String instanceId;
+    private Tournament.Listener listener;
 
-    public TournamentEntryQuery(String instanceId){
+    public TournamentEntryQuery(String instanceId, Tournament.Listener listener){
         this.instanceId = instanceId;
+        this.listener = listener;
     }
 
     public TournamentEntry create() {
-        TournamentEntry ocx = new TournamentEntry();
+        TournamentEntry ocx = new TournamentEntry(listener);
         return ocx;
     }
 

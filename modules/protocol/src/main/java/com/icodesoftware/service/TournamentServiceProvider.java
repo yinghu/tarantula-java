@@ -9,7 +9,7 @@ public interface TournamentServiceProvider extends ServiceProvider{
     void registerListener(Tournament.Listener listener);
 
     Tournament register(String type,Tournament.Schedule schedule);
-    Tournament tournament(String type);
+    Tournament tournament(String tournamentId);
 
     Tournament.Instance instance(String instanceId);
 

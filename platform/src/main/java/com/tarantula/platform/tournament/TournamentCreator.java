@@ -2,16 +2,20 @@ package com.tarantula.platform.tournament;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Tournament;
+import com.icodesoftware.service.TournamentServiceProvider;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class TournamentCreator implements Tournament.Creator {
 
     private final DataStore dataStore;
     private final Tournament.Listener listener;
-    public TournamentCreator(DataStore dataStore, Tournament.Listener listener){
+    private final TournamentServiceProvider tournamentServiceProvider;
+    public TournamentCreator(DataStore dataStore, Tournament.Listener listener,TournamentServiceProvider tournamentServiceProvider){
         this.dataStore = dataStore;
         this.listener = listener;
+        this.tournamentServiceProvider = tournamentServiceProvider;
     }
 
     @Override
@@ -23,9 +27,27 @@ public class TournamentCreator implements Tournament.Creator {
 
     @Override
     public Tournament load(String tournamentId) {
-        Tournament tournament = new DefaultTournament(this,listener);
+        DefaultTournament tournament = new DefaultTournament(this,listener);
         tournament.distributionKey(tournamentId);
-        return dataStore.load(tournament)?tournament:null;
+        if(!dataStore.load(tournament)){
+            return null;
+        }
+        TournamentInstanceQuery _q = new TournamentInstanceQuery(tournamentId);
+        List<TournamentInstance> tlist = dataStore.list(_q);
+        tlist.forEach((ti)->{
+            dataStore.list(new TournamentEntryQuery(ti.id(),listener),(te)->{
+                te.owner(ti.id());
+                listener.onCreated(te);
+                tournament.addTournamentEntry(te);
+                ti.enter(te);
+                return true;
+            });
+            ti.owner(tournamentId);
+            this.listener.onStarted(ti);
+            tournament.addTournamentInstance(ti);
+        });
+        tournament.tournamentServiceProvider(this.tournamentServiceProvider);
+        return tournament;
     }
 
     @Override

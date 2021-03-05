@@ -20,6 +20,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     private LocalDateTime close;
     private LocalDateTime end;
 
+
     public TournamentInstance(int maxEntries,LocalDateTime start,LocalDateTime close,LocalDateTime end){
         this();
         this.maxEntries = maxEntries;
@@ -46,8 +47,11 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
 
     @Override
-    public Tournament.Entry entry(String systemId) {
-        return entryIndex.get(systemId);
+    public void update(String systemId, Tournament.OnEntry updater) {
+        entryIndex.computeIfPresent(systemId,(k,v)->{
+            updater.on(v);
+            return v;
+        });
     }
     public int maxEntries(){
         return maxEntries;

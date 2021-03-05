@@ -165,7 +165,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             }
             return false;
         });
-        this.creator = new TournamentCreator(this.dataStore,this);
+        this.creator = new TournamentCreator(this.dataStore,this,this);
         logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]");
     }
     @Override
@@ -224,8 +224,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
 
     @Override
-    public Tournament tournament(String type) {
-        return tournamentIndex.get(type);
+    public Tournament tournament(String tournamentId) {
+        return tournamentIndex.get(tournamentId);
     }
     @Override
     public Tournament.Instance instance(String instanceId){
@@ -276,7 +276,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
     @Override
     public void onCreated(Tournament.Entry entry){
-        logger.warn("entry created->"+entry.systemId());
+        logger.warn("entry created->"+entry.systemId()+">>>"+entry.owner());
     }
     @Override
     public void onUpdated(Tournament.Entry entry){
