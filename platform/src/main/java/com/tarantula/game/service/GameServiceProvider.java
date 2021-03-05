@@ -231,7 +231,15 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             return tournament;
         });
     }
-
+    public boolean checkAvailable(String tournamentId){
+        return this.distributionTournamentService.checkAvailable(name(),tournamentId);
+    }
+    public String joinTournament(String tournamentId,String systemId){
+        return this.distributionTournamentService.join(name(),tournamentId,systemId);
+    }
+    public double scoreTournament(String instanceId,String systemId, double delta){
+        return this.distributionTournamentService.score(name(),instanceId,systemId,delta);
+    }
     @Override
     public Tournament tournament(String tournamentId) {
         return tournamentIndex.get(tournamentId);
