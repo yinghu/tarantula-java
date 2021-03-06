@@ -8,10 +8,11 @@ public interface TournamentServiceProvider extends ServiceProvider{
     void registerCreator(Tournament.Creator creator);
     void registerListener(Tournament.Listener listener);
 
-    Tournament register(String type,Tournament.Schedule schedule);
-    Tournament tournament(String tournamentId);
+    Tournament register(Tournament.Schedule schedule);
 
-    Tournament.Instance instance(String instanceId);
+    boolean available(String tournamentId);
+    Tournament.Entry join(String tournamentId,String systemId);
+    Tournament.Entry score(String instanceId,String systemId, double delta);
 
     void reload();
 

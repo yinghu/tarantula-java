@@ -2,7 +2,7 @@ package com.tarantula.platform.tournament;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Tournament;
-import com.icodesoftware.service.TournamentServiceProvider;
+import com.tarantula.game.service.GameServiceProvider;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,16 +11,16 @@ public class TournamentCreator implements Tournament.Creator {
 
     private final DataStore dataStore;
     private final Tournament.Listener listener;
-    private final TournamentServiceProvider tournamentServiceProvider;
-    public TournamentCreator(DataStore dataStore, Tournament.Listener listener,TournamentServiceProvider tournamentServiceProvider){
+    //private final GameServiceProvider gameServiceProvider;
+    public TournamentCreator(DataStore dataStore, Tournament.Listener listener){
         this.dataStore = dataStore;
         this.listener = listener;
-        this.tournamentServiceProvider = tournamentServiceProvider;
+
     }
 
     @Override
-    public Tournament create(String type, Tournament.Schedule schedule) {
-        Tournament tournament = new DefaultTournament(type,schedule,this,listener);
+    public Tournament create(Tournament.Schedule schedule) {
+        Tournament tournament = new DefaultTournament(schedule,this,listener);
         this.dataStore.create(tournament);
         return tournament;
     }
@@ -46,7 +46,6 @@ public class TournamentCreator implements Tournament.Creator {
             this.listener.onStarted(ti);
             tournament.addTournamentInstance(ti);
         });
-        tournament.tournamentServiceProvider(this.tournamentServiceProvider);
         return tournament;
     }
 

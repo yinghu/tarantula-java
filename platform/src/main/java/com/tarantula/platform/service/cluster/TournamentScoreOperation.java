@@ -16,7 +16,7 @@ public class TournamentScoreOperation extends Operation implements PartitionAwar
     private String systemId;
     private String instanceId;
     private double delta;
-    private double score;
+    private byte[] data;
     public TournamentScoreOperation() {
     }
 
@@ -30,12 +30,12 @@ public class TournamentScoreOperation extends Operation implements PartitionAwar
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        this.score = ais.score(serviceName,instanceId,systemId,delta);
+        this.data = ais.score(serviceName,instanceId,systemId,delta).toBinary();
     }
 
     @Override
     public Object getResponse() {
-        return this.score;
+        return this.data;
     }
 
     @Override

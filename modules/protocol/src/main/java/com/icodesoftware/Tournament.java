@@ -13,6 +13,8 @@ public interface Tournament extends Recoverable{
     }
 
     String type();
+    String description();
+    String icon();
     Status status();
     LocalDateTime startTime();
     LocalDateTime closeTime();
@@ -20,14 +22,10 @@ public interface Tournament extends Recoverable{
     int maxEntriesPerInstance();
     int durationMinutesPerInstance();
 
-    Instance join(String systemId);
+    Entry join(String systemId);
 
     interface Entry extends Recoverable{
         String systemId();
-        String name();
-        void name(String name);
-        String icon();
-        void icon(String icon);
         double score(double delta);
         int rank();
     }
@@ -56,12 +54,15 @@ public interface Tournament extends Recoverable{
         default void onUpdated(Entry entry){}
     }
     interface Creator{
-        Tournament create(String type,Schedule schedule);
+        Tournament create(Schedule schedule);
         Tournament load(String tournamentId);
         Instance create(Tournament tournament);
         Entry create(String systemId,Instance instance);
     }
     interface Schedule{
+        String type();
+        String description();
+        String icon();
         LocalDateTime startTime();
         LocalDateTime closeTime();
         LocalDateTime endTime();

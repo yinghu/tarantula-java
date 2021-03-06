@@ -1,11 +1,15 @@
 package com.tarantula.platform.service.cluster;
 
+import com.hazelcast.internal.json.Json;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
+import com.icodesoftware.Tournament;
+import com.icodesoftware.util.JsonUtil;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * created by yinghu lu on 3/5/2021.
@@ -15,7 +19,7 @@ public class TournamentJoinOperation extends Operation implements PartitionAware
     private String serviceName;
     private String tournamentId;
     private String systemId;
-    private String instanceId;
+    private byte[] data;
 
     public TournamentJoinOperation() {
     }
@@ -29,12 +33,15 @@ public class TournamentJoinOperation extends Operation implements PartitionAware
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        this.instanceId = ais.join(serviceName,tournamentId,systemId);
+        Tournament.Entry entry = ais.join(serviceName,tournamentId,systemId);
+        Map<String,Object> _map = entry.toMap();
+        _map.put("instanceId",entry.owner());
+        this.data = JsonUtil.toJson(_map);
     }
 
     @Override
     public Object getResponse() {
-        return this.instanceId;
+        return this.data;
     }
 
     @Override

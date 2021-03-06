@@ -2,6 +2,7 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.event.GameUpdateEvent;
@@ -9,11 +10,14 @@ import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.leaderboard.LeaderBoardSync;
+import com.tarantula.platform.tournament.DefaultTournament;
 import com.tarantula.platform.tournament.DistributionTournamentService;
 import com.tarantula.platform.tournament.TournamentCreator;
+import com.tarantula.platform.tournament.TournamentEntry;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -169,7 +173,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             return false;
         });
         this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
-        this.creator = new TournamentCreator(this.dataStore,this,this);
+        this.creator = new TournamentCreator(this.dataStore,this);
         logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]"+this.distributionTournamentService.name());
     }
     @Override
@@ -218,36 +222,56 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         });
     }
     @Override
-    public Tournament register(String type, Tournament.Schedule schedule) {
-        return tournamentIndex.computeIfAbsent(type,(k)->{
-            Tournament tournament = this.creator.create(type,schedule);
-            //TimeUtil.durationUTCMilliseconds()//now to start
-            GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournament");
+    public Tournament register(Tournament.Schedule schedule){
+        byte[] ret = distributionTournamentService.schedule(name(),schedule);
+        DefaultTournament tournament = new DefaultTournament();
+        Map<String,Object> _map = JsonUtil.toMap(ret);
+        tournament.distributionKey(_map.get("tournamentId").toString());
+        tournament.fromMap(_map);
+        return tournament;
+    }
+    public Tournament schedule(Tournament.Schedule schedule) {
+        Tournament tournament = this.creator.create(schedule);
+        //TimeUtil.durationUTCMilliseconds()//now to start
+        GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournament");
+        gameServiceIndex.keySet.add(tournament.distributionKey());
+        if(!dataStore.createIfAbsent(gameServiceIndex,true)){
             gameServiceIndex.keySet.add(tournament.distributionKey());
-            if(!dataStore.createIfAbsent(gameServiceIndex,true)){
-                gameServiceIndex.keySet.add(tournament.distributionKey());
-                dataStore.update(gameServiceIndex);
-            }
-            return tournament;
-        });
-    }
-    public boolean checkAvailable(String tournamentId){
-        return this.distributionTournamentService.checkAvailable(name(),tournamentId);
-    }
-    public String joinTournament(String tournamentId,String systemId){
-        return this.distributionTournamentService.join(name(),tournamentId,systemId);
-    }
-    public double scoreTournament(String instanceId,String systemId, double delta){
-        return this.distributionTournamentService.score(name(),instanceId,systemId,delta);
+            dataStore.update(gameServiceIndex);
+        }
+        tournamentIndex.put(tournament.distributionKey(),tournament);
+        this.tournamentStarted(tournament);
+        return tournament;
     }
     @Override
+    public boolean available(String tournamentId){
+        return this.distributionTournamentService.checkAvailable(name(),tournamentId);
+    }
+    @Override
+    public Tournament.Entry join(String tournamentId, String systemId){
+        byte[] _ret = this.distributionTournamentService.join(name(),tournamentId,systemId);
+        Map<String,Object> _map = JsonUtil.toMap(_ret);
+        Tournament.Entry _e = new TournamentEntry();
+        _e.owner(_map.get("instanceId").toString());
+        _e.fromMap(_map);
+        return _e;
+    }
+    @Override
+    public Tournament.Entry score(String instanceId, String systemId, double delta){
+        byte[] ret = this.distributionTournamentService.score(name(),instanceId,systemId,delta);
+        Tournament.Entry _e = new TournamentEntry();
+        _e.fromBinary(ret);
+        return _e;
+    }
+
     public Tournament tournament(String tournamentId) {
         return tournamentIndex.get(tournamentId);
     }
-    @Override
+
     public Tournament.Instance instance(String instanceId){
         return activeInstanceIndex.get(instanceId);
     }
+
     @Override
     public void registerCreator(Tournament.Creator creator){
         this.creator = creator;

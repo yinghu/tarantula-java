@@ -31,7 +31,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
     public void onJoin(Session session, Module.OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp or offline play mode
         //this.context.log(new String(session.payload()),OnLog.WARN);
-        if(mZone.descriptor.tournamentEnabled()&&(!gameServiceProvider.checkAvailable(session.instanceId()))){
+        if(mZone.descriptor.tournamentEnabled()&&(!gameServiceProvider.available(session.instanceId()))){
             session.write(toMessage("no tournament available,please try later",false).toString().getBytes(),label());
             return;
         }
@@ -68,8 +68,8 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         }
         gameObject.stub = stub;
         if(mZone.descriptor.tournamentEnabled()){
-            String insId = gameServiceProvider.joinTournament(session.instanceId(),session.systemId());
-            stub.tournamentId = insId;
+            Tournament.Entry  e = gameServiceProvider.join(session.instanceId(),session.systemId());
+            stub.entry = e;
         }
         mStub.put(session.systemId(),stub);
         session.write(gameObject.toJson().toString().getBytes(),label());
@@ -90,13 +90,12 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         else if(session.action().equals("onScore")){
             Stub stub = mStub.get(session.systemId());
             if(stub!=null){
-                double score = gameServiceProvider.scoreTournament(stub.tournamentId,session.systemId(),100);
+                Tournament.Entry _e = gameServiceProvider.score(stub.entry.owner(),session.systemId(),100);
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty("systemId",session.systemId());
-                jsonObject.addProperty("score",score);
-                jsonObject.addProperty("name","player");
-                jsonObject.addProperty("icon","player icon");
-                jsonObject.addProperty("rank",1);
+                jsonObject.addProperty("score",_e.score(0));
+                jsonObject.addProperty("rank",_e.rank());
+                jsonObject.addProperty("timestamp",_e.timestamp());
                 session.write(jsonObject.toString().getBytes(),label());
             }
             else{

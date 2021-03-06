@@ -9,8 +9,6 @@ import java.util.Map;
 public class TournamentEntry extends RecoverableObject implements Tournament.Entry {
 
     private String systemId;
-    private String name;
-    private String icon;
     private double score;
     private int rank;
     private Tournament.Listener listener;
@@ -35,26 +33,6 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     }
 
     @Override
-    public String name() {
-        return name;
-    }
-
-    @Override
-    public void name(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String icon() {
-        return icon;
-    }
-
-    @Override
-    public void icon(String icon) {
-        this.icon = icon;
-    }
-
-    @Override
     public double score(double delta) {
         score = score+delta;
         if(delta>0){
@@ -68,8 +46,6 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     }
     public Map<String,Object> toMap(){
         properties.put("1",systemId);
-        properties.put("2",name);
-        properties.put("3",icon);
         properties.put("4",score);
         properties.put("5",timestamp);
         properties.put("6",rank);
@@ -77,8 +53,6 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     }
     public void fromMap(Map<String,Object> properties){
         this.systemId = (String) properties.get("1");
-        this.name = (String) properties.getOrDefault("2","name");
-        this.icon = (String) properties.getOrDefault("3","icon");
         this.score = ((Number)properties.getOrDefault("4",0)).doubleValue();
         this.timestamp = ((Number)properties.getOrDefault("5",0)).longValue();
         this.rank = ((Number)properties.getOrDefault("6",0)).intValue();

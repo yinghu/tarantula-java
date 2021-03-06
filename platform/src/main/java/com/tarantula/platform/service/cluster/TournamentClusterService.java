@@ -7,7 +7,7 @@ import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.TournamentServiceProvider;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
 
 import java.util.Properties;
@@ -47,21 +47,26 @@ public class TournamentClusterService implements ManagedService, RemoteService {
     }
 
     public boolean checkAvailable(String serviceName,String tournamentId){
-        TournamentServiceProvider tsp = (TournamentServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         return tsp.tournament(tournamentId)!=null;
     }
-    public String join(String serviceName,String tournamentId,String systemId){
-        TournamentServiceProvider tsp = (TournamentServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        Tournament.Instance _ins = tsp.tournament(tournamentId).join(systemId);
-        return _ins.id();
+    public Tournament.Entry join(String serviceName,String tournamentId,String systemId){
+        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        Tournament.Entry _ins = tsp.tournament(tournamentId).join(systemId);
+        return _ins;
     }
-    public double score(String serviceName,String instanceId,String systemId,double delta){
-        TournamentServiceProvider tsp = (TournamentServiceProvider) tarantulaContext.serviceProvider(serviceName);
+    public Tournament.Entry score(String serviceName, String instanceId, String systemId, double delta){
+        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         Tournament.Instance _ins = tsp.instance(instanceId);
-        double[] score={0};
+        Tournament.Entry[] score={null};
         _ins.update(systemId,(e)->{
-            score[0]=e.score(delta);
+            e.score(delta);
+            score[0]=e;
         });
         return score[0];
+    }
+    public Tournament schedule(String serviceName, Tournament.Schedule schedule){
+        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        return tsp.schedule(schedule);
     }
 }
