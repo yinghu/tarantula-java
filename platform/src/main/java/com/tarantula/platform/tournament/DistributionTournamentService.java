@@ -9,6 +9,7 @@ public interface DistributionTournamentService extends ServiceProvider {
 
     boolean checkAvailable(String serviceName,String tournamentId);
     byte[] join(String serviceName, String tournamentId, String systemId);
+    byte[] enter(String serviceName,String instanceId,String systemId);
     byte[] score(String serviceName,String instanceId,String systemId,double delta);
     byte[] schedule(String serviceName, Tournament.Schedule schedule);
 

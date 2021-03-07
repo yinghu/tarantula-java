@@ -76,6 +76,19 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             return null;
         }
     }
+    public byte[] enter(String serviceName,String instanceId,String systemId){
+        NodeEngine nodeEngine = getNodeEngine();
+        TournamentEnterOperation operation = new TournamentEnterOperation(serviceName,instanceId,systemId);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
+        final Future<byte[]> future = builder.invoke();
+        try {
+            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+            return null;
+        }
+    }
     public byte[] score(String serviceName,String instanceId,String systemId,double delta){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentScoreOperation operation = new TournamentScoreOperation(serviceName,instanceId,systemId,delta);

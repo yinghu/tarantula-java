@@ -53,12 +53,7 @@ public interface Tournament extends Recoverable{
         default void onCreated(Entry entry){}
         default void onUpdated(Entry entry){}
     }
-    interface Creator{
-        Tournament create(Schedule schedule);
-        Tournament load(String tournamentId);
-        Instance create(Tournament tournament);
-        Entry create(String systemId,Instance instance);
-    }
+
     interface Schedule{
         String type();
         String description();

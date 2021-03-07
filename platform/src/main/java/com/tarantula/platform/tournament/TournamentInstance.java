@@ -12,12 +12,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TournamentInstance extends RecoverableObject implements Tournament.Instance {
 
-    private ConcurrentHashMap<String, Tournament.Entry> entryIndex = new ConcurrentHashMap<>();
-    private Tournament.Status status = Tournament.Status.STARTED;
-    private int maxEntries;
-    private LocalDateTime start;
-    private LocalDateTime close;
-    private LocalDateTime end;
+    protected ConcurrentHashMap<String, Tournament.Entry> entryIndex = new ConcurrentHashMap<>();
+    protected Tournament.Status status = Tournament.Status.STARTED;
+    protected int maxEntries;
+    protected LocalDateTime start;
+    protected LocalDateTime close;
+    protected LocalDateTime end;
 
 
     public TournamentInstance(int maxEntries,LocalDateTime start,LocalDateTime close,LocalDateTime end){

@@ -3,6 +3,7 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.game.service.GameServiceProvider;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -21,12 +22,12 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
     private int maxEntriesPerInstance;
     private int durationMinutes;
     private Listener listener;
-    private Creator creator;
+    private GameServiceProvider creator;
 
     private ConcurrentLinkedDeque<Instance> pendingQueue = new ConcurrentLinkedDeque();
     private ConcurrentHashMap<String,Entry> entryIndex = new ConcurrentHashMap<>();
 
-    public DefaultTournament(Schedule schedule,Creator creator,Listener listener){
+    public DefaultTournament(Schedule schedule,GameServiceProvider creator,Listener listener){
         this.type = schedule.type();
         this.description = schedule.description();
         this.icon = schedule.icon();
@@ -38,7 +39,7 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
         this.creator = creator;
         this.listener = listener;
     }
-    public DefaultTournament(Creator creator,Listener listener){
+    public DefaultTournament(GameServiceProvider creator,Listener listener){
         this.creator = creator;
         this.listener = listener;
     }

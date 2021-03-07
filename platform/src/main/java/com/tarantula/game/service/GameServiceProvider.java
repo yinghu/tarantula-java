@@ -28,7 +28,7 @@ import java.util.concurrent.CountDownLatch;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,Tournament.Listener,Tournament.Creator {
+public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,Tournament.Listener{
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
@@ -206,7 +206,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     //tournament integration
     private void reload(Tournament.Listener listener){
-        GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournament");
+        GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournamentIndex");
         byte[] _key = gameServiceIndex.key().asString().getBytes();
         String _name = this.recoverService.findDataNode(dataStore.name(),_key);
         if(_name==null){
@@ -221,6 +221,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
                 listener.tournamentStarted(tournament);
             }
         });
+        ///GameServiceIndex gameServiceJoin = new GameServiceIndex(name(),"tournamentJoin");
+
     }
     @Override
     public Tournament register(Tournament.Schedule schedule){
@@ -322,14 +324,14 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         logger.warn("entry updated->"+entry.score(0));
     }
 
-    @Override
+
     public Tournament create(Tournament.Schedule schedule) {
         Tournament tournament = new DefaultTournament(schedule,this,this);
         this.dataStore.create(tournament);
         return tournament;
     }
 
-    @Override
+
     public Tournament load(String tournamentId) {
         DefaultTournament tournament = new DefaultTournament(this,this);
         tournament.distributionKey(tournamentId);
@@ -359,18 +361,18 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         return tournament;
     }
 
-    @Override
+
     public Tournament.Instance create(Tournament tournament) {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime close = start.plusMinutes(tournament.durationMinutesPerInstance()-1);
         LocalDateTime end = start.plusMinutes(tournament.durationMinutesPerInstance());
-        TournamentInstance tournamentInstance = new TournamentInstance(tournament.maxEntriesPerInstance(),start,close,end);
+        TournamentJoinIndex tournamentInstance = new TournamentJoinIndex(tournament.maxEntriesPerInstance(),start,close,end);
         tournamentInstance.owner(tournament.distributionKey());
         dataStore.create(tournamentInstance);
         return tournamentInstance;
     }
 
-    @Override
+
     public Tournament.Entry create(String systemId, Tournament.Instance instance) {
         TournamentEntry entry = new TournamentEntry(systemId,this);
         entry.owner(instance.distributionKey());

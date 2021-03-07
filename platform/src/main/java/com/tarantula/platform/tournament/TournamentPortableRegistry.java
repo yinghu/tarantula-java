@@ -3,8 +3,6 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.AbstractRecoverableListener;
-import com.tarantula.platform.OnInstanceQuery;
-import com.tarantula.platform.service.deployment.*;
 
 /**
  * updated by yinghu lu on 5/1/2020.
@@ -17,6 +15,7 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
     public static final int TOURNAMENT_CID = 8;
     public static final int TOURNAMENT_INSTANCE_CID = 9;
     public static final int TOURNAMENT_ENTRY_CID = 10;
+    public static final int TOURNAMENT_JOIN_INDEX_CID = 11;
 
     public Recoverable create(int i) {
         Recoverable pt = null;
@@ -29,6 +28,9 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
                 break;
             case TOURNAMENT_ENTRY_CID:
                 pt = new TournamentEntry();
+                break;
+            case TOURNAMENT_JOIN_INDEX_CID:
+                pt = new TournamentJoinIndex();
                 break;
             default:
         }
