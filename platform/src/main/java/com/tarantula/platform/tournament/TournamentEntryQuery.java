@@ -2,7 +2,7 @@ package com.tarantula.platform.tournament;
 
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.Tournament;
-import com.tarantula.platform.presence.PresencePortableRegistry;
+
 
 /**
  * created by yinghu on 3/1/2021.
@@ -10,15 +10,15 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 public class TournamentEntryQuery implements RecoverableFactory<TournamentEntry> {
 
     private String instanceId;
-    private Tournament.Listener listener;
+    ///private Tournament.Listener listener;
 
-    public TournamentEntryQuery(String instanceId, Tournament.Listener listener){
+    public TournamentEntryQuery(String instanceId){
         this.instanceId = instanceId;
-        this.listener = listener;
+        //this.listener = listener;
     }
 
     public TournamentEntry create() {
-        TournamentEntry ocx = new TournamentEntry(listener);
+        TournamentEntry ocx = new TournamentEntry();
         return ocx;
     }
 

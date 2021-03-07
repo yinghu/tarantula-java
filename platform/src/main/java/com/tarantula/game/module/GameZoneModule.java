@@ -200,7 +200,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
     }
     @Override
     public void onBucket(int bucket,int state){
-        this.context.log("Bucket->"+bucket+"/"+state,OnLog.WARN);
+        //this.context.log("Bucket->"+bucket+"/"+state,OnLog.WARN);
     }
     public void onUpdated(Configurable zone) {
         mZone.reset((Zone)zone);

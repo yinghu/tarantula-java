@@ -2,7 +2,6 @@ package com.tarantula.platform.tournament;
 
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.Map;
 
@@ -16,10 +15,6 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     public TournamentEntry(String systemId, Tournament.Listener listener){
         this();
         this.systemId = systemId;
-        this.listener = listener;
-    }
-    public TournamentEntry(Tournament.Listener listener){
-        this();
         this.listener = listener;
     }
 
@@ -65,5 +60,9 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     @Override
     public int getClassId() {
         return TournamentPortableRegistry.TOURNAMENT_ENTRY_CID;
+    }
+
+    public void listener(Tournament.Listener listener){
+        this.listener = listener;
     }
 }

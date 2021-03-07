@@ -13,11 +13,13 @@ import com.tarantula.platform.leaderboard.LeaderBoardSync;
 import com.tarantula.platform.tournament.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
@@ -46,6 +48,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private String subscription;
     private String statisticsTag;
     private ClusterProvider integrationCluster;
+    private RecoverService recoverService;
     private ServiceContext serviceContext;
     private DistributionTournamentService distributionTournamentService;
     private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
@@ -168,6 +171,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             }
             return false;
         });
+        this.recoverService = integrationCluster.recoverService();
         this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
         logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]"+this.distributionTournamentService.name());
     }
@@ -204,11 +208,11 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private void reload(Tournament.Listener listener){
         GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournament");
         byte[] _key = gameServiceIndex.key().asString().getBytes();
-        String _name = this.integrationCluster.recoverService().findDataNode(dataStore.name(),_key);
+        String _name = this.recoverService.findDataNode(dataStore.name(),_key);
         if(_name==null){
             return;
         }
-        byte[] _data = this.integrationCluster.recoverService().load(_name,dataStore.name(),_key);
+        byte[] _data = this.recoverService.load(_name,dataStore.name(),_key);
         gameServiceIndex.fromBinary(_data);
         gameServiceIndex.keySet.forEach((tk)->{
             Tournament tournament = this.load(tk);
@@ -329,18 +333,24 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     public Tournament load(String tournamentId) {
         DefaultTournament tournament = new DefaultTournament(this,this);
         tournament.distributionKey(tournamentId);
-        if(!dataStore.load(tournament)){
+        String _node = recoverService.findDataNode(dataStore.name(),tournamentId.getBytes());
+        if(_node==null){
             return null;
         }
+        byte[] ret = recoverService.load(_node,dataStore.name(),tournamentId.getBytes());
+        tournament.fromBinary(ret);
         TournamentInstanceQuery _q = new TournamentInstanceQuery(tournamentId);
-        List<TournamentInstance> tlist = dataStore.list(_q);
+        List<TournamentInstance> tlist = query(TournamentPortableRegistry.OID,_q,new String[]{tournamentId});
         tlist.forEach((ti)->{
-            dataStore.list(new TournamentEntryQuery(ti.id(),this),(te)->{
+            TournamentEntryQuery e = new TournamentEntryQuery(ti.id());
+            List<TournamentEntry> elist = query(TournamentPortableRegistry.OID,e,new String[]{ti.id()});
+            //logger.warn(">>>>>>>>>>>>>>>>>>>>>>>>"+elist.size());
+            elist.forEach((te)->{
+                te.listener(this);
                 te.owner(ti.id());
                 this.onCreated(te);
                 tournament.addTournamentEntry(te);
                 ti.enter(te);
-                return true;
             });
             ti.owner(tournamentId);
             this.onStarted(ti);
@@ -366,5 +376,21 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         entry.owner(instance.distributionKey());
         dataStore.create(entry);
         return entry;
+    }
+    private <T extends Recoverable> List<T> query(int factoryId,RecoverableFactory<T> factory,String[] params){
+        List<T> tlist = new ArrayList<>();
+        CountDownLatch _lock = new CountDownLatch(1);
+        String cid = this.serviceContext.deploymentServiceProvider().distributionCallback().registerQueryCallback((k,v)->{
+            T t = factory.create();
+            t.fromBinary(v);
+            t.distributionKey(new String(k));
+            if(!t.disabled()){
+                tlist.add(t);
+            }
+        },()-> _lock.countDown());
+        recoverService.queryStart(null,cid,dataStore.name(),factoryId,factory.registryId(),params);
+        try{_lock.await();}catch (Exception ex){}
+        this.serviceContext.deploymentServiceProvider().distributionCallback().removeQueryCallback(cid);
+        return tlist;
     }
 }

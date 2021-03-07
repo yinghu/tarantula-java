@@ -1,7 +1,10 @@
 package com.tarantula.platform.tournament;
 
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.AbstractRecoverableListener;
+import com.tarantula.platform.OnInstanceQuery;
+import com.tarantula.platform.service.deployment.*;
 
 /**
  * updated by yinghu lu on 5/1/2020.
@@ -34,5 +37,17 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
 
     public int registryId() {
         return OID;
+    }
+    public <T extends Recoverable> RecoverableFactory<T> query(int registerId, String[] params){
+        RecoverableFactory _fac = null;
+        switch (registerId){
+            case TOURNAMENT_INSTANCE_CID:
+                _fac = new TournamentInstanceQuery(params[0]);
+                break;
+            case TOURNAMENT_ENTRY_CID:
+                _fac = new TournamentEntryQuery(params[0]);
+                break;
+        }
+        return _fac;
     }
 }
