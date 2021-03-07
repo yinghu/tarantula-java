@@ -2,10 +2,8 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.Tournament;
 
-
 public interface TournamentServiceProvider extends ServiceProvider{
 
-    void registerCreator(Tournament.Creator creator);
     void registerListener(Tournament.Listener listener);
 
     Tournament register(Tournament.Schedule schedule);
@@ -13,7 +11,5 @@ public interface TournamentServiceProvider extends ServiceProvider{
     boolean available(String tournamentId);
     Tournament.Entry join(String tournamentId,String systemId);
     Tournament.Entry score(String instanceId,String systemId, double delta);
-
-    void reload();
 
 }

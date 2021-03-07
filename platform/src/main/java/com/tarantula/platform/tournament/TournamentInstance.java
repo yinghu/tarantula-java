@@ -88,11 +88,11 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
     @Override
     public int getFactoryId() {
-        return PresencePortableRegistry.OID;
+        return TournamentPortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PresencePortableRegistry.TOURNAMENT_INSTANCE_CID;
+        return TournamentPortableRegistry.TOURNAMENT_INSTANCE_CID;
     }
 }

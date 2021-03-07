@@ -3,7 +3,6 @@ package com.tarantula.platform.leaderboard;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Recoverable;
 import com.tarantula.platform.NaturalKey;
-import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.Map;
 import com.icodesoftware.util.RecoverableObject;
@@ -69,12 +68,12 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
 
     @Override
     public int getFactoryId() {
-        return PresencePortableRegistry.OID;
+        return LeaderBoardPortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PresencePortableRegistry.LEADER_BOARD_ENTRY_CID;
+        return LeaderBoardPortableRegistry.LEADER_BOARD_ENTRY_CID;
     }
     @Override
     public String toString(){

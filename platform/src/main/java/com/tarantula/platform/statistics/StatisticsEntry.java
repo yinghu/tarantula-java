@@ -4,7 +4,6 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.ResourceKey;
-import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.time.LocalDateTime;
 import java.time.temporal.IsoFields;
@@ -99,12 +98,12 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     }
     @Override
     public int getFactoryId() {
-        return PresencePortableRegistry.OID;
+        return StatisticsPortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PresencePortableRegistry.STATISTICS_ENTRY_CID;
+        return StatisticsPortableRegistry.STATISTICS_ENTRY_CID;
     }
 
     @Override

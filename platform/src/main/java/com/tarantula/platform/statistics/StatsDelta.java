@@ -2,7 +2,6 @@ package com.tarantula.platform.statistics;
 
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.protocol.DataBuffer;
-import com.tarantula.platform.presence.PresencePortableRegistry;
 
 
 
@@ -30,11 +29,11 @@ public class StatsDelta extends RecoverableObject {
     }
     @Override
     public int getFactoryId() {
-        return PresencePortableRegistry.OID;
+        return StatisticsPortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PresencePortableRegistry.STATISTICS_DELTA_CID;
+        return StatisticsPortableRegistry.STATISTICS_DELTA_CID;
     }
 }

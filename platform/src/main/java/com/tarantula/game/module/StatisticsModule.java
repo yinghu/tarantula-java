@@ -12,6 +12,7 @@ import com.tarantula.platform.leaderboard.LeaderBoardView;
 import com.tarantula.platform.leaderboard.LeaderBoardViewSerializer;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.statistics.StatisticsIndex;
+import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 import com.tarantula.platform.statistics.StatisticsSerializer;
 import com.tarantula.platform.statistics.StatsDelta;
 
@@ -64,7 +65,7 @@ public class StatisticsModule implements Module {
         this.builder.registerTypeAdapter(LeaderBoardView.class,new LeaderBoardViewSerializer());
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
         this.gameServiceProvider.statisticsTag(this.context.descriptor().tag());
-        this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.STATISTICS_DELTA_CID,(a)->{
+        this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(StatisticsPortableRegistry.STATISTICS_DELTA_CID,(a)->{
             StatsDelta delta = (StatsDelta)a;
             Statistics statistics = gameServiceProvider.statistics(delta.owner());
             Statistics.Entry entry = statistics.entry(delta.name);

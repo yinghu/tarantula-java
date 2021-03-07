@@ -601,8 +601,9 @@
             let _mmk = a.getAttribute('game-match-making');
             let _path = a.getAttribute('game-path');
             let _gameView = a.getAttribute('game-view-id');    
-            if(tournamentEnabled){
-                let tournamentView = _gameView+'.tournament';
+            if(tournamentEnabled === 'true'){
+                let tournamentView = _gameView+'.tournament';//play.{game}.tournament
+                console.log('go to tournament lobby->'+tournamentView);
                 let payload ={serviceTag:_mmk,gamePath:_path,tournamentEnabled:true,viewId:_gameView}; 
                 TARA_API.query().payload = payload;
                 TARA_API.query().serviceTag = _path+'/tournament';
@@ -611,19 +612,9 @@
             }else{
                 let payload ={serviceTag:_mmk,gamePath:_path,tournamentEnabled:false}; 
                 TARA_API.onPlay(payload,(resp)=>{
-                    console.log(resp);
                     if(resp.successful){
-                        //TARA_API.query().stub = resp.stub;
-                        //TARA_API.query().offline = resp.offline;
-                        //TARA_API.query().tournamentEnabled = resp.tournamentEnabled;
-                        //if(!resp.offline){
-                            //let conn = resp.connection;
-                            ///conn.protocol = conn.secured?'wss':'ws';
-                            //conn.path= a.getAttribute('game-path');
-                            //conn.ticket = resp.ticket;
-                            ///TARA_API.query().connection = conn;
-                        //}
                         TARA_API.query().gamePopup = '#tx-popup-game';
+                        TARA_API.query().popup = '#tx-popup-game';//in case goes to invalid page
                         tx_view({viewId:_gameView,containerId:'#tx-popup-game'});
                     }
                     else{//goes to error page

@@ -26,7 +26,7 @@ public class TournamentInstanceQuery implements RecoverableFactory<TournamentIns
 
 
     public  int registryId(){
-        return PresencePortableRegistry.TOURNAMENT_INSTANCE_CID;
+        return TournamentPortableRegistry.TOURNAMENT_INSTANCE_CID;
     }
 
     public String label(){

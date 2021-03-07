@@ -9,7 +9,7 @@ import com.tarantula.platform.OnAccessTrack;
  */
 public class UserPortableRegistry extends AbstractRecoverableListener {
 
-    public static final int OID = 3;
+    public static final int OID = 2;
 
     public static final int USER_CID = 1;
 

@@ -121,18 +121,18 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
 
     @Override
     public int getFactoryId() {
-        return PresencePortableRegistry.OID;
+        return TournamentPortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PresencePortableRegistry.TOURNAMENT_CID;
+        return TournamentPortableRegistry.TOURNAMENT_CID;
     }
     //local methods
-    void addTournamentInstance(Instance instance){
+    public void addTournamentInstance(Instance instance){
         pendingQueue.add(instance);
     }
-    void addTournamentEntry(Entry entry){
+    public void addTournamentEntry(Entry entry){
         entryIndex.put(entry.systemId(),entry);
     }
 }

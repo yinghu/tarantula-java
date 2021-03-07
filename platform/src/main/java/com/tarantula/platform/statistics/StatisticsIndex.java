@@ -1,7 +1,6 @@
 package com.tarantula.platform.statistics;
 import com.icodesoftware.Statistics;
 import com.tarantula.platform.AssociateKey;
-import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,12 +48,12 @@ public class StatisticsIndex extends RecoverableObject implements Statistics {
     }
     @Override
     public int getFactoryId() {
-        return PresencePortableRegistry.OID;
+        return StatisticsPortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PresencePortableRegistry.STATISTICS_CID;
+        return StatisticsPortableRegistry.STATISTICS_CID;
     }
 
     @Override

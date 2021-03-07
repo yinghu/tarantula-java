@@ -28,7 +28,7 @@ public class TournamentEntryQuery implements RecoverableFactory<TournamentEntry>
 
 
     public  int registryId(){
-        return PresencePortableRegistry.TOURNAMENT_ENTRY_CID;
+        return TournamentPortableRegistry.TOURNAMENT_ENTRY_CID;
     }
 
     public String label(){

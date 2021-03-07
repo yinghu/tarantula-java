@@ -10,13 +10,10 @@ import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.leaderboard.LeaderBoardSync;
-import com.tarantula.platform.tournament.DefaultTournament;
-import com.tarantula.platform.tournament.DistributionTournamentService;
-import com.tarantula.platform.tournament.TournamentCreator;
-import com.tarantula.platform.tournament.TournamentEntry;
+import com.tarantula.platform.tournament.*;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,Tournament.Listener {
+public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,Tournament.Listener,Tournament.Creator {
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
@@ -43,7 +40,6 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private ConcurrentHashMap<String,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Tournament.Instance> activeInstanceIndex = new ConcurrentHashMap<>();
     private CopyOnWriteArrayList<Tournament.Listener> tournamentListeners = new CopyOnWriteArrayList<>();
-    private Tournament.Creator creator;
 
     private EventService publisher;
 
@@ -173,7 +169,6 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             return false;
         });
         this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
-        this.creator = new TournamentCreator(this.dataStore,this);
         logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]"+this.distributionTournamentService.name());
     }
     @Override
@@ -206,18 +201,20 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
 
     //tournament integration
-    public void reload(){
+    private void reload(Tournament.Listener listener){
         GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournament");
-        dataStore.load(gameServiceIndex);
+        byte[] _key = gameServiceIndex.key().asString().getBytes();
+        String _name = this.integrationCluster.recoverService().findDataNode(dataStore.name(),_key);
+        if(_name==null){
+            return;
+        }
+        byte[] _data = this.integrationCluster.recoverService().load(_name,dataStore.name(),_key);
+        gameServiceIndex.fromBinary(_data);
         gameServiceIndex.keySet.forEach((tk)->{
-            Tournament tournament = creator.load(tk);
+            Tournament tournament = this.load(tk);
             if(tournament!=null){
-                this.logger.warn("TOURNAMENT START TIME->"+tournament.startTime().format(DateTimeFormatter.ISO_DATE_TIME));
-                this.logger.warn("TOURNAMENT END TIME->"+tournament.endTime().format(DateTimeFormatter.ISO_DATE_TIME));
-                this.logger.warn("EXPIRED after->"+LocalDateTime.now().isAfter(tournament.endTime()));
-                this.logger.warn("EXPIRED before->"+tournament.endTime().isBefore(LocalDateTime.now()));
                 tournamentIndex.put(tournament.distributionKey(),tournament);
-                this.tournamentStarted(tournament);
+                listener.tournamentStarted(tournament);
             }
         });
     }
@@ -231,7 +228,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         return tournament;
     }
     public Tournament schedule(Tournament.Schedule schedule) {
-        Tournament tournament = this.creator.create(schedule);
+        Tournament tournament = this.create(schedule);
         //TimeUtil.durationUTCMilliseconds()//now to start
         GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournament");
         gameServiceIndex.keySet.add(tournament.distributionKey());
@@ -273,11 +270,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
 
     @Override
-    public void registerCreator(Tournament.Creator creator){
-        this.creator = creator;
-    }
-    @Override
     public void registerListener(Tournament.Listener listener){
+        reload(listener);
         this.tournamentListeners.add(listener);
     }
 
@@ -322,5 +316,55 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     @Override
     public void onUpdated(Tournament.Entry entry){
         logger.warn("entry updated->"+entry.score(0));
+    }
+
+    @Override
+    public Tournament create(Tournament.Schedule schedule) {
+        Tournament tournament = new DefaultTournament(schedule,this,this);
+        this.dataStore.create(tournament);
+        return tournament;
+    }
+
+    @Override
+    public Tournament load(String tournamentId) {
+        DefaultTournament tournament = new DefaultTournament(this,this);
+        tournament.distributionKey(tournamentId);
+        if(!dataStore.load(tournament)){
+            return null;
+        }
+        TournamentInstanceQuery _q = new TournamentInstanceQuery(tournamentId);
+        List<TournamentInstance> tlist = dataStore.list(_q);
+        tlist.forEach((ti)->{
+            dataStore.list(new TournamentEntryQuery(ti.id(),this),(te)->{
+                te.owner(ti.id());
+                this.onCreated(te);
+                tournament.addTournamentEntry(te);
+                ti.enter(te);
+                return true;
+            });
+            ti.owner(tournamentId);
+            this.onStarted(ti);
+            tournament.addTournamentInstance(ti);
+        });
+        return tournament;
+    }
+
+    @Override
+    public Tournament.Instance create(Tournament tournament) {
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime close = start.plusMinutes(tournament.durationMinutesPerInstance()-1);
+        LocalDateTime end = start.plusMinutes(tournament.durationMinutesPerInstance());
+        TournamentInstance tournamentInstance = new TournamentInstance(tournament.maxEntriesPerInstance(),start,close,end);
+        tournamentInstance.owner(tournament.distributionKey());
+        dataStore.create(tournamentInstance);
+        return tournamentInstance;
+    }
+
+    @Override
+    public Tournament.Entry create(String systemId, Tournament.Instance instance) {
+        TournamentEntry entry = new TournamentEntry(systemId,this);
+        entry.owner(instance.distributionKey());
+        dataStore.create(entry);
+        return entry;
     }
 }
