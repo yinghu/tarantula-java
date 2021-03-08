@@ -47,14 +47,14 @@
     <services>
         <service enabled="true">
             <name>DeployService</name>
-            <class-name>com.tarantula.platform.service.cluster.ClusterDeployService</class-name>
+            <class-name>com.tarantula.platform.service.cluster.deployment.ClusterDeployService</class-name>
             <properties>
                 <property name="tarantula-scope">1</property>
             </properties>
         </service>
         <service enabled="true">
             <name>RecoverService</name>
-            <class-name>com.tarantula.platform.service.cluster.ClusterRecoverService</class-name>
+            <class-name>com.tarantula.platform.service.cluster.recover.ClusterRecoverService</class-name>
             <properties>
                 <property name="tarantula-scope">1</property>
             </properties>
