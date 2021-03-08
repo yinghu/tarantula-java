@@ -63,12 +63,12 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             return false;
         }
     }
-    public byte[] join(String serviceName, String tournamentId, String systemId){
+    public String join(String serviceName, String tournamentId, String systemId){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentJoinOperation operation = new TournamentJoinOperation(serviceName,tournamentId,systemId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(tournamentId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
-        final Future<byte[]> future = builder.invoke();
+        final Future<String> future = builder.invoke();
         try {
             return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
         } catch (Exception e) {
@@ -76,9 +76,9 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             return null;
         }
     }
-    public byte[] enter(String serviceName,String instanceId,String systemId){
+    public byte[] enter(String serviceName,String tournamentId,String instanceId,String systemId){
         NodeEngine nodeEngine = getNodeEngine();
-        TournamentEnterOperation operation = new TournamentEnterOperation(serviceName,instanceId,systemId);
+        TournamentEnterOperation operation = new TournamentEnterOperation(serviceName,tournamentId,instanceId,systemId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
         final Future<byte[]> future = builder.invoke();
@@ -113,5 +113,9 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             future.cancel(true);
             return null;
         }
+    }
+    public int partitionId(String distributionKey){
+        NodeEngine nodeEngine = getNodeEngine();
+        return nodeEngine.getPartitionService().getPartitionId(distributionKey);
     }
 }

@@ -50,5 +50,9 @@ public class TournamentScoreOperation extends Operation implements PartitionAwar
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
+        serviceName = in.readUTF();
+        instanceId = in.readUTF();
+        systemId = in.readUTF();
+        delta = in.readDouble();
     }
 }

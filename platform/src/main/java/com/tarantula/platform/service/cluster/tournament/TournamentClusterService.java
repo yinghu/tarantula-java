@@ -9,6 +9,7 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.tournament.TournamentEntry;
 
 import java.util.Properties;
 
@@ -50,14 +51,17 @@ public class TournamentClusterService implements ManagedService, RemoteService {
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         return tsp.tournament(tournamentId)!=null;
     }
-    public Tournament.Entry join(String serviceName,String tournamentId,String systemId){
+    public String join(String serviceName,String tournamentId,String systemId){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        Tournament.Entry _ins = tsp.tournament(tournamentId).join(systemId);
-        return _ins;
+        return tsp.tournament(tournamentId).join(systemId);
+    }
+    public Tournament.Entry enter(String serviceName,String tournamentId,String instanceId,String systemId){
+        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        return tsp.instance(tournamentId,instanceId).enter(systemId);
     }
     public Tournament.Entry score(String serviceName, String instanceId, String systemId, double delta){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        Tournament.Instance _ins = tsp.instance(instanceId);
+        Tournament.Instance _ins = tsp.instance("",instanceId);
         Tournament.Entry[] score={null};
         _ins.update(systemId,(e)->{
             e.score(delta);

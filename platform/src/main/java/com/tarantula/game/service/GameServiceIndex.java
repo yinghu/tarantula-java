@@ -8,6 +8,11 @@ import com.tarantula.platform.IndexSet;
 
 public class GameServiceIndex extends IndexSet {
 
+    public static final String TOURNAMENT ="tournament";
+    public static final String TOURNAMENT_INSTANCE_JOIN ="join";
+    public static final String TOURNAMENT_INSTANCE ="instance";
+
+
     public GameServiceIndex(){}
     public GameServiceIndex(String serviceName,String index){
         this.owner = serviceName;

@@ -29,9 +29,10 @@ public class Email {
         b[0]="1".getBytes();
         b[1]="2".getBytes();
         //b[3]="3".getBytes();
-
-        for(byte[] v : b){
-            System.out.println(new String(v));
+        String s = ",a,b,c";
+        for(String c : new StringBuffer().toString().split(",")){
+            if(c!=null&&!c.equals("")){
+            System.out.println(c);}
         }
     }
     public static boolean send(String to,String text){

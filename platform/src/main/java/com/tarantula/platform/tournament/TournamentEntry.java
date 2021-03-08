@@ -12,6 +12,16 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     private int rank;
     private Tournament.Listener listener;
 
+    public TournamentEntry(String systemId,String instanceId){
+        this();
+        this.systemId = systemId;
+        this.owner = instanceId;
+    }
+    public TournamentEntry(String systemId){
+        this();
+        this.systemId = systemId;
+
+    }
     public TournamentEntry(String systemId, Tournament.Listener listener){
         this();
         this.systemId = systemId;

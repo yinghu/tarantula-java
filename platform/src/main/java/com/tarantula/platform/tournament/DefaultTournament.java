@@ -101,20 +101,20 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
 
 
     @Override
-    public Entry join(String systemId) {
+    public String join(String systemId) {
         Entry _entry = entryIndex.get(systemId);
         if(_entry!=null){//rejoin
-            return _entry;
+            return _entry.owner();
         }
         Instance instance = pendingQueue.poll();
         if(instance==null){
-            instance = creator.create(this);
+            instance = creator.createOnJoin(this);
             listener.onStarted(instance);
         }
-        Entry entry = creator.create(systemId,instance);
-        instance.enter(creator.create(systemId,instance));
+        _entry = instance.enter(systemId);
+        creator.updateInstance(instance);
         pendingQueue.offer(instance);
-        return entry;
+        return _entry.owner();
     }
 
     @Override

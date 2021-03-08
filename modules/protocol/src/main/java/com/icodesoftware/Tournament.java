@@ -5,7 +5,6 @@ import java.util.List;
 
 public interface Tournament extends Recoverable{
 
-    String INSTANCE_LABEL = "TIT";
     String ENTRY_LABEL = "TEE";
 
     enum Status{
@@ -22,7 +21,7 @@ public interface Tournament extends Recoverable{
     int maxEntriesPerInstance();
     int durationMinutesPerInstance();
 
-    Entry join(String systemId);
+    String join(String systemId);
 
     interface Entry extends Recoverable{
         String systemId();
@@ -36,7 +35,7 @@ public interface Tournament extends Recoverable{
         LocalDateTime startTime();
         LocalDateTime closeTime();
         LocalDateTime endTime();
-        void enter(Entry entry);
+        Entry enter(String systemId);
         void update(String systemId,OnEntry onEntry);
         List<Entry> list();
     }

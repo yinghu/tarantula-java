@@ -3,6 +3,7 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.game.service.GameServiceProvider;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     protected LocalDateTime close;
     protected LocalDateTime end;
 
+    private GameServiceProvider gameServiceProvider;
 
     public TournamentInstance(int maxEntries,LocalDateTime start,LocalDateTime close,LocalDateTime end){
         this();
@@ -28,8 +30,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         this.end = end;
     }
     public TournamentInstance(){
-        this.onEdge = true;
-        this.label = Tournament.INSTANCE_LABEL;
+
     }
 
     @Override
@@ -41,8 +42,11 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         return status;
     }
     @Override
-    public void enter(Tournament.Entry entry) {
-        this.entryIndex.putIfAbsent(entry.systemId(),entry);
+    public Tournament.Entry enter(String systemId) {
+        return this.entryIndex.computeIfAbsent(systemId,(k)->{
+            Tournament.Entry e = gameServiceProvider.create(systemId,this);
+            return e;
+        });
     }
 
     @Override
@@ -93,5 +97,12 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     @Override
     public int getClassId() {
         return TournamentPortableRegistry.TOURNAMENT_INSTANCE_CID;
+    }
+
+    public void gameServiceProvider(GameServiceProvider gameServiceProvider){
+        this.gameServiceProvider = gameServiceProvider;
+    }
+    public void addEntry(Tournament.Entry entry){
+        entryIndex.put(entry.systemId(),entry);
     }
 }

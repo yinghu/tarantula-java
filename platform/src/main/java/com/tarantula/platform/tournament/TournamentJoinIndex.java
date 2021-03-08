@@ -10,8 +10,7 @@ import java.util.Map;
 public class TournamentJoinIndex extends TournamentInstance{
 
     public TournamentJoinIndex(){
-        this.onEdge = true;
-        this.label = "TJI";
+
     }
     public TournamentJoinIndex(int maxEntries,LocalDateTime start,LocalDateTime close,LocalDateTime end){
         this();
@@ -33,25 +32,32 @@ public class TournamentJoinIndex extends TournamentInstance{
     @Override
     public Map<String,Object> toMap(){
         super.toMap();
+        StringBuffer elist = new StringBuffer();
         entryIndex.forEach((k,v)->{
-            properties.put(k,"_e");
+            elist.append(",").append(k);
         });
+        properties.put("entryList",elist.toString());
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         super.fromMap(properties);
-        properties.forEach((k,v)->{
-            if(v.toString().equals("_e")){
-                entryIndex.put(k,new TournamentEntry());
+        String elist = (String) properties.get("entryList");
+        for(String e : elist.split(",")){
+            if(e!=null&&(!e.equals(""))){
+                entryIndex.put(e,new TournamentEntry(e,id()));
             }
-        });
+        }
     }
 
-
-    public Key key(){
-        return new AssociateKey(this.bucket,this.oid,this.label);
+    @Override
+    public Tournament.Entry enter(String systemId) {
+        Tournament.Entry _e = new TournamentEntry(systemId);
+        this.entryIndex.putIfAbsent(_e.systemId(),_e);
+        _e.owner(id());
+        return _e;
     }
+
     @Override
     public int getFactoryId() {
         return TournamentPortableRegistry.OID;

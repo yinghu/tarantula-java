@@ -16,6 +16,7 @@ import java.util.Map;
 public class TournamentEnterOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;
+    private String tournamentId;
     private String instanceId;
     private String systemId;
     private byte[] data;
@@ -24,15 +25,16 @@ public class TournamentEnterOperation extends Operation implements PartitionAwar
     }
 
 
-    public TournamentEnterOperation(String serviceName, String instanceId, String systemId) {
+    public TournamentEnterOperation(String serviceName, String tournamentId,String instanceId, String systemId) {
         this.serviceName = serviceName;
+        this.tournamentId = tournamentId;
         this.instanceId = instanceId;
         this.systemId = systemId;
     }
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        Tournament.Entry entry = ais.join(serviceName,instanceId,systemId);
+        Tournament.Entry entry = ais.enter(serviceName,tournamentId,instanceId,systemId);
         Map<String,Object> _map = entry.toMap();
         _map.put("instanceId",entry.owner());
         this.data = JsonUtil.toJson(_map);
@@ -47,6 +49,7 @@ public class TournamentEnterOperation extends Operation implements PartitionAwar
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(this.serviceName);
+        out.writeUTF(tournamentId);
         out.writeUTF(this.instanceId);
         out.writeUTF(this.systemId);
     }
@@ -54,5 +57,9 @@ public class TournamentEnterOperation extends Operation implements PartitionAwar
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
+        serviceName = in.readUTF();
+        tournamentId = in.readUTF();
+        instanceId = in.readUTF();
+        systemId = in.readUTF();
     }
 }

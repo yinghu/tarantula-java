@@ -14,6 +14,9 @@ public class IndexSet extends RecoverableObject {
 
     public IndexSet(){
     }
+    public IndexSet(String label){
+        this.label = label;
+    }
 
     public int getFactoryId() {
         return PortableRegistry.OID;
