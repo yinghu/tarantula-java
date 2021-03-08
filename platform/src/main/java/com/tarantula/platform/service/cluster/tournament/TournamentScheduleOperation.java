@@ -1,4 +1,4 @@
-package com.tarantula.platform.service.cluster;
+package com.tarantula.platform.service.cluster.tournament;
 
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
@@ -6,6 +6,7 @@ import com.hazelcast.spi.Operation;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.platform.service.cluster.tournament.TournamentClusterService;
 import com.tarantula.platform.tournament.DefaultTournamentSchedule;
 
 

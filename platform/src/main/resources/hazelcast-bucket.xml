@@ -61,7 +61,7 @@
         </service>
         <service enabled="true">
             <name>DistributionTournamentService</name>
-            <class-name>com.tarantula.platform.service.cluster.TournamentClusterService</class-name>
+            <class-name>com.tarantula.platform.service.cluster.tournament.TournamentClusterService</class-name>
         </service>
     </services>
     <partition-group enabled="true" group-type="HOST_AWARE" />

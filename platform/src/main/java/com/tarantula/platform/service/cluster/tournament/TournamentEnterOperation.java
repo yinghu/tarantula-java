@@ -1,4 +1,4 @@
-package com.tarantula.platform.service.cluster;
+package com.tarantula.platform.service.cluster.tournament;
 
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;

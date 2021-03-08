@@ -206,7 +206,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     //tournament integration
     private void reload(Tournament.Listener listener){
-        GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournamentIndex");
+        GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),"tournament");
         byte[] _key = gameServiceIndex.key().asString().getBytes();
         String _name = this.recoverService.findDataNode(dataStore.name(),_key);
         if(_name==null){

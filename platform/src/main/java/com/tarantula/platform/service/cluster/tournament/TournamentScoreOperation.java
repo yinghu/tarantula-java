@@ -1,42 +1,36 @@
-package com.tarantula.platform.service.cluster;
+package com.tarantula.platform.service.cluster.tournament;
 
-import com.hazelcast.internal.json.Json;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
-import com.icodesoftware.Tournament;
-import com.icodesoftware.util.JsonUtil;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * created by yinghu lu on 3/5/2021.
  */
-public class TournamentJoinOperation extends Operation implements PartitionAwareOperation {
+public class TournamentScoreOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;
-    private String tournamentId;
     private String systemId;
+    private String instanceId;
+    private double delta;
     private byte[] data;
-
-    public TournamentJoinOperation() {
+    public TournamentScoreOperation() {
     }
 
 
-    public TournamentJoinOperation(String serviceName,String tournamentId,String systemId) {
+    public TournamentScoreOperation(String serviceName, String instanceId, String systemId,double delta) {
         this.serviceName = serviceName;
-        this.tournamentId = tournamentId;
+        this.instanceId = instanceId;
         this.systemId = systemId;
+        this.delta = delta;
     }
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        Tournament.Entry entry = ais.join(serviceName,tournamentId,systemId);
-        Map<String,Object> _map = entry.toMap();
-        _map.put("instanceId",entry.owner());
-        this.data = JsonUtil.toJson(_map);
+        this.data = ais.score(serviceName,instanceId,systemId,delta).toBinary();
     }
 
     @Override
@@ -48,8 +42,9 @@ public class TournamentJoinOperation extends Operation implements PartitionAware
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(this.serviceName);
-        out.writeUTF(this.tournamentId);
+        out.writeUTF(this.instanceId);
         out.writeUTF(this.systemId);
+        out.writeDouble(this.delta);
     }
 
     @Override
