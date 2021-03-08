@@ -216,10 +216,12 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         byte[] _data = this.recoverService.load(_name,dataStore.name(),_key);
         gameServiceIndex.fromBinary(_data);
         gameServiceIndex.keySet.forEach((tk)->{
-            Tournament tournament = this.load(tk);
-            if(tournament!=null){
-                tournamentIndex.put(tournament.distributionKey(),tournament);
-                listener.tournamentStarted(tournament);
+            if(distributionTournamentService.localPartition(tk)){
+                Tournament tournament = this.load(tk);
+                if(tournament!=null){
+                    tournamentIndex.put(tournament.distributionKey(),tournament);
+                    listener.tournamentStarted(tournament);
+                }
             }
         });
         ///GameServiceIndex gameServiceJoin = new GameServiceIndex(name(),"tournamentJoin");

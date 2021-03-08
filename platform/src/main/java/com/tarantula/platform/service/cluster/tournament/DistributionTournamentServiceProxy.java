@@ -114,8 +114,9 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             return null;
         }
     }
-    public int partitionId(String distributionKey){
+    public boolean localPartition(String distributionKey){
         NodeEngine nodeEngine = getNodeEngine();
-        return nodeEngine.getPartitionService().getPartitionId(distributionKey);
+        int pid = nodeEngine.getPartitionService().getPartitionId(distributionKey);
+        return nodeEngine.getPartitionService().getPartition(pid).isLocal();
     }
 }
