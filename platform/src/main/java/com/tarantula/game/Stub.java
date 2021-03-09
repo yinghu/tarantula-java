@@ -49,6 +49,7 @@ public class Stub extends RecoverableObject {
         jo.addProperty("rank",rating.rank);
         jo.addProperty("xp",rating.xp);
         jo.addProperty("level",rating.level);
+        jo.addProperty("tournamentEnabled",instance!=null);
         if(instance!=null){
             JsonObject jp = new JsonObject();
             jp.addProperty("id",instance.id());

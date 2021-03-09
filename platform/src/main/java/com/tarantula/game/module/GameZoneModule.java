@@ -91,9 +91,10 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         }
         else if(session.action().equals("onScore")){
             Stub stub = mStub.get(session.systemId());
-            if(stub!=null){
+            if(stub!=null&&stub.instance!=null){
                 Tournament.Entry _e = gameServiceProvider.score(stub.instance.id(),session.systemId(),100);
                 JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("successful",true);
                 jsonObject.addProperty("systemId",session.systemId());
                 jsonObject.addProperty("score",_e.score(0));
                 jsonObject.addProperty("rank",_e.rank());
@@ -101,12 +102,12 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
                 session.write(jsonObject.toString().getBytes(),label());
             }
             else{
-                session.write(toMessage("no room joined",false).toString().getBytes(),label());
+                session.write(toMessage("no tournament joined",false).toString().getBytes(),label());
             }
         }
         else if(session.action().equals("onList")){
             Stub stub = mStub.get(session.systemId());
-            if(stub!=null){
+            if(stub!=null&&stub.instance!=null){
                 List<Tournament.Entry> _e = gameServiceProvider.list(stub.instance.id());
                 JsonArray alist = new JsonArray();
                 _e.forEach((a)->{
@@ -118,11 +119,12 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
                     alist.add(jsonObject);
                 });
                 JsonObject ret = new JsonObject();
+                ret.addProperty("successful",true);
                 ret.add("list",alist);
                 session.write(ret.toString().getBytes(),label());
             }
             else{
-                session.write(toMessage("no room joined",false).toString().getBytes(),label());
+                session.write(toMessage("no tournament joined",false).toString().getBytes(),label());
             }
         }
         else if(session.action().equals("onEnded")){

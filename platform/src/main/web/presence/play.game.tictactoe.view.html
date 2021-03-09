@@ -34,9 +34,13 @@
     app.stage.addChild(exit);
     let messageQueue = ['AqC','BqC','CqC','DqC','Eq','Fq','Gq'];
     let send = text_button('SEND',()=>{
-        let m = messageQueue.shift();
-        TARA_API.send({label:'echo',message:'Rotating->'+m});
-        messageQueue.push(m);
+        if(TARA_API.query().offline){
+            messageBox.text = "offline play mode";     
+        }else{
+            let m = messageQueue.shift();
+            TARA_API.send({label:'echo',message:'Rotating->'+m});
+            messageQueue.push(m);
+        }
     });
     send.x = (window.innerWidth-64)/2;
     send.y = (window.innerHeight-64)/2;
@@ -55,7 +59,12 @@
     let score = text_button('SCORE',()=>{
         let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onScore'}; 
         TARA_API.onService(true,cmd,(resp)=>{
-            seats[resp.rank].caption.text = resp.score;            
+            if(resp.successful){
+                seats[resp.rank].caption.text = resp.score;
+            }
+            else{
+                messageBox.text = resp.message;
+            }            
         });
     });
     score.x = (window.innerWidth-64)/3;
@@ -65,8 +74,14 @@
     let list = text_button('LIST',()=>{
         let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onList'}; 
         TARA_API.onService(true,cmd,(resp)=>{
-            console.log(resp);
-            //seats[resp.rank].caption.text = resp.score;            
+            if(resp.successful){
+                resp.list.forEach((e,i)=> {
+                    seats[i].caption.text=e.score+'\n'+e.systemId;      
+                });        
+            }
+            else{
+                messageBox.text = resp.message;
+            }            
         });
     });
     list.x = (window.innerWidth-120);
