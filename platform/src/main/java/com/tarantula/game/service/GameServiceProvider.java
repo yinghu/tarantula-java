@@ -29,7 +29,7 @@ import java.util.concurrent.CountDownLatch;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,Tournament.Listener{
+public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,ItemServiceProvider,Tournament.Listener{
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
@@ -42,7 +42,9 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     private ConcurrentHashMap<String,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Tournament.Instance> activeInstanceIndex = new ConcurrentHashMap<>();
+
     private CopyOnWriteArrayList<Tournament.Listener> tournamentListeners = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<Consumable.Listener> itemListeners = new CopyOnWriteArrayList<>();
 
     private EventService publisher;
 
@@ -446,5 +448,17 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         try{_lock.await();}catch (Exception ex){}
         this.serviceContext.deploymentServiceProvider().distributionCallback().removeQueryCallback(cid);
         return tlist;
+    }
+
+    @Override
+    public Consumable register(Consumable consumable) {
+        logger.warn("register consumable item->"+consumable.category());
+        itemListeners.forEach((c)->{
+            c.onCreated(consumable);
+        });
+        return consumable;
+    }
+    public void registerListener(Consumable.Listener listener){
+        itemListeners.add(listener);
     }
 }

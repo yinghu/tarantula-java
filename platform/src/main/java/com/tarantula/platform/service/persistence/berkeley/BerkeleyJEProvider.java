@@ -225,7 +225,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         //log.info("Waiting for loading data on first member from data scope store");
         HashSet<String> ln = new HashSet<>();
         for(String dn : this.environment.getDatabaseNames()){
-            ln.add(dn.split("_")[0]);
+            int ix = dn.lastIndexOf("_");
+            ln.add(dn.substring(0,ix));
         }
         ln.forEach((n)->{
             DataStore ds = this.create(n,this.partitionNumber);

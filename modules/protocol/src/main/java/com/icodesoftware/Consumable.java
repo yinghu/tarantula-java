@@ -15,4 +15,9 @@ public interface Consumable extends Recoverable {
 
     void property(String pName,Object pValue);
     Object property(String pName);
+
+    interface Listener{
+        void onCreated(Consumable consumable);
+        void onUpdated(Consumable consumable);
+    }
 }
