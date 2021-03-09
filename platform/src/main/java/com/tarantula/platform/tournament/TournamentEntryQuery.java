@@ -10,11 +10,9 @@ import com.icodesoftware.Tournament;
 public class TournamentEntryQuery implements RecoverableFactory<TournamentEntry> {
 
     private String instanceId;
-    ///private Tournament.Listener listener;
 
     public TournamentEntryQuery(String instanceId){
         this.instanceId = instanceId;
-        //this.listener = listener;
     }
 
     public TournamentEntry create() {

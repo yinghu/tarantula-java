@@ -214,7 +214,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             return;
         }
         byte[] _data = this.recoverService.load(_name,dataStore.name(),_key);
-        gameServiceIndex.fromBinary(_data);
+        gameServiceIndex.fromBinary(_data);//=> list of tournament launched
         gameServiceIndex.keySet.forEach((tk)->{
             if(distributionTournamentService.localPartition(tk)){
                 Tournament tournament = this.load(tk);
@@ -224,8 +224,6 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
                 }
             }
         });
-        ///GameServiceIndex gameServiceJoin = new GameServiceIndex(name(),"tournamentJoin");
-
     }
     @Override
     public Tournament register(Tournament.Schedule schedule){
@@ -253,11 +251,11 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         return this.distributionTournamentService.checkAvailable(name(),tournamentId);
     }
     @Override
-    public Tournament.Entry join(String tournamentId, String systemId){
+    public Tournament.Instance join(String tournamentId, String systemId){
         String tid = this.distributionTournamentService.join(name(),tournamentId,systemId);
         byte[] ret = this.distributionTournamentService.enter(name(),tournamentId,tid,systemId);
-        Tournament.Entry _e = new TournamentEntry();
-        _e.owner(tid);
+        Tournament.Instance _e = new TournamentInstance();
+        _e.distributionKey(tid);
         _e.fromBinary(ret);
         return _e;
     }
@@ -268,14 +266,29 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         _e.fromBinary(ret);
         return _e;
     }
-
+    @Override
+    public List<Tournament.Entry> list(String instanceId){
+        Tournament.Instance _ins = instance(instanceId);
+        return _ins.list();
+    }
     public Tournament tournament(String tournamentId) {
         return tournamentIndex.get(tournamentId);
     }
 
-    public Tournament.Instance instance(String tournamentId,String instanceId){
+    public Tournament.Instance enter(String tournamentId,String instanceId){
         return activeInstanceIndex.computeIfAbsent(instanceId,(k)->{
             TournamentInstance _ins = createIfAbsent(tournament(tournamentId),instanceId);
+            _ins.gameServiceProvider(this);
+            return _ins;
+        });
+    }
+    public Tournament.Instance instance(String instanceId){
+        return activeInstanceIndex.computeIfAbsent(instanceId,(k)->{
+            TournamentInstance _ins = new TournamentInstance();
+            _ins.distributionKey(instanceId);
+            if(!dataStore.load(_ins)){
+                return null;
+            }
             _ins.gameServiceProvider(this);
             return _ins;
         });
@@ -362,24 +375,6 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
                 tournament.addTournamentInstance(tournamentJoinIndex);
             }
         });
-        /**
-        TournamentInstanceQuery _q = new TournamentInstanceQuery(tournamentId);
-        List<TournamentInstance> tlist = query(TournamentPortableRegistry.OID,_q,new String[]{tournamentId});
-        tlist.forEach((ti)->{
-            TournamentEntryQuery e = new TournamentEntryQuery(ti.id());
-            List<TournamentEntry> elist = query(TournamentPortableRegistry.OID,e,new String[]{ti.id()});
-            //logger.warn(">>>>>>>>>>>>>>>>>>>>>>>>"+elist.size());
-            elist.forEach((te)->{
-                te.listener(this);
-                te.owner(ti.id());
-                this.onCreated(te);
-                tournament.addTournamentEntry(te);
-                ti.enter(te);
-            });
-            ti.owner(tournamentId);
-            this.onStarted(ti);
-            tournament.addTournamentInstance(ti);
-        });**/
         return tournament;
     }
 
@@ -391,7 +386,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         if(!dataStore.create(tournamentInstance)){
             return null;
         }
-        IndexSet indexSet = new IndexSet(GameServiceIndex.TOURNAMENT_INSTANCE_JOIN);
+        IndexSet indexSet = new IndexSet(GameServiceIndex.TOURNAMENT_INSTANCE_JOIN);//tournament => list of join instances
         indexSet.distributionKey(tournament.distributionKey());
         indexSet.keySet.add(tournamentInstance.id());
         if(!dataStore.createIfAbsent(indexSet,true)){
@@ -416,7 +411,6 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         }
         TournamentEntryQuery e = new TournamentEntryQuery(instanceId);
         List<TournamentEntry> elist = query(TournamentPortableRegistry.OID,e,new String[]{instanceId});
-        logger.warn(">>>>>>>>>>>>>>>>>>>>>>>>"+elist.size());
         elist.forEach((te)->{
             te.listener(this);
             te.owner(instanceId);

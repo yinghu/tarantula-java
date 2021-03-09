@@ -1,5 +1,6 @@
 package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.*;
@@ -12,6 +13,7 @@ import com.tarantula.platform.statistics.StatsDelta;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 /**
  * updated by yinghu lu on 6/9/2020.
@@ -68,8 +70,8 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         }
         gameObject.stub = stub;
         if(mZone.descriptor.tournamentEnabled()){
-            Tournament.Entry  e = gameServiceProvider.join(session.instanceId(),session.systemId());
-            stub.entry = e;
+            Tournament.Instance  e = gameServiceProvider.join(session.instanceId(),session.systemId());
+            stub.instance = e;
         }
         mStub.put(session.systemId(),stub);
         session.write(gameObject.toJson().toString().getBytes(),label());
@@ -90,13 +92,34 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         else if(session.action().equals("onScore")){
             Stub stub = mStub.get(session.systemId());
             if(stub!=null){
-                Tournament.Entry _e = gameServiceProvider.score(stub.entry.owner(),session.systemId(),100);
+                Tournament.Entry _e = gameServiceProvider.score(stub.instance.id(),session.systemId(),100);
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty("systemId",session.systemId());
                 jsonObject.addProperty("score",_e.score(0));
                 jsonObject.addProperty("rank",_e.rank());
                 jsonObject.addProperty("timestamp",_e.timestamp());
                 session.write(jsonObject.toString().getBytes(),label());
+            }
+            else{
+                session.write(toMessage("no room joined",false).toString().getBytes(),label());
+            }
+        }
+        else if(session.action().equals("onList")){
+            Stub stub = mStub.get(session.systemId());
+            if(stub!=null){
+                List<Tournament.Entry> _e = gameServiceProvider.list(stub.instance.id());
+                JsonArray alist = new JsonArray();
+                _e.forEach((a)->{
+                    JsonObject jsonObject = new JsonObject();
+                    jsonObject.addProperty("systemId",a.systemId());
+                    jsonObject.addProperty("score",a.score(0));
+                    jsonObject.addProperty("rank",a.rank());
+                    jsonObject.addProperty("timestamp",a.timestamp());
+                    alist.add(jsonObject);
+                });
+                JsonObject ret = new JsonObject();
+                ret.add("list",alist);
+                session.write(ret.toString().getBytes(),label());
             }
             else{
                 session.write(toMessage("no room joined",false).toString().getBytes(),label());

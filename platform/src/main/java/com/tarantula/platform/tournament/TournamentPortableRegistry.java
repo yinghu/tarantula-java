@@ -43,9 +43,6 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
     public <T extends Recoverable> RecoverableFactory<T> query(int registerId, String[] params){
         RecoverableFactory _fac = null;
         switch (registerId){
-            case TOURNAMENT_INSTANCE_CID:
-                _fac = new TournamentInstanceQuery(params[0]);
-                break;
             case TOURNAMENT_ENTRY_CID:
                 _fac = new TournamentEntryQuery(params[0]);
                 break;

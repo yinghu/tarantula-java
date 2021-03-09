@@ -34,9 +34,8 @@ public class TournamentEnterOperation extends Operation implements PartitionAwar
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        Tournament.Entry entry = ais.enter(serviceName,tournamentId,instanceId,systemId);
+        Tournament.Instance entry = ais.enter(serviceName,tournamentId,instanceId,systemId);
         Map<String,Object> _map = entry.toMap();
-        _map.put("instanceId",entry.owner());
         this.data = JsonUtil.toJson(_map);
     }
 

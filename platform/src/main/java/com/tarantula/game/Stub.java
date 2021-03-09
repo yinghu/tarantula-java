@@ -5,6 +5,9 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.protocol.DataBuffer;
 import com.tarantula.platform.statistics.StatsDelta;
 import com.icodesoftware.util.RecoverableObject;
+
+import java.time.format.DateTimeFormatter;
+
 /**
  * Updated by yinghu lu on 6/12/2020.
  */
@@ -21,7 +24,7 @@ public class Stub extends RecoverableObject {
     public int levelUpBase;
     public StatsDelta stats;
     public Rating rating;
-    public Tournament.Entry entry; //
+    public Tournament.Instance instance; //
     /**
      * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
      * rank - final result 1,2 rank xp = (1/rank)*100  1 - 100 2 50 ..
@@ -46,6 +49,15 @@ public class Stub extends RecoverableObject {
         jo.addProperty("rank",rating.rank);
         jo.addProperty("xp",rating.xp);
         jo.addProperty("level",rating.level);
+        if(instance!=null){
+            JsonObject jp = new JsonObject();
+            jp.addProperty("id",instance.id());
+            jp.addProperty("maxEntries",instance.maxEntries());
+            jp.addProperty("startTime",instance.startTime().format(DateTimeFormatter.ISO_DATE_TIME));
+            jp.addProperty("closeTime",instance.startTime().format(DateTimeFormatter.ISO_DATE_TIME));
+            jp.addProperty("endTime",instance.startTime().format(DateTimeFormatter.ISO_DATE_TIME));
+            jo.add("tournament",jp);
+        }
         return jo;
     }
 

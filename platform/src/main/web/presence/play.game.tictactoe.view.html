@@ -3,6 +3,7 @@
 </div>
 <script type='module' tx-id='tx-md-tictactoe' tx-src='resource/tarantula.tictactoe.js' tx-version='1.1'></script>
 <script type='text/javascript'>
+    console.log(TARA_API.query().stub);
     let ttc = new TicTacToe('my ttc');
     ttc.show_name();
     let _oswaldFamily = 'Oswald, Arial';
@@ -60,6 +61,18 @@
     score.x = (window.innerWidth-64)/3;
     score.y = (window.innerHeight-64)/3;
     app.stage.addChild(score);
+
+    let list = text_button('LIST',()=>{
+        let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onList'}; 
+        TARA_API.onService(true,cmd,(resp)=>{
+            console.log(resp);
+            //seats[resp.rank].caption.text = resp.score;            
+        });
+    });
+    list.x = (window.innerWidth-120);
+    list.y = (window.innerHeight-64)/3;
+    app.stage.addChild(list);
+
     
     TARA_API.connect((data)=>{
         console.log(data);
