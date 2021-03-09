@@ -136,7 +136,6 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
 
 	public void start() throws Exception {
         //add platform portable provider from conf
-        //partitionCount = Integer.parseInt(config.getProperty("hazelcast.partition.count"));
         config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         config.getListenerConfigs().add(new ListenerConfig(this));
         _hazel = Hazelcast.newHazelcastInstance(this.config);
@@ -145,7 +144,6 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
         vMap = this._hazel.getMap(VALUE_MAP);
         this.deployService = this._hazel.getDistributedObject(DeployService.NAME,DeployService.NAME);
         this.recoverService = this._hazel.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
-        //memberId = _hazel.getCluster().getLocalMember().getUuid();
     }
 
 	public void shutdown() throws Exception {

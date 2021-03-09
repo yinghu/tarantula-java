@@ -277,19 +277,21 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     public Tournament.Instance enter(String tournamentId,String instanceId){
         return activeInstanceIndex.computeIfAbsent(instanceId,(k)->{
-            TournamentInstance _ins = createIfAbsent(tournament(tournamentId),instanceId);
+            TournamentInstance _ins = create(tournament(tournamentId),instanceId);
             _ins.gameServiceProvider(this);
+            this.onStarted(_ins);
             return _ins;
         });
     }
     public Tournament.Instance instance(String instanceId){
         return activeInstanceIndex.computeIfAbsent(instanceId,(k)->{
             TournamentInstance _ins = new TournamentInstance();
-            _ins.distributionKey(instanceId);
+            _ins.distributionKey(k);
             if(!dataStore.load(_ins)){
                 return null;
             }
             _ins.gameServiceProvider(this);
+            this.onStarted(_ins);
             return _ins;
         });
     }
@@ -321,7 +323,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     @Override
     public void onStarted(Tournament.Instance instance) {
         logger.warn("instance started->"+instance.id());
-        activeInstanceIndex.put(instance.id(),instance);
+        //activeInstanceIndex.put(instance.id(),instance);
         tournamentListeners.forEach(listener -> listener.onStarted(instance));
     }
 
@@ -395,7 +397,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         }
         return tournamentInstance;
     }
-    public TournamentInstance createIfAbsent(Tournament tournament,String instanceId) {
+    public TournamentInstance create(Tournament tournament,String instanceId) {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime close = start.plusMinutes(tournament.durationMinutesPerInstance()-1);
         LocalDateTime end = start.plusMinutes(tournament.durationMinutesPerInstance());
