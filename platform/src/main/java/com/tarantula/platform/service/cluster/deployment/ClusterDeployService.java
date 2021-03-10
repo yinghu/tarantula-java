@@ -224,6 +224,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
                 this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
             }
+            this.tarantulaContext.tarantulaCluster().onReload();
         }
         this.deploymentServiceProvider.distributionCallback().memberAdded(membershipServiceEvent.getMember().getUuid());
     }
@@ -244,6 +245,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
                 this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
             }
+            this.tarantulaContext.tarantulaCluster().onReload();
         }
         this.deploymentServiceProvider.distributionCallback().memberRemoved(membershipServiceEvent.getMember().getUuid());
     }

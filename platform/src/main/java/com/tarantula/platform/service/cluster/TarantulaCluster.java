@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.cluster;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ListenerConfig;
@@ -13,7 +14,7 @@ import com.icodesoftware.util.JsonUtil;
 
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
-import com.tarantula.platform.tournament.DistributionTournamentService;
+
 
 public class TarantulaCluster extends TarantulaApplicationHeader implements ClusterProvider, EventService,LifecycleListener{
 
@@ -32,7 +33,8 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     //private String memberId;
     private DeployService deployService;
     private RecoverService recoverService;
-    //private ConcurrentHashMap<String,EventListener> eMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, ReloadListener> rMap = new ConcurrentHashMap<>();
+
 
     public TarantulaCluster(final Config config,final String bucket,final TarantulaContext tarantulaContext){
 		this.config  = config;
@@ -197,5 +199,14 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
                 break;
             default:
         }
+    }
+    public void registerReloadListener(String typeId,ReloadListener listener){
+        rMap.put(typeId,listener);
+    }
+    public void unregisterReloadListener(String typeId){
+        rMap.remove(typeId);
+    }
+    public void onReload(){
+        rMap.forEach((k,v)->v.reload());
     }
 }

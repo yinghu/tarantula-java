@@ -359,4 +359,10 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             default:
         }
     }
+    public void registerReloadListener(String typeId,ReloadListener listener){
+
+    }
+    public void unregisterReloadListener(String typeId){
+
+    }
 }

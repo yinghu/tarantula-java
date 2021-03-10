@@ -47,5 +47,7 @@ public interface ClusterProvider extends Serviceable {
     byte[] remove(byte[] key);
 
     void registerMetricsListener(MetricsListener metricsListener);
+    void registerReloadListener(String typeId,ReloadListener reloadListener);
+    void unregisterReloadListener(String typeId);
 
 }

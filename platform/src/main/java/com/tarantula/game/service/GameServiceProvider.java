@@ -29,7 +29,7 @@ import java.util.concurrent.CountDownLatch;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,ItemServiceProvider,Tournament.Listener{
+public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,ItemServiceProvider,Tournament.Listener, ReloadListener {
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
@@ -51,6 +51,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private String subscription;
     private String statisticsTag;
     private ClusterProvider integrationCluster;
+    private ClusterProvider dataCluster;
     private RecoverService recoverService;
     private ServiceContext serviceContext;
     private DistributionTournamentService distributionTournamentService;
@@ -176,6 +177,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         });
         this.recoverService = integrationCluster.recoverService();
         this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
+        this.dataCluster = serviceContext.clusterProvider(Distributable.DATA_SCOPE);
+        this.dataCluster.registerReloadListener(name(),this);
         logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]"+this.distributionTournamentService.name());
     }
     @Override
@@ -192,6 +195,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     @Override
     public void shutdown() throws Exception {
         logger.warn("shut down service->"+NAME);
+        this.dataCluster.unregisterReloadListener(name());
         integrationCluster.unsubscribe(NAME);
     }
     private double probability(double rating1,double rating2) {
@@ -460,5 +464,10 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
     public void registerListener(Consumable.Listener listener){
         itemListeners.add(listener);
+    }
+
+    @Override
+    public void reload() {
+        logger.warn("reloading ....");
     }
 }
