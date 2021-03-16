@@ -36,6 +36,7 @@ public interface ApplicationContext {
     <T extends ServiceProvider> T serviceProvider(String name);
 
     void resource(String name,Module.OnResource onResource);
+    <T extends Object> T newInstance(String className);
 
     PostOffice postOffice();
 }

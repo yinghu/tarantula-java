@@ -56,6 +56,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //Module operation APIs
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
+    <T extends Object> T newInstance(Descriptor descriptor,String className);
     Response deployModule(String contextUrl,String resourceName);
     Response createModule(Descriptor descriptor);
     Response exportModule(Descriptor descriptor);

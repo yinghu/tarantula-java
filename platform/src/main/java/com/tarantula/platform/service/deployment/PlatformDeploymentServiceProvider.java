@@ -195,6 +195,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         DynamicModuleClassLoader dyn = cMap.get(descriptor.moduleId());
         dyn.loadResource(name,onResource);
     }
+    public <T extends Object> T newInstance(Descriptor descriptor,String className){
+        try{
+            DynamicModuleClassLoader dyn = cMap.get(descriptor.moduleId());
+            return (T)dyn.loadClass(className).getConstructor().newInstance();
+        }catch (Exception ex){
+            log.error("class->"+className,ex);
+            return null;
+        }
+    }
     public boolean resetModule(Descriptor descriptor){
         //update app desc via typeId
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();

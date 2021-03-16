@@ -104,7 +104,9 @@ public class ApplicationContextProxy implements ApplicationContext {
     public void resource(String name, Module.OnResource onResource) {
         this.tarantulaApplicationContext.resource(name,onResource);
     }
-
+    public <T extends Object> T newInstance(String className){
+        return this.tarantulaApplicationContext.newInstance(className);
+    }
     @Override
     public PostOffice postOffice() {
         return this.tarantulaApplicationContext.postOffice();

@@ -456,7 +456,15 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     @Override
     public Consumable register(Consumable consumable) {
-        logger.warn("register consumable item->"+consumable.category());
+        if(consumable.isPack()){
+            consumable.list().forEach((item)->{
+                this.dataStore.create(item);
+                itemListeners.forEach((c)->{
+                    c.onCreated(item);
+                });
+            });
+        }
+        this.dataStore.create(consumable);
         itemListeners.forEach((c)->{
             c.onCreated(consumable);
         });

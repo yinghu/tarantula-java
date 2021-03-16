@@ -2,7 +2,9 @@ package com.tarantula.platform.service.deployment;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.logging.JDKLogger;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -12,9 +14,12 @@ import java.util.jar.JarFile;
 
 public class DynamicModuleClassLoader extends ClassLoader{
 
+    private TarantulaLogger log = JDKLogger.getLogger(DynamicModuleClassLoader.class);
+
     private HashMap<String,Class> _cached = new HashMap<>();
     private String codeUrl;
     private boolean loaded;
+
     CopyOnWriteArrayList<PlatformDeploymentServiceProvider.ModuleProxy> proxies = new CopyOnWriteArrayList();
     public DynamicModuleClassLoader(Descriptor descriptor){
         this.codeUrl = "jar:"+descriptor.codebase()+"/"+descriptor.moduleArtifact()+"-"+descriptor.moduleVersion()+".jar!/";
@@ -40,7 +45,7 @@ public class DynamicModuleClassLoader extends ClassLoader{
                             _cached.put(cn,result);
                         }
                     }catch (Exception ex){
-                        //ex.printStackTrace();
+                        log.error("error",ex);
                         throw new RuntimeException(ex);
                     }
                 }
@@ -59,6 +64,10 @@ public class DynamicModuleClassLoader extends ClassLoader{
     synchronized void _clear(){
         proxies.clear();
         _cached.clear();
+    }
+    @Override
+    public synchronized Class loadClass(String name) throws ClassNotFoundException {
+        return loadClass(name,false);
     }
     @Override
     public synchronized Class loadClass(String name,boolean resolveIt) throws ClassNotFoundException {
