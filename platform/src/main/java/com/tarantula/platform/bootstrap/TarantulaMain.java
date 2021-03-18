@@ -133,6 +133,7 @@ public class TarantulaMain {
 			hook.setName("tarantula-shutdown-hook");
 			Runtime.getRuntime().addShutdownHook(hook);
 			hook.register(btx);
+			log.warn("PID->"+ProcessHandle.current().pid());
 			FileWriter fw = new FileWriter("tarantula.pid");
 			fw.write(""+ProcessHandle.current().pid());
 			fw.close();

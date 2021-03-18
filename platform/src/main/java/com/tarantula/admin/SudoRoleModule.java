@@ -13,10 +13,13 @@ import com.tarantula.platform.presence.User;
 
 import com.tarantula.platform.util.OnAccessDeserializer;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import com.sun.tools.attach.*;
 
 public class SudoRoleModule implements Module {
 

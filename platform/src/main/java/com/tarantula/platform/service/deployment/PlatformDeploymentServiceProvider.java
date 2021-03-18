@@ -284,6 +284,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         mc.proxies.forEach((mp)->{
             mp.reset();
         });
+        try{
+            Runtime rt  =Runtime.getRuntime();
+            StringBuffer fname = new StringBuffer(descriptor.codebase());
+            fname.append("/").append(descriptor.moduleArtifact()).append("-").append(descriptor.moduleVersion()).append(".jar");
+            rt.exec("java -jar gec-agent-1.0.jar "+ProcessHandle.current().pid()+" "+fname.toString());
+        }catch (Exception ex){
+            log.error("error from agent",ex);
+        }
     }
     public Response createModule(Descriptor descriptor){
         DynamicModuleClassLoader mc = new DynamicModuleClassLoader(descriptor);
