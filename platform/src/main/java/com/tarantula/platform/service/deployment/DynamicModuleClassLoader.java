@@ -5,14 +5,13 @@ import com.icodesoftware.Module;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.service.ModuleClassLoader;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.Instrumentation;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.ResourceBundle;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.jar.JarFile;
 
@@ -23,7 +22,8 @@ public class DynamicModuleClassLoader extends ModuleClassLoader {
     private HashMap<String,Class> _cached = new HashMap<>();
     private String codeUrl;
     private boolean loaded;
-    private Descriptor descriptor;
+
+    private boolean resetEnabled;
 
     CopyOnWriteArrayList<PlatformDeploymentServiceProvider.ModuleProxy> proxies = new CopyOnWriteArrayList();
     public DynamicModuleClassLoader(Descriptor descriptor){
@@ -70,6 +70,11 @@ public class DynamicModuleClassLoader extends ModuleClassLoader {
         proxies.clear();
         _cached.clear();
     }
+    @Override
+    public synchronized Class findClass(String name) throws ClassNotFoundException{
+        return loadClass(name,true);
+    }
+
     @Override
     public synchronized Class loadClass(String name) throws ClassNotFoundException {
         return loadClass(name,false);
@@ -152,58 +157,21 @@ public class DynamicModuleClassLoader extends ModuleClassLoader {
         }
     }
 
-    public synchronized void reset(Descriptor descriptor){
-        this.descriptor = descriptor;
-        this.descriptor.resetEnabled(true);
+    public synchronized void reset(boolean resetEnabled){
+        this.resetEnabled = resetEnabled;
     }
     @Override
     public synchronized void reset(Instrumentation instrumentation) {
-        if(this.descriptor.resetEnabled()){
-            try{
-                toJarUrl(descriptor);
-                JarURLConnection jarURLConnection = (JarURLConnection) new URL(codeUrl).openConnection();
-                JarFile _jar = jarURLConnection.getJarFile();
-                _cached.clear();
-                ArrayList<ClassDefinition> cList = new ArrayList<>();
-                _jar.stream().forEach((c)-> {
-                    if (c.getName().endsWith(".class")) {
-                        try {
-                            String jn = c.getName();
-                            int last = jn.lastIndexOf(".");
-                            String cn = jn.substring(0, last).replaceAll("/", "\\.");
-                            InputStream in = _jar.getInputStream(c);
-                            byte[] cdata = new byte[in.available()];
-                            in.read(cdata);
-                            try{
-                                Class<?> existed = Class.forName(cn,true,this);
-                                cList.add(new ClassDefinition(existed,cdata));
-                                //_cached.put(cn,cdata);
-                            }catch (ClassNotFoundException cex){
-                                log.warn("adding new class->"+cn);
-                                Class result = defineClass(cn, cdata, 0, cdata.length);
-                                super.resolveClass(result);
-                                _cached.put(cn, result);
-                            }
-                        } catch (IOException ioex) {
-                            throw new RuntimeException("skip reset",ioex);
-                        }
-                    }
-                });
-                _jar.close();
-                ClassDefinition[] updates = new ClassDefinition[cList.size()];
-                instrumentation.redefineClasses(cList.toArray(updates));
-                for(ClassDefinition c : updates){
-                    String cn = c.getDefinitionClass().getName();
-                    Class<?> cs = Class.forName(cn,true,this);
-                    _cached.put(cn,cs);
-                    log.warn("cache class->"+cn);
+        if(this.resetEnabled){
+            //profiling the class loader classes
+            log.warn("profiling class loader ->"+toString());
+            Arrays.stream(instrumentation.getAllLoadedClasses()).forEach((c)->{
+                if(c.getName().startsWith("com.perfectday.game")){
+                    log.warn(c.getName()+">>>>"+c.getClassLoader().toString());
                 }
-                proxies.forEach((mc)->mc.reset());
-            }catch (Exception ex){
-                log.error("error on reset",ex);
-            }
+            });
         }
-        this.descriptor.resetEnabled(false);
+        this.resetEnabled=(false);
     }
     private void toJarUrl(Descriptor descriptor){
         this.codeUrl = "jar:"+descriptor.codebase()+"/"+descriptor.moduleArtifact()+"-"+descriptor.moduleVersion()+".jar!/";

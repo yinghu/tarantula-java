@@ -269,20 +269,19 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return checked;
     }
     public void updateModule(Descriptor descriptor){
+        DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{
+            DynamicModuleClassLoader nmc = new DynamicModuleClassLoader(descriptor);
+            nmc.proxies.addAll(c.proxies);
+            c._clear();
+            nmc._load();
+            return nmc;
+        });
+        mc.proxies.forEach((mp)->{
+            mp.reset();
+        });
 
-        ///DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{
-            //DynamicModuleClassLoader nmc = new DynamicModuleClassLoader(descriptor);
-            //nmc.proxies.addAll(c.proxies);
-            //c._clear();
-            //nmc._load();
-            //c.reset(descriptor);
-            //return c;
-        //});
-        //mc.proxies.forEach((mp)->{
-            //mp.reset();
-        //});
         cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{
-           c.reset(descriptor);
+           c.reset(descriptor.resetEnabled());
            return c;
         });
         try{//agent operation into the platform vm
