@@ -357,9 +357,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public void resource(String name, Module.OnResource onResource){
         this.tarantulaContext.deploymentService().resource(this.descriptor(),name,onResource);
     }
-    public <T extends Object> T newInstance(String className){
-        return this.tarantulaContext.deploymentService().newInstance(descriptor(),className);
-    }
     public PostOffice postOffice(){
         return this.tarantulaContext.deploymentService().registerPostOffice();
     }

@@ -1,5 +1,7 @@
 package com.icodesoftware;
 
+import com.icodesoftware.service.RemovableListener;
+
 import java.util.List;
 
 public interface Consumable extends Recoverable {
@@ -29,7 +31,7 @@ public interface Consumable extends Recoverable {
     void property(String pName,Object pValue);
     Object property(String pName);
 
-    interface Listener{
+    interface Listener extends RemovableListener {
         void onCreated(Consumable consumable);
         void onUpdated(Consumable consumable);
     }

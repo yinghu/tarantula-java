@@ -775,4 +775,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	        return response;
         }
     }
+    public ModuleClassLoader moduleClassLoader(String moduleId){
+ 	    return (ModuleClassLoader)this.deploymentService().classLoader(moduleId);
+    }
 }

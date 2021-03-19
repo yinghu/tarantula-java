@@ -3,26 +3,31 @@ package com.tarantula.platform.service.deployment;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.logging.JDKLogger;
+import com.tarantula.platform.service.ModuleClassLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.instrument.ClassDefinition;
+import java.lang.instrument.Instrumentation;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.jar.JarFile;
 
-public class DynamicModuleClassLoader extends ClassLoader{
+public class DynamicModuleClassLoader extends ModuleClassLoader {
 
     private TarantulaLogger log = JDKLogger.getLogger(DynamicModuleClassLoader.class);
 
     private HashMap<String,Class> _cached = new HashMap<>();
     private String codeUrl;
     private boolean loaded;
+    private Descriptor descriptor;
 
     CopyOnWriteArrayList<PlatformDeploymentServiceProvider.ModuleProxy> proxies = new CopyOnWriteArrayList();
     public DynamicModuleClassLoader(Descriptor descriptor){
-        this.codeUrl = "jar:"+descriptor.codebase()+"/"+descriptor.moduleArtifact()+"-"+descriptor.moduleVersion()+".jar!/";
+        toJarUrl(descriptor);
     }
     synchronized void _load(){
         JarFile _jar=null;
@@ -147,5 +152,60 @@ public class DynamicModuleClassLoader extends ClassLoader{
         }
     }
 
-
+    public synchronized void reset(Descriptor descriptor){
+        this.descriptor = descriptor;
+        this.descriptor.resetEnabled(true);
+    }
+    @Override
+    public synchronized void reset(Instrumentation instrumentation) {
+        if(this.descriptor.resetEnabled()){
+            try{
+                toJarUrl(descriptor);
+                JarURLConnection jarURLConnection = (JarURLConnection) new URL(codeUrl).openConnection();
+                JarFile _jar = jarURLConnection.getJarFile();
+                _cached.clear();
+                ArrayList<ClassDefinition> cList = new ArrayList<>();
+                _jar.stream().forEach((c)-> {
+                    if (c.getName().endsWith(".class")) {
+                        try {
+                            String jn = c.getName();
+                            int last = jn.lastIndexOf(".");
+                            String cn = jn.substring(0, last).replaceAll("/", "\\.");
+                            InputStream in = _jar.getInputStream(c);
+                            byte[] cdata = new byte[in.available()];
+                            in.read(cdata);
+                            try{
+                                Class<?> existed = Class.forName(cn,true,this);
+                                cList.add(new ClassDefinition(existed,cdata));
+                                //_cached.put(cn,cdata);
+                            }catch (ClassNotFoundException cex){
+                                log.warn("adding new class->"+cn);
+                                Class result = defineClass(cn, cdata, 0, cdata.length);
+                                super.resolveClass(result);
+                                _cached.put(cn, result);
+                            }
+                        } catch (IOException ioex) {
+                            throw new RuntimeException("skip reset",ioex);
+                        }
+                    }
+                });
+                _jar.close();
+                ClassDefinition[] updates = new ClassDefinition[cList.size()];
+                instrumentation.redefineClasses(cList.toArray(updates));
+                for(ClassDefinition c : updates){
+                    String cn = c.getDefinitionClass().getName();
+                    Class<?> cs = Class.forName(cn,true,this);
+                    _cached.put(cn,cs);
+                    log.warn("cache class->"+cn);
+                }
+                proxies.forEach((mc)->mc.reset());
+            }catch (Exception ex){
+                log.error("error on reset",ex);
+            }
+        }
+        this.descriptor.resetEnabled(false);
+    }
+    private void toJarUrl(Descriptor descriptor){
+        this.codeUrl = "jar:"+descriptor.codebase()+"/"+descriptor.moduleArtifact()+"-"+descriptor.moduleVersion()+".jar!/";
+    }
 }

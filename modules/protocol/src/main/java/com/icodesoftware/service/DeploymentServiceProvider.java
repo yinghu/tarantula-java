@@ -56,13 +56,13 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //Module operation APIs
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
-    <T extends Object> T newInstance(Descriptor descriptor,String className);
     Response deployModule(String contextUrl,String resourceName);
     Response createModule(Descriptor descriptor);
     Response exportModule(Descriptor descriptor);
     boolean launchModule(String typeId);
     boolean resetModule(Descriptor descriptor);
     boolean shutdownModule(String typeId);
+    ClassLoader classLoader(String moduleId);
     //end
 
     //game cluster operation APIs

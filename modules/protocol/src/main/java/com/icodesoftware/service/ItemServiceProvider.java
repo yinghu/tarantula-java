@@ -2,9 +2,9 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.Consumable;
 
-public interface ItemServiceProvider {
+public interface ItemServiceProvider extends ServiceProvider{
 
-    void registerListener(Consumable.Listener listener);
+    String registerListener(Consumable.Listener listener);
 
     Consumable register(Consumable item);
 }

@@ -1,5 +1,7 @@
 package com.icodesoftware;
 
+import com.icodesoftware.service.RemovableListener;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,7 +41,7 @@ public interface Tournament extends Recoverable{
         void update(String systemId,OnEntry onEntry);
         List<Entry> list();
     }
-    interface Listener{
+    interface Listener extends RemovableListener {
         default void tournamentScheduled(Tournament tournament){}
         default void tournamentStarted(Tournament tournament){}
         default void tournamentClosed(Tournament tournament){}

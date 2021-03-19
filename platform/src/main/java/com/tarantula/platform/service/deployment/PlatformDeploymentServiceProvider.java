@@ -195,15 +195,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         DynamicModuleClassLoader dyn = cMap.get(descriptor.moduleId());
         dyn.loadResource(name,onResource);
     }
-    public <T extends Object> T newInstance(Descriptor descriptor,String className){
-        try{
-            DynamicModuleClassLoader dyn = cMap.get(descriptor.moduleId());
-            return (T)dyn.loadClass(className).getConstructor().newInstance();
-        }catch (Exception ex){
-            log.error("class->"+className,ex);
-            return null;
-        }
-    }
+
     public boolean resetModule(Descriptor descriptor){
         //update app desc via typeId
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
@@ -212,6 +204,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.integrationCluster.deployService().updateModule(descriptor);
         }
         return suc;
+    }
+    public ClassLoader classLoader(String moduleId){
+        return cMap.get(moduleId);
     }
     private Module _internalModule(String mname){
         try{
@@ -274,21 +269,25 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return checked;
     }
     public void updateModule(Descriptor descriptor){
-        DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{
-            DynamicModuleClassLoader nmc = new DynamicModuleClassLoader(descriptor);
-            nmc.proxies.addAll(c.proxies);
-            c._clear();
-            nmc._load();
-            return nmc;
+
+        ///DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{
+            //DynamicModuleClassLoader nmc = new DynamicModuleClassLoader(descriptor);
+            //nmc.proxies.addAll(c.proxies);
+            //c._clear();
+            //nmc._load();
+            //c.reset(descriptor);
+            //return c;
+        //});
+        //mc.proxies.forEach((mp)->{
+            //mp.reset();
+        //});
+        cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{
+           c.reset(descriptor);
+           return c;
         });
-        mc.proxies.forEach((mp)->{
-            mp.reset();
-        });
-        try{
+        try{//agent operation into the platform vm
             Runtime rt  =Runtime.getRuntime();
-            StringBuffer fname = new StringBuffer(descriptor.codebase());
-            fname.append("/").append(descriptor.moduleArtifact()).append("-").append(descriptor.moduleVersion()).append(".jar");
-            rt.exec("java -jar gec-agent-1.0.jar "+ProcessHandle.current().pid()+" "+fname.toString());
+            rt.exec("java -jar gec-agent-1.0.jar "+ProcessHandle.current().pid()+" "+descriptor.moduleId());
         }catch (Exception ex){
             log.error("error from agent",ex);
         }

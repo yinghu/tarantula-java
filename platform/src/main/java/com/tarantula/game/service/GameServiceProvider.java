@@ -43,8 +43,11 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private ConcurrentHashMap<String,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Tournament.Instance> activeInstanceIndex = new ConcurrentHashMap<>();
 
-    private CopyOnWriteArrayList<Tournament.Listener> tournamentListeners = new CopyOnWriteArrayList<>();
-    private CopyOnWriteArrayList<Consumable.Listener> itemListeners = new CopyOnWriteArrayList<>();
+    //private CopyOnWriteArrayList<Tournament.Listener> tournamentListeners = new CopyOnWriteArrayList<>();
+    //private CopyOnWriteArrayList<Consumable.Listener> itemListeners = new CopyOnWriteArrayList<>();
+
+    private ConcurrentHashMap<String,RemovableListener> rListeners = new ConcurrentHashMap<>();
+
 
     private EventService publisher;
 
@@ -303,34 +306,56 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
 
     @Override
-    public void registerListener(Tournament.Listener listener){
+    public String registerListener(Tournament.Listener listener){
         reload(listener);
-        this.tournamentListeners.add(listener);
+        String rid = UUID.randomUUID().toString();
+        this.rListeners.put(rid,listener);
+        return rid;
     }
 
     @Override
     public void tournamentScheduled(Tournament tournament) {
-        tournamentListeners.forEach(listener -> listener.tournamentScheduled(tournament));
+        rListeners.forEach((k,c)->{
+            if(c instanceof Tournament.Listener){
+                ((Tournament.Listener)c).tournamentScheduled(tournament);
+            }
+        });
     }
     @Override
     public void tournamentStarted(Tournament tournament) {
-        tournamentListeners.forEach(listener -> listener.tournamentStarted(tournament));
+        rListeners.forEach((k,c)->{
+            if(c instanceof Tournament.Listener){
+                ((Tournament.Listener)c).tournamentStarted(tournament);
+            }
+        });
     }
 
     @Override
     public void tournamentClosed(Tournament tournament) {
-        tournamentListeners.forEach(listener -> listener.tournamentClosed(tournament));
+        rListeners.forEach((k,c)->{
+            if(c instanceof Tournament.Listener){
+                ((Tournament.Listener)c).tournamentClosed(tournament);
+            }
+        });
     }
 
     @Override
     public void tournamentEnded(Tournament tournament) {
-        tournamentListeners.forEach(listener -> listener.tournamentEnded(tournament));
+        rListeners.forEach((k,c)->{
+            if(c instanceof Tournament.Listener){
+                ((Tournament.Listener)c).tournamentEnded(tournament);
+            }
+        });
     }
     @Override
     public void onStarted(Tournament.Instance instance) {
         logger.warn("instance started->"+instance.id());
         //activeInstanceIndex.put(instance.id(),instance);
-        tournamentListeners.forEach(listener -> listener.onStarted(instance));
+        rListeners.forEach((k,c)->{
+            if(c instanceof Tournament.Listener){
+                ((Tournament.Listener)c).onStarted(instance);
+            }
+        });
     }
 
     @Override
@@ -459,19 +484,28 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         if(consumable.isPack()){
             consumable.list().forEach((item)->{
                 this.dataStore.create(item);
-                itemListeners.forEach((c)->{
-                    c.onCreated(item);
+                rListeners.forEach((k,c)->{
+                    if(c instanceof Consumable.Listener){
+                        ((Consumable.Listener)c).onCreated(consumable);
+                    }
                 });
             });
         }
         this.dataStore.create(consumable);
-        itemListeners.forEach((c)->{
-            c.onCreated(consumable);
+        rListeners.forEach((k,c)->{
+            if(c instanceof Consumable.Listener){
+                ((Consumable.Listener)c).onCreated(consumable);
+            }
         });
         return consumable;
     }
-    public void registerListener(Consumable.Listener listener){
-        itemListeners.add(listener);
+    public String registerListener(Consumable.Listener listener){
+        String rid = UUID.randomUUID().toString();
+        this.rListeners.put(rid,listener);
+        return rid;
+    }
+    public void unregisterListener(String registerKey){
+        rListeners.remove(registerKey);
     }
 
     @Override
