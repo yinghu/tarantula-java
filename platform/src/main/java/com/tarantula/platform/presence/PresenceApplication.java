@@ -227,18 +227,18 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         if(!onLobby.closed()){
             String[] ps = onLobby.typeId().split("-");
             liveGameContext.addGameIndex(ps[0]);
-            context.log("Lobby ["+onLobby.typeId()+"] is going to be live",OnLog.WARN);
+            //context.log("Lobby ["+onLobby.typeId()+"] is going to be live",OnLog.WARN);
         }
         else{
             String[] ps = onLobby.typeId().split("-");
             liveGameContext.removeGameIndex(ps[0]);
-            context.log("Lobby ["+onLobby.typeId()+"] is going to be offline",OnLog.WARN);
+            //context.log("Lobby ["+onLobby.typeId()+"] is going to be offline",OnLog.WARN);
         }
     }
     @Override
     public void onState(Connection c) {
-        this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"]",OnLog.WARN);
-        this.context.log("Server->"+c.server().host(),OnLog.WARN);
+        //this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"]",OnLog.WARN);
+        //this.context.log("Server->"+c.server().host(),OnLog.WARN);
         this.connection = c;
     }
     @Override

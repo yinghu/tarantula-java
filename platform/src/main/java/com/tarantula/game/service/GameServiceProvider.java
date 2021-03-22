@@ -486,7 +486,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
                 this.dataStore.create(item);
                 rListeners.forEach((k,c)->{
                     if(c instanceof Consumable.Listener){
-                        ((Consumable.Listener)c).onCreated(consumable);
+                        ((Consumable.Listener)c).onCreated(item);
                     }
                 });
             });

@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * updated by yinghu lu on 6/9/2020.
  */
-public class GameZoneModule implements Module,Configurable.Listener,Connection.OnConnectionListener{
+public class GameZoneModule implements Module,Configurable.Listener,Connection.OnConnectionListener,Consumable.Listener{
 
     private ApplicationContext context;
     private Zone mZone;
@@ -29,6 +29,8 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
     private int DEFAULT_LEVEL_COUNT = 3;
     private int DEFAULT_LEVEL_UP_BASE = 1000;
     private DeploymentServiceProvider deploymentServiceProvider;
+    private String registerKey;
+    private Consumable consumable;
     @Override
     public void onJoin(Session session, Module.OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp or offline play mode
@@ -73,6 +75,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
             Tournament.Instance  e = gameServiceProvider.join(session.instanceId(),session.systemId());
             stub.instance = e;
         }
+        gameObject.consumable = consumable;
         mStub.put(session.systemId(),stub);
         session.write(gameObject.toJson().toString().getBytes(),label());
     }
@@ -155,6 +158,11 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
             //by passing match-making routing
             onJoin(session,update);
         }
+        else if(session.action().equals("onTest")){
+            Rating rating = this.gameServiceProvider.rating(session.systemId());
+            session.payload(rating.toBinary());
+            onJoin(session,update);
+        }
         else{
             throw new UnsupportedOperationException(session.action());
         }
@@ -197,6 +205,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         mZone.registerListener(this);
         deploymentServiceProvider.register(mZone);
         this.deploymentServiceProvider.registerOnConnectionListener(this);
+        this.registerKey = this.gameServiceProvider.registerListener(this);
         context.log("Game lobby started with tournament enabled ["+context.descriptor().tournamentEnabled()+"] on tag=>"+this.mZone.descriptor.tag(),OnLog.WARN);
     }
     @Override
@@ -221,6 +230,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
     @Override
     public void clear() {
         this.deploymentServiceProvider.release(mZone);
+        this.gameServiceProvider.unregisterListener(registerKey);
         this.context.log("clear->"+this.context.descriptor().name(),OnLog.WARN);
     }
     @Override
@@ -257,5 +267,15 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         }catch (Exception ex){
             session.write(toMessage(ex.getMessage(),false).toString().getBytes(),label());
         }
+    }
+
+    @Override
+    public void onCreated(Consumable consumable) {
+        this.consumable = consumable;
+    }
+
+    @Override
+    public void onUpdated(Consumable consumable) {
+
     }
 }

@@ -2,6 +2,8 @@ package com.tarantula.game;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Connection;
+import com.icodesoftware.Consumable;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.ResponseHeader;
 
 import java.time.format.DateTimeFormatter;
@@ -17,6 +19,7 @@ public class GameJoinObject extends ResponseHeader {
     public String serverKey;
     public boolean offline;
     public boolean tournamentEnabled;
+    public Consumable consumable;
     public JsonObject toJson(){
         JsonObject jo = new JsonObject();
         jo.addProperty("successful",successful);
@@ -26,8 +29,12 @@ public class GameJoinObject extends ResponseHeader {
         }
         jo.addProperty("offline",offline);
         jo.addProperty("tournamentEnabled",tournamentEnabled);
-        jo.addProperty("ticket",ticket);
-        jo.addProperty("serverKey",serverKey);
+        if(ticket!=null){
+            jo.addProperty("ticket",ticket);
+        }
+        if(serverKey!=null){
+            jo.addProperty("serverKey",serverKey);
+        }
         jo.add("stub",stub.toJson());
         if(connection!=null){
             JsonObject jp = new JsonObject();
@@ -38,6 +45,10 @@ public class GameJoinObject extends ResponseHeader {
             jp.addProperty("host",connection.host());
             jp.addProperty("port",connection.port());
             jo.add("connection",jp);
+        }
+        if(consumable!=null){
+            JsonObject jc = consumable.toJson();
+            jo.add("arenaSetting",jc!=null?jc: JsonUtil.toJsonObject(consumable.toMap()));
         }
         return jo;
     }

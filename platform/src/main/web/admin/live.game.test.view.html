@@ -1,0 +1,35 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-live-game-test-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-sign-in" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Live Game Test</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-panel  tx-text-16">
+        <div id="jsoneditor-live-game-test" style="width: 100%;"></div> 
+    </div> 
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-live-game-test"),{mode:'tree'},{});
+    TARA_API.onService(false,{serviceTag:TARA_API.query().liveGameTag,command:'onTest'},(resp)=>{
+        editor.set(resp);
+    });
+    document.querySelector('#tx-live-game-test-close').onclick=()=>{
+        editor.destroy();
+        let m3 = document.querySelector(TARA_API.query().popup);
+        m3.innerHTML="";
+        m3.style.display = 'none';       
+    };
+</script>

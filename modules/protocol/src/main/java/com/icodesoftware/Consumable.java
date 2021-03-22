@@ -1,5 +1,6 @@
 package com.icodesoftware;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.service.RemovableListener;
 
 import java.util.List;
@@ -25,6 +26,8 @@ public interface Consumable extends Recoverable {
 
     boolean published();
     void published(boolean published);
+
+    default JsonObject toJson(){ return null; }
 
     default <T extends Consumable> List<T> list(){ return null;}
 

@@ -41,6 +41,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
     public Descriptor descriptor;
     public int levelLimit;
     public int levelUpBase;
+
     private CopyOnWriteArrayList<Room> rList = new CopyOnWriteArrayList<>();
 
     private ConcurrentLinkedDeque<Room>[] pendingMatch;
@@ -288,12 +289,14 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         jsonObject.addProperty("joinsOnStart",joinsOnStart);
         jsonObject.addProperty("duration",roundDuration/60000);
         jsonObject.addProperty("playMode",toPlayMode());
+        jsonObject.addProperty("configLabel",this.index());
         JsonArray jds = new JsonArray();
         for(Arena a: arenas){
             JsonObject jd = new JsonObject();
             jd.addProperty("name",a.name());
             jd.addProperty("level",a.level);
             jd.addProperty("xp",a.xp);
+            jd.addProperty("configLabel",a.index());
             jd.addProperty("disabled",a.disabled());
             jds.add(jd);
         }

@@ -82,6 +82,9 @@
             <view type="api.service.matchmaking">
                 <property name="moduleResourceFile">admin/api.service.matchmaking.view.html</property>
             </view>
+            <view type="live.game.test">
+                <property name="moduleResourceFile">admin/live.game.test.view.html</property>
+            </view>
         </view-list>
 
     </lobby-context>
