@@ -48,7 +48,7 @@ public class GameJoinObject extends ResponseHeader {
         }
         if(consumable!=null){
             JsonObject jc = consumable.toJson();
-            jo.add("arenaSetting",jc!=null?jc: JsonUtil.toJsonObject(consumable.toMap()));
+            jo.add("configurations",jc!=null?jc: JsonUtil.toJsonObject(consumable.toMap()));
         }
         return jo;
     }

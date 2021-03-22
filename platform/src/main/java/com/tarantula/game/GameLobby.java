@@ -18,6 +18,7 @@ public class GameLobby {
         jsonObject.addProperty("duration",zone.roundDuration/60000);
         jsonObject.addProperty("playMode",zone.toPlayMode());
         jsonObject.addProperty("levelLimit",zone.levelLimit>0?zone.levelLimit:lobby.capacity());
+        jsonObject.addProperty("configLabel",zone.index());
         jsonObject.addProperty("disabled",lobby.disabled());
         JsonArray jds = new JsonArray();
         for(Arena a: zone.arenas){
@@ -28,6 +29,7 @@ public class GameLobby {
             jd.addProperty("capacity",a.capacity);
             jd.addProperty("joinsOnStart",a.joinsOnStart);
             jd.addProperty("duration",a.duration/60000);
+            jd.addProperty("configLabel",a.index());
             jd.addProperty("disabled",a.disabled());
             jds.add(jd);
         }

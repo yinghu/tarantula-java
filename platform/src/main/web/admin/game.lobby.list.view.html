@@ -845,7 +845,7 @@
     }
     function _reset_view(resp){
         if(resp.successful){
-            //console.log(JSON.stringify(resp).length);
+            console.log(resp);
             document.querySelector('#tx-lobby-list-1').innerHTML = resp.lobby.name;
             document.querySelector('#tx-lobby-list-2').innerHTML = resp.lobby.rank;
             document.querySelector('#tx-lobby-list-3').innerHTML = resp.lobby.tag; 

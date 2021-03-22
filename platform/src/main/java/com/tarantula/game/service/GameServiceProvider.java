@@ -43,9 +43,6 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private ConcurrentHashMap<String,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Tournament.Instance> activeInstanceIndex = new ConcurrentHashMap<>();
 
-    //private CopyOnWriteArrayList<Tournament.Listener> tournamentListeners = new CopyOnWriteArrayList<>();
-    //private CopyOnWriteArrayList<Consumable.Listener> itemListeners = new CopyOnWriteArrayList<>();
-
     private ConcurrentHashMap<String,RemovableListener> rListeners = new ConcurrentHashMap<>();
 
 
@@ -100,6 +97,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     public Zone zone(Descriptor descriptor){//application id
         Zone zone = new Zone();
         zone.distributionKey(descriptor.distributionKey());
+        zone.index(descriptor.tag());
         byte[] key = zone.key().asString().getBytes();
         String memberId = integrationCluster.recoverService().findDataNode(this.dataStore.name(),key);
         if(memberId!=null){

@@ -8,7 +8,14 @@
             <span class="tx-margin-left-8 tx-text-24">Live Game Test</span>
         </div>
     </div>
-    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>  
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <div class='w3-bar w3-white'>
+            <span id='tx-live-game-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
+            <span id='tx-live-game-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
+            <span id='tx-live-game-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
+        </div>            
+    </div> 
     <div class="w3-panel  tx-text-16">
         <div id="jsoneditor-live-game-test" style="width: 100%;"></div> 
     </div> 
@@ -31,5 +38,14 @@
         let m3 = document.querySelector(TARA_API.query().popup);
         m3.innerHTML="";
         m3.style.display = 'none';       
+    };
+    document.querySelector('#tx-live-game-json-mode-tree').onclick=()=>{
+        editor.setMode('tree');
+    };
+    document.querySelector('#tx-live-game-json-mode-code').onclick=()=>{
+        editor.setMode('code');
+    };
+    document.querySelector('#tx-live-game-json-mode-preview').onclick=()=>{
+        editor.setMode('preview');
     };
 </script>

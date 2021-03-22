@@ -241,6 +241,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         this.properties.put("6",this.timestamp);
         this.properties.put("7",this.levelLimit);
         this.properties.put("8",this.joinsOnStart);
+        this.properties.put("9",this.index);
         return this.properties;
     }
     @Override
@@ -253,6 +254,7 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         this.name = (String)properties.get("5");
         this.timestamp = ((Number)properties.getOrDefault("6",0)).longValue();
         this.levelLimit = ((Number)properties.getOrDefault("7",levelLimit)).intValue();
+        this.index = (String)properties.get("9");
     }
     @Override
     public Recoverable.Key key(){
@@ -289,14 +291,14 @@ public class Zone extends RecoverableObject implements RoomListener, DataStore.U
         jsonObject.addProperty("joinsOnStart",joinsOnStart);
         jsonObject.addProperty("duration",roundDuration/60000);
         jsonObject.addProperty("playMode",toPlayMode());
-        jsonObject.addProperty("configLabel",this.index());
+        jsonObject.addProperty("configLabel",this.descriptor.tag());
         JsonArray jds = new JsonArray();
         for(Arena a: arenas){
             JsonObject jd = new JsonObject();
             jd.addProperty("name",a.name());
             jd.addProperty("level",a.level);
             jd.addProperty("xp",a.xp);
-            jd.addProperty("configLabel",a.index());
+            jd.addProperty("configLabel",descriptor.tag());
             jd.addProperty("disabled",a.disabled());
             jds.add(jd);
         }
