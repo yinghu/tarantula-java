@@ -1,5 +1,6 @@
 package com.tarantula.game.service;
 
+import com.hazelcast.map.impl.operation.PutBackupOperation;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -43,7 +43,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private ConcurrentHashMap<String,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Tournament.Instance> activeInstanceIndex = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<String,RemovableListener> rListeners = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,DeployableListener> rListeners = new ConcurrentHashMap<>();
 
 
     private EventService publisher;
@@ -484,7 +484,9 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
                 this.dataStore.create(item);
                 rListeners.forEach((k,c)->{
                     if(c instanceof Consumable.Listener){
-                        ((Consumable.Listener)c).onCreated(item);
+                        if(c.validate(item)){
+                            ((Consumable.Listener)c).onCreated(item);
+                        }
                     }
                 });
             });
@@ -492,10 +494,16 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         this.dataStore.create(consumable);
         rListeners.forEach((k,c)->{
             if(c instanceof Consumable.Listener){
-                ((Consumable.Listener)c).onCreated(consumable);
+                if(c.validate(consumable)){
+                    ((Consumable.Listener)c).onCreated(consumable);
+                }
             }
         });
         return consumable;
+    }
+    @Override
+    public Consumable update(Consumable update){
+        return update;
     }
     public String registerListener(Consumable.Listener listener){
         String rid = UUID.randomUUID().toString();

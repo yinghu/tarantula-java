@@ -7,4 +7,5 @@ public interface ItemServiceProvider extends ServiceProvider{
     String registerListener(Consumable.Listener listener);
 
     Consumable register(Consumable item);
+    Consumable update(Consumable item);
 }

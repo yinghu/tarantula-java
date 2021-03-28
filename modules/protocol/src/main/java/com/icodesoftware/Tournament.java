@@ -1,11 +1,11 @@
 package com.icodesoftware;
 
-import com.icodesoftware.service.RemovableListener;
+import com.icodesoftware.service.DeployableListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface Tournament extends Recoverable{
+public interface Tournament extends Deployable{
 
     String ENTRY_LABEL = "TEE";
 
@@ -25,12 +25,12 @@ public interface Tournament extends Recoverable{
 
     String join(String systemId);
 
-    interface Entry extends Recoverable{
+    interface Entry extends Deployable{
         String systemId();
         double score(double delta);
         int rank();
     }
-    interface Instance extends Recoverable{
+    interface Instance extends Deployable{
         String id();
         Status status();
         int maxEntries();
@@ -41,7 +41,7 @@ public interface Tournament extends Recoverable{
         void update(String systemId,OnEntry onEntry);
         List<Entry> list();
     }
-    interface Listener extends RemovableListener {
+    interface Listener extends DeployableListener {
         default void tournamentScheduled(Tournament tournament){}
         default void tournamentStarted(Tournament tournament){}
         default void tournamentClosed(Tournament tournament){}

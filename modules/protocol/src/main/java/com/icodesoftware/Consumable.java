@@ -1,11 +1,11 @@
 package com.icodesoftware;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.service.RemovableListener;
+import com.icodesoftware.service.DeployableListener;
 
 import java.util.List;
 
-public interface Consumable extends Recoverable {
+public interface Consumable extends Deployable {
 
     String id();
 
@@ -34,7 +34,7 @@ public interface Consumable extends Recoverable {
     void property(String pName,Object pValue);
     Object property(String pName);
 
-    interface Listener extends RemovableListener {
+    interface Listener extends DeployableListener {
         void onCreated(Consumable consumable);
         void onUpdated(Consumable consumable);
     }
