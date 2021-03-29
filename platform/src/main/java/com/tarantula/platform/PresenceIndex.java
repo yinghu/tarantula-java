@@ -62,8 +62,8 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
     private void fastJoin(Session session,Descriptor desc,byte[] payload){
         SessionForward fd = new SessionForward(session.source(),session.sessionId());
-        FastPlayEvent fe = new FastPlayEvent(desc.distributionKey(),fd);
-        fe.instanceId(session.instanceId());
+        FastPlayEvent fe = new FastPlayEvent(fd);
+        fe.tournamentId(session.tournamentId());
         fe.systemId(session.systemId());
         fe.stub(session.stub());
         fe.routingNumber(session.routingNumber());

@@ -204,7 +204,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
 
     private void setApplicationManager(DeploymentDescriptor c,Lobby lb) throws Exception{
-        c.instanceId(UUID.randomUUID().toString());
+        //c.instanceId(UUID.randomUUID().toString());
         c.accessMode(lb.descriptor().accessMode());
         SingletonApplicationManager singletonApplicationManager = new SingletonApplicationManager(this,c);//pass the class loader
         this.availableApplicationManagers.put(c.distributionKey(),singletonApplicationManager);

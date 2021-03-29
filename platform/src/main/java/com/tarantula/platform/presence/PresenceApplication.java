@@ -36,14 +36,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         userDs = this.context.dataStore(Access.DataStore);
         accountDs = this.context.dataStore(Account.DataStore);
         memberDs = this.context.dataStore(Subscription.DataStore);
-        this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(PresencePortableRegistry.ON_BALANCE_CID,(t)->{
-            Presence presence = this.context.presence(t.owner());
-            OnBalance ob = (OnBalance)t;
-            if(!(presence!=null&&presence.transact(ob.balance()))){
-                ob.redeemed(false);
-                //this.context.dataStore("presence").create(ob);
-            }
-        });
         this.deploymentServiceProvider.registerOnConnectionStateListener(this);
         this.context.log("Presence application started on ["+descriptor.tag()+"]",OnLog.INFO);
     }

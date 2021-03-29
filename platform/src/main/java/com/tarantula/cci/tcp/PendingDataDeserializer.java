@@ -47,11 +47,9 @@ public class PendingDataDeserializer implements JsonDeserializer<PendingData> {
             else if(k.equals("magicKey")){
                 pendingData.headers.put(Session.TARANTULA_MAGIC_KEY,kv.getValue().getAsJsonPrimitive().getAsString());
             }
-            else if(k.equals("applicationId")){
-                pendingData.headers.put(Session.TARANTULA_APPLICATION_ID,kv.getValue().getAsJsonPrimitive().getAsString());
-            }
-            else if(k.equals("instanceId")){
-                pendingData.headers.put(Session.TARANTULA_INSTANCE_ID,kv.getValue().getAsJsonPrimitive().getAsString());
+
+            else if(k.equals("tournamentId")){
+                pendingData.headers.put(Session.TARANTULA_TOURNAMENT_ID,kv.getValue().getAsJsonPrimitive().getAsString());
             }
             else if(k.equals("viewId")){
                 pendingData.headers.put(Session.TARANTULA_VIEW_ID,kv.getValue().getAsJsonPrimitive().getAsString());

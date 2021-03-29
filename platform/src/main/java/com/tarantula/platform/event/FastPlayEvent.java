@@ -20,9 +20,8 @@ public class FastPlayEvent extends Data implements Event {
         this.stub = stub;
         this.forward = forward;
     }
-    public FastPlayEvent(String applicationId, SessionForward forward){
+    public FastPlayEvent(SessionForward forward){
         this();
-        this.applicationId = applicationId;
         this.forward = forward;
     }
     @Override
@@ -37,8 +36,7 @@ public class FastPlayEvent extends Data implements Event {
     public void writePortable(PortableWriter out) throws IOException {
         out.writeUTF("1",this.systemId);
         out.writeUTF("2",this.destination);
-        out.writeUTF("5",this.applicationId);
-        out.writeUTF("6",this.instanceId);
+        out.writeUTF("6",this.tournamentId);
         out.writeUTF("7",this.owner);
         out.writeDouble("8",this.balance);
         out.writeInt("9",this.stub);
@@ -52,8 +50,7 @@ public class FastPlayEvent extends Data implements Event {
     public void readPortable(PortableReader in) throws IOException {
         this.systemId = in.readUTF("1");
         this.destination = in.readUTF("2");
-        this.applicationId = in.readUTF("5");
-        this.instanceId = in.readUTF("6");
+        this.tournamentId = in.readUTF("6");
         this.owner = in.readUTF("7");
         this.balance = in.readDouble("8");
         this.stub = in.readInt("9");
@@ -71,9 +68,6 @@ public class FastPlayEvent extends Data implements Event {
     public void write(byte[] payload,String label,boolean closed){
         this.eventService.publish(new ResponsiveEvent(this.forward.source(),this.forward.sessionId(),payload,label,closed));
     }
-    @Override
-    public String toString(){
-        return "Fast Play Event ["+this.systemId+","+this.stub+","+this.applicationId+","+this.instanceId+","+owner+","+accessMode+"]";//
-    }
+
 
 }

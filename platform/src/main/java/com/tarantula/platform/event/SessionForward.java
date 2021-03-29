@@ -15,22 +15,7 @@ public class SessionForward extends Data {
         this.source = source;
         this.sessionId = sessionId;
     }
-    public String applicationId() {
-        return applicationId;
-    }
 
-
-    public void applicationId(String applicationId) {
-        this.applicationId =applicationId;
-    }
-
-    public String instanceId() {
-        return this.instanceId;
-    }
-
-    public void instanceId(String instanceId) {
-        this.instanceId = instanceId;
-    }
     public String sessionId() {
         return this.sessionId;
     }
@@ -55,20 +40,18 @@ public class SessionForward extends Data {
     }
 
     public void writePortable(PortableWriter out) throws IOException {
-        out.writeUTF("2", this.applicationId);
-        out.writeUTF("3",this.instanceId);
+
         out.writeUTF("4",this.source);
         out.writeUTF("5",this.sessionId);
     }
 
     public void readPortable(PortableReader in) throws IOException {
-        this.applicationId = in.readUTF("2");
-        this.instanceId = in.readUTF("3");
+
         this.source = in.readUTF("4");
         this.sessionId = in.readUTF("5");
     }
     @Override
     public String toString(){
-        return "On Application ["+applicationId+","+instanceId+"] On Session ["+source+","+sessionId+"]";
+        return "On Session ["+source+","+sessionId+"]";
     }
 }

@@ -35,7 +35,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
     public void onJoin(Session session, Module.OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp or offline play mode
         //this.context.log(new String(session.payload()),OnLog.WARN);
-        if(mZone.descriptor.tournamentEnabled()&&(!gameServiceProvider.available(session.instanceId()))){
+        if(mZone.descriptor.tournamentEnabled()&&(!gameServiceProvider.available(session.tournamentId()))){
             session.write(toMessage("no tournament available,please try later",false).toString().getBytes(),label());
             return;
         }
@@ -72,7 +72,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         }
         gameObject.stub = stub;
         if(mZone.descriptor.tournamentEnabled()){
-            Tournament.Instance  e = gameServiceProvider.join(session.instanceId(),session.systemId());
+            Tournament.Instance  e = gameServiceProvider.join(session.tournamentId(),session.systemId());
             stub.instance = e;
         }
         gameObject.consumable = consumable;
@@ -145,7 +145,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
             if(stub!=null){
                 Room room = gameServiceProvider.getRoom(stub.roomId);
                 boolean left = room.leave(stub);
-                session.instanceId(stub.roomId);
+                session.trackId(stub.roomId);
                 session.write(toMessage("onLeave",left).toString().getBytes(),label());
                 return left;
             }

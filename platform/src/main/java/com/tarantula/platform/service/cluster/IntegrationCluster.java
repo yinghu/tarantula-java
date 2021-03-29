@@ -329,9 +329,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         int _ix = magicKey.indexOf(Recoverable.PATH_SEPARATOR);
         return new ServiceRoutingKey(_ix!=-1?magicKey.substring(0,magicKey.indexOf("/")):magicKey,tag,routingNumber);
     }
-    public RoutingKey instanceRoutingKey(String applicationId,String instanceId){
-        return new InstanceRoutingKey(applicationId,instanceId,Integer.parseInt(instanceId.substring(instanceId.lastIndexOf(Recoverable.PATH_SEPARATOR)+1)));
-    }
+
     private int routingNumber(String magicKey){
         return SystemUtil.partition(magicKey,this.tarantulaContext.platformRoutingNumber);
     }

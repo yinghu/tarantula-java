@@ -19,13 +19,11 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 	private TarantulaApplication application;
 
     private TarantulaContext tarantulaContext;
-    private String applicationId;
 
      private ConcurrentHashMap<Integer,RecoverableListener> rMap = new ConcurrentHashMap<>();
 
     private HashMap<String,Configuration> configurations;
 
-    private boolean singleton;
 
     private boolean logEnabled;
     private TarantulaLogger log;
@@ -58,21 +56,11 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     public void _setup() throws Exception{
         this.validator = this.tarantulaContext.tokenValidatorProvider().tokenValidator();
-        //this.duration = _descriptor.runtimeDurationOnInstance();
-        //this.timed = this.duration>0;
         this.logEnabled = _descriptor.logEnabled();
         if(logEnabled){
             this.log = this.tarantulaContext.logger(this.application.getClass());
         }
-
-        this._setup( _descriptor.distributionKey(), _descriptor.singleton());
-    }
-    private void _setup(String applicationId,boolean singleton) throws Exception {
-        this.applicationId = applicationId;
-        this.singleton = singleton;
-        if(singleton){
-            this.application.setup(new ApplicationContextProxy(this));
-        }
+        this.application.setup(new ApplicationContextProxy(this));
     }
 
     public Configuration configuration(String type){

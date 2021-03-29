@@ -12,7 +12,7 @@ public interface EventService extends EventListener, Serviceable {
     //delegates topic subscribe
     void registerEventListener(String topic, EventListener callback);
 
-    RoutingKey instanceRoutingKey(String applicationId, String instanceId);
+    //RoutingKey instanceRoutingKey(String applicationId, String instanceId);
     RoutingKey routingKey(String magicKey,String tag);
     RoutingKey routingKey(String magicKey,String tag,int routingNumber);
 }

@@ -68,9 +68,8 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         _copy.tournamentEnabled(this.tournamentEnabled);
         return _copy;
     }
-    public DeploymentDescriptor deploy(String instanceId){
+    public DeploymentDescriptor deploy(){
         DeploymentDescriptor ins = new DeploymentDescriptor();
-        ins.instanceId(instanceId);
         ins.type(this.type+"/instance");
         ins.category(this.category);
         ins.bucket(this.bucket);

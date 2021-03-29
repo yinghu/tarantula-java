@@ -75,17 +75,14 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
         else if(k.equals("stub")){
             access.stub(((Number)v).intValue());
         }
-        else if(k.equals("applicationId")){
-            access.applicationId((String) v);
-        }
         else if(k.equals("name")){
             access.name((String) v);
         }
         else if(k.equals("accessMode")){
             access.accessMode(((Number)v).intValue());
         }
-        else if(k.equals("instanceId")){
-            access.instanceId((String) v);
+        else if(k.equals("tournamentId")){
+            access.tournamentId((String) v);
         }
         else if(k.equals("typeId")){
             access.typeId((String) v);

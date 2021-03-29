@@ -22,11 +22,9 @@ public interface OnApplication extends Response {
     String name();
     void name(String name);
 
-    String applicationId();
-    void applicationId(String applicationId);
 
-    String instanceId();
-    void instanceId(String instanceId);
+    String tournamentId();
+    void tournamentId(String tournamentId);
 
     double balance();
     void balance(double balance);

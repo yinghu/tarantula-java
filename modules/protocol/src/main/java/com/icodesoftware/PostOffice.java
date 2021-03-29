@@ -9,7 +9,7 @@ public interface PostOffice {
 
     //app to app
     OnTag onTag(String tag);
-    OnApplication onApplication(String applicationId);
+    //OnApplication onApplication(String applicationId);
     OnTopic onTopic();
 
     //send data to client on the notification topic
@@ -34,8 +34,8 @@ public interface PostOffice {
     interface OnTag{
        void send(String distributionKey, Recoverable data);
     }
-    interface OnApplication{
-        void send(String distributionKey,Recoverable data);
-    }
+    //interface OnApplication{
+        //void send(String distributionKey,Recoverable data);
+    //}
 
 }

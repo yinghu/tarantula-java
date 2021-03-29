@@ -11,8 +11,8 @@ public interface Session extends OnApplication {
     String HTTP_CONTENT_TYPE ="Content-type";
 
     //tarantula headers
-    String TARANTULA_APPLICATION_ID ="Tarantula-application-id";
-    String TARANTULA_INSTANCE_ID ="Tarantula-instance-id";
+
+    String TARANTULA_TOURNAMENT_ID ="Tarantula-tournament-id";
     String TARANTULA_TYPE_ID ="Tarantula-type-id";
     String TARANTULA_VIEW_ID ="Tarantula-view-id";
 

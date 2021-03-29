@@ -1030,15 +1030,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                integrationEventService.publish(mapStoreSyncEvent);
            };
         }
-        public OnApplication onApplication(String applicationId){
-            return (dkey,t)->{
-                String key = t.key().asString();
-                byte[] payload = t.toBinary();
-                RoutingKey routingKey = integrationEventService.instanceRoutingKey(applicationId,dkey);
-                MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),t.owner(),t.getFactoryId(),t.getClassId(),key!=null?key:"",payload);
-                integrationEventService.publish(mapStoreSyncEvent);
-            };
-        }
     }
     class ModuleProxy implements Module{
 

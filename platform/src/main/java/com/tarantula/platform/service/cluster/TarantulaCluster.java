@@ -171,9 +171,7 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
     public RoutingKey routingKey(String magicKey,String tag,int routingNumber){
         return null;
     }
-    public RoutingKey instanceRoutingKey(String applicationId,String instanceId){
-        return null;
-    }
+
     public int routingNumber(){
         return this._tarantulaContext.platformRoutingNumber;
     }

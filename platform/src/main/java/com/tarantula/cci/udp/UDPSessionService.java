@@ -58,11 +58,6 @@ public class UDPSessionService implements ConnectionEventService {
     }
 
     @Override
-    public RoutingKey instanceRoutingKey(String applicationId, String instanceId) {
-        return null;
-    }
-
-    @Override
     public RoutingKey routingKey(String magicKey, String tag) {
         return null;
     }

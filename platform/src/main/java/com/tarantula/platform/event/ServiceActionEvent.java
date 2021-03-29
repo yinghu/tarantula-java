@@ -31,7 +31,7 @@ public class ServiceActionEvent extends Data implements EventOnAction {
 		out.writeInt("12",this.routingNumber);
 		out.writeUTF("13",this.destination);
 		out.writeBoolean("14",this.streaming);
-		out.writeUTF("15",this.instanceId);
+		out.writeUTF("15",this.tournamentId);
 		out.writeUTF("16",this.name);
 		out.writeInt("17",this.accessMode);
 	}
@@ -49,7 +49,7 @@ public class ServiceActionEvent extends Data implements EventOnAction {
 		this.routingNumber = in.readInt("12");
 		this.destination = in.readUTF("13");
 		this.streaming = in.readBoolean("14");
-		this.instanceId = in.readUTF("15");
+		this.tournamentId = in.readUTF("15");
 		this.name = in.readUTF("16");
 		this.accessMode = in.readInt("17");
 	}

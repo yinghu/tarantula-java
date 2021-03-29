@@ -71,10 +71,6 @@ public class WebSocketSessionService implements ConnectionEventService,WebSocket
 
     }
 
-    @Override
-    public RoutingKey instanceRoutingKey(String applicationId, String instanceId) {
-        return null;
-    }
 
     @Override
     public RoutingKey routingKey(String magicKey, String tag) {

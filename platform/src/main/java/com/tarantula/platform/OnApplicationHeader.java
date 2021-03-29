@@ -7,8 +7,8 @@ import com.icodesoftware.OnAccess;
  */
 public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
-    protected String applicationId;
-    protected String instanceId;
+    //protected String applicationId;
+    protected String tournamentId;
     protected double entryCost;
 
     protected String systemId;
@@ -52,23 +52,15 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
     }
 
 
-    public String applicationId() {
-        return applicationId;
+
+
+    public String tournamentId() {
+        return this.tournamentId;
     }
 
 
-    public void applicationId(String applicationId) {
-        this.applicationId  = applicationId;
-    }
-
-
-    public String instanceId() {
-        return this.instanceId;
-    }
-
-
-    public void instanceId(String instanceId) {
-        this.instanceId = instanceId;
+    public void tournamentId(String tournamentId) {
+        this.tournamentId = tournamentId;
     }
 
 

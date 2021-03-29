@@ -12,19 +12,18 @@ public class PortableEventRegistry implements PortableFactory {
 
 	public static final int OID =1;
 
-	public static final int APPLICATION_ACTION_EVENT_CID = 1;
 
     public static final int RESPONSIVE_EVENT_CID = 2;
 
-    public static final int INSTANCE_PLAY_EVENT_CID = 3;
+    //public static final int INSTANCE_PLAY_EVENT_CID = 3;
 
     public static final int FAST_PLAY_EVENT_CID = 5;
 
-    public static final int ON_DEPLOY_EVENT_CID = 6;
+    //public static final int ON_DEPLOY_EVENT_CID = 6;
 
     public static final int SERVICE_ACTION_EVENT_CID = 9;
 
-    public static final int APPLICATION_SERVICE_EVENT_CID = 10;
+    //public static final int APPLICATION_SERVICE_EVENT_CID = 10;
 
     public static final int MAP_STORE_SYNC_EVENT_CID =11;
 
@@ -59,27 +58,19 @@ public class PortableEventRegistry implements PortableFactory {
     public Portable create(int cid) {
         Portable _ins;
 		switch(cid){
-			case APPLICATION_ACTION_EVENT_CID:
-				_ins = new ApplicationActionEvent();
-				break;
+
 			case RESPONSIVE_EVENT_CID:
                 _ins = new ResponsiveEvent();
                 break;
-            case INSTANCE_PLAY_EVENT_CID:
-                _ins = new InstancePlayEvent();
-                break;
+
             case FAST_PLAY_EVENT_CID:
                 _ins = new FastPlayEvent();
                 break;
-            case ON_DEPLOY_EVENT_CID:
-                _ins = new OnDeployEvent();
-                break;
+
             case SERVICE_ACTION_EVENT_CID:
                 _ins = new ServiceActionEvent();
                 break;
-            case APPLICATION_SERVICE_EVENT_CID:
-                _ins = new ApplicationServiceEvent();
-                break;
+
             case MAP_STORE_SYNC_EVENT_CID:
                 _ins = new MapStoreSyncEvent();
                 break;

@@ -8,8 +8,7 @@ import java.util.Map;
 public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 
 	protected String typeId;
-    protected String applicationId;
-    protected String instanceId;
+
 	protected String type;
     protected String subtypeId;
     protected String viewId;
@@ -103,12 +102,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     public String typeId() {
 		return this.typeId;
 	}
-    public String applicationId(){
-        return this.applicationId;
-    }
-    public String instanceId() {
-        return this.instanceId;
-    }
 
     public String type() {
 		return this.type;
@@ -158,12 +151,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 	public void typeId(String typeId) {
 		this.typeId = typeId;
 	}
-    public void applicationId(String applicationId){
-        this.applicationId = applicationId;
-    }
-    public void instanceId(String instanceId) {
-        this.instanceId = instanceId;
-    }
 
     public void name(String name) {
 		this.name = name;

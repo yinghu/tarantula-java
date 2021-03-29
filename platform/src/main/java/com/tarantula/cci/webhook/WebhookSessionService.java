@@ -26,10 +26,6 @@ public class WebhookSessionService implements EventService {
 
     }
 
-    @Override
-    public RoutingKey instanceRoutingKey(String applicationId, String instanceId) {
-        return null;
-    }
 
     @Override
     public RoutingKey routingKey(String magicKey, String tag) {
