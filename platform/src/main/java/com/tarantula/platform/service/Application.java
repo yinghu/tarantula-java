@@ -18,7 +18,6 @@ public interface Application extends Serviceable {
     Descriptor descriptor();
 
     Configuration configuration(String type);
-    //boolean launch(Instance instance);
     boolean checkAccessControl(Event event);
 
     default void atMidnight(){}

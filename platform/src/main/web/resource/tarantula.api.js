@@ -364,7 +364,7 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-token',presence.token);
     aj.setRequestHeader('Tarantula-action','onPlay');
     if(payload.tournamentEnabled){
-        aj.setRequestHeader('Tarantula-instance-id',payload.tournamentId);
+        aj.setRequestHeader('Tarantula-tournament-id',payload.tournamentId);
     }  
     aj.send();
   };
