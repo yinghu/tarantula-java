@@ -82,7 +82,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     private DeploymentServiceProvider deploymentServiceProvider;
     public String deployDir;
     public String singleModuleApplication;
-    public String moduleApplication;
 
     public  String eventThreadPoolSetting;
 
@@ -205,24 +204,11 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
 
     private void setApplicationManager(DeploymentDescriptor c,Lobby lb) throws Exception{
-        if(c.singleton()){
-            c.instanceId(UUID.randomUUID().toString());
-            c.accessMode(lb.descriptor().accessMode());
-            SingletonApplicationManager singletonApplicationManager = new SingletonApplicationManager(this,c);//pass the class loader
-            this.availableApplicationManagers.put(c.distributionKey(),singletonApplicationManager);
-            singletonApplicationManager.start();
-        }
-        else{
-            if(c.type().equals("application")){
-                c.tag(lb.descriptor().tag());//inject lobby tag
-                ApplicationManager am = new ApplicationManager(this,c);//pass the class loader
-                this.availableApplicationManagers.put(c.distributionKey(),am);//will use subtypeId as the app register key
-                am.start(); //recover on application manager start
-            }
-            else{//add future application type here
-                log.info("deployment type ["+c.type()+"] not supported");
-            }
-        }
+        c.instanceId(UUID.randomUUID().toString());
+        c.accessMode(lb.descriptor().accessMode());
+        SingletonApplicationManager singletonApplicationManager = new SingletonApplicationManager(this,c);//pass the class loader
+        this.availableApplicationManagers.put(c.distributionKey(),singletonApplicationManager);
+        singletonApplicationManager.start();
         lb.addEntry(c);
     }
     public void configureConfigurations(LobbyConfiguration conf){

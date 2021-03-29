@@ -38,10 +38,6 @@ public class ApplicationContextProxy implements ApplicationContext {
         return this.tarantulaApplicationContext.schedule(task);
     }
 
-    @Override
-    public InstanceRegistry onRegistry() {
-        return this.tarantulaApplicationContext.onRegistry();
-    }
 
     @Override
     public Configuration configuration(String type) {
@@ -61,11 +57,6 @@ public class ApplicationContextProxy implements ApplicationContext {
     @Override
     public Descriptor descriptor() {
         return this.tarantulaApplicationContext.descriptor();
-    }
-
-    @Override
-    public Descriptor descriptor(String applicationId) {
-        return this.tarantulaApplicationContext.descriptor(applicationId);
     }
 
     //@Override
@@ -110,11 +101,5 @@ public class ApplicationContextProxy implements ApplicationContext {
         return this.tarantulaApplicationContext.postOffice();
     }
 
-    public OnInstance onInstance(String systemId){
-        return this.tarantulaApplicationContext.onInstance(systemId);
-    }
-    public List<OnInstance> onInstance(){
-        return this.tarantulaApplicationContext.onInstance();
-    }
 
 }

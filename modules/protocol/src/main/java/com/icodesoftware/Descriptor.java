@@ -90,24 +90,24 @@ public interface Descriptor extends Recoverable {
     void tag(String tag);
     void entryCost(double entryCost);
 
-    int maxIdlesOnInstance(); //max client no-action idles before timeout. per idle time is the setting of per app ticker 60 seconds
-    void maxIdlesOnInstance(int maxIdlesOnInstance);
+    //int maxIdlesOnInstance(); //max client no-action idles before timeout. per idle time is the setting of per app ticker 60 seconds
+    //void maxIdlesOnInstance(int maxIdlesOnInstance);
 
-    int maxInstancesPerPartition();
-    void maxInstancesPerPartition(int maxPoolSize);
+    //int maxInstancesPerPartition();
+    //void maxInstancesPerPartition(int maxPoolSize);
 
-    int instancesOnStartupPerPartition();
-    void instancesOnStartupPerPartition(int instancesOnStartup);
+    //int instancesOnStartupPerPartition();
+    //void instancesOnStartupPerPartition(int instancesOnStartup);
 
     String applicationClassName();
 
     void applicationClassName(String applicationClassName);
 
-    long runtimeDuration(); //the application duration time in minutes
-    void runtimeDuration(long runtimeDuration);
+    //long runtimeDuration(); //the application duration time in minutes
+    //void runtimeDuration(long runtimeDuration);
 
-    long runtimeDurationOnInstance(); //the instance duration time in minutes
-    void runtimeDurationOnInstance(long runtimeDuration);
+    //long runtimeDurationOnInstance(); //the instance duration time in minutes
+    //void runtimeDurationOnInstance(long runtimeDuration);
 
     boolean resetEnabled();
     void resetEnabled(boolean resetEnabled);

@@ -26,10 +26,6 @@ public class PortableRegistry extends AbstractRecoverableListener {
 
     public static final int ACCESS_KEY = 16;
 
-    public static final int ON_INSTANCE_CID = 23;//DEPLOY OBJECT
-
-    public static final int INSTANCE_INDEX_CID = 24;//DEPLOY OBJECT
-
     public static final int ON_SESSION_CID = 25;//DEPLOY OBJECT
 
     public static final int INDEX_SET_CID = 26;
@@ -90,12 +86,6 @@ public class PortableRegistry extends AbstractRecoverableListener {
                 _ins = new AccessKey();
                 break;
 
-            case ON_INSTANCE_CID:
-                _ins = new OnInstanceTrack();
-                break;
-            case INSTANCE_INDEX_CID:
-                _ins = new InstanceIndex();
-                break;
             case ON_SESSION_CID:
                 _ins = new OnSessionTrack();
                 break;
@@ -144,12 +134,6 @@ public class PortableRegistry extends AbstractRecoverableListener {
                 break;
             case APPLICATION_DESCRIPTOR_CID:
                 _fac = new ApplicationQuery(params[0]);
-                break;
-            case INSTANCE_INDEX_CID:
-                _fac = new InstanceRegistryQuery(params[0]);
-                break;
-            case ON_INSTANCE_CID:
-                _fac = new OnInstanceQuery(params[0]);
                 break;
         }
         return _fac;

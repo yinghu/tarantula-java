@@ -189,23 +189,8 @@ public class XMLParser extends DefaultHandler{
 			else if(tblock.equals("application-list")&&qname.equals("capacity")){
                 this.applicationDescriptor.capacity(Integer.parseInt(value));
             }
-            else if(tblock.equals("application-list")&&qname.equals("max-idles-on-instance")){
-                this.applicationDescriptor.maxIdlesOnInstance(Integer.parseInt(value));
-            }
-            else if(tblock.equals("application-list")&&qname.equals("runtime-duration")){
-                this.applicationDescriptor.runtimeDuration(Long.parseLong(value)*1000*60);//minutes to milliseconds
-            }
-            else if(tblock.equals("application-list")&&qname.equals("runtime-duration-on-instance")){
-                this.applicationDescriptor.runtimeDurationOnInstance(Long.parseLong(value)*1000*60);//minutes to milliseconds
-            }
 			else if(tblock.equals("application-list")&&qname.equals("class-name")){
 				this.applicationDescriptor.applicationClassName(value);
-            }
-            else if(tblock.equals("application-list")&&qname.equals("instances-on-startup-per-partition")){
-                this.applicationDescriptor.instancesOnStartupPerPartition(Integer.parseInt(value));
-            }
-            else if(tblock.equals("application-list")&&qname.equals("max-instances-per-partition")){
-                this.applicationDescriptor.maxInstancesPerPartition(Integer.parseInt(value));
             }
             else if(tblock.equals("application-list")&&qname.equals("module-artifact")){
                 this.applicationDescriptor.moduleArtifact(value);

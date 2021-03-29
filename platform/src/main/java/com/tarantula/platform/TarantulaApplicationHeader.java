@@ -9,7 +9,7 @@ import com.tarantula.platform.util.*;
 /**
  * Updated by yinghu on 6/15/19
  */
-public class TarantulaApplicationHeader implements TarantulaApplication,InstanceRegistry.Listener {
+public class TarantulaApplicationHeader implements TarantulaApplication {
 
     protected Descriptor descriptor;
     protected ApplicationContext context;
@@ -51,9 +51,7 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
         return false;
     }
 
-    public void onRegistry(InstanceRegistry instanceRegistry){
 
-    }
     public String onLobby(){
         return this.descriptor.tag();
     }
@@ -67,9 +65,5 @@ public class TarantulaApplicationHeader implements TarantulaApplication,Instance
     public void onState(Connection onConnection){
 
     }
-    public void refund(String systemId,String applicationId){
-        Descriptor desc = this.context.descriptor(applicationId);
-        OnBalanceTrack onBalanceTrack = new OnBalanceTrack(systemId,desc.entryCost());
-        this.context.postOffice().onTag(Presence.LOBBY_TAG).send(systemId,onBalanceTrack);
-    }
+
 }

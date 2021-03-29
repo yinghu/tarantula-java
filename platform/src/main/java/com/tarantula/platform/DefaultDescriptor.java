@@ -41,14 +41,9 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     protected long timerOnModule;
     protected boolean logEnabled =true;
 
-    protected int maxInstancesPerPartition = 10;
 
     protected  String applicationClassName;
-    protected  int instancesOnStartupPerPartition =1;
 
-    protected int maxIdlesOnInstance;
-    protected long runtimeDuration;
-    protected long runtimeDurationOnInstance;
 
     protected boolean resetEnabled;
     protected boolean tournamentEnabled;
@@ -243,18 +238,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         this.entryCost = entryCost;
     }
 
-    public int maxIdlesOnInstance(){
-        return this.maxIdlesOnInstance;
-    }
-    public void maxIdlesOnInstance(int maxIdlesOnInstance){
-        this.maxIdlesOnInstance = maxIdlesOnInstance;
-    }
-    public int maxInstancesPerPartition(){
-        return this.maxInstancesPerPartition;
-    }
-    public void maxInstancesPerPartition(int maxPoolSize){
-        this.maxInstancesPerPartition = maxPoolSize;
-    }
+
     @Override
     public Map<String, Object> toMap() {
         Map<String,Object> _props = this.properties;
@@ -283,13 +267,8 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         _props.put("moduleName",this.moduleName);
         _props.put("timerOnModule",this.timerOnModule);
         _props.put("logEnabled",this.logEnabled);
-        _props.put("maxInstancesPerPartition",this.maxInstancesPerPartition);
         _props.put("applicationClassName",this.applicationClassName);
-        _props.put("instancesOnStartupPerPartition",this.instancesOnStartupPerPartition);
-        _props.put("maxIdlesOnInstance",this.maxIdlesOnInstance);
         _props.put("responseLabel",this.responseLabel);
-        _props.put("runtimeDuration",this.runtimeDuration);
-        _props.put("runtimeDurationOnInstance",this.runtimeDurationOnInstance);
         _props.put("resetEnabled",this.resetEnabled);
         _props.put("tournamentEnabled",this.tournamentEnabled);
         _props.put("index",this.index);
@@ -323,13 +302,8 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         this.moduleName = properties.get("moduleName")!=null?(String)properties.get("moduleName"):null;
         this.timerOnModule =properties.get("timerOnModule")!=null?((Number)properties.get("timerOnModule")).longValue():50;
         this.logEnabled = properties.get("logEnabled")!=null?(Boolean)properties.get("logEnabled"):true;
-        this.maxInstancesPerPartition = properties.get("maxInstancesPerPartition")!=null?((Number)properties.get("maxInstancesPerPartition")).intValue():1;
         this.applicationClassName = properties.get("applicationClassName")!=null?(String)properties.get("applicationClassName"):null;
-        this.instancesOnStartupPerPartition = properties.get("instancesOnStartupPerPartition")!=null?((Number)properties.get("instancesOnStartupPerPartition")).intValue():10;
-        this.maxIdlesOnInstance =properties.get("maxIdlesOnInstance")!=null?((Number)properties.get("maxIdlesOnInstance")).intValue():0;
         this.responseLabel =properties.get("responseLabel")!=null? (String)properties.get("responseLabel"):null;
-        this.runtimeDuration = properties.get("runtimeDuration")!=null?((Number)properties.get("runtimeDuration")).longValue():0;
-        this.runtimeDurationOnInstance = properties.get("runtimeDurationOnInstance")!=null?((Number)properties.get("runtimeDurationOnInstance")).longValue():0;
         this.resetEnabled = properties.get("resetEnabled")!=null?(boolean)properties.get("resetEnabled"):false;
         this.tournamentEnabled = (boolean)properties.getOrDefault("tournamentEnabled",false);
         this.index = properties.get("index")!=null?(String)properties.get("index"):null;
@@ -342,25 +316,8 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     public void applicationClassName(String applicationClassName) {
         this.applicationClassName = applicationClassName;
     }
-    public int instancesOnStartupPerPartition(){
-        return this.instancesOnStartupPerPartition;
-    }
 
-    public void instancesOnStartupPerPartition(int instancesOnStartup){
-        this.instancesOnStartupPerPartition = instancesOnStartup;
-    }
-    public long runtimeDuration(){
-        return this.runtimeDuration;
-    }
-    public void runtimeDuration(long runtimeDuration){
-        this.runtimeDuration = runtimeDuration;
-    }
-    public long runtimeDurationOnInstance(){
-        return this.runtimeDurationOnInstance;
-    }
-    public void runtimeDurationOnInstance(long runtimeDurationOnInstance){
-        this.runtimeDurationOnInstance = runtimeDurationOnInstance;
-    }
+
     public boolean tournamentEnabled(){
         return this.tournamentEnabled;
     }

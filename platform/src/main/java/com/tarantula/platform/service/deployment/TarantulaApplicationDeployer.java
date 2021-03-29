@@ -149,7 +149,7 @@ public class TarantulaApplicationDeployer implements Serviceable {
 				a.label(Application.LABEL);
 				a.onEdge(true);
 				if(c.descriptor.deployCode()== DeployCode.SYSTEM_MODULE||c.descriptor.deployCode()== DeployCode.APPLICATION_MODULE||c.descriptor.deployCode()== DeployCode.USER_MODULE){
-					a.applicationClassName(a.singleton()?this.context.singleModuleApplication:this.context.moduleApplication);
+					a.applicationClassName(this.context.singleModuleApplication);
 				}
 				dataStore.create(a);
 			});

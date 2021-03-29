@@ -95,14 +95,9 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         ins.timerOnModule(this.timerOnModule);
         ins.applicationClassName(this.applicationClassName);
         ins.responseLabel(this.responseLabel);
-        ins.instancesOnStartupPerPartition(this.instancesOnStartupPerPartition);
-        ins.maxInstancesPerPartition(this.maxInstancesPerPartition);
         ins.deployPriority(this.deployPriority);
         ins.deployCode(this.deployCode);
         ins.logEnabled(this.logEnabled);
-        ins.maxIdlesOnInstance(this.maxIdlesOnInstance);
-        ins.runtimeDuration(this.runtimeDuration);
-        ins.runtimeDurationOnInstance(this.runtimeDurationOnInstance);
         ins.resetEnabled(this.resetEnabled);
         ins.tournamentEnabled(this.tournamentEnabled);
         return ins;

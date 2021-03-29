@@ -93,7 +93,7 @@ public class TarantulaMain {
 		    btx.tarantulaServerValidator = override(overriding,"tarantula.service.authenticator.provider",_user,_config);
 		    btx.tarantulaDeploymentProvider = override(overriding,"tarantula.service.deployment.service.provider",_user,_config);
 		    btx.singleModuleApplication = override(overriding,"tarantula.service.deployment.module.singleton.application",_user,_config);
-			btx.moduleApplication = override(overriding,"tarantula.service.deployment.module.application",_user,_config);
+			//btx.moduleApplication = override(overriding,"tarantula.service.deployment.module.application",_user,_config);
 		    btx.deployDir  = override(overriding,"tarantula.service.deployment.dir",_user,_config);
 		    btx.maxActiveSessionNumber = Integer.parseInt(override(overriding,"tarantula.endpoint.session.max.number",_user,_config));
 			btx.tokenTimeout = Integer.parseInt(override(overriding,"tarantula.endpoint.session.timeout.m",_user,_config));

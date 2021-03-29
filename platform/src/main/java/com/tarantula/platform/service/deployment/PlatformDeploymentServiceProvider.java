@@ -48,7 +48,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ClusterProvider integrationCluster;
     private SecureRandom secureRandom;
 
-    private ConcurrentHashMap<String,InstanceRegistry.Listener> rListeners = new ConcurrentHashMap<>();
+    //private ConcurrentHashMap<String,InstanceRegistry.Listener> rListeners = new ConcurrentHashMap<>();
     private CopyOnWriteArrayList<OnLobby.Listener> oListeners = new CopyOnWriteArrayList<>();
 
     private CopyOnWriteArrayList<Connection.OnStateListener> wListeners = new CopyOnWriteArrayList<>();
@@ -325,12 +325,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             b.codebase(descriptor.codebase());
             b.moduleArtifact(descriptor.moduleArtifact());
             b.moduleVersion(descriptor.moduleVersion());
-            if(b.singleton()){
-                b.applicationClassName(this.tarantulaContext.singleModuleApplication);
-            }
-            else{
-                b.applicationClassName(this.tarantulaContext.moduleApplication);
-            }
+            b.applicationClassName(this.tarantulaContext.singleModuleApplication);
             String x = deployService.addApplication(b);
             if(x==null){
                 log.warn("Failed to add application ->"+b.toString());
@@ -379,7 +374,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     onLobby.closed(true);
                     ol.onLobby(onLobby);//removed lobby entry
                 });
-                rListeners.remove(d.tag()); //remove instance entry
+                //rListeners.remove(d.tag()); //remove instance entry
                 this.tarantulaContext.tarantulaCluster().deployService().disableLobby(d.typeId());
             }
             if(d.moduleName()!=null&&d.codebase()!=null){ //clean class loader if all apps removed on the class loader
@@ -417,9 +412,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         this.tarantulaContext.unsetLobby(typeId,(d)->{//clean up from runtime context
             //remove modules
-            if(d.singleton()){
-                rListeners.remove(d.tag());
-            }
+            //if(d.singleton()){
+                //rListeners.remove(d.tag());
+            //}
             if(d.moduleName()!=null&&d.codebase()!=null){ //clean class loader if all apps removed on the class loader
                 DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.moduleId());
                 if(dynamicModuleClassLoader!=null){
@@ -565,9 +560,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext.releaseServiceProvider(serviceProvider.name());
     }
 
-    public void registerInstanceRegistryListener(InstanceRegistry.Listener instanceRegistryListener){
-        rListeners.put(instanceRegistryListener.onLobby(),instanceRegistryListener);
-    }
     public void updateView(OnView onView){
         checkContent(onView);
         OnView removed = (OnView) vMap.remove(onView.viewId());
@@ -651,13 +643,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return new ResponseHeader("create/update view",updated?"view deployed->"+onView.moduleContext():"cannot create view",updated);
     }
 
-    private void register(InstanceRegistry registry){
-        rListeners.forEach((k,l)->{
-            if(l.onLobby().equals(registry.subtypeId())){
-                try{l.onRegistry(registry);}catch (Exception ex){}//ignore ex
-            }
-        });
-    }
     private void register(OnLobby onLobby){
         if(onLobby.deployCode()<2){
             return;
@@ -776,10 +761,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void register(Configurable configurable){
         if(configurable instanceof OnView){
             updateView((OnView)configurable);
-            return;
-        }
-        else if(configurable instanceof InstanceRegistry){
-            register((InstanceRegistry)configurable);
             return;
         }
         else if(configurable instanceof OnLobby){
@@ -1123,11 +1104,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 this.clear();//clear on old instance
                 this.module = moduleClassLoader.newModule(descriptor.moduleName());
                 this.module.setup(applicationContext);//inject the limited content to prevent unexpected calls from modules
-                if(descriptor.singleton()){
-                    log.warn("Module ["+descriptor.moduleName()+"] reset on singleton instance ["+descriptor.tag()+"]");
-                }else{
-                    log.warn("Module ["+descriptor.moduleName()+"] reset on instance ["+applicationContext.onRegistry().distributionKey()+"]");
-                }
+                log.warn("Module ["+descriptor.moduleName()+"] reset on singleton instance ["+descriptor.tag()+"]");
             }catch (Exception ex){
                 log.error("error on module reset, fix it and reset again",ex);
             }

@@ -16,14 +16,11 @@ public interface ApplicationContext {
 
     ScheduledFuture<?> schedule(SchedulingTask task);
 
-    InstanceRegistry onRegistry();
-
     Configuration configuration(String type);
     List<Configuration> configuration();
 
     TokenValidator validator();
     Descriptor descriptor();
-    Descriptor descriptor(String applicationId);
 
     DataStore dataStore(String name);
 
@@ -36,7 +33,6 @@ public interface ApplicationContext {
     <T extends ServiceProvider> T serviceProvider(String name);
 
     void resource(String name,Module.OnResource onResource);
-    //<T extends Object> T newInstance(String className);
 
     PostOffice postOffice();
 }

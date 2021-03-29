@@ -32,8 +32,6 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     void register(ServiceProvider serviceProvider);
     void release(ServiceProvider serviceProvider);
     
-    //deploy and callback instance registry
-    void registerInstanceRegistryListener(InstanceRegistry.Listener deploymentListener);
 
     //list configurations
     List<Configuration> configuration();
