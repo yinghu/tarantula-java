@@ -828,7 +828,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return false;
         }
     }
-    public <T extends OnAccess> T createGameCluster(String owner,String name,boolean tournamentEnabled){
+    public <T extends OnAccess> T createGameCluster(String owner,String name,String mode,boolean tournamentEnabled){
         AccessIndex accessIndex = this.tarantulaContext.accessIndexService().set(name);
         if(accessIndex==null){
             GameCluster gc = new GameCluster();
@@ -836,7 +836,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             gc.message("duplicated name ["+name+"]");
             return (T)gc;
         }
-        return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name,tournamentEnabled,accessIndex.distributionKey());
+        return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name,mode,tournamentEnabled,accessIndex.distributionKey());
     }
     public <T extends OnAccess> T gameCluster(String key){
         GameCluster gc = new GameCluster();

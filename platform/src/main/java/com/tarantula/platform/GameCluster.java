@@ -11,6 +11,7 @@ import java.io.IOException;
 public class GameCluster extends OnApplicationHeader implements Portable {
 
     public final static String NAME="1";
+    public final static String MODE="2";//pve | pvp
     public final static String GAME_LOBBY = "3";
     public final static String GAME_SERVICE = "4";
     public final static String GAME_DATA = "5";

@@ -67,7 +67,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     boolean createApplication(Descriptor descriptor,boolean launching);
     boolean enableApplication(String applicationId);
     boolean disableApplication(String applicationId);
-    <T extends OnAccess> T createGameCluster(String owner,String name,boolean tournamentEnabled);
+    <T extends OnAccess> T createGameCluster(String owner,String name,String mode,boolean tournamentEnabled);
     <T extends OnAccess> boolean launchGameCluster(T gameCluster);
     <T extends OnAccess> boolean shutdownGameCluster(T gameCluster);
     <T extends OnAccess> T gameCluster(String key);

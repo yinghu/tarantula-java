@@ -24,7 +24,7 @@ public interface DeployService extends ServiceProvider {
     boolean disableLobby(String typeId);
 
     //GameCluster createGameCluster(String owner,String name);
-    <T extends OnAccess> T createGameCluster(String owner,String name,boolean tournamentEnabled,String publishingId);
+    <T extends OnAccess> T createGameCluster(String owner,String name,String mode,boolean tournamentEnabled,String publishingId);
     boolean enableGameCluster(String gameClusterId);
     boolean disableGameCluster(String gameClusterId);
 

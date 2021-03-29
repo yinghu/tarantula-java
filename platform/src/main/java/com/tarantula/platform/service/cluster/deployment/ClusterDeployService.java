@@ -288,7 +288,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         mds.update(gameCluster);
         return suc1&&suc2&&suc3;//make sure all disabled
     }
-    public GameCluster createGameCluster(String owner, String name,boolean tournamentEnabled,String publishingId){
+    public GameCluster createGameCluster(String owner, String name,String mode,boolean tournamentEnabled,String publishingId){
         GameCluster gameCluster = new GameCluster();
         try {
             DataStore mds = this.tarantulaContext.masterDataStore();
@@ -303,7 +303,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();
             String typePrefix = name.toLowerCase();
-            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-basic-plan.xml"));
+            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(mode+"-game-cluster-basic-plan.xml"));
             for (LobbyConfiguration configuration : parser.configurations) {
                 configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",typePrefix));//lower case only typeId
                 if(configuration.descriptor.typeId().endsWith("-lobby")){
