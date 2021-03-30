@@ -1,4 +1,4 @@
-package com.tarantula.platform.module;
+package com.tarantula.platform.service.deployment;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;

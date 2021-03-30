@@ -293,9 +293,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         try {
             DataStore mds = this.tarantulaContext.masterDataStore();
             gameCluster.property(GameCluster.NAME,name);
+            gameCluster.property(GameCluster.MODE,mode);
             gameCluster.property(GameCluster.OWNER,owner);
             gameCluster.property(GameCluster.PUBLISHING_ID,publishingId);
-            gameCluster.property(GameCluster.ACCESS_KEY,"mock access key");
+            gameCluster.property(GameCluster.ACCESS_KEY,"pending access key");
             gameCluster.property(GameCluster.TIMESTAMP,0);
             gameCluster.property(GameCluster.TOURNAMENT_ENABLED,tournamentEnabled);
             gameCluster.property(GameCluster.DISABLED,true);
@@ -303,6 +304,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();
             String typePrefix = name.toLowerCase();
+
             parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(mode+"-game-cluster-basic-plan.xml"));
             for (LobbyConfiguration configuration : parser.configurations) {
                 configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",typePrefix));//lower case only typeId
