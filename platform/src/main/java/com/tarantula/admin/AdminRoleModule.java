@@ -232,7 +232,7 @@ public class AdminRoleModule implements Module {
             if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
                 //context.log("MODE->"+onAccess.property("playMode").toString(),OnLog.WARN);
-                GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.distributionKey(),(String)onAccess.property("name"),"pvp",(boolean)onAccess.property("tournamentEnabled"));
+                GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.distributionKey(),(String)onAccess.property("name"),(String) onAccess.property("playMode"),(boolean)onAccess.property("tournamentEnabled"));
                 if(gc.successful()){
                     IndexSet idx = new IndexSet();
                     idx.distributionKey(acc.distributionKey());
