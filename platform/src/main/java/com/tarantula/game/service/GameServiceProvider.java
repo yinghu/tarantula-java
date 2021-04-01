@@ -93,8 +93,24 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         this.dataStore.createIfAbsent(deltaStatistics,true);
         return deltaStatistics;
     }
-    public Zone zone(Descriptor descriptor){//application id
-        Zone zone = new Zone();
+    public Zone zone(Descriptor descriptor,String mode){
+        if(mode.equals(Zone.PVE)){
+            Zone zone = new PVEZone(descriptor);
+            zone.distributionKey(descriptor.distributionKey());
+            zone.mode = mode;
+            zone.dataStore(this.dataStore);
+            return zone;
+        }
+        else if(mode.equals(Zone.PVP)){
+            Zone zone = new PVPZone(descriptor);
+            zone.distributionKey(descriptor.distributionKey());
+            zone.mode = mode;
+            return zone;
+        }
+        throw new UnsupportedOperationException(mode);
+    }
+    public PVPZone zone(Descriptor descriptor){//application id
+        PVPZone zone = new PVPZone(descriptor);
         zone.distributionKey(descriptor.distributionKey());
         zone.index(descriptor.tag());
         byte[] key = zone.key().asString().getBytes();

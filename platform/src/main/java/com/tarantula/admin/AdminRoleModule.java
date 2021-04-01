@@ -263,7 +263,7 @@ public class AdminRoleModule implements Module {
             GameLobbyContext pending = this.gameLobbyContext(accessId);
             if(index==pending.page){
                 GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
-                Zone zone = gameLobby.zone;
+                PVPZone zone = gameLobby.zone;
                 zone.name = onAccess.name();
                 zone.capacity = ((Number)onAccess.property("capacity")).intValue();
                 zone.joinsOnStart = ((Number)onAccess.property("joinsOnStart")).intValue();
@@ -293,7 +293,7 @@ public class AdminRoleModule implements Module {
             GameLobbyContext pending = this.gameLobbyContext(accessId);
             if(page==pending.page){
                 GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
-                Zone zone = gameLobby.zone;
+                PVPZone zone = gameLobby.zone;
                 if(index<=maxGameLevelCount){
                     boolean updated  = false;
                     Arena pu = new Arena();
@@ -524,10 +524,10 @@ public class AdminRoleModule implements Module {
             return gameLobbyContext;
         });
     }
-    private Zone _zone(GameCluster gameCluster,Descriptor descriptor){
+    private PVPZone _zone(GameCluster gameCluster, Descriptor descriptor){
         String dn = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         DataStore dataStore = this.context.dataStore(dn.replace("-","_"));
-        Zone mZone = new Zone();
+        PVPZone mZone = new PVPZone();
         mZone.distributionKey(descriptor.distributionKey());
         mZone.capacity=1;
         mZone.roundDuration = 60*1000;

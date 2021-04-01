@@ -6,7 +6,7 @@ import com.icodesoftware.Descriptor;
 
 public class GameLobby {
     public Descriptor lobby;
-    public Zone zone;
+    public PVPZone zone;
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();

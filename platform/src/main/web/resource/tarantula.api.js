@@ -343,7 +343,7 @@ var TARA_API = (function(){
         if(aj.status === 200 && aj.readyState === 4){
             let resp = JSON.parse(aj.responseText);
             if(resp.successful){
-                qdata.stub = resp.stub;
+                qdata.stub = resp;
                 qdata.offline = resp.offline;
                 qdata.tournamentEnabled = resp.tournamentEnabled;
                 if(!resp.offline){

@@ -22,7 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PVEGameZoneModule implements Module,Configurable.Listener,Connection.OnConnectionListener,Consumable.Listener{
 
     private ApplicationContext context;
-    private Zone mZone;
+    private PVPZone mZone;
+    private Zone zone;
     private ConcurrentHashMap<String, Stub> mStub = new ConcurrentHashMap<>();
     private GsonBuilder builder;
     private GameServiceProvider gameServiceProvider;
@@ -32,8 +33,17 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
     private DeploymentServiceProvider deploymentServiceProvider;
     private String registerKey;
     private Consumable consumable;
+
     @Override
-    public void onJoin(Session session, OnUpdate onUpdate) throws Exception{
+    public void onJoin(Session session, OnUpdate onUpdate) throws Exception {
+        Rating rating = new Rating();
+        rating.fromBinary(session.payload());
+        Stub stub = zone.join(rating);
+        stub.owner(session.systemId());
+        session.write(stub.toJson().toString().getBytes(),label());
+    }
+    //@Override
+    public void _onJoin(Session session, OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp or offline play mode
         //this.context.log(new String(session.payload()),OnLog.WARN);
         if(mZone.descriptor.tournamentEnabled()&&(!gameServiceProvider.available(session.tournamentId()))){
@@ -178,6 +188,7 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         String gz = this.context.descriptor().typeId().replace("-lobby","-service");
         this.gameServiceProvider = this.context.serviceProvider(gz);
+        /**
         mZone = this.gameServiceProvider.zone(this.context.descriptor());
         mZone.levelUpBase = DEFAULT_LEVEL_UP_BASE;
         if(mZone.arenas.size()==0) {
@@ -204,10 +215,12 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         mZone.start();
         //mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
         mZone.registerListener(this);
-        deploymentServiceProvider.register(mZone);
+        deploymentServiceProvider.register(mZone);**/
         this.deploymentServiceProvider.registerOnConnectionListener(this);
         this.registerKey = this.gameServiceProvider.registerListener(this);
-        context.log("Game lobby started with tournament enabled ["+context.descriptor().tournamentEnabled()+"] on tag=>"+this.mZone.descriptor.tag(),OnLog.WARN);
+        this.zone = this.gameServiceProvider.zone(context.descriptor(),Zone.PVE);
+        this.deploymentServiceProvider.register(this.zone);
+        context.log("PVE Game lobby started with tournament enabled ["+context.descriptor().tournamentEnabled()+"] on tag=>"+this.context.descriptor().tag(),OnLog.WARN);
     }
     @Override
     public void onConnection(Connection connection){
@@ -220,7 +233,7 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
     }
     @Override
     public void onTimer(OnUpdate update){
-        mZone.onTimer((connection,label,data)->update.on(connection,label,data));
+        //mZone.onTimer((connection,label,data)->update.on(connection,label,data));
     }
     @Override
     public String label() {
@@ -239,7 +252,7 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         //this.context.log("Bucket->"+bucket+"/"+state,OnLog.WARN);
     }
     public void onUpdated(Configurable zone) {
-        mZone.reset((Zone)zone);
+        mZone.reset((PVPZone)zone);
         //this.context.log("Play mode->"+mZone.playMode,OnLog.WARN);
         //this.context.log("joinsOnStart->"+mZone.joinsOnStart,OnLog.WARN);
         //mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));

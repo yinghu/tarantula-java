@@ -768,6 +768,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return;
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
+        configurable.update(new ServiceContextProxy(this.tarantulaContext));
     }
     public void configure(String key){
         if(vMap.containsKey(key)){

@@ -31,7 +31,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
                 pt = new Rating();
                 break;
             case ZONE_CID:
-                pt = new Zone();
+                pt = new PVPZone();
                 break;
             case STUB_CID:
                 pt = new Stub();

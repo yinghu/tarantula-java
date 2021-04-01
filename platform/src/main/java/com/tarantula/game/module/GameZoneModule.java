@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameZoneModule implements Module,Configurable.Listener,Connection.OnConnectionListener,Consumable.Listener{
 
     private ApplicationContext context;
-    private Zone mZone;
+    private PVPZone mZone;
     private ConcurrentHashMap<String, Stub> mStub = new ConcurrentHashMap<>();
     private GsonBuilder builder;
     private GameServiceProvider gameServiceProvider;
@@ -238,7 +238,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         //this.context.log("Bucket->"+bucket+"/"+state,OnLog.WARN);
     }
     public void onUpdated(Configurable zone) {
-        mZone.reset((Zone)zone);
+        mZone.reset((PVPZone)zone);
         //this.context.log("Play mode->"+mZone.playMode,OnLog.WARN);
         //this.context.log("joinsOnStart->"+mZone.joinsOnStart,OnLog.WARN);
         //mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));

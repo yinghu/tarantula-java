@@ -698,7 +698,7 @@
                 resp.gameClusterList.forEach((g,i)=>{
                     console.log(g);
                     let disabled = g.disabled;
-                    let _name = g.tournamentEnabled?g.name+' [tournament mode]':g.name;
+                    let _name = g.tournamentEnabled?g.name+'/'+g.mode+'[tournament mode]':g.name+'/'+g.mode;
                     document.querySelector('#game-name-'+i).innerHTML = _name;
                     let shd = document.querySelector('#game-shutdown-id-'+i);
                     shd.setAttribute('tx-game-cluster-id',g.gameClusterId); 
