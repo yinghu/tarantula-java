@@ -14,7 +14,6 @@
                 <subtype-id>index-user</subtype-id>
                 <name>User</name>
                 <type>application</type>
-                <singleton>true</singleton>
                 <tag>index/user</tag>
                 <description>Tarantula User Management</description>
                 <class-name>com.tarantula.platform.presence.UserManagementApplication</class-name>

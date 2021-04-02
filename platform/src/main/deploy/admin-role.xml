@@ -15,7 +15,6 @@
                 <name>Admin Role</name>
                 <type>application</type>
                 <category>admin</category>
-                <singleton>true</singleton>
                 <tag>role/admin</tag>
                 <description>Tarantula Admin Role Service</description>
                 <module-name>com.tarantula.admin.AdminRoleModule</module-name>

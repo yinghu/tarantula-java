@@ -15,7 +15,6 @@
                 <name>Account Role</name>
                 <type>application</type>
                 <category>admin</category>
-                <singleton>true</singleton>
                 <tag>role/account</tag>
                 <description>Tarantula Account Role Service</description>
                 <module-name>com.tarantula.admin.AccountRoleModule</module-name>

@@ -55,7 +55,7 @@ public interface Descriptor extends Recoverable {
 
     int capacity(); //the max joined number of the instance
 
-    boolean singleton(); //single instance per node
+    //boolean singleton(); //single instance per node
 
     int accessMode();
     int accessControl(); // 0 - 10
@@ -76,7 +76,7 @@ public interface Descriptor extends Recoverable {
 
 	void capacity(int capacity);	
 
-    void singleton(boolean singleton);
+    //void singleton(boolean singleton);
 
     void accessControl(int accessControl);
     void accessMode(int accessMode);

@@ -15,7 +15,6 @@
                 <name>SudoRole</name>
                 <type>application</type>
                 <category>admin</category>
-                <singleton>true</singleton>
                 <tag>role/sudo</tag>
                 <description>Tarantula Sudo Role Service</description>
                 <module-name>com.tarantula.admin.SudoRoleModule</module-name>

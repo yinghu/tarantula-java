@@ -13,7 +13,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     protected String subtypeId;
     protected String viewId;
     protected String category;
-    protected boolean singleton;
 
     protected int accessControl;
     protected int accessMode;
@@ -182,12 +181,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 		return new String(JsonUtil.toJson(this.toMap()));
 	}
 
-	public boolean singleton(){
-        return this.singleton;
-    }
-    public void singleton(boolean singleton){
-        this.singleton = singleton;
-    }
 
 
     public int accessControl(){
@@ -236,7 +229,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         _props.put("icon",this.icon);
         _props.put("description",this.description);
         _props.put("viewId",this.viewId);
-        _props.put("singleton",this.singleton);
         _props.put("tag",this.tag);
         _props.put("entryCost",this.entryCost);
         _props.put("capacity",this.capacity); //0 unlimited
@@ -271,7 +263,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         this.icon=properties.get("icon")!=null?(String)properties.get("icon"):null;
         this.description=properties.get("description")!=null?(String)properties.get("description"):null;
         this.viewId=properties.get("viewId")!=null?(String)properties.get("viewId"):null;
-        this.singleton=properties.get("singleton")!=null?(boolean)properties.get("singleton"):false;
         this.tag=properties.get("tag")!=null?(String)properties.get("tag"):null;
         this.entryCost=properties.get("entryCost")!=null?((Number)properties.get("entryCost")).doubleValue():0;
         this.capacity=properties.get("capacity")!=null?((Number)properties.get("capacity")).intValue():0;

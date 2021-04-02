@@ -409,7 +409,7 @@ public class AdminRoleModule implements Module {
                     desc.deployPriority((Integer)exposedGameService.property(ExposedGameService.DEPLOY_PRIORITY));
                     desc.accessControl((Integer)exposedGameService.property(ExposedGameService.ACCESS_CONTROL));
                     desc.applicationClassName("com.tarantula.platform.service.deployment.SingletonModuleApplication");
-                    desc.singleton(true);
+                    //desc.singleton(true);
                     _existed[0] = this.deploymentServiceProvider.createApplication(desc,null, true);
                 }
             }

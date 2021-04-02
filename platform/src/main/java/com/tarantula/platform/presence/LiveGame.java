@@ -44,7 +44,7 @@ public class LiveGame {
         jo.addProperty("typeId",descriptor.typeId());
         jo.addProperty("name",descriptor.name());
         if(!descriptor.type().equals("lobby")){
-            jo.addProperty("singleton",descriptor.singleton());
+            //jo.addProperty("singleton",descriptor.singleton());
             jo.addProperty("tag",descriptor.tag());
             jo.addProperty("accessRank",descriptor.accessRank());
             jo.addProperty("applicationId",descriptor.distributionKey());

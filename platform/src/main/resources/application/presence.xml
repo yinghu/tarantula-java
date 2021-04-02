@@ -14,7 +14,6 @@
                 <subtype-id>presence-lobby</subtype-id>
                 <name>Presence</name>
                 <type>application</type>
-                <singleton>true</singleton>
                 <tag>presence/lobby</tag>
                 <description>Tarantula Presence</description>
                 <class-name>com.tarantula.platform.presence.PresenceApplication</class-name>

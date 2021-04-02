@@ -58,7 +58,7 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         _copy.name(this.name);
         _copy.type(this.type);
         _copy.category(this.category);
-        _copy.singleton(this.singleton);
+        //_copy.singleton(this.singleton);
         _copy.tag(this.tag);
         _copy.applicationClassName(this.applicationClassName);
         _copy.moduleName(this.moduleName);
@@ -82,7 +82,7 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         ins.accessRank(this.accessRank);
         ins.entryCost(this.entryCost);
         ins.tag(this.tag);
-        ins.singleton(this.singleton);
+        //ins.singleton(this.singleton);
         ins.name(this.name);
         ins.description(this.description);
         ins.viewId(this.viewId);

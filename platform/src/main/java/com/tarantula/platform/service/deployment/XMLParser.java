@@ -141,9 +141,6 @@ public class XMLParser extends DefaultHandler{
             else if(tblock.equals("application-list")&&qname.equals("category")){
                 this.applicationDescriptor.category(value);
             }
-            else if (tblock.equals("application-list")&&qname.equals("singleton")){
-                this.applicationDescriptor.singleton(Boolean.parseBoolean(value));
-            }
             else if (tblock.equals("application-list")&&qname.equals("reset-enabled")){
                 this.applicationDescriptor.resetEnabled(Boolean.parseBoolean(value));
             }
