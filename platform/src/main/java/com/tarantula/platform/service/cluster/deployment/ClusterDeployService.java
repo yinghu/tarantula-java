@@ -14,6 +14,7 @@ import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.util.ResponseSerializer;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.*;
 
@@ -154,13 +155,8 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 //log.warn("create index->"+descriptor.moduleId()+"<><><>"+descriptor.index());
             }
             if(postSetup!=null){
-                try {
-                    log.warn("Lobby config setup->" + postSetup);
-                    ApplicationPreSetup setup = (ApplicationPreSetup) Class.forName(postSetup).getConstructor().newInstance();
-                    setup.setup(tarantulaContext,descriptor);
-                }catch (Exception cex){
-                    log.error("error on application setup",cex);
-                }
+                ApplicationPreSetup setup = SystemUtil.applicationPreSetup(postSetup);
+                setup.setup(tarantulaContext,descriptor);
             }
             return descriptor.distributionKey();
         }
@@ -333,13 +329,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 ApplicationPreSetup[] preSetup = {null};
                 configuration.configurations.forEach(c->{
                     if(c.type().equals(ApplicationPreSetup.SET_UP_TYPE)){
-                        try {
-                            log.warn("Lobby config setup->" + c.property(ApplicationPreSetup.SET_UP_NAME));
-                            gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,c.property(ApplicationPreSetup.SET_UP_NAME));
-                            preSetup[0] = (ApplicationPreSetup) Class.forName(c.property(ApplicationPreSetup.SET_UP_NAME)).getConstructor().newInstance();
-                        }catch (Exception cex){
-                            log.error("error on application setup",cex);
-                        }
+                        String cname = c.property(ApplicationPreSetup.SET_UP_NAME);
+                        gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,cname);
+                        preSetup[0] = SystemUtil.applicationPreSetup(cname);
                     }
                 });
                 //log.warn("Create named lobby type id->"+configuration.descriptor.typeId());

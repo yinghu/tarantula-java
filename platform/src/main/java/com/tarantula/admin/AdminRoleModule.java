@@ -12,10 +12,13 @@ import com.tarantula.game.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.*;
 
+import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.util.SystemUtil;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -526,6 +529,8 @@ public class AdminRoleModule implements Module {
         });
     }
     private Zone _zone(GameCluster gameCluster, Descriptor descriptor){
+        ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        applicationPreSetup.load(context,descriptor);
         String dn = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         DataStore dataStore = this.context.dataStore(dn.replace("-","_"));
         Zone mZone = gameCluster.property(GameCluster.MODE).equals(Zone.PVE)?new PVEZone(descriptor):new PVPZone();

@@ -12,8 +12,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 abstract public class Zone extends RecoverableObject implements Configurable, DataStore.Updatable {
 
-    public static final String PVE = "pve";
-    public static final String PVP = "pvp";
+    public static final String PVE = "pve"; //player versus computer
+    public static final String PVP = "pvp"; //player versus player
+    public static final String TVE = "tve"; //team versus computer
+    public static final String TVT = "tvt"; //team versus team
 
     public List<Arena> arenas = new ArrayList<>();
     //ypublic ConcurrentHashMap<Integer,Arena> activeArenaIndex = new ConcurrentHashMap<>();

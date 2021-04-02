@@ -5,6 +5,7 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.service.ApplicationPreSetup;
 
 import java.io.IOException;
 
@@ -56,7 +57,6 @@ public class GameCluster extends OnApplicationHeader implements Portable {
         }
         return jsonObject;
     }
-
     @Override
     public int getFactoryId() {
         return PortableEventRegistry.OID;

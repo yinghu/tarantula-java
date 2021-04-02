@@ -4,6 +4,7 @@ import com.icodesoftware.OnSession;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.OnSessionTrack;
+import com.tarantula.platform.service.ApplicationPreSetup;
 
 import java.security.MessageDigest;
 import java.time.*;
@@ -235,5 +236,12 @@ public class SystemUtil {
             contentType = "application/octet-stream";
         }
         return contentType;
+    }
+    public static ApplicationPreSetup applicationPreSetup(String className){
+        try{
+            return (ApplicationPreSetup)Class.forName(className).getConstructor().newInstance();
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
 }

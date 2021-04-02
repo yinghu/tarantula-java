@@ -46,6 +46,11 @@
                 <timer-on-module>1000</timer-on-module>
             </application>
         </application-list>
+        <configuration-list>
+            <configuration type="pre-setup">
+                <property name="application-pre-setup">com.tarantula.game.service.PVPLobbySetup</property>
+            </configuration>
+        </configuration-list>
     </lobby-context>
     <lobby-context>
         <type-id>game-service</type-id>

@@ -30,12 +30,20 @@
             <input id ="tx-game-cluster-name" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='game title name'/>
         </div> 
         <div class="w3-panel">
-            <label class="tx-text-12 tx-margin-right-4">PVE (Single Player)</label>
-            <input id='tx-game-cluster-mode-pve' class="w3-radio tx-text-12" name='mode' type="radio" checked>
+            <label class="tx-text-12 tx-margin-right-4">PVE (Single Player Versus Computer)</label>
+            <input value='pve' class="w3-radio tx-text-12 tx-play-mode" name='mode' type="radio" checked>
         </div>
         <div class="w3-panel">
-            <label class="tx-text-12 tx-margin-right-4">PVP (Multiple Players)</label>
-            <input id='tx-game-cluster-mode-pvp' class="w3-radio tx-text-12" name='mode' type="radio">
+            <label class="tx-text-12 tx-margin-right-4">PVP (Player Versus Player)</label>
+            <input value='pvp' class="w3-radio tx-text-12 tx-play-mode" name='mode' type="radio">
+        </div>
+        <div class="w3-panel">
+            <label class="tx-text-12 tx-margin-right-4">TVE (Team Versus Computer)</label>
+            <input value='tve' class="w3-radio tx-text-12 tx-play-mode" name='mode' type="radio">
+        </div>
+        <div class="w3-panel">
+            <label class="tx-text-12 tx-margin-right-4">TVT (Team Versus Team)</label>
+            <input value='tvt' class="w3-radio tx-text-12 tx-play-mode" name='mode' type="radio">
         </div>
         <div class="w3-panel">
             <label class="tx-text-12 tx-margin-right-4">Enable Tournament</label>
@@ -63,15 +71,7 @@
     document.querySelector('#tx-create-game-cluster').onclick=()=>{
         let _n = document.querySelector('#tx-game-cluster-name').value;
         let _b = document.querySelector('#tx-game-cluster-enable-tournament').checked;
-        let _pve = document.querySelector('#tx-game-cluster-mode-pve').checked;
-        let _pvp = document.querySelector('#tx-game-cluster-mode-pvp').checked;
         let _mode = "pve";
-        if(_pve === true){
-            _mode = 'pve';
-        }
-        if(_pvp === true){
-            _mode = 'pvp';
-        }
         console.log('PLAY MODE->'+_mode);
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onCreateGameCluster',name:_n,playMode:_mode,tournamentEnabled:_b},(resp)=>{
             if(resp.successful){
@@ -85,6 +85,12 @@
             }
         });       
     };
+    document.querySelectorAll('.tx-play-mode').forEach(a=>{
+        a.onchange = ()=>{
+            console.log(a.value);
+            console.log(a.getAttribute('value'));
+        }
+    });
     document.querySelector('#tx-edit-game-cluster').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
