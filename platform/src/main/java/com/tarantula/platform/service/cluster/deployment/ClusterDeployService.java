@@ -11,6 +11,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.Application;
+import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.util.ResponseSerializer;
 
@@ -130,7 +131,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         ds.update(app);
         return app.typeId();
     }
-    public String addApplication(Descriptor descriptor){
+    public String addApplication(Descriptor descriptor,String postSetup){
         DataStore ds = this.tarantulaContext.masterDataStore();
         LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),descriptor.typeId());
         if(!ds.load(query)){
@@ -151,6 +152,15 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     ds.update(indexSet);
                 }
                 //log.warn("create index->"+descriptor.moduleId()+"<><><>"+descriptor.index());
+            }
+            if(postSetup!=null){
+                try {
+                    log.warn("Lobby config setup->" + postSetup);
+                    ApplicationPreSetup setup = (ApplicationPreSetup) Class.forName(postSetup).getConstructor().newInstance();
+                    setup.setup(tarantulaContext,descriptor);
+                }catch (Exception cex){
+                    log.error("error on application setup",cex);
+                }
             }
             return descriptor.distributionKey();
         }
@@ -304,7 +314,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();
             String typePrefix = name.toLowerCase();
-
             parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(mode+"-game-cluster-basic-plan.xml"));
             for (LobbyConfiguration configuration : parser.configurations) {
                 configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",typePrefix));//lower case only typeId
@@ -321,6 +330,18 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 if(mds.load(lobbyTypeIdIndex)){//stop existed
                     throw new RuntimeException("["+name+"] duplicated");
                 }
+                ApplicationPreSetup[] preSetup = {null};
+                configuration.configurations.forEach(c->{
+                    if(c.type().equals(ApplicationPreSetup.SET_UP_TYPE)){
+                        try {
+                            log.warn("Lobby config setup->" + c.property(ApplicationPreSetup.SET_UP_NAME));
+                            gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,c.property(ApplicationPreSetup.SET_UP_NAME));
+                            preSetup[0] = (ApplicationPreSetup) Class.forName(c.property(ApplicationPreSetup.SET_UP_NAME)).getConstructor().newInstance();
+                        }catch (Exception cex){
+                            log.error("error on application setup",cex);
+                        }
+                    }
+                });
                 //log.warn("Create named lobby type id->"+configuration.descriptor.typeId());
                 Descriptor descriptor = configuration.descriptor;
                 descriptor.owner(publishingId);
@@ -343,6 +364,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     a.tag(a.tag().replace("game",typePrefix));
                     a.applicationClassName(tarantulaContext.singleModuleApplication);
                     mds.create(a);
+                    if(preSetup[0]!=null){
+                        preSetup[0].setup(tarantulaContext,a);
+                    }
                 });
             }
             gameCluster.message("["+name+"] game created successfully");

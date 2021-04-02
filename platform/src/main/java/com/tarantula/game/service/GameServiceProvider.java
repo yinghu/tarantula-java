@@ -95,7 +95,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
     public Zone zone(Descriptor descriptor,String mode){
         if(mode.equals(Zone.PVE)){
-            Zone zone = new PVEZone(descriptor);
+            Zone zone = new PVELobbySetup().load(serviceContext,descriptor);
             zone.distributionKey(descriptor.distributionKey());
             zone.mode = mode;
             zone.dataStore(this.dataStore);

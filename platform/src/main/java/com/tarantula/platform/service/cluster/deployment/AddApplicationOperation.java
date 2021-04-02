@@ -15,6 +15,7 @@ public class AddApplicationOperation extends Operation {
 
 
     private Descriptor descriptor;
+    private String postSetup;
 
     private String result;
 
@@ -22,13 +23,14 @@ public class AddApplicationOperation extends Operation {
     }
 
 
-    public AddApplicationOperation(Descriptor lobby) {
+    public AddApplicationOperation(Descriptor lobby,String postSetup) {
         this.descriptor = lobby;
+        this.postSetup = postSetup;
     }
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        this.result = cds.addApplication(this.descriptor);
+        this.result = cds.addApplication(this.descriptor,postSetup);
     }
 
     @Override
@@ -40,6 +42,7 @@ public class AddApplicationOperation extends Operation {
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeByteArray(descriptor.toBinary());
+        out.writeUTF(postSetup);
     }
 
     @Override
@@ -47,5 +50,6 @@ public class AddApplicationOperation extends Operation {
         super.readInternal(in);
         this.descriptor = new DeploymentDescriptor();
         this.descriptor.fromBinary(in.readByteArray());
+        this.postSetup = (in.readUTF());
     }
 }

@@ -5,9 +5,14 @@ import com.icodesoftware.service.ServiceContext;
 
 public class PVEZone extends Zone{
 
+    public PVEZone(){
+        super();
+        mode = Zone.PVE;
+    }
 
     public PVEZone(Descriptor descriptor){
         super(descriptor);
+        mode = Zone.PVE;
     }
     @Override
     public Stub join(Rating rating) {
@@ -23,4 +28,13 @@ public class PVEZone extends Zone{
         System.out.println("loading zone from cluster->"+this.distributionKey()+dataStore.name());
 
     }
+    @Override
+    public int getFactoryId() {
+        return GamePortableRegistry.OID;
+    }
+    @Override
+    public int getClassId() {
+        return GamePortableRegistry.PVE_ZONE_CID;
+    }
+
 }

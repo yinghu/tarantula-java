@@ -6,7 +6,7 @@ import com.icodesoftware.Descriptor;
 
 public class GameLobby {
     public Descriptor lobby;
-    public PVPZone zone;
+    public Zone zone;
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
@@ -16,7 +16,7 @@ public class GameLobby {
         jsonObject.addProperty("capacity",zone.capacity);
         jsonObject.addProperty("joinsOnStart",zone.joinsOnStart);
         jsonObject.addProperty("duration",zone.roundDuration/60000);
-        jsonObject.addProperty("playMode",zone.toPlayMode());
+        jsonObject.addProperty("mode",zone.mode);
         jsonObject.addProperty("levelLimit",zone.levelLimit>0?zone.levelLimit:lobby.capacity());
         jsonObject.addProperty("configLabel",zone.index());
         jsonObject.addProperty("disabled",lobby.disabled());

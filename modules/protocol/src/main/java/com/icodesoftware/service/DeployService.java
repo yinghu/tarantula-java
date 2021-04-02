@@ -11,7 +11,7 @@ public interface DeployService extends ServiceProvider {
     boolean updateView(OnView onView);
     boolean updateResource(String contentUrl,String resourceName);
 
-    String addApplication(Descriptor application);
+    String addApplication(Descriptor application,String postSetup);
     boolean launchApplication(String typeId,String applicationId);
     boolean shutdownApplication(String typeId,String applicationId);
     boolean resetModule(Descriptor descriptor);

@@ -27,19 +27,13 @@ import com.icodesoftware.util.RecoverableObject;
  */
 public class PVPZone extends Zone implements RoomListener{
     public String subscription;
-    public List<Arena> arenas = new ArrayList<>();
-    public String name;
-    public int capacity = 1;
+
     private static int SOLO_CAPACITY = 1;
-    public long roundDuration =60000;
-    public long overtime = Room.PENDING_TIME;
-    public int playMode = Room.INTEGRATED_MODE;
-    public int joinsOnStart = 1;
+
     public ConcurrentHashMap<String,Stub> stubIndex;
     public DeploymentServiceProvider deploymentServiceProvider;
     public GameServiceProvider gameServiceProvider;
-    //public Descriptor descriptor;
-    //public int levelLimit;
+
     public int levelUpBase;
 
     private CopyOnWriteArrayList<Room> rList = new CopyOnWriteArrayList<>();
@@ -52,9 +46,11 @@ public class PVPZone extends Zone implements RoomListener{
     private Configurable.Listener listener;
     public PVPZone(){
         super();
+        mode = Zone.PVP;
     }
     public PVPZone(Descriptor descriptor){
         super(descriptor);
+        mode = Zone.PVP;
     }
     @Override
     public Stub join(Rating rating) {
@@ -138,7 +134,7 @@ public class PVPZone extends Zone implements RoomListener{
     }
     @Override
     public int getClassId() {
-        return GamePortableRegistry.ZONE_CID;
+        return GamePortableRegistry.PVP_ZONE_CID;
     }
 
     @Override
@@ -238,51 +234,7 @@ public class PVPZone extends Zone implements RoomListener{
         dataBuffer.putInt(room.capacity());
         return dataBuffer;
     }
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("1",capacity);
-        this.properties.put("2",roundDuration);
-        this.properties.put("3",overtime);
-        this.properties.put("4",playMode);
-        this.properties.put("5",name);
-        this.properties.put("6",this.timestamp);
-        this.properties.put("7",this.levelLimit);
-        this.properties.put("8",this.joinsOnStart);
-        this.properties.put("9",this.index);
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.capacity = ((Number)properties.getOrDefault("1",capacity)).intValue();
-        this.joinsOnStart = ((Number)properties.getOrDefault("8",capacity)).intValue();
-        this.roundDuration = ((Number)properties.getOrDefault("2",roundDuration)).longValue();
-        this.overtime = ((Number)properties.getOrDefault("3",overtime)).longValue();
-        this.playMode = ((Number)properties.getOrDefault("4",playMode)).intValue();
-        this.name = (String)properties.get("5");
-        this.timestamp = ((Number)properties.getOrDefault("6",0)).longValue();
-        this.levelLimit = ((Number)properties.getOrDefault("7",levelLimit)).intValue();
-        this.index = (String)properties.get("9");
-    }
-    @Override
-    public Recoverable.Key key(){
-        return new AssociateKey(this.bucket,this.oid,this.label);
-    }
-    @Override
-    public String distributionKey() {
-        if(this.bucket!=null&&this.oid!=null){
-            return new StringBuffer(this.bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(label).toString();
-        }
-        else{
-            return null;
-        }
-    }
-    @Override
-    public void distributionKey(String distributionKey) {
-        String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
-        this.bucket = klist[0];
-        this.oid = klist[1];
-        //this.label = klist[2];
-    }
+
     public String toPlayMode(){
         if(playMode==Room.INTEGRATED_MODE){
             return "Integrated";

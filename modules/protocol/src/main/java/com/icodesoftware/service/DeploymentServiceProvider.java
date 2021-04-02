@@ -64,7 +64,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
     //end
 
     //game cluster operation APIs
-    boolean createApplication(Descriptor descriptor,boolean launching);
+    boolean createApplication(Descriptor descriptor,String postSetup,boolean launching);
     boolean enableApplication(String applicationId);
     boolean disableApplication(String applicationId);
     <T extends OnAccess> T createGameCluster(String owner,String name,String mode,boolean tournamentEnabled);

@@ -160,7 +160,8 @@ public class AdminRoleModule implements Module {
                             desc.name("Game Lobby " + rk);
                             desc.tag(gname + "/lobby" + rk);
                             desc.accessRank(rk);
-                            if(this.deploymentServiceProvider.createApplication(desc, !disabled)){
+                            desc.index((String)gc.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+                            if(this.deploymentServiceProvider.createApplication(desc,(String)gc.property(GameCluster.LOBBY_PRE_SETUP_NAME),!disabled)){
                                 added[0]++;
                             }
                         }
@@ -263,7 +264,7 @@ public class AdminRoleModule implements Module {
             GameLobbyContext pending = this.gameLobbyContext(accessId);
             if(index==pending.page){
                 GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
-                PVPZone zone = gameLobby.zone;
+                Zone zone = gameLobby.zone;
                 zone.name = onAccess.name();
                 zone.capacity = ((Number)onAccess.property("capacity")).intValue();
                 zone.joinsOnStart = ((Number)onAccess.property("joinsOnStart")).intValue();
@@ -293,7 +294,7 @@ public class AdminRoleModule implements Module {
             GameLobbyContext pending = this.gameLobbyContext(accessId);
             if(page==pending.page){
                 GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
-                PVPZone zone = gameLobby.zone;
+                Zone zone = gameLobby.zone;
                 if(index<=maxGameLevelCount){
                     boolean updated  = false;
                     Arena pu = new Arena();
@@ -406,7 +407,7 @@ public class AdminRoleModule implements Module {
                     desc.accessControl((Integer)exposedGameService.property(ExposedGameService.ACCESS_CONTROL));
                     desc.applicationClassName("com.tarantula.platform.service.deployment.SingletonModuleApplication");
                     desc.singleton(true);
-                    _existed[0] = this.deploymentServiceProvider.createApplication(desc, true);
+                    _existed[0] = this.deploymentServiceProvider.createApplication(desc,null, true);
                 }
             }
             session.write(toMessage(_existed[0]?"created":"failed",_existed[0]).toString().getBytes(),label());
@@ -524,10 +525,10 @@ public class AdminRoleModule implements Module {
             return gameLobbyContext;
         });
     }
-    private PVPZone _zone(GameCluster gameCluster, Descriptor descriptor){
+    private Zone _zone(GameCluster gameCluster, Descriptor descriptor){
         String dn = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         DataStore dataStore = this.context.dataStore(dn.replace("-","_"));
-        PVPZone mZone = new PVPZone();
+        Zone mZone = gameCluster.property(GameCluster.MODE).equals(Zone.PVE)?new PVEZone(descriptor):new PVPZone();
         mZone.distributionKey(descriptor.distributionKey());
         mZone.capacity=1;
         mZone.roundDuration = 60*1000;
