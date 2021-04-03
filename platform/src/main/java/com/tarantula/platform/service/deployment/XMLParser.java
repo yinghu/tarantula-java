@@ -83,9 +83,6 @@ public class XMLParser extends DefaultHandler{
 			else if(tblock.equals("lobby-context")&&qname.equals("name")){
 				this.configuration.descriptor.name(value);
 			}
-            else if(tblock.equals("lobby-context")&&qname.equals("icon")){
-                this.configuration.descriptor.icon(value);
-            }
 			else if(tblock.equals("lobby-context")&&qname.equals("type")){
 				this.configuration.descriptor.type(value);
 			}
@@ -104,9 +101,6 @@ public class XMLParser extends DefaultHandler{
 			else if(tblock.equals("lobby-context")&&qname.equals("description")){
 				this.configuration.descriptor.description(value);
 			}
-            else if(tblock.equals("lobby-context")&&qname.equals("view-id")){
-                this.configuration.descriptor.viewId(value);
-            }
             else if(tblock.equals("lobby-context")&&qname.equals("deploy-priority")){
 				this.configuration.descriptor.deployPriority(Integer.parseInt(value));
 			}
@@ -120,15 +114,9 @@ public class XMLParser extends DefaultHandler{
             else if(tblock.equals("application-list")&&qname.equals("type-id")){
                 this.applicationDescriptor.typeId(value);
             }
-            else if(tblock.equals("application-list")&&qname.equals("view-id")){
-                this.applicationDescriptor.viewId(value);
-            }
 			else if(tblock.equals("application-list")&&qname.equals("name")){
 				this.applicationDescriptor.name(value);
 			}
-            else if(tblock.equals("application-list")&&qname.equals("icon")){
-                this.applicationDescriptor.icon(value);
-            }
 			else if(tblock.equals("application-list")&&qname.equals("type")){
                 this.applicationDescriptor.type(value);
             }

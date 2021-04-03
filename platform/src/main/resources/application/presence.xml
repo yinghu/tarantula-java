@@ -16,7 +16,6 @@
                 <tag>presence/lobby</tag>
                 <description>Tarantula Presence</description>
                 <class-name>com.tarantula.platform.presence.PresenceApplication</class-name>
-                <response-label>presence</response-label>
             </application>
         </application-list>
         <view-list>

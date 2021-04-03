@@ -16,7 +16,6 @@
                 <tag>index/user</tag>
                 <description>Tarantula User Management</description>
                 <class-name>com.tarantula.platform.presence.UserManagementApplication</class-name>
-                <response-label>user</response-label>
             </application>
 
         </application-list>

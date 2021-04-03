@@ -81,7 +81,6 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         ins.tag(this.tag);
         ins.name(this.name);
         ins.description(this.description);
-        ins.viewId(this.viewId);
         ins.moduleId(this.moduleId);
         ins.codebase(this.codebase);
         ins.moduleArtifact(this.moduleArtifact);

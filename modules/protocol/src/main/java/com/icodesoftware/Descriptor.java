@@ -44,12 +44,12 @@ public interface Descriptor extends Recoverable {
     String category(); //lobby, game, service, etc
 
 	String name();
-    String icon();
-	void icon(String icon);
+    //String icon();
+	//void icon(String icon);
     String description();
 
-    String viewId();
-    void viewId(String viewId);
+    //String viewId();
+    //void viewId(String viewId);
 
     int capacity(); //the max joined number of the instance
 

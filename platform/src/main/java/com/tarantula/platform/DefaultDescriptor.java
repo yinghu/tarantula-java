@@ -11,7 +11,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 
 	protected String type;
 
-    protected String viewId;
+
     protected String category;
 
     protected int accessControl;
@@ -21,7 +21,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     protected double entryCost;
 
 	protected String name;
-    protected String icon;
+
 	protected String description;
 
 	protected int capacity;
@@ -119,9 +119,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 	public String name() {
 		return this.name;
 	}
-    public String icon(){
-        return this.icon;
-    }
+
 	public int capacity() {
 		
 		return this.capacity;
@@ -134,12 +132,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 		this.description = description;
 	}
 
-    public String viewId(){
-        return this.viewId;
-    }
-    public void viewId(String viewId){
-        this.viewId = viewId;
-    }
+
 	public void typeId(String typeId) {
 		this.typeId = typeId;
 	}
@@ -147,9 +140,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     public void name(String name) {
 		this.name = name;
 	}
-	public void icon(String icon){
-        this.icon = icon;
-    }
+
 	public void type(String type) {
 		this.type = type;
 	}
@@ -214,9 +205,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         _props.put("typeId",this.typeId);
         _props.put("type",this.type);
         _props.put("name",this.name);
-        _props.put("icon",this.icon);
         _props.put("description",this.description);
-        _props.put("viewId",this.viewId);
         _props.put("tag",this.tag);
         _props.put("entryCost",this.entryCost);
         _props.put("capacity",this.capacity); //0 unlimited
@@ -246,9 +235,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         this.typeId=(String)properties.get("typeId");
         this.type=(String)properties.get("type");
         this.name=(String)properties.get("name");
-        this.icon=properties.get("icon")!=null?(String)properties.get("icon"):null;
         this.description=properties.get("description")!=null?(String)properties.get("description"):null;
-        this.viewId=properties.get("viewId")!=null?(String)properties.get("viewId"):null;
         this.tag=properties.get("tag")!=null?(String)properties.get("tag"):null;
         this.entryCost=properties.get("entryCost")!=null?((Number)properties.get("entryCost")).doubleValue():0;
         this.capacity=properties.get("capacity")!=null?((Number)properties.get("capacity")).intValue():0;
