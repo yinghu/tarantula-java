@@ -49,12 +49,12 @@ public interface Session extends OnApplication {
     void joined(boolean joined);
 
     //write back on http batch
-    void write(byte[] delta,int batch,String contentType,String label);
-    void write(byte[] delta,int batch,String contentType,String label,boolean closed);
+    void write(byte[] delta,int batch,String contentType);
+    void write(byte[] delta,int batch,String contentType,boolean closed);
 
     //write back on label ( ignore on http )
-    void write(byte[] payload,String label);
-    void write(byte[] payload,String label,boolean closed);
+    void write(byte[] payload);
+    void write(byte[] payload,boolean closed);
 
     boolean closed();
     void closed(boolean closed);

@@ -31,7 +31,7 @@ public class MatchMakingModule implements Module, Lobby.Listener {
             //this.context.log("ACCESS MODE->"+session.accessMode(),OnLog.WARN);
             Response response = context.presence(session.systemId()).onPlay(session,lobby);
             if(response!=null){
-                session.write(this.builder.create().toJson(response).getBytes(),label());
+                session.write(this.builder.create().toJson(response).getBytes());
             }
         }
         else{
@@ -53,10 +53,7 @@ public class MatchMakingModule implements Module, Lobby.Listener {
         context.log("Started match making module on ->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 
-    @Override
-    public String label() {
-        return this.context.descriptor().typeId();
-    }
+
 
     @Override
     public void on(Descriptor descriptor) {

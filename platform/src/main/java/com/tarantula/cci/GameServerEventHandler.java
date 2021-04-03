@@ -52,7 +52,7 @@ public class GameServerEventHandler implements RequestHandler {
                 throw new RuntimeException("Illegal access");
             }
             if(action.equals("onAck")){
-                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"ack",true));
+                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
                 deployService.ackServerPushEvent(serverId);
             }
             else if(action.equals("onStart")){//start game server
@@ -72,14 +72,14 @@ public class GameServerEventHandler implements RequestHandler {
                     cids.add(conn.connectionId());
                 }
                 resp.add("connections",cids);
-                exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
+                exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
             }
             else if(action.equals("onConnection")){
                 Connection connection = this.deploymentServiceProvider.distributionCallback().addConnection(serverId,Integer.parseInt(connectionId));
-                exchange.onEvent(new ResponsiveEvent("", "", builder.create().toJson(connection).getBytes(), "onConnection", true));
+                exchange.onEvent(new ResponsiveEvent("", "", builder.create().toJson(connection).getBytes(), true));
             }
             else if(action.equals("onUpdate")){
-                exchange.onEvent(new ResponsiveEvent("","", "{}".getBytes(),"onConnection",true));
+                exchange.onEvent(new ResponsiveEvent("","", "{}".getBytes(),true));
                 //publish event to zone subscription/trackId
                 eventService.publish(new GameUpdateEvent(zoneId,roomId,type,_payload));
             }
@@ -90,7 +90,7 @@ public class GameServerEventHandler implements RequestHandler {
                         _hex.remove(k);
                     }
                 });
-                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"stop",true));
+                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
             }
         }catch (Exception ex){
             ex.printStackTrace();

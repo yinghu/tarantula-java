@@ -50,7 +50,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             pc.access = user(session.systemId());
             pc.account = account(pc.access.primary()?session.systemId():pc.access.owner());
             pc.subscription = membership(pc.access.primary()?session.systemId():pc.access.owner());
-            session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
+            session.write(this.builder.create().toJson(pc).getBytes());
         }
         else if(session.action().equals("onConnection")){
             PresenceContext pc = new PresenceContext(session.action());
@@ -67,7 +67,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                     pc.successful(true);
                 }
             }
-            session.write(this.builder.create().toJson(pc).getBytes(),this.descriptor.responseLabel());
+            session.write(this.builder.create().toJson(pc).getBytes());
         }
         //public lobby access by page number
         else if(session.action().equals("onLobbyList")){
@@ -80,9 +80,9 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                 liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-lobby"));
                 liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-service"));
                 liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-data"));
-                session.write(liveGame.toJson().toString().getBytes(),this.descriptor.responseLabel());
+                session.write(liveGame.toJson().toString().getBytes());
             }else{
-                session.write(toMessage("no lobby data",false).toString().getBytes(),this.descriptor.responseLabel());
+                session.write(toMessage("no lobby data",false).toString().getBytes());
             }
         }
         else if(session.action().equals("onAddEmail")){
@@ -94,31 +94,31 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                 userDs.update(auser);
                 String code = this.deploymentServiceProvider.resetCode(session.systemId());
                 if(this.deploymentServiceProvider.registerPostOffice().onEmail().send(email,code)){
-                    session.write(this.builder.create().toJson(new ResponseHeader("","check email for code", true)).getBytes(), descriptor.responseLabel());
+                    session.write(this.builder.create().toJson(new ResponseHeader("","check email for code", true)).getBytes());
                 }else {
-                    session.write(this.builder.create().toJson(new ResponseHeader("","system issue, try later", false)).getBytes(), descriptor.responseLabel());
+                    session.write(this.builder.create().toJson(new ResponseHeader("","system issue, try later", false)).getBytes());
                 }
             }
             else{
-                session.write(this.builder.create().toJson(new ResponseHeader("","wrong email format ["+email+"]",false)).getBytes(),descriptor.responseLabel());
+                session.write(this.builder.create().toJson(new ResponseHeader("","wrong email format ["+email+"]",false)).getBytes());
             }
         }
         else if(session.action().equals("onRequestCode")){
             User u = user(session.systemId());
             if(u.activated()){
-                session.write(toMessage("Email already has validated",false).toString().getBytes(),descriptor.responseLabel());
+                session.write(toMessage("Email already has validated",false).toString().getBytes());
             }
             else{
                 if(u.emailAddress()!=null&&u.emailAddress.contains("@")){
                     String code = this.deploymentServiceProvider.resetCode(session.systemId());
                     if(this.deploymentServiceProvider.registerPostOffice().onEmail().send(u.emailAddress(),code)){
-                        session.write(this.builder.create().toJson(new ResponseHeader("","check email for code", true)).getBytes(), descriptor.responseLabel());
+                        session.write(this.builder.create().toJson(new ResponseHeader("","check email for code", true)).getBytes());
                     }else {
-                        session.write(this.builder.create().toJson(new ResponseHeader("","system issue, try later", false)).getBytes(), descriptor.responseLabel());
+                        session.write(this.builder.create().toJson(new ResponseHeader("","system issue, try later", false)).getBytes());
                     }
                 }
                 else{
-                    session.write(toMessage("No email available",false).toString().getBytes(),descriptor.responseLabel());
+                    session.write(toMessage("No email available",false).toString().getBytes());
                 }
             }
         }
@@ -129,10 +129,10 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
                 User u = user(session.systemId());
                 u.activated(true);
                 userDs.update(u);
-                session.write(toMessage("validated email",true).toString().getBytes(),descriptor.responseLabel());
+                session.write(toMessage("validated email",true).toString().getBytes());
             }
             else{
-                session.write(toMessage("wrong validation code",true).toString().getBytes(),descriptor.responseLabel());
+                session.write(toMessage("wrong validation code",true).toString().getBytes());
             }
         }
         else if(session.action().equals("onCheckRole")){
@@ -142,10 +142,10 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             if(tokenValidatorProvider.checkRole(u,role)){
                 PresenceContext pc = new PresenceContext(session.action());
                 pc.access = u;
-                session.write(this.builder.create().toJson(pc).getBytes(),descriptor.responseLabel());
+                session.write(this.builder.create().toJson(pc).getBytes());
             }
             else{
-                session.write(toMessage("invalid role upgrade for ["+role+"] from ["+u.role+"]",false).toString().getBytes(),descriptor.responseLabel());
+                session.write(toMessage("invalid role upgrade for ["+role+"] from ["+u.role+"]",false).toString().getBytes());
             }
         }
         else if(session.action().equals("onUpgradeAccountRole")){
@@ -154,7 +154,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             String role = (String)onAccess.property("role");
             boolean suc = this.context.validator().upgradeRole(user,role);
             PermissionContext permissionContext = new PermissionContext(role,suc);
-            session.write(permissionContext.toJson().toString().getBytes(),descriptor.responseLabel());
+            session.write(permissionContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onUpgradeAdminRole")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -166,7 +166,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             acc.owner(developerName);
             accountDs.update(acc);
             PermissionContext permissionContext = new PermissionContext(role,suc);
-            session.write(permissionContext.toJson().toString().getBytes(),descriptor.responseLabel());
+            session.write(permissionContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onChangePassword")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -174,14 +174,14 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
             user.password(this.context.validator().hashPassword((String)onAccess.property("password")));
             boolean suc = userDs.update(user);
             ResponseHeader responseHeader = new ResponseHeader(session.action(),suc?"You have changed password":"Failed to change password",suc);
-            session.write(this.builder.create().toJson(responseHeader).getBytes(),descriptor.responseLabel());
+            session.write(this.builder.create().toJson(responseHeader).getBytes());
         }
         else if (session.action().equals("onAbsence")) {
             this.context.absence(session);
-            session.write(this.builder.create().toJson(new ResponseHeader("onAbsence", "off session [" + session.stub() + "]", true)).getBytes(),this.descriptor.responseLabel());
+            session.write(this.builder.create().toJson(new ResponseHeader("onAbsence", "off session [" + session.stub() + "]", true)).getBytes());
         }
         else{
-            session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes(),this.descriptor.responseLabel());
+            session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes());
         }
     }
     private JsonObject toMessage(String msg, boolean suc){

@@ -31,7 +31,7 @@ public class PushEventHandler implements RequestHandler {
     private String serverTopic;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
     private GsonBuilder builder;
-    private Connection endpoint;
+
     private DeployService deployService;
     private DeploymentServiceProvider deploymentServiceProvider;
     public String name(){
@@ -49,7 +49,7 @@ public class PushEventHandler implements RequestHandler {
                 throw new RuntimeException("Illegal access");
             }
             if(action.equals("onAck")){
-                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),"ack",true));
+                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
                 deployService.ackServerPushEvent(serverId);
             }
             else if(action.equals("onStart")){
@@ -69,11 +69,11 @@ public class PushEventHandler implements RequestHandler {
                     cids.add(conn.connectionId());
                 }
                 resp.add("connections",cids);
-                exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),"start",true));
+                exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
             }
             else if(action.equals("onConnection")){
                 Connection connection = this.deploymentServiceProvider.distributionCallback().addConnection(serverId,Integer.parseInt(connectionId));
-                exchange.onEvent(new ResponsiveEvent("","",builder.create().toJson(connection).getBytes(),"onConnection",true));
+                exchange.onEvent(new ResponsiveEvent("","",builder.create().toJson(connection).getBytes(),true));
             }
             else if(action.equals("onStop")){
                 deployService.removeServerPushEvent(serverId);
@@ -82,47 +82,12 @@ public class PushEventHandler implements RequestHandler {
                         _hex.remove(k);
                     }
                 });
-                exchange.onEvent(new ResponsiveEvent("","",_payload,"start",true));
+                exchange.onEvent(new ResponsiveEvent("","",_payload,true));
+            }
+            else{
+                throw new UnsupportedOperationException(action);
             }
 
-            //start of socket connection methods
-            else if(action.equals("onTicket")){
-                byte[] et;
-                if(this.tokenValidatorProvider.validateAccessKey(accessKey)!=null){
-                    JsonObject jo = new JsonObject();
-                    jo.addProperty("ticket", tokenValidatorProvider.ticket(serverId,1,5));
-                    jo.addProperty("host",endpoint.host());
-                    jo.addProperty("port",endpoint.port());
-                    jo.addProperty("successful",true);
-                    et = jo.toString().getBytes();
-                }
-                else{
-                    ResponseHeader err = new ResponseHeader("onTicket","invalid access key",false);
-                    et = builder.create().toJson(err).getBytes();
-                }
-                exchange.onEvent(new ResponsiveEvent("","",et,"push",true));
-            }
-            else if(action.equals("onConnect")){//access key
-                if(tokenValidatorProvider.validateTicket(serverId,1,accessKey)){
-                    String sid = exchange.id();
-                    _hex.put(sid,exchange);
-                    ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,sid,serverId,_payload);
-                    deployService.addServerPushEvent(pushEvent);
-                }
-                else{
-                    log.warn("Invalid ticket");
-                    exchange.close();
-                }
-            }
-            else if(action.equals("onDisconnect")){//no more access key check event from server socket
-                _hex.forEach((k,v)->{
-                    if(v.header(Session.TARANTULA_SERVER_ID).equals(serverId)){
-                        _hex.remove(k);
-                        deployService.removeServerPushEvent(serverId);
-                    }
-                });
-            }
-            //end of socket connection methods
         }catch (Exception ex){
             ex.printStackTrace();
             _hex.remove(exchange.id()); //removed cache on any errors
@@ -149,7 +114,6 @@ public class PushEventHandler implements RequestHandler {
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
         this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
-        this.endpoint = tcx.endpoint();
         this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = tcx.deploymentServiceProvider();
     }

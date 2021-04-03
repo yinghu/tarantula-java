@@ -21,7 +21,6 @@
         <application-list>
             <application>
                 <type-id>game-lobby</type-id>
-                <subtype-id>game-lobby-module</subtype-id>
                 <name>Game Lobby 1</name>
                 <type>application</type>
                 <category>game</category>
@@ -33,7 +32,6 @@
             </application>
             <application>
                 <type-id>game-lobby</type-id>
-                <subtype-id>game-lobby-module</subtype-id>
                 <name>Game Lobby 2</name>
                 <type>application</type>
                 <category>game</category>
@@ -62,7 +60,6 @@
         <application-list>
             <application><!-- Match making module-->
                 <type-id>game-service</type-id>
-                <subtype-id>game-service-module</subtype-id>
                 <name>MatchMaking</name>
                 <type>application</type>
                 <category>service</category>
@@ -72,7 +69,6 @@
             </application>
             <application><!-- stats/leader board module-->
                 <type-id>game-service</type-id>
-                <subtype-id>game-service-module</subtype-id>
                 <name>Statistics</name>
                 <type>application</type>
                 <category>service</category>
@@ -93,7 +89,6 @@
         <application-list>
             <application><!-- key/value set/get app-->
                 <type-id>game-data</type-id>
-                <subtype-id>game-data-module</subtype-id>
                 <name>JsonDataStore</name>
                 <type>application</type>
                 <category>service</category>

@@ -87,17 +87,17 @@ public class ServerPushEvent extends Data implements Event {
         return "Server Push Event ["+this.typeId+"]";
     }
     @Override
-    public void write(byte[] delta,int batch,String contentType,String label){
+    public void write(byte[] delta,int batch,String contentType){
         //this.write(delta,batch,contentType,label,false);
     }
     @Override
-    public void write(byte[] payload,int batch,String contentType,String label,boolean closed){
+    public void write(byte[] payload,int batch,String contentType,boolean closed){
         //this.eventService.publish(new ResponsiveEvent(this.source,this.sessionId,payload,batch,contentType,label,closed));
     }
     @Override
-    public void write(byte[] message,String label){ }
+    public void write(byte[] message){ }
     @Override
-    public void write(byte[] payload,String label,boolean closed){ }
+    public void write(byte[] payload,boolean closed){ }
     public void connection(Connection connection){
         this.connection = connection;
     }

@@ -23,7 +23,7 @@ public class KeyValueDataStoreModule implements Module {
         if(session.action().equals("onSet")){
             if(payload.length>maxSizeOnSet){
                 ResponseHeader resp = new ResponseHeader("onSet","payload size ["+payload.length+"] cannot be over ["+maxSizeOnSet+"]",false);
-                session.write(builder.create().toJson(resp).getBytes(),label());
+                session.write(builder.create().toJson(resp).getBytes());
             }else{
                 String key = session.systemId()+ Recoverable.PATH_SEPARATOR+session.name();
                 MappingObject mo = new MappingObject();
@@ -32,7 +32,7 @@ public class KeyValueDataStoreModule implements Module {
                 mo.fromBinary(payload);
                 boolean suc = dataStore.update(mo);
                 ResponseHeader resp = new ResponseHeader("onSet","Saved on key ["+key+"]",suc);
-                session.write(builder.create().toJson(resp).getBytes(),label());
+                session.write(builder.create().toJson(resp).getBytes());
             }
         }
         else if(session.action().equals("onGet")){
@@ -44,7 +44,7 @@ public class KeyValueDataStoreModule implements Module {
             if(dataStore.load(mo)){
                 v = mo.toBinary();
             }
-            session.write(v!=null?v:"{}".getBytes(),label());
+            session.write(v!=null?v:"{}".getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action());
@@ -64,10 +64,7 @@ public class KeyValueDataStoreModule implements Module {
         this.maxSizeOnSet = this.context.descriptor().capacity();
         this.context.log("Data store ["+this.context.descriptor().typeId()+" started with max size on set call ["+maxSizeOnSet+"]", OnLog.WARN);
     }
-    @Override
-    public String label() {
-        return this.context.descriptor().typeId();
-    }
+
     @Override
     public void clear(){
         this.deploymentServiceProvider.release(gameServiceProvider);

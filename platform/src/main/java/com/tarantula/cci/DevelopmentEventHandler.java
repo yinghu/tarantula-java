@@ -30,7 +30,7 @@ public class DevelopmentEventHandler implements RequestHandler {
             InputStream inputStream = new FileInputStream(new File(homeDir+_file));
             byte[] _payload = inputStream.readAllBytes();
             inputStream.close();
-            ResponsiveEvent responsiveEvent = new ResponsiveEvent("","",_payload,"start",true);
+            ResponsiveEvent responsiveEvent = new ResponsiveEvent("","",_payload,true);
             exchange.onEvent(responsiveEvent);
 
         }catch (Exception ex){

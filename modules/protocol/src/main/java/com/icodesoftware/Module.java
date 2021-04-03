@@ -10,7 +10,6 @@ public interface Module {
 
     void setup(ApplicationContext context) throws Exception;
 
-    String label();
     default void clear(){}
     default void onConnection(Connection connection){}
     default void onTimeout(Session session,OnUpdate onUpdate){}

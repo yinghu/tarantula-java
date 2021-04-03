@@ -27,11 +27,11 @@ public class StatisticsModule implements Module {
         //fetch statistics from systemId
         if(session.action().equals("onRating")){
             Rating rating = this.gameServiceProvider.rating(session.systemId());
-            session.write(this.builder.create().toJson(rating).getBytes(),label());
+            session.write(this.builder.create().toJson(rating).getBytes());
         }
         else if(session.action().equals("OnStatistics")){
             Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
-            session.write(this.builder.create().toJson(statistics).getBytes(),label());
+            session.write(this.builder.create().toJson(statistics).getBytes());
         }
         else if(session.action().startsWith("OnLeaderBoard")){ //use query OnLeaderBoard/{category}/{classifier}
             String[] query = session.action().split(Recoverable.PATH_SEPARATOR);
@@ -44,7 +44,7 @@ public class StatisticsModule implements Module {
                 ldb.total().rank((r,e)->{
                     view.board.add(new LeaderBoardView.EntryView(r,e.owner(),e.value(),e.timestamp()));
                 });
-                session.write(this.builder.create().toJson(view).getBytes(),label());
+                session.write(this.builder.create().toJson(view).getBytes());
             }
             else{
                 throw new UnsupportedOperationException(session.action());
@@ -84,8 +84,4 @@ public class StatisticsModule implements Module {
         this.context.log("Statistics started on game service provider ["+this.context.descriptor().typeId()+"]", OnLog.WARN);
     }
 
-    @Override
-    public String label() {
-        return this.context.descriptor().typeId();
-    }
 }

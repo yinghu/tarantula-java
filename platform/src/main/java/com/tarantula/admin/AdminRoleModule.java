@@ -53,7 +53,7 @@ public class AdminRoleModule implements Module {
             acc.distributionKey(user.primary()?session.systemId():user.owner());
             account.load(acc);
             boolean ex = this.tokenValidatorProvider.checkSubscription(user.primary()?session.systemId():user.owner());
-            session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0),!ex).toJson().toString().getBytes(),label());
+            session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0),!ex).toJson().toString().getBytes());
         }
         else if(session.action().equals("onGameClusterList")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -73,7 +73,7 @@ public class AdminRoleModule implements Module {
                     }
                 });
             }
-            session.write(adminContext.toJson().toString().getBytes(),label());
+            session.write(adminContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onGameLobbyList")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -81,14 +81,14 @@ public class AdminRoleModule implements Module {
             String accessId = (String)onAccess.property(OnAccess.ACCESS_ID);
             GameLobbyContext lobbyContext = this.gameLobbyContext(accessId);
             lobbyContext.page = page;
-            session.write(lobbyContext.toJson().toString().getBytes(),label());
+            session.write(lobbyContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onGameServiceList")){
             GameServiceContext gsc = new GameServiceContext();
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
             gsc.lobby=(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_SERVICE)));
-            session.write(gsc.toJson().toString().getBytes(),label());
+            session.write(gsc.toJson().toString().getBytes());
         }
         else if(session.action().equals("onGameDataList")){
             GameDataStoreContext gsc = new GameDataStoreContext();
@@ -103,34 +103,34 @@ public class AdminRoleModule implements Module {
             DataStore ss = this.context.dataStore(lobby.descriptor().typeId().replace("-data","_service"));
             gsc.serviceStore = ss.name();
             gsc.serviceStoreCount = ss.count();
-            session.write(gsc.toJson().toString().getBytes(),label());
+            session.write(gsc.toJson().toString().getBytes());
         }
         else if(session.action().equals("onShoppingList")){
-            session.write(new ShoppingContext(monthly,yearly).toJson().toString().getBytes(),this.label());
+            session.write(new ShoppingContext(monthly,yearly).toJson().toString().getBytes());
         }
         else if(session.action().equals("onMetrics")){
             Metrics  metrics = this.deploymentServiceProvider.metrics();
             MetricsContext adminContext = new MetricsContext();
             adminContext.metrics = metrics;
-            session.write(adminContext.toJson().toString().getBytes(),label());
+            session.write(adminContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onCreateAccessKey")){
             //generate access key from game cluster id
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String key = tokenValidatorProvider.gameClusterAccessKey((String)onAccess.property("gameClusterId"));
-            session.write(new PermissionContext(key).toJson().toString().getBytes(),label());
+            session.write(new PermissionContext(key).toJson().toString().getBytes());
         }
         else if(session.action().equals("onTestAccessKey")){
             //test access key
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String key = tokenValidatorProvider.validateGameClusterAccessKey((String)onAccess.property(OnAccess.ACCESS_KEY));
-            session.write(toMessage(key!=null?"key passed":"key failed",key!=null).toString().getBytes(),label());
+            session.write(toMessage(key!=null?"key passed":"key failed",key!=null).toString().getBytes());
         }
         else if(session.action().equals("onCheckLobbySlot")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String)onAccess.property(OnAccess.ACCESS_ID);
             GameLobbyContext gameLobbyContext = this.gameLobbyContext(accessId);
-            session.write(gameLobbyContext.availableSlots().toString().getBytes(),label());
+            session.write(gameLobbyContext.availableSlots().toString().getBytes());
         }
         else if(session.action().equals("onAddLobby")){//subscription only
             //this.context.log(new String(payload),OnLog.WARN);
@@ -150,7 +150,7 @@ public class AdminRoleModule implements Module {
                 boolean disabled = (Boolean)gc.property(GameCluster.DISABLED);
                 int idx = lobby.entryList().size()+1;
                 if(idx>maxGameLobbyCount){
-                    session.write(toMessage("max lobby count has reached",false).toString().getBytes(),label());
+                    session.write(toMessage("max lobby count has reached",false).toString().getBytes());
                 }else {
                     int[] added = {0};
                     HashMap<Integer,Descriptor> _ex = new HashMap<>();
@@ -172,11 +172,11 @@ public class AdminRoleModule implements Module {
                     if(added[0]>0){
                         pendingLobby.remove(accessId);
                     }
-                    session.write(toMessage(added[0]>0?"total lobbies added ["+added[0]+"]":"lobby not added",added[0]>0).toString().getBytes(),label());
+                    session.write(toMessage(added[0]>0?"total lobbies added ["+added[0]+"]":"lobby not added",added[0]>0).toString().getBytes());
                 }
             }
             else{
-                session.write(toMessage("No lobby slot seleccted",false).toString().getBytes(),label());
+                session.write(toMessage("No lobby slot seleccted",false).toString().getBytes());
             }
         }
         else if(session.action().equals("onDisableLobby")){
@@ -192,14 +192,14 @@ public class AdminRoleModule implements Module {
                     if(suc){
                         this.pendingLobby.remove(accessId);
                     }
-                    session.write(toMessage(suc?gameLobby.lobby.name()+" disabled":"failed to disble lobby",suc).toString().getBytes(),label());
+                    session.write(toMessage(suc?gameLobby.lobby.name()+" disabled":"failed to disble lobby",suc).toString().getBytes());
                 }
                 else{
-                    session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes(),label());
+                    session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes());
                 }
             }
             else{
-                session.write(toMessage("Min lobby count ["+minGameLobbyCount+"] required",false).toString().getBytes(),label());
+                session.write(toMessage("Min lobby count ["+minGameLobbyCount+"] required",false).toString().getBytes());
             }
         }
         else if(session.action().equals("onEnableLobby")){
@@ -214,10 +214,10 @@ public class AdminRoleModule implements Module {
                 if(suc){
                     this.pendingLobby.remove(accessId);
                 }
-                session.write(toMessage(suc?gameLobby.lobby.name()+" enabled":"failed to enable lobby",suc).toString().getBytes(),label());
+                session.write(toMessage(suc?gameLobby.lobby.name()+" enabled":"failed to enable lobby",suc).toString().getBytes());
             }
             else{
-                session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes(),label());
+                session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes());
             }
         }
         else if(session.action().equals("onReloadLobby")){
@@ -227,7 +227,7 @@ public class AdminRoleModule implements Module {
             GameLobbyContext pending = this.gameLobbyContext(accessId);
             GameLobby gameLobby = pending.gameLobbyList.get(index);
             this.deploymentServiceProvider.configure(gameLobby.zone.distributionKey());
-            session.write(toMessage("Lobby reloaded",true).toString().getBytes(),label());
+            session.write(toMessage("Lobby reloaded",true).toString().getBytes());
         }
         else if(session.action().equals("onCreateGameCluster")){
             User ua = _user(session.systemId());
@@ -251,11 +251,11 @@ public class AdminRoleModule implements Module {
                     account.update(acc);
                     gc.message("Game cluster created successfully");
                 }
-                session.write(gc.toJson().toString().getBytes(),label());
+                session.write(gc.toJson().toString().getBytes());
             }
             else{
                 //reach max count
-                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"you already have max game clusters",false)).getBytes(),label());
+                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"you already have max game clusters",false)).getBytes());
             }
         }
 
@@ -281,10 +281,10 @@ public class AdminRoleModule implements Module {
                     zone.levelLimit = lmit;
                 }
                 zone.update();
-                session.write(pending.toJson().toString().getBytes(),label());
+                session.write(pending.toJson().toString().getBytes());
             }
             else{
-                session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes(),label());
+                session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes());
             }
         }
         else if(session.action().equals("onUpdateGameLevel")){
@@ -336,7 +336,7 @@ public class AdminRoleModule implements Module {
                         }
                         if(mc>0){
                             zone.update();
-                            session.write(pending.toJson().toString().getBytes(),label());
+                            session.write(pending.toJson().toString().getBytes());
                         }
                         else{
                             ap.level = pu.level;
@@ -346,7 +346,7 @@ public class AdminRoleModule implements Module {
                             ap.duration = pu.duration;
                             ap.name(pu.name());
                             ap.disabled(pu.disabled());
-                            session.write(toMessage("at least one level per lobby",false).toString().getBytes(),label());
+                            session.write(toMessage("at least one level per lobby",false).toString().getBytes());
                         }
                     }
                     else{
@@ -360,19 +360,19 @@ public class AdminRoleModule implements Module {
                         a.disabled((Boolean)onAccess.property("disabled"));
                         zone.arenas.add(a);
                         zone.update();
-                        session.write(pending.toJson().toString().getBytes(),label());
+                        session.write(pending.toJson().toString().getBytes());
                     }
                 }
                 else{
-                    session.write(toMessage("level overflow",false).toString().getBytes(),label());
+                    session.write(toMessage("level overflow",false).toString().getBytes());
                 }
             }else{
-                session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes(),label());
+                session.write(toMessage("Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]",false).toString().getBytes());
             }
         }
         else if(session.action().equals("availableGameServiceList")){
             List<ExposedGameService> alist = this.deploymentServiceProvider.gameServiceList();
-            session.write(toJson(alist),label());
+            session.write(toJson(alist));
         }
         else if(session.action().equals("onAddService")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -395,7 +395,6 @@ public class AdminRoleModule implements Module {
                 if(exposedGameService!=null){
                     DeploymentDescriptor desc = new DeploymentDescriptor();
                     desc.typeId(typeId);
-                    desc.subtypeId(name.toLowerCase() + "-service-module");
                     desc.type("application");
                     desc.name(_serviceName);
                     desc.category("service");
@@ -409,11 +408,10 @@ public class AdminRoleModule implements Module {
                     desc.deployPriority((Integer)exposedGameService.property(ExposedGameService.DEPLOY_PRIORITY));
                     desc.accessControl((Integer)exposedGameService.property(ExposedGameService.ACCESS_CONTROL));
                     desc.applicationClassName("com.tarantula.platform.service.deployment.SingletonModuleApplication");
-                    //desc.singleton(true);
                     _existed[0] = this.deploymentServiceProvider.createApplication(desc,null, true);
                 }
             }
-            session.write(toMessage(_existed[0]?"created":"failed",_existed[0]).toString().getBytes(),label());
+            session.write(toMessage(_existed[0]?"created":"failed",_existed[0]).toString().getBytes());
         }
         else if(session.action().equals("onLaunchGameCluster")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -425,10 +423,10 @@ public class AdminRoleModule implements Module {
             account.load(acc);
             if(acc.trial()||acc.subscribed()){
                 boolean suc = this.deploymentServiceProvider.launchGameCluster(gameCluster);
-                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes(),label());
+                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
             }
             else {
-                session.write(this.builder.create().toJson(new ResponseHeader(session.action(), "no subscription or trial found", false)).getBytes(), label());
+                session.write(this.builder.create().toJson(new ResponseHeader(session.action(), "no subscription or trial found", false)).getBytes());
             }
         }
         else if(session.action().equals("onCommitPurchase")){
@@ -447,10 +445,10 @@ public class AdminRoleModule implements Module {
                 int cnt = this.tokenValidatorProvider.updateSubscription(u.primary()?session.systemId():u.owner(),fee.durationMonths);
                 SubscriptionFee _log = fee.log(u.primary()?session.systemId():u.owner(),cnt);
                 purchase.create(_log);
-                session.write(this.builder.create().toJson(new ResponseHeader("onCommit", "your purchase is successful", true)).getBytes(),this.label());
+                session.write(this.builder.create().toJson(new ResponseHeader("onCommit", "your purchase is successful", true)).getBytes());
             }
             else{
-                session.write(this.builder.create().toJson(new ResponseHeader("onCommit", "failed to commit your purchase", false)).getBytes(),this.label());
+                session.write(this.builder.create().toJson(new ResponseHeader("onCommit", "failed to commit your purchase", false)).getBytes());
             }
         }
         else if(session.action().equals("onShutdownGameCluster")){
@@ -458,10 +456,10 @@ public class AdminRoleModule implements Module {
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             GameCluster gc = this.deploymentServiceProvider.gameCluster(accessId);
             boolean suc = this.deploymentServiceProvider.shutdownGameCluster(gc);
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes(),label());
+            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
         }
         else{
-            session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes(),this.label());
+            session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes());
         }
         return false;
     }
@@ -504,10 +502,7 @@ public class AdminRoleModule implements Module {
         //this.rankComparator = new GameLobbyComparator();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
-    @Override
-    public String label() {
-        return "admin-role";
-    }
+
 
     private GameLobbyContext gameLobbyContext(String accessId){
         return pendingLobby.computeIfAbsent(accessId,(k)-> {

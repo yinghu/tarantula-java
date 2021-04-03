@@ -113,18 +113,12 @@ public class XMLParser extends DefaultHandler{
             else if(tblock.equals("lobby-context")&&qname.equals("deploy-code")){
                 this.configuration.descriptor.deployCode(Integer.parseInt(value));
             }
-            else if(tblock.equals("lobby-context")&&qname.equals("response-label")){
-                this.configuration.descriptor.responseLabel(value);
-            }
             else if(tblock.equals("lobby-context")&&qname.equals("reset-enabled")){
                 this.configuration.descriptor.resetEnabled(Boolean.parseBoolean(value));
             }
 			//application-list
             else if(tblock.equals("application-list")&&qname.equals("type-id")){
                 this.applicationDescriptor.typeId(value);
-            }
-            else if(tblock.equals("application-list")&&qname.equals("subtype-id")){
-				this.applicationDescriptor.subtypeId(value);
             }
             else if(tblock.equals("application-list")&&qname.equals("view-id")){
                 this.applicationDescriptor.viewId(value);
@@ -152,9 +146,6 @@ public class XMLParser extends DefaultHandler{
             }
             else if(tblock.equals("application-list")&&qname.equals("tag")){
                 this.applicationDescriptor.tag(value);
-            }
-            else if(tblock.equals("application-list")&&qname.equals("response-label")){
-                this.applicationDescriptor.responseLabel(value);
             }
             else if(tblock.equals("application-list")&&qname.equals("deploy-priority")){
                 this.applicationDescriptor.deployPriority(Integer.parseInt(value));

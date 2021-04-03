@@ -40,10 +40,8 @@ public interface Descriptor extends Recoverable {
     String typeId(); //application type ID that should be associated with the lobby
 
     String type(); //application type
-    String subtypeId();//application group id associated with the module artifact
 
     String category(); //lobby, game, service, etc
-    String responseLabel();
 
 	String name();
     String icon();
@@ -55,8 +53,6 @@ public interface Descriptor extends Recoverable {
 
     int capacity(); //the max joined number of the instance
 
-    //boolean singleton(); //single instance per node
-
     int accessMode();
     int accessControl(); // 0 - 10
     int accessRank();
@@ -66,17 +62,15 @@ public interface Descriptor extends Recoverable {
 	void typeId(String id);//the system lobby unique ID
 
     void type(String type);
-    void subtypeId(String subtypeId);//the none-unique group ID
 
     void category(String category);
-    void responseLabel(String responseLabel);
+
 	void name(String name);
 
 	void description(String description);
 
 	void capacity(int capacity);	
 
-    //void singleton(boolean singleton);
 
     void accessControl(int accessControl);
     void accessMode(int accessMode);

@@ -23,7 +23,7 @@ public class RootContentHandler implements RequestHandler {
             }
             Content content = this.deploymentServiceProvider.resource("root"+path);
             byte[] _load = content.data();
-            exchange.onEvent(new ResponsiveEvent("","",_load,0,content.type(),"",true));
+            exchange.onEvent(new ResponsiveEvent("","",_load,0,content.type(),true));
             deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
         } catch (Exception exx){
             throw exx;

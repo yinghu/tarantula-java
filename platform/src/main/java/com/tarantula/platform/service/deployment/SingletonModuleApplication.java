@@ -95,7 +95,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     }
     @Override
     public String typeId(){
-        return module.label();
+        return this.descriptor.typeId();
     }
     @Override
     public void onState(Connection c) {

@@ -148,19 +148,19 @@ abstract public class Data extends OnApplicationHeader implements Portable{
         this.eventService = eventService;
     }
 
-    public void write(byte[] delta,int batch,String contentType,String label){
-        this.write(delta,batch,contentType,label,false);
+    public void write(byte[] delta,int batch,String contentType){
+        this.write(delta,batch,contentType,false);
     }
 
-    public void write(byte[] payload,int batch,String contentType,String label,boolean closed){
-        this.eventService.publish(new ResponsiveEvent(this.source,this.sessionId,payload,batch,contentType,label,closed));
+    public void write(byte[] payload,int batch,String contentType,boolean closed){
+        this.eventService.publish(new ResponsiveEvent(this.source,this.sessionId,payload,batch,contentType,closed));
     }
 
-    public void write(byte[] message,String label){
-        this.write(message,label,false);
+    public void write(byte[] message){
+        this.write(message,false);
     }
-    public void write(byte[] payload,String label,boolean closed){
-        this.eventService.publish(new ResponsiveEvent(this.source,this.sessionId,payload,label,closed));
+    public void write(byte[] payload,boolean closed){
+        this.eventService.publish(new ResponsiveEvent(this.source,this.sessionId,payload,closed));
     }
 
 }

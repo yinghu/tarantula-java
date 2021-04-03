@@ -380,7 +380,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(d.moduleName()!=null&&d.codebase()!=null){ //clean class loader if all apps removed on the class loader
                 DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.moduleId());
                 if(dynamicModuleClassLoader!=null){
-                    log.warn("Module resource clear on ["+d.codebase()+"/"+d.moduleArtifact()+"/"+d.moduleVersion()+"/"+d.subtypeId()+"]");
+                    log.warn("Module resource clear on ["+d.codebase()+"/"+d.moduleArtifact()+"/"+d.moduleVersion()+"]");
                     dynamicModuleClassLoader._clear();
                 }
             }
@@ -418,7 +418,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(d.moduleName()!=null&&d.codebase()!=null){ //clean class loader if all apps removed on the class loader
                 DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.moduleId());
                 if(dynamicModuleClassLoader!=null){
-                    log.warn("Module resource clear on ["+d.codebase()+"/"+d.moduleArtifact()+"/"+d.moduleVersion()+"/"+d.subtypeId()+"]");
+                    log.warn("Module resource clear on ["+d.codebase()+"/"+d.moduleArtifact()+"/"+d.moduleVersion()+"]");
                     dynamicModuleClassLoader._clear();
                 }
             }
@@ -1062,10 +1062,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.applicationContext = context;
             _setup();
             this.module.setup(context);
-        }
-        @Override
-        public String label(){
-            return this.module.label();
         }
 
         @Override

@@ -39,7 +39,7 @@ public class SudoEventHandler implements RequestHandler {
             if(!ret.existed()){
                 ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile());
             }
-            exchange.onEvent(new ResponsiveEvent("","",ret.data(),0,ret.type(),"",true));
+            exchange.onEvent(new ResponsiveEvent("","",ret.data(),0,ret.type(),true));
             deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
         }catch (Exception ex){
             ex.printStackTrace();

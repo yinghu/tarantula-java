@@ -38,36 +38,36 @@ public class SudoRoleModule implements Module {
             User acc = new User();
             acc.distributionKey(session.systemId());
             uDatastore.load(acc);
-            session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes(),label());
+            session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
         else if(session.action().equals("onCreateLabeledKey")){
             this.context.log(new String(payload),OnLog.WARN);
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String key = tokenValidatorProvider.accessKey(acc.typeId());
             PermissionContext pc = new PermissionContext(key);
-            session.write(pc.toJson().toString().getBytes(),label());
+            session.write(pc.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTestLabeledKey")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
             boolean suc = tokenValidatorProvider.validateAccessKey((String)acc.property(OnAccess.ACCESS_KEY))!=null;
-            session.write(toMessage(suc?"key passed":"key failed",suc).toString().getBytes(),label());
+            session.write(toMessage(suc?"key passed":"key failed",suc).toString().getBytes());
         }
         else if(session.action().equals("onStopAccessIndex")){
             accessIndexService.disable();
-            session.write(toMessage(session.action(),true).toString().getBytes(),label());
+            session.write(toMessage(session.action(),true).toString().getBytes());
         }
         else if(session.action().equals("onStartAccessIndex")){
             accessIndexService.enable();
-            session.write(toMessage(session.action(),true).toString().getBytes(),label());
+            session.write(toMessage(session.action(),true).toString().getBytes());
         }
         else if(session.action().equals("onFindUser")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String login = (String)acc.property(OnAccess.LOGIN);
             AccessIndex accessIndex = accessIndexService.get(login);
             if(accessIndex!=null){
-                session.write(toMessage(accessIndex.distributionKey(),true).toString().getBytes(),login);
+                session.write(toMessage(accessIndex.distributionKey(),true).toString().getBytes());
             }else{
-                session.write(toMessage("["+login+"] not found",false).toString().getBytes(),label());
+                session.write(toMessage("["+login+"] not found",false).toString().getBytes());
             }
         }
         else if(session.action().equals("onExportModule")){
@@ -77,7 +77,7 @@ public class SudoRoleModule implements Module {
             desc.moduleArtifact(acc.property(OnAccess.MODULE_ARTIFACT).toString());
             desc.moduleVersion(acc.property(OnAccess.MODULE_VERSION).toString());
             Response resp = this.deploymentServiceProvider.exportModule(desc);
-            session.write(this.toMessage(resp.message(),resp.successful()).toString().getBytes(),label());
+            session.write(this.toMessage(resp.message(),resp.successful()).toString().getBytes());
         }
         else if(session.action().equals("onAddModule")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -86,12 +86,12 @@ public class SudoRoleModule implements Module {
             desc.moduleArtifact(acc.property(OnAccess.MODULE_ARTIFACT).toString());
             desc.moduleVersion(acc.property(OnAccess.MODULE_VERSION).toString());
             Response resp = this.deploymentServiceProvider.createModule(desc);
-            session.write(this.toMessage(resp.message(),resp.successful()).toString().getBytes(),label());
+            session.write(this.toMessage(resp.message(),resp.successful()).toString().getBytes());
         }
         else if(session.action().equals("onLaunchModule")){//typeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             boolean suc = this.deploymentServiceProvider.launchModule(access.typeId());
-            session.write(this.toMessage(suc?"module launched":"module not launched",suc).toString().getBytes(),label());
+            session.write(this.toMessage(suc?"module launched":"module not launched",suc).toString().getBytes());
         }
         else if(session.action().equals("onResetModule")){//typeId or moduleId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -105,16 +105,16 @@ public class SudoRoleModule implements Module {
                 desc.index(index.distributionKey());
             }
             boolean suc  = this.deploymentServiceProvider.resetModule(desc);
-            session.write(this.toMessage(suc?"module rest":"module not reset",suc).toString().getBytes(),label());
+            session.write(this.toMessage(suc?"module rest":"module not reset",suc).toString().getBytes());
         }
         else if(session.action().equals("onShutdownModule")){//typeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             boolean suc = this.deploymentServiceProvider.shutdownModule(access.typeId());
-            session.write(this.toMessage(suc?"module shutdown":"module not shutdown",suc).toString().getBytes(),label());
+            session.write(this.toMessage(suc?"module shutdown":"module not shutdown",suc).toString().getBytes());
         }
         else if(session.action().equals("onConfigurationList")){
             List<Configuration> configurationList = this.deploymentServiceProvider.configuration();
-            session.write(toJson(configurationList).toString().getBytes(),label());
+            session.write(toJson(configurationList).toString().getBytes());
         }
         else if(session.action().equals("onUpdateConfiguration")){
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -127,7 +127,7 @@ public class SudoRoleModule implements Module {
             configuration.fromMap(_payload);
             boolean suc = this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE).update(configuration);
             this.deploymentServiceProvider.configure(configuration.distributionKey());
-            session.write(toMessage("configuration updated ["+configuration.distributionKey()+"]",suc).toString().getBytes(),label());
+            session.write(toMessage("configuration updated ["+configuration.distributionKey()+"]",suc).toString().getBytes());
         }
         else if(session.action().equals("onDeployView")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -149,21 +149,21 @@ public class SudoRoleModule implements Module {
             }
             onView.moduleContext(moduleContext);
             Response suc = this.deploymentServiceProvider.createView(onView);
-            session.write(toMessage(suc.message(),suc.successful()).toString().getBytes(),label());
+            session.write(toMessage(suc.message(),suc.successful()).toString().getBytes());
         }
         else if(session.action().equals("onDeployResource")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Response suc = this.deploymentServiceProvider.deployResource((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
-            session.write(toMessage(suc.message(),suc.successful()).toString().getBytes(),label());
+            session.write(toMessage(suc.message(),suc.successful()).toString().getBytes());
         }
         else if(session.action().equals("onDeployModule")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Response suc = this.deploymentServiceProvider.deployModule((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
-            session.write(toMessage(suc.message(),suc.successful()).toString().getBytes(),label());
+            session.write(toMessage(suc.message(),suc.successful()).toString().getBytes());
         }
         else if(session.action().equals("onListDataStore")){
             List<String> dlist = this.deploymentServiceProvider.listDataStore();
-            session.write(toJsonList(dlist).toString().getBytes(),label());
+            session.write(toJsonList(dlist).toString().getBytes());
         }
         else if(session.action().equals("onLoadDataStore")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -181,15 +181,15 @@ public class SudoRoleModule implements Module {
                 });
                 JsonObject ret = new JsonObject();
                 ret.add("resultRet",list);
-                session.write(ret.toString().getBytes(),label());
+                session.write(ret.toString().getBytes());
             }else{
-                session.write(toMessage("data store not existed->"+dataStore,false).toString().getBytes(),label());
+                session.write(toMessage("data store not existed->"+dataStore,false).toString().getBytes());
             }
 
         }
         else if(session.action().equals("onBackupDataStore")){
             this.deploymentServiceProvider.issueDataStoreBackup();
-            session.write(toMessage("backup commnad issued",true).toString().getBytes(),label());
+            session.write(toMessage("backup commnad issued",true).toString().getBytes());
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");
@@ -209,10 +209,7 @@ public class SudoRoleModule implements Module {
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.context.log("Admin setup module started", OnLog.INFO);
     }
-    @Override
-    public String label() {
-        return "admin-setup";
-    }
+
     private JsonElement _parse(JsonParser parser, byte[] k,byte[] payload){
         try{
             return parser.parse(new String(payload));

@@ -43,7 +43,7 @@ public class UploadEventHandler implements RequestHandler {
             log.warn(onSession.systemId() + " is uploading module [" + path + "]");
             boolean suc = deployService.upload(path.substring(path.lastIndexOf("/") + 1),in.readAllBytes());
             ResponseHeader resp = new ResponseHeader("upload",suc?"uploaded":"failed",suc);
-            exchange.onEvent(new ResponsiveEvent("", "",this.builder.create().toJson(resp).getBytes(), 0, "text/html", "", true));
+            exchange.onEvent(new ResponsiveEvent("", "",this.builder.create().toJson(resp).getBytes(), 0, "text/html", true));
             //}
             //else{
                 //ResponseHeader resp = new ResponseHeader("upload","no permission operation",true);

@@ -33,7 +33,7 @@ public class ViewEventHandler implements RequestHandler {
             onView = this.deploymentServiceProvider.onView(OnView.INVALID_VIEW_ID);
         }
         byte[] ret = this.builder.create().toJson(onView).getBytes();
-        exchange.onEvent(new ResponsiveEvent("","",ret,0,"application/json","",true));
+        exchange.onEvent(new ResponsiveEvent("","",ret,0,"application/json",true));
         deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
     }
     @Override

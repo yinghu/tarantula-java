@@ -36,7 +36,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         //match arena with service rank/xp or offline play mode
         //this.context.log(new String(session.payload()),OnLog.WARN);
         if(mZone.descriptor.tournamentEnabled()&&(!gameServiceProvider.available(session.tournamentId()))){
-            session.write(toMessage("no tournament available,please try later",false).toString().getBytes(),label());
+            session.write(toMessage("no tournament available,please try later",false).toString().getBytes());
             return;
         }
         Rating rating = new Rating();
@@ -54,7 +54,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
             room = mZone.playMode==Room.OFF_LINE_MODE?mZone.solo(rating):mZone.match(rating);
             stub = room.join(rating);
             if(stub==null){
-                session.write(toMessage("no room available,please try later",false).toString().getBytes(),label());
+                session.write(toMessage("no room available,please try later",false).toString().getBytes());
                 return;
             }
         }
@@ -77,19 +77,19 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         }
         gameObject.consumable = consumable;
         mStub.put(session.systemId(),stub);
-        session.write(gameObject.toJson().toString().getBytes(),label());
+        session.write(gameObject.toJson().toString().getBytes());
     }
     @Override
     public boolean onRequest(Session session, byte[] payload, Module.OnUpdate update) throws Exception {
         if(session.action().equals("onUpdated")){
             Stub stub = mStub.get(session.systemId());
             if(stub!=null){
-                session.write(toMessage(session.action(),true).toString().getBytes(),label());
+                session.write(toMessage(session.action(),true).toString().getBytes());
                 StatsDelta delta = toDelta(payload);
                 mZone.onStatistics(session.systemId(),delta.name,delta.value);
             }
             else{
-                session.write(toMessage("no room joined",false).toString().getBytes(),label());
+                session.write(toMessage("no room joined",false).toString().getBytes());
             }
         }
         else if(session.action().equals("onScore")){
@@ -102,10 +102,10 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
                 jsonObject.addProperty("score",_e.score(0));
                 jsonObject.addProperty("rank",_e.rank());
                 jsonObject.addProperty("timestamp",_e.timestamp());
-                session.write(jsonObject.toString().getBytes(),label());
+                session.write(jsonObject.toString().getBytes());
             }
             else{
-                session.write(toMessage("no tournament joined",false).toString().getBytes(),label());
+                session.write(toMessage("no tournament joined",false).toString().getBytes());
             }
         }
         else if(session.action().equals("onList")){
@@ -124,20 +124,20 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
                 JsonObject ret = new JsonObject();
                 ret.addProperty("successful",true);
                 ret.add("list",alist);
-                session.write(ret.toString().getBytes(),label());
+                session.write(ret.toString().getBytes());
             }
             else{
-                session.write(toMessage("no tournament joined",false).toString().getBytes(),label());
+                session.write(toMessage("no tournament joined",false).toString().getBytes());
             }
         }
         else if(session.action().equals("onEnded")){
             Stub stub = mStub.get(session.systemId());
             if(stub!=null){
                 //this.context.log(new String(payload),OnLog.WARN);
-                session.write(toMessage(session.action(),true).toString().getBytes(),label());
+                session.write(toMessage(session.action(),true).toString().getBytes());
             }
             else{
-                session.write(toMessage("no room joined",false).toString().getBytes(),label());
+                session.write(toMessage("no room joined",false).toString().getBytes());
             }
         }
         else if(session.action().equals("onLeave")){
@@ -146,11 +146,11 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
                 Room room = gameServiceProvider.getRoom(stub.roomId);
                 boolean left = room.leave(stub);
                 session.trackId(stub.roomId);
-                session.write(toMessage("onLeave",left).toString().getBytes(),label());
+                session.write(toMessage("onLeave",left).toString().getBytes());
                 return left;
             }
             else{
-                session.write(toMessage("no room joined",false).toString().getBytes(),label());
+                session.write(toMessage("no room joined",false).toString().getBytes());
                 return true;
             }
         }
@@ -221,10 +221,6 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
     public void onTimer(com.icodesoftware.Module.OnUpdate update){
         mZone.onTimer((connection,label,data)->update.on(connection,label,data));
     }
-    @Override
-    public String label() {
-        return this.context.descriptor().typeId();
-    }
 
 
     @Override
@@ -265,7 +261,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         try{
             this.onJoin(session,(c,l,d)->{});
         }catch (Exception ex){
-            session.write(toMessage(ex.getMessage(),false).toString().getBytes(),label());
+            session.write(toMessage(ex.getMessage(),false).toString().getBytes());
         }
     }
 

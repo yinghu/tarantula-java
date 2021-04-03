@@ -10,7 +10,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 	protected String typeId;
 
 	protected String type;
-    protected String subtypeId;
+
     protected String viewId;
     protected String category;
 
@@ -25,7 +25,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 	protected String description;
 
 	protected int capacity;
-    protected String responseLabel;
+
     protected String moduleId;
     protected String moduleArtifact;
     protected String moduleVersion;
@@ -106,17 +106,10 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 		return this.type;
 	}
 
-
-    public String subtypeId() {
-        return this.subtypeId;
-    }
-
     public String category(){
         return this.category;
     }
-    public String responseLabel(){
-        return this.responseLabel;
-    }
+
 	public String description() {
 		
 		return this.description;
@@ -161,15 +154,11 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 		this.type = type;
 	}
 
-    public void subtypeId(String subtypeId) {
-        this.subtypeId = subtypeId;
-    }
+
     public void category(String category){
         this.category = category;
     }
-    public void responseLabel(String responseLabel){
-        this.responseLabel = responseLabel;
-    }
+
     public boolean resetEnabled(){
         return this.resetEnabled;
     }
@@ -223,7 +212,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     public Map<String, Object> toMap() {
         Map<String,Object> _props = this.properties;
         _props.put("typeId",this.typeId);
-        _props.put("subtypeId",this.subtypeId);
         _props.put("type",this.type);
         _props.put("name",this.name);
         _props.put("icon",this.icon);
@@ -247,7 +235,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         _props.put("timerOnModule",this.timerOnModule);
         _props.put("logEnabled",this.logEnabled);
         _props.put("applicationClassName",this.applicationClassName);
-        _props.put("responseLabel",this.responseLabel);
         _props.put("resetEnabled",this.resetEnabled);
         _props.put("tournamentEnabled",this.tournamentEnabled);
         _props.put("index",this.index);
@@ -257,7 +244,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     @Override
     public void fromMap(Map<String, Object> properties) {
         this.typeId=(String)properties.get("typeId");
-        this.subtypeId=properties.get("subtypeId")!=null?(String)properties.get("subtypeId"):null;
         this.type=(String)properties.get("type");
         this.name=(String)properties.get("name");
         this.icon=properties.get("icon")!=null?(String)properties.get("icon"):null;
@@ -281,7 +267,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         this.timerOnModule =properties.get("timerOnModule")!=null?((Number)properties.get("timerOnModule")).longValue():50;
         this.logEnabled = properties.get("logEnabled")!=null?(Boolean)properties.get("logEnabled"):true;
         this.applicationClassName = properties.get("applicationClassName")!=null?(String)properties.get("applicationClassName"):null;
-        this.responseLabel =properties.get("responseLabel")!=null? (String)properties.get("responseLabel"):null;
         this.resetEnabled = properties.get("resetEnabled")!=null?(boolean)properties.get("resetEnabled"):false;
         this.tournamentEnabled = (boolean)properties.getOrDefault("tournamentEnabled",false);
         this.index = properties.get("index")!=null?(String)properties.get("index"):null;

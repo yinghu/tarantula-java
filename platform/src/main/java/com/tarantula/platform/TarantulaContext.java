@@ -120,8 +120,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public int platformRoutingNumber;
     public int accessIndexRoutingNumber;
 
-    public String endpointIp ="localhost";
-    public int endpointPort = 6393;
+    //public String endpointIp ="localhost";
+    //public int endpointPort = 6393;
     public static ScopedMemberDiscovery memberDiscovery;
     public static int operationTimeout = 5;
     public String authContext = "localhost";
@@ -449,9 +449,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	    return this.platformRoutingNumber;
     }
 
-    public Connection endpoint(){
- 	    return new PushEndpoint(endpointIp,endpointPort);
-    }
     //list the database list on deploy service
     public DataStoreProvider dataStoreProvider(){
  	    return (DataStoreProvider) this.dataStoreProviders.get(this.dataStoreMaster);

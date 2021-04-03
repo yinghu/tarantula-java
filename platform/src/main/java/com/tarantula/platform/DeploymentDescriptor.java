@@ -54,11 +54,9 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         _copy.moduleId(this.moduleId);
         _copy.index(this.index);
         _copy.typeId(this.typeId);
-        _copy.subtypeId(this.subtypeId);
         _copy.name(this.name);
         _copy.type(this.type);
         _copy.category(this.category);
-        //_copy.singleton(this.singleton);
         _copy.tag(this.tag);
         _copy.applicationClassName(this.applicationClassName);
         _copy.moduleName(this.moduleName);
@@ -75,14 +73,12 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         ins.bucket(this.bucket);
         ins.oid(this.oid);
         ins.typeId(this.typeId);
-        ins.subtypeId(this.subtypeId);
         ins.capacity(this.capacity);
         ins.accessControl(this.accessControl);
         ins.accessMode(this.accessMode);
         ins.accessRank(this.accessRank);
         ins.entryCost(this.entryCost);
         ins.tag(this.tag);
-        //ins.singleton(this.singleton);
         ins.name(this.name);
         ins.description(this.description);
         ins.viewId(this.viewId);
@@ -93,7 +89,6 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         ins.moduleName(this.moduleName);
         ins.timerOnModule(this.timerOnModule);
         ins.applicationClassName(this.applicationClassName);
-        ins.responseLabel(this.responseLabel);
         ins.deployPriority(this.deployPriority);
         ins.deployCode(this.deployCode);
         ins.logEnabled(this.logEnabled);

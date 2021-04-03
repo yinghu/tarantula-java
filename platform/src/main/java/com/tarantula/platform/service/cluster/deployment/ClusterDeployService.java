@@ -352,7 +352,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     a.onEdge(true);
                     a.tournamentEnabled(tournamentEnabled);
                     a.typeId(descriptor.typeId());//replaced with named type id
-                    a.subtypeId(a.subtypeId().replace("game",typePrefix));
                     a.tag(a.tag().replace("game",typePrefix));
                     a.applicationClassName(tarantulaContext.singleModuleApplication);
                     mds.create(a);

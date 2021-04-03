@@ -12,20 +12,18 @@ public class ResponsiveEvent extends Data implements Event {
 
 	public ResponsiveEvent(){}
 
-	public ResponsiveEvent(String destination,String sessionId,byte[] payload,String label,boolean closed){
+	public ResponsiveEvent(String destination,String sessionId,byte[] payload,boolean closed){
         this.destination = destination;
         this.sessionId = sessionId;
         this.payload = payload;
-        this.label = label;
         this.closed = closed;
 	}
-    public ResponsiveEvent(String destination,String sessionId,byte[] payload,int batch,String contentType,String label,boolean closed){
+    public ResponsiveEvent(String destination,String sessionId,byte[] payload,int batch,String contentType,boolean closed){
         this.destination = destination;
         this.sessionId = sessionId;
         this.payload = payload;
         this.retries = batch;
         this.contentType = contentType;
-        this.label = label;
         this.closed = closed;
     }
     @Override
@@ -42,7 +40,6 @@ public class ResponsiveEvent extends Data implements Event {
         out.writeUTF("2",this.sessionId);
         out.writeByteArray("4",this.payload);
         out.writeUTF("5",this.contentType);
-        out.writeUTF("6",this.label);
         out.writeBoolean("7",this.closed);
         out.writeInt("8",this.retries);
     }
@@ -52,13 +49,12 @@ public class ResponsiveEvent extends Data implements Event {
         this.sessionId = in.readUTF("2");
         this.payload = in.readByteArray("4");
         this.contentType = in.readUTF("5");
-        this.label = in.readUTF("6");
         this.closed = in.readBoolean("7");
         this.retries = in.readInt("8");
 	}
 	@Override
 	public String toString(){
-		return "Responsive ["+this.sessionId+","+closed+","+retries+"]["+label+"]=>"+new String(payload);
+		return "Responsive ["+this.sessionId+","+closed+","+retries+"]=>"+new String(payload);
 	}
 
 }

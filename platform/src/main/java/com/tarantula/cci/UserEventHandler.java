@@ -65,7 +65,7 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
                     }else{
                         //send login failed back
                         byte[] eb = this.builder.create().toJson(new ResponseHeader("onLogin","wrong login/password combination",false)).getBytes();
-                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                     }
                 }
                 else if(action.equals("onToken")){//to server topic
@@ -89,12 +89,12 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
                         }
                         else{
                             byte[] eb = this.builder.create().toJson(new ResponseHeader("onTokenRegister","["+magicKey+"] not available",false)).getBytes();
-                            _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                            _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                         }
                     }
                     else{
                         byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
-                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                     }
                 }
                 else if(action.equals("onTicket")){
@@ -107,7 +107,7 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
                         this.eventService.publish(event);
                     }else{
                         byte[] eb = this.builder.create().toJson(new ResponseHeader("onTicket","ticket not exist",false)).getBytes();
-                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                     }
                 }
                 else if(action.equals("onRegister")){//to server topic
@@ -121,12 +121,12 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
                             this.eventService.publish(event);
                         }else{
                             byte[] eb = this.builder.create().toJson(new ResponseHeader("onRegister","["+magicKey+"] not available",false)).getBytes();
-                            _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                            _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                         }
                     }
                     else{
                         byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
-                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                     }
                 }
                 else if(action.equals("onDevice")){//to server topic
@@ -149,12 +149,12 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
                         }
                         else{
                             byte[] eb = this.builder.create().toJson(new ResponseHeader("onDeviceRegister","["+magicKey+"] not available",false)).getBytes();
-                            _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                            _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                         }
                     }
                     else{
                         byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
-                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                     }
                 }
                 else if(action.equals("onResetCode")){
@@ -172,7 +172,7 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
                     }else{
                         //send login failed back
                         byte[] eb = this.builder.create().toJson(new ResponseHeader("onResetPassword","wrong login/password combination",false)).getBytes();
-                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,"error",true));
+                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                     }
                 }
                 else if(action.equals("onIndex")){

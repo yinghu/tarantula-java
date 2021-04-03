@@ -45,7 +45,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
                     }
                 });
             }
-            session.write(atc.toJson().toString().getBytes(),label());
+            session.write(atc.toJson().toString().getBytes());
         }
         else if(session.action().equals("onUpgradeUser")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -62,9 +62,9 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
                         this.tokenValidatorProvider.revokeAccess(u);
                     }
                 }
-                session.write(toMessage("role granted ["+u.role()+"]",false).toString().getBytes(),label());
+                session.write(toMessage("role granted ["+u.role()+"]",false).toString().getBytes());
             }else{
-                session.write(toMessage("only primary can update role",false).toString().getBytes(),label());
+                session.write(toMessage("only primary can update role",false).toString().getBytes());
             }
         }
         else if(session.action().equals("onAddUser")){
@@ -80,22 +80,22 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
                             onAccess.owner(acc.distributionKey());//make sure acc id as the owner
                             onAccess.distributionKey(query.distributionKey());
                             this.context.postOffice().onTag("index/user").send(onAccess.distributionKey(),onAccess);
-                            session.write(this.toMessage("user added",true).toString().getBytes(),label());
+                            session.write(this.toMessage("user added",true).toString().getBytes());
                         }
                         else{
-                            session.write(this.toMessage("user already existed",false).toString().getBytes(),label());
+                            session.write(this.toMessage("user already existed",false).toString().getBytes());
                         }
                     }
                     else{
-                        session.write(this.toMessage("you already have max user count",false).toString().getBytes(),label());
+                        session.write(this.toMessage("you already have max user count",false).toString().getBytes());
                     }
                 }
                 else{
-                    session.write(this.toMessage("no permission to add user",false).toString().getBytes(),label());
+                    session.write(this.toMessage("no permission to add user",false).toString().getBytes());
                 }
             }
             else{
-                session.write(this.toMessage("add user service not available",false).toString().getBytes(),label());
+                session.write(this.toMessage("add user service not available",false).toString().getBytes());
             }
         }
         else{
@@ -119,10 +119,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
         deploymentServiceProvider.registerAccessIndexListener(this);
         this.context.log("Account role module started with max user count ["+maxUserCount+"]", OnLog.INFO);
     }
-    @Override
-    public String label() {
-        return "account-role";
-    }
+
     private JsonObject toMessage(String msg, boolean suc){
         JsonObject jms = new JsonObject();
         jms.addProperty("successful",suc);

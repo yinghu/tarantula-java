@@ -61,12 +61,12 @@ public class FastPlayEvent extends Data implements Event {
         this.payload = in.readByteArray("16");
     }
     @Override
-    public void write(byte[] payload,String label){
-        this.write(payload,label,true);
+    public void write(byte[] payload){
+        this.write(payload,true);
     }
     @Override
-    public void write(byte[] payload,String label,boolean closed){
-        this.eventService.publish(new ResponsiveEvent(this.forward.source(),this.forward.sessionId(),payload,label,closed));
+    public void write(byte[] payload,boolean closed){
+        this.eventService.publish(new ResponsiveEvent(this.forward.source(),this.forward.sessionId(),payload,closed));
     }
 
 
