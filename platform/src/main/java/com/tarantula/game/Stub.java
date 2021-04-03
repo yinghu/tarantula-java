@@ -2,6 +2,7 @@ package com.tarantula.game;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Connection;
+import com.icodesoftware.Consumable;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.protocol.DataBuffer;
 import com.tarantula.platform.ResponseHeader;
@@ -28,6 +29,7 @@ public class Stub extends ResponseHeader {
     public Rating rating;
     public Connection connection;
     public Tournament.Instance instance; //
+    public Consumable consumable;
     /**
      * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
      * rank - final result 1,2 rank xp = (1/rank)*100  1 - 100 2 50 ..
@@ -85,6 +87,9 @@ public class Stub extends ResponseHeader {
             jp.addProperty("host",connection.host());
             jp.addProperty("port",connection.port());
             jo.add("connection",jp);
+        }
+        if(consumable!=null){
+            jo.add("configurations",consumable.toJson());
         }
         return jo;
     }

@@ -13,7 +13,7 @@ public class PVEZone extends Zone{
         Stub stub = new Stub();
         stub.rating = rating;
         stub.successful(true);
-        stub.arena = "level1";
+        stub.arena = aMap.get(rating.xpLevel).name();
         stub.offline = true;
         stub.tag = descriptor.tag();
         return stub;

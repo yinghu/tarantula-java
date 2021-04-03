@@ -36,6 +36,7 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         rating.fromBinary(session.payload());
         Stub stub = mZone.join(rating);
         stub.owner(session.systemId());
+        stub.consumable = consumable;
         session.write(stub.toJson().toString().getBytes());
     }
 
@@ -143,8 +144,8 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         //mZone.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         //mZone.gameServiceProvider = this.gameServiceProvider;
         mZone.descriptor = this.context.descriptor();
-        //mZone.start();
-        mZone.arenas.forEach((v)-> context.log("Add ->level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
+        mZone.start();
+        mZone.aMap.forEach((k,v)-> context.log("["+k+"] ->level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
         mZone.registerListener(this);
         deploymentServiceProvider.register(mZone);
         this.deploymentServiceProvider.registerOnConnectionListener(this);
@@ -220,7 +221,6 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
     }
     @Override
     public boolean validate(Deployable deployable){
-        //if(deployable.filter().equals(""))
-        return true;
+        return deployable.filter().equals(context.descriptor().tag());
     }
 }

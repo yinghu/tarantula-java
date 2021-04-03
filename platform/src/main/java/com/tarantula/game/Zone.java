@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 
 abstract public class Zone extends RecoverableObject implements Configurable, DataStore.Updatable {
 
@@ -22,7 +24,7 @@ abstract public class Zone extends RecoverableObject implements Configurable, Da
     public static final int DEFAULT_LEVEL_UP_BASE = 1000;
 
     public List<Arena> arenas = new ArrayList<>();
-    //ypublic ConcurrentHashMap<Integer,Arena> activeArenaIndex = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<Integer,Arena> aMap = new ConcurrentHashMap<>();
     public String name;
     public int levelLimit;
     public String mode;
@@ -93,5 +95,38 @@ abstract public class Zone extends RecoverableObject implements Configurable, Da
         });
         this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         this.dataStore.update(this);
+    }
+    public void start(){
+        //always to start max match queue to avoid level limit refresh
+        if(levelLimit==0){//assign default limit from descriptor capacity
+            levelLimit = this.descriptor.capacity();
+        }
+        listArena();
+    }
+    private void listArena(){
+        if(arenas.size()==0){
+            return;
+        }
+        int fi = levelLimit;//this.descriptor.capacity();
+        for(Arena a : arenas){
+            if(a.level>0&&a.level<=levelLimit){
+                aMap.put(a.level,a);
+                if(a.level<fi){
+                    fi = a.level;
+                }
+            }
+        }
+        //set 1 to max level count
+        for(int i=1;i<this.levelLimit+1;i++){//max matching level
+            Arena ex = aMap.get(i);
+            if(ex==null){
+                if(aMap.get(i-1)!=null){
+                    aMap.put(i,aMap.get(i-1));//fill with last one
+                }
+                else{
+                    aMap.put(i,aMap.get(fi));//fill header
+                }
+            }
+        }
     }
 }
