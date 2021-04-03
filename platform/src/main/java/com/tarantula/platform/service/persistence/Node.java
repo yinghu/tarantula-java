@@ -1,8 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
-/**
- * Updated by yinghu lu on 6/16/2020
- */
+
 public class Node{
 
     public String bucketName;

@@ -6,9 +6,6 @@ import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.statistics.StatisticsSerializer;
 import com.tarantula.platform.util.*;
 
-/**
- * Updated by yinghu on 6/15/19
- */
 public class TarantulaApplicationHeader implements TarantulaApplication {
 
     protected Descriptor descriptor;

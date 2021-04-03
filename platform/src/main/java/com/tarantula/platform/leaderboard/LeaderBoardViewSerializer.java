@@ -6,9 +6,6 @@ import com.icodesoftware.util.TimeUtil;
 import java.lang.reflect.Type;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Updated by yinghu 5/4/2020
- */
 public class LeaderBoardViewSerializer implements JsonSerializer<LeaderBoardView> {
 
 

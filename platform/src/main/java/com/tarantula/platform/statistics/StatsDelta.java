@@ -3,8 +3,6 @@ package com.tarantula.platform.statistics;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.protocol.DataBuffer;
 
-
-
 public class StatsDelta extends RecoverableObject {
     public String name;
     public double value;

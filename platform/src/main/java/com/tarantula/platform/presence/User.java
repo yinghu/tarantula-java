@@ -5,9 +5,6 @@ import com.icodesoftware.Access;
 import com.tarantula.platform.BackupObject;
 import java.util.Map;
 
-/**
- * Updated by yinghu on 5/14/2020
- */
 public class User extends BackupObject implements Access {
 
     protected String login;

@@ -8,9 +8,7 @@ import com.tarantula.platform.service.Closable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-/**
- * Created by yinghu lu on 6/29/2018.
- */
+
 public class EventSubscriptionWorker implements Closable {
 
     private final EventService eventService;

@@ -6,9 +6,7 @@ import com.hazelcast.spi.Operation;
 
 import java.io.IOException;
 
-/**
- * updated by yinghu lu on 7/10/2020.
- */
+
 public class  DataSyncOperation extends Operation {
 
     private String akey;

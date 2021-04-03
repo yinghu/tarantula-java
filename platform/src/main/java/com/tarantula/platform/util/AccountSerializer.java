@@ -8,9 +8,6 @@ import com.icodesoftware.Account;
 
 import java.lang.reflect.Type;
 
-/**
- * Created by yinghu lu on 6/16/2020
- */
 public class AccountSerializer implements JsonSerializer<Account> {
 
     public JsonElement serialize(Account access, Type type, JsonSerializationContext jsonSerializationContext) {

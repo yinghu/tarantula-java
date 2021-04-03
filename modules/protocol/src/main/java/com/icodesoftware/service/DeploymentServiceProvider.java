@@ -4,9 +4,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 
 import java.util.List;
-/**
- * Updated by yinghu lu on 5/30/2020
- */
 
 public interface DeploymentServiceProvider extends ServiceProvider,MetricsListener{
 

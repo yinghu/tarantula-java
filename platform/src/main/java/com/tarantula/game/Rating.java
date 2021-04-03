@@ -5,10 +5,7 @@ import com.icodesoftware.Recoverable;
 import com.tarantula.platform.AssociateKey;
 import com.icodesoftware.util.RecoverableObject;
 import java.util.Map;
-/**
- * Updated by yinghu lu on 6/8/2020.
- * Key form [systemId]/Rating
- */
+
 public class Rating extends RecoverableObject implements DataStore.Updatable {
 
     public static double BASE_POINTS = 100;

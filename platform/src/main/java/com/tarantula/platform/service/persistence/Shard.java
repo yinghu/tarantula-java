@@ -7,9 +7,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
 import java.util.Map;
-/**
- * Created by yinghu on 7/5/2020.
- */
+
 public class Shard implements Serviceable {
     final public int shardNumber;
     final private boolean enabled;

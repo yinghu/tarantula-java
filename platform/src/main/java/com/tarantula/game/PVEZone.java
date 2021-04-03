@@ -1,17 +1,11 @@
 package com.tarantula.game;
 
-import com.icodesoftware.Descriptor;
 import com.icodesoftware.service.ServiceContext;
 
 public class PVEZone extends Zone{
 
     public PVEZone(){
         super();
-        mode = Zone.PVE;
-    }
-
-    public PVEZone(Descriptor descriptor){
-        super(descriptor);
         mode = Zone.PVE;
     }
     @Override
@@ -25,8 +19,7 @@ public class PVEZone extends Zone{
         return stub;
     }
     public void update(ServiceContext serviceContext){
-        System.out.println("loading zone from cluster->"+this.distributionKey()+dataStore.name());
-
+        //System.out.println("loading zone from cluster->"+this.distributionKey()+dataStore.name());
     }
     @Override
     public int getFactoryId() {

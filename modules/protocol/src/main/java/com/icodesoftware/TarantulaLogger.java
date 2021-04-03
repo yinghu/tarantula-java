@@ -1,8 +1,5 @@
 package com.icodesoftware;
 
-/**
- * Updated by yinghu lu on 6/10/2018.
- */
 public interface TarantulaLogger {
 
     void debug(String message);

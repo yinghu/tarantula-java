@@ -6,9 +6,6 @@ import com.icodesoftware.Event;
 
 import java.io.IOException;
 
-/**
- * Updated by yinghu lu on 8/8/2020
- */
 public class MapStoreSyncEvent extends Data implements Event {
 
 

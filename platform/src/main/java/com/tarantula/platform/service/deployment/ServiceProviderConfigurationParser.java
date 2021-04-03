@@ -12,9 +12,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Updated by yinghu on 6/27/2018.
- */
 public class ServiceProviderConfigurationParser extends DefaultHandler implements Serviceable {
 
 

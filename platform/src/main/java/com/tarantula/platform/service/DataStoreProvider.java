@@ -10,9 +10,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Updated by yinghu on 6/27/2020.
- */
+
 public interface DataStoreProvider extends ServiceProvider {
 
     int CONCURRENCY_ACCESS_LIMIT = 17;

@@ -8,9 +8,6 @@ import com.tarantula.platform.service.ReplicationData;
 import java.io.IOException;
 import java.util.Arrays;
 
-/**
- * created by yinghu lu on 5/15/2020.
- */
 public class AccessIndexSyncBatchOperation extends Operation {
 
     private int length;

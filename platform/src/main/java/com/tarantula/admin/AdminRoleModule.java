@@ -525,10 +525,10 @@ public class AdminRoleModule implements Module {
     }
     private Zone _zone(GameCluster gameCluster, Descriptor descriptor){
         ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        applicationPreSetup.load(context,descriptor);
-        String dn = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-        DataStore dataStore = this.context.dataStore(dn.replace("-","_"));
-        Zone mZone = gameCluster.property(GameCluster.MODE).equals(Zone.PVE)?new PVEZone(descriptor):new PVPZone();
+        //String dn = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        //DataStore dataStore = this.context.dataStore(dn.replace("-","_"));
+        return applicationPreSetup.load(context,descriptor);//gameCluster.property(GameCluster.MODE).equals(Zone.PVE)?new PVEZone(descriptor):new PVPZone();
+        /**
         mZone.distributionKey(descriptor.distributionKey());
         mZone.capacity=1;
         mZone.roundDuration = 60*1000;
@@ -554,7 +554,7 @@ public class AdminRoleModule implements Module {
             }
             mZone.update();
         }
-        return mZone;
+        return mZone;**/
     }
     private JsonObject toMessage(String msg,boolean suc){
         JsonObject jms = new JsonObject();

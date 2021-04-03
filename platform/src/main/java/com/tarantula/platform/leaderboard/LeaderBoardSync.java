@@ -7,9 +7,6 @@ import com.icodesoftware.Statistics;
 import java.time.LocalDate;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-/**
- * Updated 5/4/2020
- */
 public class LeaderBoardSync implements LeaderBoard {
 
 

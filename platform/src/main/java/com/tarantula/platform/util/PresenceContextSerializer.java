@@ -7,9 +7,6 @@ import com.tarantula.platform.presence.PresenceContext;
 
 import java.lang.reflect.Type;
 
-/**
- * Updated by yinghu lu on 5/25/2020
- */
 public class PresenceContextSerializer implements JsonSerializer<PresenceContext> {
 
     public JsonElement serialize(PresenceContext presenceContext, Type type, JsonSerializationContext jsonSerializationContext) {

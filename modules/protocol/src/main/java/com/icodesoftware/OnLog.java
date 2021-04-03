@@ -1,10 +1,5 @@
 package com.icodesoftware;
 
-
-
-/**
- * Updated by yinghu on 8/26/19
- */
 public interface OnLog {
 
     int DEBUG = 1;

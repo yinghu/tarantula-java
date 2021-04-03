@@ -9,9 +9,6 @@ import com.icodesoftware.OnSession;
 
 import java.lang.reflect.Type;
 
-/**
- * Updated by yinghu on 12/25/2019.
- */
 public class  OnSessionSerializer implements JsonSerializer<OnSession>{
     public JsonElement serialize(OnSession presence, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jp = new JsonObject();

@@ -5,9 +5,6 @@ import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Map;
 
-/**
- * Updated 8/23/19 yinghu lu
- */
 public class DistributedProperty extends RecoverableObject implements Property {
     public String name;
     public String value;

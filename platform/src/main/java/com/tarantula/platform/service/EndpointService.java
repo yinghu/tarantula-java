@@ -6,10 +6,7 @@ import com.tarantula.platform.TarantulaContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-/**
- * Developer: YINGHU LU
- * Date updated 5/5/2020
- */
+
 public class EndpointService implements Serviceable,EndPoint.Resource{
 
     private TarantulaContext tarantulaContext;

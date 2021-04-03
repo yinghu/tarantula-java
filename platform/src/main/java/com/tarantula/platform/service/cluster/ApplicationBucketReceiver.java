@@ -5,9 +5,6 @@ import com.icodesoftware.EventListener;
 import com.tarantula.platform.service.BucketReceiver;
 import com.tarantula.platform.service.BucketReceiverListener;
 
-/**
- * Updated by yinghu lu on 6/3/2019.
- */
 public class ApplicationBucketReceiver implements BucketReceiver{
 
     private final int partition;

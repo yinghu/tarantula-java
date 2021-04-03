@@ -1,8 +1,5 @@
 package com.icodesoftware.service;
 
-/**
- * Created by yinghu lu on 12/26/2020.
- */
 public interface DeployCode {
     int SYSTEM_APPLICATION = 0;
     int SYSTEM_MODULE = 1;

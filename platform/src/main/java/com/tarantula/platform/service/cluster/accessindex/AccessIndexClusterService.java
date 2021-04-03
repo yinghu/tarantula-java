@@ -17,9 +17,6 @@ import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Updated by yinghu lu on 6/18/2020
- */
 public class AccessIndexClusterService implements ManagedService,RemoteService {
 
     private static TarantulaLogger log = JDKLogger.getLogger(AccessIndexClusterService.class);

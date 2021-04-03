@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * Updated by yinghu lu on 12/18/2020
- */
 public abstract class AbstractRecoverableListener implements RecoverableListener {
 
     private ConcurrentHashMap<Integer,OnFilter> oMap = new ConcurrentHashMap<>();

@@ -5,9 +5,6 @@ import com.icodesoftware.*;
 
 import java.util.concurrent.ScheduledFuture;
 
-/**
- * Updated by yinghu lu on 6/27/20
- */
 public interface ServiceContext {
 
     //create data scope partitioned data store

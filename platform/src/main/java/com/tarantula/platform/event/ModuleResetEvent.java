@@ -7,9 +7,6 @@ import com.tarantula.platform.DeploymentDescriptor;
 
 import java.io.IOException;
 
-/**
- * Created by yinghu lu on 8/3/2019.
- */
 public class ModuleResetEvent extends Data implements Event {
 
 

@@ -1,13 +1,5 @@
 package com.icodesoftware;
 
-
-/**
- * Developer: YINGHU LU
- * Updated 5/15/2020
- *
- * On Application represents an application state of the player
- */
-
 public interface OnApplication extends Response {
 
     int accessMode();

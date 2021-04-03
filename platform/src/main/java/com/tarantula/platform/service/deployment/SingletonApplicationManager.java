@@ -8,9 +8,7 @@ import com.tarantula.platform.event.EventOnAction;
 import com.tarantula.platform.service.BucketReceiver;
 import com.tarantula.platform.service.BucketReceiverListener;
 import com.tarantula.platform.service.cluster.ApplicationBucketReceiver;
-/**
- * Updated by yinghu 6/3/2019
- */
+
 public class SingletonApplicationManager extends DefaultApplication implements BucketReceiverListener, EventListener {
 
     private TarantulaApplicationContext singleton;

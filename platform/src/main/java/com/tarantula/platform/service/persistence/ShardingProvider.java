@@ -5,9 +5,7 @@ import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceProvider;
 
 import java.util.Map;
-/**
- * updated by yinghu on 7/18/2020.
- */
+
 public interface ShardingProvider extends ServiceProvider {
 
     boolean enabled();

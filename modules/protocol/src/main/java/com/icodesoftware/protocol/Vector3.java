@@ -1,8 +1,5 @@
 package com.icodesoftware.protocol;
 
-/**
- * Created by yinghu lu on 12/14/2020.
- */
 public class Vector3 {
     public float x;
     public float y;

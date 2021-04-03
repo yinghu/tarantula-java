@@ -1,8 +1,5 @@
 package com.icodesoftware;
 
-/**
- * Updated by yinghu on 4/30/20
- */
 public interface LeaderBoard {
 
     String DAILY = "daily";

@@ -2,9 +2,7 @@ package com.tarantula.platform;
 
 import com.tarantula.cci.udp.PendingServerPushMessage;
 
-/**
- * Created by yinghu lu on 12/19/2020.
- */
+
 public class PendingMessage {
 
 

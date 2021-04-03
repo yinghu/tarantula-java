@@ -11,9 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
- * Updated by yinghu on 6/27/2018.
- */
 public class PortableProviderConfigurationParser extends DefaultHandler{
 
 

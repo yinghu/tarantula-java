@@ -4,9 +4,7 @@ import com.icodesoftware.LeaderBoard;
 
 import java.util.Comparator;
 
-/**
- * Updated by yinghu on 8/24/19
- */
+
 public class EntryComparator implements Comparator<LeaderBoard.Entry> {
 
     public int compare(LeaderBoard.Entry o1, LeaderBoard.Entry o2) {

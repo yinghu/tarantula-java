@@ -8,9 +8,6 @@ import com.icodesoftware.OnView;
 
 import java.lang.reflect.Type;
 
-/**
- * Updated by yinghu on 9/5/2019.
- */
 public class OnViewSerializer implements JsonSerializer<OnView> {
     public JsonElement serialize(OnView descriptor, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = new JsonObject();

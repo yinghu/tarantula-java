@@ -8,9 +8,6 @@ import com.tarantula.platform.OnViewTrack;
 
 import java.io.IOException;
 
-/**
- * created by yinghu lu on 1/27/2021
- */
 public class UpdateViewOperation extends Operation {
 
 

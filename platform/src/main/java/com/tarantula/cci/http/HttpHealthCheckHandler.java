@@ -7,9 +7,6 @@ import com.tarantula.platform.service.EndPoint;
 
 import java.io.IOException;
 
-/**
- * Created by yinghu lu on 6/22/2018.
- */
 public class HttpHealthCheckHandler extends HttpDispatcher {
 
     private byte[] hc = "hc".getBytes();

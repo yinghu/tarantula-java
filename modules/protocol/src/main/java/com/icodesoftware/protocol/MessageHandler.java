@@ -1,8 +1,5 @@
 package com.icodesoftware.protocol;
 
-/**
- * Created by yinghu lu on 10/7/2020.
- */
 public interface MessageHandler {
 
     int ACK = 0;

@@ -1,8 +1,5 @@
 package com.icodesoftware;
 
-/**
- * Updated by yinghu lu on 7/11/2020
- */
 public interface OnView extends Configurable {
 
     String LABEL ="LVT";

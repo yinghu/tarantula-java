@@ -6,9 +6,6 @@ import com.icodesoftware.Event;
 
 import java.io.IOException;
 
-/**
- * updated by yinghu on 8/8/2020
- */
 public class FastPlayEvent extends Data implements Event {
 
     public FastPlayEvent(){

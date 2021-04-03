@@ -4,9 +4,6 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.game.service.GameServiceIndex;
 
-/**
- * Created by yinghu lu on 4/14/2020.
- */
 public class GamePortableRegistry  extends AbstractRecoverableListener {
 
     public static final int OID = 10;

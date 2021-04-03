@@ -3,9 +3,6 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.AccessIndex;
 
-/**
- * Updated by yinghu lu on 6/18/2020
- */
 public interface AccessIndexService extends ServiceProvider {
 
     String NAME = "AccessIndexService";

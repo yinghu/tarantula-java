@@ -4,9 +4,6 @@ import com.icodesoftware.service.RNG;
 
 import java.security.SecureRandom;
 
-/**
- * updated by yinghu lu on 12/11/2020.
- */
 public class JvmRNG extends SecureRandom implements RNG{
 
     private long m = 1;

@@ -1,11 +1,7 @@
 package com.tarantula.platform;
-
-
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.RecoverableObject;
-/**
- * Updated by yinghu on 8/23/19
- */
+
 public class NaturalKey extends RecoverableObject implements Recoverable.Key {
 
 

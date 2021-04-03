@@ -8,9 +8,6 @@ import com.icodesoftware.Access;
 
 import java.lang.reflect.Type;
 
-/**
- * Created by yinghu lu on 5/13/2020
- */
 public class RoleSerializer implements JsonSerializer<Access.Role> {
 
     public JsonElement serialize(Access.Role access, Type type, JsonSerializationContext jsonSerializationContext) {

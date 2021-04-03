@@ -10,9 +10,7 @@ import com.icodesoftware.util.JsonUtil;
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * created by yinghu lu on 3/5/2021.
- */
+
 public class TournamentEnterOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;

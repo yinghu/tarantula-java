@@ -12,4 +12,7 @@ public interface ApplicationPreSetup {
     void setup(ServiceContext serviceContext,Descriptor application);
     <T extends Recoverable> T load(ApplicationContext context,Descriptor application);
     <T extends Recoverable> T load(ServiceContext context,Descriptor application);
+    //<T extends Recoverable> void save(ServiceContext context,T t);
+    //<T extends Recoverable> void save(ApplicationContext context,T t);
+
 }

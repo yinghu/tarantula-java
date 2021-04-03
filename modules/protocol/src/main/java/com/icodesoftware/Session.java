@@ -1,10 +1,5 @@
 package com.icodesoftware;
 
-/**
- * Session represents the exchange between client and server via asynchronous way.
- * It is not relative to a physical connection.
- * Updated by yinghu lu on 6/29/2020
- * */
 
 public interface Session extends OnApplication {
     //standard HTTP headers
@@ -49,8 +44,8 @@ public interface Session extends OnApplication {
     void joined(boolean joined);
 
     //write back on http batch
-    void write(byte[] delta,int batch,String contentType);
-    void write(byte[] delta,int batch,String contentType,boolean closed);
+    //void write(byte[] delta,int batch,String contentType);
+    //void write(byte[] delta,int batch,String contentType,boolean closed);
 
     //write back on label ( ignore on http )
     void write(byte[] payload);

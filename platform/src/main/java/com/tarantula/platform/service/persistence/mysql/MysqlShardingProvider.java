@@ -16,9 +16,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Map;
 
-/**
- * Created by yinghu on 7/5/2020.
- */
 public class MysqlShardingProvider implements ShardingProvider {
 
     private static JDKLogger log = JDKLogger.getLogger(MysqlShardingProvider.class);

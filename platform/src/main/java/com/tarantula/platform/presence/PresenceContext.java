@@ -5,10 +5,6 @@ import com.tarantula.platform.ResponseHeader;
 
 import java.util.List;
 
-/**
- * Developer: YINGHU LU
- * Updated by yinghu lu on 6/16/2020
- */
 public class PresenceContext extends ResponseHeader {
 
     public Access access;

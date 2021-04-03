@@ -2,10 +2,6 @@ package com.icodesoftware;
 
 import com.icodesoftware.service.EventService;
 
-/**
- * Event represents an asynchronous message
- * Updated by yinghu lu on 8/23/2019
- * */
 public interface Event extends Session {
 
     String tag();

@@ -10,9 +10,7 @@ import com.tarantula.platform.event.SessionForward;
 
 import java.io.IOException;
 
-/**
- * created by yinghu lu on 12/16/2020.
- */
+
 public class GetConnectionOperation extends Operation implements PartitionAwareOperation {
 
     private String lobbyTag;

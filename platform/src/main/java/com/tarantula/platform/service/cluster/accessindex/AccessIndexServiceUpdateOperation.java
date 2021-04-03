@@ -6,9 +6,7 @@ import com.hazelcast.spi.Operation;
 
 import java.io.IOException;
 
-/**
- * Created by yinghu lu on 7/25/2020
- */
+
 public class AccessIndexServiceUpdateOperation extends Operation {
 
     private boolean enabled;

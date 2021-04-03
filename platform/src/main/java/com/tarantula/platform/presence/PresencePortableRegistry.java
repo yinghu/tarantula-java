@@ -6,9 +6,6 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.PresenceIndex;
 
-/**
- * updated by yinghu lu on 5/1/2020.
- */
 public class PresencePortableRegistry extends AbstractRecoverableListener {
 
     public static final int OID = 3;

@@ -16,20 +16,16 @@ import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * updated by yinghu lu on 6/9/2020.
- */
+
 public class PVEGameZoneModule implements Module,Configurable.Listener,Connection.OnConnectionListener,Consumable.Listener{
 
     private ApplicationContext context;
-    private PVPZone mZone;
-    private Zone zone;
+    private Zone mZone;
+
     private ConcurrentHashMap<String, Stub> mStub = new ConcurrentHashMap<>();
     private GsonBuilder builder;
     private GameServiceProvider gameServiceProvider;
 
-    private int DEFAULT_LEVEL_COUNT = 3;
-    private int DEFAULT_LEVEL_UP_BASE = 1000;
     private DeploymentServiceProvider deploymentServiceProvider;
     private String registerKey;
     private Consumable consumable;
@@ -38,58 +34,11 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
     public void onJoin(Session session, OnUpdate onUpdate) throws Exception {
         Rating rating = new Rating();
         rating.fromBinary(session.payload());
-        Stub stub = zone.join(rating);
+        Stub stub = mZone.join(rating);
         stub.owner(session.systemId());
         session.write(stub.toJson().toString().getBytes());
     }
-    //@Override
-    public void _onJoin(Session session, OnUpdate onUpdate) throws Exception{
-        //match arena with service rank/xp or offline play mode
-        //this.context.log(new String(session.payload()),OnLog.WARN);
-        if(mZone.descriptor.tournamentEnabled()&&(!gameServiceProvider.available(session.tournamentId()))){
-            session.write(toMessage("no tournament available,please try later",false).toString().getBytes());
-            return;
-        }
-        Rating rating = new Rating();
-        rating.fromBinary(session.payload());
-        Stub stub = mStub.get(session.systemId());
-        Room room =null;
-        if(stub!=null){
-            room = gameServiceProvider.getRoom(stub.roomId);
-            if(!room.rejoin(stub)){
-                mStub.remove(session.systemId());
-                stub = null;
-            }
-        }
-        if(stub==null){
-            room = mZone.playMode==Room.OFF_LINE_MODE?mZone.solo(rating):mZone.match(rating);
-            stub = room.join(rating);
-            if(stub==null){
-                session.write(toMessage("no room available,please try later",false).toString().getBytes());
-                return;
-            }
-        }
-        stub.tag = this.context.descriptor().tag();
-        stub.owner(session.systemId());
-        GameJoinObject gameObject = new GameJoinObject();
-        gameObject.successful(true);
-        gameObject.offline = mZone.playMode==Room.OFF_LINE_MODE;
-        if(!gameObject.offline){
-            gameObject.connection = room.connection();
-            Connection connection = room.connection();
-            gameObject.ticket = this.context.validator().ticket(session.systemId(),session.stub());
-            byte[] key = this.deploymentServiceProvider.serverKey(connection);
-            gameObject.serverKey = Base64.getEncoder().encodeToString(key);
-        }
-        gameObject.stub = stub;
-        if(mZone.descriptor.tournamentEnabled()){
-            Tournament.Instance  e = gameServiceProvider.join(session.tournamentId(),session.systemId());
-            stub.instance = e;
-        }
-        gameObject.consumable = consumable;
-        mStub.put(session.systemId(),stub);
-        session.write(gameObject.toJson().toString().getBytes());
-    }
+
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         if(session.action().equals("onUpdated")){
@@ -97,7 +46,7 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
             if(stub!=null){
                 session.write(toMessage(session.action(),true).toString().getBytes());
                 StatsDelta delta = toDelta(payload);
-                mZone.onStatistics(session.systemId(),delta.name,delta.value);
+                //mZone.onStatistics(session.systemId(),delta.name,delta.value);
             }
             else{
                 session.write(toMessage("no room joined",false).toString().getBytes());
@@ -188,38 +137,19 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         String gz = this.context.descriptor().typeId().replace("-lobby","-service");
         this.gameServiceProvider = this.context.serviceProvider(gz);
-        /**
-        mZone = this.gameServiceProvider.zone(this.context.descriptor());
-        mZone.levelUpBase = DEFAULT_LEVEL_UP_BASE;
-        if(mZone.arenas.size()==0) {
-            //create arenas using capacity of descriptor
-            mZone.capacity=1;
-            mZone.roundDuration = 60*1000;
-            mZone.overtime = 5000;
-            mZone.playMode = Room.OFF_LINE_MODE;
-            mZone.levelLimit = this.context.descriptor().capacity();
-            for(int i=1;i<DEFAULT_LEVEL_COUNT+1;i++){
-                Arena arena = new Arena(mZone.bucket(),mZone.oid(),i);
-                arena.name("level"+i);
-                arena.level = i;
-                arena.xp = i*DEFAULT_LEVEL_UP_BASE;
-                arena.disabled(false);
-                mZone.arenas.add(arena);
-            }
-            mZone.update();
-        }
-        mZone.stubIndex = this.mStub;
-        mZone.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        mZone.gameServiceProvider = this.gameServiceProvider;
+
+        mZone = this.gameServiceProvider.zone(this.context.descriptor(),Zone.PVE);
+        //mZone.stubIndex = this.mStub;
+        //mZone.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        //mZone.gameServiceProvider = this.gameServiceProvider;
         mZone.descriptor = this.context.descriptor();
-        mZone.start();
-        //mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
+        //mZone.start();
+        mZone.arenas.forEach((v)-> context.log("Add ->level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
         mZone.registerListener(this);
-        deploymentServiceProvider.register(mZone);**/
+        deploymentServiceProvider.register(mZone);
         this.deploymentServiceProvider.registerOnConnectionListener(this);
         this.registerKey = this.gameServiceProvider.registerListener(this);
-        this.zone = this.gameServiceProvider.zone(context.descriptor(),Zone.PVE);
-        this.deploymentServiceProvider.register(this.zone);
+        this.deploymentServiceProvider.register(this.mZone);
         context.log("PVE Game lobby started with tournament enabled ["+context.descriptor().tournamentEnabled()+"] on tag=>"+this.context.descriptor().tag(),OnLog.WARN);
     }
     @Override
@@ -248,7 +178,7 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         //this.context.log("Bucket->"+bucket+"/"+state,OnLog.WARN);
     }
     public void onUpdated(Configurable zone) {
-        mZone.reset((PVPZone)zone);
+        //mZone.reset((PVPZone)zone);
         //this.context.log("Play mode->"+mZone.playMode,OnLog.WARN);
         //this.context.log("joinsOnStart->"+mZone.joinsOnStart,OnLog.WARN);
         //mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));

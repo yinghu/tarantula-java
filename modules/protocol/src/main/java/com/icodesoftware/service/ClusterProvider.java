@@ -7,9 +7,6 @@ import com.icodesoftware.RecoverableFactory;
 
 import java.util.List;
 
-/**
- * Update by yinghu on 7/13/2020
- */
 public interface ClusterProvider extends Serviceable {
 
     String name();

@@ -5,9 +5,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-/**
- * Created by yinghu lu on 9/28/2020.
- */
 public class FIFOBufferTest {
 
     @BeforeClass

@@ -1,10 +1,6 @@
 package com.icodesoftware.protocol;
-
 import java.nio.ByteBuffer;
 
-/**
- * Created by yinghu lu on 10/15/2020.
- */
 public class DataBuffer {
     private ByteBuffer byteBuffer;
     private boolean writeMode;

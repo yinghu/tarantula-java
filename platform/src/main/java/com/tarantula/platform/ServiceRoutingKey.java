@@ -3,9 +3,6 @@ package com.tarantula.platform;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RoutingKey;
 
-/**
- * Updated by yinghu lu on 8/9/2019.
- */
 public class ServiceRoutingKey implements RoutingKey {
 
     private String bucket;

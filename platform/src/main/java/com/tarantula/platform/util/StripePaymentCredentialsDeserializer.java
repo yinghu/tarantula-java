@@ -8,9 +8,6 @@ import com.tarantula.platform.service.StripePaymentProvider;
 import java.lang.reflect.Type;
 
 
-/**
- * Created by yinghu lu on 5/14/2020
- */
 public class StripePaymentCredentialsDeserializer implements JsonDeserializer<AuthObject> {
 
     @Override

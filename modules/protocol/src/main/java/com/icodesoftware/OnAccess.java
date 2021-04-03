@@ -1,8 +1,5 @@
 package com.icodesoftware;
 
-/**
- * Updated by yinghu on 5/25/2020
- */
 public interface OnAccess extends OnApplication, DataStore.Updatable {
 
     String ACCESS_KEY = "accessKey";

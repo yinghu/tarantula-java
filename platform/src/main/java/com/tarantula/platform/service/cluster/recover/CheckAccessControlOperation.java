@@ -8,9 +8,7 @@ import com.tarantula.platform.AccessControl;
 
 import java.io.IOException;
 
-/**
- * updated by yinghu lu on 7/10/2020.
- */
+
 public class CheckAccessControlOperation extends Operation {
 
     private String systemId;

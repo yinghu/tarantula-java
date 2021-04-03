@@ -4,9 +4,6 @@ import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.Tournament;
 
 
-/**
- * created by yinghu on 3/1/2021.
- */
 public class TournamentEntryQuery implements RecoverableFactory<TournamentEntry> {
 
     private String instanceId;

@@ -7,9 +7,7 @@ import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
 
-/**
- * Updated by yinghu on 9/6/2019
- */
+
 public class RatingSerializer implements JsonSerializer<Rating> {
 
     public JsonElement serialize(Rating response, Type type, JsonSerializationContext jsonSerializationContext) {

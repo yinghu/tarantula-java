@@ -8,9 +8,6 @@ import com.icodesoftware.OnAccess;
 
 import java.lang.reflect.Type;
 
-/**
- * Updated by yinghu lu on 5/25/2020
- */
 public class OnAccessSerializer implements JsonSerializer<OnAccess> {
 
     public JsonElement serialize(OnAccess access, Type type, JsonSerializationContext jsonSerializationContext) {

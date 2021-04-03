@@ -6,9 +6,6 @@ import com.hazelcast.spi.Operation;
 
 import java.io.IOException;
 
-/**
- *  created by yinghu lu on 7/26/2020.
- */
 public class DeployServiceUploadOperation extends Operation {
 
 

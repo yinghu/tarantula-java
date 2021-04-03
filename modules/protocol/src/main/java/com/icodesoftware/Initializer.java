@@ -1,8 +1,5 @@
 package com.icodesoftware;
 
-/**
- * Created by yinghu lu on 4/27/2018.
- */
 public interface Initializer {
 
     void setup(ApplicationContext context) throws Exception;

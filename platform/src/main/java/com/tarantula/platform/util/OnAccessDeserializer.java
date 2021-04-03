@@ -7,9 +7,6 @@ import com.tarantula.platform.OnAccessTrack;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-/**
- * Updated by yinghu on 5/25/2020
- */
 public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
 
 

@@ -2,9 +2,6 @@ package com.icodesoftware.protocol;
 
 import java.nio.ByteBuffer;
 
-/**
- * Created by yinghu lu on 9/26/2020.
- */
 public class OutboundMessage {
     public static int MESSAGE_SIZE = 512;
     private ByteBuffer message;

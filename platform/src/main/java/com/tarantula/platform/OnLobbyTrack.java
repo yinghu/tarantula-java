@@ -5,9 +5,7 @@ import com.icodesoftware.service.OnLobby;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.icodesoftware.util.RecoverableObject;
 
-/**
- * Updated by yinghu lu on 5/24/2020
- */
+
 public class OnLobbyTrack extends RecoverableObject implements OnLobby {
 
     private String typeId;

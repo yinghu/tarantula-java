@@ -7,9 +7,7 @@ import com.tarantula.platform.service.GoogleOAuthProvider;
 
 import java.lang.reflect.Type;
 
-/**
- * Created by yinghu lu on 5/11/2020
- */
+
 public class GoogleAuthCredentialsDeserializer implements JsonDeserializer<AuthObject> {
 
     @Override

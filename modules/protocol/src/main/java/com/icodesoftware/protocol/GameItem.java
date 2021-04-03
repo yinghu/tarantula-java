@@ -4,9 +4,6 @@ import com.google.gson.JsonObject;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created by yinghu lu on 12/12/2020.
- */
 public class GameItem {
     public int typeId;
     public int sequence;

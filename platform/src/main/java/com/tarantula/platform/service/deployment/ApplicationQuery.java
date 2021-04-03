@@ -5,10 +5,6 @@ import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-
-/**
- * Updated by yinghu on 4/8/2019.
- */
 public class ApplicationQuery implements RecoverableFactory<DeploymentDescriptor> {
 
     private String lobbyId;

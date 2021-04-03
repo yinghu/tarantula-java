@@ -3,12 +3,13 @@ package com.tarantula.game;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.AssociateKey;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 abstract public class Zone extends RecoverableObject implements Configurable, DataStore.Updatable {
 
@@ -16,6 +17,9 @@ abstract public class Zone extends RecoverableObject implements Configurable, Da
     public static final String PVP = "pvp"; //player versus player
     public static final String TVE = "tve"; //team versus computer
     public static final String TVT = "tvt"; //team versus team
+
+    public static final int DEFAULT_LEVEL_COUNT = 3;
+    public static final int DEFAULT_LEVEL_UP_BASE = 1000;
 
     public List<Arena> arenas = new ArrayList<>();
     //ypublic ConcurrentHashMap<Integer,Arena> activeArenaIndex = new ConcurrentHashMap<>();
@@ -29,13 +33,11 @@ abstract public class Zone extends RecoverableObject implements Configurable, Da
     public int joinsOnStart = 1;
 
     public Descriptor descriptor;
+
     public Zone(){
         this.label = "Zone";
     }
-    public Zone(Descriptor descriptor){
-        this();
-        this.descriptor = descriptor;
-    }
+
 
     abstract public Stub join(Rating rating);
 
@@ -46,7 +48,6 @@ abstract public class Zone extends RecoverableObject implements Configurable, Da
         this.properties.put("1",capacity);
         this.properties.put("2",roundDuration);
         this.properties.put("3",overtime);
-        //this.properties.put("4",mode);
         this.properties.put("5",name);
         this.properties.put("6",this.timestamp);
         this.properties.put("7",this.levelLimit);
@@ -60,7 +61,6 @@ abstract public class Zone extends RecoverableObject implements Configurable, Da
         this.joinsOnStart = ((Number)properties.getOrDefault("8",capacity)).intValue();
         this.roundDuration = ((Number)properties.getOrDefault("2",roundDuration)).longValue();
         this.overtime = ((Number)properties.getOrDefault("3",overtime)).longValue();
-        //this.mode = (String)properties.getOrDefault("4",mode);
         this.name = (String)properties.get("5");
         this.timestamp = ((Number)properties.getOrDefault("6",0)).longValue();
         this.levelLimit = ((Number)properties.getOrDefault("7",levelLimit)).intValue();
@@ -84,5 +84,14 @@ abstract public class Zone extends RecoverableObject implements Configurable, Da
         String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
         this.bucket = klist[0];
         this.oid = klist[1];
+    }
+    public void update() {
+        arenas.forEach((a)->{
+            if(!this.dataStore.update(a)){//failed if no key associated
+                this.dataStore.create(a);
+            }
+        });
+        this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
+        this.dataStore.update(this);
     }
 }

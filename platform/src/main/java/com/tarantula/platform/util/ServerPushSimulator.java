@@ -20,9 +20,7 @@ import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
-/**
- * Created by yinghu lu on 9/19/2020.
- */
+
 public class ServerPushSimulator {
     static HttpCaller caller;
     static String serverId;

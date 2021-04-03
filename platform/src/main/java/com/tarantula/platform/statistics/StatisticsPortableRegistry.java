@@ -3,9 +3,6 @@ package com.tarantula.platform.statistics;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
 
-/**
- * updated by yinghu lu on 5/1/2020.
- */
 public class StatisticsPortableRegistry extends AbstractRecoverableListener {
 
     public static final int OID = 5;

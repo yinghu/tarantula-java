@@ -3,9 +3,7 @@ package com.tarantula.platform.service;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.cci.RequestHandler;
 
-/**
- * Updated by yinghu lu on 6/15/2019.
- */
+
 public interface EndPoint extends ServiceProvider {
 
     //long CHECK_POINT_DELTA = 60000;

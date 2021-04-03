@@ -2,9 +2,7 @@ package com.tarantula.platform.service;
 
 import com.icodesoftware.EventListener;
 
-/**
- * updated by yinghu lu on 6/3/2019.
- */
+
 public interface BucketReceiver extends EventListener {
 
     int OPEN = 0;

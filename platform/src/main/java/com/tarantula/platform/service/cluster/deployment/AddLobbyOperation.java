@@ -8,9 +8,6 @@ import com.tarantula.platform.LobbyDescriptor;
 
 import java.io.IOException;
 
-/**
- * updated by yinghu lu on 5/29/2019.
- */
 public class AddLobbyOperation extends Operation {
 
 

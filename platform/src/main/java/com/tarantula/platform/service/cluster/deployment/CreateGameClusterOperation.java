@@ -7,9 +7,6 @@ import com.tarantula.platform.GameCluster;
 
 import java.io.IOException;
 
-/**
- * created by yinghu lu on 5/15/2020.
- */
 public class CreateGameClusterOperation extends Operation {
 
 

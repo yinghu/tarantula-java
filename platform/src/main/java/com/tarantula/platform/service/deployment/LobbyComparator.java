@@ -3,9 +3,6 @@ package com.tarantula.platform.service.deployment;
 
 import java.util.Comparator;
 
-/**
- * Updated by yinghu lu on 10/9/2018.
- */
 public class LobbyComparator implements Comparator<LobbyConfiguration> {
 
     public int compare(LobbyConfiguration o1, LobbyConfiguration o2) {

@@ -8,9 +8,7 @@ import com.tarantula.platform.ResponseHeader;
 
 import java.time.format.DateTimeFormatter;
 
-/**
- * Updated by yinghu lu on 12/11/2020.
- */
+
 public class GameJoinObject extends ResponseHeader {
 
     public Stub stub;

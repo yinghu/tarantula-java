@@ -96,13 +96,10 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     public Zone zone(Descriptor descriptor,String mode){
         if(mode.equals(Zone.PVE)){
             Zone zone = new PVELobbySetup().load(serviceContext,descriptor);
-            zone.distributionKey(descriptor.distributionKey());
-            zone.mode = mode;
-            zone.dataStore(this.dataStore);
             return zone;
         }
         else if(mode.equals(Zone.PVP)){
-            Zone zone = new PVPZone(descriptor);
+            Zone zone = new PVPZone();
             zone.distributionKey(descriptor.distributionKey());
             zone.mode = mode;
             return zone;
@@ -110,7 +107,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         throw new UnsupportedOperationException(mode);
     }
     public PVPZone zone(Descriptor descriptor){//application id
-        PVPZone zone = new PVPZone(descriptor);
+        PVPZone zone = new PVPZone();
         zone.distributionKey(descriptor.distributionKey());
         zone.index(descriptor.tag());
         byte[] key = zone.key().asString().getBytes();

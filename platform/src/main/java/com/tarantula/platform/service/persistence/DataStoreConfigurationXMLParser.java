@@ -16,9 +16,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Updated by yinghu on 7/5/2020
- */
 public class DataStoreConfigurationXMLParser extends DefaultHandler implements Serviceable {
 
 

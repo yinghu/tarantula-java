@@ -22,9 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 import com.icodesoftware.util.RecoverableObject;
-/**
- * updated by yinghu lu on 6/9/2020.
- */
+
 public class PVPZone extends Zone implements RoomListener{
     public String subscription;
 
@@ -46,10 +44,6 @@ public class PVPZone extends Zone implements RoomListener{
     private Configurable.Listener listener;
     public PVPZone(){
         super();
-        mode = Zone.PVP;
-    }
-    public PVPZone(Descriptor descriptor){
-        super(descriptor);
         mode = Zone.PVP;
     }
     @Override
@@ -305,15 +299,6 @@ public class PVPZone extends Zone implements RoomListener{
             aMap.clear();
             listArena();
         }
-    }
-    public void update() {
-        arenas.forEach((a)->{
-            if(!this.dataStore.update(a)){//failed if no key associated
-                this.dataStore.create(a);
-            }
-        });
-        this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
-        this.dataStore.update(this);
     }
     public void registerListener(Listener listener){
         this.listener = listener;

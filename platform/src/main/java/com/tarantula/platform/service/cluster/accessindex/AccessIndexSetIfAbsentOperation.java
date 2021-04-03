@@ -8,9 +8,7 @@ import com.icodesoftware.AccessIndex;
 
 import java.io.IOException;
 
-/**
- * created by yinghu lu on 1/26/2021.
- */
+
 public class AccessIndexSetIfAbsentOperation extends Operation implements PartitionAwareOperation {
 
     //private boolean result;

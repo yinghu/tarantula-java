@@ -9,9 +9,7 @@ import com.tarantula.platform.statistics.StatsDelta;
 
 import java.time.format.DateTimeFormatter;
 
-/**
- * Updated by yinghu lu on 6/12/2020.
- */
+
 public class Stub extends ResponseHeader {
 
     public boolean offline;

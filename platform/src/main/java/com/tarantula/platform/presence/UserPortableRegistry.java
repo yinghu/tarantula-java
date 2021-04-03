@@ -4,9 +4,6 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.OnAccessTrack;
 
-/**
- * Updated by yinghu lu on 9/6/2019.
- */
 public class UserPortableRegistry extends AbstractRecoverableListener {
 
     public static final int OID = 2;

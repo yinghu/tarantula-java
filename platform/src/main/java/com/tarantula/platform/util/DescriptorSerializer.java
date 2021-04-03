@@ -8,9 +8,7 @@ import com.icodesoftware.Descriptor;
 
 import java.lang.reflect.Type;
 
-/**
- * Updated by yinghu on 5/25/2020
- */
+
 public class DescriptorSerializer implements JsonSerializer<Descriptor> {
     public JsonElement serialize(Descriptor descriptor, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = new JsonObject();

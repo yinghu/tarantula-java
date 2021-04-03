@@ -12,9 +12,7 @@ import java.util.Arrays;
 
 import java.util.UUID;
 
-/**
- * updated by yinghu lu on 1/27/21.
- */
+
 public class SystemUtil {
 
 

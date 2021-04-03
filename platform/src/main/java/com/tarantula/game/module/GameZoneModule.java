@@ -15,9 +15,7 @@ import com.tarantula.platform.util.OnAccessDeserializer;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-/**
- * updated by yinghu lu on 6/9/2020.
- */
+
 public class GameZoneModule implements Module,Configurable.Listener,Connection.OnConnectionListener,Consumable.Listener{
 
     private ApplicationContext context;

@@ -1,9 +1,5 @@
 package com.icodesoftware;
 
-/**
- * Updated by yinghu on 3/26/2018.
- * The vertex query factory with a filter
- */
 public interface RecoverableFactory<T extends Recoverable>{
 
 

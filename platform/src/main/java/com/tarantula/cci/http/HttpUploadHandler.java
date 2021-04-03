@@ -6,9 +6,6 @@ import com.tarantula.platform.service.EndPoint;
 
 import java.io.IOException;
 
-/**
- * Created by yinghu lu on 11/9/19.
- */
 public class HttpUploadHandler extends HttpDispatcher {
 
     @Override

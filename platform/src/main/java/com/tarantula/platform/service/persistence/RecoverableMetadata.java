@@ -11,9 +11,7 @@ import com.icodesoftware.util.RecoverableObject;
 
 import java.io.IOException;
 
-/**
- * Updated by yinghu lu on 7/11/2020
- */
+
 public class RecoverableMetadata extends RecoverableObject implements Metadata, Portable {
 
     private String source;

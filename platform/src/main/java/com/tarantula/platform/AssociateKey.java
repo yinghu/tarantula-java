@@ -1,11 +1,7 @@
 package com.tarantula.platform;
-
-
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.RecoverableObject;
-/**
- * updated by yinghu lu on 8/23/2019.
- */
+
 public class AssociateKey extends RecoverableObject implements Recoverable.Key {
 
     public AssociateKey(String bucket, String oid, String suffix){

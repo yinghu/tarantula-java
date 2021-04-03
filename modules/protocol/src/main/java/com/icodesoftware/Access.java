@@ -1,8 +1,5 @@
 package com.icodesoftware;
 
-/**
- * Updated by yinghu on 8/26/2019.
- */
 public interface Access extends Recoverable {
 
     //application access level control

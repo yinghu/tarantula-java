@@ -4,9 +4,6 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.AbstractRecoverableListener;
 
-/**
- * updated by yinghu lu on 5/1/2020.
- */
 public class TournamentPortableRegistry extends AbstractRecoverableListener {
 
     public static final int OID = 4;

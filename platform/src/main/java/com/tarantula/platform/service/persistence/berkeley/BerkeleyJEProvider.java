@@ -31,9 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
-/**
- * Updated by yinghu lu on 6/28/2020.
- */
 public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     private static JDKLogger log = JDKLogger.getLogger(BerkeleyJEProvider.class);

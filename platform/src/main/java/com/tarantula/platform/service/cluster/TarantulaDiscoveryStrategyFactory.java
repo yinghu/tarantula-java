@@ -12,9 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-/**
- * Created by yinghu lu on 7/6/2018.
- */
+
 public class TarantulaDiscoveryStrategyFactory implements DiscoveryStrategyFactory {
 
     @Override

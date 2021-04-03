@@ -5,10 +5,6 @@ import com.tarantula.platform.presence.UserPortableRegistry;
 import com.icodesoftware.util.JsonUtil;
 import java.util.Map;
 
-
-/**
- * Updated by yinghu on 5/15/2020
- */
 public class OnAccessTrack extends OnApplicationHeader implements OnAccess {
 
     protected String accessKey;

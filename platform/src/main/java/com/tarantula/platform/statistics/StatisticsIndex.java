@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import com.icodesoftware.util.RecoverableObject;
-/**
- * Updated by yinghu on 4/29/2020
- */
+
 public class StatisticsIndex extends RecoverableObject implements Statistics {
 
     private Map<String,StatisticsEntry> mappings = new ConcurrentHashMap<>();

@@ -3,9 +3,6 @@ package com.icodesoftware;
 
 import java.util.List;
 
-/**
- * Updated by yinghu on 7/10/2020.
- */
 public interface DataStore {
 
     int scope();

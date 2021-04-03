@@ -6,9 +6,6 @@ import com.icodesoftware.Event;
 
 import java.io.IOException;
 
-/**
- * Updated by yinghu on 4/30/2020.
- */
 public class ConnectionStateEvent extends Data implements Event {
 
 

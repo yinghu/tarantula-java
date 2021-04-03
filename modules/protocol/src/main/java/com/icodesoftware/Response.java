@@ -1,8 +1,5 @@
 package com.icodesoftware;
 
-/**
- * Updated by yinghu on 9/6/2019
- */
 public interface Response extends Recoverable {
 
     int INSUFFICIENT_BALANCE = 1;

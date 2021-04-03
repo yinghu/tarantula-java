@@ -3,9 +3,6 @@ import com.stripe.Stripe;
 import com.stripe.model.Charge;
 import java.util.Map;
 
-/**
- * Created by yinghu lu on 5/14/2020
- */
 public class StripePaymentProvider extends AuthObject {
 
 

@@ -3,9 +3,6 @@ package com.icodesoftware.util;
 
 import com.icodesoftware.Recoverable;
 
-/**
- * Update by yinghu on 8/23/19
- */
 public class DistributionKey extends RecoverableObject implements Recoverable.Key{
 
     private String bucket;

@@ -2,9 +2,7 @@ package com.tarantula.platform.util;
 
 import java.util.List;
 
-/**
- * Updated by yinghu on 6/15/2018.
- */
+
 public class DrainBuffer<T> {
 
     private T[] buffer;

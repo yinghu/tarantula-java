@@ -2,9 +2,7 @@ package com.tarantula.platform;
 
 import com.icodesoftware.OnAccess;
 
-/**
- * Updated by yinghu on 5/25/2020
- */
+
 public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
     //protected String applicationId;

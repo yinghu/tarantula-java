@@ -6,9 +6,6 @@ import com.icodesoftware.Event;
 
 import java.io.IOException;
 
-/**
- * Created by yinghu lu on 11/15/2020.
- */
 public class GameUpdateEvent extends Data implements Event {
 
     public GameUpdateEvent(){}

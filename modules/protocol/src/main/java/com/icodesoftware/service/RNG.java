@@ -1,8 +1,5 @@
 package com.icodesoftware.service;
 
-/**
- * Updated by yinghu lu on 12/11/2020
- */
 public interface RNG {
 
     void onIdle();

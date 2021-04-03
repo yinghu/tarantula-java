@@ -7,9 +7,6 @@ import com.hazelcast.spi.PartitionAwareOperation;
 
 import java.io.IOException;
 
-/**
- * created by yinghu lu on 3/5/2021.
- */
 public class TournamentCheckAvailableOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;

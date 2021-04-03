@@ -5,10 +5,6 @@ import java.net.DatagramPacket;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 
-
-/**
- * Created by yinghu lu on 11/8/2020.
- */
 public class PendingServerPushMessage {
 
     private final UDPSessionService udpSessionService;

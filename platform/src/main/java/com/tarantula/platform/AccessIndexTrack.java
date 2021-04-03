@@ -11,9 +11,7 @@ import com.tarantula.platform.event.PortableEventRegistry;
 import java.io.IOException;
 import java.util.Map;
 import com.icodesoftware.util.RecoverableObject;
-/**
- * updated 6/16/2020 yinghu lu
- */
+
 public class AccessIndexTrack extends RecoverableObject implements AccessIndex, Portable {
 
     private int nodeId;

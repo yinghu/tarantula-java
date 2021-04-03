@@ -7,9 +7,6 @@ import com.hazelcast.spi.PartitionAwareOperation;
 
 import java.io.IOException;
 
-/**
- * updated by yinghu lu on 8/9/2020
- */
 public class AccessIndexRecoverOperation extends Operation implements PartitionAwareOperation {
 
 

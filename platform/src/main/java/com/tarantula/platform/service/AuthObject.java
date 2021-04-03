@@ -5,9 +5,6 @@ import com.icodesoftware.service.TokenValidatorProvider;
 
 import java.util.Map;
 
-/**
- * Created by yinghu lu on 1/31/2019.
- */
 public class AuthObject implements TokenValidatorProvider.AuthVendor {
 
     private  String name;

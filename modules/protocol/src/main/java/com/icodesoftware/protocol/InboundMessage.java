@@ -3,9 +3,6 @@ package com.icodesoftware.protocol;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
-/**
- * Created by yinghu lu on 9/24/2020.
- */
 public class InboundMessage {
 
     public static int ACK_POS = 0;

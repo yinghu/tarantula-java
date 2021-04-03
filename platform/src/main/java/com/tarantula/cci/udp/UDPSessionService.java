@@ -19,9 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created by yinghu lu on 9/21/2020.
- */
 public class UDPSessionService implements ConnectionEventService {
 
     private DatagramSocket datagramChannel;

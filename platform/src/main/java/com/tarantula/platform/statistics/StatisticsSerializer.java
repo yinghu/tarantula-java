@@ -5,9 +5,6 @@ import com.icodesoftware.Statistics;
 
 import java.lang.reflect.Type;
 
-/**
- * Updated by yinghu on 9/6/2019
- */
 public class StatisticsSerializer implements JsonSerializer<Statistics> {
 
     public JsonElement serialize(Statistics statistics, Type type, JsonSerializationContext jsonSerializationContext) {

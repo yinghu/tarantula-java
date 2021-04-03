@@ -2,9 +2,7 @@ package com.icodesoftware;
 
 import java.util.List;
 
-/**
- * Updated by yinghu on 5/2/2020
- */
+
 public interface Statistics {
 
 

@@ -2,10 +2,6 @@ package com.icodesoftware;
 
 import java.util.Map;
 
-/**
- * Updated by yinghu lu 5/7/2020
- */
-//user application authentication utility API
 public interface TokenValidator {
 
 

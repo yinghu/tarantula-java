@@ -8,9 +8,6 @@ import com.icodesoftware.AccessIndex;
 
 import java.io.IOException;
 
-/**
- * updated by yinghu lu on 5/28/2019.
- */
 public class AccessIndexSetOperation extends Operation implements PartitionAwareOperation {
 
     //private boolean result;

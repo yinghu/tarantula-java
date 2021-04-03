@@ -7,9 +7,7 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;
 import java.util.Map;
 import com.icodesoftware.util.RecoverableObject;
-/**
- * Updated by yinghu on 4/30/2020
- */
+
 public class PresenceIndex extends RecoverableObject implements Presence {
     private double balance;
     private int counter;

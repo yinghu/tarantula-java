@@ -10,9 +10,6 @@ import com.icodesoftware.util.TimeUtil;
 import java.lang.reflect.Type;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Created by yinghu lu on 5/13/2020
- */
 public class SubscriptionSerializer implements JsonSerializer<Subscription> {
 
     public JsonElement serialize(Subscription access, Type type, JsonSerializationContext jsonSerializationContext) {

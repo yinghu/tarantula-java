@@ -13,17 +13,17 @@ public class PVPLobbySetup implements ApplicationPreSetup {
     public void setup(ServiceContext serviceContext, Descriptor application) {
         //create zone/arena for lobby
         DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.partitionNumber());
-        PVPZone pveZone = new PVPZone(application);
+        PVPZone pveZone = new PVPZone();
 
     }
     @Override
     public <T extends Recoverable> T load(ApplicationContext context, Descriptor application){
 
-        return (T)new PVPZone(application);
+        return (T)new PVPZone();
     }
     @Override
     public <T extends Recoverable> T load(ServiceContext context,Descriptor application){
-        return (T)new PVPZone(application);
+        return (T)new PVPZone();
     }
     private String serviceDataStore(Descriptor application){
         return application.typeId().replace("-lobby","_service");

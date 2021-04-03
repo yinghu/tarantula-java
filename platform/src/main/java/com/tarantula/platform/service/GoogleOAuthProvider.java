@@ -8,9 +8,6 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import java.util.Collections;
 import java.util.Map;
 
-/**
- * Created by yinghu lu on 5/11/2020
- */
 public class GoogleOAuthProvider extends AuthObject {
 
     private final GoogleIdTokenVerifier googleIdTokenVerifier;

@@ -8,9 +8,6 @@ import com.icodesoftware.Recoverable;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Updated by yinghu on 7/10/2020
- */
 public class RecoverableObject implements Recoverable {
 
     protected String bucket;

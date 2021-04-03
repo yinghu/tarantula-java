@@ -2,9 +2,7 @@ package com.tarantula.platform.service.cluster.deployment;
 
 import com.icodesoftware.service.Serviceable;
 
-/**
- * Created by yinghu lu on 8/17/2018.
- */
+
 public class DeployServiceBootstrap implements Serviceable {
 
     private final ClusterDeployService clusterDeployService;

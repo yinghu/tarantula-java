@@ -6,9 +6,7 @@ import com.hazelcast.spi.Operation;
 
 import java.io.IOException;
 
-/**
- * created by yinghu lu on 5/15/2020.
- */
+
 public class DataStoreQueryStreamOperation extends Operation {
 
     private String source;

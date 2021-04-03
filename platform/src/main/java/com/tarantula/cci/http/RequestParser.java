@@ -9,9 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * updated by yinghu on 8/18/2019.
- */
 public class RequestParser{
 
     public Map<String,Object> parse(HttpExchange httpExchange) throws IOException {

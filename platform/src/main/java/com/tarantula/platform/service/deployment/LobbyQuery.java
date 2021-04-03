@@ -4,10 +4,6 @@ import com.icodesoftware.RecoverableFactory;
 import com.tarantula.platform.LobbyDescriptor;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-
-/**
- * Updated by yinghu on 7/10/2020.
- */
 public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {
 
 

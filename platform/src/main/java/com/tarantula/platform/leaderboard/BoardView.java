@@ -6,9 +6,6 @@ import com.icodesoftware.LeaderBoard;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * Created by yinghu on 5/2/2020
- */
 public class BoardView implements LeaderBoard.Board {
 
 

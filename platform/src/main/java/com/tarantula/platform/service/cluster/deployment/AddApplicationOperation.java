@@ -8,9 +8,6 @@ import com.tarantula.platform.DeploymentDescriptor;
 
 import java.io.IOException;
 
-/**
- * updated by yinghu lu on 12/25/2020
- */
 public class AddApplicationOperation extends Operation {
 
 

@@ -8,10 +8,6 @@ import com.tarantula.platform.service.Application;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Developer: YINGHU LU
- * Updated : 7/29/2020
- */
 public class DefaultApplication implements Application {
 
     private static final TarantulaLogger log = JDKLogger.getLogger(DefaultApplication.class);

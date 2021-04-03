@@ -12,9 +12,7 @@ import com.tarantula.platform.service.ConnectionEventService;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Created by yinghu on 7/25//2020.
- */
+
 public class ServerPushEvent extends Data implements Event {
 
 

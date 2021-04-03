@@ -11,11 +11,6 @@ import com.tarantula.platform.util.*;
 import java.util.ArrayList;
 import java.util.Base64;
 
-
-/**
- * Developer: YINGHU LU
- * Date: updated 5/20/2020
- */
 public class PresenceApplication extends TarantulaApplicationHeader implements OnLobby.Listener{
 
     private DeploymentServiceProvider deploymentServiceProvider;

@@ -2,9 +2,6 @@ package com.icodesoftware.util;
 
 import java.util.List;
 
-/**
- * Updated by yinghu on 6/13/2018.
- */
 public class FIFOBuffer<T> {
 
     private T[] buffer;

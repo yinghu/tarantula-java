@@ -10,9 +10,7 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.io.IOException;
 
-/**
- * Created by yinghu lu on 12/17/2020.
- */
+
 public class ClientConnection extends ResponseHeader implements Connection, Portable {
 
     protected String type;

@@ -9,9 +9,7 @@ import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.util.ResponseSerializer;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * updated by yinghu lu on 6/7/2020.
- */
+
 public class MatchMakingModule implements Module, Lobby.Listener {
 
     private ApplicationContext context;

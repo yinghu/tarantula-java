@@ -5,9 +5,6 @@ import com.icodesoftware.EventListener;
 import com.icodesoftware.RoutingKey;
 import com.icodesoftware.service.EventService;
 
-/**
- * Created by yinghu lu on 9/21/2020.
- */
 public class WebhookSessionService implements EventService {
     @Override
     public void publish(Event out) {

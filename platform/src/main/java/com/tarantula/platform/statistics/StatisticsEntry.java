@@ -10,9 +10,6 @@ import java.time.temporal.IsoFields;
 import java.util.Map;
 import com.icodesoftware.util.RecoverableObject;
 
-/**
- * Updated by yinghu lu on 4/29/2020
- */
 public class StatisticsEntry extends RecoverableObject implements Statistics.Entry {
 
     private String name;

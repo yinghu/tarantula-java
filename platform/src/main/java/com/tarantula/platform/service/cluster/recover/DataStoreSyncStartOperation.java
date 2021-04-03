@@ -6,9 +6,6 @@ import com.hazelcast.spi.Operation;
 
 import java.io.IOException;
 
-/**
- * created by yinghu lu on 5/15/2020.
- */
 public class DataStoreSyncStartOperation extends Operation {
 
 

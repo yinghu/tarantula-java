@@ -5,10 +5,6 @@ import com.icodesoftware.RecoverableFactory;
 import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-
-/**
- * Updated by yinghu lu on 7/19/2020.
- */
 public class ApplicationConfigurationQuery implements RecoverableFactory<Configuration> {
 
 

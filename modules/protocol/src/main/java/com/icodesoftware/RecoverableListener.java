@@ -1,8 +1,5 @@
 package com.icodesoftware;
 
-/**
- * Updated by yinghu lu on 8/1/2020.
- */
 public interface RecoverableListener extends RecoverableRegistry{
 
     void onUpdated(int classId,String owner,String key, byte[] value);

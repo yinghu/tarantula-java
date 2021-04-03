@@ -9,9 +9,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Updated by yinghu lu on 8/26/2019.
- */
+
 public class StaticMemberDiscovery implements ScopedMemberDiscovery {
 
     private int scope;

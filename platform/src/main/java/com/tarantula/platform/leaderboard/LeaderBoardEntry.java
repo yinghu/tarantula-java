@@ -6,9 +6,7 @@ import com.tarantula.platform.NaturalKey;
 
 import java.util.Map;
 import com.icodesoftware.util.RecoverableObject;
-/**
- * Updated by yinghu on 5/1/2020
- */
+
 public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.Entry {
 
     private double value=0;

@@ -11,9 +11,7 @@ import com.tarantula.platform.TarantulaContext;
 import java.net.InetAddress;
 import java.util.*;
 
-/**
- * Created by yinghu lu on 7/6/2018.
- */
+
 public class TarantulaDiscoveryStrategy extends AbstractDiscoveryStrategy {
 
     private int port;

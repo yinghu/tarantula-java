@@ -1,7 +1,5 @@
 package com.icodesoftware;
-/**
- * Updated by yinghu on 7/11/2020
- */
+
 public interface Distributable {
 
     int LOCAL_SCOPE = 0; //NO REPLICATION

@@ -8,9 +8,7 @@ import com.icodesoftware.Connection;
 import java.util.ArrayDeque;
 import java.util.UUID;
 
-/**
- * Updated by yinghu lu on 6/11/2020.
- */
+
 public class Room{
 
     static final int WAITING = 0; //waiting for first join

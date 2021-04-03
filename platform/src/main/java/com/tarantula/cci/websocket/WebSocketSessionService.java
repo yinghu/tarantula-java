@@ -10,9 +10,6 @@ import com.tarantula.platform.service.ConnectionEventService;
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
 
-/**
- * Created by yinghu lu on 9/25/2020.
- */
 public class WebSocketSessionService implements ConnectionEventService,WebSocket.Listener {
 
     private Connection serverConnection;

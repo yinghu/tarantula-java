@@ -8,9 +8,6 @@ import com.tarantula.platform.event.FastPlayEvent;
 
 import java.util.concurrent.ScheduledFuture;
 
-/**
- * Updated by yinghu lu on 4/19/2020.
- */
 public class SingletonModuleApplication extends TarantulaApplicationHeader implements SchedulingTask {
 
     private long SERVER_PUSH_INTERVAL;

@@ -21,9 +21,6 @@ import com.icodesoftware.util.JsonUtil;
 import java.util.*;
 import java.util.concurrent.*;
 
-/**
- * updated by yinghu on 7/14/2020
- */
 public class IntegrationCluster extends TarantulaApplicationHeader implements ClusterProvider,EventService,LifecycleListener{
 
     private static JDKLogger log = JDKLogger.getLogger(IntegrationCluster.class);

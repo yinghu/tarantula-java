@@ -8,9 +8,6 @@ import com.icodesoftware.Response;
 
 import java.lang.reflect.Type;
 
-/**
- * Updated by yinghu on 9/6/2019
- */
 public class ResponseSerializer implements JsonSerializer<Response> {
 
     public JsonElement serialize(Response response, Type type, JsonSerializationContext jsonSerializationContext) {

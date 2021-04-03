@@ -5,9 +5,6 @@ import com.icodesoftware.RecoverableFactory;
 import com.tarantula.platform.OnViewTrack;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-/**
- * Updated by yinghu on 8/26/19
- */
 public class OnViewQuery implements RecoverableFactory<OnView> {
 
     private String lobbyId;

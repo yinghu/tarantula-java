@@ -8,9 +8,6 @@ import com.tarantula.platform.event.ServerPushEvent;
 
 import java.io.IOException;
 
-/**
- * Created by yinghu lu on 7/25/2020
- */
 public class AddServerPushEventOperation extends Operation {
 
     private Event event;

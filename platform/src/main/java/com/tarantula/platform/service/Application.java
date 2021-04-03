@@ -5,10 +5,7 @@ import com.icodesoftware.Descriptor;
 import com.icodesoftware.Event;
 import com.icodesoftware.service.Serviceable;
 
-/**
- * Developer: YINGHU LU
- * Date Updated: 8/7/2019
- */
+
 public interface Application extends Serviceable {
 
     long DELTA = 60000;

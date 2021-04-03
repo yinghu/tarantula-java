@@ -5,9 +5,7 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.util.Map;
 
-/**
- * Updated by yinghu lu on 8/20/19
- */
+
 public class OnSessionTrack extends OnApplicationHeader implements OnSession {
 
     private String token;

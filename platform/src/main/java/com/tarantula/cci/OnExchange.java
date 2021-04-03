@@ -4,9 +4,6 @@ import com.icodesoftware.EventListener;
 
 import java.io.InputStream;
 
-/**
- * Updated by yinghu lu on 12/16/2019.
- */
 public interface OnExchange extends EventListener {
     String id();
     String path();

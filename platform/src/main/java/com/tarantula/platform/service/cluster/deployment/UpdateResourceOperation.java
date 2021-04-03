@@ -6,9 +6,6 @@ import com.hazelcast.spi.Operation;
 
 import java.io.IOException;
 
-/**
- * created by yinghu lu on 2/8/2021.
- */
 public class UpdateResourceOperation extends Operation {
 
     private String contentUrl;

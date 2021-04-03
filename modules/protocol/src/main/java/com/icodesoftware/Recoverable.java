@@ -1,8 +1,6 @@
 package com.icodesoftware;
 
 
-//portable interface, which could be replicated in cluster wide or persistent in storage
-
 import java.util.Map;
 
 public interface Recoverable extends Distributable {

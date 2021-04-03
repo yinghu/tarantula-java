@@ -14,9 +14,6 @@ import com.tarantula.platform.util.ResponseSerializer;
 
 import java.io.InputStream;
 
-/**
- * Updated by yinghu lu on 7/26/20.
- */
 public class UploadEventHandler implements RequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(UploadEventHandler.class);

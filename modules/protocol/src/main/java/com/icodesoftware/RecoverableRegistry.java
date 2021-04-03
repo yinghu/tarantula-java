@@ -1,8 +1,5 @@
 package com.icodesoftware;
 
-/**
- * Updated by yinghu lu on 8/5/2020
- */
 public interface RecoverableRegistry {
 
     int registryId();

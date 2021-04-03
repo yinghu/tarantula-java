@@ -6,9 +6,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.tarantula.cci.OnExchange;
 import java.io.InputStream;
 
-/**
- * Created by yinghu lu on 11/9/19.
- */
+
 public class HttpUploadSession implements OnExchange{
 
 	private final HttpExchange hex;

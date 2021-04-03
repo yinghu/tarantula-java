@@ -16,9 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Updated 6/17/2020
- */
+
 public class UserManagementApplication extends TarantulaApplicationHeader{
 
     private String lobbyId;

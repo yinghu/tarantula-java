@@ -15,9 +15,6 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 
-/**
- * created by yinghu lu on 3/5/2021.
- */
 public class TournamentScheduleOperation extends Operation{
 
     private String serviceName;
