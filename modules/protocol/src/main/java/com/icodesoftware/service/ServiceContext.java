@@ -2,7 +2,6 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.*;
 
-
 import java.util.concurrent.ScheduledFuture;
 
 public interface ServiceContext {

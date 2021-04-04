@@ -35,8 +35,6 @@ public class RequestParser{
                         buffer[i++]=(byte)c;
                     }
                 }while(c!=-1);
-                //System.out.println("PZ->"+pz+"<><><>"+in.available());
-                //in.read(buffer);
                 requestMapping.put(Session.TARANTULA_PAYLOAD,buffer);
             }
             else{
