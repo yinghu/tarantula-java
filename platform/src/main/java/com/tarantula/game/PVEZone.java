@@ -1,5 +1,7 @@
 package com.tarantula.game;
 
+import com.icodesoftware.Distributable;
+import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
 
 public class PVEZone extends Zone{
@@ -19,7 +21,22 @@ public class PVEZone extends Zone{
         return stub;
     }
     public void update(ServiceContext serviceContext){
-        //System.out.println("loading zone from cluster->"+this.distributionKey()+dataStore.name());
+        RecoverService deployService = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).recoverService();
+        Zone zone = new PVEZone();
+        zone.distributionKey(descriptor.distributionKey());
+        byte[] _data = deployService.load(null,this.dataStore.name(),zone.distributionKey().getBytes());
+        zone.fromBinary(_data);
+        for(int i=1;i<descriptor.capacity()+1;i++){
+            Arena a = new Arena(zone.bucket(),zone.oid(),i);
+            _data = deployService.load(null,dataStore.name(),a.distributionKey().getBytes());
+            if(_data!=null){
+                a.fromBinary(_data);
+                if(!a.disabled()){//skip disabled
+                    zone.arenas.add(a);
+                }
+            }
+        }
+        this.listener.onUpdated(zone);
     }
     @Override
     public int getFactoryId() {

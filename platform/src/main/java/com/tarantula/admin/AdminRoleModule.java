@@ -161,7 +161,7 @@ public class AdminRoleModule implements Module {
                         if(!_ex.containsKey(rk)){
                             Descriptor desc = lobby.entryList().get(0).copy();
                             desc.name("Game Lobby " + rk);
-                            desc.tag(gname + "/lobby" + rk);
+                            desc.tag(gname.toLowerCase() + "/lobby" + rk);
                             desc.accessRank(rk);
                             desc.index((String)gc.property(GameCluster.LOBBY_PRE_SETUP_NAME));
                             if(this.deploymentServiceProvider.createApplication(desc,(String)gc.property(GameCluster.LOBBY_PRE_SETUP_NAME),!disabled)){

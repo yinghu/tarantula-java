@@ -18,9 +18,6 @@ public interface Consumable extends Deployable {
     String category();
     void category(String category);
 
-    String description();
-    void description(String description);
-
     boolean isPack();
     void isPack(boolean isPack);
 

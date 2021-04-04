@@ -179,7 +179,7 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         //this.context.log("Bucket->"+bucket+"/"+state,OnLog.WARN);
     }
     public void onUpdated(Configurable zone) {
-        //mZone.reset((PVPZone)zone);
+        mZone.reset((Zone)zone);
         //this.context.log("Play mode->"+mZone.playMode,OnLog.WARN);
         //this.context.log("joinsOnStart->"+mZone.joinsOnStart,OnLog.WARN);
         //mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));

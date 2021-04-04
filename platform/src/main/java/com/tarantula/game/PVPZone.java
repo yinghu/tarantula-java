@@ -284,22 +284,7 @@ public class PVPZone extends Zone implements RoomListener{
             }
         }
     }
-    public void reset(PVPZone updated){
-        arenas.clear();
-        for(Arena a : updated.arenas){
-            arenas.add(a);
-        }
-        synchronized (this){//update local zone copy
-            this.name = updated.name;
-            this.capacity = updated.capacity;
-            this.joinsOnStart = updated.joinsOnStart;
-            this.roundDuration = updated.roundDuration;
-            this.playMode = updated.playMode;
-            this.levelLimit = updated.levelLimit;
-            aMap.clear();
-            listArena();
-        }
-    }
+
     public void registerListener(Listener listener){
         this.listener = listener;
     }

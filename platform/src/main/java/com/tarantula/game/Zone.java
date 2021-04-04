@@ -35,6 +35,7 @@ abstract public class Zone extends RecoverableObject implements Configurable, Da
     public int joinsOnStart = 1;
 
     public Descriptor descriptor;
+    public Configurable.Listener listener;
 
     public Zone(){
         this.label = "Zone";
@@ -128,5 +129,25 @@ abstract public class Zone extends RecoverableObject implements Configurable, Da
                 }
             }
         }
+    }
+    public void reset(Zone updated){
+        arenas.clear();
+        for(Arena a : updated.arenas){
+            arenas.add(a);
+        }
+        synchronized (this){//update local zone copy
+            this.name = updated.name;
+            this.capacity = updated.capacity;
+            this.joinsOnStart = updated.joinsOnStart;
+            this.roundDuration = updated.roundDuration;
+            this.playMode = updated.playMode;
+            this.levelLimit = updated.levelLimit;
+            aMap.clear();
+            listArena();
+        }
+    }
+    @Override
+    public void registerListener(Listener listener){
+        this.listener = listener;
     }
 }
