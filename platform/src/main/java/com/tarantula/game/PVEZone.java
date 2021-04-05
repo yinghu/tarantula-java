@@ -12,12 +12,14 @@ public class PVEZone extends Zone{
     }
     @Override
     public Stub join(Rating rating) {
-        Stub stub = new Stub();
+        Stub stub = new Stub();//stubIndex.computeIfAbsent()new Stub();
         stub.rating = rating;
         stub.successful(true);
-        stub.arena = aMap.get(rating.xpLevel).name();
+        Arena arena = aMap.get(rating.xpLevel);
+        stub.arena = arena.name();
         stub.offline = true;
         stub.tag = descriptor.tag();
+        stub.consumable = arena.consumable;
         return stub;
     }
     public void update(ServiceContext serviceContext){

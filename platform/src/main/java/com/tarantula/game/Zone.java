@@ -36,6 +36,7 @@ abstract public class Zone extends RecoverableObject implements Configurable, Da
 
     public Descriptor descriptor;
     public Configurable.Listener listener;
+    public ConcurrentHashMap<String,Stub> stubIndex;
 
     public Zone(){
         this.label = "Zone";
@@ -149,5 +150,9 @@ abstract public class Zone extends RecoverableObject implements Configurable, Da
     @Override
     public void registerListener(Listener listener){
         this.listener = listener;
+    }
+    public void onConfiguration(Consumable consumable){
+        int level = ((Number)consumable.property("level")).intValue();
+        aMap.get(level).consumable = consumable;
     }
 }

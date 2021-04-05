@@ -73,12 +73,13 @@
 		  <version>6.8</version>
 		  <scope>test</scope>
 	  </dependency>
+	  <!--
 	  <dependency>
 		  <groupId>org.testng</groupId>
 		  <artifactId>testng</artifactId>
 		  <version>RELEASE</version>
 		  <scope>test</scope>
-	  </dependency>
+	  </dependency>-->
   </dependencies>
   <build>
   	<plugins>

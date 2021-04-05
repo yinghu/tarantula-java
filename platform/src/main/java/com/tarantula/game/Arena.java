@@ -1,5 +1,6 @@
 package com.tarantula.game;
 
+import com.icodesoftware.Consumable;
 import com.icodesoftware.Recoverable;
 import com.tarantula.platform.IndexKey;
 import com.tarantula.platform.OnApplicationHeader;
@@ -12,6 +13,8 @@ public class Arena extends OnApplicationHeader {
     public int capacity;
     public int joinsOnStart;
     public long duration;
+
+    public Consumable consumable;
 
     public Arena(){}
     public Arena(String bucket,String oid,int level){

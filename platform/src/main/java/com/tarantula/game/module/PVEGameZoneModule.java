@@ -28,7 +28,6 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
 
     private DeploymentServiceProvider deploymentServiceProvider;
     private String registerKey;
-    private Consumable consumable;
 
     @Override
     public void onJoin(Session session, OnUpdate onUpdate) throws Exception {
@@ -36,7 +35,6 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         rating.fromBinary(session.payload());
         Stub stub = mZone.join(rating);
         stub.owner(session.systemId());
-        stub.consumable = consumable;
         session.write(stub.toJson().toString().getBytes());
     }
 
@@ -140,7 +138,7 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         this.gameServiceProvider = this.context.serviceProvider(gz);
 
         mZone = this.gameServiceProvider.zone(this.context.descriptor(),Zone.PVE);
-        //mZone.stubIndex = this.mStub;
+        mZone.stubIndex = this.mStub;
         //mZone.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         //mZone.gameServiceProvider = this.gameServiceProvider;
         mZone.descriptor = this.context.descriptor();
@@ -212,7 +210,8 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
 
     @Override
     public void onCreated(Consumable consumable) {
-        this.consumable = consumable;
+        //this.consumable = consumable;
+        mZone.onConfiguration(consumable);
     }
 
     @Override
