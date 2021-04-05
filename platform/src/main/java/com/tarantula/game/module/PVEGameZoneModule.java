@@ -33,18 +33,23 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
     public void onJoin(Session session, OnUpdate onUpdate) throws Exception {
         Rating rating = new Rating();
         rating.fromBinary(session.payload());
+        rating.owner(session.systemId());
         Stub stub = mZone.join(rating);
-        stub.owner(session.systemId());
         session.write(stub.toJson().toString().getBytes());
     }
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
-        if(session.action().equals("onUpdated")){
+        if(session.action().equals("onUpdate")){
             Stub stub = mStub.get(session.systemId());
             if(stub!=null){
-                session.write(toMessage(session.action(),true).toString().getBytes());
-                StatsDelta delta = toDelta(payload);
+                stub.rank = 1;
+                stub.pxp = 90;
+                Rating updates = gameServiceProvider.rating(session.systemId());
+                updates.update(stub);
+                updates.update();
+                session.write(toJson(updates));
+                //StatsDelta delta = toDelta(payload);
                 //mZone.onStatistics(session.systemId(),delta.name,delta.value);
             }
             else{
@@ -221,5 +226,12 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
     @Override
     public boolean validate(Deployable deployable){
         return deployable.filter().equals(context.descriptor().tag());
+    }
+    private byte[] toJson(Rating rating){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("successful",true);
+        jsonObject.addProperty("level",rating.level);
+        jsonObject.addProperty("rank",rating.rank);
+        return jsonObject.toString().getBytes();
     }
 }

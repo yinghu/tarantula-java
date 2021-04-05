@@ -56,11 +56,11 @@
         app.stage.addChild(seat.container);    
         seats.push(seat);
     }
-    let score = text_button('SCORE',()=>{
-        let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onScore'}; 
+    let score = text_button('Update',()=>{
+        let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onUpdate'}; 
         TARA_API.onService(true,cmd,(resp)=>{
             if(resp.successful){
-                seats[resp.rank].caption.text = resp.score;
+                seats[resp.rank].caption.text = resp.level;
             }
             else{
                 messageBox.text = resp.message;

@@ -12,7 +12,12 @@ public class PVEZone extends Zone{
     }
     @Override
     public Stub join(Rating rating) {
-        Stub stub = new Stub();//stubIndex.computeIfAbsent()new Stub();
+        Stub stub = stubIndex.computeIfAbsent(rating.owner(),(k)->{
+            Stub _stub = new Stub();
+            _stub.levelUpBase = Zone.DEFAULT_LEVEL_UP_BASE;
+            _stub.rankUpBase = levelLimit;
+            return _stub;
+        });
         stub.rating = rating;
         stub.successful(true);
         Arena arena = aMap.get(rating.xpLevel);

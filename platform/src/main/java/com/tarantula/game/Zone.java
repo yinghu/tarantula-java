@@ -20,7 +20,7 @@ abstract public class Zone extends RecoverableObject implements Configurable, Da
     public static final String TVE = "tve"; //team versus computer
     public static final String TVT = "tvt"; //team versus team
 
-    public static final int DEFAULT_LEVEL_COUNT = 3;
+    public static final int DEFAULT_LEVEL_COUNT = 10;
     public static final int DEFAULT_LEVEL_UP_BASE = 1000;
 
     public List<Arena> arenas = new ArrayList<>();
