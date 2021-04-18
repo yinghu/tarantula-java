@@ -224,8 +224,8 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
 
     }
     @Override
-    public boolean validate(Deployable deployable){
-        return deployable.filter().equals(context.descriptor().tag());
+    public boolean validate(Filterable filterable){
+        return filterable.filter().equals(context.descriptor().tag());
     }
     private byte[] toJson(Rating rating){
         JsonObject jsonObject = new JsonObject();

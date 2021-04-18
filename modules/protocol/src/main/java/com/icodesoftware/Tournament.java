@@ -1,11 +1,11 @@
 package com.icodesoftware;
 
-import com.icodesoftware.service.DeployableListener;
+import com.icodesoftware.service.FilterableListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface Tournament extends Deployable{
+public interface Tournament extends Filterable {
 
     String ENTRY_LABEL = "TEE";
 
@@ -25,12 +25,12 @@ public interface Tournament extends Deployable{
 
     String join(String systemId);
 
-    interface Entry extends Deployable{
+    interface Entry extends Filterable {
         String systemId();
         double score(double delta);
         int rank();
     }
-    interface Instance extends Deployable{
+    interface Instance extends Filterable {
         String id();
         Status status();
         int maxEntries();
@@ -41,7 +41,7 @@ public interface Tournament extends Deployable{
         void update(String systemId,OnEntry onEntry);
         List<Entry> list();
     }
-    interface Listener extends DeployableListener {
+    interface Listener extends FilterableListener {
         default void tournamentScheduled(Tournament tournament){}
         default void tournamentStarted(Tournament tournament){}
         default void tournamentClosed(Tournament tournament){}

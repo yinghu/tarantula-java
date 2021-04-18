@@ -273,7 +273,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
 
     }
     @Override
-    public boolean validate(Deployable deployable){
+    public boolean validate(Filterable deployable){
         //if(deployable.filter().equals(""))
         return true;
     }

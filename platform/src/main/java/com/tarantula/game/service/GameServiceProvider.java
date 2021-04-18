@@ -42,7 +42,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private ConcurrentHashMap<String,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Tournament.Instance> activeInstanceIndex = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<String,DeployableListener> rListeners = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,FilterableListener> rListeners = new ConcurrentHashMap<>();
 
 
     private EventService publisher;

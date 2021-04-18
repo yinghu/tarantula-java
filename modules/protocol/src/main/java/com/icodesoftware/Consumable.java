@@ -1,17 +1,14 @@
 package com.icodesoftware;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.service.DeployableListener;
+import com.icodesoftware.service.FilterableListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public interface Consumable extends Deployable {
+public interface Consumable extends Filterable {
 
     String id();
-
-    String name();
-    void name(String name);
 
     String type();
     void type(String type);
@@ -32,7 +29,8 @@ public interface Consumable extends Deployable {
     void property(String pName,Object pValue);
     Object property(String pName);
 
-    interface Listener extends DeployableListener {
+
+    interface Listener extends FilterableListener {
         void onCreated(Consumable consumable);
         void onUpdated(Consumable consumable);
     }
