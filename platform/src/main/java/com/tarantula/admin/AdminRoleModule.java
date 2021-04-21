@@ -469,8 +469,8 @@ public class AdminRoleModule implements Module {
         this.context = context;
         Configuration ya = this.context.configuration("yearlyAccess");
         Configuration ma = this.context.configuration("monthlyAccess");
-        monthly = new SubscriptionFee("monthlyAccess",ma.property("description"),ma.property("price"),ma.property("currency"),Integer.parseInt(ma.property("durationMonths")));
-        yearly = new SubscriptionFee("yearlyAccess",ya.property("description"),ya.property("price"),ya.property("currency"),Integer.parseInt(ya.property("durationMonths")));
+        monthly = new SubscriptionFee("monthlyAccess",ma.property("description").toString(),ma.property("price").toString(),ma.property("currency").toString(),Integer.parseInt(ma.property("durationMonths").toString()));
+        yearly = new SubscriptionFee("yearlyAccess",ya.property("description").toString(),ya.property("price").toString(),ya.property("currency").toString(),Integer.parseInt(ya.property("durationMonths").toString()));
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
@@ -483,21 +483,21 @@ public class AdminRoleModule implements Module {
             //reload monthly
             this.context.log("UPDATE->"+ JsonUtil.toJsonString(cf.toMap()),OnLog.WARN);
             Configuration c = (Configuration)cf;
-            yearly =  new SubscriptionFee("yearlyAccess",c.property("description"),c.property("price"),c.property("currency"),Integer.parseInt(c.property("durationMonths")));
+            yearly =  new SubscriptionFee("yearlyAccess",c.property("description").toString(),c.property("price").toString(),c.property("currency").toString(),Integer.parseInt(c.property("durationMonths").toString()));
         });
         ma.registerListener((cf)->{
             //reload monthly
             this.context.log("UPDATE->"+JsonUtil.toJsonString(cf.toMap()),OnLog.WARN);
             Configuration c = (Configuration)cf;
-            monthly = new SubscriptionFee("monthlyAccess",c.property("description"),c.property("price"),c.property("currency"),Integer.parseInt(c.property("durationMonths")));
+            monthly = new SubscriptionFee("monthlyAccess",c.property("description").toString(),c.property("price").toString(),c.property("currency").toString(),Integer.parseInt(c.property("durationMonths").toString()));
         });
         this.deploymentServiceProvider.register(ya);
         this.deploymentServiceProvider.register(ma);
-        this.maxGameClusterCount = Integer.parseInt(this.context.configuration("setup").property("maxGameClusterCount"));
-        this.maxGameLobbyCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLobbyCount"));
-        this.defaultGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("defaultGameLevelCount"));
-        this.maxGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLevelCount"));
-        this.minGameLobbyCount = Integer.parseInt(this.context.configuration("setup").property("minGameLobbyCount"));
+        this.maxGameClusterCount = Integer.parseInt(this.context.configuration("setup").property("maxGameClusterCount").toString());
+        this.maxGameLobbyCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLobbyCount").toString());
+        this.defaultGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("defaultGameLevelCount").toString());
+        this.maxGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLevelCount").toString());
+        this.minGameLobbyCount = Integer.parseInt(this.context.configuration("setup").property("minGameLobbyCount").toString());
         this.pendingLobby = new ConcurrentHashMap<>();
         //this.rankComparator = new GameLobbyComparator();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);

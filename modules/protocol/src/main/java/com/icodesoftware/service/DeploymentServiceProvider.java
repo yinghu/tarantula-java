@@ -32,10 +32,9 @@ public interface DeploymentServiceProvider extends ServiceProvider,Configuration
 
     //list configurations
     List<Configuration> configuration();
-    //void register(Configurable configurable);
-    //void release(Configurable configurable);
 
-    void configure(String key);
+
+    //void configure(String key);
     OnView onView(String viewId);
     Response createView(OnView onView);
     Response deployResource(String contentUrl,String resourceName);

@@ -3,12 +3,11 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Property;
-import com.icodesoftware.service.DeployService;
+
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.service.cluster.PortableRegistry;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,22 +36,16 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
     public String label(){
         return Configuration.LABEL;
     }
-    public void configure(String name,String value){
-        this.properties.put(name,value);
-    }
+
     public List<Property> properties(){
         ArrayList<Property> _alist = new ArrayList();
         properties.forEach((String k,Object v)->{
             if(!k.equals("type")){
-                DistributedProperty _p = new DistributedProperty(k,v.toString());
+                DistributedProperty _p = new DistributedProperty(k,v);
                 _alist.add(_p);
             }
         });
         return _alist;
-    }
-    public String property(String name){
-        Object v = this.properties.get(name);
-        return v!=null?v.toString():null;
     }
 
     @Override

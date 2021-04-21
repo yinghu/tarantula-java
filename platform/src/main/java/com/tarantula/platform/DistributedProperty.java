@@ -7,12 +7,12 @@ import java.util.Map;
 
 public class DistributedProperty extends RecoverableObject implements Property {
     public String name;
-    public String value;
+    public Object value;
 
     public DistributedProperty(){
     }
 
-    public DistributedProperty(String name,String value){
+    public DistributedProperty(String name,Object value){
         this.name = name;
         this.value = value;
     }
@@ -41,7 +41,7 @@ public class DistributedProperty extends RecoverableObject implements Property {
     public String name(){
         return name;
     }
-    public String value(){
+    public Object value(){
         return value;
     }
     @Override

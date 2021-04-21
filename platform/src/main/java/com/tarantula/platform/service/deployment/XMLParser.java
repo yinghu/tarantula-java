@@ -186,7 +186,7 @@ public class XMLParser extends DefaultHandler{
                 }
             }
             else if(tblock.equals("configuration-list")&&qname.equals("property")){
-                this.applicationConfiguration.configure(pname,value);
+                this.applicationConfiguration.property(pname,value);
             }
 			else if(tblock.equals("application-list")&&qname.equals("application")){
                 this.configuration.applications.add(this.applicationDescriptor);

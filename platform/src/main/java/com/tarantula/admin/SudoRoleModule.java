@@ -243,7 +243,7 @@ public class SudoRoleModule implements Module {
             jc.addProperty("accessId",configuration.distributionKey());
             jc.addProperty("type",configuration.type());
             configuration.properties().forEach((p)->{
-                jc.addProperty(p.name(),p.value());
+                jc.addProperty(p.name(),p.value().toString());
             });
             clist.add(jc);
         });

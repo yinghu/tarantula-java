@@ -9,7 +9,7 @@ public interface Configuration extends Configurable {
     String type();
     void type(String type);
 
-    void configure(String name,String value);
+    void property(String name,Object value);
     List<Property> properties();
-    String property(String name);
+    Object property(String name);
 }

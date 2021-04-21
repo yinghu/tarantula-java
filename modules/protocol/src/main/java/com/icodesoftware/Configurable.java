@@ -9,6 +9,6 @@ public interface Configurable extends Recoverable, DataStore.Updatable {
     default void update(ServiceContext serviceContext){}
 
     interface Listener{
-        void onUpdated(Configurable c);
+        void onUpdated(Configurable updated);
     }
 }
