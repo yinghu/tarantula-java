@@ -5,7 +5,7 @@ import com.icodesoftware.Module;
 
 import java.util.List;
 
-public interface DeploymentServiceProvider extends ServiceProvider,MetricsListener{
+public interface DeploymentServiceProvider extends ServiceProvider,ConfigurationServiceProvider,MetricsListener{
 
     String DEPLOY_DATA_STORE = "tarantula";
     String SERVER_KEY_SPEC = "AES";
@@ -32,8 +32,8 @@ public interface DeploymentServiceProvider extends ServiceProvider,MetricsListen
 
     //list configurations
     List<Configuration> configuration();
-    void register(Configurable configurable);
-    void release(Configurable configurable);
+    //void register(Configurable configurable);
+    //void release(Configurable configurable);
     void configure(String key);
     OnView onView(String viewId);
     Response createView(OnView onView);
