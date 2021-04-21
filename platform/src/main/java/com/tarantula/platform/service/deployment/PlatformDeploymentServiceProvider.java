@@ -369,7 +369,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 this.oListeners.forEach((ol)->{ //remove lobby entry
                     OnLobby onLobby = (OnLobby) vMap.get(d.typeId());
                     onLobby.closed(true);
-                    ol.onLobby(onLobby);//removed lobby entry
+                    ol.onUpdated(onLobby);//removed lobby entry
                 });
                 //rListeners.remove(d.tag()); //remove instance entry
                 this.tarantulaContext.tarantulaCluster().deployService().disableLobby(d.typeId());
@@ -404,7 +404,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(vMap.containsKey(typeId)){//skip system level modules
                 OnLobby onLobby =(OnLobby) vMap.get(typeId);
                 onLobby.closed(true);
-                ol.onLobby(onLobby);
+                ol.onUpdated(onLobby);
             }
         });
         this.tarantulaContext.unsetLobby(typeId,(d)->{//clean up from runtime context
@@ -648,7 +648,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(onLobby.resetEnabled()){
             this.tarantulaContext.tokenValidatorProvider().onCheck(onLobby);
         }
-        oListeners.forEach((o)->o.onLobby(onLobby));
+        oListeners.forEach((o)->o.onUpdated(onLobby));
     }
     public void registerOnLobbyListener(OnLobby.Listener onLobbyListener){
         oListeners.add(onLobbyListener);

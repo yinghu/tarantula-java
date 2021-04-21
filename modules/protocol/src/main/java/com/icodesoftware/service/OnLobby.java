@@ -12,8 +12,4 @@ public interface OnLobby extends Configurable {
     boolean resetEnabled();
     boolean closed();
     void closed(boolean closed);
-
-    interface Listener{
-        void onLobby(OnLobby onLobby);
-    }
 }

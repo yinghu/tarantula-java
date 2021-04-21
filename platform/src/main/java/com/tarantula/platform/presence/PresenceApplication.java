@@ -11,7 +11,7 @@ import com.tarantula.platform.util.*;
 import java.util.ArrayList;
 import java.util.Base64;
 
-public class PresenceApplication extends TarantulaApplicationHeader implements OnLobby.Listener{
+public class PresenceApplication extends TarantulaApplicationHeader implements Configurable.Listener{
 
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
@@ -210,7 +210,8 @@ public class PresenceApplication extends TarantulaApplicationHeader implements O
         return null;
     }
     @Override
-    public void onLobby(OnLobby onLobby) {
+    public void onUpdated(Configurable updated) {
+        OnLobby onLobby = (OnLobby)updated;
         if(!onLobby.closed()){
             String[] ps = onLobby.typeId().split("-");
             liveGameContext.addGameIndex(ps[0]);

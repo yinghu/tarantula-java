@@ -303,7 +303,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         this.configureViews(lc);
         try{
             OnLobby ob = this.configure(lc);
-            listener.onLobby(ob);
+            listener.onUpdated(ob);
         }catch (Exception ex){ex.printStackTrace();}
     }
     public synchronized void setOnLobby(String memberId,LobbyDescriptor lobbyDescriptor,OnLobby.Listener listener){
@@ -318,7 +318,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         //this.configureViews(lc);
         try{
             OnLobby ob = this.configure(lc);
-            listener.onLobby(ob);
+            listener.onUpdated(ob);
         }catch (Exception ex){ex.printStackTrace();}
     }
     public synchronized void setOnLobby(String typeId,String publishingId,OnLobby.Listener listener){
@@ -336,7 +336,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             //this.configureViews(lc);
             try{
                 OnLobby ob = this.configure(lc);
-                listener.onLobby(ob);
+                listener.onUpdated(ob);
             }catch (Exception ex){ex.printStackTrace();}
         });
         IndexSet indexSet = new IndexSet();
