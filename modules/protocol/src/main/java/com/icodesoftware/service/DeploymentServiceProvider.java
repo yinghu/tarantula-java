@@ -34,6 +34,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,Configuration
     List<Configuration> configuration();
     //void register(Configurable configurable);
     //void release(Configurable configurable);
+
     void configure(String key);
     OnView onView(String viewId);
     Response createView(OnView onView);
