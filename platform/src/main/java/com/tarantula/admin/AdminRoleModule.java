@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class AdminRoleModule implements Module {
+public class AdminRoleModule implements Module,Configurable.Listener {
 
     private ApplicationContext context;
     private GsonBuilder builder;
@@ -479,18 +479,20 @@ public class AdminRoleModule implements Module {
         this.purchase = this.context.dataStore(SubscriptionFee.DataStore);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        ya.registerListener((cf)->{
+        ya.registerListener(this);
+        //ya.registerListener((cf)->{
             //reload monthly
-            this.context.log("UPDATE->"+ JsonUtil.toJsonString(cf.toMap()),OnLog.WARN);
-            Configuration c = (Configuration)cf;
-            yearly =  new SubscriptionFee("yearlyAccess",c.property("description").toString(),c.property("price").toString(),c.property("currency").toString(),Integer.parseInt(c.property("durationMonths").toString()));
-        });
-        ma.registerListener((cf)->{
+            //this.context.log("UPDATE->"+ JsonUtil.toJsonString(cf.toMap()),OnLog.WARN);
+            //Configuration c = (Configuration)cf;
+            //yearly =  new SubscriptionFee("yearlyAccess",c.property("description").toString(),c.property("price").toString(),c.property("currency").toString(),Integer.parseInt(c.property("durationMonths").toString()));
+        //});
+        ma.registerListener(this);
+        //ma.registerListener((cf)->{
             //reload monthly
-            this.context.log("UPDATE->"+JsonUtil.toJsonString(cf.toMap()),OnLog.WARN);
-            Configuration c = (Configuration)cf;
-            monthly = new SubscriptionFee("monthlyAccess",c.property("description").toString(),c.property("price").toString(),c.property("currency").toString(),Integer.parseInt(c.property("durationMonths").toString()));
-        });
+            //this.context.log("UPDATE->"+JsonUtil.toJsonString(cf.toMap()),OnLog.WARN);
+            //Configuration c = (Configuration)cf;
+            //monthly = new SubscriptionFee("monthlyAccess",c.property("description").toString(),c.property("price").toString(),c.property("currency").toString(),Integer.parseInt(c.property("durationMonths").toString()));
+        //});
         this.deploymentServiceProvider.register(ya);
         this.deploymentServiceProvider.register(ma);
         this.maxGameClusterCount = Integer.parseInt(this.context.configuration("cluster").property("maxGameClusterCount").toString());
@@ -581,5 +583,8 @@ public class AdminRoleModule implements Module {
         });
         jsonObject.add("gameServiceList",array);
         return jsonObject.toString().getBytes();
+    }
+    public void onUpdated(Configuration configuration){
+
     }
 }

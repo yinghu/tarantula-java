@@ -430,7 +430,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         byte[] ret = this.tarantulaContext.integrationCluster().recoverService().load(memberId,this.tarantulaContext.dataStoreMaster,key);
         gameCluster.fromBinary(ret);
-        this.tarantulaContext.setGameClusterOnLobby(memberId,(GameCluster)gameCluster,(ob)->this.register(ob));
+        this.tarantulaContext.setGameClusterOnLobby(memberId,(GameCluster)gameCluster,new OnLobbyListener());
     }
     public <T extends OnAccess> void closeGameCluster(T gameCluster){
         byte[] key = gameCluster.distributionKey().getBytes();
@@ -447,7 +447,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public void addLobby(String typeId){
         AccessIndex accessIndex = this.tarantulaContext.accessIndexService().get(typeId);
-        this.tarantulaContext.setOnLobby(typeId,accessIndex.distributionKey(),(ob)->this.register(ob));
+        this.tarantulaContext.setOnLobby(typeId,accessIndex.distributionKey(),new OnLobbyListener());
     }
     @Override
     public void setup(ServiceContext serviceContext){
@@ -999,7 +999,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void removeQueryCallback(String callId){
         qCallbacks.remove(callId);
     }
-
+    private class OnLobbyListener implements Configurable.Listener{
+        @Override
+        public <T extends Configurable> void onUpdated(T onLobby){
+            register(onLobby);
+        }
+    }
     private class PostOfficeSession implements PostOffice{
 
         public OnConnection onConnection(Connection connection){

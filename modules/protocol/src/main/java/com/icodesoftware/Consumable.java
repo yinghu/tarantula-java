@@ -23,9 +23,4 @@ public interface Consumable extends Configuration {
 
     default <T extends Consumable> List<T> list(){ return new ArrayList<>();}
 
-
-    interface Listener extends Configurable.Listener{
-        void onCreated(Consumable consumable);
-        void onUpdated(Consumable consumable);
-    }
 }

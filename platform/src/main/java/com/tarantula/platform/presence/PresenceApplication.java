@@ -210,7 +210,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         return null;
     }
     @Override
-    public void onUpdated(Configurable updated) {
+    public <T extends Configurable>void onUpdated(T updated) {
         OnLobby onLobby = (OnLobby)updated;
         if(!onLobby.closed()){
             String[] ps = onLobby.typeId().split("-");

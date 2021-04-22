@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class PVEGameZoneModule implements Module,Configurable.Listener,Connection.OnConnectionListener,Consumable.Listener{
+public class PVEGameZoneModule implements Module,Configurable.Listener,Connection.OnConnectionListener{
 
     private ApplicationContext context;
     private Zone mZone;
@@ -212,13 +212,12 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         }
     }
 
-    @Override
     public void onCreated(Consumable consumable) {
         //this.consumable = consumable;
         mZone.onConfiguration(consumable);
     }
 
-    @Override
+
     public void onUpdated(Consumable consumable) {
 
     }

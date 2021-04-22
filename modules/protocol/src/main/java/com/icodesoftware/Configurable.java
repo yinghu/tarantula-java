@@ -5,7 +5,7 @@ import com.icodesoftware.service.ServiceContext;
 
 public interface Configurable extends Recoverable, DataStore.Updatable {
 
-    default void registerListener(Listener listener){}
+    default <T extends Configurable> void registerListener(Listener listener){}
     default void update(ServiceContext serviceContext){}
 
     default String configurationType(){return null;}
@@ -13,7 +13,8 @@ public interface Configurable extends Recoverable, DataStore.Updatable {
     default String configurationName(){return null;}
     default void configurationName(String configurationName){}
 
-    interface Listener<T extends Configurable>{
-        void onUpdated(T updated);
+    interface Listener{
+        default <T extends Configurable> void onCreated(T created){}
+        default <T extends Configurable> void onUpdated(T updated){}
     }
 }

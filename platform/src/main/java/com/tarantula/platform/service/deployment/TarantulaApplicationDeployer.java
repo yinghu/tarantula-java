@@ -6,10 +6,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import com.icodesoftware.Account;
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.RecoverableFactory;
+import com.icodesoftware.*;
 import com.icodesoftware.service.DeployCode;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.RecoverService;
@@ -18,7 +15,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-public class TarantulaApplicationDeployer implements Serviceable {
+public class TarantulaApplicationDeployer implements Serviceable, Configurable.Listener {
 
 	private final TarantulaContext context;
 	public TarantulaApplicationDeployer(final TarantulaContext context ){
@@ -85,7 +82,7 @@ public class TarantulaApplicationDeployer implements Serviceable {
 			String memberId = recoverService.findDataNode(this.context.dataStoreMaster,publishingId.getBytes());
 			List<LobbyDescriptor> blist = this.context.queryFromIntegrationNode(memberId,PortableRegistry.OID, new LobbyQuery(publishingId), new String[]{publishingId},false);
 			blist.forEach((lb)->{
-				this.context.setOnLobby(memberId,lb,(ob)->this.context.deploymentService().register(ob));
+				this.context.setOnLobby(memberId,lb,this);
 			});
 		}catch (Exception ex){
 			ex.printStackTrace();
@@ -105,9 +102,7 @@ public class TarantulaApplicationDeployer implements Serviceable {
 			if((boolean)gameCluster.property(GameCluster.DISABLED)){
 				return;
 			}
-			this.context.setGameClusterOnLobby(memberId,gameCluster,(o)->{
-				this.context.deploymentService().register(o);
-			});
+			this.context.setGameClusterOnLobby(memberId,gameCluster,this);
 		}catch (Exception ex){
 			throw new RuntimeException(ex);
 		}
@@ -188,5 +183,9 @@ public class TarantulaApplicationDeployer implements Serviceable {
 			}
 		}
 		return arrayList;
+	}
+	@Override
+	public <T extends Configurable> void onUpdated(T onLobby){
+		this.context.deploymentService().register(onLobby);
 	}
 }

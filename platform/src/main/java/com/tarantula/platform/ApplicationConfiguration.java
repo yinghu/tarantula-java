@@ -76,6 +76,7 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
         return PortableRegistry.APPLICATION_CONFIGURATION_CID;
     }
 
+    @Override
     public void registerListener(Listener listener){
         this._listeners.add(listener);
     }

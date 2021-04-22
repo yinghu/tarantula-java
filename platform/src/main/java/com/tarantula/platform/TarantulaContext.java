@@ -276,7 +276,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public TokenValidatorProvider tokenValidatorProvider(){
  	    return this.tokenValidatorProvider;
     }
-    public synchronized void setGameClusterOnLobby(String memberId,GameCluster gameCluster,OnLobby.Listener listener){
+    public synchronized void setGameClusterOnLobby(String memberId,GameCluster gameCluster,Configurable.Listener listener){
  	    String publishingId = (String) gameCluster.property(GameCluster.PUBLISHING_ID);
         List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
         List<LobbyConfiguration> configurations = new ArrayList<>();
@@ -321,7 +321,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             listener.onUpdated(ob);
         }catch (Exception ex){ex.printStackTrace();}
     }
-    public synchronized void setOnLobby(String typeId,String publishingId,OnLobby.Listener listener){
+    public synchronized void setOnLobby(String typeId,String publishingId,Configurable.Listener listener){
         if(this._lobbyMapping.containsKey(typeId)){
             return;
         }
