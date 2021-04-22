@@ -241,8 +241,8 @@ public class SudoRoleModule implements Module {
         configurations.forEach(configuration ->{
             JsonObject jc = new JsonObject();
             jc.addProperty("accessId",configuration.distributionKey());
-            jc.addProperty("type",configuration.type());
-            jc.addProperty("name",configuration.name());
+            jc.addProperty("type",configuration.configurationType());
+            jc.addProperty("name",configuration.configurationName());
             configuration.properties().forEach((p)->{
                 jc.addProperty(p.name(),p.value().toString());
             });

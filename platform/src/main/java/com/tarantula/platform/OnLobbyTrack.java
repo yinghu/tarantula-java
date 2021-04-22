@@ -20,7 +20,7 @@ public class OnLobbyTrack extends RecoverableObject implements OnLobby {
 
     private int deployCode;
 
-    public String type(){
+    public String configurationType(){
         return OnLobby.TYPE;
     }
     public OnLobbyTrack(){

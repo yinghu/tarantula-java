@@ -12,7 +12,6 @@ import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.statistics.StatsDelta;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
-import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -223,10 +222,7 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
     public void onUpdated(Consumable consumable) {
 
     }
-    @Override
-    public boolean validate(Filterable filterable){
-        return filterable.filter().equals(context.descriptor().tag());
-    }
+
     private byte[] toJson(Rating rating){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",true);

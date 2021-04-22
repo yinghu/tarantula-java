@@ -1,19 +1,15 @@
 package com.icodesoftware;
 
-import com.icodesoftware.service.FilterableListener;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface Tournament extends Filterable {
+public interface Tournament extends Configurable {
 
     String ENTRY_LABEL = "TEE";
 
     enum Status{
         SCHEDULED,STARTED,CLOSED,ENDED
     }
-
-    String type();
     String description();
     String icon();
     Status status();
@@ -25,12 +21,12 @@ public interface Tournament extends Filterable {
 
     String join(String systemId);
 
-    interface Entry extends Filterable {
+    interface Entry extends Configurable {
         String systemId();
         double score(double delta);
         int rank();
     }
-    interface Instance extends Filterable {
+    interface Instance extends Configurable {
         String id();
         Status status();
         int maxEntries();
@@ -41,7 +37,7 @@ public interface Tournament extends Filterable {
         void update(String systemId,OnEntry onEntry);
         List<Entry> list();
     }
-    interface Listener extends FilterableListener {
+    interface Listener extends Configurable.Listener{
         default void tournamentScheduled(Tournament tournament){}
         default void tournamentStarted(Tournament tournament){}
         default void tournamentClosed(Tournament tournament){}

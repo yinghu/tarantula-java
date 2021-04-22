@@ -45,7 +45,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ClusterProvider integrationCluster;
     private SecureRandom secureRandom;
 
-    private CopyOnWriteArrayList<Configurable.Listener> oListeners = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<TypedListener> oListeners = new CopyOnWriteArrayList<>();
 
     private CopyOnWriteArrayList<Connection.OnStateListener> wListeners = new CopyOnWriteArrayList<>();
 
@@ -368,7 +368,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 this.oListeners.forEach((ol)->{ //remove lobby entry
                     OnLobby onLobby = (OnLobby) vMap.get(d.typeId());
                     onLobby.closed(true);
-                    ol.onUpdated(onLobby);//removed lobby entry
+                    if(onLobby.typeId().equals(ol.type)){
+                        ol.listener.onUpdated(onLobby);
+                    }//removed lobby entry
                 });
                 //rListeners.remove(d.tag()); //remove instance entry
                 this.tarantulaContext.tarantulaCluster().deployService().disableLobby(d.typeId());
@@ -403,7 +405,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(vMap.containsKey(typeId)){//skip system level modules
                 OnLobby onLobby =(OnLobby) vMap.get(typeId);
                 onLobby.closed(true);
-                ol.onUpdated(onLobby);
+                if(ol.type.equals(onLobby.configurationType())){
+                    ol.listener.onUpdated(onLobby);
+                }
             }
         });
         this.tarantulaContext.unsetLobby(typeId,(d)->{//clean up from runtime context
@@ -644,10 +648,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(onLobby.resetEnabled()){
             this.tarantulaContext.tokenValidatorProvider().onCheck(onLobby);
         }
-        oListeners.forEach((o)->o.onUpdated(onLobby));
+        oListeners.forEach((o)->
+                {
+                    if(o.type.equals(onLobby.configurationType())){
+                        o.listener.onUpdated(onLobby);
+                    }
+                }
+        );
     }
     public void registerConfigurableListener(String type, Configurable.Listener listener){
-        oListeners.add(listener);
+        oListeners.add(new TypedListener(type,listener));
     }
 
     public void registerServerPushEvent(Event event){
@@ -745,13 +755,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public List<Configuration> list(String type){
         ArrayList<Configuration> clist = new ArrayList<>();
         vMap.forEach((k,v)->{
-            if(v instanceof Configuration && v.type().equals(type)){
+            if(v instanceof Configuration && v.configurationType().equals(type)){
                 clist.add((Configuration) v);
             }
         });
         return clist;
     }
-    public void register(Configurable configurable){
+    public <T extends Configurable> void register(T configurable){
         if(configurable instanceof OnView){
             updateView((OnView)configurable);
             return;
@@ -966,7 +976,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext.onUpdated(key,value);
     }
 
-    public void release(Configurable configurable){
+    public <T extends Configurable> void release(T configurable){
         this.vMap.remove(configurable.distributionKey());
     }
     public void syncKey(String key){

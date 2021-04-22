@@ -272,9 +272,5 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
     public void onUpdated(Consumable consumable) {
 
     }
-    @Override
-    public boolean validate(Filterable deployable){
-        //if(deployable.filter().equals(""))
-        return true;
-    }
+
 }

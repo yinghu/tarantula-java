@@ -328,7 +328,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 }
                 ApplicationPreSetup[] preSetup = {null};
                 configuration.configurations.forEach(c->{
-                    if(c.type().equals(ApplicationPreSetup.SET_UP_TYPE)){
+                    if(c.configurationType().equals(ApplicationPreSetup.SET_UP_TYPE)){
                         String cname = c.property(ApplicationPreSetup.SET_UP_NAME).toString();
                         gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,cname);
                         preSetup[0] = SystemUtil.applicationPreSetup(cname);

@@ -1,17 +1,14 @@
 package com.icodesoftware;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.service.FilterableListener;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
-public interface Consumable extends Filterable {
+public interface Consumable extends Configuration {
 
     String id();
-
-    String type();
-    void type(String type);
 
     String category();
     void category(String category);
@@ -26,11 +23,8 @@ public interface Consumable extends Filterable {
 
     default <T extends Consumable> List<T> list(){ return new ArrayList<>();}
 
-    void property(String pName,Object pValue);
-    Object property(String pName);
 
-
-    interface Listener extends FilterableListener {
+    interface Listener extends Configurable.Listener{
         void onCreated(Consumable consumable);
         void onUpdated(Consumable consumable);
     }

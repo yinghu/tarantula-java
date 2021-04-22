@@ -39,7 +39,7 @@ public class DefaultApplication implements Application {
         List<Configuration> clist = this.tarantulaContext.configurations(this.deploymentDescriptor.typeId());
         if(clist!=null){
             clist.forEach((c)->{
-                this.configurations.put(c.name(),c);
+                this.configurations.put(c.configurationName(),c);
             });
         }
         //log.warn("Application ["+this.deploymentDescriptor.name()+"/"+this.deploymentDescriptor.distributionKey()+"] started");

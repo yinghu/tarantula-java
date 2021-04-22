@@ -19,20 +19,25 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
 
     public static final String LABEL = "AFC";
 
-    //private String type;
     private CopyOnWriteArrayList<Configurable.Listener> _listeners = new CopyOnWriteArrayList<>();
 
     public ApplicationConfiguration(){
         this.onEdge = true;
     }
 
-    public void type(String type) {
+    public void configurationType(String type) {
         this.type = type;
         this.properties.put("type",type);
     }
-    public void name(String name) {
+    public void configurationName(String name) {
         this.name = name;
         this.properties.put("name",name);
+    }
+    public String configurationType(){
+        return this.type;
+    }
+    public String configurationName(){
+        return this.name;
     }
 
     public String label(){

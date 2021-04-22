@@ -42,7 +42,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private ConcurrentHashMap<String,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Tournament.Instance> activeInstanceIndex = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<String,FilterableListener> rListeners = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,Configurable.Listener> rListeners = new ConcurrentHashMap<>();
 
 
     private EventService publisher;
@@ -496,9 +496,9 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
                 this.dataStore.create(item);
                 rListeners.forEach((k,c)->{
                     if(c instanceof Consumable.Listener){
-                        if(c.validate(item)){
-                            ((Consumable.Listener)c).onCreated(item);
-                        }
+                        //if(c.validate(item)){
+                            //((Consumable.Listener)c).onCreated(item);
+                        //}
                     }
                 });
             });
@@ -506,9 +506,9 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         this.dataStore.create(consumable);
         rListeners.forEach((k,c)->{
             if(c instanceof Consumable.Listener){
-                if(c.validate(consumable)){
-                    ((Consumable.Listener)c).onCreated(consumable);
-                }
+                //if(c.validate(consumable)){
+                    //((Consumable.Listener)c).onCreated(consumable);
+                //}
             }
         });
         return consumable;
@@ -530,4 +530,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     public void reload() {
         logger.warn("reloading ....");
     }
+
+    public void onUpdated(Configurable updated){}
+
 }
