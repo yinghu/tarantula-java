@@ -19,6 +19,10 @@ public class OnLobbyTrack extends RecoverableObject implements OnLobby {
     private String subscriptionId;
 
     private int deployCode;
+
+    public String type(){
+        return OnLobby.TYPE;
+    }
     public OnLobbyTrack(){
 
     }

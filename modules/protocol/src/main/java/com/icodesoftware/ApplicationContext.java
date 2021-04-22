@@ -16,7 +16,7 @@ public interface ApplicationContext {
 
     ScheduledFuture<?> schedule(SchedulingTask task);
 
-    Configuration configuration(String type);
+    Configuration configuration(String name);
     List<Configuration> configuration();
 
     TokenValidator validator();

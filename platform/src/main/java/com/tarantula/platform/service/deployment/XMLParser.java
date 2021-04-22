@@ -67,8 +67,8 @@ public class XMLParser extends DefaultHandler{
         }
         else if(qname.equals("configuration")){
             this.applicationConfiguration = new ApplicationConfiguration();
-            //this.applicationConfiguration.tag(attributes.getValue("tag"));
             this.applicationConfiguration.type(attributes.getValue("type"));
+            this.applicationConfiguration.name(attributes.getValue("name"));
         }
         else if(tblock.equals("configuration-list")&&qname.equals("property")){
             pname = attributes.getValue("name");

@@ -45,8 +45,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ClusterProvider integrationCluster;
     private SecureRandom secureRandom;
 
-    //private ConcurrentHashMap<String,InstanceRegistry.Listener> rListeners = new ConcurrentHashMap<>();
-    private CopyOnWriteArrayList<OnLobby.Listener> oListeners = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<Configurable.Listener> oListeners = new CopyOnWriteArrayList<>();
 
     private CopyOnWriteArrayList<Connection.OnStateListener> wListeners = new CopyOnWriteArrayList<>();
 
@@ -409,9 +408,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         this.tarantulaContext.unsetLobby(typeId,(d)->{//clean up from runtime context
             //remove modules
-            //if(d.singleton()){
-                //rListeners.remove(d.tag());
-            //}
             if(d.moduleName()!=null&&d.codebase()!=null){ //clean class loader if all apps removed on the class loader
                 DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.moduleId());
                 if(dynamicModuleClassLoader!=null){
@@ -650,8 +646,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         oListeners.forEach((o)->o.onUpdated(onLobby));
     }
-    public void registerOnLobbyListener(OnLobby.Listener onLobbyListener){
-        oListeners.add(onLobbyListener);
+    public void registerConfigurableListener(String type, Configurable.Listener listener){
+        oListeners.add(listener);
     }
 
     public void registerServerPushEvent(Event event){
@@ -746,10 +742,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerOnConnectionListener(Connection.OnConnectionListener listener){
         this.cCallbacks.put(listener.lobbyTag(),listener);
     }
-    public List<Configuration> configuration(){
+    public List<Configuration> list(String type){
         ArrayList<Configuration> clist = new ArrayList<>();
         vMap.forEach((k,v)->{
-            if(v instanceof Configuration){
+            if(v instanceof Configuration && v.type().equals(type)){
                 clist.add((Configuration) v);
             }
         });
@@ -765,7 +761,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return;
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
-        configurable.update(new ServiceContextProxy(this.tarantulaContext));
+        //configurable.update(new ServiceContextProxy(this.tarantulaContext));
     }
     public void configure(String key){
         if(vMap.containsKey(key)){

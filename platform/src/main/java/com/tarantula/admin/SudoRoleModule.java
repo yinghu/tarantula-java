@@ -113,7 +113,7 @@ public class SudoRoleModule implements Module {
             session.write(this.toMessage(suc?"module shutdown":"module not shutdown",suc).toString().getBytes());
         }
         else if(session.action().equals("onConfigurationList")){
-            List<Configuration> configurationList = this.deploymentServiceProvider.configuration();
+            List<Configuration> configurationList = this.deploymentServiceProvider.list("subscription");
             session.write(toJson(configurationList).toString().getBytes());
         }
         else if(session.action().equals("onUpdateConfiguration")){
@@ -242,6 +242,7 @@ public class SudoRoleModule implements Module {
             JsonObject jc = new JsonObject();
             jc.addProperty("accessId",configuration.distributionKey());
             jc.addProperty("type",configuration.type());
+            jc.addProperty("name",configuration.name());
             configuration.properties().forEach((p)->{
                 jc.addProperty(p.name(),p.value().toString());
             });

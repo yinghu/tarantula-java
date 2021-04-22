@@ -23,20 +23,20 @@
             </application>
         </application-list>
         <configuration-list>
-                <configuration tag="admin" type="setup">
+                <configuration type="setup" name="cluster">
                     <property name="maxGameClusterCount">10</property>
                     <property name="maxGameLobbyCount">10</property>
                     <property name="minGameLobbyCount">1</property>
                     <property name="defaultGameLevelCount">3</property>
                     <property name="maxGameLevelCount">10</property>
                 </configuration>
-                <configuration tag="admin" type="yearlyAccess">
+                <configuration name="yearlyAccess" type="subscription">
                     <property name="description">Yearly Subscription</property>
                     <property name="price">1980.00</property>
                     <property name="currency">USD</property>
                     <property name="durationMonths">12</property>
                 </configuration>
-                <configuration tag="admin" type="monthlyAccess">
+                <configuration name="monthlyAccess" type="subscription">
                     <property name="description">Monthly Subscription</property>
                     <property name="price">180.00</property>
                     <property name="currency">USD</property>

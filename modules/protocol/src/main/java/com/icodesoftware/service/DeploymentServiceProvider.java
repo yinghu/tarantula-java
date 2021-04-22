@@ -31,14 +31,11 @@ public interface DeploymentServiceProvider extends ServiceProvider,Configuration
     
 
     //list configurations
-    List<Configuration> configuration();
 
-
-    //void configure(String key);
     OnView onView(String viewId);
     Response createView(OnView onView);
     Response deployResource(String contentUrl,String resourceName);
-    void registerOnLobbyListener(OnLobby.Listener onLobbyListener);
+    //void registerOnLobbyListener(OnLobby.Listener onLobbyListener);
 
     Content resource(String name);
 

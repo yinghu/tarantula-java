@@ -26,7 +26,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         builder.registerTypeAdapter(PresenceContext.class, new PresenceContextSerializer());
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        this.deploymentServiceProvider.registerOnLobbyListener(this);
+        this.deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,this);
         liveGameContext = new LiveGameContext();
         userDs = this.context.dataStore(Access.DataStore);
         accountDs = this.context.dataStore(Account.DataStore);

@@ -22,7 +22,7 @@
             </application>
         </application-list>
         <configuration-list>
-                <configuration tag="account" type="setup">
+                <configuration type="setup" name="user">
                     <property name="maxUserCount">5</property>
                 </configuration>
 

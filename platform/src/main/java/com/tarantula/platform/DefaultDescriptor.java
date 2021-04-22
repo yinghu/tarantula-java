@@ -9,7 +9,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 
 	protected String typeId;
 
-	protected String type;
 
 
     protected String category;
@@ -19,8 +18,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     protected int accessRank;
     protected String tag;
     protected double entryCost;
-
-	protected String name;
 
 	protected String description;
 
@@ -102,10 +99,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 		return this.typeId;
 	}
 
-    public String type() {
-		return this.type;
-	}
-
     public String category(){
         return this.category;
     }
@@ -113,11 +106,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 	public String description() {
 		
 		return this.description;
-	}
-
-
-	public String name() {
-		return this.name;
 	}
 
 	public int capacity() {
@@ -135,14 +123,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 
 	public void typeId(String typeId) {
 		this.typeId = typeId;
-	}
-
-    public void name(String name) {
-		this.name = name;
-	}
-
-	public void type(String type) {
-		this.type = type;
 	}
 
 

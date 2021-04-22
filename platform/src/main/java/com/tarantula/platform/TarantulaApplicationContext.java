@@ -63,8 +63,8 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         this.application.setup(new ApplicationContextProxy(this));
     }
 
-    public Configuration configuration(String type){
-       return this.configurations.get(type);
+    public Configuration configuration(String name){
+       return this.configurations.get(name);
     }
     public List<Configuration> configuration(){
        return new ArrayList<>(this.configurations.values());

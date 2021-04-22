@@ -27,7 +27,7 @@ public class ApplicationConfigurationQuery implements RecoverableFactory<Configu
 
     @Override
     public String label() {
-        return Configuration.LABEL;
+        return ApplicationConfiguration.LABEL;
     }
 
 

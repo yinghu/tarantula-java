@@ -493,11 +493,11 @@ public class AdminRoleModule implements Module {
         });
         this.deploymentServiceProvider.register(ya);
         this.deploymentServiceProvider.register(ma);
-        this.maxGameClusterCount = Integer.parseInt(this.context.configuration("setup").property("maxGameClusterCount").toString());
-        this.maxGameLobbyCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLobbyCount").toString());
-        this.defaultGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("defaultGameLevelCount").toString());
-        this.maxGameLevelCount = Integer.parseInt(this.context.configuration("setup").property("maxGameLevelCount").toString());
-        this.minGameLobbyCount = Integer.parseInt(this.context.configuration("setup").property("minGameLobbyCount").toString());
+        this.maxGameClusterCount = Integer.parseInt(this.context.configuration("cluster").property("maxGameClusterCount").toString());
+        this.maxGameLobbyCount = Integer.parseInt(this.context.configuration("cluster").property("maxGameLobbyCount").toString());
+        this.defaultGameLevelCount = Integer.parseInt(this.context.configuration("cluster").property("defaultGameLevelCount").toString());
+        this.maxGameLevelCount = Integer.parseInt(this.context.configuration("cluster").property("maxGameLevelCount").toString());
+        this.minGameLobbyCount = Integer.parseInt(this.context.configuration("cluster").property("minGameLobbyCount").toString());
         this.pendingLobby = new ConcurrentHashMap<>();
         //this.rankComparator = new GameLobbyComparator();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);

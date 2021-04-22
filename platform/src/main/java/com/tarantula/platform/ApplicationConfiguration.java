@@ -17,30 +17,32 @@ import com.icodesoftware.util.RecoverableObject;
 
 public class ApplicationConfiguration extends RecoverableObject implements Configuration {
 
-    private String type;
+    public static final String LABEL = "AFC";
+
+    //private String type;
     private CopyOnWriteArrayList<Configurable.Listener> _listeners = new CopyOnWriteArrayList<>();
 
     public ApplicationConfiguration(){
         this.onEdge = true;
     }
 
-    public String type() {
-        return this.type;
-    }
-
     public void type(String type) {
         this.type = type;
         this.properties.put("type",type);
     }
+    public void name(String name) {
+        this.name = name;
+        this.properties.put("name",name);
+    }
 
     public String label(){
-        return Configuration.LABEL;
+        return LABEL;
     }
 
     public List<Property> properties(){
         ArrayList<Property> _alist = new ArrayList();
         properties.forEach((String k,Object v)->{
-            if(!k.equals("type")){
+            if(!k.equals("type")&&!k.equals("name")){
                 DistributedProperty _p = new DistributedProperty(k,v);
                 _alist.add(_p);
             }
@@ -55,6 +57,7 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
     @Override
     public void fromMap(Map<String,Object> properties){
         this.type = (String)properties.get("type");
+        this.name = (String)properties.get("name");
         properties.forEach((String k,Object v)->{
             this.properties.put(k,v);
         });

@@ -20,7 +20,7 @@
 
         </application-list>
         <configuration-list>
-            <configuration tag="user" type="setup">
+            <configuration type="setup" name="account">
                 <property name="lobbyId">presence</property>
                 <property name="activated">false</property>
                 <property name="initialBalance">1000000</property>

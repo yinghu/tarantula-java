@@ -37,7 +37,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        Configuration configuration = this.context.configuration("setup");
+        Configuration configuration = this.context.configuration("account");
         this.lobbyId = configuration.property("lobbyId").toString();
         this.activated = Boolean.parseBoolean(configuration.property("activated").toString());
         this.initialBalance = Double.parseDouble(configuration.property("initialBalance").toString());

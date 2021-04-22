@@ -43,7 +43,7 @@
             </application>
         </application-list>
         <configuration-list>
-            <configuration type="pre-setup">
+            <configuration type="pre-setup" name="level">
                 <property name="application-pre-setup">com.tarantula.game.service.PVPLobbySetup</property>
             </configuration>
         </configuration-list>
