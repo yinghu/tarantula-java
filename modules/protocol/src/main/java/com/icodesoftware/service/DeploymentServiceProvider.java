@@ -28,9 +28,7 @@ public interface DeploymentServiceProvider extends ServiceProvider,Configuration
      * */
     void register(ServiceProvider serviceProvider);
     void release(ServiceProvider serviceProvider);
-    
 
-    //list configurations
 
     OnView onView(String viewId);
     Response createView(OnView onView);

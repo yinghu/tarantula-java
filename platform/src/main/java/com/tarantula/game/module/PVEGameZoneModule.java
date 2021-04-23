@@ -74,7 +74,7 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         else if(session.action().equals("onList")){
             Stub stub = mStub.get(session.systemId());
             if(stub!=null&&stub.instance!=null){
-                List<Tournament.Entry> _e = gameServiceProvider.list(stub.instance.id());
+                List<Tournament.Entry> _e = gameServiceProvider.tournamentEntries(stub.instance.id());
                 JsonArray alist = new JsonArray();
                 _e.forEach((a)->{
                     JsonObject jsonObject = new JsonObject();
@@ -151,7 +151,7 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         mZone.registerListener(this);
         deploymentServiceProvider.register(mZone);
         this.deploymentServiceProvider.registerOnConnectionListener(this);
-        this.registerKey = this.gameServiceProvider.registerListener(this);
+        this.registerKey = this.gameServiceProvider.registerConfigurableListener(mZone.descriptor.tag(),this);
         this.deploymentServiceProvider.register(this.mZone);
         context.log("PVE Game lobby started with tournament enabled ["+context.descriptor().tournamentEnabled()+"] on tag=>"+this.context.descriptor().tag(),OnLog.WARN);
     }
@@ -173,19 +173,14 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
     @Override
     public void clear() {
         this.deploymentServiceProvider.release(mZone);
-        this.gameServiceProvider.unregisterListener(registerKey);
+        this.gameServiceProvider.unregisterConfigurableListener(registerKey);
         this.context.log("clear->"+this.context.descriptor().name(),OnLog.WARN);
     }
     @Override
     public void onBucket(int bucket,int state){
         //this.context.log("Bucket->"+bucket+"/"+state,OnLog.WARN);
     }
-    public void onUpdated(Configurable zone) {
-        mZone.reset((Zone)zone);
-        //this.context.log("Play mode->"+mZone.playMode,OnLog.WARN);
-        //this.context.log("joinsOnStart->"+mZone.joinsOnStart,OnLog.WARN);
-        //mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
-    }
+
     private JsonObject toMessage(String msg,boolean successful){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",successful);
@@ -212,16 +207,20 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         }
     }
 
-    public void onCreated(Consumable consumable) {
-        //this.consumable = consumable;
-        mZone.onConfiguration(consumable);
+    //configurable listener
+    public void onCreated(Configurable configurable) {
+        if(configurable instanceof Consumable){
+            mZone.onConfiguration((Consumable)configurable);
+        }
     }
-
-
-    public void onUpdated(Consumable consumable) {
-
+    public void onUpdated(Configurable updated) {
+        if(updated instanceof Zone) {
+            mZone.reset((Zone) updated);
+            this.context.log("Play mode->" + mZone.playMode, OnLog.WARN);
+            this.context.log("joinsOnStart->" + mZone.joinsOnStart, OnLog.WARN);
+            mZone.aMap.forEach((k, v) -> context.log("Add level ->" + k + " ->/level:" + v.level + "/name:" + v.name() + "/xp:" + v.xp, OnLog.WARN));
+        }
     }
-
     private byte[] toJson(Rating rating){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",true);

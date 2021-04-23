@@ -656,10 +656,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 }
         );
     }
-    public void registerConfigurableListener(String type, Configurable.Listener listener){
+    public String registerConfigurableListener(String type, Configurable.Listener listener){
         oListeners.add(new TypedListener(type,listener));
+        return null;
     }
+    public void unregisterConfigurableListener(String registryKey){
 
+    }
     public void registerServerPushEvent(Event event){
         if(event instanceof ServerPushEvent){
             ServerPushEvent serverPushEvent = (ServerPushEvent)event;
@@ -752,11 +755,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerOnConnectionListener(Connection.OnConnectionListener listener){
         this.cCallbacks.put(listener.lobbyTag(),listener);
     }
-    public List<Configuration> list(String type){
-        ArrayList<Configuration> clist = new ArrayList<>();
+    public <T extends Configuration> List<T> configurations(String type){
+        ArrayList<T> clist = new ArrayList<>();
         vMap.forEach((k,v)->{
             if(v instanceof Configuration && v.configurationType().equals(type)){
-                clist.add((Configuration) v);
+                clist.add((T) v);
             }
         });
         return clist;

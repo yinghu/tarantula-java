@@ -7,6 +7,7 @@ import com.tarantula.game.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.event.GameUpdateEvent;
+import com.tarantula.platform.service.deployment.TypedListener;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 import com.tarantula.platform.leaderboard.LeaderBoardEntry;
@@ -28,7 +29,7 @@ import java.util.concurrent.CountDownLatch;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,ItemServiceProvider,Tournament.Listener, ReloadListener {
+public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,ConfigurationServiceProvider,Tournament.Listener, ReloadListener {
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
@@ -42,7 +43,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private ConcurrentHashMap<String,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Tournament.Instance> activeInstanceIndex = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<String,Configurable.Listener> rListeners = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, TypedListener> rListeners = new ConcurrentHashMap<>();
 
 
     private EventService publisher;
@@ -286,10 +287,12 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         return _e;
     }
     @Override
-    public List<Tournament.Entry> list(String instanceId){
+    public List<Tournament.Entry> tournamentEntries(String instanceId){
         Tournament.Instance _ins = instance(instanceId);
         return _ins.list();
     }
+
+
     public Tournament tournament(String tournamentId) {
         return tournamentIndex.get(tournamentId);
     }
@@ -315,13 +318,6 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         });
     }
 
-    @Override
-    public String registerListener(Tournament.Listener listener){
-        reload(listener);
-        String rid = UUID.randomUUID().toString();
-        this.rListeners.put(rid,listener);
-        return rid;
-    }
 
     @Override
     public void tournamentScheduled(Tournament tournament) {
@@ -489,41 +485,51 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         return tlist;
     }
 
+    ///Configurable Listener
     @Override
-    public Consumable register(Consumable consumable) {
+    public <T extends Configurable> void register(T config) {
+        Consumable consumable = (Consumable)config;
         if(consumable.isPack()){
             consumable.list().forEach((item)->{
                 this.dataStore.create(item);
                 rListeners.forEach((k,c)->{
-                    if(c instanceof Consumable.Listener){
-                        //if(c.validate(item)){
-                            //((Consumable.Listener)c).onCreated(item);
-                        //}
+                    if(c.type.equals(consumable.configurationType())){
+                        c.listener.onCreated(item);
                     }
                 });
             });
         }
         this.dataStore.create(consumable);
         rListeners.forEach((k,c)->{
-            if(c instanceof Consumable.Listener){
-                //if(c.validate(consumable)){
-                    //((Consumable.Listener)c).onCreated(consumable);
-                //}
+            if(c.type.equals(config.configurationType())){
+                c.listener.onCreated(consumable);
             }
         });
-        return consumable;
+    }
+
+    @Override
+    public <T extends Configurable> void release(T t) {
+
+    }
+
+    @Override
+    public void configure(String s) {
+
+    }
+    public <T extends Configuration> List<T> configurations(String type){
+        return null;
     }
     @Override
-    public Consumable update(Consumable update){
-        return update;
-    }
-    public String registerListener(Consumable.Listener listener){
+    public String registerConfigurableListener(String type, Configurable.Listener listener) {
         String rid = UUID.randomUUID().toString();
-        this.rListeners.put(rid,listener);
+        this.rListeners.put(rid,new TypedListener(type,listener));
+        logger.warn("Listener registered with ->"+type);
         return rid;
     }
-    public void unregisterListener(String registerKey){
-        rListeners.remove(registerKey);
+    @Override
+    public void unregisterConfigurableListener(String registryKey){
+        TypedListener t = rListeners.remove(registryKey);
+        logger.warn("Listener removed with ->"+t.type);
     }
 
     @Override
@@ -531,6 +537,5 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         logger.warn("reloading ....");
     }
 
-    public void onUpdated(Configurable updated){}
 
 }

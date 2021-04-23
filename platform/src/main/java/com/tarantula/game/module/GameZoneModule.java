@@ -109,7 +109,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         else if(session.action().equals("onList")){
             Stub stub = mStub.get(session.systemId());
             if(stub!=null&&stub.instance!=null){
-                List<Tournament.Entry> _e = gameServiceProvider.list(stub.instance.id());
+                List<Tournament.Entry> _e = gameServiceProvider.tournamentEntries(stub.instance.id());
                 JsonArray alist = new JsonArray();
                 _e.forEach((a)->{
                     JsonObject jsonObject = new JsonObject();
@@ -203,7 +203,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         mZone.registerListener(this);
         deploymentServiceProvider.register(mZone);
         this.deploymentServiceProvider.registerOnConnectionListener(this);
-        this.registerKey = this.gameServiceProvider.registerListener(this);
+        this.registerKey = this.gameServiceProvider.registerConfigurableListener("",this);
         context.log("Game lobby started with tournament enabled ["+context.descriptor().tournamentEnabled()+"] on tag=>"+this.mZone.descriptor.tag(),OnLog.WARN);
     }
     @Override
@@ -224,7 +224,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
     @Override
     public void clear() {
         this.deploymentServiceProvider.release(mZone);
-        this.gameServiceProvider.unregisterListener(registerKey);
+        this.gameServiceProvider.unregisterConfigurableListener(registerKey);
         this.context.log("clear->"+this.context.descriptor().name(),OnLog.WARN);
     }
     @Override
@@ -262,15 +262,4 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
             session.write(toMessage(ex.getMessage(),false).toString().getBytes());
         }
     }
-
-
-    public void onCreated(Consumable consumable) {
-        this.consumable = consumable;
-    }
-
-
-    public void onUpdated(Consumable consumable) {
-
-    }
-
 }

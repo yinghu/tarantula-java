@@ -10,6 +10,8 @@ public interface Tournament extends Configurable {
     enum Status{
         SCHEDULED,STARTED,CLOSED,ENDED
     }
+    String type();
+    void type(String type);
     String description();
     String icon();
     Status status();

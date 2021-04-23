@@ -11,7 +11,8 @@ public interface ConfigurationServiceProvider{
     <T extends Configurable> void release(T configurable);
     void configure(String key);
 
-    List<Configuration> list(String type);
+    <T extends Configuration> List<T> configurations(String type);
 
-    void registerConfigurableListener(String type,Configurable.Listener listener);
+    String registerConfigurableListener(String type,Configurable.Listener listener);
+    void unregisterConfigurableListener(String registryKey);
 }
