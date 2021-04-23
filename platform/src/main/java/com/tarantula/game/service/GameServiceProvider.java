@@ -485,24 +485,16 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         return tlist;
     }
 
-    ///Configurable Listener
+    ///Configurable service provider
+    @Override
+    public  <T extends Configurable> void create(T configurable){
+        this.dataStore.create(configurable);
+    }
     @Override
     public <T extends Configurable> void register(T config) {
-        Consumable consumable = (Consumable)config;
-        if(consumable.isPack()){
-            consumable.list().forEach((item)->{
-                this.dataStore.create(item);
-                rListeners.forEach((k,c)->{
-                    if(c.type.equals(consumable.configurationType())){
-                        c.listener.onCreated(item);
-                    }
-                });
-            });
-        }
-        this.dataStore.create(consumable);
         rListeners.forEach((k,c)->{
-            if(c.type.equals(config.configurationType())){
-                c.listener.onCreated(consumable);
+            if(c.type==null||c.type.equals(config.configurationType())){
+                c.listener.onCreated(config);
             }
         });
     }

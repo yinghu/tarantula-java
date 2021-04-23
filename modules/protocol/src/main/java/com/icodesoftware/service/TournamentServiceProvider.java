@@ -6,7 +6,6 @@ import java.util.List;
 
 public interface TournamentServiceProvider extends ConfigurationServiceProvider{
 
-    //String registerListener(Tournament.Listener listener);
 
     Tournament register(Tournament.Schedule schedule);
 

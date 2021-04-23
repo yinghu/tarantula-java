@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface ConfigurationServiceProvider{
 
+    default <T extends Configurable> void create(T configurable){}
+
     <T extends Configurable> void register(T configurable);
     <T extends Configurable> void release(T configurable);
     void configure(String key);
