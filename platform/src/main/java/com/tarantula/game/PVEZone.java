@@ -20,6 +20,8 @@ public class PVEZone extends Zone{
         });
         stub.rating = rating;
         stub.successful(true);
+        stub.owner(rating.owner());
+        stub.capacity = capacity;
         Arena arena = aMap.get(rating.xpLevel);
         stub.arena = arena.name();
         stub.offline = true;

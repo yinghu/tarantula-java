@@ -12,6 +12,8 @@ public interface Configurable extends Recoverable, DataStore.Updatable {
     default void configurationType(String configurationType){}
     default String configurationName(){return null;}
     default void configurationName(String configurationName){}
+    default String configurationCategory(){return null;}
+    default void configurationCategory(String configurationCategory){}
 
     interface Listener{
         default <T extends Configurable> void onCreated(T created){}

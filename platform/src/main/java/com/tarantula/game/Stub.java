@@ -58,9 +58,9 @@ public class Stub extends ResponseHeader {
         jo.addProperty("capacity",capacity);
         jo.addProperty("tag",tag);
         jo.addProperty("arena",arena);
-        jo.addProperty("rank",rating.rank);
-        jo.addProperty("xp",rating.xp);
-        jo.addProperty("level",rating.level);
+        //jo.addProperty("rank",rating.rank);
+        //jo.addProperty("xp",rating.xp);
+        //jo.addProperty("level",rating.level);
         jo.addProperty("tournamentEnabled",instance!=null);
         jo.addProperty("offline",offline);
         if(ticket!=null){

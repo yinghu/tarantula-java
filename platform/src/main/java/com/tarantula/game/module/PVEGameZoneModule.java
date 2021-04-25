@@ -122,7 +122,9 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
             onJoin(session,update);
         }
         else if(session.action().equals("onTest")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Rating rating = this.gameServiceProvider.rating(session.systemId());
+            rating.xpLevel = onAccess.stub();
             session.payload(rating.toBinary());
             onJoin(session,update);
         }

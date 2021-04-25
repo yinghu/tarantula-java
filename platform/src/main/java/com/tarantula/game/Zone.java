@@ -152,7 +152,10 @@ abstract public class Zone extends RecoverableObject implements Configurable, Da
         this.listener = listener;
     }
     public void onConfiguration(Consumable consumable){
-        int level = ((Number)consumable.property("level")).intValue();
-        aMap.get(level).consumable = consumable;
+        aMap.forEach((k,a)->{
+            if(a.name().equals(consumable.configurationName())){
+                a.consumable = consumable;
+            }
+        });
     }
 }
