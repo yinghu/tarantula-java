@@ -2,9 +2,10 @@ package com.tarantula.platform.leaderboard;
 
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Recoverable;
-import com.tarantula.platform.NaturalKey;
 
 import java.util.Map;
+
+import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
 
 public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.Entry {

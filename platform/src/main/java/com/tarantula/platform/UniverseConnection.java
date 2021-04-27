@@ -1,6 +1,7 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.Connection;
+import com.icodesoftware.util.NaturalKey;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.icodesoftware.util.JsonUtil;
 import java.util.Map;

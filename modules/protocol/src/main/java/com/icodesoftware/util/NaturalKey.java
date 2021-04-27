@@ -1,13 +1,12 @@
-package com.tarantula.platform;
+package com.icodesoftware.util;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.util.RecoverableObject;
 
 public class NaturalKey extends RecoverableObject implements Recoverable.Key {
 
 
     public String key;
 
-    public NaturalKey( String key){
+    public NaturalKey(String key){
 
         this.key = key;
     }

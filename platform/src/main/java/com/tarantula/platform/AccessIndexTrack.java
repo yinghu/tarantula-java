@@ -6,6 +6,7 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.util.NaturalKey;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;

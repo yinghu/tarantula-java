@@ -5,6 +5,7 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 
 import com.icodesoftware.OnView;
+import com.icodesoftware.util.NaturalKey;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.io.IOException;
