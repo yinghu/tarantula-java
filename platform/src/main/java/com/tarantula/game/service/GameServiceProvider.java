@@ -491,6 +491,10 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         this.dataStore.create(configurable);
     }
     @Override
+    public void onDataStore(OnDataStore onDataStore){
+        onDataStore.on(dataStore);
+    }
+    @Override
     public <T extends Configurable> void register(T config) {
         rListeners.forEach((k,c)->{
             if(c.type==null||c.type.equals(config.configurationType())){

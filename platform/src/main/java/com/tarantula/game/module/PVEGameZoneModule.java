@@ -155,6 +155,9 @@ public class PVEGameZoneModule implements Module,Configurable.Listener,Connectio
         this.deploymentServiceProvider.registerOnConnectionListener(this);
         this.registerKey = this.gameServiceProvider.registerConfigurableListener(mZone.descriptor.tag(),this);
         this.deploymentServiceProvider.register(this.mZone);
+        //this.gameServiceProvider.onDataStore((ds)->{
+
+        //});
         context.log("PVE Game lobby started with tournament enabled ["+context.descriptor().tournamentEnabled()+"] on tag=>"+this.context.descriptor().tag(),OnLog.WARN);
     }
     @Override
