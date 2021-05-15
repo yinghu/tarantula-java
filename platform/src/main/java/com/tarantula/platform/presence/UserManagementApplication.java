@@ -233,7 +233,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         if(access.successful()){
             PresenceContext ptx = new PresenceContext("onLogin");
             ptx.presence= access;
-            List<Lobby> lobbyList = new ArrayList();
+            List<Lobby> lobbyList = new ArrayList<>();
             lobbyList.add(this.context.lobby(this.lobbyId));
             ptx.lobbyList=(lobbyList);
             session.write(this.builder.create().toJson(ptx).getBytes());
