@@ -8,9 +8,8 @@ import java.util.List;
 
 public interface ConfigurationServiceProvider{
 
-    default <T extends Configurable> void create(T configurable){}
 
-    default void onDataStore(OnDataStore onDataStore){
+    default void dataStore(OnDataStore onDataStore){
     }
 
 

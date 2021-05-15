@@ -487,11 +487,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     ///Configurable service provider
     @Override
-    public  <T extends Configurable> void create(T configurable){
-        this.dataStore.create(configurable);
-    }
-    @Override
-    public void onDataStore(OnDataStore onDataStore){
+    public void dataStore(OnDataStore onDataStore){
         onDataStore.on(dataStore);
     }
     @Override
