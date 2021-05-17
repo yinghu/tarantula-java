@@ -1,2 +1,46 @@
-package com.tarantula.platform.service.cluster.room;public class RoomClusterService {
+package com.tarantula.platform.service.cluster.room;
+
+import com.hazelcast.core.DistributedObject;
+import com.hazelcast.spi.ManagedService;
+import com.hazelcast.spi.NodeEngine;
+import com.hazelcast.spi.RemoteService;
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
+import com.tarantula.platform.TarantulaContext;
+
+import java.util.Properties;
+
+public class RoomClusterService implements ManagedService, RemoteService {
+
+    private static TarantulaLogger log = JDKLogger.getLogger(RoomClusterService.class);
+
+    private NodeEngine nodeEngine;
+    private TarantulaContext tarantulaContext;
+
+    @Override
+    public void init(NodeEngine nodeEngine, Properties properties) {
+        this.nodeEngine = nodeEngine;
+        this.tarantulaContext = TarantulaContext.getInstance();
+        log.warn("Start Room cluster service");
+    }
+
+    @Override
+    public void reset() {
+
+    }
+
+    @Override
+    public void shutdown(boolean b) {
+
+    }
+
+    @Override
+    public DistributedObject createDistributedObject(String objectName) {
+        return new DistributionRoomServiceProxy(objectName,nodeEngine,this);
+    }
+
+    @Override
+    public void destroyDistributedObject(String s) {
+
+    }
 }

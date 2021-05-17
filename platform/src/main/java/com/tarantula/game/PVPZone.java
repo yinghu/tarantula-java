@@ -56,6 +56,7 @@ public class PVPZone extends Zone implements RoomListener{
         if(rating.xpLevel>levelLimit){//downgrade xp level and rank up after this round
             rating.xpLevel=levelLimit;
         }
+        //distribute match to level target node
         for(int lx = rating.xpLevel;lx>0;lx--){
             matched = pendingMatch[lx].poll();
             if(matched!=null){//matched
