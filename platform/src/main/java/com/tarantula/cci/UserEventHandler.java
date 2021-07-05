@@ -36,157 +36,152 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
     public String name(){
         return "/user";
     }
-    public void onRequest(OnExchange onExchange) {
-        try{
-            deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
-            String path = onExchange.path();
-            String magicKey = onExchange.header(Session.TARANTULA_MAGIC_KEY);
-            String name = onExchange.header(Session.TARANTULA_NAME);
-            String tag = onExchange.header(Session.TARANTULA_TAG);
-            String action = onExchange.header(Session.TARANTULA_ACTION);
-            String typeId = onExchange.header(Session.TARANTULA_TYPE_ID);
-            String  sid = onExchange.id();
-            this._hex.put(sid,onExchange);
-            if(path.equals("/user/action")){
-                byte[] _payload = onExchange.payload();
-                RoutingKey routingKey = eventService.routingKey(magicKey!=null?(this.bucket+"/"+magicKey):(this.bucket+"/"+sid),tag);
-                ServiceActionEvent event = new ServiceActionEvent(this.serverTopic,sid,_payload);
-                event.action(action);
-                event.routingNumber(routingKey.routingNumber());
-                event.destination(routingKey.route());
-                if(action.equals("onLogin")){
-                    AccessIndex acc = accessIndexService.get(magicKey);
-                    if(acc!=null){
-                        event.systemId(acc.distributionKey());
-                        RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
-                        event.destination(_routingKey.route());
-                        event.routingNumber(_routingKey.routingNumber());
-                        this.eventService.publish(event);
-                    }else{
-                        //send login failed back
-                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onLogin","wrong login/password combination",false)).getBytes();
-                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
-                    }
-                }
-                else if(action.equals("onToken")){//to server topic
-                    AccessIndex acc = accessIndexService.get(magicKey);
-                    if(acc!=null){//existing entry
-                        event.systemId(acc.distributionKey());
-                        RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
-                        event.destination(_routingKey.route());
-                        event.routingNumber(_routingKey.routingNumber());
-                        this.eventService.publish(event);
-                    }
-                    else if(onIndex.get()){//third party token exchange first time
-                        event.action("onTokenRegister");
-                        AccessIndex _tindex = accessIndexService.set(magicKey);
-                        if(_tindex!=null){
-                            event.systemId(_tindex.distributionKey());
-                            RoutingKey _routingKey = eventService.routingKey(_tindex.distributionKey(),tag);
-                            event.destination(_routingKey.route());
-                            event.routingNumber(_routingKey.routingNumber());
-                            this.eventService.publish(event);
-                        }
-                        else{
-                            byte[] eb = this.builder.create().toJson(new ResponseHeader("onTokenRegister","["+magicKey+"] not available",false)).getBytes();
-                            _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
-                        }
-                    }
-                    else{
-                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
-                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
-                    }
-                }
-                else if(action.equals("onTicket")){
-                    AccessIndex acc = accessIndexService.get(magicKey);
-                    if(acc!=null){
-                        event.systemId(acc.distributionKey());
-                        RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
-                        event.destination(_routingKey.route());
-                        event.routingNumber(_routingKey.routingNumber());
-                        this.eventService.publish(event);
-                    }else{
-                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onTicket","ticket not exist",false)).getBytes();
-                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
-                    }
-                }
-                else if(action.equals("onRegister")){//to server topic
-                    if(onIndex.get()){ //register
-                        AccessIndex _aindex = this.accessIndexService.set(magicKey);
-                        if(_aindex!=null){
-                            event.systemId(_aindex.distributionKey());
-                            RoutingKey _routingKey = eventService.routingKey(_aindex.distributionKey(),tag);
-                            event.destination(_routingKey.route());
-                            event.routingNumber(_routingKey.routingNumber());
-                            this.eventService.publish(event);
-                        }else{
-                            byte[] eb = this.builder.create().toJson(new ResponseHeader("onRegister","["+magicKey+"] not available",false)).getBytes();
-                            _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
-                        }
-                    }
-                    else{
-                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
-                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
-                    }
-                }
-                else if(action.equals("onDevice")){//to server topic
-                    AccessIndex acc = accessIndexService.get(magicKey);
-                    if(acc!=null){
-                        event.systemId(acc.distributionKey());
-                        RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
-                        event.destination(_routingKey.route());
-                        event.routingNumber(_routingKey.routingNumber());
-                        this.eventService.publish(event);
-                    }else if(onIndex.get()){//device login exchange first time
-                        AccessIndex _dindex = accessIndexService.set(magicKey);
-                        if(_dindex!=null){
-                            event.action("onDeviceRegister");
-                            event.systemId(_dindex.distributionKey());
-                            RoutingKey _routingKey = eventService.routingKey(_dindex.distributionKey(),tag);
-                            event.destination(_routingKey.route());
-                            event.routingNumber(_routingKey.routingNumber());
-                            this.eventService.publish(event);
-                        }
-                        else{
-                            byte[] eb = this.builder.create().toJson(new ResponseHeader("onDeviceRegister","["+magicKey+"] not available",false)).getBytes();
-                            _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
-                        }
-                    }
-                    else{
-                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
-                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
-                    }
-                }
-                else if(action.equals("onResetCode")){
-                    event.trackId(name);
+    public void onRequest(OnExchange onExchange) throws Exception {
+
+        deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
+        String path = onExchange.path();
+        String magicKey = onExchange.header(Session.TARANTULA_MAGIC_KEY);
+        String name = onExchange.header(Session.TARANTULA_NAME);
+        String tag = onExchange.header(Session.TARANTULA_TAG);
+        String action = onExchange.header(Session.TARANTULA_ACTION);
+        String typeId = onExchange.header(Session.TARANTULA_TYPE_ID);
+        String  sid = onExchange.id();
+        this._hex.put(sid,onExchange);
+        if(path.equals("/user/action")){
+            byte[] _payload = onExchange.payload();
+            RoutingKey routingKey = eventService.routingKey(magicKey!=null?(this.bucket+"/"+magicKey):(this.bucket+"/"+sid),tag);
+            ServiceActionEvent event = new ServiceActionEvent(this.serverTopic,sid,_payload);
+            event.action(action);
+            event.routingNumber(routingKey.routingNumber());
+            event.destination(routingKey.route());
+            if(action.equals("onLogin")){
+                AccessIndex acc = accessIndexService.get(magicKey);
+                if(acc!=null){
+                    event.systemId(acc.distributionKey());
+                    RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
+                    event.destination(_routingKey.route());
+                    event.routingNumber(_routingKey.routingNumber());
                     this.eventService.publish(event);
-                }
-                else if(action.equals("onResetPassword")){
-                    AccessIndex acc = accessIndexService.get(magicKey);
-                    if(acc!=null){
-                        event.systemId(acc.distributionKey());
-                        RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
-                        event.destination(_routingKey.route());
-                        event.routingNumber(_routingKey.routingNumber());
-                        this.eventService.publish(event);
-                    }else{
-                        //send login failed back
-                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onResetPassword","wrong login/password combination",false)).getBytes();
-                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
-                    }
-                }
-                else if(action.equals("onIndex")){
-                    event.trackId(typeId);
-                    this.eventService.publish(event);
-                }
-                else{
-                    throw new RuntimeException("["+action+"] not supported");
+                }else{
+                    //send login failed back
+                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onLogin","wrong login/password combination",false)).getBytes();
+                    _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                 }
             }
-        }catch (Exception ex){
-            ex.printStackTrace();
-            _hex.remove(onExchange.id());
-            onExchange.onError(ex,"bad request");
+            else if(action.equals("onToken")){//to server topic
+                AccessIndex acc = accessIndexService.get(magicKey);
+                if(acc!=null){//existing entry
+                    event.systemId(acc.distributionKey());
+                    RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
+                    event.destination(_routingKey.route());
+                    event.routingNumber(_routingKey.routingNumber());
+                    this.eventService.publish(event);
+                }
+                else if(onIndex.get()){//third party token exchange first time
+                    event.action("onTokenRegister");
+                    AccessIndex _tindex = accessIndexService.set(magicKey);
+                    if(_tindex!=null){
+                        event.systemId(_tindex.distributionKey());
+                        RoutingKey _routingKey = eventService.routingKey(_tindex.distributionKey(),tag);
+                        event.destination(_routingKey.route());
+                        event.routingNumber(_routingKey.routingNumber());
+                        this.eventService.publish(event);
+                    }
+                    else{
+                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onTokenRegister","["+magicKey+"] not available",false)).getBytes();
+                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
+                    }
+                }
+                else{
+                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
+                    _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
+                }
+            }
+            else if(action.equals("onTicket")){
+                AccessIndex acc = accessIndexService.get(magicKey);
+                if(acc!=null){
+                    event.systemId(acc.distributionKey());
+                    RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
+                    event.destination(_routingKey.route());
+                    event.routingNumber(_routingKey.routingNumber());
+                    this.eventService.publish(event);
+                }else{
+                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onTicket","ticket not exist",false)).getBytes();
+                    _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
+                }
+            }
+            else if(action.equals("onRegister")){//to server topic
+                if(onIndex.get()){ //register
+                    AccessIndex _aindex = this.accessIndexService.set(magicKey);
+                    if(_aindex!=null){
+                        event.systemId(_aindex.distributionKey());
+                        RoutingKey _routingKey = eventService.routingKey(_aindex.distributionKey(),tag);
+                        event.destination(_routingKey.route());
+                        event.routingNumber(_routingKey.routingNumber());
+                        this.eventService.publish(event);
+                    }else{
+                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onRegister","["+magicKey+"] not available",false)).getBytes();
+                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
+                    }
+                }
+                else{
+                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
+                    _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
+                }
+            }
+            else if(action.equals("onDevice")){//to server topic
+                AccessIndex acc = accessIndexService.get(magicKey);
+                if(acc!=null){
+                    event.systemId(acc.distributionKey());
+                    RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
+                    event.destination(_routingKey.route());
+                    event.routingNumber(_routingKey.routingNumber());
+                    this.eventService.publish(event);
+                }else if(onIndex.get()){//device login exchange first time
+                    AccessIndex _dindex = accessIndexService.set(magicKey);
+                    if(_dindex!=null){
+                        event.action("onDeviceRegister");
+                        event.systemId(_dindex.distributionKey());
+                        RoutingKey _routingKey = eventService.routingKey(_dindex.distributionKey(),tag);
+                        event.destination(_routingKey.route());
+                        event.routingNumber(_routingKey.routingNumber());
+                        this.eventService.publish(event);
+                    }
+                    else{
+                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onDeviceRegister","["+magicKey+"] not available",false)).getBytes();
+                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
+                    }
+                }
+                else{
+                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
+                    _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
+                }
+            }
+            else if(action.equals("onResetCode")){
+                event.trackId(name);
+                this.eventService.publish(event);
+            }
+            else if(action.equals("onResetPassword")){
+                AccessIndex acc = accessIndexService.get(magicKey);
+                if(acc!=null){
+                    event.systemId(acc.distributionKey());
+                    RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
+                    event.destination(_routingKey.route());
+                    event.routingNumber(_routingKey.routingNumber());
+                    this.eventService.publish(event);
+                }else{
+                    //send login failed back
+                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onResetPassword","wrong login/password combination",false)).getBytes();
+                    _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
+                }
+            }
+            else if(action.equals("onIndex")){
+                event.trackId(typeId);
+                this.eventService.publish(event);
+            }
+            else{
+                throw new RuntimeException("["+action+"] not supported");
+            }
         }
     }
 

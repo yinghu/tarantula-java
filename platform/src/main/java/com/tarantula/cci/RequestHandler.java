@@ -6,7 +6,7 @@ import com.icodesoftware.service.Serviceable;
 
 public interface RequestHandler extends EventListener, Serviceable {
     String name();
-    void onRequest(OnExchange exchange);
+    void onRequest(OnExchange exchange) throws Exception;
     void setup(ServiceContext tcx);
     default void onCheck(){}
     default boolean deployable(){return false;}

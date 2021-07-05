@@ -28,28 +28,18 @@ public class UploadEventHandler implements RequestHandler {
     public String name(){
         return "/upload";
     }
-    public void onRequest(OnExchange exchange){
-        try{
-            String token = exchange.header(Session.TARANTULA_TOKEN);
-            OnSession onSession = tokenValidator.validateToken(token);
-            if(!recoverService.checkAccessControl(onSession.systemId(),AccessControl.root)){
-                throw new RuntimeException("no access permission");
-            }
-            InputStream in = exchange.onStream();
-            String path = exchange.path();
-            log.warn(onSession.systemId() + " is uploading module [" + path + "]");
-            boolean suc = deployService.upload(path.substring(path.lastIndexOf("/") + 1),in.readAllBytes());
-            ResponseHeader resp = new ResponseHeader("upload",suc?"uploaded":"failed",suc);
-            exchange.onEvent(new ResponsiveEvent("", "",this.builder.create().toJson(resp).getBytes(), 0, "text/html", true));
-            //}
-            //else{
-                //ResponseHeader resp = new ResponseHeader("upload","no permission operation",true);
-                //exchange.onEvent(new ResponsiveEvent("", "", this.builder.create().toJson(resp).getBytes(), 0, "text/html", "", true));
-            //}
-        }catch (Exception ex){
-            ex.printStackTrace();
-            exchange.onError(ex,ex.getMessage());
+    public void onRequest(OnExchange exchange) throws Exception{
+        String token = exchange.header(Session.TARANTULA_TOKEN);
+        OnSession onSession = tokenValidator.validateToken(token);
+        if(!recoverService.checkAccessControl(onSession.systemId(),AccessControl.root)){
+            throw new RuntimeException("no access permission");
         }
+        InputStream in = exchange.onStream();
+        String path = exchange.path();
+        log.warn(onSession.systemId() + " is uploading module [" + path + "]");
+        boolean suc = deployService.upload(path.substring(path.lastIndexOf("/") + 1),in.readAllBytes());
+        ResponseHeader resp = new ResponseHeader("upload",suc?"uploaded":"failed",suc);
+        exchange.onEvent(new ResponsiveEvent("", "",this.builder.create().toJson(resp).getBytes(), 0, "text/html", true));
     }
     @Override
     public void start() throws Exception {

@@ -26,7 +26,7 @@ public class ViewEventHandler implements RequestHandler {
     public String name(){
         return "/view";
     }
-    public void onRequest(OnExchange exchange){
+    public void onRequest(OnExchange exchange) throws Exception{
         String viewId = exchange.header(Session.TARANTULA_VIEW_ID);
         OnView onView = this.deploymentServiceProvider.onView(viewId);
         if(onView==null){

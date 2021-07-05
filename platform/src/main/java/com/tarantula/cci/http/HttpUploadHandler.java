@@ -21,6 +21,10 @@ public class HttpUploadHandler extends HttpDispatcher {
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         HttpUploadSession httpUploadSession = new HttpUploadSession(httpExchange);
-        requestHandler.onRequest(httpUploadSession);
+        try{
+            requestHandler.onRequest(httpUploadSession);
+        }catch (Exception ex){
+            httpUploadSession.onError(ex,ex.getMessage());
+        }
     }
 }

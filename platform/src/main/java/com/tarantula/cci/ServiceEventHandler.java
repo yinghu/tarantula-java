@@ -30,50 +30,43 @@ public class ServiceEventHandler implements RequestHandler {
     public String name(){
         return "/service";
     }
-    public void onRequest(OnExchange exchange){
-            try{
-                String path = exchange.path();
-                String token = exchange.header(Session.TARANTULA_TOKEN);//authenticated token
-                String action = exchange.header(Session.TARANTULA_ACTION);
-                String tag = exchange.header(Session.TARANTULA_TAG);
-                String tournamentId = exchange.header(Session.TARANTULA_TOURNAMENT_ID);//instance Id
-                String name = exchange.header(Session.TARANTULA_NAME);//key name
-                String pmd = exchange.header(Session.TARANTULA_ACCESS_MODE);
-                int playMode = pmd!=null?Integer.parseInt(pmd):Session.FAST_PLAY_MODE;
-                byte[]  _payload = exchange.payload();
-                String sid = exchange.id();
-                this._hex.put(sid,exchange);
-                if(path.startsWith("/service/action")){
-                    OnSession id = new OnSessionTrack();//place holder for public access applications
-                    RoutingKey routingKey = eventService.routingKey(this.bucket+"/"+sid,tag);
-                    if((token!=null)&&(!token.equals("undefined"))){
-                        id = auth.validateToken(token);//first entry point check
-                        routingKey = eventService.routingKey(id.systemId(),tag);
-                    }
-                    ServiceActionEvent actionEvent = new ServiceActionEvent(this.serverTopic,sid,_payload);
-                    actionEvent.systemId(id.systemId());
-                    actionEvent.stub(id.stub());
-                    actionEvent.ticket(id.ticket());
-                    actionEvent.trackId(id.oid());
-                    actionEvent.action(action!=null?action:path);
-                    actionEvent.routingNumber(routingKey.routingNumber());
-                    actionEvent.destination(routingKey.route());
-                    actionEvent.streaming(exchange.streaming());
-                    actionEvent.tournamentId(tournamentId);
-                    actionEvent.name(name);
-                    actionEvent.accessMode(playMode);
-                    this.eventService.publish(actionEvent);
-                }
-                else{
-                    throw new UnsupportedOperationException("HTTP ["+exchange.method()+"] request ["+path+"] not supported");
-                }
-                deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
-            }catch(Exception ex){
-                ex.printStackTrace();
-                _hex.remove(exchange.id());
-                exchange.onError(ex,"bad request");
+    public void onRequest(OnExchange exchange) throws Exception{
+        String path = exchange.path();
+        String token = exchange.header(Session.TARANTULA_TOKEN);//authenticated token
+        String action = exchange.header(Session.TARANTULA_ACTION);
+        String tag = exchange.header(Session.TARANTULA_TAG);
+        String tournamentId = exchange.header(Session.TARANTULA_TOURNAMENT_ID);//instance Id
+        String name = exchange.header(Session.TARANTULA_NAME);//key name
+        String pmd = exchange.header(Session.TARANTULA_ACCESS_MODE);
+        int playMode = pmd!=null?Integer.parseInt(pmd):Session.FAST_PLAY_MODE;
+        byte[]  _payload = exchange.payload();
+        String sid = exchange.id();
+        this._hex.put(sid,exchange);
+        if(path.startsWith("/service/action")){
+            OnSession id = new OnSessionTrack();//place holder for public access applications
+            RoutingKey routingKey = eventService.routingKey(this.bucket+"/"+sid,tag);
+            if((token!=null)&&(!token.equals("undefined"))){
+                id = auth.validateToken(token);//first entry point check
+                routingKey = eventService.routingKey(id.systemId(),tag);
             }
-
+            ServiceActionEvent actionEvent = new ServiceActionEvent(this.serverTopic,sid,_payload);
+            actionEvent.systemId(id.systemId());
+            actionEvent.stub(id.stub());
+            actionEvent.ticket(id.ticket());
+            actionEvent.trackId(id.oid());
+            actionEvent.action(action!=null?action:path);
+            actionEvent.routingNumber(routingKey.routingNumber());
+            actionEvent.destination(routingKey.route());
+            actionEvent.streaming(exchange.streaming());
+            actionEvent.tournamentId(tournamentId);
+            actionEvent.name(name);
+            actionEvent.accessMode(playMode);
+            this.eventService.publish(actionEvent);
+        }
+        else{
+            throw new UnsupportedOperationException("HTTP ["+exchange.method()+"] request ["+path+"] not supported");
+        }
+        deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
     }
 
     @Override

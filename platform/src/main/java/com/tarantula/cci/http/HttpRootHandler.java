@@ -19,9 +19,13 @@ public class HttpRootHandler extends HttpDispatcher {
     }
 
     public void handle(HttpExchange hex) throws IOException {
-        HttpSession hs = new HttpSession("id",hex);
-        hs.parse();
-        this.requestHandler.onRequest(hs);
+        HttpSession exchange = new HttpSession("id",hex);
+        exchange.parse();
+        try{
+            requestHandler.onRequest(exchange);
+        }catch (Exception ex){
+            exchange.onError(ex,ex.getMessage());
+        }
     }
 
 }

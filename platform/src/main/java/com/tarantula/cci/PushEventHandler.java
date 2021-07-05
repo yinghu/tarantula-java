@@ -37,61 +37,54 @@ public class PushEventHandler implements RequestHandler {
     public String name(){
         return "/push";
     }
-    public void onRequest(OnExchange exchange){
-        try{
-            String action = exchange.header(Session.TARANTULA_ACTION);
-            String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
-            String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
-            String connectionId = exchange.header(Session.TARANTULA_CONNECTION_ID);
-            byte[] _payload = exchange.payload();
-            String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
-            if(typeId==null){
-                throw new RuntimeException("Illegal access");
+    public void onRequest(OnExchange exchange) throws Exception{
+        String action = exchange.header(Session.TARANTULA_ACTION);
+        String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
+        String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
+        String connectionId = exchange.header(Session.TARANTULA_CONNECTION_ID);
+        byte[] _payload = exchange.payload();
+        String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
+        if(typeId==null){
+            throw new RuntimeException("Illegal access");
+        }
+        if(action.equals("onAck")){
+            exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
+            deployService.ackServerPushEvent(serverId);
+        }
+        else if(action.equals("onStart")){
+            JsonObject resp = new JsonObject();
+            resp.addProperty("typeId",typeId);
+            resp.addProperty("successful",true);
+            Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
+            resp.addProperty("serverKey",Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
+            resp.addProperty("connectionId",connection.server().connectionId());
+            resp.addProperty("sequence",connection.server().sequence());
+            ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
+            pushEvent.typeId(typeId);
+            deployService.addServerPushEvent(pushEvent);
+            JsonArray cids = new JsonArray();
+            for(int i=1;i<=connection.maxConnections();i++){
+                Connection conn = this.deploymentServiceProvider.distributionCallback().addConnection(typeId,toClientConnection(connection,connection.connectionId()+i));
+                cids.add(conn.connectionId());
             }
-            if(action.equals("onAck")){
-                exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
-                deployService.ackServerPushEvent(serverId);
-            }
-            else if(action.equals("onStart")){
-                JsonObject resp = new JsonObject();
-                resp.addProperty("typeId",typeId);
-                resp.addProperty("successful",true);
-                Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
-                resp.addProperty("serverKey",Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
-                resp.addProperty("connectionId",connection.server().connectionId());
-                resp.addProperty("sequence",connection.server().sequence());
-                ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
-                pushEvent.typeId(typeId);
-                deployService.addServerPushEvent(pushEvent);
-                JsonArray cids = new JsonArray();
-                for(int i=1;i<=connection.maxConnections();i++){
-                    Connection conn = this.deploymentServiceProvider.distributionCallback().addConnection(typeId,toClientConnection(connection,connection.connectionId()+i));
-                    cids.add(conn.connectionId());
+            resp.add("connections",cids);
+            exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
+        }
+        else if(action.equals("onConnection")){
+            Connection connection = this.deploymentServiceProvider.distributionCallback().addConnection(serverId,Integer.parseInt(connectionId));
+            exchange.onEvent(new ResponsiveEvent("","",builder.create().toJson(connection).getBytes(),true));
+        }
+        else if(action.equals("onStop")){
+            deployService.removeServerPushEvent(serverId);
+            _hex.forEach((k,v)->{//removed session if any
+                if(v.id().equals(serverId)){
+                    _hex.remove(k);
                 }
-                resp.add("connections",cids);
-                exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
-            }
-            else if(action.equals("onConnection")){
-                Connection connection = this.deploymentServiceProvider.distributionCallback().addConnection(serverId,Integer.parseInt(connectionId));
-                exchange.onEvent(new ResponsiveEvent("","",builder.create().toJson(connection).getBytes(),true));
-            }
-            else if(action.equals("onStop")){
-                deployService.removeServerPushEvent(serverId);
-                _hex.forEach((k,v)->{//removed session if any
-                    if(v.id().equals(serverId)){
-                        _hex.remove(k);
-                    }
-                });
-                exchange.onEvent(new ResponsiveEvent("","",_payload,true));
-            }
-            else{
-                throw new UnsupportedOperationException(action);
-            }
-
-        }catch (Exception ex){
-            ex.printStackTrace();
-            _hex.remove(exchange.id()); //removed cache on any errors
-            exchange.onError(ex,ex.getMessage());
+            });
+            exchange.onEvent(new ResponsiveEvent("","",_payload,true));
+        }
+        else{
+            throw new UnsupportedOperationException(action);
         }
     }
 
