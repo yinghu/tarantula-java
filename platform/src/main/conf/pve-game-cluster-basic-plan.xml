@@ -25,7 +25,7 @@
                 <type>application</type>
                 <category>game</category>
                 <tag>game/lobby1</tag>
-                <module-name>com.tarantula.game.module.PVEGameZoneModule</module-name>
+                <module-name>com.tarantula.game.module.GameLobbyModule</module-name>
                 <capacity>10</capacity>
                 <access-rank>1</access-rank>
                 <timer-on-module>1000</timer-on-module>
@@ -36,7 +36,7 @@
                 <type>application</type>
                 <category>game</category>
                 <tag>game/lobby2</tag>
-                <module-name>com.tarantula.game.module.PVEGameZoneModule</module-name>
+                <module-name>com.tarantula.game.module.GameLobbyModule</module-name>
                 <capacity>10</capacity>
                 <access-rank>2</access-rank>
                 <timer-on-module>1000</timer-on-module>
