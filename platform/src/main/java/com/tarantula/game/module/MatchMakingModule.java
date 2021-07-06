@@ -54,7 +54,7 @@ public class MatchMakingModule implements Module, Lobby.Listener {
 
 
     @Override
-    public void on(Descriptor descriptor) {
+    public void onLobby(Descriptor descriptor) {
         this.context.log("Lobby Updated->"+descriptor.disabled()+"//"+descriptor.accessRank(), OnLog.WARN);
         if(descriptor.accessRank()>0&&descriptor.accessRank()<=this.context.descriptor().capacity()){
             mZone.clear();

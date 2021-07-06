@@ -372,9 +372,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             if(lab!=null){
                 Application lbb = this.availableApplicationManagers.remove(lab.distributionKey());
                 lbb.shutdown();
-                listener.on(lab);
+                listener.onLobby(lab);
             }
-            _codeBase.forEach((k,v)-> listener.on(v)); //clean module class loader
+            _codeBase.forEach((k,v)-> listener.onLobby(v)); //clean module class loader
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -423,8 +423,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
                 this._lobbyMapping.remove(typeId);
                 Application lbb = this.availableApplicationManagers.remove(lab.distributionKey());
                 lbb.shutdown();
-                listener.on(lab);
-                _codeBase.forEach((k,v)-> listener.on(v));
+                listener.onLobby(lab);
+                _codeBase.forEach((k,v)-> listener.onLobby(v));
             }
 
         }catch (Exception ex){
@@ -559,6 +559,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         }
     }
     public TarantulaLogger logger(Class target){
+        return JDKLogger.getLogger(target);
+    }
+    public TarantulaLogger logger(String target){
         return JDKLogger.getLogger(target);
     }
     public String bucket(){

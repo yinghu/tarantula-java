@@ -15,6 +15,6 @@ public interface Lobby {
 	void addListener(Listener listener);
 
 	interface Listener{
-		void on(Descriptor descriptor);
+		void onLobby(Descriptor descriptor);
 	}
 }

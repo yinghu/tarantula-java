@@ -58,7 +58,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         this.validator = this.tarantulaContext.tokenValidatorProvider().tokenValidator();
         this.logEnabled = _descriptor.logEnabled();
         if(logEnabled){
-            this.log = this.tarantulaContext.logger(this.application.getClass());
+            this.log = _descriptor.moduleName()!=null?this.tarantulaContext.logger(_descriptor.moduleName()):this.tarantulaContext.logger(this.application.getClass());
         }
         this.application.setup(new ApplicationContextProxy(this));
     }
