@@ -10,7 +10,7 @@ public class GameLobby {
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("name",zone.name!=null?zone.name:lobby.name());
+        jsonObject.addProperty("name",zone.name()!=null?zone.name():lobby.name());
         jsonObject.addProperty("tag",lobby.tag());
         jsonObject.addProperty("rank",lobby.accessRank());
         jsonObject.addProperty("capacity",zone.capacity);

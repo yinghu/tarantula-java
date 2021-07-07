@@ -268,7 +268,7 @@ public class AdminRoleModule implements Module,Configurable.Listener {
             if(index==pending.page){
                 GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
                 Zone zone = gameLobby.zone;
-                zone.name = onAccess.name();
+                zone.name(onAccess.name());
                 zone.capacity = ((Number)onAccess.property("capacity")).intValue();
                 zone.joinsOnStart = ((Number)onAccess.property("joinsOnStart")).intValue();
                 if(zone.joinsOnStart>zone.capacity){

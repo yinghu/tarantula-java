@@ -17,7 +17,7 @@ public class PVELobbySetup implements ApplicationPreSetup {
         //create zone/arena for lobby
         DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.partitionNumber());
         PVEZone pveZone = new PVEZone();
-        pveZone.name = application.name();
+        pveZone.name(application.name());
         pveZone.levelLimit = application.capacity();
         pveZone.distributionKey(application.distributionKey());
         dataStore.create(pveZone);

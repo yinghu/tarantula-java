@@ -2,12 +2,14 @@ package com.tarantula.game.module;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.tarantula.game.GameZone;
 import com.tarantula.game.service.GameServiceProvider;
 
 public class GameLobbyModule implements Module, Configurable.Listener, Connection.OnConnectionListener {
 
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
+    private GameZone gameZone;
     @Override
     public void onJoin(Session session, Module.OnUpdate onUpdate) throws Exception{
 
@@ -22,6 +24,7 @@ public class GameLobbyModule implements Module, Configurable.Listener, Connectio
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.gameServiceProvider = applicationContext.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
+        //this.gameServiceProvider.zone()
         //this.gameServiceProvider.registerConfigurableListener()
         this.context.log("Game lobby started on tag ["+context.descriptor().tag()+"]",OnLog.WARN);
     }
