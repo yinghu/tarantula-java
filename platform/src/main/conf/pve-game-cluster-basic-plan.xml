@@ -44,7 +44,7 @@
         </application-list>
         <configuration-list>
             <configuration type="pre-setup" name="pve">
-                <property name="application-pre-setup">com.tarantula.game.service.PVELobbySetup</property>
+                <property name="application-pre-setup">com.tarantula.game.service.DynamicLobbySetup</property>
             </configuration>
         </configuration-list>
     </lobby-context>

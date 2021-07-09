@@ -16,5 +16,8 @@ public interface GameZone extends Configurable, DataStore.Updatable{
     String playMode();
     int levelLimit();
     int capacity();
+
     Stub join(Rating rating);
+    void addArena(Arena arena);
+
 }
