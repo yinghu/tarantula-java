@@ -164,7 +164,8 @@ public class AdminRoleModule implements Module,Configurable.Listener {
                             desc.tag(gname.toLowerCase() + "/lobby" + rk);
                             desc.accessRank(rk);
                             desc.index((String)gc.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-                            if(this.deploymentServiceProvider.createApplication(desc,(String)gc.property(GameCluster.LOBBY_PRE_SETUP_NAME),!disabled)){
+                            String configName = (String) gc.property(GameCluster.MODE);
+                            if(this.deploymentServiceProvider.createApplication(desc,(String)gc.property(GameCluster.LOBBY_PRE_SETUP_NAME),configName,!disabled)){
                                 added[0]++;
                             }
                         }
@@ -408,7 +409,7 @@ public class AdminRoleModule implements Module,Configurable.Listener {
                     desc.deployPriority((Integer)exposedGameService.property(ExposedGameService.DEPLOY_PRIORITY));
                     desc.accessControl((Integer)exposedGameService.property(ExposedGameService.ACCESS_CONTROL));
                     desc.applicationClassName("com.tarantula.platform.service.deployment.SingletonModuleApplication");
-                    _existed[0] = this.deploymentServiceProvider.createApplication(desc,null, true);
+                    _existed[0] = this.deploymentServiceProvider.createApplication(desc,null, null,true);
                 }
             }
             session.write(toMessage(_existed[0]?"created":"failed",_existed[0]).toString().getBytes());

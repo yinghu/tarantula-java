@@ -24,8 +24,6 @@ public class GameLobbyModule implements Module, Configurable.Listener, Connectio
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.gameServiceProvider = applicationContext.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
-        //this.gameServiceProvider.zone()
-        //this.gameServiceProvider.registerConfigurableListener()
         this.context.log("Game lobby started on tag ["+context.descriptor().tag()+"]",OnLog.WARN);
     }
 

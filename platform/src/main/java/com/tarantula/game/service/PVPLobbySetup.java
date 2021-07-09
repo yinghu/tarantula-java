@@ -10,7 +10,7 @@ import com.tarantula.platform.service.ApplicationPreSetup;
 
 public class PVPLobbySetup implements ApplicationPreSetup {
     @Override
-    public void setup(ServiceContext serviceContext, Descriptor application) {
+    public void setup(ServiceContext serviceContext, Descriptor application,String configName) {
         //create zone/arena for lobby
         DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.partitionNumber());
         PVPZone pveZone = new PVPZone();
