@@ -109,8 +109,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
     public GameZone zone(Descriptor descriptor){//application id
         DynamicLobbySetup dynamicLobbySetup = new DynamicLobbySetup();
-        GameZone zone = dynamicLobbySetup.load(serviceContext,descriptor);
-        return zone;
+        return dynamicLobbySetup.load(serviceContext,descriptor);
     }
     public void addRoom(Room room){
         roomIndex.put(room.roomId,room);

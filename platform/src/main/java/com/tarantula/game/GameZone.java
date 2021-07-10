@@ -13,7 +13,10 @@ public interface GameZone extends Configurable, DataStore.Updatable{
     String PLAY_MODE_TVT = "tvt"; //team versus team
 
     int DEFAULT_LEVEL_COUNT = 10;
+    int DEFAULT_JOINS_ON_START = 1;
+    long DEFAULT_ROUND_DURATION = 60000;
     int DEFAULT_LEVEL_UP_BASE = 1000;
+
     String name();
     void name(String name);
     String playMode();

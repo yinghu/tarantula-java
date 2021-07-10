@@ -29,6 +29,7 @@ public class GameClusterContext extends ResponseHeader {
             jo.addProperty("gameClusterId",g.distributionKey());
             jo.addProperty("name",(String)g.property(GameCluster.NAME));
             jo.addProperty("mode",(String)g.property(GameCluster.MODE));
+            jo.addProperty("setup",(String)g.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             jo.addProperty("gameLobby",(String)g.property(GameCluster.GAME_LOBBY));
             jo.addProperty("gameService",(String)g.property(GameCluster.GAME_SERVICE));
             jo.addProperty("gameData",(String)g.property(GameCluster.GAME_DATA));

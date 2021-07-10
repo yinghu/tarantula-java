@@ -43,7 +43,7 @@
             </application>
         </application-list>
         <configuration-list>
-            <configuration type="pre-setup" name="pvp">
+            <configuration type="pre-setup" name="tve">
                 <property name="application-pre-setup">com.tarantula.game.service.DynamicLobbySetup</property>
             </configuration>
         </configuration-list>

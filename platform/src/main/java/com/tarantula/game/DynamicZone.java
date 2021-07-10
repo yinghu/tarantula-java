@@ -2,8 +2,10 @@ package com.tarantula.game;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.AssociateKey;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,14 +26,16 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.label = "Zone";
         this.arenaList = new ArrayList<>();
         this.levelList = new ConcurrentHashMap<>();
+        this.joinsOnStart = DEFAULT_JOINS_ON_START;
+        this.levelLimit = DEFAULT_LEVEL_COUNT;
+        this.roundDuration = DEFAULT_ROUND_DURATION;
     }
     
-    public DynamicZone(String name,String playMode,int capacity,int levelLimit){
+    public DynamicZone(String name,String playMode,int capacity){
         this();
         this.name = name;
         this.playMode = playMode;
         this.capacity = capacity;
-        this.levelLimit = levelLimit;
     }
 
     public Stub join(Rating rating){
@@ -102,7 +106,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.properties.put("6",this.timestamp);
         this.properties.put("7",this.levelLimit);
         this.properties.put("8",this.joinsOnStart);
-        this.properties.put("9",this.index);
+        this.properties.put("9",this.playMode);
         return this.properties;
     }
     @Override
@@ -114,7 +118,17 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.name = (String)properties.get("5");
         this.timestamp = ((Number)properties.getOrDefault("6",0)).longValue();
         this.levelLimit = ((Number)properties.getOrDefault("7",levelLimit)).intValue();
-        this.index = (String)properties.get("9");
+        this.playMode = (String)properties.get("9");
+    }
+    @Override
+    public void update() {
+        arenaList.forEach((a)->{
+            if(!this.dataStore.update(a)){//failed if no key associated
+                this.dataStore.create(a);
+            }
+        });
+        this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
+        this.dataStore.update(this);
     }
 
 }

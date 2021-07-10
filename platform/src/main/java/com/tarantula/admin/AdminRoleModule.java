@@ -16,7 +16,6 @@ import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;

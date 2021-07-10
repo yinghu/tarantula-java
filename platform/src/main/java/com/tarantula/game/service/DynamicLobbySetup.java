@@ -15,7 +15,7 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
 
     @Override
     public void setup(ServiceContext serviceContext, Descriptor application, String configName) {
-        DynamicZone zone = new DynamicZone(application.name(),configName,application.capacity(), GameZone.DEFAULT_LEVEL_COUNT);
+        DynamicZone zone = new DynamicZone(application.name(),configName,application.capacity());
         DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.partitionNumber());
         zone.distributionKey(application.distributionKey());
         dataStore.create(zone);
