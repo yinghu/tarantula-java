@@ -268,18 +268,18 @@ public class AdminRoleModule implements Module,Configurable.Listener {
             GameLobbyContext pending = this.gameLobbyContext(accessId);
             if(index==pending.page){
                 GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
-                Zone zone = gameLobby.zone;
+                GameZone zone = gameLobby.zone;
                 zone.name(onAccess.name());
-                zone.capacity = ((Number)onAccess.property("capacity")).intValue();
-                zone.joinsOnStart = ((Number)onAccess.property("joinsOnStart")).intValue();
-                if(zone.joinsOnStart>zone.capacity){
-                    zone.joinsOnStart = zone.capacity;
+                zone.capacity(((Number)onAccess.property("capacity")).intValue());
+                zone.joinsOnStart(((Number)onAccess.property("joinsOnStart")).intValue());
+                if(zone.joinsOnStart()>zone.capacity()){
+                    zone.joinsOnStart(zone.capacity());
                 }
-                zone.roundDuration = ((Number)onAccess.property("duration")).intValue()*60000;
-                zone.playMode = ((Number)onAccess.property("playMode")).intValue();
+                zone.roundDuration(((Number)onAccess.property("duration")).intValue()*60000);
+                //zone.playMode = ((Number)onAccess.property("playMode")).intValue();
                 int lmit = ((Number)onAccess.property("levelLimit")).intValue();
                 if(lmit>=defaultGameLevelCount&&lmit<=maxGameLevelCount){
-                    zone.levelLimit = lmit;
+                    zone.levelLimit(lmit);
                 }
                 zone.update();
                 session.write(pending.toJson().toString().getBytes());
@@ -298,11 +298,11 @@ public class AdminRoleModule implements Module,Configurable.Listener {
             GameLobbyContext pending = this.gameLobbyContext(accessId);
             if(page==pending.page){
                 GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
-                Zone zone = gameLobby.zone;
+                GameZone zone = gameLobby.zone;
                 if(index<=maxGameLevelCount){
                     boolean updated  = false;
                     Arena pu = new Arena();
-                    for(Arena a : zone.arenas){
+                    for(Arena a : zone.arenas()){
                         if(a.level==index){
                             pu.name(a.name());
                             pu.xp = a.xp;
@@ -327,7 +327,7 @@ public class AdminRoleModule implements Module,Configurable.Listener {
                     if(updated){
                         int mc = 0;
                         Arena ap=null;
-                        for(Arena a: zone.arenas){
+                        for(Arena a: zone.arenas()){
                             if(!a.disabled()){
                                 mc++;
                             }
@@ -359,7 +359,7 @@ public class AdminRoleModule implements Module,Configurable.Listener {
                         a.joinsOnStart = ((Number)onAccess.property("joinsOnStart")).intValue();
                         a.duration = ((Number)onAccess.property("duration")).intValue()*60000;
                         a.disabled((Boolean)onAccess.property("disabled"));
-                        zone.arenas.add(a);
+                        zone.addArena(a);
                         zone.update();
                         session.write(pending.toJson().toString().getBytes());
                     }
@@ -526,38 +526,9 @@ public class AdminRoleModule implements Module,Configurable.Listener {
             return gameLobbyContext;
         });
     }
-    private Zone _zone(GameCluster gameCluster, Descriptor descriptor){
+    private GameZone _zone(GameCluster gameCluster, Descriptor descriptor){
         ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        //String dn = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-        //DataStore dataStore = this.context.dataStore(dn.replace("-","_"));
-        return applicationPreSetup.load(context,descriptor);//gameCluster.property(GameCluster.MODE).equals(Zone.PVE)?new PVEZone(descriptor):new PVPZone();
-        /**
-        mZone.distributionKey(descriptor.distributionKey());
-        mZone.capacity=1;
-        mZone.roundDuration = 60*1000;
-        mZone.overtime = 5000;
-        mZone.playMode = Room.OFF_LINE_MODE;
-        mZone.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        mZone.dataStore(dataStore);
-        dataStore.createIfAbsent(mZone,true);
-        for(int i=1;i<maxGameLevelCount+1;i++){
-            Arena a = new Arena(mZone.bucket(),mZone.oid(),i);
-            if(dataStore.load(a)){
-                mZone.arenas.add(a);
-            }
-        }
-        if(mZone.arenas.size()==0){
-            for(int i=1;i<defaultGameLevelCount+1;i++){
-                Arena a = new Arena(mZone.bucket(),mZone.oid(),i);
-                a.name("level"+i);
-                a.level = i;
-                a.xp = i*100;
-                a.disabled(false);
-                mZone.arenas.add(a);
-            }
-            mZone.update();
-        }
-        return mZone;**/
+        return applicationPreSetup.load(context,descriptor);
     }
     private JsonObject toMessage(String msg,boolean suc){
         JsonObject jms = new JsonObject();

@@ -6,22 +6,22 @@ import com.icodesoftware.Descriptor;
 
 public class GameLobby {
     public Descriptor lobby;
-    public Zone zone;
+    public GameZone zone;
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name",zone.name()!=null?zone.name():lobby.name());
         jsonObject.addProperty("tag",lobby.tag());
         jsonObject.addProperty("rank",lobby.accessRank());
-        jsonObject.addProperty("capacity",zone.capacity);
-        jsonObject.addProperty("joinsOnStart",zone.joinsOnStart);
-        jsonObject.addProperty("duration",zone.roundDuration/60000);
-        jsonObject.addProperty("mode",zone.mode);
-        jsonObject.addProperty("levelLimit",zone.levelLimit>0?zone.levelLimit:lobby.capacity());
+        jsonObject.addProperty("capacity",zone.capacity());
+        jsonObject.addProperty("joinsOnStart",zone.joinsOnStart());
+        jsonObject.addProperty("duration",zone.roundDuration()/60000);
+        jsonObject.addProperty("mode",zone.playMode());
+        jsonObject.addProperty("levelLimit",zone.levelLimit()>0?zone.levelLimit():lobby.capacity());
         jsonObject.addProperty("configLabel",zone.index());
         jsonObject.addProperty("disabled",lobby.disabled());
         JsonArray jds = new JsonArray();
-        for(Arena a: zone.arenas){
+        for(Arena a: zone.arenas()){
             JsonObject jd = new JsonObject();
             jd.addProperty("name",a.name());
             jd.addProperty("level",a.level);
