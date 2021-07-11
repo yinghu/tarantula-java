@@ -1,5 +1,6 @@
 package com.tarantula.game;
 
+import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.DataStore;
 
@@ -31,8 +32,11 @@ public interface GameZone extends Configurable, DataStore.Updatable{
     long roundDuration();
     void roundDuration(long roundDuration);
 
+    boolean connected();
     Stub join(Rating rating);
     void addArena(Arena arena);
     List<Arena> arenas();
+    void start(ApplicationContext applicationContext);
+
 
 }

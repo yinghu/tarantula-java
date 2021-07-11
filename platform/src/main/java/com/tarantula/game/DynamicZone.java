@@ -1,6 +1,10 @@
 package com.tarantula.game;
 
+import com.icodesoftware.ApplicationContext;
+import com.icodesoftware.Descriptor;
+import com.icodesoftware.OnLog;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.AssociateKey;
@@ -22,6 +26,8 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     protected List<Arena> arenaList;
     protected ConcurrentHashMap<Integer,Arena> levelList;
 
+    protected ApplicationContext applicationContext;
+    protected Descriptor application;
     public DynamicZone(){
         this.label = "Zone";
         this.arenaList = new ArrayList<>();
@@ -121,7 +127,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.playMode = (String)properties.get("9");
     }
     @Override
-    public void update() {
+    public void update() {//local data store update
         arenaList.forEach((a)->{
             if(!this.dataStore.update(a)){//failed if no key associated
                 this.dataStore.create(a);
@@ -129,6 +135,19 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         });
         this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         this.dataStore.update(this);
+    }
+    @Override
+    public void update(ServiceContext serviceContext){//config sync callback
+        this.applicationContext.log("zone updated->"+distributionKey(), OnLog.WARN);
+    }
+
+    @Override
+    public void start(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+        this.application = this.applicationContext.descriptor();
+    }
+    public boolean connected(){
+        return !this.playMode.equals(PLAY_MODE_PVE);
     }
 
 }
