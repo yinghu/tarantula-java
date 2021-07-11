@@ -17,6 +17,7 @@ public interface GameZone extends Configurable, DataStore.Updatable{
     int DEFAULT_JOINS_ON_START = 1;
     long DEFAULT_ROUND_DURATION = 60000;
     int DEFAULT_LEVEL_UP_BASE = 1000;
+    int MAX_ROOM_CAPACITY = 4;
 
     String name();
     void name(String name);

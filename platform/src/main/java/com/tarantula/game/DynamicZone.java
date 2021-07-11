@@ -7,6 +7,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.game.service.DynamicLobbySetup;
 import com.tarantula.platform.AssociateKey;
 
 import java.time.LocalDateTime;
@@ -35,13 +36,14 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.joinsOnStart = DEFAULT_JOINS_ON_START;
         this.levelLimit = DEFAULT_LEVEL_COUNT;
         this.roundDuration = DEFAULT_ROUND_DURATION;
+        this.capacity = 1;
     }
     
-    public DynamicZone(String name,String playMode,int capacity){
+    public DynamicZone(String name,String playMode){
         this();
         this.name = name;
         this.playMode = playMode;
-        this.capacity = capacity;
+        this.capacity = playMode.equals(PLAY_MODE_PVE)?1:MAX_ROOM_CAPACITY;
     }
 
     public Stub join(Rating rating){
@@ -139,15 +141,62 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     @Override
     public void update(ServiceContext serviceContext){//config sync callback
         this.applicationContext.log("zone updated->"+distributionKey(), OnLog.WARN);
+        GameZone updated = new DynamicLobbySetup().load(serviceContext,application);
+        reset(updated);
     }
 
     @Override
     public void start(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         this.application = this.applicationContext.descriptor();
+        if(levelLimit==0||levelLimit>application.capacity()){
+            levelLimit = this.application.capacity();
+        }
+        listArena();
     }
     public boolean connected(){
         return !this.playMode.equals(PLAY_MODE_PVE);
     }
 
+    private void listArena(){
+        if(arenaList.size()==0){
+            return;
+        }
+        int fi = levelLimit;//this.descriptor.capacity();
+        for(Arena a : arenaList){
+            if(a.level>0&&a.level<=levelLimit){
+                levelList.put(a.level,a);
+                if(a.level<fi){
+                    fi = a.level;
+                }
+            }
+        }
+        //set 1 to max level count
+        for(int i=1;i<this.levelLimit+1;i++){//max matching level
+            Arena ex = levelList.get(i);
+            if(ex==null){
+                if(levelList.get(i-1)!=null){
+                    levelList.put(i,levelList.get(i-1));//fill with last one
+                }
+                else{
+                    levelList.put(i,levelList.get(fi));//fill header
+                }
+            }
+        }
+    }
+    private void reset(GameZone updated){
+        arenaList.clear();
+        for(Arena a : updated.arenas()){
+            arenaList.add(a);
+        }
+        synchronized (this){//update local zone copy
+            this.name = updated.name();
+            this.capacity = updated.capacity();
+            this.joinsOnStart = updated.joinsOnStart();
+            this.roundDuration = updated.roundDuration();
+            this.levelLimit = updated.levelLimit();
+            levelList.clear();
+            listArena();
+        }
+    }
 }
