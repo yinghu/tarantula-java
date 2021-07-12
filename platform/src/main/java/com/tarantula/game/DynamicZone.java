@@ -29,6 +29,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
 
     protected ApplicationContext applicationContext;
     protected Descriptor application;
+    protected JoinProxy joinProxy;
     public DynamicZone(){
         this.label = "Zone";
         this.arenaList = new ArrayList<>();
@@ -47,7 +48,8 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     }
 
     public Stub join(Rating rating){
-        return null;
+        Arena arena = levelList.get(rating.xpLevel);
+        return joinProxy.join(rating);
     }
     public void addArena(Arena arena){
         arenaList.add(arena);
@@ -157,7 +159,9 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public boolean connected(){
         return !this.playMode.equals(PLAY_MODE_PVE);
     }
-
+    public void joinProxy(JoinProxy joinProxy){
+        this.joinProxy = joinProxy;
+    }
     private void listArena(){
         if(arenaList.size()==0){
             return;

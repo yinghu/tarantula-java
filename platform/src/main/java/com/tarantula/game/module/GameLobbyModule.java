@@ -1,5 +1,6 @@
 package com.tarantula.game.module;
 
+import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
@@ -7,6 +8,7 @@ import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.util.OnAccessDeserializer;
 
 public class GameLobbyModule implements Module, Connection.OnConnectionListener {
 
@@ -14,20 +16,31 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     private DeploymentServiceProvider deploymentServiceProvider;
     private GameServiceProvider gameServiceProvider;
     private GameZone gameZone;
+    private GsonBuilder builder;
     @Override
     public void onJoin(Session session, Module.OnUpdate onUpdate) throws Exception{
         Rating rating = gameServiceProvider.rating(session.systemId());
         Stub stub = gameZone.join(rating);
+        session.write(stub.toJson().toString().getBytes());
     }
 
     @Override
-    public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
+        if(session.action().equals("onTest")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            Rating rating = this.gameServiceProvider.rating(session.systemId());
+            rating.xpLevel = onAccess.stub();
+            Stub stub = gameZone.join(rating);
+            session.write(stub.toJson().toString().getBytes());
+        }
         return false;
     }
 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
+        this.builder = new GsonBuilder();
+        this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.deploymentServiceProvider = applicationContext.serviceProvider(DeploymentServiceProvider.NAME);
         this.gameServiceProvider = applicationContext.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
         this.gameZone = this.gameServiceProvider.zone(this.context.descriptor());

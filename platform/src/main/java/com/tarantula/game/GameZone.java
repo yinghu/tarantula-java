@@ -39,5 +39,10 @@ public interface GameZone extends Configurable, DataStore.Updatable{
     List<Arena> arenas();
     void start(ApplicationContext applicationContext);
 
+    void joinProxy(JoinProxy joinProxy);
+
+    interface JoinProxy{
+        Stub join(Rating rating);
+    }
 
 }
