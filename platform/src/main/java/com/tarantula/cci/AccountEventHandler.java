@@ -21,12 +21,13 @@ public class AccountEventHandler implements RequestHandler {
     private RecoverService recoverService;
     private GsonBuilder builder;
     private OnView invalidView;
+
     public AccountEventHandler(){
 
     }
 
     public String name(){
-        return "/account";
+        return ACCOUNT_PATH;
     }
 
     public void onRequest(OnExchange exchange) throws Exception{

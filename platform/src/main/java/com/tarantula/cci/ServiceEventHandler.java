@@ -28,7 +28,7 @@ public class ServiceEventHandler implements RequestHandler {
 
 	}
     public String name(){
-        return "/service";
+        return SERVICE_PATH;
     }
     public void onRequest(OnExchange exchange) throws Exception{
         String path = exchange.path();

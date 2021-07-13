@@ -13,7 +13,7 @@ public class RootContentHandler implements RequestHandler {
     private static final JDKLogger log = JDKLogger.getLogger(RootContentHandler.class);
     private DeploymentServiceProvider deploymentServiceProvider;
     public String name(){
-        return "/";
+        return ROOT_PATH;
     }
     public void onRequest(OnExchange exchange) throws Exception{//load from web folder including sub folders
         String path = exchange.path();

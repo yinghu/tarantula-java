@@ -1,6 +1,7 @@
 package com.tarantula.cci.http;
 
 import com.tarantula.cci.HttpDispatcher;
+import com.tarantula.cci.RequestHandler;
 import com.tarantula.platform.service.EndPoint;
 
 
@@ -14,6 +15,6 @@ public class HttpServiceHandler extends HttpDispatcher {
 
     @Override
     public String path() {
-        return "/service";
+        return RequestHandler.SERVICE_PATH;
     }
 }

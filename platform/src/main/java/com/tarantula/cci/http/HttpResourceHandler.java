@@ -1,6 +1,7 @@
 package com.tarantula.cci.http;
 
 import com.tarantula.cci.HttpDispatcher;
+import com.tarantula.cci.RequestHandler;
 import com.tarantula.platform.service.EndPoint;
 
 
@@ -16,7 +17,7 @@ public class HttpResourceHandler extends HttpDispatcher {
 
     @Override
     public String path() {
-        return "/resource";
+        return RequestHandler.RESOURCE_PATH;
     }
 
 

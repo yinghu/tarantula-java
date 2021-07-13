@@ -35,7 +35,7 @@ public class GameServerEventHandler implements RequestHandler {
 
     private DeployService deployService;
     public String name(){
-        return "/server";
+        return GAME_SERVER_PATH;
     }
 
     public void onRequest(OnExchange exchange) throws Exception{

@@ -34,7 +34,7 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
 
     }
     public String name(){
-        return "/user";
+        return USER_PATH;
     }
     public void onRequest(OnExchange onExchange) throws Exception {
 

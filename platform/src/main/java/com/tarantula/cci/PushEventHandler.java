@@ -35,7 +35,7 @@ public class PushEventHandler implements RequestHandler {
     private DeployService deployService;
     private DeploymentServiceProvider deploymentServiceProvider;
     public String name(){
-        return "/push";
+        return PUSH_PATH;
     }
     public void onRequest(OnExchange exchange) throws Exception{
         String action = exchange.header(Session.TARANTULA_ACTION);

@@ -26,7 +26,7 @@ public class UploadEventHandler implements RequestHandler {
     public UploadEventHandler(){
     }
     public String name(){
-        return "/upload";
+        return UPLOAD_PATH;
     }
     public void onRequest(OnExchange exchange) throws Exception{
         String token = exchange.header(Session.TARANTULA_TOKEN);

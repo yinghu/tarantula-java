@@ -20,7 +20,7 @@ public class ResourceEventHandler implements RequestHandler {
     public ResourceEventHandler(){
     }
     public String name(){
-        return "/resource";
+        return RESOURCE_PATH;
     }
     public void onRequest(OnExchange exchange) throws Exception{
         String path = exchange.path();

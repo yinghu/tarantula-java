@@ -15,7 +15,7 @@ public class DevelopmentEventHandler implements RequestHandler {
     private String homeDir;
 
     public String name(){
-        return "/development";
+        return DEVELOPMENT_PATH;
     }
 
     public void onRequest(OnExchange exchange) throws Exception{

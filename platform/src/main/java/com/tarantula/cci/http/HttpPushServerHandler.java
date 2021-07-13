@@ -1,6 +1,7 @@
 package com.tarantula.cci.http;
 
 import com.tarantula.cci.HttpDispatcher;
+import com.tarantula.cci.RequestHandler;
 import com.tarantula.platform.service.EndPoint;
 
 public class HttpPushServerHandler extends HttpDispatcher {
@@ -11,6 +12,6 @@ public class HttpPushServerHandler extends HttpDispatcher {
     }
     @Override
     public String path() {
-        return "/push";
+        return RequestHandler.PUSH_PATH;
     }
 }

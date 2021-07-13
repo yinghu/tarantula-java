@@ -26,7 +26,7 @@ public class AdminEventHandler implements RequestHandler{
     }
 
     public String name(){
-        return "/admin";
+        return ADMIN_PATH;
     }
 
     public void onRequest(OnExchange exchange) throws Exception{

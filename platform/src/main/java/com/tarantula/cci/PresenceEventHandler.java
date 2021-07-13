@@ -29,7 +29,7 @@ public class PresenceEventHandler implements RequestHandler {
 
     }
     public String name(){
-        return "/presence";
+        return PRESENCE_PATH;
     }
     public void onRequest(OnExchange exchange) throws Exception{
         String token = exchange.header(Session.TARANTULA_TOKEN);

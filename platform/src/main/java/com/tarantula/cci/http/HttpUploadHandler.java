@@ -2,6 +2,7 @@ package com.tarantula.cci.http;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.tarantula.cci.HttpDispatcher;
+import com.tarantula.cci.RequestHandler;
 import com.tarantula.platform.service.EndPoint;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ public class HttpUploadHandler extends HttpDispatcher {
 
     @Override
     public String path() {
-        return "/upload";
+        return RequestHandler.UPLOAD_PATH;
     }
 
     @Override

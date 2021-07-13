@@ -26,7 +26,7 @@ public class SudoEventHandler implements RequestHandler {
 
     }
     public String name(){
-        return "/sudo";
+        return SUDO_PATH;
     }
     public void onRequest(OnExchange exchange) throws Exception{
         String token = exchange.header(Session.TARANTULA_TOKEN);
