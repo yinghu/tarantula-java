@@ -42,7 +42,7 @@ public interface GameZone extends Configurable, DataStore.Updatable{
     void joinProxy(JoinProxy joinProxy);
 
     interface JoinProxy{
-        Stub join(Rating rating);
+        Stub join(Arena  arena,Rating rating);
     }
 
 }

@@ -25,15 +25,17 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     protected long roundDuration;
 
     protected List<Arena> arenaList;
-    protected ConcurrentHashMap<Integer,Arena> levelList;
+    protected ConcurrentHashMap<Integer,Arena> levelIndex;
 
     protected ApplicationContext applicationContext;
     protected Descriptor application;
     protected JoinProxy joinProxy;
+    protected ConcurrentHashMap<String,Stub> stubIndex;
     public DynamicZone(){
         this.label = "Zone";
         this.arenaList = new ArrayList<>();
-        this.levelList = new ConcurrentHashMap<>();
+        this.levelIndex = new ConcurrentHashMap<>();
+        this.stubIndex = new ConcurrentHashMap<>();
         this.joinsOnStart = DEFAULT_JOINS_ON_START;
         this.levelLimit = DEFAULT_LEVEL_COUNT;
         this.roundDuration = DEFAULT_ROUND_DURATION;
@@ -48,8 +50,16 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     }
 
     public Stub join(Rating rating){
-        Arena arena = levelList.get(rating.xpLevel);
-        return joinProxy.join(rating);
+        Stub _joined = stubIndex.get(rating.distributionKey());
+        if(_joined!=null){
+            return _joined;
+        }
+        Arena arena = levelIndex.get(rating.xpLevel);
+        Stub stub = joinProxy.join(arena,rating);
+        stub.tag = application.tag();
+        stub.capacity = capacity;
+        stubIndex.put(rating.distributionKey(),stub);
+        return stub;
     }
     public void addArena(Arena arena){
         arenaList.add(arena);
@@ -168,8 +178,11 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         }
         int fi = levelLimit;//this.descriptor.capacity();
         for(Arena a : arenaList){
+            if(a.disabled()){
+                continue;
+            }
             if(a.level>0&&a.level<=levelLimit){
-                levelList.put(a.level,a);
+                levelIndex.put(a.level,a);
                 if(a.level<fi){
                     fi = a.level;
                 }
@@ -177,13 +190,13 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         }
         //set 1 to max level count
         for(int i=1;i<this.levelLimit+1;i++){//max matching level
-            Arena ex = levelList.get(i);
+            Arena ex = levelIndex.get(i);
             if(ex==null){
-                if(levelList.get(i-1)!=null){
-                    levelList.put(i,levelList.get(i-1));//fill with last one
+                if(levelIndex.get(i-1)!=null){
+                    levelIndex.put(i,levelIndex.get(i-1));//fill with last one
                 }
                 else{
-                    levelList.put(i,levelList.get(fi));//fill header
+                    levelIndex.put(i,levelIndex.get(fi));//fill header
                 }
             }
         }
@@ -199,7 +212,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
             this.joinsOnStart = updated.joinsOnStart();
             this.roundDuration = updated.roundDuration();
             this.levelLimit = updated.levelLimit();
-            levelList.clear();
+            levelIndex.clear();
             listArena();
         }
     }
