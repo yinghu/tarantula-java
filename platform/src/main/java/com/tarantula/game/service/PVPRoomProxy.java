@@ -14,7 +14,7 @@ public class PVPRoomProxy implements GameZone.RoomProxy {
         stub.successful(true);
         stub.seat = rating.xpLevel;
         stub.rating = rating;
-        stub.arena = arena.name();
+        stub.arena = arena;
         stub.owner(rating.distributionKey());
         return stub;
     }

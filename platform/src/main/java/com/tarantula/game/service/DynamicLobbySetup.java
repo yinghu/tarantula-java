@@ -24,6 +24,9 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
             arena.name("level"+i);
             arena.level = i;
             arena.xp = i* GameZone.DEFAULT_LEVEL_UP_BASE;
+            arena.capacity = zone.capacity();
+            arena.duration = zone.roundDuration();
+            arena.joinsOnStart = zone.joinsOnStart();
             arena.disabled(false);
             dataStore.create(arena);
             zone.addArena(arena);

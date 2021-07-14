@@ -11,9 +11,9 @@ public class PVERoomProxy implements GameZone.RoomProxy {
     public Stub join(Arena arena, Rating rating) {
         Stub stub = new Stub();
         stub.successful(true);
-        stub.seat = rating.xpLevel;
         stub.rating = rating;
-        stub.arena = arena.name();
+        stub.arena = arena;
+        stub.offline = true;
         stub.owner(rating.distributionKey());
         return stub;
     }

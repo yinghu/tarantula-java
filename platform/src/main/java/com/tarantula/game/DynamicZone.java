@@ -66,12 +66,12 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         Arena arena = levelIndex.get(rating.xpLevel);
         Stub stub = roomProxy.join(arena,rating);
         stub.tag = application.tag();
-        stub.capacity = capacity;
         stubIndex.put(rating.distributionKey(),stub);
         return stub;
     }
     public void leave(String systemId){
         stubIndex.remove(systemId);
+        roomProxy.leave(systemId);
     }
     public void addArena(Arena arena){
         arenaList.add(arena);

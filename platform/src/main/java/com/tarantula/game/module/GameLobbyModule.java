@@ -1,6 +1,7 @@
 package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
@@ -26,13 +27,20 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
-        if(session.action().equals("onTest")){
+        if(session.action().equals("onLeave")){
+            gameZone.leave(session.systemId());
+            session.write(toMessage("left room",true).toString().getBytes());
+        }
+        else if(session.action().equals("onTest")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Rating rating = this.gameServiceProvider.rating(session.systemId());
             rating.xpLevel = onAccess.stub();
             Stub stub = gameZone.join(rating);
             session.write(stub.toJson().toString().getBytes());
             gameZone.leave(session.systemId());
+        }
+        else{
+            throw new UnsupportedOperationException(session.action());
         }
         return false;
     }
@@ -69,5 +77,12 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     @Override
     public void onConnection(Session session) {
 
+    }
+
+    private JsonObject toMessage(String msg, boolean successful){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("successful",successful);
+        jsonObject.addProperty("message",msg);
+        return jsonObject;
     }
 }
