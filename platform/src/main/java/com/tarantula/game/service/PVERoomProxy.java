@@ -1,6 +1,5 @@
 package com.tarantula.game.service;
 
-import com.icodesoftware.Module;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
@@ -21,8 +20,4 @@ public class PVERoomProxy implements GameZone.RoomProxy {
     public void leave(String systemId){
 
     }
-    public void onTimer(Module.OnUpdate onUpdate){
-
-    }
-
 }

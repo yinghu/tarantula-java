@@ -50,6 +50,6 @@ public interface GameZone extends Configurable, DataStore.Updatable{
     interface RoomProxy{
         Stub join(Arena  arena,Rating rating);
         void leave(String systemId);
-        void onTimer(Module.OnUpdate onUpdate);
+        default void onTimer(Module.OnUpdate onUpdate){}
     }
 }

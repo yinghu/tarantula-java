@@ -25,7 +25,6 @@ public class MatchMakingModule implements Module, Lobby.Listener {
             Rating rating = this.gameServiceProvider.rating(session.systemId());
             int mix = rating.rank>maxRank?maxRank:rating.rank;
             Descriptor lobby = mZone.get(mix);
-            session.payload(rating.toBinary());
             //this.context.log("ACCESS MODE->"+session.accessMode(),OnLog.WARN);
             Response response = context.presence(session.systemId()).onPlay(session,lobby);
             if(response!=null){
