@@ -2,6 +2,7 @@ package com.tarantula.game;
 
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Descriptor;
+import com.icodesoftware.Module;
 import com.icodesoftware.OnLog;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.ServiceContext;
@@ -29,7 +30,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
 
     protected ApplicationContext applicationContext;
     protected Descriptor application;
-    protected JoinProxy joinProxy;
+    protected RoomProxy roomProxy;
     protected ConcurrentHashMap<String,Stub> stubIndex;
     public DynamicZone(){
         this.label = "Zone";
@@ -39,14 +40,22 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.joinsOnStart = DEFAULT_JOINS_ON_START;
         this.levelLimit = DEFAULT_LEVEL_COUNT;
         this.roundDuration = DEFAULT_ROUND_DURATION;
-        this.capacity = 1;
+        this.capacity = PVE_MAX_ROOM_CAPACITY;
     }
     
     public DynamicZone(String name,String playMode){
         this();
         this.name = name;
         this.playMode = playMode;
-        this.capacity = playMode.equals(PLAY_MODE_PVE)?1:MAX_ROOM_CAPACITY;
+        if(playMode.equals(PLAY_MODE_PVP)){
+            this.capacity = PVP_MAX_ROOM_CAPACITY;
+        }
+        else if(playMode.equals(PLAY_MODE_TVE)){
+            this.capacity = TVE_MAX_ROOM_CAPACITY;
+        }
+        else if(playMode.equals(PLAY_MODE_TVT)){
+            this.capacity = TVT_MAX_ROOM_CAPACITY;
+        }
     }
 
     public Stub join(Rating rating){
@@ -55,11 +64,14 @@ public class DynamicZone extends RecoverableObject implements GameZone {
             return _joined;
         }
         Arena arena = levelIndex.get(rating.xpLevel);
-        Stub stub = joinProxy.join(arena,rating);
+        Stub stub = roomProxy.join(arena,rating);
         stub.tag = application.tag();
         stub.capacity = capacity;
         stubIndex.put(rating.distributionKey(),stub);
         return stub;
+    }
+    public void leave(String systemId){
+        stubIndex.remove(systemId);
     }
     public void addArena(Arena arena){
         arenaList.add(arena);
@@ -169,8 +181,8 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public boolean connected(){
         return !this.playMode.equals(PLAY_MODE_PVE);
     }
-    public void joinProxy(JoinProxy joinProxy){
-        this.joinProxy = joinProxy;
+    public void roomProxy(RoomProxy roomProxy){
+        this.roomProxy = roomProxy;
     }
     private void listArena(){
         if(arenaList.size()==0){
@@ -215,5 +227,16 @@ public class DynamicZone extends RecoverableObject implements GameZone {
             levelIndex.clear();
             listArena();
         }
+    }
+    public void onTimer(Module.OnUpdate onUpdate){
+        roomProxy.onTimer(onUpdate);
+    }
+    @Override
+    public int getFactoryId() {
+        return GamePortableRegistry.OID;
+    }
+    @Override
+    public int getClassId() {
+        return GamePortableRegistry.GAME_ZONE_CID;
     }
 }

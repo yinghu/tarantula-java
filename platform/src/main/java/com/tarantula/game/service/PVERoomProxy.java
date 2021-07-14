@@ -1,11 +1,12 @@
 package com.tarantula.game.service;
 
+import com.icodesoftware.Module;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
 
-public class PVEJoinProxy implements GameZone.JoinProxy {
+public class PVERoomProxy implements GameZone.RoomProxy {
 
     @Override
     public Stub join(Arena arena, Rating rating) {
@@ -17,4 +18,11 @@ public class PVEJoinProxy implements GameZone.JoinProxy {
         stub.owner(rating.distributionKey());
         return stub;
     }
+    public void leave(String systemId){
+
+    }
+    public void onTimer(Module.OnUpdate onUpdate){
+
+    }
+
 }

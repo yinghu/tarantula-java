@@ -53,24 +53,24 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
             }
         }
         zone.dataStore(dataStore);
-        zone.joinProxy(joinProxy(zone.playMode()));
+        zone.roomProxy(joinProxy(zone.playMode()));
         return zone;
     }
 
     private String serviceDataStore(Descriptor application){
         return application.typeId().replace("-lobby","_service");
     }
-    private GameZone.JoinProxy joinProxy(String playMode){
-        GameZone.JoinProxy joinProxy = new PVEJoinProxy();
+    private GameZone.RoomProxy joinProxy(String playMode){
+        GameZone.RoomProxy roomProxy = new PVERoomProxy();
         if(playMode.equals(GameZone.PLAY_MODE_PVP)){
-            joinProxy = new PVPJoinProxy();
+            roomProxy = new PVPRoomProxy();
         }
         else if(playMode.equals(GameZone.PLAY_MODE_TVE)){
-            joinProxy = new TVEJoinProxy();
+            roomProxy = new TVERoomProxy();
         }
         else if(playMode.equals(GameZone.PLAY_MODE_TVT)){
-            joinProxy = new TVTJoinProxy();
+            roomProxy = new TVTRoomProxy();
         }
-        return joinProxy;
+        return roomProxy;
     }
 }

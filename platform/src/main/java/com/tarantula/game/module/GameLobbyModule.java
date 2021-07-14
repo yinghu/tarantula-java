@@ -32,10 +32,14 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
             rating.xpLevel = onAccess.stub();
             Stub stub = gameZone.join(rating);
             session.write(stub.toJson().toString().getBytes());
+            gameZone.leave(session.systemId());
         }
         return false;
     }
-
+    @Override
+    public void onTimer(Module.OnUpdate update){
+        this.gameZone.onTimer(update);
+    }
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
@@ -51,7 +55,11 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
         }
         this.context.log("Game lobby started on tag ["+context.descriptor().tag()+"]",OnLog.WARN);
     }
-
+    @Override
+    public void clear() {
+        this.deploymentServiceProvider.release(gameZone);
+        this.context.log("clear->"+this.context.descriptor().tag(),OnLog.WARN);
+    }
     //connection listener
     @Override
     public String lobbyTag() {

@@ -95,16 +95,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         return deltaStatistics;
     }
     public Zone zone(Descriptor descriptor,String mode){
-        if(mode.equals(Zone.PVE)){
-            Zone zone = new PVELobbySetup().load(serviceContext,descriptor);
-            return zone;
-        }
-        else if(mode.equals(Zone.PVP)){
-            Zone zone = new PVPZone();
-            zone.distributionKey(descriptor.distributionKey());
-            zone.mode = mode;
-            return zone;
-        }
+
         throw new UnsupportedOperationException(mode);
     }
     public GameZone zone(Descriptor descriptor){//application id

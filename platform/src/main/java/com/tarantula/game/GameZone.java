@@ -3,6 +3,7 @@ package com.tarantula.game;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Module;
 
 import java.util.List;
 
@@ -17,7 +18,10 @@ public interface GameZone extends Configurable, DataStore.Updatable{
     int DEFAULT_JOINS_ON_START = 1;
     long DEFAULT_ROUND_DURATION = 60000;
     int DEFAULT_LEVEL_UP_BASE = 1000;
-    int MAX_ROOM_CAPACITY = 4;
+    int PVE_MAX_ROOM_CAPACITY = 1;
+    int PVP_MAX_ROOM_CAPACITY = 2;
+    int TVE_MAX_ROOM_CAPACITY = 2;
+    int TVT_MAX_ROOM_CAPACITY = 4;
 
     String name();
     void name(String name);
@@ -35,14 +39,17 @@ public interface GameZone extends Configurable, DataStore.Updatable{
 
     boolean connected();
     Stub join(Rating rating);
+    void leave(String systemId);
+    void onTimer(Module.OnUpdate onUpdate);
     void addArena(Arena arena);
     List<Arena> arenas();
     void start(ApplicationContext applicationContext);
 
-    void joinProxy(JoinProxy joinProxy);
+    void roomProxy(RoomProxy roomProxy);
 
-    interface JoinProxy{
+    interface RoomProxy{
         Stub join(Arena  arena,Rating rating);
+        void leave(String systemId);
+        void onTimer(Module.OnUpdate onUpdate);
     }
-
 }
