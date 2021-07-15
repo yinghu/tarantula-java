@@ -18,8 +18,13 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     private GameServiceProvider gameServiceProvider;
     private GameZone gameZone;
     private GsonBuilder builder;
+    private Descriptor application;
     @Override
     public void onJoin(Session session, Module.OnUpdate onUpdate) throws Exception{
+        if(application.tournamentEnabled()&&(!gameServiceProvider.available(session.tournamentId()))){
+            session.write(toMessage("no tournament available,please try later",false).toString().getBytes());
+            return;
+        }
         Rating rating = gameServiceProvider.rating(session.systemId());
         Stub stub = gameZone.join(rating);
         session.write(stub.toJson().toString().getBytes());
@@ -51,6 +56,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
+        this.application = this.context.descriptor();
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.deploymentServiceProvider = applicationContext.serviceProvider(DeploymentServiceProvider.NAME);
