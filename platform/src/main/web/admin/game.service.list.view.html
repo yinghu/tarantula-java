@@ -109,7 +109,7 @@
     </div>
 </div>
 <script>
-    document.querySelector("#tx-game-service-list-message").innerHTML = TARA_API.query().gameClusterId;
+    document.querySelector("#tx-game-service-list-message").innerHTML = "Game Cluster ID : "+TARA_API.query().gameClusterId;
     TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameServiceList',accessId:TARA_API.query().gameClusterId},(resp)=>{
         if(resp.successful){
             document.querySelector('#tx-service-name').innerHTML = resp.name;
