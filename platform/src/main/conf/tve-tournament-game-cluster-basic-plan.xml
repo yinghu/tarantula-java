@@ -75,6 +75,14 @@
                 <tag>game/stats</tag>
                 <module-name>com.tarantula.game.module.StatisticsModule</module-name>
             </application>
+            <application><!-- stats/leader board module-->
+                <type-id>game-service</type-id>
+                <name>Tournament</name>
+                <type>application</type>
+                <category>service</category>
+                <tag>game/tournament</tag>
+                <module-name>com.tarantula.game.module.TournamentModule</module-name>
+            </application>
         </application-list>
     </lobby-context>
     <lobby-context>
