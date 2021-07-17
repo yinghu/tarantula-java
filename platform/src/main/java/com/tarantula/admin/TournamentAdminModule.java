@@ -1,12 +1,12 @@
 package com.tarantula.admin;
 
-import com.icodesoftware.ApplicationContext;
+import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.OnLog;
-import com.icodesoftware.Session;
 import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.tournament.TournamentScheduleParser;
 
 public class TournamentAdminModule implements Module {
 
@@ -21,7 +21,16 @@ public class TournamentAdminModule implements Module {
         }
         else if(session.action().equals("onSchedule")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            session.write(JsonUtil.toSimpleResponse(true,(String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).getBytes());
+            if((boolean)gameCluster.property(GameCluster.TOURNAMENT_ENABLED)){
+                Tournament.Schedule schedule = TournamentScheduleParser.parse(payload);
+                String serviceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+                TournamentServiceProvider tsp = this.context.serviceProvider(serviceName);
+                tsp.register(schedule);
+                session.write(JsonUtil.toSimpleResponse(true,serviceName).getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"tournament not supported").getBytes());
+            }
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");

@@ -7,6 +7,9 @@ public interface Tournament extends Configurable {
 
     String ENTRY_LABEL = "TEE";
 
+    String DAILY_SCHEDULE = "daily";
+    String ON_DEMAND_SCHEDULE = "onDemand";
+
     enum Status{
         SCHEDULED,STARTED,CLOSED,ENDED
     }
@@ -53,8 +56,9 @@ public interface Tournament extends Configurable {
         default void onUpdated(Entry entry){}
     }
 
-    interface Schedule{
+    interface Schedule extends Recoverable{
         String type();
+        String schedule();
         String description();
         String icon();
         LocalDateTime startTime();

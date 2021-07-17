@@ -49,6 +49,7 @@ public class TournamentScheduleOperation extends Operation{
         out.writeUTF(this.schedule.type());
         out.writeUTF(this.schedule.description());
         out.writeUTF(this.schedule.icon());
+        out.writeUTF(this.schedule.schedule());
         out.writeInt(this.schedule.maxEntriesPerInstance());
         out.writeInt(this.schedule.instanceDurationInMinutes());
         out.writeLong(TimeUtil.toUTCMilliseconds(this.schedule.startTime()));
@@ -63,11 +64,12 @@ public class TournamentScheduleOperation extends Operation{
         String type = in.readUTF();
         String desc = in.readUTF();
         String icon = in.readUTF();
+        String schedule = in.readUTF();
         int mz = in.readInt();
         int dur = in.readInt();
         LocalDateTime start = TimeUtil.fromUTCMilliseconds(in.readLong());
         LocalDateTime close = TimeUtil.fromUTCMilliseconds(in.readLong());
         LocalDateTime end = TimeUtil.fromUTCMilliseconds(in.readLong());
-        this.schedule = new DefaultTournamentSchedule(type,desc,icon,start,close,end,dur,mz);
+        this.schedule = new DefaultTournamentSchedule(type,desc,icon,schedule,start,close,end,dur,mz);
     }
 }
