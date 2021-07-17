@@ -1,0 +1,20 @@
+package com.tarantula.admin;
+
+import com.icodesoftware.ApplicationContext;
+import com.icodesoftware.Module;
+import com.icodesoftware.OnLog;
+import com.icodesoftware.Session;
+
+public class GameStoreAdminModule implements Module {
+    private ApplicationContext context;
+    @Override
+    public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
+        return false;
+    }
+
+    @Override
+    public void setup(ApplicationContext applicationContext) throws Exception {
+        this.context = applicationContext;
+        this.context.log("game store module started", OnLog.WARN);
+    }
+}

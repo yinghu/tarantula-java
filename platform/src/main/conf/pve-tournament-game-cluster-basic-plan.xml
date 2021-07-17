@@ -85,6 +85,14 @@
             </application>
             <application><!-- stats/leader board module-->
                 <type-id>game-service</type-id>
+                <name>GameStore</name>
+                <type>application</type>
+                <category>service</category>
+                <tag>game/store</tag>
+                <module-name>com.tarantula.game.module.GameStoreModule</module-name>
+            </application>
+            <application><!-- stats/leader board module-->
+                <type-id>game-service</type-id>
                 <name>Tournament</name>
                 <type>application</type>
                 <category>service</category>

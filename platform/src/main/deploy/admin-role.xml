@@ -33,6 +33,18 @@
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
             </application>
+            <application>
+                <type-id>admin-role</type-id>
+                <name>Admin Role</name>
+                <type>application</type>
+                <category>admin</category>
+                <tag>role/store</tag>
+                <description>Tarantula Admin Role Service</description>
+                <module-name>com.tarantula.admin.GameStoreAdminModule</module-name>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <access-control>30</access-control>
+            </application>
         </application-list>
         <configuration-list>
                 <configuration type="setup" name="cluster">
@@ -62,6 +74,9 @@
             <view type="create.access.key">
                 <property name="moduleResourceFile">admin/create.access.key.view.html</property>
             </view>
+            <view type="create.template">
+                <property name="moduleResourceFile">admin/create.template.view.html</property>
+            </view>
             <view type="game.lobby.list">
                 <property name="moduleResourceFile">admin/game.lobby.list.view.html</property>
             </view>
@@ -89,8 +104,14 @@
             <view type="api.service.statistics">
                 <property name="moduleResourceFile">admin/api.service.statistics.view.html</property>
             </view>
+            <view type="api.service.leaderboard">
+                <property name="moduleResourceFile">admin/api.service.leaderboard.view.html</property>
+            </view>
             <view type="api.service.matchmaking">
                 <property name="moduleResourceFile">admin/api.service.matchmaking.view.html</property>
+            </view>
+            <view type="api.service.gamestore">
+                <property name="moduleResourceFile">admin/api.service.gamestore.view.html</property>
             </view>
             <view type="api.service.tournament">
                 <property name="moduleResourceFile">admin/api.service.tournament.view.html</property>
