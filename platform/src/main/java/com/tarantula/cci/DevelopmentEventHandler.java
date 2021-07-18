@@ -15,28 +15,22 @@ public class DevelopmentEventHandler implements RequestHandler {
     private String homeDir;
 
     public String name(){
-        return "/development";
+        return DEVELOPMENT_PATH;
     }
 
-    public void onRequest(OnExchange exchange){
-        try{
-            String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
-            String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
-            if(typeId==null){
-                throw new RuntimeException("Illegal access");
-            }
-            String _file = exchange.path().replaceFirst("/development","");
-            log.warn("Downloading ["+_file+"] from developer->"+typeId);
-            InputStream inputStream = new FileInputStream(new File(homeDir+_file));
-            byte[] _payload = inputStream.readAllBytes();
-            inputStream.close();
-            ResponsiveEvent responsiveEvent = new ResponsiveEvent("","",_payload,true);
-            exchange.onEvent(responsiveEvent);
-
-        }catch (Exception ex){
-            ex.printStackTrace();
-            exchange.onError(ex,ex.getMessage());
+    public void onRequest(OnExchange exchange) throws Exception{
+        String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
+        String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
+        if(typeId==null){
+            throw new RuntimeException("Illegal access");
         }
+        String _file = exchange.path().replaceFirst("/development","");
+        log.warn("Downloading ["+_file+"] from developer->"+typeId);
+        InputStream inputStream = new FileInputStream(new File(homeDir+_file));
+        byte[] _payload = inputStream.readAllBytes();
+        inputStream.close();
+        ResponsiveEvent responsiveEvent = new ResponsiveEvent("","",_payload,true);
+        exchange.onEvent(responsiveEvent);
     }
 
     @Override

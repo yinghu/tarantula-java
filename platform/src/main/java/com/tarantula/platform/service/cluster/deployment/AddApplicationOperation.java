@@ -13,6 +13,7 @@ public class AddApplicationOperation extends Operation {
 
     private Descriptor descriptor;
     private String postSetup;
+    private String configName;
 
     private String result;
 
@@ -20,14 +21,15 @@ public class AddApplicationOperation extends Operation {
     }
 
 
-    public AddApplicationOperation(Descriptor lobby,String postSetup) {
+    public AddApplicationOperation(Descriptor lobby,String postSetup,String configName) {
         this.descriptor = lobby;
         this.postSetup = postSetup;
+        this.configName = configName;
     }
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        this.result = cds.addApplication(this.descriptor,postSetup);
+        this.result = cds.addApplication(this.descriptor,postSetup,configName);
     }
 
     @Override
@@ -40,6 +42,7 @@ public class AddApplicationOperation extends Operation {
         super.writeInternal(out);
         out.writeByteArray(descriptor.toBinary());
         out.writeUTF(postSetup);
+        out.writeUTF(configName);
     }
 
     @Override
@@ -47,6 +50,7 @@ public class AddApplicationOperation extends Operation {
         super.readInternal(in);
         this.descriptor = new DeploymentDescriptor();
         this.descriptor.fromBinary(in.readByteArray());
-        this.postSetup = (in.readUTF());
+        this.postSetup = in.readUTF();
+        this.configName = in.readUTF();
     }
 }

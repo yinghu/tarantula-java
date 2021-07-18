@@ -26,25 +26,20 @@ public class SudoEventHandler implements RequestHandler {
 
     }
     public String name(){
-        return "/sudo";
+        return SUDO_PATH;
     }
-    public void onRequest(OnExchange exchange){
-        try{
-            String token = exchange.header(Session.TARANTULA_TOKEN);
-            OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
-            if(!recoverService.checkAccessControl(onSession.systemId(), AccessControl.root)){
-                throw new RuntimeException("no access permission");
-            }
-            Content ret = this.deploymentServiceProvider.resource(exchange.path().substring(1));
-            if(!ret.existed()){
-                ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile());
-            }
-            exchange.onEvent(new ResponsiveEvent("","",ret.data(),0,ret.type(),true));
-            deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
-        }catch (Exception ex){
-            ex.printStackTrace();
-            exchange.onError(ex,ex.getMessage());
+    public void onRequest(OnExchange exchange) throws Exception{
+        String token = exchange.header(Session.TARANTULA_TOKEN);
+        OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
+        if(!recoverService.checkAccessControl(onSession.systemId(), AccessControl.root)){
+            throw new RuntimeException("no access permission");
         }
+        Content ret = this.deploymentServiceProvider.resource(exchange.path().substring(1));
+        if(!ret.existed()){
+            ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile());
+        }
+        exchange.onEvent(new ResponsiveEvent("","",ret.data(),0,ret.type(),true));
+        deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
     }
 
     @Override

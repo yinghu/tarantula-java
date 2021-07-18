@@ -3,6 +3,7 @@ package com.tarantula.cci.http;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.tarantula.cci.HttpDispatcher;
+import com.tarantula.cci.RequestHandler;
 import com.tarantula.platform.service.EndPoint;
 
 import java.io.IOException;
@@ -15,13 +16,17 @@ public class HttpRootHandler extends HttpDispatcher {
 
     @Override
     public String path() {
-        return "/";
+        return RequestHandler.ROOT_PATH;
     }
 
     public void handle(HttpExchange hex) throws IOException {
-        HttpSession hs = new HttpSession("id",hex);
-        hs.parse();
-        this.requestHandler.onRequest(hs);
+        HttpSession exchange = new HttpSession("id",hex);
+        exchange.parse();
+        try{
+            requestHandler.onRequest(exchange);
+        }catch (Exception ex){
+            exchange.onError(ex,ex.getMessage());
+        }
     }
 
 }

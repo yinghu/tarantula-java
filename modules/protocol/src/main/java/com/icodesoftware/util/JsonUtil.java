@@ -82,4 +82,10 @@ public class JsonUtil {
         });
         return _mv;
     }
+    public static String toSimpleResponse(boolean successful,String message){
+        JsonObject resp = new JsonObject();
+        resp.addProperty("successful",successful);
+        resp.addProperty("message",message);
+        return resp.toString();
+    }
 }

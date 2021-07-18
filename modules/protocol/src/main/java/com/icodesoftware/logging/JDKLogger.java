@@ -40,8 +40,14 @@ public class JDKLogger implements TarantulaLogger {
 		private JDKLogger(Class<?> t){
 			_log = Logger.getLogger(t.getName());
 		}
+		private JDKLogger(String name){
+			_log = Logger.getLogger(name);
+		}
 		public static JDKLogger getLogger(Class<?> t){
 			return new JDKLogger(t);
+		}
+		public static JDKLogger getLogger(String name){
+			return new JDKLogger(name);
 		}
 		public  void debug(String message){
 			if(__DEV__){

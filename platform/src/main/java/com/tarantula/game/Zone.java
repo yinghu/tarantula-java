@@ -25,7 +25,7 @@ abstract public class Zone extends RecoverableObject implements Configurable, Da
 
     public List<Arena> arenas = new ArrayList<>();
     public ConcurrentHashMap<Integer,Arena> aMap = new ConcurrentHashMap<>();
-    public String name;
+    //public String name;
     public int levelLimit;
     public String mode;
     public int capacity = 1;

@@ -19,14 +19,14 @@ public class DefaultLobby implements Lobby {
     public void addEntry(Descriptor descriptor){
 		this.applicationIndex.put(descriptor.distributionKey(),descriptor);
 		listeners.forEach((l)->{
-			l.on(descriptor);
+			l.onLobby(descriptor);
 		});
 	}
 	public  void removeEntry(String applicationId){
 		Descriptor removed = this.applicationIndex.remove(applicationId);
 		removed.disabled(true);
 		listeners.forEach((l)->{
-			l.on(removed);
+			l.onLobby(removed);
 		});
     }
 	public List<Descriptor> entryList(){

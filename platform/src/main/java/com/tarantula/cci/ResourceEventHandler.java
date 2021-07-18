@@ -20,9 +20,9 @@ public class ResourceEventHandler implements RequestHandler {
     public ResourceEventHandler(){
     }
     public String name(){
-        return "/resource";
+        return RESOURCE_PATH;
     }
-    public void onRequest(OnExchange exchange){
+    public void onRequest(OnExchange exchange) throws Exception{
         String path = exchange.path();
         //load js API in resources/web, public access
         Content _load = this.deploymentServiceProvider.resource(path.substring(1));

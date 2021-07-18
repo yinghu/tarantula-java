@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameZoneModule implements Module,Configurable.Listener,Connection.OnConnectionListener{
 
     private ApplicationContext context;
-    private PVPZone mZone;
+    private Zone mZone;
     private ConcurrentHashMap<String, Stub> mStub = new ConcurrentHashMap<>();
     private GsonBuilder builder;
     private GameServiceProvider gameServiceProvider;
@@ -49,7 +49,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
             }
         }
         if(stub==null){
-            room = mZone.playMode==Room.OFF_LINE_MODE?mZone.solo(rating):mZone.match(rating);
+            //room = mZone.playMode==Room.OFF_LINE_MODE?mZone.solo(rating):mZone.match(rating);
             stub = room.join(rating);
             if(stub==null){
                 session.write(toMessage("no room available,please try later",false).toString().getBytes());
@@ -84,7 +84,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
             if(stub!=null){
                 session.write(toMessage(session.action(),true).toString().getBytes());
                 StatsDelta delta = toDelta(payload);
-                mZone.onStatistics(session.systemId(),delta.name,delta.value);
+                //mZone.onStatistics(session.systemId(),delta.name,delta.value);
             }
             else{
                 session.write(toMessage("no room joined",false).toString().getBytes());
@@ -175,8 +175,8 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         String gz = this.context.descriptor().typeId().replace("-lobby","-service");
         this.gameServiceProvider = this.context.serviceProvider(gz);
-        mZone = this.gameServiceProvider.zone(this.context.descriptor());
-        mZone.levelUpBase = DEFAULT_LEVEL_UP_BASE;
+        mZone = this.gameServiceProvider.zone(this.context.descriptor(),"pvp");
+        //mZone.levelUpBase = DEFAULT_LEVEL_UP_BASE;
         if(mZone.arenas.size()==0) {
             //create arenas using capacity of descriptor
             mZone.capacity=1;
@@ -195,8 +195,8 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
             mZone.update();
         }
         mZone.stubIndex = this.mStub;
-        mZone.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        mZone.gameServiceProvider = this.gameServiceProvider;
+        //mZone.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        //mZone.gameServiceProvider = this.gameServiceProvider;
         mZone.descriptor = this.context.descriptor();
         mZone.start();
         //mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));
@@ -217,7 +217,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
     }
     @Override
     public void onTimer(com.icodesoftware.Module.OnUpdate update){
-        mZone.onTimer((connection,label,data)->update.on(connection,label,data));
+        //mZone.onTimer((connection,label,data)->update.on(connection,label,data));
     }
 
 
@@ -232,7 +232,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
         //this.context.log("Bucket->"+bucket+"/"+state,OnLog.WARN);
     }
     public void onUpdated(Configurable zone) {
-        mZone.reset((PVPZone)zone);
+        //mZone.reset((PVPZone)zone);
         //this.context.log("Play mode->"+mZone.playMode,OnLog.WARN);
         //this.context.log("joinsOnStart->"+mZone.joinsOnStart,OnLog.WARN);
         //mZone.aMap.forEach((k,v)-> context.log("Add level ->"+k+" ->/level:"+v.level+"/name:"+v.name()+"/xp:"+v.xp,OnLog.WARN));

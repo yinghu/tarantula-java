@@ -1,5 +1,7 @@
 package com.tarantula.game;
 
+import com.google.api.client.json.Json;
+import com.google.gson.JsonObject;
 import com.icodesoftware.Consumable;
 import com.icodesoftware.Recoverable;
 import com.tarantula.platform.IndexKey;
@@ -84,5 +86,14 @@ public class Arena extends OnApplicationHeader {
         _cp.name = this.name;
         _cp.index = this.index;
         return _cp;
+    }
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("name",name);
+        jsonObject.addProperty("capacity",capacity);
+        jsonObject.addProperty("duration",duration);
+        jsonObject.addProperty("xp",xp);
+        jsonObject.addProperty("level",level);
+        return jsonObject;
     }
 }

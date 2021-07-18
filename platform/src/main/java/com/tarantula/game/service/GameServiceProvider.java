@@ -95,53 +95,12 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         return deltaStatistics;
     }
     public Zone zone(Descriptor descriptor,String mode){
-        if(mode.equals(Zone.PVE)){
-            Zone zone = new PVELobbySetup().load(serviceContext,descriptor);
-            return zone;
-        }
-        else if(mode.equals(Zone.PVP)){
-            Zone zone = new PVPZone();
-            zone.distributionKey(descriptor.distributionKey());
-            zone.mode = mode;
-            return zone;
-        }
+
         throw new UnsupportedOperationException(mode);
     }
-    public PVPZone zone(Descriptor descriptor){//application id
-        PVPZone zone = new PVPZone();
-        zone.distributionKey(descriptor.distributionKey());
-        zone.index(descriptor.tag());
-        byte[] key = zone.key().asString().getBytes();
-        String memberId = integrationCluster.recoverService().findDataNode(this.dataStore.name(),key);
-        if(memberId!=null){
-            byte[] data = integrationCluster.recoverService().load(memberId,this.dataStore.name(),key);
-            zone.fromBinary(data);
-            for(int i=1;i<descriptor.capacity()+1;i++){
-                Arena a = new Arena(zone.bucket(),zone.oid(),i);
-                data = integrationCluster.recoverService().load(memberId,this.dataStore.name(),a.key().asString().getBytes());
-                if(data!=null){
-                    a.fromBinary(data);
-                    if(!a.disabled()){//skip disabled
-                        zone.arenas.add(a);
-                    }
-                }
-            }
-        }
-        else{//create local zone
-            this.dataStore.createIfAbsent(zone,true);
-            zone.dataStore(this.dataStore);
-            for(int i=1;i<descriptor.capacity()+1;i++){
-                Arena a = new Arena(zone.bucket(),zone.oid(),i);
-                if(this.dataStore.load(a)){
-                    if(!a.disabled()){//skip disabled
-                        zone.arenas.add(a);
-                    }
-                }
-            }
-        }
-        zone.dataStore(this.dataStore);
-        zone.subscription = this.subscription;
-        return zone;
+    public GameZone zone(Descriptor descriptor){//application id
+        DynamicLobbySetup dynamicLobbySetup = new DynamicLobbySetup();
+        return dynamicLobbySetup.load(serviceContext,descriptor);
     }
     public void addRoom(Room room){
         roomIndex.put(room.roomId,room);
@@ -263,6 +222,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             dataStore.update(gameServiceIndex);
         }
         tournamentIndex.put(tournament.distributionKey(),tournament);
+        this.logger.warn("tournament started->"+tournament.distributionKey());
         this.tournamentStarted(tournament);
         return tournament;
     }
@@ -330,8 +290,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     @Override
     public void tournamentStarted(Tournament tournament) {
         rListeners.forEach((k,c)->{
-            if(c instanceof Tournament.Listener){
-                ((Tournament.Listener)c).tournamentStarted(tournament);
+            if(c.listener instanceof Tournament.Listener){
+                ((Tournament.Listener)c.listener).tournamentStarted(tournament);
             }
         });
     }

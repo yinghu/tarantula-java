@@ -22,6 +22,10 @@ abstract public class HttpDispatcher implements HttpHandler {
         }
         HttpSession exchange = new HttpSession(id,httpExchange);
         exchange.parse();
-        requestHandler.onRequest(exchange);
+        try{
+            requestHandler.onRequest(exchange);
+        }catch (Exception ex){
+            exchange.onError(ex,ex.getMessage());
+        }
     }
 }

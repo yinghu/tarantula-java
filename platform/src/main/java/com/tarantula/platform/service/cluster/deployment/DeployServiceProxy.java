@@ -100,9 +100,9 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public String addApplication(Descriptor application,String postSetup){
+    public String addApplication(Descriptor application,String postSetup,String configName){
         NodeEngine nodeEngine = getNodeEngine();
-        AddApplicationOperation operation = new AddApplicationOperation(application,postSetup);
+        AddApplicationOperation operation = new AddApplicationOperation(application,postSetup,configName);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<String> future = builder.invoke();

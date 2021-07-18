@@ -17,10 +17,10 @@ public class Stub extends ResponseHeader {
     public String serverKey;
     public String ticket;
     public String roomId;
-    public int capacity;
     public int seat;
     public String tag;
-    public String arena;
+    public boolean tournamentEnabled;
+    public Arena arena;
     public int rank; //rank of game 1 basis
     public double pxp; //percentage of game xp 100 basis
     public int rankUpBase;
@@ -55,13 +55,11 @@ public class Stub extends ResponseHeader {
         if(roomId!=null){
             jo.addProperty("roomId",roomId);
         }
-        jo.addProperty("capacity",capacity);
+        if(arena!=null){
+            jo.add("arena", arena.toJson());
+        }
         jo.addProperty("tag",tag);
-        jo.addProperty("arena",arena);
-        //jo.addProperty("rank",rating.rank);
-        //jo.addProperty("xp",rating.xp);
-        //jo.addProperty("level",rating.level);
-        jo.addProperty("tournamentEnabled",instance!=null);
+        jo.addProperty("tournamentEnabled",tournamentEnabled);
         jo.addProperty("offline",offline);
         if(ticket!=null){
             jo.addProperty("ticket",ticket);

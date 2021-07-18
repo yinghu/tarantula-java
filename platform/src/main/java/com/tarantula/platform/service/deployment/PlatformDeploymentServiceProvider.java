@@ -322,7 +322,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             b.moduleArtifact(descriptor.moduleArtifact());
             b.moduleVersion(descriptor.moduleVersion());
             b.applicationClassName(this.tarantulaContext.singleModuleApplication);
-            String x = deployService.addApplication(b,null);
+            String x = deployService.addApplication(b,null,null);
             if(x==null){
                 log.warn("Failed to add application ->"+b.toString());
             }
@@ -332,9 +332,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return response;
     }
 
-    public boolean createApplication(Descriptor descriptor, String postSetup,boolean launching){
+    public boolean createApplication(Descriptor descriptor, String postSetup,String configName,boolean launching){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
-        String  suc = deployService.addApplication(descriptor,postSetup);
+        String  suc = deployService.addApplication(descriptor,postSetup,configName);
         if(suc!=null&&launching){//launch if lobby on line
             this.integrationCluster.deployService().launchApplication(descriptor.typeId(),suc);
         }

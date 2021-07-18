@@ -132,7 +132,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         ds.update(app);
         return app.typeId();
     }
-    public String addApplication(Descriptor descriptor,String postSetup){
+    public String addApplication(Descriptor descriptor,String postSetup,String configName){
         DataStore ds = this.tarantulaContext.masterDataStore();
         LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),descriptor.typeId());
         if(!ds.load(query)){
@@ -156,7 +156,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             }
             if(postSetup!=null){
                 ApplicationPreSetup setup = SystemUtil.applicationPreSetup(postSetup);
-                setup.setup(tarantulaContext,descriptor);
+                setup.setup(tarantulaContext,descriptor,configName);
             }
             return descriptor.distributionKey();
         }
@@ -310,7 +310,8 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();
             String typePrefix = name.toLowerCase();
-            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(mode+"-game-cluster-basic-plan.xml"));
+            String configPrefix = tournamentEnabled?(mode+"-tournament"):(mode);
+            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(configPrefix+"-game-cluster-basic-plan.xml"));
             for (LobbyConfiguration configuration : parser.configurations) {
                 configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",typePrefix));//lower case only typeId
                 if(configuration.descriptor.typeId().endsWith("-lobby")){
@@ -331,6 +332,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     if(c.configurationType().equals(ApplicationPreSetup.SET_UP_TYPE)){
                         String cname = c.property(ApplicationPreSetup.SET_UP_NAME).toString();
                         gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,cname);
+                        gameCluster.property(GameCluster.MODE,c.configurationName());
                         preSetup[0] = SystemUtil.applicationPreSetup(cname);
                     }
                 });
@@ -356,7 +358,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     a.applicationClassName(tarantulaContext.singleModuleApplication);
                     mds.create(a);
                     if(preSetup[0]!=null){
-                        preSetup[0].setup(tarantulaContext,a);
+                        preSetup[0].setup(tarantulaContext,a,(String)gameCluster.property(GameCluster.MODE));
                     }
                 });
             }

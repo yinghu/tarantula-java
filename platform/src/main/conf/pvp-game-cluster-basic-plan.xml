@@ -25,7 +25,7 @@
                 <type>application</type>
                 <category>game</category>
                 <tag>game/lobby1</tag>
-                <module-name>com.tarantula.game.module.GameZoneModule</module-name>
+                <module-name>com.tarantula.game.module.GameLobbyModule</module-name>
                 <capacity>10</capacity>
                 <access-rank>1</access-rank>
                 <timer-on-module>1000</timer-on-module>
@@ -36,15 +36,15 @@
                 <type>application</type>
                 <category>game</category>
                 <tag>game/lobby2</tag>
-                <module-name>com.tarantula.game.module.GameZoneModule</module-name>
+                <module-name>com.tarantula.game.module.GameLobbyModule</module-name>
                 <capacity>10</capacity>
                 <access-rank>2</access-rank>
                 <timer-on-module>1000</timer-on-module>
             </application>
         </application-list>
         <configuration-list>
-            <configuration type="pre-setup" name="level">
-                <property name="application-pre-setup">com.tarantula.game.service.PVPLobbySetup</property>
+            <configuration type="pre-setup" name="pvp">
+                <property name="application-pre-setup">com.tarantula.game.service.DynamicLobbySetup</property>
             </configuration>
         </configuration-list>
     </lobby-context>
@@ -74,6 +74,22 @@
                 <category>service</category>
                 <tag>game/stats</tag>
                 <module-name>com.tarantula.game.module.StatisticsModule</module-name>
+            </application>
+            <application><!-- stats/leader board module-->
+                <type-id>game-service</type-id>
+                <name>LeaderBoard</name>
+                <type>application</type>
+                <category>service</category>
+                <tag>game/leaderboard</tag>
+                <module-name>com.tarantula.game.module.LeaderBoardModule</module-name>
+            </application>
+            <application><!-- stats/leader board module-->
+                <type-id>game-service</type-id>
+                <name>GameStore</name>
+                <type>application</type>
+                <category>service</category>
+                <tag>game/store</tag>
+                <module-name>com.tarantula.game.module.GameStoreModule</module-name>
             </application>
         </application-list>
     </lobby-context>

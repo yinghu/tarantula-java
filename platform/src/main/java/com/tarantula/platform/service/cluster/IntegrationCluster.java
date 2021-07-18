@@ -130,32 +130,10 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             log.warn("No destination message ->"+message.toString());
         }
     }
-    /**
-    public String addEventListener(String registerId,EventListener e){
-        if(registerId==null){
-            String rid = UUID.randomUUID().toString();
-            eMap.put(rid,e);
-            return rid;
-        }
-        else{
-            eMap.put(registerId,e);
-            return registerId;
-        }
-    }
-    public void removeEventListener(String registerId){
-        eMap.remove(registerId);
-    }**/
-    /**
     public boolean onEvent(Event event) {
-        EventListener e = eMap.get(event.trackId());
-        if(e!=null){
-            if(e.onEvent(event)){
-                eMap.remove(event.trackId());
-            }
-            metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
-        }
+        onDispatch(event);
         return false;
-    }**/
+    }
     public void retry(String retryKey) {
 
     }

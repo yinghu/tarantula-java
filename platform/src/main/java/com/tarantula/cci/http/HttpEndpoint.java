@@ -3,13 +3,11 @@ package com.tarantula.cci.http;
 import java.net.InetSocketAddress;
 import java.util.concurrent.*;
 
-import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.sun.net.httpserver.HttpServer;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.service.EndPoint;
-
 
 public class HttpEndpoint implements EndPoint {
 
@@ -19,7 +17,6 @@ public class HttpEndpoint implements EndPoint {
 	private int port;
 	private String inboundThreadPoolSetting;
 	private int backlog;
-
 
 	private ExecutorService tpool;
 	private Serviceable retryPool;
@@ -37,7 +34,6 @@ public class HttpEndpoint implements EndPoint {
 		InetSocketAddress ip = this.address==null?new InetSocketAddress(this.port):new InetSocketAddress(this.address,this.port);
 		hserver = HttpServer.create(ip,this.backlog);
 		hserver.setExecutor(this.tpool);
-		log.info("Initializing web context ...");
 		HttpRootHandler root = new HttpRootHandler();
 		root.resource(this.resource);
 		this.hserver.createContext(root.path(),root);
@@ -96,8 +92,9 @@ public class HttpEndpoint implements EndPoint {
 
 		hserver.start();
         started = true;
-        log.info("Tarantula HTTP Endpoint is listening on ["+ip.toString()+"]");
+        log.info("Tarantula HTTP Endpoint is listening on ["+ip+"]");
 	}
+
 	public void shutdown() throws Exception {
 		if(started){
 			retryPool.shutdown();
@@ -110,39 +107,27 @@ public class HttpEndpoint implements EndPoint {
 		}
 	}
 
-
 	public void address(String address) {
 		this.address = address;
 	}
 
-
 	public void port(int port) {
 		this.port = port;
 	}
+
 	public void backlog(int backlog) {
 		this.backlog = backlog;
-	}
-
-	public void secured(boolean secured){
-
 	}
 
 	public void inboundThreadPoolSetting(String inboundThreadPoolSetting){
 		this.inboundThreadPoolSetting = inboundThreadPoolSetting;
 	}
+
 	public String name(){
 		return "HTTP-endpoint";
 	}
 
-
 	public void resource(Resource resource){
 		this.resource = resource;
-	}
-
-	public void setup(ServiceContext serviceContext){
-
-	}
-	public void waitForData(){
-
 	}
 }

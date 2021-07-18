@@ -1,6 +1,7 @@
 package com.tarantula.cci.http;
 
 import com.tarantula.cci.HttpDispatcher;
+import com.tarantula.cci.RequestHandler;
 import com.tarantula.platform.service.EndPoint;
 
 public class HttpViewHandler extends HttpDispatcher {
@@ -12,7 +13,7 @@ public class HttpViewHandler extends HttpDispatcher {
 
     @Override
     public String path() {
-        return "/view";
+        return RequestHandler.VIEW_PATH;
     }
 
 }
