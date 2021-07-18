@@ -50,6 +50,10 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
         return type;
     }
     @Override
+    public void type(String type){
+        this.type = type;
+    }
+    @Override
     public String description() {
         return description;
     }

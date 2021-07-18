@@ -29,7 +29,6 @@ public class RecoverableObject implements Recoverable {
 
     protected String index;
 
-    protected String type;
     protected String name;
     protected DataStore dataStore;
 
@@ -75,12 +74,7 @@ public class RecoverableObject implements Recoverable {
         this.label = label;
     }
     //on access API
-    public String type(){
-        return this.type;
-    }
-    public void type(String type){
-        this.type = type;
-    }
+
     public String name(){
         return this.name;
     }

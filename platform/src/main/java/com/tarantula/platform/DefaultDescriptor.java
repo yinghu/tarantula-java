@@ -9,7 +9,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 
 	protected String typeId;
 
-
+    protected String type;
 
     protected String category;
 
@@ -125,7 +125,12 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 		this.typeId = typeId;
 	}
 
-
+    public String type(){
+        return this.type;
+    }
+    public void type(String type){
+        this.type = type;
+    }
     public void category(String category){
         this.category = category;
     }

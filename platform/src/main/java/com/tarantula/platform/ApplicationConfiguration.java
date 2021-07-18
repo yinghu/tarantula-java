@@ -21,6 +21,8 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
 
     private CopyOnWriteArrayList<Configurable.Listener> _listeners = new CopyOnWriteArrayList<>();
 
+    private String type;
+
     public ApplicationConfiguration(){
         this.onEdge = true;
     }
