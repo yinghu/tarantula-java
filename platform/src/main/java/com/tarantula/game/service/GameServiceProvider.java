@@ -42,6 +42,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     private ConcurrentHashMap<String,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Tournament.Instance> activeInstanceIndex = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Tournament.Listener> tListeners = new ConcurrentHashMap<>();
 
     private ConcurrentHashMap<String, TypedListener> rListeners = new ConcurrentHashMap<>();
 
@@ -281,47 +282,25 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     @Override
     public void tournamentScheduled(Tournament tournament) {
-        rListeners.forEach((k,c)->{
-            if(c instanceof Tournament.Listener){
-                ((Tournament.Listener)c).tournamentScheduled(tournament);
-            }
-        });
+        tListeners.forEach((k,c)-> c.tournamentScheduled(tournament));
     }
     @Override
     public void tournamentStarted(Tournament tournament) {
-        rListeners.forEach((k,c)->{
-            if(c.listener instanceof Tournament.Listener){
-                ((Tournament.Listener)c.listener).tournamentStarted(tournament);
-            }
-        });
+        tListeners.forEach((k,c)-> c.tournamentStarted(tournament));
     }
 
     @Override
     public void tournamentClosed(Tournament tournament) {
-        rListeners.forEach((k,c)->{
-            if(c instanceof Tournament.Listener){
-                ((Tournament.Listener)c).tournamentClosed(tournament);
-            }
-        });
+        tListeners.forEach((k,c)-> c.tournamentClosed(tournament));
     }
 
     @Override
     public void tournamentEnded(Tournament tournament) {
-        rListeners.forEach((k,c)->{
-            if(c instanceof Tournament.Listener){
-                ((Tournament.Listener)c).tournamentEnded(tournament);
-            }
-        });
+        tListeners.forEach((k,c)-> c.tournamentEnded(tournament));
     }
     @Override
     public void onStarted(Tournament.Instance instance) {
-        logger.warn("instance started->"+instance.id());
-        //activeInstanceIndex.put(instance.id(),instance);
-        rListeners.forEach((k,c)->{
-            if(c instanceof Tournament.Listener){
-                ((Tournament.Listener)c).onStarted(instance);
-            }
-        });
+        tListeners.forEach((k,c)-> c.onStarted(instance));
     }
 
     @Override
@@ -489,5 +468,13 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         logger.warn("reloading ....");
     }
 
+    public String registerTournamentListener(Tournament.Listener listener){
+        String tid = UUID.randomUUID().toString();
+        tListeners.put(tid,listener);
+        return tid;
+    }
+    public void unregisterTournamentListener(String registryKey){
+        tListeners.remove(registryKey);
+    }
 
 }

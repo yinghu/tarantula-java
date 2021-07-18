@@ -17,12 +17,12 @@ public class TournamentModule implements Module , Tournament.Listener {
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.gameServiceProvider = context.serviceProvider(context.descriptor().typeId());
-        regKey = this.gameServiceProvider.registerConfigurableListener(context.descriptor().typeId(),this);
+        regKey = this.gameServiceProvider.registerTournamentListener(this);
         this.context.log("tournament module started", OnLog.WARN);
     }
     @Override
     public void clear(){
-        this.gameServiceProvider.unregisterConfigurableListener(regKey);
+        this.gameServiceProvider.unregisterTournamentListener(regKey);
     }
     public void tournamentStarted(Tournament tournament){
         this.context.log("tournament started->"+tournament.type(),OnLog.WARN);
