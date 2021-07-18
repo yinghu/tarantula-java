@@ -25,8 +25,8 @@ public class TournamentAdminModule implements Module {
                 Tournament.Schedule schedule = TournamentScheduleParser.parse(payload);
                 String serviceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
                 TournamentServiceProvider tsp = this.context.serviceProvider(serviceName);
-                tsp.register(schedule);
-                session.write(JsonUtil.toSimpleResponse(true,serviceName).getBytes());
+                Tournament tournament = tsp.register(schedule);
+                session.write(JsonUtil.toSimpleResponse(true,tournament.distributionKey()).getBytes());
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"tournament not supported").getBytes());

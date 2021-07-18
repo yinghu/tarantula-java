@@ -222,6 +222,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             dataStore.update(gameServiceIndex);
         }
         tournamentIndex.put(tournament.distributionKey(),tournament);
+        this.logger.warn("tournament started->"+tournament.distributionKey());
         this.tournamentStarted(tournament);
         return tournament;
     }
@@ -289,8 +290,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     @Override
     public void tournamentStarted(Tournament tournament) {
         rListeners.forEach((k,c)->{
-            if(c instanceof Tournament.Listener){
-                ((Tournament.Listener)c).tournamentStarted(tournament);
+            if(c.listener instanceof Tournament.Listener){
+                ((Tournament.Listener)c.listener).tournamentStarted(tournament);
             }
         });
     }
