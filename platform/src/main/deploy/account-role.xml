@@ -13,7 +13,7 @@
                 <type-id>account-role</type-id>
                 <name>Account Role</name>
                 <type>application</type>
-                <category>admin</category>
+                <category>account</category>
                 <tag>role/account</tag>
                 <description>Tarantula Account Role Service</description>
                 <module-name>com.tarantula.admin.AccountRoleModule</module-name>

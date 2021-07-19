@@ -25,7 +25,7 @@
                 <type-id>admin-role</type-id>
                 <name>Admin Role</name>
                 <type>application</type>
-                <category>admin</category>
+                <category>tournament</category>
                 <tag>role/tournament</tag>
                 <description>Tarantula Admin Role Service</description>
                 <module-name>com.tarantula.admin.TournamentAdminModule</module-name>
@@ -37,7 +37,7 @@
                 <type-id>admin-role</type-id>
                 <name>Admin Role</name>
                 <type>application</type>
-                <category>admin</category>
+                <category>store</category>
                 <tag>role/store</tag>
                 <description>Tarantula Admin Role Service</description>
                 <module-name>com.tarantula.admin.GameStoreAdminModule</module-name>

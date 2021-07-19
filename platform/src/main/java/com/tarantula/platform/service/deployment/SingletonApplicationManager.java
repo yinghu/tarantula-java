@@ -19,11 +19,11 @@ public class SingletonApplicationManager extends DefaultApplication implements B
     @Override
     public void start() throws Exception {
         super.start();
-        DeploymentDescriptor dd = this.deploymentDescriptor.deploy();
+        //DeploymentDescriptor dd = this.deploymentDescriptor.deploy();
         //dd.owner(dd.distributionKey());
-        this.singleton = this.launch(dd);
+        this.singleton = this.launch(this.deploymentDescriptor);
         this.singleton._setup();//inject the app context proxy to decouple the TarantulaApplicationContext
-        if(dd.accessMode()!= Access.PRIVATE_ACCESS_MODE){
+        if(this.deploymentDescriptor.accessMode()!= Access.PRIVATE_ACCESS_MODE){
             for(int r=0;r<this.tarantulaContext.platformRoutingNumber;r++){
                 StringBuffer bs = new StringBuffer(this.tarantulaContext.dataBucketGroup).append(Recoverable.PATH_SEPARATOR).append(singleton.descriptor().tag()).append(Recoverable.PATH_SEPARATOR).append(r);
                 this.tarantulaContext.integrationCluster().registerBucketReceiver(new ApplicationBucketReceiver(bs.toString(),r,this,this));

@@ -68,7 +68,7 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
     }
     public DeploymentDescriptor deploy(){
         DeploymentDescriptor ins = new DeploymentDescriptor();
-        ins.type(this.type+"/instance");
+        ins.type(this.type);
         ins.category(this.category);
         ins.bucket(this.bucket);
         ins.oid(this.oid);

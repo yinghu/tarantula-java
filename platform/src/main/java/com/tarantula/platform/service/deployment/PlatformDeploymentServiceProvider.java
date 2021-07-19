@@ -364,7 +364,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public void  removeApplication(String typeId,String applicationId){
         this.tarantulaContext.unsetApplication(typeId,applicationId,(d)->{
-            if(d.category().equals("lobby")){
+            if(d.type().equals(Descriptor.TYPE_LOBBY)){
                 this.oListeners.forEach((ol)->{ //remove lobby entry
                     OnLobby onLobby = (OnLobby) vMap.get(d.typeId());
                     onLobby.closed(true);

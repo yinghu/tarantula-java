@@ -361,7 +361,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
                 if(d.codebase()!=null&&d.moduleName()!=null){
                     _codeBase.putIfAbsent(d.codebase(),d);
                 }
-                if(!d.category().equals("lobby")){ //shut down app
+                if(d.type().equals(Descriptor.TYPE_APPLICATION)){ //shut down app
                     ap.shutdown();
                     this.availableApplicationManagers.remove(d.distributionKey());
                 }
@@ -407,7 +407,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             HashMap<String,Descriptor> _codeBase = new HashMap<>();
             Descriptor lab = null;
             for(Descriptor d : lb.entryList()){
-                if(!d.category().equals("lobby")&&d.distributionKey().equals(applicationId)){
+                if(d.type().equals(Descriptor.TYPE_APPLICATION)&&d.distributionKey().equals(applicationId)){
                     lb.removeEntry(applicationId);
                     Application app = this.availableApplicationManagers.remove(applicationId);
                     app.shutdown();
@@ -415,7 +415,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
                 if(d.codebase()!=null&&d.moduleName()!=null){
                     _codeBase.putIfAbsent(d.codebase(),d);
                 }
-                if(d.category().equals("lobby")){
+                if(d.type().equals(Descriptor.TYPE_LOBBY)){
                     lab = d;
                 }
             }
