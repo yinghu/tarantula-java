@@ -87,7 +87,7 @@
                 <type-id>game-service</type-id>
                 <name>GameStore</name>
                 <type>application</type>
-                <category>service</category>
+                <category>store</category>
                 <tag>game/store</tag>
                 <module-name>com.tarantula.game.module.GameStoreModule</module-name>
             </application>

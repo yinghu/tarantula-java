@@ -3,7 +3,7 @@ package com.icodesoftware;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface Tournament extends Configurable {
+public interface Tournament extends Recoverable {
 
     String ENTRY_LABEL = "TEE";
 
@@ -26,12 +26,12 @@ public interface Tournament extends Configurable {
 
     String join(String systemId);
 
-    interface Entry extends Configurable {
+    interface Entry extends Recoverable {
         String systemId();
         double score(double delta);
         int rank();
     }
-    interface Instance extends Configurable {
+    interface Instance extends Recoverable {
         String id();
         Status status();
         int maxEntries();
@@ -42,7 +42,7 @@ public interface Tournament extends Configurable {
         void update(String systemId,OnEntry onEntry);
         List<Entry> list();
     }
-    interface Listener extends Configurable.Listener{
+    interface Listener{
         default void tournamentScheduled(Tournament tournament){}
         default void tournamentStarted(Tournament tournament){}
         default void tournamentClosed(Tournament tournament){}

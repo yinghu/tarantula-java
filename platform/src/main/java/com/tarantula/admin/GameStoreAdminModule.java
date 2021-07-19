@@ -20,7 +20,7 @@ public class GameStoreAdminModule implements Module {
             String serviceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
             GameServiceProvider gameServiceProvider = this.context.serviceProvider(serviceName);
             ApplicationConfiguration app = new ApplicationConfiguration();
-            app.configurationType("store");
+            app.configurationType(this.context.descriptor().category());
             gameServiceProvider.register(app);
             session.write(JsonUtil.toSimpleResponse(true,serviceName).getBytes());
         }

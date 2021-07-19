@@ -4,8 +4,10 @@ import com.icodesoftware.Tournament;
 
 import java.util.List;
 
-public interface TournamentServiceProvider extends ConfigurationServiceProvider{
+public interface TournamentServiceProvider{
 
+    String registerTournamentListener(Tournament.Listener listener);
+    void unregisterTournamentListener(String registryKey);
 
     Tournament register(Tournament.Schedule schedule);
 

@@ -2,6 +2,9 @@ package com.icodesoftware;
 
 public interface Descriptor extends Recoverable {
 
+    String TYPE_LOBBY ="lobby";
+    String TYPE_APPLICATION = "application";
+
     //the order of the deployment
     int deployPriority();
     void deployPriority(int deployPriority);

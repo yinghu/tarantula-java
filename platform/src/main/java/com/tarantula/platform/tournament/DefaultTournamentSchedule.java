@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 public class DefaultTournamentSchedule extends RecoverableObject implements Tournament.Schedule {
-
+    private String type;
     private String description;
     private String icon;
     private LocalDateTime start;

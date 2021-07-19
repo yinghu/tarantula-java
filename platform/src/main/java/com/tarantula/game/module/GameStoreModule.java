@@ -16,7 +16,7 @@ public class GameStoreModule implements Module,Configurable.Listener{
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
-        this.gameServiceProvider.registerConfigurableListener(null,this);
+        this.gameServiceProvider.registerConfigurableListener(this.context.descriptor().category(),this);
         this.context.log("game store module started", OnLog.WARN);
     }
     public <T extends Configurable> void onCreated(T created){
