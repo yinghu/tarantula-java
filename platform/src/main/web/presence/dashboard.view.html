@@ -131,9 +131,11 @@
                 <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-group" style="font-size:16px"></i></span>
                     <span id='tx-game-cluster-role' class='w3-left tx-text-14'>Role name</span>
+                    <!--
                     <span id='tx-game-cluster-price' view-id='game.cluster.price' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Price</span>
                     <span id='tx-game-cluster-role-upgrade' view-id='upgrade.role.admin' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upgrade Role</span>
                     <span id='tx-shopping-card' view-id='shopping.card' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Subscription</span>
+                    -->
                 </div>
                 <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
@@ -682,16 +684,16 @@
             if(resp.successful){
                 document.querySelector('#tx-max-game-cluster-count').innerHTML=resp.maxGameClusterCount;
                 document.querySelector('#tx-current-count').innerHTML=resp.currentCount;
-                document.querySelector('#tx-game-cluster-role-upgrade').style.display='none'; 
+                //document.querySelector('#tx-game-cluster-role-upgrade').style.display='none'; 
                 document.querySelector('#tx-game-cluster-create').style.display='block';
-                document.querySelector('#tx-shopping-card').style.display='block';
+                //document.querySelector('#tx-shopping-card').style.display='block';
                 document.querySelector('#tx-game-cluster-warning').style.display='none'; 
                 _tx_game_cluster_list();
             }
             else{
-                document.querySelector('#tx-game-cluster-role-upgrade').style.display='block'; 
+                //document.querySelector('#tx-game-cluster-role-upgrade').style.display='block'; 
                 document.querySelector('#tx-game-cluster-create').style.display='none';
-                document.querySelector('#tx-shopping-card').style.display='none'; 
+                //document.querySelector('#tx-shopping-card').style.display='none'; 
                 document.querySelector('#tx-game-cluster-warning').style.display='block'; 
             }        
         });

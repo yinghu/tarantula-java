@@ -10,7 +10,7 @@ import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.GameCluster;
 
-public class GameStoreAdminModule implements Module {
+public class GameLobbyAdminModule implements Module {
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
     @Override
@@ -34,6 +34,6 @@ public class GameStoreAdminModule implements Module {
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
-        this.context.log("game store admin module started", OnLog.WARN);
+        this.context.log("game lobby admin module started", OnLog.WARN);
     }
 }
