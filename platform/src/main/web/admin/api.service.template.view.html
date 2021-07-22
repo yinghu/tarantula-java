@@ -39,28 +39,7 @@
     </div>
 </div>
 <script>
-    document.querySelector('#tx-TEMPLATE-api-service-save').style.display='none';
-    document.querySelector('#tx-TEMPLATE-api-service-list').style.display='block';
     let editor = new JSONEditor(document.querySelector("#jsoneditor-api-service-TEMPLATE"),{mode:'code'},{});
-    document.querySelector('#tx-TEMPLATE-api-service-list').onclick=()=>{
-        TARA_API.onGet('role/TEMPLATE','onList',TARA_API.query().gameClusterId,(resp)=>{
-            editor.set(resp);       
-        });
-    };
-    document.querySelector('#tx-api-service-new-TEMPLATE-1').onclick=()=>{
-        TARA_API.onGet('role/admin','onLoadTemplate',TARA_API.query().gameClusterId+'#onDemand',(resp)=>{
-            editor.set(resp);
-            document.querySelector('#tx-TEMPLATE-api-service-save').style.display='block';
-            document.querySelector('#tx-TEMPLATE-api-service-list').style.display='none';          
-        });
-    };
-    document.querySelector('#tx-TEMPLATE-api-service-save').onclick=()=>{
-        TARA_API.onSet('role/TEMPLATE','onSave',TARA_API.query().gameClusterId,editor.get(),(resp)=>{
-            editor.set(resp);
-            document.querySelector('#tx-TEMPLATE-api-service-save').style.display='none';
-            document.querySelector('#tx-TEMPLATE-api-service-list').style.display='block';
-        });
-    };
     document.querySelector('#tx-TEMPLATE-api-close').onclick=()=>{
         editor.destroy();
         let m3 = document.querySelector(TARA_API.query().popup);

@@ -12,7 +12,7 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
     protected String systemId;
     protected String name;
     protected String typeId;
-    protected String subtypeId;
+    //protected String subtypeId;
     protected int accessMode;
 
     protected double balance;
@@ -89,12 +89,6 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
     }
     public void typeId(String typeId){
         this.typeId = typeId;
-    }
-    public String subtypeId(){
-        return this.subtypeId;
-    }
-    public void subtypeId(String subtypeId){
-        this.subtypeId = subtypeId;
     }
 
     public void event(String event){
