@@ -12,11 +12,14 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.util.DescriptorSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class GameLobbyAdminModule implements Module {
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
+    private int maxGameLobbyCount;
+
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
         if (session.action().equals("onGameLobbyList")){
@@ -43,6 +46,39 @@ public class GameLobbyAdminModule implements Module {
             gameLobby.zone = zone;
             session.write(gameLobby.toJson().toString().getBytes());
         }
+        else if (session.action().equals("onAddLobby")){
+            Map<String,Object> cmd = JsonUtil.toMap(payload);
+            String gameClusterId = (String) cmd.get("gameClusterId");
+            int lobbyIndex = ((Number) cmd.get("lobbyIndex")).intValue();
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
+            String lobbyTypeId = (String)gameCluster.property(GameCluster.GAME_LOBBY);
+            Lobby lobby = this.deploymentServiceProvider.lobby(lobbyTypeId);
+            if(lobby.entryList().size()<maxGameLobbyCount&&lobbyIndex<=maxGameLobbyCount){
+                HashMap<Integer,Descriptor> eMap = new HashMap<>();
+                lobby.entryList().forEach((d)->{
+                    eMap.put(d.accessRank(),d);
+                });
+                if(!eMap.containsKey(lobbyIndex)) {
+                    Descriptor desc = lobby.entryList().get(0).copy();
+                    desc.name("Game Lobby " + lobbyIndex);
+                    desc.tag(((String) gameCluster.property(GameCluster.NAME)).toLowerCase() + "/lobby" + lobbyIndex);
+                    desc.accessRank(lobbyIndex);
+                    desc.index((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+                    String configName = (String) gameCluster.property(GameCluster.MODE);
+                    if(this.deploymentServiceProvider.createApplication(desc,(String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME),configName,false)){
+                        session.write(JsonUtil.toSimpleResponse(true,"lobby added->"+lobbyIndex).getBytes());
+                    }
+                    else{
+                        session.write(JsonUtil.toSimpleResponse(false,"lobby failed->"+lobbyIndex).getBytes());
+                    }
+                }else{
+                    session.write(JsonUtil.toSimpleResponse(false,"lobby already existed->"+lobbyIndex).getBytes());
+                }
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"lobby size is over max count->"+maxGameLobbyCount).getBytes());
+            }
+        }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");
         }
@@ -53,6 +89,7 @@ public class GameLobbyAdminModule implements Module {
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
+        this.maxGameLobbyCount = Integer.parseInt(this.context.configuration("cluster").property("maxGameLobbyCount").toString());
         this.context.log("game lobby admin module started", OnLog.WARN);
     }
 

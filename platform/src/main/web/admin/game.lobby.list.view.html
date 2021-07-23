@@ -127,25 +127,11 @@
 </div>
 <script>
     document.querySelector("#tx-game-lobby-list-message").innerHTML = TARA_API.query().gameClusterId;
+    let lobbyIndex;
     document.querySelectorAll(".tx-game-lobby-action").forEach((a)=>{
         a.style.display = 'none';
     });
-    TARA_API.onGet('role/lobby','onGameLobbyList',TARA_API.query().gameClusterId,(resp)=>{
-        if(resp.successful){
-            resp.gameLobbyList.forEach((a)=>{
-                let i = (a.accessRank/1)-1;
-                document.querySelector('#tx-game-lobby-list-name-'+i).innerHTML="Name : "+a.name;
-                document.querySelector('#tx-game-lobby-list-tag-'+i).innerHTML='Access Tag : '+a.tag;
-                document.querySelector('#tx-game-lobby-list-api-'+i).setAttribute('tx-game-lobby-api-view-id','api.game.lobby');
-                document.querySelector('#tx-game-lobby-list-api-'+i).setAttribute('tx-game-lobby-id',a.applicationId);
-                document.querySelector('#tx-game-lobby-list-api-'+i).style.display ='block';
-                document.querySelector('#tx-game-lobby-list-add-'+i).style.display ='none';
-            });
-        }
-        else{
-            document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;
-        }       
-    });
+    list_game_lobby();
     document.querySelectorAll('.tx-game-lobby-action').forEach((a)=>{
         a.onclick=()=>{
             TARA_API.query().popup='#tx-popup-api';
@@ -160,7 +146,7 @@
             //TARA_API.query().applicationId = a.getAttribute('tx-game-lobby-id');
             //let vid = a.getAttribute('tx-game-lobby-api-view-id');
             //tx_view({viewId:vid,containerId:'#tx-popup-api'});
-            console.log('lobby index->'+a.getAttribute('lobby-index'));  
+            lobbyIndex = a.getAttribute('lobby-index')/1;  
             document.querySelector('#tx-game-lobby-list-add-form').style.display ='block';  
         }
     });
@@ -168,6 +154,11 @@
         document.querySelector('#tx-game-lobby-list-add-form').style.display='none';
     };
     document.querySelector('#tx-game-lobby-list-add-ok').onclick=()=>{
+        let cmd ={serviceTag:'role/lobby',command:'onAddLobby',lobbyIndex:lobbyIndex,gameClusterId:TARA_API.query().gameClusterId};
+        TARA_API.onService(true,cmd,(resp)=>{
+            console.log(resp);
+            list_game_lobby();
+        });
         document.querySelector('#tx-game-lobby-list-add-form').style.display='none';
     };
     document.querySelector('#tx-game-lobby-list-close').onclick=()=>{
@@ -175,4 +166,22 @@
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
+    function list_game_lobby(){
+        TARA_API.onGet('role/lobby','onGameLobbyList',TARA_API.query().gameClusterId,(resp)=>{
+            if(resp.successful){
+                resp.gameLobbyList.forEach((a)=>{
+                    let i = (a.accessRank/1)-1;
+                    document.querySelector('#tx-game-lobby-list-name-'+i).innerHTML="Name : "+a.name;
+                    document.querySelector('#tx-game-lobby-list-tag-'+i).innerHTML='Access Tag : '+a.tag;
+                    document.querySelector('#tx-game-lobby-list-api-'+i).setAttribute('tx-game-lobby-api-view-id','api.game.lobby');
+                    document.querySelector('#tx-game-lobby-list-api-'+i).setAttribute('tx-game-lobby-id',a.applicationId);
+                    document.querySelector('#tx-game-lobby-list-api-'+i).style.display ='block';
+                    document.querySelector('#tx-game-lobby-list-add-'+i).style.display ='none';
+                });
+            }
+            else{
+                document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;
+            }       
+        });    
+    }
 </script>
