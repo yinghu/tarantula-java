@@ -65,7 +65,7 @@ public class GameLobbyAdminModule implements Module {
                     desc.accessRank(lobbyIndex);
                     desc.index((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
                     String configName = (String) gameCluster.property(GameCluster.MODE);
-                    if(this.deploymentServiceProvider.createApplication(desc,(String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME),configName,false)){
+                    if(this.deploymentServiceProvider.createApplication(desc,(String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME),configName,true)){
                         session.write(JsonUtil.toSimpleResponse(true,"lobby added->"+lobbyIndex).getBytes());
                     }
                     else{
@@ -78,6 +78,16 @@ public class GameLobbyAdminModule implements Module {
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"lobby size is over max count->"+maxGameLobbyCount).getBytes());
             }
+        }
+        else if(session.action().equals("onDisableLobby")){
+            Map<String,Object> cmd = JsonUtil.toMap(payload);
+            this.deploymentServiceProvider.disableApplication((String)cmd.get("lobbyId"));
+            session.write(payload);
+        }
+        else if(session.action().equals("onEnableLobby")){
+            Map<String,Object> cmd = JsonUtil.toMap(payload);
+            this.deploymentServiceProvider.enableApplication((String)cmd.get("lobbyId"));
+            session.write(payload);
         }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");
