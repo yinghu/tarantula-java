@@ -91,6 +91,14 @@
                 <tag>game/store</tag>
                 <module-name>com.tarantula.game.module.GameStoreModule</module-name>
             </application>
+            <application>
+                <type-id>game-service</type-id>
+                <name>Achievement</name>
+                <type>application</type>
+                <category>achievement</category>
+                <tag>game/achievement</tag>
+                <module-name>com.tarantula.game.module.AchievementModule</module-name>
+            </application>
         </application-list>
     </lobby-context>
     <lobby-context>

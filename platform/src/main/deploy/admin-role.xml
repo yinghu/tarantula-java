@@ -57,6 +57,18 @@
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
             </application>
+            <application>
+                <type-id>admin-role</type-id>
+                <name>Admin Role</name>
+                <type>application</type>
+                <category>achievement</category>
+                <tag>role/achievement</tag>
+                <description>Tarantula Admin Role Service</description>
+                <module-name>com.tarantula.admin.AchievementAdminModule</module-name>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <access-control>30</access-control>
+            </application>
         </application-list>
         <configuration-list>
                 <configuration type="setup" name="cluster">

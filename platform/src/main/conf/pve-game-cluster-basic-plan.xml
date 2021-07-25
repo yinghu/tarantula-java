@@ -83,6 +83,14 @@
                 <tag>game/leaderboard</tag>
                 <module-name>com.tarantula.game.module.LeaderBoardModule</module-name>
             </application>
+            <application>
+                <type-id>game-service</type-id>
+                <name>Achievement</name>
+                <type>application</type>
+                <category>achievement</category>
+                <tag>game/achievement</tag>
+                <module-name>com.tarantula.game.module.AchievementModule</module-name>
+            </application>
             <application><!-- stats/leader board module-->
                 <type-id>game-service</type-id>
                 <name>GameStore</name>
