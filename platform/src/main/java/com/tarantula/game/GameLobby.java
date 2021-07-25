@@ -10,15 +10,18 @@ public class GameLobby {
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("name",zone.name()!=null?zone.name():lobby.name());
-        jsonObject.addProperty("tag",lobby.tag());
-        jsonObject.addProperty("rank",lobby.accessRank());
-        jsonObject.addProperty("capacity",zone.capacity());
-        jsonObject.addProperty("joinsOnStart",zone.joinsOnStart());
-        jsonObject.addProperty("duration",zone.roundDuration()/60000);
-        jsonObject.addProperty("levelLimit",zone.levelLimit()>0?zone.levelLimit():lobby.capacity());
-        jsonObject.addProperty("playMode",zone.playMode());
-        jsonObject.addProperty("disabled",lobby.disabled());
+        jsonObject.addProperty("successful",true);
+        JsonObject jzon = new JsonObject();
+        jzon.addProperty("name",zone.name()!=null?zone.name():lobby.name());
+        jzon.addProperty("tag",lobby.tag());
+        jzon.addProperty("rank",lobby.accessRank());
+        jzon.addProperty("capacity",zone.capacity());
+        jzon.addProperty("joinsOnStart",zone.joinsOnStart());
+        jzon.addProperty("duration",zone.roundDuration()/60000);
+        jzon.addProperty("levelLimit",zone.levelLimit()>0?zone.levelLimit():lobby.capacity());
+        jzon.addProperty("playMode",zone.playMode());
+        jzon.addProperty("disabled",lobby.disabled());
+        jsonObject.add("zone",jzon);
         JsonArray jds = new JsonArray();
         for(Arena a: zone.arenas()){
             JsonObject jd = new JsonObject();

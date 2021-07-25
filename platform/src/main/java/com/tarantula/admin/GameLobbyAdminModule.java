@@ -7,6 +7,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameLobby;
+import com.tarantula.game.GameLobbyContext;
 import com.tarantula.game.GameZone;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.util.DescriptorSerializer;
@@ -87,6 +88,24 @@ public class GameLobbyAdminModule implements Module {
         else if(session.action().equals("onEnableLobby")){
             Map<String,Object> cmd = JsonUtil.toMap(payload);
             this.deploymentServiceProvider.enableApplication((String)cmd.get("lobbyId"));
+            session.write(payload);
+        }
+        else if(session.action().equals("onReloadLobby")){
+            //Map<String,Object> cmd = JsonUtil.toMap(payload);
+            //String gameClusterId = (String) cmd.get("gameClusterId");
+            //GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
+            //String = (String)gameCluster.property(GameCluster.GAME_LOBBY);
+            //Lobby lobby = this.deploymentServiceProvider.lobby(lobbyTypeId);
+            //this.deploymentServiceProvider.configure(gameLobby.zone.distributionKey());
+            //session.write(JsonUtil.toSimpleResponse(true,"Lobby reloaded").getBytes());
+            session.write(payload);
+        }
+        else if(session.action().equals("onSaveLobbyZone")){
+            this.context.log(session.name(),OnLog.WARN);
+            session.write(payload);
+        }
+        else if(session.action().equals("onSaveLobbyLevel")){
+            this.context.log(session.name(),OnLog.WARN);
             session.write(payload);
         }
         else {
