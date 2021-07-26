@@ -7,8 +7,8 @@ import com.icodesoftware.Session;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.item.Item;
 
 public class GameStoreAdminModule implements Module {
     private ApplicationContext context;
@@ -19,8 +19,9 @@ public class GameStoreAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             String serviceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
             GameServiceProvider gameServiceProvider = this.context.serviceProvider(serviceName);
-            ApplicationConfiguration app = new ApplicationConfiguration();
+            Item app = new Item();
             app.configurationType(this.context.descriptor().category());
+
             gameServiceProvider.register(app);
             session.write(JsonUtil.toSimpleResponse(true,serviceName).getBytes());
         }
