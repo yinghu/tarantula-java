@@ -13,12 +13,10 @@ import com.tarantula.game.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.*;
 
-import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.deployment.ConfigurationTemplate;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,13 +36,8 @@ public class AdminRoleModule implements Module,Configurable.Listener {
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
     private int maxGameClusterCount;
-    private int maxGameLobbyCount;
-    private int minGameLobbyCount;
-    private int defaultGameLevelCount;
-    private int maxGameLevelCount;
     private SubscriptionFee monthly;
     private SubscriptionFee yearly;
-    private ConcurrentHashMap<String,GameLobbyContext> pendingLobby;
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
@@ -75,14 +68,6 @@ public class AdminRoleModule implements Module,Configurable.Listener {
                 });
             }
             session.write(adminContext.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onGameLobbyList")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            int page = ((Number)onAccess.property("page")).intValue();
-            String accessId = (String)onAccess.property(OnAccess.ACCESS_ID);
-            GameLobbyContext lobbyContext = this.gameLobbyContext(accessId);
-            lobbyContext.page = page;
-            session.write(lobbyContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onGameServiceList")){
             GameServiceContext gsc = new GameServiceContext();
@@ -127,110 +112,6 @@ public class AdminRoleModule implements Module,Configurable.Listener {
             String key = tokenValidatorProvider.validateGameClusterAccessKey((String)onAccess.property(OnAccess.ACCESS_KEY));
             session.write(JsonUtil.toSimpleResponse(key!=null,key!=null?"key passed":"key failed").getBytes());
         }
-        else if(session.action().equals("onCheckLobbySlot")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String accessId = (String)onAccess.property(OnAccess.ACCESS_ID);
-            GameLobbyContext gameLobbyContext = this.gameLobbyContext(accessId);
-            session.write(gameLobbyContext.availableSlots().toString().getBytes());
-        }
-        else if(session.action().equals("onAddLobby")){//subscription only
-            //this.context.log(new String(payload),OnLog.WARN);
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            ArrayList<Integer> _alist = new ArrayList<>();
-            for(int i=1;i<maxGameLobbyCount+1;i++){
-                Object slot = onAccess.property("slot-"+i);
-                if(slot!=null){
-                    _alist.add(i);
-                }
-            }
-            if(!_alist.isEmpty()){
-                String accessId = (String)onAccess.property(OnAccess.ACCESS_ID);
-                GameCluster gc = this.deploymentServiceProvider.gameCluster(accessId);
-                Lobby lobby = this.deploymentServiceProvider.lobby((String)gc.property(GameCluster.GAME_LOBBY));
-                String gname = (String) gc.property(GameCluster.NAME);
-                boolean disabled = (Boolean)gc.property(GameCluster.DISABLED);
-                int idx = lobby.entryList().size()+1;
-                if(idx>maxGameLobbyCount){
-                    session.write(JsonUtil.toSimpleResponse(false,"max lobby count has reached").getBytes());
-                }else {
-                    int[] added = {0};
-                    HashMap<Integer,Descriptor> _ex = new HashMap<>();
-                    lobby.entryList().forEach((a)->{
-                        _ex.put(a.accessRank(),a);
-                    });
-                    _alist.forEach((rk) -> {
-                        if(!_ex.containsKey(rk)){
-                            Descriptor desc = lobby.entryList().get(0).copy();
-                            desc.name("Game Lobby " + rk);
-                            desc.tag(gname.toLowerCase() + "/lobby" + rk);
-                            desc.accessRank(rk);
-                            desc.index((String)gc.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-                            String configName = (String) gc.property(GameCluster.MODE);
-                            if(this.deploymentServiceProvider.createApplication(desc,(String)gc.property(GameCluster.LOBBY_PRE_SETUP_NAME),configName,!disabled)){
-                                added[0]++;
-                            }
-                        }
-                    });
-                    if(added[0]>0){
-                        pendingLobby.remove(accessId);
-                    }
-                    session.write(JsonUtil.toSimpleResponse(added[0]>0,added[0]>0?"total lobbies added ["+added[0]+"]":"lobby not added").getBytes());
-                }
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"No lobby slot seleccted").getBytes());
-            }
-        }
-        else if(session.action().equals("onDisableLobby")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            int index = ((Number)onAccess.property("index")).intValue();
-            GameLobbyContext pending = this.gameLobbyContext(accessId);
-            if(pending.checkEnabledLobbyCount()>minGameLobbyCount){
-                //do disable operation
-                GameLobby gameLobby = pending.gameLobbyList.get(index);
-                if(pending.page==index&&(!gameLobby.lobby.disabled())){//set to disable
-                    boolean suc = this.deploymentServiceProvider.disableApplication(gameLobby.lobby.distributionKey());
-                    if(suc){
-                        this.pendingLobby.remove(accessId);
-                    }
-                    session.write(JsonUtil.toSimpleResponse(suc,suc?gameLobby.lobby.name()+" disabled":"failed to disble lobby").getBytes());
-                }
-                else{
-                    session.write(JsonUtil.toSimpleResponse(false,"Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]").getBytes());
-                }
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"Min lobby count ["+minGameLobbyCount+"] required").getBytes());
-            }
-        }
-        else if(session.action().equals("onEnableLobby")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            int index = ((Number)onAccess.property("index")).intValue();
-            GameLobbyContext pending = this.gameLobbyContext(accessId);
-            //do enable operation
-            GameLobby gameLobby = pending.gameLobbyList.get(index);
-            if(pending.page==index&&(gameLobby.lobby.disabled())){//set to enable
-                boolean suc = this.deploymentServiceProvider.enableApplication(gameLobby.lobby.distributionKey());
-                if(suc){
-                    this.pendingLobby.remove(accessId);
-                }
-                session.write(JsonUtil.toSimpleResponse(suc,suc?gameLobby.lobby.name()+" enabled":"failed to enable lobby").getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]").getBytes());
-            }
-        }
-        else if(session.action().equals("onReloadLobby")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            int index = ((Number)onAccess.property("index")).intValue();
-            GameLobbyContext pending = this.gameLobbyContext(accessId);
-            GameLobby gameLobby = pending.gameLobbyList.get(index);
-            this.deploymentServiceProvider.configure(gameLobby.zone.distributionKey());
-            session.write(JsonUtil.toSimpleResponse(true,"Lobby reloaded").getBytes());
-        }
         else if(session.action().equals("onCreateGameCluster")){
             User ua = _user(session.systemId());
             Account acc = new UserAccount();
@@ -258,118 +139,6 @@ public class AdminRoleModule implements Module,Configurable.Listener {
             else{
                 //reach max count
                 session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"you already have max game clusters",false)).getBytes());
-            }
-        }
-
-        else if(session.action().equals("onUpdateGameLobby")){
-            //this.context.log(new String(payload),OnLog.WARN);
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            int index = ((Number)onAccess.property("page")).intValue();
-            GameLobbyContext pending = this.gameLobbyContext(accessId);
-            if(index==pending.page){
-                GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
-                GameZone zone = gameLobby.zone;
-                zone.name(onAccess.name());
-                zone.capacity(((Number)onAccess.property("capacity")).intValue());
-                zone.joinsOnStart(((Number)onAccess.property("joinsOnStart")).intValue());
-                if(zone.joinsOnStart()>zone.capacity()){
-                    zone.joinsOnStart(zone.capacity());
-                }
-                zone.roundDuration(((Number)onAccess.property("duration")).intValue()*60000);
-                //zone.playMode = ((Number)onAccess.property("playMode")).intValue();
-                int lmit = ((Number)onAccess.property("levelLimit")).intValue();
-                if(lmit>=defaultGameLevelCount&&lmit<=maxGameLevelCount){
-                    zone.levelLimit(lmit);
-                }
-                zone.update();
-                session.write(pending.toJson().toString().getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]").getBytes());
-            }
-        }
-        else if(session.action().equals("onUpdateGameLevel")){
-            //this.context.log(new String(payload),OnLog.WARN);
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            int index = ((Number)onAccess.property("index")).intValue();
-            int page = ((Number)onAccess.property("page")).intValue();
-            boolean disabled = (Boolean)onAccess.property("disabled");
-            GameLobbyContext pending = this.gameLobbyContext(accessId);
-            if(page==pending.page){
-                GameLobby gameLobby = pending.gameLobbyList.get(pending.page);
-                GameZone zone = gameLobby.zone;
-                if(index<=maxGameLevelCount){
-                    boolean updated  = false;
-                    Arena pu = new Arena();
-                    for(Arena a : zone.arenas()){
-                        if(a.level==index){
-                            pu.name(a.name());
-                            pu.xp = a.xp;
-                            pu.level = a.level;
-                            pu.capacity = a.capacity;
-                            pu.joinsOnStart = a.joinsOnStart;
-                            pu.duration = a.duration;
-                            pu.disabled(a.disabled());
-                            a.name(onAccess.name());
-                            a.xp = ((Number)onAccess.property("xp")).intValue();
-                            a.capacity = ((Number)onAccess.property("capacity")).intValue();
-                            a.joinsOnStart = ((Number)onAccess.property("joinsOnStart")).intValue();
-                            if(a.joinsOnStart>a.capacity){
-                                a.joinsOnStart = a.capacity;
-                            }
-                            a.duration = ((Number)onAccess.property("duration")).intValue()*60000;
-                            a.disabled(disabled);
-                            updated = true;
-                            break;
-                        }
-                    }
-                    if(updated){
-                        int mc = 0;
-                        Arena ap=null;
-                        for(Arena a: zone.arenas()){
-                            if(!a.disabled()){
-                                mc++;
-                            }
-                            if(a.level==pu.level){
-                                ap = a;
-                            }
-                        }
-                        if(mc>0){
-                            zone.update();
-                            session.write(pending.toJson().toString().getBytes());
-                        }
-                        else{
-                            ap.level = pu.level;
-                            ap.xp = pu.xp;
-                            ap.capacity = pu.capacity;
-                            ap.joinsOnStart = pu.joinsOnStart;
-                            ap.duration = pu.duration;
-                            ap.name(pu.name());
-                            ap.disabled(pu.disabled());
-                            session.write(JsonUtil.toSimpleResponse(false,"at least one level per lobby").getBytes());
-                        }
-                    }
-                    else{
-                        Arena a = new Arena(zone.bucket(),zone.oid(),index);
-                        a.name(onAccess.name());
-                        a.xp = ((Number)onAccess.property("xp")).intValue();
-                        a.level = index;
-                        a.capacity = ((Number)onAccess.property("capacity")).intValue();
-                        a.joinsOnStart = ((Number)onAccess.property("joinsOnStart")).intValue();
-                        a.duration = ((Number)onAccess.property("duration")).intValue()*60000;
-                        a.disabled((Boolean)onAccess.property("disabled"));
-                        zone.addArena(a);
-                        zone.update();
-                        session.write(pending.toJson().toString().getBytes());
-                    }
-                }
-                else{
-                    session.write(JsonUtil.toSimpleResponse(false,"level overflow").getBytes());
-                }
-            }else{
-                session.write(JsonUtil.toSimpleResponse(false,"Updated lobby ["+index+"] not matched with loaded lobby["+pending.page+"]").getBytes());
             }
         }
         else if(session.action().equals("availableGameServiceList")){
@@ -519,38 +288,9 @@ public class AdminRoleModule implements Module,Configurable.Listener {
         this.deploymentServiceProvider.register(ya);
         this.deploymentServiceProvider.register(ma);
         this.maxGameClusterCount = Integer.parseInt(this.context.configuration("cluster").property("maxGameClusterCount").toString());
-        this.maxGameLobbyCount = Integer.parseInt(this.context.configuration("cluster").property("maxGameLobbyCount").toString());
-        this.defaultGameLevelCount = Integer.parseInt(this.context.configuration("cluster").property("defaultGameLevelCount").toString());
-        this.maxGameLevelCount = Integer.parseInt(this.context.configuration("cluster").property("maxGameLevelCount").toString());
-        this.minGameLobbyCount = Integer.parseInt(this.context.configuration("cluster").property("minGameLobbyCount").toString());
-        this.pendingLobby = new ConcurrentHashMap<>();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
 
-
-    private GameLobbyContext gameLobbyContext(String accessId){
-        return pendingLobby.computeIfAbsent(accessId,(k)-> {
-            GameLobbyContext gameLobbyContext = new GameLobbyContext();
-            gameLobbyContext.maxLobbyCount = maxGameLobbyCount;
-            gameLobbyContext.gameLobbyList = new ConcurrentHashMap<>();
-            gameLobbyContext.successful(true);
-            GameCluster gc = this.deploymentServiceProvider.gameCluster(accessId);
-            //query from master node to make sure data available always
-            Lobby lobby = this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_LOBBY));
-            lobby.entryList().forEach((a) -> {
-                GameLobby gameLobby = new GameLobby();
-                gameLobby.lobby = a;
-                gameLobby.zone = _zone(gc, a);
-                gameLobbyContext.gameLobbyList.put(a.accessRank(),gameLobby);
-            });
-            //Collections.sort(gameLobbyContext.gameLobbyList,rankComparator);
-            return gameLobbyContext;
-        });
-    }
-    private GameZone _zone(GameCluster gameCluster, Descriptor descriptor){
-        ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        return applicationPreSetup.load(context,descriptor);
-    }
     private User _user(String systemId){
         User u = new User();
         u.distributionKey(systemId);

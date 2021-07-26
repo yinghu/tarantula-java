@@ -1,15 +1,16 @@
 package com.tarantula.game;
 
-import com.google.api.client.json.Json;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Configurable;
 import com.icodesoftware.Consumable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.IndexKey;
-import com.tarantula.platform.OnApplicationHeader;
 
 import java.util.Map;
 
-public class Arena extends OnApplicationHeader {
+public class Arena extends RecoverableObject implements Configurable {
     public int level;
     public int xp;
     public int capacity;
@@ -95,5 +96,10 @@ public class Arena extends OnApplicationHeader {
         jsonObject.addProperty("xp",xp);
         jsonObject.addProperty("level",level);
         return jsonObject;
+    }
+    public boolean configureAndValidate(byte[] data){
+        Map<String,Object> map = JsonUtil.toMap(data);
+        this.disabled = (boolean)map.get("disabled");
+        return true;
     }
 }

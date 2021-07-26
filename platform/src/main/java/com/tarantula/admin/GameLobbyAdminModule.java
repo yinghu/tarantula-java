@@ -7,7 +7,6 @@ import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameLobby;
-import com.tarantula.game.GameLobbyContext;
 import com.tarantula.game.GameZone;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.util.DescriptorSerializer;
@@ -20,7 +19,6 @@ public class GameLobbyAdminModule implements Module {
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
     private int maxGameLobbyCount;
-
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
         if (session.action().equals("onGameLobbyList")){
@@ -34,16 +32,10 @@ public class GameLobbyAdminModule implements Module {
             String gameClusterId = (String) cmd.get("gameClusterId");
             String applicationId = (String) cmd.get("applicationId");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
-            Lobby lobby = this.deploymentServiceProvider.lobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
-            Descriptor[] descriptors = {null};
-            lobby.entryList().forEach((a)->{
-                if(a.distributionKey().equals(applicationId)){
-                    descriptors[0] = a;
-                }
-            });
-            GameZone zone = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,descriptors[0]);
+            Descriptor app = loadDescriptor(gameCluster,applicationId);
+            GameZone zone = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
             GameLobby gameLobby = new GameLobby();
-            gameLobby.lobby = descriptors[0];
+            gameLobby.lobby = app;
             gameLobby.zone = zone;
             session.write(gameLobby.toJson().toString().getBytes());
         }
@@ -91,22 +83,41 @@ public class GameLobbyAdminModule implements Module {
             session.write(payload);
         }
         else if(session.action().equals("onReloadLobby")){
-            //Map<String,Object> cmd = JsonUtil.toMap(payload);
-            //String gameClusterId = (String) cmd.get("gameClusterId");
-            //GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
-            //String = (String)gameCluster.property(GameCluster.GAME_LOBBY);
-            //Lobby lobby = this.deploymentServiceProvider.lobby(lobbyTypeId);
-            //this.deploymentServiceProvider.configure(gameLobby.zone.distributionKey());
-            //session.write(JsonUtil.toSimpleResponse(true,"Lobby reloaded").getBytes());
-            session.write(payload);
+            Map<String,Object> cmd = JsonUtil.toMap(payload);
+            String gameClusterId = (String) cmd.get("gameClusterId");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
+            String lobbyId = (String)cmd.get("lobbyId");
+            Descriptor app = loadDescriptor(gameCluster,lobbyId);
+            GameZone zone = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
+            this.deploymentServiceProvider.configure(zone.distributionKey());
+            session.write(JsonUtil.toSimpleResponse(true,"Lobby reloaded").getBytes());
         }
         else if(session.action().equals("onSaveLobbyZone")){
-            this.context.log(session.name(),OnLog.WARN);
-            session.write(payload);
+            String[] keys = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(keys[0]);
+            Descriptor app = loadDescriptor(gameCluster,keys[1]);
+            GameZone zone = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
+            boolean updated = zone.configureAndValidate(payload);
+            if(updated){
+                zone.update();
+            }
+            session.write(JsonUtil.toSimpleResponse(updated,"zone updated ["+updated+"]").getBytes());
         }
         else if(session.action().equals("onSaveLobbyLevel")){
-            this.context.log(session.name(),OnLog.WARN);
-            session.write(payload);
+            String[] keys = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(keys[0]);
+            Descriptor app = loadDescriptor(gameCluster,keys[1]);
+            GameZone zone = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
+            boolean[] updated = {false};
+            zone.arenas().forEach((a)->{
+                if(a.distributionKey().equals(keys[2])){
+                    updated[0]= a.configureAndValidate(payload);
+                }
+            });
+            if(updated[0]){
+                zone.update();
+            }
+            session.write(JsonUtil.toSimpleResponse(updated[0],"level updated ["+updated[0]+"]").getBytes());
         }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");
@@ -121,7 +132,17 @@ public class GameLobbyAdminModule implements Module {
         this.maxGameLobbyCount = Integer.parseInt(this.context.configuration("cluster").property("maxGameLobbyCount").toString());
         this.context.log("game lobby admin module started", OnLog.WARN);
     }
-
+    private Descriptor loadDescriptor(GameCluster gameCluster,String lobbyId){
+        String lobbyTypeId = (String)gameCluster.property(GameCluster.GAME_LOBBY);
+        Lobby lobby = this.deploymentServiceProvider.lobby(lobbyTypeId);
+        Descriptor[] descriptors = {null};
+        lobby.entryList().forEach((d)->{
+            if(d.distributionKey().equals(lobbyId)){
+                descriptors[0]=d;
+            }
+        });
+        return descriptors[0];
+    }
     private JsonObject toJson(Lobby lobby){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",true);

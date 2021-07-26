@@ -12,6 +12,7 @@ public class GameLobby {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",true);
         JsonObject jzon = new JsonObject();
+        jzon.addProperty("zoneId",zone.distributionKey());
         jzon.addProperty("name",zone.name()!=null?zone.name():lobby.name());
         jzon.addProperty("tag",lobby.tag());
         jzon.addProperty("rank",lobby.accessRank());
@@ -25,6 +26,7 @@ public class GameLobby {
         JsonArray jds = new JsonArray();
         for(Arena a: zone.arenas()){
             JsonObject jd = new JsonObject();
+            jd.addProperty("arenaId",a.distributionKey());
             jd.addProperty("name",a.name());
             jd.addProperty("level",a.level);
             jd.addProperty("xp",a.xp);

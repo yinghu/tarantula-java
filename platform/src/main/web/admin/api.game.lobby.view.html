@@ -153,15 +153,16 @@
     function save_game_lobby_zone(){
         let key = TARA_API.query().gameClusterId+"#"+TARA_API.query().applicationId;
         TARA_API.onSet('role/lobby','onSaveLobbyZone',key,editor.get(),(resp)=>{
-            console.log(resp);
+            editor.set(resp);
         });
         document.querySelector('#tx-game-lobby-api-service-reload').style.display = 'block';
         document.querySelector('#tx-game-lobby-api-service-save').style.display ='none'; 
     }
     function save_game_lobby_level(){
-        let key = TARA_API.query().gameClusterId+"#"+TARA_API.query().applicationId;
+        let arenaId = editor.get().arenaId;
+        let key = TARA_API.query().gameClusterId+"#"+TARA_API.query().applicationId+"#"+arenaId;
         TARA_API.onSet('role/lobby','onSaveLobbyLevel',key,editor.get(),(resp)=>{
-            console.log(resp);
+            editor.set(resp);
         });
         document.querySelector('#tx-game-lobby-api-service-reload').style.display = 'block';
         document.querySelector('#tx-game-lobby-api-service-save').style.display ='none';
