@@ -1,7 +1,10 @@
 package com.tarantula.platform.item;
 
 import com.icodesoftware.Configurable;
+import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
+
+import java.util.Map;
 
 public class Item extends RecoverableObject implements Configurable {
 
@@ -21,7 +24,14 @@ public class Item extends RecoverableObject implements Configurable {
     public void configurationCategory(String configurationCategory){
         this.configurationCategory = configurationCategory;
     }
-
+    @Override
+    public Map<String,Object> toMap(){
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        this.properties.putAll(properties);
+    }
 
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
@@ -32,6 +42,8 @@ public class Item extends RecoverableObject implements Configurable {
     }
 
     public boolean configureAndValidate(byte[] data){
+        this.properties.clear();
+        this.properties.putAll(JsonUtil.toMap(data));
         return true;
     }
 
