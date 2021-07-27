@@ -22,6 +22,8 @@ public class GameStoreAdminModule implements Module {
             Item app = new Item();
             if(app.configureAndValidate(payload)){
                 app.configurationType(this.context.descriptor().category());
+                app.configurationName("gem");
+                app.configurationCategory("item");
                 gameServiceProvider.register(app);
                 session.write(JsonUtil.toSimpleResponse(true,serviceName).getBytes());
             }
