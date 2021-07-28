@@ -1,15 +1,16 @@
 package com.tarantula.game.service;
 
-import com.icodesoftware.ApplicationContext;
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Recoverable;
+import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.Arena;
 import com.tarantula.game.DynamicZone;
 import com.tarantula.game.GameZone;
 
+import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.service.ApplicationPreSetup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DynamicLobbySetup implements ApplicationPreSetup {
 
@@ -59,7 +60,38 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
         zone.roomProxy(joinProxy(zone.playMode()));
         return zone;
     }
-
+    public <T extends Recoverable> void save(ApplicationContext context,Descriptor application,T t){
+        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        IndexSet indexSet = new IndexSet(application.category());
+        indexSet.distributionKey(application.distributionKey());
+        dataStore.load(indexSet);
+        if(!dataStore.update(t)){
+            dataStore.create(t);
+            indexSet.keySet.add(t.distributionKey());
+            dataStore.update(indexSet);
+        }
+    }
+    public <T extends Recoverable> boolean load(ApplicationContext context,Descriptor application,T t){
+        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        return dataStore.load(t);
+    }
+    public <T extends Recoverable> List<T> list(ApplicationContext context, Descriptor application, RecoverableFactory<T> recoverableFactory){
+        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        IndexSet indexSet = new IndexSet(application.category());
+        indexSet.distributionKey(application.distributionKey());
+        ArrayList<T> arrayList = new ArrayList<>();
+        if(!dataStore.load(indexSet)){
+            return arrayList;
+        }
+        indexSet.keySet.forEach((k)->{
+            T t = recoverableFactory.create();
+            t.distributionKey(k);
+            if(dataStore.load(t)){
+                arrayList.add(t);
+            }
+        });
+        return arrayList;
+    }
     private String serviceDataStore(Descriptor application){
         return application.typeId().replace("-lobby","_service");
     }

@@ -73,7 +73,7 @@
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-api-service-gamestore"),{mode:'code'},{});
     document.querySelector('#tx-gamestore-api-service-list').onclick=()=>{
-        TARA_API.onGet(TARA_API.query().serviceTag,'onList',TARA_API.query().gameClusterId,(resp)=>{
+        TARA_API.onGet('role/store','onList',TARA_API.query().gameClusterId,(resp)=>{
             editor.set(resp);       
         });
     };

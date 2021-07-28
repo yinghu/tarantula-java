@@ -54,10 +54,10 @@ public class Item extends RecoverableObject implements Configurable {
         jsonObject.addProperty("type",configurationType);
         jsonObject.addProperty("name",configurationName);
         jsonObject.addProperty("category",configurationCategory);
+        jsonObject.addProperty("itemId",distributionKey());
         jsonObject.add("payload",payload);
         return jsonObject;
     }
-
     public boolean configureAndValidate(byte[] data){
         this.payload = JsonUtil.parse(data);
         return true;
