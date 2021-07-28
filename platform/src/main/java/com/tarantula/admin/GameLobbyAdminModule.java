@@ -6,7 +6,9 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.game.GameDataStoreContext;
 import com.tarantula.game.GameLobby;
+import com.tarantula.game.GameServiceContext;
 import com.tarantula.game.GameZone;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.util.DescriptorSerializer;
@@ -26,6 +28,26 @@ public class GameLobbyAdminModule implements Module {
             String lobbyTypeId = (String)gameCluster.property(GameCluster.GAME_LOBBY);
             Lobby lobby = this.deploymentServiceProvider.lobby(lobbyTypeId);
             session.write(toJson(lobby).toString().getBytes());
+        }
+        else if(session.action().equals("onGameServiceList")){
+            GameServiceContext gsc = new GameServiceContext();
+            GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
+            gsc.lobby=(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_SERVICE)));
+            session.write(gsc.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onGameDataList")){
+            GameDataStoreContext gsc = new GameDataStoreContext();
+            GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
+            Lobby lobby =(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_DATA)));
+            DataStore ds = this.context.dataStore(lobby.descriptor().typeId().replace("-","_"));
+            gsc.name = lobby.descriptor().typeId();
+            gsc.tag = lobby.entryList().get(0).tag();
+            gsc.dataStore = ds.name();//lobby.descriptor().typeId();
+            gsc.dataStoreCount = ds.count();
+            DataStore ss = this.context.dataStore(lobby.descriptor().typeId().replace("-data","_service"));
+            gsc.serviceStore = ss.name();
+            gsc.serviceStoreCount = ss.count();
+            session.write(gsc.toJson().toString().getBytes());
         }
         else if(session.action().equals("onGameLobby")){
             Map<String,Object> cmd = JsonUtil.toMap(payload);

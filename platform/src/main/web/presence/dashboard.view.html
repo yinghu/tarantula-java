@@ -214,10 +214,10 @@
                     <div class="w3-display-bottomleft w3-padding">
                         <span id='live-game-list-name' class="tx-text-18"></span>
                     </div>
-                    <div class="w3-display-topright w3-padding">
-                        <span id='live-game-inbox' view-id='live.game.inbox' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Inbox</span>
-                        <span id='live-game-inventory' view-id='live.game.inventory' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Inventory</span>
-                        <span id='live-game-rating' view-id='live.game.rating' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Rating</span>
+                    <div class="w3-display-topright w3-padding" style="display: none;">
+                        <span id='live-game-service-0' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service1</span>
+                        <span id='live-game-service-1' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service2</span>
+                        <span id='live-game-service-2' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service3</span>
                     </div>
                     <div class="w3-display-bottomright w3-padding">
                         <span id='live-game-list-play' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-play">PLAY</span>
@@ -598,9 +598,9 @@
     document.querySelectorAll('.tx-game-service-bar').forEach((a)=>{
         a.onclick=()=>{
             //TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
-            TARA_API.query().popup = '#tx-popup';
-            let vid = a.getAttribute('view-id');
-            tx_view({viewId:vid,containerId:'#tx-popup'});    
+            //TARA_API.query().popup = '#tx-popup';
+            //let vid = a.getAttribute('view-id');
+            //tx_view({viewId:vid,containerId:'#tx-popup'});    
         }
     });
     document.querySelectorAll('.tx-game-play').forEach((a)=>{

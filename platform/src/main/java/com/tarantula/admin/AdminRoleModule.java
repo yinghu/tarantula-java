@@ -3,16 +3,16 @@ package com.tarantula.admin;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.game.*;
+
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.*;
-
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.service.deployment.ConfigurationTemplate;
 import com.tarantula.platform.util.OnAccessDeserializer;
@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 
 public class AdminRoleModule implements Module,Configurable.Listener {
 
@@ -68,28 +66,6 @@ public class AdminRoleModule implements Module,Configurable.Listener {
                 });
             }
             session.write(adminContext.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onGameServiceList")){
-            GameServiceContext gsc = new GameServiceContext();
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
-            gsc.lobby=(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_SERVICE)));
-            session.write(gsc.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onGameDataList")){
-            GameDataStoreContext gsc = new GameDataStoreContext();
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            GameCluster gc = this.deploymentServiceProvider.gameCluster((String)onAccess.property(OnAccess.ACCESS_ID));
-            Lobby lobby =(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_DATA)));
-            DataStore ds = this.context.dataStore(lobby.descriptor().typeId().replace("-","_"));
-            gsc.name = lobby.descriptor().typeId();
-            gsc.tag = lobby.entryList().get(0).tag();
-            gsc.dataStore = ds.name();//lobby.descriptor().typeId();
-            gsc.dataStoreCount = ds.count();
-            DataStore ss = this.context.dataStore(lobby.descriptor().typeId().replace("-data","_service"));
-            gsc.serviceStore = ss.name();
-            gsc.serviceStoreCount = ss.count();
-            session.write(gsc.toJson().toString().getBytes());
         }
         else if(session.action().equals("onShoppingList")){
             session.write(new ShoppingContext(monthly,yearly).toJson().toString().getBytes());
