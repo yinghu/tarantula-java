@@ -12,11 +12,14 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TimeUtil;
 
 import com.tarantula.platform.*;
+import com.tarantula.platform.item.Item;
+import com.tarantula.platform.item.ItemQuery;
 import com.tarantula.platform.presence.*;
+import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.Metrics;
-import com.tarantula.platform.service.deployment.ConfigurationTemplate;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -208,28 +211,20 @@ public class AdminRoleModule implements Module,Configurable.Listener {
         else if(session.action().equals("onLoadTemplate")){
             String[] keys = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(keys[0]);
-            ConfigurationTemplate temp = new ConfigurationTemplate();
-            temp.distributionKey(gameCluster.distributionKey());
-            temp.label(keys[1]);
-            DataStore dataStore = this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE);
-            if(dataStore.load(temp)){
-                session.write(temp.toBinary());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"template not existed").getBytes());
-            }
+            ApplicationPreSetup setup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            List<Item> alist = setup.list(context,gameCluster,new ItemQuery());
+            session.write(toItemJson(alist).toString().getBytes());
         }
         else if(session.action().equals("onSaveTemplate")){
             String[] keys = session.name().split("#");
             if(keys[1]!=null&&keys[1].length()>0) {
                 GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(keys[0]);
-                ConfigurationTemplate temp = new ConfigurationTemplate();
-                temp.label(keys[1]);
-                temp.distributionKey(gameCluster.distributionKey());
-                temp.fromBinary(payload);
-                DataStore dataStore = this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE);
-                if(dataStore.update(temp)){
-                    session.write(payload);
+                ApplicationPreSetup setup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+                Item temp = new Item();
+                temp.configurationType(keys[1]);
+                if(temp.configureAndValidate(payload)){
+                    setup.save(context,gameCluster,temp);
+                    session.write(JsonUtil.toSimpleResponse(true,"saved").getBytes());
                 }
                 else{
                     session.write(JsonUtil.toSimpleResponse(false,"template save failed").getBytes());
@@ -286,6 +281,16 @@ public class AdminRoleModule implements Module,Configurable.Listener {
         });
         jsonObject.add("gameServiceList",array);
         return jsonObject.toString().getBytes();
+    }
+    private JsonObject toItemJson(List<Item> itemList){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("successful",true);
+        JsonArray alist = new JsonArray();
+        itemList.forEach((v)->{
+            alist.add(v.toJson());
+        });
+        jsonObject.add("itemList",alist);
+        return jsonObject;
     }
     public void onUpdated(Configuration configuration){
 

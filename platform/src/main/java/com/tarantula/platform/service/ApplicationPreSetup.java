@@ -5,6 +5,7 @@ import com.icodesoftware.Descriptor;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.platform.GameCluster;
 
 import java.util.List;
 
@@ -19,5 +20,8 @@ public interface ApplicationPreSetup {
     <T extends Recoverable> void save(ApplicationContext context,Descriptor application,T t);
     <T extends Recoverable> boolean load(ApplicationContext context,Descriptor application,T t);
     <T extends Recoverable> List<T> list(ApplicationContext context, Descriptor application, RecoverableFactory<T> recoverableFactory);
+
+    <T extends Recoverable> void save(ApplicationContext context, GameCluster application, T t);
+    <T extends Recoverable> List<T> list(ApplicationContext context, GameCluster application, RecoverableFactory<T> recoverableFactory);
 
 }

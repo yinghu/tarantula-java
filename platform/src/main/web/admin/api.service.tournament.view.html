@@ -12,9 +12,7 @@
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
-            <span id='tx-api-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
-            <span id='tx-api-service-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
-            <span id='tx-api-service-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
+            <span id='tx-api-service-tournament-template' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Create Template</span>
             <span id='tx-api-service-tournament-list' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>List</span>          
             <span id='tx-api-service-tournament-schedule' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Schedule</span> 
         </div>            
@@ -24,6 +22,13 @@
         <div class='w3-bar w3-white'>  
             <span id='tx-api-service-new-tournament-daily' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Daily</span>
             <span id='tx-api-service-new-tournament-on-demand' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>On Demand</span>
+        </div>            
+    </div>
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <div class='w3-bar w3-white'>
+            <span id='tx-api-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
+            <span id='tx-api-service-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
+            <span id='tx-api-service-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
         </div>            
     </div>
     <div class="w3-panel w3-center tx-text-14">
@@ -46,6 +51,9 @@
         TARA_API.onGet('role/tournament','onList',TARA_API.query().gameClusterId,(resp)=>{
             editor.set(resp);       
         });
+    };
+    document.querySelector('#tx-api-service-tournament-template').onclick=()=>{
+         
     };
     document.querySelector('#tx-api-service-new-tournament-on-demand').onclick=()=>{
         TARA_API.onGet('role/admin','onLoadTemplate',TARA_API.query().gameClusterId+'#onDemand',(resp)=>{

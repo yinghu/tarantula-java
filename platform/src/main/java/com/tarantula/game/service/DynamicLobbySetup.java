@@ -6,6 +6,7 @@ import com.tarantula.game.Arena;
 import com.tarantula.game.DynamicZone;
 import com.tarantula.game.GameZone;
 
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.service.ApplicationPreSetup;
 
@@ -71,6 +72,17 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
             dataStore.update(indexSet);
         }
     }
+    public <T extends Recoverable> void save(ApplicationContext context, GameCluster application, T t){
+        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        IndexSet indexSet = new IndexSet(GameCluster.TEMPLATE_LABEL);
+        indexSet.distributionKey(application.distributionKey());
+        dataStore.load(indexSet);
+        if(!dataStore.update(t)){
+            dataStore.create(t);
+            indexSet.keySet.add(t.distributionKey());
+            dataStore.update(indexSet);
+        }
+    }
     public <T extends Recoverable> boolean load(ApplicationContext context,Descriptor application,T t){
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         return dataStore.load(t);
@@ -92,8 +104,29 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
         });
         return arrayList;
     }
+    public <T extends Recoverable> List<T> list(ApplicationContext context, GameCluster application, RecoverableFactory<T> recoverableFactory){
+        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        IndexSet indexSet = new IndexSet(GameCluster.TEMPLATE_LABEL);
+        indexSet.distributionKey(application.distributionKey());
+        ArrayList<T> arrayList = new ArrayList<>();
+        if(!dataStore.load(indexSet)){
+            return arrayList;
+        }
+        indexSet.keySet.forEach((k)->{
+            T t = recoverableFactory.create();
+            t.distributionKey(k);
+            if(dataStore.load(t)){
+                arrayList.add(t);
+            }
+        });
+        return arrayList;
+    }
     private String serviceDataStore(Descriptor application){
         return application.typeId().replace("-lobby","_service");
+    }
+    private String serviceDataStore(GameCluster application){
+        String serviceTypeId = (String) application.property(GameCluster.GAME_SERVICE);
+        return serviceTypeId.replaceAll("-","_");
     }
     private GameZone.RoomProxy joinProxy(String playMode){
         GameZone.RoomProxy roomProxy = new PVERoomProxy();
