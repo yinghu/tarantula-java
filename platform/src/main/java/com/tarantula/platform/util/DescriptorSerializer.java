@@ -16,6 +16,7 @@ public class DescriptorSerializer implements JsonSerializer<Descriptor> {
         jo.addProperty("type",descriptor.type());
         jo.addProperty("typeId",descriptor.typeId());
         jo.addProperty("name",descriptor.name());
+        jo.addProperty("category",descriptor.category());
         if(!descriptor.type().equals(Descriptor.TYPE_LOBBY)){
             jo.addProperty("tag",descriptor.tag());
             jo.addProperty("accessRank",descriptor.accessRank());
