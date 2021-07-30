@@ -44,36 +44,27 @@
     </div>
 </div>
 <script>
-    document.querySelector('#tx-api-service-tournament-schedule').style.display='none';
-    document.querySelector('#tx-api-service-tournament-list').style.display='block';
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-api-service-tournament"),{mode:'code'},{});
+    //document.querySelector('#tx-api-service-tournament-schedule').style.display='none';
+    //document.querySelector('#tx-api-service-tournament-list').style.display='block';
+    let sample = {type:'T100',description:'desc',icon:'icon',schedule:'onDemand',durationHours:24,maxEntriesPerInstance:100,durationMinutesPerInstance:10}; 
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-api-service-tournament"),{mode:'code'},sample);
+
+    //TARA_API.onGet('role/admin','onLoadTemplate',TARA_API.query().gameClusterId,(resp)=>{
+        //editor.set(resp);
+        //document.querySelector('#tx-api-service-tournament-schedule').style.display='block';
+        //document.querySelector('#tx-api-service-tournament-list').style.display='none';       
+    //});
     document.querySelector('#tx-api-service-tournament-list').onclick=()=>{
         TARA_API.onGet('role/tournament','onList',TARA_API.query().gameClusterId,(resp)=>{
             editor.set(resp);       
         });
     };
-    document.querySelector('#tx-api-service-tournament-template').onclick=()=>{
-         
-    };
-    document.querySelector('#tx-api-service-new-tournament-on-demand').onclick=()=>{
-        TARA_API.onGet('role/admin','onLoadTemplate',TARA_API.query().gameClusterId+'#onDemand',(resp)=>{
-            editor.set(resp);
-            document.querySelector('#tx-api-service-tournament-schedule').style.display='block';
-            document.querySelector('#tx-api-service-tournament-list').style.display='none';       
-        });
-    };
-    document.querySelector('#tx-api-service-new-tournament-daily').onclick=()=>{
-        TARA_API.onGet('role/admin','onLoadTemplate',TARA_API.query().gameClusterId+'#daily',(resp)=>{
-            editor.set(resp);
-            document.querySelector('#tx-api-service-tournament-schedule').style.display='block';
-            document.querySelector('#tx-api-service-tournament-list').style.display='none';       
-        });
-    };
+   
     document.querySelector('#tx-api-service-tournament-schedule').onclick=()=>{
         TARA_API.onSet('role/tournament','onSchedule',TARA_API.query().gameClusterId,editor.get(),(resp)=>{
             editor.set(resp);
-            document.querySelector('#tx-api-service-tournament-schedule').style.display='none';
-            document.querySelector('#tx-api-service-tournament-list').style.display='block';       
+            //document.querySelector('#tx-api-service-tournament-schedule').style.display='none';
+            //document.querySelector('#tx-api-service-tournament-list').style.display='block';       
         });
     };
     document.querySelector('#tx-tournamnet-api-close').onclick=()=>{

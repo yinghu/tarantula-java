@@ -209,8 +209,7 @@ public class AdminRoleModule implements Module,Configurable.Listener {
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
         }
         else if(session.action().equals("onLoadTemplate")){
-            String[] keys = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(keys[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup setup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             List<Item> alist = setup.list(context,gameCluster,new ItemQuery());
             session.write(toItemJson(alist).toString().getBytes());
