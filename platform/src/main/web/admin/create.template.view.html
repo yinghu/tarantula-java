@@ -12,13 +12,17 @@
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
-            <span id='tx-configuration-template-load' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Load</span>          
+            <span id='tx-configuration-template-load' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>List</span>          
             <span id='tx-configuration-template-save' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Save</span> 
         </div>            
     </div>
-    <div class="w3-panel  tx-margin-bottom-8">
+    <div class="w3-panel">
+        <label class="tx-text-12 tx-margin-left-4">Configuration Template Type:</label>
+        <input id='tx-configuration-template-type' class="w3-input w3-round w3-border tx-text-12" type="text">    
         <label class="tx-text-12 tx-margin-left-4">Configuration Template Name:</label>
-        <input id='tx-configuration-template-name' class="w3-input tx-text-12" type="text">    
+        <input id='tx-configuration-template-name' class="w3-input w3-round w3-border tx-text-12" type="text">    
+        <label class="tx-text-12 tx-margin-left-4">Configuration Template Category:</label>
+        <input id='tx-configuration-template-category' class="w3-input w3-round w3-border tx-text-12" type="text">    
     </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
@@ -43,14 +47,16 @@
     let sample = {type:'T100',description:'desc',icon:'icon',schedule:'onDemand',durationHours:24,maxEntriesPerInstance:100,durationMinutesPerInstance:10}; 
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-template"),{mode:'code'},sample);
     document.querySelector('#tx-configuration-template-load').onclick=()=>{
-        let _k = document.querySelector('#tx-configuration-template-name').value;
-        TARA_API.onGet('role/admin','onLoadTemplate',TARA_API.query().gameClusterId+'#'+_k,(resp)=>{
+        TARA_API.onGet('role/admin','onLoadTemplate',TARA_API.query().gameClusterId,(resp)=>{
             editor.set(resp);       
         });
     };
     document.querySelector('#tx-configuration-template-save').onclick=()=>{
+        let _t = document.querySelector('#tx-configuration-template-type').value;
         let _k = document.querySelector('#tx-configuration-template-name').value;
-        TARA_API.onSet('role/admin','onSaveTemplate',TARA_API.query().gameClusterId+'#'+_k,editor.get(),(resp)=>{
+        let _c = document.querySelector('#tx-configuration-template-category').value;
+        let config = {header:{configurationType:_t,configurationName:_k,configurationCategory:_c},payload:editor.get()};
+        TARA_API.onSet('role/admin','onSaveTemplate',TARA_API.query().gameClusterId,config,(resp)=>{
             editor.set(resp);   
         });
     };

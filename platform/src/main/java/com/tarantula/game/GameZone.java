@@ -2,12 +2,11 @@ package com.tarantula.game;
 
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Configurable;
-import com.icodesoftware.DataStore;
 import com.icodesoftware.Module;
 
 import java.util.List;
 
-public interface GameZone extends Configurable, DataStore.Updatable{
+public interface GameZone extends Configurable{
 
     String PLAY_MODE_PVE = "pve"; //player versus computer
     String PLAY_MODE_PVP = "pvp"; //player versus player

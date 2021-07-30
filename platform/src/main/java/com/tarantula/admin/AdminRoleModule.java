@@ -216,21 +216,15 @@ public class AdminRoleModule implements Module,Configurable.Listener {
             session.write(toItemJson(alist).toString().getBytes());
         }
         else if(session.action().equals("onSaveTemplate")){
-            String[] keys = session.name().split("#");
-            if(keys[1]!=null&&keys[1].length()>0) {
-                GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(keys[0]);
-                ApplicationPreSetup setup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-                Item temp = new Item();
-                temp.configurationType(keys[1]);
-                if(temp.configureAndValidate(payload)){
-                    setup.save(context,gameCluster,temp);
-                    session.write(JsonUtil.toSimpleResponse(true,"saved").getBytes());
-                }
-                else{
-                    session.write(JsonUtil.toSimpleResponse(false,"template save failed").getBytes());
-                }
-            }else{
-                session.write(JsonUtil.toSimpleResponse(false,session.name()+" invalid").getBytes());
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            ApplicationPreSetup setup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            Item temp = new Item();
+            if(temp.configureAndValidate(payload)){
+                setup.save(context,gameCluster,temp);
+                session.write(JsonUtil.toSimpleResponse(true,"saved").getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"template save failed").getBytes());
             }
         }
         else{

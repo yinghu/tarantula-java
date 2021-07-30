@@ -36,13 +36,13 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
     }
 
     @Override
-    public <T extends Recoverable> T load(ApplicationContext context, Descriptor application) {
+    public <T extends Configurable> T load(ApplicationContext context, Descriptor application) {
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         return (T)load(dataStore,application);
     }
 
     @Override
-    public <T extends Recoverable> T load(ServiceContext context, Descriptor application) {
+    public <T extends Configurable> T load(ServiceContext context, Descriptor application) {
         DataStore dataStore = context.dataStore(serviceDataStore(application),context.partitionNumber());
         return (T)load(dataStore,application);
     }
@@ -61,7 +61,7 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
         zone.roomProxy(joinProxy(zone.playMode()));
         return zone;
     }
-    public <T extends Recoverable> void save(ApplicationContext context,Descriptor application,T t){
+    public <T extends Configurable> void save(ApplicationContext context,Descriptor application,T t){
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         IndexSet indexSet = new IndexSet(application.category());
         indexSet.distributionKey(application.distributionKey());
@@ -72,7 +72,7 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
             dataStore.update(indexSet);
         }
     }
-    public <T extends Recoverable> void save(ApplicationContext context, GameCluster application, T t){
+    public <T extends Configurable> void save(ApplicationContext context, GameCluster application, T t){
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         IndexSet indexSet = new IndexSet(GameCluster.TEMPLATE_LABEL);
         indexSet.distributionKey(application.distributionKey());
@@ -83,11 +83,11 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
             dataStore.update(indexSet);
         }
     }
-    public <T extends Recoverable> boolean load(ApplicationContext context,Descriptor application,T t){
+    public <T extends Configurable> boolean load(ApplicationContext context,Descriptor application,T t){
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         return dataStore.load(t);
     }
-    public <T extends Recoverable> List<T> list(ApplicationContext context, Descriptor application, RecoverableFactory<T> recoverableFactory){
+    public <T extends Configurable> List<T> list(ApplicationContext context, Descriptor application, RecoverableFactory<T> recoverableFactory){
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         IndexSet indexSet = new IndexSet(application.category());
         indexSet.distributionKey(application.distributionKey());
@@ -104,7 +104,7 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
         });
         return arrayList;
     }
-    public <T extends Recoverable> List<T> list(ApplicationContext context, GameCluster application, RecoverableFactory<T> recoverableFactory){
+    public <T extends Configurable> List<T> list(ApplicationContext context, GameCluster application, RecoverableFactory<T> recoverableFactory){
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         IndexSet indexSet = new IndexSet(GameCluster.TEMPLATE_LABEL);
         indexSet.distributionKey(application.distributionKey());
