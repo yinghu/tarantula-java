@@ -27,8 +27,8 @@ public interface OnApplication extends Response {
     String typeId();
     void typeId(String typeId);
 
-    String subtypeId();
-    void subtypeId(String subtypeId);
+    //String subtypeId();
+    //void subtypeId(String subtypeId);
 
     String ticket();
     void ticket(String ticket);

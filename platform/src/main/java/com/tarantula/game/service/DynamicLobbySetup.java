@@ -1,15 +1,17 @@
 package com.tarantula.game.service;
 
-import com.icodesoftware.ApplicationContext;
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Recoverable;
+import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.Arena;
 import com.tarantula.game.DynamicZone;
 import com.tarantula.game.GameZone;
 
+import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.service.ApplicationPreSetup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DynamicLobbySetup implements ApplicationPreSetup {
 
@@ -34,13 +36,13 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
     }
 
     @Override
-    public <T extends Recoverable> T load(ApplicationContext context, Descriptor application) {
+    public <T extends Configurable> T load(ApplicationContext context, Descriptor application) {
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         return (T)load(dataStore,application);
     }
 
     @Override
-    public <T extends Recoverable> T load(ServiceContext context, Descriptor application) {
+    public <T extends Configurable> T load(ServiceContext context, Descriptor application) {
         DataStore dataStore = context.dataStore(serviceDataStore(application),context.partitionNumber());
         return (T)load(dataStore,application);
     }
@@ -59,9 +61,72 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
         zone.roomProxy(joinProxy(zone.playMode()));
         return zone;
     }
-
+    public <T extends Configurable> void save(ApplicationContext context,Descriptor application,T t){
+        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        IndexSet indexSet = new IndexSet(application.category());
+        indexSet.distributionKey(application.distributionKey());
+        dataStore.load(indexSet);
+        if(!dataStore.update(t)){
+            dataStore.create(t);
+            indexSet.keySet.add(t.distributionKey());
+            dataStore.update(indexSet);
+        }
+    }
+    public <T extends Configurable> void save(ApplicationContext context, GameCluster application, T t){
+        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        IndexSet indexSet = new IndexSet(GameCluster.TEMPLATE_LABEL);
+        indexSet.distributionKey(application.distributionKey());
+        dataStore.load(indexSet);
+        if(!dataStore.update(t)){
+            dataStore.create(t);
+            indexSet.keySet.add(t.distributionKey());
+            dataStore.update(indexSet);
+        }
+    }
+    public <T extends Configurable> boolean load(ApplicationContext context,Descriptor application,T t){
+        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        return dataStore.load(t);
+    }
+    public <T extends Configurable> List<T> list(ApplicationContext context, Descriptor application, RecoverableFactory<T> recoverableFactory){
+        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        IndexSet indexSet = new IndexSet(application.category());
+        indexSet.distributionKey(application.distributionKey());
+        ArrayList<T> arrayList = new ArrayList<>();
+        if(!dataStore.load(indexSet)){
+            return arrayList;
+        }
+        indexSet.keySet.forEach((k)->{
+            T t = recoverableFactory.create();
+            t.distributionKey(k);
+            if(dataStore.load(t)){
+                arrayList.add(t);
+            }
+        });
+        return arrayList;
+    }
+    public <T extends Configurable> List<T> list(ApplicationContext context, GameCluster application, RecoverableFactory<T> recoverableFactory){
+        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        IndexSet indexSet = new IndexSet(GameCluster.TEMPLATE_LABEL);
+        indexSet.distributionKey(application.distributionKey());
+        ArrayList<T> arrayList = new ArrayList<>();
+        if(!dataStore.load(indexSet)){
+            return arrayList;
+        }
+        indexSet.keySet.forEach((k)->{
+            T t = recoverableFactory.create();
+            t.distributionKey(k);
+            if(dataStore.load(t)){
+                arrayList.add(t);
+            }
+        });
+        return arrayList;
+    }
     private String serviceDataStore(Descriptor application){
         return application.typeId().replace("-lobby","_service");
+    }
+    private String serviceDataStore(GameCluster application){
+        String serviceTypeId = (String) application.property(GameCluster.GAME_SERVICE);
+        return serviceTypeId.replaceAll("-","_");
     }
     private GameZone.RoomProxy joinProxy(String playMode){
         GameZone.RoomProxy roomProxy = new PVERoomProxy();

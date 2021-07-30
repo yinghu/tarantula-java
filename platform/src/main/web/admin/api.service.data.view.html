@@ -8,14 +8,19 @@
             <span class="tx-margin-left-8 tx-text-24">API SET/GET</span>
         </div>
     </div>
-    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <div class='w3-bar w3-white'>
+            <span id='tx-data-api-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
+            <span id='tx-data-api-service-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
+            <span id='tx-data-api-service-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
+            <span id='tx-data-api-service-list' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-8'>Get</span>          
+            <span id='tx-data-api-service-save' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Set</span> 
+        </div>            
+    </div>  
     <div class="w3-panel  tx-margin-bottom-8">
-        <label class="tx-text-16 tx-margin-left-4">Key Name:</label>
-        <input id='tx-set-key-name' class="w3-input tx-text-16" type="text">    
-    </div>
-    <div class='w3-panel w3-border-bottom w3-border-red'>
-        <span id="tx-api-service-get-json" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Get</span>     
-        <span id="tx-api-service-set-json" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Set</span>       
+        <label class="tx-text-12 tx-margin-left-4">Key Name:</label>
+        <input id='tx-set-key-name' class="w3-input tx-text-14" type="text" placeholder="Input key name">    
     </div>
     <div class="w3-panel  tx-text-16">
         <div id="jsoneditor-api-service-data" style="width: 100%;"></div> 
@@ -31,17 +36,26 @@
 </div>
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-api-service-data"),{mode:'code'},{});
-    document.querySelector('#tx-api-service-set-json').onclick=()=>{
+    document.querySelector('#tx-data-api-service-save').onclick=()=>{
         let _k = document.querySelector('#tx-set-key-name').value;
         TARA_API.onSet(TARA_API.query().serviceTag,'onSet',_k,editor.get(),(resp)=>{
             editor.set(resp);     
         });
     };
-    document.querySelector('#tx-api-service-get-json').onclick=()=>{
+    document.querySelector('#tx-data-api-service-list').onclick=()=>{
         let _k = document.querySelector('#tx-set-key-name').value;
         TARA_API.onGet(TARA_API.query().serviceTag,'onGet',_k,(resp)=>{
             editor.set(resp);
         });
+    };
+    document.querySelector('#tx-data-api-service-json-mode-tree').onclick=()=>{
+        editor.setMode('tree');
+    };
+    document.querySelector('#tx-data-api-service-json-mode-code').onclick=()=>{
+        editor.setMode('code');
+    };
+    document.querySelector('#tx-data-api-service-json-mode-preview').onclick=()=>{
+        editor.setMode('preview');
     };
     document.querySelector('#tx-api-service-data-close').onclick=()=>{
         editor.destroy();

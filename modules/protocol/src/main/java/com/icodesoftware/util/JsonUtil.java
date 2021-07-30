@@ -5,8 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -87,5 +86,14 @@ public class JsonUtil {
         resp.addProperty("successful",successful);
         resp.addProperty("message",message);
         return resp.toString();
+    }
+    public static JsonObject parse(String json){
+        JsonParser jp = new JsonParser();
+        return jp.parse(json).getAsJsonObject();
+    }
+    public static JsonObject parse(byte[] json){
+        JsonParser jp = new JsonParser();
+        InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(json));
+        return jp.parse(inr).getAsJsonObject();
     }
 }

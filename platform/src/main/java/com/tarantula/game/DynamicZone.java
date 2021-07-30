@@ -6,6 +6,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.OnLog;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.DynamicLobbySetup;
@@ -145,12 +146,12 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     @Override
     public void fromMap(Map<String,Object> properties){
         this.capacity = ((Number)properties.getOrDefault("1",capacity)).intValue();
-        this.joinsOnStart = ((Number)properties.getOrDefault("8",capacity)).intValue();
         this.roundDuration = ((Number)properties.getOrDefault("2",roundDuration)).longValue();
         //this.overtime = ((Number)properties.getOrDefault("3",overtime)).longValue();
         this.name = (String)properties.get("5");
         this.timestamp = ((Number)properties.getOrDefault("6",0)).longValue();
         this.levelLimit = ((Number)properties.getOrDefault("7",levelLimit)).intValue();
+        this.joinsOnStart = ((Number)properties.getOrDefault("8",joinsOnStart)).intValue();
         this.playMode = (String)properties.get("9");
     }
     @Override
@@ -239,5 +240,11 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     @Override
     public int getClassId() {
         return GamePortableRegistry.GAME_ZONE_CID;
+    }
+
+    public boolean configureAndValidate(byte[] data){
+        Map<String,Object> map = JsonUtil.toMap(data);
+        this.roundDuration = ((Number)map.get("duration")).intValue()*60000;
+        return true;
     }
 }

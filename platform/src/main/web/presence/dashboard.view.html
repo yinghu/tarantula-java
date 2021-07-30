@@ -131,9 +131,11 @@
                 <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-group" style="font-size:16px"></i></span>
                     <span id='tx-game-cluster-role' class='w3-left tx-text-14'>Role name</span>
+                    <!--
                     <span id='tx-game-cluster-price' view-id='game.cluster.price' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Price</span>
                     <span id='tx-game-cluster-role-upgrade' view-id='upgrade.role.admin' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upgrade Role</span>
                     <span id='tx-shopping-card' view-id='shopping.card' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Subscription</span>
+                    -->
                 </div>
                 <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
@@ -157,29 +159,29 @@
                 </div>
             </div>
             <div id='game-cluster-0' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
-                <div class="w3-container w3-padding">
+                <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
                     <span id='game-name-0' class='w3-left tx-text-16'>GAME TITLE NAME</span>
                     <span id='game-test-id-0' tx-game-cluster-id='' view-id='game.cluster.test' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>API Test</span>
                     <span id='game-shutdown-id-0' tx-game-cluster-id='' view-id='game.cluster.shutdown' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>ShutDown</span>   
                     <span id='game-launch-id-0' tx-game-cluster-id='' view-id='game.cluster.launch' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Launch</span>
                 </div>
-                <div class="w3-container w3-padding">
+                <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class='w3-left tx-text-14'>Game Lobby</span>
                     <span id='game-lobby-list-id-0' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Edit</span>   
                     <span id='game-lobby-0' class='w3-right tx-text-14 tx-margin-right-8'>game-lobby</span>
                 </div>
-                <div class="w3-container w3-padding">
+                <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class='w3-left tx-text-14'>Game Service</span>
                     <span id='game-service-list-id-0' tx-game-cluster-id='' view-id='game.service.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Edit</span>
                     <span id='game-service-0' class='w3-right tx-text-14 tx-margin-right-8'>game-service</span>  
                 </div>
-                <div class="w3-container w3-padding">
+                <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class='w3-left tx-text-14'>Game Data</span>
                     <span id='game-data-list-id-0' tx-game-cluster-id='' view-id='game.data.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Edit</span>
                     <span id='game-data-0' class='w3-right tx-text-14 tx-margin-right-8'>game-data</span>   
                 </div> 
-                <div class="w3-container w3-padding">
+                <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class='w3-left tx-text-14'>Game Server Access Key</span>
                     <span id='game-cluster-id-0' tx-game-cluster-id='' view-id='create.access.key' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>   
                 </div> 
@@ -205,19 +207,28 @@
                 </div>
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
-                <div class="w3-display-container w3-white w3-border-bottom w3-border-red tx-content-100">
-                    <div class="w3-display-topleft w3-padding">
+                <div class="w3-container w3-white w3-border-bottom w3-border-red">
+                    <div class="w3-panel w3-padding">
                         <span class="w3-text-green"><i class="fa fa-cubes" style="font-size:24px"></i></span>            
-                    </div>
-                    <div class="w3-display-bottomleft w3-padding">
                         <span id='live-game-list-name' class="tx-text-18"></span>
                     </div>
-                    <div class="w3-display-topright w3-padding">
-                        <span id='live-game-inbox' view-id='live.game.inbox' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Inbox</span>
-                        <span id='live-game-inventory' view-id='live.game.inventory' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Inventory</span>
-                        <span id='live-game-rating' view-id='live.game.rating' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Rating</span>
+                    <div class="w3-panel w3-padding w3-border-bottom w3-border-red">
+                        <div class='w3-bar w3-white'>
+                            <span id='live-game-service-0' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service1</span>
+                            <span id='live-game-service-1' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service2</span>
+                            <span id='live-game-service-2' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service3</span>
+                            <span id='live-game-service-3' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service1</span>
+                            <span id='live-game-service-4' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service2</span>
+                            <span id='live-game-service-5' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service3</span>
+                            <span id='live-game-service-6' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service1</span>
+                            <span id='live-game-service-7' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service2</span>
+                            <span id='live-game-service-8' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service3</span>
+                            <span id='live-game-service-9' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service1</span>
+                            <span id='live-game-service-10' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service2</span>
+                            <span id='live-game-service-11' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar">Service3</span>
+                        </div>
                     </div>
-                    <div class="w3-display-bottomright w3-padding">
+                    <div class="w3-panel w3-padding">
                         <span id='live-game-list-play' class="w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-play">PLAY</span>
                     </div>
                 </div>
@@ -596,9 +607,9 @@
     document.querySelectorAll('.tx-game-service-bar').forEach((a)=>{
         a.onclick=()=>{
             //TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
-            TARA_API.query().popup = '#tx-popup';
-            let vid = a.getAttribute('view-id');
-            tx_view({viewId:vid,containerId:'#tx-popup'});    
+            //TARA_API.query().popup = '#tx-popup';
+            //let vid = a.getAttribute('view-id');
+            //tx_view({viewId:vid,containerId:'#tx-popup'});    
         }
     });
     document.querySelectorAll('.tx-game-play').forEach((a)=>{
@@ -682,16 +693,16 @@
             if(resp.successful){
                 document.querySelector('#tx-max-game-cluster-count').innerHTML=resp.maxGameClusterCount;
                 document.querySelector('#tx-current-count').innerHTML=resp.currentCount;
-                document.querySelector('#tx-game-cluster-role-upgrade').style.display='none'; 
+                //document.querySelector('#tx-game-cluster-role-upgrade').style.display='none'; 
                 document.querySelector('#tx-game-cluster-create').style.display='block';
-                document.querySelector('#tx-shopping-card').style.display='block';
+                //document.querySelector('#tx-shopping-card').style.display='block';
                 document.querySelector('#tx-game-cluster-warning').style.display='none'; 
                 _tx_game_cluster_list();
             }
             else{
-                document.querySelector('#tx-game-cluster-role-upgrade').style.display='block'; 
+                //document.querySelector('#tx-game-cluster-role-upgrade').style.display='block'; 
                 document.querySelector('#tx-game-cluster-create').style.display='none';
-                document.querySelector('#tx-shopping-card').style.display='none'; 
+                //document.querySelector('#tx-shopping-card').style.display='none'; 
                 document.querySelector('#tx-game-cluster-warning').style.display='block'; 
             }        
         });
@@ -776,9 +787,11 @@
         });
     }
     function _tx_lobby(){   
+        reset_live_game_service_bar();
         let lgn = document.querySelector('#tx-live-game-next-list');
         let _pg = lgn.getAttribute('live-game-page')/1;
         TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onLobbyList',page:_pg},(resp)=>{
+            console.log(resp);
             let lb;
             let lp = document.querySelector('#live-game-list-play'); 
             for(lb=1;lb<11;lb++){
@@ -795,12 +808,12 @@
             lp.setAttribute('game-match-making',resp.name+'/mmk');
             lp.setAttribute('game-path',resp.name.toLowerCase());
             lp.style.display ='block';
-            let lbn = resp.name+'-lobby';
+            //let lbn = resp.name+'-lobby';
             resp.lobbyList.forEach((a,i)=>{
                 //listing live games 
-                if(a.descriptor.typeId == lbn ){
+                if(a.descriptor.typeId == resp.name+'-lobby' ){
                     a.applications.forEach((b)=>{
-                        console.log(b);
+                        //console.log(b);
                         lp.setAttribute('tournament-enabled',b.tournamentEnabled);
                         document.querySelector('#live-game-list-'+b.accessRank+'-0').innerHTML = b.tag
                         document.querySelector('#live-game-list-'+b.accessRank+'-1').style.display='block';
@@ -808,8 +821,21 @@
                         document.querySelector('#live-game-list-'+b.accessRank+'-2').style.display='none';
                     });
                 }
+                else if(a.descriptor.typeId == resp.name+'-service'){
+                    console.log('setup live game service');
+                    a.applications.forEach((b,i)=>{
+                        document.querySelector('#live-game-service-'+i).style.display = 'block';
+                        document.querySelector('#live-game-service-'+i).innerHTML = b.name;
+                    });        
+                }
+                //else if(a.descriptor.typeId == resp.name+'-data'){
+                    //console.log('setup live data service');
+                //}
             });
             lgn.setAttribute('live-game-page',(resp.index+1));
         });
+    }
+    function reset_live_game_service_bar(){
+        document.querySelectorAll('.tx-game-service-bar').forEach((a)=>{a.style.display ='none';});
     }
 </script>

@@ -5,7 +5,6 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.tarantula.platform.event.PortableEventRegistry;
-import com.tarantula.platform.service.ApplicationPreSetup;
 
 import java.io.IOException;
 
@@ -23,6 +22,8 @@ public class GameCluster extends OnApplicationHeader implements Portable {
     public final static String PUBLISHING_ID = "10";
     public final static String TOURNAMENT_ENABLED = "11";
     public final static String LOBBY_PRE_SETUP_NAME ="12";
+
+    public final static String TEMPLATE_LABEL = "template";
 
     @Override
     public int getClassId() {

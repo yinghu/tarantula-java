@@ -215,12 +215,12 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         if(!onLobby.closed()){
             String[] ps = onLobby.typeId().split("-");
             liveGameContext.addGameIndex(ps[0]);
-            //context.log("Lobby ["+onLobby.typeId()+"] is going to be live",OnLog.WARN);
+            context.log("Lobby ["+onLobby.typeId()+"] is going to be live",OnLog.WARN);
         }
         else{
             String[] ps = onLobby.typeId().split("-");
             liveGameContext.removeGameIndex(ps[0]);
-            //context.log("Lobby ["+onLobby.typeId()+"] is going to be offline",OnLog.WARN);
+            context.log("Lobby ["+onLobby.typeId()+"] is going to be offline",OnLog.WARN);
         }
     }
     @Override

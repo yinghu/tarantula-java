@@ -8,377 +8,109 @@
             <span class="tx-margin-left-8 tx-text-24">Game Lobby List</span>
         </div>
     </div>
-    <!--
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
-    <div class="w3-display-container w3-white tx-content-8"></div>-->
+    <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-game-lobby-list-message"></div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
+    <div class="w3-panel  w3-border-bottom w3-border-red">
         <div class="w3-container">
-            <span id='tx-add-lobby' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-12">Add Lobby</span>
-        </div>
-        <div class="w3-row">
-            <div class="w3-half w3-container">
-                <span lobby-list-no='1' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-20 tx-padding-number tx-margin-bottom-8 tx-margin-left-8 tx-lobby-list-action">1</span>
-                <span lobby-list-no='2' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-20 tx-padding-number tx-margin-bottom-8 tx-margin-left-8 tx-lobby-list-action">2</span>
-                <span lobby-list-no='3' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-20 tx-padding-number tx-margin-bottom-8 tx-margin-left-8 tx-lobby-list-action">3</span>
-                <span lobby-list-no='4' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-20 tx-padding-number tx-margin-bottom-8 tx-margin-left-8 tx-lobby-list-action">4</span>
-                <span lobby-list-no='5' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-20 tx-padding-number tx-margin-bottom-8 tx-margin-left-8 tx-lobby-list-action">5</span>
-            </div> 
-            <div class="w3-half w3-container">
-                <span lobby-list-no='6' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-20 tx-padding-number tx-margin-bottom-8 tx-margin-left-8 tx-lobby-list-action">6</span>
-                <span lobby-list-no='7' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-20 tx-padding-number tx-margin-bottom-8 tx-margin-left-8 tx-lobby-list-action">7</span>
-                <span lobby-list-no='8' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-20 tx-padding-number tx-margin-bottom-8 tx-margin-left-8 tx-lobby-list-action">8</span>
-                <span lobby-list-no='9' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-20 tx-padding-number tx-margin-bottom-8 tx-margin-left-8 tx-lobby-list-action">9</span>
-                <span lobby-list-no='10' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-20 tx-padding-number tx-margin-bottom-8 tx-margin-left-8 tx-lobby-list-action">10</span>
-            </div>
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-gamepad" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-lobby-list-name-0' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-game-lobby-list-tag-0' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-game-lobby-list-add-0" lobby-index='1' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-create">Create</span>
+            <span id="tx-game-lobby-list-api-0" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-action">Edit</span>
+            <span id="tx-game-lobby-list-disable-0" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-margin-right-16 tx-game-lobby-disable">Disable</span>
         </div>    
     </div>
     <div class="w3-panel  w3-border-bottom w3-border-red">
         <div class="w3-container">
-            <span id="tx-lobby-list-no" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-20 tx-padding-number tx-margin-bottom-8 tx-margin-right-8">1</span>
-            <span id='tx-lobby-list-1' class='w3-left tx-text-14 tx-margin-top-8'>Name</span>
-            <span id='tx-disable-lobby' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-12">Disable Lobby</span>
-            <span id='tx-reload-lobby' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-12">Reload Lobby</span>
-            <span id='tx-enable-lobby' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-12">Enable Lobby</span>
-        
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-gamepad" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-lobby-list-name-1' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-game-lobby-list-tag-1' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-game-lobby-list-add-1" lobby-index='2' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-create">Create</span>
+            <span id="tx-game-lobby-list-api-1" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-action">Edit</span>
+            <span id="tx-game-lobby-list-disable-1" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-margin-right-16 tx-game-lobby-disable">Disable</span>
         </div>    
     </div>
-    <div class='w3-panel w3-border-bottom w3-border-red'>
-        <div class="w3-container w3-border-bottom w3-border-red">
-            <span id='tx-lobby-list-3' class='w3-left tx-text-14 tx-margin-top-8'>Access Tag</span>
-            <span id='tx-lobby-list-edit-open' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-bottom-4">Edit</span>  
-        </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
         <div class="w3-container">
-            <span class='w3-left tx-text-12'>Player Rank</span>
-            <span id='tx-lobby-list-2' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Room Capacity</span>
-            <span id='tx-lobby-list-4' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Min Players</span>
-            <span id='tx-lobby-list-8' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Round Duration (minutes)</span>
-            <span id='tx-lobby-list-5' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Play Mode</span>
-            <span id='tx-lobby-list-6' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Lobby Level Limit</span>
-            <span id='tx-lobby-list-7' class='w3-right tx-text-12'>0</span>   
-        </div>
-    </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class="w3-container">
-            <span class="tx-text-14 tx-margin-top-8">Level/Arena Configurations (Max 10 levels per lobby)</span>
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-gamepad" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-lobby-list-name-2' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-game-lobby-list-tag-2' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-game-lobby-list-add-2" lobby-index='3' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-create">Create</span>
+            <span id="tx-game-lobby-list-api-2" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-action">Edit</span>
+            <span id="tx-game-lobby-list-disable-2" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-margin-right-16 tx-game-lobby-disable">Disable</span>
         </div>    
     </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class="w3-container w3-border-bottom w3-border-red">
-            <span id='tx-level-v-1-1' class="w3-left tx-text-14 tx-margin-top-16">Pending</span>
-            <span tx-level-no="1" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit-open">Edit</span>    
-        </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
         <div class="w3-container">
-            <span class="w3-left tx-text-12">Level</span>
-            <span id='tx-level-v-1-2' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">XP</span>
-            <span id='tx-level-v-1-3' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Room Capacity</span>
-            <span id='tx-level-v-1-5' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Min Players</span>
-            <span id='tx-level-v-1-7' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Round Duration (minutes)</span>
-            <span id='tx-level-v-1-6' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Disabled</span>
-            <span id='tx-level-v-1-4' class="w3-right tx-text-12">true</span>    
-        </div>
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-gamepad" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-lobby-list-name-3' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-game-lobby-list-tag-3' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-game-lobby-list-add-3" lobby-index='4' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-create">Create</span>
+            <span id="tx-game-lobby-list-api-3" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-action">Edit</span>
+            <span id="tx-game-lobby-list-disable-3" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-margin-right-16 tx-game-lobby-disable">Disable</span>
+        </div>    
     </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class="w3-container w3-border-bottom w3-border-red">
-            <span id='tx-level-v-2-1' class="w3-left tx-text-14 tx-margin-top-16">Pending</span>
-            <span tx-level-no="2" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit-open">Edit</span>    
-        </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
         <div class="w3-container">
-            <span class="w3-left tx-text-12">Level</span>
-            <span id='tx-level-v-2-2' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">XP</span>
-            <span id='tx-level-v-2-3' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Room Capacity</span>
-            <span id='tx-level-v-2-5' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Min Players</span>
-            <span id='tx-level-v-2-7' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Round Duration (minutes)</span>
-            <span id='tx-level-v-2-6' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Disabled</span>
-            <span id='tx-level-v-2-4' class="w3-right tx-text-12">true</span>    
-        </div>
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-gamepad" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-lobby-list-name-4' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-game-lobby-list-tag-4' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-game-lobby-list-add-4" lobby-index='5' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-create">Create</span>
+            <span id="tx-game-lobby-list-api-4" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-action">Edit</span>
+            <span id="tx-game-lobby-list-disable-4" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-margin-right-16 tx-game-lobby-disable">Disable</span>
+        </div>    
     </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class="w3-container w3-border-bottom w3-border-red">
-            <span id='tx-level-v-3-1' class="w3-left tx-text-14 tx-margin-top-16">Pending</span>
-            <span tx-level-no="3" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit-open">Edit</span>    
-        </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
         <div class="w3-container">
-            <span class="w3-left tx-text-12">Level</span>
-            <span id='tx-level-v-3-2' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">XP</span>
-            <span id='tx-level-v-3-3' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Room Capacity</span>
-            <span id='tx-level-v-3-5' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Min Players</span>
-            <span id='tx-level-v-3-7' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Round Duration (minutes)</span>
-            <span id='tx-level-v-3-6' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Disabled</span>
-            <span id='tx-level-v-3-4' class="w3-right tx-text-12">true</span>    
-        </div>
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-gamepad" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-lobby-list-name-5' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-game-lobby-list-tag-5' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-game-lobby-list-add-5" lobby-index='6' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-create">Create</span>
+            <span id="tx-game-lobby-list-api-5" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-action">Edit</span>
+            <span id="tx-game-lobby-list-disable-5" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-margin-right-16 tx-game-lobby-disable">Disable</span>
+        </div>    
     </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class="w3-container w3-border-bottom w3-border-red">
-            <span id='tx-level-v-4-1' class="w3-left tx-text-14 tx-margin-top-16">Pending</span>
-            <span tx-level-no="4" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit-open">Edit</span>    
-        </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
         <div class="w3-container">
-            <span class="w3-left tx-text-12">Level</span>
-            <span id='tx-level-v-4-2' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">XP</span>
-            <span id='tx-level-v-4-3' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Room Capacity</span>
-            <span id='tx-level-v-4-5' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Min Players</span>
-            <span id='tx-level-v-4-7' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Round Duration (minutes)</span>
-            <span id='tx-level-v-4-6' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Disabled</span>
-            <span id='tx-level-v-4-4' class="w3-right tx-text-12">true</span>    
-        </div>
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-gamepad" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-lobby-list-name-6' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-game-lobby-list-tag-6' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-game-lobby-list-add-6" lobby-index='7' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-create">Create</span>
+            <span id="tx-game-lobby-list-api-6" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-action">Edit</span>
+            <span id="tx-game-lobby-list-disable-6" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-margin-right-16 tx-game-lobby-disable">Disable</span>
+        </div>    
     </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class="w3-container w3-border-bottom w3-border-red">
-            <span id='tx-level-v-5-1' class="w3-left tx-text-14 tx-margin-top-16">Pending</span>
-            <span tx-level-no="5" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit-open">Edit</span>    
-        </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
         <div class="w3-container">
-            <span class="w3-left tx-text-12">Level</span>
-            <span id='tx-level-v-5-2' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">XP</span>
-            <span id='tx-level-v-5-3' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Room Capacity</span>
-            <span id='tx-level-v-5-5' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Min Players</span>
-            <span id='tx-level-v-5-7' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Round Duration (minutes)</span>
-            <span id='tx-level-v-5-6' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Disabled</span>
-            <span id='tx-level-v-5-4' class="w3-right tx-text-12">true</span>    
-        </div>
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-gamepad" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-lobby-list-name-7' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-game-lobby-list-tag-7' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-game-lobby-list-add-7" lobby-index='8' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-create">Create</span>
+            <span id="tx-game-lobby-list-api-7" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-action">Edit</span>
+            <span id="tx-game-lobby-list-disable-7" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-margin-right-16 tx-game-lobby-disable">Disable</span>
+        </div>    
     </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class="w3-container w3-border-bottom w3-border-red">
-            <span id='tx-level-v-6-1' class="w3-left tx-text-14 tx-margin-top-16">Pending</span>
-            <span tx-level-no="6" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit-open">Edit</span>    
-        </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
         <div class="w3-container">
-            <span class="w3-left tx-text-12">Level</span>
-            <span id='tx-level-v-6-2' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">XP</span>
-            <span id='tx-level-v-6-3' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Room Capacity</span>
-            <span id='tx-level-v-6-5' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Min Players</span>
-            <span id='tx-level-v-6-7' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Round Duration (minutes)</span>
-            <span id='tx-level-v-6-6' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Disabled</span>
-            <span id='tx-level-v-6-4' class="w3-right tx-text-12">true</span>    
-        </div>
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-gamepad" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-lobby-list-name-8' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-game-lobby-list-tag-8' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-game-lobby-list-add-8" lobby-index='9' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-create">Create</span>
+            <span id="tx-game-lobby-list-api-8" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-action">Edit</span>
+            <span id="tx-game-lobby-list-disable-8" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-margin-right-16 tx-game-lobby-disable">Disable</span>
+        </div>    
     </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class="w3-container w3-border-bottom w3-border-red">
-            <span id='tx-level-v-7-1' class="w3-left tx-text-14 tx-margin-top-16">Pending</span>
-            <span tx-level-no="7" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit-open">Edit</span>    
-        </div>
+    <div class="w3-panel  w3-border-bottom w3-border-red">
         <div class="w3-container">
-            <span class="w3-left tx-text-12">Level</span>
-            <span id='tx-level-v-7-2' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">XP</span>
-            <span id='tx-level-v-7-3' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Room Capacity</span>
-            <span id='tx-level-v-7-5' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Min Players</span>
-            <span id='tx-level-v-7-7' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Round Duration (minutes)</span>
-            <span id='tx-level-v-7-6' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Disabled</span>
-            <span id='tx-level-v-7-4' class="w3-right tx-text-12">true</span>    
-        </div>
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-gamepad" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-lobby-list-name-9' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-game-lobby-list-tag-9' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-game-lobby-list-add-9" lobby-index='10' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-create">Create</span>
+            <span id="tx-game-lobby-list-api-9" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-action">Edit</span>
+            <span id="tx-game-lobby-list-disable-9" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-margin-right-16 tx-game-lobby-disable">Disable</span>
+        </div>    
     </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class="w3-container w3-border-bottom w3-border-red">
-            <span id='tx-level-v-8-1' class="w3-left tx-text-14 tx-margin-top-16">Pending</span>
-            <span tx-level-no="8" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit-open">Edit</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Level</span>
-            <span id='tx-level-v-8-2' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">XP</span>
-            <span id='tx-level-v-8-3' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Room Capacity</span>
-            <span id='tx-level-v-8-5' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Min Players</span>
-            <span id='tx-level-v-8-7' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Round Duration (minutes)</span>
-            <span id='tx-level-v-8-6' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Disabled</span>
-            <span id='tx-level-v-8-4' class="w3-right tx-text-12">true</span>    
-        </div>
-    </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class="w3-container w3-border-bottom w3-border-red">
-            <span id='tx-level-v-9-1' class="w3-left tx-text-14 tx-margin-top-16">Pending</span>
-            <span tx-level-no="9" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit-open">Edit</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Level</span>
-            <span id='tx-level-v-9-2' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">XP</span>
-            <span id='tx-level-v-9-3' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Room Capacity</span>
-            <span id='tx-level-v-9-5' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Min Players</span>
-            <span id='tx-level-v-9-7' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Round Duration (minutes)</span>
-            <span id='tx-level-v-9-6' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Disabled</span>
-            <span id='tx-level-v-9-4' class="w3-right tx-text-12">true</span>    
-        </div>
-    </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class="w3-container w3-border-bottom w3-border-red">
-            <span id='tx-level-v-10-1' class="w3-left tx-text-14 tx-margin-top-16">Pending</span>
-            <span tx-level-no="10" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-level-edit-open">Edit</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Level</span>
-            <span id='tx-level-v-10-2' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">XP</span>
-            <span id='tx-level-v-10-3' class="w3-right tx-text-12">0</span>    
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Room Capacity</span>
-            <span id='tx-level-v-10-5' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Min Players</span>
-            <span id='tx-level-v-10-7' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class='w3-left tx-text-12'>Round Duration (minutes)</span>
-            <span id='tx-level-v-10-6' class='w3-right tx-text-12'>0</span>   
-        </div>
-        <div class="w3-container">
-            <span class="w3-left tx-text-12">Disabled</span>
-            <span id='tx-level-v-10-4' class="w3-right tx-text-12">true</span>    
-        </div>
-    </div>
-    
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -387,107 +119,7 @@
             <span class="tx-text-12">Powered By ICodeSoftware</span>
         </div>
     </div>
-    <!-- level edit popup--> 
-    <div class="w3-card-4 w3-border w3-round w3-white tx-level-checkout" id="tx-level-edit">
-        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
-            <div class="w3-display-topright w3-padding">
-                <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
-            </div>
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="fa fa-cubes" style="font-size:24px"></i></span>
-                <span id='tx-level-edit-no' class="tx-margin-left-8 tx-text-18">Update Level</span>
-            </div>
-        </div>
-        <div class="w3-container tx-margin-top-8">
-            <label class="tx-text-12">Level Name</label>
-            <input id ="tx-level-name" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='level name'/>
-        </div>
-        <div class="w3-container">
-            <label class="tx-text-12">XP</label>
-            <input id ="tx-level-xp" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='xp'/>
-        </div>
-        <div class="w3-container">
-            <label class="tx-text-12">Max Players Per Room</label>
-            <input id ="tx-level-capacity" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='capacity'/>
-        </div>
-        <div class="w3-container">
-            <label class="tx-text-12">Min Players Per Room</label>
-            <input id ="tx-min-level-capacity" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='min players'/>
-        </div>
-        <div class="w3-container">
-            <label class="tx-text-12">Round Time In Minute</label>
-            <input id ="tx-level-duration" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='duration'/>
-        </div>
-        <div class="w3-container tx-margin-top-4">
-            <input id='tx-level-disabled' class="w3-check tx-text-12" type="checkbox">
-            <label class="tx-text-12">Disabled</label>
-        </div>    
-        <div class="w3-container tx-margin-top-12">
-            <span id="tx-level-edit-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
-        
-            <span id="tx-level-edit-save" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Save</span>     
-        </div>
-        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
-            </div>
-            <div class="w3-display-bottomright w3-padding">
-                <span class="tx-text-12">Powered By ICodeSoftware</span>
-            </div>
-        </div>     
-    </div>
-    <!-- lobby edit popup--> 
-    <div class="w3-card-4 w3-border w3-round w3-white tx-lobby-checkout" id="tx-lobby-list-edit">
-        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
-            <div class="w3-display-topright w3-padding">
-                <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
-            </div>
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="fa fa-cubes" style="font-size:24px"></i></span>
-                <span class="tx-margin-left-8 tx-text-18">Update Lobby Settings</span>
-            </div>
-        </div>
-        <div class="w3-container tx-margin-top-8">
-            <label class="tx-text-12">Short Lobby Name</label>
-            <input id ="tx-lobby-name" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='name'/>
-        </div>
-        
-        <div class="w3-container">
-            <label class="tx-text-12">Level Limit (3-10) </label>
-            <input id ="tx-level-limit" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='level limit'/>
-        </div>
-        <div class="w3-container">
-            <label class="tx-text-12">Max Players Per Room</label>
-            <input id ="tx-capacity" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='capacity'/>
-        </div>
-        <div class="w3-container">
-            <label class="tx-text-12">Min Players Per Room</label>
-            <input id ="tx-min-capacity" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='min players'/>
-        </div>
-        <div class="w3-container">
-            <label class="tx-text-12">Round Time In Minute</label>
-            <input id ="tx-duration" class="w3-input w3-round w3-border tx-text-14" style="height:32px" type="text" placeholder='duration'/>
-        </div>
-        <!--
-        <div class="w3-container w3-center tx-margin-top-8">
-            <input id='tx-integration-mode-enabled' class="w3-check tx-text-12" type="checkbox">
-            <label class="tx-text-12">Integration Mode</label>            
-        </div>-->
-        <div class="w3-container">
-            <span id="tx-lobby-list-edit-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
-        
-            <span id="tx-lobby-list-edit-save" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Save</span>     
-        </div>
-        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
-            </div>
-            <div class="w3-display-bottomright w3-padding">
-                <span class="tx-text-12">Powered By ICodeSoftware</span>
-            </div>
-        </div>     
-    </div>
-    <div class="w3-card-4 w3-border w3-round w3-white tx-ok-checkout" id="tx-lobby-list-remove-form">
+    <div class="w3-card-4 w3-border w3-round w3-white tx-ok-checkout" id="tx-game-lobby-list-add-form">
         <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
             <div class="w3-display-topright w3-padding">
                 <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
@@ -497,110 +129,11 @@
                 <span class="tx-margin-left-8 tx-text-18">Confirmation</span>
             </div>
         </div>
-        <div id="tx-lobby-list-remove-message" class="w3-panel w3-center w3-border-bottom w3-border-red tx-text-14">Are you sure to disable lobby?</div>
+        <div id="tx-game-lobby-list-add-message" class="w3-panel w3-center w3-border-bottom w3-border-red tx-text-14">Are you sure to create new lobby?</div>
         <div class="w3-panel w3-border-bottom w3-border-red">
-            <span id="tx-lobby-list-remove-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
+            <span id="tx-game-lobby-list-add-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
         
-            <span id="tx-lobby-list-remove-ok" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Confirm</span>     
-        </div>
-        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
-            </div>
-            <div class="w3-display-bottomright w3-padding">
-                <span class="tx-text-12">Powered By ICodeSoftware</span>
-            </div>
-        </div> 
-    </div>
-    <div class="w3-card-4 w3-border w3-round w3-white tx-lobby-add-checkout" id="tx-lobby-list-add-form">
-        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
-            <div class="w3-display-topright w3-padding">
-                <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
-            </div>
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="fa fa-exclamation-triangle w3-text-yellow tx-margin-top-4" style="font-size:24px"></i></span>
-                <span class="tx-margin-left-8 tx-text-18">Confirmation</span>
-            </div>
-        </div>
-        <div id="tx-lobby-list-add-message" class="w3-panel w3-center w3-border-bottom w3-border-red tx-text-14">Check slots for lobby?</div>
-        <div class="w3-panel w3-center tx-margin-bottom-8">
-            <label class="tx-text-12 tx-margin-right-4">1</label>
-            <input id='tx-slot-1' class="w3-check tx-text-12" type="checkbox">
-            <label class="tx-text-12 tx-margin-right-4">2</label>
-            <input id='tx-slot-2' class="w3-check tx-text-12" type="checkbox">
-            <label class="tx-text-12 tx-margin-right-4">3</label>
-            <input id='tx-slot-3' class="w3-check tx-text-12" type="checkbox">
-            <label class="tx-text-12 tx-margin-right-4">4</label>
-            <input id='tx-slot-4' class="w3-check tx-text-12" type="checkbox">
-            <label class="tx-text-12 tx-margin-right-4">5</label>
-            <input id='tx-slot-5' class="w3-check tx-text-12" type="checkbox">    
-        </div>
-        <div class="w3-panel w3-center tx-margin-bottom-8">
-            <label class="tx-text-12 tx-margin-right-4">6</label>
-            <input id='tx-slot-6' class="w3-check tx-text-12" type="checkbox">
-            <label class="tx-text-12 tx-margin-right-4">7</label>
-            <input id='tx-slot-7' class="w3-check tx-text-12" type="checkbox">
-            <label class="tx-text-12 tx-margin-right-4">8</label>
-            <input id='tx-slot-8' class="w3-check tx-text-12" type="checkbox">
-            <label class="tx-text-12 tx-margin-right-4">9</label>
-            <input id='tx-slot-9' class="w3-check tx-text-12" type="checkbox">
-            <label class="tx-text-12 tx-margin-right-4">10</label>
-            <input id='tx-slot-10' class="w3-check tx-text-12" type="checkbox">    
-        </div>
-        <div class="w3-panel w3-border-bottom w3-border-red">
-            <span id="tx-lobby-list-add-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
-        
-            <span id="tx-lobby-list-add-ok" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Confirm</span>     
-        </div>
-        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
-            </div>
-            <div class="w3-display-bottomright w3-padding">
-                <span class="tx-text-12">Powered By ICodeSoftware</span>
-            </div>
-        </div> 
-    </div>
-    <div class="w3-card-4 w3-border w3-round w3-white tx-ok-checkout" id="tx-lobby-list-enable-form">
-        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
-            <div class="w3-display-topright w3-padding">
-                <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
-            </div>
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="fa fa-exclamation-triangle w3-text-yellow tx-margin-top-4" style="font-size:24px"></i></span>
-                <span class="tx-margin-left-8 tx-text-18">Confirmation</span>
-            </div>
-        </div>
-        <div id="tx-lobby-list-enable-message" class="w3-panel w3-center w3-border-bottom w3-border-red tx-text-14">Are you sure to enable lobby?</div>
-        <div class="w3-panel w3-border-bottom w3-border-red">
-            <span id="tx-lobby-list-enable-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
-        
-            <span id="tx-lobby-list-enable-ok" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Confirm</span>     
-        </div>
-        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
-            </div>
-            <div class="w3-display-bottomright w3-padding">
-                <span class="tx-text-12">Powered By ICodeSoftware</span>
-            </div>
-        </div> 
-    </div>
-    <div class="w3-card-4 w3-border w3-round w3-white tx-ok-checkout" id="tx-lobby-list-reload-form">
-        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
-            <div class="w3-display-topright w3-padding">
-                <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
-            </div>
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="fa fa-exclamation-triangle w3-text-yellow tx-margin-top-4" style="font-size:24px"></i></span>
-                <span class="tx-margin-left-8 tx-text-18">Confirmation</span>
-            </div>
-        </div>
-        <div id="tx-lobby-list-reload-message" class="w3-panel w3-center w3-border-bottom w3-border-red tx-text-14">Are you sure to reload lobby?</div>
-        <div class="w3-panel w3-border-bottom w3-border-red">
-            <span id="tx-lobby-list-reload-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
-        
-            <span id="tx-lobby-list-reload-ok" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Confirm</span>     
+            <span id="tx-game-lobby-list-add-ok" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Confirm</span>     
         </div>
         <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
             <div class="w3-display-topleft w3-padding">
@@ -613,281 +146,102 @@
     </div>
 </div>
 <script>
-    //document.querySelector("#tx-game-lobby-list-message").innerHTML = TARA_API.query().gameClusterId;
-    let _page = 1;
-    _list_lobby();
-    document.querySelectorAll('.tx-lobby-list-action').forEach((a)=>{
+    document.querySelector("#tx-game-lobby-list-message").innerHTML = TARA_API.query().gameClusterId;
+    document.querySelectorAll(".tx-game-lobby-action").forEach((a)=>{
+        a.style.display = 'none';
+    });
+    document.querySelectorAll(".tx-game-lobby-disable").forEach((a)=>{
+        a.style.display = 'none';
+    });
+    list_game_lobby();
+    document.querySelectorAll('.tx-game-lobby-action').forEach((a)=>{
         a.onclick=()=>{
-            _page = a.getAttribute('lobby-list-no')/1;
-            _list_lobby();
+            TARA_API.query().popup='#tx-popup-api';
+            TARA_API.query().applicationId = a.getAttribute('tx-game-lobby-id');
+            let vid = a.getAttribute('tx-game-lobby-api-view-id');
+            tx_view({viewId:vid,containerId:'#tx-popup-api'});    
         }
     });
+    document.querySelectorAll('.tx-game-lobby-create').forEach((a)=>{
+        a.onclick=()=>{
+            TARA_API.query().lobbyIndex = a.getAttribute('lobby-index')/1;  
+            TARA_API.query().command = create_game_lobby;
+            document.querySelector('#tx-game-lobby-list-add-message').innerHTML ='Are you sure to create new game lobby?';
+            document.querySelector('#tx-game-lobby-list-add-form').style.display ='block';  
+        }
+    });
+    document.querySelectorAll('.tx-game-lobby-disable').forEach((a)=>{
+        a.onclick=()=>{
+            TARA_API.query().applicationId = a.getAttribute('tx-game-lobby-id');
+            TARA_API.query().lobbyDisabled = a.getAttribute('tx-game-lobby-disabled');
+            if(TARA_API.query().lobbyDisabled == 'false'){
+                document.querySelector('#tx-game-lobby-list-add-message').innerHTML ='Are you sure to disable game lobby?';
+                TARA_API.query().command = disable_game_lobby;
+            }
+            else{
+                document.querySelector('#tx-game-lobby-list-add-message').innerHTML ='Are you sure to enable game lobby?';
+                TARA_API.query().command = enable_game_lobby;
+            }
+            document.querySelector('#tx-game-lobby-list-add-form').style.display ='block';  
+        }
+    });
+    document.querySelector('#tx-game-lobby-list-add-cancel').onclick=()=>{
+        document.querySelector('#tx-game-lobby-list-add-form').style.display='none';
+    };
+    document.querySelector('#tx-game-lobby-list-add-ok').onclick=()=>{
+        TARA_API.query().command.call();
+        document.querySelector('#tx-game-lobby-list-add-form').style.display='none';
+    };
     document.querySelector('#tx-game-lobby-list-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
-    document.querySelector('#tx-lobby-list-edit-open').onclick=()=>{
-        document.querySelector('#tx-lobby-name').value = document.querySelector("#tx-lobby-list-1").innerHTML;
-        document.querySelector('#tx-level-limit').value = document.querySelector("#tx-lobby-list-7").innerHTML;
-        document.querySelector('#tx-capacity').value = document.querySelector("#tx-lobby-list-4").innerHTML;
-        document.querySelector('#tx-min-capacity').value = document.querySelector("#tx-lobby-list-8").innerHTML;
-        document.querySelector('#tx-duration').value = document.querySelector("#tx-lobby-list-5").innerHTML;
-        //let pm = document.querySelector("#tx-lobby-list-6").innerHTML;
-        //if(pm == 'Offline'){
-            //document.querySelector('#tx-play-mode').options[0].selected=true; 
-            //document.querySelector('#tx-integration-mode-enabled').checked = false;
-        //}
-        //else if(pm == 'Integrated'){
-            //document.querySelector('#tx-play-mode').options[1].selected=true;
-            //document.querySelector('#tx-integration-mode-enabled').checked = true;
-        //}
-        document.querySelector('#tx-lobby-list-edit').style.display='block';
-    };
-    document.querySelector('#tx-lobby-list-edit-cancel').onclick=()=>{
-        document.querySelector('#tx-lobby-list-edit').style.display='none';
-    };
-    document.querySelector('#tx-lobby-list-edit-save').onclick=()=>{
-        let _nm = document.querySelector('#tx-lobby-name').value;
-        let _cap = document.querySelector('#tx-capacity').value;
-        let _mcap = document.querySelector('#tx-min-capacity').value;
-        let _dur = document.querySelector('#tx-duration').value;
-        //let pm = document.querySelector('#tx-integration-mode-enabled').checked;//document.querySelector('#tx-play-mode').value;
-        let lm = document.querySelector('#tx-level-limit').value;
-        let payload ={serviceTag:'role/admin',command:'onUpdateGameLobby',accessId:TARA_API.query().gameClusterId}
-        payload.name = _nm;
-        payload.capacity = _cap/1;
-        payload.joinsOnStart = _mcap/1;
-        payload.duration = _dur/1;
-        //payload.playMode = pm?1:0;
-        payload.levelLimit= lm/1;
-        payload.page = document.querySelector('#tx-lobby-list-no').innerHTML/1;
-        TARA_API.onService(true,payload,(resp)=>{
-            if(resp.successful){  
-                _reset_view(resp);
-            }
-            else{
-                document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;      
-            }
-            document.querySelector('#tx-lobby-list-edit').style.display='none';       
+    function disable_game_lobby(){
+        let cmd ={serviceTag:'role/lobby',command:'onDisableLobby',lobbyId:TARA_API.query().applicationId,gameClusterId:TARA_API.query().gameClusterId};
+        TARA_API.onService(true,cmd,(resp)=>{
+            console.log(resp);
+            list_game_lobby();
+        });    
+    }
+    function enable_game_lobby(){
+        let cmd ={serviceTag:'role/lobby',command:'onEnableLobby',lobbyId:TARA_API.query().applicationId,gameClusterId:TARA_API.query().gameClusterId};
+        TARA_API.onService(true,cmd,(resp)=>{
+            console.log(resp);
+            list_game_lobby();
         });
-    };
-    document.querySelectorAll('.tx-level-edit-open').forEach((a)=>{
-        a.onclick=()=>{
-            let lix = parseInt(a.getAttribute('tx-level-no'));
-            TARA_API.query().levelIndex = lix;
-            document.querySelector('#tx-level-edit-no').innerHTML="Update Level ["+lix+"]";
-            document.querySelector('#tx-level-name').value = document.querySelector('#tx-level-v-'+lix+'-1').innerHTML;
-            document.querySelector('#tx-level-capacity').value = document.querySelector('#tx-level-v-'+lix+'-5').innerHTML;
-            document.querySelector('#tx-min-level-capacity').value = document.querySelector('#tx-level-v-'+lix+'-7').innerHTML;
-            document.querySelector('#tx-level-duration').value = document.querySelector('#tx-level-v-'+lix+'-6').innerHTML;
-            document.querySelector('#tx-level-xp').value = document.querySelector('#tx-level-v-'+lix+'-3').innerHTML;
-            if(document.querySelector('#tx-level-v-'+lix+'-4').innerHTML == 'true'){
-                document.querySelector('#tx-level-disabled').checked = true;    
-            }
-            else{
-                document.querySelector('#tx-level-disabled').checked = false;
-            }
-            document.querySelector('#tx-level-edit').style.display='block';
-        };
-    });
-    document.querySelector('#tx-level-edit-save').onclick=()=>{
-        let _ln = document.querySelector('#tx-level-name').value;
-        let _lx = document.querySelector('#tx-level-xp').value;
-        let _lp = document.querySelector('#tx-level-capacity').value;
-        let _lmp = document.querySelector('#tx-min-level-capacity').value;
-        let _lr = document.querySelector('#tx-level-duration').value;
-        let _ld = document.querySelector('#tx-level-disabled').checked;
-        let payload ={serviceTag:'role/admin',command:'onUpdateGameLevel'}
-        payload.accessId = TARA_API.query().gameClusterId;
-        payload.index = TARA_API.query().levelIndex;
-        payload.page = document.querySelector('#tx-lobby-list-no').innerHTML/1;
-        payload.name = _ln;
-        payload.xp = _lx/1;
-        payload.capacity = _lp/1;
-        payload.joinsOnStart = _lmp/1;
-        payload.duration = _lr/1;
-        payload.disabled = _ld;
-        TARA_API.onService(true,payload,(resp)=>{
-            if(resp.successful){  
-                _reset_view(resp);
-            }
-            else{
-                document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message; 
-            }
-            document.querySelector('#tx-level-edit').style.display='none';        
+    }
+    function create_game_lobby(){
+        let cmd ={serviceTag:'role/lobby',command:'onAddLobby',lobbyIndex:TARA_API.query().lobbyIndex,gameClusterId:TARA_API.query().gameClusterId};
+        TARA_API.onService(true,cmd,(resp)=>{
+            list_game_lobby();
         });
-    };
-    document.querySelector('#tx-level-edit-cancel').onclick=()=>{
-        document.querySelector('#tx-level-edit').style.display='none';
-    };
-    document.querySelector("#tx-add-lobby").onclick=()=>{
-        TARA_API.onService(true,{serviceTag:'role/admin',command:'onCheckLobbySlot',accessId:TARA_API.query().gameClusterId},(resp)=>{
+    }
+    function list_game_lobby(){
+        TARA_API.onGet('role/lobby','onGameLobbyList',TARA_API.query().gameClusterId,(resp)=>{
             if(resp.successful){
-                resp.slots.forEach((a)=>{
-                    let added = a.added;
-                    if(added == true){
-                        let sch = document.querySelector('#tx-slot-'+a.slot);
-                        sch.disabled = true;
-                        sch.checked = true;
-                    }            
+                resp.gameLobbyList.forEach((a)=>{
+                    let i = (a.accessRank/1)-1;
+                    document.querySelector('#tx-game-lobby-list-name-'+i).innerHTML="Name : "+a.name;
+                    document.querySelector('#tx-game-lobby-list-tag-'+i).innerHTML='Access Tag : '+a.tag;
+                    document.querySelector('#tx-game-lobby-list-api-'+i).setAttribute('tx-game-lobby-api-view-id','api.game.lobby');
+                    document.querySelector('#tx-game-lobby-list-api-'+i).setAttribute('tx-game-lobby-id',a.applicationId);
+                    document.querySelector('#tx-game-lobby-list-api-'+i).style.display ='block';
+                    document.querySelector('#tx-game-lobby-list-disable-'+i).setAttribute('tx-game-lobby-id',a.applicationId);
+                    document.querySelector('#tx-game-lobby-list-disable-'+i).setAttribute('tx-game-lobby-disabled',a.disabled);
+                    if(a.disabled == true){
+                        document.querySelector('#tx-game-lobby-list-disable-'+i).innerHTML = 'Enable';        
+                    }
+                    else{
+                        document.querySelector('#tx-game-lobby-list-disable-'+i).innerHTML = 'Disable'; 
+                    }
+                    document.querySelector('#tx-game-lobby-list-disable-'+i).style.display ='block';
+                    document.querySelector('#tx-game-lobby-list-add-'+i).style.display ='none';
                 });
-                document.querySelector('#tx-lobby-list-add-form').style.display='block';
-            }
-            else{
-                document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message; 
-            }
-        });
-    };
-    document.querySelector("#tx-lobby-list-add-cancel").onclick=()=>{
-        document.querySelector('#tx-lobby-list-add-form').style.display='none';
-    };
-    document.querySelector("#tx-lobby-list-add-ok").onclick=()=>{
-        let i;
-        let payload = {serviceTag:'role/admin',command:'onAddLobby',accessId:TARA_API.query().gameClusterId};
-        let slots=[];
-        for(i=1;i<11;i++){
-            let slot = document.querySelector('#tx-slot-'+i);
-            if(!slot.disabled){
-                if(slot.checked==true){
-                    slots.push({name:'slot-'+i,value:true});
-                }
-            }
-        }
-        payload.slots=slots;
-        if(slots.length>0){
-            TARA_API.onService(true,payload,(resp)=>{
-                if(resp.successful){
-                    document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;  
-                    _page=1; 
-                    _list_lobby();                
-                }
-                else{
-                    document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;
-                }       
-            });
-        }
-        else{
-            document.querySelector('#tx-game-lobby-list-message').innerHTML='At lease one slot checked!'; 
-        }    
-    };
-    document.querySelector("#tx-disable-lobby").onclick=()=>{
-        document.querySelector('#tx-lobby-list-remove-message').innerHTML = 'Are you sure to disable '+document.querySelector("#tx-lobby-list-1").innerHTML;
-        document.querySelector('#tx-lobby-list-remove-form').style.display='block';      
-    };
-    document.querySelector("#tx-reload-lobby").onclick=()=>{
-        document.querySelector('#tx-lobby-list-reload-message').innerHTML = 'Are you sure to reload '+document.querySelector("#tx-lobby-list-1").innerHTML;
-        document.querySelector('#tx-lobby-list-reload-form').style.display='block';      
-    };
-    document.querySelector("#tx-enable-lobby").onclick=()=>{
-        document.querySelector('#tx-lobby-list-enable-message').innerHTML = 'Are you sure to enable '+document.querySelector("#tx-lobby-list-1").innerHTML;
-        document.querySelector('#tx-lobby-list-enable-form').style.display='block';      
-    };
-    document.querySelector('#tx-lobby-list-remove-cancel').onclick=()=>{
-        document.querySelector('#tx-lobby-list-remove-form').style.display='none';
-    };
-    document.querySelector('#tx-lobby-list-reload-cancel').onclick=()=>{
-        document.querySelector('#tx-lobby-list-reload-form').style.display='none';
-    };
-    document.querySelector('#tx-lobby-list-enable-cancel').onclick=()=>{
-        document.querySelector('#tx-lobby-list-enable-form').style.display='none';
-    };
-    document.querySelector('#tx-lobby-list-remove-ok').onclick=()=>{
-        let _pno = (document.querySelector('#tx-lobby-list-no').innerHTML/1);
-        TARA_API.onService(true,{serviceTag:'role/admin',command:'onDisableLobby',accessId:TARA_API.query().gameClusterId,index:_pno},(resp)=>{
-            if(resp.successful){
-                document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;   
-                _page = document.querySelector('#tx-lobby-list-no').innerHTML/1;
-                _list_lobby();                
-            }
-            else{
-                document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;
-            }
-            document.querySelector('#tx-lobby-list-remove-form').style.display='none';       
-        });   
-    };
-    document.querySelector('#tx-lobby-list-enable-ok').onclick=()=>{
-        let _pno = (document.querySelector('#tx-lobby-list-no').innerHTML/1);
-        TARA_API.onService(true,{serviceTag:'role/admin',command:'onEnableLobby',accessId:TARA_API.query().gameClusterId,index:_pno},(resp)=>{
-            if(resp.successful){
-                document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;   
-                _page=document.querySelector('#tx-lobby-list-no').innerHTML/1;
-                _list_lobby();                
-            }
-            else{
-                document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;
-            }
-            document.querySelector('#tx-lobby-list-enable-form').style.display='none';       
-        });   
-    };
-    document.querySelector('#tx-lobby-list-reload-ok').onclick=()=>{
-        let _pno = (document.querySelector('#tx-lobby-list-no').innerHTML/1);
-        TARA_API.onService(true,{serviceTag:'role/admin',command:'onReloadLobby',accessId:TARA_API.query().gameClusterId,index:_pno},(resp)=>{
-            if(resp.successful){
-                document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;   
-                _page=document.querySelector('#tx-lobby-list-no').innerHTML/1;
-                _list_lobby();                
-            }
-            else{
-                document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;
-            }
-            document.querySelector('#tx-lobby-list-reload-form').style.display='none';       
-        });   
-    };
-    function _list_lobby(){
-        TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameLobbyList',accessId:TARA_API.query().gameClusterId,page:_page},(resp)=>{
-            if(resp.successful){
-                _reset_view(resp);                    
             }
             else{
                 document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message;
             }       
-        });
+        });    
     }
-    function _reset_view(resp){
-        if(resp.successful){
-            console.log(resp);
-            document.querySelector('#tx-lobby-list-1').innerHTML = resp.lobby.name;
-            document.querySelector('#tx-lobby-list-2').innerHTML = resp.lobby.rank;
-            document.querySelector('#tx-lobby-list-3').innerHTML = resp.lobby.tag; 
-            document.querySelector('#tx-lobby-list-4').innerHTML = resp.lobby.capacity; 
-            document.querySelector('#tx-lobby-list-5').innerHTML = resp.lobby.duration; 
-            document.querySelector('#tx-lobby-list-6').innerHTML = resp.lobby.playMode;
-            document.querySelector('#tx-lobby-list-7').innerHTML = resp.lobby.levelLimit;
-            document.querySelector('#tx-lobby-list-8').innerHTML = resp.lobby.joinsOnStart;
-            document.querySelector('#tx-lobby-list-no').innerHTML = resp.index;
-            let disabled = resp.lobby.disabled;
-            if(disabled == false){
-                document.querySelector('#tx-disable-lobby').style.display='block';
-                document.querySelector('#tx-reload-lobby').style.display='block';
-                document.querySelector('#tx-enable-lobby').style.display='none';    
-            }
-            else{
-                document.querySelector('#tx-disable-lobby').style.display='none';
-                document.querySelector('#tx-reload-lobby').style.display='none';
-                document.querySelector('#tx-enable-lobby').style.display='block';
-            }
-            let i;
-            for(i=1;i<11;i++){
-                document.querySelector('#tx-level-v-'+i+'-1').innerHTML ='Pending';
-                document.querySelector('#tx-level-v-'+i+'-2').innerHTML = '0';
-                document.querySelector('#tx-level-v-'+i+'-3').innerHTML = '0';
-                document.querySelector('#tx-level-v-'+i+'-5').innerHTML = '0';
-                document.querySelector('#tx-level-v-'+i+'-6').innerHTML = '0';
-                document.querySelector('#tx-level-v-'+i+'-4').innerHTML = 'true';   
-            }
-            resp.lobby.levels.forEach((a)=> {
-                i = (a.level);
-                document.querySelector('#tx-level-v-'+i+'-1').innerHTML = a.name;
-                document.querySelector('#tx-level-v-'+i+'-2').innerHTML = a.level;
-                document.querySelector('#tx-level-v-'+i+'-3').innerHTML = a.xp;
-                document.querySelector('#tx-level-v-'+i+'-5').innerHTML = a.capacity;
-                document.querySelector('#tx-level-v-'+i+'-6').innerHTML = a.duration;
-                document.querySelector('#tx-level-v-'+i+'-4').innerHTML = a.disabled; 
-                document.querySelector('#tx-level-v-'+i+'-7').innerHTML = a.joinsOnStart; 
-            });
-        }
-        document.querySelector('#tx-game-lobby-list-message').innerHTML=resp.message; 
-    }
-
 </script>

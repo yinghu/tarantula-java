@@ -1,0 +1,25 @@
+package com.tarantula.game.module;
+
+import com.icodesoftware.Module;
+import com.icodesoftware.*;
+import com.icodesoftware.service.TournamentServiceProvider;
+
+public class AchievementModule implements Module {
+    private ApplicationContext context;
+
+    @Override
+    public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
+        return false;
+    }
+
+    @Override
+    public void setup(ApplicationContext applicationContext) throws Exception {
+        this.context = applicationContext;
+        this.context.log("achievement module started", OnLog.WARN);
+    }
+    @Override
+    public void clear(){
+
+    }
+
+}
