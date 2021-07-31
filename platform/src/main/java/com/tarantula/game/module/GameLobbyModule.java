@@ -21,7 +21,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     private Descriptor application;
     @Override
     public void onJoin(Session session, Module.OnUpdate onUpdate) throws Exception{
-        if(application.tournamentEnabled()&&(!gameServiceProvider.available(session.tournamentId()))){
+        if(application.tournamentEnabled()&&(!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
             session.write(toMessage("no tournament available,please try later",false).toString().getBytes());
             return;
         }

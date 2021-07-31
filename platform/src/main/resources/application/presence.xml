@@ -40,6 +40,12 @@
             <view type="game.cluster.price">
                 <property name="moduleResourceFile">presence/game.cluster.price.view.html</property>
             </view>
+            <view type="play.game.tossup">
+                <property name="moduleResourceFile">presence/play.game.tossup.view.html</property>
+            </view>
+            <view type="play.game.tossup.tournament">
+                <property name="moduleResourceFile">presence/play.game.tossup.tournament.view.html</property>
+            </view>
         </view-list>
     </lobby-context>
 </tarantula>

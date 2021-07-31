@@ -39,6 +39,16 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
         this.creator = creator;
         this.listener = listener;
     }
+    public DefaultTournament(Schedule schedule){
+        this.type = schedule.type();
+        this.description = schedule.description();
+        this.icon = schedule.icon();
+        this.startTime = schedule.startTime();
+        this.closeTime = schedule.closeTime();
+        this.endTime = schedule.endTime();
+        this.maxEntriesPerInstance = schedule.maxEntriesPerInstance();
+        this.durationMinutes = schedule.instanceDurationInMinutes();
+    }
     public DefaultTournament(GameServiceProvider creator,Listener listener){
         this.creator = creator;
         this.listener = listener;

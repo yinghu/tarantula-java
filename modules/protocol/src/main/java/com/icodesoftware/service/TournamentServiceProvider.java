@@ -4,7 +4,7 @@ import com.icodesoftware.Tournament;
 
 import java.util.List;
 
-public interface TournamentServiceProvider{
+public interface TournamentServiceProvider extends ServiceProvider{
 
     String registerTournamentListener(Tournament.Listener listener);
     void unregisterTournamentListener(String registryKey);

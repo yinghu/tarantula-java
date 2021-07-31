@@ -813,7 +813,7 @@
                 //listing live games 
                 if(a.descriptor.typeId == resp.name+'-lobby' ){
                     a.applications.forEach((b)=>{
-                        //console.log(b);
+                        console.log(b);
                         lp.setAttribute('tournament-enabled',b.tournamentEnabled);
                         document.querySelector('#live-game-list-'+b.accessRank+'-0').innerHTML = b.tag
                         document.querySelector('#live-game-list-'+b.accessRank+'-1').style.display='block';
@@ -822,7 +822,7 @@
                     });
                 }
                 else if(a.descriptor.typeId == resp.name+'-service'){
-                    console.log('setup live game service');
+                    //console.log('setup live game service');
                     a.applications.forEach((b,i)=>{
                         document.querySelector('#live-game-service-'+i).style.display = 'block';
                         document.querySelector('#live-game-service-'+i).innerHTML = b.name;

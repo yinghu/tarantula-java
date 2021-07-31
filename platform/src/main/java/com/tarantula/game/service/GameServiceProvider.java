@@ -29,7 +29,7 @@ import java.util.concurrent.CountDownLatch;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,ConfigurationServiceProvider,Tournament.Listener, ReloadListener {
+public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener,ConfigurationServiceProvider,Tournament.Listener, ReloadListener {
 
     private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
     private final String NAME;
@@ -57,6 +57,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private ServiceContext serviceContext;
     private DistributionTournamentService distributionTournamentService;
     private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
+
+    private DistributedTournamentServiceProvider tournamentServiceProvider;
 
     public GameServiceProvider(String name){
         NAME = name;
@@ -153,6 +155,10 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
         this.dataCluster = serviceContext.clusterProvider(Distributable.DATA_SCOPE);
         this.dataCluster.registerReloadListener(name(),this);
+
+        this.tournamentServiceProvider = new DistributedTournamentServiceProvider(NAME);
+        this.tournamentServiceProvider.setup(serviceContext);
+        this.tournamentServiceProvider.waitForData();
         logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]"+this.distributionTournamentService.name());
     }
     @Override
@@ -163,12 +169,13 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
     @Override
     public void start() throws Exception {
-
+        this.tournamentServiceProvider.start();
     }
 
     @Override
     public void shutdown() throws Exception {
         logger.warn("shut down service->"+NAME);
+        this.tournamentServiceProvider.shutdown();
         this.dataCluster.unregisterReloadListener(name());
         integrationCluster.unsubscribe(NAME);
     }
@@ -205,16 +212,10 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             }
         });
     }
-    @Override
-    public Tournament register(Tournament.Schedule schedule){
-        byte[] ret = distributionTournamentService.schedule(name(),schedule);
-        DefaultTournament tournament = new DefaultTournament();
-        Map<String,Object> _map = JsonUtil.toMap(ret);
-        tournament.distributionKey(_map.get("tournamentId").toString());
-        tournament.fromMap(_map);
-        return tournament;
-    }
     public Tournament schedule(Tournament.Schedule schedule) {
+        return this.tournamentServiceProvider.schedule(schedule);
+    }
+    public Tournament _schedule(Tournament.Schedule schedule) {
         Tournament tournament = this.create(schedule);
         GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),GameServiceIndex.TOURNAMENT);
         gameServiceIndex.keySet.add(tournament.distributionKey());
@@ -227,11 +228,10 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         this.tournamentStarted(tournament);
         return tournament;
     }
-    @Override
-    public boolean available(String tournamentId){
-        return this.distributionTournamentService.checkAvailable(name(),tournamentId);
-    }
-    @Override
+    //public boolean available(String tournamentId){
+        //return this.distributionTournamentService.checkAvailable(name(),tournamentId);
+    //}
+
     public Tournament.Instance join(String tournamentId, String systemId){
         String tid = this.distributionTournamentService.join(name(),tournamentId,systemId);
         byte[] ret = this.distributionTournamentService.enter(name(),tournamentId,tid,systemId);
@@ -240,14 +240,14 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         _e.fromBinary(ret);
         return _e;
     }
-    @Override
+
     public Tournament.Entry score(String instanceId, String systemId, double delta){
         byte[] ret = this.distributionTournamentService.score(name(),instanceId,systemId,delta);
         Tournament.Entry _e = new TournamentEntry();
         _e.fromBinary(ret);
         return _e;
     }
-    @Override
+
     public List<Tournament.Entry> tournamentEntries(String instanceId){
         Tournament.Instance _ins = instance(instanceId);
         return _ins.list();
@@ -475,6 +475,10 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
     public void unregisterTournamentListener(String registryKey){
         tListeners.remove(registryKey);
+    }
+
+    public TournamentServiceProvider tournamentServiceProvider(){
+        return this.tournamentServiceProvider;
     }
 
 }

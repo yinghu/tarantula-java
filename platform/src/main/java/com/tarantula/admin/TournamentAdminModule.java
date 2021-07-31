@@ -5,6 +5,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.tournament.TournamentScheduleParser;
 
@@ -24,8 +25,8 @@ public class TournamentAdminModule implements Module {
             if((boolean)gameCluster.property(GameCluster.TOURNAMENT_ENABLED)){
                 Tournament.Schedule schedule = TournamentScheduleParser.parse(payload);
                 String serviceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-                TournamentServiceProvider tsp = this.context.serviceProvider(serviceName);
-                Tournament tournament = tsp.register(schedule);
+                GameServiceProvider tsp = this.context.serviceProvider(serviceName);
+                Tournament tournament = tsp.tournamentServiceProvider().register(schedule);
                 session.write(JsonUtil.toSimpleResponse(true,tournament.distributionKey()).getBytes());
             }
             else{

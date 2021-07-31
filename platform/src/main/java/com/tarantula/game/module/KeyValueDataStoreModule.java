@@ -61,6 +61,7 @@ public class KeyValueDataStoreModule implements Module {
         gameServiceProvider = new GameServiceProvider(this.context.descriptor().typeId().replace("-data","-service"));
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.register(gameServiceProvider);
+        this.gameServiceProvider.start();
         this.maxSizeOnSet = this.context.descriptor().capacity();
         this.context.log("Data store ["+this.context.descriptor().typeId()+" started with max size on set call ["+maxSizeOnSet+"]", OnLog.WARN);
     }

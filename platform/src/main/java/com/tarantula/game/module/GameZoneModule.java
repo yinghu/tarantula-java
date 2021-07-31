@@ -33,7 +33,7 @@ public class GameZoneModule implements Module,Configurable.Listener,Connection.O
     public void onJoin(Session session, Module.OnUpdate onUpdate) throws Exception{
         //match arena with service rank/xp or offline play mode
         //this.context.log(new String(session.payload()),OnLog.WARN);
-        if(mZone.descriptor.tournamentEnabled()&&(!gameServiceProvider.available(session.tournamentId()))){
+        if(mZone.descriptor.tournamentEnabled()&&(!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
             session.write(toMessage("no tournament available,please try later",false).toString().getBytes());
             return;
         }
