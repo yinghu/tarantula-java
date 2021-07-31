@@ -55,13 +55,21 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     }
 
     @Override
-    public Tournament.Instance join(String s, String s1) {
-        return null;
+    public Tournament.Instance join(String tournamentId, String systemId) {
+        String tid = this.distributionTournamentService.join(name(),tournamentId,systemId);
+        byte[] ret = this.distributionTournamentService.enter(name(),tournamentId,tid,systemId);
+        Tournament.Instance _e = new TournamentInstance();
+        _e.distributionKey(tid);
+        _e.fromBinary(ret);
+        return _e;
     }
 
     @Override
-    public Tournament.Entry score(String s, String s1, double v) {
-        return null;
+    public Tournament.Entry score(String instanceId, String systemId, double delta) {
+        byte[] ret = this.distributionTournamentService.score(name(),instanceId,systemId,delta);
+        Tournament.Entry _e = new TournamentEntry();
+        _e.fromBinary(ret);
+        return _e;
     }
 
     @Override
@@ -87,9 +95,9 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
 
     @Override
     public void shutdown() throws Exception {
-
+        this.logger.warn("distributed tournament shutdown");
     }
-
+    //distributed operations callbacks
     public Tournament schedule(Tournament.Schedule schedule) {
         DefaultTournament tournament = new DefaultTournament(schedule);
         dataStore.create(tournament);
@@ -99,5 +107,17 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
             v.tournamentEnded(tournament);
         });
         return tournament;
+    }
+    public Tournament tournament(String tournamentId){
+        Tournament tournament = new DefaultTournament();
+        tournament.distributionKey(tournamentId);
+        dataStore.load(tournament);
+        return tournament;
+    }
+    public Tournament.Instance instance(String tournamentId,String instanceId){
+        return null;
+    }
+    public Tournament.Instance instance(String instanceId){
+        return null;
     }
 }

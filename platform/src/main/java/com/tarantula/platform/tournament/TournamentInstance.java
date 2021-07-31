@@ -44,7 +44,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     @Override
     public Tournament.Entry enter(String systemId) {
         return this.entryIndex.computeIfAbsent(systemId,(k)->{
-            Tournament.Entry e = gameServiceProvider.create(systemId,this);
+            Tournament.Entry e = new TournamentEntry();//gameServiceProvider.create(systemId,this);
             return e;
         });
     }

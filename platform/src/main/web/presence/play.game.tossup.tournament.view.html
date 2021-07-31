@@ -10,8 +10,7 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-game-tossup-tournament-message">
-    </div>
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-game-tossup-tournament-message">Waiting for tournament schedule</div>
     <div id='tx-live-tournament-list-0' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
         <div class="w3-container">
             <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
@@ -54,23 +53,23 @@
     //document.querySelector("#tx-live-tournament-list-1").style.display = 'block';
     //document.querySelector("#tx-live-tournament-list-2").style.display = 'block';
     //document.querySelector("#tx-live-tournament-list-3").style.display = 'block';
+    
     TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
         resp.tournamentList.forEach((t,i) => {
             document.querySelector('#tx-live-tournament-list-type-'+i).innerHTML = t.type;
             document.querySelector('#tx-live-tournament-list-play-'+i).setAttribute('tournament-id',t.tournamentId);  
-            document.querySelector("#tx-live-tournament-list-"+i).style.display = 'block';      
+            document.querySelector("#tx-live-tournament-list-"+i).style.display = 'block';
+            document.querySelector('#tx-game-tossup-tournament-message').innerHTML = 'Play tournament game!';      
         });
     });
     document.querySelectorAll('.tx-live-tournament-action').forEach((a)=>{
         a.onclick=()=>{
-            //TARA_API.query().popup='#tx-popup-api';
             let tid = a.getAttribute('tournament-id');
-            console.log('TID->'+tid);
-            //let vid = a.getAttribute('tx-service-api-view-id');
-            //tx_view({viewId:vid,containerId:'#tx-popup-api'}); 
             let cmd = {serviceTag:'tossup/mmk',tournamentEnabled:true,tournamentId:tid};
             TARA_API.onPlay(cmd,(resp)=>{
                 console.log(resp);
+                TARA_API.query().gamePopup = '#tx-popup-game';
+                tx_view({viewId:'play.game.tossup',containerId:'#tx-popup-game'}); 
             });   
         }
     });

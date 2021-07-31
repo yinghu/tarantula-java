@@ -22,23 +22,12 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
     private int maxEntriesPerInstance;
     private int durationMinutes;
     private Listener listener;
-    private GameServiceProvider creator;
+    //private GameServiceProvider creator;
 
     private ConcurrentLinkedDeque<Instance> pendingQueue = new ConcurrentLinkedDeque();
     private ConcurrentHashMap<String,Entry> entryIndex = new ConcurrentHashMap<>();
 
-    public DefaultTournament(Schedule schedule,GameServiceProvider creator,Listener listener){
-        this.type = schedule.type();
-        this.description = schedule.description();
-        this.icon = schedule.icon();
-        this.startTime = schedule.startTime();
-        this.closeTime = schedule.closeTime();
-        this.endTime = schedule.endTime();
-        this.maxEntriesPerInstance = schedule.maxEntriesPerInstance();
-        this.durationMinutes = schedule.instanceDurationInMinutes();
-        this.creator = creator;
-        this.listener = listener;
-    }
+
     public DefaultTournament(Schedule schedule){
         this.type = schedule.type();
         this.description = schedule.description();
@@ -49,10 +38,7 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
         this.maxEntriesPerInstance = schedule.maxEntriesPerInstance();
         this.durationMinutes = schedule.instanceDurationInMinutes();
     }
-    public DefaultTournament(GameServiceProvider creator,Listener listener){
-        this.creator = creator;
-        this.listener = listener;
-    }
+
     public DefaultTournament(){
     }
     @Override
@@ -122,11 +108,11 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
         }
         Instance instance = pendingQueue.poll();
         if(instance==null){
-            instance = creator.createOnJoin(this);
+            //instance = creator.createOnJoin(this);
             listener.onStarted(instance);
         }
         _entry = instance.enter(systemId);
-        creator.updateInstance(instance);
+        //creator.updateInstance(instance);
         pendingQueue.offer(instance);
         return _entry.owner();
     }
