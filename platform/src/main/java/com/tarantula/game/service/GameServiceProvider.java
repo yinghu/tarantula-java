@@ -7,6 +7,7 @@ import com.tarantula.game.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.event.GameUpdateEvent;
+import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 import com.tarantula.platform.service.deployment.TypedListener;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
@@ -29,9 +30,9 @@ import java.util.concurrent.CountDownLatch;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener,ConfigurationServiceProvider {
+public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener {
 
-    private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
+    private TarantulaLogger logger;
     private final String NAME;
     private static int ELO_K = 30;
     private static int LDB_SIZE = 10;
@@ -40,20 +41,17 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,Room> roomIndex = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<String, TypedListener> rListeners = new ConcurrentHashMap<>();
-
-
     private EventService publisher;
 
     private String subscription;
     private String statisticsTag;
     private ClusterProvider integrationCluster;
     private ClusterProvider dataCluster;
-    private RecoverService recoverService;
     private ServiceContext serviceContext;
-    private DistributionTournamentService distributionTournamentService;
+
     private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
 
+    private ConfigurationServiceProvider configurationServiceProvider;
     private DistributedTournamentServiceProvider tournamentServiceProvider;
 
     public GameServiceProvider(String name){
@@ -123,6 +121,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     @Override
     public void setup(ServiceContext serviceContext) {
+        this.logger = serviceContext.logger(GameServiceProvider.class);
         this.serviceContext = serviceContext;
         this.dataStore = serviceContext.dataStore(NAME.replace("-","_"),serviceContext.partitionNumber());//typeId_service
         this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
@@ -143,14 +142,14 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             }
             return false;
         });
-        this.recoverService = integrationCluster.recoverService();
-        this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
         this.dataCluster = serviceContext.clusterProvider(Distributable.DATA_SCOPE);
-
+        this.configurationServiceProvider = new ItemConfigurationServiceProvider(NAME);
+        this.configurationServiceProvider.setup(serviceContext);
+        this.configurationServiceProvider.waitForData();
         this.tournamentServiceProvider = new DistributedTournamentServiceProvider(NAME);
         this.tournamentServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider.waitForData();
-        logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]"+this.distributionTournamentService.name());
+        logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]");
     }
     @Override
     public void atMidnight(){
@@ -184,78 +183,26 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
 
 
-    private <T extends Recoverable> List<T> query(int factoryId,RecoverableFactory<T> factory,String[] params){
-        List<T> tlist = new ArrayList<>();
-        CountDownLatch _lock = new CountDownLatch(1);
-        String cid = this.serviceContext.deploymentServiceProvider().distributionCallback().registerQueryCallback((k,v)->{
-            T t = factory.create();
-            t.fromBinary(v);
-            t.distributionKey(new String(k));
-            if(!t.disabled()){
-                tlist.add(t);
-            }
-        },()-> _lock.countDown());
-        recoverService.queryStart(null,cid,dataStore.name(),factoryId,factory.registryId(),params);
-        try{_lock.await();}catch (Exception ex){}
-        this.serviceContext.deploymentServiceProvider().distributionCallback().removeQueryCallback(cid);
-        return tlist;
+    //configuration service provider hood calls
+    public ConfigurationServiceProvider configurationServiceProvider(){
+        return this.configurationServiceProvider;
     }
-
-    ///Configurable service provider
-    @Override
-    public void dataStore(OnDataStore onDataStore){
-        onDataStore.on(dataStore);
-    }
-    @Override
-    public <T extends Configurable> void register(T config) {
-        rListeners.forEach((k,c)->{
-            if(c.type==null||c.type.equals(config.configurationType())){
-                c.listener.onCreated(config);
-            }
-        });
-    }
-
-    @Override
-    public <T extends Configurable> void release(T t) {
-
-    }
-
-    @Override
-    public void configure(String s) {
-
-    }
-    public <T extends Configuration> List<T> configurations(String type){
-        return null;
-    }
-    @Override
-    public String registerConfigurableListener(String type, Configurable.Listener listener) {
-        String rid = UUID.randomUUID().toString();
-        this.rListeners.put(rid,new TypedListener(type,listener));
-        logger.warn("Listener registered with ->"+type);
-        return rid;
-    }
-    @Override
-    public void unregisterConfigurableListener(String registryKey){
-        TypedListener t = rListeners.remove(registryKey);
-        logger.warn("Listener removed with ->"+t.type);
-    }
-
 
     //tournament service provider hook calls
     public TournamentServiceProvider tournamentServiceProvider(){
         return this.tournamentServiceProvider;
     }
-    public Tournament schedule(Tournament.Schedule schedule) {
+    public Tournament onSchedule(Tournament.Schedule schedule) {
         return this.tournamentServiceProvider.schedule(schedule);
     }
-    public Tournament tournament(String tournamentId){
+    public Tournament onTournament(String tournamentId){
         return this.tournamentServiceProvider.tournament(tournamentId);
     }
 
-    public Tournament.Instance instance(String tournamentId,String instanceId){
+    public Tournament.Instance onInstance(String tournamentId,String instanceId){
         return this.tournamentServiceProvider.instance(tournamentId,instanceId);
     }
-    public Tournament.Instance instance(String instanceId) {
+    public Tournament.Instance onInstance(String instanceId) {
         return this.tournamentServiceProvider.instance(instanceId);
     }
 

@@ -27,7 +27,7 @@ public class GameStoreModule implements Module,Configurable.Listener{
         this.context = applicationContext;
         this.itemList = new ConcurrentHashMap<>();
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
-        this.gameServiceProvider.registerConfigurableListener(this.context.descriptor().category(),this);
+        this.gameServiceProvider.configurationServiceProvider().registerConfigurableListener(this.context.descriptor().category(),this);
         this.context.log("game store module started", OnLog.WARN);
     }
     public <T extends Configurable> void onCreated(T created){

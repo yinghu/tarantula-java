@@ -21,7 +21,7 @@ public class AchievementAdminModule implements Module {
             GameServiceProvider gameServiceProvider = this.context.serviceProvider(serviceName);
             ApplicationConfiguration app = new ApplicationConfiguration();
             app.configurationType(this.context.descriptor().category());
-            gameServiceProvider.register(app);
+            gameServiceProvider.configurationServiceProvider().register(app);
             session.write(JsonUtil.toSimpleResponse(true,serviceName).getBytes());
         }
         else {
