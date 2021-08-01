@@ -18,7 +18,7 @@
         </div>            
     </div>
     <div class="w3-panel w3-center tx-text-14">
-        <div id="jsoneditor-live-service-stattistics" style="width: 100%;"></div>
+        <div id="jsoneditor-live-service-statistics" style="width: 100%;"></div>
     </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
@@ -30,7 +30,7 @@
     </div>
 </div>
 <script>
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-stattistics"),{mode:'tree'},{});
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-statistics"),{mode:'tree'},{});
     TARA_API.onGet(TARA_API.query().serviceTag,'onStatistics',"",(resp)=>{
         editor.set(resp);
     });

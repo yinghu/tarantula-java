@@ -30,71 +30,33 @@ import java.util.concurrent.CountDownLatch;
  * zxp = zxp +xp-delta
  * xp = xp + xp-delta
  */
-public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener {
+public class GameServiceProvider implements ServiceProvider{
 
     private TarantulaLogger logger;
     private final String NAME;
-    private static int ELO_K = 30;
-    private static int LDB_SIZE = 10;
+
     private DataStore dataStore;
 
-    private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
+
     private ConcurrentHashMap<String,Room> roomIndex = new ConcurrentHashMap<>();
 
-    private EventService publisher;
 
     private String subscription;
-    private String statisticsTag;
+
     private ClusterProvider integrationCluster;
     private ClusterProvider dataCluster;
     private ServiceContext serviceContext;
 
-    private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
-
+    private PlayerDataProvider playerDataProvider;
+    private LeaderBoardProvider leaderBoardProvider;
     private ItemConfigurationServiceProvider configurationServiceProvider;
     private DistributedTournamentServiceProvider tournamentServiceProvider;
+
 
     public GameServiceProvider(String name){
         NAME = name;
     }
-    public void statisticsTag(String statTag){
-        this.statisticsTag = statTag;
-    }
-    public String statisticsTag(){
-        return statisticsTag;
-    }
-    public Rating rating(String systemId){
-        return rMap.computeIfAbsent(systemId,(k)->{
-            Rating rating = new Rating();
-            rating.distributionKey(systemId);
-            this.dataStore.createIfAbsent(rating,true);
-            rating.dataStore(this.dataStore);
-            return rating;
-        });
-    }
-    public void elo(Rating rating1,Rating rating2){
-        double p1 = probability(rating2.elo,rating1.elo);
-        double p2 = probability(rating1.elo,rating2.elo);
-        if (rating1.rank-rating1.rank>0) {//1 win
-            rating1.elo = rating1.elo + ELO_K * (1 - p1);
-            rating2.elo = rating2.elo + ELO_K * (0 - p2);
-        }
-        else {//2 win
-            rating1.elo = rating1.elo + ELO_K * (0 - p1);
-            rating2.elo = rating2.elo + ELO_K * (1 - p2);
-        }
-    }
-    public Statistics statistics(String systemId){
-        StatisticsIndex deltaStatistics = new StatisticsIndex();
-        deltaStatistics.distributionKey(systemId);
-        deltaStatistics.dataStore(this.dataStore);
-        this.dataStore.createIfAbsent(deltaStatistics,true);
-        deltaStatistics.registerListener((entry -> {
-            LeaderBoard leaderBoard = leaderBoard(entry.name());
-            leaderBoard.onAllBoard(entry);
-        }));
-        return deltaStatistics;
-    }
+
     public GameZone zone(Descriptor descriptor){//application id
         DynamicLobbySetup dynamicLobbySetup = new DynamicLobbySetup();
         return dynamicLobbySetup.load(serviceContext,descriptor);
@@ -106,18 +68,6 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         return roomIndex.get(roomId);
     }
 
-    public LeaderBoard leaderBoard(String category){
-        return _leaderBoard(category);
-    }
-    private LeaderBoardSync _leaderBoard(String category){
-        return tMap.computeIfAbsent(category,(s)->{
-            LeaderBoardSync ldb = new LeaderBoardSync(category,LDB_SIZE);
-            ldb.dataStore(this.dataStore);
-            ldb.masterListener(this);
-            ldb.load();
-            return ldb;
-        });
-    }
     @Override
     public String name() {
         return NAME;
@@ -128,17 +78,8 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         this.logger = serviceContext.logger(GameServiceProvider.class);
         this.serviceContext = serviceContext;
         this.dataStore = serviceContext.dataStore(NAME.replace("-","_"),serviceContext.partitionNumber());//typeId_service
-        this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
         this.subscription = UUID.randomUUID().toString();
         integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
-        integrationCluster.subscribe(NAME,(e)->{
-            if(e instanceof LeaderBoardGlobalEvent){
-                LeaderBoardEntry update = new LeaderBoardEntry(e.index(),e.name(),e.version(),e.owner(),e.balance(),e.timestamp());
-                LeaderBoardSync ldb = this._leaderBoard(update.category());
-                ldb.onView(update);
-            }
-            return false;
-        });
         integrationCluster.subscribe(subscription,(e)->{
             if(e instanceof GameUpdateEvent){
                 Room room = roomIndex.get(e.trackId());
@@ -147,6 +88,12 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
             return false;
         });
         this.dataCluster = serviceContext.clusterProvider(Distributable.DATA_SCOPE);
+        this.playerDataProvider = new PlayerDataProvider(NAME);
+        this.playerDataProvider.setup(serviceContext);
+        this.playerDataProvider.waitForData();
+        this.leaderBoardProvider = new LeaderBoardProvider(NAME);
+        this.leaderBoardProvider.setup(serviceContext);
+        this.leaderBoardProvider.waitForData();
         this.configurationServiceProvider = new ItemConfigurationServiceProvider(NAME);
         this.configurationServiceProvider.setup(serviceContext);
         this.configurationServiceProvider.waitForData();
@@ -157,12 +104,12 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     }
     @Override
     public void atMidnight(){
-        tMap.forEach((k,v)->{
-            v.reset();
-        });
+        leaderBoardProvider.atMidnight();
     }
     @Override
     public void start() throws Exception {
+        this.playerDataProvider.start();
+        this.leaderBoardProvider.start();
         this.tournamentServiceProvider.start();
         this.configurationServiceProvider.start();
     }
@@ -170,24 +117,30 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     @Override
     public void shutdown() throws Exception {
         logger.warn("shut down service->"+NAME);
+        this.playerDataProvider.shutdown();
+        this.leaderBoardProvider.shutdown();
         this.tournamentServiceProvider.shutdown();
         this.configurationServiceProvider.shutdown();
         this.dataCluster.unregisterReloadListener(name());
         integrationCluster.unsubscribe(NAME);
     }
-    private double probability(double rating1,double rating2) {
-        return 1.0 * 1.0 / (1 + 1.0 * (Math.pow(10, 1.0 * (rating1 - rating2) / 400)));
-    }
-    @Override
-    public void onUpdated(LeaderBoard.Entry entry) {
-        publisher.publish(new LeaderBoardGlobalEvent(NAME,NAME,entry));
-    }
-
 
     public void onClosed(Connection connection) {
         roomIndex.forEach((k,r)->r.connectionClosed(connection));
     }
 
+    //player data service provider hook calls
+    public Rating rating(String systemId){
+        return playerDataProvider.rating(systemId);
+    }
+    public Statistics statistics(String systemId){
+        return playerDataProvider.statistics(systemId,leaderBoardProvider);
+    }
+
+    //leader service provider hook calls
+    public LeaderBoard leaderBoard(String category){
+        return leaderBoardProvider.leaderBoard(category);
+    }
 
     //configuration service provider hood calls
     public ConfigurationServiceProvider configurationServiceProvider(){

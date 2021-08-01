@@ -85,16 +85,6 @@ public class LeaderBoardModule implements Module {
         this.builder.registerTypeAdapter(Rating.class,new RatingSerializer());
         this.builder.registerTypeAdapter(LeaderBoardView.class,new LeaderBoardViewSerializer());
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
-        this.gameServiceProvider.statisticsTag(this.context.descriptor().tag());
-        this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(StatisticsPortableRegistry.STATISTICS_DELTA_CID,(a)->{
-            StatsDelta delta = (StatsDelta)a;
-            Statistics statistics = gameServiceProvider.statistics(delta.owner());
-            Statistics.Entry entry = statistics.entry(delta.name);
-            entry.update(delta.value).update();
-            LeaderBoard ldb = gameServiceProvider.leaderBoard(delta.name);
-            ldb.onAllBoard(entry);
-            //this.context.log("delta->"+delta.name+"<>"+delta.value+"//"+delta.owner(), OnLog.WARN);
-        });
         this.context.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.STUB_CID,(a)->{
             Stub stub = (Stub)a;
             Rating rating = this.gameServiceProvider.rating(stub.owner());
@@ -102,7 +92,7 @@ public class LeaderBoardModule implements Module {
             rating.update();
             //this.context.log("a->"+stub.owner()+"/"+stub.rank+"/"+stub.pxp+"/"+stub.rankUpBase+"/"+stub.levelUpBase,OnLog.WARN);
         });
-        this.context.log("Leader board service started ["+this.context.descriptor().typeId()+"]", OnLog.WARN);
+        this.context.log("Leader board module started ["+this.context.descriptor().typeId()+"]", OnLog.WARN);
     }
 
 }
