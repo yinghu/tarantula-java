@@ -47,6 +47,7 @@ public class GameServiceProvider implements ServiceProvider{
     private ClusterProvider dataCluster;
     private ServiceContext serviceContext;
 
+    private RoomServiceProvider roomServiceProvider;
     private PlayerDataProvider playerDataProvider;
     private LeaderBoardProvider leaderBoardProvider;
     private ItemConfigurationServiceProvider configurationServiceProvider;
@@ -88,6 +89,9 @@ public class GameServiceProvider implements ServiceProvider{
             return false;
         });
         this.dataCluster = serviceContext.clusterProvider(Distributable.DATA_SCOPE);
+        this.roomServiceProvider = new RoomServiceProvider(NAME);
+        this.roomServiceProvider.setup(serviceContext);
+        this.roomServiceProvider.waitForData();
         this.playerDataProvider = new PlayerDataProvider(NAME);
         this.playerDataProvider.setup(serviceContext);
         this.playerDataProvider.waitForData();
@@ -108,6 +112,7 @@ public class GameServiceProvider implements ServiceProvider{
     }
     @Override
     public void start() throws Exception {
+        this.roomServiceProvider.start();
         this.playerDataProvider.start();
         this.leaderBoardProvider.start();
         this.tournamentServiceProvider.start();
@@ -117,6 +122,7 @@ public class GameServiceProvider implements ServiceProvider{
     @Override
     public void shutdown() throws Exception {
         logger.warn("shut down service->"+NAME);
+        this.roomServiceProvider.shutdown();
         this.playerDataProvider.shutdown();
         this.leaderBoardProvider.shutdown();
         this.tournamentServiceProvider.shutdown();
@@ -127,6 +133,11 @@ public class GameServiceProvider implements ServiceProvider{
 
     public void onClosed(Connection connection) {
         roomIndex.forEach((k,r)->r.connectionClosed(connection));
+    }
+
+    //room service provider hool calls
+    public RoomServiceProvider roomServiceProvider(){
+        return roomServiceProvider;
     }
 
     //player data service provider hook calls

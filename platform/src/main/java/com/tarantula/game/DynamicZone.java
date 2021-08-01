@@ -10,6 +10,7 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.DynamicLobbySetup;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.AssociateKey;
 
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
 
     protected ApplicationContext applicationContext;
     protected Descriptor application;
+    protected GameServiceProvider gameServiceProvider;
     protected RoomProxy roomProxy;
     protected ConcurrentHashMap<String,Stub> stubIndex;
     public DynamicZone(){
@@ -64,6 +66,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         if(_joined!=null){
             return _joined;
         }
+        this.gameServiceProvider.roomServiceProvider().join(rating);
         Arena arena = levelIndex.get(rating.xpLevel);
         Stub stub = roomProxy.join(arena,rating);
         stub.tag = application.tag();
@@ -175,6 +178,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public void start(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         this.application = this.applicationContext.descriptor();
+        this.gameServiceProvider = this.applicationContext.serviceProvider(application.typeId().replace("lobby","service"));
         if(levelLimit==0||levelLimit>application.capacity()){
             levelLimit = this.application.capacity();
         }
