@@ -5,7 +5,7 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-sign-in" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">TossUp Tournament</span>
+            <span class="tx-margin-left-8 tx-text-24">Live TossUp Tournament</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
@@ -49,11 +49,6 @@
     </div>
 </div>
 <script>
-    //document.querySelector("#tx-live-tournament-list-0").style.display = 'block';
-    //document.querySelector("#tx-live-tournament-list-1").style.display = 'block';
-    //document.querySelector("#tx-live-tournament-list-2").style.display = 'block';
-    //document.querySelector("#tx-live-tournament-list-3").style.display = 'block';
-    
     TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
         resp.tournamentList.forEach((t,i) => {
             document.querySelector('#tx-live-tournament-list-type-'+i).innerHTML = t.type;

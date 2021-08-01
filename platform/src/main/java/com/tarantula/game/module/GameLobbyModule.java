@@ -1,7 +1,6 @@
 package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
@@ -42,10 +41,6 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
             statistics.entry("kills").update(1).update();
             statistics.entry("wins").update(1).update();
             statistics.entry("stars").update(1).update();
-            //LeaderBoard leaderBoard = gameServiceProvider.leaderBoard("kills");
-            //leaderBoard.onAllBoard(statistics.entry("kills"));
-            //leaderBoard.onAllBoard(statistics.entry("wins"));
-            //leaderBoard.onAllBoard(statistics.entry("stars"));
             session.write(toMessage("updated",true).getBytes());
         }
         else if(session.action().equals("onTest")){
