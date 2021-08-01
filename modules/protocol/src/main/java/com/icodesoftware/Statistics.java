@@ -12,6 +12,8 @@ public interface Statistics {
     List<Entry> summary();
     void summary(Stream query);
 
+    void registerListener(Listener listener);
+
     interface Entry extends Recoverable, DataStore.Updatable{
         String name();
         double total();
@@ -23,6 +25,9 @@ public interface Statistics {
     }
     interface Stream{
         void onEntry(Entry entry);
+    }
+    interface Listener{
+        void entryUpdated(Entry entry);
     }
 
 }

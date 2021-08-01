@@ -11,9 +11,13 @@ import com.icodesoftware.util.RecoverableObject;
 public class StatisticsIndex extends RecoverableObject implements Statistics {
 
     private Map<String,StatisticsEntry> mappings = new ConcurrentHashMap<>();
-
+    private Listener listener;
     public StatisticsIndex(){
         this.label = "Stats";
+    }
+
+    public void registerListener(Listener listener){
+        this.listener = listener;
     }
 
     public Entry entry(String key) {
@@ -26,6 +30,7 @@ public class StatisticsIndex extends RecoverableObject implements Statistics {
         if(entry.load()){
             this.dataStore.update(this);//update index
         }//load as request
+        entry.listener(this.listener);
         return entry;
     }
     //memory copy list

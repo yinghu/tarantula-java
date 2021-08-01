@@ -33,9 +33,38 @@ public class LeaderBoardModule implements Module {
                 view.category = ldb.category();
                 view.classifier = query[2];
                 view.board = new ArrayList<>();
-                ldb.total().rank((r,e)->{
-                    view.board.add(new LeaderBoardView.EntryView(r,e.owner(),e.value(),e.timestamp()));
-                });
+                int[] size  ={0};
+                if(view.category.equals(LeaderBoard.DAILY)) {
+                    ldb.total().rank((r, e) -> {
+                        view.board.add(new LeaderBoardView.EntryView(r, e.owner(), e.value(), e.timestamp()));
+                        size[0]++;
+                    });
+                }
+                else if(view.category.equals(LeaderBoard.WEEKLY)) {
+                    ldb.total().rank((r, e) -> {
+                        view.board.add(new LeaderBoardView.EntryView(r, e.owner(), e.value(), e.timestamp()));
+                        size[0]++;
+                    });
+                }
+                else if(view.category.equals(LeaderBoard.MONTHLY)) {
+                    ldb.total().rank((r, e) -> {
+                        view.board.add(new LeaderBoardView.EntryView(r, e.owner(), e.value(), e.timestamp()));
+                        size[0]++;
+                    });
+                }
+                else if(view.category.equals(LeaderBoard.YEARLY)) {
+                    ldb.total().rank((r, e) -> {
+                        view.board.add(new LeaderBoardView.EntryView(r, e.owner(), e.value(), e.timestamp()));
+                        size[0]++;
+                    });
+                }
+                else{
+                    ldb.total().rank((r, e) -> {
+                        view.board.add(new LeaderBoardView.EntryView(r, e.owner(), e.value(), e.timestamp()));
+                        size[0]++;
+                    });
+                }
+                view.size = size[0];
                 session.write(this.builder.create().toJson(view).getBytes());
             }
             else{

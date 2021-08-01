@@ -89,6 +89,10 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
         deltaStatistics.distributionKey(systemId);
         deltaStatistics.dataStore(this.dataStore);
         this.dataStore.createIfAbsent(deltaStatistics,true);
+        deltaStatistics.registerListener((entry -> {
+            LeaderBoard leaderBoard = leaderBoard(entry.name());
+            leaderBoard.onAllBoard(entry);
+        }));
         return deltaStatistics;
     }
     public GameZone zone(Descriptor descriptor){//application id

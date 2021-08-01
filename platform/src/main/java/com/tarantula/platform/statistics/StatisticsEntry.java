@@ -21,6 +21,7 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     private double yearly=0;
 
     private boolean loaded;
+    private Statistics.Listener listener;
     public StatisticsEntry(){
         this.label = "Stats";
     }
@@ -37,6 +38,9 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         this.monthly = entry.monthly();
         this.yearly = entry.yearly();
         this.total = entry.total();
+    }
+    public void listener(Statistics.Listener listener){
+        this.listener = listener;
     }
     @Override
     public String name() {
@@ -92,6 +96,9 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         }
         total += delta;
         timestamp = TimeUtil.toUTCMilliseconds(_now);
+        if(listener!=null){
+            listener.entryUpdated(this);
+        }
         return this;
     }
     @Override
