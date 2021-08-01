@@ -30,7 +30,7 @@
     </div>
 </div>
 <script>
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-stattistics"),{mode:'code'},{});
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-stattistics"),{mode:'tree'},{});
     TARA_API.onGet(TARA_API.query().serviceTag,'onStatistics',"",(resp)=>{
         editor.set(resp);
     });
