@@ -1,29 +1,26 @@
 package com.tarantula.platform.item;
 
-import com.icodesoftware.Configurable;
-import com.icodesoftware.Configuration;
+import com.icodesoftware.*;
 import com.icodesoftware.service.ConfigurationServiceProvider;
+import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.service.deployment.TypedListener;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ItemConfigurationServiceProvider implements ConfigurationServiceProvider {
-
+    private TarantulaLogger logger;
     private ConcurrentHashMap<String, TypedListener> rListeners = new ConcurrentHashMap<>();
-
+    private ServiceContext serviceContext;
+    private DistributionItemService distributionItemService;
+    private DataStore dataStore;
     private final String name;
     public ItemConfigurationServiceProvider(String name){
         this.name = name;
     }
     @Override
     public <T extends Configurable> void register(T config) {
-        rListeners.forEach((k,c)->{
-            if(c.type==null||c.type.equals(config.configurationType())){
-                c.listener.onCreated(config);
-            }
-        });
+        distributionItemService.register(name,(Item)config);
     }
 
     @Override
@@ -44,15 +41,23 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     public String registerConfigurableListener(String type, Configurable.Listener listener) {
         String rid = UUID.randomUUID().toString();
         this.rListeners.put(rid,new TypedListener(type,listener));
-        //logger.warn("Listener registered with ->"+type);
+        logger.warn("Listener registered with ->"+type);
         return rid;
     }
     @Override
     public void unregisterConfigurableListener(String registryKey){
         TypedListener t = rListeners.remove(registryKey);
-        //logger.warn("Listener removed with ->"+t.type);
+        logger.warn("Listener removed with ->"+t.type);
     }
+    @Override
+    public void setup(ServiceContext serviceContext) {
+        this.serviceContext = serviceContext;
+        this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
+        this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);
+        this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
 
+        this.logger.warn("item configuration service provider setup");
+    }
     @Override
     public String name() {
         return name;
@@ -66,5 +71,13 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     @Override
     public void shutdown() throws Exception {
 
+    }
+    public boolean onRegister(Configurable configurable){
+        rListeners.forEach((k,c)->{
+            if(c.type==null||c.type.equals(configurable.configurationType())){
+                c.listener.onCreated(configurable);
+            }
+        });
+        return true;
     }
 }

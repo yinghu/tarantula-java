@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
@@ -22,7 +23,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     @Override
     public void onJoin(Session session, Module.OnUpdate onUpdate) throws Exception{
         if(application.tournamentEnabled()&&(!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
-            session.write(toMessage("no tournament available,please try later",false).toString().getBytes());
+            session.write(toMessage("no tournament available,please try later",false).getBytes());
             return;
         }
         Rating rating = gameServiceProvider.rating(session.systemId());
@@ -34,7 +35,14 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onLeave")){
             gameZone.leave(session.systemId());
-            session.write(toMessage("left room",true).toString().getBytes());
+            session.write(toMessage("left room",true).getBytes());
+        }
+        else if(session.action().equals("onUpdate")){
+            Statistics statistics = gameServiceProvider.statistics(session.systemId());
+            statistics.entry("kills").update(1).update();
+            statistics.entry("wins").update(1).update();
+            statistics.entry("stars").update(1).update();
+            session.write(toMessage("updated",true).getBytes());
         }
         else if(session.action().equals("onTest")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -85,10 +93,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
 
     }
 
-    private JsonObject toMessage(String msg, boolean successful){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",successful);
-        jsonObject.addProperty("message",msg);
-        return jsonObject;
+    private String toMessage(String msg, boolean successful){
+        return JsonUtil.toSimpleResponse(successful,msg);
     }
 }

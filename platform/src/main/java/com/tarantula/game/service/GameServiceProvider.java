@@ -51,7 +51,7 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
 
-    private ConfigurationServiceProvider configurationServiceProvider;
+    private ItemConfigurationServiceProvider configurationServiceProvider;
     private DistributedTournamentServiceProvider tournamentServiceProvider;
 
     public GameServiceProvider(String name){
@@ -160,12 +160,14 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     @Override
     public void start() throws Exception {
         this.tournamentServiceProvider.start();
+        this.configurationServiceProvider.start();
     }
 
     @Override
     public void shutdown() throws Exception {
         logger.warn("shut down service->"+NAME);
         this.tournamentServiceProvider.shutdown();
+        this.configurationServiceProvider.shutdown();
         this.dataCluster.unregisterReloadListener(name());
         integrationCluster.unsubscribe(NAME);
     }
@@ -186,6 +188,9 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
     //configuration service provider hood calls
     public ConfigurationServiceProvider configurationServiceProvider(){
         return this.configurationServiceProvider;
+    }
+    public boolean onRegister(Configurable configurable){
+        return configurationServiceProvider.onRegister(configurable);
     }
 
     //tournament service provider hook calls

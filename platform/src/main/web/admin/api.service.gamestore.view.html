@@ -78,9 +78,11 @@
         });
     };
     document.querySelector('#tx-api-service-new-gamestore-1').onclick=()=>{
-        TARA_API.onGet('role/admin','onLoadTemplate',TARA_API.query().gameClusterId+'#onDemand',(resp)=>{
-            editor.set(resp);        
-        });
+        //TARA_API.onGet('role/admin','onLoadTemplate',TARA_API.query().gameClusterId+'#onDemand',(resp)=>{
+            //editor.set(resp);        
+        //});
+        let sample = {type:'Gold',amount:100,price:10.00,unit:'USD'};
+        editor.set(sample);
     };
     document.querySelector('#tx-gamestore-api-service-save').onclick=()=>{
         TARA_API.query().command = save_service_store_item;
@@ -109,7 +111,8 @@
         editor.setMode('preview');
     };
     function save_service_store_item(){
-        TARA_API.onSet('role/store','onSave',TARA_API.query().gameClusterId,editor.get(),(resp)=>{
+        let payload ={header:{configurationType:'Gold',configurationName:'goldPack',configurationCategory:'store'},payload:editor.get()};
+        TARA_API.onSet('role/store','onSave',TARA_API.query().gameClusterId,payload,(resp)=>{
             editor.set(resp);
         });
     }

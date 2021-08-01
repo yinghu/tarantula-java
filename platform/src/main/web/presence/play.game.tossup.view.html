@@ -60,7 +60,8 @@
         let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onUpdate'}; 
         TARA_API.onService(true,cmd,(resp)=>{
             if(resp.successful){
-                seats[resp.rank].caption.text = resp.level;
+                messageBox.text = resp.message;
+                //seats[resp.rank].caption.text = resp.level;
             }
             else{
                 messageBox.text = resp.message;

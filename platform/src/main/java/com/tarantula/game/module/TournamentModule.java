@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.TournamentServiceProvider;
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 
 import java.util.concurrent.ConcurrentHashMap;

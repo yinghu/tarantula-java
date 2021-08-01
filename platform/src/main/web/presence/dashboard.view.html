@@ -606,10 +606,12 @@
     };
     document.querySelectorAll('.tx-game-service-bar').forEach((a)=>{
         a.onclick=()=>{
+            console.log(a);
             //TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
-            //TARA_API.query().popup = '#tx-popup';
-            //let vid = a.getAttribute('view-id');
-            //tx_view({viewId:vid,containerId:'#tx-popup'});    
+            TARA_API.query().popup = '#tx-popup';
+            TARA_API.query().serviceTag = a.getAttribute('service-tag');
+            let vid = a.getAttribute('view-id');
+            tx_view({viewId:vid,containerId:'#tx-popup'});    
         }
     });
     document.querySelectorAll('.tx-game-play').forEach((a)=>{
@@ -824,8 +826,11 @@
                 else if(a.descriptor.typeId == resp.name+'-service'){
                     //console.log('setup live game service');
                     a.applications.forEach((b,i)=>{
-                        document.querySelector('#live-game-service-'+i).style.display = 'block';
-                        document.querySelector('#live-game-service-'+i).innerHTML = b.name;
+                        let serviceBar = document.querySelector('#live-game-service-'+i); 
+                        serviceBar.style.display = 'block';
+                        serviceBar.innerHTML = b.name;
+                        serviceBar.setAttribute('service-tag',b.tag);
+                        serviceBar.setAttribute('view-id','live.game.service.'+b.name.toLowerCase());
                     });        
                 }
                 //else if(a.descriptor.typeId == resp.name+'-data'){

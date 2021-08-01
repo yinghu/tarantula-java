@@ -6,6 +6,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.Item;
 import com.tarantula.platform.item.ItemQuery;
@@ -36,6 +37,8 @@ public class GameStoreAdminModule implements Module {
                 app.configurationCategory("item");
                 Descriptor desc = loadDescriptor(gameCluster,this.context.descriptor().category());
                 SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);
+                GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
+                gameServiceProvider.configurationServiceProvider().register(app);
                 session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
             }
             else{

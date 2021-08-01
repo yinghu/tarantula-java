@@ -20,5 +20,6 @@ public interface Configurable extends Recoverable, DataStore.Updatable {
     interface Listener{
         default <T extends Configurable> void onCreated(T created){}
         default <T extends Configurable> void onUpdated(T updated){}
+        default <T extends Configurable> void onRemoved(T removed){}
     }
 }

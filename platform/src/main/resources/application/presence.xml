@@ -46,6 +46,12 @@
             <view type="play.game.tossup.tournament">
                 <property name="moduleResourceFile">presence/play.game.tossup.tournament.view.html</property>
             </view>
+            <view type="live.game.service.statistics">
+                <property name="moduleResourceFile">presence/live.game.service.statistics.view.html</property>
+            </view>
+            <view type="live.game.service.leaderboard">
+                <property name="moduleResourceFile">presence/live.game.service.leaderboard.view.html</property>
+            </view>
         </view-list>
     </lobby-context>
 </tarantula>

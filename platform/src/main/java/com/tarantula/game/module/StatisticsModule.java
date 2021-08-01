@@ -25,30 +25,9 @@ public class StatisticsModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         //fetch statistics from systemId
-        if(session.action().equals("onRating")){
-            Rating rating = this.gameServiceProvider.rating(session.systemId());
-            session.write(this.builder.create().toJson(rating).getBytes());
-        }
-        else if(session.action().equals("OnStatistics")){
+        if(session.action().equals("onStatistics")){
             Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
             session.write(this.builder.create().toJson(statistics).getBytes());
-        }
-        else if(session.action().startsWith("OnLeaderBoard")){ //use query OnLeaderBoard/{category}/{classifier}
-            String[] query = session.action().split(Recoverable.PATH_SEPARATOR);
-            if(query.length==3){
-                LeaderBoard ldb = this.gameServiceProvider.leaderBoard(query[1]);
-                LeaderBoardView view = new LeaderBoardView();
-                view.category = ldb.category();
-                view.classifier = query[2];
-                view.board = new ArrayList<>();
-                ldb.total().rank((r,e)->{
-                    view.board.add(new LeaderBoardView.EntryView(r,e.owner(),e.value(),e.timestamp()));
-                });
-                session.write(this.builder.create().toJson(view).getBytes());
-            }
-            else{
-                throw new UnsupportedOperationException(session.action());
-            }
         }
         else{
             throw new UnsupportedOperationException(session.action());

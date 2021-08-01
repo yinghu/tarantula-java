@@ -64,6 +64,10 @@
             <class-name>com.tarantula.platform.service.cluster.tournament.TournamentClusterService</class-name>
         </service>
         <service enabled="true">
+            <name>DistributionItemService</name>
+            <class-name>com.tarantula.platform.service.cluster.item.ItemClusterService</class-name>
+        </service>
+        <service enabled="true">
             <name>RoomService</name>
             <class-name>com.tarantula.platform.service.cluster.room.RoomClusterService</class-name>
         </service>

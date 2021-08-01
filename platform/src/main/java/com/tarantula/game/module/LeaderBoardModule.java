@@ -25,15 +25,7 @@ public class LeaderBoardModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         //fetch statistics from systemId
-        if(session.action().equals("onRating")){
-            Rating rating = this.gameServiceProvider.rating(session.systemId());
-            session.write(this.builder.create().toJson(rating).getBytes());
-        }
-        else if(session.action().equals("OnStatistics")){
-            Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
-            session.write(this.builder.create().toJson(statistics).getBytes());
-        }
-        else if(session.action().startsWith("OnLeaderBoard")){ //use query OnLeaderBoard/{category}/{classifier}
+        if(session.action().startsWith("onLeaderBoard")){ //use query OnLeaderBoard/{category}/{classifier}
             String[] query = session.action().split(Recoverable.PATH_SEPARATOR);
             if(query.length==3){
                 LeaderBoard ldb = this.gameServiceProvider.leaderBoard(query[1]);
