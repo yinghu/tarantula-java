@@ -5,7 +5,7 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">TEMPLATE API</span>
+            <span class="tx-margin-left-8 tx-text-24">Live Statistics</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
@@ -30,7 +30,7 @@
     </div>
 </div>
 <script>
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-stattistics"),{mode:'code'},{});
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-stattistics"),{mode:'tree'},{});
     TARA_API.onGet(TARA_API.query().serviceTag,'onStatistics',"",(resp)=>{
         editor.set(resp);
     });

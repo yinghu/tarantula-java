@@ -5,7 +5,7 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">TEMPLATE API</span>
+            <span class="tx-margin-left-8 tx-text-24">Live Leader Board</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
@@ -31,7 +31,7 @@
         </div>            
     </div>
     <div class="w3-panel w3-center tx-text-14">
-        <div id="jsoneditor-api-service-TEMPLATE" style="width: 100%;"></div>
+        <div id="jsoneditor-live-service-leaderboard" style="width: 100%;"></div>
     </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
@@ -44,7 +44,7 @@
 </div>
 <script>
     let desc = {usage:'input a leader board category like kills wins etc and click query!'};
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-api-service-TEMPLATE"),{mode:'code'},desc);
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-leaderboard"),{mode:'tree'},desc);
     document.querySelectorAll('.tx-leader-board-query').forEach((a)=>{
         a.onclick=()=>{
             let _c = document.querySelector('#tx-leaderboard-category').value;
