@@ -50,5 +50,6 @@ public interface GameZone extends Configurable{
         Stub join(Arena  arena,Rating rating);
         void leave(String systemId);
         default void onTimer(Module.OnUpdate onUpdate){}
+        void setup(ApplicationContext applicationContext);
     }
 }

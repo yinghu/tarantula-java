@@ -5,7 +5,7 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
 import com.tarantula.game.Rating;
-import com.tarantula.game.Stub;
+import com.tarantula.game.Room;
 
 import java.io.IOException;
 
@@ -13,7 +13,7 @@ public class JoinOperation extends Operation implements PartitionAwareOperation 
 
     private String serviceName;
     private Rating rating;
-    private Stub stub;
+    private Room stub;
     public JoinOperation(){}
     public JoinOperation(String serviceName,Rating rating){
         this.serviceName = serviceName;

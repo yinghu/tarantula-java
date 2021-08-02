@@ -1,5 +1,6 @@
 package com.tarantula.game.service;
 
+import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Module;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
@@ -18,4 +19,5 @@ public class TVERoomProxy implements GameZone.RoomProxy {
     public void onTimer(Module.OnUpdate onUpdate){
 
     }
+    public void setup(ApplicationContext applicationContext){}
 }

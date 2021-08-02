@@ -1,13 +1,14 @@
 package com.tarantula.game.service;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Descriptor;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
+import com.tarantula.game.Arena;
 import com.tarantula.game.Rating;
-import com.tarantula.game.Stub;
-
+import com.tarantula.game.Room;
 
 public class RoomServiceProvider implements ServiceProvider {
 
@@ -15,9 +16,11 @@ public class RoomServiceProvider implements ServiceProvider {
     private final String name;
     private DataStore dataStore;
     private DistributionRoomService distributionRoomService;
+
     public RoomServiceProvider(String name){
         this.name = name;
     }
+
     @Override
     public void setup(ServiceContext serviceContext) {
         this.logger = serviceContext.logger(PlayerDataProvider.class);
@@ -38,15 +41,15 @@ public class RoomServiceProvider implements ServiceProvider {
     public void shutdown() throws Exception {
         logger.warn("room service provider shutdown");
     }
-    public Stub join(Rating rating){
-        return distributionRoomService.join(name,rating);
+    public Room join(Arena arena,Rating rating){
+        return distributionRoomService.join(name,arena,rating);
     }
-    public void leave(String roomId,String systemId){
-        this.distributionRoomService.leave(name,roomId,systemId);
+    public void leave(Arena arena,String roomId,String systemId){
+        this.distributionRoomService.leave(name,arena,roomId,systemId);
     }
 
-    public Stub onJoin(Rating rating){
-        Stub stub = new Stub();
+    public Room onJoin(Rating rating){
+        Room stub = new Room();
         stub.roomId = "roomId";
         return stub;
     }

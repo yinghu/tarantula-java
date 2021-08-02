@@ -5,7 +5,9 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.game.Arena;
 import com.tarantula.game.Rating;
+import com.tarantula.game.Room;
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.DistributionRoomService;
 import com.tarantula.platform.TarantulaContext;
@@ -36,12 +38,12 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
 
 
     @Override
-    public Stub join(String serviceName,Rating rating) {
+    public Room join(String serviceName, Arena arena, Rating rating) {
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(rating.xpLevel);
         JoinOperation joinOperation = new JoinOperation(serviceName,rating);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME,joinOperation,partitionId);
-        final Future<Stub> future = builder.invoke();
+        final Future<Room> future = builder.invoke();
         try {
             return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
         } catch (Exception e) {
@@ -49,7 +51,7 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             return null;
         }
     }
-    public void leave(String serviceName,String roomId,String systemId){
+    public void leave(String serviceName,Arena arena,String roomId,String systemId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
         LeaveOperation leaveOperation = new LeaveOperation(serviceName,roomId,systemId);

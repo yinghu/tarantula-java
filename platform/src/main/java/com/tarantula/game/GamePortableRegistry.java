@@ -9,12 +9,13 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
 
     public static final int OID = 10;
 
-    public static final int RATING_CID = PortableEventRegistry.RATING_CID;
+    public static final int RATING_CID = PortableEventRegistry.RATING_CID;//110
     public static final int GAME_ZONE_CID = 2;
     public static final int STUB_CID = PortableEventRegistry.GAME_STUB_CID;//109
     public static final int ARENA_CID = 4;
     public static final int MAPPING_OBJECT_CID = 5;
     public static final int GAME_SERVICE_INDEX_CID = 6;
+    public static final int ROOM_CID = PortableEventRegistry.ROOM_CID;//111
 
     @Override
     public int registryId() {
@@ -33,6 +34,9 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
                 break;
             case STUB_CID:
                 pt = new Stub();
+                break;
+            case ROOM_CID:
+                pt = new Room();
                 break;
             case ARENA_CID:
                 pt = new Arena();
