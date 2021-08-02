@@ -68,7 +68,7 @@
             <class-name>com.tarantula.platform.service.cluster.item.ItemClusterService</class-name>
         </service>
         <service enabled="true">
-            <name>RoomService</name>
+            <name>DistributionRoomService</name>
             <class-name>com.tarantula.platform.service.cluster.room.RoomClusterService</class-name>
         </service>
     </services>

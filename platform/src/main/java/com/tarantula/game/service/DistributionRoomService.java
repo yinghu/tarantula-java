@@ -7,8 +7,8 @@ import com.tarantula.game.Room;
 
 public interface DistributionRoomService extends ServiceProvider {
 
-    String NAME = "RoomService";
+    String NAME = "DistributionRoomService";
 
-    Room join(String serviceName, Arena arena, Rating rating);
+    Room join(String serviceName, Arena arena,Rating rating);
     void leave(String serviceName,Arena arena, String roomId,String systemId);
 }

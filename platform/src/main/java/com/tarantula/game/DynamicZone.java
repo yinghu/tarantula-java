@@ -1,10 +1,7 @@
 package com.tarantula.game;
 
-import com.icodesoftware.ApplicationContext;
-import com.icodesoftware.Descriptor;
+import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.OnLog;
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
@@ -17,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DynamicZone extends RecoverableObject implements GameZone {
 
@@ -33,11 +31,14 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     protected Descriptor application;
     protected RoomProxy roomProxy;
     protected ConcurrentHashMap<String,Stub> stubIndex;
+    protected CopyOnWriteArrayList<Listener> listeners;
+
     public DynamicZone(){
         this.label = "Zone";
         this.arenaList = new ArrayList<>();
         this.levelIndex = new ConcurrentHashMap<>();
         this.stubIndex = new ConcurrentHashMap<>();
+        this.listeners = new CopyOnWriteArrayList<>();
         this.joinsOnStart = DEFAULT_JOINS_ON_START;
         this.levelLimit = DEFAULT_LEVEL_COUNT;
         this.roundDuration = DEFAULT_ROUND_DURATION;
@@ -154,6 +155,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.joinsOnStart = ((Number)properties.getOrDefault("8",joinsOnStart)).intValue();
         this.playMode = (String)properties.get("9");
     }
+
     @Override
     public void update() {//local data store update
         arenaList.forEach((a)->{
@@ -164,13 +166,18 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         this.dataStore.update(this);
     }
+
     @Override
     public void update(ServiceContext serviceContext){//config sync callback
         this.applicationContext.log("zone updated->"+distributionKey(), OnLog.WARN);
         GameZone updated = new DynamicLobbySetup().load(serviceContext,application);
         reset(updated);
+        listeners.forEach((l)->l.onUpdated(updated));
     }
 
+    public <T extends Configurable> void registerListener(Listener listener){
+        listeners.add(listener);
+    }
     @Override
     public void start(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -181,12 +188,15 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         listArena();
         roomProxy.setup(applicationContext);
     }
+
     public boolean connected(){
         return !this.playMode.equals(PLAY_MODE_PVE);
     }
+
     public void roomProxy(RoomProxy roomProxy){
         this.roomProxy = roomProxy;
     }
+
     private void listArena(){
         if(arenaList.size()==0){
             return;
@@ -216,6 +226,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
             }
         }
     }
+
     private void reset(GameZone updated){
         arenaList.clear();
         for(Arena a : updated.arenas()){
@@ -231,13 +242,16 @@ public class DynamicZone extends RecoverableObject implements GameZone {
             listArena();
         }
     }
+
     public void onTimer(Module.OnUpdate onUpdate){
         roomProxy.onTimer(onUpdate);
     }
+
     @Override
     public int getFactoryId() {
         return GamePortableRegistry.OID;
     }
+
     @Override
     public int getClassId() {
         return GamePortableRegistry.GAME_ZONE_CID;

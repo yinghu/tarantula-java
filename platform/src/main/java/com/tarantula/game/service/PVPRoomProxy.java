@@ -1,19 +1,19 @@
 package com.tarantula.game.service;
 
-import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Module;
 import com.tarantula.game.Arena;
-import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
+import com.tarantula.game.Room;
 import com.tarantula.game.Stub;
 
-public class PVPRoomProxy implements GameZone.RoomProxy {
+public class PVPRoomProxy extends RoomProxyHeader {
 
     @Override
     public Stub join(Arena arena, Rating rating) {
+        Room room = gameServiceProvider.roomServiceProvider().join(arena,rating);
         Stub stub = new Stub();
         stub.successful(true);
-        stub.seat = rating.xpLevel;
+        stub.roomId = room.roomId;
         stub.rating = rating;
         stub.arena = arena;
         stub.owner(rating.distributionKey());
@@ -23,7 +23,6 @@ public class PVPRoomProxy implements GameZone.RoomProxy {
 
     }
     public void onTimer(Module.OnUpdate onUpdate){
-
+        //gameServiceProvider.roomServiceProvider().leave(arena,_remote.roomId,rating.distributionKey());
     }
-    public void setup(ApplicationContext applicationContext){}
 }

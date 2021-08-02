@@ -1,16 +1,14 @@
 package com.tarantula.game.service;
 
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.Arena;
+import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Room;
 
-public class RoomServiceProvider implements ServiceProvider {
+public class RoomServiceProvider implements ServiceProvider, Configurable.Listener {
 
     private TarantulaLogger logger;
     private final String name;
@@ -55,5 +53,16 @@ public class RoomServiceProvider implements ServiceProvider {
     }
     public void onLeave(String roomId,String systemId){
         logger.warn(systemId+" leave->"+roomId);
+    }
+    public void registerGameZone(GameZone gameZone){
+        gameZone.registerListener(this);
+        logger.warn("Game zone registered->"+gameZone.name());
+    }
+    public void releaseGameZone(GameZone gameZone){
+        logger.warn("Game zone released->"+gameZone.name());
+    }
+    public <T extends Configurable> void onUpdated(T updated){
+
+        logger.warn("zone updated in room service provider->"+updated.distributionKey());
     }
 }

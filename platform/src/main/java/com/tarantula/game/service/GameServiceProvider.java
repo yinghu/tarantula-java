@@ -62,12 +62,7 @@ public class GameServiceProvider implements ServiceProvider{
         DynamicLobbySetup dynamicLobbySetup = new DynamicLobbySetup();
         return dynamicLobbySetup.load(serviceContext,descriptor);
     }
-    public void addRoom(Room room){
-        roomIndex.put(room.roomId,room);
-    }
-    public Room getRoom(String roomId){
-        return roomIndex.get(roomId);
-    }
+
 
     @Override
     public String name() {

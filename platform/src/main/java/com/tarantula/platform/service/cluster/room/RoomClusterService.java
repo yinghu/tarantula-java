@@ -8,7 +8,6 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Room;
-import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.service.RoomServiceProvider;
 import com.tarantula.platform.TarantulaContext;
@@ -48,11 +47,13 @@ public class RoomClusterService implements ManagedService, RemoteService {
     public void destroyDistributedObject(String s) {
 
     }
+
     public Room join(String serviceName, Rating rating){
         GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
         RoomServiceProvider roomServiceProvider = gameServiceProvider.roomServiceProvider();
         return roomServiceProvider.onJoin(rating);
     }
+
     public void leave(String serviceName,String roomId,String systemId){
         GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
         RoomServiceProvider roomServiceProvider = gameServiceProvider.roomServiceProvider();

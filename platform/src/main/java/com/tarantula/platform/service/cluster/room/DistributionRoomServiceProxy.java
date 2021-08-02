@@ -3,15 +3,11 @@ package com.tarantula.platform.service.cluster.room;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
-import com.icodesoftware.service.RecoverService;
-import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.Arena;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Room;
-import com.tarantula.game.Stub;
 import com.tarantula.game.service.DistributionRoomService;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.service.cluster.recover.ClusterRecoverService;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +21,6 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         this.objectName = objectName;
     }
 
-
     @Override
     public String getName() {
         return this.objectName;
@@ -36,11 +31,10 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         return DistributionRoomService.NAME;
     }
 
-
     @Override
     public Room join(String serviceName, Arena arena, Rating rating) {
         NodeEngine nodeEngine = getNodeEngine();
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(rating.xpLevel);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(arena.level);
         JoinOperation joinOperation = new JoinOperation(serviceName,rating);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME,joinOperation,partitionId);
         final Future<Room> future = builder.invoke();
@@ -51,9 +45,10 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             return null;
         }
     }
+
     public void leave(String serviceName,Arena arena,String roomId,String systemId){
         NodeEngine nodeEngine = getNodeEngine();
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(arena.level);
         LeaveOperation leaveOperation = new LeaveOperation(serviceName,roomId,systemId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME,leaveOperation,partitionId);
         final Future<Void> future = builder.invoke();
