@@ -1,17 +1,22 @@
 package com.tarantula.game;
 
 import com.google.gson.JsonObject;
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Consumable;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.protocol.DataBuffer;
 import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.statistics.StatsDelta;
 
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 
 
-public class Stub extends ResponseHeader {
+public class Stub extends ResponseHeader implements Portable {
 
     public boolean offline;
     public String serverKey;
@@ -111,10 +116,20 @@ public class Stub extends ResponseHeader {
     }
     @Override
     public int getFactoryId() {
-        return GamePortableRegistry.OID;
+        return PortableEventRegistry.OID;
     }
     @Override
     public int getClassId() {
-        return GamePortableRegistry.STUB_CID;
+        return PortableEventRegistry.GAME_STUB_CID;
+    }
+
+    @Override
+    public void writePortable(PortableWriter portableWriter) throws IOException {
+        portableWriter.writeUTF("roomId",roomId);
+    }
+
+    @Override
+    public void readPortable(PortableReader portableReader) throws IOException {
+        roomId = portableReader.readUTF("roomId");
     }
 }

@@ -1,12 +1,18 @@
 package com.tarantula.game;
 
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.tarantula.platform.AssociateKey;
 import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.event.PortableEventRegistry;
+
+import java.io.IOException;
 import java.util.Map;
 
-public class Rating extends RecoverableObject implements DataStore.Updatable {
+public class Rating extends RecoverableObject implements DataStore.Updatable, Portable {
 
     public static double BASE_POINTS = 100;
     public int rank =1; //rank of zone
@@ -73,12 +79,25 @@ public class Rating extends RecoverableObject implements DataStore.Updatable {
 
     @Override
     public int getFactoryId() {
-        return GamePortableRegistry.OID;
+        return PortableEventRegistry.OID;
     }
     @Override
     public int getClassId() {
-        return GamePortableRegistry.RATING_CID;
+        return PortableEventRegistry.RATING_CID;
     }
+
+    @Override
+    public void writePortable(PortableWriter portableWriter) throws IOException {
+        portableWriter.writeInt("rank",rank);
+        portableWriter.writeInt("xpLevel",xpLevel);
+    }
+
+    @Override
+    public void readPortable(PortableReader portableReader) throws IOException {
+        this.rank = portableReader.readInt("rank");
+        this.xpLevel = portableReader.readInt("xpLevel");
+    }
+
     @Override
     public Recoverable.Key key(){
         return new AssociateKey(this.bucket,this.oid,this.label);

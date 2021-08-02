@@ -3,14 +3,15 @@ package com.tarantula.game;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.game.service.GameServiceIndex;
+import com.tarantula.platform.event.PortableEventRegistry;
 
 public class GamePortableRegistry  extends AbstractRecoverableListener {
 
     public static final int OID = 10;
 
-    public static final int RATING_CID = 1;
+    public static final int RATING_CID = PortableEventRegistry.RATING_CID;
     public static final int GAME_ZONE_CID = 2;
-    public static final int STUB_CID = 3;
+    public static final int STUB_CID = PortableEventRegistry.GAME_STUB_CID;//109
     public static final int ARENA_CID = 4;
     public static final int MAPPING_OBJECT_CID = 5;
     public static final int GAME_SERVICE_INDEX_CID = 6;

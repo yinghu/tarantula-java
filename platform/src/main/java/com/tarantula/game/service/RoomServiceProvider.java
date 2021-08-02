@@ -39,6 +39,18 @@ public class RoomServiceProvider implements ServiceProvider {
         logger.warn("room service provider shutdown");
     }
     public Stub join(Rating rating){
-        return distributionRoomService.join(rating);
+        return distributionRoomService.join(name,rating);
+    }
+    public void leave(String roomId,String systemId){
+        this.distributionRoomService.leave(name,roomId,systemId);
+    }
+
+    public Stub onJoin(Rating rating){
+        Stub stub = new Stub();
+        stub.roomId = "roomId";
+        return stub;
+    }
+    public void onLeave(String roomId,String systemId){
+        logger.warn(systemId+" leave->"+roomId);
     }
 }

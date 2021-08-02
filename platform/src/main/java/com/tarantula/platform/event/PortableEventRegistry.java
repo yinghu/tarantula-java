@@ -2,6 +2,8 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
+import com.tarantula.game.Rating;
+import com.tarantula.game.Stub;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
@@ -39,6 +41,8 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int TOPIC_MAP_STORE_SYNC_EVENT_CID = 23;
 
+
+
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
 
@@ -54,6 +58,8 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int EXPOSED_GAME_SERVICE_CID = 108;
 
+    public static final int GAME_STUB_CID = 109;
+    public static final int RATING_CID = 110;
 
     public Portable create(int cid) {
         Portable _ins;
@@ -107,6 +113,12 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case ACCESS_INDEX_CID:
                 _ins = new AccessIndexTrack();
+                break;
+            case GAME_STUB_CID:
+                _ins = new Stub();
+                break;
+            case RATING_CID:
+                _ins = new Rating();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");

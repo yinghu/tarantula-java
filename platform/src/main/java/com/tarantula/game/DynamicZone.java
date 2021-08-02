@@ -66,7 +66,9 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         if(_joined!=null){
             return _joined;
         }
-        this.gameServiceProvider.roomServiceProvider().join(rating);
+        Stub _remote = this.gameServiceProvider.roomServiceProvider().join(rating);
+        this.gameServiceProvider.roomServiceProvider().leave(_remote.roomId,rating.distributionKey());
+        this.applicationContext.log("ROOMID->"+_remote.roomId,OnLog.WARN);
         Arena arena = levelIndex.get(rating.xpLevel);
         Stub stub = roomProxy.join(arena,rating);
         stub.tag = application.tag();
