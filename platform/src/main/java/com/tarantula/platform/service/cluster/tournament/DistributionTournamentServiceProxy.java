@@ -65,7 +65,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
     }
     public String join(String serviceName, String tournamentId, String systemId){
         NodeEngine nodeEngine = getNodeEngine();
-        TournamentJoinOperation operation = new TournamentJoinOperation(serviceName,tournamentId,systemId);
+        TournamentRegisterOperation operation = new TournamentRegisterOperation(serviceName,tournamentId,systemId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(tournamentId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
         final Future<String> future = builder.invoke();
@@ -78,7 +78,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
     }
     public byte[] enter(String serviceName,String tournamentId,String instanceId,String systemId){
         NodeEngine nodeEngine = getNodeEngine();
-        TournamentEnterOperation operation = new TournamentEnterOperation(serviceName,tournamentId,instanceId,systemId);
+        TournamentJoinOperation operation = new TournamentJoinOperation(serviceName,tournamentId,instanceId,systemId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
         final Future<byte[]> future = builder.invoke();

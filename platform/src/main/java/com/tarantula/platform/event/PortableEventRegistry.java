@@ -2,8 +2,8 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
+import com.tarantula.game.GameRoom;
 import com.tarantula.game.Rating;
-import com.tarantula.game.Room;
 import com.tarantula.game.Stub;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
@@ -123,7 +123,7 @@ public class PortableEventRegistry implements PortableFactory {
                 _ins = new Rating();
                 break;
             case ROOM_CID:
-                _ins = new Room();
+                _ins = new GameRoom();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");

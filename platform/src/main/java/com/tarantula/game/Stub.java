@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Stub extends ResponseHeader implements Portable {
 
+    public GameRoom room;
     public boolean offline;
     public String serverKey;
     public String ticket;
@@ -44,10 +45,7 @@ public class Stub extends ResponseHeader implements Portable {
       */
 
     public Stub(){}
-    public Stub(int seat,String roomId){
-        this.seat = seat;
-        this.roomId = roomId;
-    }
+
     public JsonObject toJson(){
         JsonObject jo = new JsonObject();
         jo.addProperty("successful",successful);
@@ -57,8 +55,8 @@ public class Stub extends ResponseHeader implements Portable {
         }
         jo.addProperty("owner",owner);
         jo.addProperty("seat",seat);
-        if(roomId!=null){
-            jo.addProperty("roomId",roomId);
+        if(room!=null){
+            jo.add("room",room.toJson());
         }
         if(arena!=null){
             jo.add("arena", arena.toJson());

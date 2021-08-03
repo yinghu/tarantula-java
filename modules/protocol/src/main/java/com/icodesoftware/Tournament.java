@@ -24,7 +24,7 @@ public interface Tournament extends Recoverable {
     int maxEntriesPerInstance();
     int durationMinutesPerInstance();
 
-    String join(String systemId);
+    String register(String systemId);
 
     interface Entry extends Recoverable {
         String systemId();
@@ -38,7 +38,7 @@ public interface Tournament extends Recoverable {
         LocalDateTime startTime();
         LocalDateTime closeTime();
         LocalDateTime endTime();
-        Entry enter(String systemId);
+        Entry join(String systemId);
         void update(String systemId,OnEntry onEntry);
         List<Entry> list();
     }

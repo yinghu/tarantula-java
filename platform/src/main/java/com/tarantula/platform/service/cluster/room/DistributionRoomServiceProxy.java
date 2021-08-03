@@ -4,6 +4,7 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.tarantula.game.Arena;
+import com.tarantula.game.GameRoom;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Room;
 import com.tarantula.game.service.DistributionRoomService;
@@ -32,12 +33,12 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
     }
 
     @Override
-    public Room join(String serviceName, Arena arena, Rating rating) {
+    public GameRoom join(String serviceName, Arena arena, Rating rating) {
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(arena.level);
         JoinOperation joinOperation = new JoinOperation(serviceName,rating);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME,joinOperation,partitionId);
-        final Future<Room> future = builder.invoke();
+        final Future<GameRoom> future = builder.invoke();
         try {
             return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
         } catch (Exception e) {

@@ -40,7 +40,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     @Override
     public Tournament register(Tournament.Schedule schedule) {
         byte[] ret = distributionTournamentService.schedule(name(),schedule);
-        DefaultTournament tournament = new DefaultTournament();
+        TournamentHeader tournament = new TournamentHeader();
         Map<String,Object> _map = JsonUtil.toMap(ret);
         tournament.distributionKey(_map.get("tournamentId").toString());
         tournament.fromMap(_map);
@@ -49,7 +49,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
 
     @Override
     public boolean available(String tournamentId) {
-        DefaultTournament tournament = new DefaultTournament();
+        TournamentHeader tournament = new TournamentHeader();
         tournament.distributionKey(tournamentId);
         return dataStore.load(tournament);
     }
@@ -58,7 +58,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     public Tournament.Instance join(String tournamentId, String systemId) {
         String tid = this.distributionTournamentService.join(name(),tournamentId,systemId);
         byte[] ret = this.distributionTournamentService.enter(name(),tournamentId,tid,systemId);
-        Tournament.Instance _e = new TournamentInstance();
+        Tournament.Instance _e = new TournamentInstanceHeader();
         _e.distributionKey(tid);
         _e.fromBinary(ret);
         return _e;
@@ -69,6 +69,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         byte[] ret = this.distributionTournamentService.score(name(),instanceId,systemId,delta);
         Tournament.Entry _e = new TournamentEntry();
         _e.fromBinary(ret);
+        logger.warn("tournament score->"+_e.score(0));
         return _e;
     }
 
@@ -99,7 +100,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     }
     //distributed operations callbacks
     public Tournament schedule(Tournament.Schedule schedule) {
-        DefaultTournament tournament = new DefaultTournament(schedule);
+        TournamentHeader tournament = new TournamentHeader(schedule);
         dataStore.create(tournament);
         listeners.forEach((k,v)->{
             v.tournamentStarted(tournament);
@@ -108,16 +109,25 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         });
         return tournament;
     }
-    public Tournament tournament(String tournamentId){
-        Tournament tournament = new DefaultTournament();
+    public Tournament tournament(String tournamentId){//schedule node
+        JoinTournament tournament = new JoinTournament();
         tournament.distributionKey(tournamentId);
         dataStore.load(tournament);
+        tournament.dataStore(dataStore);
         return tournament;
     }
-    public Tournament.Instance instance(String tournamentId,String instanceId){
-        return null;
+    public Tournament.Instance instance(String tournamentId,String instanceId){//instance node
+        PlayTournament tournament = new PlayTournament();
+        tournament.distributionKey(tournamentId);
+        dataStore.load(tournament);
+        tournament.dataStore(dataStore);
+        return tournament.findInstance(instanceId);
     }
     public Tournament.Instance instance(String instanceId){
-        return null;
-    }
+        TournamentInstanceHeader tournament = new TournamentInstanceHeader();
+        tournament.distributionKey(instanceId);
+        dataStore.load(tournament);
+        tournament.dataStore(dataStore);
+        return tournament;
+    }//instance node
 }

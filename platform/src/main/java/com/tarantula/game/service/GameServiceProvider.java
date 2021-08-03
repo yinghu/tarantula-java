@@ -160,17 +160,17 @@ public class GameServiceProvider implements ServiceProvider{
     public TournamentServiceProvider tournamentServiceProvider(){
         return this.tournamentServiceProvider;
     }
-    public Tournament onSchedule(Tournament.Schedule schedule) {
+    public Tournament onSchedule(Tournament.Schedule schedule) { //all nodes
         return this.tournamentServiceProvider.schedule(schedule);
     }
-    public Tournament onTournament(String tournamentId){
+    public Tournament onTournament(String tournamentId){ //register node
         return this.tournamentServiceProvider.tournament(tournamentId);
     }
 
-    public Tournament.Instance onInstance(String tournamentId,String instanceId){
+    public Tournament.Instance onInstance(String tournamentId,String instanceId){//play node
         return this.tournamentServiceProvider.instance(tournamentId,instanceId);
     }
-    public Tournament.Instance onInstance(String instanceId) {
+    public Tournament.Instance onInstance(String instanceId) { //play node
         return this.tournamentServiceProvider.instance(instanceId);
     }
 

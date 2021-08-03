@@ -3,10 +3,7 @@ package com.tarantula.game.service;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
-import com.tarantula.game.Arena;
-import com.tarantula.game.GameZone;
-import com.tarantula.game.Rating;
-import com.tarantula.game.Room;
+import com.tarantula.game.*;
 
 public class RoomServiceProvider implements ServiceProvider, Configurable.Listener {
 
@@ -39,15 +36,15 @@ public class RoomServiceProvider implements ServiceProvider, Configurable.Listen
     public void shutdown() throws Exception {
         logger.warn("room service provider shutdown");
     }
-    public Room join(Arena arena,Rating rating){
+    public GameRoom join(Arena arena, Rating rating){
         return distributionRoomService.join(name,arena,rating);
     }
     public void leave(Arena arena,String roomId,String systemId){
         this.distributionRoomService.leave(name,arena,roomId,systemId);
     }
 
-    public Room onJoin(Rating rating){
-        Room stub = new Room();
+    public GameRoom onJoin(Rating rating){
+        GameRoom stub = new GameRoom();
         stub.roomId = "roomId";
         return stub;
     }

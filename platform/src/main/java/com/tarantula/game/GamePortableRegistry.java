@@ -36,7 +36,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
                 pt = new Stub();
                 break;
             case ROOM_CID:
-                pt = new Room();
+                pt = new GameRoom();
                 break;
             case ARENA_CID:
                 pt = new Arena();

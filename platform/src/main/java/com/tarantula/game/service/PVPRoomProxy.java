@@ -1,23 +1,21 @@
 package com.tarantula.game.service;
 
 import com.icodesoftware.Module;
-import com.tarantula.game.Arena;
-import com.tarantula.game.Rating;
-import com.tarantula.game.Room;
-import com.tarantula.game.Stub;
+import com.icodesoftware.Session;
+import com.tarantula.game.*;
 
 public class PVPRoomProxy extends RoomProxyHeader {
 
     @Override
-    public Stub join(Arena arena, Rating rating) {
-        Room room = gameServiceProvider.roomServiceProvider().join(arena,rating);
+    public GameRoom join(Session session, Arena arena, Rating rating) {
+        GameRoom room = gameServiceProvider.roomServiceProvider().join(arena,rating);
         Stub stub = new Stub();
         stub.successful(true);
         stub.roomId = room.roomId;
         stub.rating = rating;
         stub.arena = arena;
         stub.owner(rating.distributionKey());
-        return stub;
+        return new GameRoom(true);
     }
     public void leave(String systemId){
 

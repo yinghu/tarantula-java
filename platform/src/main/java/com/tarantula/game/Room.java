@@ -55,6 +55,10 @@ public class Room extends RecoverableObject implements Portable {
     public Room(){
         this.roomId = UUID.randomUUID().toString();
     }
+    public Room(boolean online){
+        this();
+        this.online = online;
+    }
 
     public synchronized Stub join(Rating rating){
         if(online&&(connection==null||connection.disabled())){
@@ -109,7 +113,7 @@ public class Room extends RecoverableObject implements Portable {
         this.pQueue = new ArrayDeque<>(this.capacity);
         this.stubs = new Stub[this.capacity];
         for(int i=0;i<this.capacity;i++){
-            Stub stub = new Stub(i,roomId);
+            Stub stub = new Stub();
             //stub.capacity = this.capacity;
             stub.arena = this.arena;
             this.pQueue.offer(stub);
@@ -140,7 +144,7 @@ public class Room extends RecoverableObject implements Portable {
         state = WAITING;
         this.stubs = new Stub[this.capacity];
         for(int i=0;i<this.capacity;i++){
-            Stub stub = new Stub(i,roomId);
+            Stub stub = new Stub();
             this.pQueue.offer(stub);
             this.stubs[i] = stub;
         }

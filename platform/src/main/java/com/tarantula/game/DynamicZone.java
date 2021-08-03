@@ -60,17 +60,34 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         }
     }
 
-    public Stub join(Rating rating){
-        Stub _joined = stubIndex.get(rating.distributionKey());
+    public Stub join(Session session,Rating rating){
+        Stub _joined = stubIndex.get(session.systemId());
         if(_joined!=null){
             return _joined;
         }
-        Arena arena = levelIndex.get(rating.xpLevel);
-        Stub stub = roomProxy.join(arena,rating);
+        Arena arena = levelIndex.get(rating.xpLevel>levelLimit?levelLimit:rating.xpLevel);
+        Stub stub = new Stub();
+        stub.successful(true);
+        stub.rating = rating;
+        stub.arena = arena;
+        stub.owner(session.systemId());
         stub.tag = application.tag();
         stub.tournamentEnabled = application.tournamentEnabled();
-        stubIndex.put(rating.distributionKey(),stub);
+        rating.owner(session.systemId());
+        GameRoom room = roomProxy.join(session,arena,rating);
+        //setup after joining
+        stub.room = room;
+        stub.offline = room.offline;
+        stub.instance = room.instance;
+        stub.roomId = room.roomId;
+        stubIndex.put(session.systemId(),stub);
         return stub;
+    }
+    public void update(String systemId){
+        if(application.tournamentEnabled()){
+            Stub stub = stubIndex.get(systemId);
+            this.roomProxy.update(systemId,stub.instance);
+        }
     }
     public void leave(String systemId){
         stubIndex.remove(systemId);
@@ -186,7 +203,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
             levelLimit = this.application.capacity();
         }
         listArena();
-        roomProxy.setup(applicationContext);
+        roomProxy.setup(applicationContext,this);
     }
 
     public boolean connected(){

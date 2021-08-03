@@ -20,10 +20,10 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
         Recoverable pt = null;
         switch (i){
             case TOURNAMENT_CID:
-                pt = new DefaultTournament();
+                pt = new TournamentHeader();
                 break;
             case TOURNAMENT_INSTANCE_CID:
-                pt = new TournamentInstance();
+                pt = new TournamentInstanceHeader();
                 break;
             case TOURNAMENT_ENTRY_CID:
                 pt = new TournamentEntry();

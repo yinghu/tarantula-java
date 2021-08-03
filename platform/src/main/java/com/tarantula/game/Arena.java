@@ -92,7 +92,7 @@ public class Arena extends RecoverableObject implements Configurable {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name",name);
         jsonObject.addProperty("capacity",capacity);
-        jsonObject.addProperty("duration",duration);
+        jsonObject.addProperty("duration",duration/60000);
         jsonObject.addProperty("xp",xp);
         jsonObject.addProperty("level",level);
         return jsonObject;
@@ -100,6 +100,10 @@ public class Arena extends RecoverableObject implements Configurable {
     public boolean configureAndValidate(byte[] data){
         Map<String,Object> map = JsonUtil.toMap(data);
         this.disabled = (boolean)map.get("disabled");
+        this.name = (String)map.get("name");
+        this.capacity = ((Number)map.get("capacity")).intValue();
+        this.duration = ((Number)map.get("duration")).intValue()*60000;
+        this.xp = ((Number)map.get("xp")).intValue();
         return true;
     }
 }

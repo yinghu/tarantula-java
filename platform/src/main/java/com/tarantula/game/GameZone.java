@@ -1,7 +1,6 @@
 package com.tarantula.game;
 
-import com.icodesoftware.ApplicationContext;
-import com.icodesoftware.Configurable;
+import com.icodesoftware.*;
 import com.icodesoftware.Module;
 
 import java.util.List;
@@ -37,8 +36,9 @@ public interface GameZone extends Configurable{
     void roundDuration(long roundDuration);
 
     boolean connected();
-    Stub join(Rating rating);
+    Stub join(Session session,Rating rating);
     void leave(String systemId);
+    void update(String systemId);
     void onTimer(Module.OnUpdate onUpdate);
     void addArena(Arena arena);
     List<Arena> arenas();
@@ -47,9 +47,10 @@ public interface GameZone extends Configurable{
     void roomProxy(RoomProxy roomProxy);
 
     interface RoomProxy{
-        Stub join(Arena  arena,Rating rating);
+        GameRoom join(Session session,Arena  arena,Rating rating);
+        void update(String systemId, Tournament.Instance instance);
         void leave(String systemId);
         default void onTimer(Module.OnUpdate onUpdate){}
-        void setup(ApplicationContext applicationContext);
+        void setup(ApplicationContext applicationContext,GameZone gameZone);
     }
 }

@@ -26,7 +26,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
             return;
         }
         Rating rating = gameServiceProvider.rating(session.systemId());
-        Stub stub = gameZone.join(rating);
+        Stub stub = gameZone.join(session,rating);
         session.write(stub.toJson().toString().getBytes());
     }
 
@@ -42,14 +42,22 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
             statistics.entry("wins").update(1).update();
             statistics.entry("stars").update(1).update();
             session.write(toMessage("updated",true).getBytes());
+            if(application.tournamentEnabled()){
+                this.gameZone.update(session.systemId());
+            }
         }
         else if(session.action().equals("onTest")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            Rating rating = this.gameServiceProvider.rating(session.systemId());
-            rating.xpLevel = onAccess.stub();
-            Stub stub = gameZone.join(rating);
-            session.write(stub.toJson().toString().getBytes());
-            gameZone.leave(session.systemId());
+            if(application.tournamentEnabled()&&(!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
+                session.write(toMessage("no tournament available,please try later",false).getBytes());
+            }
+            else{
+                OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+                Rating rating = this.gameServiceProvider.rating(session.systemId());
+                rating.xpLevel = onAccess.stub();
+                Stub stub = gameZone.join(session,rating);
+                session.write(stub.toJson().toString().getBytes());
+                gameZone.leave(session.systemId());
+            }
         }
         else{
             throw new UnsupportedOperationException(session.action());
@@ -71,7 +79,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
         this.gameZone = this.gameServiceProvider.zone(this.context.descriptor());
         this.gameZone.start(this.context);
         this.deploymentServiceProvider.register(this.gameZone);
-        this.gameServiceProvider.roomServiceProvider().registerGameZone(this.gameZone);
+        gameServiceProvider.roomServiceProvider().registerGameZone(this.gameZone);
         if(this.gameZone.connected()){
             this.deploymentServiceProvider.registerOnConnectionListener(this);
         }

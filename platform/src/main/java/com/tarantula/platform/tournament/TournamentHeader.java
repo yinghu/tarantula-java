@@ -3,32 +3,23 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.game.service.GameServiceProvider;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class DefaultTournament extends RecoverableObject implements Tournament {
+public class TournamentHeader extends RecoverableObject implements Tournament {
 
-    private String type;
-    private String description;
-    private String icon;
-    private Status status = Status.SCHEDULED;
-    private LocalDateTime startTime;
-    private LocalDateTime closeTime;
-    private LocalDateTime endTime;
-    private int maxEntriesPerInstance;
-    private int durationMinutes;
-    private Listener listener;
-    //private GameServiceProvider creator;
+    protected String type;
+    protected String description;
+    protected String icon;
+    protected Status status = Status.SCHEDULED;
+    protected LocalDateTime startTime;
+    protected LocalDateTime closeTime;
+    protected LocalDateTime endTime;
+    protected int maxEntriesPerInstance;
+    protected int durationMinutes;
 
-    private ConcurrentLinkedDeque<Instance> pendingQueue = new ConcurrentLinkedDeque();
-    private ConcurrentHashMap<String,Entry> entryIndex = new ConcurrentHashMap<>();
-
-
-    public DefaultTournament(Schedule schedule){
+    public TournamentHeader(Schedule schedule){
         this.type = schedule.type();
         this.description = schedule.description();
         this.icon = schedule.icon();
@@ -39,7 +30,7 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
         this.durationMinutes = schedule.instanceDurationInMinutes();
     }
 
-    public DefaultTournament(){
+    public TournamentHeader(){
     }
     @Override
     public String type() {
@@ -101,20 +92,8 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
 
 
     @Override
-    public String join(String systemId) {
-        Entry _entry = entryIndex.get(systemId);
-        if(_entry!=null){//rejoin
-            return _entry.owner();
-        }
-        Instance instance = pendingQueue.poll();
-        if(instance==null){
-            //instance = creator.createOnJoin(this);
-            listener.onStarted(instance);
-        }
-        _entry = instance.enter(systemId);
-        //creator.updateInstance(instance);
-        pendingQueue.offer(instance);
-        return _entry.owner();
+    public String register(String systemId) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -126,11 +105,5 @@ public class DefaultTournament extends RecoverableObject implements Tournament {
     public int getClassId() {
         return TournamentPortableRegistry.TOURNAMENT_CID;
     }
-    //local methods
-    public void addTournamentInstance(Instance instance){
-        pendingQueue.add(instance);
-    }
-    public void addTournamentEntry(Entry entry){
-        entryIndex.put(entry.systemId(),entry);
-    }
+
 }
