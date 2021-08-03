@@ -3,11 +3,16 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.platform.IndexSet;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TournamentHeader extends RecoverableObject implements Tournament {
+
+    private static final String TOURNAMENT_REGISTER = "register";
+    private static final String TOURNAMENT_PLAY = "play";
 
     protected String type;
     protected String description;
@@ -18,6 +23,10 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
     protected LocalDateTime endTime;
     protected int maxEntriesPerInstance;
     protected int durationMinutes;
+
+    public IndexSet tournamentRegisterIndex;
+    public IndexSet tournamentPlayIndex;
+    public ConcurrentHashMap<String,TournamentInstanceHeader> _instanceIndex;
 
     public TournamentHeader(Schedule schedule){
         this.type = schedule.type();
@@ -31,6 +40,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
     }
 
     public TournamentHeader(){
+
     }
     @Override
     public String type() {
@@ -93,9 +103,24 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
 
     @Override
     public String register(String systemId) {
-        throw new UnsupportedOperationException();
+        TournamentRegistry tournamentRegistry = new TournamentRegistry(maxEntriesPerInstance);
+        this.dataStore.create(tournamentRegistry);
+        tournamentRegisterIndex.keySet.add(tournamentRegistry.distributionKey());
+        tournamentRegisterIndex.update();
+        tournamentRegistry.addPlayer(systemId);
+        dataStore.update(tournamentRegistry);
+        return tournamentRegistry.distributionKey();
     }
-
+    public Tournament.Instance lookup(String instanceId){
+        return _instanceIndex.computeIfAbsent(instanceId,(k)->{
+            TournamentInstanceHeader instanceHeader = new TournamentInstanceHeader(maxEntriesPerInstance,startTime,closeTime,endTime);
+            this.dataStore.create(instanceHeader);
+            instanceHeader.dataStore(dataStore);
+            tournamentPlayIndex.keySet.add(instanceHeader.distributionKey());
+            tournamentPlayIndex.update();
+            return instanceHeader;
+        });
+    }
     @Override
     public int getFactoryId() {
         return TournamentPortableRegistry.OID;
@@ -104,6 +129,18 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
     @Override
     public int getClassId() {
         return TournamentPortableRegistry.TOURNAMENT_CID;
+    }
+    public void setup(ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex){
+        this._instanceIndex = instanceIndex;
+        tournamentRegisterIndex = new IndexSet(TOURNAMENT_REGISTER);
+        tournamentRegisterIndex.distributionKey(this.distributionKey());
+        this.dataStore.createIfAbsent(tournamentRegisterIndex,true);
+        this.tournamentRegisterIndex.dataStore(dataStore);
+
+        tournamentPlayIndex = new IndexSet(TOURNAMENT_PLAY);
+        tournamentPlayIndex.distributionKey(this.distributionKey());
+        this.dataStore.createIfAbsent(tournamentPlayIndex,true);
+        tournamentPlayIndex.dataStore(this.dataStore);
     }
 
 }

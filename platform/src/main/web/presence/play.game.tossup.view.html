@@ -24,7 +24,8 @@
     
     let exit = text_button('EXIT',()=>{
         let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onLeave'};
-        TARA_API.onService(false,{},(resp)=>{
+        TARA_API.onService(false,cmd,(resp)=>{
+            console.log(resp);
             TARA_API.disconnect();
             TGL.shutdown();
             let m3 = document.querySelector(TARA_API.query().gamePopup);

@@ -7,6 +7,7 @@ import com.icodesoftware.util.TimeUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class TournamentInstanceHeader extends RecoverableObject implements Tournament.Instance {
@@ -17,6 +18,7 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
     protected LocalDateTime close;
     protected LocalDateTime end;
 
+    private ConcurrentHashMap<String, Tournament.Entry> entryIndex = new ConcurrentHashMap<>();
 
     public TournamentInstanceHeader(int maxEntries, LocalDateTime start, LocalDateTime close, LocalDateTime end){
         this.maxEntries = maxEntries;
@@ -44,6 +46,7 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
     @Override
     public void update(String systemId, Tournament.OnEntry updater) {
         TournamentEntry entry = new TournamentEntry(systemId,distributionKey());
+        entry.dataStore(dataStore);
         updater.on(entry);
     }
     public int maxEntries(){
@@ -83,6 +86,9 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
     @Override
     public int getClassId() {
         return TournamentPortableRegistry.TOURNAMENT_INSTANCE_CID;
+    }
+    public void load(){
+
     }
 
 }
