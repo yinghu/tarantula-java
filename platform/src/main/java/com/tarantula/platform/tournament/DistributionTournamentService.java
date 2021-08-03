@@ -11,6 +11,7 @@ public interface DistributionTournamentService extends ServiceProvider {
     String join(String serviceName, String tournamentId, String systemId);
     byte[] enter(String serviceName,String tournamentId,String instanceId,String systemId);
     byte[] score(String serviceName,String instanceId,String systemId,double delta);
+    byte[] configure(String serviceName,String instanceId,String systemId,byte[] payload);
     byte[] schedule(String serviceName, Tournament.Schedule schedule);
     boolean localPartition(String distributionKey);
 

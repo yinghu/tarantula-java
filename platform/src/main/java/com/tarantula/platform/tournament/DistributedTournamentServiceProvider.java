@@ -69,12 +69,18 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         byte[] ret = this.distributionTournamentService.score(name(),instanceId,systemId,delta);
         Tournament.Entry _e = new TournamentEntry();
         _e.fromBinary(ret);
-        logger.warn("tournament score->"+_e.score(0));
         return _e;
     }
-
     @Override
-    public List<Tournament.Entry> tournamentEntries(String s) {
+    public Tournament.Entry configure(String instanceId, String systemId, byte[] payload) {
+        byte[] ret = this.distributionTournamentService.configure(name(),instanceId,systemId,payload);
+        Tournament.Entry _e = new TournamentEntry();
+        _e.fromBinary(ret);
+        logger.warn("tournament configure->"+_e.score(0));
+        return _e;
+    }
+    @Override
+    public List<Tournament.Entry> list(String instanceId) {
         return null;
     }
     public String name(){
@@ -123,11 +129,11 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         tournament.dataStore(dataStore);
         return tournament.findInstance(instanceId);
     }
-    public Tournament.Instance instance(String instanceId){
+    public Tournament.Instance instance(String instanceId){//instance node
         TournamentInstanceHeader tournament = new TournamentInstanceHeader();
         tournament.distributionKey(instanceId);
         dataStore.load(tournament);
         tournament.dataStore(dataStore);
         return tournament;
-    }//instance node
+    }
 }

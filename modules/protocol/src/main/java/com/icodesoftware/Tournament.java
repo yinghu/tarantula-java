@@ -26,7 +26,7 @@ public interface Tournament extends Recoverable {
 
     String register(String systemId);
 
-    interface Entry extends Recoverable {
+    interface Entry extends Configurable {
         String systemId();
         double score(double delta);
         int rank();
