@@ -1,6 +1,7 @@
 package com.icodesoftware;
 
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.service.ServiceContext;
 
 public interface Configurable extends Recoverable, DataStore.Updatable {
@@ -16,6 +17,8 @@ public interface Configurable extends Recoverable, DataStore.Updatable {
     default void configurationCategory(String configurationCategory){}
 
     default boolean configureAndValidate(byte[] data){ return false;}
+
+    default JsonObject toJson(){ return new JsonObject();}
 
     interface Listener{
         default <T extends Configurable> void onCreated(T created){}

@@ -63,7 +63,8 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             return false;
         }
     }
-    public String join(String serviceName, String tournamentId, String systemId){
+
+    public String register(String serviceName, String tournamentId, String systemId){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentRegisterOperation operation = new TournamentRegisterOperation(serviceName,tournamentId,systemId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(tournamentId);
@@ -76,7 +77,8 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             return null;
         }
     }
-    public byte[] enter(String serviceName,String tournamentId,String instanceId,String systemId){
+
+    public byte[] join(String serviceName,String tournamentId,String instanceId,String systemId){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentJoinOperation operation = new TournamentJoinOperation(serviceName,tournamentId,instanceId,systemId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
@@ -89,6 +91,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             return null;
         }
     }
+
     public byte[] score(String serviceName,String instanceId,String systemId,double delta){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentScoreOperation operation = new TournamentScoreOperation(serviceName,instanceId,systemId,delta);
@@ -102,6 +105,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             return null;
         }
     }
+
     public byte[] configure(String serviceName,String instanceId,String systemId,byte[] payload){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentConfigureOperation operation = new TournamentConfigureOperation(serviceName,instanceId,systemId,payload);
@@ -115,6 +119,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             return null;
         }
     }
+
     public byte[] schedule(String serviceName, Tournament.Schedule schedule){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentScheduleOperation operation = new TournamentScheduleOperation(serviceName,schedule);
@@ -126,10 +131,5 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             future.cancel(true);
             return null;
         }
-    }
-    public boolean localPartition(String distributionKey){
-        NodeEngine nodeEngine = getNodeEngine();
-        int pid = nodeEngine.getPartitionService().getPartitionId(distributionKey);
-        return nodeEngine.getPartitionService().getPartition(pid).isLocal();
     }
 }

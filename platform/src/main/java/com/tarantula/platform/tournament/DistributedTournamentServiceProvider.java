@@ -56,8 +56,8 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
 
     @Override
     public Tournament.Instance join(String tournamentId, String systemId) {
-        String tid = this.distributionTournamentService.join(name(),tournamentId,systemId);
-        byte[] ret = this.distributionTournamentService.enter(name(),tournamentId,tid,systemId);
+        String tid = this.distributionTournamentService.register(name(),tournamentId,systemId);
+        byte[] ret = this.distributionTournamentService.join(name(),tournamentId,tid,systemId);
         Tournament.Instance _e = new TournamentInstanceHeader();
         _e.distributionKey(tid);
         _e.fromBinary(ret);
@@ -76,7 +76,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         byte[] ret = this.distributionTournamentService.configure(name(),instanceId,systemId,payload);
         Tournament.Entry _e = new TournamentEntry();
         _e.fromBinary(ret);
-        logger.warn("tournament configure->"+_e.score(0));
+        logger.warn("tournament configure->"+_e.toJson());
         return _e;
     }
     @Override

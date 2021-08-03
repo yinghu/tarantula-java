@@ -71,8 +71,20 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     public int getClassId() {
         return TournamentPortableRegistry.TOURNAMENT_ENTRY_CID;
     }
+
+    @Override
     public boolean configureAndValidate(byte[] data){
         payload = JsonUtil.parse(data);
         return true;
+    }
+    @Override
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("systemId",systemId);
+        jsonObject.addProperty("score",score);
+        jsonObject.addProperty("rank",rank);
+        jsonObject.addProperty("timestamp",timestamp);
+        jsonObject.add("payload",payload);
+        return jsonObject;
     }
 }
