@@ -19,13 +19,6 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         this.systemId = systemId;
         this.owner = instanceId;
     }
-    public TournamentEntry(String systemId){
-        this();
-        this.systemId = systemId;
-
-    }
-
-
     public TournamentEntry(){
         this.onEdge = true;
         this.label = Tournament.ENTRY_LABEL;
@@ -39,7 +32,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     public double score(double delta) {
         score = score+delta;
         if(delta>0){
-            //this.update();
+            this.update();
         }
         return score;
     }

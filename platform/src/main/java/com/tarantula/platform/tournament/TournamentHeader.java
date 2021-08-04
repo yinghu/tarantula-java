@@ -8,6 +8,7 @@ import com.tarantula.platform.IndexSet;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class TournamentHeader extends RecoverableObject implements Tournament {
 
@@ -26,7 +27,8 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
 
     public IndexSet tournamentRegisterIndex;
     public IndexSet tournamentPlayIndex;
-    public ConcurrentHashMap<String,TournamentInstanceHeader> _instanceIndex;
+    private ConcurrentHashMap<String,TournamentInstanceHeader> _instanceIndex;
+    private ConcurrentLinkedDeque<TournamentRegistry> pendingRegistryQueue;
 
     public TournamentHeader(Schedule schedule){
         this.type = schedule.type();
@@ -103,12 +105,16 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
 
     @Override
     public String register(String systemId) {
-        TournamentRegistry tournamentRegistry = new TournamentRegistry(maxEntriesPerInstance);
-        this.dataStore.create(tournamentRegistry);
-        tournamentRegisterIndex.keySet.add(tournamentRegistry.distributionKey());
-        tournamentRegisterIndex.update();
+        TournamentRegistry tournamentRegistry = pendingRegistryQueue.poll();
+        if(tournamentRegistry==null){
+            tournamentRegistry = new TournamentRegistry();
+            this.dataStore.create(tournamentRegistry);
+            tournamentRegisterIndex.keySet.add(tournamentRegistry.distributionKey());
+            tournamentRegisterIndex.update();
+        }
         tournamentRegistry.addPlayer(systemId);
         dataStore.update(tournamentRegistry);
+        pendingRegistryQueue.offer(tournamentRegistry);
         return tournamentRegistry.distributionKey();
     }
     public Tournament.Instance lookup(String instanceId){
@@ -132,15 +138,31 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
     }
     public void setup(ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex){
         this._instanceIndex = instanceIndex;
+        this.pendingRegistryQueue = new ConcurrentLinkedDeque();
         tournamentRegisterIndex = new IndexSet(TOURNAMENT_REGISTER);
         tournamentRegisterIndex.distributionKey(this.distributionKey());
         this.dataStore.createIfAbsent(tournamentRegisterIndex,true);
         this.tournamentRegisterIndex.dataStore(dataStore);
-
+        this.tournamentRegisterIndex.keySet.forEach((k)->{
+            TournamentRegistry tournamentRegistry = new TournamentRegistry();
+            tournamentRegistry.distributionKey(k);
+            if(this.dataStore.load(tournamentRegistry)){
+                pendingRegistryQueue.offer(tournamentRegistry);
+            }
+        });
         tournamentPlayIndex = new IndexSet(TOURNAMENT_PLAY);
         tournamentPlayIndex.distributionKey(this.distributionKey());
         this.dataStore.createIfAbsent(tournamentPlayIndex,true);
         tournamentPlayIndex.dataStore(this.dataStore);
+        this.tournamentPlayIndex.keySet.forEach((k)->{
+            TournamentInstanceHeader instanceHeader = new TournamentInstanceHeader();
+            instanceHeader.distributionKey(k);
+            if(this.dataStore.load(instanceHeader)){
+                instanceHeader.dataStore(dataStore);
+                instanceHeader.load();
+                _instanceIndex.put(k,instanceHeader);
+            }
+        });
     }
 
 }

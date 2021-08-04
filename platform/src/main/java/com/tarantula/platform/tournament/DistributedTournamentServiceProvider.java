@@ -1,13 +1,12 @@
 package com.tarantula.platform.tournament;
 
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.Tournament;
+import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.IndexSet;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -24,7 +23,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
 
     private ConcurrentHashMap<String,TournamentHeader> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex = new ConcurrentHashMap<>();
-
+    private IndexSet lookupKey;
     public DistributedTournamentServiceProvider(String gameServiceProviderName){
         this.name = gameServiceProviderName;
     }
@@ -33,6 +32,11 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     public String registerTournamentListener(Tournament.Listener listener) {
         String key = UUID.randomUUID().toString();
         listeners.put(key,listener);
+        tournamentIndex.forEach((k,v)->{
+            listeners.forEach((s,l)->{
+                l.tournamentStarted(v);
+            });
+        });
         return key;
     }
 
@@ -94,18 +98,30 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
+        this.lookupKey = new IndexSet("tournament");
+        AccessIndex accessIndex = this.serviceContext.accessIndexService().setIfAbsent(name);
+        this.lookupKey.distributionKey(accessIndex.distributionKey());
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
+        this.dataStore.createIfAbsent(this.lookupKey,true);
         this.logger = serviceContext.logger(DistributedTournamentServiceProvider.class);
         this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
-        this.logger.warn("distributed tournament setup");
     }
     @Override
     public void waitForData(){
-
+        ArrayList removed = new ArrayList();
+        lookupKey.keySet.forEach((k)->{
+            if(!loadTournamentHeader(k)){
+                removed.add(k);
+            }
+        });
+        removed.forEach((r)->{
+            lookupKey.keySet.remove(r);
+        });
+        this.dataStore.update(lookupKey);
     }
     @Override
     public void start() throws Exception {
-        this.logger.warn("distributed tournament started");
+        this.logger.warn("distributed tournament started on lookup key->"+lookupKey.distributionKey());
     }
 
     @Override
@@ -117,6 +133,8 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         TournamentHeader tournament = new TournamentHeader(schedule);
         tournament.dataStore(dataStore);
         dataStore.create(tournament);
+        lookupKey.keySet.add(tournament.distributionKey());
+        dataStore.update(lookupKey);
         listeners.forEach((k,v)->{
             v.tournamentStarted(tournament);
             v.tournamentClosed(tournament);
@@ -137,5 +155,17 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     public Tournament.Instance instance(String instanceId){//instance node
         TournamentInstanceHeader tournament = this.instanceIndex.get(instanceId);
         return tournament;
+    }
+    private boolean loadTournamentHeader(String tournamentId){
+        logger.warn("loading tournament header=>"+tournamentId);
+        TournamentHeader tournamentHeader = new TournamentHeader();
+        tournamentHeader.distributionKey(tournamentId);
+        if(!this.dataStore.load(tournamentHeader)){
+            return false;
+        }
+        tournamentHeader.dataStore(this.dataStore);
+        tournamentHeader.setup(instanceIndex);
+        tournamentIndex.put(tournamentId,tournamentHeader);
+        return true;
     }
 }

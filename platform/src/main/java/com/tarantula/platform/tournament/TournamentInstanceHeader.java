@@ -18,7 +18,7 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
     protected LocalDateTime close;
     protected LocalDateTime end;
 
-    private ConcurrentHashMap<String, Tournament.Entry> entryIndex = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, TournamentEntry> entryIndex = new ConcurrentHashMap<>();
 
     public TournamentInstanceHeader(int maxEntries, LocalDateTime start, LocalDateTime close, LocalDateTime end){
         this.maxEntries = maxEntries;
@@ -40,13 +40,17 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
     }
     @Override
     public Tournament.Entry join(String systemId) {
-        return null;
+        return entryIndex.computeIfAbsent(systemId,(k)->{
+            TournamentEntry entry = new TournamentEntry(systemId,this.distributionKey());
+            this.dataStore.create(entry);
+            entry.dataStore(dataStore);
+            return entry;
+        });
     }
 
     @Override
     public void update(String systemId, Tournament.OnEntry updater) {
-        TournamentEntry entry = new TournamentEntry(systemId,distributionKey());
-        entry.dataStore(dataStore);
+        TournamentEntry entry = entryIndex.get(systemId);
         updater.on(entry);
     }
     public int maxEntries(){
@@ -88,7 +92,11 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
         return TournamentPortableRegistry.TOURNAMENT_INSTANCE_CID;
     }
     public void load(){
-
+        dataStore.list(new TournamentEntryQuery(this.distributionKey()),(e)->{
+            e.dataStore(dataStore);
+            entryIndex.put(e.systemId(),e);
+            return true;
+        });
     }
 
 }
