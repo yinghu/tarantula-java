@@ -94,6 +94,7 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
     public void load(){
         dataStore.list(new TournamentEntryQuery(this.distributionKey()),(e)->{
             e.dataStore(dataStore);
+            System.out.println("LOADING ENTRY->"+e.distributionKey()+">"+e.toJson());
             entryIndex.put(e.systemId(),e);
             return true;
         });

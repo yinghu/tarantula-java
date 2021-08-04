@@ -120,6 +120,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
     public Tournament.Instance lookup(String instanceId){
         return _instanceIndex.computeIfAbsent(instanceId,(k)->{
             TournamentInstanceHeader instanceHeader = new TournamentInstanceHeader(maxEntriesPerInstance,startTime,closeTime,endTime);
+            instanceHeader.distributionKey(instanceId);
             this.dataStore.create(instanceHeader);
             instanceHeader.dataStore(dataStore);
             tournamentPlayIndex.keySet.add(instanceHeader.distributionKey());
@@ -144,6 +145,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
         this.dataStore.createIfAbsent(tournamentRegisterIndex,true);
         this.tournamentRegisterIndex.dataStore(dataStore);
         this.tournamentRegisterIndex.keySet.forEach((k)->{
+            System.out.println("LOADING  REGISTRY->"+k);
             TournamentRegistry tournamentRegistry = new TournamentRegistry();
             tournamentRegistry.distributionKey(k);
             if(this.dataStore.load(tournamentRegistry)){
@@ -155,6 +157,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
         this.dataStore.createIfAbsent(tournamentPlayIndex,true);
         tournamentPlayIndex.dataStore(this.dataStore);
         this.tournamentPlayIndex.keySet.forEach((k)->{
+            System.out.println("LOADING INSTANCE->"+k);
             TournamentInstanceHeader instanceHeader = new TournamentInstanceHeader();
             instanceHeader.distributionKey(k);
             if(this.dataStore.load(instanceHeader)){
