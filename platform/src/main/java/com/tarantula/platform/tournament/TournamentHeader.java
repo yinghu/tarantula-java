@@ -115,7 +115,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
         tournamentRegistry.addPlayer(systemId);
         dataStore.update(tournamentRegistry);
         pendingRegistryQueue.offer(tournamentRegistry);
-        return tournamentRegistry.distributionKey();
+        return tournamentRegistry.tournamentInstanceId();
     }
     public Tournament.Instance lookup(String instanceId){
         return _instanceIndex.computeIfAbsent(instanceId,(k)->{
