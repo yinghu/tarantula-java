@@ -6,6 +6,7 @@ import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.IndexSet;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -131,6 +132,9 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     //distributed operations callbacks
     public Tournament schedule(Tournament.Schedule schedule) {
         TournamentHeader tournament = new TournamentHeader(schedule);
+        logger.warn("start->"+tournament.startTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        logger.warn("close->"+tournament.closeTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        logger.warn("end->"+tournament.endTime.format(DateTimeFormatter.ISO_DATE_TIME));
         tournament.dataStore(dataStore);
         dataStore.create(tournament);
         lookupKey.keySet.add(tournament.distributionKey());

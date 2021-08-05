@@ -75,8 +75,8 @@ public class Stub extends ResponseHeader implements Portable {
             jp.addProperty("id",instance.id());
             jp.addProperty("maxEntries",instance.maxEntries());
             jp.addProperty("startTime",instance.startTime().format(DateTimeFormatter.ISO_DATE_TIME));
-            jp.addProperty("closeTime",instance.startTime().format(DateTimeFormatter.ISO_DATE_TIME));
-            jp.addProperty("endTime",instance.startTime().format(DateTimeFormatter.ISO_DATE_TIME));
+            jp.addProperty("closeTime",instance.closeTime().format(DateTimeFormatter.ISO_DATE_TIME));
+            jp.addProperty("endTime",instance.endTime().format(DateTimeFormatter.ISO_DATE_TIME));
             jo.add("tournament",jp);
         }
         if(connection!=null){

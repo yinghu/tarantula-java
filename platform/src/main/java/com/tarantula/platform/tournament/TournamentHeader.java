@@ -119,7 +119,10 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
     }
     public Tournament.Instance lookup(String instanceId){
         return _instanceIndex.computeIfAbsent(instanceId,(k)->{
-            TournamentInstanceHeader instanceHeader = new TournamentInstanceHeader(maxEntriesPerInstance,startTime,closeTime,endTime);
+            LocalDateTime _startTime = LocalDateTime.now();
+            LocalDateTime _closeTime = _startTime.plusMinutes(durationMinutes-3);
+            LocalDateTime _endTime = _startTime.plusMinutes(durationMinutes);
+            TournamentInstanceHeader instanceHeader = new TournamentInstanceHeader(maxEntriesPerInstance,_startTime,_closeTime,_endTime);
             instanceHeader.distributionKey(instanceId);
             this.dataStore.create(instanceHeader);
             instanceHeader.dataStore(dataStore);

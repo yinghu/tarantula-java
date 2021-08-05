@@ -22,7 +22,7 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
 
     public TournamentInstanceHeader(int maxEntries, LocalDateTime start, LocalDateTime close, LocalDateTime end){
         this.maxEntries = maxEntries;
-        this.start =start;
+        this.start = start;
         this.close = close;
         this.end = end;
     }

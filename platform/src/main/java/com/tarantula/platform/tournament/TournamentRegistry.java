@@ -45,10 +45,10 @@ public class TournamentRegistry extends RecoverableObject {
     public int getClassId() {
         return TournamentPortableRegistry.TOURNAMENT_REGISTRY_CID;
     }
-    //@Override
-    //public Recoverable.Key key(){
-        //return new AssociateKey(this.bucket,this.oid,this.label);
-    //}
+    @Override
+    public Recoverable.Key key(){
+        return new AssociateKey(this.bucket,this.oid,this.label);
+    }
     @Override
     public String distributionKey() {
         if(this.bucket!=null&&this.oid!=null){

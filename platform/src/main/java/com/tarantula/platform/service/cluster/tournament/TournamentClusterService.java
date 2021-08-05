@@ -10,6 +10,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 public class TournamentClusterService implements ManagedService, RemoteService {
@@ -57,6 +58,9 @@ public class TournamentClusterService implements ManagedService, RemoteService {
     public Tournament.Instance join(String serviceName,String tournamentId,String instanceId,String systemId){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         Tournament.Instance _ins = tsp.onInstance(tournamentId,instanceId);
+        log.warn("start->"+_ins.startTime().format(DateTimeFormatter.ISO_DATE_TIME));
+        log.warn("close->"+_ins.closeTime().format(DateTimeFormatter.ISO_DATE_TIME));
+        log.warn("end->"+_ins.endTime().format(DateTimeFormatter.ISO_DATE_TIME));
         _ins.join(systemId);
         return _ins;
     }
