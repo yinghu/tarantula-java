@@ -75,19 +75,18 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
 
     @Override
     public Tournament.Entry score(String instanceId, String systemId, double delta) {
-        byte[] ret = this.distributionTournamentService.score(name(),instanceId,systemId,delta);
-        Tournament.Entry _e = new TournamentEntry();
-        _e.fromBinary(ret);
+        Tournament.Entry _e = this.distributionTournamentService.score(name(),instanceId,systemId,delta);
         logger.warn("tournament score->"+_e.toJson());
         return _e;
     }
     @Override
     public Tournament.Entry configure(String instanceId, String systemId, byte[] payload) {
-        byte[] ret = this.distributionTournamentService.configure(name(),instanceId,systemId,payload);
-        Tournament.Entry _e = new TournamentEntry();
-        _e.fromBinary(ret);
+        Tournament.Entry _e = this.distributionTournamentService.configure(name(),instanceId,systemId,payload);
         logger.warn("tournament configure->"+_e.toJson());
         return _e;
+    }
+    public void leave(String instanceId, String systemId){
+
     }
     @Override
     public List<Tournament.Entry> list(String instanceId) {

@@ -55,8 +55,6 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);
         this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
-
-        this.logger.warn("item configuration service provider setup");
     }
     @Override
     public String name() {
@@ -65,7 +63,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
 
     @Override
     public void start() throws Exception {
-
+        this.logger.warn("item configuration service provider started");
     }
 
     @Override

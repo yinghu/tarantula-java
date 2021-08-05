@@ -1,13 +1,17 @@
 package com.tarantula.platform.tournament;
 
 import com.google.gson.JsonObject;
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class TournamentEntry extends RecoverableObject implements Tournament.Entry {
+public class TournamentEntry extends RecoverableObject implements Tournament.Entry, Portable {
 
     private String systemId;
     private double score;
@@ -63,6 +67,24 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     @Override
     public int getClassId() {
         return TournamentPortableRegistry.TOURNAMENT_ENTRY_CID;
+    }
+
+    @Override
+    public void writePortable(PortableWriter portableWriter) throws IOException {
+        portableWriter.writeUTF("1",systemId);
+        portableWriter.writeDouble("2",score);
+        portableWriter.writeLong("3",timestamp);
+        portableWriter.writeInt("4",rank);
+        portableWriter.writeUTF("5",payload.toString());
+    }
+
+    @Override
+    public void readPortable(PortableReader portableReader) throws IOException {
+        this.systemId = portableReader.readUTF("1");
+        this.score = portableReader.readDouble("2");
+        this.timestamp = portableReader.readLong("3");
+        this.rank = portableReader.readInt("4");
+        this.payload = JsonUtil.parse(portableReader.readUTF("5"));
     }
 
     @Override

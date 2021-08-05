@@ -10,8 +10,8 @@ public interface DistributionTournamentService extends ServiceProvider {
     boolean checkAvailable(String serviceName,String tournamentId);
     String register(String serviceName, String tournamentId, String systemId);
     byte[] join(String serviceName,String tournamentId,String instanceId,String systemId);
-    byte[] score(String serviceName,String instanceId,String systemId,double delta);
-    byte[] configure(String serviceName,String instanceId,String systemId,byte[] payload);
+    Tournament.Entry score(String serviceName,String instanceId,String systemId,double delta);
+    Tournament.Entry configure(String serviceName,String instanceId,String systemId,byte[] payload);
     byte[] schedule(String serviceName, Tournament.Schedule schedule);
 
 }

@@ -2,34 +2,15 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.*;
-import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.event.GameUpdateEvent;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
-import com.tarantula.platform.service.deployment.TypedListener;
-import com.tarantula.platform.statistics.StatisticsIndex;
-import com.tarantula.platform.event.LeaderBoardGlobalEvent;
-import com.tarantula.platform.leaderboard.LeaderBoardEntry;
-import com.tarantula.platform.leaderboard.LeaderBoardSync;
+
 import com.tarantula.platform.tournament.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 
-/**
- * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
- * rank - final result 1,2 rank xp = (1/rank)*100  1 - 100 2 50 ..
- * xp-delta = (1/rank)*(100)+pxp*(100)+csw*(100); //cws only if last is cws
- * zxp = zxp +xp-delta
- * xp = xp + xp-delta
- */
 public class GameServiceProvider implements ServiceProvider{
 
     private TarantulaLogger logger;

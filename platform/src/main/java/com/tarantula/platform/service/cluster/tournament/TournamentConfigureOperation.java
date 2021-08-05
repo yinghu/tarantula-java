@@ -4,6 +4,7 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
+import com.icodesoftware.Tournament;
 
 import java.io.IOException;
 
@@ -13,7 +14,7 @@ public class TournamentConfigureOperation extends Operation implements Partition
     private String systemId;
     private String instanceId;
     private byte[] payload;
-    private byte[] data;
+    private Tournament.Entry entry;
     public TournamentConfigureOperation() {
     }
     public TournamentConfigureOperation(String serviceName, String instanceId, String systemId,byte[] payload) {
@@ -25,12 +26,12 @@ public class TournamentConfigureOperation extends Operation implements Partition
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        this.data = ais.configure(serviceName,instanceId,systemId,payload).toBinary();
+        this.entry = ais.configure(serviceName,instanceId,systemId,payload);
     }
 
     @Override
     public Object getResponse() {
-        return this.data;
+        return this.entry;
     }
 
     @Override

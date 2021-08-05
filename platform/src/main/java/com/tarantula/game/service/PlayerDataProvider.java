@@ -71,6 +71,13 @@ public class PlayerDataProvider implements ServiceProvider {
     public void atMidnight(){
 
     }
+    /**
+     * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
+     * rank - final result 1,2 rank xp = (1/rank)*100  1 - 100 2 50 ..
+     * xp-delta = (1/rank)*(100)+pxp*(100)+csw*(100); //cws only if last is cws
+     * zxp = zxp +xp-delta
+     * xp = xp + xp-delta
+     */
     public void elo(Rating rating1,Rating rating2){
         double p1 = probability(rating2.elo,rating1.elo);
         double p2 = probability(rating1.elo,rating2.elo);

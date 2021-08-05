@@ -3,6 +3,7 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.AbstractRecoverableListener;
+import com.tarantula.platform.event.PortableEventRegistry;
 
 public class TournamentPortableRegistry extends AbstractRecoverableListener {
 
@@ -11,7 +12,7 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
 
     public static final int TOURNAMENT_CID = 8;
     public static final int TOURNAMENT_INSTANCE_CID = 9;
-    public static final int TOURNAMENT_ENTRY_CID = 10;
+    public static final int TOURNAMENT_ENTRY_CID = PortableEventRegistry.TOURNAMENT_ENTRY_CID;
     public static final int TOURNAMENT_SCHEDULE_CID = 12;
 
     public static final int TOURNAMENT_REGISTRY_CID = 13;

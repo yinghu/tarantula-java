@@ -19,7 +19,7 @@ public class PVERoomProxy extends RoomProxyHeader {
     }
     public void leave(String systemId){
         if(application.tournamentEnabled()){
-
+            //gameServiceProvider.tournamentServiceProvider().leave();
         }
     }
 }

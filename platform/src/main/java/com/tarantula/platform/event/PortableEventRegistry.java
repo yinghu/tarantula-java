@@ -9,24 +9,18 @@ import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
+import com.tarantula.platform.tournament.TournamentEntry;
 
 
 public class PortableEventRegistry implements PortableFactory {
 
 	public static final int OID =1;
 
-
     public static final int RESPONSIVE_EVENT_CID = 2;
-
-    //public static final int INSTANCE_PLAY_EVENT_CID = 3;
 
     public static final int FAST_PLAY_EVENT_CID = 5;
 
-    //public static final int ON_DEPLOY_EVENT_CID = 6;
-
     public static final int SERVICE_ACTION_EVENT_CID = 9;
-
-    //public static final int APPLICATION_SERVICE_EVENT_CID = 10;
 
     public static final int MAP_STORE_SYNC_EVENT_CID =11;
 
@@ -50,8 +44,8 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int METADATA_CID = 101;
 
     public static final int LOBBY_CID = 102;
-    public static final int APPLICATION_DESCRIPTOR_CID =103;
 
+    public static final int APPLICATION_DESCRIPTOR_CID =103;
 
     public static final int GAME_CLUSTER_CID = 106;
 
@@ -60,8 +54,12 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int EXPOSED_GAME_SERVICE_CID = 108;
 
     public static final int GAME_STUB_CID = 109;
+
     public static final int RATING_CID = 110;
+
     public static final int ROOM_CID = 111;
+
+    public static final int TOURNAMENT_ENTRY_CID = 112;
 
     public Portable create(int cid) {
         Portable _ins;
@@ -124,6 +122,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case ROOM_CID:
                 _ins = new GameRoom();
+                break;
+            case TOURNAMENT_ENTRY_CID:
+                _ins = new TournamentEntry();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");

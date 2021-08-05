@@ -15,6 +15,7 @@ public interface TournamentServiceProvider extends ServiceProvider{
     Tournament.Instance join(String tournamentId,String systemId);
     Tournament.Entry score(String instanceId,String systemId, double delta);
     Tournament.Entry configure(String instanceId,String systemId,byte[] payload);
+    void leave(String instanceId,String systemId);
 
     List<Tournament.Entry> list(String instanceId);
 }

@@ -92,12 +92,12 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         }
     }
 
-    public byte[] score(String serviceName,String instanceId,String systemId,double delta){
+    public Tournament.Entry score(String serviceName,String instanceId,String systemId,double delta){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentScoreOperation operation = new TournamentScoreOperation(serviceName,instanceId,systemId,delta);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
-        final Future<byte[]> future = builder.invoke();
+        final Future<Tournament.Entry> future = builder.invoke();
         try {
             return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
         } catch (Exception e) {
@@ -106,12 +106,12 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         }
     }
 
-    public byte[] configure(String serviceName,String instanceId,String systemId,byte[] payload){
+    public Tournament.Entry configure(String serviceName,String instanceId,String systemId,byte[] payload){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentConfigureOperation operation = new TournamentConfigureOperation(serviceName,instanceId,systemId,payload);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
-        final Future<byte[]> future = builder.invoke();
+        final Future<Tournament.Entry> future = builder.invoke();
         try {
             return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
         } catch (Exception e) {

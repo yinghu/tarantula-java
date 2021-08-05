@@ -63,7 +63,7 @@ public class LeaderBoardProvider implements ServiceProvider, LeaderBoard.Listene
 
     @Override
     public void start() throws Exception {
-        logger.warn("leader service provider started");
+        logger.warn("Leader board service provider started");
     }
 
     @Override

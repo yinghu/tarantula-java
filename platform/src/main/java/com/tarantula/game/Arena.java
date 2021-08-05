@@ -1,8 +1,8 @@
 package com.tarantula.game;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
-import com.icodesoftware.Consumable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
@@ -17,7 +17,7 @@ public class Arena extends RecoverableObject implements Configurable {
     public int joinsOnStart;
     public long duration;
 
-    public Consumable consumable;
+    public JsonObject payload = new JsonObject();
 
     public Arena(){}
     public Arena(String bucket,String oid,int level){
@@ -35,6 +35,7 @@ public class Arena extends RecoverableObject implements Configurable {
         this.properties.put("duration",duration);
         this.properties.put("index",index);
         this.properties.put("disabled",disabled);
+        this.properties.put("payload",payload.toString());
         return this.properties;
     }
     @Override
@@ -47,6 +48,7 @@ public class Arena extends RecoverableObject implements Configurable {
         this.duration = ((Number)properties.getOrDefault("duration",0)).longValue();
         this.index =(String)properties.get("index");
         this.disabled = (boolean)properties.get("disabled");
+        this.payload = JsonUtil.parse((String) properties.getOrDefault("payload","{}"));
     }
     @Override
     public int getFactoryId() {
@@ -104,6 +106,9 @@ public class Arena extends RecoverableObject implements Configurable {
         this.capacity = ((Number)map.get("capacity")).intValue();
         this.duration = ((Number)map.get("duration")).intValue()*60000;
         this.xp = ((Number)map.get("xp")).intValue();
+        if(map.containsKey("payload")){
+            payload = ((JsonElement)map.get("payload")).getAsJsonObject();
+        }
         return true;
     }
 }
