@@ -1,0 +1,9 @@
+{
+  "typeId":"game-service",
+  "name":"Tournament",
+  "type":"application",
+  "category":"tournament",
+  "tag":"game/tournament",
+  "moduleName":"com.tarantula.game.module.TournamentModule",
+  "applicationClassName": "com.tarantula.platform.service.deployment.SingletonModuleApplication"
+}

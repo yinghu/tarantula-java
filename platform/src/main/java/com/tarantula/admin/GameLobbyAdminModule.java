@@ -11,7 +11,6 @@ import com.tarantula.game.GameLobby;
 import com.tarantula.game.GameServiceContext;
 import com.tarantula.game.GameZone;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.service.deployment.JsonTemplateParser;
 import com.tarantula.platform.util.DescriptorSerializer;
 import com.tarantula.platform.util.SystemUtil;
 

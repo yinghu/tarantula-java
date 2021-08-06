@@ -14,12 +14,10 @@ public class DistributionKey extends RecoverableObject implements Recoverable.Ke
     }
 
     public String asString(){
-        if(bucket!=null&&oid!=null){
-            return new StringBuffer(bucket).append(Recoverable.PATH_SEPARATOR).append(oid).toString();
-        }
-        else{
+        if(bucket==null||oid==null){
             return null;
         }
+        return new StringBuffer(bucket).append(Recoverable.PATH_SEPARATOR).append(oid).toString();
     }
     @Override
     public String toString(){

@@ -1,14 +1,14 @@
 <div class="tx-modal-content">
-    <canvas id='tx-game-tictactoe'></canvas>
+    <canvas id='tx-game-tossup'></canvas>
 </div>
-<script type='module' tx-id='tx-md-tictactoe' tx-src='resource/tarantula.tictactoe.js' tx-version='1.1'></script>
+<script type='module' tx-id='tx-md-tossup' tx-src='resource/tarantula.tossup.js' tx-version='1.1'></script>
 <script type='text/javascript'>
     console.log(TARA_API.query().stub);
-    let ttc = new TicTacToe('my ttc');
+    let ttc = new TossUp('my ttc');
     ttc.show_name();
     let _oswaldFamily = 'Oswald, Arial';
     let _felipaFamily = 'Felipa, Arial';
-    let app = TGL.start(document.querySelector('#tx-game-tictactoe'));
+    let app = TGL.start(document.querySelector('#tx-game-tossup'));
     const loader = PIXI.Loader.shared;
     loader.add('robot','resource/robotQuest_icon.png').load(()=>{
         let robot = new PIXI.Sprite(loader.resources['robot'].texture);
