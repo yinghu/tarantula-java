@@ -43,6 +43,9 @@
             <view type="play.game.tossup">
                 <property name="moduleResourceFile">presence/play.game.tossup.view.html</property>
             </view>
+            <view type="play.game.tictactoe">
+                <property name="moduleResourceFile">presence/play.game.tictactoe.view.html</property>
+            </view>
             <view type="play.game.tossup.tournament">
                 <property name="moduleResourceFile">presence/play.game.tossup.tournament.view.html</property>
             </view>

@@ -75,7 +75,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
                 acc.distributionKey(ua.primary()?session.systemId():ua.owner());
                 if(account.load(acc)){
                     if(acc.userCount(0)<maxUserCount){
-                        AccessIndex query = accessIndexService.set((String)onAccess.property("login"));
+                        AccessIndex query = accessIndexService.set((String)onAccess.property("login"),0);
                         if(query!=null){
                             onAccess.owner(acc.distributionKey());//make sure acc id as the owner
                             onAccess.distributionKey(query.distributionKey());

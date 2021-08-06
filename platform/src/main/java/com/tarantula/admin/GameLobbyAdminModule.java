@@ -11,6 +11,7 @@ import com.tarantula.game.GameLobby;
 import com.tarantula.game.GameServiceContext;
 import com.tarantula.game.GameZone;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.service.deployment.JsonTemplateParser;
 import com.tarantula.platform.util.DescriptorSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -78,7 +79,7 @@ public class GameLobbyAdminModule implements Module {
                     desc.name("Game Lobby " + lobbyIndex);
                     desc.tag(((String) gameCluster.property(GameCluster.NAME)).toLowerCase() + "/lobby" + lobbyIndex);
                     desc.accessRank(lobbyIndex);
-                    desc.index((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+                    //desc.index((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
                     String configName = (String) gameCluster.property(GameCluster.MODE);
                     if(this.deploymentServiceProvider.createApplication(desc,(String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME),configName,true)){
                         session.write(JsonUtil.toSimpleResponse(true,"lobby added->"+lobbyIndex).getBytes());

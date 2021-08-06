@@ -96,4 +96,9 @@ public class JsonUtil {
         InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(json));
         return jp.parse(inr).getAsJsonObject();
     }
+    public static JsonObject parse(InputStream jsonInput){
+        JsonParser jp = new JsonParser();
+        InputStreamReader inr = new InputStreamReader(jsonInput);
+        return jp.parse(inr).getAsJsonObject();
+    }
 }

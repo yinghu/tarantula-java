@@ -221,7 +221,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 JsonObject jo = parser.parse(new InputStreamReader(in)).getAsJsonObject();
                 String _moduleId = jo.get(ExposedGameService.MODULE_ID).getAsString();
                 response.message(_moduleId);
-                AccessIndex accessIndex = this.tarantulaContext.accessIndexService().setIfAbsent(_moduleId);
+                AccessIndex accessIndex = this.tarantulaContext.accessIndexService().setIfAbsent(_moduleId,0);
                 jo.getAsJsonArray("exposedServiceList").forEach((es)->{
                     JsonObject je = es.getAsJsonObject();
                     ExposedGameService egs = new ExposedGameService();
@@ -306,7 +306,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         LobbyConfiguration a = xmlParser.configurations.get(0);
-        AccessIndex publishId = this.tarantulaContext.accessIndexService().set(a.descriptor.typeId());
+        AccessIndex publishId = this.tarantulaContext.accessIndexService().set(a.descriptor.typeId(),0);
         if(publishId==null){
             response.successful(false);
             response.message("module already existed");
@@ -836,7 +836,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     public <T extends OnAccess> T createGameCluster(String owner,String name,String mode,boolean tournamentEnabled){
-        AccessIndex accessIndex = this.tarantulaContext.accessIndexService().set(name);//name+"-"+mode
+        AccessIndex accessIndex = this.tarantulaContext.accessIndexService().set(name,0);//name+"-"+mode
         if(accessIndex==null){
             GameCluster gc = new GameCluster();
             gc.successful(false);

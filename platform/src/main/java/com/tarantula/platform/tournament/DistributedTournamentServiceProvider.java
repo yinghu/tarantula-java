@@ -99,7 +99,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.lookupKey = new IndexSet("tournament");
-        AccessIndex accessIndex = this.serviceContext.accessIndexService().setIfAbsent(name);
+        AccessIndex accessIndex = this.serviceContext.accessIndexService().setIfAbsent(name,0);
         this.lookupKey.distributionKey(accessIndex.distributionKey());
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.dataStore.createIfAbsent(this.lookupKey,true);

@@ -1,0 +1,145 @@
+<div class="tx-modal-content">
+    <canvas id='tx-game-tictactoe'></canvas>
+</div>
+<script type='module' tx-id='tx-md-tictactoe' tx-src='resource/tarantula.tictactoe.js' tx-version='1.1'></script>
+<script type='text/javascript'>
+    console.log(TARA_API.query().stub);
+    let ttc = new TicTacToe('my ttc');
+    ttc.show_name();
+    let _oswaldFamily = 'Oswald, Arial';
+    let _felipaFamily = 'Felipa, Arial';
+    let app = TGL.start(document.querySelector('#tx-game-tictactoe'));
+    const loader = PIXI.Loader.shared;
+    loader.add('robot','resource/robotQuest_icon.png').load(()=>{
+        let robot = new PIXI.Sprite(loader.resources['robot'].texture);
+        robot.width=100;
+        robot.height = 100;
+        robot.x = 120;
+        robot.y = 120;
+        app.stage.addChild(robot);    
+    });
+
+    let messageBox = new PIXI.Text('',{fontFamily:_oswaldFamily,fontSize:40,fill:'yellow'});
+    app.stage.addChild(messageBox);
+    
+    let exit = text_button('EXIT',()=>{
+        let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onLeave'};
+        TARA_API.onService(false,cmd,(resp)=>{
+            console.log(resp);
+            TARA_API.disconnect();
+            TGL.shutdown();
+            let m3 = document.querySelector(TARA_API.query().gamePopup);
+            m3.innerHTML="";
+            m3.style.display = 'none';
+        });
+    });
+    exit.x = window.innerWidth-70;
+    exit.y = 6;
+    app.stage.addChild(exit);
+    let messageQueue = ['AqC','BqC','CqC','DqC','Eq','Fq','Gq'];
+    let send = text_button('SEND',()=>{
+        if(TARA_API.query().offline){
+            messageBox.text = "offline play mode";     
+        }else{
+            let m = messageQueue.shift();
+            TARA_API.send({label:'echo',message:'Rotating->'+m});
+            messageQueue.push(m);
+        }
+    });
+    send.x = (window.innerWidth-64)/2;
+    send.y = (window.innerHeight-64)/2;
+    app.stage.addChild(send);
+
+
+    let i;
+    let seats =[];
+    for(i=0;i<4;i++){
+        let seat = text_seat('seat-'+i);
+        seat.container.x = 10;
+        seat.container.y = 100+i*70;
+        app.stage.addChild(seat.container);    
+        seats.push(seat);
+    }
+    let score = text_button('Update',()=>{
+        let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onUpdate'}; 
+        TARA_API.onService(true,cmd,(resp)=>{
+            if(resp.successful){
+                messageBox.text = resp.message;
+                //seats[resp.rank].caption.text = resp.level;
+            }
+            else{
+                messageBox.text = resp.message;
+            }            
+        });
+    });
+    score.x = (window.innerWidth-64)/3;
+    score.y = (window.innerHeight-64)/3;
+    app.stage.addChild(score);
+
+    let list = text_button('LIST',()=>{
+        let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onList'}; 
+        TARA_API.onService(true,cmd,(resp)=>{
+            if(resp.successful){
+                resp.list.forEach((e,i)=> {
+                    seats[i].caption.text=e.score+'\n'+e.systemId;      
+                });        
+            }
+            else{
+                messageBox.text = resp.message;
+            }            
+        });
+    });
+    list.x = (window.innerWidth-120);
+    list.y = (window.innerHeight-64)/3;
+    app.stage.addChild(list);
+
+    
+    TARA_API.connect((data)=>{
+        console.log(data);
+        if(data.label==='join'){
+            seats[data.payload.seat].caption.text= data.payload.player;    
+        }
+        else if(data.label==='left'){
+            seats[data.payload.seat].caption.text='left';
+        }
+        else if(data.label==='ws-close'){
+            send.visible = false;     
+        }
+        else if(data.label==='ws-error'){
+            send.visible = false;     
+        }
+        messageBox.text = data.payload.message;        
+    });
+
+    function text_button(cap,cmd){
+        let container = new PIXI.Container();
+        let rect = new PIXI.Graphics();
+        rect.lineStyle(4, 0xFF3300, 1);
+        rect.beginFill(0x66CCFF);
+        rect.drawRect(0, 0, 64, 64);
+        rect.endFill();
+        rect.interactive = true;
+        rect.buttonMode = true;
+        rect.on('pointerdown',cmd);
+        let txt = new PIXI.Text(cap,{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
+        txt.x = (64-txt.width)/2;
+        txt.y = (64-txt.height)/2;
+        container.addChild(rect);
+        container.addChild(txt);
+        return container;
+    }
+    function text_seat(cap){
+        let container = new PIXI.Container();
+        let rect = new PIXI.Graphics();
+        rect.lineStyle(4, 0xFF3300, 1);
+        rect.beginFill(0x66CCFF);
+        rect.drawRect(0, 0, 128, 64);
+        rect.endFill();
+        let txt = new PIXI.Text(cap,{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
+        txt.x = (128-txt.width)/2;
+        txt.y = (64-txt.height)/2;
+        container.addChild(rect);
+        container.addChild(txt);
+        return {container:container,caption:txt};
+    }
+</script>
