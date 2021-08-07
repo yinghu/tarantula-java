@@ -38,7 +38,6 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
         this.properties.put("capacity",capacity);
         this.properties.put("joinsOnStart",joinsOnStart);
         this.properties.put("duration",duration);
-        this.properties.put("index",index);
         this.properties.put("disabled",disabled);
         this.properties.put("payload",payload.toString());
         return this.properties;
@@ -51,7 +50,6 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
         this.capacity = ((Number)properties.getOrDefault("capacity",0)).intValue();
         this.joinsOnStart = ((Number)properties.getOrDefault("joinsOnStart",capacity)).intValue();
         this.duration = ((Number)properties.getOrDefault("duration",0)).longValue();
-        this.index =(String)properties.get("index");
         this.disabled = (boolean)properties.get("disabled");
         this.payload = JsonUtil.parse((String) properties.getOrDefault("payload","{}"));
     }
@@ -102,7 +100,6 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
         _cp.joinsOnStart = this.joinsOnStart;
         _cp.duration = this.duration;
         _cp.name = this.name;
-        _cp.index = this.index;
         return _cp;
     }
     public JsonObject toJson(){

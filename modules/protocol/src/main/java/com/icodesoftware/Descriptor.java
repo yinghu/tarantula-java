@@ -48,9 +48,6 @@ public interface Descriptor extends Recoverable {
 
 	String name();
 
-    String description();
-
-
     int capacity(); //the max joined number of the instance
 
     int accessMode();
@@ -67,10 +64,7 @@ public interface Descriptor extends Recoverable {
 
 	void name(String name);
 
-	void description(String description);
-
 	void capacity(int capacity);	
-
 
     void accessControl(int accessControl);
     void accessMode(int accessMode);

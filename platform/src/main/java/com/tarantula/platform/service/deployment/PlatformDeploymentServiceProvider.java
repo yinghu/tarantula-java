@@ -45,7 +45,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ClusterProvider integrationCluster;
     private SecureRandom secureRandom;
 
-    private CopyOnWriteArrayList<TypedListener> oListeners = new CopyOnWriteArrayList<>();
+    private ConcurrentHashMap<String,TypedListener> oListeners = new ConcurrentHashMap<>();
 
     private CopyOnWriteArrayList<Connection.OnStateListener> wListeners = new CopyOnWriteArrayList<>();
 
@@ -365,7 +365,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void  removeApplication(String typeId,String applicationId){
         this.tarantulaContext.unsetApplication(typeId,applicationId,(d)->{
             if(d.type().equals(Descriptor.TYPE_LOBBY)){
-                this.oListeners.forEach((ol)->{ //remove lobby entry
+                this.oListeners.forEach((k,ol)->{ //remove lobby entry
                     OnLobby onLobby = (OnLobby) vMap.get(d.typeId());
                     onLobby.closed(true);
                     if(onLobby.typeId().equals(ol.type)){
@@ -401,7 +401,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return suc;
     }
     public void removeLobby(String typeId){
-        this.oListeners.forEach((ol)->{
+        this.oListeners.forEach((k,ol)->{
             if(vMap.containsKey(typeId)){//skip system level modules
                 OnLobby onLobby =(OnLobby) vMap.get(typeId);
                 onLobby.closed(true);
@@ -648,7 +648,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(onLobby.resetEnabled()){
             this.tarantulaContext.tokenValidatorProvider().onCheck(onLobby);
         }
-        oListeners.forEach((o)->
+        oListeners.forEach((k,o)->
                 {
                     if(o.type.equals(onLobby.configurationType())){
                         o.listener.onUpdated(onLobby);
@@ -657,11 +657,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         );
     }
     public String registerConfigurableListener(String type, Configurable.Listener listener){
-        oListeners.add(new TypedListener(type,listener));
-        return null;
+        String regKey = UUID.randomUUID().toString();
+        oListeners.put(regKey,new TypedListener(type,listener));
+        return regKey;
     }
     public void unregisterConfigurableListener(String registryKey){
-
+        oListeners.remove(registryKey);
     }
     public void registerServerPushEvent(Event event){
         if(event instanceof ServerPushEvent){
@@ -1002,9 +1003,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void removeQueryCallback(String callId){
         qCallbacks.remove(callId);
     }
-    private class OnLobbyListener implements Configurable.Listener{
+    private class OnLobbyListener implements Configurable.Listener<OnLobby>{
         @Override
-        public <T extends Configurable> void onUpdated(T onLobby){
+        public void onUpdated(OnLobby onLobby){
             register(onLobby);
         }
     }

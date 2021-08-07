@@ -73,41 +73,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         fe.destination(rk.route());//node/tag/partition
         this.eventService.onEvent(fe);
     }
-    /**
-    public Response onPlay(Session session,OnAccess onAccess,Descriptor desc){
-        Response resp = null;
-        if(this.transact(desc.entryCost() * (-1))){
-            switch (onAccess.accessMode()){
-                case Session.FAST_PLAY_MODE:
-                    //distributed on application Id
-                    fastJoin(session,desc,(byte[])onAccess.property(OnAccess.PAYLOAD));
-                    break;
-                case Session.INVITATION_PLAY_MODE:
-                    SessionForward fxd = new SessionForward(session.source(),session.sessionId());
-                    InstancePlayEvent onInstanceEvent = new InstancePlayEvent(onAccess.applicationId(),onAccess.instanceId(),fxd);
-                    onInstanceEvent.systemId(session.systemId());
-                    onInstanceEvent.balance(desc.entryCost());
-                    onInstanceEvent.stub(session.stub());
-                    onInstanceEvent.routingNumber(session.routingNumber());
-                    onInstanceEvent.accessMode(Session.INVITATION_PLAY_MODE);
-                    onInstanceEvent.ticket(session.ticket());//session presence OID embedded in token
-                    onInstanceEvent.payload((byte[])onAccess.property(OnAccess.PAYLOAD));
-                    RoutingKey rk2 = this.eventService.routingKey(onAccess.instanceId(),desc.tag(),partitionFromInstanceId(onAccess.instanceId())); //route to the partition of the instance node
-                    onInstanceEvent.destination(rk2.route());
-                    this.eventService.publish(onInstanceEvent);
-                    break;
-                default:
-                    resp = new ResponseHeader("onPlay",false,Response.ACCESS_MODE_NOT_SUPPORTED,"Access Mode ["+onAccess.accessMode()+"] not supported","error");
-            }
-        }else{
-            resp = new ResponseHeader("onPlay",false,Response.INSUFFICIENT_BALANCE,"not enough balance","error");
-        }
-        return resp;
-    }
-    private int partitionFromInstanceId(String tid){
-        return Integer.parseInt(tid.substring(tid.lastIndexOf(Recoverable.PATH_SEPARATOR)+1));
-    }
-     **/
+
     @Override
     public int getFactoryId() {
         return PresencePortableRegistry.OID;

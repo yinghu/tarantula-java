@@ -7,7 +7,6 @@
         <name>Admin Role</name>
         <access-mode>12</access-mode>
         <deploy-code>1</deploy-code>
-        <description>Tarantula Admin Role Service</description>
         <application-list>
             <application>
                 <type-id>admin-role</type-id>
@@ -15,7 +14,6 @@
                 <type>application</type>
                 <category>admin</category>
                 <tag>role/admin</tag>
-                <description>Tarantula Admin Role Service</description>
                 <module-name>com.tarantula.admin.AdminRoleModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
@@ -27,7 +25,6 @@
                 <type>application</type>
                 <category>lobby</category>
                 <tag>role/lobby</tag>
-                <description>Tarantula Admin Role Service</description>
                 <module-name>com.tarantula.admin.GameLobbyAdminModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
@@ -39,7 +36,6 @@
                 <type>application</type>
                 <category>tournament</category>
                 <tag>role/tournament</tag>
-                <description>Tarantula Admin Role Service</description>
                 <module-name>com.tarantula.admin.TournamentAdminModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
@@ -51,7 +47,6 @@
                 <type>application</type>
                 <category>store</category>
                 <tag>role/store</tag>
-                <description>Tarantula Admin Role Service</description>
                 <module-name>com.tarantula.admin.GameStoreAdminModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
@@ -63,7 +58,6 @@
                 <type>application</type>
                 <category>achievement</category>
                 <tag>role/achievement</tag>
-                <description>Tarantula Admin Role Service</description>
                 <module-name>com.tarantula.admin.AchievementAdminModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>

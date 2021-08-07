@@ -66,33 +66,4 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         _copy.tournamentEnabled(this.tournamentEnabled);
         return _copy;
     }
-    public DeploymentDescriptor deploy(){
-        DeploymentDescriptor ins = new DeploymentDescriptor();
-        ins.type(this.type);
-        ins.category(this.category);
-        ins.bucket(this.bucket);
-        ins.oid(this.oid);
-        ins.typeId(this.typeId);
-        ins.capacity(this.capacity);
-        ins.accessControl(this.accessControl);
-        ins.accessMode(this.accessMode);
-        ins.accessRank(this.accessRank);
-        ins.entryCost(this.entryCost);
-        ins.tag(this.tag);
-        ins.name(this.name);
-        ins.description(this.description);
-        ins.moduleId(this.moduleId);
-        ins.codebase(this.codebase);
-        ins.moduleArtifact(this.moduleArtifact);
-        ins.moduleVersion(this.moduleVersion);
-        ins.moduleName(this.moduleName);
-        ins.timerOnModule(this.timerOnModule);
-        ins.applicationClassName(this.applicationClassName);
-        ins.deployPriority(this.deployPriority);
-        ins.deployCode(this.deployCode);
-        ins.logEnabled(this.logEnabled);
-        ins.resetEnabled(this.resetEnabled);
-        ins.tournamentEnabled(this.tournamentEnabled);
-        return ins;
-    }
 }

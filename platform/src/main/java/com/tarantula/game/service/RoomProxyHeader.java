@@ -16,7 +16,6 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
         this.application = applicationContext.descriptor();
         this.gameServiceProvider = applicationContext.serviceProvider(application.typeId().replace("lobby","service"));
         this.gameZone = gameZone;
-        //this.gameServiceProvider.roomServiceProvider().registerGameZone(gameZone);
     }
     @Override
     public void update(String systemId, Tournament.Instance instance){

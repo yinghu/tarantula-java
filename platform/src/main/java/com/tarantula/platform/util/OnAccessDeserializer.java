@@ -88,7 +88,7 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
             access.oid((String) v);
         }
         else if(k.equals("balance")){
-            access.entryCost(((Number)v).doubleValue());
+            access.balance(((Number)v).doubleValue());
         }
         else if(k.equals("timestamp")){
             access.timestamp(((Number)v).longValue());

@@ -6,7 +6,6 @@
         <category>service</category>
         <access-mode>12</access-mode>
         <name>presence</name>
-        <description>Tarantula Presence Service</description>
         <deploy-priority>400</deploy-priority>
         <application-list>
             <application>
@@ -14,7 +13,6 @@
                 <name>Presence</name>
                 <type>application</type>
                 <tag>presence/lobby</tag>
-                <description>Tarantula Presence</description>
                 <class-name>com.tarantula.platform.presence.PresenceApplication</class-name>
             </application>
         </application-list>

@@ -192,7 +192,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         listeners.forEach((l)->l.onUpdated(updated));
     }
 
-    public <T extends Configurable> void registerListener(Listener listener){
+    public <T extends Configurable> void registerListener(Listener<T> listener){
         listeners.add(listener);
     }
     @Override
@@ -204,6 +204,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         }
         listArena();
         roomProxy.setup(applicationContext,this);
+        this.listeners.forEach(l->l.onLoaded(this));
     }
 
     public boolean connected(){

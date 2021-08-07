@@ -77,9 +77,9 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
         this.deploymentServiceProvider = applicationContext.serviceProvider(DeploymentServiceProvider.NAME);
         this.gameServiceProvider = applicationContext.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
         this.gameZone = this.gameServiceProvider.zone(this.context.descriptor());
-        this.gameZone.start(this.context);
         this.deploymentServiceProvider.register(this.gameZone);
-        //gameServiceProvider.roomServiceProvider().registerGameZone(this.gameZone);
+        this.gameZone.registerListener(this.gameServiceProvider.roomServiceProvider());
+        this.gameZone.start(this.context);
         if(this.gameZone.connected()){
             this.deploymentServiceProvider.registerOnConnectionListener(this);
         }
@@ -88,7 +88,6 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     @Override
     public void clear() {
         this.deploymentServiceProvider.release(gameZone);
-        //this.gameServiceProvider.roomServiceProvider().releaseGameZone(gameZone);
         this.context.log("clear->"+this.context.descriptor().tag(),OnLog.WARN);
     }
     //connection listener

@@ -15,7 +15,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.service.Application;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-public class TarantulaApplicationDeployer implements Serviceable, Configurable.Listener {
+public class TarantulaApplicationDeployer implements Serviceable, Configurable.Listener<OnLobby> {
 
 	private final TarantulaContext context;
 	public TarantulaApplicationDeployer(final TarantulaContext context ){
@@ -185,7 +185,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		return arrayList;
 	}
 	@Override
-	public <T extends Configurable> void onUpdated(T onLobby){
+	public  void onUpdated(OnLobby onLobby){
 		this.context.deploymentService().register(onLobby);
 	}
 }

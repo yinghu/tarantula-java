@@ -17,7 +17,6 @@
         <access-mode>12</access-mode>
         <deploy-code>4</deploy-code>
         <deploy-priority>15</deploy-priority>
-        <description>Tarantula Game Lobby Service</description>
         <application-list>
             <application>
                 <type-id>game-lobby</type-id>
@@ -56,7 +55,6 @@
         <access-mode>12</access-mode>
         <deploy-code>4</deploy-code>
         <deploy-priority>10</deploy-priority>
-        <description>Tarantula Match Making Service</description>
         <application-list>
             <application><!-- Match making module-->
                 <type-id>game-service</type-id>
@@ -109,7 +107,6 @@
         <access-mode>12</access-mode>
         <deploy-code>4</deploy-code>
         <deploy-priority>20</deploy-priority>
-        <description>Tarantula Game Data Service</description>
         <application-list>
             <application><!-- key/value set/get app-->
                 <type-id>game-data</type-id>

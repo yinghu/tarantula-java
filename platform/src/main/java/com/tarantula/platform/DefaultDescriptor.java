@@ -19,8 +19,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     protected String tag;
     protected double entryCost;
 
-	protected String description;
-
 	protected int capacity;
 
     protected String moduleId;
@@ -103,10 +101,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         return this.category;
     }
 
-	public String description() {
-		
-		return this.description;
-	}
 
 	public int capacity() {
 		
@@ -116,9 +110,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 		this.capacity = capacity;
 	}
 	
-	public void description(String description) {
-		this.description = description;
-	}
 
 
 	public void typeId(String typeId) {
@@ -190,7 +181,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         _props.put("typeId",this.typeId);
         _props.put("type",this.type);
         _props.put("name",this.name);
-        _props.put("description",this.description);
         _props.put("tag",this.tag);
         _props.put("entryCost",this.entryCost);
         _props.put("capacity",this.capacity); //0 unlimited
@@ -220,7 +210,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         this.typeId=(String)properties.get("typeId");
         this.type=(String)properties.get("type");
         this.name=(String)properties.get("name");
-        this.description=properties.get("description")!=null?(String)properties.get("description"):null;
         this.tag=properties.get("tag")!=null?(String)properties.get("tag"):null;
         this.entryCost=properties.get("entryCost")!=null?((Number)properties.get("entryCost")).doubleValue():0;
         this.capacity=properties.get("capacity")!=null?((Number)properties.get("capacity")).intValue():0;

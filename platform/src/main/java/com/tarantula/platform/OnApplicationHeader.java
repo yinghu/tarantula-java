@@ -5,19 +5,16 @@ import com.icodesoftware.OnAccess;
 
 public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
-    //protected String applicationId;
+
     protected String tournamentId;
-    protected double entryCost;
 
     protected String systemId;
     protected String name;
     protected String typeId;
-    //protected String subtypeId;
+
     protected int accessMode;
 
     protected double balance;
-    protected String event;
-    protected boolean redeemed;
 
     protected int stub;
 
@@ -32,12 +29,6 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
         this.balance = balance;
     }
 
-    public void redeemed(boolean redeemed){
-        this.redeemed = redeemed;
-    }
-    public boolean redeemed(){
-        return this.redeemed;
-    }
 
 
     public String systemId() {
@@ -50,8 +41,6 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
     }
 
 
-
-
     public String tournamentId() {
         return this.tournamentId;
     }
@@ -61,15 +50,6 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
         this.tournamentId = tournamentId;
     }
 
-
-    public double entryCost() {
-        return this.entryCost;
-    }
-
-
-    public void entryCost(double entryCost) {
-        this.entryCost = entryCost;
-    }
 
     public int accessMode(){
         return this.accessMode;
@@ -90,14 +70,6 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
     public void typeId(String typeId){
         this.typeId = typeId;
     }
-
-    public void event(String event){
-        this.event = event;
-    }
-    public String event(){
-        return this.event;
-    }
-
 
     public int stub(){return this.stub;}
     public void stub(int stub){ this.stub = stub;}

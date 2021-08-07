@@ -53,16 +53,12 @@ public class DistributionRoomServiceProvider implements GameRoomServiceProvider 
     public void onLeave(String roomId,String systemId){
         logger.warn(systemId+" leave->"+roomId);
     }
-    public void registerGameZone(GameZone gameZone){
-        gameZone.registerListener(this);
-        logger.warn("Game zone registered->"+gameZone.name());
-    }
-    public void releaseGameZone(GameZone gameZone){
-        logger.warn("Game zone released->"+gameZone.name());
-    }
 
-    public <T extends Configurable> void onUpdated(T updated){
 
+    public  void onLoaded(GameZone updated){
+        logger.warn("zone loaded in room service provider->"+updated.distributionKey());
+    }
+    public void onUpdated(GameZone updated){
         logger.warn("zone updated in room service provider->"+updated.distributionKey());
     }
 }

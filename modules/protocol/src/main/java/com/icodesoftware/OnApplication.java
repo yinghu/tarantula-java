@@ -21,14 +21,8 @@ public interface OnApplication extends Response {
     double balance();
     void balance(double balance);
 
-    double entryCost();
-    void entryCost(double entryCost);
-
     String typeId();
     void typeId(String typeId);
-
-    //String subtypeId();
-    //void subtypeId(String subtypeId);
 
     String ticket();
     void ticket(String ticket);

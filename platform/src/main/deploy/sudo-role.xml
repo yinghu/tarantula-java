@@ -7,15 +7,13 @@
         <name>Sudo Role</name>
         <access-mode>12</access-mode>
         <deploy-code>1</deploy-code>
-        <description>Tarantula Sudo Role Service</description>
-        <application-list>
+       <application-list>
             <application>
                 <type-id>sudo-role</type-id>
                 <name>SudoRole</name>
                 <type>application</type>
                 <category>sudo</category>
                 <tag>role/sudo</tag>
-                <description>Tarantula Sudo Role Service</description>
                 <module-name>com.tarantula.admin.SudoRoleModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>

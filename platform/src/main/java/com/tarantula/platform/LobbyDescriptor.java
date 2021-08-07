@@ -25,7 +25,6 @@ public class LobbyDescriptor extends DefaultDescriptor {
         _props.put("type",this.type);
         _props.put("category",this.category);
         _props.put("name",this.name);
-        _props.put("description",this.description);
         _props.put("tag",this.tag);
         _props.put("accessControl",this.accessControl);
         _props.put("accessMode",this.accessMode);
@@ -43,7 +42,6 @@ public class LobbyDescriptor extends DefaultDescriptor {
         this.type=(String)properties.get("type");
         this.category=properties.get("category")!=null?(String)properties.get("category"):null;
         this.name=(String)properties.get("name");
-        this.description=properties.get("description")!=null?(String)properties.get("description"):null;
         this.tag=properties.get("tag")!=null?(String)properties.get("tag"):null;
         this.accessControl  = properties.get("accessControl")!=null?((Number)properties.get("accessControl")).intValue():0;
         this.accessMode  = properties.get("accessMode")!=null?((Number)properties.get("accessMode")).intValue():12;
