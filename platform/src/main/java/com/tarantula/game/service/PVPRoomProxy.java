@@ -9,13 +9,7 @@ public class PVPRoomProxy extends RoomProxyHeader {
     @Override
     public GameRoom join(Session session, Arena arena, Rating rating) {
         GameRoom room = gameServiceProvider.roomServiceProvider().join(arena,rating);
-        Stub stub = new Stub();
-        stub.successful(true);
-        stub.roomId = room.roomId;
-        stub.rating = rating;
-        stub.arena = arena;
-        stub.owner(rating.distributionKey());
-        return new GameRoom(true);
+        return room;
     }
     public void leave(String systemId){
 

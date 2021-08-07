@@ -4,45 +4,45 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
-import com.tarantula.game.GameRoom;
-import com.tarantula.game.Rating;
-import com.tarantula.game.Room;
 
 import java.io.IOException;
 
-public class JoinOperation extends Operation implements PartitionAwareOperation {
+public class RoomLeaveOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;
-    private Rating rating;
-    private GameRoom stub;
-    public JoinOperation(){}
-    public JoinOperation(String serviceName,Rating rating){
+    private String roomId;
+    private String systemId;
+    public RoomLeaveOperation(){}
+    public RoomLeaveOperation(String serviceName, String roomId, String systemId){
         this.serviceName = serviceName;
-        this.rating = rating;
+        this.roomId = roomId;
+        this.systemId = systemId;
     }
 
     @Override
     public void run() throws Exception {
         RoomClusterService ais = this.getService();
-        stub = ais.join(serviceName,rating);
+        ais.leave(serviceName,roomId,systemId);
     }
 
     @Override
     public Object getResponse() {
-        return stub;
+        return null;
     }
 
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(serviceName);
-        out.writeObject(rating);
+        out.writeUTF(roomId);
+        out.writeUTF(systemId);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         serviceName = in.readUTF();
-        rating = in.readObject();
+        roomId = in.readUTF();
+        systemId = in.readUTF();
     }
 }

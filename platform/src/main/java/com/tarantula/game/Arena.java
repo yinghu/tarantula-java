@@ -2,15 +2,20 @@ package com.tarantula.game;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.IndexKey;
+import com.tarantula.platform.event.PortableEventRegistry;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class Arena extends RecoverableObject implements Configurable {
+public class Arena extends RecoverableObject implements Configurable, Portable {
     public int level;
     public int xp;
     public int capacity;
@@ -52,11 +57,21 @@ public class Arena extends RecoverableObject implements Configurable {
     }
     @Override
     public int getFactoryId() {
-        return GamePortableRegistry.OID;
+        return PortableEventRegistry.OID;
     }
     @Override
     public int getClassId() {
-        return GamePortableRegistry.ARENA_CID;
+        return PortableEventRegistry.ARENA_CID;
+    }
+
+    @Override
+    public void writePortable(PortableWriter portableWriter) throws IOException {
+        portableWriter.writeInt("1",level);
+    }
+
+    @Override
+    public void readPortable(PortableReader portableReader) throws IOException {
+        level = portableReader.readInt("1");
     }
 
     @Override

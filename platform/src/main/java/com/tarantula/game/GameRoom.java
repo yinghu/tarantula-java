@@ -34,12 +34,14 @@ public class GameRoom extends RecoverableObject implements Portable {
 
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeUTF("roomId",roomId);
+        portableWriter.writeUTF("1",roomId);
+        portableWriter.writeBoolean("2",offline);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
-        this.roomId = portableReader.readUTF("roomId");
+        this.roomId = portableReader.readUTF("1");
+        this.offline = portableReader.readBoolean("2");
     }
     @Override
     public JsonObject toJson(){

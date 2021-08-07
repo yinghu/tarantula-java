@@ -2,17 +2,16 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.*;
 
-public class RoomServiceProvider implements ServiceProvider, Configurable.Listener {
+public class DistributionRoomServiceProvider implements GameRoomServiceProvider {
 
     private TarantulaLogger logger;
     private final String name;
     private DataStore dataStore;
     private DistributionRoomService distributionRoomService;
 
-    public RoomServiceProvider(String name){
+    public DistributionRoomServiceProvider(String name){
         this.name = name;
     }
 
@@ -37,15 +36,18 @@ public class RoomServiceProvider implements ServiceProvider, Configurable.Listen
         logger.warn("room service provider shutdown");
     }
     public GameRoom join(Arena arena, Rating rating){
-        return distributionRoomService.join(name,arena,rating);
+        String roomId = distributionRoomService.register(name,arena,rating);
+        return distributionRoomService.join(name,arena,roomId,rating.owner());
     }
     public void leave(Arena arena,String roomId,String systemId){
         this.distributionRoomService.leave(name,arena,roomId,systemId);
     }
-
-    public GameRoom onJoin(Rating rating){
-        GameRoom stub = new GameRoom();
-        stub.roomId = "roomId";
+    public String onRegister(Arena arena,Rating rating){
+        return rating.owner()+"/"+arena.level;
+    }
+    public GameRoom onJoin(Arena arena,String roomId,String systemId){
+        GameRoom stub = new GameRoom(true);
+        stub.roomId = roomId;
         return stub;
     }
     public void onLeave(String roomId,String systemId){
@@ -58,6 +60,7 @@ public class RoomServiceProvider implements ServiceProvider, Configurable.Listen
     public void releaseGameZone(GameZone gameZone){
         logger.warn("Game zone released->"+gameZone.name());
     }
+
     public <T extends Configurable> void onUpdated(T updated){
 
         logger.warn("zone updated in room service provider->"+updated.distributionKey());

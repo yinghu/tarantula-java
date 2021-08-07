@@ -88,14 +88,16 @@ public class Rating extends RecoverableObject implements DataStore.Updatable, Po
 
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeInt("rank",rank);
-        portableWriter.writeInt("xpLevel",xpLevel);
+        portableWriter.writeUTF("1",owner);
+        //portableWriter.writeInt("rank",rank);
+        //portableWriter.writeInt("xpLevel",xpLevel);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
-        this.rank = portableReader.readInt("rank");
-        this.xpLevel = portableReader.readInt("xpLevel");
+        owner = portableReader.readUTF("1");
+        //this.rank = portableReader.readInt("rank");
+        //this.xpLevel = portableReader.readInt("xpLevel");
     }
 
     @Override

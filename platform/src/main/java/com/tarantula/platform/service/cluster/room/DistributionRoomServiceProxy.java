@@ -6,7 +6,6 @@ import com.hazelcast.spi.NodeEngine;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameRoom;
 import com.tarantula.game.Rating;
-import com.tarantula.game.Room;
 import com.tarantula.game.service.DistributionRoomService;
 import com.tarantula.platform.TarantulaContext;
 
@@ -33,11 +32,24 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
     }
 
     @Override
-    public GameRoom join(String serviceName, Arena arena, Rating rating) {
+    public String register(String serviceName, Arena arena, Rating rating) {
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(arena.level);
-        JoinOperation joinOperation = new JoinOperation(serviceName,rating);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME,joinOperation,partitionId);
+        RoomRegisterOperation roomJoinOperation = new RoomRegisterOperation(serviceName,arena,rating);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomJoinOperation,partitionId);
+        final Future<String> future = builder.invoke();
+        try {
+            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+            return null;
+        }
+    }
+    public GameRoom join(String serviceName,Arena arena,String roomId, String systemId){
+        NodeEngine nodeEngine = getNodeEngine();
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
+        RoomJoinOperation roomJoinOperation = new RoomJoinOperation(serviceName,arena,roomId,systemId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomJoinOperation,partitionId);
         final Future<GameRoom> future = builder.invoke();
         try {
             return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
@@ -50,8 +62,8 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
     public void leave(String serviceName,Arena arena,String roomId,String systemId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(arena.level);
-        LeaveOperation leaveOperation = new LeaveOperation(serviceName,roomId,systemId);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME,leaveOperation,partitionId);
+        RoomLeaveOperation roomLeaveOperation = new RoomLeaveOperation(serviceName,roomId,systemId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomLeaveOperation,partitionId);
         final Future<Void> future = builder.invoke();
         try {
             future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);

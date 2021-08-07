@@ -28,7 +28,7 @@ public class GameServiceProvider implements ServiceProvider{
     private ClusterProvider dataCluster;
     private ServiceContext serviceContext;
 
-    private RoomServiceProvider roomServiceProvider;
+    private DistributionRoomServiceProvider roomServiceProvider;
     private PlayerDataProvider playerDataProvider;
     private LeaderBoardProvider leaderBoardProvider;
     private ItemConfigurationServiceProvider configurationServiceProvider;
@@ -65,7 +65,7 @@ public class GameServiceProvider implements ServiceProvider{
             return false;
         });
         this.dataCluster = serviceContext.clusterProvider(Distributable.DATA_SCOPE);
-        this.roomServiceProvider = new RoomServiceProvider(NAME);
+        this.roomServiceProvider = new DistributionRoomServiceProvider(NAME);
         this.roomServiceProvider.setup(serviceContext);
         this.roomServiceProvider.waitForData();
         this.playerDataProvider = new PlayerDataProvider(NAME);
@@ -112,9 +112,16 @@ public class GameServiceProvider implements ServiceProvider{
     }
 
     //room service provider hool calls
-    public RoomServiceProvider roomServiceProvider(){
+    public GameRoomServiceProvider roomServiceProvider(){
         return roomServiceProvider;
     }
+    public String onRegisterRoom(Arena arena,Rating rating){
+        return roomServiceProvider.onRegister(arena,rating);
+    }
+    public GameRoom onJoinRoom(Arena arena,String roomId,String systemId){
+        return roomServiceProvider.onJoin(arena,roomId,systemId);
+    }
+
 
     //player data service provider hook calls
     public Rating rating(String systemId){

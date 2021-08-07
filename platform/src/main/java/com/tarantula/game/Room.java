@@ -15,7 +15,7 @@ import java.util.ArrayDeque;
 import java.util.UUID;
 
 
-public class Room extends RecoverableObject implements Portable {
+public class Room extends RecoverableObject{
 
     static final int WAITING = 0; //waiting for first join
     static final int PENDING_JOIN = 1; //waiting after first join
@@ -282,13 +282,4 @@ public class Room extends RecoverableObject implements Portable {
         return PortableEventRegistry.ROOM_CID;
     }
 
-    @Override
-    public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeUTF("roomId",roomId);
-    }
-
-    @Override
-    public void readPortable(PortableReader portableReader) throws IOException {
-        this.roomId = portableReader.readUTF("roomId");
-    }
 }

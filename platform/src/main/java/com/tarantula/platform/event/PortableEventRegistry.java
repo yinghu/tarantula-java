@@ -2,6 +2,7 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
+import com.tarantula.game.Arena;
 import com.tarantula.game.GameRoom;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
@@ -59,7 +60,9 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int ROOM_CID = 111;
 
-    public static final int TOURNAMENT_ENTRY_CID = 112;
+    public static final int ARENA_CID = 112;
+
+    public static final int TOURNAMENT_ENTRY_CID = 113;
 
     public Portable create(int cid) {
         Portable _ins;
@@ -122,6 +125,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case ROOM_CID:
                 _ins = new GameRoom();
+                break;
+            case ARENA_CID:
+                _ins = new Arena();
                 break;
             case TOURNAMENT_ENTRY_CID:
                 _ins = new TournamentEntry();
