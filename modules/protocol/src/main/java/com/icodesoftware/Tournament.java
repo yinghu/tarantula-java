@@ -32,7 +32,7 @@ public interface Tournament extends Configurable {
         int rank();
     }
     interface Instance extends Configurable {
-        String id();
+
         Status status();
         int maxEntries();
         LocalDateTime startTime();

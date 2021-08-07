@@ -72,7 +72,7 @@ public class Stub extends ResponseHeader implements Portable {
         }
         if(instance!=null){
             JsonObject jp = new JsonObject();
-            jp.addProperty("id",instance.id());
+            jp.addProperty("id",instance.distributionKey());
             jp.addProperty("maxEntries",instance.maxEntries());
             jp.addProperty("startTime",instance.startTime().format(DateTimeFormatter.ISO_DATE_TIME));
             jp.addProperty("closeTime",instance.closeTime().format(DateTimeFormatter.ISO_DATE_TIME));

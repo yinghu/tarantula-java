@@ -29,11 +29,6 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
     public TournamentInstanceHeader(){
 
     }
-
-    @Override
-    public String id() {
-        return this.distributionKey();
-    }
     @Override
     public Tournament.Status status(){
         return status;

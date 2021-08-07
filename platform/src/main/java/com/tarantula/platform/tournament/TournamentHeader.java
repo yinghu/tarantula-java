@@ -115,7 +115,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
         tournamentRegistry.addPlayer(systemId);
         dataStore.update(tournamentRegistry);
         pendingRegistryQueue.offer(tournamentRegistry);
-        return tournamentRegistry.tournamentInstanceId();
+        return tournamentRegistry.instanceId();
     }
     public Tournament.Instance lookup(String instanceId){
         return _instanceIndex.computeIfAbsent(instanceId,(k)->{
@@ -149,10 +149,12 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
         this.tournamentRegisterIndex.dataStore(dataStore);
         this.tournamentRegisterIndex.keySet.forEach((k)->{
             System.out.println("LOADING  REGISTRY->"+k);
-            TournamentRegistry tournamentRegistry = new TournamentRegistry();
+            TournamentRegistry tournamentRegistry = new TournamentRegistry(this.maxEntriesPerInstance);
             tournamentRegistry.distributionKey(k);
             if(this.dataStore.load(tournamentRegistry)){
-                pendingRegistryQueue.offer(tournamentRegistry);
+                if(!tournamentRegistry.fullJoined()){
+                    pendingRegistryQueue.offer(tournamentRegistry);
+                }
             }
         });
         tournamentPlayIndex = new IndexSet(TOURNAMENT_PLAY);
