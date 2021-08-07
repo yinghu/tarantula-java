@@ -5,11 +5,10 @@ import com.icodesoftware.OnAccess;
 
 public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
-
     protected String tournamentId;
 
     protected String systemId;
-    protected String name;
+
     protected String typeId;
 
     protected int accessMode;
@@ -58,12 +57,7 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
         this.accessMode = mode;
     }
 
-    public String name(){
-        return this.name;
-    }
-    public void name(String name){
-        this.name = name;
-    }
+
     public String typeId(){
         return this.typeId;
     }

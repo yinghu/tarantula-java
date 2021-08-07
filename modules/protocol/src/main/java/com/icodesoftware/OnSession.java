@@ -10,6 +10,4 @@ public interface OnSession extends OnApplication, Response {
     String login();
     void login(String login);
 
-    String ticket();
-    void ticket(String ticket);
 }
