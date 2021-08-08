@@ -16,9 +16,6 @@ public class GameServiceProvider implements ServiceProvider{
     private TarantulaLogger logger;
     private final String NAME;
 
-    private DataStore dataStore;
-
-
     private ConcurrentHashMap<String,Room> roomIndex = new ConcurrentHashMap<>();
 
 
@@ -54,7 +51,6 @@ public class GameServiceProvider implements ServiceProvider{
     public void setup(ServiceContext serviceContext) {
         this.logger = serviceContext.logger(GameServiceProvider.class);
         this.serviceContext = serviceContext;
-        this.dataStore = serviceContext.dataStore(NAME.replace("-","_"),serviceContext.partitionNumber());//typeId_service
         this.subscription = UUID.randomUUID().toString();
         integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         integrationCluster.subscribe(subscription,(e)->{

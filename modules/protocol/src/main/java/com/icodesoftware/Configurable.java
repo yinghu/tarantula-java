@@ -7,7 +7,10 @@ import com.icodesoftware.service.ServiceContext;
 public interface Configurable extends Recoverable, DataStore.Updatable {
 
     default <T extends Configurable> void registerListener(Listener<T> listener){}
-    default void update(ServiceContext serviceContext){}
+
+    default void registered(){};
+    default void released(){}
+    default void updated(ServiceContext serviceContext){}
 
     default String configurationType(){return null;}
     default void configurationType(String configurationType){}

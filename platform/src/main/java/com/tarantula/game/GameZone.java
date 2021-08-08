@@ -42,7 +42,8 @@ public interface GameZone extends Configurable{
     void onTimer(Module.OnUpdate onUpdate);
     void addArena(Arena arena);
     List<Arena> arenas();
-    void start(ApplicationContext applicationContext);
+    Arena arena(int level);
+    void setup(ApplicationContext applicationContext);
 
     void roomProxy(RoomProxy roomProxy);
 

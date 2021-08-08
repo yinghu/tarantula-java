@@ -1,9 +1,6 @@
-package com.tarantula.game.service;
+package com.tarantula.game;
 
-
-import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.platform.RoomRegistry;
-
 
 public class GameRoomRegistry extends RoomRegistry {
 

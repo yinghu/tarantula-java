@@ -109,6 +109,9 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public List<Arena> arenas(){
         return arenaList;
     }
+    public Arena arena(int level){
+        return levelIndex.get(level).copy();
+    }
     public String playMode(){
         return playMode;
     }
@@ -195,7 +198,15 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     }
 
     @Override
-    public void update(ServiceContext serviceContext){//config sync callback
+    public void registered(){
+        listeners.forEach((l)->l.onLoaded(this));
+    }
+    @Override
+    public void released(){
+        listeners.forEach((l)->l.onRemoved(this));
+    }
+    @Override
+    public void updated(ServiceContext serviceContext){//config sync callback
         this.applicationContext.log("zone updated->"+distributionKey(), OnLog.WARN);
         GameZone updated = new DynamicLobbySetup().load(serviceContext,application);
         reset(updated);
@@ -206,7 +217,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         listeners.add(listener);
     }
     @Override
-    public void start(ApplicationContext applicationContext) {
+    public void setup(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         this.application = this.applicationContext.descriptor();
         if(levelLimit==0||levelLimit>application.capacity()){
@@ -214,7 +225,6 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         }
         listArena();
         roomProxy.setup(applicationContext,this);
-        this.listeners.forEach(l->l.onLoaded(this));
     }
 
     public boolean connected(){

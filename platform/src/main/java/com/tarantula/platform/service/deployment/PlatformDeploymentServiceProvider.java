@@ -775,7 +775,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return;
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
-        //configurable.update(new ServiceContextProxy(this.tarantulaContext));
+        configurable.registered();
     }
     public void configure(String key){
         if(vMap.containsKey(key)){
@@ -981,12 +981,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public <T extends Configurable> void release(T configurable){
-        this.vMap.remove(configurable.distributionKey());
+        Configurable removed = this.vMap.remove(configurable.distributionKey());
+        removed.released();
     }
     public void syncKey(String key){
         if(vMap.containsKey(key)){
             Configurable configurable = vMap.get(key);
-            configurable.update(new ServiceContextProxy(this.tarantulaContext));
+            configurable.updated(new ServiceContextProxy(this.tarantulaContext));
         }
     }
     public String registerQueryCallback(RecoverService.QueryCallback queryCallback, RecoverService.QueryEndCallback queryEndCallback){

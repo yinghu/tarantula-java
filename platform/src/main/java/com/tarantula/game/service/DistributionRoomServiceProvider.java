@@ -48,6 +48,8 @@ public class DistributionRoomServiceProvider implements GameRoomServiceProvider 
     }
     public String onRegister(Arena arena,Rating rating){
         logger.warn("Zone registered->"+arena.owner());
+        GameZone gameZone = this.gameZoneIndex.get(arena.owner());
+
         return rating.owner()+"/"+arena.level;
     }
     public GameRoom onJoin(Arena arena,String roomId,String systemId){
@@ -67,5 +69,10 @@ public class DistributionRoomServiceProvider implements GameRoomServiceProvider 
     }
     public void onUpdated(GameZone updated){
         logger.warn("zone updated in room service provider->"+updated.distributionKey());
+    }
+    public void onRemoved(GameZone remoted){
+        logger.warn("zone removed in room service provider->"+remoted.distributionKey());
+        gameZoneIndex.remove(remoted.distributionKey());
+        gameZoneIndex.remove(remoted.distributionKey());
     }
 }
