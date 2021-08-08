@@ -56,6 +56,17 @@
                 <type-id>admin-role</type-id>
                 <name>Admin Role</name>
                 <type>application</type>
+                <category>data</category>
+                <tag>role/data</tag>
+                <module-name>com.tarantula.admin.GameDataAdminModule</module-name>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <access-control>30</access-control>
+            </application>
+            <application>
+                <type-id>admin-role</type-id>
+                <name>Admin Role</name>
+                <type>application</type>
                 <category>achievement</category>
                 <tag>role/achievement</tag>
                 <module-name>com.tarantula.admin.AchievementAdminModule</module-name>
@@ -118,6 +129,9 @@
             </view>
             <view type="api.service.data">
                 <property name="moduleResourceFile">admin/api.service.data.view.html</property>
+            </view>
+            <view type="api.service.data1">
+                <property name="moduleResourceFile">admin/api.service.data1.view.html</property>
             </view>
             <view type="api.game.lobby">
                 <property name="moduleResourceFile">admin/api.game.lobby.view.html</property>

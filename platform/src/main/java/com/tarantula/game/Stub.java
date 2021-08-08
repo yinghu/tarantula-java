@@ -5,7 +5,10 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Connection;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.Tournament;
+import com.tarantula.platform.AssociateKey;
+
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.statistics.StatsDelta;
 
@@ -15,6 +18,8 @@ import java.util.Map;
 
 
 public class Stub extends ResponseHeader implements Portable {
+
+    public boolean joined;
 
     public GameRoom room;
     public boolean offline;
@@ -84,14 +89,36 @@ public class Stub extends ResponseHeader implements Portable {
     }
     @Override
     public Map<String,Object> toMap(){
+        properties.put("joined",joined);
         properties.put("roomId",roomId);
+
         return properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        roomId = (String)properties.get("roomId");
+        joined = (boolean)properties.getOrDefault("joined",false);
+        roomId = (String)properties.getOrDefault("roomId",null);
     }
-
+    @Override
+    public Recoverable.Key key(){
+        return new AssociateKey(this.bucket,this.oid,label);
+    }
+    @Override
+    public String distributionKey() {
+        if(this.bucket!=null&&this.oid!=null){
+            return new StringBuffer(this.bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(label).toString();
+        }
+        else{
+            return null;
+        }
+    }
+    @Override
+    public void distributionKey(String distributionKey) {
+        String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
+        this.bucket = klist[0];
+        this.oid = klist[1];
+        if(klist.length==3) this.label = klist[2];
+    }
     @Override
     public int getFactoryId() {
         return GamePortableRegistry.OID;
@@ -109,5 +136,9 @@ public class Stub extends ResponseHeader implements Portable {
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         roomId = portableReader.readUTF("roomId");
+    }
+    @Override
+    public String toString(){
+        return label+"=>"+super.toString();
     }
 }

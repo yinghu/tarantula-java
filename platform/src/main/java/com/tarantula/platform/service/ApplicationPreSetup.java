@@ -20,5 +20,5 @@ public interface ApplicationPreSetup {
 
     <T extends Configurable> void save(ApplicationContext context, GameCluster application, T t);
     <T extends Configurable> List<T> list(ApplicationContext context, GameCluster application, RecoverableFactory<T> recoverableFactory);
-
+    byte[] load(ApplicationContext context,GameCluster application,byte[] key);
 }

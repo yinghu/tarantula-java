@@ -121,6 +121,11 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
         });
         return arrayList;
     }
+    public byte[] load(ApplicationContext context,GameCluster application,byte[] key){
+        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        byte[] data = dataStore.backup().get(key);
+        return data!=null?data:"{}".getBytes();
+    }
     private String serviceDataStore(Descriptor application){
         return application.typeId().replace("-lobby","_service");
     }

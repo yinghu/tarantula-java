@@ -67,6 +67,10 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         }
         Arena arena = levelIndex.get(rating.xpLevel>levelLimit?levelLimit:rating.xpLevel);
         Stub stub = new Stub();
+        stub.distributionKey(session.systemId());
+        stub.label(application.tag());
+        dataStore.createIfAbsent(stub,true);
+        this.applicationContext.log(stub.toString(),OnLog.WARN);
         stub.successful(true);
         stub.rating = rating;
         stub.arena = arena;
@@ -76,6 +80,9 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         rating.owner(session.systemId());
         GameRoom room = roomProxy.join(session,arena,rating);
         //setup after joining
+        stub.joined = true;
+        dataStore.update(stub);
+        this.applicationContext.log(stub.toString(),OnLog.WARN);
         stub.room = room;
         stub.offline = room.offline;
         stub.instance = room.instance;
@@ -90,7 +97,10 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         }
     }
     public void leave(String systemId){
-        stubIndex.remove(systemId);
+        Stub stub = stubIndex.remove(systemId);
+        stub.joined = false;
+        this.dataStore.update(stub);
+        this.applicationContext.log(stub.toString(),OnLog.WARN);
         roomProxy.leave(systemId);
     }
     public void addArena(Arena arena){

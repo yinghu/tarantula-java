@@ -22,7 +22,6 @@ public class GameStoreAdminModule implements Module {
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-
             Descriptor app = this.loadDescriptor(gameCluster,this.context.descriptor().category());
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             List<Item> items = preSetup.list(this.context,app,new ItemQuery());
