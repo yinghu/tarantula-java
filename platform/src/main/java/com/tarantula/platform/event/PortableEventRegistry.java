@@ -54,8 +54,6 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int EXPOSED_GAME_SERVICE_CID = 108;
 
-    public static final int GAME_STUB_CID = 109;
-
     public static final int RATING_CID = 110;
 
     public static final int ROOM_CID = 111;
@@ -116,9 +114,6 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case ACCESS_INDEX_CID:
                 _ins = new AccessIndexTrack();
-                break;
-            case GAME_STUB_CID:
-                _ins = new Stub();
                 break;
             case RATING_CID:
                 _ins = new Rating();

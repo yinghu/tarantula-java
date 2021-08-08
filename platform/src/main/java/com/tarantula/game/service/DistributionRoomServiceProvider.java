@@ -4,12 +4,16 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.*;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public class DistributionRoomServiceProvider implements GameRoomServiceProvider {
 
     private TarantulaLogger logger;
     private final String name;
     private DataStore dataStore;
     private DistributionRoomService distributionRoomService;
+
+    private ConcurrentHashMap<String,GameZone> gameZoneIndex = new ConcurrentHashMap<>();
 
     public DistributionRoomServiceProvider(String name){
         this.name = name;
@@ -43,9 +47,11 @@ public class DistributionRoomServiceProvider implements GameRoomServiceProvider 
         this.distributionRoomService.leave(name,arena,roomId,systemId);
     }
     public String onRegister(Arena arena,Rating rating){
+        logger.warn("Zone registered->"+arena.owner());
         return rating.owner()+"/"+arena.level;
     }
     public GameRoom onJoin(Arena arena,String roomId,String systemId){
+        logger.warn("Zone joined->"+arena.owner());
         GameRoom stub = new GameRoom(true);
         stub.roomId = roomId;
         return stub;
@@ -55,8 +61,9 @@ public class DistributionRoomServiceProvider implements GameRoomServiceProvider 
     }
 
 
-    public  void onLoaded(GameZone updated){
-        logger.warn("zone loaded in room service provider->"+updated.distributionKey());
+    public  void onLoaded(GameZone loaded){
+        logger.warn("zone loaded in room service provider->"+loaded.distributionKey());
+        gameZoneIndex.put(loaded.distributionKey(),loaded);
     }
     public void onUpdated(GameZone updated){
         logger.warn("zone updated in room service provider->"+updated.distributionKey());

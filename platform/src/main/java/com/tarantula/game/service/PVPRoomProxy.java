@@ -8,7 +8,7 @@ public class PVPRoomProxy extends RoomProxyHeader {
 
     @Override
     public GameRoom join(Session session, Arena arena, Rating rating) {
-
+        arena.owner(gameZone.distributionKey());
         GameRoom room = gameServiceProvider.roomServiceProvider().join(arena,rating);
         return room;
     }

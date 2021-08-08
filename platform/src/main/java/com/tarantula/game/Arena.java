@@ -64,12 +64,14 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
 
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeInt("1",level);
+        portableWriter.writeUTF("1",owner);
+        portableWriter.writeInt("2",level);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
-        level = portableReader.readInt("1");
+        owner = portableReader.readUTF("1");
+        level = portableReader.readInt("2");
     }
 
     @Override

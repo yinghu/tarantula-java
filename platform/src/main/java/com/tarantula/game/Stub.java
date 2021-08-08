@@ -5,15 +5,13 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Connection;
-import com.icodesoftware.Consumable;
 import com.icodesoftware.Tournament;
-import com.icodesoftware.protocol.DataBuffer;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.statistics.StatsDelta;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 
 public class Stub extends ResponseHeader implements Portable {
@@ -35,14 +33,7 @@ public class Stub extends ResponseHeader implements Portable {
     public Rating rating;
     public Connection connection;
     public Tournament.Instance instance; //
-    public Consumable consumable;
-    /**
-     * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
-     * rank - final result 1,2 rank xp = (1/rank)*100  1 - 100 2 50 ..
-     * xp-delta = (1/rank)*(100)+pxp*(100)+csw*(100); //cws only if last is cws
-     * zxp = zxp +xp-delta
-     * xp = xp + xp-delta
-      */
+
 
     public Stub(){}
 
@@ -89,36 +80,25 @@ public class Stub extends ResponseHeader implements Portable {
             jp.addProperty("port",connection.port());
             jo.add("connection",jp);
         }
-        if(consumable!=null){
-            jo.add("configurations",consumable.toJson());
-        }
         return jo;
+    }
+    @Override
+    public Map<String,Object> toMap(){
+        properties.put("roomId",roomId);
+        return properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        roomId = (String)properties.get("roomId");
     }
 
     @Override
-    public byte[] toBinary(){
-        DataBuffer dataBuffer = new DataBuffer();
-        dataBuffer.putInt(rank);
-        dataBuffer.putDouble(pxp);
-        dataBuffer.putInt(rankUpBase);
-        dataBuffer.putInt(levelUpBase);
-        return dataBuffer.toArray();
-    }
-    @Override
-    public void fromBinary(byte[] payload){
-        DataBuffer buffer = new DataBuffer(payload);
-        this.rank = buffer.getInt();
-        this.pxp = buffer.getDouble();
-        this.rankUpBase = buffer.getInt();
-        this.levelUpBase = buffer.getInt();
-    }
-    @Override
     public int getFactoryId() {
-        return PortableEventRegistry.OID;
+        return GamePortableRegistry.OID;
     }
     @Override
     public int getClassId() {
-        return PortableEventRegistry.GAME_STUB_CID;
+        return GamePortableRegistry.STUB_CID;
     }
 
     @Override
