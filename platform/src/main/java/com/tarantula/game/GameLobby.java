@@ -5,6 +5,8 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.IndexSet;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,6 +22,11 @@ public class GameLobby extends IndexSet implements Configurable {
     }
     public void addGameZone(GameZone gameZone){
         gameZones.put(gameZone.distributionKey(),gameZone);
+    }
+    public List<GameZone> list(){
+        ArrayList<GameZone> list = new ArrayList<>();
+        gameZones.forEach((k,v)->{list.add(v);});
+        return list;
     }
     @Override
     public Map<String,Object> toMap(){

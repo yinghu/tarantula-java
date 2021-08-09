@@ -6,8 +6,8 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.game.service.DynamicLobbySetup;
-import com.tarantula.platform.AssociateKey;
+import com.tarantula.game.service.DynamicGameLobbySetup;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,7 +35,6 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     protected CopyOnWriteArrayList<Listener> listeners;
 
     public DynamicZone(){
-        this.label = "Zone";
         this.arenaList = new ArrayList<>();
         this.levelIndex = new ConcurrentHashMap<>();
         this.stubIndex = new ConcurrentHashMap<>();
@@ -46,10 +45,11 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.capacity = PVE_MAX_ROOM_CAPACITY;
     }
     
-    public DynamicZone(String name,String playMode){
+    public DynamicZone(String name,String playMode,int levelMatch){
         this();
         this.name = name;
         this.playMode = playMode;
+        this.levelMatch = levelMatch;
         if(playMode.equals(PLAY_MODE_PVP)){
             this.capacity = PVP_MAX_ROOM_CAPACITY;
         }
@@ -147,26 +147,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public void levelMatch(int levelMatch){
         this.levelMatch = levelMatch;
     }
-    @Override
-    public Recoverable.Key key(){
-        return new AssociateKey(this.bucket,this.oid,this.label);
-    }
 
-    @Override
-    public String distributionKey() {
-        if(this.bucket!=null&&this.oid!=null){
-            return new StringBuffer(this.bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(label).toString();
-        }
-        else{
-            return null;
-        }
-    }
-    @Override
-    public void distributionKey(String distributionKey) {
-        String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
-        this.bucket = klist[0];
-        this.oid = klist[1];
-    }
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",capacity);
@@ -213,7 +194,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     @Override
     public void updated(ServiceContext serviceContext){//config sync callback
         this.applicationContext.log("zone updated->"+distributionKey(), OnLog.WARN);
-        GameZone updated = new DynamicLobbySetup().load(serviceContext,application);
+        GameZone updated = new DynamicGameLobbySetup().loadGameZone(this.dataStore,this.distributionKey());
         reset(updated);
         listeners.forEach((l)->l.onUpdated(updated));
     }

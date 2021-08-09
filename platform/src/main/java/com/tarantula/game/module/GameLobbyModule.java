@@ -76,7 +76,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.deploymentServiceProvider = applicationContext.serviceProvider(DeploymentServiceProvider.NAME);
         this.gameServiceProvider = applicationContext.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
-        this.gameZone = this.gameServiceProvider.zone(this.context.descriptor());
+        this.gameZone = this.gameServiceProvider.lobby(this.context.descriptor()).list().get(0);
         this.gameZone.registerListener(this.gameServiceProvider.roomServiceProvider());
         this.gameZone.setup(this.context);
         this.deploymentServiceProvider.register(this.gameZone);

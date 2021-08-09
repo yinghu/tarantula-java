@@ -6,16 +6,15 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Configurable;
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.IndexKey;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 import java.util.Map;
 
 public class Arena extends RecoverableObject implements Configurable, Portable {
+    public static String LABEL = "ZNR";
     public int level;
     public int xp;
     public int capacity;
@@ -24,11 +23,9 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
 
     public JsonObject payload = new JsonObject();
 
-    public Arena(){}
-    public Arena(String bucket,String oid,int level){
-        this.bucket = bucket;
-        this.oid = oid;
-        this.routingNumber = level;
+    public Arena(){
+        this.label = LABEL;
+        this.onEdge = true;
     }
     @Override
     public Map<String,Object> toMap(){
@@ -74,26 +71,6 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
         level = portableReader.readInt("2");
     }
 
-    @Override
-    public String distributionKey() {
-        if(this.bucket!=null&&this.oid!=null){
-            return new StringBuffer(this.bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(routingNumber).toString();
-        }
-        else{
-            return null;
-        }
-    }
-    @Override
-    public void distributionKey(String distributionKey) {
-        String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
-        this.bucket = klist[0];
-        this.oid = klist[1];
-        this.routingNumber = Integer.parseInt(klist[2]);
-    }
-    @Override
-    public Key key(){
-        return new IndexKey(this.bucket,this.oid,this.routingNumber);
-    }
     public Arena copy(){
         Arena _cp = new Arena();
         _cp.level = this.level;

@@ -52,8 +52,8 @@ public class GameLobbyAdminModule implements Module {
             String applicationId = (String) cmd.get("applicationId");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
             Descriptor app = loadDescriptor(gameCluster,applicationId);
-            GameZone zone = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
-            session.write(toJson(app,zone).toString().getBytes());
+            GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
+            session.write(toJson(app,lobby.list().get(0)).toString().getBytes());
         }
         else if (session.action().equals("onAddLobby")){
             Map<String,Object> cmd = JsonUtil.toMap(payload);
@@ -104,7 +104,8 @@ public class GameLobbyAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
             String lobbyId = (String)cmd.get("lobbyId");
             Descriptor app = loadDescriptor(gameCluster,lobbyId);
-            GameZone zone = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
+            GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
+            GameZone zone = lobby.list().get(0);
             this.deploymentServiceProvider.configure(zone.distributionKey());
             session.write(JsonUtil.toSimpleResponse(true,"Lobby reloaded").getBytes());
         }
@@ -112,7 +113,8 @@ public class GameLobbyAdminModule implements Module {
             String[] keys = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(keys[0]);
             Descriptor app = loadDescriptor(gameCluster,keys[1]);
-            GameZone zone = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
+            GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
+            GameZone zone = lobby.list().get(0);
             boolean updated = zone.configureAndValidate(payload);
             if(updated){
                 zone.update();
@@ -177,6 +179,7 @@ public class GameLobbyAdminModule implements Module {
         JsonObject jzon = new JsonObject();
         jzon.addProperty("zoneId",zone.distributionKey());
         jzon.addProperty("name",zone.name()!=null?zone.name():lobby.name());
+        jzon.addProperty("levelMatch",zone.levelMatch());
         jzon.addProperty("tag",lobby.tag());
         jzon.addProperty("rank",lobby.accessRank());
         jzon.addProperty("capacity",zone.capacity());

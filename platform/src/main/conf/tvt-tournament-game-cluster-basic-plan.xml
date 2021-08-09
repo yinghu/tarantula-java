@@ -43,7 +43,7 @@
         </application-list>
         <configuration-list>
             <configuration type="pre-setup" name="tvt">
-                <property name="application-pre-setup">com.tarantula.game.service.DynamicLobbySetup</property>
+                <property name="application-pre-setup">com.tarantula.game.service.DynamicGameLobbySetup</property>
             </configuration>
         </configuration-list>
     </lobby-context>
