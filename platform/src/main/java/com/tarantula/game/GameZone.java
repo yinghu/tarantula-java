@@ -50,7 +50,7 @@ public interface GameZone extends Configurable{
     interface RoomProxy{
         GameRoom join(Session session,Arena  arena,Rating rating);
         void update(String systemId,Tournament.Instance instance);
-        void leave(String systemId);
+        void leave(Stub stub);
         default void onTimer(Module.OnUpdate onUpdate){}
         void setup(ApplicationContext applicationContext,GameZone gameZone);
     }

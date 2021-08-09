@@ -10,7 +10,7 @@ public class TVERoomProxy extends RoomProxyHeader {
     public GameRoom join(Session session, Arena arena, Rating rating) {
         return new GameRoom();
     }
-    public void leave(String systemId){
+    public void leave(Stub stub){
 
     }
     public void onTimer(Module.OnUpdate onUpdate){

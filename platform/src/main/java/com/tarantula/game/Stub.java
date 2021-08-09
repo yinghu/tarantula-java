@@ -1,9 +1,6 @@
 package com.tarantula.game;
 
 import com.google.gson.JsonObject;
-import com.hazelcast.nio.serialization.Portable;
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Tournament;
@@ -12,12 +9,11 @@ import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.statistics.StatsDelta;
 
-import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 
-public class Stub extends ResponseHeader implements Portable {
+public class Stub extends ResponseHeader {
 
     public boolean joined;
 
@@ -38,7 +34,6 @@ public class Stub extends ResponseHeader implements Portable {
     public Rating rating;
     public Connection connection;
     public Tournament.Instance instance; //
-
 
     public Stub(){}
 
@@ -128,15 +123,6 @@ public class Stub extends ResponseHeader implements Portable {
         return GamePortableRegistry.STUB_CID;
     }
 
-    @Override
-    public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeUTF("roomId",roomId);
-    }
-
-    @Override
-    public void readPortable(PortableReader portableReader) throws IOException {
-        roomId = portableReader.readUTF("roomId");
-    }
     @Override
     public String toString(){
         return label+"=>"+super.toString();

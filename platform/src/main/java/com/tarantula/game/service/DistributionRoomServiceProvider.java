@@ -13,7 +13,8 @@ public class DistributionRoomServiceProvider implements GameRoomServiceProvider 
     private DataStore dataStore;
     private DistributionRoomService distributionRoomService;
 
-    private ConcurrentHashMap<String,GameZone> gameZoneIndex = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,GameRoomRegistryManager> gameRoomRegistryManagers = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,GameRoomManager> gameRoomManagers = new ConcurrentHashMap<>();
 
     public DistributionRoomServiceProvider(String name){
         this.name = name;
@@ -47,16 +48,13 @@ public class DistributionRoomServiceProvider implements GameRoomServiceProvider 
         this.distributionRoomService.leave(name,arena,roomId,systemId);
     }
     public String onRegister(Arena arena,Rating rating){
-        logger.warn("Zone registered->"+arena.owner());
-        GameZone gameZone = this.gameZoneIndex.get(arena.owner());
-
-        return rating.owner()+"/"+arena.level;
+        GameRoomRegistryManager gameRoomRegistryManager = gameRoomRegistryManagers.get(arena.owner());
+        return gameRoomRegistryManager.register(rating.owner()).instanceId();
     }
     public GameRoom onJoin(Arena arena,String roomId,String systemId){
-        logger.warn("Zone joined->"+arena.owner());
-        GameRoom stub = new GameRoom(true);
-        stub.roomId = roomId;
-        return stub;
+        GameRoomManager gameRoomManager = gameRoomManagers.get(arena.owner());
+        GameRoom gameRoom = gameRoomManager.join(arena,roomId,systemId);
+        return gameRoom;
     }
     public void onLeave(String roomId,String systemId){
         logger.warn(systemId+" leave->"+roomId);
@@ -65,14 +63,15 @@ public class DistributionRoomServiceProvider implements GameRoomServiceProvider 
 
     public  void onLoaded(GameZone loaded){
         logger.warn("zone loaded in room service provider->"+loaded.distributionKey());
-        gameZoneIndex.put(loaded.distributionKey(),loaded);
+        gameRoomRegistryManagers.put(loaded.distributionKey(),new GameRoomRegistryManager(dataStore,loaded));
+        gameRoomManagers.put(loaded.distributionKey(),new GameRoomManager(dataStore,loaded));
     }
     public void onUpdated(GameZone updated){
         logger.warn("zone updated in room service provider->"+updated.distributionKey());
     }
     public void onRemoved(GameZone remoted){
         logger.warn("zone removed in room service provider->"+remoted.distributionKey());
-        gameZoneIndex.remove(remoted.distributionKey());
-        gameZoneIndex.remove(remoted.distributionKey());
+        gameRoomRegistryManagers.remove(remoted.distributionKey());
+        gameRoomManagers.remove(remoted.distributionKey());
     }
 }

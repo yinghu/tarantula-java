@@ -6,6 +6,7 @@ import com.tarantula.game.Arena;
 
 import com.tarantula.game.GameRoom;
 import com.tarantula.game.Rating;
+import com.tarantula.game.Stub;
 
 
 public class TVTRoomProxy extends RoomProxyHeader {
@@ -14,7 +15,7 @@ public class TVTRoomProxy extends RoomProxyHeader {
     public GameRoom join(Session session, Arena arena, Rating rating) {
         return new GameRoom();
     }
-    public void leave(String systemId){
+    public void leave(Stub stub){
 
     }
     public void onTimer(Module.OnUpdate onUpdate){

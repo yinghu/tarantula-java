@@ -117,7 +117,9 @@ public class GameServiceProvider implements ServiceProvider{
     public GameRoom onJoinRoom(Arena arena,String roomId,String systemId){
         return roomServiceProvider.onJoin(arena,roomId,systemId);
     }
-
+    public void onLeaveRoom(String roomId,String systemId){
+        this.roomServiceProvider.onLeave(roomId,systemId);
+    }
 
     //player data service provider hook calls
     public Rating rating(String systemId){

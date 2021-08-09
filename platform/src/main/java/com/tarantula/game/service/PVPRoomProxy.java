@@ -12,8 +12,8 @@ public class PVPRoomProxy extends RoomProxyHeader {
         GameRoom room = gameServiceProvider.roomServiceProvider().join(arena,rating);
         return room;
     }
-    public void leave(String systemId){
-
+    public void leave(Stub stub){
+        this.gameServiceProvider.roomServiceProvider().leave(stub.arena,stub.roomId,stub.owner());
     }
     public void onTimer(Module.OnUpdate onUpdate){
         //gameServiceProvider.roomServiceProvider().leave(arena,_remote.roomId,rating.distributionKey());

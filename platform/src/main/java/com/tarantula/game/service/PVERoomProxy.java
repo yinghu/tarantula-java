@@ -17,7 +17,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         }
         return new GameRoom(true);
     }
-    public void leave(String systemId){
+    public void leave(Stub stub){
         if(application.tournamentEnabled()){
             //gameServiceProvider.tournamentServiceProvider().leave();
         }
