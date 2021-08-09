@@ -24,4 +24,5 @@ public interface ServiceContext {
     String nodeId();
     RecoverableRegistry recoverableRegistry(int registryId);
     TokenValidatorProvider.AuthVendor authVendor(String name);
+    Configuration configuration(String config);
 }

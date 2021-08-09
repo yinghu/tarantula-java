@@ -25,7 +25,7 @@
                 <category>game</category>
                 <tag>game/lobby1</tag>
                 <module-name>com.tarantula.game.module.GameLobbyModule</module-name>
-                <capacity>10</capacity>
+                <capacity>10</capacity><!--max zone count per game lobby -->
                 <access-rank>1</access-rank>
                 <timer-on-module>1000</timer-on-module>
             </application>
@@ -43,7 +43,7 @@
         </application-list>
         <configuration-list>
             <configuration type="pre-setup" name="pvp">
-                <property name="application-pre-setup">com.tarantula.game.service.DynamicLobbySetup</property>
+                <property name="application-pre-setup">com.tarantula.game.service.DynamicGameLobbySetup</property>
             </configuration>
         </configuration-list>
     </lobby-context>

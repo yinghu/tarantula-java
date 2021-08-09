@@ -36,6 +36,9 @@ public class GameServiceProvider implements ServiceProvider{
         NAME = name;
     }
 
+    public GameLobby lobby(Descriptor descriptor){
+        return new GameLobby();
+    }
     public GameZone zone(Descriptor descriptor){//application id
         DynamicLobbySetup dynamicLobbySetup = new DynamicLobbySetup();
         return dynamicLobbySetup.load(serviceContext,descriptor);

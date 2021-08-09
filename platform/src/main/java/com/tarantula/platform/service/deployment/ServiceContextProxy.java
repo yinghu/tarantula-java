@@ -81,4 +81,7 @@ public class ServiceContextProxy implements ServiceContext {
     public DeploymentServiceProvider deploymentServiceProvider(){
         return this.tarantulaContext.deploymentServiceProvider();
     }
+    public Configuration configuration(String config){
+        return this.tarantulaContext.configuration(config);
+    }
 }

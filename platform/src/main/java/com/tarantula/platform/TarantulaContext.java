@@ -5,10 +5,12 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
+import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.cci.RequestHandler;
@@ -763,5 +765,12 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     public ModuleClassLoader moduleClassLoader(String moduleId){
  	    return (ModuleClassLoader)this.deploymentService().classLoader(moduleId);
+    }
+
+    public Configuration configuration(String config){
+        Map<String,Object> kv = JsonUtil.toMap(Thread.currentThread().getContextClassLoader().getResourceAsStream(config+".json"));
+        ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration();
+        kv.forEach((k,v)->applicationConfiguration.property(k,v));
+        return applicationConfiguration;
     }
 }

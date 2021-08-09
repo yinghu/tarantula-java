@@ -101,4 +101,26 @@ public class JsonUtil {
         InputStreamReader inr = new InputStreamReader(jsonInput);
         return jp.parse(inr).getAsJsonObject();
     }
+    public static Map<String,Object> toMap(InputStream jsonInput){
+        JsonParser jp = new JsonParser();
+        InputStreamReader inr = new InputStreamReader(jsonInput);
+        JsonElement j = jp.parse(inr);
+        Map<String,Object> _mv = new HashMap<>();
+        j.getAsJsonObject().entrySet().forEach((e)->{
+            JsonElement je = e.getValue();
+            if(je.isJsonPrimitive()){
+                JsonPrimitive m = je.getAsJsonPrimitive();
+                if(m.isString()){
+                    _mv.put(e.getKey(),m.getAsString());
+                }
+                else if(m.isNumber()){
+                    _mv.put(e.getKey(),m.getAsNumber());
+                }
+                else if(m.isBoolean()){
+                    _mv.put(e.getKey(),m.getAsBoolean());
+                }
+            }
+        });
+        return _mv;
+    }
 }

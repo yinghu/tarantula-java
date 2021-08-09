@@ -126,14 +126,14 @@ public class DynamicLobbySetup implements ApplicationPreSetup {
         byte[] data = dataStore.backup().get(key);
         return data!=null?data:"{}".getBytes();
     }
-    private String serviceDataStore(Descriptor application){
+    protected String serviceDataStore(Descriptor application){
         return application.typeId().replace("-lobby","_service");
     }
-    private String serviceDataStore(GameCluster application){
+    protected String serviceDataStore(GameCluster application){
         String serviceTypeId = (String) application.property(GameCluster.GAME_SERVICE);
         return serviceTypeId.replaceAll("-","_");
     }
-    private GameZone.RoomProxy joinProxy(String playMode){
+    protected GameZone.RoomProxy joinProxy(String playMode){
         GameZone.RoomProxy roomProxy = new PVERoomProxy();
         if(playMode.equals(GameZone.PLAY_MODE_PVP)){
             roomProxy = new PVPRoomProxy();

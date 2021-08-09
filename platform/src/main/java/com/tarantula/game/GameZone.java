@@ -23,6 +23,8 @@ public interface GameZone extends Configurable{
 
     String name();
     void name(String name);
+    int levelMatch();
+    void levelMatch(int levelMatch);
     String playMode();
     int levelLimit();
     void levelLimit(int levelLimit);

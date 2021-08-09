@@ -18,6 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DynamicZone extends RecoverableObject implements GameZone {
 
+    protected int levelMatch;
     protected String playMode;
     protected int levelLimit;
     protected int capacity;
@@ -140,7 +141,12 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public void roundDuration(long roundDuration){
         this.roundDuration = roundDuration;
     }
-
+    public int levelMatch(){
+        return levelMatch;
+    }
+    public void levelMatch(int levelMatch){
+        this.levelMatch = levelMatch;
+    }
     @Override
     public Recoverable.Key key(){
         return new AssociateKey(this.bucket,this.oid,this.label);
@@ -165,7 +171,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public Map<String,Object> toMap(){
         this.properties.put("1",capacity);
         this.properties.put("2",roundDuration);
-        //this.properties.put("3",overtime);
+        this.properties.put("3",levelMatch);
         this.properties.put("5",name);
         this.properties.put("6",this.timestamp);
         this.properties.put("7",this.levelLimit);
@@ -177,7 +183,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public void fromMap(Map<String,Object> properties){
         this.capacity = ((Number)properties.getOrDefault("1",capacity)).intValue();
         this.roundDuration = ((Number)properties.getOrDefault("2",roundDuration)).longValue();
-        //this.overtime = ((Number)properties.getOrDefault("3",overtime)).longValue();
+        this.levelMatch = ((Number)properties.getOrDefault("3",levelMatch)).intValue();
         this.name = (String)properties.get("5");
         this.timestamp = ((Number)properties.getOrDefault("6",0)).longValue();
         this.levelLimit = ((Number)properties.getOrDefault("7",levelLimit)).intValue();

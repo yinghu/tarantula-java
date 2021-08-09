@@ -18,6 +18,7 @@ public class IndexSet extends RecoverableObject {
         this.label = label;
     }
 
+    @Override
     public int getFactoryId() {
         return PortableRegistry.OID;
     }
@@ -36,10 +37,12 @@ public class IndexSet extends RecoverableObject {
        });
     }
 
+    @Override
     public int getClassId() {
         return PortableRegistry.INDEX_SET_CID;
     }
 
+    @Override
     public Recoverable.Key key(){
         return new AssociateKey(this.bucket,this.oid,this.label);
     }
