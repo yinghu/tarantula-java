@@ -80,9 +80,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
         this.gameZone.registerListener(this.gameServiceProvider.roomServiceProvider());
         this.gameZone.setup(this.context);
         this.deploymentServiceProvider.register(this.gameZone);
-        if(this.gameZone.connected()){
-            this.deploymentServiceProvider.registerOnConnectionListener(this);
-        }
+        if(this.gameZone.connected()) this.deploymentServiceProvider.registerOnConnectionListener(this);
         this.context.log("Game lobby started on tag ["+context.descriptor().tag()+"]",OnLog.WARN);
     }
     @Override

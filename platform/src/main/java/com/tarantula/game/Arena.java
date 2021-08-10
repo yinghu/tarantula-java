@@ -97,9 +97,7 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
         this.capacity = ((Number)map.get("capacity")).intValue();
         this.duration = ((Number)map.get("duration")).intValue()*60000;
         this.xp = ((Number)map.get("xp")).intValue();
-        if(map.containsKey("payload")){
-            payload = ((JsonElement)map.get("payload")).getAsJsonObject();
-        }
+        if(map.containsKey("payload")) payload = ((JsonElement)map.get("payload")).getAsJsonObject();
         return true;
     }
 }

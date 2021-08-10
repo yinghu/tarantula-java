@@ -30,9 +30,7 @@ public class Rating extends RecoverableObject implements DataStore.Updatable, Po
     }
 
     public void update(Stub stub){
-        if(stub.rank==0){
-            return;
-        }
+        if(stub.rank==0) return;
         double dxp = (1/stub.rank+stub.pxp/BASE_POINTS)*BASE_POINTS;
         if(stub.rank==1){
             csw++;

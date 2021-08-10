@@ -18,9 +18,7 @@ public class GameClusterContext extends ResponseHeader {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",successful);
         JsonArray glist = new JsonArray();
-        if(index>=gameClusterList.size()){
-            index=0;
-        }
+        if(index>=gameClusterList.size()) index=0;
         int len = pageSize;
         for(int i=index;i<gameClusterList.size();i++){
             GameCluster g = gameClusterList.get(i);
@@ -37,9 +35,8 @@ public class GameClusterContext extends ResponseHeader {
             jo.addProperty("tournamentEnabled",(Boolean)g.property(GameCluster.TOURNAMENT_ENABLED));
             jo.addProperty("disabled",(Boolean)g.property(GameCluster.DISABLED));
             glist.add(jo);
-            if(len==0){
-                break;
-            }
+            if(len==0) break;
+
         }
         jsonObject.addProperty("index",index+(pageSize-len));
         jsonObject.add("gameClusterList",glist);

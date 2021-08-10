@@ -63,9 +63,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
 
     public Stub join(Session session,Rating rating){
         Stub _joined = stubIndex.get(session.systemId());
-        if(_joined!=null){
-            return _joined;
-        }
+        if(_joined!=null) return _joined;
         Arena arena = levelIndex.get(rating.xpLevel>levelLimit?levelLimit:rating.xpLevel);
         Stub stub = new Stub();
         stub.distributionKey(session.systemId());
@@ -175,9 +173,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     @Override
     public void update() {//local data store update
         arenaList.forEach((a)->{
-            if(!this.dataStore.update(a)){//failed if no key associated
-                this.dataStore.create(a);
-            }
+            if(!this.dataStore.update(a)) this.dataStore.create(a);
         });
         this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         this.dataStore.update(this);
@@ -206,9 +202,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public void setup(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         this.application = this.applicationContext.descriptor();
-        if(levelLimit==0||levelLimit>application.capacity()){
-            levelLimit = this.application.capacity();
-        }
+        if(levelLimit==0||levelLimit>application.capacity()) levelLimit = this.application.capacity();
         listArena();
         roomProxy.setup(applicationContext,this);
     }
@@ -222,31 +216,21 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     }
 
     private void listArena(){
-        if(arenaList.size()==0){
-            return;
-        }
+        if(arenaList.size()==0) return;
         int fi = levelLimit;//this.descriptor.capacity();
         for(Arena a : arenaList){
-            if(a.disabled()){
-                continue;
-            }
+            if(a.disabled()) continue;
             if(a.level>0&&a.level<=levelLimit){
                 levelIndex.put(a.level,a);
-                if(a.level<fi){
-                    fi = a.level;
-                }
+                if(a.level<fi) fi = a.level;
             }
         }
         //set 1 to max level count
         for(int i=1;i<this.levelLimit+1;i++){//max matching level
             Arena ex = levelIndex.get(i);
             if(ex==null){
-                if(levelIndex.get(i-1)!=null){
-                    levelIndex.put(i,levelIndex.get(i-1));//fill with last one
-                }
-                else{
-                    levelIndex.put(i,levelIndex.get(fi));//fill header
-                }
+                if(levelIndex.get(i-1)!=null) levelIndex.put(i,levelIndex.get(i-1));//fill with last one
+                else levelIndex.put(i,levelIndex.get(fi));//fill header
             }
         }
     }

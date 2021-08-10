@@ -27,9 +27,7 @@ public class MatchMakingModule implements Module, Lobby.Listener {
             Descriptor lobby = mZone.get(mix);
             //this.context.log("ACCESS MODE->"+session.accessMode(),OnLog.WARN);
             Response response = context.presence(session.systemId()).onPlay(session,lobby);
-            if(response!=null){
-                session.write(this.builder.create().toJson(response).getBytes());
-            }
+            if(response!=null) session.write(this.builder.create().toJson(response).getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action());

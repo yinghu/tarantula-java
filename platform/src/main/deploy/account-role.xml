@@ -23,7 +23,6 @@
                 <configuration type="setup" name="user">
                     <property name="maxUserCount">5</property>
                 </configuration>
-
         </configuration-list>
         <view-list>
             <view type="add.user">
