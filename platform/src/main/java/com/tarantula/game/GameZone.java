@@ -5,7 +5,7 @@ import com.icodesoftware.Module;
 
 import java.util.List;
 
-public interface GameZone extends Configurable{
+public interface GameZone extends Configurable,Initializer{
 
     String PLAY_MODE_PVE = "pve"; //player versus computer
     String PLAY_MODE_PVP = "pvp"; //player versus player
@@ -45,7 +45,6 @@ public interface GameZone extends Configurable{
     void addArena(Arena arena);
     List<Arena> arenas();
     Arena arena(int level);
-    void setup(ApplicationContext applicationContext);
 
     void roomProxy(RoomProxy roomProxy);
 

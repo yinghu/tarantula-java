@@ -198,8 +198,14 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public <T extends Configurable> void registerListener(Listener<T> listener){
         listeners.add(listener);
     }
+    public Descriptor descriptor(){
+        return application;
+    }
+    public void descriptor(Descriptor descriptor){
+
+    }
     @Override
-    public void setup(ApplicationContext applicationContext) {
+    public void setup(ApplicationContext applicationContext) throws Exception{
         this.applicationContext = applicationContext;
         this.application = this.applicationContext.descriptor();
         if(levelLimit==0||levelLimit>application.capacity()) levelLimit = this.application.capacity();

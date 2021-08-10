@@ -5,7 +5,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.GameZone;
+import com.tarantula.game.GameLobby;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
@@ -16,7 +16,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
     private GameServiceProvider gameServiceProvider;
-    private GameZone gameZone;
+    private GameLobby gameLobby;
     private GsonBuilder builder;
     private Descriptor application;
     @Override
@@ -26,14 +26,14 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
             return;
         }
         Rating rating = gameServiceProvider.rating(session.systemId());
-        Stub stub = gameZone.join(session,rating);
+        Stub stub = gameLobby.join(session,rating);
         session.write(stub.toJson().toString().getBytes());
     }
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onLeave")){
-            gameZone.leave(session.systemId());
+            gameLobby.leave(session.systemId());
             session.write(toMessage("left room",true).getBytes());
         }
         else if(session.action().equals("onUpdate")){
@@ -43,7 +43,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
             statistics.entry("stars").update(1).update();
             session.write(toMessage("updated",true).getBytes());
             if(application.tournamentEnabled()){
-                this.gameZone.update(session.systemId());
+                this.gameLobby.update(session.systemId());
             }
         }
         else if(session.action().equals("onTest")){
@@ -54,9 +54,9 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
                 Rating rating = this.gameServiceProvider.rating(session.systemId());
                 rating.xpLevel = onAccess.stub();
-                Stub stub = gameZone.join(session,rating);
+                Stub stub = gameLobby.join(session,rating);
                 session.write(stub.toJson().toString().getBytes());
-                gameZone.leave(session.systemId());
+                gameLobby.leave(session.systemId());
             }
         }
         else{
@@ -66,7 +66,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     }
     @Override
     public void onTimer(Module.OnUpdate update){
-        this.gameZone.onTimer(update);
+        this.gameLobby.onTimer(update);
     }
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
@@ -76,16 +76,20 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.deploymentServiceProvider = applicationContext.serviceProvider(DeploymentServiceProvider.NAME);
         this.gameServiceProvider = applicationContext.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
-        this.gameZone = this.gameServiceProvider.lobby(this.context.descriptor()).list().get(0);
-        this.gameZone.registerListener(this.gameServiceProvider.roomServiceProvider());
-        this.gameZone.setup(this.context);
-        this.deploymentServiceProvider.register(this.gameZone);
-        if(this.gameZone.connected()) this.deploymentServiceProvider.registerOnConnectionListener(this);
+        this.gameLobby = this.gameServiceProvider.lobby(this.context.descriptor());
+        this.gameLobby.setup(context);
+        this.gameLobby.start();
+        //this.gameZone.registerListener(this.gameServiceProvider.roomServiceProvider());
+        //this.gameZone.setup(this.context);
+        //this.deploymentServiceProvider.register(this.gameZone);
+        //if(this.gameZone.connected()) this.deploymentServiceProvider.registerOnConnectionListener(this);
         this.context.log("Game lobby started on tag ["+context.descriptor().tag()+"]",OnLog.WARN);
     }
     @Override
     public void clear() {
-        this.deploymentServiceProvider.release(gameZone);
+        try{
+            gameLobby.shutdown();
+        }catch (Exception ex){}
         this.context.log("clear->"+this.context.descriptor().tag(),OnLog.WARN);
     }
     //connection listener

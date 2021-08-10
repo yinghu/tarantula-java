@@ -31,7 +31,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
                 pt = new Rating();
                 break;
             case GAME_LOBBY_CID:
-                pt = new GameLobby();
+                pt = new DynamicGameLobby();
                 break;
             case GAME_ZONE_CID:
                 pt = new DynamicZone();

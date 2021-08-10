@@ -1,56 +1,19 @@
 package com.tarantula.game;
 
-import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
-import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.IndexSet;
+import com.icodesoftware.Initializer;
+import com.icodesoftware.Module;
+import com.icodesoftware.Session;
+import com.icodesoftware.service.Serviceable;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class GameLobby extends IndexSet implements Configurable {
+public interface GameLobby extends Configurable, Initializer, Serviceable {
 
-    private JsonObject payload;
-    private ConcurrentHashMap<String,GameZone> gameZones;
+    List<GameZone> list();
+    Stub join(Session session, Rating rating);
+    void leave(String systemId);
+    void update(String systemId);
+    void onTimer(Module.OnUpdate onUpdate);
 
-    public GameLobby(){
-        super("gameLobby");
-        payload = new JsonObject();
-        gameZones = new ConcurrentHashMap<>();
-    }
-    public void addGameZone(GameZone gameZone){
-        gameZones.put(gameZone.distributionKey(),gameZone);
-    }
-    public List<GameZone> list(){
-        ArrayList<GameZone> list = new ArrayList<>();
-        gameZones.forEach((k,v)->{list.add(v);});
-        return list;
-    }
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("payload",payload.toString());
-        return super.toMap();
-    }
-
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        payload = JsonUtil.parse((String)properties.remove("payload"));
-        super.fromMap(properties);
-    }
-
-    @Override
-    public int getFactoryId() {
-        return GamePortableRegistry.OID;
-    }
-
-    @Override
-    public int getClassId() { return GamePortableRegistry.GAME_LOBBY_CID; }
-
-    @Override
-    public boolean configureAndValidate(byte[] data){
-        payload = JsonUtil.parse(data);
-        return true;
-    }
 }

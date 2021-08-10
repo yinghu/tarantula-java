@@ -3,16 +3,13 @@ package com.tarantula.game.service;
 import com.icodesoftware.*;
 
 import com.icodesoftware.service.ServiceContext;
-import com.tarantula.game.Arena;
-import com.tarantula.game.DynamicZone;
-import com.tarantula.game.GameLobby;
-import com.tarantula.game.GameZone;
+import com.tarantula.game.*;
 
 public class DynamicGameLobbySetup extends GameObjectSetup {
     private static String CONFIG = "game-lobby-settings";
     @Override
     public void setup(ServiceContext serviceContext, Descriptor application, String configName) {
-        GameLobby gameLobby = new GameLobby();
+        DynamicGameLobby gameLobby = new DynamicGameLobby();
         gameLobby.distributionKey(application.distributionKey());
         Configuration configuration = serviceContext.configuration(CONFIG);
         int initialZoneCount = ((Number)configuration.property("initialZoneCount")).intValue();
@@ -27,7 +24,7 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
     @Override
     public <T extends Configurable> T load(ApplicationContext context, Descriptor application) {
         DataStore dataStore = context.dataStore(serviceDataStore(application));
-        GameLobby gameLobby = new GameLobby();
+        DynamicGameLobby gameLobby = new DynamicGameLobby();
         gameLobby.distributionKey(application.distributionKey());
         dataStore.load(gameLobby);
         gameLobby.keySet.forEach((k)->{
@@ -40,7 +37,7 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
     @Override
     public <T extends Configurable> T load(ServiceContext context, Descriptor application) {
         DataStore dataStore = context.dataStore(serviceDataStore(application),context.partitionNumber());
-        GameLobby gameLobby = new GameLobby();
+        DynamicGameLobby gameLobby = new DynamicGameLobby();
         gameLobby.distributionKey(application.distributionKey());
         dataStore.load(gameLobby);
         gameLobby.keySet.forEach((k)->{
