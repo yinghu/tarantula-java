@@ -53,7 +53,10 @@ public class GameLobbyAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
             Descriptor app = loadDescriptor(gameCluster,applicationId);
             GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
-            session.write(toJson(app,lobby.list().get(0)).toString().getBytes());
+            lobby.list().forEach((a)->{
+                this.context.log(a.toString(),OnLog.WARN);
+            });
+            session.write(toJson(app,lobby).toString().getBytes());
         }
         else if (session.action().equals("onAddLobby")){
             Map<String,Object> cmd = JsonUtil.toMap(payload);
@@ -173,36 +176,42 @@ public class GameLobbyAdminModule implements Module {
         jsonObject.add("gameLobbyList",alist);
         return jsonObject;
     }
-    private JsonObject toJson(Descriptor lobby,GameZone zone){
+    private JsonObject toJson(Descriptor lobby,GameLobby gameLobby){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",true);
-        JsonObject jzon = new JsonObject();
-        jzon.addProperty("zoneId",zone.distributionKey());
-        jzon.addProperty("name",zone.name()!=null?zone.name():lobby.name());
-        jzon.addProperty("levelMatch",zone.levelMatch());
-        jzon.addProperty("tag",lobby.tag());
-        jzon.addProperty("rank",lobby.accessRank());
-        jzon.addProperty("capacity",zone.capacity());
-        jzon.addProperty("joinsOnStart",zone.joinsOnStart());
-        jzon.addProperty("duration",zone.roundDuration()/60000);
-        jzon.addProperty("levelLimit",zone.levelLimit()>0?zone.levelLimit():lobby.capacity());
-        jzon.addProperty("playMode",zone.playMode());
-        jzon.addProperty("disabled",lobby.disabled());
-        jsonObject.add("zone",jzon);
-        JsonArray jds = new JsonArray();
-        for(Arena a: zone.arenas()){
-            JsonObject jd = new JsonObject();
-            jd.addProperty("arenaId",a.distributionKey());
-            jd.addProperty("name",a.name());
-            jd.addProperty("level",a.level);
-            jd.addProperty("xp",a.xp);
-            jd.addProperty("capacity",a.capacity);
-            jd.addProperty("joinsOnStart",a.joinsOnStart);
-            jd.addProperty("duration",a.duration/60000);
-            jd.addProperty("disabled",a.disabled());
-            jds.add(jd);
-        }
-        jsonObject.add("levels",jds);
+        JsonArray zarray = new JsonArray();
+        gameLobby.list().forEach((zone)->{
+            JsonObject _jo = new JsonObject();
+            JsonObject jzon = new JsonObject();
+            jzon.addProperty("zoneId",zone.distributionKey());
+            jzon.addProperty("name",zone.name()!=null?zone.name():lobby.name());
+            jzon.addProperty("levelMatch",zone.levelMatch());
+            jzon.addProperty("tag",lobby.tag());
+            jzon.addProperty("rank",lobby.accessRank());
+            jzon.addProperty("capacity",zone.capacity());
+            jzon.addProperty("joinsOnStart",zone.joinsOnStart());
+            jzon.addProperty("duration",zone.roundDuration()/60000);
+            jzon.addProperty("levelLimit",zone.levelLimit()>0?zone.levelLimit():lobby.capacity());
+            jzon.addProperty("playMode",zone.playMode());
+            jzon.addProperty("disabled",lobby.disabled());
+            _jo.add("zone",jzon);
+            JsonArray jds = new JsonArray();
+            for(Arena a: zone.arenas()){
+                JsonObject jd = new JsonObject();
+                jd.addProperty("arenaId",a.distributionKey());
+                jd.addProperty("name",a.name());
+                jd.addProperty("level",a.level);
+                jd.addProperty("xp",a.xp);
+                jd.addProperty("capacity",a.capacity);
+                jd.addProperty("joinsOnStart",a.joinsOnStart);
+                jd.addProperty("duration",a.duration/60000);
+                jd.addProperty("disabled",a.disabled());
+                jds.add(jd);
+            }
+            _jo.add("levels",jds);
+            zarray.add(_jo);
+        });
+        jsonObject.add("list",zarray);
         return jsonObject;
     }
 }
