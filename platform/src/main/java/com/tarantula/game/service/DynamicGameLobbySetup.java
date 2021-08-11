@@ -14,9 +14,14 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
         Configuration configuration = serviceContext.configuration(CONFIG);
         int initialZoneCount = ((Number)configuration.property("initialZoneCount")).intValue();
         int levelMatchFactor = ((Number)configuration.property("levelMatchFactor")).intValue();
+        int levelLimit = ((Number)configuration.property("levelLimit")).intValue();
+        int roomCapacity = ((Number)configuration.property(configName+"MaxRoomCapacity")).intValue();
+        int joinsOnStart = ((Number)configuration.property("defaultJoinsOnStart")).intValue();
+        long duration = ((Number)configuration.property("defaultRoundDuration")).longValue();
+        int levelUpBase = ((Number)configuration.property("defaultLevelUpBase")).intValue();
         DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.partitionNumber());
         for(int i=0;i<initialZoneCount;i++){
-            GameZone zone = createGameZone(dataStore,application,configName,(i+1)*levelMatchFactor);
+            GameZone zone = createGameZone(dataStore,application,configName,(i+1)*levelMatchFactor,levelLimit,roomCapacity,joinsOnStart,duration,levelUpBase);
             gameLobby.keySet.add(zone.distributionKey());
         }
         dataStore.create(gameLobby);
@@ -47,14 +52,14 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
         });
         return (T)gameLobby;
     }
-    protected GameZone createGameZone(DataStore dataStore,Descriptor application,String configName,int levelMatch){
-        DynamicZone zone = new DynamicZone(application.name(),configName,levelMatch);
+    protected GameZone createGameZone(DataStore dataStore,Descriptor application,String configName,int levelMatch,int levelLimit,int roomCapacity,int joinsOnStart,long roundDuration,int levelUpBase){
+        DynamicZone zone = new DynamicZone(application.name(),configName,levelMatch,levelLimit,roomCapacity,joinsOnStart,roundDuration);
         dataStore.create(zone);
-        for(int i = 1; i< GameZone.DEFAULT_LEVEL_COUNT+1; i++){
+        for(int i = 1; i< levelLimit+1; i++){
             Arena arena = new Arena();
             arena.name("level"+i);
             arena.level = i;
-            arena.xp = i* GameZone.DEFAULT_LEVEL_UP_BASE;
+            arena.xp = i* levelUpBase;
             arena.capacity = zone.capacity();
             arena.duration = zone.roundDuration();
             arena.joinsOnStart = zone.joinsOnStart();

@@ -12,15 +12,6 @@ public interface GameZone extends Configurable,Initializer{
     String PLAY_MODE_TVE = "tve"; //team versus computer
     String PLAY_MODE_TVT = "tvt"; //team versus team
 
-    int DEFAULT_LEVEL_COUNT = 10;
-    int DEFAULT_JOINS_ON_START = 1;
-    long DEFAULT_ROUND_DURATION = 60000;
-    int DEFAULT_LEVEL_UP_BASE = 1000;
-    int PVE_MAX_ROOM_CAPACITY = 1;
-    int PVP_MAX_ROOM_CAPACITY = 2;
-    int TVE_MAX_ROOM_CAPACITY = 2;
-    int TVT_MAX_ROOM_CAPACITY = 4;
-
     String name();
     void name(String name);
     int levelMatch();
@@ -32,7 +23,7 @@ public interface GameZone extends Configurable,Initializer{
     void capacity(int capacity);
 
     int joinsOnStart();
-    void joinsOnStart(int capacity);
+    void joinsOnStart(int joinsOnStart);
 
     long roundDuration();
     void roundDuration(long roundDuration);

@@ -1,4 +1,12 @@
 {
   "initialZoneCount": 2,
-  "levelMatchFactor": 10
+  "levelMatchFactor": 10,
+  "levelLimit": 10,
+  "pveMaxRoomCapacity": 1,
+  "pvpMaxRoomCapacity": 2,
+  "tveMaxRoomCapacity": 2,
+  "tvtMaxRoomCapacity": 4,
+  "defaultJoinsOnStart": 1,
+  "defaultRoundDuration": 60000,
+  "defaultLevelUpBase": 1000
 }

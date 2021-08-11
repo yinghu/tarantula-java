@@ -39,26 +39,17 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.levelIndex = new ConcurrentHashMap<>();
         this.stubIndex = new ConcurrentHashMap<>();
         this.listeners = new CopyOnWriteArrayList<>();
-        this.joinsOnStart = DEFAULT_JOINS_ON_START;
-        this.levelLimit = DEFAULT_LEVEL_COUNT;
-        this.roundDuration = DEFAULT_ROUND_DURATION;
-        this.capacity = PVE_MAX_ROOM_CAPACITY;
     }
     
-    public DynamicZone(String name,String playMode,int levelMatch){
+    public DynamicZone(String name,String playMode,int levelMatch,int levelLimit,int roomCapacity,int joinsOnStart,long roundDuration){
         this();
         this.name = name;
         this.playMode = playMode;
         this.levelMatch = levelMatch;
-        if(playMode.equals(PLAY_MODE_PVP)){
-            this.capacity = PVP_MAX_ROOM_CAPACITY;
-        }
-        else if(playMode.equals(PLAY_MODE_TVE)){
-            this.capacity = TVE_MAX_ROOM_CAPACITY;
-        }
-        else if(playMode.equals(PLAY_MODE_TVT)){
-            this.capacity = TVT_MAX_ROOM_CAPACITY;
-        }
+        this.levelLimit = levelLimit;
+        this.capacity = roomCapacity;
+        this.joinsOnStart = joinsOnStart;
+        this.roundDuration = roundDuration;
     }
 
     public Stub join(Session session,Rating rating){
