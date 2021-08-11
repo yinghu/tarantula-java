@@ -156,9 +156,6 @@ public class XMLParser extends DefaultHandler{
             else if(tblock.equals("application-list")&&qname.equals("timer-on-module")){
                 this.applicationDescriptor.timerOnModule(Long.parseLong(value));
             }
-			else if(tblock.equals("application-list")&&qname.equals("capacity")){
-                this.applicationDescriptor.capacity(Integer.parseInt(value));
-            }
 			else if(tblock.equals("application-list")&&qname.equals("class-name")){
 				this.applicationDescriptor.applicationClassName(value);
             }

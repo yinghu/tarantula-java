@@ -1,3 +1,4 @@
 {
-  "initialZoneCount":2
+  "initialZoneCount": 2,
+  "levelMatchFactor": 10
 }

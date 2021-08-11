@@ -13,9 +13,10 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
         gameLobby.distributionKey(application.distributionKey());
         Configuration configuration = serviceContext.configuration(CONFIG);
         int initialZoneCount = ((Number)configuration.property("initialZoneCount")).intValue();
+        int levelMatchFactor = ((Number)configuration.property("levelMatchFactor")).intValue();
         DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.partitionNumber());
         for(int i=0;i<initialZoneCount;i++){
-            GameZone zone = createGameZone(dataStore,application,configName,i+1);
+            GameZone zone = createGameZone(dataStore,application,configName,(i+1)*levelMatchFactor);
             gameLobby.keySet.add(zone.distributionKey());
         }
         dataStore.create(gameLobby);

@@ -837,6 +837,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     public <T extends OnAccess> T createGameCluster(String owner,String name,String mode,boolean tournamentEnabled){
+        if(name==null||name.length()<5){
+            GameCluster gc = new GameCluster();
+            gc.successful(false);
+            gc.message("invalid game cluster name ["+name+"]");
+            return (T)gc;
+        }
         AccessIndex accessIndex = this.tarantulaContext.accessIndexService().set(name,0);//name+"-"+mode
         if(accessIndex==null){
             GameCluster gc = new GameCluster();

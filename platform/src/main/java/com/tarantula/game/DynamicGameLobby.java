@@ -5,8 +5,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.GameRoomManager;
-import com.tarantula.game.service.GameRoomRegistryManager;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.IndexSet;
 
@@ -21,6 +19,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     private JsonObject payload;
     private CopyOnWriteArrayList<GameZone> zoneList;
     private ConcurrentHashMap<Integer,GameZone> zoneIndex;
+    private int[] levelMatches;
     private ApplicationContext context;
     private Descriptor application;
     private DeploymentServiceProvider deploymentServiceProvider;

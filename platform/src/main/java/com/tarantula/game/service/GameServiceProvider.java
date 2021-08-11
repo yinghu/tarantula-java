@@ -2,12 +2,15 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.*;
+import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.event.GameUpdateEvent;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 
 import com.tarantula.platform.tournament.*;
 
+import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,7 +33,7 @@ public class GameServiceProvider implements ServiceProvider{
     private LeaderBoardProvider leaderBoardProvider;
     private ItemConfigurationServiceProvider configurationServiceProvider;
     private DistributedTournamentServiceProvider tournamentServiceProvider;
-
+    private Configuration configuration;
 
     public GameServiceProvider(String name){
         NAME = name;
@@ -39,6 +42,9 @@ public class GameServiceProvider implements ServiceProvider{
     public GameLobby lobby(Descriptor descriptor){
         DynamicGameLobbySetup dynamicLobbySetup = new DynamicGameLobbySetup();
         return dynamicLobbySetup.load(serviceContext,descriptor);
+    }
+    public Configuration configuration(){
+        return configuration;
     }
     @Override
     public String name() {
@@ -75,6 +81,16 @@ public class GameServiceProvider implements ServiceProvider{
         this.tournamentServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider.waitForData();
         logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]");
+    }
+    @Override
+    public void waitForData(){
+        try{
+            InputStream conf = Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-settings.json");
+            configuration = new ApplicationConfiguration();
+            JsonUtil.toMap(conf).forEach((k,v)->configuration.property(k,v));
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
     @Override
     public void atMidnight(){

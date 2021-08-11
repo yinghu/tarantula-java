@@ -8,9 +8,7 @@ import java.util.Map;
 public class DefaultDescriptor extends DeploymentObject implements Descriptor {
 
 	protected String typeId;
-
     protected String type;
-
     protected String category;
 
     protected int accessControl;
@@ -19,14 +17,11 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     protected String tag;
     protected double entryCost;
 
-	protected int capacity;
-
     protected String moduleId;
     protected String moduleArtifact;
     protected String moduleVersion;
     protected String codebase;
     protected String moduleName;
-
 
     protected int deployPriority;
     protected int deployCode = DeployCode.SYSTEM_APPLICATION;
@@ -34,9 +29,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     protected long timerOnModule;
     protected boolean logEnabled =true;
 
-
     protected  String applicationClassName;
-
 
     protected boolean resetEnabled;
     protected boolean tournamentEnabled;
@@ -100,17 +93,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     public String category(){
         return this.category;
     }
-
-
-	public int capacity() {
-		
-		return this.capacity;
-	}
-	public void capacity(int capacity) {
-		this.capacity = capacity;
-	}
-	
-
 
 	public void typeId(String typeId) {
 		this.typeId = typeId;
@@ -183,7 +165,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         _props.put("name",this.name);
         _props.put("tag",this.tag);
         _props.put("entryCost",this.entryCost);
-        _props.put("capacity",this.capacity); //0 unlimited
         _props.put("category",this.category);
         _props.put("disabled",this.disabled);
         _props.put("accessControl",this.accessControl);
@@ -212,7 +193,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         this.name=(String)properties.get("name");
         this.tag=properties.get("tag")!=null?(String)properties.get("tag"):null;
         this.entryCost=properties.get("entryCost")!=null?((Number)properties.get("entryCost")).doubleValue():0;
-        this.capacity=properties.get("capacity")!=null?((Number)properties.get("capacity")).intValue():0;
         this.category=properties.get("category")!=null?(String)properties.get("category"):null;
         this.disabled = properties.get("disabled")!=null?(boolean)properties.get("disabled"):false;
         this.accessControl  = properties.get("accessControl")!=null?((Number)properties.get("accessControl")).intValue():0;
@@ -240,7 +220,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     public void applicationClassName(String applicationClassName) {
         this.applicationClassName = applicationClassName;
     }
-
 
     public boolean tournamentEnabled(){
         return this.tournamentEnabled;

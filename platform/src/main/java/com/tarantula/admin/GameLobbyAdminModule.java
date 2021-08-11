@@ -53,9 +53,6 @@ public class GameLobbyAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
             Descriptor app = loadDescriptor(gameCluster,applicationId);
             GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
-            lobby.list().forEach((a)->{
-                this.context.log(a.toString(),OnLog.WARN);
-            });
             session.write(toJson(app,lobby).toString().getBytes());
         }
         else if (session.action().equals("onAddLobby")){
@@ -191,7 +188,7 @@ public class GameLobbyAdminModule implements Module {
             jzon.addProperty("capacity",zone.capacity());
             jzon.addProperty("joinsOnStart",zone.joinsOnStart());
             jzon.addProperty("duration",zone.roundDuration()/60000);
-            jzon.addProperty("levelLimit",zone.levelLimit()>0?zone.levelLimit():lobby.capacity());
+            //jzon.addProperty("levelLimit",zone.levelLimit()>0?zone.levelLimit():lobby.capacity());
             jzon.addProperty("playMode",zone.playMode());
             jzon.addProperty("disabled",lobby.disabled());
             _jo.add("zone",jzon);

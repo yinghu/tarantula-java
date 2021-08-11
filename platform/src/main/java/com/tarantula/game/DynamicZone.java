@@ -208,7 +208,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public void setup(ApplicationContext applicationContext) throws Exception{
         this.applicationContext = applicationContext;
         this.application = this.applicationContext.descriptor();
-        if(levelLimit==0||levelLimit>application.capacity()) levelLimit = this.application.capacity();
+        if(levelLimit==0||levelLimit>10) levelLimit = 10;
         listArena();
         roomProxy.setup(applicationContext,this);
     }

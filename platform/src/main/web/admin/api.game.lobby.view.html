@@ -13,16 +13,16 @@
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-game-lobby-message"></div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'> 
-            <span zone-index='10' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 10</span>
-            <span zone-index='9' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 9</span>
-            <span zone-index='8' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 8</span>
-            <span zone-index='7' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 7</span>
-            <span zone-index='6' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 6</span>
-            <span zone-index='5' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 5</span>
-            <span zone-index='4' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 4</span>
-            <span zone-index='3' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 3</span>
-            <span zone-index='2' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 2</span>
-            <span zone-index='1' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 1</span>           
+            <span zone-index='9' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 10</span>
+            <span zone-index='8' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 9</span>
+            <span zone-index='7' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 8</span>
+            <span zone-index='6' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 7</span>
+            <span zone-index='5' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 6</span>
+            <span zone-index='4' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 5</span>
+            <span zone-index='3' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 4</span>
+            <span zone-index='2' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 3</span>
+            <span zone-index='1' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 2</span>
+            <span zone-index='0' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-zone'>Zone 1</span>           
         </div>            
     </div>
 
@@ -122,15 +122,14 @@
             document.querySelector('#tx-game-zone-edit').style.display = 'none';
             document.querySelector('#tx-game-lobby-api-service-save').style.display ='none';
             document.querySelector('#tx-game-lobby-api-service-reload').style.display = 'none';
-            editor.set({});
             let zoneIndex = a.getAttribute('zone-index')/1;  
-            TARA_API.query().zoneIndex = zoneIndex;
-            console.log("Zone index->"+TARA_API.query().zoneIndex);
-            gameLobby.list.forEach((z)=>{
-                if(z.zone.levelMatch == zoneIndex){
+            editor.set({message:"zone selected",successful:false});
+            gameLobby.list.forEach((z,i)=>{
+                if(i == zoneIndex){
                     gameLobby.zone = z.zone;
                     gameLobby.levels = z.levels;
                     document.querySelector('#tx-game-zone-edit').style.display = 'block';
+                    editor.set({message:"zone selected",successful:true});
                 }
             });
         }

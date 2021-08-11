@@ -41,10 +41,10 @@ public class MatchMakingModule implements Module, Lobby.Listener {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         mZone = new ConcurrentHashMap<>();//max matching level
-        maxRank = this.context.descriptor().capacity();
         lobbyId = this.context.descriptor().typeId().replace("service","lobby");
-        listLobby().addListener(this);
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
+        this.maxRank = ((Number)this.gameServiceProvider.configuration().property("matchMakingMaxRank")).intValue();
+        listLobby().addListener(this);
         context.log("Started match making module on ->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 
@@ -53,16 +53,16 @@ public class MatchMakingModule implements Module, Lobby.Listener {
     @Override
     public void onLobby(Descriptor descriptor) {
         this.context.log("Lobby Updated : disable["+descriptor.disabled()+"] rank["+descriptor.accessRank()+"]", OnLog.WARN);
-        if(descriptor.accessRank()>0&&descriptor.accessRank()<=this.context.descriptor().capacity()){
+        if(descriptor.accessRank()>0&&descriptor.accessRank()<=this.maxRank){
             mZone.clear();
             listLobby();
         }
     }
     private Lobby listLobby(){
         Lobby lobby = this.context.lobby(lobbyId);
-        int[] fi = {this.context.descriptor().capacity()};
+        int[] fi = {maxRank};
         lobby.entryList().forEach((a)->{
-            if(a.accessRank()>0&&a.accessRank()<=this.context.descriptor().capacity()){
+            if(a.accessRank()>0&&a.accessRank()<=maxRank){
                 mZone.put(a.accessRank(),a);
                 if(a.accessRank()<fi[0]){
                     fi[0] = a.accessRank();
@@ -70,7 +70,7 @@ public class MatchMakingModule implements Module, Lobby.Listener {
             }
         });
         //set 1 to max lobby count from capacity setting
-        for(int i=1;i<this.context.descriptor().capacity()+1;i++){//max matching level
+        for(int i=1;i<maxRank+1;i++){//max matching level
             Descriptor ex = mZone.get(i);
             if(ex==null){
                 if(mZone.get(i-1)!=null){
