@@ -73,7 +73,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         stub.joined = true;
         stub.roomId = room.roomId();
         dataStore.update(stub);
-        this.applicationContext.log(stub.toString(),OnLog.WARN);
+        //this.applicationContext.log(stub.toString(),OnLog.WARN);
         stub.room = room;
         stub.offline = room.offline;
         stub.instance = room.instance;

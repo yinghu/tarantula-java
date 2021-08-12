@@ -39,7 +39,8 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     }
 
     public Stub join(Session session, Rating rating){
-        return null;
+        GameZone _zone = zoneIndex.get(rating.level);
+        return _zone.join(session,rating);
     }
 
     public List<GameZone> list(){
