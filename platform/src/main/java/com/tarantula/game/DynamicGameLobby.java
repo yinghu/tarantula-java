@@ -8,18 +8,16 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.IndexSet;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DynamicGameLobby extends IndexSet implements GameLobby, Configurable.Listener<GameZone> {
 
+    private int levelMatchOffset;
     private JsonObject payload;
     private CopyOnWriteArrayList<GameZone> zoneList;
     private ConcurrentHashMap<Integer,GameZone> zoneIndex;
-    private int[] levelMatches;
     private ApplicationContext context;
     private Descriptor application;
     private DeploymentServiceProvider deploymentServiceProvider;
@@ -30,7 +28,12 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         zoneList = new CopyOnWriteArrayList<>();
         zoneIndex = new ConcurrentHashMap<>();
     }
-
+    public int levelMatchOffset(){
+        return levelMatchOffset;
+    }
+    public void levelMatchOffset(int levelMatchOffset){
+        this.levelMatchOffset =levelMatchOffset;
+    }
     public void addGameZone(GameZone gameZone){
         zoneList.add(gameZone);
     }
@@ -42,6 +45,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     public List<GameZone> list(){
         ArrayList<GameZone> list = new ArrayList<>();
         zoneList.forEach((v)->list.add(v));
+        Collections.sort(zoneList,new GameZoneComparator());
         return list;
     }
     public void leave(String systemId){}
@@ -49,6 +53,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     public void onTimer(Module.OnUpdate onUpdate){}
     @Override
     public Map<String,Object> toMap(){
+        this.properties.put("levelMatchOffset",levelMatchOffset);
         this.properties.put("payload",this.payload.toString());
         this.properties.put("disabled",this.disabled);
         return super.toMap();
@@ -58,6 +63,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     public void fromMap(Map<String,Object> properties){
         this.payload = JsonUtil.parse((String)properties.remove("payload"));
         this.disabled = (boolean)properties.remove("disabled");
+        this.levelMatchOffset = ((Number)properties.remove("levelMatchOffset")).intValue();
         super.fromMap(properties);
     }
 
@@ -93,12 +99,25 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
 
     @Override
     public void start() throws Exception{
+        Collections.sort(zoneList,new GameZoneComparator());
+        int levelEnd = application.accessRank()*levelMatchOffset;
+        int levelStart = levelEnd-(levelMatchOffset-1);
+        this.context.log("game start on level match from ["+levelStart+" to "+levelEnd+"]",OnLog.WARN);
         for(GameZone gameZone : zoneList){
+            if(gameZone.disabled()) continue;
             gameZone.registerListener(this.gameServiceProvider.roomServiceProvider());
             gameZone.registerListener(this);
             gameZone.setup(this.context);
             deploymentServiceProvider.register(gameZone);
+            for(int i=levelStart;i<gameZone.levelMatch();i++){
+                zoneIndex.put(i,gameZone);
+            }
+            zoneIndex.put(gameZone.levelMatch(),gameZone);
+            levelStart = gameZone.levelMatch()+1;
         }
+        zoneIndex.forEach((k,v)->{
+            context.log("Level ["+k+"] registered on ["+v.levelMatch()+"]",OnLog.WARN);
+        });
     }
 
     @Override

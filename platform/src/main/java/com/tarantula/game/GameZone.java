@@ -17,8 +17,8 @@ public interface GameZone extends Configurable,Initializer{
     int levelMatch();
     void levelMatch(int levelMatch);
     String playMode();
-    int levelLimit();
-    void levelLimit(int levelLimit);
+    int arenaLimit();
+    void arenaLimit(int arenaLimit);
     int capacity();
     void capacity(int capacity);
 

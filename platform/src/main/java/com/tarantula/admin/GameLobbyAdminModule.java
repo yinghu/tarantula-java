@@ -11,6 +11,7 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.util.DescriptorSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -188,7 +189,6 @@ public class GameLobbyAdminModule implements Module {
             jzon.addProperty("capacity",zone.capacity());
             jzon.addProperty("joinsOnStart",zone.joinsOnStart());
             jzon.addProperty("duration",zone.roundDuration()/60000);
-            //jzon.addProperty("levelLimit",zone.levelLimit()>0?zone.levelLimit():lobby.capacity());
             jzon.addProperty("playMode",zone.playMode());
             jzon.addProperty("disabled",lobby.disabled());
             _jo.add("zone",jzon);

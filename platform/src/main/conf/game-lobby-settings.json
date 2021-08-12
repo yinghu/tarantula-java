@@ -1,7 +1,8 @@
 {
-  "initialZoneCount": 2,
-  "levelMatchFactor": 10,
-  "levelLimit": 10,
+  "initialZoneCount": 10,
+  "zoneLimit": 10,
+  "levelMatchOffset": 100,
+  "arenaLimit": 10,
   "pveMaxRoomCapacity": 1,
   "pvpMaxRoomCapacity": 2,
   "tveMaxRoomCapacity": 2,

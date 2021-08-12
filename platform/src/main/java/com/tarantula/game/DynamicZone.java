@@ -11,6 +11,7 @@ import com.tarantula.game.service.DynamicGameLobbySetup;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,7 +21,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
 
     protected int levelMatch;
     protected String playMode;
-    protected int levelLimit;
+    protected int arenaLimit;
     protected int capacity;
     protected int joinsOnStart;
     protected long roundDuration;
@@ -41,12 +42,12 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.listeners = new CopyOnWriteArrayList<>();
     }
     
-    public DynamicZone(String name,String playMode,int levelMatch,int levelLimit,int roomCapacity,int joinsOnStart,long roundDuration){
+    public DynamicZone(String name,String playMode,int levelMatch,int arenaLimit,int roomCapacity,int joinsOnStart,long roundDuration){
         this();
         this.name = name;
         this.playMode = playMode;
         this.levelMatch = levelMatch;
-        this.levelLimit = levelLimit;
+        this.arenaLimit = arenaLimit;
         this.capacity = roomCapacity;
         this.joinsOnStart = joinsOnStart;
         this.roundDuration = roundDuration;
@@ -55,7 +56,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public Stub join(Session session,Rating rating){
         Stub _joined = stubIndex.get(session.systemId());
         if(_joined!=null) return _joined;
-        Arena arena = levelIndex.get(rating.xpLevel>levelLimit?levelLimit:rating.xpLevel);
+        Arena arena = levelIndex.get(rating.xpLevel>arenaLimit?arenaLimit:rating.xpLevel);
         Stub stub = new Stub();
         stub.distributionKey(session.systemId());
         stub.label(application.tag());
@@ -104,15 +105,15 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public String playMode(){
         return playMode;
     }
-    public int levelLimit(){
-        return levelLimit;
+    public int arenaLimit(){
+        return arenaLimit;
     }
     public int capacity(){
         return capacity;
     }
 
-    public void levelLimit(int levelLimit){
-        this.levelLimit = levelLimit;
+    public void arenaLimit(int arenaLimit){
+        this.arenaLimit = arenaLimit;
     }
     public void capacity(int capacity){
         this.capacity = capacity;
@@ -144,7 +145,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.properties.put("3",levelMatch);
         this.properties.put("5",name);
         this.properties.put("6",this.timestamp);
-        this.properties.put("7",this.levelLimit);
+        this.properties.put("7",this.arenaLimit);
         this.properties.put("8",this.joinsOnStart);
         this.properties.put("9",this.playMode);
         return this.properties;
@@ -156,7 +157,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.levelMatch = ((Number)properties.getOrDefault("3",levelMatch)).intValue();
         this.name = (String)properties.get("5");
         this.timestamp = ((Number)properties.getOrDefault("6",0)).longValue();
-        this.levelLimit = ((Number)properties.getOrDefault("7",levelLimit)).intValue();
+        this.arenaLimit = ((Number)properties.getOrDefault("7",arenaLimit)).intValue();
         this.joinsOnStart = ((Number)properties.getOrDefault("8",joinsOnStart)).intValue();
         this.playMode = (String)properties.get("9");
     }
@@ -199,7 +200,6 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public void setup(ApplicationContext applicationContext) throws Exception{
         this.applicationContext = applicationContext;
         this.application = this.applicationContext.descriptor();
-        if(levelLimit==0||levelLimit>10) levelLimit = 10;
         listArena();
         roomProxy.setup(applicationContext,this);
     }
@@ -214,16 +214,17 @@ public class DynamicZone extends RecoverableObject implements GameZone {
 
     private void listArena(){
         if(arenaList.size()==0) return;
-        int fi = levelLimit;//this.descriptor.capacity();
+        Collections.sort(arenaList,new ArenaComparator());
+        int fi = arenaLimit;
         for(Arena a : arenaList){
             if(a.disabled()) continue;
-            if(a.level>0&&a.level<=levelLimit){
+            if(a.level>0&&a.level<=arenaLimit){
                 levelIndex.put(a.level,a);
                 if(a.level<fi) fi = a.level;
             }
         }
         //set 1 to max level count
-        for(int i=1;i<this.levelLimit+1;i++){//max matching level
+        for(int i=1;i<this.arenaLimit+1;i++){//max matching level
             Arena ex = levelIndex.get(i);
             if(ex==null){
                 if(levelIndex.get(i-1)!=null) levelIndex.put(i,levelIndex.get(i-1));//fill with last one
@@ -242,7 +243,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
             this.capacity = updated.capacity();
             this.joinsOnStart = updated.joinsOnStart();
             this.roundDuration = updated.roundDuration();
-            this.levelLimit = updated.levelLimit();
+            this.arenaLimit = updated.arenaLimit();
             levelIndex.clear();
             listArena();
         }
