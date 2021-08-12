@@ -5,27 +5,17 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.*;
 import com.tarantula.platform.ApplicationConfiguration;
-import com.tarantula.platform.event.GameUpdateEvent;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 
 import com.tarantula.platform.tournament.*;
 
 import java.io.InputStream;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class GameServiceProvider implements ServiceProvider{
 
     private TarantulaLogger logger;
     private final String NAME;
 
-    private ConcurrentHashMap<String,Room> roomIndex = new ConcurrentHashMap<>();
-
-
-    private String subscription;
-
-    private ClusterProvider integrationCluster;
-    private ClusterProvider dataCluster;
     private ServiceContext serviceContext;
 
     private DistributionRoomServiceProvider roomServiceProvider;
@@ -55,16 +45,6 @@ public class GameServiceProvider implements ServiceProvider{
     public void setup(ServiceContext serviceContext) {
         this.logger = serviceContext.logger(GameServiceProvider.class);
         this.serviceContext = serviceContext;
-        this.subscription = UUID.randomUUID().toString();
-        integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
-        integrationCluster.subscribe(subscription,(e)->{
-            if(e instanceof GameUpdateEvent){
-                Room room = roomIndex.get(e.trackId());
-                room.onUpdated(e.action(),e.payload());
-            }
-            return false;
-        });
-        this.dataCluster = serviceContext.clusterProvider(Distributable.DATA_SCOPE);
         this.roomServiceProvider = new DistributionRoomServiceProvider(NAME);
         this.roomServiceProvider.setup(serviceContext);
         this.roomServiceProvider.waitForData();
@@ -80,17 +60,11 @@ public class GameServiceProvider implements ServiceProvider{
         this.tournamentServiceProvider = new DistributedTournamentServiceProvider(NAME);
         this.tournamentServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider.waitForData();
-        logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]");
+        logger.info("Game service provider ["+ NAME+"] started");
     }
     @Override
     public void waitForData(){
-        try{
-            InputStream conf = Thread.currentThread().getContextClassLoader().getResourceAsStream("game-cluster-settings.json");
-            configuration = new ApplicationConfiguration();
-            JsonUtil.toMap(conf).forEach((k,v)->configuration.property(k,v));
-        }catch (Exception ex){
-            throw new RuntimeException(ex);
-        }
+        this.configuration = serviceContext.configuration("game-cluster-settings");
     }
     @Override
     public void atMidnight(){
@@ -113,12 +87,6 @@ public class GameServiceProvider implements ServiceProvider{
         this.leaderBoardProvider.shutdown();
         this.tournamentServiceProvider.shutdown();
         this.configurationServiceProvider.shutdown();
-        this.dataCluster.unregisterReloadListener(name());
-        integrationCluster.unsubscribe(NAME);
-    }
-
-    public void onClosed(Connection connection) {
-        roomIndex.forEach((k,r)->r.connectionClosed(connection));
     }
 
     //room service provider hool calls

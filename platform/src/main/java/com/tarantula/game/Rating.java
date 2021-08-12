@@ -15,11 +15,12 @@ import java.util.Map;
 public class Rating extends RecoverableObject implements DataStore.Updatable, Portable {
 
     public static double BASE_POINTS = 100;
+
     public int rank =1; //rank of lobby
     public int level = 1; //total level
     public double xp =0; //total xp
     public int arenaLevel =1; //level of arena
-    public double arenaXp =0;  //xp of level
+    public double arenaXp =0;  //xp of arena level
 
     public double elo = 1200; //elo service
     public int csw = 0; //consecutive winnings
