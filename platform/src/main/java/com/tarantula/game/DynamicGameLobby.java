@@ -115,6 +115,12 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
             zoneIndex.put(gameZone.levelMatch(),gameZone);
             levelStart = gameZone.levelMatch()+1;
         }
+        if(levelStart<levelEnd){
+            GameZone lastZone = zoneIndex.get(levelStart-1);
+            for(int i=levelStart;i<=levelEnd;i++){
+                zoneIndex.put(i,lastZone);
+            }
+        }
         zoneIndex.forEach((k,v)->{
             context.log("Level ["+k+"] registered on ["+v.levelMatch()+"]",OnLog.WARN);
         });

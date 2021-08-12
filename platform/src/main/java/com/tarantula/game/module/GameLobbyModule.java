@@ -53,7 +53,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
             else{
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
                 Rating rating = this.gameServiceProvider.rating(session.systemId());
-                rating.xpLevel = onAccess.stub();
+                rating.arenaLevel = onAccess.stub();
                 Stub stub = gameLobby.join(session,rating);
                 session.write(stub.toJson().toString().getBytes());
                 gameLobby.leave(session.systemId());

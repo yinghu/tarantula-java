@@ -56,7 +56,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public Stub join(Session session,Rating rating){
         Stub _joined = stubIndex.get(session.systemId());
         if(_joined!=null) return _joined;
-        Arena arena = levelIndex.get(rating.xpLevel>arenaLimit?arenaLimit:rating.xpLevel);
+        Arena arena = levelIndex.get(rating.arenaLevel>arenaLimit?arenaLimit:rating.arenaLevel);
         Stub stub = new Stub();
         stub.distributionKey(session.systemId());
         stub.label(application.tag());

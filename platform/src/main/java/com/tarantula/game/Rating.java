@@ -17,9 +17,9 @@ public class Rating extends RecoverableObject implements DataStore.Updatable, Po
     public static double BASE_POINTS = 100;
     public int rank =1; //rank of lobby
     public int level = 1; //total level
-    public double xp=0; //total xp
-    public int xpLevel=1; //level of arena
-    public double lxp=0;  //xp of level
+    public double xp =0; //total xp
+    public int arenaLevel =1; //level of arena
+    public double arenaXp =0;  //xp of level
 
     public double elo = 1200; //elo service
     public int csw = 0; //consecutive winnings
@@ -39,27 +39,27 @@ public class Rating extends RecoverableObject implements DataStore.Updatable, Po
         else{
             csw=0;
         }
-        lxp += dxp;
+        arenaXp += dxp;
         xp += dxp;
-        int _xpLevel = (int)lxp/stub.levelUpBase;
-        if(_xpLevel>xpLevel){
-            _xpLevel = _xpLevel-xpLevel;//xplevel delta
-            xpLevel = xpLevel +(_xpLevel);//
+        int _xpLevel = (int)arenaXp/stub.levelUpBase;
+        if(_xpLevel>arenaLevel){
+            _xpLevel = _xpLevel-arenaLevel;//xplevel delta
+            arenaLevel = arenaLevel +(_xpLevel);//
             level = level+(_xpLevel);//add level jump delta
         }
-        if(xpLevel-stub.rankUpBase>0){//rank up if level pass the base
+        if(arenaLevel-stub.rankUpBase>0){//rank up if level pass the base
             rank++;
             //reset next level from 1 - 10 and rank up again
-            xpLevel = 1;
-            lxp = 0;
+            arenaLevel = 1;
+            arenaXp = 0;
         }
     }
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",rank);
         this.properties.put("2",level);
-        this.properties.put("3",xpLevel);
-        this.properties.put("4",lxp);
+        this.properties.put("3",arenaLevel);
+        this.properties.put("4",arenaXp);
         this.properties.put("5",xp);
         this.properties.put("6",elo);
         this.properties.put("7",csw);
@@ -69,8 +69,8 @@ public class Rating extends RecoverableObject implements DataStore.Updatable, Po
     public void fromMap(Map<String,Object> properties){
         this.rank = ((Number)properties.get("1")).intValue();
         this.level =((Number)properties.get("2")).intValue();
-        this.xpLevel =((Number)properties.get("3")).intValue();
-        this.lxp = ((Number)properties.get("4")).doubleValue();
+        this.arenaLevel =((Number)properties.get("3")).intValue();
+        this.arenaXp = ((Number)properties.get("4")).doubleValue();
         this.xp = ((Number)properties.get("5")).doubleValue();
         this.elo = ((Number)properties.get("6")).doubleValue();
         this.csw =((Number)properties.get("7")).intValue();
