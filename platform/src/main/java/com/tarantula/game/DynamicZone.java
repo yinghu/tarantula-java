@@ -213,26 +213,26 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     }
 
     private void listArena(){
-        if(arenaList.size()==0) return;
         Collections.sort(arenaList,new ArenaComparator());
-        int fi = arenaLimit;
+        int start = 1;
         for(Arena a : arenaList){
             if(a.disabled()) continue;
-            if(a.level>0&&a.level<=arenaLimit){
-                levelIndex.put(a.level,a);
-                if(a.level<fi) fi = a.level;
+            levelIndex.put(a.level,a);
+            for(int i = start;i<a.level;i++){
+                levelIndex.put(i,a);
+            }
+            start++;
+        }
+        if(start<arenaLimit){
+            Arena lastArena = levelIndex.get(start-1);
+            for(int i = start;i<=arenaLimit;i++){
+                levelIndex.put(i,lastArena);
             }
         }
-        //set 1 to max level count
-        for(int i=1;i<this.arenaLimit+1;i++){//max matching level
-            Arena ex = levelIndex.get(i);
-            if(ex==null){
-                if(levelIndex.get(i-1)!=null) levelIndex.put(i,levelIndex.get(i-1));//fill with last one
-                else levelIndex.put(i,levelIndex.get(fi));//fill header
-            }
-        }
+        levelIndex.forEach((k,v)->{
+            applicationContext.log("Arena level ["+k+"] registered on ["+v.level+"]",OnLog.WARN);
+        });
     }
-
     private void reset(GameZone updated){
         arenaList.clear();
         for(Arena a : updated.arenas()){
