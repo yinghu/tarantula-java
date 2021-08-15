@@ -122,7 +122,6 @@
                 <type>application</type>
                 <category>service</category>
                 <tag>game/data</tag>
-                <capacity>4000</capacity><!--max bytes per set call-->
                 <module-name>com.tarantula.game.module.KeyValueDataStoreModule</module-name>
             </application>
         </application-list>

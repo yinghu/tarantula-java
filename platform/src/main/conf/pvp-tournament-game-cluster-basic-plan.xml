@@ -26,7 +26,6 @@
                 <category>game</category>
                 <tag>game/lobby1</tag>
                 <module-name>com.tarantula.game.module.GameLobbyModule</module-name>
-                <capacity>10</capacity>
                 <access-rank>1</access-rank>
                 <timer-on-module>1000</timer-on-module>
             </application>
@@ -37,7 +36,6 @@
                 <category>game</category>
                 <tag>game/lobby2</tag>
                 <module-name>com.tarantula.game.module.GameLobbyModule</module-name>
-                <capacity>10</capacity>
                 <access-rank>2</access-rank>
                 <timer-on-module>1000</timer-on-module>
             </application>
@@ -64,7 +62,6 @@
                 <type>application</type>
                 <category>service</category>
                 <tag>game/mmk</tag>
-                <capacity>10</capacity><!--max zone count per game title-->
                 <module-name>com.tarantula.game.module.MatchMakingModule</module-name>
             </application>
             <application><!-- stats/leader board module-->
@@ -124,7 +121,6 @@
                 <type>application</type>
                 <category>service</category>
                 <tag>game/data</tag>
-                <capacity>4000</capacity><!--max bytes per set call-->
                 <module-name>com.tarantula.game.module.KeyValueDataStoreModule</module-name>
             </application>
         </application-list>

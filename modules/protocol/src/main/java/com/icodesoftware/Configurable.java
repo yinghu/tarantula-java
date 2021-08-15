@@ -4,6 +4,8 @@ package com.icodesoftware;
 import com.google.gson.JsonObject;
 import com.icodesoftware.service.ServiceContext;
 
+import java.util.Map;
+
 public interface Configurable extends Recoverable, DataStore.Updatable {
 
     default <T extends Configurable> void registerListener(Listener<T> listener){}
@@ -20,7 +22,7 @@ public interface Configurable extends Recoverable, DataStore.Updatable {
     default void configurationCategory(String configurationCategory){}
 
     default boolean configureAndValidate(byte[] data){ return false;}
-    default boolean configureAndValidate(JsonObject data){ return false;}
+    default boolean configureAndValidate(Map<String,Object> data){ return false;}
 
     default JsonObject toJson(){ return new JsonObject();}
 

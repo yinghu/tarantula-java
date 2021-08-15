@@ -271,8 +271,8 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.roundDuration = ((Number)map.get("duration")).intValue()*60000;
         return true;
     }
-    public boolean configureAndValidate(JsonObject data){
-        this.roundDuration = data.get("duration").getAsInt()*60000;
+    public boolean configureAndValidate(Map<String,Object> data){
+        this.roundDuration = ((Number)data.get("duration")).intValue()*60000;
         return true;
     }
 }

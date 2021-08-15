@@ -319,6 +319,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 }
                 else if(configuration.descriptor.typeId().endsWith("-service")){
                     gameCluster.property(GameCluster.GAME_SERVICE,configuration.descriptor.typeId());
+                    //configuration.applications.add(JsonServiceParser.descriptor("achievement"));
                 }
                 else if(configuration.descriptor.typeId().endsWith("-data")){
                     gameCluster.property(GameCluster.GAME_DATA,configuration.descriptor.typeId());

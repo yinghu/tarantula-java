@@ -92,6 +92,9 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
     }
     public boolean configureAndValidate(byte[] data){
         Map<String,Object> map = JsonUtil.toMap(data);
+        return configureAndValidate(map);
+    }
+    public boolean configureAndValidate(Map<String,Object> map){
         this.disabled = (boolean)map.get("disabled");
         this.name = (String)map.get("name");
         this.capacity = ((Number)map.get("capacity")).intValue();

@@ -1,13 +1,14 @@
 package com.tarantula.platform.service.deployment;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.Descriptor;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.DeploymentDescriptor;
 
 public class JsonServiceParser {
+
     private static String CONFIG_DEPLOY = "deploy/";
-    public static Descriptor descriptor(String templateName){
+
+    public static DeploymentDescriptor descriptor(String templateName){
         try{
             DeploymentDescriptor descriptor = new DeploymentDescriptor();
             JsonObject temp = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_DEPLOY+templateName+".json"));

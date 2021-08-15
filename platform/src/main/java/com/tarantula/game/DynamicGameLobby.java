@@ -151,21 +151,21 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     }
     public boolean configureGameZone(byte[] payload){
         GameZone gameZone = new DynamicZone();
-        JsonObject jsonObject = JsonUtil.parse(payload);
-        String zoneId = jsonObject.get("zoneId").getAsString();
+        Map<String,Object> data = JsonUtil.toMap(payload);
+        String zoneId = (String)data.get("zoneId");
         gameZone.distributionKey(zoneId);
         this.dataStore.load(gameZone);
         this.context.log(gameZone.toString(),OnLog.WARN);
-        return gameZone.configureAndValidate(jsonObject);
+        return gameZone.configureAndValidate(data);
     }
     public boolean configureArena(byte[] payload){
         Arena arena = new Arena();
-        JsonObject jsonObject = JsonUtil.parse(payload);
-        String arenaId = jsonObject.get("arenaId").getAsString();
+        Map<String,Object> data = JsonUtil.toMap(payload);
+        String arenaId = (String) data.get("arenaId");
         arena.distributionKey(arenaId);
         this.dataStore.load(arena);
         this.context.log(arena.toString(),OnLog.WARN);
-        return arena.configureAndValidate(jsonObject);
+        return arena.configureAndValidate(data);
     }
     public void reload(){
         this.context.log(this.toString(),OnLog.WARN);
