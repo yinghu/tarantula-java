@@ -1,5 +1,6 @@
 package com.tarantula.game;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.ServiceContext;
@@ -148,6 +149,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.properties.put("7",this.arenaLimit);
         this.properties.put("8",this.joinsOnStart);
         this.properties.put("9",this.playMode);
+        this.properties.put("10",this.disabled);
         return this.properties;
     }
     @Override
@@ -160,6 +162,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.arenaLimit = ((Number)properties.getOrDefault("7",arenaLimit)).intValue();
         this.joinsOnStart = ((Number)properties.getOrDefault("8",joinsOnStart)).intValue();
         this.playMode = (String)properties.get("9");
+        this.disabled = (boolean)properties.getOrDefault("10",false);
     }
 
     @Override
@@ -266,6 +269,10 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public boolean configureAndValidate(byte[] data){
         Map<String,Object> map = JsonUtil.toMap(data);
         this.roundDuration = ((Number)map.get("duration")).intValue()*60000;
+        return true;
+    }
+    public boolean configureAndValidate(JsonObject data){
+        this.roundDuration = data.get("duration").getAsInt()*60000;
         return true;
     }
 }

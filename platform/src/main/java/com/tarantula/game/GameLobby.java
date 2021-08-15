@@ -16,4 +16,7 @@ public interface GameLobby extends Configurable, Initializer, Serviceable {
     void update(String systemId);
     void onTimer(Module.OnUpdate onUpdate);
 
+    boolean configureGameZone(byte[] payload);
+    boolean configureArena(byte[] payload);
+    void reload();
 }

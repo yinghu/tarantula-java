@@ -39,6 +39,7 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
         DynamicGameLobby gameLobby = new DynamicGameLobby();
         gameLobby.distributionKey(application.distributionKey());
         dataStore.load(gameLobby);
+        gameLobby.dataStore(dataStore);
         gameLobby.keySet.forEach((k)->{
             GameZone zone = loadGameZone(dataStore,k);
             gameLobby.addGameZone(zone);
@@ -52,6 +53,7 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
         DynamicGameLobby gameLobby = new DynamicGameLobby();
         gameLobby.distributionKey(application.distributionKey());
         dataStore.load(gameLobby);
+        gameLobby.dataStore(dataStore);
         gameLobby.keySet.forEach((k)->{
             GameZone zone = loadGameZone(dataStore,k);
             gameLobby.addGameZone(zone);

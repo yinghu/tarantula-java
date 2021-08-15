@@ -149,4 +149,25 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         //gameRoomRegistryManagers.remove(remoted.distributionKey());
         //gameRoomManagers.remove(remoted.distributionKey());
     }
+    public boolean configureGameZone(byte[] payload){
+        GameZone gameZone = new DynamicZone();
+        JsonObject jsonObject = JsonUtil.parse(payload);
+        String zoneId = jsonObject.get("zoneId").getAsString();
+        gameZone.distributionKey(zoneId);
+        this.dataStore.load(gameZone);
+        this.context.log(gameZone.toString(),OnLog.WARN);
+        return gameZone.configureAndValidate(jsonObject);
+    }
+    public boolean configureArena(byte[] payload){
+        Arena arena = new Arena();
+        JsonObject jsonObject = JsonUtil.parse(payload);
+        String arenaId = jsonObject.get("arenaId").getAsString();
+        arena.distributionKey(arenaId);
+        this.dataStore.load(arena);
+        this.context.log(arena.toString(),OnLog.WARN);
+        return arena.configureAndValidate(jsonObject);
+    }
+    public void reload(){
+        this.context.log(this.toString(),OnLog.WARN);
+    }
 }

@@ -106,8 +106,10 @@ public class GameLobbyAdminModule implements Module {
             String lobbyId = (String)cmd.get("lobbyId");
             Descriptor app = loadDescriptor(gameCluster,lobbyId);
             GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
-            GameZone zone = lobby.list().get(0);
-            this.deploymentServiceProvider.configure(zone.distributionKey());
+            lobby.setup(context);
+            lobby.reload();
+            //GameZone zone = lobby.list().get(0);
+            //this.deploymentServiceProvider.configure(zone.distributionKey());
             session.write(JsonUtil.toSimpleResponse(true,"Lobby reloaded").getBytes());
         }
         else if(session.action().equals("onSaveLobbyZone")){
@@ -115,28 +117,18 @@ public class GameLobbyAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(keys[0]);
             Descriptor app = loadDescriptor(gameCluster,keys[1]);
             GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
-            GameZone zone = lobby.list().get(0);
-            boolean updated = zone.configureAndValidate(payload);
-            if(updated){
-                zone.update();
-            }
-            session.write(JsonUtil.toSimpleResponse(updated,"zone updated ["+updated+"]").getBytes());
+            lobby.setup(context);
+            lobby.configureGameZone(payload);
+            session.write(JsonUtil.toSimpleResponse(true,"zone updated").getBytes());
         }
         else if(session.action().equals("onSaveLobbyLevel")){
             String[] keys = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(keys[0]);
             Descriptor app = loadDescriptor(gameCluster,keys[1]);
-            GameZone zone = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
-            boolean[] updated = {false};
-            zone.arenas().forEach((a)->{
-                if(a.distributionKey().equals(keys[2])){
-                    updated[0]= a.configureAndValidate(payload);
-                }
-            });
-            if(updated[0]){
-                zone.update();
-            }
-            session.write(JsonUtil.toSimpleResponse(updated[0],"level updated ["+updated[0]+"]").getBytes());
+            GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
+            lobby.setup(context);
+            lobby.configureArena(payload);
+            session.write(JsonUtil.toSimpleResponse(true,"level updated").getBytes());
         }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");
