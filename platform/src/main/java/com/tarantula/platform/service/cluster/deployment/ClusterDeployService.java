@@ -310,8 +310,8 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();
             String typePrefix = name.toLowerCase();
-            String configPrefix = tournamentEnabled?(mode+"-tournament"):(mode);
-            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(configPrefix+"-game-cluster-basic-plan.xml"));
+            //String configPrefix = tournamentEnabled?(mode+"-tournament"):(mode);
+            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(tournamentEnabled?"tournament-game-cluster-basic-plan.xml":"game-cluster-basic-plan.xml"));
             for (LobbyConfiguration configuration : parser.configurations) {
                 configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",typePrefix));//lower case only typeId
                 if(configuration.descriptor.typeId().endsWith("-lobby")){
@@ -319,7 +319,8 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 }
                 else if(configuration.descriptor.typeId().endsWith("-service")){
                     gameCluster.property(GameCluster.GAME_SERVICE,configuration.descriptor.typeId());
-                    //configuration.applications.add(JsonServiceParser.descriptor("achievement"));
+                    configuration.applications.add(JsonServiceParser.descriptor("achievement"));
+                    configuration.applications.add(JsonServiceParser.descriptor("store"));
                 }
                 else if(configuration.descriptor.typeId().endsWith("-data")){
                     gameCluster.property(GameCluster.GAME_DATA,configuration.descriptor.typeId());

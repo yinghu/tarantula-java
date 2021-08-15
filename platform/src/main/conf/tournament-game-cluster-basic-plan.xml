@@ -17,7 +17,7 @@
         <access-mode>12</access-mode>
         <deploy-code>4</deploy-code>
         <deploy-priority>15</deploy-priority>
-        <application-list>
+       <application-list>
             <application>
                 <type-id>game-lobby</type-id>
                 <name>Game Lobby 1</name>
@@ -25,7 +25,6 @@
                 <category>game</category>
                 <tag>game/lobby1</tag>
                 <module-name>com.tarantula.game.module.GameLobbyModule</module-name>
-                <capacity>10</capacity>
                 <access-rank>1</access-rank>
                 <timer-on-module>1000</timer-on-module>
             </application>
@@ -36,13 +35,12 @@
                 <category>game</category>
                 <tag>game/lobby2</tag>
                 <module-name>com.tarantula.game.module.GameLobbyModule</module-name>
-                <capacity>10</capacity>
                 <access-rank>2</access-rank>
                 <timer-on-module>1000</timer-on-module>
             </application>
         </application-list>
         <configuration-list>
-            <configuration type="pre-setup" name="tvt">
+            <configuration type="pre-setup" name="pve">
                 <property name="application-pre-setup">com.tarantula.game.service.DynamicGameLobbySetup</property>
             </configuration>
         </configuration-list>
@@ -60,12 +58,11 @@
                 <type-id>game-service</type-id>
                 <name>MatchMaking</name>
                 <type>application</type>
-                <category>service</category>
+                <category>matchmaking</category>
                 <tag>game/mmk</tag>
-                <capacity>10</capacity><!--max zone count per game title-->
                 <module-name>com.tarantula.game.module.MatchMakingModule</module-name>
             </application>
-            <application><!-- stats/leader board module-->
+            <application><!-- stats module-->
                 <type-id>game-service</type-id>
                 <name>Statistics</name>
                 <type>application</type>
@@ -73,7 +70,7 @@
                 <tag>game/stats</tag>
                 <module-name>com.tarantula.game.module.StatisticsModule</module-name>
             </application>
-            <application><!-- stats/leader board module-->
+            <application><!-- leader board module-->
                 <type-id>game-service</type-id>
                 <name>LeaderBoard</name>
                 <type>application</type>
@@ -81,27 +78,11 @@
                 <tag>game/leaderboard</tag>
                 <module-name>com.tarantula.game.module.LeaderBoardModule</module-name>
             </application>
-            <application><!-- stats/leader board module-->
-                <type-id>game-service</type-id>
-                <name>GameStore</name>
-                <type>application</type>
-                <category>service</category>
-                <tag>game/store</tag>
-                <module-name>com.tarantula.game.module.GameStoreModule</module-name>
-            </application>
-            <application>
-                <type-id>game-service</type-id>
-                <name>Achievement</name>
-                <type>application</type>
-                <category>achievement</category>
-                <tag>game/achievement</tag>
-                <module-name>com.tarantula.game.module.AchievementModule</module-name>
-            </application>
-            <application><!-- stats/leader board module-->
+            <application><!-- tournament module-->
                 <type-id>game-service</type-id>
                 <name>Tournament</name>
                 <type>application</type>
-                <category>service</category>
+                <category>tournament</category>
                 <tag>game/tournament</tag>
                 <module-name>com.tarantula.game.module.TournamentModule</module-name>
             </application>
