@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.TarantulaContext;
 
+import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
 public class ServiceContextProxy implements ServiceContext {
@@ -83,5 +84,8 @@ public class ServiceContextProxy implements ServiceContext {
     }
     public Configuration configuration(String config){
         return this.tarantulaContext.configuration(config);
+    }
+    public List<Descriptor> availableServices(){
+        return this.tarantulaContext.availableServices();
     }
 }

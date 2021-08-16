@@ -1,6 +1,8 @@
 package com.tarantula.platform;
 
 import java.io.*;
+import java.net.URL;
+import java.nio.file.FileSystem;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -772,5 +774,17 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration();
         kv.forEach((k,v)->applicationConfiguration.property(k,v));
         return applicationConfiguration;
+    }
+    public List<Descriptor> availableServices(){
+ 	    URL url = Thread.currentThread().getContextClassLoader().getResource("deploy");
+ 	    File f = new File(url.getFile());
+        ArrayList<Descriptor> alist = new ArrayList<>();
+ 	    f.list((m,n)->{
+ 	        if(n.endsWith(".json")){
+ 	            alist.add(JsonServiceParser.descriptor(n));
+            }
+ 	        return false;
+        });
+ 	    return alist;
     }
 }

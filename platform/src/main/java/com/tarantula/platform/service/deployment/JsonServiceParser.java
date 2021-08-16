@@ -11,7 +11,7 @@ public class JsonServiceParser {
     public static DeploymentDescriptor descriptor(String templateName){
         try{
             DeploymentDescriptor descriptor = new DeploymentDescriptor();
-            JsonObject temp = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_DEPLOY+templateName+".json"));
+            JsonObject temp = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_DEPLOY+templateName));
             descriptor.typeId(temp.get("typeId").getAsString());
             descriptor.type(temp.get("type").getAsString());
             descriptor.name(temp.get("name").getAsString());
