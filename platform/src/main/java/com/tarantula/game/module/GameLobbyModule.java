@@ -33,18 +33,11 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onLeave")){
-            gameLobby.leave(session.systemId());
+            gameLobby.leave(session);
             session.write(toMessage("left room",true).getBytes());
         }
         else if(session.action().equals("onUpdate")){
-            Statistics statistics = gameServiceProvider.statistics(session.systemId());
-            statistics.entry("kills").update(1).update();
-            statistics.entry("wins").update(1).update();
-            statistics.entry("stars").update(1).update();
-            session.write(toMessage("updated",true).getBytes());
-            if(application.tournamentEnabled()){
-                this.gameLobby.update(session.systemId());
-            }
+            this.gameLobby.update(session,payload,onUpdate);
         }
         else if(session.action().equals("onTest")){
             if(application.tournamentEnabled()&&(!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
@@ -56,7 +49,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
                 rating.arenaLevel = onAccess.stub();
                 Stub stub = gameLobby.join(session,rating);
                 session.write(stub.toJson().toString().getBytes());
-                gameLobby.leave(session.systemId());
+                gameLobby.leave(session);
             }
         }
         else{
@@ -79,17 +72,11 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
         this.gameLobby = this.gameServiceProvider.lobby(this.context.descriptor());
         this.gameLobby.setup(context);
         this.gameLobby.start();
-        //this.gameZone.registerListener(this.gameServiceProvider.roomServiceProvider());
-        //this.gameZone.setup(this.context);
-        //this.deploymentServiceProvider.register(this.gameZone);
-        //if(this.gameZone.connected()) this.deploymentServiceProvider.registerOnConnectionListener(this);
         this.context.log("Game lobby started on tag ["+context.descriptor().tag()+"]",OnLog.WARN);
     }
     @Override
     public void clear() {
-        try{
-            gameLobby.shutdown();
-        }catch (Exception ex){}
+        try{ gameLobby.shutdown();}catch (Exception ex){}
         this.context.log("clear->"+this.context.descriptor().tag(),OnLog.WARN);
     }
     //connection listener

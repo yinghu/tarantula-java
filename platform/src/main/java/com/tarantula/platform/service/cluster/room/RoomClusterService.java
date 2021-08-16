@@ -49,9 +49,9 @@ public class RoomClusterService implements ManagedService, RemoteService {
 
     }
 
-    public String register(String serviceName, Arena arena,Rating rating){
+    public String register(String serviceName,String zoneId,Rating rating){
         GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
-        return gameServiceProvider.onRegisterRoom(arena,rating);
+        return gameServiceProvider.onRegisterRoom(zoneId,rating);
     }
 
     public GameRoom join(String serviceName,Arena arena, String roomId,String systemId){

@@ -33,13 +33,12 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     protected ApplicationContext applicationContext;
     protected Descriptor application;
     protected RoomProxy roomProxy;
-    protected ConcurrentHashMap<String,Stub> stubIndex;
+
     protected CopyOnWriteArrayList<Listener> listeners;
 
     public DynamicZone(){
         this.arenaList = new ArrayList<>();
         this.levelIndex = new ConcurrentHashMap<>();
-        this.stubIndex = new ConcurrentHashMap<>();
         this.listeners = new CopyOnWriteArrayList<>();
     }
     
@@ -55,40 +54,36 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     }
 
     public Stub join(Session session,Rating rating){
-        Stub _joined = stubIndex.get(session.systemId());
-        if(_joined!=null) return _joined;
-        Arena arena = levelIndex.get(rating.arenaLevel>arenaLimit?arenaLimit:rating.arenaLevel);
         Stub stub = new Stub();
         stub.distributionKey(session.systemId());
         stub.label(application.tag());
         dataStore.createIfAbsent(stub,true);
         stub.successful(true);
         stub.rating = rating;
-        stub.arena = arena;
         stub.owner(session.systemId());
         stub.tag = application.tag();
         stub.tournamentEnabled = application.tournamentEnabled();
         rating.owner(session.systemId());
-        GameRoom room = roomProxy.join(session,arena,rating);
+        stub.systemId = session.systemId();
+        GameRoom room = roomProxy.join(session,this.distributionKey(),rating);
         //setup after joining
+        stub.zone = this;
         stub.joined = true;
         stub.roomId = room.roomId();
+        stub.arena = room.arena;
         dataStore.update(stub);
         //this.applicationContext.log(stub.toString(),OnLog.WARN);
         stub.room = room;
         stub.offline = room.offline;
         stub.instance = room.instance;
-        stubIndex.put(session.systemId(),stub);
         return stub;
     }
-    public void update(String systemId){
+    public void update(Stub stub){
         if(application.tournamentEnabled()){
-            Stub stub = stubIndex.get(systemId);
-            this.roomProxy.update(systemId,stub.instance);
+            this.roomProxy.update(stub.owner(),stub.instance);
         }
     }
-    public void leave(String systemId){
-        Stub stub = stubIndex.remove(systemId);
+    public void leave(Stub stub){
         stub.joined = false;
         this.dataStore.update(stub);
         this.applicationContext.log(stub.toString(),OnLog.WARN);

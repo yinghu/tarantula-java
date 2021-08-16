@@ -93,8 +93,8 @@ public class GameServiceProvider implements ServiceProvider{
     public GameRoomServiceProvider roomServiceProvider(){
         return roomServiceProvider;
     }
-    public String onRegisterRoom(Arena arena,Rating rating){
-        return roomServiceProvider.onRegister(arena,rating);
+    public String onRegisterRoom(String zoneId,Rating rating){
+        return roomServiceProvider.onRegister(zoneId,rating);
     }
     public GameRoom onJoinRoom(Arena arena,String roomId,String systemId){
         return roomServiceProvider.onJoin(arena,roomId,systemId);

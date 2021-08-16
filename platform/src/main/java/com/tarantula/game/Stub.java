@@ -14,9 +14,9 @@ import java.util.Map;
 
 
 public class Stub extends ResponseHeader {
-
+    public String systemId;
     public boolean joined;
-
+    public GameZone zone;
     public GameRoom room;
     public boolean offline;
     public String serverKey;

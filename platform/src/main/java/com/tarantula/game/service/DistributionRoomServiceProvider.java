@@ -40,15 +40,15 @@ public class DistributionRoomServiceProvider implements GameRoomServiceProvider 
     public void shutdown() throws Exception {
         logger.warn("room service provider shutdown");
     }
-    public GameRoom join(Arena arena, Rating rating){
-        String roomId = distributionRoomService.register(name,arena,rating);
-        return distributionRoomService.join(name,arena,roomId,rating.owner());
+    public GameRoom join(String zoneId, Rating rating){
+        String roomId = distributionRoomService.register(name,zoneId,rating);
+        return distributionRoomService.join(name,null,roomId,rating.owner());
     }
     public void leave(Arena arena,String roomId,String systemId){
         this.distributionRoomService.leave(name,arena,roomId,systemId);
     }
-    public String onRegister(Arena arena,Rating rating){
-        GameRoomRegistryManager gameRoomRegistryManager = gameRoomRegistryManagers.get(arena.owner());
+    public String onRegister(String zoneId,Rating rating){
+        GameRoomRegistryManager gameRoomRegistryManager = gameRoomRegistryManagers.get(zoneId);
         return gameRoomRegistryManager.register(rating.owner()).instanceId();
     }
     public GameRoom onJoin(Arena arena,String roomId,String systemId){

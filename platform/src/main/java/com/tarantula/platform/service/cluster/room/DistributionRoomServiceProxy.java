@@ -32,10 +32,10 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
     }
 
     @Override
-    public String register(String serviceName, Arena arena, Rating rating) {
+    public String register(String serviceName, String zoneId, Rating rating) {
         NodeEngine nodeEngine = getNodeEngine();
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(arena.level);
-        RoomRegisterOperation roomJoinOperation = new RoomRegisterOperation(serviceName,arena,rating);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(zoneId);
+        RoomRegisterOperation roomJoinOperation = new RoomRegisterOperation(serviceName,zoneId,rating);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomJoinOperation,partitionId);
         final Future<String> future = builder.invoke();
         try {

@@ -22,11 +22,13 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     private Descriptor application;
     private DeploymentServiceProvider deploymentServiceProvider;
     private GameServiceProvider gameServiceProvider;
+    private ConcurrentHashMap<String,Stub> stubIndex;
     public DynamicGameLobby(){
         super("gameLobby");
         payload = new JsonObject();
         zoneList = new CopyOnWriteArrayList<>();
         zoneIndex = new ConcurrentHashMap<>();
+        stubIndex = new ConcurrentHashMap<>();
     }
     public int levelMatchOffset(){
         return levelMatchOffset;
@@ -39,8 +41,12 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     }
 
     public Stub join(Session session, Rating rating){
+        Stub stub = stubIndex.get(session.systemId());
+        if(stub!=null) return stub;
         GameZone _zone = zoneIndex.get(rating.level);
-        return _zone.join(session,rating);
+        Stub _stub = _zone.join(session,rating);
+        stubIndex.put(session.systemId(),_stub);
+        return _stub;
     }
 
     public List<GameZone> list(){
@@ -49,9 +55,19 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         Collections.sort(zoneList,new GameZoneComparator());
         return list;
     }
-    public void leave(String systemId){}
-    public void update(String systemId){}
-    public void onTimer(Module.OnUpdate onUpdate){}
+    public void leave(Session session){
+        Stub stub = stubIndex.remove(session.systemId());
+        if(stub==null) return;
+        stub.zone.leave(stub);
+    }
+    public void update(Session session, byte[] payload, Module.OnUpdate onUpdate){
+
+    }
+    public void onTimer(Module.OnUpdate onUpdate){
+        zoneList.forEach((z)->{
+            if(!z.disabled()) z.onTimer(onUpdate);
+        });
+    }
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("levelMatchOffset",levelMatchOffset);

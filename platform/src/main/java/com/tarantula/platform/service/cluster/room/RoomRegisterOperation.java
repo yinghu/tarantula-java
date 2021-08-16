@@ -13,20 +13,20 @@ import java.io.IOException;
 public class RoomRegisterOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;
-    private Arena arena;
+    private String zoneId;
     private Rating rating;
     private String roomId;
     public RoomRegisterOperation(){}
-    public RoomRegisterOperation(String serviceName, Arena arena, Rating rating){
+    public RoomRegisterOperation(String serviceName, String zoneId, Rating rating){
         this.serviceName = serviceName;
-        this.arena = arena;
+        this.zoneId = zoneId;
         this.rating = rating;
     }
 
     @Override
     public void run() throws Exception {
         RoomClusterService ais = this.getService();
-        roomId = ais.register(serviceName,arena,rating);
+        roomId = ais.register(serviceName,zoneId,rating);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class RoomRegisterOperation extends Operation implements PartitionAwareOp
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(serviceName);
-        out.writeObject(arena);
+        out.writeUTF(zoneId);
         out.writeObject(rating);
     }
 
@@ -46,7 +46,7 @@ public class RoomRegisterOperation extends Operation implements PartitionAwareOp
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         serviceName = in.readUTF();
-        arena = in.readObject();
+        zoneId = in.readUTF();
         rating = in.readObject();
     }
 }

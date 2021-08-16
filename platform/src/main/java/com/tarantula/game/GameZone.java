@@ -30,8 +30,8 @@ public interface GameZone extends Configurable,Initializer{
 
     boolean connected();
     Stub join(Session session,Rating rating);
-    void leave(String systemId);
-    void update(String systemId);
+    void leave(Stub stub);
+    void update(Stub stub);
     void onTimer(Module.OnUpdate onUpdate);
     void addArena(Arena arena);
     List<Arena> arenas();
@@ -40,7 +40,7 @@ public interface GameZone extends Configurable,Initializer{
     void roomProxy(RoomProxy roomProxy);
 
     interface RoomProxy{
-        GameRoom join(Session session,Arena  arena,Rating rating);
+        GameRoom join(Session session,String zoneId,Rating rating);
         void update(String systemId,Tournament.Instance instance);
         void leave(Stub stub);
         default void onTimer(Module.OnUpdate onUpdate){}

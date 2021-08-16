@@ -1,5 +1,7 @@
 package com.tarantula.game.service;
 
+import com.icodesoftware.Module;
+import com.icodesoftware.OnLog;
 import com.icodesoftware.Session;
 import com.icodesoftware.Tournament;
 import com.tarantula.game.*;
@@ -8,18 +10,22 @@ public class PVERoomProxy extends RoomProxyHeader {
 
 
     @Override
-    public GameRoom join(Session session,Arena arena, Rating rating) {
+    public GameRoom join(Session session,String zoneId, Rating rating) {
+        GameRoom room = new GameRoom(true);
         if(application.tournamentEnabled()){
             Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().join(session.tournamentId(),session.systemId());
-            GameRoom room = new GameRoom(true);
             room.instance = instance;
-            return room;
         }
-        return new GameRoom(true);
+        room.arena = gameZone.arena(rating.arenaLevel);
+        return room;
     }
     public void leave(Stub stub){
+        this.context.log(stub.systemId+" leave room", OnLog.WARN);
         if(application.tournamentEnabled()){
             //gameServiceProvider.tournamentServiceProvider().leave();
         }
+    }
+    public void onTimer(Module.OnUpdate onUpdate){
+        //this.context.log("ON TIMER->"+gameZone.distributionKey(), OnLog.WARN);
     }
 }

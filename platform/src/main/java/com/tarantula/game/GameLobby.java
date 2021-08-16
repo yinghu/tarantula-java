@@ -12,8 +12,8 @@ public interface GameLobby extends Configurable, Initializer, Serviceable {
 
     List<GameZone> list();
     Stub join(Session session, Rating rating);
-    void leave(String systemId);
-    void update(String systemId);
+    void leave(Session session);
+    void update(Session session, byte[] payload, Module.OnUpdate onUpdate);
     void onTimer(Module.OnUpdate onUpdate);
 
     boolean configureGameZone(byte[] payload);

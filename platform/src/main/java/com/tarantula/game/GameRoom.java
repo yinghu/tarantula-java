@@ -14,6 +14,7 @@ import java.util.Map;
 public class GameRoom extends RecoverableObject implements Portable {
 
     public boolean offline;
+    public Arena arena;
     public Tournament.Instance instance;
 
     public GameRoom(){
