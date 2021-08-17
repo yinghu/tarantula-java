@@ -76,6 +76,6 @@ public class GameRoom extends RecoverableObject implements Portable {
         return jsonObject;
     }
     public void onTimer(Module.OnUpdate onUpdate){
-        onUpdate.on(null,"label",new byte[0]);
+
     }
 }

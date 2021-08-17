@@ -9,5 +9,5 @@
   "tvtMaxRoomCapacity": 4,
   "defaultJoinsOnStart": 1,
   "defaultRoundDuration": 60000,
-  "defaultLevelUpBase": 1000
+  "defaultLevelUpXpBase": 1000
 }
