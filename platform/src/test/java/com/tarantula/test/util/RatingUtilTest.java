@@ -15,8 +15,8 @@ public class RatingUtilTest {
     public void ratingTest() {
         Rating rating = new Rating();
         rating.level = 101;
-        Assert.assertEquals(rating.level%10,1);
+        Assert.assertEquals(rating.level%100,1);
         rating.level = 102;
-        Assert.assertEquals(rating.level%10,2);
+        Assert.assertEquals(rating.level%100,2);
     }
 }

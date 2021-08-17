@@ -1,42 +1,33 @@
 package com.tarantula.game;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.Connection;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Tournament;
 import com.tarantula.platform.AssociateKey;
-
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.statistics.StatsDelta;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-
+//per stub/game by playerId + lobby tag
 public class Stub extends ResponseHeader {
-    public String systemId;
     public boolean joined;
     public GameZone zone;
+    public Arena arena;
     public GameRoom room;
     public boolean offline;
-    public String serverKey;
-    public String ticket;
-    public String roomId;
-    public int seat;
     public String tag;
     public boolean tournamentEnabled;
-    public Arena arena;
+
     public int rank; //rank of game 1 basis
     public double pxp; //percentage of game xp 100 basis
-    public int rankUpBase;
-    public int levelUpBase;
-    public StatsDelta stats;
     public Rating rating;
-    public Connection connection;
-    public Tournament.Instance instance; //
+    public Tournament.Instance tournament; //
 
-    public Stub(){}
-
+    public Stub(){
+    }
+    public String systemId(){
+        return this.bucket+Recoverable.PATH_SEPARATOR+oid;
+    }
     public JsonObject toJson(){
         JsonObject jo = new JsonObject();
         jo.addProperty("successful",successful);
@@ -44,55 +35,37 @@ public class Stub extends ResponseHeader {
             jo.addProperty("message",message);
             return jo;
         }
-        jo.addProperty("owner",owner);
-        jo.addProperty("seat",seat);
-        if(room!=null){
-            jo.add("room",room.toJson());
+        if(zone!=null){
+            jo.add("zone",zone.toJson());
         }
         if(arena!=null){
             jo.add("arena", arena.toJson());
         }
+        if(room!=null){
+            jo.add("room",room.toJson());
+        }
+        if(tournament!=null){
+            jo.add("tournament",tournament.toJson());
+        }
+        if(rating!=null){
+            jo.add("rating",rating.toJson());
+        }
         jo.addProperty("tag",tag);
         jo.addProperty("tournamentEnabled",tournamentEnabled);
         jo.addProperty("offline",offline);
-        if(ticket!=null){
-            jo.addProperty("ticket",ticket);
-        }
-        if(serverKey!=null){
-            jo.addProperty("serverKey",serverKey);
-        }
-        if(instance!=null){
-            JsonObject jp = new JsonObject();
-            jp.addProperty("id",instance.distributionKey());
-            jp.addProperty("maxEntries",instance.maxEntries());
-            jp.addProperty("startTime",instance.startTime().format(DateTimeFormatter.ISO_DATE_TIME));
-            jp.addProperty("closeTime",instance.closeTime().format(DateTimeFormatter.ISO_DATE_TIME));
-            jp.addProperty("endTime",instance.endTime().format(DateTimeFormatter.ISO_DATE_TIME));
-            jo.add("tournament",jp);
-        }
-        if(connection!=null){
-            JsonObject jp = new JsonObject();
-            jp.addProperty("type",connection.type());
-            jp.addProperty("serverId",connection.serverId());
-            jp.addProperty("secured",connection.secured());
-            jp.addProperty("connectionId",connection.connectionId());
-            jp.addProperty("host",connection.host());
-            jp.addProperty("port",connection.port());
-            jo.add("connection",jp);
-        }
         return jo;
     }
     @Override
     public Map<String,Object> toMap(){
         properties.put("joined",joined);
-        properties.put("roomId",roomId);
-
+        properties.put("roomId",room!=null?room.roomId():null);
         return properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         joined = (boolean)properties.getOrDefault("joined",false);
-        roomId = (String)properties.getOrDefault("roomId",null);
+        GameRoom room = new GameRoom();
+        room.distributionKey((String)properties.getOrDefault("roomId",null));
     }
     @Override
     public Recoverable.Key key(){

@@ -2,8 +2,10 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Descriptor;
+import com.icodesoftware.Session;
 import com.icodesoftware.Tournament;
 import com.tarantula.game.GameZone;
+import com.tarantula.game.Stub;
 
 abstract public class RoomProxyHeader implements GameZone.RoomProxy {
 
@@ -20,7 +22,6 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
         this.gameZone = gameZone;
     }
     @Override
-    public void update(String systemId, Tournament.Instance instance){
-        gameServiceProvider.tournamentServiceProvider().score(instance.distributionKey(),systemId,100);
+    public void update(Session session, Stub stub,byte[] payload){
     }
 }

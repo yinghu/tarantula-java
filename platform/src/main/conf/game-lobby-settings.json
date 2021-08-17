@@ -1,5 +1,5 @@
 {
-  "initialZoneCount": 1,
+  "initialZoneCount": 10,
   "zoneLimit": 10,
   "levelMatchOffset": 100,
   "arenaLimit": 10,

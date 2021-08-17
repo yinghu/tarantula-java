@@ -12,7 +12,7 @@ public class PVPRoomProxy extends RoomProxyHeader {
         return room;
     }
     public void leave(Stub stub){
-        this.gameServiceProvider.roomServiceProvider().leave(stub.arena,stub.roomId,stub.owner());
+        this.gameServiceProvider.roomServiceProvider().leave(stub.arena,stub.room.roomId(),stub.owner());
     }
     public void onTimer(Module.OnUpdate onUpdate){
         //gameServiceProvider.roomServiceProvider().leave(arena,_remote.roomId,rating.distributionKey());

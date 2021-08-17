@@ -1,5 +1,6 @@
 package com.tarantula.game;
 
+import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
@@ -15,6 +16,8 @@ import java.util.Map;
 public class Rating extends RecoverableObject implements DataStore.Updatable, Portable {
 
     public static double BASE_POINTS = 100;
+    public static int ARENA_LEVEL_LIMIT = 10;
+    public static int RANK_UP_LEVEL_BASE = 100;
 
     public int rank =1; //rank of lobby
     public int level = 1; //total level
@@ -30,10 +33,9 @@ public class Rating extends RecoverableObject implements DataStore.Updatable, Po
         this.label = "Rating";
     }
 
-    public void update(Stub stub){
-        if(stub.rank==0) return;
-        double dxp = (1/stub.rank+stub.pxp/BASE_POINTS)*BASE_POINTS;
-        if(stub.rank==1){
+    public void update(int rankDelta,double xpDelta,double arenaXpLimit){
+        double dxp = rankDelta!=0?(1/rankDelta+xpDelta/BASE_POINTS)*BASE_POINTS:(xpDelta/BASE_POINTS)*BASE_POINTS;
+        if(rankDelta==1){
             csw++;
             dxp = dxp+(csw-1)*BASE_POINTS;
         }
@@ -42,18 +44,14 @@ public class Rating extends RecoverableObject implements DataStore.Updatable, Po
         }
         arenaXp += dxp;
         xp += dxp;
-        int _xpLevel = (int)arenaXp/stub.levelUpBase;
-        if(_xpLevel>arenaLevel){
-            _xpLevel = _xpLevel-arenaLevel;//xplevel delta
-            arenaLevel = arenaLevel +(_xpLevel);//
-            level = level+(_xpLevel);//add level jump delta
-        }
-        if(arenaLevel-stub.rankUpBase>0){//rank up if level pass the base
-            rank++;
-            //reset next level from 1 - 10 and rank up again
-            arenaLevel = 1;
-            arenaXp = 0;
-        }
+        if(arenaXp<arenaXpLimit) return;
+        //level up
+        arenaLevel = arenaLevel==ARENA_LEVEL_LIMIT?1:(arenaLevel+1);
+        level++;
+        arenaXp = 0;
+        csw=0;
+        int _tryRank = 1+((level-1)/RANK_UP_LEVEL_BASE);
+        if(_tryRank>rank) rank = _tryRank;
     }
     @Override
     public Map<String,Object> toMap(){
@@ -103,6 +101,16 @@ public class Rating extends RecoverableObject implements DataStore.Updatable, Po
     @Override
     public Recoverable.Key key(){
         return new AssociateKey(this.bucket,this.oid,this.label);
+    }
+
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("rank",rank);
+        jsonObject.addProperty("level",level);
+        jsonObject.addProperty("xp",xp);
+        jsonObject.addProperty("arenaLevel",arenaLevel);
+        jsonObject.addProperty("arenaXP",arenaXp);
+        return jsonObject;
     }
 
 }

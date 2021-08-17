@@ -64,24 +64,20 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         stub.tag = application.tag();
         stub.tournamentEnabled = application.tournamentEnabled();
         rating.owner(session.systemId());
-        stub.systemId = session.systemId();
         GameRoom room = roomProxy.join(session,this.distributionKey(),rating);
         //setup after joining
-        stub.zone = this;
         stub.joined = true;
-        stub.roomId = room.roomId();
+        stub.zone = this;
         stub.arena = room.arena;
-        dataStore.update(stub);
-        //this.applicationContext.log(stub.toString(),OnLog.WARN);
-        stub.room = room;
+        stub.room= room;
         stub.offline = room.offline;
-        stub.instance = room.instance;
+        stub.tournament = room.instance;
+        dataStore.update(stub);
+        this.applicationContext.log(stub.toString(),OnLog.WARN);
         return stub;
     }
-    public void update(Stub stub){
-        if(application.tournamentEnabled()){
-            this.roomProxy.update(stub.owner(),stub.instance);
-        }
+    public void update(Session session,Stub stub,byte[] payload){
+        roomProxy.update(session,stub,payload);
     }
     public void leave(Stub stub){
         stub.joined = false;
@@ -269,5 +265,12 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public boolean configureAndValidate(Map<String,Object> data){
         this.roundDuration = ((Number)data.get("duration")).intValue()*60000;
         return true;
+    }
+    public JsonObject toJson(){
+        JsonObject jzon = new JsonObject();
+        jzon.addProperty("name",name);
+        jzon.addProperty("rank",application.accessRank());
+        jzon.addProperty("levelMatch",levelMatch);
+        return jzon;
     }
 }

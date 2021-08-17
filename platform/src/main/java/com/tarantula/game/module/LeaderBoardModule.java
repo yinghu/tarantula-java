@@ -85,13 +85,6 @@ public class LeaderBoardModule implements Module {
         this.builder.registerTypeAdapter(Rating.class,new RatingSerializer());
         this.builder.registerTypeAdapter(LeaderBoardView.class,new LeaderBoardViewSerializer());
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
-        this.context.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.STUB_CID,(a)->{
-            Stub stub = (Stub)a;
-            Rating rating = this.gameServiceProvider.rating(stub.owner());
-            rating.update(stub);
-            rating.update();
-            //this.context.log("a->"+stub.owner()+"/"+stub.rank+"/"+stub.pxp+"/"+stub.rankUpBase+"/"+stub.levelUpBase,OnLog.WARN);
-        });
         this.context.log("Leader board module started ["+this.context.descriptor().typeId()+"]", OnLog.WARN);
     }
 
