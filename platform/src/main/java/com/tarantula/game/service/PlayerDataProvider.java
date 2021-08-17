@@ -7,7 +7,6 @@ import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.statistics.StatisticsIndex;
 
-import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerDataProvider implements ServiceProvider {
 
@@ -18,19 +17,15 @@ public class PlayerDataProvider implements ServiceProvider {
 
     private DataStore dataStore;
 
-    private ConcurrentHashMap<String,PlayerData> tMap = new ConcurrentHashMap<>();
-
     public PlayerDataProvider(String name){
         this.name = name;
     }
     public Rating rating(String systemId){
-        //return rMap.computeIfAbsent(systemId,(k)->{
         Rating rating = new Rating();
         rating.distributionKey(systemId);
         this.dataStore.createIfAbsent(rating,true);
         rating.dataStore(this.dataStore);
         return rating;
-        //});
     }
     public Statistics statistics(String systemId,LeaderBoardProvider leaderBoardProvider){
         StatisticsIndex deltaStatistics = new StatisticsIndex();
@@ -92,9 +87,5 @@ public class PlayerDataProvider implements ServiceProvider {
     }
     private double probability(double rating1,double rating2) {
         return 1.0 * 1.0 / (1 + 1.0 * (Math.pow(10, 1.0 * (rating1 - rating2) / 400)));
-    }
-    private class PlayerData{
-        public Rating rating;
-        public Statistics statistics;
     }
 }

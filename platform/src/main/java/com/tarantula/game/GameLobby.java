@@ -15,6 +15,8 @@ public interface GameLobby extends Configurable, Initializer, Serviceable {
     void leave(Session session);
     void update(Session session, byte[] payload, Module.OnUpdate onUpdate);
     void onTimer(Module.OnUpdate onUpdate);
+    void onTimer(GameRoom gameRoom);
+    void offTimer(GameRoom gameRoom);
 
     boolean configureGameZone(byte[] payload);
     boolean configureArena(byte[] payload);

@@ -23,12 +23,14 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     private DeploymentServiceProvider deploymentServiceProvider;
     private GameServiceProvider gameServiceProvider;
     private ConcurrentHashMap<String,Stub> stubIndex;
+    private ConcurrentHashMap<String,GameRoom> roomIndexOnTimer;
     public DynamicGameLobby(){
         super("gameLobby");
         payload = new JsonObject();
         zoneList = new CopyOnWriteArrayList<>();
         zoneIndex = new ConcurrentHashMap<>();
         stubIndex = new ConcurrentHashMap<>();
+        roomIndexOnTimer = new ConcurrentHashMap<>();
     }
     public int levelMatchOffset(){
         return levelMatchOffset;
@@ -45,6 +47,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         if(stub!=null) return stub;
         GameZone _zone = zoneIndex.get(rating.level);
         Stub _stub = _zone.join(session,rating);
+        _stub.statistics = gameServiceProvider.statistics(session.systemId());
         stubIndex.put(session.systemId(),_stub);
         return _stub;
     }
@@ -66,12 +69,18 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
             session.write(JsonUtil.toSimpleResponse(false,"no access token").getBytes());
             return;
         }
-        stub.zone.update(session,stub,payload);
+        stub.zone.update(session,stub,payload,onUpdate);
     }
     public void onTimer(Module.OnUpdate onUpdate){
-        zoneList.forEach((z)->{
-            if(!z.disabled()) z.onTimer(onUpdate);
+        roomIndexOnTimer.forEach((k,v)->{
+            v.onTimer(onUpdate);
         });
+    }
+    public void onTimer(GameRoom gameRoom){
+        roomIndexOnTimer.put(gameRoom.roomId(),gameRoom);
+    }
+    public void offTimer(GameRoom gameRoom){
+        roomIndexOnTimer.remove(gameRoom.roomId());
     }
     @Override
     public Map<String,Object> toMap(){
@@ -129,7 +138,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
             if(gameZone.disabled()) continue;
             gameZone.registerListener(this.gameServiceProvider.roomServiceProvider());
             gameZone.registerListener(this);
-            gameZone.setup(this.context);
+            gameZone.setup(this.context,this);
             deploymentServiceProvider.register(gameZone);
             for(int i=levelStart;i<gameZone.levelMatch();i++){
                 zoneIndex.put(i,gameZone);

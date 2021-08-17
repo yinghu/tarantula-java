@@ -5,7 +5,7 @@ import com.icodesoftware.Module;
 
 import java.util.List;
 
-public interface GameZone extends Configurable,Initializer{
+public interface GameZone extends Configurable{
 
     String PLAY_MODE_PVE = "pve"; //player versus computer
     String PLAY_MODE_PVP = "pvp"; //player versus player
@@ -31,19 +31,18 @@ public interface GameZone extends Configurable,Initializer{
     boolean connected();
     Stub join(Session session,Rating rating);
     void leave(Stub stub);
-    void update(Session session,Stub stub,byte[] payload);
-    void onTimer(Module.OnUpdate onUpdate);
+    void update(Session session, Stub stub, byte[] payload, Module.OnUpdate onUpdate);
+
     void addArena(Arena arena);
     List<Arena> arenas();
     Arena arena(int level);
-
+    void setup(ApplicationContext applicationContext,GameLobby gameLobby);
     void roomProxy(RoomProxy roomProxy);
 
     interface RoomProxy{
         GameRoom join(Session session,String zoneId,Rating rating);
-        void update(Session session,Stub stub,byte[] payload);
+        void update(Session session, Stub stub, byte[] payload, Module.OnUpdate onUpdate);
         void leave(Stub stub);
-        default void onTimer(Module.OnUpdate onUpdate){}
-        void setup(ApplicationContext applicationContext,GameZone gameZone);
+        void setup(ApplicationContext applicationContext,GameLobby gameLobby,GameZone gameZone);
     }
 }

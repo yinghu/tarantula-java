@@ -1,10 +1,13 @@
 package com.tarantula.game.service;
 
-import com.icodesoftware.ApplicationContext;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Session;
-import com.icodesoftware.Tournament;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.icodesoftware.*;
+import com.icodesoftware.Module;
+import com.icodesoftware.util.JsonUtil;
+import com.tarantula.game.GameLobby;
 import com.tarantula.game.GameZone;
+import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
 
 abstract public class RoomProxyHeader implements GameZone.RoomProxy {
@@ -12,16 +15,35 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
     protected ApplicationContext context;
     protected GameServiceProvider gameServiceProvider;
     protected Descriptor application;
+    protected GameLobby gameLobby;
     protected GameZone gameZone;
 
     @Override
-    public void setup(ApplicationContext applicationContext,GameZone gameZone) {
+    public void setup(ApplicationContext applicationContext, GameLobby gameLobby,GameZone gameZone) {
         this.context = applicationContext;
         this.application = applicationContext.descriptor();
         this.gameServiceProvider = applicationContext.serviceProvider(application.typeId().replace("lobby","service"));
+        this.gameLobby = gameLobby;
         this.gameZone = gameZone;
     }
     @Override
-    public void update(Session session, Stub stub,byte[] payload){
+    public void update(Session session, Stub stub, byte[] payload, Module.OnUpdate onUpdate){
+        JsonObject jsonObject = JsonUtil.parse(payload);
+        if(jsonObject.has("rating")){
+            JsonObject delta = jsonObject.getAsJsonObject("rating");
+            stub.rating.update(delta.get("rank").getAsInt(),delta.get("delta").getAsDouble(),stub.arena.xp).update();
+            session.write(stub.rating.toJson().toString().getBytes());
+        }
+        if(jsonObject.has("stats")){
+            JsonArray stats = jsonObject.getAsJsonArray("stats");
+            stats.forEach((a)->{
+                JsonObject kv = a.getAsJsonObject();
+                stub.statistics.entry(kv.get("name").getAsString()).update(kv.get("value").getAsDouble()).update();
+            });
+        }
+        if(application.tournamentEnabled()&&jsonObject.has("tournament")){
+            JsonObject score = jsonObject.getAsJsonObject("tournament");
+            gameServiceProvider.tournamentServiceProvider().score(stub.tournament.distributionKey(),session.systemId(),score.get("score").getAsDouble());
+        }
     }
 }

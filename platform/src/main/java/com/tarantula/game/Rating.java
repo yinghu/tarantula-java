@@ -33,7 +33,7 @@ public class Rating extends RecoverableObject implements DataStore.Updatable, Po
         this.label = "Rating";
     }
 
-    public void update(int rankDelta,double xpDelta,double arenaXpLimit){
+    public Rating update(int rankDelta,double xpDelta,double arenaXpLimit){
         double dxp = rankDelta!=0?(1/rankDelta+xpDelta/BASE_POINTS)*BASE_POINTS:(xpDelta/BASE_POINTS)*BASE_POINTS;
         if(rankDelta==1){
             csw++;
@@ -44,7 +44,7 @@ public class Rating extends RecoverableObject implements DataStore.Updatable, Po
         }
         arenaXp += dxp;
         xp += dxp;
-        if(arenaXp<arenaXpLimit) return;
+        if(arenaXp<arenaXpLimit) return this;
         //level up
         arenaLevel = arenaLevel==ARENA_LEVEL_LIMIT?1:(arenaLevel+1);
         level++;
@@ -52,6 +52,7 @@ public class Rating extends RecoverableObject implements DataStore.Updatable, Po
         csw=0;
         int _tryRank = 1+((level-1)/RANK_UP_LEVEL_BASE);
         if(_tryRank>rank) rank = _tryRank;
+        return this;
     }
     @Override
     public Map<String,Object> toMap(){

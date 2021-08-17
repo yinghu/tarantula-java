@@ -46,7 +46,7 @@
     app.stage.addChild(exit);
    
     let score = text_button('Update',()=>{
-        let payload ={rank:1,delta:70,stats:[{name:'kills',value:1}]}; 
+        let payload ={rating:{rank:1,delta:70},stats:[{name:'kills',value:1}]}; 
         TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','',payload,(resp)=>{
             messageBox.text = JSON.stringify(resp);    
         });
@@ -56,7 +56,7 @@
     app.stage.addChild(score);
 
     let stats = text_button('Stats',()=>{
-        let payload ={rank:0,delta:10,stats:[{name:'kills',value:1}]}; 
+        let payload ={rating:{rank:0,delta:10},stats:[{name:'kills',value:1}]}; 
         TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','',payload,(resp)=>{
             messageBox.text = JSON.stringify(resp);    
         });

@@ -73,16 +73,14 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         stub.offline = room.offline;
         stub.tournament = room.instance;
         dataStore.update(stub);
-        this.applicationContext.log(stub.toString(),OnLog.WARN);
         return stub;
     }
-    public void update(Session session,Stub stub,byte[] payload){
-        roomProxy.update(session,stub,payload);
+    public void update(Session session, Stub stub, byte[] payload, Module.OnUpdate onUpdate){
+        roomProxy.update(session,stub,payload,onUpdate);
     }
     public void leave(Stub stub){
         stub.joined = false;
         this.dataStore.update(stub);
-        this.applicationContext.log(stub.toString(),OnLog.WARN);
         roomProxy.leave(stub);
     }
     public void addArena(Arena arena){
@@ -184,18 +182,13 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public <T extends Configurable> void registerListener(Listener<T> listener){
         listeners.add(listener);
     }
-    public Descriptor descriptor(){
-        return application;
-    }
-    public void descriptor(Descriptor descriptor){
 
-    }
     @Override
-    public void setup(ApplicationContext applicationContext) throws Exception{
+    public void setup(ApplicationContext applicationContext,GameLobby gameLobby){
         this.applicationContext = applicationContext;
         this.application = this.applicationContext.descriptor();
         listArena();
-        roomProxy.setup(applicationContext,this);
+        roomProxy.setup(applicationContext,gameLobby,this);
     }
 
     public boolean connected(){
@@ -242,11 +235,6 @@ public class DynamicZone extends RecoverableObject implements GameZone {
             listArena();
         }
     }
-
-    public void onTimer(Module.OnUpdate onUpdate){
-        roomProxy.onTimer(onUpdate);
-    }
-
     @Override
     public int getFactoryId() {
         return GamePortableRegistry.OID;
@@ -270,6 +258,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         JsonObject jzon = new JsonObject();
         jzon.addProperty("name",name);
         jzon.addProperty("rank",application.accessRank());
+        jzon.addProperty("playMode",playMode);
         jzon.addProperty("levelMatch",levelMatch);
         return jzon;
     }

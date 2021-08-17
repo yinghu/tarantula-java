@@ -2,14 +2,9 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.*;
-import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
-
 import com.tarantula.platform.tournament.*;
-
-import java.io.InputStream;
 
 public class GameServiceProvider implements ServiceProvider{
 

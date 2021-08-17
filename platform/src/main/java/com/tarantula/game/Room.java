@@ -266,8 +266,8 @@ public class Room extends RecoverableObject{
                 JsonObject js = j.getAsJsonObject();
                 int seat = js.get("seat").getAsInt();
                 Stub stub = stubs[seat];
-                stub.rank = js.get("rank").getAsInt();
-                stub.pxp = js.get("xp").getAsDouble();
+                //stub.rank = js.get("rank").getAsInt();
+                //stub.pxp = js.get("xp").getAsDouble();
                 roomListener.onRating(stub,rankUpBase);
             });
         }

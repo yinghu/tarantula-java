@@ -2,6 +2,7 @@ package com.tarantula.game;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Statistics;
 import com.icodesoftware.Tournament;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.ResponseHeader;
@@ -10,18 +11,20 @@ import java.util.Map;
 
 //per stub/game by playerId + lobby tag
 public class Stub extends ResponseHeader {
+
     public boolean joined;
+
     public GameZone zone;
     public Arena arena;
     public GameRoom room;
+    public Tournament.Instance tournament; //
+
     public boolean offline;
     public String tag;
     public boolean tournamentEnabled;
 
-    public int rank; //rank of game 1 basis
-    public double pxp; //percentage of game xp 100 basis
     public Rating rating;
-    public Tournament.Instance tournament; //
+    public Statistics statistics;
 
     public Stub(){
     }
