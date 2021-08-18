@@ -63,7 +63,7 @@ public class Stub extends PlayerGameObject {
     @Override
     public void fromMap(Map<String,Object> properties){
         joined = (boolean)properties.getOrDefault("joined",false);
-        GameRoom room = new GameRoom();
+        this.room = new GameRoom();
         room.distributionKey((String)properties.getOrDefault("roomId",null));
     }
     @Override

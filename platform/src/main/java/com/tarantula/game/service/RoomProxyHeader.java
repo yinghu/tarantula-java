@@ -18,6 +18,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
     protected GameZone gameZone;
     protected DataStore dataStore;
     protected String registerKey;
+
     @Override
     public void setup(ApplicationContext applicationContext, GameLobby gameLobby,GameZone gameZone) {
         this.context = applicationContext;
