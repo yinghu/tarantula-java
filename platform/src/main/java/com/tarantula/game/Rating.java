@@ -7,13 +7,12 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.tarantula.platform.AssociateKey;
-import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 import java.util.Map;
 
-public class Rating extends RecoverableObject implements DataStore.Updatable, Portable {
+public class Rating extends PlayerGameObject implements DataStore.Updatable, Portable {
 
     public static double BASE_POINTS = 100;
     public static int ARENA_LEVEL_LIMIT = 10;
@@ -87,16 +86,18 @@ public class Rating extends RecoverableObject implements DataStore.Updatable, Po
 
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeUTF("1",owner);
-        portableWriter.writeInt("2",arenaLevel);
-        portableWriter.writeDouble("3",arenaXp);
+        portableWriter.writeUTF("1",bucket);
+        portableWriter.writeUTF("2",oid);
+        portableWriter.writeInt("3",arenaLevel);
+        portableWriter.writeDouble("4",arenaXp);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
-        owner = portableReader.readUTF("1");
-        arenaLevel = portableReader.readInt("2");
-        arenaXp = portableReader.readDouble("3");
+        bucket = portableReader.readUTF("1");
+        oid = portableReader.readUTF("2");
+        arenaLevel = portableReader.readInt("3");
+        arenaXp = portableReader.readDouble("4");
     }
 
     @Override
@@ -113,5 +114,4 @@ public class Rating extends RecoverableObject implements DataStore.Updatable, Po
         jsonObject.addProperty("arenaXP",arenaXp);
         return jsonObject;
     }
-
 }

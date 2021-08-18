@@ -17,6 +17,8 @@ public class GameRoom extends RecoverableObject implements Portable {
     public boolean offline;
     public int totalJoined;
     public boolean tournamentEnabled;
+    public long duration;
+    public int round;
     public Arena arena;
     public Tournament.Instance instance;
 
@@ -36,6 +38,8 @@ public class GameRoom extends RecoverableObject implements Portable {
         this.properties.put("1",offline);
         this.properties.put("2",totalJoined);
         this.properties.put("3",tournamentEnabled);
+        this.properties.put("4",duration);
+        this.properties.put("5",round);
         return this.properties;
     }
     @Override
@@ -43,6 +47,8 @@ public class GameRoom extends RecoverableObject implements Portable {
         this.offline = (boolean)properties.getOrDefault("1",true);
         this.totalJoined = ((Number)properties.getOrDefault("2",0)).intValue();
         this.tournamentEnabled = (boolean)properties.getOrDefault("3",false);
+        this.duration = ((Number)properties.getOrDefault("4",0)).longValue();
+        this.round = ((Number)properties.getOrDefault("5",0)).intValue();
     }
     @Override
     public int getFactoryId() {
@@ -58,6 +64,8 @@ public class GameRoom extends RecoverableObject implements Portable {
         portableWriter.writeUTF("1",this.distributionKey());
         portableWriter.writeBoolean("2",offline);
         portableWriter.writeInt("3",totalJoined);
+        portableWriter.writeLong("4",duration);
+        portableWriter.writeInt("5",round);
     }
 
     @Override
@@ -65,6 +73,8 @@ public class GameRoom extends RecoverableObject implements Portable {
         this.distributionKey(portableReader.readUTF("1"));
         this.offline = portableReader.readBoolean("2");
         this.totalJoined = portableReader.readInt("3");
+        this.duration = portableReader.readLong("4");
+        this.round = portableReader.readInt("5");
     }
     @Override
     public JsonObject toJson(){
@@ -73,9 +83,11 @@ public class GameRoom extends RecoverableObject implements Portable {
         jsonObject.addProperty("offline",offline);
         jsonObject.addProperty("totalJoined",totalJoined);
         jsonObject.addProperty("tournamentEnabled",tournamentEnabled);
+        jsonObject.addProperty("duration",duration);
+        jsonObject.addProperty("round",round);
         return jsonObject;
     }
     public void onTimer(Module.OnUpdate onUpdate){
-
+        
     }
 }

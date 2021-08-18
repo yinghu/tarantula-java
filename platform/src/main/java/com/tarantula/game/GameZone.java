@@ -37,12 +37,17 @@ public interface GameZone extends Configurable{
     List<Arena> arenas();
     Arena arena(int level);
     void setup(ApplicationContext applicationContext,GameLobby gameLobby);
+    DataStore dataStore();
     void roomProxy(RoomProxy roomProxy);
 
     interface RoomProxy{
-        GameRoom join(Session session,String zoneId,Rating rating);
+        GameRoom join(Session session,Rating rating);
         void update(Session session, Stub stub, byte[] payload, Module.OnUpdate onUpdate);
         void leave(Stub stub);
         void setup(ApplicationContext applicationContext,GameLobby gameLobby,GameZone gameZone);
+
+        default String onRegister(Rating rating){ return null;}
+        default GameRoom onJoin(Arena arena,String roomId,String systemId){return null;}
+        default void onLeave(String roomId,String systemId){}
     }
 }

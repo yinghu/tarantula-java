@@ -10,5 +10,5 @@ public interface DistributionRoomService extends ServiceProvider {
     String NAME = "DistributionRoomService";
     String register(String serviceName,String zoneId,Rating rating);
     GameRoom join(String serviceName,Arena arena,String roomId, String systemId);
-    void leave(String serviceName,Arena arena, String roomId,String systemId);
+    void leave(String serviceName,String zoneId,String roomId,String systemId);
 }

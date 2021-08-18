@@ -6,12 +6,12 @@ import com.tarantula.game.*;
 public class PVPRoomProxy extends RoomProxyHeader {
 
     @Override
-    public GameRoom join(Session session, String zoneId, Rating rating) {
-        GameRoom room = gameServiceProvider.roomServiceProvider().join(zoneId,rating);
-        return room;
+    public GameRoom join(Session session, Rating rating) {
+        //GameRoom room = gameServiceProvider.roomServiceProvider().join(zoneId,rating);
+        return new GameRoom();
     }
     public void leave(Stub stub){
-        this.gameServiceProvider.roomServiceProvider().leave(stub.arena,stub.room.roomId(),stub.owner());
+        //this.gameServiceProvider.roomServiceProvider().leave(stub.arena,stub.room.roomId(),stub.owner());
     }
 
 }

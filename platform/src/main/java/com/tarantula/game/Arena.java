@@ -73,6 +73,7 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
 
     public Arena copy(){
         Arena _cp = new Arena();
+        _cp.owner = this.owner;
         _cp.level = this.level;
         _cp.xp = this.xp;
         _cp.capacity = this.capacity;

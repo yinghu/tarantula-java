@@ -6,6 +6,8 @@ import com.tarantula.game.*;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 import com.tarantula.platform.tournament.*;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public class GameServiceProvider implements ServiceProvider{
 
     private TarantulaLogger logger;
@@ -13,12 +15,15 @@ public class GameServiceProvider implements ServiceProvider{
 
     private ServiceContext serviceContext;
 
-    private DistributionRoomServiceProvider roomServiceProvider;
+    //private DistributionRoomServiceProvider roomServiceProvider;
+    private DistributionRoomService distributionRoomService;
     private PlayerDataProvider playerDataProvider;
     private LeaderBoardProvider leaderBoardProvider;
     private ItemConfigurationServiceProvider configurationServiceProvider;
     private DistributedTournamentServiceProvider tournamentServiceProvider;
     private Configuration configuration;
+
+    private ConcurrentHashMap<String, GameZone.RoomProxy> roomProxyIndex;
 
     public GameServiceProvider(String name){
         NAME = name;
@@ -39,10 +44,12 @@ public class GameServiceProvider implements ServiceProvider{
     @Override
     public void setup(ServiceContext serviceContext) {
         this.logger = serviceContext.logger(GameServiceProvider.class);
+        this.roomProxyIndex = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
-        this.roomServiceProvider = new DistributionRoomServiceProvider(NAME);
-        this.roomServiceProvider.setup(serviceContext);
-        this.roomServiceProvider.waitForData();
+        this.distributionRoomService = serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionRoomService.NAME);
+        //this.roomServiceProvider = new DistributionRoomServiceProvider(NAME);
+        //this.roomServiceProvider.setup(serviceContext);
+        //this.roomServiceProvider.waitForData();
         this.playerDataProvider = new PlayerDataProvider(NAME);
         this.playerDataProvider.setup(serviceContext);
         this.playerDataProvider.waitForData();
@@ -67,7 +74,7 @@ public class GameServiceProvider implements ServiceProvider{
     }
     @Override
     public void start() throws Exception {
-        this.roomServiceProvider.start();
+        //this.roomServiceProvider.start();
         this.playerDataProvider.start();
         this.leaderBoardProvider.start();
         this.tournamentServiceProvider.start();
@@ -77,25 +84,33 @@ public class GameServiceProvider implements ServiceProvider{
     @Override
     public void shutdown() throws Exception {
         logger.warn("shut down service->"+NAME);
-        this.roomServiceProvider.shutdown();
+        //this.roomServiceProvider.shutdown();
         this.playerDataProvider.shutdown();
         this.leaderBoardProvider.shutdown();
         this.tournamentServiceProvider.shutdown();
         this.configurationServiceProvider.shutdown();
     }
-
+    public void registerRoomProxy(String zoneId, GameZone.RoomProxy roomProxy){
+        roomProxyIndex.put(zoneId,roomProxy);
+    }
+    public void releaseRoomProxy(String zoneId){
+        roomProxyIndex.remove(zoneId);
+    }
     //room service provider hool calls
-    public GameRoomServiceProvider roomServiceProvider(){
-        return roomServiceProvider;
+    public DistributionRoomService distributionRoomService(){
+        return distributionRoomService;
     }
     public String onRegisterRoom(String zoneId,Rating rating){
-        return roomServiceProvider.onRegister(zoneId,rating);
+        GameZone.RoomProxy proxy = roomProxyIndex.get(zoneId);
+        return proxy.onRegister(rating);
     }
     public GameRoom onJoinRoom(Arena arena,String roomId,String systemId){
-        return roomServiceProvider.onJoin(arena,roomId,systemId);
+        GameZone.RoomProxy proxy = roomProxyIndex.get(arena.owner());
+        return proxy.onJoin(arena,roomId,systemId);
     }
-    public void onLeaveRoom(String roomId,String systemId){
-        this.roomServiceProvider.onLeave(roomId,systemId);
+    public void onLeaveRoom(String zoneId,String roomId,String systemId){
+        GameZone.RoomProxy proxy = roomProxyIndex.get(zoneId);
+        proxy.onLeave(roomId,systemId);
     }
 
     //player data service provider hook calls

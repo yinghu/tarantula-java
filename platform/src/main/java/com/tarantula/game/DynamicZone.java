@@ -58,13 +58,11 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         stub.distributionKey(session.systemId());
         stub.label(application.tag());
         dataStore.createIfAbsent(stub,true);
-        stub.successful(true);
         stub.rating = rating;
-        stub.owner(session.systemId());
         stub.tag = application.tag();
         stub.tournamentEnabled = application.tournamentEnabled();
         rating.owner(session.systemId());
-        GameRoom room = roomProxy.join(session,this.distributionKey(),rating);
+        GameRoom room = roomProxy.join(session,rating);
         //setup after joining
         stub.joined = true;
         stub.zone = this;
@@ -198,12 +196,15 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public void roomProxy(RoomProxy roomProxy){
         this.roomProxy = roomProxy;
     }
-
+    public DataStore dataStore(){
+        return this.dataStore;
+    }
     private void listArena(){
         Collections.sort(arenaList,new ArenaComparator());
         int start = 1;
         for(Arena a : arenaList){
             if(a.disabled()) continue;
+            a.owner(this.distributionKey());
             levelIndex.put(a.level,a);
             for(int i = start;i<a.level;i++){
                 levelIndex.put(i,a);
@@ -216,9 +217,9 @@ public class DynamicZone extends RecoverableObject implements GameZone {
                 levelIndex.put(i,lastArena);
             }
         }
-        levelIndex.forEach((k,v)->{
-            applicationContext.log("Arena level ["+k+"] registered on ["+v.level+"]",OnLog.WARN);
-        });
+        //levelIndex.forEach((k,v)->{
+            //applicationContext.log("Arena level ["+k+"] registered on ["+v.level+"]",OnLog.WARN);
+        //});
     }
     private void reset(GameZone updated){
         arenaList.clear();

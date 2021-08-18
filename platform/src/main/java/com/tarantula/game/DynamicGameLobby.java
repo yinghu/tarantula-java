@@ -23,14 +23,14 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     private DeploymentServiceProvider deploymentServiceProvider;
     private GameServiceProvider gameServiceProvider;
     private ConcurrentHashMap<String,Stub> stubIndex;
-    private ConcurrentHashMap<String,GameRoom> roomIndexOnTimer;
+    private ConcurrentHashMap<String,TimerLister> timerListenerIndex;
     public DynamicGameLobby(){
         super("gameLobby");
         payload = new JsonObject();
         zoneList = new CopyOnWriteArrayList<>();
         zoneIndex = new ConcurrentHashMap<>();
         stubIndex = new ConcurrentHashMap<>();
-        roomIndexOnTimer = new ConcurrentHashMap<>();
+        timerListenerIndex = new ConcurrentHashMap<>();
     }
     public int levelMatchOffset(){
         return levelMatchOffset;
@@ -72,16 +72,19 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         stub.zone.update(session,stub,payload,onUpdate);
     }
     public void onTimer(Module.OnUpdate onUpdate){
-        roomIndexOnTimer.forEach((k,v)->{
+        timerListenerIndex.forEach((k,v)->{
             v.onTimer(onUpdate);
         });
     }
-    public void onTimer(GameRoom gameRoom){
-        roomIndexOnTimer.put(gameRoom.roomId(),gameRoom);
+    public String registerTimerListener(TimerLister timerLister){
+        String regKey = UUID.randomUUID().toString();
+        this.timerListenerIndex.put(regKey,timerLister);
+        return regKey;
     }
-    public void offTimer(GameRoom gameRoom){
-        roomIndexOnTimer.remove(gameRoom.roomId());
+    public void releaseTimerListener(String registerKey){
+        this.timerListenerIndex.remove(registerKey);
     }
+
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("levelMatchOffset",levelMatchOffset);
@@ -136,7 +139,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         this.context.log("game start on level match from ["+levelStart+" to "+levelEnd+"]",OnLog.WARN);
         for(GameZone gameZone : zoneList){
             if(gameZone.disabled()) continue;
-            gameZone.registerListener(this.gameServiceProvider.roomServiceProvider());
+            //gameZone.registerListener(this.gameServiceProvider.roomServiceProvider());
             gameZone.registerListener(this);
             gameZone.setup(this.context,this);
             deploymentServiceProvider.register(gameZone);
@@ -152,9 +155,9 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
                 zoneIndex.put(i,lastZone);
             }
         }
-        zoneIndex.forEach((k,v)->{
-            context.log("Level ["+k+"] registered on ["+v.levelMatch()+"]",OnLog.WARN);
-        });
+        //zoneIndex.forEach((k,v)->{
+            //context.log("Level ["+k+"] registered on ["+v.levelMatch()+"]",OnLog.WARN);
+        //});
     }
 
     @Override

@@ -5,12 +5,11 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.Tournament;
 import com.tarantula.platform.AssociateKey;
-import com.tarantula.platform.ResponseHeader;
 
 import java.util.Map;
 
 //per stub/game by playerId + lobby tag
-public class Stub extends ResponseHeader {
+public class Stub extends PlayerGameObject {
 
     public boolean joined;
 
@@ -28,14 +27,12 @@ public class Stub extends ResponseHeader {
 
     public Stub(){
     }
-    public String systemId(){
-        return this.bucket+Recoverable.PATH_SEPARATOR+oid;
-    }
+
     public JsonObject toJson(){
         JsonObject jo = new JsonObject();
-        jo.addProperty("successful",successful);
-        if(!successful){
-            jo.addProperty("message",message);
+        jo.addProperty("successful",joined);
+        if(!joined){
+            jo.addProperty("message","failed to join");
             return jo;
         }
         if(zone!=null){
