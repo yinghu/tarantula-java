@@ -22,9 +22,10 @@ public interface GameZone extends Configurable{
     int capacity();
     void capacity(int capacity);
 
+    int maxJoinsPerRoom();
+    void maxJoinsPerRoom(int maxJoinsPerRoom);
     int joinsOnStart();
     void joinsOnStart(int joinsOnStart);
-
     long roundDuration();
     void roundDuration(long roundDuration);
 
@@ -41,11 +42,11 @@ public interface GameZone extends Configurable{
     void roomProxy(RoomProxy roomProxy);
 
     interface RoomProxy{
-        GameRoom join(Session session,Rating rating);
+        Stub join(Session session,Rating rating);
         void update(Session session, Stub stub, byte[] payload, Module.OnUpdate onUpdate);
         void leave(Stub stub);
         void setup(ApplicationContext applicationContext,GameLobby gameLobby,GameZone gameZone);
-
+        default void close(){}
         default String onRegister(Rating rating){ return null;}
         default GameRoom onJoin(Arena arena,String roomId,String systemId){return null;}
         default void onLeave(String roomId,String systemId){}

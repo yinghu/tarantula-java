@@ -23,7 +23,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     private DeploymentServiceProvider deploymentServiceProvider;
     private GameServiceProvider gameServiceProvider;
     private ConcurrentHashMap<String,Stub> stubIndex;
-    private ConcurrentHashMap<String,TimerLister> timerListenerIndex;
+    private ConcurrentHashMap<String,TimerListener> timerListenerIndex;
     public DynamicGameLobby(){
         super("gameLobby");
         payload = new JsonObject();
@@ -47,7 +47,6 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         if(stub!=null) return stub;
         GameZone _zone = zoneIndex.get(rating.level);
         Stub _stub = _zone.join(session,rating);
-        _stub.statistics = gameServiceProvider.statistics(session.systemId());
         stubIndex.put(session.systemId(),_stub);
         return _stub;
     }
@@ -76,9 +75,9 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
             v.onTimer(onUpdate);
         });
     }
-    public String registerTimerListener(TimerLister timerLister){
+    public String registerTimerListener(TimerListener timerListener){
         String regKey = UUID.randomUUID().toString();
-        this.timerListenerIndex.put(regKey,timerLister);
+        this.timerListenerIndex.put(regKey,timerListener);
         return regKey;
     }
     public void releaseTimerListener(String registerKey){

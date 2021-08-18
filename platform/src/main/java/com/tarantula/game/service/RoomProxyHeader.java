@@ -9,7 +9,7 @@ import com.tarantula.game.GameLobby;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Stub;
 
-abstract public class RoomProxyHeader implements GameZone.RoomProxy {
+abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.TimerListener {
 
     protected ApplicationContext context;
     protected GameServiceProvider gameServiceProvider;
@@ -17,7 +17,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
     protected GameLobby gameLobby;
     protected GameZone gameZone;
     protected DataStore dataStore;
-
+    protected String registerKey;
     @Override
     public void setup(ApplicationContext applicationContext, GameLobby gameLobby,GameZone gameZone) {
         this.context = applicationContext;
@@ -26,6 +26,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
         this.gameLobby = gameLobby;
         this.gameZone = gameZone;
         this.dataStore = gameZone.dataStore();
+        this.registerKey = this.gameLobby.registerTimerListener(this);
     }
     @Override
     public void update(Session session, Stub stub, byte[] payload, Module.OnUpdate onUpdate){
@@ -46,5 +47,8 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
             JsonObject score = jsonObject.getAsJsonObject("tournament");
             gameServiceProvider.tournamentServiceProvider().score(stub.tournament.distributionKey(),session.systemId(),score.get("score").getAsDouble());
         }
+    }
+    public void close(){
+        gameServiceProvider.releaseRoomProxy(registerKey);
     }
 }

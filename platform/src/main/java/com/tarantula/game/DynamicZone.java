@@ -24,6 +24,8 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     protected String playMode;
     protected int arenaLimit;
     protected int capacity;
+
+    protected int maxJoinsPerRoom;
     protected int joinsOnStart;
     protected long roundDuration;
 
@@ -42,43 +44,25 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.listeners = new CopyOnWriteArrayList<>();
     }
     
-    public DynamicZone(String name,String playMode,int levelMatch,int arenaLimit,int roomCapacity,int joinsOnStart,long roundDuration){
+    public DynamicZone(String name,String playMode,int levelMatch,int arenaLimit,int capacity,int roomCapacity,int joinsOnStart,long roundDuration){
         this();
         this.name = name;
         this.playMode = playMode;
         this.levelMatch = levelMatch;
         this.arenaLimit = arenaLimit;
-        this.capacity = roomCapacity;
+        this.capacity = capacity;
+        this.maxJoinsPerRoom = roomCapacity;
         this.joinsOnStart = joinsOnStart;
         this.roundDuration = roundDuration;
     }
 
     public Stub join(Session session,Rating rating){
-        Stub stub = new Stub();
-        stub.distributionKey(session.systemId());
-        stub.label(application.tag());
-        dataStore.createIfAbsent(stub,true);
-        stub.rating = rating;
-        stub.tag = application.tag();
-        stub.tournamentEnabled = application.tournamentEnabled();
-        rating.owner(session.systemId());
-        GameRoom room = roomProxy.join(session,rating);
-        //setup after joining
-        stub.joined = true;
-        stub.zone = this;
-        stub.arena = room.arena;
-        stub.room= room;
-        stub.offline = room.offline;
-        stub.tournament = room.instance;
-        dataStore.update(stub);
-        return stub;
+        return roomProxy.join(session,rating);
     }
     public void update(Session session, Stub stub, byte[] payload, Module.OnUpdate onUpdate){
         roomProxy.update(session,stub,payload,onUpdate);
     }
     public void leave(Stub stub){
-        stub.joined = false;
-        this.dataStore.update(stub);
         roomProxy.leave(stub);
     }
     public void addArena(Arena arena){
@@ -105,6 +89,12 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     }
     public void capacity(int capacity){
         this.capacity = capacity;
+    }
+    public int maxJoinsPerRoom(){
+        return maxJoinsPerRoom;
+    }
+    public void maxJoinsPerRoom(int maxJoinsPerRoom){
+        this.maxJoinsPerRoom = maxJoinsPerRoom;
     }
     public int joinsOnStart(){
         return joinsOnStart;
@@ -137,6 +127,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.properties.put("8",this.joinsOnStart);
         this.properties.put("9",this.playMode);
         this.properties.put("10",this.disabled);
+        this.properties.put("11",this.maxJoinsPerRoom);
         return this.properties;
     }
     @Override
@@ -150,6 +141,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         this.joinsOnStart = ((Number)properties.getOrDefault("8",joinsOnStart)).intValue();
         this.playMode = (String)properties.get("9");
         this.disabled = (boolean)properties.getOrDefault("10",false);
+        this.maxJoinsPerRoom = ((Number)properties.getOrDefault("11",maxJoinsPerRoom)).intValue();
     }
 
     @Override
@@ -229,6 +221,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         synchronized (this){//update local zone copy
             this.name = updated.name();
             this.capacity = updated.capacity();
+            this.maxJoinsPerRoom = updated.maxJoinsPerRoom();
             this.joinsOnStart = updated.joinsOnStart();
             this.roundDuration = updated.roundDuration();
             this.arenaLimit = updated.arenaLimit();
@@ -261,6 +254,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         jzon.addProperty("rank",application.accessRank());
         jzon.addProperty("playMode",playMode);
         jzon.addProperty("levelMatch",levelMatch);
+        jzon.addProperty("capacity",capacity);
         return jzon;
     }
 }

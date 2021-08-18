@@ -179,6 +179,7 @@ public class GameLobbyAdminModule implements Module {
             jzon.addProperty("tag",lobby.tag());
             jzon.addProperty("rank",lobby.accessRank());
             jzon.addProperty("capacity",zone.capacity());
+            jzon.addProperty("maxJoinsPerRoom",zone.maxJoinsPerRoom());
             jzon.addProperty("joinsOnStart",zone.joinsOnStart());
             jzon.addProperty("duration",zone.roundDuration()/60000);
             jzon.addProperty("playMode",zone.playMode());

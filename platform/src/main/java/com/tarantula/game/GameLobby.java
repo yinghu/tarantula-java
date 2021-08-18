@@ -15,14 +15,14 @@ public interface GameLobby extends Configurable, Initializer, Serviceable {
     void leave(Session session);
     void update(Session session, byte[] payload, Module.OnUpdate onUpdate);
     void onTimer(Module.OnUpdate onUpdate);
-    String registerTimerListener(TimerLister timerLister);
+    String registerTimerListener(TimerListener timerListener);
     void releaseTimerListener(String registerKey);
 
     boolean configureGameZone(byte[] payload);
     boolean configureArena(byte[] payload);
     void reload();
 
-    interface TimerLister{
+    interface TimerListener{
         void onTimer(Module.OnUpdate onUpdate);
     }
 }
