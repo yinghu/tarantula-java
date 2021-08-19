@@ -34,7 +34,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
         JsonObject jsonObject = JsonUtil.parse(payload);
         if(jsonObject.has("rating")){
             JsonObject delta = jsonObject.getAsJsonObject("rating");
-            stub.rating.update(delta.get("rank").getAsInt(),delta.get("delta").getAsDouble(),stub.arena.xp).update();
+            stub.rating.update(delta.get("rank").getAsInt(),delta.get("delta").getAsDouble(),stub.room.arena().xp).update();
             session.write(stub.rating.toJson().toString().getBytes());
         }
         if(jsonObject.has("stats")){
@@ -46,7 +46,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
         }
         if(application.tournamentEnabled()&&jsonObject.has("tournament")){
             JsonObject score = jsonObject.getAsJsonObject("tournament");
-            gameServiceProvider.tournamentServiceProvider().score(stub.tournament.distributionKey(),session.systemId(),score.get("score").getAsDouble());
+            gameServiceProvider.tournamentServiceProvider().score(stub.room.tournament().distributionKey(),session.systemId(),score.get("score").getAsDouble());
         }
     }
     public void close(){

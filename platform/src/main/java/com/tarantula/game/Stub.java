@@ -3,7 +3,6 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
-import com.icodesoftware.Tournament;
 import com.tarantula.platform.AssociateKey;
 
 import java.util.Map;
@@ -12,15 +11,10 @@ import java.util.Map;
 public class Stub extends PlayerGameObject {
 
     public boolean joined;
+    public GameRoom room;
 
     public GameZone zone;
-    public Arena arena;
-    public GameRoom room;
-    public Tournament.Instance tournament; //
-
     public String tag;
-    public boolean tournamentEnabled;
-
     public Rating rating;
     public Statistics statistics;
 
@@ -34,24 +28,16 @@ public class Stub extends PlayerGameObject {
             jo.addProperty("message","failed to join");
             return jo;
         }
-        if(zone!=null){
-            jo.add("zone",zone.toJson());
-        }
-        if(arena!=null){
-            jo.add("arena", arena.toJson());
-        }
-        if(room!=null){
-            jo.add("room",room.toJson());
-        }
-        if(tournament!=null){
-            jo.add("tournament",tournament.toJson());
-        }
-        if(rating!=null){
-            jo.add("rating",rating.toJson());
+        jo.add("zone",zone.toJson());
+        jo.add("arena", room.arena().toJson());
+        jo.add("room",room.toJson());
+        jo.add("rating",rating.toJson());
+        if(room.tournamentEnabled()){
+            jo.add("tournament",room.tournament().toJson());
         }
         jo.addProperty("tag",tag);
-        jo.addProperty("tournamentEnabled",tournamentEnabled);
-        jo.addProperty("offline",room.offline);
+        jo.addProperty("tournamentEnabled",room.tournamentEnabled());
+        jo.addProperty("offline",room.offline());
         return jo;
     }
     @Override

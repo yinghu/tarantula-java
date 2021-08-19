@@ -115,7 +115,7 @@ public class Room extends RecoverableObject{
         for(int i=0;i<this.capacity;i++){
             Stub stub = new Stub();
             //stub.capacity = this.capacity;
-            stub.arena = this.arena;
+            //stub.arena = this.arena();
             this.pQueue.offer(stub);
             this.stubs[i] = stub;
         }

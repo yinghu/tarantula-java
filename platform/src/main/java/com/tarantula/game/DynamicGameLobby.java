@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class DynamicGameLobby extends IndexSet implements GameLobby, Configurable.Listener<GameZone> {
+public class DynamicGameLobby extends IndexSet implements GameLobby, Configurable.Listener<GameZone>,GameRoomListener {
 
     private int levelMatchOffset;
     private JsonObject payload;
@@ -201,5 +201,11 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     }
     public void reload(){
         this.context.log(this.toString(),OnLog.WARN);
+    }
+
+    @Override
+    public void timeout(GameRoom room) {
+        this.context.log("Room->timeout>"+room.toString(),OnLog.WARN);
+        //stubIndex.remove(stub.systemId());
     }
 }

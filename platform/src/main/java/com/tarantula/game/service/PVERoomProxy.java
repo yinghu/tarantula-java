@@ -28,20 +28,17 @@ public class PVERoomProxy extends RoomProxyHeader {
         else{
             this.dataStore.create(room);
         }
-        room.arena = gameZone.arena(rating.arenaLevel);
-        room.totalJoined = 1;
+        room.setup(gameZone.arena(rating.arenaLevel));
+        //room.totalJoined = 1;
         if(application.tournamentEnabled()){
             Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().join(session.tournamentId(),session.systemId());
-            room.instance = instance;
+            //room.instance = instance;
         }
-        room.duration = room.arena.duration;
-        room.round++;
+        //room.round++;
         this.dataStore.update(room);
         stub.zone = gameZone;
-        stub.arena = room.arena;
         stub.joined = true;
         stub.tag = application.tag();
-        stub.tournamentEnabled = application.tournamentEnabled();
         stub.rating = rating;
         stub.statistics = gameServiceProvider.statistics(session.systemId());
         activeRoomIndex.put(room.distributionKey(),room);
@@ -60,9 +57,10 @@ public class PVERoomProxy extends RoomProxyHeader {
     public void onTimer(Module.OnUpdate onUpdate) {
         //this.context.log("calling on ->"+registerKey,OnLog.WARN);
         activeRoomIndex.forEach((k,v)->{
-            v.duration -= application.timerOnModule();
-            if(v.duration>=0) dataStore.update(v);
-            this.context.log(v.toString(),OnLog.WARN);
+            //v.duration -= application.timerOnModule();
+            //if(v.duration <=0){
+                //gameLobby.timeout(v);
+            //}
         });
     }
 }

@@ -10,22 +10,42 @@ import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 
 public class GameRoom extends RecoverableObject implements Portable {
 
-    public boolean offline;
-    public int totalJoined;
-    public boolean tournamentEnabled;
-    public long duration;
-    public int round;
-    public Arena arena;
-    public Tournament.Instance instance;
+    private boolean offline;
+    private int totalJoined;
+    private boolean tournamentEnabled;
+    private long duration;
+    private int round;
+    private Arena arena;
+    private Tournament.Instance instance;
+
+    private HashSet<GameEntry> playList;
 
     public GameRoom(){
-
+        playList = new HashSet<>();
     }
-
+    public int round(){
+        return round;
+    }
+    public boolean offline(){
+        return offline;
+    }
+    public int totalJoined(){
+        return totalJoined;
+    }
+    public boolean tournamentEnabled(){
+        return tournamentEnabled;
+    }
+    public Arena arena(){
+        return this.arena;
+    }
+    public Tournament.Instance tournament(){
+        return this.instance;
+    }
     public GameRoom(boolean offline){
         this.offline = offline;
     }
@@ -89,5 +109,9 @@ public class GameRoom extends RecoverableObject implements Portable {
     }
     public void onTimer(Module.OnUpdate onUpdate){
         
+    }
+    public void setup(Arena arena){
+        this.arena = arena;
+        this.duration = arena.duration;
     }
 }

@@ -13,6 +13,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
     public static final int STUB_CID = 3;
     public static final int MAPPING_OBJECT_CID = 4;
     public static final int ROOM_REGISTRY_CID = 5;
+    public static final int GAME_ENTRY_CID = 6;
 
     public static final int RATING_CID = PortableEventRegistry.RATING_CID;//110
     public static final int ARENA_CID = PortableEventRegistry.ARENA_CID;//112
@@ -50,6 +51,9 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
                 break;
             case ROOM_REGISTRY_CID:
                 pt = new GameRoomRegistry();
+                break;
+            case GAME_ENTRY_CID:
+                pt = new GameEntry();
                 break;
             default:
         }
