@@ -19,6 +19,7 @@ public class Stub extends PlayerGameObject {
     public Statistics statistics;
 
     public Stub(){
+        this.room = new GameRoom();
     }
 
     public JsonObject toJson(){
@@ -43,14 +44,13 @@ public class Stub extends PlayerGameObject {
     @Override
     public Map<String,Object> toMap(){
         properties.put("joined",joined);
-        properties.put("roomId",room!=null?room.roomId():null);
+        properties.put("roomId",room.roomId());
         return properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         joined = (boolean)properties.getOrDefault("joined",false);
-        this.room = new GameRoom();
-        room.distributionKey((String)properties.getOrDefault("roomId",null));
+        this.room.distributionKey((String)properties.getOrDefault("roomId",null));
     }
     @Override
     public Recoverable.Key key(){

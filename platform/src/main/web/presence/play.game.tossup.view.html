@@ -45,9 +45,9 @@
     exit.y = 6;
     app.stage.addChild(exit);
    
-    let score = text_button('Update',()=>{
+    let score = text_button('Rating',()=>{
         let payload ={rating:{rank:1,delta:70},stats:[{name:'kills',value:1}]}; 
-        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','',payload,(resp)=>{
+        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','rating',payload,(resp)=>{
             messageBox.text = JSON.stringify(resp);    
         });
     });
@@ -55,15 +55,25 @@
     score.y = 400;
     app.stage.addChild(score);
 
-    let stats = text_button('Stats',()=>{
+    let stats = text_button('Kills',()=>{
         let payload ={rating:{rank:0,delta:10},stats:[{name:'kills',value:1}]}; 
-        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','',payload,(resp)=>{
+        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','stats',payload,(resp)=>{
             messageBox.text = JSON.stringify(resp);    
         });
     });
     stats.x = window.innerWidth-70;;
     stats.y = 480;
     app.stage.addChild(stats);
+
+    let wins = text_button('Wins',()=>{
+        let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}]}; 
+        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','stats',payload,(resp)=>{
+            messageBox.text = JSON.stringify(resp);    
+        });
+    });
+    wins.x = window.innerWidth-70;;
+    wins.y = 560;
+    app.stage.addChild(wins);
 
 
     function text_button(cap,cmd){

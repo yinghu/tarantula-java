@@ -1,5 +1,6 @@
 package com.tarantula.game;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
@@ -7,6 +8,7 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Module;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.game.service.GameEntryQuery;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
@@ -105,6 +107,11 @@ public class GameRoom extends RecoverableObject implements Portable {
         jsonObject.addProperty("tournamentEnabled",tournamentEnabled);
         jsonObject.addProperty("duration",duration);
         jsonObject.addProperty("round",round);
+        JsonArray plist = new JsonArray();
+        playList.forEach((ge)->{
+            plist.add(ge.toJson());
+        });
+        jsonObject.add("list",plist);
         return jsonObject;
     }
     public void onTimer(Module.OnUpdate onUpdate){
@@ -113,5 +120,17 @@ public class GameRoom extends RecoverableObject implements Portable {
     public void setup(Arena arena){
         this.arena = arena;
         this.duration = arena.duration;
+        this.offline = arena.capacity==1;
+        this.round++;
+    }
+    public void reset(){
+        this.totalJoined = 0;
+    }
+    public void load(){
+        dataStore.list(new GameEntryQuery(this.distributionKey()),(ge)->{
+            playList.add(ge);
+            totalJoined++;
+            return true;
+        });
     }
 }

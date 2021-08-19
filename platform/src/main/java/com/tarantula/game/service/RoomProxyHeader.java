@@ -8,6 +8,7 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameLobby;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Stub;
+import com.tarantula.platform.statistics.StatisticsSerializer;
 
 abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.TimerListener {
 
@@ -35,7 +36,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
         if(jsonObject.has("rating")){
             JsonObject delta = jsonObject.getAsJsonObject("rating");
             stub.rating.update(delta.get("rank").getAsInt(),delta.get("delta").getAsDouble(),stub.room.arena().xp).update();
-            session.write(stub.rating.toJson().toString().getBytes());
+            if(session.name().equals("rating")) session.write(stub.rating.toJson().toString().getBytes());
         }
         if(jsonObject.has("stats")){
             JsonArray stats = jsonObject.getAsJsonArray("stats");
@@ -43,6 +44,10 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
                 JsonObject kv = a.getAsJsonObject();
                 stub.statistics.entry(kv.get("name").getAsString()).update(kv.get("value").getAsDouble()).update();
             });
+            if(session.name().equals("stats")){
+                StatisticsSerializer serializer = new StatisticsSerializer();
+                session.write(serializer.serialize(stub.statistics,Statistics.class,null).toString().getBytes());
+            }
         }
         if(application.tournamentEnabled()&&jsonObject.has("tournament")){
             JsonObject score = jsonObject.getAsJsonObject("tournament");

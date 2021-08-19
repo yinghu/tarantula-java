@@ -15,10 +15,9 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     public static final OnSession PASSWORD_NOT_MATCHED = new OnSessionTrack("PASSWORD NOT MATCHED");
 
     public OnSessionTrack(){
-        //this.vertex = "OnSession";
+
     }
     public OnSessionTrack(String msg){
-        //this();
         this.message = msg;
         this.successful = false;
     }

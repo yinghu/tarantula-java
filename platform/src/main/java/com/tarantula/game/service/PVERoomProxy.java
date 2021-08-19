@@ -22,19 +22,28 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.label(application.tag());
         this.dataStore.createIfAbsent(stub,true);
         GameRoom room = stub.room;
-        if(room.distributionKey()!=null){
-            this.dataStore.createIfAbsent(room,true);
-        }
-        else{
+        if(room.distributionKey()==null){//create new one
             this.dataStore.create(room);
+            GameEntry gameEntry = new GameEntry(1);
+            gameEntry.systemId = session.systemId();
+            gameEntry.owner(room.distributionKey());
+            dataStore.create(gameEntry);
+            room.dataStore(dataStore);
+            room.load();
+        }
+        else if(room.distributionKey()!=null&&(!activeRoomIndex.containsKey(room.distributionKey()))){
+            this.dataStore.load(room);
+            room.dataStore(dataStore);
+            room.load();
+        }
+        else if(room.distributionKey()!=null&&activeRoomIndex.containsKey(room.distributionKey())){
+            room = activeRoomIndex.get(room.distributionKey());
         }
         room.setup(gameZone.arena(rating.arenaLevel));
-        //room.totalJoined = 1;
         if(application.tournamentEnabled()){
             Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().join(session.tournamentId(),session.systemId());
             //room.instance = instance;
         }
-        //room.round++;
         this.dataStore.update(room);
         stub.zone = gameZone;
         stub.joined = true;
@@ -48,6 +57,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.joined = false;
         this.dataStore.update(stub);
         activeRoomIndex.remove(stub.room.distributionKey());
+        stub.room.reset();
         this.dataStore.update(stub.room);
         if(application.tournamentEnabled()){
             //gameServiceProvider.tournamentServiceProvider().leave();
