@@ -66,11 +66,9 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     @Override
     public Tournament.Instance join(String tournamentId, String systemId) {
         String tid = this.distributionTournamentService.register(name(),tournamentId,systemId);
-        byte[] ret = this.distributionTournamentService.join(name(),tournamentId,tid,systemId);
-        Tournament.Instance _e = new TournamentInstanceHeader();
-        _e.distributionKey(tid);
-        _e.fromBinary(ret);
-        return _e;
+        Tournament.Instance instance = this.distributionTournamentService.join(name(),tournamentId,tid,systemId);
+        instance.distributionKey(tid);
+        return instance;
     }
 
     @Override

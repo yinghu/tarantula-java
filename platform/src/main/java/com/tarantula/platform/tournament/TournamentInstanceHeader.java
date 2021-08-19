@@ -1,16 +1,23 @@
 package com.tarantula.platform.tournament;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class TournamentInstanceHeader extends RecoverableObject implements Tournament.Instance {
+public class TournamentInstanceHeader extends RecoverableObject implements Tournament.Instance, Portable {
 
     protected Tournament.Status status = Tournament.Status.STARTED;
     protected int maxEntries;
@@ -86,6 +93,34 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
     public int getClassId() {
         return TournamentPortableRegistry.TOURNAMENT_INSTANCE_CID;
     }
+
+    @Override
+    public void writePortable(PortableWriter portableWriter) throws IOException {
+        portableWriter.writeLong("1",TimeUtil.toUTCMilliseconds(start));
+        portableWriter.writeLong("2",TimeUtil.toUTCMilliseconds(close));
+        portableWriter.writeLong("3",TimeUtil.toUTCMilliseconds(end));
+        int[] index = {0};
+        entryIndex.forEach((k,v)->{
+            try{
+                portableWriter.writePortable("e"+index[0],v);
+                index[0]++;
+            }catch (Exception ex){}
+        });
+        portableWriter.writeInt("e",index[0]);
+    }
+
+    @Override
+    public void readPortable(PortableReader portableReader) throws IOException {
+        this.start = TimeUtil.fromUTCMilliseconds(portableReader.readLong("1"));
+        this.close = TimeUtil.fromUTCMilliseconds(portableReader.readLong("2"));
+        this.end = TimeUtil.fromUTCMilliseconds(portableReader.readLong("3"));
+        int index = portableReader.readInt("e");
+        for(int i=0;i<index;i++){
+            TournamentEntry e = portableReader.readPortable("e"+i);
+            entryIndex.put(e.systemId(),e);
+        }
+    }
+
     public void load(){
         dataStore.list(new TournamentEntryQuery(this.distributionKey()),(e)->{
             e.dataStore(dataStore);
@@ -93,6 +128,18 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
             entryIndex.put(e.systemId(),e);
             return true;
         });
+    }
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("start",start.format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.addProperty("close",close.format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.addProperty("end",end.format(DateTimeFormatter.ISO_DATE_TIME));
+        JsonArray plist = new JsonArray();
+        entryIndex.forEach((k,v)->{
+            plist.add(v.toJson());
+        });
+        jsonObject.add("board",plist);
+        return jsonObject;
     }
 
 }

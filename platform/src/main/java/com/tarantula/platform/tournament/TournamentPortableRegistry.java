@@ -11,7 +11,7 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
 
 
     public static final int TOURNAMENT_CID = 8;
-    public static final int TOURNAMENT_INSTANCE_CID = 9;
+    public static final int TOURNAMENT_INSTANCE_CID = PortableEventRegistry.TOURNAMENT_INSTANCE_CID;
     public static final int TOURNAMENT_ENTRY_CID = PortableEventRegistry.TOURNAMENT_ENTRY_CID;
     public static final int TOURNAMENT_SCHEDULE_CID = 12;
 

@@ -117,8 +117,10 @@ public class GameRoom extends RecoverableObject implements Portable {
     public void onTimer(Module.OnUpdate onUpdate){
         
     }
-    public void setup(Arena arena){
+    public void setup(Arena arena,Tournament.Instance instance){
         this.arena = arena;
+        this.instance = instance;
+        this.tournamentEnabled = this.instance!=null;
         this.duration = arena.duration;
         this.offline = arena.capacity==1;
         this.round++;

@@ -39,10 +39,12 @@ public class PVERoomProxy extends RoomProxyHeader {
         else if(room.distributionKey()!=null&&activeRoomIndex.containsKey(room.distributionKey())){
             room = activeRoomIndex.get(room.distributionKey());
         }
-        room.setup(gameZone.arena(rating.arenaLevel));
         if(application.tournamentEnabled()){
             Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().join(session.tournamentId(),session.systemId());
-            //room.instance = instance;
+            room.setup(gameZone.arena(rating.arenaLevel),instance);
+        }
+        else{
+            room.setup(gameZone.arena(rating.arenaLevel),null);
         }
         this.dataStore.update(room);
         stub.zone = gameZone;

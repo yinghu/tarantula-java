@@ -11,6 +11,7 @@ import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.tournament.TournamentEntry;
+import com.tarantula.platform.tournament.TournamentInstanceHeader;
 
 
 public class PortableEventRegistry implements PortableFactory {
@@ -60,7 +61,10 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int ARENA_CID = 112;
 
-    public static final int TOURNAMENT_ENTRY_CID = 113;
+    public static final int TOURNAMENT_INSTANCE_CID = 113;
+
+    public static final int TOURNAMENT_ENTRY_CID = 114;
+
 
     public Portable create(int cid) {
         Portable _ins;
@@ -123,6 +127,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case ARENA_CID:
                 _ins = new Arena();
+                break;
+            case TOURNAMENT_INSTANCE_CID:
+                _ins = new TournamentInstanceHeader();
                 break;
             case TOURNAMENT_ENTRY_CID:
                 _ins = new TournamentEntry();

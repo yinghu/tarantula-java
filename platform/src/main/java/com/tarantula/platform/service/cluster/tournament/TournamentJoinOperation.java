@@ -5,10 +5,8 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
 import com.icodesoftware.Tournament;
-import com.icodesoftware.util.JsonUtil;
 
 import java.io.IOException;
-import java.util.Map;
 
 
 public class TournamentJoinOperation extends Operation implements PartitionAwareOperation {
@@ -17,7 +15,7 @@ public class TournamentJoinOperation extends Operation implements PartitionAware
     private String tournamentId;
     private String instanceId;
     private String systemId;
-    private byte[] data;
+    private Tournament.Instance instance;
 
     public TournamentJoinOperation() {
     }
@@ -32,14 +30,12 @@ public class TournamentJoinOperation extends Operation implements PartitionAware
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        Tournament.Instance entry = ais.join(serviceName,tournamentId,instanceId,systemId);
-        Map<String,Object> _map = entry.toMap();
-        this.data = JsonUtil.toJson(_map);
+        instance = ais.join(serviceName,tournamentId,instanceId,systemId);
     }
 
     @Override
     public Object getResponse() {
-        return this.data;
+        return this.instance;
     }
 
     @Override
