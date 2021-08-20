@@ -82,6 +82,7 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
         this.end = TimeUtil.fromUTCMilliseconds(((Number)properties.get("4")).longValue());
     }
     public Tournament.RaceBoard raceBoard(){
+        tournamentRaceBoard.reset();
         return tournamentRaceBoard;
     }
 

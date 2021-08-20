@@ -15,8 +15,7 @@ public interface Tournament extends Configurable {
     }
     String type();
     void type(String type);
-    String description();
-    String icon();
+    String name();
     Status status();
     LocalDateTime startTime();
     LocalDateTime closeTime();
@@ -64,8 +63,7 @@ public interface Tournament extends Configurable {
     interface Schedule extends Configurable{
         String type();
         String schedule();
-        String description();
-        String icon();
+        String name();
         LocalDateTime startTime();
         LocalDateTime closeTime();
         LocalDateTime endTime();

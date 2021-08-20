@@ -14,8 +14,7 @@ public class TournamentScheduleParser {
         InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(payload));
         JsonObject cmd = new JsonParser().parse(inr).getAsJsonObject();
         String type = cmd.get("type").getAsString();
-        String desc = cmd.get("description").getAsString();
-        String icon = cmd.get("icon").getAsString();
+        String name = cmd.get("name").getAsString();
         String _schedule = Tournament.DAILY_SCHEDULE;
         if(cmd.has("schedule")){
             _schedule = cmd.get("schedule").getAsString();
@@ -28,7 +27,7 @@ public class TournamentScheduleParser {
             int entries = cmd.get("maxEntriesPerInstance").getAsInt();
             LocalDateTime _close = _start.plusMinutes(hours*60-minutes);
             LocalDateTime _end  = _start.plusHours(hours);
-            schedule = new DefaultTournamentSchedule(type,desc,icon,Tournament.ON_DEMAND_SCHEDULE,_start,_close,_end,minutes,entries);
+            schedule = new DefaultTournamentSchedule(type,name,Tournament.ON_DEMAND_SCHEDULE,_start,_close,_end,minutes,entries);
 
         }
         else if(_schedule.equals(Tournament.DAILY_SCHEDULE)){
@@ -37,7 +36,7 @@ public class TournamentScheduleParser {
             int entries = cmd.get("maxEntriesPerInstance").getAsInt();
             LocalDateTime _close = _start.plusMinutes(24*60-minutes);
             LocalDateTime _end  = _start.plusHours(24);
-            schedule = new DefaultTournamentSchedule(type,desc,icon,Tournament.DAILY_SCHEDULE,_start,_close,_end,minutes,entries);
+            schedule = new DefaultTournamentSchedule(type,name,Tournament.DAILY_SCHEDULE,_start,_close,_end,minutes,entries);
         }
         else{
             throw new UnsupportedOperationException(_schedule+" not supported");

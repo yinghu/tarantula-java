@@ -16,17 +16,11 @@ import java.util.List;
 public class TournamentRaceBoard extends RecoverableObject implements Tournament.RaceBoard, Portable {
 
     private List<Tournament.Entry> onBoard = new ArrayList<>();
+    private Portable[] pending;
     private int size;
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        Portable[] entries;
-        synchronized (onBoard){
-            entries = new Portable[size];
-            for(int i=0;i<size;i++){
-                entries[i]=(Portable)onBoard.get(i);
-            }
-        }
-        portableWriter.writePortableArray("1",entries);
+        portableWriter.writePortableArray("1",pending);
     }
 
     @Override
@@ -58,6 +52,14 @@ public class TournamentRaceBoard extends RecoverableObject implements Tournament
         synchronized (onBoard){
             onBoard.add(entry);
             size++;
+        }
+    }
+    public void reset(){
+        synchronized (onBoard){
+            pending = new Portable[size];
+            for(int i=0;i<size;i++){
+                pending[i]=(Portable)onBoard.get(i);
+            }
         }
     }
 

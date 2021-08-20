@@ -3,10 +3,8 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TournamentServiceProvider;
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.IndexSet;
 
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -67,13 +65,11 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     @Override
     public Tournament.Entry score(String instanceId, String systemId, double delta) {
         Tournament.Entry _e = this.distributionTournamentService.score(name(),instanceId,systemId,delta);
-        //logger.warn("tournament score->"+_e.toJson());
         return _e;
     }
     @Override
     public Tournament.Entry configure(String instanceId, String systemId, byte[] payload) {
         Tournament.Entry _e = this.distributionTournamentService.configure(name(),instanceId,systemId,payload);
-        //logger.warn("tournament configure->"+_e.toJson());
         return _e;
     }
     public void leave(String instanceId, String systemId){
@@ -124,9 +120,6 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     //distributed operations callbacks
     public Tournament schedule(Tournament.Schedule schedule) {
         TournamentHeader tournament = new TournamentHeader(schedule);
-        logger.warn("start->"+tournament.startTime.format(DateTimeFormatter.ISO_DATE_TIME));
-        logger.warn("close->"+tournament.closeTime.format(DateTimeFormatter.ISO_DATE_TIME));
-        logger.warn("end->"+tournament.endTime.format(DateTimeFormatter.ISO_DATE_TIME));
         tournament.dataStore(dataStore);
         dataStore.create(tournament);
         lookupKey.keySet.add(tournament.distributionKey());
@@ -153,7 +146,6 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         return tournament;
     }
     private boolean loadTournamentHeader(String tournamentId){
-        logger.warn("loading tournament header=>"+tournamentId);
         TournamentHeader tournamentHeader = new TournamentHeader();
         tournamentHeader.distributionKey(tournamentId);
         if(!this.dataStore.load(tournamentHeader)){

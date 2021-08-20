@@ -46,7 +46,7 @@
 <script>
     //document.querySelector('#tx-api-service-tournament-schedule').style.display='none';
     //document.querySelector('#tx-api-service-tournament-list').style.display='block';
-    let sample = {type:'T100',description:'desc',icon:'icon',schedule:'onDemand',durationHours:24,maxEntriesPerInstance:100,durationMinutesPerInstance:10}; 
+    let sample = {type:'T100',name:'Fast 100 players',schedule:'onDemand',durationHours:24,maxEntriesPerInstance:100,durationMinutesPerInstance:10}; 
     let editor = new JSONEditor(document.querySelector("#jsoneditor-api-service-tournament"),{mode:'code'},sample);
 
     //TARA_API.onGet('role/admin','onLoadTemplate',TARA_API.query().gameClusterId,(resp)=>{

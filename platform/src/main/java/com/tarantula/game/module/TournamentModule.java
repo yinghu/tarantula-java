@@ -56,6 +56,7 @@ public class TournamentModule implements Module , Tournament.Listener {
             JsonObject tt = new JsonObject();
             tt.addProperty("tournamentId",k);
             tt.addProperty("type",v.type());
+            tt.addProperty("name",v.name());
             alist.add(tt);
         });
         jsonObject.add("tournamentList",alist);

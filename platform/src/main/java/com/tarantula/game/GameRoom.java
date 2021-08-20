@@ -101,7 +101,7 @@ public class GameRoom extends RecoverableObject implements Portable {
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("roomId",distributionKey());
+        //jsonObject.addProperty("roomId",distributionKey());
         jsonObject.addProperty("offline",offline);
         jsonObject.addProperty("totalJoined",totalJoined);
         jsonObject.addProperty("tournamentEnabled",tournamentEnabled);

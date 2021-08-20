@@ -15,6 +15,7 @@
         <div class="w3-container">
             <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
             <span id='tx-live-tournament-list-type-0' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-live-tournament-list-name-0' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
             <span id="tx-live-tournament-list-play-0" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-tournament-action">Play</span>
         </div>    
     </div> 
@@ -22,6 +23,7 @@
         <div class="w3-container">
             <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
             <span id='tx-live-tournament-list-type-1' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-live-tournament-list-name-1' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
             <span id="tx-live-tournament-list-play-1" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-tournament-action">Play</span>
         </div>    
     </div> 
@@ -29,6 +31,7 @@
         <div class="w3-container">
             <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
             <span id='tx-live-tournament-list-type-2' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-live-tournament-list-name-2' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
             <span id="tx-live-tournament-list-play-2" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-tournament-action">Play</span>
         </div>    
     </div> 
@@ -36,6 +39,7 @@
         <div class="w3-container">
             <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
             <span id='tx-live-tournament-list-type-3' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-live-tournament-list-name-3' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
             <span id="tx-live-tournament-list-play-3" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-tournament-action">Play</span>
         </div>    
     </div> 
@@ -51,7 +55,9 @@
 <script>
     TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
         resp.tournamentList.forEach((t,i) => {
+            console.log(t);
             document.querySelector('#tx-live-tournament-list-type-'+i).innerHTML = t.type;
+            document.querySelector('#tx-live-tournament-list-name-'+i).innerHTML = t.name;
             document.querySelector('#tx-live-tournament-list-play-'+i).setAttribute('tournament-id',t.tournamentId);  
             document.querySelector("#tx-live-tournament-list-"+i).style.display = 'block';
             document.querySelector('#tx-game-tossup-tournament-message').innerHTML = 'Play tournament game!';      

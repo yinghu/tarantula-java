@@ -21,8 +21,6 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     private static final String TOURNAMENT_PLAY = "play";
 
     protected String type;
-    protected String description;
-    protected String icon;
     protected Status status = Status.SCHEDULED;
     protected LocalDateTime startTime;
     protected LocalDateTime closeTime;
@@ -37,8 +35,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
 
     public TournamentHeader(Schedule schedule){
         this.type = schedule.type();
-        this.description = schedule.description();
-        this.icon = schedule.icon();
+        this.name = schedule.name();
         this.startTime = schedule.startTime();
         this.closeTime = schedule.closeTime();
         this.endTime = schedule.endTime();
@@ -57,14 +54,6 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     public void type(String type){
         this.type = type;
     }
-    @Override
-    public String description() {
-        return description;
-    }
-    @Override
-    public String icon() {
-        return icon;
-    }
 
     @Override
     public Status status(){
@@ -76,20 +65,22 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     }
     public Map<String,Object> toMap(){
         properties.put("1",type);
-        properties.put("2", TimeUtil.toUTCMilliseconds(startTime));
-        properties.put("3", TimeUtil.toUTCMilliseconds(closeTime));
-        properties.put("4", TimeUtil.toUTCMilliseconds(endTime));
-        properties.put("5",maxEntriesPerInstance);
-        properties.put("6",durationMinutes);
+        properties.put("2",name);
+        properties.put("3", TimeUtil.toUTCMilliseconds(startTime));
+        properties.put("4", TimeUtil.toUTCMilliseconds(closeTime));
+        properties.put("5", TimeUtil.toUTCMilliseconds(endTime));
+        properties.put("6",maxEntriesPerInstance);
+        properties.put("7",durationMinutes);
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
         this.type = (String)properties.get("1");
-        this.startTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("2")).longValue());
-        this.closeTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("3")).longValue());
-        this.endTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("4")).longValue());
-        this.maxEntriesPerInstance = ((Number)properties.get("5")).intValue();
-        this.durationMinutes = ((Number)properties.get("6")).intValue();
+        this.name = (String)properties.get("2");
+        this.startTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("3")).longValue());
+        this.closeTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("4")).longValue());
+        this.endTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("5")).longValue());
+        this.maxEntriesPerInstance = ((Number)properties.get("6")).intValue();
+        this.durationMinutes = ((Number)properties.get("7")).intValue();
     }
     @Override
     public LocalDateTime closeTime() {
@@ -149,8 +140,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeUTF("1",type);
-        portableWriter.writeUTF("2",description);
-        portableWriter.writeUTF("3",icon);
+        portableWriter.writeUTF("2",name);
         portableWriter.writeLong("4",TimeUtil.toUTCMilliseconds(startTime));
         portableWriter.writeLong("5",TimeUtil.toUTCMilliseconds(closeTime));
         portableWriter.writeLong("6",TimeUtil.toUTCMilliseconds(endTime));
@@ -162,8 +152,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         this.type = portableReader.readUTF("1");
-        this.description = portableReader.readUTF("2");
-        this.icon = portableReader.readUTF("3");
+        this.name = portableReader.readUTF("2");
         this.startTime = TimeUtil.fromUTCMilliseconds(portableReader.readLong("4"));
         this.closeTime = TimeUtil.fromUTCMilliseconds(portableReader.readLong("5"));
         this.endTime = TimeUtil.fromUTCMilliseconds(portableReader.readLong("6"));
@@ -180,7 +169,6 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.dataStore.createIfAbsent(tournamentRegisterIndex,true);
         this.tournamentRegisterIndex.dataStore(dataStore);
         this.tournamentRegisterIndex.keySet.forEach((k)->{
-            System.out.println("LOADING  REGISTRY->"+k);
             TournamentRegistry tournamentRegistry = new TournamentRegistry(this.maxEntriesPerInstance);
             tournamentRegistry.distributionKey(k);
             if(this.dataStore.load(tournamentRegistry)){
@@ -194,7 +182,6 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.dataStore.createIfAbsent(tournamentPlayIndex,true);
         tournamentPlayIndex.dataStore(this.dataStore);
         this.tournamentPlayIndex.keySet.forEach((k)->{
-            System.out.println("LOADING INSTANCE->"+k);
             TournamentInstanceHeader instanceHeader = new TournamentInstanceHeader();
             instanceHeader.distributionKey(k);
             if(this.dataStore.load(instanceHeader)){

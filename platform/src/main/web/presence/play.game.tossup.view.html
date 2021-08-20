@@ -24,7 +24,7 @@
     room.x = 10;
     app.stage.addChild(room);
 
-    let tournament = new PIXI.Text('Tournament=>'+JSON.stringify(TARA_API.query().stub.tournament.board),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
+    let tournament = new PIXI.Text('Tournament=>'+JSON.stringify(TARA_API.query().stub.tournament),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
     tournament.y = 140;
     tournament.x = 10;
     app.stage.addChild(tournament);
