@@ -81,9 +81,9 @@ public class MatchMakingModule implements Module, Lobby.Listener {
                 mLobby.put(i,lastZone);
             }
         }
-        mLobby.forEach((k,v)->{
-            context.log("Access Rank ["+k+"] registered on ["+v.accessRank()+"]",OnLog.WARN);
-        });
+        //mLobby.forEach((k,v)->{
+            //context.log("Access Rank ["+k+"] registered on ["+v.accessRank()+"]",OnLog.WARN);
+        //});
         return lobby;
     }
 }

@@ -1,9 +1,12 @@
 package com.tarantula.platform.tournament;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Tournament;
+import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.IndexSet;
@@ -27,6 +30,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     protected LocalDateTime endTime;
     protected int maxEntriesPerInstance;
     protected int durationMinutes;
+    protected JsonObject payload = new JsonObject();
 
     public IndexSet tournamentRegisterIndex;
     public IndexSet tournamentPlayIndex;
@@ -71,6 +75,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         properties.put("5", TimeUtil.toUTCMilliseconds(endTime));
         properties.put("6",maxEntriesPerInstance);
         properties.put("7",durationMinutes);
+        properties.put("8",payload.toString());
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
@@ -81,6 +86,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.endTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("5")).longValue());
         this.maxEntriesPerInstance = ((Number)properties.get("6")).intValue();
         this.durationMinutes = ((Number)properties.get("7")).intValue();
+        this.payload = JsonUtil.parse((String) properties.getOrDefault("8","{}"));
     }
     @Override
     public LocalDateTime closeTime() {
@@ -147,6 +153,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         portableWriter.writeInt("7",durationMinutes);
         portableWriter.writeUTF("8",bucket);
         portableWriter.writeUTF("9",oid);
+        portableWriter.writeUTF("10",payload.toString());
     }
 
     @Override
@@ -159,6 +166,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.durationMinutes = portableReader.readInt("7");
         this.bucket = portableReader.readUTF("8");
         this.oid = portableReader.readUTF("9");
+        this.payload = JsonUtil.parse(portableReader.readUTF("10"));
     }
 
     public void setup(ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex){
@@ -190,6 +198,11 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
                 _instanceIndex.put(k,instanceHeader);
             }
         });
+    }
+    @Override
+    public boolean configureAndValidate(Map<String,Object> data){
+        payload = ((JsonElement) data.getOrDefault("payload",new JsonObject())).getAsJsonObject();
+        return true;
     }
 
 }

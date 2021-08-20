@@ -23,6 +23,7 @@ public interface Configurable extends Recoverable, DataStore.Updatable {
 
     default boolean configureAndValidate(byte[] data){ return false;}
     default boolean configureAndValidate(Map<String,Object> data){ return false;}
+    default boolean configureAndValidate(JsonObject payload){ return false;}
 
     default JsonObject toJson(){ return new JsonObject();}
 

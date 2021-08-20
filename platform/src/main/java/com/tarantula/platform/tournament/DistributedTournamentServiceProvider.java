@@ -1,14 +1,18 @@
 package com.tarantula.platform.tournament;
 
 import com.icodesoftware.*;
+import com.icodesoftware.service.ReloadListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TournamentServiceProvider;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.IndexSet;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DistributedTournamentServiceProvider implements TournamentServiceProvider {
+public class DistributedTournamentServiceProvider implements TournamentServiceProvider, ReloadListener {
+
+    private static final String CONFIG = "game-tournament-settings";
 
     private TarantulaLogger logger;
     private ServiceContext serviceContext;
@@ -20,6 +24,8 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     private ConcurrentHashMap<String,TournamentHeader> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex = new ConcurrentHashMap<>();
     private IndexSet lookupKey;
+    private Configuration configuration;
+    private String reloadKey;
     public DistributedTournamentServiceProvider(String gameServiceProviderName){
         this.name = gameServiceProviderName;
     }
@@ -87,12 +93,14 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
+        this.configuration = serviceContext.configuration(CONFIG);
         this.lookupKey = new IndexSet("tournament");
         AccessIndex accessIndex = this.serviceContext.accessIndexService().setIfAbsent(name,0);
         this.lookupKey.distributionKey(accessIndex.distributionKey());
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.dataStore.createIfAbsent(this.lookupKey,true);
         this.logger = serviceContext.logger(DistributedTournamentServiceProvider.class);
+        reloadKey = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
     }
     @Override
@@ -110,12 +118,13 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     }
     @Override
     public void start() throws Exception {
-        this.logger.warn("distributed tournament started on lookup key->"+lookupKey.distributionKey());
+        this.logger.warn("distributed tournament started pending pool size->"+configuration.property("pendingTournamentPoolSize"));
     }
 
     @Override
     public void shutdown() throws Exception {
         this.logger.warn("distributed tournament shutdown");
+        this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).unregisterReloadListener(reloadKey);
     }
     //distributed operations callbacks
     public Tournament schedule(Tournament.Schedule schedule) {
@@ -148,12 +157,25 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     private boolean loadTournamentHeader(String tournamentId){
         TournamentHeader tournamentHeader = new TournamentHeader();
         tournamentHeader.distributionKey(tournamentId);
-        if(!this.dataStore.load(tournamentHeader)){
+        if(!this.dataStore.load(tournamentHeader)) return false;
+        if(TimeUtil.expired(tournamentHeader.endTime)){
+            logger.warn("Tournament is expired and set to end");
             return false;
         }
         tournamentHeader.dataStore(this.dataStore);
-        tournamentHeader.setup(instanceIndex);
         tournamentIndex.put(tournamentId,tournamentHeader);
+        if(distributionTournamentService.localManaged(tournamentHeader.distributionKey())) tournamentHeader.setup(instanceIndex);
         return true;
+    }
+
+    @Override
+    public void reload() {
+        logger.warn("reloading tournament");
+    }
+    public void atMidnight(){
+        serviceContext.schedule(new TournamentMidnightTask(this));
+    }
+    void midnightCheck(){
+        //midnight close/launch daily tournaments
     }
 }

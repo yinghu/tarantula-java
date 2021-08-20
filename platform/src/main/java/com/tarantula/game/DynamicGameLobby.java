@@ -174,17 +174,17 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         }
     }
     public  void onLoaded(GameZone loaded){
-        context.log("zone loaded in room service provider->"+loaded.distributionKey(),OnLog.WARN);
+        //context.log("zone loaded in room service provider->"+loaded.distributionKey(),OnLog.WARN);
         //gameRoomRegistryManagers.put(loaded.distributionKey(),new GameRoomRegistryManager(dataStore,loaded));
         //gameRoomManagers.put(loaded.distributionKey(),new GameRoomManager(dataStore,loaded));
     }
     public void onUpdated(GameZone updated){
         //logger.warn("zone updated in room service provider->"+updated.distributionKey());
-        context.log("zone updated in room service provider->"+updated.distributionKey(),OnLog.WARN);
+        //context.log("zone updated in room service provider->"+updated.distributionKey(),OnLog.WARN);
 
     }
     public void onRemoved(GameZone remoted){
-        context.log("zone removed in room service provider->"+remoted.distributionKey(),OnLog.WARN);
+        //context.log("zone removed in room service provider->"+remoted.distributionKey(),OnLog.WARN);
         //logger.warn("zone removed in room service provider->"+remoted.distributionKey());
         //gameRoomRegistryManagers.remove(remoted.distributionKey());
         //gameRoomManagers.remove(remoted.distributionKey());

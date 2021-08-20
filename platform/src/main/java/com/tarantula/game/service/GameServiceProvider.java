@@ -15,7 +15,6 @@ public class GameServiceProvider implements ServiceProvider{
 
     private ServiceContext serviceContext;
 
-    //private DistributionRoomServiceProvider roomServiceProvider;
     private DistributionRoomService distributionRoomService;
     private PlayerDataProvider playerDataProvider;
     private LeaderBoardProvider leaderBoardProvider;
@@ -47,9 +46,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.roomProxyIndex = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
         this.distributionRoomService = serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionRoomService.NAME);
-        //this.roomServiceProvider = new DistributionRoomServiceProvider(NAME);
-        //this.roomServiceProvider.setup(serviceContext);
-        //this.roomServiceProvider.waitForData();
+
         this.playerDataProvider = new PlayerDataProvider(NAME);
         this.playerDataProvider.setup(serviceContext);
         this.playerDataProvider.waitForData();
@@ -71,6 +68,7 @@ public class GameServiceProvider implements ServiceProvider{
     @Override
     public void atMidnight(){
         leaderBoardProvider.atMidnight();
+        tournamentServiceProvider.atMidnight();
     }
     @Override
     public void start() throws Exception {

@@ -26,4 +26,7 @@ public class TimeUtil {
         LocalDateTime end = LocalDateTime.of(date.plusDays(1),mid);
         return Duration.between(LocalDateTime.now(),end).toMillis();
     }
+    public static boolean expired(LocalDateTime dateTime){
+        return dateTime.isBefore(LocalDateTime.now());
+    }
 }

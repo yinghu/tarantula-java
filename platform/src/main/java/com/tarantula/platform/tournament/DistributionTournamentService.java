@@ -14,5 +14,5 @@ public interface DistributionTournamentService extends ServiceProvider {
     Tournament.Entry configure(String serviceName,String instanceId,String systemId,byte[] payload);
     Tournament schedule(String serviceName, Tournament.Schedule schedule);
     Tournament.RaceBoard list(String serviceName,String instanceId);
-
+    boolean localManaged(String key);
 }
