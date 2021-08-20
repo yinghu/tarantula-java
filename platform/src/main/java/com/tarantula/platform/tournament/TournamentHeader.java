@@ -1,16 +1,20 @@
 package com.tarantula.platform.tournament;
 
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.IndexSet;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class TournamentHeader extends RecoverableObject implements Tournament {
+public class TournamentHeader extends RecoverableObject implements Tournament, Portable {
 
     private static final String TOURNAMENT_REGISTER = "register";
     private static final String TOURNAMENT_PLAY = "play";
@@ -140,6 +144,33 @@ public class TournamentHeader extends RecoverableObject implements Tournament {
     public int getClassId() {
         return TournamentPortableRegistry.TOURNAMENT_CID;
     }
+
+    @Override
+    public void writePortable(PortableWriter portableWriter) throws IOException {
+        portableWriter.writeUTF("1",type);
+        portableWriter.writeUTF("2",description);
+        portableWriter.writeUTF("3",icon);
+        portableWriter.writeLong("4",TimeUtil.toUTCMilliseconds(startTime));
+        portableWriter.writeLong("5",TimeUtil.toUTCMilliseconds(closeTime));
+        portableWriter.writeLong("6",TimeUtil.toUTCMilliseconds(endTime));
+        portableWriter.writeInt("7",durationMinutes);
+        portableWriter.writeUTF("8",bucket);
+        portableWriter.writeUTF("9",oid);
+    }
+
+    @Override
+    public void readPortable(PortableReader portableReader) throws IOException {
+        this.type = portableReader.readUTF("1");
+        this.description = portableReader.readUTF("2");
+        this.icon = portableReader.readUTF("3");
+        this.startTime = TimeUtil.fromUTCMilliseconds(portableReader.readLong("4"));
+        this.closeTime = TimeUtil.fromUTCMilliseconds(portableReader.readLong("5"));
+        this.endTime = TimeUtil.fromUTCMilliseconds(portableReader.readLong("6"));
+        this.durationMinutes = portableReader.readInt("7");
+        this.bucket = portableReader.readUTF("8");
+        this.oid = portableReader.readUTF("9");
+    }
+
     public void setup(ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex){
         this._instanceIndex = instanceIndex;
         this.pendingRegistryQueue = new ConcurrentLinkedDeque();

@@ -40,6 +40,11 @@ public interface Tournament extends Configurable {
         LocalDateTime endTime();
         Entry join(String systemId);
         void update(String systemId,OnEntry onEntry);
+
+        RaceBoard raceBoard();
+    }
+    interface RaceBoard extends Configurable{
+        int size();
         List<Entry> list();
     }
     interface Listener{

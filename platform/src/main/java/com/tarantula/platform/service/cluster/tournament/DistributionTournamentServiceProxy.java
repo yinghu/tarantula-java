@@ -120,11 +120,25 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         }
     }
 
-    public byte[] schedule(String serviceName, Tournament.Schedule schedule){
+    public Tournament.RaceBoard list(String serviceName,String instanceId){
+        NodeEngine nodeEngine = getNodeEngine();
+        TournamentListOperation operation = new TournamentListOperation(serviceName,instanceId);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
+        final Future<Tournament.RaceBoard> future = builder.invoke();
+        try {
+            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+            return null;
+        }
+    }
+
+    public Tournament schedule(String serviceName, Tournament.Schedule schedule){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentScheduleOperation operation = new TournamentScheduleOperation(serviceName,schedule);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,nodeEngine.getMasterAddress());
-        final Future<byte[]> future = builder.invoke();
+        final Future<Tournament> future = builder.invoke();
         try {
             return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
         } catch (Exception e) {

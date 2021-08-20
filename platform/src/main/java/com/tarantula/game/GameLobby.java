@@ -14,6 +14,7 @@ public interface GameLobby extends Configurable, Initializer, Serviceable,GameRo
     Stub join(Session session, Rating rating);
     void leave(Session session);
     void update(Session session, byte[] payload, Module.OnUpdate onUpdate);
+    void list(Session session);
     void onTimer(Module.OnUpdate onUpdate);
     String registerTimerListener(TimerListener timerListener);
     void releaseTimerListener(String registerKey);

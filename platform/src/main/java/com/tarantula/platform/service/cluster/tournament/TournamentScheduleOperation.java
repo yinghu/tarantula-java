@@ -4,22 +4,18 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.icodesoftware.Tournament;
-import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.platform.service.cluster.tournament.TournamentClusterService;
 import com.tarantula.platform.tournament.DefaultTournamentSchedule;
-
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Map;
 
 
 public class TournamentScheduleOperation extends Operation{
 
     private String serviceName;
     private Tournament.Schedule schedule;
-    private byte[] data;
+    private Tournament tournament;
     public TournamentScheduleOperation() {
     }
 
@@ -31,15 +27,12 @@ public class TournamentScheduleOperation extends Operation{
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        Tournament tournament = ais.schedule(serviceName,this.schedule);
-        Map<String,Object> _map = tournament.toMap();
-        _map.put("tournamentId",tournament.distributionKey());
-        this.data = JsonUtil.toJson(_map);
+        tournament = ais.schedule(serviceName,this.schedule);
     }
 
     @Override
     public Object getResponse() {
-        return data;
+        return tournament;
     }
 
     @Override

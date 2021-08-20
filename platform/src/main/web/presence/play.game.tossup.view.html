@@ -24,10 +24,12 @@
     room.x = 10;
     app.stage.addChild(room);
 
-    let tournament = new PIXI.Text('Tournament=>'+JSON.stringify(TARA_API.query().stub.tournament),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
+    let tournament = new PIXI.Text('Tournament=>'+JSON.stringify(TARA_API.query().stub.tournament.board),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
     tournament.y = 140;
     tournament.x = 10;
     app.stage.addChild(tournament);
+
+
 
     let messageBox = new PIXI.Text('',{fontFamily:_oswaldFamily,fontSize:30,fill:'yellow'});
     messageBox.y = 180;
@@ -89,6 +91,16 @@
     score.x = window.innerWidth-70;;
     score.y = 640;
     app.stage.addChild(score);
+
+    let list = text_button('List',()=>{
+        //let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}],tournament:{score:100}}; 
+        TARA_API.onGet(TARA_API.query().stub.tag,'onList','tournament',(resp)=>{
+            messageBox.text = JSON.stringify(resp);    
+        });
+    });
+    list.x = window.innerWidth-70;;
+    list.y = 720;
+    app.stage.addChild(list);
 
 
     function text_button(cap,cmd){

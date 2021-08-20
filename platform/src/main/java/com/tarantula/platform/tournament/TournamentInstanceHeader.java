@@ -12,6 +12,7 @@ import com.icodesoftware.util.TimeUtil;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +27,7 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
     protected LocalDateTime end;
 
     private ConcurrentHashMap<String, TournamentEntry> entryIndex = new ConcurrentHashMap<>();
+    private TournamentRaceBoard tournamentRaceBoard = new TournamentRaceBoard();
 
     public TournamentInstanceHeader(int maxEntries, LocalDateTime start, LocalDateTime close, LocalDateTime end){
         this.maxEntries = maxEntries;
@@ -46,6 +48,7 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
             TournamentEntry entry = new TournamentEntry(systemId,this.distributionKey());
             this.dataStore.create(entry);
             entry.dataStore(dataStore);
+            tournamentRaceBoard.addEntry(entry);
             return entry;
         });
     }
@@ -80,10 +83,10 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
         this.close = TimeUtil.fromUTCMilliseconds(((Number)properties.get("3")).longValue());
         this.end = TimeUtil.fromUTCMilliseconds(((Number)properties.get("4")).longValue());
     }
-    @Override
-    public List<Tournament.Entry> list() {
-        throw new UnsupportedOperationException();
+    public Tournament.RaceBoard raceBoard(){
+        return tournamentRaceBoard;
     }
+
     @Override
     public int getFactoryId() {
         return TournamentPortableRegistry.OID;
@@ -124,8 +127,8 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
     public void load(){
         dataStore.list(new TournamentEntryQuery(this.distributionKey()),(e)->{
             e.dataStore(dataStore);
-            System.out.println("LOADING ENTRY->"+e.distributionKey()+">"+e.toJson());
             entryIndex.put(e.systemId(),e);
+            tournamentRaceBoard.addEntry(e);
             return true;
         });
     }

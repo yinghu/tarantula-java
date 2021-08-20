@@ -70,6 +70,14 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         }
         stub.zone.update(session,stub,payload,onUpdate);
     }
+    public void list(Session session){
+        Stub stub = stubIndex.get(session.systemId());
+        if(stub==null){
+            session.write(JsonUtil.toSimpleResponse(false,"no access token").getBytes());
+            return;
+        }
+        stub.zone.list(session,stub);
+    }
     public void onTimer(Module.OnUpdate onUpdate){
         timerListenerIndex.forEach((k,v)->{
             v.onTimer(onUpdate);

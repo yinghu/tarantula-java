@@ -39,6 +39,9 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
         else if(session.action().equals("onUpdate")){
             this.gameLobby.update(session,payload,onUpdate);
         }
+        else if(session.action().equals("onList")){
+            this.gameLobby.list(session);
+        }
         else if(session.action().equals("onTest")){
             if(application.tournamentEnabled()&&(!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
                 session.write(toMessage("no tournament available,please try later",false).getBytes());

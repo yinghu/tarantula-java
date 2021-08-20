@@ -151,5 +151,8 @@ public class GameServiceProvider implements ServiceProvider{
     public Tournament.Instance onInstance(String instanceId) { //play node
         return this.tournamentServiceProvider.instance(instanceId);
     }
+    public Tournament.RaceBoard onRaceBoard(String instanceId){
+        return this.tournamentServiceProvider.instance(instanceId).raceBoard();
+    }
 
 }

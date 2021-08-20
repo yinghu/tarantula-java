@@ -9,6 +9,9 @@ import com.tarantula.game.GameLobby;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Stub;
 import com.tarantula.platform.statistics.StatisticsSerializer;
+import com.tarantula.platform.tournament.TournamentRaceBoard;
+
+import java.util.List;
 
 abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.TimerListener {
 
@@ -55,6 +58,15 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
             if(session.name().equals("tournament")){
                 session.write(entry.toJson().toString().getBytes());
             }
+        }
+    }
+    public void list(Session session,Stub stub){
+        if(session.name().equals("tournament")&&stub.room.tournament()!=null){
+            Tournament.RaceBoard board = gameServiceProvider.tournamentServiceProvider().list(stub.room.tournament().distributionKey());
+            session.write(board.toJson().toString().getBytes());
+        }
+        else{
+            session.write(JsonUtil.toSimpleResponse(false,"no tournament").getBytes());
         }
     }
     public void close(){

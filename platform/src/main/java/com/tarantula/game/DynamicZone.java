@@ -65,6 +65,9 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public void leave(Stub stub){
         roomProxy.leave(stub);
     }
+    public void list(Session session,Stub stub){
+        roomProxy.list(session,stub);
+    }
     public void addArena(Arena arena){
         arenaList.add(arena);
     }

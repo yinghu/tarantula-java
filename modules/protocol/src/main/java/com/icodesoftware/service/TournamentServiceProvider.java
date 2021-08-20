@@ -2,8 +2,6 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.Tournament;
 
-import java.util.List;
-
 public interface TournamentServiceProvider extends ServiceProvider{
 
     String registerTournamentListener(Tournament.Listener listener);
@@ -17,5 +15,5 @@ public interface TournamentServiceProvider extends ServiceProvider{
     Tournament.Entry configure(String instanceId,String systemId,byte[] payload);
     void leave(String instanceId,String systemId);
 
-    List<Tournament.Entry> list(String instanceId);
+    Tournament.RaceBoard list(String instanceId);
 }

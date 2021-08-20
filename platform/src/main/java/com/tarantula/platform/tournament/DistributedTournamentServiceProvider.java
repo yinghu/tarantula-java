@@ -7,10 +7,7 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.IndexSet;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DistributedTournamentServiceProvider implements TournamentServiceProvider {
@@ -48,11 +45,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
 
     @Override
     public Tournament register(Tournament.Schedule schedule) {
-        byte[] ret = distributionTournamentService.schedule(name(),schedule);
-        TournamentHeader tournament = new TournamentHeader();
-        Map<String,Object> _map = JsonUtil.toMap(ret);
-        tournament.distributionKey(_map.get("tournamentId").toString());
-        tournament.fromMap(_map);
+        Tournament tournament = distributionTournamentService.schedule(name(),schedule);
         return tournament;
     }
 
@@ -74,21 +67,23 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     @Override
     public Tournament.Entry score(String instanceId, String systemId, double delta) {
         Tournament.Entry _e = this.distributionTournamentService.score(name(),instanceId,systemId,delta);
-        logger.warn("tournament score->"+_e.toJson());
+        //logger.warn("tournament score->"+_e.toJson());
         return _e;
     }
     @Override
     public Tournament.Entry configure(String instanceId, String systemId, byte[] payload) {
         Tournament.Entry _e = this.distributionTournamentService.configure(name(),instanceId,systemId,payload);
-        logger.warn("tournament configure->"+_e.toJson());
+        //logger.warn("tournament configure->"+_e.toJson());
         return _e;
     }
     public void leave(String instanceId, String systemId){
 
     }
     @Override
-    public List<Tournament.Entry> list(String instanceId) {
-        return null;
+    public Tournament.RaceBoard list(String instanceId) {
+        Tournament.RaceBoard ins = this.distributionTournamentService.list(name(),instanceId);
+        Collections.sort(ins.list(),new TournamentEntryComparator());
+        return ins;
     }
     public String name(){
         return name;
