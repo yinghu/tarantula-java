@@ -7,6 +7,7 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 import java.util.Map;
@@ -61,12 +62,12 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     }
     @Override
     public int getFactoryId() {
-        return TournamentPortableRegistry.OID;
+        return PortableEventRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return TournamentPortableRegistry.TOURNAMENT_ENTRY_CID;
+        return PortableEventRegistry.TOURNAMENT_ENTRY_CID;
     }
 
     @Override

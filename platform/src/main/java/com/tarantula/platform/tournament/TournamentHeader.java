@@ -7,6 +7,7 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.IndexSet;
+import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -137,12 +138,12 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     }
     @Override
     public int getFactoryId() {
-        return TournamentPortableRegistry.OID;
+        return PortableEventRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return TournamentPortableRegistry.TOURNAMENT_CID;
+        return PortableEventRegistry.TOURNAMENT_CID;
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,7 +35,15 @@ public class TournamentRaceBoard extends RecoverableObject implements Tournament
             onBoard.add((Tournament.Entry)p);
         }
     }
+    @Override
+    public int getFactoryId() {
+        return PortableEventRegistry.OID;
+    }
 
+    @Override
+    public int getClassId() {
+        return PortableEventRegistry.TOURNAMENT_RACE_BOARD_CID;
+    }
     @Override
     public int size() {
         return size;
