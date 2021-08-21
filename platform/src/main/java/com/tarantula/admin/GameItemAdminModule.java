@@ -6,7 +6,6 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.Item;
 import com.tarantula.platform.item.ItemQuery;
@@ -21,13 +20,14 @@ public class GameItemAdminModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            Descriptor app = this.loadDescriptor(gameCluster,this.context.descriptor().category());
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            Descriptor app = this.loadDescriptor(gameCluster,query[1]);
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             List<Item> items = preSetup.list(this.context,app,new ItemQuery());
             session.write(toJson(items).toString().getBytes());
         }
-        else if (session.action().equals("onSave")){
+        else if (session.action().equals("onCreate")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Item app = new Item();
             if(app.configureAndValidate(payload)){
@@ -42,7 +42,9 @@ public class GameItemAdminModule implements Module {
         else if(session.action().equals("onLoad")){
 
         }
+        else if(session.action().equals("onUpdate")){
 
+        }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");
         }

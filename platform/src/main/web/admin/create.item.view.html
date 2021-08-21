@@ -49,7 +49,7 @@
     itemTemplate.application =sample;
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-item"),{mode:'code'},itemTemplate);
     document.querySelector('#tx-configuration-item-load').onclick=()=>{
-        TARA_API.onGet('role/item','onList',TARA_API.query().gameClusterId,(resp)=>{
+        TARA_API.onGet('role/item','onList',TARA_API.query().gameClusterId+'#store',(resp)=>{
             editor.set(resp);       
         });
     };
@@ -61,7 +61,7 @@
         item.header.configurationType = _t;
         item.header.configurationName = _k;
         item.header.configurationCategory = _c;
-        TARA_API.onSet('role/item','onSave',TARA_API.query().gameClusterId,config,(resp)=>{
+        TARA_API.onSet('role/item','onCreate',TARA_API.query().gameClusterId,config,(resp)=>{
             editor.set(resp);   
         });
     };
