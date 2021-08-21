@@ -78,6 +78,7 @@
                 TARA_API.query().gameClusterId = resp.accessId;
                 document.querySelector('#tx-create-game-cluster-form').style.display='none';
                 document.querySelector('#tx-launch-game-cluster-form').style.display='block';
+                TARA_API.query().callback();
             }
             else{
                 document.querySelector('#tx-create-game-cluster-message').innerHTML = resp.message;

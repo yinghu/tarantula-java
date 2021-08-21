@@ -56,8 +56,8 @@
             <view type="live.game.service.leaderboard">
                 <property name="moduleResourceFile">presence/live.game.service.leaderboard.view.html</property>
             </view>
-            <view type="live.game.service.gamestore">
-                <property name="moduleResourceFile">presence/live.game.service.gamestore.view.html</property>
+            <view type="live.game.service.store">
+                <property name="moduleResourceFile">presence/live.game.service.store.view.html</property>
             </view>
         </view-list>
     </lobby-context>

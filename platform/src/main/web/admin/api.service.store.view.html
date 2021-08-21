@@ -68,7 +68,7 @@
     </div>
 </div>
 <script>
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-api-service-item-data"),{mode:'tree',search:false,mainMenuBar:false,navigationBar:false,statusBar:false},{});
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-api-service-item-data"),{mode:'preview',search:false,mainMenuBar:false,navigationBar:false},{});
     let items;
     TARA_API.onGet('role/store','onList',TARA_API.query().gameClusterId,(resp)=>{
             items = resp.itemList;
@@ -82,10 +82,6 @@
     };
     document.querySelectorAll('.tx-service-item-register').forEach((a)=>{
         a.onclick=()=>{
-            //TARA_API.query().popup='#tx-popup-api';
-            //TARA_API.query().serviceTag = a.getAttribute('tx-service-tag');
-            //let vid = a.getAttribute('tx-service-api-view-id');
-            //tx_view({viewId:vid,containerId:'#tx-popup-api'});
             document.querySelector('#tx-game-service-store-edit-form').style.display='block';
             let ix = a.getAttribute('item-index')/1;    
             TARA_API.query().itemId = a.getAttribute('item-id');
@@ -93,10 +89,6 @@
             editor.expandAll();
         }
     });
-    //document.querySelector('#tx-gamestore-api-service-save').onclick=()=>{
-        //TARA_API.query().command = save_service_store_item;
-        //document.querySelector('#tx-game-service-store-edit-form').style.display='block';
-    //};
     document.querySelector('#tx-game-service-store-edit-cancel').onclick=()=>{
         document.querySelector('#tx-game-service-store-edit-form').style.display='none';
     };

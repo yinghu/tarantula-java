@@ -31,19 +31,17 @@ public class GameStoreAdminModule implements Module {
             String[] ks = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(ks[0]);
             Item app = new Item();
-            //if(app.configureAndValidate(payload)){
-                //app.configurationType(this.context.descriptor().category());
-                //app.configurationName("gem");
-                //app.configurationCategory("item");
-                //Descriptor desc = loadDescriptor(gameCluster,this.context.descriptor().category());
-                //SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);
-                //Ga/meServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
-                //gameServiceProvider.configurationServiceProvider().register(app);
+            app.distributionKey(ks[1]);
+            Descriptor desc = loadDescriptor(gameCluster,this.context.descriptor().category());
+            if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app)){
                 session.write(JsonUtil.toSimpleResponse(true,ks[1]).getBytes());
-            //}
-            //else{
-                //session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
-            //}
+                GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
+                gameServiceProvider.configurationServiceProvider().register(app);
+                session.write(JsonUtil.toSimpleResponse(true,"item live").getBytes());
+            }
+           else{
+               session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
+           }
         }
         else if(session.action().equals("onLoad")){
 

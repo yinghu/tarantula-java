@@ -377,6 +377,7 @@
             }
             else if(a.innerHTML == 'Developer'){
                 _tx_game_cluster();
+                TARA_API.query().callback = _tx_game_cluster;
             }
             else if(a.innerHTML == 'LiveGame'){
                 _tx_game();

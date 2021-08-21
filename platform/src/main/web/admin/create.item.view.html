@@ -44,8 +44,10 @@
     </div>
 </div>
 <script>
-    let sample = {type:'T100',description:'desc',icon:'icon',schedule:'onDemand',durationHours:24,maxEntriesPerInstance:100,durationMinutesPerInstance:10}; 
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-item"),{mode:'code'},sample);
+    let itemTemplate = {header:{},application:{},payload:{}};
+    let sample = {type:'T100',name:'fast 100 player',schedule:'onDemand',durationHours:24,maxEntriesPerInstance:100,durationMinutesPerInstance:10}; 
+    itemTemplate.application =sample;
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-item"),{mode:'code'},itemTemplate);
     document.querySelector('#tx-configuration-item-load').onclick=()=>{
         TARA_API.onGet('role/item','onList',TARA_API.query().gameClusterId,(resp)=>{
             editor.set(resp);       
@@ -55,7 +57,10 @@
         let _t = document.querySelector('#tx-configuration-item-type').value;
         let _k = document.querySelector('#tx-configuration-item-name').value;
         let _c = document.querySelector('#tx-configuration-item-category').value;
-        let config = {header:{configurationType:_t,configurationName:_k,configurationCategory:_c},payload:editor.get()};
+        let item = editor.get();
+        item.header.configurationType = _t;
+        item.header.configurationName = _k;
+        item.header.configurationCategory = _c;
         TARA_API.onSet('role/item','onSave',TARA_API.query().gameClusterId,config,(resp)=>{
             editor.set(resp);   
         });

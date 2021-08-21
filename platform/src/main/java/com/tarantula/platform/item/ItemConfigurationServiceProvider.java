@@ -72,7 +72,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     }
     public boolean onRegister(Configurable configurable){
         rListeners.forEach((k,c)->{
-            if(c.type==null||c.type.equals(configurable.configurationType())){
+            if(c.type==null||c.type.equals(configurable.configurationCategory())){
                 c.listener.onCreated(configurable);
             }
         });
