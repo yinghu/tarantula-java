@@ -51,10 +51,12 @@ public class Item extends RecoverableObject implements Configurable {
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("type",configurationType);
-        jsonObject.addProperty("name",configurationName);
-        jsonObject.addProperty("category",configurationCategory);
         jsonObject.addProperty("itemId",distributionKey());
+        JsonObject header = new JsonObject();
+        header.addProperty("configurationType",configurationType);
+        header.addProperty("configurationName",configurationName);
+        header.addProperty("configurationCategory",configurationCategory);
+        jsonObject.add("header",header);
         jsonObject.add("payload",payload);
         return jsonObject;
     }
