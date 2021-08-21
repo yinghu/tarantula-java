@@ -19,6 +19,7 @@ public class JsonServiceParser {
             descriptor.tag(temp.get("tag").getAsString());
             descriptor.moduleName(temp.get("moduleName").getAsString());
             descriptor.applicationClassName(temp.get("applicationClassName").getAsString());
+            descriptor.disabled(temp.get("disabled").getAsBoolean());
             return descriptor;
         }catch (Exception ex){
             throw new RuntimeException(ex);

@@ -73,12 +73,6 @@ public class AdminRoleModule implements Module,Configurable.Listener {
         else if(session.action().equals("onShoppingList")){
             session.write(new ShoppingContext(monthly,yearly).toJson().toString().getBytes());
         }
-        else if(session.action().equals("onMetrics")){
-            Metrics  metrics = this.deploymentServiceProvider.metrics();
-            MetricsContext adminContext = new MetricsContext();
-            adminContext.metrics = metrics;
-            session.write(adminContext.toJson().toString().getBytes());
-        }
         else if(session.action().equals("onCreateAccessKey")){
             //generate access key from game cluster id
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -207,24 +201,6 @@ public class AdminRoleModule implements Module,Configurable.Listener {
             GameCluster gc = this.deploymentServiceProvider.gameCluster(accessId);
             boolean suc = this.deploymentServiceProvider.shutdownGameCluster(gc);
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
-        }
-        else if(session.action().equals("onLoadTemplate")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ApplicationPreSetup setup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            List<Item> alist = setup.list(context,gameCluster,new ItemQuery());
-            session.write(toItemJson(alist).toString().getBytes());
-        }
-        else if(session.action().equals("onSaveTemplate")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ApplicationPreSetup setup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            Item temp = new Item();
-            if(temp.configureAndValidate(payload)){
-                setup.save(context,gameCluster,temp);
-                session.write(JsonUtil.toSimpleResponse(true,"saved").getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"template save failed").getBytes());
-            }
         }
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", session.action()+" operation not supported", false)).getBytes());

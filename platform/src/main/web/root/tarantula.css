@@ -5,6 +5,7 @@
 .tx-lobby-checkout{position: fixed;left: 50%;top: 50%;width: 300px;height: 450px; margin-top:-225px;margin-left: -150px; display: none}
 .tx-lobby-add-checkout{position: fixed;left: 50%;top: 50%;width: 300px;height: 294px; margin-top:-147px;margin-left: -150px; display: none}
 .tx-ok-checkout{position: fixed;left: 50%;top: 50%;width: 300px;height: 200px; margin-top:-100px;margin-left: -150px; display: none}
+.tx-item-checkout{position: fixed;left: 50%;top: 50%;width: 500px;height: 620px; margin-top:-310px;margin-left: -250px; display: none}
 .tx-content-8{height: 8px; width: 100%;}
 .tx-content-36{height: 36px; width: 100%;}
 .tx-content-48{height: 48px; width: 100%;}

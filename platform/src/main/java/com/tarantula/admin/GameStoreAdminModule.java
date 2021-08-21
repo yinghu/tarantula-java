@@ -27,7 +27,7 @@ public class GameStoreAdminModule implements Module {
             List<Item> items = preSetup.list(this.context,app,new ItemQuery());
             session.write(toJson(items).toString().getBytes());
         }
-        else if (session.action().equals("onSave")){
+        else if (session.action().equals("onRegister")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Item app = new Item();
             if(app.configureAndValidate(payload)){

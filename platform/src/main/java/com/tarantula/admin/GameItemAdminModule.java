@@ -31,13 +31,8 @@ public class GameItemAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Item app = new Item();
             if(app.configureAndValidate(payload)){
-                app.configurationType(this.context.descriptor().category());
-                app.configurationName("gem");
-                app.configurationCategory("item");
-                Descriptor desc = loadDescriptor(gameCluster,this.context.descriptor().category());
+                Descriptor desc = loadDescriptor(gameCluster,app.configurationCategory());
                 SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);
-                GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
-                gameServiceProvider.configurationServiceProvider().register(app);
                 session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
             }
             else{

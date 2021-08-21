@@ -1,9 +1,10 @@
 {
   "typeId":"game-service",
-  "name":"GameStore",
+  "name":"Store",
   "type":"application",
   "category":"store",
   "tag":"game/store",
   "moduleName":"com.tarantula.game.module.GameStoreModule",
-  "applicationClassName": "com.tarantula.platform.service.deployment.SingletonModuleApplication"
+  "applicationClassName": "com.tarantula.platform.service.deployment.SingletonModuleApplication",
+  "disabled": false
 }

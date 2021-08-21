@@ -11,6 +11,7 @@ import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.presence.SubscriptionFee;
 import com.tarantula.platform.presence.User;
 
+import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
 import java.io.File;
@@ -190,6 +191,12 @@ public class SudoRoleModule implements Module {
         else if(session.action().equals("onBackupDataStore")){
             this.deploymentServiceProvider.issueDataStoreBackup();
             session.write(toMessage("backup commnad issued",true).toString().getBytes());
+        }
+        else if(session.action().equals("onMetrics")){
+            Metrics metrics = this.deploymentServiceProvider.metrics();
+            MetricsContext adminContext = new MetricsContext();
+            adminContext.metrics = metrics;
+            session.write(adminContext.toJson().toString().getBytes());
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");

@@ -781,7 +781,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         ArrayList<Descriptor> alist = new ArrayList<>();
  	    f.list((m,n)->{
  	        if(n.endsWith(".json")){
- 	            alist.add(JsonServiceParser.descriptor(n));
+ 	            Descriptor app = JsonServiceParser.descriptor(n);
+ 	            if(!app.disabled()) alist.add(JsonServiceParser.descriptor(n));
             }
  	        return false;
         });
