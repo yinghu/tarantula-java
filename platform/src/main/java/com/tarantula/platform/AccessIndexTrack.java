@@ -62,7 +62,7 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
     public void readPortable(PortableReader in) throws IOException {
         this.owner = in.readUTF("1");
         this.bucket = in.readUTF("2");
-        this.oid = in.readPortable("3");
+        this.oid = in.readUTF("3");
         this.version = in.readInt("4");
     }
     @Override

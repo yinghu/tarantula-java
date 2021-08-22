@@ -60,6 +60,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
         } catch (Exception e) {
             future.cancel(true);
+            //e.printStackTrace();
             return null;
         }
     }
