@@ -44,7 +44,7 @@
     </div>
 </div>
 <script>
-    let itemTemplate = {header:{},application:{},payload:{}};
+    let itemTemplate = {header:{},application:{},payload:{},reference:{}};
     let sample = {type:'T100',name:'fast 100 player',schedule:'onDemand',durationHours:24,maxEntriesPerInstance:100,durationMinutesPerInstance:10}; 
     itemTemplate.application =sample;
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-item"),{mode:'code'},itemTemplate);

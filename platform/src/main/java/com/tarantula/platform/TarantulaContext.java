@@ -525,15 +525,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             }
         }
         this.accessIndexService().enable();
-        AccessIndex bid = this.accessIndexService().get(node.bucketName);
-        if(bid==null){
-            bid = this.accessIndexService().setIfAbsent(node.bucketName,0);
-        }
+        AccessIndex bid = this.accessIndexService().setIfAbsent(node.bucketName,0);
         node.bucketId = bid.distributionKey();
-        AccessIndex nid = this.accessIndexService().get(node.nodeName);
-        if(nid==null){
-            nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
-        }
+        AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
         node.nodeId = nid.distributionKey();
         nodeMetrics = new StatisticsIndex();
         nodeMetrics.distributionKey(node.nodeId);

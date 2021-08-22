@@ -23,8 +23,6 @@ public class GameCluster extends OnApplicationHeader implements Portable {
     public final static String TOURNAMENT_ENABLED = "11";
     public final static String LOBBY_PRE_SETUP_NAME ="12";
 
-    public final static String TEMPLATE_LABEL = "template";
-
     @Override
     public int getClassId() {
        return PortableEventRegistry.GAME_CLUSTER_CID;

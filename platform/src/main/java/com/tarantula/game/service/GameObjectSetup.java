@@ -24,17 +24,7 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
             dataStore.update(indexSet);
         }
     }
-    public <T extends Configurable> void save(ApplicationContext context, GameCluster application, T t){
-        DataStore dataStore = context.dataStore(serviceDataStore(application));
-        IndexSet indexSet = new IndexSet(GameCluster.TEMPLATE_LABEL);
-        indexSet.distributionKey(application.distributionKey());
-        dataStore.load(indexSet);
-        if(!dataStore.update(t)){
-            dataStore.create(t);
-            indexSet.keySet.add(t.distributionKey());
-            dataStore.update(indexSet);
-        }
-    }
+
     public <T extends Configurable> boolean load(ApplicationContext context,Descriptor application,T t){
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         return dataStore.load(t);
@@ -56,23 +46,7 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         });
         return arrayList;
     }
-    public <T extends Configurable> List<T> list(ApplicationContext context, GameCluster application, RecoverableFactory<T> recoverableFactory){
-        DataStore dataStore = context.dataStore(serviceDataStore(application));
-        IndexSet indexSet = new IndexSet(GameCluster.TEMPLATE_LABEL);
-        indexSet.distributionKey(application.distributionKey());
-        ArrayList<T> arrayList = new ArrayList<>();
-        if(!dataStore.load(indexSet)){
-            return arrayList;
-        }
-        indexSet.keySet.forEach((k)->{
-            T t = recoverableFactory.create();
-            t.distributionKey(k);
-            if(dataStore.load(t)){
-                arrayList.add(t);
-            }
-        });
-        return arrayList;
-    }
+
     public byte[] load(ApplicationContext context,GameCluster application,byte[] key){
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         byte[] data = dataStore.backup().get(key);
