@@ -93,7 +93,7 @@
                 <type-id>game-data</type-id>
                 <name>JsonDataStore</name>
                 <type>application</type>
-                <category>service</category>
+                <category>data</category>
                 <tag>game/data</tag>
                 <module-name>com.tarantula.game.module.KeyValueDataStoreModule</module-name>
             </application>

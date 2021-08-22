@@ -7,7 +7,14 @@ import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.item.Item;
+import com.tarantula.platform.item.ItemContext;
+import com.tarantula.platform.item.ItemQuery;
+import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.tournament.TournamentScheduleParser;
+import com.tarantula.platform.util.SystemUtil;
+
+import java.util.List;
 
 public class TournamentAdminModule implements Module {
 
@@ -18,7 +25,10 @@ public class TournamentAdminModule implements Module {
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            session.write(JsonUtil.toSimpleResponse(true,(String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).getBytes());
+            Descriptor app = gameCluster.serviceWithCategory(this.context.descriptor().category());
+            ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            List<Item> items = preSetup.list(this.context,app,new ItemQuery());
+            session.write(new ItemContext(true,items).toJson().toString().getBytes());
         }
         else if(session.action().equals("onSchedule")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());

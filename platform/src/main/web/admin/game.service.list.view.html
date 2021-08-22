@@ -113,10 +113,11 @@
     TARA_API.onGet('role/lobby','onGameServiceList',TARA_API.query().gameClusterId,(resp)=>{
         if(resp.successful){
             resp.serviceList.forEach((a,i)=>{
+                console.log(a);
                 document.querySelector('#tx-service-list-name-'+i).innerHTML=a.name;
                 document.querySelector('#tx-service-list-tag-'+i).innerHTML='Access Tag : '+a.tag;
-                document.querySelector('#tx-service-list-api-'+i).setAttribute('tx-service-api-view-id','api.service.'+a.name.toLowerCase());
-                document.querySelector('#tx-service-list-api-'+i).setAttribute('tx-service-tag',a.tag);
+                document.querySelector('#tx-service-list-api-'+i).setAttribute('tx-service-api-view-id','api.service.'+a.category.toLowerCase());
+                document.querySelector('#tx-service-list-api-'+i).setAttribute('tx-service-tag','role/'+a.category.toLowerCase());
                 document.querySelector('#tx-service-list-'+i).style.display='block';
             });
         }

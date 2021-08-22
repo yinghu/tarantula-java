@@ -147,23 +147,23 @@
             <view type="api.game.lobby">
                 <property name="moduleResourceFile">admin/api.game.lobby.view.html</property>
             </view>
+            <view type="api.service.achievement">
+                <property name="moduleResourceFile">admin/api.service.item.view.html</property>
+            </view>
             <view type="api.service.statistics">
-                <property name="moduleResourceFile">admin/api.service.statistics.view.html</property>
+                <property name="moduleResourceFile">admin/api.service.item.view.html</property>
             </view>
             <view type="api.service.leaderboard">
-                <property name="moduleResourceFile">admin/api.service.leaderboard.view.html</property>
+                <property name="moduleResourceFile">admin/api.service.item.view.html</property>
             </view>
             <view type="api.service.matchmaking">
-                <property name="moduleResourceFile">admin/api.service.matchmaking.view.html</property>
+                <property name="moduleResourceFile">admin/api.service.item.view.html</property>
             </view>
             <view type="api.service.store">
-                <property name="moduleResourceFile">admin/api.service.store.view.html</property>
+                <property name="moduleResourceFile">admin/api.service.item.view.html</property>
             </view>
             <view type="api.service.tournament">
-                <property name="moduleResourceFile">admin/api.service.tournament.view.html</property>
-            </view>
-            <view type="live.game.test">
-                <property name="moduleResourceFile">admin/live.game.test.view.html</property>
+                <property name="moduleResourceFile">admin/api.service.item.view.html</property>
             </view>
         </view-list>
 

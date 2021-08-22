@@ -857,6 +857,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         gc.distributionKey(key);
         gc.dataStore(this.tarantulaContext.masterDataStore());
         if(this.tarantulaContext.masterDataStore().load(gc)){
+            gc.gameLobby = this.tarantulaContext.lobby((String) gc.property(GameCluster.GAME_LOBBY));
+            gc.serviceLobby = this.tarantulaContext.lobby((String) gc.property(GameCluster.GAME_SERVICE));
+            gc.dataLobby = this.tarantulaContext.lobby((String) gc.property(GameCluster.GAME_DATA));
             return (T)gc;
         }
         return null;

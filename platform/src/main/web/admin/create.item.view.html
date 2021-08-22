@@ -47,9 +47,11 @@
     let itemTemplate = {header:{},application:{},payload:{},reference:{}};
     let sample = {type:'T100',name:'fast 100 player',schedule:'onDemand',durationHours:24,maxEntriesPerInstance:100,durationMinutesPerInstance:10}; 
     itemTemplate.application =sample;
+    let category = "tournament";
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-item"),{mode:'code'},itemTemplate);
     document.querySelector('#tx-configuration-item-load').onclick=()=>{
-        TARA_API.onGet('role/item','onList',TARA_API.query().gameClusterId+'#store',(resp)=>{
+        category = document.querySelector('#tx-configuration-item-category').value;
+        TARA_API.onGet('role/item','onList',TARA_API.query().gameClusterId+'#'+category,(resp)=>{
             editor.set(resp);       
         });
     };
@@ -61,7 +63,7 @@
         item.header.configurationType = _t;
         item.header.configurationName = _k;
         item.header.configurationCategory = _c;
-        TARA_API.onSet('role/item','onCreate',TARA_API.query().gameClusterId,config,(resp)=>{
+        TARA_API.onSet('role/item','onCreate',TARA_API.query().gameClusterId,item,(resp)=>{
             editor.set(resp);   
         });
     };

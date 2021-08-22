@@ -251,16 +251,7 @@ public class AdminRoleModule implements Module,Configurable.Listener {
         jsonObject.add("gameServiceList",array);
         return jsonObject.toString().getBytes();
     }
-    private JsonObject toItemJson(List<Item> itemList){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",true);
-        JsonArray alist = new JsonArray();
-        itemList.forEach((v)->{
-            alist.add(v.toJson());
-        });
-        jsonObject.add("itemList",alist);
-        return jsonObject;
-    }
+
     public void onUpdated(Configuration configuration){
 
     }

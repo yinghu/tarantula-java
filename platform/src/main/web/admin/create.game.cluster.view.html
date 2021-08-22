@@ -75,7 +75,7 @@
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onCreateGameCluster',name:_n,playMode:_mode,tournamentEnabled:_b},(resp)=>{
             if(resp.successful){
                 //goes to do lobby configurations
-                TARA_API.query().gameClusterId = resp.accessId;
+                TARA_API.query().gameClusterId = resp.gameClusterId;
                 document.querySelector('#tx-create-game-cluster-form').style.display='none';
                 document.querySelector('#tx-launch-game-cluster-form').style.display='block';
                 TARA_API.query().callback();

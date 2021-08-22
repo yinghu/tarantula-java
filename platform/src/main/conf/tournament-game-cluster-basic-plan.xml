@@ -66,7 +66,7 @@
                 <type-id>game-service</type-id>
                 <name>Statistics</name>
                 <type>application</type>
-                <category>service</category>
+                <category>statistics</category>
                 <tag>game/stats</tag>
                 <module-name>com.tarantula.game.module.StatisticsModule</module-name>
             </application>
@@ -74,7 +74,7 @@
                 <type-id>game-service</type-id>
                 <name>LeaderBoard</name>
                 <type>application</type>
-                <category>service</category>
+                <category>leaderboard</category>
                 <tag>game/leaderboard</tag>
                 <module-name>com.tarantula.game.module.LeaderBoardModule</module-name>
             </application>
@@ -101,7 +101,7 @@
                 <type-id>game-data</type-id>
                 <name>JsonDataStore</name>
                 <type>application</type>
-                <category>service</category>
+                <category>data</category>
                 <tag>game/data</tag>
                 <module-name>com.tarantula.game.module.KeyValueDataStoreModule</module-name>
             </application>

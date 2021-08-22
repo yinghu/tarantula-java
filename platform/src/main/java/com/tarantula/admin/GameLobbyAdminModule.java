@@ -23,20 +23,18 @@ public class GameLobbyAdminModule implements Module {
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
         if (session.action().equals("onGameLobbyList")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            String lobbyTypeId = (String)gameCluster.property(GameCluster.GAME_LOBBY);
-            Lobby lobby = this.deploymentServiceProvider.lobby(lobbyTypeId);
-            session.write(toJson(lobby).toString().getBytes());
+            session.write(toJson(gameCluster.gameLobby).toString().getBytes());
         }
         else if(session.action().equals("onGameServiceList")){
             GameServiceContext gsc = new GameServiceContext();
             GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
-            gsc.lobby=(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_SERVICE)));
+            gsc.lobby= gc.serviceLobby;
             session.write(gsc.toJson().toString().getBytes());
         }
         else if(session.action().equals("onGameDataList")){
             GameDataStoreContext gsc = new GameDataStoreContext();
             GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
-            Lobby lobby =(this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_DATA)));
+            Lobby lobby = gc.dataLobby;
             DataStore ds = this.context.dataStore(lobby.descriptor().typeId().replace("-","_"));
             gsc.name = lobby.descriptor().typeId();
             gsc.tag = lobby.entryList().get(0).tag();
@@ -52,7 +50,7 @@ public class GameLobbyAdminModule implements Module {
             String gameClusterId = (String) cmd.get("gameClusterId");
             String applicationId = (String) cmd.get("applicationId");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
-            Descriptor app = loadDescriptor(gameCluster,applicationId);
+            Descriptor app = gameCluster.gameWithKey(applicationId);
             GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
             session.write(toJson(app,lobby).toString().getBytes());
         }
@@ -61,8 +59,7 @@ public class GameLobbyAdminModule implements Module {
             String gameClusterId = (String) cmd.get("gameClusterId");
             int lobbyIndex = ((Number) cmd.get("lobbyIndex")).intValue();
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
-            String lobbyTypeId = (String)gameCluster.property(GameCluster.GAME_LOBBY);
-            Lobby lobby = this.deploymentServiceProvider.lobby(lobbyTypeId);
+            Lobby lobby = gameCluster.gameLobby;
             if(lobby.entryList().size()<maxGameLobbyCount&&lobbyIndex<=maxGameLobbyCount){
                 HashMap<Integer,Descriptor> eMap = new HashMap<>();
                 lobby.entryList().forEach((d)->{
@@ -104,7 +101,7 @@ public class GameLobbyAdminModule implements Module {
             String gameClusterId = (String) cmd.get("gameClusterId");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
             String lobbyId = (String)cmd.get("lobbyId");
-            Descriptor app = loadDescriptor(gameCluster,lobbyId);
+            Descriptor app = gameCluster.gameWithKey(lobbyId);
             GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
             lobby.setup(context);
             lobby.reload();
@@ -115,7 +112,7 @@ public class GameLobbyAdminModule implements Module {
         else if(session.action().equals("onSaveLobbyZone")){
             String[] keys = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(keys[0]);
-            Descriptor app = loadDescriptor(gameCluster,keys[1]);
+            Descriptor app = gameCluster.gameWithKey(keys[1]);
             GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
             lobby.setup(context);
             lobby.configureGameZone(payload);
@@ -124,7 +121,7 @@ public class GameLobbyAdminModule implements Module {
         else if(session.action().equals("onSaveLobbyLevel")){
             String[] keys = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(keys[0]);
-            Descriptor app = loadDescriptor(gameCluster,keys[1]);
+            Descriptor app = gameCluster.gameWithKey(keys[1]);
             GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
             lobby.setup(context);
             lobby.configureArena(payload);
@@ -143,17 +140,7 @@ public class GameLobbyAdminModule implements Module {
         this.maxGameLobbyCount = Integer.parseInt(this.context.configuration("cluster").property("maxGameLobbyCount").toString());
         this.context.log("game lobby admin module started", OnLog.WARN);
     }
-    private Descriptor loadDescriptor(GameCluster gameCluster,String lobbyId){
-        String lobbyTypeId = (String)gameCluster.property(GameCluster.GAME_LOBBY);
-        Lobby lobby = this.deploymentServiceProvider.lobby(lobbyTypeId);
-        Descriptor[] descriptors = {null};
-        lobby.entryList().forEach((d)->{
-            if(d.distributionKey().equals(lobbyId)){
-                descriptors[0]=d;
-            }
-        });
-        return descriptors[0];
-    }
+
     private JsonObject toJson(Lobby lobby){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",true);
