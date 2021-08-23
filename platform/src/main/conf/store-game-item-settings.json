@@ -1,21 +1,20 @@
 {
-  "description": "tournament item template list",
+  "description": "store item template list",
   "template-list":
   [
       {
-        "type": "T10",
-        "name": "fast 10 player",
-        "schedule": "onDemand",
-        "durationHours": 24,
-        "maxEntriesPerInstance": 10,
-        "durationMinutesPerInstance": 10
+        "type": "A10",
+        "name": "MiniGun",
+        "price": 1.0,
+        "unit": "USD",
+        "quantity": 1
       },
       {
-        "type": "T100",
-        "name": "fast 100 player",
-        "schedule": "daily",
-        "maxEntriesPerInstance": 100,
-        "durationMinutesPerInstance": 30
+        "type": "R5",
+        "name": "Dark Bot",
+        "price": 2.0,
+        "unit": "USD",
+        "quantity": 1
       }
   ]
 }

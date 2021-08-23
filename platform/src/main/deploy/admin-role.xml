@@ -114,6 +114,9 @@
             <view type="create.access.key">
                 <property name="moduleResourceFile">admin/create.access.key.view.html</property>
             </view>
+            <view type="game.item.list">
+                <property name="moduleResourceFile">admin/game.item.list.view.html</property>
+            </view>
             <view type="create.item">
                 <property name="moduleResourceFile">admin/create.item.view.html</property>
             </view>
