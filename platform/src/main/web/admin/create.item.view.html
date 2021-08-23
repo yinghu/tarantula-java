@@ -12,8 +12,14 @@
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
-            <span id='tx-configuration-item-load' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>List</span>          
             <span id='tx-configuration-item-save' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Save</span> 
+        </div>            
+    </div>
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <div class='w3-bar w3-white'>
+            <span tx-category='tournament' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-template'>Tournament</span>          
+            <span tx-category='store' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-template'>Store</span> 
+        
         </div>            
     </div>
     <div class="w3-panel">
@@ -47,14 +53,16 @@
     let itemTemplate = {header:{},application:{},payload:{},reference:{}};
     let sample = {type:'T100',name:'fast 100 player',schedule:'onDemand',durationHours:24,maxEntriesPerInstance:100,durationMinutesPerInstance:10}; 
     itemTemplate.application =sample;
-    let category = "tournament";
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-item"),{mode:'code'},itemTemplate);
-    document.querySelector('#tx-configuration-item-load').onclick=()=>{
-        category = document.querySelector('#tx-configuration-item-category').value;
-        TARA_API.onGet('role/item','onList',TARA_API.query().gameClusterId+'#'+category,(resp)=>{
-            editor.set(resp);       
-        });
-    };
+    
+    document.querySelectorAll('.tx-game-item-template').forEach(a=>{
+        a.onclick=()=>{
+            let category = a.getAttribute('tx-category');
+            TARA_API.onGet('role/item','onList',category,(resp)=>{
+                editor.set(resp);       
+            });
+        };
+    });
     document.querySelector('#tx-configuration-item-save').onclick=()=>{
         let _t = document.querySelector('#tx-configuration-item-type').value;
         let _k = document.querySelector('#tx-configuration-item-name').value;

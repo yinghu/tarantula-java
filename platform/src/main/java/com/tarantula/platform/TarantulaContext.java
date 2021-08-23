@@ -769,6 +769,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         kv.forEach((k,v)->applicationConfiguration.property(k,v));
         return applicationConfiguration;
     }
+
     public List<Descriptor> availableServices(){
  	    URL url = Thread.currentThread().getContextClassLoader().getResource("deploy");
  	    File f = new File(url.getFile());
@@ -781,5 +782,17 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	        return false;
         });
  	    return alist;
+    }
+
+    public byte[] loadFromTemplate(String resourceFile){
+ 	    try{
+ 	        String _template = resourceFile+"-game-item-settings.json";
+ 	        BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(_template));
+ 	        byte[] ret = in.readAllBytes();
+ 	        in.close();
+ 	        return ret;
+        }catch (Exception ex){
+ 	        return new byte[0];
+        }
     }
 }

@@ -16,15 +16,19 @@ import java.util.List;
 public class GameItemAdminModule implements Module {
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
+    private static String TEMPLATE_SUFFIX = "-game-item-settings";
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
-            String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            Descriptor app = gameCluster.serviceWithCategory(query[1]);
-            ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            List<Item> items = preSetup.list(this.context,app,new ItemQuery());
-            session.write(new ItemContext(true,items).toJson().toString().getBytes());
+            String conf = session.name()+TEMPLATE_SUFFIX;
+            Configuration configuration = this.deploymentServiceProvider.configuration(conf);
+            session.write(configuration.property("template-list").toString().getBytes());
+            //String[] query = session.name().split("#");
+            //GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            //Descriptor app = gameCluster.serviceWithCategory(query[1]);
+            //ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            //List<Item> items = preSetup.list(this.context,app,new ItemQuery());
+            //session.write(new ItemContext(true,items).toJson().toString().getBytes());
         }
         else if (session.action().equals("onCreate")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());

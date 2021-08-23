@@ -120,6 +120,9 @@ public class JsonUtil {
                     _mv.put(e.getKey(),m.getAsBoolean());
                 }
             }
+            else if(!je.isJsonNull()){
+                _mv.put(e.getKey(),je);
+            }
         });
         return _mv;
     }

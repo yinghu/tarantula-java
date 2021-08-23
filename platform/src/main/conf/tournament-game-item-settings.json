@@ -1,0 +1,21 @@
+{
+  "description": "tournament item template list",
+  "template-list":
+  [
+      {
+        "type": "T10",
+        "name": "fast 10 player",
+        "schedule": "onDemand",
+        "durationHours": 24,
+        "maxEntriesPerInstance": 10,
+        "durationMinutesPerInstance": 10
+      },
+      {
+        "type": "T100",
+        "name": "fast 100 player",
+        "schedule": "daily",
+        "maxEntriesPerInstance": 100,
+        "durationMinutesPerInstance": 30
+      }
+  ]
+}

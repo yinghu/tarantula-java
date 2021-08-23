@@ -113,10 +113,10 @@ public class SudoRoleModule implements Module {
             boolean suc = this.deploymentServiceProvider.shutdownModule(access.typeId());
             session.write(this.toMessage(suc?"module shutdown":"module not shutdown",suc).toString().getBytes());
         }
-        else if(session.action().equals("onConfigurationList")){
-            List<Configuration> configurationList = this.deploymentServiceProvider.configurations("subscription");
-            session.write(toJson(configurationList).toString().getBytes());
-        }
+        //else if(session.action().equals("onConfigurationList")){
+            //List<Configuration> configurationList = this.deploymentServiceProvider.configurations("subscription");
+            //session.write(toJson(configurationList).toString().getBytes());
+        //}
         else if(session.action().equals("onUpdateConfiguration")){
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Configuration configuration = new ApplicationConfiguration();

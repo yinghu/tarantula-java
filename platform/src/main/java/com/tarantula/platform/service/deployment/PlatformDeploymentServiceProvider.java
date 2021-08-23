@@ -756,14 +756,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerOnConnectionListener(Connection.OnConnectionListener listener){
         this.cCallbacks.put(listener.lobbyTag(),listener);
     }
-    public <T extends Configuration> List<T> configurations(String type){
+    public <T extends Configuration> T configuration(String config){
+        /**
         ArrayList<T> clist = new ArrayList<>();
         vMap.forEach((k,v)->{
             if(v instanceof Configuration && v.configurationType().equals(type)){
                 clist.add((T) v);
             }
-        });
-        return clist;
+        });**/
+        return (T)tarantulaContext.configuration(config);
     }
     public <T extends Configurable> void register(T configurable){
         if(configurable instanceof OnView){

@@ -34,7 +34,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     }
 
     @Override
-    public <T extends Configuration> List<T> configurations(String s) {
+    public <T extends Configuration> T configuration(String s) {
         return null;
     }
     @Override
