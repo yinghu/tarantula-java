@@ -70,15 +70,9 @@
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-game-item-api-service-list"),{mode:'preview',search:false,mainMenuBar:false,navigationBar:false},{});
     let items;
-    TARA_API.onGet(TARA_API.query().serviceTag,'onList',TARA_API.query().gameClusterId,(resp)=>{  
-        items = resp.itemList;
-        list_service_item();       
-    });
+    list_service_item();       
     document.querySelector('#tx-game-item-api-service-list').onclick=()=>{
-        TARA_API.onGet(TARA_API.query().serviceTag,'onList',TARA_API.query().gameClusterId,(resp)=>{
-            items = resp.itemList;
-            list_service_item();       
-        });
+        list_service_item();       
     };
     document.querySelectorAll('.tx-game-item-api-service-list-register').forEach((a)=>{
         a.onclick=()=>{
@@ -106,12 +100,17 @@
         m3.style.display = 'none';       
     };
     function list_service_item(){
-        items.forEach((a,i)=>{
-            document.querySelector('#tx-game-item-api-service-list-type-'+i).innerHTML = a.header.configurationType;
-            document.querySelector('#tx-game-item-api-service-list-name-'+i).innerHTML = a.header.configurationName;
-            document.querySelector('#tx-game-item-api-service-list-api-'+i).setAttribute('item-id',a.itemId);
-            document.querySelector('#tx-game-item-api-service-list-api-'+i).setAttribute('item-index',i);
-            document.querySelector('#tx-game-item-api-service-list-'+i).style.display = 'block';
+        TARA_API.onGet(TARA_API.query().serviceTag,'onList',TARA_API.query().gameClusterId,(resp)=>{
+            if(resp.successful){
+                items = resp.itemList;
+                resp.itemList.forEach((a,i)=>{
+                    document.querySelector('#tx-game-item-api-service-list-type-'+i).innerHTML = a.header.configurationType;
+                    document.querySelector('#tx-game-item-api-service-list-name-'+i).innerHTML = a.header.configurationName;
+                    document.querySelector('#tx-game-item-api-service-list-api-'+i).setAttribute('item-id',a.itemId);
+                    document.querySelector('#tx-game-item-api-service-list-api-'+i).setAttribute('item-index',i);
+                    document.querySelector('#tx-game-item-api-service-list-'+i).style.display = 'block';
+                });
+            }
         });
     }
 </script>

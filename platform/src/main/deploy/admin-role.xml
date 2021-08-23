@@ -135,9 +135,6 @@
             <view type="game.cluster.shutdown">
                 <property name="moduleResourceFile">admin/game.cluster.shutdown.view.html</property>
             </view>
-            <view type="game.cluster.test">
-                <property name="moduleResourceFile">admin/game.cluster.test.view.html</property>
-            </view>
             <view type="api.service.data">
                 <property name="moduleResourceFile">admin/api.service.data.view.html</property>
             </view>

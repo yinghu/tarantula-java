@@ -4,6 +4,7 @@
   "type":"application",
   "category":"store",
   "tag":"game/store",
+  "resetEnabled": true,
   "moduleName":"com.tarantula.game.module.GameStoreModule",
   "applicationClassName": "com.tarantula.platform.service.deployment.SingletonModuleApplication",
   "disabled": false

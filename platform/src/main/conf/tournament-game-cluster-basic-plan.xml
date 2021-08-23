@@ -58,7 +58,7 @@
                 <type-id>game-service</type-id>
                 <name>MatchMaking</name>
                 <type>application</type>
-                <category>matchmaking</category>
+                <category>system</category>
                 <tag>game/mmk</tag>
                 <module-name>com.tarantula.game.module.MatchMakingModule</module-name>
             </application>
@@ -84,6 +84,7 @@
                 <type>application</type>
                 <category>tournament</category>
                 <tag>game/tournament</tag>
+                <reset-enabled>true</reset-enabled>
                 <module-name>com.tarantula.game.module.TournamentModule</module-name>
             </application>
         </application-list>

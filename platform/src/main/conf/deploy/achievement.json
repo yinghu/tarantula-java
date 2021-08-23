@@ -4,6 +4,7 @@
   "type":"application",
   "category":"achievement",
   "tag":"game/achievement",
+  "resetEnabled": true,
   "moduleName":"com.tarantula.game.module.AchievementModule",
   "applicationClassName": "com.tarantula.platform.service.deployment.SingletonModuleApplication",
   "disabled": false

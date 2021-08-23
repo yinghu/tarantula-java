@@ -17,6 +17,7 @@ public class JsonServiceParser {
             descriptor.name(temp.get("name").getAsString());
             descriptor.category(temp.get("category").getAsString());
             descriptor.tag(temp.get("tag").getAsString());
+            if(temp.has("resetEnabled")) descriptor.resetEnabled(temp.get("resetEnabled").getAsBoolean());
             descriptor.moduleName(temp.get("moduleName").getAsString());
             descriptor.applicationClassName(temp.get("applicationClassName").getAsString());
             descriptor.disabled(temp.get("disabled").getAsBoolean());

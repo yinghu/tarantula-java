@@ -571,12 +571,16 @@
                 }
                 else if(a.descriptor.typeId == resp.name+'-service'){
                     //console.log('setup live game service');
-                    a.applications.forEach((b,i)=>{
-                        let serviceBar = document.querySelector('#live-game-service-'+i); 
-                        serviceBar.style.display = 'block';
-                        serviceBar.innerHTML = b.name;
-                        serviceBar.setAttribute('service-tag',b.tag);
-                        serviceBar.setAttribute('view-id','live.game.service.'+b.name.toLowerCase());
+                    let ix = 0;
+                    a.applications.forEach((b)=>{
+                        if(b.category !== 'system'){
+                            let serviceBar = document.querySelector('#live-game-service-'+ix); 
+                            serviceBar.style.display = 'block';
+                            serviceBar.innerHTML = b.name;
+                            serviceBar.setAttribute('service-tag',b.tag);
+                            serviceBar.setAttribute('view-id','live.game.service.'+b.name.toLowerCase());
+                            ix++;
+                        }
                     });        
                 }
                 //else if(a.descriptor.typeId == resp.name+'-data'){
