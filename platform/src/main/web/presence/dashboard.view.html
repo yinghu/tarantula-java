@@ -552,7 +552,8 @@
                 return;
             }
             document.querySelector('#live-game-list-name').innerHTML=resp.name;
-            lp.setAttribute('game-view-id','play.game.'+resp.name.toLowerCase());
+            TARA_API.query().gamePlayViewId = 'play.game.'+resp.name.toLowerCase(); 
+            lp.setAttribute('game-view-id',TARA_API.query().gamePlayViewId);
             lp.setAttribute('game-match-making',resp.name+'/mmk');
             lp.setAttribute('game-path',resp.name.toLowerCase());
             lp.style.display ='block';
@@ -574,6 +575,7 @@
                     let ix = 0;
                     a.applications.forEach((b)=>{
                         if(b.category !== 'system'){
+                            console.log(b);
                             let serviceBar = document.querySelector('#live-game-service-'+ix); 
                             serviceBar.style.display = 'block';
                             serviceBar.innerHTML = b.name;

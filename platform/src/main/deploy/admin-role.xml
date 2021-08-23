@@ -153,9 +153,6 @@
             <view type="api.service.leaderboard">
                 <property name="moduleResourceFile">admin/api.service.item.view.html</property>
             </view>
-            <view type="api.service.matchmaking">
-                <property name="moduleResourceFile">admin/api.service.item.view.html</property>
-            </view>
             <view type="api.service.store">
                 <property name="moduleResourceFile">admin/api.service.item.view.html</property>
             </view>

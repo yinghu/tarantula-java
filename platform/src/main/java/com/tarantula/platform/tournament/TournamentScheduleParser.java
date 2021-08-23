@@ -13,7 +13,7 @@ import java.util.HashMap;
 public class TournamentScheduleParser {
     public static Tournament.Schedule parse(byte[] payload){
         InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(payload));
-        JsonObject cmd = new JsonParser().parse(inr).getAsJsonObject();
+        JsonObject cmd = new JsonParser().parse(inr).getAsJsonObject().getAsJsonObject("application");
         String type = cmd.get("type").getAsString();
         String name = cmd.get("name").getAsString();
         JsonObject attach = new JsonObject();

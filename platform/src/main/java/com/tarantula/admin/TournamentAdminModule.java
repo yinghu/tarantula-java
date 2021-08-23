@@ -30,8 +30,9 @@ public class TournamentAdminModule implements Module {
             List<Item> items = preSetup.list(this.context,app,new ItemQuery());
             session.write(new ItemContext(true,items).toJson().toString().getBytes());
         }
-        else if(session.action().equals("onSchedule")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+        else if(session.action().equals("onRegister")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             if((boolean)gameCluster.property(GameCluster.TOURNAMENT_ENABLED)){
                 Tournament.Schedule schedule = TournamentScheduleParser.parse(payload);
                 String serviceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);

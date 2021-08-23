@@ -80,7 +80,7 @@
             let ix = a.getAttribute('item-index')/1;    
             TARA_API.query().itemId = a.getAttribute('item-id');
             editor.set(items[ix]);
-            editor.expandAll();
+            //editor.expandAll();
         }
     });
     document.querySelector('#tx-game-item-api-service-list-edit-cancel').onclick=()=>{

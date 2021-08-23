@@ -65,11 +65,11 @@
     document.querySelectorAll('.tx-live-tournament-action').forEach((a)=>{
         a.onclick=()=>{
             let tid = a.getAttribute('tournament-id');
-            let cmd = {serviceTag:'tossup/mmk',tournamentEnabled:true,tournamentId:tid};
+            let cmd = {serviceTag:TARA_API.query().serviceTag.replace('tournament','mmk'),tournamentEnabled:true,tournamentId:tid};
             TARA_API.onPlay(cmd,(resp)=>{
                 console.log(resp);
                 TARA_API.query().gamePopup = '#tx-popup-game';
-                tx_view({viewId:'play.game.tossup',containerId:'#tx-popup-game'}); 
+                tx_view({viewId:TARA_API.query().gamePlayViewId,containerId:'#tx-popup-game'}); 
             });   
         }
     });
