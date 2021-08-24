@@ -1,11 +1,19 @@
 {
   "description": "store item template list",
+  "category": "store",
   "template-list":
   [
       {
         "type": "A10",
         "name": "MiniGun",
         "price": 1.0,
+        "unit": "USD",
+        "quantity": 1
+      },
+      {
+        "type": "R5",
+        "name": "Dark Bot",
+        "price": 2.0,
         "unit": "USD",
         "quantity": 1
       },

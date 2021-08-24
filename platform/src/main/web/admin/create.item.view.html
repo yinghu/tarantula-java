@@ -15,19 +15,11 @@
             <span id='tx-configuration-item-save' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Save</span> 
         </div>            
     </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class='w3-bar w3-white'>
-            <span tx-category='tournament' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-template'>Tournament</span>          
-            <span tx-category='store' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-template'>Store</span> 
-        </div>            
-    </div>
     <div class="w3-panel">
         <label class="tx-text-12 tx-margin-left-4">Configuration item Type:</label>
         <input id='tx-configuration-item-type' class="w3-input w3-round w3-border tx-text-12" type="text">    
         <label class="tx-text-12 tx-margin-left-4">Configuration item Name:</label>
-        <input id='tx-configuration-item-name' class="w3-input w3-round w3-border tx-text-12" type="text">    
-        <label class="tx-text-12 tx-margin-left-4">Configuration item Category:</label>
-        <input id='tx-configuration-item-category' class="w3-input w3-round w3-border tx-text-12" type="text">    
+        <input id='tx-configuration-item-name' class="w3-input w3-round w3-border tx-text-12" type="text">      
     </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
@@ -50,8 +42,8 @@
 </div>
 <script>
     let itemTemplate = {header:{},application:{},payload:{},reference:{}};
-    let sample = {type:'T100',name:'fast 100 player',schedule:'onDemand',durationHours:24,maxEntriesPerInstance:100,durationMinutesPerInstance:10}; 
-    itemTemplate.application =sample;
+    itemTemplate.header.configurationCategory = TARA_API.query().gameItemCategory;
+    itemTemplate.application = TARA_API.query().gameItem;
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-item"),{mode:'code'},itemTemplate);
     
     document.querySelectorAll('.tx-game-item-template').forEach(a=>{
@@ -65,11 +57,9 @@
     document.querySelector('#tx-configuration-item-save').onclick=()=>{
         let _t = document.querySelector('#tx-configuration-item-type').value;
         let _k = document.querySelector('#tx-configuration-item-name').value;
-        let _c = document.querySelector('#tx-configuration-item-category').value;
         let item = editor.get();
         item.header.configurationType = _t;
         item.header.configurationName = _k;
-        item.header.configurationCategory = _c;
         TARA_API.onSet('role/item','onCreate',TARA_API.query().gameClusterId,item,(resp)=>{
             editor.set(resp);   
         });

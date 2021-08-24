@@ -1,17 +1,14 @@
 package com.tarantula.admin;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.Item;
-import com.tarantula.platform.item.ItemContext;
-import com.tarantula.platform.item.ItemQuery;
-import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
-
-import java.util.List;
 
 public class GameItemAdminModule implements Module {
     private ApplicationContext context;
@@ -22,13 +19,7 @@ public class GameItemAdminModule implements Module {
         if(session.action().equals("onList")){
             String conf = session.name()+TEMPLATE_SUFFIX;
             Configuration configuration = this.deploymentServiceProvider.configuration(conf);
-            session.write(configuration.property("template-list").toString().getBytes());
-            //String[] query = session.name().split("#");
-            //GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            //Descriptor app = gameCluster.serviceWithCategory(query[1]);
-            //ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            //List<Item> items = preSetup.list(this.context,app,new ItemQuery());
-            //session.write(new ItemContext(true,items).toJson().toString().getBytes());
+            session.write(toJson(configuration).toString().getBytes());
         }
         else if (session.action().equals("onCreate")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
@@ -42,12 +33,6 @@ public class GameItemAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
             }
         }
-        else if(session.action().equals("onLoad")){
-
-        }
-        else if(session.action().equals("onUpdate")){
-
-        }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");
         }
@@ -59,5 +44,12 @@ public class GameItemAdminModule implements Module {
         this.context = applicationContext;
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
         this.context.log("game item admin module started", OnLog.WARN);
+    }
+    private JsonObject toJson(Configuration configuration){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("description",(String)configuration.property("description"));
+        jsonObject.addProperty("category",(String) configuration.property("category"));
+        jsonObject.add("itemList",(JsonArray)configuration.property("template-list"));
+        return jsonObject;
     }
 }
