@@ -46,14 +46,6 @@
     itemTemplate.application = TARA_API.query().gameItem;
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-item"),{mode:'code'},itemTemplate);
     
-    document.querySelectorAll('.tx-game-item-template').forEach(a=>{
-        a.onclick=()=>{
-            let category = a.getAttribute('tx-category');
-            TARA_API.onGet('role/item','onList',category,(resp)=>{
-                editor.set(resp);       
-            });
-        };
-    });
     document.querySelector('#tx-configuration-item-save').onclick=()=>{
         let _t = document.querySelector('#tx-configuration-item-type').value;
         let _k = document.querySelector('#tx-configuration-item-name').value;

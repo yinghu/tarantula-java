@@ -10,7 +10,7 @@ import com.tarantula.platform.item.Item;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class GameStoreModule implements Module,Configurable.Listener<Item>{
+public class GameItemModule implements Module,Configurable.Listener<Item>{
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
     private ConcurrentHashMap<String,Item> itemList;
@@ -28,7 +28,7 @@ public class GameStoreModule implements Module,Configurable.Listener<Item>{
         this.itemList = new ConcurrentHashMap<>();
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
         this.gameServiceProvider.configurationServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
-        this.context.log("game store module started", OnLog.WARN);
+        this.context.log("game configuration module started", OnLog.WARN);
     }
     public void onCreated(Item item){
         itemList.put(UUID.randomUUID().toString(),item);

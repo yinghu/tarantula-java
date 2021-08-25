@@ -1,6 +1,7 @@
 package com.tarantula.game.service;
 
 import com.icodesoftware.*;
+import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.GameZone;
 
 import com.tarantula.platform.GameCluster;
@@ -31,20 +32,11 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
     }
     public <T extends Configurable> List<T> list(ApplicationContext context, Descriptor application, RecoverableFactory<T> recoverableFactory){
         DataStore dataStore = context.dataStore(serviceDataStore(application));
-        IndexSet indexSet = new IndexSet(application.category());
-        indexSet.distributionKey(application.distributionKey());
-        ArrayList<T> arrayList = new ArrayList<>();
-        if(!dataStore.load(indexSet)){
-            return arrayList;
-        }
-        indexSet.keySet.forEach((k)->{
-            T t = recoverableFactory.create();
-            t.distributionKey(k);
-            if(dataStore.load(t)){
-                arrayList.add(t);
-            }
-        });
-        return arrayList;
+        return list(dataStore,application,recoverableFactory);
+    }
+    public <T extends Configurable> List<T> list(ServiceContext context, Descriptor application, RecoverableFactory<T> recoverableFactory){
+        DataStore dataStore = context.dataStore(this.serviceDataStore(application),context.partitionNumber());
+        return list(dataStore,application,recoverableFactory);
     }
 
     public byte[] load(ApplicationContext context,GameCluster application,byte[] key){
@@ -72,5 +64,21 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
             roomProxy = new TVTRoomProxy();
         }
         return roomProxy;
+    }
+    protected <T extends Configurable> List<T> list(DataStore dataStore, Descriptor application, RecoverableFactory<T> recoverableFactory){
+        IndexSet indexSet = new IndexSet(application.category());
+        indexSet.distributionKey(application.distributionKey());
+        ArrayList<T> arrayList = new ArrayList<>();
+        if(!dataStore.load(indexSet)){
+            return arrayList;
+        }
+        indexSet.keySet.forEach((k)->{
+            T t = recoverableFactory.create();
+            t.distributionKey(k);
+            if(dataStore.load(t)){
+                arrayList.add(t);
+            }
+        });
+        return arrayList;
     }
 }

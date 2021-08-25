@@ -182,7 +182,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         _props.put("applicationClassName",this.applicationClassName);
         _props.put("resetEnabled",this.resetEnabled);
         _props.put("tournamentEnabled",this.tournamentEnabled);
-        _props.put("index",this.index);
+        //_props.put("index",this.index);
         return _props;
     }
 
@@ -210,7 +210,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         this.applicationClassName = properties.get("applicationClassName")!=null?(String)properties.get("applicationClassName"):null;
         this.resetEnabled = properties.get("resetEnabled")!=null?(boolean)properties.get("resetEnabled"):false;
         this.tournamentEnabled = (boolean)properties.getOrDefault("tournamentEnabled",false);
-        this.index = properties.get("index")!=null?(String)properties.get("index"):null;
+        //this.index = properties.get("index")!=null?(String)properties.get("index"):null;
     }
 
     public String applicationClassName() {

@@ -32,7 +32,7 @@ public class LobbyDescriptor extends DefaultDescriptor {
         _props.put("deployPriority",this.deployPriority);
         _props.put("resetEnabled",this.resetEnabled);
         _props.put("disabled",this.disabled);
-        _props.put("index",this.index);//game cluster id
+        //_props.put("index",this.index);//game cluster id
         return _props;
     }
 
@@ -49,7 +49,7 @@ public class LobbyDescriptor extends DefaultDescriptor {
         this.deployPriority = properties.get("deployPriority")!=null?((Number)properties.get("deployPriority")).intValue():0;
         this.resetEnabled = properties.get("resetEnabled")!=null?(boolean)properties.get("resetEnabled"):false;
         this.disabled = properties.get("disabled")!=null?(boolean)properties.get("disabled"):false;
-        this.index = (String)properties.get("index");
+        //this.index = (String)properties.get("index");
     }
 
 }

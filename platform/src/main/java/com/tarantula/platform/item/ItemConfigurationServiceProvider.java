@@ -3,6 +3,8 @@ package com.tarantula.platform.item;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.game.service.DynamicGameLobbySetup;
+import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.deployment.TypedListener;
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +17,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     private DistributionItemService distributionItemService;
     private DataStore dataStore;
     private final String name;
+    private ApplicationPreSetup applicationPreSetup;
     public ItemConfigurationServiceProvider(String name){
         this.name = name;
     }
@@ -38,10 +41,10 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
         return null;
     }
     @Override
-    public String registerConfigurableListener(String type, Configurable.Listener listener) {
+    public String registerConfigurableListener(Descriptor application, Configurable.Listener listener) {
         String rid = UUID.randomUUID().toString();
-        this.rListeners.put(rid,new TypedListener(type,listener));
-        logger.warn("Listener registered with ->"+type);
+        this.rListeners.put(rid,new TypedListener(application.category(),listener));
+        logger.warn("Listener registered with ->"+application.category());
         return rid;
     }
     @Override
@@ -51,6 +54,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     }
     @Override
     public void setup(ServiceContext serviceContext) {
+        this.applicationPreSetup = new DynamicGameLobbySetup();
         this.serviceContext = serviceContext;
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);
@@ -72,10 +76,16 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     }
     public boolean onRegister(Configurable configurable){
         rListeners.forEach((k,c)->{
-            if(c.type==null||c.type.equals(configurable.configurationCategory())){
+            if(c.type==null||c.type.equals("system")){
+                c.listener.onCreated(configurable);
+            }
+            else if(c.type.equals(configurable.configurationCategory())){
                 c.listener.onCreated(configurable);
             }
         });
         return true;
+    }
+    public String registerConfigurableListener(String category, Configurable.Listener listener){
+        throw new UnsupportedOperationException("using descriptor");
     }
 }

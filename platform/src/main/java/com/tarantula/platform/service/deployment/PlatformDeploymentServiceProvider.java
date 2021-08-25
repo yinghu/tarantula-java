@@ -661,6 +661,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         oListeners.put(regKey,new TypedListener(type,listener));
         return regKey;
     }
+    public String registerConfigurableListener(Descriptor category, Configurable.Listener listener){
+        throw new UnsupportedOperationException("use string");
+    }
     public void unregisterConfigurableListener(String registryKey){
         oListeners.remove(registryKey);
     }

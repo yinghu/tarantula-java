@@ -62,6 +62,14 @@
                 <tag>game/mmk</tag>
                 <module-name>com.tarantula.game.module.MatchMakingModule</module-name>
             </application>
+            <application><!-- Configuration module-->
+                <type-id>game-service</type-id>
+                <name>Configuration</name>
+                <type>application</type>
+                <category>system</category>
+                <tag>game/cfg</tag>
+                <module-name>com.tarantula.game.module.GameItemModule</module-name>
+            </application>
             <application><!-- stats module-->
                 <type-id>game-service</type-id>
                 <name>Statistics</name>

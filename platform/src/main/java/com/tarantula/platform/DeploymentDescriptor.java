@@ -13,7 +13,6 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
 
 
     public DeploymentDescriptor(){
-        //this.vertex = "DeploymentApplication";
         this.onEdge = true;
     }
 
@@ -52,7 +51,6 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
     public Descriptor copy() {
         DeploymentDescriptor _copy = new DeploymentDescriptor();
         _copy.moduleId(this.moduleId);
-        _copy.index(this.index);
         _copy.typeId(this.typeId);
         _copy.name(this.name);
         _copy.type(this.type);

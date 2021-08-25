@@ -19,4 +19,7 @@ public interface ApplicationPreSetup {
     <T extends Configurable> List<T> list(ApplicationContext context, Descriptor application, RecoverableFactory<T> recoverableFactory);
 
     byte[] load(ApplicationContext context,GameCluster application,byte[] key);
+
+    <T extends Configurable> List<T> list(ServiceContext context, Descriptor application, RecoverableFactory<T> recoverableFactory);
+
 }
