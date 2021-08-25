@@ -5,12 +5,10 @@ import com.icodesoftware.RecoverableFactory;
 public class ItemQuery implements RecoverableFactory<Item> {
 
     public String label;
-    public String applicationId;
 
     public ItemQuery(){}
 
-    public ItemQuery(String applicationId,String configurationType){
-        this.applicationId = applicationId;
+    public ItemQuery(String configurationType){
         this.label = configurationType;
     }
 
@@ -31,6 +29,6 @@ public class ItemQuery implements RecoverableFactory<Item> {
 
     @Override
     public String distributionKey() {
-        return applicationId;
+        return null;
     }
 }

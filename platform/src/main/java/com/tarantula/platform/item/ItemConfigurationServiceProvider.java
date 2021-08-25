@@ -17,12 +17,12 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     private DistributionItemService distributionItemService;
     private DataStore dataStore;
     private final String name;
-    private ApplicationPreSetup applicationPreSetup;
     public ItemConfigurationServiceProvider(String name){
         this.name = name;
     }
     @Override
     public <T extends Configurable> void register(T config) {
+
         distributionItemService.register(name,(Item)config);
     }
 
@@ -54,7 +54,6 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     }
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.applicationPreSetup = new DynamicGameLobbySetup();
         this.serviceContext = serviceContext;
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);

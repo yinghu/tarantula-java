@@ -113,23 +113,6 @@ public class SudoRoleModule implements Module {
             boolean suc = this.deploymentServiceProvider.shutdownModule(access.typeId());
             session.write(this.toMessage(suc?"module shutdown":"module not shutdown",suc).toString().getBytes());
         }
-        //else if(session.action().equals("onConfigurationList")){
-            //List<Configuration> configurationList = this.deploymentServiceProvider.configurations("subscription");
-            //session.write(toJson(configurationList).toString().getBytes());
-        //}
-        else if(session.action().equals("onUpdateConfiguration")){
-            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            Configuration configuration = new ApplicationConfiguration();
-            configuration.distributionKey(access.property(OnAccess.ACCESS_ID).toString());
-            Map<String,Object> _payload = access.toMap();
-            _payload.remove(OnAccess.ACCESS_ID);
-            _payload.remove(OnAccess.COMMAND);
-            _payload.remove(OnAccess.SERVICE_TAG);
-            configuration.fromMap(_payload);
-            boolean suc = this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE).update(configuration);
-            this.deploymentServiceProvider.configure(configuration.distributionKey());
-            session.write(toMessage("configuration updated ["+configuration.distributionKey()+"]",suc).toString().getBytes());
-        }
         else if(session.action().equals("onDeployView")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             OnView onView = new OnViewTrack();

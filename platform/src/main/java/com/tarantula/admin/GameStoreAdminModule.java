@@ -40,9 +40,9 @@ public class GameStoreAdminModule implements Module {
                 gameServiceProvider.configurationServiceProvider().register(app);
                 session.write(JsonUtil.toSimpleResponse(true,"item live").getBytes());
             }
-           else{
+            else{
                session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
-           }
+            }
         }
         else if(session.action().equals("onLoad")){
 

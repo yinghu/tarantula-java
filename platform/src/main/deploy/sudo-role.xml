@@ -69,9 +69,6 @@
             <view type="export.module">
                 <property name="moduleResourceFile">sudo/export.module.view.html</property>
             </view>
-            <view type="configuration.list">
-                <property name="moduleResourceFile">sudo/configuration.list.view.html</property>
-            </view>
         </view-list>
 
     </lobby-context>

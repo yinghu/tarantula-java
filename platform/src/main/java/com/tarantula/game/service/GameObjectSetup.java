@@ -19,10 +19,15 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         IndexSet indexSet = new IndexSet(application.category());
         indexSet.distributionKey(application.distributionKey());
         dataStore.load(indexSet);
+        IndexSet typeIndex = new IndexSet(t.configurationType());
+        typeIndex.distributionKey(application.distributionKey());
+        dataStore.load(typeIndex);
         if(!dataStore.update(t)){
             dataStore.create(t);
             indexSet.keySet.add(t.distributionKey());
             dataStore.update(indexSet);
+            typeIndex.keySet.add(t.distributionKey());
+            dataStore.update(typeIndex);
         }
     }
 
@@ -66,7 +71,7 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         return roomProxy;
     }
     protected <T extends Configurable> List<T> list(DataStore dataStore, Descriptor application, RecoverableFactory<T> recoverableFactory){
-        IndexSet indexSet = new IndexSet(application.category());
+        IndexSet indexSet = new IndexSet(recoverableFactory.label()==null?application.category():recoverableFactory.label());
         indexSet.distributionKey(application.distributionKey());
         ArrayList<T> arrayList = new ArrayList<>();
         if(!dataStore.load(indexSet)){

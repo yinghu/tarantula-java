@@ -120,6 +120,9 @@
             <view type="create.item">
                 <property name="moduleResourceFile">admin/create.item.view.html</property>
             </view>
+            <view type="register.item">
+                <property name="moduleResourceFile">admin/register.item.view.html</property>
+            </view>
             <view type="game.lobby.list">
                 <property name="moduleResourceFile">admin/game.lobby.list.view.html</property>
             </view>
@@ -140,9 +143,6 @@
             </view>
             <view type="api.service.data">
                 <property name="moduleResourceFile">admin/api.service.data.view.html</property>
-            </view>
-            <view type="api.service.data1">
-                <property name="moduleResourceFile">admin/api.service.data1.view.html</property>
             </view>
             <view type="api.game.lobby">
                 <property name="moduleResourceFile">admin/api.game.lobby.view.html</property>

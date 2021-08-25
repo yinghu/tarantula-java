@@ -33,6 +33,9 @@ public class GameItemAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
             }
         }
+        else if(session.action().equals("")){
+
+        }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");
         }
