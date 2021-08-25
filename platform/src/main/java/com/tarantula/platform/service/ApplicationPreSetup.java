@@ -6,7 +6,6 @@ import com.tarantula.platform.GameCluster;
 
 import java.util.List;
 
-
 public interface ApplicationPreSetup {
     String SET_UP_TYPE = "pre-setup";
     String SET_UP_NAME = "application-pre-setup";
