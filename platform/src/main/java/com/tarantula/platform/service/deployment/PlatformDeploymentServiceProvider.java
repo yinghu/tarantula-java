@@ -441,6 +441,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         byte[] ret = this.tarantulaContext.integrationCluster().recoverService().load(memberId,this.tarantulaContext.dataStoreMaster,key);
         gameCluster.fromBinary(ret);
+        this.tarantulaContext.releaseServiceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
         removeLobby((String)gameCluster.property(GameCluster.GAME_DATA));
         removeLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
         removeLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));

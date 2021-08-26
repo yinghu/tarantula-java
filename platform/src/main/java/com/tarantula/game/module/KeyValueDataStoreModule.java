@@ -15,7 +15,6 @@ public class KeyValueDataStoreModule implements Module {
     private ApplicationContext context;
     private GsonBuilder builder;
     private DataStore dataStore;
-    private DeploymentServiceProvider deploymentServiceProvider;
     private GameServiceProvider gameServiceProvider;
     private int maxSizeOnSet;
     @Override
@@ -58,16 +57,13 @@ public class KeyValueDataStoreModule implements Module {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.dataStore = this.context.dataStore(this.context.descriptor().typeId().replace("-","_"));//typeId_data
-        gameServiceProvider = new GameServiceProvider(this.context.descriptor().typeId().replace("-data","-service"));
-        deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        deploymentServiceProvider.register(gameServiceProvider);
-        this.gameServiceProvider.start();
+        gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId().replace("-data","-service"));
         this.maxSizeOnSet = ((Number)this.gameServiceProvider.configuration().property("maxSizeOnSet")).intValue();
         this.context.log("Data store module ["+this.context.descriptor().typeId()+" started with max size on set call ["+maxSizeOnSet+"]", OnLog.WARN);
     }
 
     @Override
     public void clear(){
-        this.deploymentServiceProvider.release(gameServiceProvider);
+
     }
 }

@@ -3,6 +3,7 @@ package com.tarantula.game.service;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.tarantula.game.*;
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 import com.tarantula.platform.tournament.*;
 
@@ -21,11 +22,12 @@ public class GameServiceProvider implements ServiceProvider{
     private ItemConfigurationServiceProvider configurationServiceProvider;
     private DistributedTournamentServiceProvider tournamentServiceProvider;
     private Configuration configuration;
-
+    private GameCluster gameCluster;
     private ConcurrentHashMap<String, GameZone.RoomProxy> roomProxyIndex;
 
-    public GameServiceProvider(String name){
-        NAME = name;
+    public GameServiceProvider(GameCluster gameCluster){
+        NAME = (String) gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameCluster = gameCluster;
     }
 
     public GameLobby lobby(Descriptor descriptor){
@@ -59,7 +61,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.tournamentServiceProvider = new DistributedTournamentServiceProvider(NAME);
         this.tournamentServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider.waitForData();
-        logger.info("Game service provider ["+ NAME+"] started");
+        logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
     }
     @Override
     public void waitForData(){

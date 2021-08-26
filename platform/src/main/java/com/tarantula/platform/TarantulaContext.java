@@ -16,6 +16,7 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.cci.RequestHandler;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
@@ -281,7 +282,14 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     public synchronized void setGameClusterOnLobby(String memberId,GameCluster gameCluster,Configurable.Listener listener){
  	    String publishingId = (String) gameCluster.property(GameCluster.PUBLISHING_ID);
-        List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
+ 	    try{
+ 	        GameServiceProvider gameServiceProvider = new GameServiceProvider(gameCluster);
+            this.deployServiceProvider(gameServiceProvider);
+            gameServiceProvider.start();
+        }catch (Exception ex){
+            throw new RuntimeException("failed to start game service provider->"+gameCluster.property(GameCluster.NAME));
+        }
+ 	    List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
         List<LobbyConfiguration> configurations = new ArrayList<>();
         bList.forEach((lb)->configurations.add(new LobbyConfiguration(lb)));
         Collections.sort(configurations,new LobbyComparator());
