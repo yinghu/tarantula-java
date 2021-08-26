@@ -69,7 +69,6 @@ public class GameLobbyAdminModule implements Module {
                     desc.name("Game Lobby " + lobbyIndex);
                     desc.tag(((String) gameCluster.property(GameCluster.NAME)).toLowerCase() + "/lobby" + lobbyIndex);
                     desc.accessRank(lobbyIndex);
-                    //desc.index((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
                     String configName = (String) gameCluster.property(GameCluster.MODE);
                     if(this.deploymentServiceProvider.createApplication(desc,(String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME),configName,true)){
                         session.write(JsonUtil.toSimpleResponse(true,"lobby added->"+lobbyIndex).getBytes());
