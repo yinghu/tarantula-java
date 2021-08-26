@@ -1,0 +1,17 @@
+{
+  "description": "robot item template list",
+  "category": "robot",
+  "template-list":
+  [
+      {
+        "type": "R5",
+        "name": "Dark Bot",
+        "version": 1
+      },
+      {
+        "type": "R3",
+        "name": "Dark Bot",
+        "version": 1
+      }
+  ]
+}

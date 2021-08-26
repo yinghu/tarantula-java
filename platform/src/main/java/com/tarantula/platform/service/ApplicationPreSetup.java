@@ -5,6 +5,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.GameCluster;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ApplicationPreSetup {
     String SET_UP_TYPE = "pre-setup";
@@ -20,5 +21,7 @@ public interface ApplicationPreSetup {
     byte[] load(ApplicationContext context,GameCluster application,byte[] key);
 
     <T extends Configurable> List<T> list(ServiceContext context, Descriptor application, RecoverableFactory<T> recoverableFactory);
+
+    Set<String> list(ApplicationContext context, Descriptor application);
 
 }

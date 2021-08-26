@@ -15,7 +15,11 @@
             <span id='tx-register-item-register' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Register</span> 
         </div>            
     </div>
-   
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <div class='w3-bar w3-white'>
+            <span tx-category='robot' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-reference'>Robot</span>
+        </div>            
+    </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
             <span id='tx-register-item-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
@@ -61,4 +65,15 @@
     document.querySelector('#tx-register-item-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
+
+    document.querySelectorAll('.tx-game-item-reference').forEach(a=>{
+        a.onclick=()=>{
+            //hide_game_item_list();
+            let category = a.getAttribute('tx-category');
+            let query = TARA_API.query().gameClusterId+'#'+category;
+            TARA_API.onGet('role/item','onReferenceList',query,(resp)=>{
+                console.log(resp);
+            });
+        };
+    });
 </script>

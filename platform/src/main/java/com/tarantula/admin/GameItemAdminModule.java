@@ -8,7 +8,13 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.Item;
+import com.tarantula.platform.item.ItemContext;
+import com.tarantula.platform.item.ItemQuery;
+import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
+
+import java.util.List;
+import java.util.Set;
 
 public class GameItemAdminModule implements Module {
     private ApplicationContext context;
@@ -26,6 +32,9 @@ public class GameItemAdminModule implements Module {
             Item app = new Item();
             if(app.configureAndValidate(payload)){
                 Descriptor desc = gameCluster.serviceWithCategory(app.configurationCategory());
+                if(desc==null){
+                    desc = gameCluster.serviceWithCategory("system");
+                }
                 SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);
                 session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
             }
@@ -33,8 +42,20 @@ public class GameItemAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
             }
         }
-        else if(session.action().equals("")){
-
+        else if(session.action().equals("onReferenceSet")){
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            Descriptor app = gameCluster.serviceWithCategory("system");
+            ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            Set<String> refs = preSetup.list(this.context,app);
+            session.write(toJson(refs).toString().getBytes());
+        }
+        else if(session.action().equals("onReferenceList")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            Descriptor app = gameCluster.serviceWithCategory("system");
+            ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            List<Item> items = preSetup.list(this.context,app,new ItemQuery(query[1]));
+            session.write(new ItemContext(true,items).toJson().toString().getBytes());
         }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");
@@ -53,6 +74,13 @@ public class GameItemAdminModule implements Module {
         jsonObject.addProperty("description",(String)configuration.property("description"));
         jsonObject.addProperty("category",(String) configuration.property("category"));
         jsonObject.add("itemList",(JsonArray)configuration.property("template-list"));
+        return jsonObject;
+    }
+    private JsonObject toJson(Set<String> refs){
+        JsonObject jsonObject = new JsonObject();
+        JsonArray alist = new JsonArray();
+        refs.forEach((ref)->alist.add(ref));
+        jsonObject.add("onList",alist);
         return jsonObject;
     }
 }

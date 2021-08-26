@@ -641,19 +641,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     private void register(OnLobby onLobby){
-        if(onLobby.deployCode()<2){
-            return;
-        }
+        if(onLobby.deployCode()<2) return;
         vMap.put(onLobby.typeId(),onLobby);
-        if(onLobby.resetEnabled()){
-            this.tarantulaContext.tokenValidatorProvider().onCheck(onLobby);
-        }
+        if(onLobby.resetEnabled()&&TarantulaContext.lobbySubscriptionEnabled) this.tarantulaContext.tokenValidatorProvider().onCheck(onLobby);
+
         oListeners.forEach((k,o)->
-                {
-                    if(o.type.equals(onLobby.configurationType())){
-                        o.listener.onUpdated(onLobby);
-                    }
+            {
+                if(o.type.equals(onLobby.configurationType())){
+                    o.listener.onUpdated(onLobby);
                 }
+            }
         );
     }
     public String registerConfigurableListener(String type, Configurable.Listener listener){

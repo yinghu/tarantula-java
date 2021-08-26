@@ -106,7 +106,7 @@
         a.onclick=()=>{
             let levelIndex = a.getAttribute('level-index')/1;  
             TARA_API.query().levelIndex = levelIndex;
-            console.log("Level index->"+TARA_API.query().levelIndex);
+            //console.log("Level index->"+TARA_API.query().levelIndex);
             gameLobby.levels.forEach((a)=> {
                 if(a.level == levelIndex){
                     editor.set(a);

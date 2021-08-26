@@ -10,6 +10,7 @@ import com.tarantula.platform.service.ApplicationPreSetup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 abstract public class GameObjectSetup implements ApplicationPreSetup {
 
@@ -22,12 +23,27 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         IndexSet typeIndex = new IndexSet(t.configurationType());
         typeIndex.distributionKey(application.distributionKey());
         dataStore.load(typeIndex);
+        IndexSet categorySet = null;
+        if(!application.category().equals(t.configurationCategory())){
+            categorySet = new IndexSet(t.configurationCategory());
+            categorySet.distributionKey(application.distributionKey());
+            dataStore.load(categorySet);
+            IndexSet referenceIndex = new IndexSet("reference");
+            referenceIndex.distributionKey(application.distributionKey());
+            dataStore.load(referenceIndex);
+            referenceIndex.keySet.add(t.configurationCategory());
+            dataStore.update(referenceIndex);
+        }
         if(!dataStore.update(t)){
             dataStore.create(t);
             indexSet.keySet.add(t.distributionKey());
             dataStore.update(indexSet);
             typeIndex.keySet.add(t.distributionKey());
             dataStore.update(typeIndex);
+            if(categorySet!=null){
+                categorySet.keySet.add(t.distributionKey());
+                dataStore.update(categorySet);
+            }
         }
     }
 
@@ -43,7 +59,13 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         DataStore dataStore = context.dataStore(this.serviceDataStore(application),context.partitionNumber());
         return list(dataStore,application,recoverableFactory);
     }
-
+    public Set<String> list(ApplicationContext context, Descriptor application){
+        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        IndexSet referenceSet = new IndexSet("reference");
+        referenceSet.distributionKey(application.distributionKey());
+        dataStore.load(referenceSet);
+        return referenceSet.keySet;
+    }
     public byte[] load(ApplicationContext context,GameCluster application,byte[] key){
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         byte[] data = dataStore.backup().get(key);

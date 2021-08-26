@@ -124,10 +124,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public int platformRoutingNumber;
     public int accessIndexRoutingNumber;
 
-    //public String endpointIp ="localhost";
-    //public int endpointPort = 6393;
     public static ScopedMemberDiscovery memberDiscovery;
     public static int operationTimeout = 5;
+    public static boolean lobbySubscriptionEnabled = false;
     public String authContext = "localhost";
     public boolean udpEndpointEnabled;
     public String udpReceiverThreadPoolSetting;
