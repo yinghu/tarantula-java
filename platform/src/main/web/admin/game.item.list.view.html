@@ -57,6 +57,9 @@
     </div>
 </div>
 <script>
+    TARA_API.onGet('role/item','onTemplateCategory',TARA_API.query().gameClusterId,(resp)=>{
+        console.log(resp);
+    });
     document.querySelectorAll('.tx-game-item-template').forEach(a=>{
         a.onclick=()=>{
             hide_game_item_list();

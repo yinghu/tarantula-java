@@ -13,7 +13,7 @@ public class JsonItemParser {
             JsonObject temp = JsonUtil.parse(json);
             itemSet.property("description",temp.get("description").getAsString());
             itemSet.property("category",temp.get("category").getAsString());
-            itemSet.property("itemList",temp.get("template-list").getAsJsonArray());
+            itemSet.property("itemList",temp.get("itemList").getAsJsonArray());
             return itemSet;
         }catch (Exception ex){
             throw new RuntimeException(ex);

@@ -1,7 +1,7 @@
 {
   "description": "tournament item template list",
   "category": "tournament",
-  "template-list":
+  "itemList":
   [
       {
         "type": "T10",

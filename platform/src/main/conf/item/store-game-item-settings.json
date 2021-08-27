@@ -1,7 +1,7 @@
 {
   "description": "store item template list",
   "category": "store",
-  "template-list":
+  "itemList":
   [
       {
         "type": "A10",

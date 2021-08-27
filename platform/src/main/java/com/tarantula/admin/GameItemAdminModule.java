@@ -23,11 +23,9 @@ public class GameItemAdminModule implements Module {
     private static String TEMPLATE_SUFFIX = "-game-item-settings";
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
-        if(session.action().equals("onTemplate")){
-            String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            String conf = gameCluster.property(GameCluster.NAME)+"/"+TEMPLATE_SUFFIX;
-            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,conf);
+        if(session.action().equals("onTemplateCategory")){
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,"game-item-category-settings");
             session.write(configuration.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTemplateList")){

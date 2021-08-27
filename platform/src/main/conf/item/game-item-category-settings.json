@@ -1,6 +1,7 @@
 {
   "description": "game item category list",
-  "category-list":
+  "category": "category",
+  "itemList":
   [
     {
       "category": "tournament",
