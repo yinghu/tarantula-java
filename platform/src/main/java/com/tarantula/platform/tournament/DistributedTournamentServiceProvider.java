@@ -5,6 +5,7 @@ import com.icodesoftware.service.ReloadListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 
 import java.util.*;
@@ -26,8 +27,10 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     private IndexSet lookupKey;
     private Configuration configuration;
     private String reloadKey;
-    public DistributedTournamentServiceProvider(String gameServiceProviderName){
-        this.name = gameServiceProviderName;
+    private GameCluster gameCluster;
+    public DistributedTournamentServiceProvider(GameCluster gameCluster){
+        this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameCluster = gameCluster;
     }
 
     @Override
@@ -94,9 +97,8 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.configuration = serviceContext.configuration(CONFIG);
-        this.lookupKey = new IndexSet("tournament");
-        AccessIndex accessIndex = this.serviceContext.accessIndexService().setIfAbsent(name,0);
-        this.lookupKey.distributionKey(accessIndex.distributionKey());
+        this.lookupKey = new IndexSet(GameCluster.TOURNAMENT_LOOKUP_INDEX);
+        this.lookupKey.distributionKey(gameCluster.distributionKey());
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.dataStore.createIfAbsent(this.lookupKey,true);
         this.logger = serviceContext.logger(DistributedTournamentServiceProvider.class);

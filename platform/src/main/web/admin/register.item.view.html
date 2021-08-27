@@ -42,7 +42,10 @@
 <script>
     let itemTemplate = TARA_API.query().item;
     let editor = new JSONEditor(document.querySelector("#jsoneditor-register-item"),{mode:'code'},itemTemplate);
-    
+    TARA_API.onGet('role/item','onCategory',TARA_API.query().gameClusterId,(resp)=>{
+        console.log(resp);
+        //editor.set(resp);   
+    });
     document.querySelector('#tx-register-item-register').onclick=()=>{
         let item = editor.get();
         let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().itemId
@@ -71,7 +74,7 @@
             //hide_game_item_list();
             let category = a.getAttribute('tx-category');
             let query = TARA_API.query().gameClusterId+'#'+category;
-            TARA_API.onGet('role/item','onReferenceList',query,(resp)=>{
+            TARA_API.onGet('role/item','onInventory',query,(resp)=>{
                 console.log(resp);
             });
         };

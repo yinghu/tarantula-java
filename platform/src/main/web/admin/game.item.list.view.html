@@ -61,7 +61,7 @@
         a.onclick=()=>{
             hide_game_item_list();
             let category = a.getAttribute('tx-category');
-            TARA_API.onGet('role/item','onList',category,(resp)=>{
+            TARA_API.onGet('role/item','onTemplateList',category,(resp)=>{
                 console.log(resp);
                 document.querySelector('#tx-game-item-list-description-0').innerHTML = resp.description;
                 document.querySelector('#tx-game-item-list-category-0').innerHTML = resp.category; 

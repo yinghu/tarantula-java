@@ -123,6 +123,9 @@
             <view type="register.item">
                 <property name="moduleResourceFile">admin/register.item.view.html</property>
             </view>
+            <view type="edit.item.template">
+                <property name="moduleResourceFile">admin/edit.item.template.view.html</property>
+            </view>
             <view type="game.lobby.list">
                 <property name="moduleResourceFile">admin/game.lobby.list.view.html</property>
             </view>

@@ -171,7 +171,12 @@
                 <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class='w3-left tx-text-14 tx-margin-top-8'>Game Item</span>
                     <span id='game-configuration-id-0' tx-game-cluster-id='' view-id='game.item.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Edit</span>   
-                    <span class='w3-right tx-text-14 tx-margin-right-8 tx-margin-top-8'>Configuration</span> 
+                    <span class='w3-right tx-text-14 tx-margin-right-8 tx-margin-top-8'>Item Configuration</span> 
+                </div> 
+                <div class="w3-container w3-padding w3-border-bottom w3-border-red">
+                    <span class='w3-left tx-text-14 tx-margin-top-8'>Game Item Template</span>
+                    <span id='game-item-template-id-0' tx-game-cluster-id='' view-id='edit.item.template' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Edit</span>   
+                    <span class='w3-right tx-text-14 tx-margin-right-8 tx-margin-top-8'>Item Template</span> 
                 </div> 
                 <div class="w3-container w3-padding">
                     <span class='w3-left tx-text-14 tx-margin-top-8'>Game Server Access Key</span>
@@ -494,7 +499,8 @@
                     document.querySelector('#game-lobby-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-data-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-service-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
-                    document.querySelector('#game-configuration-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);                    
+                    document.querySelector('#game-configuration-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
+                    document.querySelector('#game-item-template-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);                    
                     document.querySelector('#game-cluster-'+i).style.display='block';
                     document.querySelector('#tx-game-cluster-next').style.display='block';
                 });

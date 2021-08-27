@@ -3,10 +3,10 @@ package com.tarantula.platform.item;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
-import com.tarantula.game.service.DynamicGameLobbySetup;
-import com.tarantula.platform.service.ApplicationPreSetup;
+
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.deployment.TypedListener;
-import java.util.List;
+
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,8 +17,11 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     private DistributionItemService distributionItemService;
     private DataStore dataStore;
     private final String name;
-    public ItemConfigurationServiceProvider(String name){
-        this.name = name;
+    private GameCluster gameCluster;
+
+    public ItemConfigurationServiceProvider(GameCluster gameCluster){
+        this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameCluster = gameCluster;
     }
     @Override
     public <T extends Configurable> void register(T config) {

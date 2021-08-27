@@ -5,7 +5,9 @@ import com.icodesoftware.service.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
+import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.tournament.*;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,6 +25,7 @@ public class GameServiceProvider implements ServiceProvider{
     private DistributedTournamentServiceProvider tournamentServiceProvider;
     private Configuration configuration;
     private GameCluster gameCluster;
+    private ApplicationPreSetup applicationPreSetup;
     private ConcurrentHashMap<String, GameZone.RoomProxy> roomProxyIndex;
 
     public GameServiceProvider(GameCluster gameCluster){
@@ -31,8 +34,7 @@ public class GameServiceProvider implements ServiceProvider{
     }
 
     public GameLobby lobby(Descriptor descriptor){
-        DynamicGameLobbySetup dynamicLobbySetup = new DynamicGameLobbySetup();
-        return dynamicLobbySetup.load(serviceContext,descriptor);
+        return applicationPreSetup.load(serviceContext,descriptor);
     }
     public Configuration configuration(){
         return configuration;
@@ -48,17 +50,17 @@ public class GameServiceProvider implements ServiceProvider{
         this.roomProxyIndex = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
         this.distributionRoomService = serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionRoomService.NAME);
-
+        this.applicationPreSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.playerDataProvider = new PlayerDataProvider(NAME);
         this.playerDataProvider.setup(serviceContext);
         this.playerDataProvider.waitForData();
         this.leaderBoardProvider = new LeaderBoardProvider(NAME);
         this.leaderBoardProvider.setup(serviceContext);
         this.leaderBoardProvider.waitForData();
-        this.configurationServiceProvider = new ItemConfigurationServiceProvider(NAME);
+        this.configurationServiceProvider = new ItemConfigurationServiceProvider(gameCluster);
         this.configurationServiceProvider.setup(serviceContext);
         this.configurationServiceProvider.waitForData();
-        this.tournamentServiceProvider = new DistributedTournamentServiceProvider(NAME);
+        this.tournamentServiceProvider = new DistributedTournamentServiceProvider(gameCluster);
         this.tournamentServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider.waitForData();
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
@@ -74,7 +76,6 @@ public class GameServiceProvider implements ServiceProvider{
     }
     @Override
     public void start() throws Exception {
-        //this.roomServiceProvider.start();
         this.playerDataProvider.start();
         this.leaderBoardProvider.start();
         this.tournamentServiceProvider.start();
@@ -83,12 +84,11 @@ public class GameServiceProvider implements ServiceProvider{
 
     @Override
     public void shutdown() throws Exception {
-        logger.warn("shut down service->"+NAME);
-        //this.roomServiceProvider.shutdown();
         this.playerDataProvider.shutdown();
         this.leaderBoardProvider.shutdown();
         this.tournamentServiceProvider.shutdown();
         this.configurationServiceProvider.shutdown();
+        this.logger.warn("Game service provider ["+NAME+"] shutting down");
     }
     public void registerRoomProxy(String zoneId, GameZone.RoomProxy roomProxy){
         roomProxyIndex.put(zoneId,roomProxy);
@@ -96,6 +96,7 @@ public class GameServiceProvider implements ServiceProvider{
     public void releaseRoomProxy(String zoneId){
         roomProxyIndex.remove(zoneId);
     }
+
     //room service provider hool calls
     public DistributionRoomService distributionRoomService(){
         return distributionRoomService;

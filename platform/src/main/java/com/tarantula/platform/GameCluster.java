@@ -30,6 +30,10 @@ public class GameCluster extends OnApplicationHeader implements Portable {
     public Lobby serviceLobby;
     public Lobby dataLobby;
 
+    public final static String TOURNAMENT_LOOKUP_INDEX = "tournament";
+    public final static String STORE_LOOKUP_INDEX = "store";
+
+
     @Override
     public int getClassId() {
        return PortableEventRegistry.GAME_CLUSTER_CID;

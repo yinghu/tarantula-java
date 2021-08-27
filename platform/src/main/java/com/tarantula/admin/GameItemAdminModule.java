@@ -19,15 +19,19 @@ import java.util.Set;
 public class GameItemAdminModule implements Module {
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
+    private static String TEMPLATE_PREFIX = "item/";
     private static String TEMPLATE_SUFFIX = "-game-item-settings";
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
-        if(session.action().equals("onList")){
-            String conf = session.name()+TEMPLATE_SUFFIX;
+        if(session.action().equals("onTemplateCategory")){
+
+        }
+        else if(session.action().equals("onTemplateList")){
+            String conf = TEMPLATE_PREFIX+session.name()+TEMPLATE_SUFFIX;
             Configuration configuration = this.deploymentServiceProvider.configuration(conf);
             session.write(toJson(configuration).toString().getBytes());
         }
-        else if (session.action().equals("onCreate")){
+        else if (session.action().equals("onCreateItem")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Item app = new Item();
             if(app.configureAndValidate(payload)){
@@ -42,14 +46,14 @@ public class GameItemAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
             }
         }
-        else if(session.action().equals("onReferenceSet")){
+        else if(session.action().equals("onCategory")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Descriptor app = gameCluster.serviceWithCategory("system");
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Set<String> refs = preSetup.list(this.context,app);
             session.write(toJson(refs).toString().getBytes());
         }
-        else if(session.action().equals("onReferenceList")){
+        else if(session.action().equals("onInventory")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             Descriptor app = gameCluster.serviceWithCategory("system");
