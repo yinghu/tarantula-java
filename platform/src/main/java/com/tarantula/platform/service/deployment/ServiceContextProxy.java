@@ -88,4 +88,7 @@ public class ServiceContextProxy implements ServiceContext {
     public List<Descriptor> availableServices(){
         return this.tarantulaContext.availableServices();
     }
+    public <T extends OnAccess> void setup(T configuration){
+        this.tarantulaContext.setup(configuration);
+    }
 }

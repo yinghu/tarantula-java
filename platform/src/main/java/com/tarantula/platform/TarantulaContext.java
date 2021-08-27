@@ -2,7 +2,7 @@ package com.tarantula.platform;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.file.FileSystem;
+import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,6 +17,9 @@ import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.cci.RequestHandler;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.item.Item;
+import com.tarantula.platform.item.ItemSet;
+import com.tarantula.platform.item.JsonItemParser;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
@@ -771,10 +774,16 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
 
     public Configuration configuration(String config){
-        Map<String,Object> kv = JsonUtil.toMap(Thread.currentThread().getContextClassLoader().getResourceAsStream(config+".json"));
-        ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration();
-        kv.forEach((k,v)->applicationConfiguration.property(k,v));
-        return applicationConfiguration;
+ 	    try{
+
+            Map<String,Object> kv = JsonUtil.toMap(Thread.currentThread().getContextClassLoader().getResourceAsStream(config+".json"));
+            ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration();
+            kv.forEach((k,v)->applicationConfiguration.property(k,v));
+            return applicationConfiguration;
+ 	    }catch (Exception ex){
+            log.error("error on load master config->"+config,ex);
+ 	        return  null;
+        }
     }
 
     public List<Descriptor> availableServices(){
@@ -790,16 +799,43 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         });
  	    return alist;
     }
-
-    public byte[] loadFromTemplate(String resourceFile){
- 	    try{
- 	        String _template = resourceFile+"-game-item-settings.json";
- 	        BufferedInputStream in = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(_template));
- 	        byte[] ret = in.readAllBytes();
- 	        in.close();
- 	        return ret;
+    public <T extends OnAccess> void setup(T configuration){
+        if(!(configuration instanceof GameCluster)){
+            return;
+        }
+        try{
+            GameCluster gameCluster = (GameCluster)configuration;
+            Path _config_game = Paths.get(this.deployDir+"/conf/"+gameCluster.property(GameCluster.NAME));
+            if(!Files.exists(_config_game)){
+                Files.createDirectories(_config_game);
+                URL url = Thread.currentThread().getContextClassLoader().getResource("item");
+                String[] fs = new File(url.getFile()).list((m,n)->true);
+                String _path = url.getFile();
+                int wp = _path.indexOf(":");
+                if(wp>0){
+                    _path = _path.substring(wp+1);
+                }
+                for(String f : fs){
+                    Path _item = Paths.get(_path+"/"+f);
+                    Path _game = Paths.get(_config_game+"/"+f);
+                    Files.copy(_item,_game,StandardCopyOption.COPY_ATTRIBUTES);
+                }
+            }
         }catch (Exception ex){
- 	        return new byte[0];
+            log.error("error on game cluster->"+configuration.property(GameCluster.NAME),ex);
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public Configuration configuration(GameCluster gameCluster,String config){
+        try{
+            FileInputStream fileInputStream = new FileInputStream(this.deployDir+"/conf/"+gameCluster.property(GameCluster.NAME)+"/"+config+".json");
+            ItemSet item = JsonItemParser.itemSet(fileInputStream);
+            fileInputStream.close();
+            return item;
+        }catch (Exception ex){
+            log.error("error on load config->"+config,ex);
+            return  null;
         }
     }
 }

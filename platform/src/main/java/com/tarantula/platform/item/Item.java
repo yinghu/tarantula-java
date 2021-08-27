@@ -1,13 +1,15 @@
 package com.tarantula.platform.item;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.Configurable;
+import com.icodesoftware.Configuration;
+import com.icodesoftware.Property;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 
+import java.util.List;
 import java.util.Map;
 
-public class Item extends RecoverableObject implements Configurable {
+public class Item extends RecoverableObject implements Configuration {
 
     protected String configurationType;
     protected String configurationName;

@@ -19,17 +19,23 @@ import java.util.Set;
 public class GameItemAdminModule implements Module {
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
-    private static String TEMPLATE_PREFIX = "item/";
+    //private static String TEMPLATE_PREFIX = "item/";
     private static String TEMPLATE_SUFFIX = "-game-item-settings";
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
-        if(session.action().equals("onTemplateCategory")){
-
+        if(session.action().equals("onTemplate")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            String conf = gameCluster.property(GameCluster.NAME)+"/"+TEMPLATE_SUFFIX;
+            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,conf);
+            session.write(configuration.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTemplateList")){
-            String conf = TEMPLATE_PREFIX+session.name()+TEMPLATE_SUFFIX;
-            Configuration configuration = this.deploymentServiceProvider.configuration(conf);
-            session.write(toJson(configuration).toString().getBytes());
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            String conf = query[1]+TEMPLATE_SUFFIX;
+            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,conf);
+            session.write(configuration.toJson().toString().getBytes());
         }
         else if (session.action().equals("onCreateItem")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
@@ -73,13 +79,7 @@ public class GameItemAdminModule implements Module {
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
         this.context.log("game item admin module started", OnLog.WARN);
     }
-    private JsonObject toJson(Configuration configuration){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("description",(String)configuration.property("description"));
-        jsonObject.addProperty("category",(String) configuration.property("category"));
-        jsonObject.add("itemList",(JsonArray)configuration.property("template-list"));
-        return jsonObject;
-    }
+
     private JsonObject toJson(Set<String> refs){
         JsonObject jsonObject = new JsonObject();
         JsonArray alist = new JsonArray();

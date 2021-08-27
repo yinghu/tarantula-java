@@ -1,0 +1,18 @@
+{
+  "description": "game item category list",
+  "category-list":
+  [
+    {
+      "category": "tournament",
+      "name": "tournament-game-item-setting.json",
+      "enabled": true,
+      "version": 1.0
+    },
+    {
+      "category": "store",
+      "name": "store-game-item-setting.json",
+      "enabled": true,
+      "version": 1.0
+    }
+  ]
+}

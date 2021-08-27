@@ -47,6 +47,7 @@ public class GameServiceProvider implements ServiceProvider{
     @Override
     public void setup(ServiceContext serviceContext) {
         this.logger = serviceContext.logger(GameServiceProvider.class);
+        serviceContext.setup(gameCluster);
         this.roomProxyIndex = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
         this.distributionRoomService = serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionRoomService.NAME);

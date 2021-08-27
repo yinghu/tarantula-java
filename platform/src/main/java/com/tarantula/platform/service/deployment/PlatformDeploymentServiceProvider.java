@@ -486,6 +486,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(!Files.exists(_web_sudo)){
                 Files.createDirectories(_web_sudo);
             }
+            Path _config_game = Paths.get(this.tarantulaContext.deployDir+"/conf/root");
+            if(!Files.exists(_config_game)){
+                Files.createDirectories(_config_game);
+            }
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -853,6 +857,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return (T)gc;
         }
         return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name,mode,tournamentEnabled,accessIndex.distributionKey());
+    }
+    public <T extends Configuration,S extends OnAccess> T configuration(S gameCluster,String config){
+        return (T)this.tarantulaContext.configuration((GameCluster)gameCluster,config);
     }
     public <T extends OnAccess> T gameCluster(String key){
         GameCluster gc = new GameCluster();
