@@ -35,7 +35,7 @@ public class GameItemAdminModule implements Module {
         }
         else if (session.action().equals("onCreateCommodity")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            Commodity app = new Commodity();
+            Item app = new Item();
             if(app.configureAndValidate(payload)){
                 Descriptor desc = gameCluster.serviceWithCategory("system");
                 SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);
@@ -69,8 +69,8 @@ public class GameItemAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             Descriptor app = gameCluster.serviceWithCategory("system");
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            List<Commodity> items = preSetup.list(this.context,app,new CommodityQuery(query[1]));
-            session.write(new CommodityContext(true,items).toJson().toString().getBytes());
+            List<Item> items = preSetup.list(this.context,app,new ItemQuery(query[1]));
+            session.write(new ItemContext(true,"",items).toJson().toString().getBytes());
         }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");

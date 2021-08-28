@@ -1,0 +1,36 @@
+{
+  "type": "commodity",
+  "category": "abilities",
+  "version": "1.0",
+  "quantity": 1,
+  "description": "abilities item template list",
+  "itemList":
+  [
+      {
+        "header": {
+          "type": "R5",
+          "name": "Dark Bot"
+        },
+        "application":
+        {
+          "type": "R5",
+          "name": "Dark Bot",
+          "version": 1
+        },
+        "payload": {}
+      },
+      {
+        "header": {
+          "type": "R5",
+          "name": "Dark Bot"
+        },
+        "application":
+        {
+          "type": "R3",
+          "name": "Dark Bot",
+          "version": 1
+        },
+        "payload": {}
+      }
+  ]
+}

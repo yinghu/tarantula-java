@@ -10,8 +10,9 @@ public class ItemContext extends ResponseHeader {
 
     private List<Item> itemList;
 
-    public ItemContext(boolean successful,List<Item> itemList){
+    public ItemContext(boolean successful,String message,List<Item> itemList){
         this.successful = successful;
+        this.message = message;
         this.itemList = itemList;
     }
 
@@ -19,6 +20,7 @@ public class ItemContext extends ResponseHeader {
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",this.successful);
+        jsonObject.addProperty("message",message);
         JsonArray alist = new JsonArray();
         itemList.forEach((v)->{
             alist.add(v.toJson());

@@ -17,11 +17,6 @@
     </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
-            <span tx-category='robot' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-reference'>Robot</span>
-        </div>            
-    </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class='w3-bar w3-white'>
             <span id='tx-register-item-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
             <span id='tx-register-item-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
             <span id='tx-register-item-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
@@ -42,10 +37,6 @@
 <script>
     let itemTemplate = TARA_API.query().item;
     let editor = new JSONEditor(document.querySelector("#jsoneditor-register-item"),{mode:'code'},itemTemplate);
-    TARA_API.onGet('role/item','onCategory',TARA_API.query().gameClusterId,(resp)=>{
-        console.log(resp);
-        //editor.set(resp);   
-    });
     document.querySelector('#tx-register-item-register').onclick=()=>{
         let item = editor.get();
         let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().itemId
@@ -68,15 +59,4 @@
     document.querySelector('#tx-register-item-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
-
-    document.querySelectorAll('.tx-game-item-reference').forEach(a=>{
-        a.onclick=()=>{
-            //hide_game_item_list();
-            let category = a.getAttribute('tx-category');
-            let query = TARA_API.query().gameClusterId+'#'+category;
-            TARA_API.onGet('role/item','onStock',query,(resp)=>{
-                console.log(resp);
-            });
-        };
-    });
 </script>

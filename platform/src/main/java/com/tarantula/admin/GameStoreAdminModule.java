@@ -24,7 +24,7 @@ public class GameStoreAdminModule implements Module {
             Descriptor app = gameCluster.serviceWithCategory(this.context.descriptor().category());
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             List<Item> items = preSetup.list(this.context,app,new ItemQuery());
-            session.write(new ItemContext(true,items).toJson().toString().getBytes());
+            session.write(new ItemContext(true,items.size()>0?"Configure store item":"no items configured",items).toJson().toString().getBytes());
         }
         else if (session.action().equals("onRegister")){
             String[] ks = session.name().split("#");
