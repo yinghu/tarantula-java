@@ -1,23 +1,39 @@
 {
-  "description": "tournament item template list",
-  "category": "tournament",
   "type": "item",
+  "category": "tournament",
+  "version": "1.0",
+  "quantity": 1,
+  "description": "tournament item template list",
   "itemList":
   [
       {
-        "type": "T10",
-        "name": "fast 10 player",
-        "schedule": "onDemand",
-        "durationHours": 24,
-        "maxEntriesPerInstance": 10,
-        "durationMinutesPerInstance": 10
+        "header": {
+          "type": "T10",
+          "name": "10 player"
+        },
+        "application":
+        {
+          "type": "T10",
+          "name": "fast 10 player",
+          "schedule": "onDemand",
+          "durationHours": 24,
+          "maxEntriesPerInstance": 10,
+          "durationMinutesPerInstance": 10
+        }
       },
       {
-        "type": "T100",
-        "name": "fast 100 player",
-        "schedule": "daily",
-        "maxEntriesPerInstance": 100,
-        "durationMinutesPerInstance": 30
+        "header": {
+          "type": "T100",
+          "name": "Daily 100 player"
+        },
+        "application":
+        {
+          "type": "T100",
+          "name": "Daily 100 player",
+          "schedule": "daily",
+          "maxEntriesPerInstance": 100,
+          "durationMinutesPerInstance": 30
+        }
       }
   ]
 }

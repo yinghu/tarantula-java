@@ -8,6 +8,9 @@ import java.util.Map;
 
 public interface Configurable extends Recoverable, DataStore.Updatable {
 
+    String COMMODITY_CONFIG_TYPE = "commodity";
+    String ITEM_CONFIG_TYPE = "item";
+
     default <T extends Configurable> void registerListener(Listener<T> listener){}
 
     default void registered(){};
@@ -20,6 +23,11 @@ public interface Configurable extends Recoverable, DataStore.Updatable {
     default void configurationName(String configurationName){}
     default String configurationCategory(){return null;}
     default void configurationCategory(String configurationCategory){}
+    default String configurationVersion(){return null;}
+    default void configurationVersion(String configurationVersion){}
+    default int configurationQuantity(){return 1;}
+    default void configurationQuantity(int configurationQuantity){}
+
 
     default boolean configureAndValidate(byte[] data){ return false;}
     default boolean configureAndValidate(Map<String,Object> data){ return false;}

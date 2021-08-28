@@ -74,7 +74,7 @@
             //hide_game_item_list();
             let category = a.getAttribute('tx-category');
             let query = TARA_API.query().gameClusterId+'#'+category;
-            TARA_API.onGet('role/item','onInventory',query,(resp)=>{
+            TARA_API.onGet('role/item','onStock',query,(resp)=>{
                 console.log(resp);
             });
         };

@@ -57,9 +57,9 @@
     </div>
 </div>
 <script>
-    TARA_API.onGet('role/item','onTemplateCategory',TARA_API.query().gameClusterId,(resp)=>{
-        console.log(resp);
-    });
+    //TARA_API.onGet('role/item','onTemplateCategory',TARA_API.query().gameClusterId,(resp)=>{
+        //console.log(resp);
+    //});
     document.querySelectorAll('.tx-game-item-template').forEach(a=>{
         a.onclick=()=>{
             hide_game_item_list();
@@ -69,22 +69,19 @@
                 console.log(resp);
                 document.querySelector('#tx-game-item-list-description-0').innerHTML = resp.description;
                 document.querySelector('#tx-game-item-list-category-0').innerHTML = resp.category; 
-                document.querySelector('#tx-game-item-list-category-0').setAttribute('tx-category',resp.category);       
                 resp.itemList.forEach((gi,i)=>{
-                    document.querySelector('#tx-game-item-list-type-'+i).innerHTML = gi.type;
-                    document.querySelector('#tx-game-item-list-name-'+i).innerHTML = gi.name;
+                    document.querySelector('#tx-game-item-list-type-'+i).innerHTML = gi.header.type;
+                    document.querySelector('#tx-game-item-list-name-'+i).innerHTML = gi.header.name;
                     document.querySelector('#tx-game-item-list-'+i).style.display = 'block';    
                 });
-                TARA_API.query().gameItems = resp.itemList;
+                TARA_API.query().itemTemplate = resp;
             });
         };
     });
     document.querySelectorAll('.tx-game-item-register').forEach(a=>{
         a.onclick=()=>{
             let ix = a.getAttribute('tx-index')/1;
-            let cat = document.querySelector('#tx-game-item-list-category-0').getAttribute('tx-category');
-            TARA_API.query().gameItem = TARA_API.query().gameItems[ix];
-            TARA_API.query().gameItemCategory = cat;
+            TARA_API.query().gameItemIndex= ix;
             TARA_API.query().popup='#tx-popup-api'; 
             tx_view({viewId:'create.item',containerId:'#tx-popup-api'});
         };

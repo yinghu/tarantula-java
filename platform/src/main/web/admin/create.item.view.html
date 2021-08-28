@@ -15,11 +15,9 @@
             <span id='tx-configuration-item-save' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Save</span> 
         </div>            
     </div>
-    <div class="w3-panel">
-        <label class="tx-text-12 tx-margin-left-4">Configuration item Type:</label>
-        <input id='tx-configuration-item-type' class="w3-input w3-round w3-border tx-text-12" type="text">    
-        <label class="tx-text-12 tx-margin-left-4">Configuration item Name:</label>
-        <input id='tx-configuration-item-name' class="w3-input w3-round w3-border tx-text-12" type="text">      
+    <div class="w3-panel">   
+        <label class="tx-text-12 tx-margin-left-4">Configuration Name:</label>
+        <input id='tx-configuration-item-name' class="w3-input w3-round w3-border tx-text-12" type="text">        
     </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
@@ -42,17 +40,28 @@
 </div>
 <script>
     let itemTemplate = {header:{},application:{},payload:{},reference:{}};
-    itemTemplate.header.configurationCategory = TARA_API.query().gameItemCategory;
-    itemTemplate.application = TARA_API.query().gameItem;
+    itemTemplate.configurationType = TARA_API.query().itemTemplate.type;
+    itemTemplate.configurationCategory = TARA_API.query().itemTemplate.category;
+    itemTemplate.configurationVersion = TARA_API.query().itemTemplate.version;
+    itemTemplate.configurationQuantity = TARA_API.query().itemTemplate.quantity;
+    let selectedItem = TARA_API.query().itemTemplate.itemList[TARA_API.query().gameItemIndex];
+    itemTemplate.application = selectedItem.application;
+    itemTemplate.header = selectedItem.header;
+    itemTemplate.payload = selectedItem.payload;
+    itemTemplate.reference = selectedItem.reference;
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-item"),{mode:'code'},itemTemplate);
-    
+    let cmd = 'onCreateItem';
+    if(itemTemplate.configurationType == 'commodity'){
+        cmd = 'onCreateCommodity';
+    }
+    else if(itemTemplate.configurationType == 'item'){
+        cmd = 'onCreateItem';
+    }
     document.querySelector('#tx-configuration-item-save').onclick=()=>{
-        let _t = document.querySelector('#tx-configuration-item-type').value;
         let _k = document.querySelector('#tx-configuration-item-name').value;
         let item = editor.get();
-        item.header.configurationType = _t;
-        item.header.configurationName = _k;
-        TARA_API.onSet('role/item','onCreateItem',TARA_API.query().gameClusterId,item,(resp)=>{
+        item.configurationName = _k;
+        TARA_API.onSet('role/item',cmd,TARA_API.query().gameClusterId,item,(resp)=>{
             editor.set(resp);   
         });
     };

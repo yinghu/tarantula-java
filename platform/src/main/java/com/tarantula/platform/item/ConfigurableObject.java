@@ -1,0 +1,88 @@
+package com.tarantula.platform.item;
+
+import com.google.gson.JsonObject;
+import com.icodesoftware.Configuration;
+import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.RecoverableObject;
+
+import java.util.Map;
+
+public class ConfigurableObject extends RecoverableObject implements Configuration {
+
+    protected String configurationType;
+    protected String configurationName;
+    protected String configurationCategory;
+    protected String configurationVersion;
+    protected int configurationQuantity;
+
+    protected JsonObject header = new JsonObject();
+    protected JsonObject payload = new JsonObject();
+    protected JsonObject application = new JsonObject();
+    protected JsonObject reference = new JsonObject();
+
+    public String configurationType(){return this.configurationType;}
+    public void configurationType(String configurationType){
+        this.configurationType = configurationType;
+    }
+    public String configurationName(){return configurationName;}
+    public void configurationName(String configurationName){
+        this.configurationName = configurationName;
+    }
+    public String configurationCategory(){return configurationCategory;}
+    public void configurationCategory(String configurationCategory){
+        this.configurationCategory = configurationCategory;
+    }
+    public String configurationVersion(){return configurationVersion;}
+    public void configurationVersion(String configurationVersion){
+        this.configurationVersion = configurationVersion;
+    }
+    public int configurationQuantity(){return configurationQuantity;}
+    public void configurationQuantity(int configurationQuantity){
+        this.configurationQuantity = configurationQuantity;
+    }
+    @Override
+    public Map<String,Object> toMap(){
+        this.properties.put("1",this.configurationType);
+        this.properties.put("2",this.configurationName);
+        this.properties.put("3",this.configurationCategory);
+        this.properties.put("4",this.configurationVersion);
+        this.properties.put("5",this.configurationQuantity);
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        this.configurationType = (String)properties.get("1");
+        this.configurationName = (String)properties.get("2");
+        this.configurationCategory = (String)properties.get("3");
+        this.configurationVersion = (String)properties.get("4");
+        this.configurationQuantity = ((Number)properties.get("5")).intValue();
+    }
+    @Override
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("itemId",distributionKey());
+        jsonObject.addProperty("configurationType",configurationType);
+        jsonObject.addProperty("configurationName",configurationName);
+        jsonObject.addProperty("configurationCategory",configurationCategory);
+        jsonObject.addProperty("configurationVersion",configurationVersion);
+        jsonObject.addProperty("configurationQuantity",configurationQuantity);
+        jsonObject.add("header",header);
+        jsonObject.add("application",application);
+        jsonObject.add("payload",payload);
+        jsonObject.add("reference",reference);
+        return jsonObject;
+    }
+    public boolean configureAndValidate(byte[] data){
+        JsonObject config = JsonUtil.parse(data);
+        this.configurationType = config.get("configurationType").getAsString();
+        this.configurationName = config.get("configurationName").getAsString();
+        this.configurationCategory = config.get("configurationCategory").getAsString();
+        this.configurationVersion = config.get("configurationVersion").getAsString();
+        this.configurationQuantity = config.get("configurationQuantity").getAsInt();
+        if(config.has("header")) this.header = config.getAsJsonObject("header");
+        if(config.has("application")) this.application = config.getAsJsonObject("application");
+        if(config.has("payload")) this.payload = config.getAsJsonObject("payload");
+        if(config.has("reference")) this.reference = config.getAsJsonObject("reference");
+        return true;
+    }
+}

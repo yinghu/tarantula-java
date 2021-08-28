@@ -1,29 +1,38 @@
 {
-  "description": "store item template list",
-  "category": "store",
   "type": "item",
+  "category": "store",
+  "version": "1.0",
+  "quantity": 1,
+  "description": "robot item template list",
   "itemList":
   [
-      {
-        "type": "A10",
-        "name": "MiniGun",
-        "price": 1.0,
-        "unit": "USD",
-        "quantity": 1
+    {
+      "header": {
+        "type": "R5",
+        "name": "Dark Bot"
       },
+      "application":
       {
         "type": "R5",
         "name": "Dark Bot",
-        "price": 2.0,
-        "unit": "USD",
-        "quantity": 1
+        "version": 1
       },
-      {
+      "payload": {},
+      "reference": {}
+    },
+    {
+      "header": {
         "type": "R5",
+        "name": "Dark Bot"
+      },
+      "application":
+      {
+        "type": "R3",
         "name": "Dark Bot",
-        "price": 2.0,
-        "unit": "USD",
-        "quantity": 1
-      }
+        "version": 1
+      },
+      "payload": {},
+      "reference": {}
+    }
   ]
 }

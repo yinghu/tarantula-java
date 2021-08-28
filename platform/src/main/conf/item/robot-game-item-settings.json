@@ -1,18 +1,36 @@
 {
-  "description": "robot item template list",
-  "category": "robot",
   "type": "commodity",
+  "category": "robot",
+  "version": "1.0",
+  "quantity": 1,
+  "description": "robot item template list",
   "itemList":
   [
       {
-        "type": "R5",
-        "name": "Dark Bot",
-        "version": 1
+        "header": {
+          "type": "R5",
+          "name": "Dark Bot"
+        },
+        "application":
+        {
+          "type": "R5",
+          "name": "Dark Bot",
+          "version": 1
+        },
+        "payload": {}
       },
       {
-        "type": "R3",
-        "name": "Dark Bot",
-        "version": 1
+        "header": {
+          "type": "R5",
+          "name": "Dark Bot"
+        },
+        "application":
+        {
+          "type": "R3",
+          "name": "Dark Bot",
+          "version": 1
+        },
+        "payload": {}
       }
   ]
 }

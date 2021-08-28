@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.icodesoftware.*;
@@ -17,9 +16,8 @@ import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.cci.RequestHandler;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.platform.item.Item;
-import com.tarantula.platform.item.ItemSet;
-import com.tarantula.platform.item.JsonItemParser;
+import com.tarantula.platform.item.ConfigurableTemplate;
+import com.tarantula.platform.item.JsonConfigurableTemplateParser;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
@@ -830,7 +828,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public Configuration configuration(GameCluster gameCluster,String config){
         try{
             FileInputStream fileInputStream = new FileInputStream(this.deployDir+"/conf/"+gameCluster.property(GameCluster.NAME)+"/"+config+".json");
-            ItemSet item = JsonItemParser.itemSet(fileInputStream);
+            ConfigurableTemplate item = JsonConfigurableTemplateParser.itemSet(fileInputStream);
             fileInputStream.close();
             return item;
         }catch (Exception ex){
