@@ -75,9 +75,11 @@
     TARA_API.onGet('role/item',"onCategory",TARA_API.query().gameClusterId,(resp)=>{
         console.log(resp);
         resp.onList.forEach((a,i) => {
-            document.querySelector('#tx-item-category-'+i).innerHTML = a;
-            document.querySelector('#tx-item-category-'+i).setAttribute('tx-category',a);
-            document.querySelector('#tx-item-category-'+i).style.display = 'block';
+            if(a !== itemTemplate.configurationCategory){
+                document.querySelector('#tx-item-category-'+i).innerHTML = a;
+                document.querySelector('#tx-item-category-'+i).setAttribute('tx-category',a);
+                document.querySelector('#tx-item-category-'+i).style.display = 'block';
+            }
         });   
     });
     document.querySelectorAll('.tx-game-item-category').forEach(a=>{
