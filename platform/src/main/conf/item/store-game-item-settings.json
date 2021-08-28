@@ -1,6 +1,7 @@
 {
   "description": "store item template list",
   "category": "store",
+  "type": "item",
   "itemList":
   [
       {

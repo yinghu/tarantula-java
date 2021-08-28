@@ -1,6 +1,7 @@
 {
   "description": "game item category list",
   "category": "category",
+  "type": "header",
   "itemList":
   [
     {

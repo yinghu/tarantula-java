@@ -1,6 +1,7 @@
 {
   "description": "robot item template list",
   "category": "robot",
+  "type": "commodity",
   "itemList":
   [
       {
