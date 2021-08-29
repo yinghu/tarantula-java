@@ -7,7 +7,6 @@ import com.icodesoftware.*;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.item.Item;
 
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameStoreModule implements Module,Configurable.Listener<Item>{
@@ -18,6 +17,10 @@ public class GameStoreModule implements Module,Configurable.Listener<Item>{
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
             session.write(toJson().toString().getBytes());
+        }
+        if(session.action().equals("onBuy")){
+            Item item = itemList.get(session.name());
+            session.write(item.toJson().toString().getBytes());
         }
         return false;
     }
@@ -31,7 +34,7 @@ public class GameStoreModule implements Module,Configurable.Listener<Item>{
         this.context.log("game store module started", OnLog.WARN);
     }
     public void onCreated(Item item){
-        itemList.put(UUID.randomUUID().toString(),item);
+        itemList.put(item.distributionKey(),item);
         this.context.log(item.toJson().toString(),OnLog.WARN);
     }
     private JsonObject toJson(){
