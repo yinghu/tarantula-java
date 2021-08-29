@@ -30,6 +30,30 @@
             <span id='tx-item-category-10' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-category' style="display: none;"></span>          
         </div>            
     </div>
+    <div id='tx-game-item-reference-list-0' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-item-reference-list-type-0' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-game-item-reference-list-name-0' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
+            <span id="tx-game-item-reference-list-api-0" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-item-reference-list-add">Add Reference</span>
+        </div>    
+    </div>
+    <div id='tx-game-item-reference-list-1' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-item-reference-list-type-1' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-game-item-reference-list-name-1' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
+            <span id="tx-game-item-reference-list-api-1" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-item-reference-list-add">Add Reference</span>
+        </div>    
+    </div>
+    <div id='tx-game-item-reference-list-2' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-item-reference-list-type-2' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-game-item-reference-list-name-2' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
+            <span id="tx-game-item-reference-list-api-2" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-item-reference-list-add">Add Reference</span>
+        </div>    
+    </div>
     <div class="w3-panel">   
         <label class="tx-text-12 tx-margin-left-4">Configuration Name:</label>
         <input id='tx-configuration-item-name' class="w3-input w3-round w3-border tx-text-12" type="text">        
@@ -84,23 +108,36 @@
     });
     document.querySelectorAll('.tx-game-item-category').forEach(a=>{
         a.onclick=()=>{
-            //hide_game_item_list();
+            hide_game_item_reference_list();
             let category = a.getAttribute('tx-category');
             let query = TARA_API.query().gameClusterId+'#'+category;
             TARA_API.onGet('role/item','onStock',query,(resp)=>{
                 console.log(resp);
                 //document.querySelector('#tx-game-item-list-description-0').innerHTML = resp.description;
                 //document.querySelector('#tx-game-item-list-category-0').innerHTML = resp.category; 
-                //resp.itemList.forEach((gi,i)=>{
-                    //document.querySelector('#tx-game-item-list-type-'+i).innerHTML = gi.header.type;
-                    ///document.querySelector('#tx-game-item-list-name-'+i).innerHTML = gi.header.name;
-                    //document.querySelector('#tx-game-item-list-'+i).style.display = 'block';    
-                //});
+                resp.itemList.forEach((gi,i)=>{
+                    document.querySelector('#tx-game-item-reference-list-type-'+i).innerHTML = gi.header.type;
+                    document.querySelector('#tx-game-item-reference-list-name-'+i).innerHTML = gi.header.name;
+                    document.querySelector('#tx-game-item-reference-list-api-'+i).setAttribute('tx-reference-id',gi.itemId);
+                    document.querySelector('#tx-game-item-reference-list-'+i).style.display = 'block';    
+                });
                 //TARA_API.query().itemTemplate = resp;
             });
         };
     });
+    document.querySelectorAll('.tx-game-item-reference-list-add').forEach(a=>{
+        a.onclick=()=>{
+            let itemId = a.getAttribute('tx-reference-id');
+            let item = editor.get();
+            item.reference.push(itemId);
+            editor.set(item);
+            ///TARA_API.query().gameItemIndex= ix;
+            //TARA_API.query().popup='#tx-popup-api'; 
+            //tx_view({viewId:'create.item',containerId:'#tx-popup-api'});
+        };
+    });
     document.querySelector('#tx-configuration-item-save').onclick=()=>{
+        document.querySelector('#tx-configuration-item-save').style.display = 'none';
         let _k = document.querySelector('#tx-configuration-item-name').value;
         let item = editor.get();
         item.configurationName = _k;
@@ -123,4 +160,9 @@
     document.querySelector('#tx-item-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
+    function hide_game_item_reference_list(){
+        for (let i = 0; i <3; i++) {
+            document.querySelector('#tx-game-item-reference-list-'+i).style.display = 'none';
+        }            
+    }
 </script>

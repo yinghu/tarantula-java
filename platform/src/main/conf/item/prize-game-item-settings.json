@@ -16,7 +16,8 @@
           "rank": 1,
           "prize": 100000
         },
-        "payload": {}
+        "payload": {},
+        "reference": []
       },
       {
         "header": {
@@ -28,7 +29,8 @@
           "rank": 2,
           "prize": 70000
         },
-        "payload": {}
+        "payload": {},
+        "reference": []
       },
       {
         "header": {
@@ -40,7 +42,8 @@
           "rank": 3,
           "prize": 50000
         },
-        "payload": {}
+        "payload": {},
+        "reference": []
       }
   ]
 }

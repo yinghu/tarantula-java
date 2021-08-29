@@ -23,7 +23,7 @@ public class Item extends ConfigurableObject{
         this.header = JsonUtil.parse((String)properties.get("6"));
         this.application = JsonUtil.parse((String)properties.get("7"));
         this.payload = JsonUtil.parse((String)properties.get("8"));
-        this.reference = JsonUtil.parse((String)properties.get("9"));
+        this.reference = JsonUtil.parseAsArray((String)properties.get("9"));
     }
     public int getFactoryId() {
         return ItemPortableRegistry.OID;

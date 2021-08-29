@@ -8,29 +8,27 @@
   [
       {
         "header": {
-          "type": "R5",
-          "name": "Dark Bot"
+          "type": "A5",
+          "name": "MiniGun"
         },
         "application":
         {
-          "type": "R5",
-          "name": "Dark Bot",
           "version": 1
         },
-        "payload": {}
+        "payload": {},
+        "reference": []
       },
       {
         "header": {
-          "type": "R5",
-          "name": "Dark Bot"
+          "type": "A9",
+          "name": "FastMissile"
         },
         "application":
         {
-          "type": "R3",
-          "name": "Dark Bot",
           "version": 1
         },
-        "payload": {}
+        "payload": {},
+        "reference": []
       }
   ]
 }

@@ -19,7 +19,9 @@
           "durationHours": 24,
           "maxEntriesPerInstance": 10,
           "durationMinutesPerInstance": 10
-        }
+        },
+        "payload": {},
+        "reference": []
       },
       {
         "header": {
@@ -33,7 +35,9 @@
           "schedule": "daily",
           "maxEntriesPerInstance": 100,
           "durationMinutesPerInstance": 30
-        }
+        },
+        "payload": {},
+        "reference": []
       }
   ]
 }

@@ -8,31 +8,27 @@
   [
     {
       "header": {
-        "type": "R5",
-        "name": "Dark Bot"
+        "type": "SP1",
+        "name": "Bot Pack"
       },
       "application":
       {
-        "type": "R5",
-        "name": "Dark Bot",
         "version": 1
       },
       "payload": {},
-      "reference": {}
+      "reference": []
     },
     {
       "header": {
-        "type": "R5",
-        "name": "Dark Bot"
+        "type": "SP2",
+        "name": "Abilities Pack"
       },
       "application":
       {
-        "type": "R3",
-        "name": "Dark Bot",
         "version": 1
       },
       "payload": {},
-      "reference": {}
+      "reference": []
     }
   ]
 }

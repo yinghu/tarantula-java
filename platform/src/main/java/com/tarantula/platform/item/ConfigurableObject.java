@@ -1,5 +1,6 @@
 package com.tarantula.platform.item;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.util.JsonUtil;
@@ -18,7 +19,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     protected JsonObject header = new JsonObject();
     protected JsonObject payload = new JsonObject();
     protected JsonObject application = new JsonObject();
-    protected JsonObject reference = new JsonObject();
+    protected JsonArray reference = new JsonArray();
 
     public String configurationType(){return this.configurationType;}
     public void configurationType(String configurationType){
@@ -82,7 +83,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         if(config.has("header")) this.header = config.getAsJsonObject("header");
         if(config.has("application")) this.application = config.getAsJsonObject("application");
         if(config.has("payload")) this.payload = config.getAsJsonObject("payload");
-        if(config.has("reference")) this.reference = config.getAsJsonObject("reference");
+        if(config.has("reference")) this.reference = config.getAsJsonArray("reference");
         return true;
     }
 }

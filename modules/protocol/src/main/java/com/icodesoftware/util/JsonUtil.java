@@ -1,9 +1,6 @@
 package com.icodesoftware.util;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -90,6 +87,10 @@ public class JsonUtil {
     public static JsonObject parse(String json){
         JsonParser jp = new JsonParser();
         return jp.parse(json).getAsJsonObject();
+    }
+    public static JsonArray parseAsArray(String json){
+        JsonParser jp = new JsonParser();
+        return jp.parse(json).getAsJsonArray();
     }
     public static JsonObject parse(byte[] json){
         JsonParser jp = new JsonParser();
