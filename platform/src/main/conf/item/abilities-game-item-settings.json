@@ -9,24 +9,20 @@
       {
         "header": {
           "type": "A5",
-          "name": "MiniGun"
-        },
-        "application":
-        {
+          "name": "MiniGun",
           "version": 1
         },
+        "application": {},
         "payload": {},
         "reference": []
       },
       {
         "header": {
           "type": "A9",
-          "name": "FastMissile"
-        },
-        "application":
-        {
+          "name": "FastMissile",
           "version": 1
         },
+        "application": {},
         "payload": {},
         "reference": []
       }

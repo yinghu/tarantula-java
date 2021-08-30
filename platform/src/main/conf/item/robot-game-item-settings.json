@@ -9,24 +9,20 @@
       {
         "header": {
           "type": "R5",
-          "name": "Dark Bot"
-        },
-        "application":
-        {
+          "name": "Dark Bot",
           "version": 1
         },
+        "application": {},
         "payload": {},
         "reference": []
       },
       {
         "header": {
           "type": "R1",
-          "name": "Boss Bot"
-        },
-        "application":
-        {
+          "name": "Boss Bot",
           "version": 1
         },
+        "application": {},
         "payload": {},
         "reference": []
       }

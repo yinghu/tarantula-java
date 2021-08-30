@@ -33,12 +33,13 @@ public class TournamentAdminModule implements Module {
         else if(session.action().equals("onRegister")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            Item app = new Item();
+            ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            TournamentScheduleParser app = new TournamentScheduleParser();
             app.distributionKey(query[1]);
             Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
-            boolean loaded = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app);
+            boolean loaded = applicationPreSetup.load(context,desc,app);
             if(loaded&&(boolean)gameCluster.property(GameCluster.TOURNAMENT_ENABLED)){
-                Tournament.Schedule schedule = TournamentScheduleParser.parse(payload);
+                Tournament.Schedule schedule = app.parse();
                 String serviceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
                 GameServiceProvider tsp = this.context.serviceProvider(serviceName);
                 Tournament tournament = tsp.tournamentServiceProvider().register(schedule);

@@ -17,19 +17,19 @@ import java.util.Set;
 public class GameItemAdminModule implements Module {
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
-    //private static String TEMPLATE_PREFIX = "item/";
-    private static String TEMPLATE_SUFFIX = "-game-item-settings";
+    private static String GAME_ITEM_CATEGORY_TEMPLATE = "game-item-category-settings";
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onTemplateCategory")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,"game-item-category-settings");
+            ConfigurableTemplate configuration = this.deploymentServiceProvider.configuration(gameCluster,GAME_ITEM_CATEGORY_TEMPLATE);
             session.write(configuration.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTemplateList")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            String conf = query[1]+TEMPLATE_SUFFIX;
+            ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GAME_ITEM_CATEGORY_TEMPLATE);
+            String conf = template.settings.get(query[1]).settingName;
             Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,conf);
             session.write(configuration.toJson().toString().getBytes());
         }

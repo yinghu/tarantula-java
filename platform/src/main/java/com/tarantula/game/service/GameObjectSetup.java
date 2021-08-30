@@ -49,6 +49,7 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
 
     public <T extends Configurable> boolean load(ApplicationContext context,Descriptor application,T t){
         DataStore dataStore = context.dataStore(serviceDataStore(application));
+        t.dataStore(dataStore);
         return dataStore.load(t);
     }
     public <T extends Configurable> List<T> list(ApplicationContext context, Descriptor application, RecoverableFactory<T> recoverableFactory){

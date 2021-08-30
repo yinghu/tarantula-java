@@ -103,7 +103,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     private final ConcurrentHashMap<String,ServiceProvider> dataStoreProviders = new ConcurrentHashMap();
     private final ConcurrentHashMap<String,List<Configuration>> configurations = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
-
+    private final ConcurrentHashMap<String,ConfigurableTemplate> cMap = new ConcurrentHashMap<>();
 
     public String dataBucketGroup;
     public String dataBucketNode;
@@ -826,14 +826,16 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
 
     public Configuration configuration(GameCluster gameCluster,String config){
-        try{
-            FileInputStream fileInputStream = new FileInputStream(this.deployDir+"/conf/"+gameCluster.property(GameCluster.NAME)+"/"+config+".json");
-            ConfigurableTemplate item = JsonConfigurableTemplateParser.itemSet(fileInputStream);
-            fileInputStream.close();
-            return item;
-        }catch (Exception ex){
-            log.error("error on load config->"+config,ex);
-            return  null;
-        }
+        return cMap.computeIfAbsent(config,(k)->{
+            try{
+                FileInputStream fileInputStream = new FileInputStream(this.deployDir+"/conf/"+gameCluster.property(GameCluster.NAME)+"/"+config+".json");
+                ConfigurableTemplate item = JsonConfigurableTemplateParser.itemSet(fileInputStream);
+                fileInputStream.close();
+                return item;
+            }catch (Exception exx){
+                log.warn("configuration not existed->"+config);
+                return null;
+            }
+        });
     }
 }

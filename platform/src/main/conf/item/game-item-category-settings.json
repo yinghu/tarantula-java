@@ -7,43 +7,38 @@
   "itemList":
   [
     {
-      "header": {"type": "tournament","name": "tournament config","enabled": true},
+      "header": {"type": "tournament","name": "tournament","enabled": true,"version": 1.0},
       "application":
       {
-        "name": "tournament-game-item-setting.json",
-        "version": 1.0
+        "name": "tournament-game-item-settings"
       }
     },
     {
-      "header": {"type": "store","name": "store config","enabled": true},
+      "header": {"type": "store","name": "store","enabled": true,"version": 1.0},
       "application":
       {
-        "name": "store-game-item-setting.json",
-        "version": 1.0
+        "name": "store-game-item-settings"
       }
     },
     {
-      "header": {"type": "prize","name": "prize config","enabled": true},
+      "header": {"type": "prize","name": "prize","enabled": true,"version": 1.0},
       "application":
       {
-        "name": "prize-game-item-setting.json",
-        "version": 1.0
+        "name": "prize-game-item-settings"
       }
     },
     {
-      "header": {"type": "robot","name": "robot config","enabled": true},
+      "header": {"type": "robot","name": "robot","enabled": true,"version": 1.0},
       "application":
       {
-        "name": "robot-game-item-setting.json",
-        "version": 1.0
+        "name": "robot-game-item-settings"
       }
     },
     {
-      "header": {"type": "abilities","name": "abilities config","enabled": true},
+      "header": {"type": "abilities","name": "abilities","enabled": true,"version": 1.0},
       "application":
       {
-        "name": "abilities-game-item-setting.json",
-        "version": 1.0
+        "name": "abilities-game-item-settings"
       }
     }
   ]

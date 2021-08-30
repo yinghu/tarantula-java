@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.item.Item;
 
@@ -20,7 +21,12 @@ public class GameStoreModule implements Module,Configurable.Listener<Item>{
         }
         if(session.action().equals("onBuy")){
             Item item = itemList.get(session.name());
-            session.write(item.toJson().toString().getBytes());
+            if(item!=null){
+                session.write(JsonUtil.toSimpleResponse(true,"pending inventory").getBytes());
+                this.gameServiceProvider.inventoryServiceProvider().redeem(session.systemId(),item);
+            }else{
+                session.write(JsonUtil.toSimpleResponse(false,"item not existed->"+session.name()).getBytes());
+            }
         }
         return false;
     }

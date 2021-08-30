@@ -20,9 +20,17 @@ public class JsonConfigurableTemplateParser {
             JsonArray items = temp.get("itemList").getAsJsonArray();
             JsonArray exposed = new JsonArray();
             items.forEach((item)->{
-                JsonObject header = item.getAsJsonObject().getAsJsonObject("header");
+                JsonObject template = item.getAsJsonObject();
+                JsonObject header = template.getAsJsonObject("header");
                 if(!header.has("enabled")||header.get("enabled").getAsBoolean()){
                     exposed.add(item);
+                    if(itemSet.type.equals("category")){
+                        ConfigurableSetting setting = new ConfigurableSetting();
+                        setting.type = header.get("type").getAsString();
+                        setting.category = header.get("name").getAsString();
+                        setting.settingName = template.getAsJsonObject("application").get("name").getAsString();
+                        itemSet.settings.put(setting.type,setting);
+                    }
                 }
             });
             itemSet.property("itemList",exposed);

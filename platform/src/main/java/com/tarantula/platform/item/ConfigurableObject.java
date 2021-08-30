@@ -48,6 +48,10 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.properties.put("3",this.configurationCategory);
         this.properties.put("4",this.configurationVersion);
         this.properties.put("5",this.configurationQuantity);
+        this.properties.put("6",this.header.toString());
+        this.properties.put("7",this.application.toString());
+        this.properties.put("8",this.payload.toString());
+        this.properties.put("9",this.reference.toString());
         return this.properties;
     }
     @Override
@@ -57,6 +61,10 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.configurationCategory = (String)properties.get("3");
         this.configurationVersion = (String)properties.get("4");
         this.configurationQuantity = ((Number)properties.get("5")).intValue();
+        this.header = JsonUtil.parse((String)properties.get("6"));
+        this.application = JsonUtil.parse((String)properties.get("7"));
+        this.payload = JsonUtil.parse((String)properties.get("8"));
+        this.reference = JsonUtil.parseAsArray((String)properties.get("9"));
     }
     @Override
     public JsonObject toJson(){

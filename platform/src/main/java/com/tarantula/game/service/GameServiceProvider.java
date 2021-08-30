@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.item.Item;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.tournament.*;
@@ -21,6 +22,7 @@ public class GameServiceProvider implements ServiceProvider{
     private DistributionRoomService distributionRoomService;
     private PlayerDataProvider playerDataProvider;
     private LeaderBoardProvider leaderBoardProvider;
+    private InventoryServiceProvider inventoryServiceProvider;
     private ItemConfigurationServiceProvider configurationServiceProvider;
     private DistributedTournamentServiceProvider tournamentServiceProvider;
     private Configuration configuration;
@@ -52,6 +54,9 @@ public class GameServiceProvider implements ServiceProvider{
         this.serviceContext = serviceContext;
         this.distributionRoomService = serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionRoomService.NAME);
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.inventoryServiceProvider = new InventoryServiceProvider(gameCluster);
+        this.inventoryServiceProvider.setup(serviceContext);
+        this.inventoryServiceProvider.waitForData();
         this.playerDataProvider = new PlayerDataProvider(NAME);
         this.playerDataProvider.setup(serviceContext);
         this.playerDataProvider.waitForData();
@@ -77,6 +82,7 @@ public class GameServiceProvider implements ServiceProvider{
     }
     @Override
     public void start() throws Exception {
+        this.inventoryServiceProvider.start();
         this.playerDataProvider.start();
         this.leaderBoardProvider.start();
         this.tournamentServiceProvider.start();
@@ -121,6 +127,10 @@ public class GameServiceProvider implements ServiceProvider{
     }
     public Statistics statistics(String systemId){
         return playerDataProvider.statistics(systemId,leaderBoardProvider);
+    }
+
+    public InventoryServiceProvider inventoryServiceProvider(){
+        return this.inventoryServiceProvider;
     }
 
     //leader service provider hook calls

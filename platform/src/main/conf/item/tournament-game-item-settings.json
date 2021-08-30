@@ -13,8 +13,6 @@
         },
         "application":
         {
-          "type": "T10",
-          "name": "fast 10 player",
           "schedule": "onDemand",
           "durationHours": 24,
           "maxEntriesPerInstance": 10,
@@ -30,8 +28,6 @@
         },
         "application":
         {
-          "type": "T100",
-          "name": "Daily 100 player",
           "schedule": "daily",
           "maxEntriesPerInstance": 100,
           "durationMinutesPerInstance": 30
