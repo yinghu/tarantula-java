@@ -130,6 +130,7 @@
 </div>
 <script>
     TARA_API.onGet('role/item','onTemplateCategory',TARA_API.query().gameClusterId,(resp)=>{
+        console.log(resp);
         resp.itemList.forEach((a,i)=>{
             document.querySelector('#tx-item-template-'+i).style.display = 'block';
             document.querySelector('#tx-item-template-'+i).innerHTML = a.header.type;

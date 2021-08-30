@@ -8,6 +8,7 @@ import java.util.Map;
 
 public interface Configurable extends Recoverable, DataStore.Updatable {
 
+    String ASSET_CONFIG_TYPE = "asset";
     String COMMODITY_CONFIG_TYPE = "commodity";
     String ITEM_CONFIG_TYPE = "item";
 
