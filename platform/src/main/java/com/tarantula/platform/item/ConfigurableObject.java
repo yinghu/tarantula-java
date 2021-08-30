@@ -11,6 +11,7 @@ import java.util.Map;
 public class ConfigurableObject extends RecoverableObject implements Configuration {
 
     protected String configurationType;
+    protected String configurationTypeId;
     protected String configurationName;
     protected String configurationCategory;
     protected String configurationVersion;
@@ -25,6 +26,12 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     public void configurationType(String configurationType){
         this.configurationType = configurationType;
     }
+
+    public String configurationTypeId(){return this.configurationTypeId;}
+    public void configurationTypeId(String configurationTypeId){
+        this.configurationTypeId = configurationTypeId;
+    }
+
     public String configurationName(){return configurationName;}
     public void configurationName(String configurationName){
         this.configurationName = configurationName;
@@ -44,33 +51,36 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",this.configurationType);
-        this.properties.put("2",this.configurationName);
-        this.properties.put("3",this.configurationCategory);
-        this.properties.put("4",this.configurationVersion);
-        this.properties.put("5",this.configurationQuantity);
-        this.properties.put("6",this.header.toString());
-        this.properties.put("7",this.application.toString());
-        this.properties.put("8",this.payload.toString());
-        this.properties.put("9",this.reference.toString());
+        this.properties.put("2",this.configurationTypeId);
+        this.properties.put("3",this.configurationName);
+        this.properties.put("4",this.configurationCategory);
+        this.properties.put("5",this.configurationVersion);
+        this.properties.put("6",this.configurationQuantity);
+        this.properties.put("7",this.header.toString());
+        this.properties.put("8",this.application.toString());
+        this.properties.put("9",this.payload.toString());
+        this.properties.put("10",this.reference.toString());
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.configurationType = (String)properties.get("1");
-        this.configurationName = (String)properties.get("2");
-        this.configurationCategory = (String)properties.get("3");
-        this.configurationVersion = (String)properties.get("4");
-        this.configurationQuantity = ((Number)properties.get("5")).intValue();
-        this.header = JsonUtil.parse((String)properties.get("6"));
-        this.application = JsonUtil.parse((String)properties.get("7"));
-        this.payload = JsonUtil.parse((String)properties.get("8"));
-        this.reference = JsonUtil.parseAsArray((String)properties.get("9"));
+        this.configurationTypeId = (String)properties.get("2");
+        this.configurationName = (String)properties.get("3");
+        this.configurationCategory = (String)properties.get("4");
+        this.configurationVersion = (String)properties.get("5");
+        this.configurationQuantity = ((Number)properties.get("6")).intValue();
+        this.header = JsonUtil.parse((String)properties.get("7"));
+        this.application = JsonUtil.parse((String)properties.get("8"));
+        this.payload = JsonUtil.parse((String)properties.get("9"));
+        this.reference = JsonUtil.parseAsArray((String)properties.get("10"));
     }
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("itemId",distributionKey());
         jsonObject.addProperty("configurationType",configurationType);
+        jsonObject.addProperty("configurationTypeId",configurationTypeId);
         jsonObject.addProperty("configurationName",configurationName);
         jsonObject.addProperty("configurationCategory",configurationCategory);
         jsonObject.addProperty("configurationVersion",configurationVersion);
@@ -84,6 +94,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     public boolean configureAndValidate(byte[] data){
         JsonObject config = JsonUtil.parse(data);
         this.configurationType = config.get("configurationType").getAsString();
+        this.configurationTypeId = config.get("configurationTypeId").getAsString();
         this.configurationName = config.get("configurationName").getAsString();
         this.configurationCategory = config.get("configurationCategory").getAsString();
         this.configurationVersion = config.get("configurationVersion").getAsString();

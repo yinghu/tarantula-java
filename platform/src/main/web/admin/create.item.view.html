@@ -119,6 +119,8 @@
         </div>    
     </div>
     <div class="w3-panel">   
+        <label class="tx-text-12 tx-margin-left-4">Configuration TypeId:</label>
+        <input id='tx-configuration-item-type-id' class="w3-input w3-round w3-border tx-text-12" type="text">  
         <label class="tx-text-12 tx-margin-left-4">Configuration Name:</label>
         <input id='tx-configuration-item-name' class="w3-input w3-round w3-border tx-text-12" type="text">        
     </div>
@@ -199,8 +201,10 @@
     });
     document.querySelector('#tx-configuration-item-save').onclick=()=>{
         document.querySelector('#tx-configuration-item-save').style.display = 'none';
+        let _tid = document.querySelector('#tx-configuration-item-type-id').value;
         let _k = document.querySelector('#tx-configuration-item-name').value;
         let item = editor.get();
+        item.configurationTypeId = _tid;
         item.configurationName = _k;
         TARA_API.onSet('role/item',cmd,TARA_API.query().gameClusterId,item,(resp)=>{
             editor.set(resp);   

@@ -37,7 +37,7 @@ public class GameItemAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Item app = new Item();
             if(app.configureAndValidate(payload)){
-                Descriptor desc = gameCluster.serviceWithCategory("system");
+                Descriptor desc = gameCluster.serviceWithCategory("item");
                 SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);
                 session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
             }
@@ -59,7 +59,7 @@ public class GameItemAdminModule implements Module {
         }
         else if(session.action().equals("onCategory")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            Descriptor app = gameCluster.serviceWithCategory("system");
+            Descriptor app = gameCluster.serviceWithCategory("item");
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Set<String> refs = preSetup.list(this.context,app);
             session.write(toJson(refs).toString().getBytes());
@@ -67,7 +67,7 @@ public class GameItemAdminModule implements Module {
         else if(session.action().equals("onStock")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            Descriptor app = gameCluster.serviceWithCategory("system");
+            Descriptor app = gameCluster.serviceWithCategory("item");
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             List<Item> items = preSetup.list(this.context,app,new ItemQuery(query[1]));
             session.write(new ItemContext(true,"",items).toJson().toString().getBytes());

@@ -27,6 +27,13 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
     }
+
+    public List<Item> gameConfig(Descriptor descriptor,String category){
+        return applicationPreSetup.list(serviceContext,descriptor,new ItemQuery(category));
+    }
+    //public Item gameConfiga(Descriptor descriptor,String category){
+        //return null;//applicationPreSetup.list(serviceContext,descriptor,new ItemQuery(category));
+    //}
     @Override
     public <T extends Configurable> void register(T config) {
         distributionItemService.register(name,(Item)config);

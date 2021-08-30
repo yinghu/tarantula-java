@@ -6,8 +6,9 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.item.Item;
+import com.tarantula.platform.item.ItemContext;
 
-import java.util.UUID;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameItemModule implements Module,Configurable.Listener<Item>{
@@ -17,7 +18,11 @@ public class GameItemModule implements Module,Configurable.Listener<Item>{
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
-            session.write(toJson().toString().getBytes());
+            List<Item> _item = this.gameServiceProvider.configurationServiceProvider().gameConfig(this.context.descriptor(),session.name());
+            session.write(new ItemContext(true,"",_item).toString().getBytes());
+        }
+        else if(session.action().equals("onLoad")){
+
         }
         return false;
     }
@@ -31,7 +36,7 @@ public class GameItemModule implements Module,Configurable.Listener<Item>{
         this.context.log("game configuration module started", OnLog.WARN);
     }
     public void onCreated(Item item){
-        itemList.put(UUID.randomUUID().toString(),item);
+        itemList.put(item.distributionKey(),item);
         this.context.log(item.toJson().toString(),OnLog.WARN);
     }
     private JsonObject toJson(){

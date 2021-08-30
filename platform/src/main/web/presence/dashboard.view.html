@@ -561,6 +561,7 @@
                 else if(a.descriptor.typeId == resp.name+'-service'){
                     let ix = 0;
                     a.applications.forEach((b)=>{
+                        console.log(b);
                         if(b.category !== 'system'){
                             let serviceBar = document.querySelector('#live-game-service-'+ix); 
                             serviceBar.style.display = 'block';

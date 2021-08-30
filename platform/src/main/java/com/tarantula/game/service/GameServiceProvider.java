@@ -139,7 +139,7 @@ public class GameServiceProvider implements ServiceProvider{
     }
 
     //configuration service provider hood calls
-    public ConfigurationServiceProvider configurationServiceProvider(){
+    public ItemConfigurationServiceProvider configurationServiceProvider(){
         return this.configurationServiceProvider;
     }
     public boolean onRegister(Configurable configurable){

@@ -18,10 +18,13 @@ public interface Configurable extends Recoverable, DataStore.Updatable {
     default void released(){}
     default void updated(ServiceContext serviceContext){}
 
-    default String configurationType(){return null;}
-    default void configurationType(String configurationType){}
+    default String configurationTypeId(){return null;}
+    default void configurationTypeId(String configurationTypeId){}
     default String configurationName(){return null;}
     default void configurationName(String configurationName){}
+
+    default String configurationType(){return null;}
+    default void configurationType(String configurationType){}
     default String configurationCategory(){return null;}
     default void configurationCategory(String configurationCategory){}
     default String configurationVersion(){return null;}
