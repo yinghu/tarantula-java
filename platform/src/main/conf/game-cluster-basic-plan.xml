@@ -64,7 +64,7 @@
             </application>
             <application><!-- Configuration module-->
                 <type-id>game-service</type-id>
-                <name>Configuration</name>
+                <name>Item</name>
                 <type>application</type>
                 <category>item</category>
                 <tag>game/cfg</tag>

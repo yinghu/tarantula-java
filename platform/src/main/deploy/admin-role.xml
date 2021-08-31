@@ -114,6 +114,12 @@
             <view type="create.access.key">
                 <property name="moduleResourceFile">admin/create.access.key.view.html</property>
             </view>
+            <view type="game.asset.list">
+                <property name="moduleResourceFile">admin/game.asset.list.view.html</property>
+            </view>
+            <view type="game.commodity.list">
+                <property name="moduleResourceFile">admin/game.commodity.list.view.html</property>
+            </view>
             <view type="game.item.list">
                 <property name="moduleResourceFile">admin/game.item.list.view.html</property>
             </view>

@@ -129,7 +129,7 @@
     </div>
 </div>
 <script>
-    TARA_API.onGet('role/item','onTemplateCategory',TARA_API.query().gameClusterId,(resp)=>{
+    TARA_API.onGet('role/item','onTemplateItemCategory',TARA_API.query().gameClusterId,(resp)=>{
         console.log(resp);
         resp.itemList.forEach((a,i)=>{
             document.querySelector('#tx-item-template-'+i).style.display = 'block';
@@ -142,7 +142,7 @@
             hide_game_item_list();
             let category = a.getAttribute('tx-category');
             let query = TARA_API.query().gameClusterId+'#'+category;
-            TARA_API.onGet('role/item','onTemplateList',query,(resp)=>{
+            TARA_API.onGet('role/item','onTemplateItemList',query,(resp)=>{
                 console.log(resp);
                 document.querySelector('#tx-game-item-list-description-0').innerHTML = resp.description;
                 document.querySelector('#tx-game-item-list-category-0').innerHTML = resp.category; 

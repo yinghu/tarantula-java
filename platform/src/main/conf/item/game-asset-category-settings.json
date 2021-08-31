@@ -1,0 +1,17 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "quantity": 1,
+  "description": "category asset template list",
+  "itemList":
+  [
+    {
+      "header": {"type": "icon","name": "icon","enabled": true,"version": 1.0},
+      "application":
+      {
+        "name": "icon-game-item-settings"
+      }
+    }
+  ]
+}
