@@ -159,8 +159,8 @@
         a.onclick=()=>{
             let ix = a.getAttribute('tx-index')/1;
             TARA_API.query().gameItemIndex= ix;
-            TARA_API.query().popup='#tx-popup-api'; 
-            tx_view({viewId:'create.item',containerId:'#tx-popup-api'});
+            TARA_API.query().popup='#tx-popup-api';
+            tx_view({viewId:'create.asset',containerId:'#tx-popup-api'});
         };
     });
     document.querySelector('#tx-game-asset-list-close').onclick=()=>{

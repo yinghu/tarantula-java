@@ -160,6 +160,7 @@
             let ix = a.getAttribute('tx-index')/1;
             TARA_API.query().gameItemIndex= ix;
             TARA_API.query().popup='#tx-popup-api'; 
+            TARA_API.query().configurationType='item';
             tx_view({viewId:'create.item',containerId:'#tx-popup-api'});
         };
     });

@@ -123,6 +123,12 @@
             <view type="game.item.list">
                 <property name="moduleResourceFile">admin/game.item.list.view.html</property>
             </view>
+            <view type="create.asset">
+                <property name="moduleResourceFile">admin/create.asset.view.html</property>
+            </view>
+            <view type="create.commodity">
+                <property name="moduleResourceFile">admin/create.commodity.view.html</property>
+            </view>
             <view type="create.item">
                 <property name="moduleResourceFile">admin/create.item.view.html</property>
             </view>

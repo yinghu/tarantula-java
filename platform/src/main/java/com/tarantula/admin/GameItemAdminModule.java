@@ -61,6 +61,18 @@ public class GameItemAdminModule implements Module {
             Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,conf);
             session.write(configuration.toJson().toString().getBytes());
         }
+        else if (session.action().equals("onCreateAsset")){
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            Item app = new Item();
+            if(app.configureAndValidate(payload)){
+                Descriptor desc = gameCluster.serviceWithCategory("item");
+                SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);
+                session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"failed to save commodity").getBytes());
+            }
+        }
         else if (session.action().equals("onCreateCommodity")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Item app = new Item();
