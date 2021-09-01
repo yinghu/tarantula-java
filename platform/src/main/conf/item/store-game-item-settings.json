@@ -2,14 +2,12 @@
   "type": "item",
   "category": "store",
   "version": "1.0",
-  "quantity": 1,
   "description": "robot item template list",
   "itemList":
   [
     {
       "header": {
-        "name": "Bot Pack",
-        "version": 1
+        "name": "Bot Pack"
       },
       "application": {},
       "payload": {},
@@ -17,8 +15,7 @@
     },
     {
       "header": {
-        "name": "Abilities Pack",
-        "version": 1
+        "name": "Abilities Pack"
       },
       "application": {},
       "payload": {},

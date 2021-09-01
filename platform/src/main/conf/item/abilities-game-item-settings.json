@@ -2,14 +2,12 @@
   "type": "commodity",
   "category": "abilities",
   "version": "1.0",
-  "quantity": 1,
   "description": "abilities item template list",
   "itemList":
   [
       {
         "header": {
-          "name": "MiniGun",
-          "version": 1
+          "name": "MiniGun"
         },
         "application": {},
         "payload": {},
@@ -17,8 +15,7 @@
       },
       {
         "header": {
-          "name": "FastMissile",
-          "version": 1
+          "name": "FastMissile"
         },
         "application": {},
         "payload": {},

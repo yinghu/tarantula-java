@@ -15,7 +15,6 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     protected String configurationName;
     protected String configurationCategory;
     protected String configurationVersion;
-    protected int configurationQuantity;
 
     protected JsonObject header = new JsonObject();
     protected JsonObject payload = new JsonObject();
@@ -44,10 +43,6 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     public void configurationVersion(String configurationVersion){
         this.configurationVersion = configurationVersion;
     }
-    public int configurationQuantity(){return configurationQuantity;}
-    public void configurationQuantity(int configurationQuantity){
-        this.configurationQuantity = configurationQuantity;
-    }
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",this.configurationType);
@@ -55,11 +50,10 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.properties.put("3",this.configurationName);
         this.properties.put("4",this.configurationCategory);
         this.properties.put("5",this.configurationVersion);
-        this.properties.put("6",this.configurationQuantity);
-        this.properties.put("7",this.header.toString());
-        this.properties.put("8",this.application.toString());
-        this.properties.put("9",this.payload.toString());
-        this.properties.put("10",this.reference.toString());
+        this.properties.put("6",this.header.toString());
+        this.properties.put("7",this.application.toString());
+        this.properties.put("8",this.payload.toString());
+        this.properties.put("9",this.reference.toString());
         return this.properties;
     }
     @Override
@@ -69,11 +63,10 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.configurationName = (String)properties.get("3");
         this.configurationCategory = (String)properties.get("4");
         this.configurationVersion = (String)properties.get("5");
-        this.configurationQuantity = ((Number)properties.get("6")).intValue();
-        this.header = JsonUtil.parse((String)properties.get("7"));
-        this.application = JsonUtil.parse((String)properties.get("8"));
-        this.payload = JsonUtil.parse((String)properties.get("9"));
-        this.reference = JsonUtil.parseAsArray((String)properties.get("10"));
+        this.header = JsonUtil.parse((String)properties.get("6"));
+        this.application = JsonUtil.parse((String)properties.get("7"));
+        this.payload = JsonUtil.parse((String)properties.get("8"));
+        this.reference = JsonUtil.parseAsArray((String)properties.get("9"));
     }
     @Override
     public JsonObject toJson(){
@@ -84,7 +77,6 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         jsonObject.addProperty("configurationName",configurationName);
         jsonObject.addProperty("configurationCategory",configurationCategory);
         jsonObject.addProperty("configurationVersion",configurationVersion);
-        jsonObject.addProperty("configurationQuantity",configurationQuantity);
         jsonObject.add("header",header);
         jsonObject.add("application",application);
         jsonObject.add("payload",payload);
@@ -98,7 +90,6 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.configurationName = config.get("configurationName").getAsString();
         this.configurationCategory = config.get("configurationCategory").getAsString();
         this.configurationVersion = config.get("configurationVersion").getAsString();
-        this.configurationQuantity = config.get("configurationQuantity").getAsInt();
         if(config.has("header")) this.header = config.getAsJsonObject("header");
         if(config.has("application")) this.application = config.getAsJsonObject("application");
         if(config.has("payload")) this.payload = config.getAsJsonObject("payload");

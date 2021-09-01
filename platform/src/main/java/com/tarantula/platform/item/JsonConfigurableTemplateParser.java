@@ -15,7 +15,6 @@ public class JsonConfigurableTemplateParser {
             itemSet.type = temp.has("type")?temp.get("type").getAsString():"";
             itemSet.category = temp.has("category")?temp.get("category").getAsString():"";
             itemSet.version = temp.has("version")?temp.get("version").getAsString():"";
-            itemSet.quantity = temp.has("quantity")?temp.get("quantity").getAsInt():1;
             itemSet.description = temp.has("description")?temp.get("description").getAsString():"";
             JsonArray items = temp.get("itemList").getAsJsonArray();
             JsonArray exposed = new JsonArray();

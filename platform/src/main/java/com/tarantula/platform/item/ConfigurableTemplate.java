@@ -12,7 +12,6 @@ public class ConfigurableTemplate extends RecoverableObject implements Configura
     public String type;
     public String category;
     public String version;
-    public int quantity;
     public String description;
     public HashMap<String,ConfigurableSetting> settings = new HashMap<>();
 
@@ -22,7 +21,6 @@ public class ConfigurableTemplate extends RecoverableObject implements Configura
         jsonObject.addProperty("type",type);
         jsonObject.addProperty("category",category);
         jsonObject.addProperty("version",version);
-        jsonObject.addProperty("quantity",quantity);
         jsonObject.addProperty("description",description);
         jsonObject.add("itemList",(JsonArray)property("itemList"));
         return jsonObject;
