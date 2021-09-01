@@ -1,14 +1,13 @@
 {
   "type": "asset",
-  "category": "icon",
+  "category": "card",
   "version": "1.0",
   "quantity": 1,
-  "description": "icon asset template list",
+  "description": "card asset template list",
   "itemList":
   [
       {
         "header": {
-          "type": "A1",
           "name": "miniGun",
           "version": 1
         },
@@ -18,7 +17,6 @@
       },
       {
         "header": {
-          "type": "A2",
           "name": "topGun",
           "version": 1
         },

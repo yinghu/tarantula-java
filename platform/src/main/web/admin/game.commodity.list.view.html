@@ -133,7 +133,7 @@
         console.log(resp);
         resp.itemList.forEach((a,i)=>{
             document.querySelector('#tx-commodity-template-'+i).style.display = 'block';
-            document.querySelector('#tx-commodity-template-'+i).innerHTML = a.header.type;
+            document.querySelector('#tx-commodity-template-'+i).innerHTML = a.header.name;
             document.querySelector('#tx-commodity-template-'+i).setAttribute('tx-category',a.header.type);
         });
     });
@@ -147,7 +147,7 @@
                 document.querySelector('#tx-game-commodity-list-description-0').innerHTML = resp.description;
                 document.querySelector('#tx-game-commodity-list-category-0').innerHTML = resp.category; 
                 resp.itemList.forEach((gi,i)=>{
-                    document.querySelector('#tx-game-commodity-list-type-'+i).innerHTML = gi.header.type;
+                    document.querySelector('#tx-game-commodity-list-type-'+i).innerHTML = resp.category;
                     document.querySelector('#tx-game-commodity-list-name-'+i).innerHTML = gi.header.name;
                     document.querySelector('#tx-game-commodity-list-'+i).style.display = 'block';    
                 });
@@ -160,8 +160,8 @@
             let ix = a.getAttribute('tx-index')/1;
             TARA_API.query().gameItemIndex= ix;
             TARA_API.query().popup='#tx-popup-api'; 
-            TARA_API.query().configurationType='commodity';
-            tx_view({viewId:'create.item',containerId:'#tx-popup-api'});
+            //TARA_API.query().configurationType='commodity';
+            tx_view({viewId:'create.commodity',containerId:'#tx-popup-api'});
         };
     });
     document.querySelector('#tx-game-commodity-list-close').onclick=()=>{

@@ -8,7 +8,6 @@
   [
       {
         "header": {
-          "type": "T10",
           "name": "10 player"
         },
         "application":
@@ -23,7 +22,6 @@
       },
       {
         "header": {
-          "type": "T100",
           "name": "Daily 100 player"
         },
         "application":

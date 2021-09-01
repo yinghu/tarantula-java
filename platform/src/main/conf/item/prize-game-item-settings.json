@@ -8,7 +8,6 @@
   [
       {
         "header": {
-          "type": "R1",
           "name": "Chip Prize"
         },
         "application":
@@ -21,7 +20,6 @@
       },
       {
         "header": {
-          "type": "R2",
           "name": "Chip Prize"
         },
         "application":
@@ -34,12 +32,10 @@
       },
       {
         "header": {
-          "type": "R3",
           "name": "Chip Prize"
         },
         "application":
         {
-          "rank": 3,
           "prize": 50000
         },
         "payload": {},

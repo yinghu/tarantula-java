@@ -17,17 +17,18 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
 
     public <T extends Configurable> void save(ApplicationContext context,Descriptor application,T t){
         DataStore dataStore = context.dataStore(serviceDataStore(application));
-        IndexSet indexSet = new IndexSet(application.category());
+        IndexSet indexSet = new IndexSet(query("category",t.configurationCategory()));//category/{category}
         indexSet.distributionKey(application.distributionKey());
         dataStore.load(indexSet);
-        IndexSet typeIndex = new IndexSet(t.configurationType());
+        IndexSet typeIndex = new IndexSet(query("type",t.configurationType()));//type/{asset|commodity|item}
         typeIndex.distributionKey(application.distributionKey());
         dataStore.load(typeIndex);
-        IndexSet categorySet = null;
+
+        IndexSet typeIdIndex = new IndexSet(query("typeId",t.configurationTypeId()));//typeId/{asset|commodity|item}
+        typeIdIndex.distributionKey(application.distributionKey());
+        dataStore.load(typeIdIndex);
+
         if(!application.category().equals(t.configurationCategory())){
-            categorySet = new IndexSet(t.configurationCategory());
-            categorySet.distributionKey(application.distributionKey());
-            dataStore.load(categorySet);
             IndexSet referenceIndex = new IndexSet("reference");
             referenceIndex.distributionKey(application.distributionKey());
             dataStore.load(referenceIndex);
@@ -40,10 +41,8 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
             dataStore.update(indexSet);
             typeIndex.keySet.add(t.distributionKey());
             dataStore.update(typeIndex);
-            if(categorySet!=null){
-                categorySet.keySet.add(t.distributionKey());
-                dataStore.update(categorySet);
-            }
+            typeIdIndex.keySet.add(t.distributionKey());
+            dataStore.update(typeIdIndex);
         }
     }
 
@@ -94,7 +93,7 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         return roomProxy;
     }
     protected <T extends Configurable> List<T> list(DataStore dataStore, Descriptor application, RecoverableFactory<T> recoverableFactory){
-        IndexSet indexSet = new IndexSet(recoverableFactory.label()==null?application.category():recoverableFactory.label());
+        IndexSet indexSet = new IndexSet(recoverableFactory.label());
         indexSet.distributionKey(application.distributionKey());
         ArrayList<T> arrayList = new ArrayList<>();
         if(!dataStore.load(indexSet)){
@@ -108,5 +107,8 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
             }
         });
         return arrayList;
+    }
+    protected String query(String type,String category){
+        return new StringBuffer().append(type).append(Recoverable.PATH_SEPARATOR).append(category).toString();
     }
 }

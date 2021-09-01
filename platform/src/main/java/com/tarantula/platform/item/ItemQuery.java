@@ -8,8 +8,8 @@ public class ItemQuery implements RecoverableFactory<Item> {
 
     public ItemQuery(){}
 
-    public ItemQuery(String configurationType){
-        this.label = configurationType;
+    public ItemQuery(String query){
+        this.label = query;
     }
 
     @Override

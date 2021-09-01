@@ -7,21 +7,21 @@
   "itemList":
   [
     {
-      "header": {"type": "prize","name": "prize","enabled": true,"version": 1.0},
+      "header": {"type": "prize","name": "Prize","enabled": true,"version": 1.0},
       "application":
       {
         "name": "prize-game-item-settings"
       }
     },
     {
-      "header": {"type": "robot","name": "robot","enabled": true,"version": 1.0},
+      "header": {"type": "robot","name": "Robot","enabled": true,"version": 1.0},
       "application":
       {
         "name": "robot-game-item-settings"
       }
     },
     {
-      "header": {"type": "abilities","name": "abilities","enabled": true,"version": 1.0},
+      "header": {"type": "abilities","name": "Abilities","enabled": true,"version": 1.0},
       "application":
       {
         "name": "abilities-game-item-settings"

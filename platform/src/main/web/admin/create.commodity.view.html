@@ -169,13 +169,13 @@
         a.onclick=()=>{
             hide_game_item_reference_list();
             let category = a.getAttribute('tx-category');
-            let query = TARA_API.query().gameClusterId+'#'+category;
+            let query = TARA_API.query().gameClusterId+'#category/'+category;
             TARA_API.onGet('role/item','onStock',query,(resp)=>{
                 console.log(resp);
                 //document.querySelector('#tx-game-commodity-list-description-0').innerHTML = resp.description;
                 //document.querySelector('#tx-game-commodity-list-category-0').innerHTML = resp.category; 
                 resp.itemList.forEach((gi,i)=>{
-                    document.querySelector('#tx-game-commodity-reference-list-type-'+i).innerHTML = gi.header.type;
+                    document.querySelector('#tx-game-commodity-reference-list-type-'+i).innerHTML = gi.configurationCategory;
                     document.querySelector('#tx-game-commodity-reference-list-name-'+i).innerHTML = gi.header.name;
                     document.querySelector('#tx-game-commodity-reference-list-api-'+i).setAttribute('tx-reference-id',gi.itemId);
                     document.querySelector('#tx-game-commodity-reference-list-'+i).style.display = 'block';    

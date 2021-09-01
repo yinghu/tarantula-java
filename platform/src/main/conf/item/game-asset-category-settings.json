@@ -7,10 +7,10 @@
   "itemList":
   [
     {
-      "header": {"type": "icon","name": "icon","enabled": true,"version": 1.0},
+      "header": {"type": "card","name": "Item Card","enabled": true,"version": 1.0},
       "application":
       {
-        "name": "icon-game-item-settings"
+        "name": "item-card-asset-settings"
       }
     }
   ]
