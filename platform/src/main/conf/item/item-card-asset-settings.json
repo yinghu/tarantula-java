@@ -6,18 +6,13 @@
   "itemList":
   [
       {
-        "configurationName": "MiniGun",
+        "configurationName": "MagnetAbilityCard",
         "header": {
-          "Name": "miniGun"
+          "Name": "Magnet",
+          "Description": "Magnet",
+          "Icon": "MagnetIcon.png"
         },
-        "payload": {"smallIcon": "icon url","largeIcon": "large icon url"}
-      },
-      {
-        "configurationName": "MiniGun",
-        "header": {
-          "Name": "topGun"
-        },
-        "payload": {"smallIcon": "icon url","largeIcon": "large icon url"}
+        "payload": {}
       }
   ]
 }

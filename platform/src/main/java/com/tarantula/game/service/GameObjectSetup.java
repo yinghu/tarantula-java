@@ -107,6 +107,8 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
             T t = recoverableFactory.create();
             t.distributionKey(k);
             if(dataStore.load(t)){
+                t.dataStore(dataStore);
+                t.load();
                 arrayList.add(t);
             }
         });

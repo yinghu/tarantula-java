@@ -6,21 +6,29 @@
   "itemList":
   [
       {
-        "configurationName": "MiniGun",
-        "header": {
-          "Name": "MiniGun"
+        "configurationName": "MagnetToss",
+        "header":
+        {
+          "Name": "MagnetToss",
+          "Description": "MagnetToss",
+          "AbilityType": "Utility",
+          "Rarity": "Rare",
+          "StopMovementDuringCharge": true,
+          "GlobalCooldownSeconds": 0,
+          "RequiresExplicitTargeting": false,
+          "ShowRangeWhenTargeting": true,
+          "TargetType": "Attacked"
         },
-        "application": {},
-        "payload": {},
-        "reference": []
-      },
-      {
-        "configurationName": "FastMissile",
-        "header": {
-          "Name": "FastMissile"
+        "application":
+        {
+          "Levels": [],
+          "StatsToShow": ["TargetingRange","Duration"]
         },
-        "application": {},
-        "payload": {},
+        "payload":
+        {
+          "TargetShape": {"Shape": "Circle","RadiusMin": 0,"RadiusMax": 7},
+          "DamageShape": {"Shape": "Circle","RadiusMin": 0,"RadiusMax": 2.75}
+        },
         "reference": []
       }
   ]

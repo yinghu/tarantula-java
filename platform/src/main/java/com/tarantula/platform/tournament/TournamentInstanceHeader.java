@@ -110,13 +110,14 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
         this.end = TimeUtil.fromUTCMilliseconds(portableReader.readLong("3"));
     }
 
-    public void load(){
+    public boolean load(){
         dataStore.list(new TournamentEntryQuery(this.distributionKey()),(e)->{
             e.dataStore(dataStore);
             entryIndex.put(e.systemId(),e);
             tournamentRaceBoard.addEntry(e);
             return true;
         });
+        return true;
     }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();

@@ -1,5 +1,7 @@
 package com.tarantula.platform.item;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.Map;
@@ -40,9 +42,27 @@ public class Commodity extends ConfigurableObject{
     }
     @Override
     public boolean configureAndValidate(){
-        this.reference.forEach((refId)->{
-
-        });
+        boolean passed = true;
+        for(JsonElement je : this.reference){
+            ConfigurableObject cob = new ConfigurableObject();
+            cob.distributionKey(je.getAsString());
+            if(!dataStore.load(cob)){
+                passed = false;
+                break;
+            }
+        }
+        return passed;
+    }
+    @Override
+    public boolean load(){
+        JsonArray loaded = new JsonArray();
+        for(JsonElement je : reference){
+            ConfigurableObject cob = new ConfigurableObject();
+            cob.distributionKey(je.getAsString());
+            dataStore.load(cob);
+            loaded.add(cob.toJson());
+        }
+        reference = loaded;
         return true;
     }
 }

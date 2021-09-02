@@ -1,6 +1,7 @@
 package com.tarantula.platform.item;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.util.JsonUtil;
@@ -137,6 +138,18 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     @Override
     public boolean configureAndValidate() {
+        return true;
+    }
+    @Override
+    public boolean load(){
+        JsonArray loaded = new JsonArray();
+        for(JsonElement je : reference){
+            ConfigurableObject cob = new ConfigurableObject();
+            cob.distributionKey(je.getAsString());
+            dataStore.load(cob);
+            loaded.add(cob.toJson());
+        }
+        reference = loaded;
         return true;
     }
 }

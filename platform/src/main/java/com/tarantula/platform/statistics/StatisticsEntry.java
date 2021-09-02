@@ -144,7 +144,7 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     Statistics.Entry duplicate(){
         return new StatisticsEntry(this);
     }
-    synchronized boolean load(){
+    public synchronized boolean load(){
         if(loaded){
             return false;
         }

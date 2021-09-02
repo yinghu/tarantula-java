@@ -9,7 +9,7 @@
     let _oswaldFamily = 'Oswald, Arial';
     let _felipaFamily = 'Felipa, Arial';
     let app = TGL.start(document.querySelector('#tx-game-tossup'));
-    TARA_API.onGet('tossup/cfg','onList','robot',(resp)=>{
+    TARA_API.onGet('tossup/cfg','onList','category/abilities',(resp)=>{
         console.log(resp);
     });
     let zone = new PIXI.Text('Zone=>'+JSON.stringify(TARA_API.query().stub.zone),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
