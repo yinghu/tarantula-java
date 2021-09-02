@@ -6,6 +6,7 @@
   "itemList":
   [
     {
+      "configurationName": "Bot Pack",
       "header": {
         "name": "Bot Pack"
       },
@@ -14,6 +15,7 @@
       "reference": []
     },
     {
+      "configurationName": "Gun Pack",
       "header": {
         "name": "Abilities Pack"
       },

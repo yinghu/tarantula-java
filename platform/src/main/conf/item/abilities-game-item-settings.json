@@ -6,16 +6,18 @@
   "itemList":
   [
       {
+        "configurationName": "MiniGun",
         "header": {
-          "name": "MiniGun"
+          "Name": "MiniGun"
         },
         "application": {},
         "payload": {},
         "reference": []
       },
       {
+        "configurationName": "FastMissile",
         "header": {
-          "name": "FastMissile"
+          "Name": "FastMissile"
         },
         "application": {},
         "payload": {},

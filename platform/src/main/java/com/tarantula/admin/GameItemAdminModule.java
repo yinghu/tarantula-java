@@ -67,7 +67,7 @@ public class GameItemAdminModule implements Module {
             if(app.configureAndValidate(payload)){
                 Descriptor desc = gameCluster.serviceWithCategory("item");
                 SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);
-                session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
+                session.write(app.toJson().toString().getBytes());
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"failed to save commodity").getBytes());

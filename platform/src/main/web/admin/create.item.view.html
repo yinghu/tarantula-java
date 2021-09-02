@@ -149,18 +149,12 @@
     itemTemplate.configurationCategory = TARA_API.query().itemTemplate.category;
     itemTemplate.configurationVersion = TARA_API.query().itemTemplate.version;
     let selectedItem = TARA_API.query().itemTemplate.itemList[TARA_API.query().gameItemIndex];
+    itemTemplate.configurationName = selectedItem.configurationName;
     itemTemplate.application = selectedItem.application;
     itemTemplate.header = selectedItem.header;
     itemTemplate.payload = selectedItem.payload;
     itemTemplate.reference = selectedItem.reference;
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-item"),{mode:'code'},itemTemplate);
-    let cmd = 'onCreateItem';
-    if(itemTemplate.configurationType == 'commodity'){
-        cmd = 'onCreateCommodity';
-    }
-    else if(itemTemplate.configurationType == 'item'){
-        cmd = 'onCreateItem';
-    }
     TARA_API.onGet('role/item',"onCategory",TARA_API.query().gameClusterId,(resp)=>{
         console.log(resp);
         resp.onList.forEach((a,i) => {
@@ -175,14 +169,12 @@
         a.onclick=()=>{
             hide_game_item_reference_list();
             let category = a.getAttribute('tx-category');
-            let query = TARA_API.query().gameClusterId+'#'+category;
+            let query = TARA_API.query().gameClusterId+'#category/'+category;
             TARA_API.onGet('role/item','onStock',query,(resp)=>{
                 console.log(resp);
-                //document.querySelector('#tx-game-item-list-description-0').innerHTML = resp.description;
-                //document.querySelector('#tx-game-item-list-category-0').innerHTML = resp.category; 
                 resp.itemList.forEach((gi,i)=>{
-                    document.querySelector('#tx-game-item-reference-list-type-'+i).innerHTML = gi.header.type;
-                    document.querySelector('#tx-game-item-reference-list-name-'+i).innerHTML = gi.header.name;
+                    document.querySelector('#tx-game-item-reference-list-type-'+i).innerHTML = gi.configurationCategory;
+                    document.querySelector('#tx-game-item-reference-list-name-'+i).innerHTML = gi.configurationName;
                     document.querySelector('#tx-game-item-reference-list-api-'+i).setAttribute('tx-reference-id',gi.itemId);
                     document.querySelector('#tx-game-item-reference-list-'+i).style.display = 'block';    
                 });
@@ -205,7 +197,7 @@
         let item = editor.get();
         item.configurationTypeId = _tid;
         item.configurationName = _k;
-        TARA_API.onSet('role/item',cmd,TARA_API.query().gameClusterId,item,(resp)=>{
+        TARA_API.onSet('role/item','onCreateItem',TARA_API.query().gameClusterId,item,(resp)=>{
             editor.set(resp);   
         });
     };

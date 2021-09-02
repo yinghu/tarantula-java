@@ -148,7 +148,7 @@
                 document.querySelector('#tx-game-item-list-category-0').innerHTML = resp.category; 
                 resp.itemList.forEach((gi,i)=>{
                     document.querySelector('#tx-game-item-list-type-'+i).innerHTML = resp.category;
-                    document.querySelector('#tx-game-item-list-name-'+i).innerHTML = gi.header.name;
+                    document.querySelector('#tx-game-item-list-name-'+i).innerHTML = gi.configurationName;
                     document.querySelector('#tx-game-item-list-'+i).style.display = 'block';    
                 });
                 TARA_API.query().itemTemplate = resp;

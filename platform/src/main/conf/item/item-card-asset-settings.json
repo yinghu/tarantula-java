@@ -6,20 +6,18 @@
   "itemList":
   [
       {
+        "configurationName": "MiniGun",
         "header": {
-          "name": "miniGun"
+          "Name": "miniGun"
         },
-        "application": {},
-        "payload": {"smallIcon": "icon url","largeIcon": "large icon url"},
-        "reference": []
+        "payload": {"smallIcon": "icon url","largeIcon": "large icon url"}
       },
       {
+        "configurationName": "MiniGun",
         "header": {
-          "name": "topGun"
+          "Name": "topGun"
         },
-        "application": {},
-        "payload": {"smallIcon": "icon url","largeIcon": "large icon url"},
-        "reference": []
+        "payload": {"smallIcon": "icon url","largeIcon": "large icon url"}
       }
   ]
 }

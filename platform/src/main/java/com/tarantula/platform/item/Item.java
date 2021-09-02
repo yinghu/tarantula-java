@@ -10,6 +10,10 @@ public class Item extends ConfigurableObject{
     @Override
     public Map<String,Object> toMap(){
         super.toMap();
+        properties.put(HEADER_KEY,header.toString());
+        properties.put(PAYLOAD_KEY,payload.toString());
+        properties.put(APPLICATION_KEY,application.toString());
+        properties.put(REFERENCE_KEY,reference.toString());
         return this.properties;
     }
     @Override
@@ -27,7 +31,14 @@ public class Item extends ConfigurableObject{
     public JsonObject toJson(){
        return super.toJson();
     }
-    public boolean configureAndValidate(byte[] data){
-        return super.configureAndValidate(data);
+    public boolean configureAndValidate(JsonObject config){
+        if(!config.has("header")||!config.has("payload")||!config.has("application")||!config.has("reference")){
+            return false;
+        }
+        this.header = config.getAsJsonObject("header");
+        this.payload = config.getAsJsonObject("payload");
+        this.application = config.getAsJsonObject("application");
+        this.reference = config.getAsJsonArray("reference");
+        return true;
     }
 }

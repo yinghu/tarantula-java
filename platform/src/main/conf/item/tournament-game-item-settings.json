@@ -6,6 +6,7 @@
   "itemList":
   [
       {
+        "configurationName": "On Demand 10",
         "header": {
           "name": "10 player"
         },
@@ -20,6 +21,7 @@
         "reference": []
       },
       {
+        "configurationName": "Daily 100",
         "header": {
           "name": "Daily 100 player"
         },

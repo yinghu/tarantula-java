@@ -6,16 +6,18 @@
   "itemList":
   [
       {
+        "configurationName": "Dark Bot",
         "header": {
-          "name": "Dark Bot"
+          "Name": "Dark Bot"
         },
         "application": {},
         "payload": {},
         "reference": []
       },
       {
+        "configurationName": "Boss Bot",
         "header": {
-          "name": "Boss Bot"
+          "Name": "Boss Bot"
         },
         "application": {},
         "payload": {},

@@ -10,6 +10,12 @@ import java.util.Map;
 
 public class ConfigurableObject extends RecoverableObject implements Configuration {
 
+    protected static String HEADER_KEY = "6";
+    protected static String APPLICATION_KEY = "7";
+    protected static String PAYLOAD_KEY = "8";
+    protected static String REFERENCE_KEY = "9";
+
+
     protected String configurationType;
     protected String configurationTypeId;
     protected String configurationName;
@@ -50,10 +56,6 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.properties.put("3",this.configurationName);
         this.properties.put("4",this.configurationCategory);
         this.properties.put("5",this.configurationVersion);
-        this.properties.put("6",this.header.toString());
-        this.properties.put("7",this.application.toString());
-        this.properties.put("8",this.payload.toString());
-        this.properties.put("9",this.reference.toString());
         return this.properties;
     }
     @Override
@@ -63,10 +65,10 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.configurationName = (String)properties.get("3");
         this.configurationCategory = (String)properties.get("4");
         this.configurationVersion = (String)properties.get("5");
-        this.header = JsonUtil.parse((String)properties.get("6"));
-        this.application = JsonUtil.parse((String)properties.get("7"));
-        this.payload = JsonUtil.parse((String)properties.get("8"));
-        this.reference = JsonUtil.parseAsArray((String)properties.get("9"));
+        this.header = JsonUtil.parse((String)properties.getOrDefault(HEADER_KEY,"{}"));
+        this.application = JsonUtil.parse((String)properties.getOrDefault(APPLICATION_KEY,"{}"));
+        this.payload = JsonUtil.parse((String)properties.getOrDefault(PAYLOAD_KEY,"{}"));
+        this.reference = JsonUtil.parseAsArray((String)properties.getOrDefault(REFERENCE_KEY,"[]"));
     }
     @Override
     public JsonObject toJson(){
@@ -90,10 +92,17 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.configurationName = config.get("configurationName").getAsString();
         this.configurationCategory = config.get("configurationCategory").getAsString();
         this.configurationVersion = config.get("configurationVersion").getAsString();
-        if(config.has("header")) this.header = config.getAsJsonObject("header");
-        if(config.has("application")) this.application = config.getAsJsonObject("application");
-        if(config.has("payload")) this.payload = config.getAsJsonObject("payload");
-        if(config.has("reference")) this.reference = config.getAsJsonArray("reference");
+        return configureAndValidate(config);
+    }
+    @Override
+    public boolean configureAndValidate(JsonObject config){
+        if(!config.has("header")||!config.has("payload")||!config.has("application")||!config.has("reference")){
+            return false;
+        }
+        this.header = config.getAsJsonObject("header");
+        this.payload = config.getAsJsonObject("payload");
+        this.application = config.getAsJsonObject("application");
+        this.reference = config.getAsJsonArray("reference");
         return true;
     }
 }

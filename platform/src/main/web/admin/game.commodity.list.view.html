@@ -148,7 +148,7 @@
                 document.querySelector('#tx-game-commodity-list-category-0').innerHTML = resp.category; 
                 resp.itemList.forEach((gi,i)=>{
                     document.querySelector('#tx-game-commodity-list-type-'+i).innerHTML = resp.category;
-                    document.querySelector('#tx-game-commodity-list-name-'+i).innerHTML = gi.header.name;
+                    document.querySelector('#tx-game-commodity-list-name-'+i).innerHTML = gi.configurationName;
                     document.querySelector('#tx-game-commodity-list-'+i).style.display = 'block';    
                 });
                 TARA_API.query().itemTemplate = resp;
@@ -160,7 +160,6 @@
             let ix = a.getAttribute('tx-index')/1;
             TARA_API.query().gameItemIndex= ix;
             TARA_API.query().popup='#tx-popup-api'; 
-            //TARA_API.query().configurationType='commodity';
             tx_view({viewId:'create.commodity',containerId:'#tx-popup-api'});
         };
     });
