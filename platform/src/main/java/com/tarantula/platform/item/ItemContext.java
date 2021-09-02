@@ -8,9 +8,9 @@ import java.util.List;
 
 public class ItemContext extends ResponseHeader {
 
-    private List<Item> itemList;
+    private List<ConfigurableObject> itemList;
 
-    public ItemContext(boolean successful,String message,List<Item> itemList){
+    public ItemContext(boolean successful,String message,List<ConfigurableObject> itemList){
         this.successful = successful;
         this.message = message;
         this.itemList = itemList;

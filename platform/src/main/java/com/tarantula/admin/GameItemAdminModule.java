@@ -110,7 +110,7 @@ public class GameItemAdminModule implements Module {
             Descriptor app = gameCluster.serviceWithCategory("item");
             this.context.log(query[1],OnLog.WARN);
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            List<Item> items = preSetup.list(this.context,app,new ItemQuery(query[1]));
+            List<ConfigurableObject> items = preSetup.list(this.context,app,new ConfigurableObjectQuery(query[1]));
             session.write(new ItemContext(true,query[1],items).toJson().toString().getBytes());
         }
         else {

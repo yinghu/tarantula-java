@@ -38,4 +38,11 @@ public class Commodity extends ConfigurableObject{
         this.reference = config.getAsJsonArray("reference");
         return true;
     }
+    @Override
+    public boolean configureAndValidate(){
+        this.reference.forEach((refId)->{
+
+        });
+        return true;
+    }
 }

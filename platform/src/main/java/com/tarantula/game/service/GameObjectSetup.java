@@ -14,9 +14,12 @@ import java.util.Set;
 
 abstract public class GameObjectSetup implements ApplicationPreSetup {
 
-
-    public <T extends Configurable> void save(ApplicationContext context,Descriptor application,T t){
+    public <T extends Configurable> boolean save(ApplicationContext context,Descriptor application,T t){
         DataStore dataStore = context.dataStore(serviceDataStore(application));
+        t.dataStore(dataStore);
+        if(!t.configureAndValidate()){
+            return false;
+        }
         IndexSet indexSet = new IndexSet(query("category",t.configurationCategory()));//category/{category}
         indexSet.distributionKey(application.distributionKey());
         dataStore.load(indexSet);
@@ -44,6 +47,7 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
             typeIdIndex.keySet.add(t.distributionKey());
             dataStore.update(typeIdIndex);
         }
+        return true;
     }
 
     public <T extends Configurable> boolean load(ApplicationContext context,Descriptor application,T t){

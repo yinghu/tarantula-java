@@ -28,8 +28,8 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
         this.gameCluster = gameCluster;
     }
 
-    public List<Item> gameConfig(Descriptor descriptor,String category){
-        return applicationPreSetup.list(serviceContext,descriptor,new ItemQuery(category));
+    public List<ConfigurableObject> gameConfig(Descriptor descriptor,String category){
+        return applicationPreSetup.list(serviceContext,descriptor,new ConfigurableObjectQuery(category));
     }
     //public Item gameConfiga(Descriptor descriptor,String category){
         //return null;//applicationPreSetup.list(serviceContext,descriptor,new ItemQuery(category));
@@ -56,7 +56,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     @Override
     public String registerConfigurableListener(Descriptor application, Configurable.Listener listener) {
         String rid = UUID.randomUUID().toString();
-        List<Item> items = applicationPreSetup.list(serviceContext,application,new ItemQuery());
+        List<ConfigurableObject> items = applicationPreSetup.list(serviceContext,application,new ConfigurableObjectQuery());
         items.forEach((a)-> listener.onCreated(a));
         this.rListeners.put(rid,new TypedListener(application.category(),listener));
         logger.warn("Listener registered with ->"+application.category());

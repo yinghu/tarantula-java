@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.Item;
 import com.tarantula.platform.item.ItemContext;
 
@@ -18,7 +19,7 @@ public class GameItemModule implements Module,Configurable.Listener<Item>{
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
-            List<Item> _item = this.gameServiceProvider.configurationServiceProvider().gameConfig(this.context.descriptor(),session.name());
+            List<ConfigurableObject> _item = this.gameServiceProvider.configurationServiceProvider().gameConfig(this.context.descriptor(),session.name());
             session.write(new ItemContext(true,"",_item).toString().getBytes());
         }
         else if(session.action().equals("onLoad")){
