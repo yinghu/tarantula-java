@@ -23,8 +23,6 @@ public class Asset extends ConfigurableObject{
     @Override
     public Map<String,Object> toMap(){
         super.toMap();
-        properties.put(HEADER_KEY,header.toString());
-        properties.put(PAYLOAD_KEY,payload.toString());
         return this.properties;
     }
     @Override
@@ -55,7 +53,10 @@ public class Asset extends ConfigurableObject{
 
     @Override
     public boolean configureAndValidate(JsonObject config){
-        if(!config.has("header")||!config.has("payload")){
+        if(configurationType==null||configurationName==null||configurationTypeId==null||configurationVersion==null||configurationCategory==null){
+            return false;
+        }
+        if (!config.has("header") || !config.has("payload")) {
             return false;
         }
         this.header = config.getAsJsonObject("header");

@@ -36,7 +36,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     //}
     @Override
     public <T extends Configurable> void register(T config) {
-        distributionItemService.register(name,(Item)config);
+        distributionItemService.register(name,config.configurationCategory(),config.distributionKey());
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     @Override
     public String registerConfigurableListener(Descriptor application, Configurable.Listener listener) {
         String rid = UUID.randomUUID().toString();
-        List<ConfigurableObject> items = applicationPreSetup.list(serviceContext,application,new ConfigurableObjectQuery());
+        List<ConfigurableObject> items = applicationPreSetup.list(serviceContext,application,new ConfigurableObjectQuery("category/"+application.category()));
         items.forEach((a)-> listener.onCreated(a));
         this.rListeners.put(rid,new TypedListener(application.category(),listener));
         logger.warn("Listener registered with ->"+application.category());
@@ -89,13 +89,20 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     public void shutdown() throws Exception {
 
     }
-    public boolean onRegister(Configurable configurable){
+    public boolean onRegister(String category,String itemId){
+        ConfigurableObject configurableObject = new ConfigurableObject();
+        configurableObject.distributionKey(itemId);
+        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        Descriptor app = _gc.serviceWithCategory(category);
+        if(!applicationPreSetup.load(serviceContext,app,configurableObject)){
+            return false;
+        }
         rListeners.forEach((k,c)->{
             if(c.type==null||c.type.equals("system")){
-                c.listener.onCreated(configurable);
+                c.listener.onCreated(configurableObject.setup());
             }
-            else if(c.type.equals(configurable.configurationCategory())){
-                c.listener.onCreated(configurable);
+            else if(c.type.equals(configurableObject.configurationCategory())){
+                c.listener.onCreated(configurableObject.setup());
             }
         });
         return true;

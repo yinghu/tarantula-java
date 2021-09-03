@@ -10,22 +10,24 @@ import java.io.IOException;
 public class ItemRegisterOperation extends Operation {
 
     private String serviceName;
-    private Item item;
+    private String category;
+    private String itemId;
     private boolean ret;
 
     public ItemRegisterOperation() {
     }
 
 
-    public ItemRegisterOperation(String serviceName, Item item) {
+    public ItemRegisterOperation(String serviceName,String category,String itemId) {
         this.serviceName = serviceName;
-        this.item = item;
+        this.category = category;
+        this.itemId = itemId;
     }
 
     @Override
     public void run() throws Exception {
         ItemClusterService cis = this.getService();
-        this.ret = cis.register(serviceName,item);
+        this.ret = cis.register(serviceName,category,itemId);
     }
 
     @Override
@@ -37,14 +39,15 @@ public class ItemRegisterOperation extends Operation {
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(serviceName);
-        out.writeByteArray(item.toBinary());
+        out.writeUTF(category);
+        out.writeUTF(itemId);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         serviceName = in.readUTF();
-        item = new Item();
-        item.fromBinary(in.readByteArray());
+        category = in.readUTF();
+        itemId = in.readUTF();
     }
 }

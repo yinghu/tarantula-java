@@ -4,5 +4,5 @@ import com.icodesoftware.service.ServiceProvider;
 
 public interface DistributionItemService extends ServiceProvider {
     String NAME = "DistributionItemService";
-    boolean register(String serviceName,Item item);
+    boolean register(String serviceName,String category,String itemId);
 }

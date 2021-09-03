@@ -37,7 +37,6 @@ public class GameStoreAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(true,ks[1]).getBytes());
                 GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
                 gameServiceProvider.configurationServiceProvider().register(app.setup());
-                session.write(JsonUtil.toSimpleResponse(true,"item live").getBytes());
             }
             else{
                session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());

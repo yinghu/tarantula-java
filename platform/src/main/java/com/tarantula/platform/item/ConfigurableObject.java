@@ -11,6 +11,12 @@ import java.util.Map;
 
 public class ConfigurableObject extends RecoverableObject implements Configuration {
 
+    protected static String TYPE_KEY = "1";
+    protected static String TYPE_ID_KEY = "2";
+    protected static String NAME_KEY = "3";
+    protected static String CATEGORY_KEY = "4";
+    protected static String VERSION_KEY = "5";
+
     protected static String HEADER_KEY = "6";
     protected static String APPLICATION_KEY = "7";
     protected static String PAYLOAD_KEY = "8";
@@ -70,21 +76,25 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     @Override
     public Map<String, Object> toMap() {
-        this.properties.put("1", this.configurationType);
-        this.properties.put("2", this.configurationTypeId);
-        this.properties.put("3", this.configurationName);
-        this.properties.put("4", this.configurationCategory);
-        this.properties.put("5", this.configurationVersion);
+        this.properties.put(TYPE_KEY, this.configurationType);
+        this.properties.put(TYPE_ID_KEY, this.configurationTypeId);
+        this.properties.put(NAME_KEY, this.configurationName);
+        this.properties.put(CATEGORY_KEY, this.configurationCategory);
+        this.properties.put(VERSION_KEY, this.configurationVersion);
+        this.properties.put(HEADER_KEY,header.toString());
+        this.properties.put(PAYLOAD_KEY,payload.toString());
+        this.properties.put(APPLICATION_KEY,application.toString());
+        this.properties.put(REFERENCE_KEY,reference.toString());
         return this.properties;
     }
 
     @Override
     public void fromMap(Map<String, Object> properties) {
-        this.configurationType = (String) properties.get("1");
-        this.configurationTypeId = (String) properties.get("2");
-        this.configurationName = (String) properties.get("3");
-        this.configurationCategory = (String) properties.get("4");
-        this.configurationVersion = (String) properties.get("5");
+        this.configurationType = (String) properties.get(TYPE_KEY);
+        this.configurationTypeId = (String) properties.get(TYPE_ID_KEY);
+        this.configurationName = (String) properties.get(NAME_KEY);
+        this.configurationCategory = (String) properties.get(CATEGORY_KEY);
+        this.configurationVersion = (String) properties.get(VERSION_KEY);
         this.header = JsonUtil.parse((String) properties.getOrDefault(HEADER_KEY, "{}"));
         this.application = JsonUtil.parse((String) properties.getOrDefault(APPLICATION_KEY, "{}"));
         this.payload = JsonUtil.parse((String) properties.getOrDefault(PAYLOAD_KEY, "{}"));
@@ -127,6 +137,9 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     @Override
     public boolean configureAndValidate(JsonObject config) {
+        if(configurationType==null||configurationName==null||configurationTypeId==null||configurationVersion==null||configurationCategory==null){
+            return false;
+        }
         if (!config.has("header") || !config.has("payload") || !config.has("application") || !config.has("reference")) {
             return false;
         }

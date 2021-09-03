@@ -142,9 +142,9 @@ public class GameServiceProvider implements ServiceProvider{
     public ItemConfigurationServiceProvider configurationServiceProvider(){
         return this.configurationServiceProvider;
     }
-    public boolean onRegister(Configurable configurable){
-        return configurationServiceProvider.onRegister(configurable);
-    }
+    //public boolean onRegister(Configurable configurable){
+        //return configurationServiceProvider.onRegister(configurable);
+    //}
 
     //tournament service provider hook calls
     public TournamentServiceProvider tournamentServiceProvider(){

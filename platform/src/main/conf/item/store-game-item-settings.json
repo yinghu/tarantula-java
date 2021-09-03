@@ -8,7 +8,7 @@
     {
       "configurationName": "Bot Pack",
       "header": {
-        "name": "Bot Pack"
+        "Name": "Bot Pack"
       },
       "application": {},
       "payload": {},
@@ -17,7 +17,7 @@
     {
       "configurationName": "Gun Pack",
       "header": {
-        "name": "Abilities Pack"
+        "Name": "Abilities Pack"
       },
       "application": {},
       "payload": {},

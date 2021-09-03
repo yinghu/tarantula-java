@@ -74,8 +74,8 @@
     TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
         editor.set(resp);
         resp.itemList.forEach((gi,i)=>{
-            document.querySelector('#tx-live-store-game-item-list-type-'+i).innerHTML = gi.header.type;
-            document.querySelector('#tx-live-store-game-item-list-name-'+i).innerHTML = gi.header.name;
+            document.querySelector('#tx-live-store-game-item-list-type-'+i).innerHTML = gi.configurationType;
+            document.querySelector('#tx-live-store-game-item-list-name-'+i).innerHTML = gi.configurationName;
             document.querySelector('#tx-live-store-game-item-list-api-'+i).setAttribute('tx-item-id',gi.itemId);
             document.querySelector('#tx-live-store-game-item-list-'+i).style.display = 'block';    
         });

@@ -70,7 +70,7 @@ public class GameItemAdminModule implements Module {
                 session.write(app.toJson().toString().getBytes());
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"failed to save commodity").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"failed to save asset").getBytes());
             }
         }
         else if (session.action().equals("onCreateCommodity")){
@@ -108,7 +108,6 @@ public class GameItemAdminModule implements Module {
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             Descriptor app = gameCluster.serviceWithCategory("item");
-            this.context.log(query[1],OnLog.WARN);
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             List<ConfigurableObject> items = preSetup.list(this.context,app,new ConfigurableObjectQuery(query[1]));
             session.write(new ItemContext(true,query[1],items).toJson().toString().getBytes());

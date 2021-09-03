@@ -75,7 +75,11 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         byte[] data = dataStore.backup().get(key);
         return data!=null?data:"{}".getBytes();
     }
-
+    public <T extends Configurable> boolean load(ServiceContext context,Descriptor application,T t){
+        DataStore dataStore = context.dataStore(this.serviceDataStore(application),context.partitionNumber());
+        t.dataStore(dataStore);
+        return dataStore.load(t);
+    }
     protected String serviceDataStore(Descriptor application){
         return application.typeId().replace("-lobby","_service");
     }
