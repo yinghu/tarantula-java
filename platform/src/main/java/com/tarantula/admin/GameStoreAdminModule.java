@@ -30,13 +30,13 @@ public class GameStoreAdminModule implements Module {
         else if (session.action().equals("onRegister")){
             String[] ks = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(ks[0]);
-            Item app = new Item();
+            ConfigurableObject app = new ConfigurableObject();
             app.distributionKey(ks[1]);
             Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
             if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app)){
                 session.write(JsonUtil.toSimpleResponse(true,ks[1]).getBytes());
                 GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
-                gameServiceProvider.configurationServiceProvider().register(app);
+                gameServiceProvider.configurationServiceProvider().register(app.setup());
                 session.write(JsonUtil.toSimpleResponse(true,"item live").getBytes());
             }
             else{
