@@ -3,10 +3,28 @@ package com.tarantula.platform.item;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Configurable;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class Commodity extends ConfigurableObject{
+
+    private ArrayList<ConfigurableObject> _reference;
+    public Commodity(){}
+
+    public Commodity(ConfigurableObject configurableObject){
+        this.configurationType = configurableObject.configurationType;
+        this.configurationTypeId = configurableObject.configurationTypeId;
+        this.configurationName = configurableObject.configurationName;
+        this.configurationCategory = configurableObject.configurationCategory;
+        this.configurationVersion = configurableObject.configurationVersion;
+        this.header = configurableObject.header;
+        this.payload = configurableObject.payload;
+        this.application = configurableObject.application;
+        this.reference = configurableObject.reference;
+        this.distributionKey(configurableObject.distributionKey());
+    }
 
     @Override
     public Map<String,Object> toMap(){
@@ -54,15 +72,25 @@ public class Commodity extends ConfigurableObject{
         return passed;
     }
     @Override
-    public boolean load(){
-        JsonArray loaded = new JsonArray();
+    public JsonObject toJson() {
+        JsonObject json = super.toJson();
+        _reference.forEach((cob)->{
+            json.add(cob.configurationName,cob.toJson());
+        });
+        return json;
+    }
+    @Override
+    public  <T extends Configurable> T setup(){
+        _reference = new ArrayList<>();
         for(JsonElement je : reference){
             ConfigurableObject cob = new ConfigurableObject();
             cob.distributionKey(je.getAsString());
-            dataStore.load(cob);
-            loaded.add(cob.toJson());
+            cob.dataStore(dataStore);
+            if(this.dataStore.load(cob)){
+                _reference.add(cob.setup());
+            }
         }
-        reference = loaded;
-        return true;
+        return (T)this;
     }
+
 }

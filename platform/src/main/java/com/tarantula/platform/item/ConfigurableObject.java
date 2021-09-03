@@ -1,8 +1,8 @@
 package com.tarantula.platform.item;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
@@ -97,6 +97,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     public int getClassId() {
         return ItemPortableRegistry.CONFIGURABLE_OBJECT_CID;
     }
+
     @Override
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
@@ -140,16 +141,24 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     public boolean configureAndValidate() {
         return true;
     }
+
     @Override
-    public boolean load(){
-        JsonArray loaded = new JsonArray();
-        for(JsonElement je : reference){
-            ConfigurableObject cob = new ConfigurableObject();
-            cob.distributionKey(je.getAsString());
-            dataStore.load(cob);
-            loaded.add(cob.toJson());
+    public  <T extends Configurable> T setup(){
+        if(this.configurationType.equals(Configurable.ASSET_CONFIG_TYPE)){
+            Asset asset = new Asset(this);
+            asset.dataStore(dataStore);
+            return asset.setup();
         }
-        reference = loaded;
-        return true;
+        if(this.configurationType.equals(Configurable.COMMODITY_CONFIG_TYPE)){
+            Commodity commodity = new Commodity(this);
+            commodity.dataStore(dataStore);
+            return commodity.setup();
+        }
+        if(this.configurationType.equals(Configurable.ITEM_CONFIG_TYPE)){
+            Item item = new Item(this);
+            item.dataStore(dataStore);
+            return item.setup();
+        }
+        return null;
     }
 }

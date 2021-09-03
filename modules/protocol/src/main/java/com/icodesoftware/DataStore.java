@@ -51,6 +51,6 @@ public interface DataStore {
     interface Updatable{
         void dataStore(DataStore dataStore);
         void update();
-        default boolean load(){return false;}
+        //default boolean load(){return false;}
     }
 }
