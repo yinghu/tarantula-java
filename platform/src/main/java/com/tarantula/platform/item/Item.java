@@ -13,16 +13,7 @@ public class Item extends ConfigurableObject{
     public Item(){}
 
     public Item(ConfigurableObject configurableObject){
-        this.configurationType = configurableObject.configurationType;
-        this.configurationTypeId = configurableObject.configurationTypeId;
-        this.configurationName = configurableObject.configurationName;
-        this.configurationCategory = configurableObject.configurationCategory;
-        this.configurationVersion = configurableObject.configurationVersion;
-        this.header = configurableObject.header;
-        this.payload = configurableObject.payload;
-        this.application = configurableObject.application;
-        this.reference = configurableObject.reference;
-        this.distributionKey(configurableObject.distributionKey());
+       super(configurableObject);
     }
 
     @Override

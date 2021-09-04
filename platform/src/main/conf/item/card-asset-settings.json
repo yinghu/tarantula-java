@@ -12,7 +12,9 @@
           "Description": "Magnet",
           "Icon": "MagnetIcon.png"
         },
-        "payload": {}
+        "application": {},
+        "payload": {},
+        "reference": []
       }
   ]
 }

@@ -19,7 +19,7 @@ public class GameItemModule implements Module,Configurable.Listener<Item>{
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
-            List<ConfigurableObject> _item = this.gameServiceProvider.configurationServiceProvider().gameConfig(this.context.descriptor(),session.name());
+            List<ConfigurableObject> _item = this.gameServiceProvider.configurationServiceProvider().list(this.context.descriptor(),session.name());
             session.write(new ItemContext(true,"",_item).toString().getBytes());
         }
         else if(session.action().equals("onLoad")){

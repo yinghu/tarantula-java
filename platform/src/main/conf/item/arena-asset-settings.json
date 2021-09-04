@@ -6,7 +6,7 @@
   "itemList":
   [
       {
-        "configurationName": "BumpCity",
+        "configurationName": "Arena",
         "header": {
           "Name": "BumpCity",
           "Description": "Amber2",
@@ -14,7 +14,9 @@
           "Xp": 1000,
           "ArenaScene": "Amber2"
         },
-        "payload": {}
+        "application": {},
+        "payload": {},
+        "reference": []
       }
   ]
 }

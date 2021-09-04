@@ -34,6 +34,21 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     protected JsonObject application = new JsonObject();
     protected JsonArray reference = new JsonArray();
 
+    public ConfigurableObject(){}
+    public ConfigurableObject(ConfigurableObject configurableObject){
+        this.configurationType = configurableObject.configurationType;
+        this.configurationTypeId = configurableObject.configurationTypeId;
+        this.configurationName = configurableObject.configurationName;
+        this.configurationCategory = configurableObject.configurationCategory;
+        this.configurationVersion = configurableObject.configurationVersion;
+        this.header = configurableObject.header;
+        this.application = configurableObject.application;
+        this.payload = configurableObject.payload;
+        this.reference = configurableObject.reference;
+        this.distributionKey(configurableObject.distributionKey());
+    }
+
+
     public String configurationType() {
         return this.configurationType;
     }
@@ -117,16 +132,22 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         jsonObject.addProperty("configurationName", configurationName);
         jsonObject.addProperty("configurationCategory", configurationCategory);
         jsonObject.addProperty("configurationVersion", configurationVersion);
-        jsonObject.add("header", header);
-        jsonObject.add("application", application);
-        jsonObject.add("payload", payload);
-        jsonObject.add("reference", reference);
+        header.entrySet().forEach((e)->{
+            jsonObject.add(e.getKey(),e.getValue());
+        });
+        application.entrySet().forEach((e)->{
+            jsonObject.add(e.getKey(),e.getValue());
+        });
+        payload.entrySet().forEach((e)->{
+            jsonObject.add(e.getKey(),e.getValue());
+        });
         return jsonObject;
     }
 
     @Override
     public boolean configureAndValidate(byte[] data) {
         JsonObject config = JsonUtil.parse(data);
+        if(!config.has("configurationType")||!config.has("configurationTypeId")||!config.has("configurationName") ||!config.has("configurationCategory")||!config.has("configurationVersion")) return false;
         this.configurationType = config.get("configurationType").getAsString();
         this.configurationTypeId = config.get("configurationTypeId").getAsString();
         this.configurationName = config.get("configurationName").getAsString();
@@ -137,9 +158,6 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     @Override
     public boolean configureAndValidate(JsonObject config) {
-        if(configurationType==null||configurationName==null||configurationTypeId==null||configurationVersion==null||configurationCategory==null){
-            return false;
-        }
         if (!config.has("header") || !config.has("payload") || !config.has("application") || !config.has("reference")) {
             return false;
         }

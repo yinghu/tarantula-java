@@ -1,0 +1,31 @@
+{
+  "type": "commodity",
+  "category": "abilities",
+  "version": "1.0",
+  "description": "abilities item template list",
+  "itemList":
+  [
+      {
+        "configurationName": "MagnetToss",
+        "header":
+        {
+          "Name": "MagnetToss",
+          "Description": "MagnetToss",
+          "AbilityType": "Utility",
+          "Rarity": "Rare",
+          "StopMovementDuringCharge": true,
+          "GlobalCooldownSeconds": 0,
+          "RequiresExplicitTargeting": false,
+          "ShowRangeWhenTargeting": true,
+          "TargetType": "Attacked"
+        },
+        "application": {},
+        "payload":
+        {
+          "TargetShape": {"Shape": "Circle","RadiusMin": 0,"RadiusMax": 7},
+          "DamageShape": {"Shape": "Circle","RadiusMin": 0,"RadiusMax": 2.75}
+        },
+        "reference": []
+      }
+  ]
+}

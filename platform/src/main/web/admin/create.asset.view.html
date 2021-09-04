@@ -41,13 +41,14 @@
     </div>
 </div>
 <script>
-    let itemTemplate = {header:{},payload:{}};
+    let itemTemplate = {header:{},application:{},payload:{},reference:[]};
     itemTemplate.configurationType = TARA_API.query().itemTemplate.type;
     itemTemplate.configurationCategory = TARA_API.query().itemTemplate.category;
     itemTemplate.configurationVersion = TARA_API.query().itemTemplate.version;
     let selectedItem = TARA_API.query().itemTemplate.itemList[TARA_API.query().gameItemIndex];
     itemTemplate.configurationName = selectedItem.configurationName;
     itemTemplate.header = selectedItem.header;
+    itemTemplate.application = selectedItem.application;
     itemTemplate.payload = selectedItem.payload;
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'code'},itemTemplate);
     document.querySelector('#tx-configuration-asset-save').onclick=()=>{

@@ -1,14 +1,13 @@
 {
-  "type": "commodity",
-  "category": "robot",
+  "type": "asset",
+  "category": "robotLevels",
   "version": "1.0",
-  "description": "robot item template list",
+  "description": "robot levels asset template list",
   "itemList":
   [
       {
-        "configurationName": "BossTack",
+        "configurationName": "RobotLevels",
         "header": {
-          "Name": "BossTack","Type": "BossTack"
         },
         "application": {
           "Levels":

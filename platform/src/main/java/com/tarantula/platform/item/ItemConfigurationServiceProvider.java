@@ -28,7 +28,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
         this.gameCluster = gameCluster;
     }
 
-    public List<ConfigurableObject> gameConfig(Descriptor descriptor,String category){
+    public List<ConfigurableObject> list(Descriptor descriptor,String category){
         return applicationPreSetup.list(serviceContext,descriptor,new ConfigurableObjectQuery(category));
     }
     //public Item gameConfiga(Descriptor descriptor,String category){
