@@ -3,6 +3,7 @@ package com.tarantula.admin;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
@@ -13,10 +14,11 @@ public class GameDataAdminModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onLoad")){
-            String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            ApplicationPreSetup app = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            session.write(app.load(context,gameCluster,query[1].getBytes()));
+            //String[] query = session.name().split("#");
+            //GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            //ApplicationPreSetup app = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            //session.write(app.load(context,gameCluster,query[1].getBytes()));
+            session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
         }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");

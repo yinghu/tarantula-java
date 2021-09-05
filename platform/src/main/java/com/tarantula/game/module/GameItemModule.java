@@ -16,6 +16,7 @@ public class GameItemModule implements Module,Configurable.Listener<Item>{
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
     private ConcurrentHashMap<String,Item> itemList;
+
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
@@ -40,15 +41,4 @@ public class GameItemModule implements Module,Configurable.Listener<Item>{
         itemList.put(item.distributionKey(),item);
         this.context.log(item.toJson().toString(),OnLog.WARN);
     }
-    private JsonObject toJson(){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",true);
-        JsonArray alist = new JsonArray();
-        itemList.forEach((k,v)->{
-            alist.add(v.toJson());
-        });
-        jsonObject.add("itemList",alist);
-        return jsonObject;
-    }
-
 }

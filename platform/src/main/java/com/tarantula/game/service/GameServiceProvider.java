@@ -4,7 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.item.Item;
+import com.tarantula.platform.inventory.InventoryServiceProvider;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.tournament.*;

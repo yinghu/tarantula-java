@@ -59,10 +59,12 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         return list(dataStore,application,recoverableFactory);
     }
+
     public <T extends Configurable> List<T> list(ServiceContext context, Descriptor application, RecoverableFactory<T> recoverableFactory){
         DataStore dataStore = context.dataStore(this.serviceDataStore(application),context.partitionNumber());
         return list(dataStore,application,recoverableFactory);
     }
+
     public Set<String> list(ApplicationContext context, Descriptor application){
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         IndexSet referenceSet = new IndexSet("reference");
@@ -70,23 +72,22 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         dataStore.load(referenceSet);
         return referenceSet.keySet;
     }
-    public byte[] load(ApplicationContext context,GameCluster application,byte[] key){
-        DataStore dataStore = context.dataStore(serviceDataStore(application));
-        byte[] data = dataStore.backup().get(key);
-        return data!=null?data:"{}".getBytes();
-    }
+
     public <T extends Configurable> boolean load(ServiceContext context,Descriptor application,T t){
         DataStore dataStore = context.dataStore(this.serviceDataStore(application),context.partitionNumber());
         t.dataStore(dataStore);
         return dataStore.load(t);
     }
+
     protected String serviceDataStore(Descriptor application){
         return application.typeId().replace("-lobby","_service");
     }
+
     protected String serviceDataStore(GameCluster application){
         String serviceTypeId = (String) application.property(GameCluster.GAME_SERVICE);
         return serviceTypeId.replaceAll("-","_");
     }
+
     protected GameZone.RoomProxy joinProxy(String playMode){
         GameZone.RoomProxy roomProxy = new PVERoomProxy();
         if(playMode.equals(GameZone.PLAY_MODE_PVP)){
@@ -100,6 +101,7 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         }
         return roomProxy;
     }
+
     protected <T extends Configurable> List<T> list(DataStore dataStore, Descriptor application, RecoverableFactory<T> recoverableFactory){
         IndexSet indexSet = new IndexSet(recoverableFactory.label());
         indexSet.distributionKey(application.distributionKey());
@@ -117,6 +119,7 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         });
         return arrayList;
     }
+
     protected String query(String type,String category){
         return new StringBuffer().append(type).append(Recoverable.PATH_SEPARATOR).append(category).toString();
     }
