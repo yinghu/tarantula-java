@@ -1,38 +1,54 @@
 package com.tarantula.platform.inventory;
 
 import com.icodesoftware.Configurable;
-import com.tarantula.platform.item.Asset;
 import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.item.Item;
 
-import java.util.ArrayList;
 
 public class InventoryRedeemer extends ConfigurableObject {
 
     private String systemId;
-    private ArrayList<InventoryRedeemer> _pendingCommodity;
+
     public InventoryRedeemer(String systemId){
         this.systemId = systemId;
-        _pendingCommodity = new ArrayList<>();
+    }
+    public InventoryRedeemer(String systemId,InventoryRedeemer inventoryRedeemer){
+        this.systemId = systemId;
+        this.configurationType = inventoryRedeemer.configurationType;
+        this.configurationTypeId = inventoryRedeemer.configurationTypeId;
+        this.configurationName = inventoryRedeemer.configurationName;
+        this.configurationCategory = inventoryRedeemer.configurationCategory;
+        this.configurationVersion = inventoryRedeemer.configurationVersion;
+        this.header = inventoryRedeemer.header;
+        this.application = inventoryRedeemer.application;
+        this.payload = inventoryRedeemer.payload;
+        this.reference = inventoryRedeemer.reference;
+        this.distributionKey(inventoryRedeemer.distributionKey());
     }
 
     @Override
     public  <T extends Configurable> T setup(){
         if(this.configurationType.equals(Configurable.ASSET_CONFIG_TYPE)){
-            //Asset asset = new Asset(this);
-            //asset.dataStore(dataStore);
-            //return asset.setup();
+            //skip
         }
-        if(this.configurationType.equals(Configurable.COMMODITY_CONFIG_TYPE)){
-            //Commodity commodity = new Commodity(this);
-            //commodity.dataStore(dataStore);
-            //return commodity.setup();
+        else if(this.configurationType.equals(Configurable.COMMODITY_CONFIG_TYPE)){
+            reference.forEach((ref)->{//redeem commodity
+                ConfigurableObject cop = new ConfigurableObject();
+                cop.distributionKey(ref.getAsString());
+                if(this.dataStore.load(cop)){
+                    Inventory inventory = new Inventory(cop.configurationCategory());
+                    inventory.distributionKey(systemId);
+                    this.dataStore.createIfAbsent(inventory,true);
+                    inventory.dataStore(dataStore);
+                    inventory.redeem(new Commodity(cop));
+                }
+            });
         }
-        if(this.configurationType.equals(Configurable.ITEM_CONFIG_TYPE)){
-            //Item item = new Item(this);
-            //item.dataStore(dataStore);
-            //return item.setup();
+        else if(this.configurationType.equals(Configurable.ITEM_CONFIG_TYPE)){
+            //redeem item
+            InventoryRedeemer item = new InventoryRedeemer(systemId,this);
+            item.dataStore(dataStore);
+            item.setup();
         }
         return null;
     }

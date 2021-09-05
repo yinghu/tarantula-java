@@ -2,6 +2,7 @@ package com.tarantula.platform.item;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
+import com.tarantula.platform.inventory.InventoryItem;
 
 
 public class ItemPortableRegistry extends AbstractRecoverableListener {
@@ -12,6 +13,8 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
     public static final int ASSET_CID = 2;
     public static final int COMMODITY_CID = 3;
     public static final int ITEM_CID = 4;
+
+    public static final int INVENTORY_ITEM_CID = 5;
 
     public Recoverable create(int i) {
         Recoverable pt = null;
@@ -27,6 +30,9 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
                 break;
             case ITEM_CID:
                 pt = new Item();
+                break;
+            case INVENTORY_ITEM_CID:
+                pt = new InventoryItem();
                 break;
             default:
         }

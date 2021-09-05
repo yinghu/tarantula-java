@@ -59,6 +59,9 @@
             <view type="live.game.service.store">
                 <property name="moduleResourceFile">presence/live.game.service.store.view.html</property>
             </view>
+            <view type="live.game.service.inventory">
+                <property name="moduleResourceFile">presence/live.game.service.inventory.view.html</property>
+            </view>
         </view-list>
     </lobby-context>
 </tarantula>

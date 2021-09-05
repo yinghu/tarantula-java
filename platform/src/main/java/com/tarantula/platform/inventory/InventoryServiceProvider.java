@@ -4,12 +4,13 @@ import com.icodesoftware.Descriptor;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
-import com.sleepycat.je.tree.IN;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.Item;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
+
+import java.util.List;
 
 public class InventoryServiceProvider implements ServiceProvider {
     private TarantulaLogger logger;
@@ -41,9 +42,13 @@ public class InventoryServiceProvider implements ServiceProvider {
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        //this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);
-        //this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
+    }
+    public List<InventoryItem> list(String systemId,String category){
+        Inventory inventory = new Inventory(category);
+        inventory.distributionKey(systemId);
+        //this.applicationPreSetup.load(serviceContext,)
+        return inventory.list();
     }
     public boolean redeem(String systemId, Item item){
         InventoryRedeemer redeemer = new InventoryRedeemer(systemId);
@@ -54,12 +59,6 @@ public class InventoryServiceProvider implements ServiceProvider {
             return false;
         }
         redeemer.setup();
-        //Inventory inventory = new Inventory(item.configurationCategory());
-        //inventory.distributionKey(systemId);
-        //if(this.dataStore.load(inventory)){
-
-        //}
-        //logger.warn(item.toJson().toString());
         return true;
     }
 }
