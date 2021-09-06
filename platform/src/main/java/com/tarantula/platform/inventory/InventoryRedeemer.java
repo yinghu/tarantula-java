@@ -7,7 +7,7 @@ import com.tarantula.platform.item.ConfigurableObject;
 
 public class InventoryRedeemer extends ConfigurableObject {
 
-    private String systemId;
+    protected String systemId;
 
     public InventoryRedeemer(String systemId){
         this.systemId = systemId;
@@ -26,30 +26,27 @@ public class InventoryRedeemer extends ConfigurableObject {
         this.distributionKey(inventoryRedeemer.distributionKey());
     }
 
-    @Override
-    public  <T extends Configurable> T setup(){
-        if(this.configurationType.equals(Configurable.ASSET_CONFIG_TYPE)){
-            //skip
-        }
-        else if(this.configurationType.equals(Configurable.COMMODITY_CONFIG_TYPE)){
-            reference.forEach((ref)->{//redeem commodity
-                ConfigurableObject cop = new ConfigurableObject();
-                cop.distributionKey(ref.getAsString());
-                if(this.dataStore.load(cop)){
-                    Inventory inventory = new Inventory(cop.configurationCategory());
-                    inventory.distributionKey(systemId);
-                    this.dataStore.createIfAbsent(inventory,true);
-                    inventory.dataStore(dataStore);
-                    inventory.redeem(new Commodity(cop));
+
+    public  void redeem(){
+        reference.forEach((ref)->{
+            InventoryRedeemer inventoryRedeemer = new InventoryRedeemer(systemId);
+            inventoryRedeemer.distributionKey(ref.getAsString());
+            if(dataStore.load(inventoryRedeemer)){
+                if(inventoryRedeemer.configurationType().equals(Configurable.ASSET_CONFIG_TYPE)){
+                    AssetRedeemer assetRedeemer = new AssetRedeemer(systemId,inventoryRedeemer);
+                    assetRedeemer.dataStore(dataStore);
+                    assetRedeemer.redeem();
                 }
-            });
-        }
-        else if(this.configurationType.equals(Configurable.ITEM_CONFIG_TYPE)){
-            //redeem item
-            InventoryRedeemer item = new InventoryRedeemer(systemId,this);
-            item.dataStore(dataStore);
-            item.setup();
-        }
-        return null;
+                else if(inventoryRedeemer.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE)){
+                    CommodityRedeemer commodityRedeemer = new CommodityRedeemer(systemId,inventoryRedeemer);
+                    commodityRedeemer.dataStore(dataStore);
+                    commodityRedeemer.redeem();
+                }
+                else if(inventoryRedeemer.configurationType().equals(Configurable.ITEM_CONFIG_TYPE)){
+                    inventoryRedeemer.dataStore(dataStore);
+                    inventoryRedeemer.redeem();
+                }
+            }
+        });
     }
 }

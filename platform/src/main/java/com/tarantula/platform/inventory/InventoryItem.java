@@ -3,7 +3,6 @@ package com.tarantula.platform.inventory;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
@@ -14,7 +13,7 @@ public class InventoryItem extends ConfigurableObject {
     public InventoryItem(){
 
     }
-    public InventoryItem(Commodity commodity){
+    public InventoryItem(InventoryRedeemer commodity){
         this.configurationName = commodity.configurationName();
         this.configurationTypeId = commodity.configurationTypeId();
         this.reference.add(commodity.distributionKey());

@@ -10,6 +10,7 @@ import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InventoryServiceProvider implements ServiceProvider {
@@ -44,21 +45,22 @@ public class InventoryServiceProvider implements ServiceProvider {
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);
     }
-    public List<InventoryItem> list(String systemId,String category){
+    public Inventory inventory(String systemId,String category){
         Inventory inventory = new Inventory(category);
         inventory.distributionKey(systemId);
-        //this.applicationPreSetup.load(serviceContext,)
-        return inventory.list();
+        GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        Descriptor app = _gc.serviceWithCategory("store");
+        if(!this.applicationPreSetup.load(serviceContext,app,inventory)) return null;
+        inventory.list();
+        return inventory;
     }
     public boolean redeem(String systemId, Item item){
         InventoryRedeemer redeemer = new InventoryRedeemer(systemId);
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory("store");
-        if(!applicationPreSetup.load(serviceContext,app,redeemer)){
-            return false;
-        }
-        redeemer.setup();
+        if(!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
+        redeemer.redeem();
         return true;
     }
 }

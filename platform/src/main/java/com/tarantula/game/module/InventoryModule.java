@@ -4,18 +4,36 @@ import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Module;
 import com.icodesoftware.OnLog;
 import com.icodesoftware.Session;
+import com.icodesoftware.util.JsonUtil;
+import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.inventory.Inventory;
+
 
 public class InventoryModule implements Module {
+
     private ApplicationContext context;
+    private GameServiceProvider gameServiceProvider;
 
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
+        if(session.action().equals("onList")){
+            Inventory inventory = gameServiceProvider.inventoryServiceProvider().inventory(session.systemId(),"abilities");
+            if(inventory!=null){
+                session.write(inventory.toJson().toString().getBytes());
+            }else{
+                session.write(JsonUtil.toSimpleResponse(false,"no inventory").getBytes());
+            }
+        }
+        else if(session.action().equals("onView")){
+            session.write(JsonUtil.toSimpleResponse(false,"inventory view").getBytes());
+        }
         return false;
     }
 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
+        this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
         this.context.log("Inventory module started", OnLog.WARN);
     }
     @Override
