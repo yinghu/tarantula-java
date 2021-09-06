@@ -43,7 +43,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		for(LobbyConfiguration c:configurations){//may load from cluster or data store or local files
 			//c.configurations = query(recoverService,PortableRegistry.OID,new ApplicationConfigurationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
 			//this.context.configureConfigurations(c);
-			c.views = query(recoverService,PortableRegistry.OID,new OnViewQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
+			c.views = this.context.loadViewList(c.descriptor.typeId());//query(recoverService,PortableRegistry.OID,new OnViewQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
 			this.context.configureViews(c);//deploy views
 			c.applications = query(recoverService,PortableRegistry.OID,new ApplicationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
 			OnLobby _ob = this.context.configure(c);
@@ -148,10 +148,10 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 				}
 				dataStore.create(a);
 			});
-			c.views.forEach((v)->{
-				v.owner(c.descriptor.distributionKey());
-				dataStore.create(v);
-			});
+			//c.views.forEach((v)->{
+				//v.owner(c.descriptor.distributionKey());
+				//dataStore.create(v);
+			//});
 			//c.configurations.forEach((cf)->{
 				//cf.owner(c.descriptor.distributionKey());
 				//dataStore.create(cf);

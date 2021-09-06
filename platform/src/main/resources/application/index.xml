@@ -17,19 +17,5 @@
                 <class-name>com.tarantula.platform.presence.UserManagementApplication</class-name>
             </application>
         </application-list>
-        <view-list>
-            <view type="sign.in">
-                <property name="moduleResourceFile">sign.in.view.html</property>
-            </view>
-            <view type="sign.up">
-                <property name="moduleResourceFile">sign.up.view.html</property>
-            </view>
-            <view type="password.reset">
-                <property name="moduleResourceFile">password.reset.view.html</property>
-            </view>
-            <view type="invalid.request">
-                <property name="moduleResourceFile">invalid.request.view.html</property>
-            </view>
-        </view-list>
     </lobby-context>
 </tarantula>

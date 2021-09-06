@@ -24,8 +24,8 @@ public class XMLParser extends DefaultHandler{
 	LobbyConfiguration configuration;
 
 	DeploymentDescriptor applicationDescriptor;
-	OnView view;
-    String pname;
+	//OnView view;
+    //String pname;
 
     //Configuration applicationConfiguration;
 
@@ -50,16 +50,16 @@ public class XMLParser extends DefaultHandler{
 		else if(tblock.equals("application-list")&&qname.equals("application")){
 			this.applicationDescriptor = new DeploymentDescriptor();
 		}
-		else if(qname.equals("view-list")){
-		    this.tblock = qname;
-        }
-		else if(qname.equals("view")){
-            this.view = new OnViewTrack();
-            this.view.viewId(attributes.getValue("type"));
-        }
-        else if(tblock.equals("view-list")&&qname.equals("property")){
-            pname = attributes.getValue("name");
-        }
+		//else if(qname.equals("view-list")){
+		    //this.tblock = qname;
+        //}
+		//else if(qname.equals("view")){
+            //this.view = new OnViewTrack();
+            //this.view.viewId(attributes.getValue("type"));
+        //}
+        //else if(tblock.equals("view-list")&&qname.equals("property")){
+            //pname = attributes.getValue("name");
+        //}
         //else if(qname.equals("configuration-list")){
             //this.tblock = qname;
         //}
@@ -166,31 +166,31 @@ public class XMLParser extends DefaultHandler{
             else if(tblock.equals("application-list")&&qname.equals("log-enabled")){
                 this.applicationDescriptor.logEnabled(Boolean.parseBoolean(value));
             }
-            else if(tblock.equals("view-list")&&qname.equals("property")){
-                if(pname.equals("moduleContext")){
-                    view.moduleContext(value);
-                }
-                else if(pname.equals("moduleResourceFile")){
-                    view.moduleResourceFile(value);
-                }
-            }
+            //else if(tblock.equals("view-list")&&qname.equals("property")){
+                //if(pname.equals("moduleContext")){
+                    //view.moduleContext(value);
+                //}
+                //else if(pname.equals("moduleResourceFile")){
+                    //view.moduleResourceFile(value);
+                //}
+            //}
             //else if(tblock.equals("configuration-list")&&qname.equals("property")){
                 //this.applicationConfiguration.property(pname,value);
             //}
 			else if(tblock.equals("application-list")&&qname.equals("application")){
                 this.configuration.applications.add(this.applicationDescriptor);
             }
-            else  if(tblock.equals("view-list")&&qname.equals("view")){
-                if(view.moduleContext()==null){
-                    int _mix = view.moduleResourceFile().lastIndexOf('/');
-                    if(_mix<0){
-                        view.moduleContext("root");
-                    }else{
-                        view.moduleContext(view.moduleResourceFile().substring(0,_mix));
-                    }
-                }
-                this.configuration.views.add(view);
-            }
+            //else  if(tblock.equals("view-list")&&qname.equals("view")){
+                //if(view.moduleContext()==null){
+                    //int _mix = view.moduleResourceFile().lastIndexOf('/');
+                    //if(_mix<0){
+                        //view.moduleContext("root");
+                    //}else{
+                        //view.moduleContext(view.moduleResourceFile().substring(0,_mix));
+                    //}
+                //}
+                //this.configuration.views.add(view);
+            //}
             //else if(tblock.equals("configuration-list")&&qname.equals("configuration")){
                 //this.configuration.configurations.add(applicationConfiguration);
             //}

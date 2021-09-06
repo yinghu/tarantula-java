@@ -16,52 +16,5 @@
                 <class-name>com.tarantula.platform.presence.PresenceApplication</class-name>
             </application>
         </application-list>
-        <view-list>
-            <view type="dashboard">
-                <property name="moduleResourceFile">presence/dashboard.view.html</property>
-            </view>
-            <view type="add.email">
-                <property name="moduleResourceFile">presence/add.email.view.html</property>
-            </view>
-            <view type="validate.email">
-                <property name="moduleResourceFile">presence/validate.email.view.html</property>
-            </view>
-            <view type="change.password">
-                <property name="moduleResourceFile">presence/change.password.view.html</property>
-            </view>
-            <view type="upgrade.role.account">
-                <property name="moduleResourceFile">presence/upgrade.account.view.html</property>
-            </view>
-            <view type="upgrade.role.admin">
-                <property name="moduleResourceFile">presence/upgrade.admin.view.html</property>
-            </view>
-            <view type="game.cluster.price">
-                <property name="moduleResourceFile">presence/game.cluster.price.view.html</property>
-            </view>
-            <view type="play.game.tossup">
-                <property name="moduleResourceFile">presence/play.game.tossup.view.html</property>
-            </view>
-            <view type="play.game.tictactoe">
-                <property name="moduleResourceFile">presence/play.game.tictactoe.view.html</property>
-            </view>
-            <view type="play.game.tossup.tournament">
-                <property name="moduleResourceFile">presence/live.game.service.tournament.view.html</property>
-            </view>
-            <view type="live.game.service.tournament">
-                <property name="moduleResourceFile">presence/live.game.service.tournament.view.html</property>
-            </view>
-            <view type="live.game.service.statistics">
-                <property name="moduleResourceFile">presence/live.game.service.statistics.view.html</property>
-            </view>
-            <view type="live.game.service.leaderboard">
-                <property name="moduleResourceFile">presence/live.game.service.leaderboard.view.html</property>
-            </view>
-            <view type="live.game.service.store">
-                <property name="moduleResourceFile">presence/live.game.service.store.view.html</property>
-            </view>
-            <view type="live.game.service.inventory">
-                <property name="moduleResourceFile">presence/live.game.service.inventory.view.html</property>
-            </view>
-        </view-list>
     </lobby-context>
 </tarantula>

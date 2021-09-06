@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.*;
+import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.tarantula.cci.udp.PendingServerPushMessage;
 import com.tarantula.cci.udp.UDPSessionService;
@@ -490,6 +491,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(!Files.exists(_config_game)){
                 Files.createDirectories(_config_game);
             }
+            //JsonObject jview = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("view-index-settings.json"));
+            //log.warn(jview.toString());
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }

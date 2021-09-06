@@ -7,6 +7,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.icodesoftware.*;
@@ -833,5 +835,22 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
                 return null;
             }
         });
+    }
+
+    public List<OnView> loadViewList(String typeId){
+ 	    log.warn("Load view list->"+typeId);
+ 	    ArrayList<OnView> _vlist = new ArrayList<>();
+        JsonObject jview = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("view-"+typeId+"-settings.json"));
+        String context = jview.get("context").getAsString();
+        JsonArray views = jview.get("viewList").getAsJsonArray();
+ 	    views.forEach((je)->{
+ 	        JsonObject jv = je.getAsJsonObject();
+ 	        OnViewTrack view = new OnViewTrack();
+ 	        view.moduleContext(context);
+ 	        view.viewId(jv.get("type").getAsString());
+ 	        view.moduleResourceFile(jv.get("moduleResourceFile").getAsString());
+ 	        _vlist.add(view);
+        });
+        return _vlist;
     }
 }
