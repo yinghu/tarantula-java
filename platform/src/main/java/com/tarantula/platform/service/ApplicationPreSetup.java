@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface ApplicationPreSetup {
-    String SET_UP_TYPE = "pre-setup";
+
     String SET_UP_NAME = "application-pre-setup";
     void setup(ServiceContext serviceContext,Descriptor application,String configName);
     <T extends Configurable> T load(ApplicationContext context,Descriptor application);

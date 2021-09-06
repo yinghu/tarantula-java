@@ -1,0 +1,7 @@
+{
+  "maxGameClusterCount":10,
+  "maxGameLobbyCount":10,
+  "minGameLobbyCount":1,
+  "defaultGameLevelCount":3,
+  "maxGameLevelCount":10
+}

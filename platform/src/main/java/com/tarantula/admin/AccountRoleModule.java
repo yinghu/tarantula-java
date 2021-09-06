@@ -114,7 +114,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.user = this.context.dataStore(Access.DataStore);
         this.account = this.context.dataStore(Account.DataStore);
-        this.maxUserCount = Integer.parseInt(this.context.configuration("user").property("maxUserCount").toString());
+        this.maxUserCount = ((Number)this.context.configuration("user").property("maxUserCount")).intValue();
         DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.registerAccessIndexListener(this);
         this.context.log("Account role module started with max user count ["+maxUserCount+"]", OnLog.INFO);

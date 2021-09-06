@@ -32,8 +32,8 @@ public class AdminRoleModule implements Module,Configurable.Listener {
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
     private int maxGameClusterCount;
-    private SubscriptionFee monthly;
-    private SubscriptionFee yearly;
+    //private SubscriptionFee monthly;
+    //private SubscriptionFee yearly;
 
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
@@ -65,9 +65,9 @@ public class AdminRoleModule implements Module,Configurable.Listener {
             }
             session.write(adminContext.toJson().toString().getBytes());
         }
-        else if(session.action().equals("onShoppingList")){
-            session.write(new ShoppingContext(monthly,yearly).toJson().toString().getBytes());
-        }
+        //else if(session.action().equals("onShoppingList")){
+            //session.write(new ShoppingContext(monthly,yearly).toJson().toString().getBytes());
+        //}
         else if(session.action().equals("onCreateAccessKey")){
             //generate access key from game cluster id
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -168,6 +168,7 @@ public class AdminRoleModule implements Module,Configurable.Listener {
                 session.write(this.builder.create().toJson(new ResponseHeader(session.action(), "no subscription or trial found", false)).getBytes());
             }
         }
+        /**
         else if(session.action().equals("onCommitPurchase")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String cid = (String)onAccess.property("checkoutId");
@@ -189,7 +190,7 @@ public class AdminRoleModule implements Module,Configurable.Listener {
             else{
                 session.write(this.builder.create().toJson(new ResponseHeader("onCommit", "failed to commit your purchase", false)).getBytes());
             }
-        }
+        }**/
         else if(session.action().equals("onShutdownGameCluster")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
@@ -206,10 +207,10 @@ public class AdminRoleModule implements Module,Configurable.Listener {
     @Override
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
-        Configuration ya = this.context.configuration("yearlyAccess");
-        Configuration ma = this.context.configuration("monthlyAccess");
-        monthly = new SubscriptionFee("monthlyAccess",ma.property("description").toString(),ma.property("price").toString(),ma.property("currency").toString(),Integer.parseInt(ma.property("durationMonths").toString()));
-        yearly = new SubscriptionFee("yearlyAccess",ya.property("description").toString(),ya.property("price").toString(),ya.property("currency").toString(),Integer.parseInt(ya.property("durationMonths").toString()));
+        //Configuration ya = this.context.configuration("yearlyAccess");
+        //Configuration ma = this.context.configuration("monthlyAccess");
+        //monthly = new SubscriptionFee("monthlyAccess",ma.property("description").toString(),ma.property("price").toString(),ma.property("currency").toString(),Integer.parseInt(ma.property("durationMonths").toString()));
+        //yearly = new SubscriptionFee("yearlyAccess",ya.property("description").toString(),ya.property("price").toString(),ya.property("currency").toString(),Integer.parseInt(ya.property("durationMonths").toString()));
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
@@ -218,11 +219,11 @@ public class AdminRoleModule implements Module,Configurable.Listener {
         this.purchase = this.context.dataStore(SubscriptionFee.DataStore);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        ya.registerListener(this);
-        ma.registerListener(this);
-        this.deploymentServiceProvider.register(ya);
-        this.deploymentServiceProvider.register(ma);
-        this.maxGameClusterCount = Integer.parseInt(this.context.configuration("cluster").property("maxGameClusterCount").toString());
+        //ya.registerListener(this);
+        //ma.registerListener(this);
+        //this.deploymentServiceProvider.register(ya);
+        //this.deploymentServiceProvider.register(ma);
+        this.maxGameClusterCount = ((Number)this.context.configuration("cluster").property("maxGameClusterCount")).intValue();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
 

@@ -86,27 +86,6 @@
                 <access-control>30</access-control>
             </application>
         </application-list>
-        <configuration-list>
-                <configuration type="setup" name="cluster">
-                    <property name="maxGameClusterCount">10</property>
-                    <property name="maxGameLobbyCount">10</property>
-                    <property name="minGameLobbyCount">1</property>
-                    <property name="defaultGameLevelCount">3</property>
-                    <property name="maxGameLevelCount">10</property>
-                </configuration>
-                <configuration name="yearlyAccess" type="subscription">
-                    <property name="description">Yearly Subscription</property>
-                    <property name="price">1980.00</property>
-                    <property name="currency">USD</property>
-                    <property name="durationMonths">12</property>
-                </configuration>
-                <configuration name="monthlyAccess" type="subscription">
-                    <property name="description">Monthly Subscription</property>
-                    <property name="price">180.00</property>
-                    <property name="currency">USD</property>
-                    <property name="durationMonths">1</property>
-                </configuration>
-        </configuration-list>
         <view-list>
             <view type="create.game.cluster">
                 <property name="moduleResourceFile">admin/create.game.cluster.view.html</property>

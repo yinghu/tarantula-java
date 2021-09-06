@@ -45,11 +45,6 @@ public class ApplicationContextProxy implements ApplicationContext {
     }
 
     @Override
-    public List<Configuration> configuration() {
-        return this.tarantulaApplicationContext.configuration();
-    }
-
-    @Override
     public TokenValidator validator() {
         return this.tarantulaApplicationContext.validator();
     }

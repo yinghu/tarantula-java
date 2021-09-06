@@ -13,20 +13,10 @@
                 <name>User</name>
                 <type>application</type>
                 <tag>index/user</tag>
+                <category>account</category>
                 <class-name>com.tarantula.platform.presence.UserManagementApplication</class-name>
             </application>
-
         </application-list>
-        <configuration-list>
-            <configuration type="setup" name="account">
-                <property name="lobbyId">presence</property>
-                <property name="activated">false</property>
-                <property name="initialBalance">1000000</property>
-                <property name="roleName">player</property>
-                <property name="root">root</property>
-                <property name="password">root</property>
-            </configuration>
-        </configuration-list>
         <view-list>
             <view type="sign.in">
                 <property name="moduleResourceFile">sign.in.view.html</property>

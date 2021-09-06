@@ -38,17 +38,17 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         Configuration configuration = this.context.configuration("account");
-        this.lobbyId = configuration.property("lobbyId").toString();
-        this.activated = Boolean.parseBoolean(configuration.property("activated").toString());
-        this.initialBalance = Double.parseDouble(configuration.property("initialBalance").toString());
-        this.role = configuration.property("roleName").toString();
+        this.lobbyId = (String)configuration.property("lobbyId");
+        this.activated = (boolean)configuration.property("activated");
+        this.initialBalance = ((Number)configuration.property("initialBalance")).doubleValue();
+        this.role = (String)configuration.property("roleName");
         builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.roleList = this.tokenValidatorProvider.list();
-        String root = configuration.property("root").toString();
-        String pwd = configuration.property("password").toString();
+        String root = (String)configuration.property("root");
+        String pwd = (String) configuration.property("password");
         OnAccess onAccess = new OnAccessTrack();
         onAccess.property("login",root);
         onAccess.property("password",pwd);

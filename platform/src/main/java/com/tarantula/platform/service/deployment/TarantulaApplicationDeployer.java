@@ -41,8 +41,8 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		});
 		Collections.sort(configurations,new LobbyComparator());
 		for(LobbyConfiguration c:configurations){//may load from cluster or data store or local files
-			c.configurations = query(recoverService,PortableRegistry.OID,new ApplicationConfigurationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
-			this.context.configureConfigurations(c);
+			//c.configurations = query(recoverService,PortableRegistry.OID,new ApplicationConfigurationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
+			//this.context.configureConfigurations(c);
 			c.views = query(recoverService,PortableRegistry.OID,new OnViewQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
 			this.context.configureViews(c);//deploy views
 			c.applications = query(recoverService,PortableRegistry.OID,new ApplicationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
@@ -152,10 +152,10 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 				v.owner(c.descriptor.distributionKey());
 				dataStore.create(v);
 			});
-			c.configurations.forEach((cf)->{
-				cf.owner(c.descriptor.distributionKey());
-				dataStore.create(cf);
-			});
+			//c.configurations.forEach((cf)->{
+				//cf.owner(c.descriptor.distributionKey());
+				//dataStore.create(cf);
+			//});
 		});
 		return blist;
 	}

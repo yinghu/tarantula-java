@@ -22,22 +22,19 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
      private ConcurrentHashMap<Integer,RecoverableListener> rMap = new ConcurrentHashMap<>();
 
-    private HashMap<String,Configuration> configurations;
-
 
     private boolean logEnabled;
     private TarantulaLogger log;
 
     private TokenValidator validator;
 
-    private final boolean resetEnabled;
+    //private final boolean resetEnabled;
 
-    public TarantulaApplicationContext(TarantulaContext tarantulaContext,Descriptor descriptor,TarantulaApplication application,HashMap<String,Configuration> configurations){
+    public TarantulaApplicationContext(TarantulaContext tarantulaContext,Descriptor descriptor,TarantulaApplication application){
         this.tarantulaContext = tarantulaContext;
         this._descriptor = descriptor;
         this.application = application;
-        this.configurations = configurations;
-        this.resetEnabled = descriptor.resetEnabled();
+        //this.resetEnabled = descriptor.resetEnabled();
     }
     public String typeId(){
         return this._descriptor.typeId();
@@ -64,11 +61,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     }
 
     public Configuration configuration(String name){
-       return this.configurations.get(name);
+        return this.tarantulaContext.configuration(_descriptor.typeId()+"-"+name+"-settings");//this.configurations.get(name);
     }
-    public List<Configuration> configuration(){
-       return new ArrayList<>(this.configurations.values());
-    }
+
     public ScheduledFuture<?> schedule(SchedulingTask task){
         return this.tarantulaContext.schedule(task);
     }
@@ -168,7 +163,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     public void clear(){
         this.application.clear();
-        configurations.clear();
         rMap.clear();
     }
 }

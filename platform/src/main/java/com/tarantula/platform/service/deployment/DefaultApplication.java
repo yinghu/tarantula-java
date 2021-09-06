@@ -16,7 +16,7 @@ public class DefaultApplication implements Application {
     protected final DeploymentDescriptor deploymentDescriptor;
 
 
-    protected HashMap<String, Configuration> configurations = new HashMap<>();
+    //protected HashMap<String, Configuration> configurations = new HashMap<>();
 
     public DefaultApplication(final TarantulaContext tarantulaContext, final DeploymentDescriptor deploymentDescriptor){
         this.tarantulaContext = tarantulaContext;
@@ -36,12 +36,12 @@ public class DefaultApplication implements Application {
 
     @Override
     public void start() throws Exception{
-        List<Configuration> clist = this.tarantulaContext.configurations(this.deploymentDescriptor.typeId());
-        if(clist!=null){
-            clist.forEach((c)->{
-                this.configurations.put(c.configurationName(),c);
-            });
-        }
+        //List<Configuration> clist = this.tarantulaContext.configurations(this.deploymentDescriptor.typeId());
+        //if(clist!=null){
+            //clist.forEach((c)->{
+                //this.configurations.put(c.configurationName(),c);
+        //});
+        //}
         //log.warn("Application ["+this.deploymentDescriptor.name()+"/"+this.deploymentDescriptor.distributionKey()+"] started");
     }
 
@@ -59,7 +59,7 @@ public class DefaultApplication implements Application {
             TarantulaApplicationContext app;
             TarantulaApplication _app = (TarantulaApplication)Class.forName(this.deploymentDescriptor.applicationClassName()).getConstructor().newInstance();
             _app.descriptor(dd);
-            app = new TarantulaApplicationContext(tarantulaContext,dd,_app,this.configurations);
+            app = new TarantulaApplicationContext(tarantulaContext,dd,_app);
             return app;
 
         }catch (Exception ex){
@@ -67,12 +67,6 @@ public class DefaultApplication implements Application {
             throw new RuntimeException(ex);
         }
     }
-    @Override
-    public  Configuration configuration(String type){
-        return this.configurations.get(type);
-    }
-
-
 
     public void atMidnight(){
 

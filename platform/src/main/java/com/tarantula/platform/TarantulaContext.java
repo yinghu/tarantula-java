@@ -101,7 +101,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     private final ConcurrentHashMap<String,ServiceProvider> serviceProviders = new ConcurrentHashMap();
     private final ConcurrentHashMap<String,ServiceProvider> dataStoreProviders = new ConcurrentHashMap();
-    private final ConcurrentHashMap<String,List<Configuration>> configurations = new ConcurrentHashMap<>();
+    //private final ConcurrentHashMap<String,List<Configuration>> configurations = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String,ConfigurableTemplate> cMap = new ConcurrentHashMap<>();
 
@@ -216,11 +216,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         singletonApplicationManager.start();
         lb.addEntry(c);
     }
-    public void configureConfigurations(LobbyConfiguration conf){
-        if(conf.configurations.size()>0){
-            configurations.put(conf.descriptor.typeId(),conf.configurations);
-        }
- 	}
+
     public void configureViews(LobbyConfiguration conf){
  	    conf.views.forEach((v)->{
  	        this.deploymentServiceProvider.register(v);
@@ -501,9 +497,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public IntegrationCluster integrationCluster(){
         return integrationCluster;
     }
-    public List<Configuration> configurations(String name){
- 	    return this.configurations.get(name);
-    }
+    //public List<Configuration> configurations(String name){
+ 	    //return this.configurations.get(name);
+    //}
     public ServiceProvider serviceProvider(String name){
         return this.serviceProviders.get(name);
     }
@@ -779,7 +775,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             kv.forEach((k,v)->applicationConfiguration.property(k,v));
             return applicationConfiguration;
  	    }catch (Exception ex){
-            log.error("error on load master config->"+config,ex);
+            log.warn("no master config->"+config);
  	        return  null;
         }
     }

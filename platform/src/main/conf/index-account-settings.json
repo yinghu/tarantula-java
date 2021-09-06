@@ -1,0 +1,8 @@
+{
+  "lobbyId":"presence",
+  "activated":false,
+  "initialBalance":1000000,
+  "roleName":"player",
+  "root":"root",
+  "password":"root"
+}

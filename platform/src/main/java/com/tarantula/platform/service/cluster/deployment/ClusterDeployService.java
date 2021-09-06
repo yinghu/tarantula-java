@@ -328,14 +328,12 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     throw new RuntimeException("["+name+"] duplicated");
                 }
                 ApplicationPreSetup[] preSetup = {null};
-                configuration.configurations.forEach(c->{
-                    if(c.configurationType().equals(ApplicationPreSetup.SET_UP_TYPE)){
-                        String cname = c.property(ApplicationPreSetup.SET_UP_NAME).toString();
-                        gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,cname);
-                        gameCluster.property(GameCluster.MODE,c.configurationName());
-                        preSetup[0] = SystemUtil.applicationPreSetup(cname);
-                    }
-                });
+                Configuration presetup = this.tarantulaContext.configuration(configuration.descriptor.category()+"-pre-setup-settings");
+                if(presetup!=null){
+                    String cname = (String) presetup.property(ApplicationPreSetup.SET_UP_NAME);
+                    gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,cname);
+                    preSetup[0] = SystemUtil.applicationPreSetup(cname);
+                }
                 //log.warn("Create named lobby type id->"+configuration.descriptor.typeId());
                 Descriptor descriptor = configuration.descriptor;
                 descriptor.owner(publishingId);

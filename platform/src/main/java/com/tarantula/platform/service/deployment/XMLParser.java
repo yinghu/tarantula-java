@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import com.icodesoftware.Configuration;
 import com.icodesoftware.OnView;
-import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.OnViewTrack;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -29,7 +27,7 @@ public class XMLParser extends DefaultHandler{
 	OnView view;
     String pname;
 
-    Configuration applicationConfiguration;
+    //Configuration applicationConfiguration;
 
     public XMLParser(){
 	}
@@ -62,17 +60,17 @@ public class XMLParser extends DefaultHandler{
         else if(tblock.equals("view-list")&&qname.equals("property")){
             pname = attributes.getValue("name");
         }
-        else if(qname.equals("configuration-list")){
-            this.tblock = qname;
-        }
-        else if(qname.equals("configuration")){
-            this.applicationConfiguration = new ApplicationConfiguration();
-            this.applicationConfiguration.configurationType(attributes.getValue("type"));
-            this.applicationConfiguration.configurationName(attributes.getValue("name"));
-        }
-        else if(tblock.equals("configuration-list")&&qname.equals("property")){
-            pname = attributes.getValue("name");
-        }
+        //else if(qname.equals("configuration-list")){
+            //this.tblock = qname;
+        //}
+        //else if(qname.equals("configuration")){
+            //this.applicationConfiguration = new ApplicationConfiguration();
+            //this.applicationConfiguration.configurationType(attributes.getValue("type"));
+            //this.applicationConfiguration.configurationName(attributes.getValue("name"));
+        //}
+        //else if(tblock.equals("configuration-list")&&qname.equals("property")){
+            //pname = attributes.getValue("name");
+        //}
 	}
 	@Override
 	public void endElement(String uri, String lname, String qname) throws SAXException {
@@ -176,9 +174,9 @@ public class XMLParser extends DefaultHandler{
                     view.moduleResourceFile(value);
                 }
             }
-            else if(tblock.equals("configuration-list")&&qname.equals("property")){
-                this.applicationConfiguration.property(pname,value);
-            }
+            //else if(tblock.equals("configuration-list")&&qname.equals("property")){
+                //this.applicationConfiguration.property(pname,value);
+            //}
 			else if(tblock.equals("application-list")&&qname.equals("application")){
                 this.configuration.applications.add(this.applicationDescriptor);
             }
@@ -193,9 +191,9 @@ public class XMLParser extends DefaultHandler{
                 }
                 this.configuration.views.add(view);
             }
-            else if(tblock.equals("configuration-list")&&qname.equals("configuration")){
-                this.configuration.configurations.add(applicationConfiguration);
-            }
+            //else if(tblock.equals("configuration-list")&&qname.equals("configuration")){
+                //this.configuration.configurations.add(applicationConfiguration);
+            //}
 			else if(qname.equals("lobby-context")){
 				this.configurations.add(this.configuration);
 			}
