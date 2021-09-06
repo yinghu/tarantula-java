@@ -1,0 +1,23 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category item template list",
+  "itemList":
+  [
+    {
+      "header": {"type": "tournament","name": "Tournament","enabled": true,"version": 1.0},
+      "application":
+      {
+        "name": "tournament-game-item-settings"
+      }
+    },
+    {
+      "header": {"type": "store","name": "Store","enabled": true,"version": 1.0},
+      "application":
+      {
+        "name": "store-game-item-settings"
+      }
+    }
+  ]
+}

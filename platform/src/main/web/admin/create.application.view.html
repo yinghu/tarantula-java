@@ -1,0 +1,224 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-configuration-item-api-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Create Game Item</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <div class='w3-bar w3-white'>
+            <span id='tx-configuration-item-save' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Save</span> 
+        </div>            
+    </div>
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <div class='w3-bar w3-white'>
+            <span id='tx-item-category-0' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-category' style="display: none;"></span>          
+            <span id='tx-item-category-1' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-category' style="display: none;"></span>          
+            <span id='tx-item-category-2' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-category' style="display: none;"></span>          
+            <span id='tx-item-category-3' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-category' style="display: none;"></span>          
+            <span id='tx-item-category-4' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-category' style="display: none;"></span>          
+            <span id='tx-item-category-5' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-category' style="display: none;"></span>          
+            <span id='tx-item-category-6' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-category' style="display: none;"></span>          
+            <span id='tx-item-category-7' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-category' style="display: none;"></span>          
+            <span id='tx-item-category-8' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-category' style="display: none;"></span>          
+            <span id='tx-item-category-9' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-category' style="display: none;"></span>          
+            <span id='tx-item-category-10' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-item-category' style="display: none;"></span>          
+        </div>            
+    </div>
+    <div id='tx-game-item-reference-list-0' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-item-reference-list-type-0' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-game-item-reference-list-name-0' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
+            <span id="tx-game-item-reference-list-api-0" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-item-reference-list-add">Add Reference</span>
+        </div>    
+    </div>
+    <div id='tx-game-item-reference-list-1' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-item-reference-list-type-1' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-game-item-reference-list-name-1' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
+            <span id="tx-game-item-reference-list-api-1" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-item-reference-list-add">Add Reference</span>
+        </div>    
+    </div>
+    <div id='tx-game-item-reference-list-2' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-item-reference-list-type-2' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-game-item-reference-list-name-2' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
+            <span id="tx-game-item-reference-list-api-2" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-item-reference-list-add">Add Reference</span>
+        </div>    
+    </div>
+    <div id='tx-game-item-reference-list-3' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-item-reference-list-type-3' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-game-item-reference-list-name-3' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
+            <span id="tx-game-item-reference-list-api-3" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-item-reference-list-add">Add Reference</span>
+        </div>    
+    </div>
+    <div id='tx-game-item-reference-list-4' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-item-reference-list-type-4' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-game-item-reference-list-name-4' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
+            <span id="tx-game-item-reference-list-api-4" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-item-reference-list-add">Add Reference</span>
+        </div>    
+    </div>
+    <div id='tx-game-item-reference-list-5' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-item-reference-list-type-5' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-game-item-reference-list-name-5' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
+            <span id="tx-game-item-reference-list-api-5" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-item-reference-list-add">Add Reference</span>
+        </div>    
+    </div>
+    <div id='tx-game-item-reference-list-6' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-item-reference-list-type-6' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-game-item-reference-list-name-6' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
+            <span id="tx-game-item-reference-list-api-6" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-item-reference-list-add">Add Reference</span>
+        </div>    
+    </div>
+    <div id='tx-game-item-reference-list-7' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-item-reference-list-type-7' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-game-item-reference-list-name-7' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
+            <span id="tx-game-item-reference-list-api-7" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-item-reference-list-add">Add Reference</span>
+        </div>    
+    </div>
+    <div id='tx-game-item-reference-list-8' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-item-reference-list-type-8' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-game-item-reference-list-name-8' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
+            <span id="tx-game-item-reference-list-api-8" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-item-reference-list-add">Add Reference</span>
+        </div>    
+    </div>
+    <div id='tx-game-item-reference-list-9' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-item-reference-list-type-9' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-game-item-reference-list-name-9' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
+            <span id="tx-game-item-reference-list-api-9" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-item-reference-list-add">Add Reference</span>
+        </div>    
+    </div>
+    <div id='tx-game-item-reference-list-10' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-game-item-reference-list-type-10' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-game-item-reference-list-name-10' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
+            <span id="tx-game-item-reference-list-api-10" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-item-reference-list-add">Add Reference</span>
+        </div>    
+    </div>
+    <div class="w3-panel">   
+        <label class="tx-text-12 tx-margin-left-4">Configuration TypeId:</label>
+        <input id='tx-configuration-item-type-id' class="w3-input w3-round w3-border tx-text-12" type="text">  
+        <label class="tx-text-12 tx-margin-left-4">Configuration Name:</label>
+        <input id='tx-configuration-item-name' class="w3-input w3-round w3-border tx-text-12" type="text">        
+    </div>
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <div class='w3-bar w3-white'>
+            <span id='tx-item-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
+            <span id='tx-item-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
+            <span id='tx-item-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
+        </div>            
+    </div>
+    <div class="w3-panel w3-center tx-text-14">
+        <div id="jsoneditor-configuration-item" style="width: 100%;"></div>
+    </div> 
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    let itemTemplate = {header:{},application:{},payload:{},reference:[]};
+    itemTemplate.configurationType = TARA_API.query().itemTemplate.type;
+    itemTemplate.configurationCategory = TARA_API.query().itemTemplate.category;
+    itemTemplate.configurationVersion = TARA_API.query().itemTemplate.version;
+    let selectedItem = TARA_API.query().itemTemplate.itemList[TARA_API.query().gameItemIndex];
+    itemTemplate.configurationName = selectedItem.configurationName;
+    itemTemplate.application = selectedItem.application;
+    itemTemplate.header = selectedItem.header;
+    itemTemplate.payload = selectedItem.payload;
+    itemTemplate.reference = selectedItem.reference;
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-item"),{mode:'code'},itemTemplate);
+    TARA_API.onGet('role/item',"onCategory",TARA_API.query().gameClusterId,(resp)=>{
+        console.log(resp);
+        resp.onList.forEach((a,i) => {
+            if(a !== itemTemplate.configurationCategory){
+                document.querySelector('#tx-item-category-'+i).innerHTML = a;
+                document.querySelector('#tx-item-category-'+i).setAttribute('tx-category',a);
+                document.querySelector('#tx-item-category-'+i).style.display = 'block';
+            }
+        });   
+    });
+    document.querySelectorAll('.tx-game-item-category').forEach(a=>{
+        a.onclick=()=>{
+            hide_game_item_reference_list();
+            let category = a.getAttribute('tx-category');
+            let query = TARA_API.query().gameClusterId+'#category/'+category;
+            TARA_API.onGet('role/item','onStock',query,(resp)=>{
+                console.log(resp);
+                resp.itemList.forEach((gi,i)=>{
+                    document.querySelector('#tx-game-item-reference-list-type-'+i).innerHTML = gi.configurationCategory;
+                    document.querySelector('#tx-game-item-reference-list-name-'+i).innerHTML = gi.configurationName;
+                    document.querySelector('#tx-game-item-reference-list-api-'+i).setAttribute('tx-reference-id',gi.itemId);
+                    document.querySelector('#tx-game-item-reference-list-'+i).style.display = 'block';    
+                });
+                //TARA_API.query().itemTemplate = resp;
+            });
+        };
+    });
+    document.querySelectorAll('.tx-game-item-reference-list-add').forEach(a=>{
+        a.onclick=()=>{
+            let itemId = a.getAttribute('tx-reference-id');
+            let item = editor.get();
+            item.reference.push(itemId);
+            editor.set(item);
+        };
+    });
+    document.querySelector('#tx-configuration-item-save').onclick=()=>{
+        document.querySelector('#tx-configuration-item-save').style.display = 'none';
+        let _tid = document.querySelector('#tx-configuration-item-type-id').value;
+        let _k = document.querySelector('#tx-configuration-item-name').value;
+        let item = editor.get();
+        item.configurationTypeId = _tid;
+        item.configurationName = _k;
+        TARA_API.onSet('role/item','onCreateItem',TARA_API.query().gameClusterId,item,(resp)=>{
+            editor.set(resp);   
+        });
+    };
+    document.querySelector('#tx-configuration-item-api-close').onclick=()=>{
+        editor.destroy();
+        let m3 = document.querySelector(TARA_API.query().popup);
+        m3.innerHTML="";
+        m3.style.display = 'none';       
+    };
+    document.querySelector('#tx-item-json-mode-tree').onclick=()=>{
+        editor.setMode('tree');
+    };
+    document.querySelector('#tx-item-json-mode-code').onclick=()=>{
+        editor.setMode('code');
+    };
+    document.querySelector('#tx-item-json-mode-preview').onclick=()=>{
+        editor.setMode('preview');
+    };
+    function hide_game_item_reference_list(){
+        for (let i = 0; i <=10; i++) {
+            document.querySelector('#tx-game-item-reference-list-'+i).style.display = 'none';
+        }            
+    }
+</script>

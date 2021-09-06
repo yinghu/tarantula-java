@@ -123,6 +123,9 @@
             <view type="game.item.list">
                 <property name="moduleResourceFile">admin/game.item.list.view.html</property>
             </view>
+            <view type="game.application.list">
+                <property name="moduleResourceFile">admin/game.application.list.view.html</property>
+            </view>
             <view type="create.asset">
                 <property name="moduleResourceFile">admin/create.asset.view.html</property>
             </view>
@@ -132,8 +135,11 @@
             <view type="create.item">
                 <property name="moduleResourceFile">admin/create.item.view.html</property>
             </view>
-            <view type="register.item">
-                <property name="moduleResourceFile">admin/register.item.view.html</property>
+            <view type="create.application">
+                <property name="moduleResourceFile">admin/create.application.view.html</property>
+            </view>
+            <view type="register.application">
+                <property name="moduleResourceFile">admin/register.application.view.html</property>
             </view>
             <view type="edit.item.template">
                 <property name="moduleResourceFile">admin/edit.item.template.view.html</property>
