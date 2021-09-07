@@ -6,13 +6,6 @@
   "itemList":
   [
     {
-      "header": {"type": "prize","name": "Prize","enabled": true,"version": 1.0},
-      "application":
-      {
-        "name": "prize-commodity-settings"
-      }
-    },
-    {
       "header": {"type": "robot","name": "Robot","enabled": true,"version": 1.0},
       "application":
       {

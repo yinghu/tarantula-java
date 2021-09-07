@@ -28,13 +28,10 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     private TokenValidator validator;
 
-    //private final boolean resetEnabled;
-
     public TarantulaApplicationContext(TarantulaContext tarantulaContext,Descriptor descriptor,TarantulaApplication application){
         this.tarantulaContext = tarantulaContext;
         this._descriptor = descriptor;
         this.application = application;
-        //this.resetEnabled = descriptor.resetEnabled();
     }
     public String typeId(){
         return this._descriptor.typeId();

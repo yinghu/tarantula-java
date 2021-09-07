@@ -20,6 +20,7 @@ public class GameItemAdminModule implements Module {
     private static String GAME_ASSET_CATEGORY_TEMPLATE = "game-asset-category-settings";
     private static String GAME_COMMODITY_CATEGORY_TEMPLATE = "game-commodity-category-settings";
     private static String GAME_ITEM_CATEGORY_TEMPLATE = "game-item-category-settings";
+    private static String GAME_APPLICATION_CATEGORY_TEMPLATE = "game-application-category-settings";
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onTemplateAssetCategory")){
@@ -35,6 +36,11 @@ public class GameItemAdminModule implements Module {
         else if(session.action().equals("onTemplateItemCategory")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ConfigurableTemplate configuration = this.deploymentServiceProvider.configuration(gameCluster,GAME_ITEM_CATEGORY_TEMPLATE);
+            session.write(configuration.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onTemplateApplicationCategory")){
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            ConfigurableTemplate configuration = this.deploymentServiceProvider.configuration(gameCluster,GAME_APPLICATION_CATEGORY_TEMPLATE);
             session.write(configuration.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTemplateAssetList")){
@@ -57,6 +63,14 @@ public class GameItemAdminModule implements Module {
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GAME_ITEM_CATEGORY_TEMPLATE);
+            String conf = template.settings.get(query[1]).settingName;
+            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,conf);
+            session.write(configuration.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onTemplateApplicationList")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GAME_APPLICATION_CATEGORY_TEMPLATE);
             String conf = template.settings.get(query[1]).settingName;
             Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,conf);
             session.write(configuration.toJson().toString().getBytes());
@@ -88,6 +102,18 @@ public class GameItemAdminModule implements Module {
         else if (session.action().equals("onCreateItem")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Item app = new Item();
+            if(app.configureAndValidate(payload)){
+                Descriptor desc = gameCluster.serviceWithCategory(app.configurationCategory());
+                SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);
+                session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
+            }
+        }
+        else if (session.action().equals("onCreateApplication")){
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            Application app = new Application();
             if(app.configureAndValidate(payload)){
                 Descriptor desc = gameCluster.serviceWithCategory(app.configurationCategory());
                 SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);

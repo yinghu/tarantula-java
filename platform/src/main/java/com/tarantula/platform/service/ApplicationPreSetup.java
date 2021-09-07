@@ -2,7 +2,6 @@ package com.tarantula.platform.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
-import com.tarantula.platform.GameCluster;
 
 import java.util.List;
 import java.util.Set;

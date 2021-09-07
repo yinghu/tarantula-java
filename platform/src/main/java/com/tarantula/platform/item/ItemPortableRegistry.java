@@ -14,10 +14,11 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
     public static final int ASSET_CID = 2;
     public static final int COMMODITY_CID = 3;
     public static final int ITEM_CID = 4;
+    public static final int APPLICATION_CID = 5;
 
-    public static final int INVENTORY_CID = 5;
+    public static final int INVENTORY_CID = 6;
 
-    public static final int INVENTORY_ITEM_CID = 6;
+    public static final int INVENTORY_ITEM_CID = 7;
 
     public Recoverable create(int i) {
         Recoverable pt = null;
@@ -33,6 +34,9 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
                 break;
             case ITEM_CID:
                 pt = new Item();
+                break;
+            case APPLICATION_CID:
+                pt = new Application();
                 break;
             case INVENTORY_CID:
                 pt = new Inventory();

@@ -9,14 +9,14 @@
       "header": {"type": "tournament","name": "Tournament","enabled": true,"version": 1.0},
       "application":
       {
-        "name": "tournament-game-item-settings"
+        "name": "tournament-game-application-settings"
       }
     },
     {
       "header": {"type": "store","name": "Store","enabled": true,"version": 1.0},
       "application":
       {
-        "name": "store-game-item-settings"
+        "name": "store-game-application-settings"
       }
     }
   ]

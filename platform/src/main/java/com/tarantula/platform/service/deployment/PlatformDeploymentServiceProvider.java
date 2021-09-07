@@ -491,8 +491,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(!Files.exists(_config_game)){
                 Files.createDirectories(_config_game);
             }
-            //JsonObject jview = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("view-index-settings.json"));
-            //log.warn(jview.toString());
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -765,13 +763,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.cCallbacks.put(listener.lobbyTag(),listener);
     }
     public <T extends Configuration> T configuration(String config){
-        /**
-        ArrayList<T> clist = new ArrayList<>();
-        vMap.forEach((k,v)->{
-            if(v instanceof Configuration && v.configurationType().equals(type)){
-                clist.add((T) v);
-            }
-        });**/
         return (T)tarantulaContext.configuration(config);
     }
     public <T extends Configurable> void register(T configurable){

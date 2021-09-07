@@ -10,7 +10,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
-import com.tarantula.platform.service.Application;
+import com.tarantula.platform.service.ApplicationProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -139,7 +139,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             return null;
         }
         descriptor.owner(query.index());
-        descriptor.label(Application.LABEL);
+        descriptor.label(ApplicationProvider.LABEL);
         descriptor.onEdge(true);
         if(ds.create(descriptor)){
             if(!descriptor.typeId().equals(descriptor.moduleId())){
@@ -348,7 +348,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 mds.create(lobbyTypeIdIndex);
                 configuration.applications.forEach((a)->{
                     a.owner(descriptor.distributionKey());
-                    a.label(Application.LABEL);
+                    a.label(ApplicationProvider.LABEL);
                     a.onEdge(true);
                     a.tournamentEnabled(tournamentEnabled);
                     a.typeId(descriptor.typeId());//replaced with named type id

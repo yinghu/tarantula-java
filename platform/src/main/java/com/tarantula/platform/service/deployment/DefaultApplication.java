@@ -4,19 +4,15 @@ package com.tarantula.platform.service.deployment;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
-import com.tarantula.platform.service.Application;
-import java.util.HashMap;
-import java.util.List;
+import com.tarantula.platform.service.ApplicationProvider;
 
-public class DefaultApplication implements Application {
+
+public class DefaultApplication implements ApplicationProvider {
 
     private static final TarantulaLogger log = JDKLogger.getLogger(DefaultApplication.class);
 
     protected final TarantulaContext tarantulaContext;
     protected final DeploymentDescriptor deploymentDescriptor;
-
-
-    //protected HashMap<String, Configuration> configurations = new HashMap<>();
 
     public DefaultApplication(final TarantulaContext tarantulaContext, final DeploymentDescriptor deploymentDescriptor){
         this.tarantulaContext = tarantulaContext;
@@ -29,30 +25,17 @@ public class DefaultApplication implements Application {
         }
         return this.tarantulaContext.tokenValidatorProvider().tokenValidator().validateTicket(event.systemId(),event.stub(),event.ticket());
     }
-    @Override
+    //@Override
     public Descriptor descriptor() {
         return this.deploymentDescriptor;
     }
 
-    @Override
+    //@Override
     public void start() throws Exception{
-        //List<Configuration> clist = this.tarantulaContext.configurations(this.deploymentDescriptor.typeId());
-        //if(clist!=null){
-            //clist.forEach((c)->{
-                //this.configurations.put(c.configurationName(),c);
-        //});
-        //}
-        //log.warn("Application ["+this.deploymentDescriptor.name()+"/"+this.deploymentDescriptor.distributionKey()+"] started");
     }
 
-    @Override
+    //@Override
     public void shutdown() throws Exception {
-        //onAvailable.forEach((String k,InstanceRegistry ir)->{
-            //ir.disabled(true);
-            //this.tarantulaContext.deploymentService().register(ir);
-        //});
-        //onAvailable.clear();
-        //log.warn("Application ["+this.deploymentDescriptor.name()+"/"+this.deploymentDescriptor.distributionKey()+"] shutdown");
     }
     protected TarantulaApplicationContext launch(DeploymentDescriptor dd){ //private instance launched by owner
         try{

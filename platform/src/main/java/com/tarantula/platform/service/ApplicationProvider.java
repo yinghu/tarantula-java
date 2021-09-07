@@ -5,7 +5,7 @@ import com.icodesoftware.Event;
 import com.icodesoftware.service.Serviceable;
 
 
-public interface Application extends Serviceable {
+public interface ApplicationProvider extends Serviceable {
 
     long DELTA = 60000;
 
@@ -13,7 +13,6 @@ public interface Application extends Serviceable {
 
     Descriptor descriptor();
 
-    //Configuration configuration(String type);
     boolean checkAccessControl(Event event);
 
     default void atMidnight(){}

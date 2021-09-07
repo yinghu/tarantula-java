@@ -75,7 +75,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     private final List<DefaultLobby> mlobbyList = new LinkedList();
 
-    private final ConcurrentHashMap<String,Application> availableApplicationManagers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ApplicationProvider> availableApplicationManagers = new ConcurrentHashMap<>();
 
     public String applicationSchedulingPoolSetting;
     private ScheduledExecutorService scheduledExecutorService;
@@ -103,7 +103,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     private final ConcurrentHashMap<String,ServiceProvider> serviceProviders = new ConcurrentHashMap();
     private final ConcurrentHashMap<String,ServiceProvider> dataStoreProviders = new ConcurrentHashMap();
-    //private final ConcurrentHashMap<String,List<Configuration>> configurations = new ConcurrentHashMap<>();
+
     private final ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String,ConfigurableTemplate> cMap = new ConcurrentHashMap<>();
 
@@ -206,7 +206,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             return this.scheduledExecutorService.scheduleAtFixedRate(task,task.initialDelay(),task.delay(),TimeUnit.MILLISECONDS);
         }
     }
-    public Application applicationManager(String applicationId){
+    public ApplicationProvider applicationManager(String applicationId){
        return this.availableApplicationManagers.get(applicationId);
     }
 
@@ -367,7 +367,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             HashMap<String, Descriptor> _codeBase = new HashMap<>();
             Descriptor lab = null;
             for(Descriptor d : lb.entryList()){
-                Application ap = this.availableApplicationManagers.get(d.distributionKey());
+                ApplicationProvider ap = this.availableApplicationManagers.get(d.distributionKey());
                 if(d.codebase()!=null&&d.moduleName()!=null){
                     _codeBase.putIfAbsent(d.codebase(),d);
                 }
@@ -380,7 +380,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
                 }
             }
             if(lab!=null){
-                Application lbb = this.availableApplicationManagers.remove(lab.distributionKey());
+                ApplicationProvider lbb = this.availableApplicationManagers.remove(lab.distributionKey());
                 lbb.shutdown();
                 listener.onLobby(lab);
             }
@@ -419,7 +419,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             for(Descriptor d : lb.entryList()){
                 if(d.type().equals(Descriptor.TYPE_APPLICATION)&&d.distributionKey().equals(applicationId)){
                     lb.removeEntry(applicationId);
-                    Application app = this.availableApplicationManagers.remove(applicationId);
+                    ApplicationProvider app = this.availableApplicationManagers.remove(applicationId);
                     app.shutdown();
                 }
                 if(d.codebase()!=null&&d.moduleName()!=null){
@@ -431,7 +431,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             }
             if(lb.entryList().size()==1&&(lab!=null)){//clean lobby and clean module class loaders
                 this._lobbyMapping.remove(typeId);
-                Application lbb = this.availableApplicationManagers.remove(lab.distributionKey());
+                ApplicationProvider lbb = this.availableApplicationManagers.remove(lab.distributionKey());
                 lbb.shutdown();
                 listener.onLobby(lab);
                 _codeBase.forEach((k,v)-> listener.onLobby(v));
@@ -499,9 +499,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public IntegrationCluster integrationCluster(){
         return integrationCluster;
     }
-    //public List<Configuration> configurations(String name){
- 	    //return this.configurations.get(name);
-    //}
+
     public ServiceProvider serviceProvider(String name){
         return this.serviceProviders.get(name);
     }
@@ -838,7 +836,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
 
     public List<OnView> loadViewList(String typeId){
- 	    log.warn("Load view list->"+typeId);
  	    ArrayList<OnView> _vlist = new ArrayList<>();
         JsonObject jview = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("view-"+typeId+"-settings.json"));
         String context = jview.get("context").getAsString();

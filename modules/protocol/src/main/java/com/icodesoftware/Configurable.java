@@ -11,6 +11,7 @@ public interface Configurable extends Recoverable, DataStore.Updatable {
     String ASSET_CONFIG_TYPE = "asset";
     String COMMODITY_CONFIG_TYPE = "commodity";
     String ITEM_CONFIG_TYPE = "item";
+    String APPLICATION_CONFIG_TYPE = "application";
 
     default <T extends Configurable> void registerListener(Listener<T> listener){}
 
