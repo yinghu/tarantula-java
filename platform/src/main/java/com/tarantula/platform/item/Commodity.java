@@ -35,7 +35,7 @@ public class Commodity extends ConfigurableObject{
 
     @Override
     public boolean configureAndValidate(JsonObject config){
-        return super.configureAndValidate(config);
+        return super.configureAndValidate(config)&&this.configurationType.equals(Configurable.COMMODITY_CONFIG_TYPE);
     }
     @Override
     public boolean configureAndValidate(){

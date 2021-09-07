@@ -44,7 +44,7 @@ public class Application extends ConfigurableObject{
 
     @Override
     public boolean configureAndValidate(JsonObject config){
-        return super.configureAndValidate(config);
+        return super.configureAndValidate(config)&&this.configurationType.equals(Configurable.APPLICATION_CONFIG_TYPE);
     }
 
     @Override

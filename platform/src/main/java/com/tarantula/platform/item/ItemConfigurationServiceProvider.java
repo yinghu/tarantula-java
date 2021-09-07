@@ -18,7 +18,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     private ConcurrentHashMap<String, TypedListener> rListeners = new ConcurrentHashMap<>();
     private ServiceContext serviceContext;
     private DistributionItemService distributionItemService;
-    private DataStore dataStore;
+
     private final String name;
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
@@ -31,9 +31,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     public List<ConfigurableObject> list(Descriptor descriptor,String category){
         return applicationPreSetup.list(serviceContext,descriptor,new ConfigurableObjectQuery(category));
     }
-    //public Item gameConfiga(Descriptor descriptor,String category){
-        //return null;//applicationPreSetup.list(serviceContext,descriptor,new ItemQuery(category));
-    //}
+
     @Override
     public <T extends Configurable> void register(T config) {
         distributionItemService.register(name,config.configurationCategory(),config.distributionKey());
@@ -71,7 +69,6 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);
         this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
     }
@@ -98,7 +95,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
             return false;
         }
         rListeners.forEach((k,c)->{
-            if(c.type==null||c.type.equals("system")){
+            if(c.type==null||c.type.equals("item")){
                 c.listener.onCreated(configurableObject.setup());
             }
             else if(c.type.equals(configurableObject.configurationCategory())){

@@ -127,8 +127,12 @@ public class GameItemAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Descriptor app = gameCluster.serviceWithCategory("item");
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            Set<String> refs = preSetup.list(this.context,app);
-            session.write(toJson(refs).toString().getBytes());
+            Category category = new Category();
+            category.distributionKey(app.distributionKey());
+            if(preSetup.load(context,app,category)){
+
+            }
+            session.write(category.toJson().toString().getBytes());
         }
         else if(session.action().equals("onStock")){
             String[] query = session.name().split("#");

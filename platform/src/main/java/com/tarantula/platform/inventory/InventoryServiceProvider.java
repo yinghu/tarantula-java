@@ -59,7 +59,7 @@ public class InventoryServiceProvider implements ServiceProvider {
         InventoryRedeemer redeemer = new InventoryRedeemer(systemId);
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory("store");
+        Descriptor app = _gc.serviceWithCategory(item.configurationCategory());
         if(!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
         redeemer.redeem();
         return true;

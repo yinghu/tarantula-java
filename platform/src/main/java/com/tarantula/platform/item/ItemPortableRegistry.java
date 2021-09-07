@@ -20,6 +20,9 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
 
     public static final int INVENTORY_ITEM_CID = 7;
 
+    public static final int CATEGORY_CID = 8;
+    public static final int CATEGORY_ITEM_CID = 9;
+
     public Recoverable create(int i) {
         Recoverable pt = null;
         switch (i){
@@ -43,6 +46,12 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
                 break;
             case INVENTORY_ITEM_CID:
                 pt = new InventoryItem();
+                break;
+            case CATEGORY_CID:
+                pt = new Category();
+                break;
+            case CATEGORY_ITEM_CID:
+                pt = new CategoryItem();
                 break;
             default:
         }

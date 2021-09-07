@@ -1,7 +1,5 @@
 package com.tarantula.game.module;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.tarantula.game.service.GameServiceProvider;
@@ -12,16 +10,16 @@ import com.tarantula.platform.item.ItemContext;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class GameItemModule implements Module,Configurable.Listener<Item>{
+public class GameItemModule implements Module,Configurable.Listener<ConfigurableObject>{
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
-    private ConcurrentHashMap<String,Item> itemList;
+    private ConcurrentHashMap<String,ConfigurableObject> itemList;
 
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
             List<ConfigurableObject> _item = this.gameServiceProvider.configurationServiceProvider().list(this.context.descriptor(),session.name());
-            session.write(new ItemContext(true,"",_item).toString().getBytes());
+            session.write(new ItemContext(true,session.name(),_item).toString().getBytes());
         }
         else if(session.action().equals("onLoad")){
 
@@ -37,7 +35,7 @@ public class GameItemModule implements Module,Configurable.Listener<Item>{
         this.gameServiceProvider.configurationServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("game configuration module started", OnLog.WARN);
     }
-    public void onCreated(Item item){
+    public void onCreated(ConfigurableObject item){
         itemList.put(item.distributionKey(),item);
         this.context.log(item.toJson().toString(),OnLog.WARN);
     }

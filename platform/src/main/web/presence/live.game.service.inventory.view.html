@@ -71,7 +71,7 @@
 </div>
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-inventory"),{mode:'tree'},{});
-    TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
+    TARA_API.onGet(TARA_API.query().serviceTag,'onList',"gold",(resp)=>{
         editor.set(resp);
         if(!resp.successful) return;        
         resp.itemList.forEach((gi,i)=>{

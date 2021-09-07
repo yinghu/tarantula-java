@@ -21,6 +21,6 @@ public interface ApplicationPreSetup {
     <T extends Configurable> boolean load(ServiceContext context,Descriptor application,T t);
     <T extends Configurable> List<T> list(ServiceContext context, Descriptor application, RecoverableFactory<T> recoverableFactory);
 
-    Set<String> list(ApplicationContext context, Descriptor application);
+    //Set<String> list(ApplicationContext context, Descriptor application);
 
 }

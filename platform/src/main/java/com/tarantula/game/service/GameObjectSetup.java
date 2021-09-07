@@ -13,17 +13,17 @@ import java.util.List;
 import java.util.Set;
 
 abstract public class GameObjectSetup implements ApplicationPreSetup {
-
+    protected DataStore _dataStore;
     public <T extends Configurable> boolean save(ApplicationContext context,Descriptor application,T t){
-        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        DataStore dataStore = _dataStore!=null?_dataStore:context.dataStore(serviceDataStore(application));
         t.dataStore(dataStore);
         if(!t.configureAndValidate()){
             return false;
         }
-        //context.log("Save on app->"+application.distributionKey()+"<><><>"+application.category(),OnLog.WARN);
         IndexSet indexSet = new IndexSet(query("category",t.configurationCategory()));//category/{category}
         indexSet.distributionKey(application.distributionKey());
         dataStore.createIfAbsent(indexSet,true);
+
         IndexSet typeIndex = new IndexSet(query("type",t.configurationType()));//type/{asset|commodity|item|application}
         typeIndex.distributionKey(application.distributionKey());
         dataStore.createIfAbsent(typeIndex,true);
@@ -33,7 +33,7 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         dataStore.createIfAbsent(typeIdIndex,true);
 
         if(!application.category().equals(t.configurationCategory())){
-            IndexSet referenceIndex = new IndexSet("reference");
+            IndexSet referenceIndex = new IndexSet("reference");//do pre-setup
             referenceIndex.distributionKey(application.distributionKey());
             dataStore.createIfAbsent(referenceIndex,false);
             referenceIndex.keySet.add(t.configurationCategory());
@@ -52,31 +52,31 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
     }
 
     public <T extends Configurable> boolean load(ApplicationContext context,Descriptor application,T t){
-        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        DataStore dataStore = _dataStore!=null?_dataStore:context.dataStore(serviceDataStore(application));
         t.dataStore(dataStore);
         return dataStore.load(t);
     }
     public <T extends Configurable> List<T> list(ApplicationContext context, Descriptor application, RecoverableFactory<T> recoverableFactory){
-        //context.log("Load on app->"+application.distributionKey()+"<><><>"+application.category(),OnLog.WARN);
-        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        DataStore dataStore = _dataStore!=null?_dataStore:context.dataStore(serviceDataStore(application));
         return list(dataStore,application,recoverableFactory);
     }
 
     public <T extends Configurable> List<T> list(ServiceContext context, Descriptor application, RecoverableFactory<T> recoverableFactory){
-        DataStore dataStore = context.dataStore(this.serviceDataStore(application),context.partitionNumber());
+        DataStore dataStore = _dataStore!=null?_dataStore:context.dataStore(this.serviceDataStore(application),context.partitionNumber());
         return list(dataStore,application,recoverableFactory);
     }
 
     public Set<String> list(ApplicationContext context, Descriptor application){
-        DataStore dataStore = context.dataStore(serviceDataStore(application));
+        DataStore dataStore = _dataStore!=null?_dataStore:context.dataStore(serviceDataStore(application));
         IndexSet referenceSet = new IndexSet("reference");
         referenceSet.distributionKey(application.distributionKey());
         dataStore.load(referenceSet);
         return referenceSet.keySet;
     }
 
+
     public <T extends Configurable> boolean load(ServiceContext context,Descriptor application,T t){
-        DataStore dataStore = context.dataStore(this.serviceDataStore(application),context.partitionNumber());
+        DataStore dataStore = _dataStore!=null?_dataStore:context.dataStore(this.serviceDataStore(application),context.partitionNumber());
         t.dataStore(dataStore);
         return dataStore.load(t);
     }

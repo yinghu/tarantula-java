@@ -43,21 +43,24 @@ public class Item extends ConfigurableObject{
 
     @Override
     public boolean configureAndValidate(JsonObject config){
-        return super.configureAndValidate(config);
+        return super.configureAndValidate(config)&&this.configurationType.equals(Configurable.ITEM_CONFIG_TYPE);
     }
 
     @Override
     public boolean configureAndValidate(){
-        boolean passed = true;
+        int passed = 0;
         for(JsonElement je : this.reference){
             ConfigurableObject cob = new ConfigurableObject();
             cob.distributionKey(je.getAsString());
-            if(!dataStore.load(cob)){
-                passed = false;
+            if(dataStore.load(cob)){
+                passed++;
+            }
+            else{
+                passed=0;//invalid reference
                 break;
             }
         }
-        return passed;
+        return passed>0;
     }
     @Override
     public  <T extends Configurable> T setup(){

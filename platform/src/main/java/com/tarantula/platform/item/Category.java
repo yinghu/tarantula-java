@@ -1,39 +1,21 @@
-package com.tarantula.platform.inventory;
+package com.tarantula.platform.item;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.tarantula.platform.IndexSet;
-import com.tarantula.platform.item.ItemPortableRegistry;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-public class Inventory extends IndexSet implements Configurable {
+public class Category extends IndexSet implements Configurable {
 
-    private ArrayList<InventoryItem> itemList = new ArrayList<>();
+    private ArrayList<CategoryItem> itemList = new ArrayList<>();
 
-    public Inventory(){}
-
-    public Inventory(String category){
-        super("Inventory/"+category);
+    public Category(){
+        this.label = "category";
     }
 
-    public void redeem(InventoryRedeemer commodity){
-        InventoryItem inventoryItem = new InventoryItem(commodity);
-        dataStore.create(inventoryItem);
-        keySet.add(inventoryItem.distributionKey());
-        dataStore.update(this);
-    }
-    public void list(){
-        keySet.forEach((k)->{
-            InventoryItem inventoryItem = new InventoryItem();
-            inventoryItem.distributionKey(k);
-            if(dataStore.load(inventoryItem)){
-                itemList.add(inventoryItem);
-            }
-        });
-    }
     @Override
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
@@ -51,7 +33,17 @@ public class Inventory extends IndexSet implements Configurable {
 
     @Override
     public int getClassId() {
-        return ItemPortableRegistry.INVENTORY_CID;
+        return ItemPortableRegistry.CATEGORY_CID;
+    }
+
+    public void list(){
+        keySet.forEach((k)->{
+            CategoryItem categoryItem = new CategoryItem();
+            categoryItem.distributionKey(k);
+            if(dataStore.load(categoryItem)){
+                itemList.add(categoryItem);
+            }
+        });
     }
 
     @Override

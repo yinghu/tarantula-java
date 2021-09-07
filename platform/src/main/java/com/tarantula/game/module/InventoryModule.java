@@ -17,7 +17,7 @@ public class InventoryModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
-            Inventory inventory = gameServiceProvider.inventoryServiceProvider().inventory(session.systemId(),"abilities");
+            Inventory inventory = gameServiceProvider.inventoryServiceProvider().inventory(session.systemId(),session.name());
             if(inventory!=null){
                 session.write(inventory.toJson().toString().getBytes());
             }else{
