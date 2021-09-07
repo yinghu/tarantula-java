@@ -190,6 +190,11 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
             item.dataStore(dataStore);
             return item.setup();
         }
+        if(this.configurationType.equals(Configurable.APPLICATION_CONFIG_TYPE)){
+            Application application = new Application(this);
+            application.dataStore(dataStore);
+            return application.setup();
+        }
         return null;
     }
 }

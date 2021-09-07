@@ -1,0 +1,20 @@
+{
+  "type": "commodity",
+  "category": "gold",
+  "version": "1.0",
+  "description": "gold template list",
+  "itemList":
+  [
+      {
+        "configurationName": "100GoldPack",
+        "header": {
+          "Name": "GoldPack","Type": "Gold"
+        },
+        "application": {
+           "Amount": 100
+        },
+        "payload": {},
+        "reference": []
+      }
+  ]
+}

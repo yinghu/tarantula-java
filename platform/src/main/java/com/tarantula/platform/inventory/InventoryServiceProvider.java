@@ -5,6 +5,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.Item;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -54,7 +55,7 @@ public class InventoryServiceProvider implements ServiceProvider {
         inventory.list();
         return inventory;
     }
-    public boolean redeem(String systemId, Item item){
+    public boolean redeem(String systemId, Application item){
         InventoryRedeemer redeemer = new InventoryRedeemer(systemId);
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());

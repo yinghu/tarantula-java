@@ -197,7 +197,7 @@
         let item = editor.get();
         item.configurationTypeId = _tid;
         item.configurationName = _k;
-        TARA_API.onSet('role/item','onCreateItem',TARA_API.query().gameClusterId,item,(resp)=>{
+        TARA_API.onSet('role/item','onCreateApplication',TARA_API.query().gameClusterId,item,(resp)=>{
             editor.set(resp);   
         });
     };

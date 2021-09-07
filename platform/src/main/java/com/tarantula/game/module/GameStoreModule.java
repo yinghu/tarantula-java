@@ -6,21 +6,22 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.Item;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class GameStoreModule implements Module,Configurable.Listener<Item>{
+public class GameStoreModule implements Module,Configurable.Listener<Application>{
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
-    private ConcurrentHashMap<String,Item> itemList;
+    private ConcurrentHashMap<String,Application> itemList;
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
             session.write(toJson().toString().getBytes());
         }
         if(session.action().equals("onBuy")){
-            Item item = itemList.get(session.name());
+            Application item = itemList.get(session.name());
             if(item!=null){
                 session.write(JsonUtil.toSimpleResponse(true,"pending inventory").getBytes());
                 this.gameServiceProvider.inventoryServiceProvider().redeem(session.systemId(),item);
@@ -39,7 +40,7 @@ public class GameStoreModule implements Module,Configurable.Listener<Item>{
         this.gameServiceProvider.configurationServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("game store module started", OnLog.WARN);
     }
-    public void onCreated(Item item){
+    public void onCreated(Application item){
         itemList.put(item.distributionKey(),item);
         this.context.log(item.toJson().toString(),OnLog.WARN);
     }

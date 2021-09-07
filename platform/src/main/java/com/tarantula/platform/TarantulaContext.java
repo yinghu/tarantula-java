@@ -837,7 +837,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     public List<OnView> loadViewList(String typeId){
  	    ArrayList<OnView> _vlist = new ArrayList<>();
-        JsonObject jview = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("view-"+typeId+"-settings.json"));
+        JsonObject jview = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("view/view-"+typeId+"-settings.json"));
         String context = jview.get("context").getAsString();
         JsonArray views = jview.get("viewList").getAsJsonArray();
  	    views.forEach((je)->{

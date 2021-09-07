@@ -20,21 +20,22 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         if(!t.configureAndValidate()){
             return false;
         }
+        //context.log("Save on app->"+application.distributionKey()+"<><><>"+application.category(),OnLog.WARN);
         IndexSet indexSet = new IndexSet(query("category",t.configurationCategory()));//category/{category}
         indexSet.distributionKey(application.distributionKey());
-        dataStore.load(indexSet);
-        IndexSet typeIndex = new IndexSet(query("type",t.configurationType()));//type/{asset|commodity|item}
+        dataStore.createIfAbsent(indexSet,true);
+        IndexSet typeIndex = new IndexSet(query("type",t.configurationType()));//type/{asset|commodity|item|application}
         typeIndex.distributionKey(application.distributionKey());
-        dataStore.load(typeIndex);
+        dataStore.createIfAbsent(typeIndex,true);
 
-        IndexSet typeIdIndex = new IndexSet(query("typeId",t.configurationTypeId()));//typeId/{asset|commodity|item}
+        IndexSet typeIdIndex = new IndexSet(query("typeId",t.configurationTypeId()));//typeId/{asset|commodity|item|application}
         typeIdIndex.distributionKey(application.distributionKey());
-        dataStore.load(typeIdIndex);
+        dataStore.createIfAbsent(typeIdIndex,true);
 
         if(!application.category().equals(t.configurationCategory())){
             IndexSet referenceIndex = new IndexSet("reference");
             referenceIndex.distributionKey(application.distributionKey());
-            dataStore.load(referenceIndex);
+            dataStore.createIfAbsent(referenceIndex,false);
             referenceIndex.keySet.add(t.configurationCategory());
             dataStore.update(referenceIndex);
         }
@@ -56,6 +57,7 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         return dataStore.load(t);
     }
     public <T extends Configurable> List<T> list(ApplicationContext context, Descriptor application, RecoverableFactory<T> recoverableFactory){
+        //context.log("Load on app->"+application.distributionKey()+"<><><>"+application.category(),OnLog.WARN);
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         return list(dataStore,application,recoverableFactory);
     }

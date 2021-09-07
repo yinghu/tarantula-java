@@ -18,6 +18,13 @@
       {
         "name": "abilities-commodity-settings"
       }
+    },
+    {
+      "header": {"type": "gold","name": "Gold","enabled": true,"version": 1.0},
+      "application":
+      {
+        "name": "gold-commodity-settings"
+      }
     }
   ]
 }
