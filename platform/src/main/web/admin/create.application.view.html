@@ -157,10 +157,10 @@
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-application"),{mode:'code'},itemTemplate);
     TARA_API.onGet('role/item',"onCategory",TARA_API.query().gameClusterId,(resp)=>{
         console.log(resp);
-        resp.onList.forEach((a,i) => {
+        resp.itemList.forEach((a,i) => {
             if(a !== itemTemplate.configurationCategory){
-                document.querySelector('#tx-application-category-'+i).innerHTML = a;
-                document.querySelector('#tx-application-category-'+i).setAttribute('tx-category',a);
+                document.querySelector('#tx-application-category-'+i).innerHTML = a.name;
+                document.querySelector('#tx-application-category-'+i).setAttribute('tx-category',a.category);
                 document.querySelector('#tx-application-category-'+i).style.display = 'block';
             }
         });   

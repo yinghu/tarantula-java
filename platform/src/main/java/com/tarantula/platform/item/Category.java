@@ -5,12 +5,13 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.tarantula.platform.IndexSet;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Category extends IndexSet implements Configurable {
 
-    private ArrayList<CategoryItem> itemList = new ArrayList<>();
+    private Set<CategoryItem> itemList = new HashSet<>();
 
     public Category(){
         this.label = "category";
@@ -45,7 +46,13 @@ public class Category extends IndexSet implements Configurable {
             }
         });
     }
-
+    public void addItem(CategoryItem item){
+        if(itemList.add(item)){
+            dataStore.create(item);
+            keySet.add(item.distributionKey());
+            dataStore.update(this);
+        }
+    }
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();

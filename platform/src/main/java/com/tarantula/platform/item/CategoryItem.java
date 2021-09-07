@@ -7,6 +7,13 @@ import java.util.Map;
 
 public class CategoryItem extends ConfigurableObject{
 
+
+    public CategoryItem(){}
+    public CategoryItem(String category,String name){
+        this.configurationCategory = category;
+        this.configurationName = name;
+    }
+
     @Override
     public Map<String,Object> toMap(){
         this.properties.put(CATEGORY_KEY, this.configurationCategory);
@@ -36,4 +43,15 @@ public class CategoryItem extends ConfigurableObject{
         header.entrySet().forEach((je)->jsonObject.add(je.getKey(),je.getValue()));
         return jsonObject;
     }
+
+    @Override
+    public boolean equals(Object obj){
+        CategoryItem categoryItem =(CategoryItem)obj;
+        return categoryItem.configurationCategory.equals(configurationCategory);
+    }
+    @Override
+    public int hashCode(){
+        return configurationCategory.hashCode();
+    }
+
 }

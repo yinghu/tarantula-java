@@ -80,7 +80,11 @@ public class GameItemAdminModule implements Module {
             Asset app = new Asset();
             if(app.configureAndValidate(payload)){
                 Descriptor desc = gameCluster.serviceWithCategory("item");
-                SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);
+                if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
+                    Category category = app.category(desc);
+                    category.list();
+                    category.addItem(new CategoryItem(app.configurationCategory(),app.configurationCategory()));
+                }
                 session.write(app.toJson().toString().getBytes());
             }
             else{
@@ -92,7 +96,11 @@ public class GameItemAdminModule implements Module {
             Commodity app = new Commodity();
             if(app.configureAndValidate(payload)){
                 Descriptor desc = gameCluster.serviceWithCategory("item");
-                SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);
+                if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
+                    Category category = app.category(desc);
+                    category.list();
+                    category.addItem(new CategoryItem(app.configurationCategory(),app.configurationCategory()));
+                }
                 session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
             }
             else{
@@ -104,7 +112,11 @@ public class GameItemAdminModule implements Module {
             Item app = new Item();
             if(app.configureAndValidate(payload)){
                 Descriptor desc = gameCluster.serviceWithCategory("item");
-                SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);
+                if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
+                    Category category = app.category(desc);
+                    category.list();
+                    category.addItem(new CategoryItem(app.configurationCategory(),app.configurationCategory()));
+                }
                 session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
             }
             else{
@@ -129,9 +141,8 @@ public class GameItemAdminModule implements Module {
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Category category = new Category();
             category.distributionKey(app.distributionKey());
-            if(preSetup.load(context,app,category)){
-
-            }
+            preSetup.load(context,app,category);
+            category.list();
             session.write(category.toJson().toString().getBytes());
         }
         else if(session.action().equals("onStock")){
@@ -153,13 +164,5 @@ public class GameItemAdminModule implements Module {
         this.context = applicationContext;
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
         this.context.log("game item admin module started", OnLog.WARN);
-    }
-
-    private JsonObject toJson(Set<String> refs){
-        JsonObject jsonObject = new JsonObject();
-        JsonArray alist = new JsonArray();
-        refs.forEach((ref)->alist.add(ref));
-        jsonObject.add("onList",alist);
-        return jsonObject;
     }
 }

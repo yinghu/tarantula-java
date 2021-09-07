@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
+import com.icodesoftware.Descriptor;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 
@@ -196,5 +197,13 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
             return application.setup();
         }
         return null;
+    }
+
+    public Category category(Descriptor app){
+        Category category = new Category();
+        category.distributionKey(app.distributionKey());
+        this.dataStore.createIfAbsent(category,true);
+        category.dataStore(dataStore);
+        return category;
     }
 }
