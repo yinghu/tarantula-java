@@ -26,7 +26,7 @@ public class JsonConfigurableTemplateParser {
                     if(itemSet.type.equals("category")){
                         ConfigurableSetting setting = new ConfigurableSetting();
                         setting.type = header.get("type").getAsString();
-                        setting.category = header.get("name").getAsString();
+                        setting.name = header.get("name").getAsString();
                         setting.settingName = template.getAsJsonObject("application").get("name").getAsString();
                         itemSet.settings.put(setting.type,setting);
                     }
