@@ -837,17 +837,27 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     public List<OnView> loadViewList(String typeId){
  	    ArrayList<OnView> _vlist = new ArrayList<>();
-        JsonObject jview = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("view/view-"+typeId+"-settings.json"));
-        String context = jview.get("context").getAsString();
-        JsonArray views = jview.get("viewList").getAsJsonArray();
- 	    views.forEach((je)->{
- 	        JsonObject jv = je.getAsJsonObject();
- 	        OnViewTrack view = new OnViewTrack();
- 	        view.moduleContext(context);
- 	        view.viewId(jv.get("type").getAsString());
- 	        view.moduleResourceFile(jv.get("moduleResourceFile").getAsString());
- 	        _vlist.add(view);
-        });
+        InputStream fin = Thread.currentThread().getContextClassLoader().getResourceAsStream("view/view-"+typeId+"-settings.json");
+        try{
+ 	        JsonObject jview = JsonUtil.parse(fin);
+            String context = jview.get("context").getAsString();
+            JsonArray views = jview.get("viewList").getAsJsonArray();
+ 	        views.forEach((je)->{
+ 	            JsonObject jv = je.getAsJsonObject();
+ 	            OnViewTrack view = new OnViewTrack();
+ 	            view.moduleContext(context);
+ 	            view.viewId(jv.get("type").getAsString());
+ 	            view.moduleResourceFile(jv.get("moduleResourceFile").getAsString());
+ 	            _vlist.add(view);
+            });
+ 	    }catch (Exception ex){
+ 	        log.warn("no view config->"+typeId);
+        }
+        finally {
+            if(fin!=null){
+                try{fin.close();}catch (IOException ioex){}
+            }
+        }
         return _vlist;
     }
 }

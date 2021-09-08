@@ -11,10 +11,7 @@
           "Name": "Magnet",
           "Description": "Magnet",
           "Icon": "MagnetIcon.png"
-        },
-        "application": {},
-        "payload": {},
-        "reference": []
+        }
       }
   ]
 }
