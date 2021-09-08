@@ -32,13 +32,6 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         typeIdIndex.distributionKey(application.distributionKey());
         dataStore.createIfAbsent(typeIdIndex,true);
 
-        //if(!application.category().equals(t.configurationCategory())){
-            //IndexSet referenceIndex = new IndexSet("reference");
-            //referenceIndex.distributionKey(application.distributionKey());
-            //dataStore.createIfAbsent(referenceIndex,false);
-            //referenceIndex.keySet.add(t.configurationCategory());
-            //dataStore.update(referenceIndex);
-        //}
         if(!dataStore.update(t)){
             dataStore.create(t);
             indexSet.keySet.add(t.distributionKey());

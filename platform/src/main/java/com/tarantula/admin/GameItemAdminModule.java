@@ -83,6 +83,8 @@ public class GameItemAdminModule implements Module {
                     Category category = app.category(desc);
                     category.list();
                     category.addItem(new CategoryItem(conf.type,conf.name));
+                    Index index = app.index(desc,app.configurationName());
+                    index.index(app.distributionKey());
                 }
                 session.write(app.toJson().toString().getBytes());
             }
