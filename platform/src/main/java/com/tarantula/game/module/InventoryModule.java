@@ -7,6 +7,7 @@ import com.icodesoftware.Session;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.inventory.Inventory;
+import com.tarantula.platform.item.Category;
 
 
 public class InventoryModule implements Module {
@@ -16,7 +17,11 @@ public class InventoryModule implements Module {
 
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
-        if(session.action().equals("onList")){
+        if(session.action().equals("onCategory")){
+            Category category = gameServiceProvider.inventoryServiceProvider().category();
+            session.write(category.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onList")){
             Inventory inventory = gameServiceProvider.inventoryServiceProvider().inventory(session.systemId(),session.name());
             if(inventory!=null){
                 session.write(inventory.toJson().toString().getBytes());

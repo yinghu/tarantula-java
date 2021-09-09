@@ -10,6 +10,22 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-padding w3-border-bottom w3-border-red">
+        <div class='w3-bar w3-white'>
+            <span id='live-game-inventory-category-0' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-inventory-bar">Service1</span>
+            <span id='live-game-inventory-category-1' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-inventory-bar">Service2</span>
+            <span id='live-game-inventory-category-2' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-inventory-bar">Service3</span>
+            <span id='live-game-inventory-category-3' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-inventory-bar">Service1</span>
+            <span id='live-game-inventory-category-4' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-inventory-bar">Service2</span>
+            <span id='live-game-inventory-category-5' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-inventory-bar">Service3</span>
+            <span id='live-game-inventory-category-6' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-inventory-bar">Service1</span>
+            <span id='live-game-inventory-category-7' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-inventory-bar">Service2</span>
+            <span id='live-game-inventory-category-8' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-inventory-bar">Service3</span>
+            <span id='live-game-inventory-category-9' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-inventory-bar">Service1</span>
+            <span id='live-game-inventory-category-10' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-inventory-bar">Service2</span>
+            <span id='live-game-inventory-category-11' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-inventory-bar">Service3</span>
+        </div>
+    </div>
     <div id='tx-live-game-inventory-list-0' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
         <div class="w3-container">
             <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
@@ -70,16 +86,32 @@
     </div>
 </div>
 <script>
+    reset_live_game_inventory_bar();
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-inventory"),{mode:'tree'},{});
-    TARA_API.onGet(TARA_API.query().serviceTag,'onList',"gold",(resp)=>{
+    TARA_API.onGet(TARA_API.query().serviceTag,'onCategory','',(resp)=>{
         editor.set(resp);
         if(!resp.successful) return;        
         resp.itemList.forEach((gi,i)=>{
-            document.querySelector('#tx-live-game-inventory-list-type-'+i).innerHTML = gi.typeId;
-            document.querySelector('#tx-live-game-inventory-list-name-'+i).innerHTML = gi.name;
-            document.querySelector('#tx-live-game-inventory-list-api-'+i).setAttribute('tx-inventory-id',gi.inventoryId);
-            document.querySelector('#tx-live-game-inventory-list-'+i).style.display = 'block';    
+            let cbar = document.querySelector('#live-game-inventory-category-'+i);
+            cbar.innerHTML = gi.name;
+            cbar.setAttribute('tx-inventory-category',gi.category);
+            cbar.style.display = 'block';
         });
+    });
+    document.querySelectorAll('.tx-live-game-inventory-bar').forEach((a)=>{
+        a.onclick=()=>{
+            let cat = a.getAttribute('tx-inventory-category');
+            TARA_API.onGet(TARA_API.query().serviceTag,'onList',cat,(resp)=>{
+            editor.set(resp);
+            if(!resp.successful) return;        
+                resp.itemList.forEach((gi,i)=>{
+                    document.querySelector('#tx-live-game-inventory-list-type-'+i).innerHTML = gi.typeId;
+                    document.querySelector('#tx-live-game-inventory-list-name-'+i).innerHTML = gi.name;
+                    document.querySelector('#tx-live-game-inventory-list-api-'+i).setAttribute('tx-inventory-id',gi.inventoryId);
+                    document.querySelector('#tx-live-game-inventory-list-'+i).style.display = 'block';    
+                });
+            });        
+        }
     });
     document.querySelectorAll('.tx-live-game-inventory-list-view').forEach(a=>{
         a.onclick=()=>{
@@ -105,4 +137,7 @@
     document.querySelector('#tx-inventory-live-service-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
+    function reset_live_game_inventory_bar(){
+        document.querySelectorAll('.tx-live-game-inventory-bar').forEach((a)=>{a.style.display ='none';});
+    }
 </script>

@@ -6,13 +6,11 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.Application;
-import com.tarantula.platform.item.Item;
+import com.tarantula.platform.item.Category;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class InventoryServiceProvider implements ServiceProvider {
     private TarantulaLogger logger;
@@ -45,6 +43,16 @@ public class InventoryServiceProvider implements ServiceProvider {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);
+    }
+    public Category category(){
+        GameCluster _gameCluster = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        Descriptor app = _gameCluster.serviceWithCategory("item");
+        ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) _gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        Category category = new Category();
+        category.distributionKey(app.distributionKey());
+        preSetup.load(serviceContext,app,category);
+        category.list();
+        return category;
     }
     public Inventory inventory(String systemId,String category){
         Inventory inventory = new Inventory(category);
