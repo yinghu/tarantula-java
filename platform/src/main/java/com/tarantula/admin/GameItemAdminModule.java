@@ -15,6 +15,7 @@ public class GameItemAdminModule implements Module {
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
     private static String GAME_ASSET_CATEGORY_TEMPLATE = "game-asset-category-settings";
+    private static String GAME_COMPONENT_CATEGORY_TEMPLATE = "game-component-category-settings";
     private static String GAME_COMMODITY_CATEGORY_TEMPLATE = "game-commodity-category-settings";
     private static String GAME_ITEM_CATEGORY_TEMPLATE = "game-item-category-settings";
     private static String GAME_APPLICATION_CATEGORY_TEMPLATE = "game-application-category-settings";
@@ -23,6 +24,11 @@ public class GameItemAdminModule implements Module {
         if(session.action().equals("onTemplateAssetCategory")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ConfigurableTemplate configuration = this.deploymentServiceProvider.configuration(gameCluster,GAME_ASSET_CATEGORY_TEMPLATE);
+            session.write(configuration.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onTemplateComponentCategory")){
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            ConfigurableTemplate configuration = this.deploymentServiceProvider.configuration(gameCluster,GAME_COMPONENT_CATEGORY_TEMPLATE);
             session.write(configuration.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTemplateCommodityCategory")){
@@ -44,6 +50,14 @@ public class GameItemAdminModule implements Module {
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GAME_ASSET_CATEGORY_TEMPLATE);
+            ConfigurableSetting conf = template.settings.get(query[1]);
+            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,conf.settingName);
+            session.write(configuration.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onTemplateComponentList")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GAME_COMPONENT_CATEGORY_TEMPLATE);
             ConfigurableSetting conf = template.settings.get(query[1]);
             Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,conf.settingName);
             session.write(configuration.toJson().toString().getBytes());
