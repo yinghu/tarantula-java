@@ -82,7 +82,27 @@ public class GameItemAdminModule implements Module {
                 if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
                     Category category = app.category(desc);
                     category.list();
-                    category.addItem(new CategoryItem(conf.type,conf.name));
+                    category.addItem(new CategoryItem(Configurable.ASSET_CONFIG_TYPE,conf.type,conf.name));
+                    //Index index = app.index(desc,app.configurationName());
+                    //index.index(app.distributionKey());
+                }
+                session.write(app.toJson().toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"failed to save asset").getBytes());
+            }
+        }
+        else if (session.action().equals("onCreateComponent")){
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            Component app = new Component();
+            if(app.configureAndValidate(payload)){
+                ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GAME_ASSET_CATEGORY_TEMPLATE);
+                ConfigurableSetting conf = template.settings.get(app.configurationCategory());
+                Descriptor desc = gameCluster.serviceWithCategory("item");
+                if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
+                    Category category = app.category(desc);
+                    category.list();
+                    category.addItem(new CategoryItem(Configurable.COMPONENT_CONFIG_TYPE,conf.type,conf.name));
                     //Index index = app.index(desc,app.configurationName());
                     //index.index(app.distributionKey());
                 }
@@ -102,7 +122,7 @@ public class GameItemAdminModule implements Module {
                 if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
                     Category category = app.category(desc);
                     category.list();
-                    category.addItem(new CategoryItem(conf.type,conf.name));
+                    category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.type,conf.name));
                 }
                 session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
             }
@@ -120,7 +140,7 @@ public class GameItemAdminModule implements Module {
                 if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
                     Category category = app.category(desc);
                     category.list();
-                    category.addItem(new CategoryItem(conf.type,conf.name));
+                    category.addItem(new CategoryItem(Configurable.ITEM_CONFIG_TYPE,conf.type,conf.name));
                 }
                 session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
             }

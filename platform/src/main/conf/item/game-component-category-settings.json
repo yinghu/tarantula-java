@@ -1,0 +1,23 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category component template list",
+  "itemList":
+  [
+    {
+      "header": {"type": "abilitiesLevels","name": "Abilities Levels","enabled": true,"version": 1.0},
+      "application":
+      {
+        "name": "abilities-levels-component-settings"
+      }
+    },
+    {
+      "header": {"type": "robotLevels","name": "Robot Levels","enabled": true,"version": 1.0},
+      "application":
+      {
+        "name": "robot-levels-component-settings"
+      }
+    }
+  ]
+}

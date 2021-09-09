@@ -1,5 +1,6 @@
 package com.tarantula.platform.inventory;
 
+import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ServiceContext;
@@ -51,7 +52,7 @@ public class InventoryServiceProvider implements ServiceProvider {
         Category category = new Category();
         category.distributionKey(app.distributionKey());
         preSetup.load(serviceContext,app,category);
-        category.list();
+        category.list((ci)-> ci.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE));
         return category;
     }
     public Inventory inventory(String systemId,String category){

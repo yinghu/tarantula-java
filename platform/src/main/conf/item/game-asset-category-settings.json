@@ -18,20 +18,6 @@
       {
         "name": "arena-asset-settings"
       }
-    },
-    {
-      "header": {"type": "abilitiesLevels","name": "Abilities Levels","enabled": true,"version": 1.0},
-      "application":
-      {
-        "name": "abilities-levels-asset-settings"
-      }
-    },
-    {
-      "header": {"type": "robotLevels","name": "Robot Levels","enabled": true,"version": 1.0},
-      "application":
-      {
-        "name": "robot-levels-asset-settings"
-      }
     }
   ]
 }

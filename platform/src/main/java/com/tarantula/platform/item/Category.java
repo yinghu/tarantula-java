@@ -38,11 +38,14 @@ public class Category extends IndexSet implements Configurable {
     }
 
     public void list(){
+        list(ci->true);
+    }
+    public void list(Filter filter){
         keySet.forEach((k)->{
             CategoryItem categoryItem = new CategoryItem();
             categoryItem.distributionKey(k);
             if(dataStore.load(categoryItem)){
-                itemList.add(categoryItem);
+                if(filter.onFilter(categoryItem)) itemList.add(categoryItem);
             }
         });
     }
@@ -62,5 +65,8 @@ public class Category extends IndexSet implements Configurable {
         itemList.forEach((item)->items.add(item.toJson()));
         jsonObject.add("itemList",items);
         return jsonObject;
+    }
+    public interface Filter{
+        boolean onFilter(CategoryItem categoryItem);
     }
 }

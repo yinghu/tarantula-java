@@ -11,19 +11,21 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
     public static final int OID = 7;
 
     public static final int CONFIGURABLE_OBJECT_CID = 1;
+
     public static final int ASSET_CID = 2;
-    public static final int COMMODITY_CID = 3;
-    public static final int ITEM_CID = 4;
-    public static final int APPLICATION_CID = 5;
+    public static final int COMPONENT_CID = 3;
+    public static final int COMMODITY_CID = 4;
+    public static final int ITEM_CID = 5;
+    public static final int APPLICATION_CID = 6;
 
-    public static final int INVENTORY_CID = 6;
+    public static final int INVENTORY_CID = 7;
 
-    public static final int INVENTORY_ITEM_CID = 7;
+    public static final int INVENTORY_ITEM_CID = 8;
 
-    public static final int CATEGORY_CID = 8;
-    public static final int CATEGORY_ITEM_CID = 9;
+    public static final int CATEGORY_CID = 9;
+    public static final int CATEGORY_ITEM_CID = 10;
 
-    public static final int INDEX_CID = 10;
+    public static final int INDEX_CID = 11;
 
 
     public Recoverable create(int i) {
@@ -34,6 +36,9 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
                 break;
             case ASSET_CID:
                 pt = new Asset();
+                break;
+            case COMPONENT_CID:
+                pt = new Component();
                 break;
             case COMMODITY_CID:
                 pt = new Commodity();
