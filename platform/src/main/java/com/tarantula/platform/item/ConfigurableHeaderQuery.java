@@ -2,23 +2,23 @@ package com.tarantula.platform.item;
 
 import com.icodesoftware.RecoverableFactory;
 
-public class ConfigurableObjectQuery implements RecoverableFactory<ConfigurableObject> {
+public class ConfigurableHeaderQuery implements RecoverableFactory<ConfigurableHeader> {
 
     public String label;
 
 
-    public ConfigurableObjectQuery(String query){
+    public ConfigurableHeaderQuery(String query){
         this.label = query;
     }
 
     @Override
-    public ConfigurableObject create() {
-        return new ConfigurableObject();
+    public ConfigurableHeader create() {
+        return new ConfigurableHeader();
     }
 
     @Override
     public int registryId() {
-        return ItemPortableRegistry.CONFIGURABLE_OBJECT_CID;
+        return ItemPortableRegistry.CONFIGURABLE_HEADER_CID;
     }
 
     @Override

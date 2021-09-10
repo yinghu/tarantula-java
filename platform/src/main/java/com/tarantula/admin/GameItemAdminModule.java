@@ -220,8 +220,8 @@ public class GameItemAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             Descriptor app = gameCluster.serviceWithCategory("item");
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            List<ConfigurableObject> items = preSetup.list(this.context,app,new ConfigurableObjectQuery(query[1]));
-            session.write(new ItemContext(true,query[1],items).toJson().toString().getBytes());
+            List<ConfigurableHeader> items = preSetup.list(this.context,app,new ConfigurableHeaderQuery(query[1]));
+            session.write(new ItemHeaderContext(true,query[1],items).toJson().toString().getBytes());
         }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");

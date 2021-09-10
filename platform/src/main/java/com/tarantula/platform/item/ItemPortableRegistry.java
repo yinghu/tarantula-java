@@ -27,6 +27,8 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
 
     public static final int INDEX_CID = 11;
 
+    public static final int CONFIGURABLE_HEADER_CID = 12;
+
 
     public Recoverable create(int i) {
         Recoverable pt = null;
@@ -63,6 +65,9 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
                 break;
             case INDEX_CID:
                 pt = new Index();
+                break;
+            case CONFIGURABLE_HEADER_CID:
+                pt = new ConfigurableHeader();
                 break;
             default:
         }

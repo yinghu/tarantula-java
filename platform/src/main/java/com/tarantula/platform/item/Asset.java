@@ -22,9 +22,7 @@ public class Asset extends ConfigurableObject{
     public void fromMap(Map<String,Object> properties){
         super.fromMap(properties);
     }
-    public int getFactoryId() {
-        return ItemPortableRegistry.OID;
-    }
+
     @Override
     public int getClassId() {
         return ItemPortableRegistry.ASSET_CID;

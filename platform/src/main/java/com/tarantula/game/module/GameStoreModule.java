@@ -48,7 +48,7 @@ public class GameStoreModule implements Module,Configurable.Listener<Application
         jsonObject.addProperty("successful",true);
         JsonArray alist = new JsonArray();
         itemList.forEach((k,v)->{
-            alist.add(v.toJson());
+            alist.add(v.configurableHeader().toJson());
         });
         jsonObject.add("itemList",alist);
         return jsonObject;

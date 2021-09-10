@@ -30,9 +30,7 @@ public class CategoryItem extends ConfigurableObject{
         this.configurationName = (String) properties.get(NAME_KEY);
         this.header = JsonUtil.parse((String) properties.getOrDefault(HEADER_KEY, "{}"));
     }
-    public int getFactoryId() {
-        return ItemPortableRegistry.OID;
-    }
+
     @Override
     public int getClassId() {
         return ItemPortableRegistry.CATEGORY_ITEM_CID;

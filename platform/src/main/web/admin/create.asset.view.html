@@ -50,6 +50,8 @@
     itemTemplate.header = selectedItem.header;
     itemTemplate.application = selectedItem.application;
     itemTemplate.payload = selectedItem.payload;
+    document.querySelector('#tx-configuration-asset-type-id').value = itemTemplate.configurationTypeId;
+    document.querySelector('#tx-configuration-asset-name').value = itemTemplate.configurationName;   
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'tree'},itemTemplate);
     document.querySelector('#tx-configuration-asset-save').onclick=()=>{
         document.querySelector('#tx-configuration-asset-save').style.display = 'none';
