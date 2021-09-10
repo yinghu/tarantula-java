@@ -1,9 +1,6 @@
 package com.icodesoftware.util;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -91,9 +88,43 @@ public class JsonUtil {
         JsonParser jp = new JsonParser();
         return jp.parse(json).getAsJsonObject();
     }
+    public static JsonArray parseAsArray(String json){
+        JsonParser jp = new JsonParser();
+        return jp.parse(json).getAsJsonArray();
+    }
     public static JsonObject parse(byte[] json){
         JsonParser jp = new JsonParser();
         InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(json));
         return jp.parse(inr).getAsJsonObject();
+    }
+    public static JsonObject parse(InputStream jsonInput){
+        JsonParser jp = new JsonParser();
+        InputStreamReader inr = new InputStreamReader(jsonInput);
+        return jp.parse(inr).getAsJsonObject();
+    }
+    public static Map<String,Object> toMap(InputStream jsonInput){
+        JsonParser jp = new JsonParser();
+        InputStreamReader inr = new InputStreamReader(jsonInput);
+        JsonElement j = jp.parse(inr);
+        Map<String,Object> _mv = new HashMap<>();
+        j.getAsJsonObject().entrySet().forEach((e)->{
+            JsonElement je = e.getValue();
+            if(je.isJsonPrimitive()){
+                JsonPrimitive m = je.getAsJsonPrimitive();
+                if(m.isString()){
+                    _mv.put(e.getKey(),m.getAsString());
+                }
+                else if(m.isNumber()){
+                    _mv.put(e.getKey(),m.getAsNumber());
+                }
+                else if(m.isBoolean()){
+                    _mv.put(e.getKey(),m.getAsBoolean());
+                }
+            }
+            else if(!je.isJsonNull()){
+                _mv.put(e.getKey(),je);
+            }
+        });
+        return _mv;
     }
 }

@@ -6,7 +6,6 @@
         <category>service</category>
         <access-mode>12</access-mode>
         <name>presence</name>
-        <description>Tarantula Presence Service</description>
         <deploy-priority>400</deploy-priority>
         <application-list>
             <application>
@@ -14,32 +13,8 @@
                 <name>Presence</name>
                 <type>application</type>
                 <tag>presence/lobby</tag>
-                <description>Tarantula Presence</description>
                 <class-name>com.tarantula.platform.presence.PresenceApplication</class-name>
             </application>
         </application-list>
-        <view-list>
-            <view type="dashboard">
-                <property name="moduleResourceFile">presence/dashboard.view.html</property>
-            </view>
-            <view type="add.email">
-                <property name="moduleResourceFile">presence/add.email.view.html</property>
-            </view>
-            <view type="validate.email">
-                <property name="moduleResourceFile">presence/validate.email.view.html</property>
-            </view>
-            <view type="change.password">
-                <property name="moduleResourceFile">presence/change.password.view.html</property>
-            </view>
-            <view type="upgrade.role.account">
-                <property name="moduleResourceFile">presence/upgrade.account.view.html</property>
-            </view>
-            <view type="upgrade.role.admin">
-                <property name="moduleResourceFile">presence/upgrade.admin.view.html</property>
-            </view>
-            <view type="game.cluster.price">
-                <property name="moduleResourceFile">presence/game.cluster.price.view.html</property>
-            </view>
-        </view-list>
     </lobby-context>
 </tarantula>

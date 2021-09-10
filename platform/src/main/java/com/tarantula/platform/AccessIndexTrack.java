@@ -5,7 +5,6 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.Distributable;
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.NaturalKey;
 import com.tarantula.platform.event.PortableEventRegistry;
 
@@ -15,23 +14,22 @@ import com.icodesoftware.util.RecoverableObject;
 
 public class AccessIndexTrack extends RecoverableObject implements AccessIndex, Portable {
 
-    private int nodeId;
 
     public AccessIndexTrack(){
     }
-
-    public AccessIndexTrack(String owner,String bucket,String label,int pid){
+    public AccessIndexTrack(String owner,String bucket,String oid,int referenceId){
         this.owner = owner;
         this.bucket = bucket;
-        this.label = label;
-        this.nodeId = pid;
+        this.oid = oid;
+        this.version = referenceId;
     }
+
     public AccessIndexTrack(String owner){
         this();
         this.owner = owner;
     }
-    public int nodeId(){
-        return this.nodeId;
+    public int referenceId(){
+        return version;
     }
     public int scope(){
         return Distributable.INTEGRATION_SCOPE;
@@ -55,37 +53,35 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
     @Override
     public void writePortable(PortableWriter out) throws IOException {
         out.writeUTF("1",this.owner);
-        out.writeUTF("2",bucket);
-        out.writeUTF("3",this.label);
-        out.writeInt("4",this.nodeId);
+        out.writeUTF("2",this.bucket);
+        out.writeUTF("3",this.oid);
+        out.writeInt("4",this.version);
     }
 
     @Override
     public void readPortable(PortableReader in) throws IOException {
         this.owner = in.readUTF("1");
         this.bucket = in.readUTF("2");
-        this.label  = in.readUTF("3");
-        this.nodeId = in.readInt("4");
+        this.oid = in.readUTF("3");
+        this.version = in.readInt("4");
     }
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("1",bucket);//lobby id
-        this.properties.put("2",label);//game cluster id
-        this.properties.put("3",nodeId);
+        this.properties.put("1",bucket);
+        this.properties.put("2",oid);
+        this.properties.put("3",version);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.bucket = (String)properties.get("1");
-        this.label = (String)properties.get("2");
-        this.nodeId = ((Number)properties.getOrDefault("3",0)).intValue();
+        this.oid = (String)properties.get("2");
+        this.version = ((Number)properties.get("3")).intValue();
     }
-    public String distributionKey(){
-        return this.bucket+ Recoverable.PATH_SEPARATOR+this.label+"-"+nodeId;
-    }
+
     @Override
     public String toString(){
-        return "Access Index ["+owner+"]->"+bucket+"/"+label+"/"+nodeId+"]";
+        return "Access Index ["+owner+"]->"+bucket+"/"+oid+"] referenceID =>"+version+"]";
     }
     public void distributionKey(String distributionKey){
        //skip the natural key

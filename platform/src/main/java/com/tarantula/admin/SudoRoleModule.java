@@ -11,6 +11,7 @@ import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.presence.SubscriptionFee;
 import com.tarantula.platform.presence.User;
 
+import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
 import java.io.File;
@@ -112,23 +113,6 @@ public class SudoRoleModule implements Module {
             boolean suc = this.deploymentServiceProvider.shutdownModule(access.typeId());
             session.write(this.toMessage(suc?"module shutdown":"module not shutdown",suc).toString().getBytes());
         }
-        else if(session.action().equals("onConfigurationList")){
-            List<Configuration> configurationList = this.deploymentServiceProvider.configurations("subscription");
-            session.write(toJson(configurationList).toString().getBytes());
-        }
-        else if(session.action().equals("onUpdateConfiguration")){
-            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            Configuration configuration = new ApplicationConfiguration();
-            configuration.distributionKey(access.property(OnAccess.ACCESS_ID).toString());
-            Map<String,Object> _payload = access.toMap();
-            _payload.remove(OnAccess.ACCESS_ID);
-            _payload.remove(OnAccess.COMMAND);
-            _payload.remove(OnAccess.SERVICE_TAG);
-            configuration.fromMap(_payload);
-            boolean suc = this.context.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE).update(configuration);
-            this.deploymentServiceProvider.configure(configuration.distributionKey());
-            session.write(toMessage("configuration updated ["+configuration.distributionKey()+"]",suc).toString().getBytes());
-        }
         else if(session.action().equals("onDeployView")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             OnView onView = new OnViewTrack();
@@ -190,6 +174,12 @@ public class SudoRoleModule implements Module {
         else if(session.action().equals("onBackupDataStore")){
             this.deploymentServiceProvider.issueDataStoreBackup();
             session.write(toMessage("backup commnad issued",true).toString().getBytes());
+        }
+        else if(session.action().equals("onMetrics")){
+            Metrics metrics = this.deploymentServiceProvider.metrics();
+            MetricsContext adminContext = new MetricsContext();
+            adminContext.metrics = metrics;
+            session.write(adminContext.toJson().toString().getBytes());
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");

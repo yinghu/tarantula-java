@@ -12,10 +12,10 @@ import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.Serviceable;
 import com.tarantula.platform.*;
-import com.tarantula.platform.service.Application;
+import com.tarantula.platform.service.ApplicationProvider;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-public class TarantulaApplicationDeployer implements Serviceable, Configurable.Listener {
+public class TarantulaApplicationDeployer implements Serviceable, Configurable.Listener<OnLobby> {
 
 	private final TarantulaContext context;
 	public TarantulaApplicationDeployer(final TarantulaContext context ){
@@ -41,9 +41,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		});
 		Collections.sort(configurations,new LobbyComparator());
 		for(LobbyConfiguration c:configurations){//may load from cluster or data store or local files
-			c.configurations = query(recoverService,PortableRegistry.OID,new ApplicationConfigurationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
-			this.context.configureConfigurations(c);
-			c.views = query(recoverService,PortableRegistry.OID,new OnViewQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
+			c.views = this.context.loadViewList(c.descriptor.typeId());
 			this.context.configureViews(c);//deploy views
 			c.applications = query(recoverService,PortableRegistry.OID,new ApplicationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
 			OnLobby _ob = this.context.configure(c);
@@ -141,20 +139,12 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			blist.add(c.descriptor);
 			c.applications.forEach((a)->{
 				a.owner(c.descriptor.distributionKey());
-				a.label(Application.LABEL);
+				a.label(ApplicationProvider.LABEL);
 				a.onEdge(true);
 				if(c.descriptor.deployCode()== DeployCode.SYSTEM_MODULE||c.descriptor.deployCode()== DeployCode.APPLICATION_MODULE||c.descriptor.deployCode()== DeployCode.USER_MODULE){
 					a.applicationClassName(this.context.singleModuleApplication);
 				}
 				dataStore.create(a);
-			});
-			c.views.forEach((v)->{
-				v.owner(c.descriptor.distributionKey());
-				dataStore.create(v);
-			});
-			c.configurations.forEach((cf)->{
-				cf.owner(c.descriptor.distributionKey());
-				dataStore.create(cf);
 			});
 		});
 		return blist;
@@ -185,7 +175,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		return arrayList;
 	}
 	@Override
-	public <T extends Configurable> void onUpdated(T onLobby){
+	public  void onUpdated(OnLobby onLobby){
 		this.context.deploymentService().register(onLobby);
 	}
 }

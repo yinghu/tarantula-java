@@ -25,15 +25,7 @@ public class LeaderBoardModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         //fetch statistics from systemId
-        if(session.action().equals("onRating")){
-            Rating rating = this.gameServiceProvider.rating(session.systemId());
-            session.write(this.builder.create().toJson(rating).getBytes());
-        }
-        else if(session.action().equals("OnStatistics")){
-            Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
-            session.write(this.builder.create().toJson(statistics).getBytes());
-        }
-        else if(session.action().startsWith("OnLeaderBoard")){ //use query OnLeaderBoard/{category}/{classifier}
+        if(session.action().startsWith("onLeaderBoard")){ //use query OnLeaderBoard/{category}/{classifier}
             String[] query = session.action().split(Recoverable.PATH_SEPARATOR);
             if(query.length==3){
                 LeaderBoard ldb = this.gameServiceProvider.leaderBoard(query[1]);
@@ -41,9 +33,38 @@ public class LeaderBoardModule implements Module {
                 view.category = ldb.category();
                 view.classifier = query[2];
                 view.board = new ArrayList<>();
-                ldb.total().rank((r,e)->{
-                    view.board.add(new LeaderBoardView.EntryView(r,e.owner(),e.value(),e.timestamp()));
-                });
+                int[] size  ={0};
+                if(view.category.equals(LeaderBoard.DAILY)) {
+                    ldb.total().rank((r, e) -> {
+                        view.board.add(new LeaderBoardView.EntryView(r, e.owner(), e.value(), e.timestamp()));
+                        size[0]++;
+                    });
+                }
+                else if(view.category.equals(LeaderBoard.WEEKLY)) {
+                    ldb.total().rank((r, e) -> {
+                        view.board.add(new LeaderBoardView.EntryView(r, e.owner(), e.value(), e.timestamp()));
+                        size[0]++;
+                    });
+                }
+                else if(view.category.equals(LeaderBoard.MONTHLY)) {
+                    ldb.total().rank((r, e) -> {
+                        view.board.add(new LeaderBoardView.EntryView(r, e.owner(), e.value(), e.timestamp()));
+                        size[0]++;
+                    });
+                }
+                else if(view.category.equals(LeaderBoard.YEARLY)) {
+                    ldb.total().rank((r, e) -> {
+                        view.board.add(new LeaderBoardView.EntryView(r, e.owner(), e.value(), e.timestamp()));
+                        size[0]++;
+                    });
+                }
+                else{
+                    ldb.total().rank((r, e) -> {
+                        view.board.add(new LeaderBoardView.EntryView(r, e.owner(), e.value(), e.timestamp()));
+                        size[0]++;
+                    });
+                }
+                view.size = size[0];
                 session.write(this.builder.create().toJson(view).getBytes());
             }
             else{
@@ -64,24 +85,7 @@ public class LeaderBoardModule implements Module {
         this.builder.registerTypeAdapter(Rating.class,new RatingSerializer());
         this.builder.registerTypeAdapter(LeaderBoardView.class,new LeaderBoardViewSerializer());
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
-        this.gameServiceProvider.statisticsTag(this.context.descriptor().tag());
-        this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(StatisticsPortableRegistry.STATISTICS_DELTA_CID,(a)->{
-            StatsDelta delta = (StatsDelta)a;
-            Statistics statistics = gameServiceProvider.statistics(delta.owner());
-            Statistics.Entry entry = statistics.entry(delta.name);
-            entry.update(delta.value).update();
-            LeaderBoard ldb = gameServiceProvider.leaderBoard(delta.name);
-            ldb.onAllBoard(entry);
-            //this.context.log("delta->"+delta.name+"<>"+delta.value+"//"+delta.owner(), OnLog.WARN);
-        });
-        this.context.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.STUB_CID,(a)->{
-            Stub stub = (Stub)a;
-            Rating rating = this.gameServiceProvider.rating(stub.owner());
-            rating.update(stub);
-            rating.update();
-            //this.context.log("a->"+stub.owner()+"/"+stub.rank+"/"+stub.pxp+"/"+stub.rankUpBase+"/"+stub.levelUpBase,OnLog.WARN);
-        });
-        this.context.log("Leader board service started ["+this.context.descriptor().typeId()+"]", OnLog.WARN);
+        this.context.log("Leader board module started ["+this.context.descriptor().typeId()+"]", OnLog.WARN);
     }
 
 }

@@ -22,6 +22,8 @@ public class DescriptorSerializer implements JsonSerializer<Descriptor> {
             jo.addProperty("accessRank",descriptor.accessRank());
             jo.addProperty("applicationId",descriptor.distributionKey());
             jo.addProperty("disabled",descriptor.disabled());
+            jo.addProperty("tournamentEnabled",descriptor.tournamentEnabled());
+            jo.addProperty("resetEnabled",descriptor.resetEnabled());
         }
         return jo;
     }

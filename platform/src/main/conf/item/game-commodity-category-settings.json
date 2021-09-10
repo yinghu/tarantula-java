@@ -1,0 +1,30 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category commodity template list",
+  "itemList":
+  [
+    {
+      "header": {"type": "robot","name": "Robot","enabled": true,"version": 1.0},
+      "application":
+      {
+        "name": "robot-commodity-settings"
+      }
+    },
+    {
+      "header": {"type": "abilities","name": "Abilities","enabled": true,"version": 1.0},
+      "application":
+      {
+        "name": "abilities-commodity-settings"
+      }
+    },
+    {
+      "header": {"type": "gold","name": "Gold","enabled": true,"version": 1.0},
+      "application":
+      {
+        "name": "gold-commodity-settings"
+      }
+    }
+  ]
+}

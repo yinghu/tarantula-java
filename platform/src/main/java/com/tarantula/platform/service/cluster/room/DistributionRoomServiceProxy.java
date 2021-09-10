@@ -1,23 +1,25 @@
 package com.tarantula.platform.service.cluster.room;
 
 import com.hazelcast.spi.AbstractDistributedObject;
+import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
-import com.icodesoftware.service.RecoverService;
-import com.icodesoftware.service.ServiceContext;
+import com.tarantula.game.Arena;
+import com.tarantula.game.GameRoom;
 import com.tarantula.game.Rating;
-import com.tarantula.game.Stub;
 import com.tarantula.game.service.DistributionRoomService;
-import com.tarantula.platform.service.cluster.recover.ClusterRecoverService;
+import com.tarantula.platform.TarantulaContext;
+
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class DistributionRoomServiceProxy extends AbstractDistributedObject<RoomClusterService> implements DistributionRoomService {
 
     private String objectName;
 
-    public DistributionRoomServiceProxy(String objectName, NodeEngine nodeEngine, RoomClusterService clusterRecoverService){
-        super(nodeEngine,clusterRecoverService);
+    public DistributionRoomServiceProxy(String objectName, NodeEngine nodeEngine, RoomClusterService roomClusterService){
+        super(nodeEngine,roomClusterService);
         this.objectName = objectName;
     }
-
 
     @Override
     public String getName() {
@@ -29,13 +31,59 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         return DistributionRoomService.NAME;
     }
 
+    @Override
+    public String register(String serviceName, String zoneId, Rating rating) {
+        NodeEngine nodeEngine = getNodeEngine();
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(zoneId);
+        RoomRegisterOperation roomJoinOperation = new RoomRegisterOperation(serviceName,zoneId,rating);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomJoinOperation,partitionId);
+        final Future<String> future = builder.invoke();
+        try {
+            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+            return null;
+        }
+    }
+    public GameRoom join(String serviceName,Arena arena,String roomId, String systemId){
+        NodeEngine nodeEngine = getNodeEngine();
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
+        RoomJoinOperation roomJoinOperation = new RoomJoinOperation(serviceName,arena,roomId,systemId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomJoinOperation,partitionId);
+        final Future<GameRoom> future = builder.invoke();
+        try {
+            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+            return null;
+        }
+    }
+
+    public void leave(String serviceName,String zoneId,String roomId,String systemId){
+        NodeEngine nodeEngine = getNodeEngine();
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
+        RoomLeaveOperation roomLeaveOperation = new RoomLeaveOperation(serviceName,zoneId,roomId,systemId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomLeaveOperation,partitionId);
+        final Future<Void> future = builder.invoke();
+        try {
+            future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+        }
+    }
 
     @Override
-    public Stub join(Rating rating) {
-        NodeEngine nodeEngine = getNodeEngine();
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(rating.xpLevel);
-        JoinOperation joinOperation = new JoinOperation();
-        nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME,joinOperation,partitionId);
-        return null;
+    public String name() {
+        return DistributionRoomService.NAME;
+    }
+
+    @Override
+    public void start() throws Exception {
+
+    }
+
+    @Override
+    public void shutdown() throws Exception {
+
     }
 }

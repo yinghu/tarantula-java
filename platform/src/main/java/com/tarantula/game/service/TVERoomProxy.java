@@ -1,21 +1,21 @@
 package com.tarantula.game.service;
 
 import com.icodesoftware.Module;
-import com.tarantula.game.Arena;
-import com.tarantula.game.GameZone;
-import com.tarantula.game.Rating;
-import com.tarantula.game.Stub;
+import com.icodesoftware.Session;
+import com.tarantula.game.*;
 
-public class TVERoomProxy implements GameZone.RoomProxy {
+public class TVERoomProxy extends RoomProxyHeader {
 
     @Override
-    public Stub join(Arena arena, Rating rating) {
-        return null;
+    public Stub join(Session session, Rating rating) {
+        return new Stub();
     }
-    public void leave(String systemId){
+    public void leave(Stub stub){
 
     }
+
     public void onTimer(Module.OnUpdate onUpdate){
 
     }
+
 }

@@ -3,36 +3,47 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.AbstractRecoverableListener;
+import com.tarantula.platform.event.PortableEventRegistry;
 
 public class TournamentPortableRegistry extends AbstractRecoverableListener {
 
     public static final int OID = 4;
 
 
-    public static final int TOURNAMENT_CID = 8;
-    public static final int TOURNAMENT_INSTANCE_CID = 9;
-    public static final int TOURNAMENT_ENTRY_CID = 10;
-    public static final int TOURNAMENT_JOIN_INDEX_CID = 11;
+    public static final int TOURNAMENT_CID = PortableEventRegistry.TOURNAMENT_CID;
+    public static final int TOURNAMENT_INSTANCE_CID = PortableEventRegistry.TOURNAMENT_INSTANCE_CID;
+    public static final int TOURNAMENT_ENTRY_CID = PortableEventRegistry.TOURNAMENT_ENTRY_CID;
+    public static final int TOURNAMENT_RACE_BOARD_CID = PortableEventRegistry.TOURNAMENT_RACE_BOARD_CID;
     public static final int TOURNAMENT_SCHEDULE_CID = 12;
 
+    public static final int TOURNAMENT_REGISTRY_CID = 13;
+
+    public static final int TOURNAMENT_SCHEDULE_PARSER_CID = 14;
 
     public Recoverable create(int i) {
         Recoverable pt = null;
         switch (i){
             case TOURNAMENT_CID:
-                pt = new DefaultTournament();
+                pt = new TournamentHeader();
                 break;
             case TOURNAMENT_INSTANCE_CID:
-                pt = new TournamentInstance();
+                pt = new TournamentInstanceHeader();
                 break;
             case TOURNAMENT_ENTRY_CID:
                 pt = new TournamentEntry();
                 break;
-            case TOURNAMENT_JOIN_INDEX_CID:
-                pt = new TournamentJoinIndex();
-                break;
+
             case TOURNAMENT_SCHEDULE_CID:
                 pt = new DefaultTournamentSchedule();
+                break;
+            case TOURNAMENT_REGISTRY_CID:
+                pt = new TournamentRegistry();
+                break;
+            case TOURNAMENT_RACE_BOARD_CID:
+                pt = new TournamentRaceBoard();
+                break;
+            case TOURNAMENT_SCHEDULE_PARSER_CID:
+                pt = new TournamentScheduleParser();
                 break;
             default:
         }

@@ -2,125 +2,44 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.*;
-import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.platform.IndexSet;
-import com.tarantula.platform.event.GameUpdateEvent;
-import com.tarantula.platform.service.deployment.TypedListener;
-import com.tarantula.platform.statistics.StatisticsIndex;
-import com.tarantula.platform.event.LeaderBoardGlobalEvent;
-import com.tarantula.platform.leaderboard.LeaderBoardEntry;
-import com.tarantula.platform.leaderboard.LeaderBoardSync;
+import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.inventory.InventoryServiceProvider;
+import com.tarantula.platform.item.ItemConfigurationServiceProvider;
+import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.tournament.*;
+import com.tarantula.platform.util.SystemUtil;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 
-/**
- * pxp - performance xp percentage on 100 base points pxp*(100) 0.7*100 = 70 0.3*100 = 30
- * rank - final result 1,2 rank xp = (1/rank)*100  1 - 100 2 50 ..
- * xp-delta = (1/rank)*(100)+pxp*(100)+csw*(100); //cws only if last is cws
- * zxp = zxp +xp-delta
- * xp = xp + xp-delta
- */
-public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listener, TournamentServiceProvider,ConfigurationServiceProvider,Tournament.Listener, ReloadListener {
+public class GameServiceProvider implements ServiceProvider{
 
-    private JDKLogger logger = JDKLogger.getLogger(GameServiceProvider.class);
+    private TarantulaLogger logger;
     private final String NAME;
-    private static int ELO_K = 30;
-    private static int LDB_SIZE = 10;
-    private DataStore dataStore;
 
-    private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String,Room> roomIndex = new ConcurrentHashMap<>();
-
-    private ConcurrentHashMap<String,Tournament> tournamentIndex = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String,Tournament.Instance> activeInstanceIndex = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, Tournament.Listener> tListeners = new ConcurrentHashMap<>();
-
-    private ConcurrentHashMap<String, TypedListener> rListeners = new ConcurrentHashMap<>();
-
-
-    private EventService publisher;
-
-    private String subscription;
-    private String statisticsTag;
-    private ClusterProvider integrationCluster;
-    private ClusterProvider dataCluster;
-    private RecoverService recoverService;
     private ServiceContext serviceContext;
-    private DistributionTournamentService distributionTournamentService;
-    private ConcurrentHashMap<String,Rating> rMap = new ConcurrentHashMap<>();
 
-    public GameServiceProvider(String name){
-        NAME = name;
-    }
-    public void statisticsTag(String statTag){
-        this.statisticsTag = statTag;
-    }
-    public String statisticsTag(){
-        return statisticsTag;
-    }
-    public Rating rating(String systemId){
-        return rMap.computeIfAbsent(systemId,(k)->{
-            Rating rating = new Rating();
-            rating.distributionKey(systemId);
-            this.dataStore.createIfAbsent(rating,true);
-            rating.dataStore(this.dataStore);
-            return rating;
-        });
-    }
-    public void elo(Rating rating1,Rating rating2){
-        double p1 = probability(rating2.elo,rating1.elo);
-        double p2 = probability(rating1.elo,rating2.elo);
-        if (rating1.rank-rating1.rank>0) {//1 win
-            rating1.elo = rating1.elo + ELO_K * (1 - p1);
-            rating2.elo = rating2.elo + ELO_K * (0 - p2);
-        }
-        else {//2 win
-            rating1.elo = rating1.elo + ELO_K * (0 - p1);
-            rating2.elo = rating2.elo + ELO_K * (1 - p2);
-        }
-    }
-    public Statistics statistics(String systemId){
-        StatisticsIndex deltaStatistics = new StatisticsIndex();
-        deltaStatistics.distributionKey(systemId);
-        deltaStatistics.dataStore(this.dataStore);
-        this.dataStore.createIfAbsent(deltaStatistics,true);
-        return deltaStatistics;
-    }
-    public Zone zone(Descriptor descriptor,String mode){
+    private DistributionRoomService distributionRoomService;
+    private PlayerDataProvider playerDataProvider;
+    private LeaderBoardProvider leaderBoardProvider;
+    private InventoryServiceProvider inventoryServiceProvider;
+    private ItemConfigurationServiceProvider configurationServiceProvider;
+    private DistributedTournamentServiceProvider tournamentServiceProvider;
+    private Configuration configuration;
+    private GameCluster gameCluster;
+    private ApplicationPreSetup applicationPreSetup;
+    private ConcurrentHashMap<String, GameZone.RoomProxy> roomProxyIndex;
 
-        throw new UnsupportedOperationException(mode);
-    }
-    public GameZone zone(Descriptor descriptor){//application id
-        DynamicLobbySetup dynamicLobbySetup = new DynamicLobbySetup();
-        return dynamicLobbySetup.load(serviceContext,descriptor);
-    }
-    public void addRoom(Room room){
-        roomIndex.put(room.roomId,room);
-    }
-    public Room getRoom(String roomId){
-        return roomIndex.get(roomId);
+    public GameServiceProvider(GameCluster gameCluster){
+        NAME = (String) gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameCluster = gameCluster;
     }
 
-    public LeaderBoard leaderBoard(String category){
-        return _leaderBoard(category);
+    public GameLobby lobby(Descriptor descriptor){
+        return applicationPreSetup.load(serviceContext,descriptor);
     }
-    private LeaderBoardSync _leaderBoard(String category){
-        return tMap.computeIfAbsent(category,(s)->{
-            LeaderBoardSync ldb = new LeaderBoardSync(category,LDB_SIZE);
-            ldb.dataStore(this.dataStore);
-            ldb.masterListener(this);
-            ldb.load();
-            return ldb;
-        });
+    public Configuration configuration(){
+        return configuration;
     }
     @Override
     public String name() {
@@ -129,352 +48,123 @@ public class GameServiceProvider implements ServiceProvider, LeaderBoard.Listene
 
     @Override
     public void setup(ServiceContext serviceContext) {
+        this.logger = serviceContext.logger(GameServiceProvider.class);
+        serviceContext.setup(gameCluster);
+        this.roomProxyIndex = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
-        this.dataStore = serviceContext.dataStore(NAME.replace("-","_"),serviceContext.partitionNumber());//typeId_service
-        this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
-        this.subscription = UUID.randomUUID().toString();
-        integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
-        integrationCluster.subscribe(NAME,(e)->{
-            if(e instanceof LeaderBoardGlobalEvent){
-                LeaderBoardEntry update = new LeaderBoardEntry(e.index(),e.name(),e.version(),e.owner(),e.balance(),e.timestamp());
-                LeaderBoardSync ldb = this._leaderBoard(update.category());
-                ldb.onView(update);
-            }
-            return false;
-        });
-        integrationCluster.subscribe(subscription,(e)->{
-            if(e instanceof GameUpdateEvent){
-                Room room = roomIndex.get(e.trackId());
-                room.onUpdated(e.action(),e.payload());
-            }
-            return false;
-        });
-        this.recoverService = integrationCluster.recoverService();
-        this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
-        this.dataCluster = serviceContext.clusterProvider(Distributable.DATA_SCOPE);
-        this.dataCluster.registerReloadListener(name(),this);
-        logger.info("Game service provider ["+ NAME+"] started on ["+subscription+"]"+this.distributionTournamentService.name());
+        this.distributionRoomService = serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionRoomService.NAME);
+        this.applicationPreSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.inventoryServiceProvider = new InventoryServiceProvider(gameCluster);
+        this.inventoryServiceProvider.setup(serviceContext);
+        this.inventoryServiceProvider.waitForData();
+        this.playerDataProvider = new PlayerDataProvider(NAME);
+        this.playerDataProvider.setup(serviceContext);
+        this.playerDataProvider.waitForData();
+        this.leaderBoardProvider = new LeaderBoardProvider(NAME);
+        this.leaderBoardProvider.setup(serviceContext);
+        this.leaderBoardProvider.waitForData();
+        this.configurationServiceProvider = new ItemConfigurationServiceProvider(gameCluster);
+        this.configurationServiceProvider.setup(serviceContext);
+        this.configurationServiceProvider.waitForData();
+        this.tournamentServiceProvider = new DistributedTournamentServiceProvider(gameCluster);
+        this.tournamentServiceProvider.setup(serviceContext);
+        this.tournamentServiceProvider.waitForData();
+        logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
+    }
+    @Override
+    public void waitForData(){
+        this.configuration = serviceContext.configuration("game-cluster-settings");
     }
     @Override
     public void atMidnight(){
-        tMap.forEach((k,v)->{
-            v.reset();
-        });
+        leaderBoardProvider.atMidnight();
+        tournamentServiceProvider.atMidnight();
     }
     @Override
     public void start() throws Exception {
-
+        this.inventoryServiceProvider.start();
+        this.playerDataProvider.start();
+        this.leaderBoardProvider.start();
+        this.tournamentServiceProvider.start();
+        this.configurationServiceProvider.start();
     }
 
     @Override
     public void shutdown() throws Exception {
-        logger.warn("shut down service->"+NAME);
-        this.dataCluster.unregisterReloadListener(name());
-        integrationCluster.unsubscribe(NAME);
+        this.playerDataProvider.shutdown();
+        this.leaderBoardProvider.shutdown();
+        this.tournamentServiceProvider.shutdown();
+        this.configurationServiceProvider.shutdown();
+        this.logger.warn("Game service provider ["+NAME+"] shutting down");
     }
-    private double probability(double rating1,double rating2) {
-        return 1.0 * 1.0 / (1 + 1.0 * (Math.pow(10, 1.0 * (rating1 - rating2) / 400)));
+    public void registerRoomProxy(String zoneId, GameZone.RoomProxy roomProxy){
+        roomProxyIndex.put(zoneId,roomProxy);
     }
-    @Override
-    public void onUpdated(LeaderBoard.Entry entry) {
-        publisher.publish(new LeaderBoardGlobalEvent(NAME,NAME,entry));
-    }
-
-
-    public void onClosed(Connection connection) {
-        roomIndex.forEach((k,r)->r.connectionClosed(connection));
+    public void releaseRoomProxy(String zoneId){
+        roomProxyIndex.remove(zoneId);
     }
 
-    //tournament integration
-    private void reload(Tournament.Listener listener){
-        GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),GameServiceIndex.TOURNAMENT);
-        byte[] _key = gameServiceIndex.key().asString().getBytes();
-        String _name = this.recoverService.findDataNode(dataStore.name(),_key);
-        if(_name==null){
-            return;
-        }
-        byte[] _data = this.recoverService.load(_name,dataStore.name(),_key);
-        gameServiceIndex.fromBinary(_data);//=> list of tournament launched
-        gameServiceIndex.keySet.forEach((tk)->{
-            if(distributionTournamentService.localPartition(tk)){
-                Tournament tournament = this.load(tk);
-                if(tournament!=null){
-                    tournamentIndex.put(tournament.distributionKey(),tournament);
-                    listener.tournamentStarted(tournament);
-                }
-            }
-        });
+    //room service provider hool calls
+    public DistributionRoomService distributionRoomService(){
+        return distributionRoomService;
     }
-    @Override
-    public Tournament register(Tournament.Schedule schedule){
-        byte[] ret = distributionTournamentService.schedule(name(),schedule);
-        DefaultTournament tournament = new DefaultTournament();
-        Map<String,Object> _map = JsonUtil.toMap(ret);
-        tournament.distributionKey(_map.get("tournamentId").toString());
-        tournament.fromMap(_map);
-        return tournament;
+    public String onRegisterRoom(String zoneId,Rating rating){
+        GameZone.RoomProxy proxy = roomProxyIndex.get(zoneId);
+        return proxy.onRegister(rating);
     }
-    public Tournament schedule(Tournament.Schedule schedule) {
-        Tournament tournament = this.create(schedule);
-        GameServiceIndex gameServiceIndex = new GameServiceIndex(name(),GameServiceIndex.TOURNAMENT);
-        gameServiceIndex.keySet.add(tournament.distributionKey());
-        if(!dataStore.createIfAbsent(gameServiceIndex,true)){
-            gameServiceIndex.keySet.add(tournament.distributionKey());
-            dataStore.update(gameServiceIndex);
-        }
-        tournamentIndex.put(tournament.distributionKey(),tournament);
-        this.logger.warn("tournament started->"+tournament.distributionKey());
-        this.tournamentStarted(tournament);
-        return tournament;
+    public GameRoom onJoinRoom(Arena arena,String roomId,String systemId){
+        GameZone.RoomProxy proxy = roomProxyIndex.get(arena.owner());
+        return proxy.onJoin(arena,roomId,systemId);
     }
-    @Override
-    public boolean available(String tournamentId){
-        return this.distributionTournamentService.checkAvailable(name(),tournamentId);
-    }
-    @Override
-    public Tournament.Instance join(String tournamentId, String systemId){
-        String tid = this.distributionTournamentService.join(name(),tournamentId,systemId);
-        byte[] ret = this.distributionTournamentService.enter(name(),tournamentId,tid,systemId);
-        Tournament.Instance _e = new TournamentInstance();
-        _e.distributionKey(tid);
-        _e.fromBinary(ret);
-        return _e;
-    }
-    @Override
-    public Tournament.Entry score(String instanceId, String systemId, double delta){
-        byte[] ret = this.distributionTournamentService.score(name(),instanceId,systemId,delta);
-        Tournament.Entry _e = new TournamentEntry();
-        _e.fromBinary(ret);
-        return _e;
-    }
-    @Override
-    public List<Tournament.Entry> tournamentEntries(String instanceId){
-        Tournament.Instance _ins = instance(instanceId);
-        return _ins.list();
+    public void onLeaveRoom(String zoneId,String roomId,String systemId){
+        GameZone.RoomProxy proxy = roomProxyIndex.get(zoneId);
+        proxy.onLeave(roomId,systemId);
     }
 
-
-    public Tournament tournament(String tournamentId) {
-        return tournamentIndex.get(tournamentId);
+    //player data service provider hook calls
+    public Rating rating(String systemId){
+        return playerDataProvider.rating(systemId);
+    }
+    public Statistics statistics(String systemId){
+        return playerDataProvider.statistics(systemId,leaderBoardProvider);
     }
 
-    public Tournament.Instance enter(String tournamentId,String instanceId){
-        return activeInstanceIndex.computeIfAbsent(instanceId,(k)->{
-            TournamentInstance _ins = create(tournament(tournamentId),instanceId);
-            _ins.gameServiceProvider(this);
-            this.onStarted(_ins);
-            return _ins;
-        });
-    }
-    public Tournament.Instance instance(String instanceId){
-        return activeInstanceIndex.computeIfAbsent(instanceId,(k)->{
-            TournamentInstance _ins = new TournamentInstance();
-            _ins.distributionKey(k);
-            if(!dataStore.load(_ins)){
-                return null;
-            }
-            _ins.gameServiceProvider(this);
-            this.onStarted(_ins);
-            return _ins;
-        });
+    public InventoryServiceProvider inventoryServiceProvider(){
+        return this.inventoryServiceProvider;
     }
 
-
-    @Override
-    public void tournamentScheduled(Tournament tournament) {
-        tListeners.forEach((k,c)-> c.tournamentScheduled(tournament));
-    }
-    @Override
-    public void tournamentStarted(Tournament tournament) {
-        tListeners.forEach((k,c)-> c.tournamentStarted(tournament));
+    //leader service provider hook calls
+    public LeaderBoard leaderBoard(String category){
+        return leaderBoardProvider.leaderBoard(category);
     }
 
-    @Override
-    public void tournamentClosed(Tournament tournament) {
-        tListeners.forEach((k,c)-> c.tournamentClosed(tournament));
+    //configuration service provider hood calls
+    public ItemConfigurationServiceProvider configurationServiceProvider(){
+        return this.configurationServiceProvider;
+    }
+    //public boolean onRegister(Configurable configurable){
+        //return configurationServiceProvider.onRegister(configurable);
+    //}
+
+    //tournament service provider hook calls
+    public TournamentServiceProvider tournamentServiceProvider(){
+        return this.tournamentServiceProvider;
+    }
+    public Tournament onSchedule(Tournament.Schedule schedule) { //all nodes
+        return this.tournamentServiceProvider.schedule(schedule);
+    }
+    public Tournament onTournament(String tournamentId){ //register node
+        return this.tournamentServiceProvider.tournament(tournamentId);
     }
 
-    @Override
-    public void tournamentEnded(Tournament tournament) {
-        tListeners.forEach((k,c)-> c.tournamentEnded(tournament));
+    public Tournament.Instance onInstance(String tournamentId,String instanceId){//play node
+        return this.tournamentServiceProvider.instance(tournamentId,instanceId);
     }
-    @Override
-    public void onStarted(Tournament.Instance instance) {
-        tListeners.forEach((k,c)-> c.onStarted(instance));
+    public Tournament.Instance onInstance(String instanceId) { //play node
+        return this.tournamentServiceProvider.instance(instanceId);
     }
-
-    @Override
-    public void onClosed(Tournament.Instance instance) {
-
-    }
-
-    @Override
-    public void onEnded(Tournament.Instance instance) {
-
-    }
-    @Override
-    public void onCreated(Tournament.Entry entry){
-        logger.warn("entry created->"+entry.systemId()+">>>"+entry.owner());
-    }
-    @Override
-    public void onUpdated(Tournament.Entry entry){
-        logger.warn("entry updated->"+entry.score(0)+"-->"+entry.distributionKey());
-        this.dataStore.update(entry);
-    }
-
-
-    public Tournament create(Tournament.Schedule schedule) {
-        Tournament tournament = new DefaultTournament(schedule,this,this);
-        this.dataStore.create(tournament);
-        return tournament;
-    }
-
-
-    public Tournament load(String tournamentId) {
-        DefaultTournament tournament = new DefaultTournament(this,this);
-        tournament.distributionKey(tournamentId);
-        String _node = recoverService.findDataNode(dataStore.name(),tournamentId.getBytes());
-        if(_node==null){
-            return null;
-        }
-        byte[] ret = recoverService.load(_node,dataStore.name(),tournamentId.getBytes());
-        tournament.fromBinary(ret);
-        IndexSet indexSet = new IndexSet(GameServiceIndex.TOURNAMENT_INSTANCE_JOIN);
-        indexSet.distributionKey(tournamentId);
-        dataStore.load(indexSet);
-        indexSet.keySet.forEach((k)->{
-            TournamentJoinIndex tournamentJoinIndex = new TournamentJoinIndex();
-            tournamentJoinIndex.distributionKey(k);
-            if(dataStore.load(tournamentJoinIndex)){
-                tournamentJoinIndex.list().forEach((e)->{
-                    tournament.addTournamentEntry(e);
-                    this.onCreated(e);
-                });
-                tournament.addTournamentInstance(tournamentJoinIndex);
-            }
-        });
-        return tournament;
-    }
-
-    public Tournament.Instance createOnJoin(Tournament tournament) {
-        LocalDateTime start = LocalDateTime.now();
-        LocalDateTime close = start.plusMinutes(tournament.durationMinutesPerInstance()-1);
-        LocalDateTime end = start.plusMinutes(tournament.durationMinutesPerInstance());
-        TournamentJoinIndex tournamentInstance = new TournamentJoinIndex(tournament.maxEntriesPerInstance(),start,close,end);
-        if(!dataStore.create(tournamentInstance)){
-            return null;
-        }
-        IndexSet indexSet = new IndexSet(GameServiceIndex.TOURNAMENT_INSTANCE_JOIN);//tournament => list of join instances
-        indexSet.distributionKey(tournament.distributionKey());
-        indexSet.keySet.add(tournamentInstance.id());
-        if(!dataStore.createIfAbsent(indexSet,true)){
-            indexSet.keySet.add(tournamentInstance.id());
-            dataStore.update(indexSet);
-        }
-        return tournamentInstance;
-    }
-    public TournamentInstance create(Tournament tournament,String instanceId) {
-        LocalDateTime start = LocalDateTime.now();
-        LocalDateTime close = start.plusMinutes(tournament.durationMinutesPerInstance()-1);
-        LocalDateTime end = start.plusMinutes(tournament.durationMinutesPerInstance());
-        TournamentInstance tournamentInstance = new TournamentInstance(tournament.maxEntriesPerInstance(),start,close,end);
-        tournamentInstance.distributionKey(instanceId);
-        dataStore.createIfAbsent(tournamentInstance,true);
-        IndexSet indexSet = new IndexSet(GameServiceIndex.TOURNAMENT_INSTANCE);
-        indexSet.distributionKey(tournament.distributionKey());
-        indexSet.keySet.add(tournamentInstance.id());
-        if(!dataStore.createIfAbsent(indexSet,true)){
-            indexSet.keySet.add(tournamentInstance.id());
-            dataStore.update(indexSet);
-        }
-        TournamentEntryQuery e = new TournamentEntryQuery(instanceId);
-        List<TournamentEntry> elist = query(TournamentPortableRegistry.OID,e,new String[]{instanceId});
-        elist.forEach((te)->{
-            te.listener(this);
-            te.owner(instanceId);
-            this.onCreated(te);
-            tournamentInstance.addEntry(te);
-        });
-        return tournamentInstance;
-    }
-    public void updateInstance(Tournament.Instance instance){
-        this.dataStore.update(instance);
-    }
-
-    public Tournament.Entry create(String systemId, Tournament.Instance instance) {
-        TournamentEntry entry = new TournamentEntry(systemId,this);
-        entry.owner(instance.distributionKey());
-        dataStore.create(entry);
-        return entry;
-    }
-    private <T extends Recoverable> List<T> query(int factoryId,RecoverableFactory<T> factory,String[] params){
-        List<T> tlist = new ArrayList<>();
-        CountDownLatch _lock = new CountDownLatch(1);
-        String cid = this.serviceContext.deploymentServiceProvider().distributionCallback().registerQueryCallback((k,v)->{
-            T t = factory.create();
-            t.fromBinary(v);
-            t.distributionKey(new String(k));
-            if(!t.disabled()){
-                tlist.add(t);
-            }
-        },()-> _lock.countDown());
-        recoverService.queryStart(null,cid,dataStore.name(),factoryId,factory.registryId(),params);
-        try{_lock.await();}catch (Exception ex){}
-        this.serviceContext.deploymentServiceProvider().distributionCallback().removeQueryCallback(cid);
-        return tlist;
-    }
-
-    ///Configurable service provider
-    @Override
-    public void dataStore(OnDataStore onDataStore){
-        onDataStore.on(dataStore);
-    }
-    @Override
-    public <T extends Configurable> void register(T config) {
-        rListeners.forEach((k,c)->{
-            if(c.type==null||c.type.equals(config.configurationType())){
-                c.listener.onCreated(config);
-            }
-        });
-    }
-
-    @Override
-    public <T extends Configurable> void release(T t) {
-
-    }
-
-    @Override
-    public void configure(String s) {
-
-    }
-    public <T extends Configuration> List<T> configurations(String type){
-        return null;
-    }
-    @Override
-    public String registerConfigurableListener(String type, Configurable.Listener listener) {
-        String rid = UUID.randomUUID().toString();
-        this.rListeners.put(rid,new TypedListener(type,listener));
-        logger.warn("Listener registered with ->"+type);
-        return rid;
-    }
-    @Override
-    public void unregisterConfigurableListener(String registryKey){
-        TypedListener t = rListeners.remove(registryKey);
-        logger.warn("Listener removed with ->"+t.type);
-    }
-
-    @Override
-    public void reload() {
-        logger.warn("reloading ....");
-    }
-
-    public String registerTournamentListener(Tournament.Listener listener){
-        String tid = UUID.randomUUID().toString();
-        tListeners.put(tid,listener);
-        return tid;
-    }
-    public void unregisterTournamentListener(String registryKey){
-        tListeners.remove(registryKey);
+    public Tournament.RaceBoard onRaceBoard(String instanceId){
+        return this.tournamentServiceProvider.instance(instanceId).raceBoard();
     }
 
 }

@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.*;
+import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.tarantula.cci.udp.PendingServerPushMessage;
 import com.tarantula.cci.udp.UDPSessionService;
@@ -45,7 +46,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ClusterProvider integrationCluster;
     private SecureRandom secureRandom;
 
-    private CopyOnWriteArrayList<TypedListener> oListeners = new CopyOnWriteArrayList<>();
+    private ConcurrentHashMap<String,TypedListener> oListeners = new ConcurrentHashMap<>();
 
     private CopyOnWriteArrayList<Connection.OnStateListener> wListeners = new CopyOnWriteArrayList<>();
 
@@ -221,7 +222,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 JsonObject jo = parser.parse(new InputStreamReader(in)).getAsJsonObject();
                 String _moduleId = jo.get(ExposedGameService.MODULE_ID).getAsString();
                 response.message(_moduleId);
-                AccessIndex accessIndex = this.tarantulaContext.accessIndexService().setIfAbsent(_moduleId);
+                AccessIndex accessIndex = this.tarantulaContext.accessIndexService().setIfAbsent(_moduleId,0);
                 jo.getAsJsonArray("exposedServiceList").forEach((es)->{
                     JsonObject je = es.getAsJsonObject();
                     ExposedGameService egs = new ExposedGameService();
@@ -306,7 +307,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         LobbyConfiguration a = xmlParser.configurations.get(0);
-        AccessIndex publishId = this.tarantulaContext.accessIndexService().set(a.descriptor.typeId());
+        AccessIndex publishId = this.tarantulaContext.accessIndexService().set(a.descriptor.typeId(),0);
         if(publishId==null){
             response.successful(false);
             response.message("module already existed");
@@ -365,7 +366,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void  removeApplication(String typeId,String applicationId){
         this.tarantulaContext.unsetApplication(typeId,applicationId,(d)->{
             if(d.type().equals(Descriptor.TYPE_LOBBY)){
-                this.oListeners.forEach((ol)->{ //remove lobby entry
+                this.oListeners.forEach((k,ol)->{ //remove lobby entry
                     OnLobby onLobby = (OnLobby) vMap.get(d.typeId());
                     onLobby.closed(true);
                     if(onLobby.typeId().equals(ol.type)){
@@ -401,7 +402,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return suc;
     }
     public void removeLobby(String typeId){
-        this.oListeners.forEach((ol)->{
+        this.oListeners.forEach((k,ol)->{
             if(vMap.containsKey(typeId)){//skip system level modules
                 OnLobby onLobby =(OnLobby) vMap.get(typeId);
                 onLobby.closed(true);
@@ -441,6 +442,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         byte[] ret = this.tarantulaContext.integrationCluster().recoverService().load(memberId,this.tarantulaContext.dataStoreMaster,key);
         gameCluster.fromBinary(ret);
+        this.tarantulaContext.releaseServiceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
         removeLobby((String)gameCluster.property(GameCluster.GAME_DATA));
         removeLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
         removeLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
@@ -484,6 +486,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             Path _web_sudo = Paths.get(this.tarantulaContext.deployDir+"/web/sudo");
             if(!Files.exists(_web_sudo)){
                 Files.createDirectories(_web_sudo);
+            }
+            Path _config_game = Paths.get(this.tarantulaContext.deployDir+"/conf/root");
+            if(!Files.exists(_config_game)){
+                Files.createDirectories(_config_game);
             }
         }catch (Exception ex){
             throw new RuntimeException(ex);
@@ -641,27 +647,28 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     private void register(OnLobby onLobby){
-        if(onLobby.deployCode()<2){
-            return;
-        }
+        if(onLobby.deployCode()<2) return;
         vMap.put(onLobby.typeId(),onLobby);
-        if(onLobby.resetEnabled()){
-            this.tarantulaContext.tokenValidatorProvider().onCheck(onLobby);
-        }
-        oListeners.forEach((o)->
-                {
-                    if(o.type.equals(onLobby.configurationType())){
-                        o.listener.onUpdated(onLobby);
-                    }
+        if(onLobby.resetEnabled()&&TarantulaContext.lobbySubscriptionEnabled) this.tarantulaContext.tokenValidatorProvider().onCheck(onLobby);
+
+        oListeners.forEach((k,o)->
+            {
+                if(o.type.equals(onLobby.configurationType())){
+                    o.listener.onUpdated(onLobby);
                 }
+            }
         );
     }
     public String registerConfigurableListener(String type, Configurable.Listener listener){
-        oListeners.add(new TypedListener(type,listener));
-        return null;
+        String regKey = UUID.randomUUID().toString();
+        oListeners.put(regKey,new TypedListener(type,listener));
+        return regKey;
+    }
+    public String registerConfigurableListener(Descriptor category, Configurable.Listener listener){
+        throw new UnsupportedOperationException("use string");
     }
     public void unregisterConfigurableListener(String registryKey){
-
+        oListeners.remove(registryKey);
     }
     public void registerServerPushEvent(Event event){
         if(event instanceof ServerPushEvent){
@@ -755,14 +762,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerOnConnectionListener(Connection.OnConnectionListener listener){
         this.cCallbacks.put(listener.lobbyTag(),listener);
     }
-    public <T extends Configuration> List<T> configurations(String type){
-        ArrayList<T> clist = new ArrayList<>();
-        vMap.forEach((k,v)->{
-            if(v instanceof Configuration && v.configurationType().equals(type)){
-                clist.add((T) v);
-            }
-        });
-        return clist;
+    public <T extends Configuration> T configuration(String config){
+        return (T)tarantulaContext.configuration(config);
     }
     public <T extends Configurable> void register(T configurable){
         if(configurable instanceof OnView){
@@ -774,7 +775,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return;
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
-        //configurable.update(new ServiceContextProxy(this.tarantulaContext));
+        configurable.registered();
     }
     public void configure(String key){
         if(vMap.containsKey(key)){
@@ -836,7 +837,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     public <T extends OnAccess> T createGameCluster(String owner,String name,String mode,boolean tournamentEnabled){
-        AccessIndex accessIndex = this.tarantulaContext.accessIndexService().set(name);//name+"-"+mode
+        if(name==null||name.length()<5){
+            GameCluster gc = new GameCluster();
+            gc.successful(false);
+            gc.message("invalid game cluster name ["+name+"]");
+            return (T)gc;
+        }
+        AccessIndex accessIndex = this.tarantulaContext.accessIndexService().set(name,0);//name+"-"+mode
         if(accessIndex==null){
             GameCluster gc = new GameCluster();
             gc.successful(false);
@@ -845,11 +852,17 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name,mode,tournamentEnabled,accessIndex.distributionKey());
     }
+    public <T extends Configuration,S extends OnAccess> T configuration(S gameCluster,String config){
+        return (T)this.tarantulaContext.configuration((GameCluster)gameCluster,config);
+    }
     public <T extends OnAccess> T gameCluster(String key){
         GameCluster gc = new GameCluster();
         gc.distributionKey(key);
         gc.dataStore(this.tarantulaContext.masterDataStore());
         if(this.tarantulaContext.masterDataStore().load(gc)){
+            gc.gameLobby = this.tarantulaContext.lobby((String) gc.property(GameCluster.GAME_LOBBY));
+            gc.serviceLobby = this.tarantulaContext.lobby((String) gc.property(GameCluster.GAME_SERVICE));
+            gc.dataLobby = this.tarantulaContext.lobby((String) gc.property(GameCluster.GAME_DATA));
             return (T)gc;
         }
         return null;
@@ -980,12 +993,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public <T extends Configurable> void release(T configurable){
-        this.vMap.remove(configurable.distributionKey());
+        Configurable removed = this.vMap.remove(configurable.distributionKey());
+        removed.released();
     }
     public void syncKey(String key){
         if(vMap.containsKey(key)){
             Configurable configurable = vMap.get(key);
-            configurable.update(new ServiceContextProxy(this.tarantulaContext));
+            configurable.updated(new ServiceContextProxy(this.tarantulaContext));
         }
     }
     public String registerQueryCallback(RecoverService.QueryCallback queryCallback, RecoverService.QueryEndCallback queryEndCallback){
@@ -1002,9 +1016,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void removeQueryCallback(String callId){
         qCallbacks.remove(callId);
     }
-    private class OnLobbyListener implements Configurable.Listener{
+    private class OnLobbyListener implements Configurable.Listener<OnLobby>{
         @Override
-        public <T extends Configurable> void onUpdated(T onLobby){
+        public void onUpdated(OnLobby onLobby){
             register(onLobby);
         }
     }

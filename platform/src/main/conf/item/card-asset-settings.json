@@ -1,0 +1,17 @@
+{
+  "type": "asset",
+  "category": "card",
+  "version": "1.0",
+  "description": "card asset template list",
+  "itemList":
+  [
+      {
+        "configurationName": "MagnetAbilityCard",
+        "header": {
+          "Name": "Magnet",
+          "Description": "Magnet",
+          "Icon": "MagnetIcon.png"
+        }
+      }
+  ]
+}

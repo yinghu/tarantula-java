@@ -13,7 +13,6 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
 
 
     public DeploymentDescriptor(){
-        //this.vertex = "DeploymentApplication";
         this.onEdge = true;
     }
 
@@ -52,7 +51,6 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
     public Descriptor copy() {
         DeploymentDescriptor _copy = new DeploymentDescriptor();
         _copy.moduleId(this.moduleId);
-        _copy.index(this.index);
         _copy.typeId(this.typeId);
         _copy.name(this.name);
         _copy.type(this.type);
@@ -60,39 +58,9 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         _copy.tag(this.tag);
         _copy.applicationClassName(this.applicationClassName);
         _copy.moduleName(this.moduleName);
-        _copy.capacity(this.capacity);
         _copy.accessRank(this.accessRank);
         _copy.timerOnModule(this.timerOnModule);
         _copy.tournamentEnabled(this.tournamentEnabled);
         return _copy;
-    }
-    public DeploymentDescriptor deploy(){
-        DeploymentDescriptor ins = new DeploymentDescriptor();
-        ins.type(this.type);
-        ins.category(this.category);
-        ins.bucket(this.bucket);
-        ins.oid(this.oid);
-        ins.typeId(this.typeId);
-        ins.capacity(this.capacity);
-        ins.accessControl(this.accessControl);
-        ins.accessMode(this.accessMode);
-        ins.accessRank(this.accessRank);
-        ins.entryCost(this.entryCost);
-        ins.tag(this.tag);
-        ins.name(this.name);
-        ins.description(this.description);
-        ins.moduleId(this.moduleId);
-        ins.codebase(this.codebase);
-        ins.moduleArtifact(this.moduleArtifact);
-        ins.moduleVersion(this.moduleVersion);
-        ins.moduleName(this.moduleName);
-        ins.timerOnModule(this.timerOnModule);
-        ins.applicationClassName(this.applicationClassName);
-        ins.deployPriority(this.deployPriority);
-        ins.deployCode(this.deployCode);
-        ins.logEnabled(this.logEnabled);
-        ins.resetEnabled(this.resetEnabled);
-        ins.tournamentEnabled(this.tournamentEnabled);
-        return ins;
     }
 }

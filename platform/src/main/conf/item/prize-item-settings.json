@@ -1,0 +1,47 @@
+{
+  "type": "commodity",
+  "category": "prize",
+  "version": "1.0",
+  "description": "prize item template list",
+  "itemList":
+  [
+      {
+        "configurationName": "Rank1",
+        "header": {
+          "name": "Chip Prize"
+        },
+        "application":
+        {
+          "rank": 1,
+          "prize": 100000
+        },
+        "payload": {},
+        "reference": []
+      },
+      {
+        "configurationName": "Rank2",
+        "header": {
+          "name": "Chip Prize"
+        },
+        "application":
+        {
+          "rank": 2,
+          "prize": 70000
+        },
+        "payload": {},
+        "reference": []
+      },
+      {
+        "configurationName": "Rank3",
+        "header": {
+          "name": "Chip Prize"
+        },
+        "application":
+        {
+          "prize": 50000
+        },
+        "payload": {},
+        "reference": []
+      }
+  ]
+}

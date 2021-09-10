@@ -1,0 +1,10 @@
+{
+  "typeId":"game-service",
+  "name":"RecentlyPlayList",
+  "type":"application",
+  "category":"playlist",
+  "tag":"game/playlist",
+  "moduleName":"com.tarantula.game.module.RecentlyPlayListModule",
+  "applicationClassName": "com.tarantula.platform.service.deployment.SingletonModuleApplication",
+  "disabled": true
+}

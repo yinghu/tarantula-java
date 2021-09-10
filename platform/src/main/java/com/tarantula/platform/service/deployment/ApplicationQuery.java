@@ -2,7 +2,7 @@ package com.tarantula.platform.service.deployment;
 
 import com.icodesoftware.RecoverableFactory;
 import com.tarantula.platform.DeploymentDescriptor;
-import com.tarantula.platform.service.Application;
+import com.tarantula.platform.service.ApplicationProvider;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class ApplicationQuery implements RecoverableFactory<DeploymentDescriptor> {
@@ -29,6 +29,6 @@ public class ApplicationQuery implements RecoverableFactory<DeploymentDescriptor
     }
 
     public String label(){
-        return Application.LABEL;
+        return ApplicationProvider.LABEL;
     }
 }

@@ -2,28 +2,29 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
+import com.tarantula.game.Arena;
+import com.tarantula.game.GameRoom;
+import com.tarantula.game.Rating;
+import com.tarantula.game.Stub;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
+import com.tarantula.platform.tournament.TournamentEntry;
+import com.tarantula.platform.tournament.TournamentHeader;
+import com.tarantula.platform.tournament.TournamentInstanceHeader;
+import com.tarantula.platform.tournament.TournamentRaceBoard;
 
 
 public class PortableEventRegistry implements PortableFactory {
 
 	public static final int OID =1;
 
-
     public static final int RESPONSIVE_EVENT_CID = 2;
-
-    //public static final int INSTANCE_PLAY_EVENT_CID = 3;
 
     public static final int FAST_PLAY_EVENT_CID = 5;
 
-    //public static final int ON_DEPLOY_EVENT_CID = 6;
-
     public static final int SERVICE_ACTION_EVENT_CID = 9;
-
-    //public static final int APPLICATION_SERVICE_EVENT_CID = 10;
 
     public static final int MAP_STORE_SYNC_EVENT_CID =11;
 
@@ -39,14 +40,16 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int TOPIC_MAP_STORE_SYNC_EVENT_CID = 23;
 
+
+
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
 
     public static final int METADATA_CID = 101;
 
     public static final int LOBBY_CID = 102;
-    public static final int APPLICATION_DESCRIPTOR_CID =103;
 
+    public static final int APPLICATION_DESCRIPTOR_CID =103;
 
     public static final int GAME_CLUSTER_CID = 106;
 
@@ -54,6 +57,19 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int EXPOSED_GAME_SERVICE_CID = 108;
 
+    public static final int RATING_CID = 110;
+
+    public static final int ROOM_CID = 111;
+
+    public static final int ARENA_CID = 112;
+
+    public static final int TOURNAMENT_CID = 113;
+
+    public static final int TOURNAMENT_INSTANCE_CID = 114;
+
+    public static final int TOURNAMENT_ENTRY_CID = 115;
+
+    public static final int TOURNAMENT_RACE_BOARD_CID = 116;
 
     public Portable create(int cid) {
         Portable _ins;
@@ -107,6 +123,27 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case ACCESS_INDEX_CID:
                 _ins = new AccessIndexTrack();
+                break;
+            case RATING_CID:
+                _ins = new Rating();
+                break;
+            case ROOM_CID:
+                _ins = new GameRoom();
+                break;
+            case ARENA_CID:
+                _ins = new Arena();
+                break;
+            case TOURNAMENT_CID:
+                _ins = new TournamentHeader();
+                break;
+            case TOURNAMENT_INSTANCE_CID:
+                _ins = new TournamentInstanceHeader();
+                break;
+            case TOURNAMENT_ENTRY_CID:
+                _ins = new TournamentEntry();
+                break;
+            case TOURNAMENT_RACE_BOARD_CID:
+                _ins = new TournamentRaceBoard();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");

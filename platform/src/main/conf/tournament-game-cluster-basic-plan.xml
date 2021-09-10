@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tarantula>
+    <!--
+        Game Lobby Name Rule
+        game name : system level unique
+        game lobby type id : [game name]-lobby , tag : [game name]/zone[sequence]
+        game service type id : [game name]-service, tag : [game name]/mmk
+        game data type id : [game name]-data, tag : [game name]/data
+        data service name : [game name]-service
+        data service data store : [game name]-service
+    -->
+    <lobby-context>
+        <type-id>game-lobby</type-id>
+        <type>lobby</type>
+        <category>game</category>
+        <name>GameLobby</name>
+        <access-mode>12</access-mode>
+        <deploy-code>4</deploy-code>
+        <deploy-priority>15</deploy-priority>
+       <application-list>
+            <application>
+                <type-id>game-lobby</type-id>
+                <name>Game Lobby 1</name>
+                <type>application</type>
+                <category>game</category>
+                <tag>game/lobby1</tag>
+                <module-name>com.tarantula.game.module.GameLobbyModule</module-name>
+                <access-rank>1</access-rank>
+                <timer-on-module>1000</timer-on-module>
+            </application>
+            <application>
+                <type-id>game-lobby</type-id>
+                <name>Game Lobby 2</name>
+                <type>application</type>
+                <category>game</category>
+                <tag>game/lobby2</tag>
+                <module-name>com.tarantula.game.module.GameLobbyModule</module-name>
+                <access-rank>2</access-rank>
+                <timer-on-module>1000</timer-on-module>
+            </application>
+        </application-list>
+    </lobby-context>
+    <lobby-context>
+        <type-id>game-service</type-id>
+        <type>lobby</type>
+        <category>service</category>
+        <name>LiveService</name>
+        <access-mode>12</access-mode>
+        <deploy-code>4</deploy-code>
+        <deploy-priority>10</deploy-priority>
+        <application-list>
+            <application><!-- Match making module-->
+                <type-id>game-service</type-id>
+                <name>MatchMaking</name>
+                <type>application</type>
+                <category>system</category>
+                <tag>game/mmk</tag>
+                <module-name>com.tarantula.game.module.MatchMakingModule</module-name>
+            </application>
+            <application><!-- Configuration module-->
+                <type-id>game-service</type-id>
+                <name>Item</name>
+                <type>application</type>
+                <category>item</category>
+                <tag>game/cfg</tag>
+                <module-name>com.tarantula.game.module.GameItemModule</module-name>
+            </application>
+            <application><!-- stats module-->
+                <type-id>game-service</type-id>
+                <name>Statistics</name>
+                <type>application</type>
+                <category>statistics</category>
+                <tag>game/stats</tag>
+                <module-name>com.tarantula.game.module.StatisticsModule</module-name>
+            </application>
+            <application><!-- leader board module-->
+                <type-id>game-service</type-id>
+                <name>LeaderBoard</name>
+                <type>application</type>
+                <category>leaderboard</category>
+                <tag>game/leaderboard</tag>
+                <module-name>com.tarantula.game.module.LeaderBoardModule</module-name>
+            </application>
+            <application><!-- tournament module-->
+                <type-id>game-service</type-id>
+                <name>Tournament</name>
+                <type>application</type>
+                <category>tournament</category>
+                <tag>game/tournament</tag>
+                <reset-enabled>true</reset-enabled>
+                <module-name>com.tarantula.game.module.TournamentModule</module-name>
+            </application>
+        </application-list>
+    </lobby-context>
+    <lobby-context>
+        <type-id>game-data</type-id>
+        <type>lobby</type>
+        <category>service</category>
+        <name>DataStore</name>
+        <access-mode>12</access-mode>
+        <deploy-code>4</deploy-code>
+        <deploy-priority>20</deploy-priority>
+        <application-list>
+            <application><!-- key/value set/get app-->
+                <type-id>game-data</type-id>
+                <name>JsonDataStore</name>
+                <type>application</type>
+                <category>data</category>
+                <tag>game/data</tag>
+                <module-name>com.tarantula.game.module.KeyValueDataStoreModule</module-name>
+            </application>
+        </application-list>
+    </lobby-context>
+</tarantula>

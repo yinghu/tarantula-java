@@ -4,6 +4,9 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.Descriptor;
+import com.icodesoftware.Lobby;
+import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
@@ -23,7 +26,13 @@ public class GameCluster extends OnApplicationHeader implements Portable {
     public final static String TOURNAMENT_ENABLED = "11";
     public final static String LOBBY_PRE_SETUP_NAME ="12";
 
-    public final static String TEMPLATE_LABEL = "template";
+    public Lobby gameLobby;
+    public Lobby serviceLobby;
+    public Lobby dataLobby;
+
+    public final static String TOURNAMENT_LOOKUP_INDEX = "tournament";
+    public final static String STORE_LOOKUP_INDEX = "store";
+
 
     @Override
     public int getClassId() {
@@ -50,16 +59,50 @@ public class GameCluster extends OnApplicationHeader implements Portable {
         }
     }
     public JsonObject toJson(){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",successful);
-        jsonObject.addProperty("message",message);
-        if(successful){
-            jsonObject.addProperty("accessId",this.distributionKey());
-        }
-        return jsonObject;
+        JsonObject jo = new JsonObject();
+        jo.addProperty("successful",successful);
+        jo.addProperty("message",message);
+        jo.addProperty("gameClusterId",distributionKey());
+        jo.addProperty("name",(String)property(GameCluster.NAME));
+        jo.addProperty("mode",(String)property(GameCluster.MODE));
+        jo.addProperty("setup",(String)property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        jo.addProperty("gameLobby",(String)property(GameCluster.GAME_LOBBY));
+        jo.addProperty("gameService",(String)property(GameCluster.GAME_SERVICE));
+        jo.addProperty("gameData",(String)property(GameCluster.GAME_DATA));
+        jo.addProperty("accessKey",(String)property(GameCluster.ACCESS_KEY));
+        jo.addProperty("tournamentEnabled",(Boolean)property(GameCluster.TOURNAMENT_ENABLED));
+        jo.addProperty("disabled",(Boolean)property(GameCluster.DISABLED));
+        return jo;
     }
     @Override
     public int getFactoryId() {
         return PortableEventRegistry.OID;
+    }
+
+    public Descriptor serviceWithCategory(String category){
+        if(serviceLobby==null){
+            return null;
+        }
+        Descriptor loaded =null;
+        for(Descriptor d : serviceLobby.entryList()){
+            if(d.category().equals(category)){
+                loaded = d;
+                break;
+            }
+        }
+        return loaded;
+    }
+    public Descriptor gameWithKey(String key){
+        if(gameLobby==null){
+            return null;
+        }
+        Descriptor loaded =null;
+        for(Descriptor d : gameLobby.entryList()){
+            if(d.distributionKey().equals(key)){
+                loaded = d;
+                break;
+            }
+        }
+        return loaded;
     }
 }

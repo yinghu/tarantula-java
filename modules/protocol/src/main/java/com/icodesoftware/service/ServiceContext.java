@@ -2,6 +2,7 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.*;
 
+import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
 public interface ServiceContext {
@@ -24,4 +25,7 @@ public interface ServiceContext {
     String nodeId();
     RecoverableRegistry recoverableRegistry(int registryId);
     TokenValidatorProvider.AuthVendor authVendor(String name);
+    Configuration configuration(String config);
+    <T extends OnAccess> void setup(T configuration);
+    List<Descriptor> availableServices();
 }

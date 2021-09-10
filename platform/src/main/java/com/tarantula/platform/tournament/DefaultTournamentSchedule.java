@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 public class DefaultTournamentSchedule extends RecoverableObject implements Tournament.Schedule {
+
     private String type;
-    private String description;
-    private String icon;
+
     private LocalDateTime start;
     private LocalDateTime close;
     private LocalDateTime end;
@@ -21,10 +21,9 @@ public class DefaultTournamentSchedule extends RecoverableObject implements Tour
     public DefaultTournamentSchedule(){
     }
 
-    public DefaultTournamentSchedule(String type, String description, String icon, String schedule,LocalDateTime start, LocalDateTime close, LocalDateTime end, int duration, int maxEntries){
+    public DefaultTournamentSchedule(String type, String name, String schedule,LocalDateTime start, LocalDateTime close, LocalDateTime end, int duration, int maxEntries){
         this.type = type;
-        this.description = description;
-        this.icon = icon;
+        this.name = name;
         this.schedule = schedule;
         this.start = start;
         this.close = close;
@@ -36,14 +35,7 @@ public class DefaultTournamentSchedule extends RecoverableObject implements Tour
     public String type() {
         return type;
     }
-    @Override
-    public String description() {
-        return description;
-    }
-    @Override
-    public String icon() {
-        return icon;
-    }
+
     @Override
     public String schedule(){ return schedule;}
     @Override
@@ -72,7 +64,7 @@ public class DefaultTournamentSchedule extends RecoverableObject implements Tour
     }
     public Map<String,Object> toMap(){
         properties.put("type",type);
-        properties.put("description",description);
+        properties.put("name",name);
         properties.put("schedule",schedule);
         properties.put("start", TimeUtil.toUTCMilliseconds(start));
         properties.put("close",TimeUtil.toUTCMilliseconds(close));
@@ -83,7 +75,7 @@ public class DefaultTournamentSchedule extends RecoverableObject implements Tour
     }
     public void fromMap(Map<String,Object> properties){
         this.type = (String) properties.get("type");
-        this.description = (String) properties.get("description");
+        this.name = (String) properties.get("name");
         this.schedule = (String) properties.get("schedule");
         this.start = TimeUtil.fromUTCMilliseconds(((Number)properties.get("start")).longValue());
         this.close = TimeUtil.fromUTCMilliseconds(((Number)properties.get("close")).longValue());

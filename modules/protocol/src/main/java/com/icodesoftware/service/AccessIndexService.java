@@ -7,8 +7,8 @@ public interface AccessIndexService extends ServiceProvider {
 
     String NAME = "AccessIndexService";
 
-    AccessIndex set(String accessKey);
-    AccessIndex setIfAbsent(String accessKey);
+    AccessIndex set(String accessKey,int referenceId);
+    AccessIndex setIfAbsent(String accessKey,int referenceId);
 
     AccessIndex get(String accessKey);
 

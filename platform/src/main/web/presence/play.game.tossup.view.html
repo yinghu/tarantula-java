@@ -1,0 +1,126 @@
+<div class="tx-modal-content">
+    <canvas id='tx-game-tossup'></canvas>
+</div>
+<script type='module' tx-id='tx-md-tossup' tx-src='resource/tarantula.tossup.js' tx-version='1.1'></script>
+<script type='text/javascript'>
+    console.log(TARA_API.query().stub);
+    let ttc = new TossUp('my ttc');
+    ttc.show_name();
+    let _oswaldFamily = 'Oswald, Arial';
+    let _felipaFamily = 'Felipa, Arial';
+    let app = TGL.start(document.querySelector('#tx-game-tossup'));
+    TARA_API.onGet('tossup/cfg','onList','category/abilities',(resp)=>{
+        console.log(resp);
+    });
+    let zone = new PIXI.Text('Zone=>'+JSON.stringify(TARA_API.query().stub.zone),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
+    zone.y = 20;
+    zone.x = 10;
+    app.stage.addChild(zone);
+    let arena = new PIXI.Text('Arena=>'+JSON.stringify(TARA_API.query().stub.arena),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
+    arena.y = 60;
+    arena.x = 10;
+    app.stage.addChild(arena);
+
+    let room = new PIXI.Text('Room=>'+JSON.stringify(TARA_API.query().stub.room),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
+    room.y = 100;
+    room.x = 10;
+    app.stage.addChild(room);
+
+    let tournament = new PIXI.Text('Tournament=>'+JSON.stringify(TARA_API.query().stub.tournament),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
+    tournament.y = 140;
+    tournament.x = 10;
+    app.stage.addChild(tournament);
+
+
+
+    let messageBox = new PIXI.Text('',{fontFamily:_oswaldFamily,fontSize:30,fill:'yellow'});
+    messageBox.y = 180;
+    messageBox.x = 10;
+    app.stage.addChild(messageBox);
+    messageBox.text = JSON.stringify(TARA_API.query().stub.rating); 
+
+    let exit = text_button('EXIT',()=>{
+        let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onLeave'};
+        TARA_API.onService(false,cmd,(resp)=>{
+            console.log(resp);
+            TARA_API.disconnect();
+            TGL.shutdown();
+            let m3 = document.querySelector(TARA_API.query().gamePopup);
+            m3.innerHTML="";
+            m3.style.display = 'none';
+        });
+    });
+    exit.x = window.innerWidth-70;
+    exit.y = 6;
+    app.stage.addChild(exit);
+   
+    let rating = text_button('Rating',()=>{
+        let payload ={rating:{rank:1,delta:70},stats:[{name:'kills',value:1}]}; 
+        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','rating',payload,(resp)=>{
+            messageBox.text = JSON.stringify(resp);    
+        });
+    });
+    rating.x = window.innerWidth-70;;
+    rating.y = 400;
+    app.stage.addChild(rating);
+
+    let stats = text_button('Kills',()=>{
+        let payload ={rating:{rank:0,delta:10},stats:[{name:'kills',value:1}]}; 
+        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','stats',payload,(resp)=>{
+            messageBox.text = JSON.stringify(resp);    
+        });
+    });
+    stats.x = window.innerWidth-70;;
+    stats.y = 480;
+    app.stage.addChild(stats);
+
+    let wins = text_button('Wins',()=>{
+        let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}]}; 
+        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','stats',payload,(resp)=>{
+            messageBox.text = JSON.stringify(resp);    
+        });
+    });
+    wins.x = window.innerWidth-70;;
+    wins.y = 560;
+    app.stage.addChild(wins);
+
+    let score = text_button('Score',()=>{
+        let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}],tournament:{score:100}}; 
+        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','tournament',payload,(resp)=>{
+            messageBox.text = JSON.stringify(resp);    
+        });
+    });
+    score.x = window.innerWidth-70;;
+    score.y = 640;
+    app.stage.addChild(score);
+
+    let list = text_button('List',()=>{
+        //let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}],tournament:{score:100}}; 
+        TARA_API.onGet(TARA_API.query().stub.tag,'onList','tournament',(resp)=>{
+            messageBox.text = JSON.stringify(resp);    
+        });
+    });
+    list.x = window.innerWidth-70;;
+    list.y = 720;
+    app.stage.addChild(list);
+
+
+    function text_button(cap,cmd){
+        let container = new PIXI.Container();
+        let rect = new PIXI.Graphics();
+        rect.lineStyle(4, 0xFF3300, 1);
+        rect.beginFill(0x66CCFF);
+        rect.drawRect(0, 0, 64, 64);
+        rect.endFill();
+        rect.interactive = true;
+        rect.buttonMode = true;
+        rect.on('pointerdown',cmd);
+        let txt = new PIXI.Text(cap,{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
+        txt.x = (64-txt.width)/2;
+        txt.y = (64-txt.height)/2;
+        container.addChild(rect);
+        container.addChild(txt);
+        return container;
+    }
+
+</script>

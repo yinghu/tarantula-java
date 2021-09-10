@@ -1,14 +1,12 @@
 package com.tarantula.admin;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.item.Item;
-import com.tarantula.platform.item.ItemQuery;
+import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -21,25 +19,24 @@ public class GameStoreAdminModule implements Module {
     public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-
-            Descriptor app = this.loadDescriptor(gameCluster,this.context.descriptor().category());
+            Descriptor app = gameCluster.serviceWithCategory(this.context.descriptor().category());
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            List<Item> items = preSetup.list(this.context,app,new ItemQuery());
-            session.write(toJson(items).toString().getBytes());
+            List<ConfigurableHeader> items = preSetup.list(this.context,app,new ConfigurableHeaderQuery("category/"+app.category()));
+            session.write(new ItemHeaderContext(true,items.size()>0?"Configure store item":"no items configured",items).toJson().toString().getBytes());
         }
-        else if (session.action().equals("onSave")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            Item app = new Item();
-            if(app.configureAndValidate(payload)){
-                app.configurationType(this.context.descriptor().category());
-                app.configurationName("gem");
-                app.configurationCategory("item");
-                Descriptor desc = loadDescriptor(gameCluster,this.context.descriptor().category());
-                SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);
-                session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
+        else if (session.action().equals("onRegister")){
+            String[] ks = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(ks[0]);
+            ConfigurableObject app = new ConfigurableObject();
+            app.distributionKey(ks[1]);
+            Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
+            if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app)){
+                session.write(JsonUtil.toSimpleResponse(true,ks[1]).getBytes());
+                GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
+                gameServiceProvider.configurationServiceProvider().register(app.setup());
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
+               session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
             }
         }
         else if(session.action().equals("onLoad")){
@@ -58,25 +55,5 @@ public class GameStoreAdminModule implements Module {
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
         this.context.log("game store admin module started", OnLog.WARN);
     }
-    private Descriptor loadDescriptor(GameCluster gameCluster, String category){
-        String lobbyTypeId = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-        Lobby lobby = this.deploymentServiceProvider.lobby(lobbyTypeId);
-        Descriptor[] descriptors = {null};
-        lobby.entryList().forEach((d)->{
-            if(d.category().equals(category)){
-                descriptors[0]=d;
-            }
-        });
-        return descriptors[0];
-    }
-    private JsonObject toJson(List<Item> itemList){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",true);
-        JsonArray alist = new JsonArray();
-        itemList.forEach((v)->{
-            alist.add(v.toJson());
-        });
-        jsonObject.add("itemList",alist);
-        return jsonObject;
-    }
+
 }

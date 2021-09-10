@@ -198,11 +198,13 @@ public class TarantulaCluster extends TarantulaApplicationHeader implements Clus
             default:
         }
     }
-    public void registerReloadListener(String typeId,ReloadListener listener){
-        rMap.put(typeId,listener);
+    public String registerReloadListener(ReloadListener listener){
+        String regKey = UUID.randomUUID().toString();
+        rMap.put(regKey,listener);
+        return regKey;
     }
-    public void unregisterReloadListener(String typeId){
-        rMap.remove(typeId);
+    public void unregisterReloadListener(String regKey){
+        rMap.remove(regKey);
     }
     public void onReload(){
         rMap.forEach((k,v)->v.reload());

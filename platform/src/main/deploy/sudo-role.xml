@@ -7,74 +7,18 @@
         <name>Sudo Role</name>
         <access-mode>12</access-mode>
         <deploy-code>1</deploy-code>
-        <description>Tarantula Sudo Role Service</description>
-        <application-list>
+       <application-list>
             <application>
                 <type-id>sudo-role</type-id>
                 <name>SudoRole</name>
                 <type>application</type>
                 <category>sudo</category>
                 <tag>role/sudo</tag>
-                <description>Tarantula Sudo Role Service</description>
                 <module-name>com.tarantula.admin.SudoRoleModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <access-control>100</access-control>
             </application>
         </application-list>
-        <view-list>
-            <view type="upload.view">
-                <property name="moduleResourceFile">sudo/upload.view.html</property>
-            </view>
-            <view type="deploy.view">
-                <property name="moduleResourceFile">sudo/deploy.view.html</property>
-            </view>
-            <view type="deploy.resource">
-                <property name="moduleResourceFile">sudo/deploy.resource.view.html</property>
-            </view>
-            <view type="data.store.load">
-                <property name="moduleResourceFile">sudo/data.store.load.view.html</property>
-            </view>
-            <view type="find.user">
-                <property name="moduleResourceFile">sudo/find.user.view.html</property>
-            </view>
-            <view type="data.store.count.list">
-                <property name="moduleResourceFile">sudo/data.store.count.list.view.html</property>
-            </view>
-            <view type="create.labeled.key">
-                <property name="moduleResourceFile">sudo/create.labeled.key.view.html</property>
-            </view>
-            <view type="stop.access.index">
-                <property name="moduleResourceFile">sudo/stop.access.index.view.html</property>
-            </view>
-            <view type="start.access.index">
-                <property name="moduleResourceFile">sudo/start.access.index.view.html</property>
-            </view>
-            <view type="data.store.backup">
-                <property name="moduleResourceFile">sudo/data.store.backup.view.html</property>
-            </view>
-            <view type="deploy.module">
-                <property name="moduleResourceFile">sudo/deploy.module.view.html</property>
-            </view>
-            <view type="add.module">
-                <property name="moduleResourceFile">sudo/add.module.view.html</property>
-            </view>
-            <view type="launch.module">
-                <property name="moduleResourceFile">sudo/launch.module.view.html</property>
-            </view>
-            <view type="shutdown.module">
-                <property name="moduleResourceFile">sudo/shutdown.module.view.html</property>
-            </view>
-            <view type="reset.module">
-                <property name="moduleResourceFile">sudo/reset.module.view.html</property>
-            </view>
-            <view type="export.module">
-                <property name="moduleResourceFile">sudo/export.module.view.html</property>
-            </view>
-            <view type="configuration.list">
-                <property name="moduleResourceFile">sudo/configuration.list.view.html</property>
-            </view>
-        </view-list>
-
     </lobby-context>
 </tarantula>

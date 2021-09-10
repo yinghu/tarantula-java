@@ -25,30 +25,9 @@ public class StatisticsModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
         //fetch statistics from systemId
-        if(session.action().equals("onRating")){
-            Rating rating = this.gameServiceProvider.rating(session.systemId());
-            session.write(this.builder.create().toJson(rating).getBytes());
-        }
-        else if(session.action().equals("OnStatistics")){
+        if(session.action().equals("onStatistics")){
             Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
             session.write(this.builder.create().toJson(statistics).getBytes());
-        }
-        else if(session.action().startsWith("OnLeaderBoard")){ //use query OnLeaderBoard/{category}/{classifier}
-            String[] query = session.action().split(Recoverable.PATH_SEPARATOR);
-            if(query.length==3){
-                LeaderBoard ldb = this.gameServiceProvider.leaderBoard(query[1]);
-                LeaderBoardView view = new LeaderBoardView();
-                view.category = ldb.category();
-                view.classifier = query[2];
-                view.board = new ArrayList<>();
-                ldb.total().rank((r,e)->{
-                    view.board.add(new LeaderBoardView.EntryView(r,e.owner(),e.value(),e.timestamp()));
-                });
-                session.write(this.builder.create().toJson(view).getBytes());
-            }
-            else{
-                throw new UnsupportedOperationException(session.action());
-            }
         }
         else{
             throw new UnsupportedOperationException(session.action());
@@ -64,23 +43,6 @@ public class StatisticsModule implements Module {
         this.builder.registerTypeAdapter(Rating.class,new RatingSerializer());
         this.builder.registerTypeAdapter(LeaderBoardView.class,new LeaderBoardViewSerializer());
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
-        this.gameServiceProvider.statisticsTag(this.context.descriptor().tag());
-        this.context.registerRecoverableListener(new PresencePortableRegistry()).addRecoverableFilter(StatisticsPortableRegistry.STATISTICS_DELTA_CID,(a)->{
-            StatsDelta delta = (StatsDelta)a;
-            Statistics statistics = gameServiceProvider.statistics(delta.owner());
-            Statistics.Entry entry = statistics.entry(delta.name);
-            entry.update(delta.value).update();
-            LeaderBoard ldb = gameServiceProvider.leaderBoard(delta.name);
-            ldb.onAllBoard(entry);
-            //this.context.log("delta->"+delta.name+"<>"+delta.value+"//"+delta.owner(), OnLog.WARN);
-        });
-        this.context.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.STUB_CID,(a)->{
-            Stub stub = (Stub)a;
-            Rating rating = this.gameServiceProvider.rating(stub.owner());
-            rating.update(stub);
-            rating.update();
-            //this.context.log("a->"+stub.owner()+"/"+stub.rank+"/"+stub.pxp+"/"+stub.rankUpBase+"/"+stub.levelUpBase,OnLog.WARN);
-        });
         this.context.log("Statistics started on game service provider ["+this.context.descriptor().typeId()+"]", OnLog.WARN);
     }
 

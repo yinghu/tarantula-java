@@ -2,27 +2,22 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
-import com.icodesoftware.DataStore;
-
-import java.util.List;
-
-public interface ConfigurationServiceProvider{
+import com.icodesoftware.Descriptor;
 
 
-    default void dataStore(OnDataStore onDataStore){
-    }
+public interface ConfigurationServiceProvider extends ServiceProvider{
+
 
 
     <T extends Configurable> void register(T configurable);
     <T extends Configurable> void release(T configurable);
     void configure(String key);
 
-    <T extends Configuration> List<T> configurations(String type);
+    <T extends Configuration> T configuration(String config);
 
-    String registerConfigurableListener(String type,Configurable.Listener listener);
+    String registerConfigurableListener(Descriptor application, Configurable.Listener listener);
+    String registerConfigurableListener(String category, Configurable.Listener listener);
+
     void unregisterConfigurableListener(String registryKey);
 
-    interface OnDataStore{
-        void on(DataStore dataStore);
-    }
 }

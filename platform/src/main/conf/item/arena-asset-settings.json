@@ -1,0 +1,19 @@
+{
+  "type": "asset",
+  "category": "arena",
+  "version": "1.0",
+  "description": "arena asset template list",
+  "itemList":
+  [
+      {
+        "configurationName": "Arena",
+        "header": {
+          "Name": "BumpCity",
+          "Description": "Amber2",
+          "Rank": 1,
+          "Xp": 1000,
+          "ArenaScene": "Amber2"
+        }
+      }
+  ]
+}

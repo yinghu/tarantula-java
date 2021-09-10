@@ -79,7 +79,7 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
                 }
                 else if(onIndex.get()){//third party token exchange first time
                     event.action("onTokenRegister");
-                    AccessIndex _tindex = accessIndexService.set(magicKey);
+                    AccessIndex _tindex = accessIndexService.set(magicKey,0);
                     if(_tindex!=null){
                         event.systemId(_tindex.distributionKey());
                         RoutingKey _routingKey = eventService.routingKey(_tindex.distributionKey(),tag);
@@ -112,7 +112,7 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
             }
             else if(action.equals("onRegister")){//to server topic
                 if(onIndex.get()){ //register
-                    AccessIndex _aindex = this.accessIndexService.set(magicKey);
+                    AccessIndex _aindex = this.accessIndexService.set(magicKey,0);
                     if(_aindex!=null){
                         event.systemId(_aindex.distributionKey());
                         RoutingKey _routingKey = eventService.routingKey(_aindex.distributionKey(),tag);
@@ -138,7 +138,7 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
                     event.routingNumber(_routingKey.routingNumber());
                     this.eventService.publish(event);
                 }else if(onIndex.get()){//device login exchange first time
-                    AccessIndex _dindex = accessIndexService.set(magicKey);
+                    AccessIndex _dindex = accessIndexService.set(magicKey,0);
                     if(_dindex!=null){
                         event.action("onDeviceRegister");
                         event.systemId(_dindex.distributionKey());

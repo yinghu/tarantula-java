@@ -1,17 +1,25 @@
 package com.tarantula.platform;
 
 import java.io.*;
+import java.net.URL;
+import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
+import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.cci.RequestHandler;
+import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.item.ConfigurableTemplate;
+import com.tarantula.platform.item.JsonConfigurableTemplateParser;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
@@ -67,7 +75,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     private final List<DefaultLobby> mlobbyList = new LinkedList();
 
-    private final ConcurrentHashMap<String,Application> availableApplicationManagers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ApplicationProvider> availableApplicationManagers = new ConcurrentHashMap<>();
 
     public String applicationSchedulingPoolSetting;
     private ScheduledExecutorService scheduledExecutorService;
@@ -95,9 +103,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     private final ConcurrentHashMap<String,ServiceProvider> serviceProviders = new ConcurrentHashMap();
     private final ConcurrentHashMap<String,ServiceProvider> dataStoreProviders = new ConcurrentHashMap();
-    private final ConcurrentHashMap<String,List<Configuration>> configurations = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
 
+    private final ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,ConfigurableTemplate> cMap = new ConcurrentHashMap<>();
 
     public String dataBucketGroup;
     public String dataBucketNode;
@@ -120,10 +128,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public int platformRoutingNumber;
     public int accessIndexRoutingNumber;
 
-    //public String endpointIp ="localhost";
-    //public int endpointPort = 6393;
     public static ScopedMemberDiscovery memberDiscovery;
     public static int operationTimeout = 5;
+    public static boolean lobbySubscriptionEnabled = false;
     public String authContext = "localhost";
     public boolean udpEndpointEnabled;
     public String udpReceiverThreadPoolSetting;
@@ -199,7 +206,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             return this.scheduledExecutorService.scheduleAtFixedRate(task,task.initialDelay(),task.delay(),TimeUnit.MILLISECONDS);
         }
     }
-    public Application applicationManager(String applicationId){
+    public ApplicationProvider applicationManager(String applicationId){
        return this.availableApplicationManagers.get(applicationId);
     }
 
@@ -211,11 +218,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         singletonApplicationManager.start();
         lb.addEntry(c);
     }
-    public void configureConfigurations(LobbyConfiguration conf){
-        if(conf.configurations.size()>0){
-            configurations.put(conf.descriptor.typeId(),conf.configurations);
-        }
- 	}
+
     public void configureViews(LobbyConfiguration conf){
  	    conf.views.forEach((v)->{
  	        this.deploymentServiceProvider.register(v);
@@ -278,7 +281,14 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     public synchronized void setGameClusterOnLobby(String memberId,GameCluster gameCluster,Configurable.Listener listener){
  	    String publishingId = (String) gameCluster.property(GameCluster.PUBLISHING_ID);
-        List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
+ 	    try{
+ 	        GameServiceProvider gameServiceProvider = new GameServiceProvider(gameCluster);
+            this.deployServiceProvider(gameServiceProvider);
+            gameServiceProvider.start();
+        }catch (Exception ex){
+            throw new RuntimeException("failed to start game service provider->"+gameCluster.property(GameCluster.NAME));
+        }
+ 	    List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
         List<LobbyConfiguration> configurations = new ArrayList<>();
         bList.forEach((lb)->configurations.add(new LobbyConfiguration(lb)));
         Collections.sort(configurations,new LobbyComparator());
@@ -357,7 +367,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             HashMap<String, Descriptor> _codeBase = new HashMap<>();
             Descriptor lab = null;
             for(Descriptor d : lb.entryList()){
-                Application ap = this.availableApplicationManagers.get(d.distributionKey());
+                ApplicationProvider ap = this.availableApplicationManagers.get(d.distributionKey());
                 if(d.codebase()!=null&&d.moduleName()!=null){
                     _codeBase.putIfAbsent(d.codebase(),d);
                 }
@@ -370,7 +380,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
                 }
             }
             if(lab!=null){
-                Application lbb = this.availableApplicationManagers.remove(lab.distributionKey());
+                ApplicationProvider lbb = this.availableApplicationManagers.remove(lab.distributionKey());
                 lbb.shutdown();
                 listener.onLobby(lab);
             }
@@ -409,7 +419,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             for(Descriptor d : lb.entryList()){
                 if(d.type().equals(Descriptor.TYPE_APPLICATION)&&d.distributionKey().equals(applicationId)){
                     lb.removeEntry(applicationId);
-                    Application app = this.availableApplicationManagers.remove(applicationId);
+                    ApplicationProvider app = this.availableApplicationManagers.remove(applicationId);
                     app.shutdown();
                 }
                 if(d.codebase()!=null&&d.moduleName()!=null){
@@ -421,7 +431,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             }
             if(lb.entryList().size()==1&&(lab!=null)){//clean lobby and clean module class loaders
                 this._lobbyMapping.remove(typeId);
-                Application lbb = this.availableApplicationManagers.remove(lab.distributionKey());
+                ApplicationProvider lbb = this.availableApplicationManagers.remove(lab.distributionKey());
                 lbb.shutdown();
                 listener.onLobby(lab);
                 _codeBase.forEach((k,v)-> listener.onLobby(v));
@@ -489,9 +499,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public IntegrationCluster integrationCluster(){
         return integrationCluster;
     }
-    public List<Configuration> configurations(String name){
- 	    return this.configurations.get(name);
-    }
+
     public ServiceProvider serviceProvider(String name){
         return this.serviceProviders.get(name);
     }
@@ -521,15 +529,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             }
         }
         this.accessIndexService().enable();
-        AccessIndex bid = this.accessIndexService().get(node.bucketName);
-        if(bid==null){
-            bid = this.accessIndexService().set(node.bucketName);
-        }
+        AccessIndex bid = this.accessIndexService().setIfAbsent(node.bucketName,0);
         node.bucketId = bid.distributionKey();
-        AccessIndex nid = this.accessIndexService().get(node.nodeName);
-        if(nid==null){
-            nid = this.accessIndexService().set(node.nodeName);
-        }
+        AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
         node.nodeId = nid.distributionKey();
         nodeMetrics = new StatisticsIndex();
         nodeMetrics.distributionKey(node.nodeId);
@@ -763,5 +765,99 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     public ModuleClassLoader moduleClassLoader(String moduleId){
  	    return (ModuleClassLoader)this.deploymentService().classLoader(moduleId);
+    }
+
+    public Configuration configuration(String config){
+ 	    try{
+
+            Map<String,Object> kv = JsonUtil.toMap(Thread.currentThread().getContextClassLoader().getResourceAsStream(config+".json"));
+            ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration();
+            kv.forEach((k,v)->applicationConfiguration.property(k,v));
+            return applicationConfiguration;
+ 	    }catch (Exception ex){
+            log.warn("no master config->"+config);
+ 	        return  null;
+        }
+    }
+
+    public List<Descriptor> availableServices(){
+ 	    URL url = Thread.currentThread().getContextClassLoader().getResource("deploy");
+ 	    File f = new File(url.getFile());
+        ArrayList<Descriptor> alist = new ArrayList<>();
+ 	    f.list((m,n)->{
+ 	        if(n.endsWith(".json")){
+ 	            Descriptor app = JsonServiceParser.descriptor(n);
+ 	            if(!app.disabled()) alist.add(JsonServiceParser.descriptor(n));
+            }
+ 	        return false;
+        });
+ 	    return alist;
+    }
+    public <T extends OnAccess> void setup(T configuration){
+        if(!(configuration instanceof GameCluster)){
+            return;
+        }
+        try{
+            GameCluster gameCluster = (GameCluster)configuration;
+            Path _config_game = Paths.get(this.deployDir+"/conf/"+gameCluster.property(GameCluster.NAME));
+            if(!Files.exists(_config_game)){
+                Files.createDirectories(_config_game);
+                URL url = Thread.currentThread().getContextClassLoader().getResource("item");
+                String[] fs = new File(url.getFile()).list((m,n)->true);
+                String _path = url.getFile();
+                int wp = _path.indexOf(":");
+                if(wp>0){
+                    _path = _path.substring(wp+1);
+                }
+                for(String f : fs){
+                    Path _item = Paths.get(_path+"/"+f);
+                    Path _game = Paths.get(_config_game+"/"+f);
+                    Files.copy(_item,_game,StandardCopyOption.COPY_ATTRIBUTES);
+                }
+            }
+        }catch (Exception ex){
+            log.error("error on game cluster->"+configuration.property(GameCluster.NAME),ex);
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public Configuration configuration(GameCluster gameCluster,String config){
+        return cMap.computeIfAbsent(config,(k)->{
+            try{
+                FileInputStream fileInputStream = new FileInputStream(this.deployDir+"/conf/"+gameCluster.property(GameCluster.NAME)+"/"+config+".json");
+                ConfigurableTemplate item = JsonConfigurableTemplateParser.itemSet(fileInputStream);
+                fileInputStream.close();
+                return item;
+            }catch (Exception exx){
+                log.warn("configuration not existed->"+config);
+                return null;
+            }
+        });
+    }
+
+    public List<OnView> loadViewList(String typeId){
+ 	    ArrayList<OnView> _vlist = new ArrayList<>();
+        InputStream fin = Thread.currentThread().getContextClassLoader().getResourceAsStream("view/view-"+typeId+"-settings.json");
+        try{
+ 	        JsonObject jview = JsonUtil.parse(fin);
+            String context = jview.get("context").getAsString();
+            JsonArray views = jview.get("viewList").getAsJsonArray();
+ 	        views.forEach((je)->{
+ 	            JsonObject jv = je.getAsJsonObject();
+ 	            OnViewTrack view = new OnViewTrack();
+ 	            view.moduleContext(context);
+ 	            view.viewId(jv.get("type").getAsString());
+ 	            view.moduleResourceFile(jv.get("moduleResourceFile").getAsString());
+ 	            _vlist.add(view);
+            });
+ 	    }catch (Exception ex){
+ 	        log.warn("no view config->"+typeId);
+        }
+        finally {
+            if(fin!=null){
+                try{fin.close();}catch (IOException ioex){}
+            }
+        }
+        return _vlist;
     }
 }

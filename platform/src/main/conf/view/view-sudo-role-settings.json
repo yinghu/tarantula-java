@@ -1,0 +1,23 @@
+{
+  "description": "view list of sudo",
+  "context": "sudo",
+  "viewList":
+  [
+    {"type":"upload.view","moduleResourceFile":"sudo/upload.view.html"},
+    {"type":"deploy.view","moduleResourceFile":"sudo/deploy.view.html"},
+    {"type":"deploy.resource","moduleResourceFile":"sudo/deploy.resource.view.html"},
+    {"type":"data.store.load","moduleResourceFile":"sudo/data.store.load.view.html"},
+    {"type":"find.user","moduleResourceFile":"sudo/find.user.view.html"},
+    {"type":"data.store.count.list","moduleResourceFile":"sudo/data.store.count.list.view.html"},
+    {"type":"create.labeled.key","moduleResourceFile":"sudo/create.labeled.key.view.html"},
+    {"type":"stop.access.index","moduleResourceFile":"sudo/stop.access.index.view.html"},
+    {"type":"start.access.index","moduleResourceFile":"sudo/start.access.index.view.html"},
+    {"type":"data.store.backup","moduleResourceFile":"sudo/data.store.backup.view.html"},
+    {"type":"deploy.module","moduleResourceFile":"sudo/deploy.module.view.html"},
+    {"type":"add.module","moduleResourceFile":"sudo/add.module.view.html"},
+    {"type":"launch.module","moduleResourceFile":"sudo/launch.module.view.html"},
+    {"type":"shutdown.module","moduleResourceFile":"sudo/shutdown.module.view.html"},
+    {"type":"reset.module","moduleResourceFile":"sudo/reset.module.view.html"},
+    {"type":"export.module","moduleResourceFile":"sudo/export.module.view.html"}
+  ]
+}

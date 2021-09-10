@@ -1,0 +1,16 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category item template list",
+  "itemList":
+  [
+    {
+      "header": {"type": "prize","name": "Prize","enabled": true,"version": 1.0},
+      "application":
+      {
+        "name": "prize-item-settings"
+      }
+    }
+  ]
+}

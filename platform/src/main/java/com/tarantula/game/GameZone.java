@@ -1,7 +1,6 @@
 package com.tarantula.game;
 
-import com.icodesoftware.ApplicationContext;
-import com.icodesoftware.Configurable;
+import com.icodesoftware.*;
 import com.icodesoftware.Module;
 
 import java.util.List;
@@ -13,42 +12,44 @@ public interface GameZone extends Configurable{
     String PLAY_MODE_TVE = "tve"; //team versus computer
     String PLAY_MODE_TVT = "tvt"; //team versus team
 
-    int DEFAULT_LEVEL_COUNT = 10;
-    int DEFAULT_JOINS_ON_START = 1;
-    long DEFAULT_ROUND_DURATION = 60000;
-    int DEFAULT_LEVEL_UP_BASE = 1000;
-    int PVE_MAX_ROOM_CAPACITY = 1;
-    int PVP_MAX_ROOM_CAPACITY = 2;
-    int TVE_MAX_ROOM_CAPACITY = 2;
-    int TVT_MAX_ROOM_CAPACITY = 4;
-
     String name();
     void name(String name);
+    int levelMatch();
+    void levelMatch(int levelMatch);
     String playMode();
-    int levelLimit();
-    void levelLimit(int levelLimit);
+    int arenaLimit();
+    void arenaLimit(int arenaLimit);
     int capacity();
     void capacity(int capacity);
 
+    int maxJoinsPerRoom();
+    void maxJoinsPerRoom(int maxJoinsPerRoom);
     int joinsOnStart();
-    void joinsOnStart(int capacity);
-
+    void joinsOnStart(int joinsOnStart);
     long roundDuration();
     void roundDuration(long roundDuration);
 
     boolean connected();
-    Stub join(Rating rating);
-    void leave(String systemId);
-    void onTimer(Module.OnUpdate onUpdate);
+    Stub join(Session session,Rating rating);
+    void leave(Stub stub);
+    void update(Session session, Stub stub, byte[] payload, Module.OnUpdate onUpdate);
+    void list(Session session,Stub stub);
     void addArena(Arena arena);
     List<Arena> arenas();
-    void start(ApplicationContext applicationContext);
-
+    Arena arena(int level);
+    void setup(ApplicationContext applicationContext,GameLobby gameLobby);
+    DataStore dataStore();
     void roomProxy(RoomProxy roomProxy);
 
     interface RoomProxy{
-        Stub join(Arena  arena,Rating rating);
-        void leave(String systemId);
-        default void onTimer(Module.OnUpdate onUpdate){}
+        Stub join(Session session,Rating rating);
+        void update(Session session, Stub stub, byte[] payload, Module.OnUpdate onUpdate);
+        void list(Session session,Stub stub);
+        void leave(Stub stub);
+        void setup(ApplicationContext applicationContext,GameLobby gameLobby,GameZone gameZone);
+        default void close(){}
+        default String onRegister(Rating rating){ return null;}
+        default GameRoom onJoin(Arena arena,String roomId,String systemId){return null;}
+        default void onLeave(String roomId,String systemId){}
     }
 }

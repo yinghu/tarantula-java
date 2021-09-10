@@ -10,7 +10,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
-import com.tarantula.platform.service.Application;
+import com.tarantula.platform.service.ApplicationProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -139,7 +139,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             return null;
         }
         descriptor.owner(query.index());
-        descriptor.label(Application.LABEL);
+        descriptor.label(ApplicationProvider.LABEL);
         descriptor.onEdge(true);
         if(ds.create(descriptor)){
             if(!descriptor.typeId().equals(descriptor.moduleId())){
@@ -310,8 +310,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();
             String typePrefix = name.toLowerCase();
-            String configPrefix = tournamentEnabled?(mode+"-tournament"):(mode);
-            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(configPrefix+"-game-cluster-basic-plan.xml"));
+            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(tournamentEnabled?"tournament-game-cluster-basic-plan.xml":"game-cluster-basic-plan.xml"));
             for (LobbyConfiguration configuration : parser.configurations) {
                 configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",typePrefix));//lower case only typeId
                 if(configuration.descriptor.typeId().endsWith("-lobby")){
@@ -319,6 +318,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 }
                 else if(configuration.descriptor.typeId().endsWith("-service")){
                     gameCluster.property(GameCluster.GAME_SERVICE,configuration.descriptor.typeId());
+                    this.tarantulaContext.availableServices().forEach((s)-> configuration.applications.add((DeploymentDescriptor)s));
                 }
                 else if(configuration.descriptor.typeId().endsWith("-data")){
                     gameCluster.property(GameCluster.GAME_DATA,configuration.descriptor.typeId());
@@ -328,14 +328,12 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                     throw new RuntimeException("["+name+"] duplicated");
                 }
                 ApplicationPreSetup[] preSetup = {null};
-                configuration.configurations.forEach(c->{
-                    if(c.configurationType().equals(ApplicationPreSetup.SET_UP_TYPE)){
-                        String cname = c.property(ApplicationPreSetup.SET_UP_NAME).toString();
-                        gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,cname);
-                        gameCluster.property(GameCluster.MODE,c.configurationName());
-                        preSetup[0] = SystemUtil.applicationPreSetup(cname);
-                    }
-                });
+                Configuration presetup = this.tarantulaContext.configuration(configuration.descriptor.category()+"-pre-setup-settings");
+                if(presetup!=null){
+                    String cname = (String) presetup.property(ApplicationPreSetup.SET_UP_NAME);
+                    gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,cname);
+                    preSetup[0] = SystemUtil.applicationPreSetup(cname);
+                }
                 //log.warn("Create named lobby type id->"+configuration.descriptor.typeId());
                 Descriptor descriptor = configuration.descriptor;
                 descriptor.owner(publishingId);
@@ -350,7 +348,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 mds.create(lobbyTypeIdIndex);
                 configuration.applications.forEach((a)->{
                     a.owner(descriptor.distributionKey());
-                    a.label(Application.LABEL);
+                    a.label(ApplicationProvider.LABEL);
                     a.onEdge(true);
                     a.tournamentEnabled(tournamentEnabled);
                     a.typeId(descriptor.typeId());//replaced with named type id

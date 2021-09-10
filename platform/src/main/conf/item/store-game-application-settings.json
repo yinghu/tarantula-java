@@ -1,0 +1,27 @@
+{
+  "type": "application",
+  "category": "store",
+  "version": "1.0",
+  "description": "robot item template list",
+  "itemList":
+  [
+    {
+      "configurationName": "Bot Pack",
+      "header": {
+        "Name": "Bot Pack"
+      },
+      "application": {},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationName": "Gun Pack",
+      "header": {
+        "Name": "Abilities Pack"
+      },
+      "application": {},
+      "payload": {},
+      "reference": []
+    }
+  ]
+}

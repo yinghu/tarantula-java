@@ -1,0 +1,33 @@
+{
+  "description": "view list of admin",
+  "context": "admin",
+  "viewList":[
+    {"type":"create.game.cluster","moduleResourceFile":"admin/create.game.cluster.view.html"},
+    {"type":"create.access.key","moduleResourceFile":"admin/create.access.key.view.html"},
+    {"type":"game.asset.list","moduleResourceFile":"admin/game.asset.list.view.html"},
+    {"type":"game.component.list","moduleResourceFile":"admin/game.component.list.view.html"},
+    {"type":"game.commodity.list","moduleResourceFile":"admin/game.commodity.list.view.html"},
+    {"type":"game.item.list","moduleResourceFile":"admin/game.item.list.view.html"},
+    {"type":"game.application.list","moduleResourceFile":"admin/game.application.list.view.html"},
+    {"type":"create.asset","moduleResourceFile":"admin/create.asset.view.html"},
+    {"type":"create.commodity","moduleResourceFile":"admin/create.commodity.view.html"},
+    {"type":"create.component","moduleResourceFile":"admin/create.component.view.html"},
+    {"type":"create.item","moduleResourceFile":"admin/create.item.view.html"},
+    {"type":"create.application","moduleResourceFile":"admin/create.application.view.html"},
+    {"type":"register.application","moduleResourceFile":"admin/register.application.view.html"},
+    {"type":"edit.item.template","moduleResourceFile":"admin/edit.item.template.view.html"},
+    {"type":"game.lobby.list","moduleResourceFile":"admin/game.lobby.list.view.html"},
+    {"type":"game.service.list","moduleResourceFile":"admin/game.service.list.view.html"},
+    {"type":"game.data.list","moduleResourceFile":"admin/game.data.list.view.html"},
+    {"type":"shopping.card","moduleResourceFile":"admin/stripe.card.view.html"},
+    {"type":"game.cluster.launch","moduleResourceFile":"admin/game.cluster.launch.view.html"},
+    {"type":"game.cluster.shutdown","moduleResourceFile":"admin/game.cluster.shutdown.view.html"},
+    {"type":"api.service.data","moduleResourceFile":"admin/api.service.data.view.html"},
+    {"type":"api.game.lobby","moduleResourceFile":"admin/api.game.lobby.view.html"},
+    {"type":"api.service.achievement","moduleResourceFile":"admin/api.service.item.view.html"},
+    {"type":"api.service.statistics","moduleResourceFile":"admin/api.service.item.view.html"},
+    {"type":"api.service.leaderboard","moduleResourceFile":"admin/api.service.item.view.html"},
+    {"type":"api.service.store","moduleResourceFile":"admin/api.service.item.view.html"},
+    {"type":"api.service.tournament","moduleResourceFile":"admin/api.service.item.view.html"}
+  ]
+}

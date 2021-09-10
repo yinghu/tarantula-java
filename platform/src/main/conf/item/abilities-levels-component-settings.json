@@ -1,0 +1,74 @@
+{
+  "type": "component",
+  "category": "abilitiesLevels",
+  "version": "1.0",
+  "description": "abilities levels item template list",
+  "itemList":
+  [
+      {
+        "configurationName": "AbilitiesLevels",
+        "header":
+        {
+        },
+        "application":
+        {
+          "Levels":
+            [ {"Stats":
+                [
+                  {"Type":"EnergyCost","Value": 4},
+                  {"Type":"ChargeTime","Value": 0.4},
+                  {"Type":"Duration","Value": 3},
+                  {"Type":"TargetingRange","Value": 5.5},
+                  {"Type":"DamageRange","Value": 2.75}
+                ]
+              },
+              {"Stats":
+                [
+                  {"Type":"Duration","Value": 3},
+                  {"Type":"TargetingRange","Value": 6.5}
+                ]
+              },
+              {"Stats":
+                [
+                  {"Type":"Duration","Value": 3.5},
+                  {"Type":"TargetingRange","Value": 6.5}
+                ]
+              },
+              {"Stats":
+                [
+                  {"Type":"Duration","Value": 3.5},
+                  {"Type":"TargetingRange","Value": 7}
+                ]
+              },
+              {"Stats":
+                [
+                  {"Type":"Duration","Value": 4},
+                  {"Type":"TargetingRange","Value": 7}
+                ]
+              },
+              {"Stats":
+                [
+                  {"Type":"Duration","Value": 4},
+                  {"Type":"TargetingRange","Value": 7.5}
+                ]
+              },
+              {"Stats":
+                [
+                  {"Type":"Duration","Value": 4.5},
+                  {"Type":"TargetingRange","Value": 7.5}
+                ]
+              },
+              {"Stats":
+                [
+                  {"Type":"Duration","Value": 4.5},
+                  {"Type":"TargetingRange","Value": 8}
+                ]
+              }
+            ],
+          "StatsToShow": ["TargetingRange","Duration"]
+        },
+        "payload": {},
+        "reference": []
+      }
+  ]
+}

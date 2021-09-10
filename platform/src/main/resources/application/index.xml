@@ -6,7 +6,6 @@
         <category>service</category>
         <access-mode>10</access-mode>
         <name>Index</name>
-        <description>Tarantula Lobby Index</description>
         <deploy-priority>500</deploy-priority>
         <application-list>
             <application>
@@ -14,34 +13,9 @@
                 <name>User</name>
                 <type>application</type>
                 <tag>index/user</tag>
-                <description>Tarantula User Management</description>
+                <category>account</category>
                 <class-name>com.tarantula.platform.presence.UserManagementApplication</class-name>
             </application>
-
         </application-list>
-        <configuration-list>
-            <configuration type="setup" name="account">
-                <property name="lobbyId">presence</property>
-                <property name="activated">false</property>
-                <property name="initialBalance">1000000</property>
-                <property name="roleName">player</property>
-                <property name="root">root</property>
-                <property name="password">root</property>
-            </configuration>
-        </configuration-list>
-        <view-list>
-            <view type="sign.in">
-                <property name="moduleResourceFile">sign.in.view.html</property>
-            </view>
-            <view type="sign.up">
-                <property name="moduleResourceFile">sign.up.view.html</property>
-            </view>
-            <view type="password.reset">
-                <property name="moduleResourceFile">password.reset.view.html</property>
-            </view>
-            <view type="invalid.request">
-                <property name="moduleResourceFile">invalid.request.view.html</property>
-            </view>
-        </view-list>
     </lobby-context>
 </tarantula>

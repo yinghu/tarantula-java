@@ -315,7 +315,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     @Override
     public void stateChanged(LifecycleEvent state) {
      LifecycleEvent.LifecycleState cs = state.getState();
-        log.warn("Integration state changed->"+state.toString());
+        log.warn("Integration state changed->"+state);
         switch(cs){
             case STARTED:
                 TarantulaContext._integrationInstanceStarted.countDown();
@@ -332,10 +332,10 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             default:
         }
     }
-    public void registerReloadListener(String typeId,ReloadListener listener){
-
+    public String registerReloadListener(ReloadListener listener){
+        return this.tarantulaContext.tarantulaCluster().registerReloadListener(listener);
     }
-    public void unregisterReloadListener(String typeId){
-
+    public void unregisterReloadListener(String regKey){
+        this.tarantulaContext.tarantulaCluster().unregisterReloadListener(regKey);
     }
 }

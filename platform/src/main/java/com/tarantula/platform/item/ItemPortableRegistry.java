@@ -2,21 +2,72 @@ package com.tarantula.platform.item;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
+import com.tarantula.platform.inventory.Inventory;
+import com.tarantula.platform.inventory.InventoryItem;
 
 
 public class ItemPortableRegistry extends AbstractRecoverableListener {
 
     public static final int OID = 7;
 
-    public static final int ITEM_CID = 4;
+    public static final int CONFIGURABLE_OBJECT_CID = 1;
 
+    public static final int ASSET_CID = 2;
+    public static final int COMPONENT_CID = 3;
+    public static final int COMMODITY_CID = 4;
+    public static final int ITEM_CID = 5;
+    public static final int APPLICATION_CID = 6;
+
+    public static final int INVENTORY_CID = 7;
+
+    public static final int INVENTORY_ITEM_CID = 8;
+
+    public static final int CATEGORY_CID = 9;
+    public static final int CATEGORY_ITEM_CID = 10;
+
+    public static final int INDEX_CID = 11;
+
+    public static final int CONFIGURABLE_HEADER_CID = 12;
 
 
     public Recoverable create(int i) {
         Recoverable pt = null;
         switch (i){
+            case CONFIGURABLE_OBJECT_CID:
+                pt = new ConfigurableObject();
+                break;
+            case ASSET_CID:
+                pt = new Asset();
+                break;
+            case COMPONENT_CID:
+                pt = new Component();
+                break;
+            case COMMODITY_CID:
+                pt = new Commodity();
+                break;
             case ITEM_CID:
                 pt = new Item();
+                break;
+            case APPLICATION_CID:
+                pt = new Application();
+                break;
+            case INVENTORY_CID:
+                pt = new Inventory();
+                break;
+            case INVENTORY_ITEM_CID:
+                pt = new InventoryItem();
+                break;
+            case CATEGORY_CID:
+                pt = new Category();
+                break;
+            case CATEGORY_ITEM_CID:
+                pt = new CategoryItem();
+                break;
+            case INDEX_CID:
+                pt = new Index();
+                break;
+            case CONFIGURABLE_HEADER_CID:
+                pt = new ConfigurableHeader();
                 break;
             default:
         }

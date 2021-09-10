@@ -2,8 +2,10 @@ package com.tarantula.game;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Descriptor;
 import com.icodesoftware.Lobby;
 import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.util.DescriptorSerializer;
 
 public class GameServiceContext extends ResponseHeader {
 
@@ -14,16 +16,12 @@ public class GameServiceContext extends ResponseHeader {
     }
 
     public JsonObject toJson(){
-        JsonObject jsonObject = new JsonObject();
+        DescriptorSerializer serializer = new DescriptorSerializer();
+        JsonObject jsonObject = (JsonObject) serializer.serialize(lobby.descriptor(), Descriptor.class,null);
         jsonObject.addProperty("successful",successful);
-        jsonObject.addProperty("typeId",lobby.descriptor().typeId());
-        jsonObject.addProperty("name",lobby.descriptor().name());
         JsonArray ja = new JsonArray();
         lobby.entryList().forEach((a)->{
-            JsonObject jsc = new JsonObject();
-            jsc.addProperty("name",a.name());
-            jsc.addProperty("tag",a.tag());
-            ja.add(jsc);
+            ja.add(serializer.serialize(a,Descriptor.class,null));
         });
         jsonObject.add("serviceList",ja);
         return jsonObject;

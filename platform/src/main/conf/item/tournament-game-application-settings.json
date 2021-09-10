@@ -1,0 +1,38 @@
+{
+  "type": "application",
+  "category": "tournament",
+  "version": "1.0",
+  "description": "tournament item template list",
+  "itemList":
+  [
+      {
+        "configurationName": "On Demand 10",
+        "header": {
+          "name": "10 player"
+        },
+        "application":
+        {
+          "schedule": "onDemand",
+          "durationHours": 24,
+          "maxEntriesPerInstance": 10,
+          "durationMinutesPerInstance": 10
+        },
+        "payload": {},
+        "reference": []
+      },
+      {
+        "configurationName": "Daily 100",
+        "header": {
+          "name": "Daily 100 player"
+        },
+        "application":
+        {
+          "schedule": "daily",
+          "maxEntriesPerInstance": 100,
+          "durationMinutesPerInstance": 30
+        },
+        "payload": {},
+        "reference": []
+      }
+  ]
+}

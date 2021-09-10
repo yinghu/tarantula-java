@@ -4,20 +4,29 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.platform.item.Item;
+import com.tarantula.platform.item.Application;
 
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class GameStoreModule implements Module,Configurable.Listener{
+public class GameStoreModule implements Module,Configurable.Listener<Application>{
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
-    private ConcurrentHashMap<String,Item> itemList;
+    private ConcurrentHashMap<String,Application> itemList;
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
             session.write(toJson().toString().getBytes());
+        }
+        if(session.action().equals("onBuy")){
+            Application item = itemList.get(session.name());
+            if(item!=null){
+                session.write(JsonUtil.toSimpleResponse(true,"pending inventory").getBytes());
+                this.gameServiceProvider.inventoryServiceProvider().redeem(session.systemId(),item);
+            }else{
+                session.write(JsonUtil.toSimpleResponse(false,"item not existed->"+session.name()).getBytes());
+            }
         }
         return false;
     }
@@ -27,12 +36,11 @@ public class GameStoreModule implements Module,Configurable.Listener{
         this.context = applicationContext;
         this.itemList = new ConcurrentHashMap<>();
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
-        this.gameServiceProvider.registerConfigurableListener(this.context.descriptor().category(),this);
+        this.gameServiceProvider.configurationServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("game store module started", OnLog.WARN);
     }
-    public <T extends Configurable> void onCreated(T created){
-        Item item = (Item)created;
-        itemList.put(UUID.randomUUID().toString(),item);
+    public void onCreated(Application item){
+        itemList.put(item.distributionKey(),item);
         this.context.log(item.toJson().toString(),OnLog.WARN);
     }
     private JsonObject toJson(){
@@ -40,7 +48,7 @@ public class GameStoreModule implements Module,Configurable.Listener{
         jsonObject.addProperty("successful",true);
         JsonArray alist = new JsonArray();
         itemList.forEach((k,v)->{
-            alist.add(v.toJson());
+            alist.add(v.configurableHeader().toJson());
         });
         jsonObject.add("itemList",alist);
         return jsonObject;

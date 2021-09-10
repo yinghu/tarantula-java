@@ -1,0 +1,23 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category asset template list",
+  "itemList":
+  [
+    {
+      "header": {"type": "card","name": "Item Card","icon":"icon","enabled": true,"version": 1.0},
+      "application":
+      {
+        "name": "card-asset-settings"
+      }
+    },
+    {
+      "header": {"type": "arena","name": "Arena","enabled": true,"version": 1.0},
+      "application":
+      {
+        "name": "arena-asset-settings"
+      }
+    }
+  ]
+}

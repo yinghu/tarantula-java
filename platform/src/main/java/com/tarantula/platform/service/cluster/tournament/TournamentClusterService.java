@@ -10,6 +10,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 public class TournamentClusterService implements ManagedService, RemoteService {
@@ -48,21 +49,21 @@ public class TournamentClusterService implements ManagedService, RemoteService {
 
     public boolean checkAvailable(String serviceName,String tournamentId){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        return tsp.tournament(tournamentId)!=null;
+        return tsp.onTournament(tournamentId)!=null;
     }
-    public String join(String serviceName,String tournamentId,String systemId){
+    public String register(String serviceName,String tournamentId,String systemId){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        return tsp.tournament(tournamentId).join(systemId);
+        return tsp.onTournament(tournamentId).register(systemId);
     }
-    public Tournament.Instance enter(String serviceName,String tournamentId,String instanceId,String systemId){
+    public Tournament.Instance join(String serviceName,String tournamentId,String instanceId,String systemId){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        Tournament.Instance _ins = tsp.enter(tournamentId,instanceId);
-        _ins.enter(systemId);
+        Tournament.Instance _ins = tsp.onInstance(tournamentId,instanceId);
+        _ins.join(systemId);
         return _ins;
     }
     public Tournament.Entry score(String serviceName, String instanceId, String systemId, double delta){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        Tournament.Instance _ins = tsp.instance(instanceId);
+        Tournament.Instance _ins = tsp.onInstance(instanceId);
         Tournament.Entry[] score={null};
         _ins.update(systemId,(e)->{
             e.score(delta);
@@ -70,8 +71,23 @@ public class TournamentClusterService implements ManagedService, RemoteService {
         });
         return score[0];
     }
+    public Tournament.Entry configure(String serviceName, String instanceId, String systemId, byte[] payload){
+        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        Tournament.Instance _ins = tsp.onInstance(instanceId);
+        Tournament.Entry[] score={null};
+        _ins.update(systemId,(e)->{
+            if(e.configureAndValidate(payload)){
+                score[0]=e;
+            }
+        });
+        return score[0];
+    }
+    public Tournament.RaceBoard list(String serviceName,String instanceId){
+        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        return tsp.onRaceBoard(instanceId);
+    }
     public Tournament schedule(String serviceName, Tournament.Schedule schedule){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        return tsp.schedule(schedule);
+        return tsp.onSchedule(schedule);
     }
 }

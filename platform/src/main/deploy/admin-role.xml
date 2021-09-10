@@ -7,7 +7,6 @@
         <name>Admin Role</name>
         <access-mode>12</access-mode>
         <deploy-code>1</deploy-code>
-        <description>Tarantula Admin Role Service</description>
         <application-list>
             <application>
                 <type-id>admin-role</type-id>
@@ -15,7 +14,6 @@
                 <type>application</type>
                 <category>admin</category>
                 <tag>role/admin</tag>
-                <description>Tarantula Admin Role Service</description>
                 <module-name>com.tarantula.admin.AdminRoleModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
@@ -27,8 +25,18 @@
                 <type>application</type>
                 <category>lobby</category>
                 <tag>role/lobby</tag>
-                <description>Tarantula Admin Role Service</description>
                 <module-name>com.tarantula.admin.GameLobbyAdminModule</module-name>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <access-control>30</access-control>
+            </application>
+            <application>
+                <type-id>admin-role</type-id>
+                <name>Admin Role</name>
+                <type>application</type>
+                <category>item</category>
+                <tag>role/item</tag>
+                <module-name>com.tarantula.admin.GameItemAdminModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
@@ -39,7 +47,6 @@
                 <type>application</type>
                 <category>tournament</category>
                 <tag>role/tournament</tag>
-                <description>Tarantula Admin Role Service</description>
                 <module-name>com.tarantula.admin.TournamentAdminModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
@@ -51,8 +58,18 @@
                 <type>application</type>
                 <category>store</category>
                 <tag>role/store</tag>
-                <description>Tarantula Admin Role Service</description>
                 <module-name>com.tarantula.admin.GameStoreAdminModule</module-name>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <access-control>30</access-control>
+            </application>
+            <application>
+                <type-id>admin-role</type-id>
+                <name>Admin Role</name>
+                <type>application</type>
+                <category>data</category>
+                <tag>role/data</tag>
+                <module-name>com.tarantula.admin.GameDataAdminModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
@@ -63,90 +80,11 @@
                 <type>application</type>
                 <category>achievement</category>
                 <tag>role/achievement</tag>
-                <description>Tarantula Admin Role Service</description>
                 <module-name>com.tarantula.admin.AchievementAdminModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
             </application>
         </application-list>
-        <configuration-list>
-                <configuration type="setup" name="cluster">
-                    <property name="maxGameClusterCount">10</property>
-                    <property name="maxGameLobbyCount">10</property>
-                    <property name="minGameLobbyCount">1</property>
-                    <property name="defaultGameLevelCount">3</property>
-                    <property name="maxGameLevelCount">10</property>
-                </configuration>
-                <configuration name="yearlyAccess" type="subscription">
-                    <property name="description">Yearly Subscription</property>
-                    <property name="price">1980.00</property>
-                    <property name="currency">USD</property>
-                    <property name="durationMonths">12</property>
-                </configuration>
-                <configuration name="monthlyAccess" type="subscription">
-                    <property name="description">Monthly Subscription</property>
-                    <property name="price">180.00</property>
-                    <property name="currency">USD</property>
-                    <property name="durationMonths">1</property>
-                </configuration>
-        </configuration-list>
-        <view-list>
-            <view type="create.game.cluster">
-                <property name="moduleResourceFile">admin/create.game.cluster.view.html</property>
-            </view>
-            <view type="create.access.key">
-                <property name="moduleResourceFile">admin/create.access.key.view.html</property>
-            </view>
-            <view type="create.template">
-                <property name="moduleResourceFile">admin/create.template.view.html</property>
-            </view>
-            <view type="game.lobby.list">
-                <property name="moduleResourceFile">admin/game.lobby.list.view.html</property>
-            </view>
-            <view type="game.service.list">
-                <property name="moduleResourceFile">admin/game.service.list.view.html</property>
-            </view>
-            <view type="game.data.list">
-                <property name="moduleResourceFile">admin/game.data.list.view.html</property>
-            </view>
-            <view type="shopping.card">
-                <property name="moduleResourceFile">admin/stripe.card.view.html</property>
-            </view>
-            <view type="game.cluster.launch">
-                <property name="moduleResourceFile">admin/game.cluster.launch.view.html</property>
-            </view>
-            <view type="game.cluster.shutdown">
-                <property name="moduleResourceFile">admin/game.cluster.shutdown.view.html</property>
-            </view>
-            <view type="game.cluster.test">
-                <property name="moduleResourceFile">admin/game.cluster.test.view.html</property>
-            </view>
-            <view type="api.service.data">
-                <property name="moduleResourceFile">admin/api.service.data.view.html</property>
-            </view>
-            <view type="api.game.lobby">
-                <property name="moduleResourceFile">admin/api.game.lobby.view.html</property>
-            </view>
-            <view type="api.service.statistics">
-                <property name="moduleResourceFile">admin/api.service.statistics.view.html</property>
-            </view>
-            <view type="api.service.leaderboard">
-                <property name="moduleResourceFile">admin/api.service.leaderboard.view.html</property>
-            </view>
-            <view type="api.service.matchmaking">
-                <property name="moduleResourceFile">admin/api.service.matchmaking.view.html</property>
-            </view>
-            <view type="api.service.gamestore">
-                <property name="moduleResourceFile">admin/api.service.gamestore.view.html</property>
-            </view>
-            <view type="api.service.tournament">
-                <property name="moduleResourceFile">admin/api.service.tournament.view.html</property>
-            </view>
-            <view type="live.game.test">
-                <property name="moduleResourceFile">admin/live.game.test.view.html</property>
-            </view>
-        </view-list>
-
     </lobby-context>
 </tarantula>

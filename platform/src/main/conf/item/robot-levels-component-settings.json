@@ -1,0 +1,30 @@
+{
+  "type": "component",
+  "category": "robotLevels",
+  "version": "1.0",
+  "description": "robot levels asset template list",
+  "itemList":
+  [
+      {
+        "configurationName": "RobotLevels",
+        "header": {
+        },
+        "application": {
+          "Levels":
+          [ {"Stats":
+              [
+                {"Type":"Health","Value": 1000},
+                {"Type":"MeleeDamage","Value": 100},
+                {"Type":"RangedDamage","Value": 100},
+                {"Type":"CriticalDamagePercent","Value": 0.3},
+                {"Type":"Recovery","Value": 100},
+                {"Type":"Speed","Value": 0}
+              ]
+            }
+          ]
+        },
+        "payload": {},
+        "reference": []
+      }
+  ]
+}

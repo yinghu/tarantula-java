@@ -1,0 +1,82 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-configuration-asset-api-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Create Game Asset</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <div class='w3-bar w3-white'>
+            <span id='tx-configuration-asset-save' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Save</span> 
+        </div>            
+    </div>
+    <div class="w3-panel">   
+        <label class="tx-text-12 tx-margin-left-4">Configuration TypeId:</label>
+        <input id='tx-configuration-asset-type-id' class="w3-input w3-round w3-border tx-text-12" type="text">  
+        <label class="tx-text-12 tx-margin-left-4">Configuration Name:</label>
+        <input id='tx-configuration-asset-name' class="w3-input w3-round w3-border tx-text-12" type="text">        
+    </div>
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <div class='w3-bar w3-white'>
+            <span id='tx-asset-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
+            <span id='tx-asset-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
+            <span id='tx-asset-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
+        </div>            
+    </div>
+    <div class="w3-panel w3-center tx-text-14">
+        <div id="jsoneditor-configuration-asset" style="width: 100%;"></div>
+    </div> 
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    let itemTemplate = {header:{},application:{},payload:{},reference:[]};
+    itemTemplate.configurationType = TARA_API.query().itemTemplate.type;
+    itemTemplate.configurationCategory = TARA_API.query().itemTemplate.category;
+    itemTemplate.configurationVersion = TARA_API.query().itemTemplate.version;
+    let selectedItem = TARA_API.query().itemTemplate.itemList[TARA_API.query().gameItemIndex];
+    itemTemplate.configurationName = selectedItem.configurationName;
+    itemTemplate.header = selectedItem.header;
+    itemTemplate.application = selectedItem.application;
+    itemTemplate.payload = selectedItem.payload;
+    document.querySelector('#tx-configuration-asset-type-id').value = itemTemplate.configurationTypeId;
+    document.querySelector('#tx-configuration-asset-name').value = itemTemplate.configurationName;   
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'tree'},itemTemplate);
+    document.querySelector('#tx-configuration-asset-save').onclick=()=>{
+        document.querySelector('#tx-configuration-asset-save').style.display = 'none';
+        let _tid = document.querySelector('#tx-configuration-asset-type-id').value;
+        let _k = document.querySelector('#tx-configuration-asset-name').value;
+        let item = editor.get();
+        item.configurationTypeId = _tid;
+        item.configurationName = _k;
+        TARA_API.onSet('role/item','onCreateAsset',TARA_API.query().gameClusterId,item,(resp)=>{
+            editor.set(resp);   
+        });
+    };
+    document.querySelector('#tx-configuration-asset-api-close').onclick=()=>{
+        editor.destroy();
+        let m3 = document.querySelector(TARA_API.query().popup);
+        m3.innerHTML="";
+        m3.style.display = 'none';       
+    };
+    document.querySelector('#tx-asset-json-mode-tree').onclick=()=>{
+        editor.setMode('tree');
+    };
+    document.querySelector('#tx-asset-json-mode-code').onclick=()=>{
+        editor.setMode('code');
+    };
+    document.querySelector('#tx-asset-json-mode-preview').onclick=()=>{
+        editor.setMode('preview');
+    };
+</script>

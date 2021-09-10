@@ -10,7 +10,7 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-game-service-list-message"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-14" id="tx-game-service-list-message"></div>
     <div id='tx-service-list-0' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
         <div class="w3-container">
             <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
@@ -59,6 +59,46 @@
             <span id="tx-service-list-api-5" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-service-action">Admin</span>
         </div>    
     </div>
+    <div id='tx-service-list-6' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-service-list-name-6' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-service-list-tag-6' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-service-list-api-6" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-service-action">Admin</span>
+        </div>    
+    </div>
+    <div id='tx-service-list-7' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-service-list-name-7' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-service-list-tag-7' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-service-list-api-7" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-service-action">Admin</span>
+        </div>    
+    </div>
+    <div id='tx-service-list-8' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-service-list-name-8' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-service-list-tag-8' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-service-list-api-8" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-service-action">Admin</span>
+        </div>    
+    </div>
+    <div id='tx-service-list-9' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-service-list-name-9' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-service-list-tag-9' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-service-list-api-9" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-service-action">Admin</span>
+        </div>    
+    </div>
+    <div id='tx-service-list-10' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-service-list-name-10' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id='tx-service-list-tag-10' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>tag</span>
+            <span id="tx-service-list-api-10" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-service-action">Admin</span>
+        </div>    
+    </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -73,11 +113,14 @@
     TARA_API.onGet('role/lobby','onGameServiceList',TARA_API.query().gameClusterId,(resp)=>{
         if(resp.successful){
             resp.serviceList.forEach((a,i)=>{
-                document.querySelector('#tx-service-list-name-'+i).innerHTML=a.name;
-                document.querySelector('#tx-service-list-tag-'+i).innerHTML='Access Tag : '+a.tag;
-                document.querySelector('#tx-service-list-api-'+i).setAttribute('tx-service-api-view-id','api.service.'+a.name.toLowerCase());
-                document.querySelector('#tx-service-list-api-'+i).setAttribute('tx-service-tag',a.tag);
-                document.querySelector('#tx-service-list-'+i).style.display='block';
+                //console.log(a);
+                if(a.resetEnabled == true){
+                    document.querySelector('#tx-service-list-name-'+i).innerHTML=a.name;
+                    document.querySelector('#tx-service-list-tag-'+i).innerHTML='Access Tag : '+a.tag;
+                    document.querySelector('#tx-service-list-api-'+i).setAttribute('tx-service-api-view-id','api.service.'+a.category.toLowerCase());
+                    document.querySelector('#tx-service-list-api-'+i).setAttribute('tx-service-tag','role/'+a.category.toLowerCase());
+                    document.querySelector('#tx-service-list-'+i).style.display='block';
+                }
             });
         }
         else{

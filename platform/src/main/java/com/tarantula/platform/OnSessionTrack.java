@@ -11,16 +11,13 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     private String token;
 
     private String login;
-    private String ticket;
 
     public static final OnSession PASSWORD_NOT_MATCHED = new OnSessionTrack("PASSWORD NOT MATCHED");
-    //public static final OnSession TOKEN_NOT_VALID = new OnSessionTrack("TOKEN NOT VALID");
 
     public OnSessionTrack(){
-        //this.vertex = "OnSession";
+
     }
     public OnSessionTrack(String msg){
-        //this();
         this.message = msg;
         this.successful = false;
     }
@@ -73,12 +70,6 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         this.login = login;
     }
 
-    public String ticket(){
-        return this.ticket;
-    }
-    public void ticket(String ticket){
-        this.ticket = ticket;
-    }
 
     public String toString(){
         return "OnSession->["+token+"]";

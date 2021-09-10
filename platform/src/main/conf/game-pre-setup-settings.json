@@ -1,0 +1,3 @@
+{
+  "application-pre-setup":"com.tarantula.game.service.DynamicGameLobbySetup"
+}

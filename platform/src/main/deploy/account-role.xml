@@ -7,7 +7,6 @@
         <name>Account Role</name>
         <access-mode>12</access-mode>
         <deploy-code>1</deploy-code>
-        <description>Tarantula Admin Service</description>
         <application-list>
             <application>
                 <type-id>account-role</type-id>
@@ -15,26 +14,11 @@
                 <type>application</type>
                 <category>account</category>
                 <tag>role/account</tag>
-                <description>Tarantula Account Role Service</description>
                 <module-name>com.tarantula.admin.AccountRoleModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <access-control>20</access-control>
             </application>
         </application-list>
-        <configuration-list>
-                <configuration type="setup" name="user">
-                    <property name="maxUserCount">5</property>
-                </configuration>
-
-        </configuration-list>
-        <view-list>
-            <view type="add.user">
-                <property name="moduleResourceFile">account/add.user.view.html</property>
-            </view>
-            <view type="user.list">
-                <property name="moduleResourceFile">account/user.list.view.html</property>
-            </view>
-        </view-list>
 
     </lobby-context>
 </tarantula>

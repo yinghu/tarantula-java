@@ -3,13 +3,11 @@ package com.tarantula.platform.service.persistence;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.Metadata;
 import com.sleepycat.je.Database;
-import com.tarantula.platform.service.cluster.PartitionIndex;
 
 public class DataStoreOnPartition {
     public final int partition;
     public final String name;
     public DataStore dataStore;//set on data store ready
-    public PartitionIndex partitionIndex;
 
     public Database database;
     public Metadata metadata;

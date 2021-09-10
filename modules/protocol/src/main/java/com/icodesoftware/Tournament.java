@@ -3,7 +3,7 @@ package com.icodesoftware;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface Tournament extends Recoverable {
+public interface Tournament extends Configurable {
 
     String ENTRY_LABEL = "TEE";
 
@@ -15,8 +15,7 @@ public interface Tournament extends Recoverable {
     }
     String type();
     void type(String type);
-    String description();
-    String icon();
+    String name();
     Status status();
     LocalDateTime startTime();
     LocalDateTime closeTime();
@@ -24,22 +23,27 @@ public interface Tournament extends Recoverable {
     int maxEntriesPerInstance();
     int durationMinutesPerInstance();
 
-    String join(String systemId);
+    String register(String systemId);
 
-    interface Entry extends Recoverable {
+    interface Entry extends Configurable {
         String systemId();
         double score(double delta);
         int rank();
     }
-    interface Instance extends Recoverable {
-        String id();
+    interface Instance extends Configurable {
+
         Status status();
         int maxEntries();
         LocalDateTime startTime();
         LocalDateTime closeTime();
         LocalDateTime endTime();
-        Entry enter(String systemId);
+        Entry join(String systemId);
         void update(String systemId,OnEntry onEntry);
+
+        RaceBoard raceBoard();
+    }
+    interface RaceBoard extends Configurable{
+        int size();
         List<Entry> list();
     }
     interface Listener{
@@ -56,11 +60,10 @@ public interface Tournament extends Recoverable {
         default void onUpdated(Entry entry){}
     }
 
-    interface Schedule extends Recoverable{
+    interface Schedule extends Configurable{
         String type();
         String schedule();
-        String description();
-        String icon();
+        String name();
         LocalDateTime startTime();
         LocalDateTime closeTime();
         LocalDateTime endTime();

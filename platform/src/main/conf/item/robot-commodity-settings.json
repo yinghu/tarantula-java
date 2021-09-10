@@ -1,0 +1,18 @@
+{
+  "type": "commodity",
+  "category": "robot",
+  "version": "1.0",
+  "description": "robot item template list",
+  "itemList":
+  [
+      {
+        "configurationName": "BossTack",
+        "header": {
+          "Name": "BossTack","Type": "BossTack"
+        },
+        "application": {},
+        "payload": {},
+        "reference": []
+      }
+  ]
+}

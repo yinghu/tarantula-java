@@ -36,9 +36,9 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
     }
 
     @Override
-    public AccessIndex set(String accessKey){
+    public AccessIndex set(String accessKey,int referenceId){
         NodeEngine nodeEngine = getNodeEngine();
-        AccessIndexSetOperation operation = new AccessIndexSetOperation(accessKey);
+        AccessIndexSetOperation operation = new AccessIndexSetOperation(accessKey,referenceId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(accessKey);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,partitionId);
         final Future<AccessIndex> future = builder.invoke();
@@ -50,9 +50,9 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         }
     }
     @Override
-    public AccessIndex setIfAbsent(String accessKey){
+    public AccessIndex setIfAbsent(String accessKey,int referenceId){
         NodeEngine nodeEngine = getNodeEngine();
-        AccessIndexSetIfAbsentOperation operation = new AccessIndexSetIfAbsentOperation(accessKey);
+        AccessIndexSetIfAbsentOperation operation = new AccessIndexSetIfAbsentOperation(accessKey,referenceId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(accessKey);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,partitionId);
         final Future<AccessIndex> future = builder.invoke();
@@ -60,6 +60,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
         } catch (Exception e) {
             future.cancel(true);
+            //e.printStackTrace();
             return null;
         }
     }

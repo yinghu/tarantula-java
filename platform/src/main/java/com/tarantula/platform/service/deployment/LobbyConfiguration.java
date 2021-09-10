@@ -14,7 +14,7 @@ public class LobbyConfiguration{
 	public LobbyDescriptor descriptor = new LobbyDescriptor();
 	public List<DeploymentDescriptor> applications = new ArrayList();
 	public List<OnView> views = new ArrayList<>();
-	public List<Configuration> configurations = new ArrayList<>();
+	//public List<Configuration> configurations = new ArrayList<>();
 
 	public LobbyConfiguration(){}
 	public LobbyConfiguration(LobbyDescriptor lobbyDescriptor){

@@ -3,13 +3,19 @@ package com.tarantula.game;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Connection;
+import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.event.PortableEventRegistry;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.UUID;
 
 
-public class Room{
+public class Room extends RecoverableObject{
 
     static final int WAITING = 0; //waiting for first join
     static final int PENDING_JOIN = 1; //waiting after first join
@@ -48,6 +54,10 @@ public class Room{
 
     public Room(){
         this.roomId = UUID.randomUUID().toString();
+    }
+    public Room(boolean online){
+        this();
+        this.online = online;
     }
 
     public synchronized Stub join(Rating rating){
@@ -103,9 +113,9 @@ public class Room{
         this.pQueue = new ArrayDeque<>(this.capacity);
         this.stubs = new Stub[this.capacity];
         for(int i=0;i<this.capacity;i++){
-            Stub stub = new Stub(i,roomId);
+            Stub stub = new Stub();
             //stub.capacity = this.capacity;
-            stub.arena = this.arena;
+            //stub.arena = this.arena();
             this.pQueue.offer(stub);
             this.stubs[i] = stub;
         }
@@ -134,7 +144,7 @@ public class Room{
         state = WAITING;
         this.stubs = new Stub[this.capacity];
         for(int i=0;i<this.capacity;i++){
-            Stub stub = new Stub(i,roomId);
+            Stub stub = new Stub();
             this.pQueue.offer(stub);
             this.stubs[i] = stub;
         }
@@ -256,10 +266,20 @@ public class Room{
                 JsonObject js = j.getAsJsonObject();
                 int seat = js.get("seat").getAsInt();
                 Stub stub = stubs[seat];
-                stub.rank = js.get("rank").getAsInt();
-                stub.pxp = js.get("xp").getAsDouble();
+                //stub.rank = js.get("rank").getAsInt();
+                //stub.pxp = js.get("xp").getAsDouble();
                 roomListener.onRating(stub,rankUpBase);
             });
         }
     }
+
+    @Override
+    public int getFactoryId() {
+        return PortableEventRegistry.OID;
+    }
+    @Override
+    public int getClassId() {
+        return PortableEventRegistry.ROOM_CID;
+    }
+
 }

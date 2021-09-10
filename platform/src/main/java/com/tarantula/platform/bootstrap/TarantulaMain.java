@@ -59,26 +59,13 @@ public class TarantulaMain {
 				log.warn("No user configurations used to override system configurations");
 				overriding = false;
 			}
-			/**
-			try{
-				File f = new File("/etc/tarantula/ip.txt");
-				if(f.exists()){
-					//read line
-					BufferedReader reader = new BufferedReader(new FileReader(f));
-					endpointIp = reader.readLine();
-					reader.close();
-					log.warn("Endpoint IP ->"+endpointIp);
-				}
-			}catch (Exception ex){
-				log.warn("No endpoint id found from /etc/tarantula/ip.txt");
-			}**/
 			TarantulaContext btx = TarantulaContext.getInstance();
 			TarantulaContext.memberDiscovery = (ScopedMemberDiscovery) Class.forName(override(overriding,"tarantula.member.discovery.name",_user,_config)).getConstructor().newInstance();
 			TarantulaContext.operationTimeout = Integer.parseInt(override(overriding,"tarantula.operation.timeout.seconds",_user,_config));
+			TarantulaContext.lobbySubscriptionEnabled = Boolean.parseBoolean(override(overriding,"tarantula.lobby.subscription.enabled",_user,_config));
 			btx.platformVersion = override(overriding,"tarantula.platform.version",_user,_config);
 			btx.platformRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.routing.number",_user,_config));
 			btx.accessIndexRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.access.index.routing.number",_user,_config));
-			//btx.bootstrapRetries = Integer.parseInt(override(overriding,"tarantula.bootstrap.max.retries",_user,_config));
 			btx.metricsUpdateIntervalMinutes = Integer.parseInt(override(overriding,"tarantula.operation.metrics.interval.m",_user,_config));
 			btx.clusterNamePrefix = override(overriding,"tarantula.cluster.name",_user,_config);
 			btx.dataBucketGroup = override(overriding,"tarantula.data.bucket.group",_user,_config);
