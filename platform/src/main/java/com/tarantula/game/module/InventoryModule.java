@@ -1,9 +1,7 @@
 package com.tarantula.game.module;
 
-import com.icodesoftware.ApplicationContext;
+import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.OnLog;
-import com.icodesoftware.Session;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.inventory.Inventory;
@@ -21,7 +19,7 @@ public class InventoryModule implements Module {
             Category category = gameServiceProvider.inventoryServiceProvider().category();
             session.write(category.toJson().toString().getBytes());
         }
-        else if(session.action().equals("onList")){
+        else if(session.action().equals("onInventory")){
             Inventory inventory = gameServiceProvider.inventoryServiceProvider().inventory(session.systemId(),session.name());
             if(inventory!=null){
                 session.write(inventory.toJson().toString().getBytes());
@@ -29,8 +27,16 @@ public class InventoryModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"no inventory").getBytes());
             }
         }
-        else if(session.action().equals("onView")){
-            session.write(JsonUtil.toSimpleResponse(false,"inventory view").getBytes());
+        else if(session.action().equals("onCommodity")){
+            String[] query = session.name().split("#");
+            Inventory inventory = gameServiceProvider.inventoryServiceProvider().inventory(session.systemId(),query[0]);
+            Configurable commodity;
+            if(inventory!=null&&(commodity=inventory.load(query[1]))!=null){
+                session.write(commodity.toJson().toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,session.name()).getBytes());
+            }
         }
         return false;
     }

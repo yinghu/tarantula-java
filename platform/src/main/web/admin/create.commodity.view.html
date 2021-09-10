@@ -154,8 +154,8 @@
     itemTemplate.header = selectedItem.header;
     itemTemplate.payload = selectedItem.payload;
     itemTemplate.reference = selectedItem.reference;
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-commodity"),{mode:'code'},itemTemplate);
-    TARA_API.onGet('role/item',"onCategory",TARA_API.query().gameClusterId,(resp)=>{
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-commodity"),{mode:'tree'},itemTemplate);
+    TARA_API.onGet('role/item',"onCategoryForCommodity",TARA_API.query().gameClusterId,(resp)=>{
         console.log(resp);
         resp.itemList.forEach((a,i) => {
             if(a !== itemTemplate.configurationCategory){

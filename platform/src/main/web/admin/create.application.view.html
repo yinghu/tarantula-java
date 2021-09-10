@@ -5,7 +5,7 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">Create Game Item</span>
+            <span class="tx-margin-left-8 tx-text-24">Create Game Application</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
@@ -154,8 +154,8 @@
     itemTemplate.header = selectedItem.header;
     itemTemplate.payload = selectedItem.payload;
     itemTemplate.reference = selectedItem.reference;
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-application"),{mode:'code'},itemTemplate);
-    TARA_API.onGet('role/item',"onCategory",TARA_API.query().gameClusterId,(resp)=>{
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-application"),{mode:'tree'},itemTemplate);
+    TARA_API.onGet('role/item',"onCategoryForApplication",TARA_API.query().gameClusterId,(resp)=>{
         console.log(resp);
         resp.itemList.forEach((a,i) => {
             if(a !== itemTemplate.configurationCategory){

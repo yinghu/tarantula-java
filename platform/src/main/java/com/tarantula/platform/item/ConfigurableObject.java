@@ -176,6 +176,11 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     @Override
     public  <T extends Configurable> T setup(){
+        if(this.configurationType.equals(Configurable.COMPONENT_CONFIG_TYPE)){
+            Component component = new Component(this);
+            component.dataStore(dataStore);
+            return component.setup();
+        }
         if(this.configurationType.equals(Configurable.ASSET_CONFIG_TYPE)){
             Asset asset = new Asset(this);
             asset.dataStore(dataStore);

@@ -4,14 +4,17 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.tarantula.platform.IndexSet;
+import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Inventory extends IndexSet implements Configurable {
 
-    private ArrayList<InventoryItem> itemList = new ArrayList<>();
+    private HashMap<String,InventoryItem> itemList = new HashMap<>();
+
 
     public Inventory(){}
 
@@ -25,12 +28,20 @@ public class Inventory extends IndexSet implements Configurable {
         keySet.add(inventoryItem.distributionKey());
         dataStore.update(this);
     }
+    public Configurable load(String inventoryId){
+        InventoryItem inventoryItem = itemList.get(inventoryId);
+        if(inventoryItem==null){
+            return null;
+        }
+        return inventoryItem.load();
+    }
     public void list(){
         keySet.forEach((k)->{
             InventoryItem inventoryItem = new InventoryItem();
             inventoryItem.distributionKey(k);
             if(dataStore.load(inventoryItem)){
-                itemList.add(inventoryItem);
+                inventoryItem.dataStore(dataStore);
+                itemList.put(k,inventoryItem);
             }
         });
     }
@@ -58,9 +69,9 @@ public class Inventory extends IndexSet implements Configurable {
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",true);
-        jsonObject.addProperty("name",label);
+        jsonObject.addProperty("name",label.split("/")[1]);
         JsonArray items = new JsonArray();
-        itemList.forEach((item)->items.add(item.toJson()));
+        itemList.forEach((k,item)->items.add(item.toJson()));
         jsonObject.add("itemList",items);
         return jsonObject;
     }

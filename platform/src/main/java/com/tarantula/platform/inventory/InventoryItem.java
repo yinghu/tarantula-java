@@ -49,4 +49,12 @@ public class InventoryItem extends ConfigurableObject {
         return jsonObject;
     }
 
+    public ConfigurableObject load(){
+        ConfigurableObject configurableObject = new ConfigurableObject();
+        configurableObject.distributionKey(reference.get(0).getAsString());
+        if(!dataStore.load(configurableObject)) return null;
+        configurableObject.dataStore(dataStore);
+        return configurableObject.setup();
+    }
+
 }
