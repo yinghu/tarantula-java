@@ -6,10 +6,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.item.Item;
-import com.tarantula.platform.item.ItemContext;
-import com.tarantula.platform.item.ConfigurableObjectQuery;
+import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.tournament.TournamentScheduleParser;
 import com.tarantula.platform.util.SystemUtil;
@@ -27,8 +24,8 @@ public class TournamentAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Descriptor app = gameCluster.serviceWithCategory(this.context.descriptor().category());
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            List<ConfigurableObject> items = preSetup.list(this.context,app,new ConfigurableObjectQuery("category/"+app.category()));
-            session.write(new ItemContext(true,items.size()>0?"Configure tournament item":"no items configured",items).toJson().toString().getBytes());
+            List<ConfigurableHeader> items = preSetup.list(this.context,app,new ConfigurableHeaderQuery("category/"+app.category()));
+            session.write(new ItemHeaderContext(true,items.size()>0?"Configure tournament item":"no items configured",items).toJson().toString().getBytes());
         }
         else if(session.action().equals("onRegister")){
             String[] query = session.name().split("#");

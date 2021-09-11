@@ -25,6 +25,13 @@
       {
         "name": "gold-commodity-settings"
       }
+    },
+    {
+      "header": {"type": "prize","name": "Prize","enabled": true,"version": 1.0},
+      "application":
+      {
+        "name": "prize-commodity-settings"
+      }
     }
   ]
 }

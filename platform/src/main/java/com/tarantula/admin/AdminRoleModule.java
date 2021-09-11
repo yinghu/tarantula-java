@@ -18,9 +18,7 @@ import com.tarantula.platform.util.ResponseSerializer;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AdminRoleModule implements Module,Configurable.Listener {
 
@@ -28,7 +26,7 @@ public class AdminRoleModule implements Module,Configurable.Listener {
     private GsonBuilder builder;
     private DataStore account;
     private DataStore user;
-    private DataStore purchase;
+    //private DataStore purchase;
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
     private int maxGameClusterCount;
@@ -216,7 +214,7 @@ public class AdminRoleModule implements Module,Configurable.Listener {
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.account = this.context.dataStore(Account.DataStore);
         this.user = this.context.dataStore(Access.DataStore);
-        this.purchase = this.context.dataStore(SubscriptionFee.DataStore);
+        //this.purchase = this.context.dataStore(SubscriptionFee.DataStore);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         //ya.registerListener(this);

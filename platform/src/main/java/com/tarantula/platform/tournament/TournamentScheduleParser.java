@@ -3,7 +3,7 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.item.Item;
+
 
 import java.time.LocalDateTime;
 
@@ -59,10 +59,11 @@ public class TournamentScheduleParser extends ConfigurableObject {
     }
     private void loadPrize(){
         reference.forEach((refId)->{
-            Item item = new Item();
+            ConfigurableObject item = new ConfigurableObject();
             item.distributionKey(refId.getAsString());
             this.dataStore.load(item);
-            System.out.println(item.toJson().toString());
+            item.dataStore(dataStore);
+            System.out.println(item.setup().toJson().toString());
         });
     }
 }

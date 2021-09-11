@@ -75,7 +75,8 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
     }
 
     protected String serviceDataStore(Descriptor application){
-        return application.typeId().replace("-lobby","_service");
+        String replaced = application.typeId().endsWith("-lobby")?"-lobby":"-service";
+        return application.typeId().replace(replaced,"_service");
     }
 
     protected String serviceDataStore(GameCluster application){

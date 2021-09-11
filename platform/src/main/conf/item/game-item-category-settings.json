@@ -6,10 +6,10 @@
   "itemList":
   [
     {
-      "header": {"type": "prize","name": "Prize","enabled": true,"version": 1.0},
+      "header": {"type": "loadouts","name": "LoadOuts","enabled": true,"version": 1.0},
       "application":
       {
-        "name": "prize-item-settings"
+        "name": "loadouts-item-settings"
       }
     }
   ]

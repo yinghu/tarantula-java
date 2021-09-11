@@ -1,0 +1,18 @@
+{
+  "type": "item",
+  "category": "loadouts",
+  "version": "1.0",
+  "description": "loadouts item template list",
+  "itemList":
+  [
+    {
+      "configurationName": "Loadouts Pack",
+      "header": {
+        "Name": "Loadouts Pack"
+      },
+      "application": {},
+      "payload": {},
+      "reference": []
+    }
+  ]
+}

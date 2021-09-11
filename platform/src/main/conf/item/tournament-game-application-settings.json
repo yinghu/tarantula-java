@@ -8,7 +8,7 @@
       {
         "configurationName": "On Demand 10",
         "header": {
-          "name": "10 player"
+          "type":"T10","name": "10 player"
         },
         "application":
         {
@@ -23,7 +23,7 @@
       {
         "configurationName": "Daily 100",
         "header": {
-          "name": "Daily 100 player"
+          "type":"T100","name": "Daily 100 player"
         },
         "application":
         {

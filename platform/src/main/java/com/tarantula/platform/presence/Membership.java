@@ -19,7 +19,7 @@ public class Membership extends RecoverableObject implements Subscription {
         return this.count=this.count+(delta);
     }
     public int getClassId() {
-        return UserPortableRegistry.USER_ACCOUNT_CID;
+        return UserPortableRegistry.MEMBERSHIP_CID;
     }
     public Map<String,Object> toMap(){
         properties.put("1",startTimestamp);

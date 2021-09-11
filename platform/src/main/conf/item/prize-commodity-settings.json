@@ -2,7 +2,7 @@
   "type": "commodity",
   "category": "prize",
   "version": "1.0",
-  "description": "prize item template list",
+  "description": "prize commodity template list",
   "itemList":
   [
       {
