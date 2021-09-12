@@ -1,10 +1,11 @@
 package com.tarantula.platform.presence;
 
-import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.Metrics;
@@ -15,9 +16,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
-public class UserManagementApplication extends TarantulaApplicationHeader{
+public class UserManagementApplication extends TarantulaApplicationHeader implements Configurable.Listener<OnLobby>{
 
     private String lobbyId;
     private boolean activated;
@@ -28,6 +30,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
 
     private List<Access.Role> roleList;
     private TokenValidatorProvider tokenValidatorProvider;
+    private List<String> gameList;
 
     private DataStore uDatastore;
     private DataStore pDatastore;
@@ -47,6 +50,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.roleList = this.tokenValidatorProvider.list();
+        this.gameList = new CopyOnWriteArrayList<>();
         String root = (String)configuration.property("root");
         String pwd = (String) configuration.property("password");
         OnAccess onAccess = new OnAccessTrack();
@@ -98,6 +102,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             }
         });
         this.deploymentServiceProvider.registerOnConnectionStateListener(this);
+        this.deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,this);
         this.context.log("User management application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
     }
     @Override
@@ -110,6 +115,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             ic.stripeClientId = this.tokenValidatorProvider.authVendor(OnAccess.STRIPE).clientId();
             ic.lobbyList = this.context.index();
             ic.roleList = roleList;
+            ic.gameList = gameList;
             session.write(builder.create().toJson(ic).getBytes());
         }
         else if(session.action().equals("onLogin")){
@@ -200,10 +206,10 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         else if(session.action().equals("onResetCode")){
             String code = this.deploymentServiceProvider.resetCode(session.trackId());
             if(this.deploymentServiceProvider.registerPostOffice().onEmail().send(session.trackId(),code)){
-                session.write(toMessage("check email for code",true).toString().getBytes());
+                session.write(JsonUtil.toSimpleResponse(true,"check email for code").getBytes());
             }
             else{
-                session.write(toMessage("system error,try later",true).toString().getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"system error,try later").getBytes());
             }
         }
         else if(session.action().equals("onResetPassword")){
@@ -211,7 +217,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
             Access user = new User();
             user.distributionKey(session.systemId());
             if(!uDatastore.load(user)){
-                session.write(toMessage("wrong user name",false).toString().getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"wrong user name").getBytes());
             }
             else{
                 if(user.activated()&&this.deploymentServiceProvider.checkCode(code).equals(user.emailAddress())){
@@ -274,10 +280,18 @@ public class UserManagementApplication extends TarantulaApplicationHeader{
         }
         return acc;
     }
-    private JsonObject toMessage(String msg, boolean suc){
-        JsonObject jms = new JsonObject();
-        jms.addProperty("successful",suc);
-        jms.addProperty("message",msg);
-        return jms;
+
+    @Override
+    public void onUpdated(OnLobby onLobby) {
+        if(!onLobby.closed()){
+            String[] ps = onLobby.typeId().split("-");
+            gameList.add(ps[0]);
+            context.log("Lobby ["+onLobby.typeId()+"] is going to be live",OnLog.WARN);
+        }
+        else{
+            String[] ps = onLobby.typeId().split("-");
+            gameList.remove(ps[0]);
+            context.log("Lobby ["+onLobby.typeId()+"] is going to be offline",OnLog.WARN);
+        }
     }
 }
