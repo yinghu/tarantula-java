@@ -5,7 +5,6 @@
   [
     {"type": "sign.in","moduleResourceFile": "sign.in.view.html"},
     {"type": "sign.up","moduleResourceFile": "sign.up.view.html"},
-    {"type": "play.game","moduleResourceFile": "play.game.view.html"},
     {"type": "password.reset","moduleResourceFile": "password.reset.view.html"},
     {"type": "invalid.request","moduleResourceFile": "invalid.request.view.html"}
   ]

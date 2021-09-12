@@ -66,7 +66,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         }
         //public lobby access by page number
         else if(session.action().equals("onLobbyList")){
-            //this.context.log(new String(payload),OnLog.WARN);
+            this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             int page = Integer.parseInt(onAccess.property("page").toString());
             LiveGame liveGame = liveGameContext.onIndex(page);
@@ -79,6 +79,14 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             }else{
                 session.write(toMessage("no lobby data",false).toString().getBytes());
             }
+        }
+        else if(session.action().equals("onLobby")){
+            LiveGame liveGame = new LiveGame(0,session.name());
+            liveGame.lobbyList = new ArrayList<>();
+            liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-lobby"));
+            liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-service"));
+            liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-data"));
+            session.write(liveGame.toJson().toString().getBytes());
         }
         else if(session.action().equals("onAddEmail")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);

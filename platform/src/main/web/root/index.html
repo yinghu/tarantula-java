@@ -264,7 +264,8 @@
                 a.onclick=()=>{
                     //console.log(a.getAttribute('tx-game'));
                     TARA_API.query().game = a.getAttribute('tx-game');
-                    tx_view({viewId:'play.game',containerId:'#tx-popup'});
+                    tx_guest_play_try();
+                    //tx_view({viewId:'play.game',containerId:'#tx-popup'});
                 }
             });
         }
@@ -335,7 +336,6 @@
             let m3 = document.querySelector('#tx-popup');
             m3.innerHTML="";
             m3.style.display = 'none'; 
-            //document.querySelector("#tx-sign-up").innerHTML="SIGN OUT";
             tx_view({viewId:'dashboard',containerId:'#tx-dash-board'});
         }
         function tx_on_google_auth(){
@@ -381,12 +381,93 @@
             }); 
         }
         function tx_oauth_sign_out() {
+            if(!window.gapi) return;
             let auth2 = gapi.auth2.getAuthInstance();
             if(auth2.isSignedIn.get() == true){
                 auth2.signOut().then(function () {
                     console.log('Google user signed out.');
                 });
             }
+        }
+        function tx_create_uuid(){
+            let dt = new Date().getTime();
+            let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                let r = (dt + Math.random()*16)%16 | 0;
+                dt = Math.floor(dt/16);
+                return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+            });
+            return uuid;
+        }
+        function tx_guest_play_try(){
+            let payload = {login:'',password:''};
+            if(window.localStorage){
+                let _login = localStorage.getItem('guest_try');
+                if(_login){
+                    payload.login = _login;
+                    payload.password = _login;
+                }    
+                else{
+                    payload.login = tx_create_uuid();
+                    payload.password = payload.login;
+                    localStorage.setItem('guest_try',payload.login);    
+                }
+            }
+            else{
+                payload.login = tx_create_uuid();
+                payload.password = payload.login;    
+            }
+            TARA_API.onRegister(payload,function(resp){
+                _tx_guest_login_and_setup(payload);
+            });     
+        }
+        function _tx_guest_login_and_setup(payload){
+            TARA_API.onLogin(payload,function(resp){
+                if(resp.successful){
+                    TARA_API.onGet('presence/lobby','onLobby',TARA_API.query().game,(resp)=>{
+                        _tx_guest_play(resp);
+                    });              
+                }
+                else{
+                    document.querySelector("#tx-play-game-message").innerHTML=resp.message;
+                }
+            });  
+        }
+        function _tx_guest_play(lobby){
+            let tournamentEnabled = false;
+            lobby.lobbyList.forEach((a)=>{
+                if(a.descriptor.typeId == lobby.name+'-lobby' ){
+                    a.applications.forEach((b)=>{
+                        tournamentEnabled = b.tournamentEnabled;
+                    });
+                }
+            });
+            let _mmk = TARA_API.query().game+'/mmk';
+            let _path = TARA_API.query().game;
+            let _gameView = 'play.game.'+TARA_API.query().game;
+            TARA_API.query().gamePlayViewId = _gameView;
+            if(tournamentEnabled){
+                let tournamentView = _gameView+'.tournament';//play.{game}.tournament
+                let payload ={serviceTag:_mmk,gamePath:_path,tournamentEnabled:true,viewId:_gameView}; 
+                TARA_API.query().payload = payload;
+                TARA_API.query().serviceTag = _path+'/tournament';
+                TARA_API.query().popup = '#tx-popup';
+                tx_view({viewId:tournamentView,containerId:'#tx-popup'});       
+            }
+            else{
+                let payload ={serviceTag:_mmk,gamePath:_path,tournamentEnabled:false}; 
+                TARA_API.onPlay(payload,(resp)=>{
+                    if(resp.successful){
+                        TARA_API.query().gamePopup = '#tx-popup-game';
+                        TARA_API.query().popup = '#tx-popup-game';//in case goes to invalid page
+                        tx_view({viewId:_gameView,containerId:'#tx-popup-game'});
+                    }
+                    else{//goes to error page
+                        TARA_API.query().popup = '#tx-popup';
+                        TARA_API.query().message = resp.message;
+                        tx_view({viewId:'error',containerId:'#tx-popup'});
+                    }
+                });
+            }         
         }
 
     </script>
