@@ -31,7 +31,14 @@ public class GameCluster extends OnApplicationHeader implements Portable {
     public Lobby dataLobby;
 
     public final static String TOURNAMENT_LOOKUP_INDEX = "tournament";
-    public final static String STORE_LOOKUP_INDEX = "store";
+
+    public final static String GAME_ASSET_CATEGORY_TEMPLATE = "game-asset-category-settings";
+    public final static String GAME_COMPONENT_CATEGORY_TEMPLATE = "game-component-category-settings";
+    public final static String GAME_COMMODITY_CATEGORY_TEMPLATE = "game-commodity-category-settings";
+    public final static String GAME_ITEM_CATEGORY_TEMPLATE = "game-item-category-settings";
+    public final static String GAME_APPLICATION_CATEGORY_TEMPLATE = "game-application-category-settings";
+
+
 
 
     @Override

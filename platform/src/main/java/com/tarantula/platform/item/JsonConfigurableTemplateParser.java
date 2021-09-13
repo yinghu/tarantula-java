@@ -31,6 +31,7 @@ public class JsonConfigurableTemplateParser {
                         ConfigurableSetting setting = new ConfigurableSetting();
                         setting.type = header.get("type").getAsString();
                         setting.name = header.get("name").getAsString();
+                        setting.rechargeable = header.has("rechargeable")&&header.get("rechargeable").getAsBoolean();
                         setting.settingName = template.getAsJsonObject("application").get("name").getAsString();
                         itemSet.settings.put(setting.type,setting);
                     }

@@ -11,6 +11,13 @@
       {
         "name": "loadouts-item-settings"
       }
+    },
+    {
+      "header": {"type": "prize","name": "Prize","rechargeable":true,"enabled": true,"version": 1.0},
+      "application":
+      {
+        "name": "prize-item-settings"
+      }
     }
   ]
 }

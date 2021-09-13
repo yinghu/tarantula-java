@@ -1,0 +1,99 @@
+{
+  "type": "item",
+  "category": "prize",
+  "version": "1.0",
+  "description": "prize item template list",
+  "itemList":
+  [
+      {
+        "configurationName": "Rank1",
+        "header": {
+          "name": "Prize1","rank": 1
+        },
+        "application":{},
+        "payload": {},
+        "reference": []
+      },
+      {
+        "configurationName": "Rank2",
+        "header": {
+          "name": "Prize2","rank": 2
+        },
+        "application":{},
+        "payload": {},
+        "reference": []
+      },
+      {
+        "configurationName": "Rank3",
+        "header": {
+          "name": "Prize3","rank": 3
+        },
+        "application":{},
+        "payload": {},
+        "reference": []
+      },
+    {
+      "configurationName": "Rank4",
+      "header": {
+        "name": "Prize4","rank": 4
+      },
+      "application":{},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationName": "Rank5",
+      "header": {
+        "name": "Prize5","rank": 5
+      },
+      "application":{},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationName": "Rank6",
+      "header": {
+        "name": "Prize6","rank": 6
+      },
+      "application":{},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationName": "Rank7",
+      "header": {
+        "name": "Prize7","rank": 7
+      },
+      "application":{},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationName": "Rank8",
+      "header": {
+        "name": "Prize8","rank": 8
+      },
+      "application":{},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationName": "Rank9",
+      "header": {
+        "name": "Prize9","rank": 9
+      },
+      "application":{},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationName": "Rank10",
+      "header": {
+        "name": "Prize10","rank": 10
+      },
+      "application":{},
+      "payload": {},
+      "reference": []
+    }
+  ]
+}

@@ -8,6 +8,7 @@ import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.Category;
+import com.tarantula.platform.item.ConfigurableTemplate;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
@@ -33,6 +34,10 @@ public class InventoryServiceProvider implements ServiceProvider {
     @Override
     public void start() throws Exception {
         logger.warn("Inventory service provider started");
+        ConfigurableTemplate template = this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
+        template.settings.forEach((k,v)->{
+            logger.warn(k+">>>"+v.type+"/"+ v.name+"/"+v.rechargeable);
+        });
     }
 
     @Override

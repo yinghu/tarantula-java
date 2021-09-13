@@ -51,6 +51,8 @@
     itemTemplate.header = selectedItem.header;
     itemTemplate.payload = selectedItem.payload;
     itemTemplate.reference = selectedItem.reference;
+    document.querySelector('#tx-configuration-component-type-id').value = itemTemplate.configurationTypeId;
+    document.querySelector('#tx-configuration-component-name').value = itemTemplate.configurationName;  
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-component"),{mode:'tree'},itemTemplate);
    
     document.querySelector('#tx-configuration-component-save').onclick=()=>{

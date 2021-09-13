@@ -154,6 +154,8 @@
     itemTemplate.header = selectedItem.header;
     itemTemplate.payload = selectedItem.payload;
     itemTemplate.reference = selectedItem.reference;
+    document.querySelector('#tx-configuration-application-type-id').value = itemTemplate.configurationTypeId;
+    document.querySelector('#tx-configuration-application-name').value = itemTemplate.configurationName;  
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-application"),{mode:'tree'},itemTemplate);
     TARA_API.onGet('role/item',"onCategoryForApplication",TARA_API.query().gameClusterId,(resp)=>{
         console.log(resp);

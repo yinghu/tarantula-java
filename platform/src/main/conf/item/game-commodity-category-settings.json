@@ -20,17 +20,17 @@
       }
     },
     {
-      "header": {"type": "gold","name": "Gold","enabled": true,"version": 1.0},
+      "header": {"type": "gold","name": "Gold","rechargeable":true,"enabled": true,"version": 1.0},
       "application":
       {
         "name": "gold-commodity-settings"
       }
     },
     {
-      "header": {"type": "prize","name": "Prize","enabled": true,"version": 1.0},
+      "header": {"type": "token","name": "Token","rechargeable":true,"enabled": true,"version": 1.0},
       "application":
       {
-        "name": "prize-commodity-settings"
+        "name": "token-commodity-settings"
       }
     }
   ]

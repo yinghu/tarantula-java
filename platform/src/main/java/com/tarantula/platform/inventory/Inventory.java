@@ -4,10 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.tarantula.platform.IndexSet;
-import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 

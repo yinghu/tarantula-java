@@ -1,0 +1,42 @@
+{
+  "type": "commodity",
+  "category": "token",
+  "version": "1.0",
+  "description": "token commodity list",
+  "itemList":
+  [
+      {
+        "configurationName": "EntryPack",
+        "header": {
+          "Name": "EntryPack","Type": "Token"
+        },
+        "application": {
+           "amount": 100
+        },
+        "payload": {},
+        "reference": []
+      },
+      {
+        "configurationName": "SuperPack",
+        "header": {
+          "Name": "SuperPack","Type": "Token"
+        },
+        "application": {
+          "amount": 1000
+        },
+        "payload": {},
+        "reference": []
+      },
+      {
+        "configurationName": "BossPack",
+        "header": {
+          "Name": "BossPack","Type": "Token"
+        },
+        "application": {
+          "amount": 10000
+        },
+        "payload": {},
+        "reference": []
+      }
+  ]
+}
