@@ -11,10 +11,10 @@
     </div>
     <div><!-- Dash board content-->
         <div class="w3-bar w3-green">
-            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-20 tx-opt">LiveGame</span>
-            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-20 tx-opt">Account</span>
-            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-20 tx-opt">Developer</span>
-            <span class="w3-bar-item w3-green w3-tag  w3-border-white tx-text-20 tx-opt">Sudo</span>
+            <span tx-pane-name='LiveGame' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">LiveGame<i id='tx-LiveGame-down' class="fa fa-caret-down" style="font-size:24px; display: none;"></i></span>
+            <span tx-pane-name='Account' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">Account<i id='tx-Account-down' class="fa fa-caret-down" style="font-size:24px; display: none;"></i></span>
+            <span tx-pane-name='Developer' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">Developer<i id='tx-Developer-down' class="fa fa-caret-down" style="font-size:24px; display: none;"></i></span>
+            <span tx-pane-name='Sudo' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">Sudo<i id='tx-Sudo-down' class="fa fa-caret-down" style="font-size:24px;display: none;"></i></span>
         </div>
         <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
         <div class="w3-display-container w3-white tx-content-8"></div>  
@@ -384,22 +384,26 @@
         a.onclick = ()=>{
             document.querySelectorAll('.tx-pane').forEach((a)=>{
                     a.style.display = 'none';
+                    let _pn = '#'+a.id+'-down';
+                    document.querySelector(_pn).style.display ='none';
                 }
             );
-            if(a.innerHTML == 'Account'){
+            let _pane = a.getAttribute('tx-pane-name');
+            document.querySelector('#tx-'+_pane+'-down').style.display ='block';
+            if(_pane == 'Account'){
                 _tx_account();
             }
-            else if(a.innerHTML == 'Developer'){
+            else if(_pane == 'Developer'){
                 _tx_game_cluster();
                 TARA_API.query().callback = _tx_game_cluster;
             }
-            else if(a.innerHTML == 'LiveGame'){
+            else if(_pane == 'LiveGame'){
                 _tx_game();
             }
-            else if(a.innerHTML == 'Sudo'){
+            else if(_pane == 'Sudo'){
                 _tx_extension();
             }
-            document.querySelector('#tx-'+a.innerHTML).style.display='block'; 
+            document.querySelector('#tx-'+_pane).style.display='block'; 
         }; 
     });
     document.querySelectorAll('.tx-action').forEach((a)=>{
@@ -455,6 +459,7 @@
         }
     });
     _tx_account();
+    document.querySelector('#tx-Account-down').style.display ='block';
     function _tx_account(){
         TARA_API.onService(false,{serviceTag:'presence/lobby',command:'onPresence'},(resp)=>{
             if(resp.successful){

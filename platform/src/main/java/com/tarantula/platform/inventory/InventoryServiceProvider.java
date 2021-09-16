@@ -6,10 +6,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.item.Application;
-import com.tarantula.platform.item.Category;
-import com.tarantula.platform.item.ConfigurableTemplate;
-import com.tarantula.platform.item.ItemConfigurationServiceProvider;
+import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -70,12 +67,18 @@ public class InventoryServiceProvider implements ServiceProvider {
         return inventory;
     }
     public boolean redeem(String systemId, Application item){
-        InventoryRedeemer redeemer = new InventoryRedeemer(systemId);
+        InventoryRedeemer redeemer = new InventoryRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(item.configurationCategory());
         if(!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
         redeemer.redeem();
         return true;
+    }
+    public boolean rechargeable(String category){
+        ConfigurableTemplate template = this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
+        ConfigurableSetting conf = template.settings.get(category);
+        logger.warn(">>>"+conf.type+"/"+ conf.name+"/"+conf.rechargeable);
+        return conf.rechargeable;
     }
 }
