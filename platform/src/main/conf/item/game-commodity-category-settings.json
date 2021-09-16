@@ -6,28 +6,28 @@
   "itemList":
   [
     {
-      "header": {"type": "robot","name": "Robot","enabled": true,"version": 1.0},
+      "header": {"type": "robot","name": "Robot","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
         "name": "robot-commodity-settings"
       }
     },
     {
-      "header": {"type": "abilities","name": "Abilities","enabled": true,"version": 1.0},
+      "header": {"type": "abilities","name": "Abilities","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
         "name": "abilities-commodity-settings"
       }
     },
     {
-      "header": {"type": "gold","name": "Gold","rechargeable":true,"enabled": true,"version": 1.0},
+      "header": {"type": "gold","name": "Gold","rechargeable":true,"enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
         "name": "gold-commodity-settings"
       }
     },
     {
-      "header": {"type": "token","name": "Token","rechargeable":true,"enabled": true,"version": 1.0},
+      "header": {"type": "token","name": "Token","rechargeable":true,"enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
         "name": "token-commodity-settings"

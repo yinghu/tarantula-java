@@ -6,6 +6,7 @@
   "itemList":
   [
     {
+      "configurationTypeId": "Loadouts",
       "configurationName": "Loadouts Pack",
       "header": {
         "Name": "Loadouts Pack"

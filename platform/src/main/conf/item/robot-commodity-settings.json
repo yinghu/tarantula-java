@@ -6,6 +6,7 @@
   "itemList":
   [
       {
+        "configurationTypeId": "Robot",
         "configurationName": "BossTack",
         "header": {
           "Name": "BossTack","Type": "BossTack"

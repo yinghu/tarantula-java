@@ -107,7 +107,7 @@
                 resp.itemList.forEach((gi,i)=>{
                     document.querySelector('#tx-live-game-inventory-list-type-'+i).innerHTML = gi.typeId;
                     document.querySelector('#tx-live-game-inventory-list-name-'+i).innerHTML = gi.name;
-                    document.querySelector('#tx-live-game-inventory-list-api-'+i).setAttribute('tx-inventory-id',(resp.name+'#'+gi.inventoryId));
+                    document.querySelector('#tx-live-game-inventory-list-api-'+i).setAttribute('tx-inventory-id',(resp.type+'#'+gi.inventoryId));
                     document.querySelector('#tx-live-game-inventory-list-'+i).style.display = 'block';    
                 });
             });        

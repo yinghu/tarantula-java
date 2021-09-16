@@ -6,6 +6,7 @@
   "itemList":
   [
       {
+        "configurationTypeId": "Winner",
         "configurationName": "Rank1",
         "header": {
           "name": "Prize1","rank": 1
@@ -15,6 +16,7 @@
         "reference": []
       },
       {
+        "configurationTypeId": "Winner",
         "configurationName": "Rank2",
         "header": {
           "name": "Prize2","rank": 2
@@ -24,6 +26,7 @@
         "reference": []
       },
       {
+        "configurationTypeId": "Winner",
         "configurationName": "Rank3",
         "header": {
           "name": "Prize3","rank": 3
@@ -33,6 +36,7 @@
         "reference": []
       },
     {
+      "configurationTypeId": "Winner",
       "configurationName": "Rank4",
       "header": {
         "name": "Prize4","rank": 4
@@ -42,6 +46,7 @@
       "reference": []
     },
     {
+      "configurationTypeId": "Winner",
       "configurationName": "Rank5",
       "header": {
         "name": "Prize5","rank": 5
@@ -51,6 +56,7 @@
       "reference": []
     },
     {
+      "configurationTypeId": "Winner",
       "configurationName": "Rank6",
       "header": {
         "name": "Prize6","rank": 6
@@ -60,6 +66,7 @@
       "reference": []
     },
     {
+      "configurationTypeId": "Winner",
       "configurationName": "Rank7",
       "header": {
         "name": "Prize7","rank": 7
@@ -69,6 +76,7 @@
       "reference": []
     },
     {
+      "configurationTypeId": "Winner",
       "configurationName": "Rank8",
       "header": {
         "name": "Prize8","rank": 8
@@ -78,6 +86,7 @@
       "reference": []
     },
     {
+      "configurationTypeId": "Winner",
       "configurationName": "Rank9",
       "header": {
         "name": "Prize9","rank": 9
@@ -87,6 +96,7 @@
       "reference": []
     },
     {
+      "configurationTypeId": "Winner",
       "configurationName": "Rank10",
       "header": {
         "name": "Prize10","rank": 10

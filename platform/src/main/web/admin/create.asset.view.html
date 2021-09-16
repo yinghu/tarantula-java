@@ -47,6 +47,7 @@
     itemTemplate.configurationVersion = TARA_API.query().itemTemplate.version;
     let selectedItem = TARA_API.query().itemTemplate.itemList[TARA_API.query().gameItemIndex];
     itemTemplate.configurationName = selectedItem.configurationName;
+    itemTemplate.configurationTypeId = selectedItem.configurationTypeId;
     itemTemplate.header = selectedItem.header;
     itemTemplate.application = selectedItem.application;
     itemTemplate.payload = selectedItem.payload;

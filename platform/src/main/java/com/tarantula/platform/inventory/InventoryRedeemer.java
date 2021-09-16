@@ -1,10 +1,11 @@
 package com.tarantula.platform.inventory;
 
+import com.icodesoftware.Balance;
 import com.icodesoftware.Configurable;
 import com.tarantula.platform.item.ConfigurableObject;
 
 
-public class InventoryRedeemer extends ConfigurableObject {
+public class InventoryRedeemer extends ConfigurableObject{
 
     protected String systemId;
     protected InventoryServiceProvider inventoryServiceProvider;
@@ -50,5 +51,10 @@ public class InventoryRedeemer extends ConfigurableObject {
                 }
             }
         });
+    }
+
+
+    public double amount() {
+        return application.has("amount")?application.get("amount").getAsDouble():0;
     }
 }

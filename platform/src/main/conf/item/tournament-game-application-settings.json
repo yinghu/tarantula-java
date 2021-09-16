@@ -6,6 +6,7 @@
   "itemList":
   [
       {
+        "configurationTypeId": "T10",
         "configurationName": "On Demand 10",
         "header": {
           "type":"T10","name": "10 player"
@@ -21,6 +22,7 @@
         "reference": []
       },
       {
+        "configurationTypeId": "T100",
         "configurationName": "Daily 100",
         "header": {
           "type":"T100","name": "Daily 100 player"

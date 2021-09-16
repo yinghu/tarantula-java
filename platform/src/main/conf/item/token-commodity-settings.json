@@ -6,6 +6,7 @@
   "itemList":
   [
       {
+        "configurationTypeId": "Token",
         "configurationName": "EntryPack",
         "header": {
           "Name": "EntryPack","Type": "Token"
@@ -17,6 +18,7 @@
         "reference": []
       },
       {
+        "configurationTypeId": "Token",
         "configurationName": "SuperPack",
         "header": {
           "Name": "SuperPack","Type": "Token"
@@ -28,6 +30,7 @@
         "reference": []
       },
       {
+        "configurationTypeId": "Token",
         "configurationName": "BossPack",
         "header": {
           "Name": "BossPack","Type": "Token"

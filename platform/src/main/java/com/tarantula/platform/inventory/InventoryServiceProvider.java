@@ -75,10 +75,10 @@ public class InventoryServiceProvider implements ServiceProvider {
         redeemer.redeem();
         return true;
     }
-    public boolean rechargeable(String category){
+    public Inventory inventory(String category){
         ConfigurableTemplate template = this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
         ConfigurableSetting conf = template.settings.get(category);
-        logger.warn(">>>"+conf.type+"/"+ conf.name+"/"+conf.rechargeable);
-        return conf.rechargeable;
+        logger.warn("Inventory=>"+conf.type+"/"+ conf.name+"/"+conf.rechargeable);
+        return new Inventory(conf.type,conf.name,conf.icon,conf.rechargeable);
     }
 }
