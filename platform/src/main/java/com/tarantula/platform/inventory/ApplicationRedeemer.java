@@ -1,20 +1,19 @@
 package com.tarantula.platform.inventory;
 
-import com.icodesoftware.Balance;
 import com.icodesoftware.Configurable;
 import com.tarantula.platform.item.ConfigurableObject;
 
 
-public class InventoryRedeemer extends ConfigurableObject{
+public class ApplicationRedeemer extends ConfigurableObject{
 
     protected String systemId;
     protected InventoryServiceProvider inventoryServiceProvider;
 
-    public InventoryRedeemer(String systemId,InventoryServiceProvider inventoryServiceProvider){
+    public ApplicationRedeemer(String systemId, InventoryServiceProvider inventoryServiceProvider){
         this.systemId = systemId;
         this.inventoryServiceProvider = inventoryServiceProvider;
     }
-    public InventoryRedeemer(String systemId,InventoryRedeemer inventoryRedeemer){
+    public ApplicationRedeemer(String systemId, ApplicationRedeemer inventoryRedeemer){
         this.systemId = systemId;
         this.configurationType = inventoryRedeemer.configurationType;
         this.configurationTypeId = inventoryRedeemer.configurationTypeId;
@@ -31,8 +30,9 @@ public class InventoryRedeemer extends ConfigurableObject{
 
 
     public  void redeem(){
+        if(!this.configurationCategory.equals(Configurable.APPLICATION_CONFIG_TYPE)) return;
         reference.forEach((ref)->{
-            InventoryRedeemer inventoryRedeemer = new InventoryRedeemer(systemId,this.inventoryServiceProvider);
+            ApplicationRedeemer inventoryRedeemer = new ApplicationRedeemer(systemId,this.inventoryServiceProvider);
             inventoryRedeemer.distributionKey(ref.getAsString());
             if(dataStore.load(inventoryRedeemer)){
                 if(inventoryRedeemer.configurationType().equals(Configurable.ASSET_CONFIG_TYPE)){
@@ -46,13 +46,13 @@ public class InventoryRedeemer extends ConfigurableObject{
                     commodityRedeemer.redeem();
                 }
                 else if(inventoryRedeemer.configurationType().equals(Configurable.ITEM_CONFIG_TYPE)){
-                    inventoryRedeemer.dataStore(dataStore);
-                    inventoryRedeemer.redeem();
+                    ItemRedeemer itemRedeemer = new ItemRedeemer(systemId,inventoryRedeemer);
+                    itemRedeemer.dataStore(dataStore);
+                    itemRedeemer.redeem();
                 }
             }
         });
     }
-
 
     public double amount() {
         return application.has("amount")?application.get("amount").getAsDouble():0;

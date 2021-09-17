@@ -36,63 +36,7 @@
     exit.x = window.innerWidth-70;
     exit.y = 6;
     app.stage.addChild(exit);
-    let messageQueue = ['AqC','BqC','CqC','DqC','Eq','Fq','Gq'];
-    let send = text_button('SEND',()=>{
-        if(TARA_API.query().offline){
-            messageBox.text = "offline play mode";     
-        }else{
-            let m = messageQueue.shift();
-            TARA_API.send({label:'echo',message:'Rotating->'+m});
-            messageQueue.push(m);
-        }
-    });
-    send.x = (window.innerWidth-64)/2;
-    send.y = (window.innerHeight-64)/2;
-    app.stage.addChild(send);
-
-
-    let i;
-    let seats =[];
-    for(i=0;i<4;i++){
-        let seat = text_seat('seat-'+i);
-        seat.container.x = 10;
-        seat.container.y = 100+i*70;
-        app.stage.addChild(seat.container);    
-        seats.push(seat);
-    }
-    let score = text_button('Update',()=>{
-        let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onUpdate'}; 
-        TARA_API.onService(true,cmd,(resp)=>{
-            if(resp.successful){
-                messageBox.text = resp.message;
-                //seats[resp.rank].caption.text = resp.level;
-            }
-            else{
-                messageBox.text = resp.message;
-            }            
-        });
-    });
-    score.x = (window.innerWidth-64)/3;
-    score.y = (window.innerHeight-64)/3;
-    app.stage.addChild(score);
-
-    let list = text_button('LIST',()=>{
-        let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onList'}; 
-        TARA_API.onService(true,cmd,(resp)=>{
-            if(resp.successful){
-                resp.list.forEach((e,i)=> {
-                    seats[i].caption.text=e.score+'\n'+e.systemId;      
-                });        
-            }
-            else{
-                messageBox.text = resp.message;
-            }            
-        });
-    });
-    list.x = (window.innerWidth-120);
-    list.y = (window.innerHeight-64)/3;
-    app.stage.addChild(list);
-
+   
     
     TARA_API.connect((data)=>{
         console.log(data);

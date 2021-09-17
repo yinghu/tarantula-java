@@ -21,9 +21,8 @@ public class GameStoreModule implements Module,Configurable.Listener<Application
         }
         if(session.action().equals("onBuy")){
             Application item = itemList.get(session.name());
-            if(item!=null){
-                session.write(JsonUtil.toSimpleResponse(true,"pending inventory").getBytes());
-                this.gameServiceProvider.inventoryServiceProvider().redeem(session.systemId(),item);
+            if(item!=null&&this.gameServiceProvider.inventoryServiceProvider().redeem(session.systemId(),item)){
+                session.write(JsonUtil.toSimpleResponse(true,"inventory redeemed").getBytes());
             }else{
                 session.write(JsonUtil.toSimpleResponse(false,"item not existed->"+session.name()).getBytes());
             }

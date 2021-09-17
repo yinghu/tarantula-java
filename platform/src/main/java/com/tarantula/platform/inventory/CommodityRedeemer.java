@@ -1,9 +1,9 @@
 package com.tarantula.platform.inventory;
 
 
-public class CommodityRedeemer extends InventoryRedeemer{
+public class CommodityRedeemer extends ApplicationRedeemer {
 
-    public CommodityRedeemer(String systemId,InventoryRedeemer inventoryRedeemer){
+    public CommodityRedeemer(String systemId, ApplicationRedeemer inventoryRedeemer){
         super(systemId,inventoryRedeemer);
     }
 

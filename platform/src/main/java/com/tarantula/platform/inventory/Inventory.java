@@ -30,7 +30,7 @@ public class Inventory extends IndexSet implements Configurable, Balance {
         this.rechargeable = rechargeable;
     }
 
-    public void redeem(InventoryRedeemer commodity){
+    public void redeem(ApplicationRedeemer commodity){
         InventoryItem inventoryItem = new InventoryItem(commodity);
         dataStore.create(inventoryItem);
         keySet.add(inventoryItem.distributionKey());

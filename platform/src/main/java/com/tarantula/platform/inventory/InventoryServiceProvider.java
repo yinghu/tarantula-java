@@ -31,10 +31,6 @@ public class InventoryServiceProvider implements ServiceProvider {
     @Override
     public void start() throws Exception {
         logger.warn("Inventory service provider started");
-        ConfigurableTemplate template = this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
-        template.settings.forEach((k,v)->{
-            logger.warn(k+">>>"+v.type+"/"+ v.name+"/"+v.rechargeable);
-        });
     }
 
     @Override
@@ -67,7 +63,7 @@ public class InventoryServiceProvider implements ServiceProvider {
         return inventory;
     }
     public boolean redeem(String systemId, Application item){
-        InventoryRedeemer redeemer = new InventoryRedeemer(systemId,this);
+        ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(item.configurationCategory());
@@ -78,7 +74,7 @@ public class InventoryServiceProvider implements ServiceProvider {
     public Inventory inventory(String category){
         ConfigurableTemplate template = this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
         ConfigurableSetting conf = template.settings.get(category);
-        logger.warn("Inventory=>"+conf.type+"/"+ conf.name+"/"+conf.rechargeable);
+        logger.warn("Inventory=>"+conf.type+"/"+ conf.name+"/"+conf.rechargeable+"/"+conf.icon);
         return new Inventory(conf.type,conf.name,conf.icon,conf.rechargeable);
     }
 }
