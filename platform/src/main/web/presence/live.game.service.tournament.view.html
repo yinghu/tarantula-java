@@ -81,9 +81,14 @@
     document.querySelector('#tx-play-without-tournament').onclick=()=>{
         let cmd = {serviceTag:TARA_API.query().serviceTag.replace('tournament','mmk'),tournamentEnabled:false};
         TARA_API.onPlay(cmd,(resp)=>{
-            console.log(resp);
-            //TARA_API.query().gamePopup = '#tx-popup-game';
-            //tx_view({viewId:TARA_API.query().gamePlayViewId,containerId:'#tx-popup-game'}); 
+            //console.log(resp);
+            if(resp.successful){
+                TARA_API.query().gamePopup = '#tx-popup-game';
+                tx_view({viewId:TARA_API.query().gamePlayViewId,containerId:'#tx-popup-game'});
+            }
+            else{
+                document.querySelector('#tx-game-service-tournament-message').innerHTML = resp.message;
+            } 
         });
     };
     document.querySelector('#tx-game-service-tournament-close').onclick=()=>{

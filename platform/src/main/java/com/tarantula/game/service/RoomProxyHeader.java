@@ -54,9 +54,14 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
         }
         if(application.tournamentEnabled()&&jsonObject.has("tournament")){
             JsonObject score = jsonObject.getAsJsonObject("tournament");
-            Tournament.Entry entry = gameServiceProvider.tournamentServiceProvider().score(stub.room.tournament().distributionKey(),session.systemId(),score.get("score").getAsDouble());
-            if(session.name().equals("tournament")){
-                session.write(entry.toJson().toString().getBytes());
+            if(stub.room.tournament()!=null){
+                Tournament.Entry entry = gameServiceProvider.tournamentServiceProvider().score(stub.room.tournament().distributionKey(),session.systemId(),score.get("score").getAsDouble());
+                if(session.name().equals("tournament")){
+                    session.write(entry.toJson().toString().getBytes());
+                }
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"no tournament joined").getBytes());
             }
         }
     }

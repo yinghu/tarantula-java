@@ -3,15 +3,11 @@
 </div>
 <script type='module' tx-id='tx-md-tossup' tx-src='resource/tarantula.tossup.js' tx-version='1.1'></script>
 <script type='text/javascript'>
-    console.log(TARA_API.query().stub);
-    let ttc = new TossUp('my ttc');
-    ttc.show_name();
+    let ttc = new TossUp();
     let _oswaldFamily = 'Oswald, Arial';
     let _felipaFamily = 'Felipa, Arial';
     let app = TGL.start(document.querySelector('#tx-game-tossup'));
-    TARA_API.onGet('tossup/cfg','onList','category/abilities',(resp)=>{
-        console.log(resp);
-    });
+    ttc.commit_config();
     let zone = new PIXI.Text('Zone=>'+JSON.stringify(TARA_API.query().stub.zone),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
     zone.y = 20;
     zone.x = 10;
@@ -31,8 +27,6 @@
     tournament.x = 10;
     app.stage.addChild(tournament);
 
-
-
     let messageBox = new PIXI.Text('',{fontFamily:_oswaldFamily,fontSize:30,fill:'yellow'});
     messageBox.y = 180;
     messageBox.x = 10;
@@ -40,11 +34,7 @@
     messageBox.text = JSON.stringify(TARA_API.query().stub.rating); 
 
     let exit = text_button('EXIT',()=>{
-        let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onLeave'};
-        TARA_API.onService(false,cmd,(resp)=>{
-            console.log(resp);
-            TARA_API.disconnect();
-            TGL.shutdown();
+        ttc.commit_leave((resp)=>{
             let m3 = document.querySelector(TARA_API.query().gamePopup);
             m3.innerHTML="";
             m3.style.display = 'none';
@@ -55,9 +45,8 @@
     app.stage.addChild(exit);
    
     let rating = text_button('Rating',()=>{
-        let payload ={rating:{rank:1,delta:70},stats:[{name:'kills',value:1}]}; 
-        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','rating',payload,(resp)=>{
-            messageBox.text = JSON.stringify(resp);    
+        ttc.commit_rating((resp)=>{
+            messageBox.text = JSON.stringify(resp);
         });
     });
     rating.x = window.innerWidth-70;;
@@ -65,9 +54,8 @@
     app.stage.addChild(rating);
 
     let stats = text_button('Kills',()=>{
-        let payload ={rating:{rank:0,delta:10},stats:[{name:'kills',value:1}]}; 
-        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','stats',payload,(resp)=>{
-            messageBox.text = JSON.stringify(resp);    
+        ttc.commit_kills((resp)=>{
+            messageBox.text = JSON.stringify(resp);
         });
     });
     stats.x = window.innerWidth-70;;
@@ -75,9 +63,8 @@
     app.stage.addChild(stats);
 
     let wins = text_button('Wins',()=>{
-        let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}]}; 
-        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','stats',payload,(resp)=>{
-            messageBox.text = JSON.stringify(resp);    
+        ttc.commit_wins((resp)=>{
+            messageBox.text = JSON.stringify(resp);
         });
     });
     wins.x = window.innerWidth-70;;
@@ -85,9 +72,8 @@
     app.stage.addChild(wins);
 
     let score = text_button('Score',()=>{
-        let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}],tournament:{score:100}}; 
-        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','tournament',payload,(resp)=>{
-            messageBox.text = JSON.stringify(resp);    
+        ttc.commit_score((resp)=>{
+            messageBox.text = JSON.stringify(resp);
         });
     });
     score.x = window.innerWidth-70;;
@@ -95,9 +81,8 @@
     app.stage.addChild(score);
 
     let list = text_button('List',()=>{
-        //let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}],tournament:{score:100}}; 
-        TARA_API.onGet(TARA_API.query().stub.tag,'onList','tournament',(resp)=>{
-            messageBox.text = JSON.stringify(resp);    
+        ttc.commit_list((resp)=>{
+            messageBox.text = JSON.stringify(resp);
         });
     });
     list.x = window.innerWidth-70;;
