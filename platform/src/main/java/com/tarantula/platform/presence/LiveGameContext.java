@@ -43,4 +43,14 @@ public class LiveGameContext {
             return new LiveGame(0,gameIndex.get(0));
         }
     }
+    public synchronized boolean onIndex(String name){
+        boolean indexed = false;
+        for(String n : gameIndex){
+            if (n.equals(name)) {
+                indexed = true;
+                break;
+            }
+        }
+        return indexed;
+    }
 }

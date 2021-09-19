@@ -11,8 +11,7 @@
     <link rel="stylesheet" href="tarantula.css"/>
     <link rel="stylesheet" href="jsoneditor.min.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
-    <script src="https://js.stripe.com/v3/"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.3/pixi.min.js"></script>
+    <script src="https://pixijs.download/v6.1.3/pixi.min.js"></script>
     <script src="resource/tarantula.api.js"></script>
     <script src="resource/tarantula.webgl.js"></script>
     <script src="jsoneditor.min.js"></script>
@@ -41,9 +40,9 @@
             </div>    
         </div>
         <div class="w3-panel w3-padding w3-border-bottom w3-border-red">
+            <span id='tx-play-game-message' class="tx-text-12"></span>
             <div class='w3-bar w3-white'>
                 <span tx-game='tossup' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-play-bar">Play Tossup</span>
-                <span tx-game='tictactoe' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-play-bar">Play TicTacToe</span>
             </div>
         </div>
         <div class="w3-display-container w3-white tx-content-16"></div> 
@@ -423,8 +422,13 @@
         function _tx_guest_login_and_setup(payload){
             TARA_API.onLogin(payload,function(resp){
                 if(resp.successful){
-                    TARA_API.onGet('presence/lobby','onLobby',TARA_API.query().game,(resp)=>{
-                        _tx_guest_play(resp);
+                    TARA_API.onGet('presence/lobby','onLobby',TARA_API.query().game,(respLobby)=>{
+                        if(respLobby.successful){
+                            _tx_guest_play(respLobby);
+                        }
+                        else{
+                            document.querySelector("#tx-play-game-message").innerHTML=respLobby.message;        
+                        }
                     });              
                 }
                 else{
