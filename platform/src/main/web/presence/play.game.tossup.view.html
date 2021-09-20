@@ -8,6 +8,7 @@
     let _felipaFamily = 'Felipa, Arial';
     let app = TGL.start(document.querySelector('#tx-game-tossup'));
     ttc.commit_config();
+   
     let zone = new PIXI.Text('Zone=>'+JSON.stringify(TARA_API.query().stub.zone),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
     zone.y = 20;
     zone.x = 10;
@@ -33,6 +34,7 @@
     app.stage.addChild(messageBox);
     messageBox.text = JSON.stringify(TARA_API.query().stub.rating); 
 
+    
     let exit = text_button('EXIT',()=>{
         ttc.commit_leave((resp)=>{
             let m3 = document.querySelector(TARA_API.query().gamePopup);
@@ -88,6 +90,7 @@
     list.x = window.innerWidth-70;;
     list.y = 720;
     app.stage.addChild(list);
+
 
 
     function text_button(cap,cmd){
