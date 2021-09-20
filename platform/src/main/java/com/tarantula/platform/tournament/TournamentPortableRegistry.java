@@ -14,11 +14,14 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
     public static final int TOURNAMENT_INSTANCE_CID = PortableEventRegistry.TOURNAMENT_INSTANCE_CID;
     public static final int TOURNAMENT_ENTRY_CID = PortableEventRegistry.TOURNAMENT_ENTRY_CID;
     public static final int TOURNAMENT_RACE_BOARD_CID = PortableEventRegistry.TOURNAMENT_RACE_BOARD_CID;
+
     public static final int TOURNAMENT_SCHEDULE_CID = 12;
 
     public static final int TOURNAMENT_REGISTRY_CID = 13;
 
     public static final int TOURNAMENT_SCHEDULE_PARSER_CID = 14;
+
+    public static final int TOURNAMENT_PRIZE_CID = 15;
 
     public Recoverable create(int i) {
         Recoverable pt = null;
@@ -44,6 +47,9 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
                 break;
             case TOURNAMENT_SCHEDULE_PARSER_CID:
                 pt = new TournamentScheduleParser();
+                break;
+            case TOURNAMENT_PRIZE_CID:
+                pt = new TournamentPrize();
                 break;
             default:
         }

@@ -8,7 +8,6 @@ import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.item.Item;
 import com.tarantula.platform.item.ItemContext;
 import com.tarantula.platform.item.ConfigurableObjectQuery;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -28,7 +27,7 @@ public class AchievementAdminModule implements Module {
             List<ConfigurableObject> items = preSetup.list(this.context,app,new ConfigurableObjectQuery("category/"+app.category()));
             session.write(new ItemContext(true,items.size()>0?"Configure achievement item":"no items configured",items).toJson().toString().getBytes());
         }
-        else if (session.action().equals("onSave")){
+        else if (session.action().equals("onRegister")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             String serviceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
             GameServiceProvider gameServiceProvider = this.context.serviceProvider(serviceName);

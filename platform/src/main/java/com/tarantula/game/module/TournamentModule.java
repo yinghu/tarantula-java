@@ -19,6 +19,12 @@ public class TournamentModule implements Module , Tournament.Listener {
         if(session.action().equals("onList")){
             session.write(toList().toString().getBytes());
         }
+        else if(session.action().equals("onRace")){
+
+        }
+        else if(session.action().equals("onHistory")){
+
+        }
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");
         }

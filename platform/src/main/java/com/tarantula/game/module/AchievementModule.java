@@ -2,7 +2,6 @@ package com.tarantula.game.module;
 
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
-import com.icodesoftware.service.TournamentServiceProvider;
 
 public class AchievementModule implements Module {
     private ApplicationContext context;

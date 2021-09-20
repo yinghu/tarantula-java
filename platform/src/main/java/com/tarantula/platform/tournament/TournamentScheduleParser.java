@@ -40,7 +40,6 @@ public class TournamentScheduleParser extends ConfigurableObject {
             LocalDateTime _end  = _start.plusHours(hours);
             schedule = new DefaultTournamentSchedule(type,name,Tournament.ON_DEMAND_SCHEDULE,_start,_close,_end,minutes,entries);
             loadPrize();
-            schedule.configureAndValidate(payload);
         }
         else if(_schedule.equals(Tournament.DAILY_SCHEDULE)){
             LocalDateTime _start = TimeUtil.midnight();
@@ -50,7 +49,6 @@ public class TournamentScheduleParser extends ConfigurableObject {
             LocalDateTime _end  = _start.plusHours(24);
             schedule = new DefaultTournamentSchedule(type,name,Tournament.DAILY_SCHEDULE,_start,_close,_end,minutes,entries);
             loadPrize();
-            schedule.configureAndValidate(payload);
         }
         else{
             throw new UnsupportedOperationException(_schedule+" not supported");

@@ -5,6 +5,8 @@ import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class DefaultTournamentSchedule extends RecoverableObject implements Tournament.Schedule {
@@ -19,6 +21,7 @@ public class DefaultTournamentSchedule extends RecoverableObject implements Tour
     private String schedule;
 
     public DefaultTournamentSchedule(){
+
     }
 
     public DefaultTournamentSchedule(String type, String name, String schedule,LocalDateTime start, LocalDateTime close, LocalDateTime end, int duration, int maxEntries){
@@ -92,4 +95,9 @@ public class DefaultTournamentSchedule extends RecoverableObject implements Tour
     public int getClassId() {
         return TournamentPortableRegistry.TOURNAMENT_SCHEDULE_CID;
     }
+
+    public List<Tournament.Prize> prizeList(){
+        return new ArrayList<>();
+    }
+
 }

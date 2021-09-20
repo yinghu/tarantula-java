@@ -6,6 +6,7 @@ import java.util.List;
 public interface Tournament extends Configurable {
 
     String ENTRY_LABEL = "TEE";
+    String PRIZE_LABEL = "TPZ";
 
     String DAILY_SCHEDULE = "daily";
     String ON_DEMAND_SCHEDULE = "onDemand";
@@ -42,6 +43,9 @@ public interface Tournament extends Configurable {
 
         RaceBoard raceBoard();
     }
+    interface Prize extends Configurable{
+        int rank();
+    }
     interface RaceBoard extends Configurable{
         int size();
         List<Entry> list();
@@ -69,6 +73,7 @@ public interface Tournament extends Configurable {
         LocalDateTime endTime();
         int maxEntriesPerInstance();
         int instanceDurationInMinutes();
+        List<Prize> prizeList();
     }
     interface OnEntry{
         void on(Entry entry);
