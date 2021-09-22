@@ -140,7 +140,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
             v.tournamentClosed(tournament);
             v.tournamentEnded(tournament);
         });
-        tournament.setup(instanceIndex);
+        tournament.setup(instanceIndex,this);
         tournamentIndex.put(tournament.distributionKey(),tournament);
         return tournament;
     }
@@ -166,7 +166,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         }
         tournamentHeader.dataStore(this.dataStore);
         tournamentIndex.put(tournamentId,tournamentHeader);
-        if(distributionTournamentService.localManaged(tournamentHeader.distributionKey())) tournamentHeader.setup(instanceIndex);
+        if(distributionTournamentService.localManaged(tournamentHeader.distributionKey())) tournamentHeader.setup(instanceIndex,this);
         return true;
     }
 
@@ -179,5 +179,8 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     }
     void midnightCheck(){
         //midnight close/launch daily tournaments
+    }
+    void monitorInstance(TournamentInstanceHeader instanceHeader){
+
     }
 }

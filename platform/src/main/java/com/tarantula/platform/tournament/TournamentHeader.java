@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class TournamentHeader extends RecoverableObject implements Tournament, Portable {
+public class TournamentHeader extends RecoverableObject implements Tournament, Portable,Tournament.Listener {
 
     private static final String TOURNAMENT_REGISTER = "register";
     private static final String TOURNAMENT_PLAY = "play";
@@ -36,6 +36,8 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     public IndexSet tournamentPlayIndex;
     private ConcurrentHashMap<String,TournamentInstanceHeader> _instanceIndex;
     private ConcurrentLinkedDeque<TournamentRegistry> pendingRegistryQueue;
+
+    private DistributedTournamentServiceProvider tournamentServiceProvider;
 
     public TournamentHeader(Schedule schedule){
         this.type = schedule.type();
@@ -130,6 +132,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
             instanceHeader.dataStore(dataStore);
             tournamentPlayIndex.keySet.add(instanceHeader.distributionKey());
             tournamentPlayIndex.update();
+            this.tournamentServiceProvider.monitorInstance(instanceHeader);
             return instanceHeader;
         });
     }
@@ -169,8 +172,9 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.payload = JsonUtil.parse(portableReader.readUTF("10"));
     }
 
-    public void setup(ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex){
+    public void setup(ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex,DistributedTournamentServiceProvider tournamentServiceProvider){
         this._instanceIndex = instanceIndex;
+        this.tournamentServiceProvider = tournamentServiceProvider;
         this.pendingRegistryQueue = new ConcurrentLinkedDeque();
         tournamentRegisterIndex = new IndexSet(TOURNAMENT_REGISTER);
         tournamentRegisterIndex.distributionKey(this.distributionKey());
