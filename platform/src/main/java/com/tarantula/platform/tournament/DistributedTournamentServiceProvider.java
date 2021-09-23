@@ -180,7 +180,13 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     void midnightCheck(){
         //midnight close/launch daily tournaments
     }
-    void monitorInstance(TournamentInstanceHeader instanceHeader){
-
+    void monitorInstanceOnClose(TournamentHeader tournamentHeader,TournamentInstanceHeader instanceHeader){
+        this.serviceContext.schedule(new TournamentInstanceCloseMonitor(tournamentHeader,instanceHeader));
+    }
+    void monitorInstanceOnEnd(TournamentHeader tournamentHeader,TournamentInstanceHeader instanceHeader){
+        this.serviceContext.schedule(new TournamentInstanceEndMonitor(tournamentHeader,instanceHeader));
+    }
+    void monitorRegistry(TournamentHeader tournamentHeader,TournamentRegistry tournamentRegistry){
+        this.serviceContext.schedule(new TournamentRegistryCloseMonitor(tournamentHeader,tournamentRegistry));
     }
 }

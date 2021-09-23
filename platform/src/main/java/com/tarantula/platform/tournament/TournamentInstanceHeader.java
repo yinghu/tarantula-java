@@ -126,5 +126,8 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
         jsonObject.addProperty("end",end.format(DateTimeFormatter.ISO_DATE_TIME));
         return jsonObject;
     }
+    void end(TournamentPrize[] tournamentPrizes){
+
+    }
 
 }

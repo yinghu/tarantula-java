@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class TournamentHeader extends RecoverableObject implements Tournament, Portable,Tournament.Listener {
+public class TournamentHeader extends RecoverableObject implements Tournament, Portable {
 
     private static final String TOURNAMENT_REGISTER = "register";
     private static final String TOURNAMENT_PLAY = "play";
@@ -115,6 +115,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
             this.dataStore.create(tournamentRegistry);
             tournamentRegisterIndex.keySet.add(tournamentRegistry.distributionKey());
             tournamentRegisterIndex.update();
+            this.tournamentServiceProvider.monitorRegistry(this,tournamentRegistry);
         }
         tournamentRegistry.addPlayer(systemId);
         dataStore.update(tournamentRegistry);
@@ -132,7 +133,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
             instanceHeader.dataStore(dataStore);
             tournamentPlayIndex.keySet.add(instanceHeader.distributionKey());
             tournamentPlayIndex.update();
-            this.tournamentServiceProvider.monitorInstance(instanceHeader);
+            this.tournamentServiceProvider.monitorInstanceOnClose(this,instanceHeader);
             return instanceHeader;
         });
     }
@@ -207,6 +208,20 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     public boolean configureAndValidate(Map<String,Object> data){
         payload = ((JsonElement) data.getOrDefault("payload",new JsonObject())).getAsJsonObject();
         return true;
+    }
+
+    void tournamentRegistryClosed(TournamentRegistry closed){
+        //remove closed register
+        this.pendingRegistryQueue.remove(closed);
+    }
+    void tournamentInstanceClosed(TournamentInstanceHeader closed){
+        //close enter
+        this.tournamentServiceProvider.monitorInstanceOnEnd(this,closed);
+    }
+    void tournamentInstanceEnded(TournamentInstanceHeader ended){
+        //end tournament and prize
+        TournamentInstanceHeader _ended = _instanceIndex.remove(ended.distributionKey());
+        _ended.end(new TournamentPrize[0]);
     }
 
 }
