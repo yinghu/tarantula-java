@@ -45,6 +45,9 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     public int rank(){
         return rank;
     }
+    void rank(int rank){
+        this.rank = rank;
+    }
     public Map<String,Object> toMap(){
         properties.put("1",systemId);
         properties.put("2",score);

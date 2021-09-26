@@ -1,14 +1,13 @@
 package com.tarantula.platform.tournament;
 
 import com.icodesoftware.Tournament;
-import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.item.ConfigurableObject;
 
 import java.util.Map;
 
-public class TournamentPrize extends RecoverableObject implements Tournament.Prize {
+public class TournamentPrize extends ConfigurableObject implements Tournament.Prize {
 
     public int rank;
-    public String itemId;
 
     public TournamentPrize(){
         this.onEdge = true;
@@ -16,15 +15,14 @@ public class TournamentPrize extends RecoverableObject implements Tournament.Pri
     }
     @Override
     public Map<String,Object> toMap(){
-        properties.put("1",rank);
-        properties.put("2",itemId);
-        return properties;
+        super.toMap();
+        return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        rank = ((Number)properties.get("1")).intValue();
-        itemId = (String) properties.get("2");
+        super.fromMap(properties);
     }
+
     public int getFactoryId() {
         return TournamentPortableRegistry.OID;
     }
@@ -35,5 +33,16 @@ public class TournamentPrize extends RecoverableObject implements Tournament.Pri
     @Override
     public int rank() {
         return rank;
+    }
+
+    @Override
+    public boolean configureAndValidate(){
+        boolean valid = this.header.has("name")&&this.header.has("rank");
+        name = header.get("name").getAsString();
+        rank = header.get("rank").getAsInt();
+        return valid;
+    }
+    public String toString(){
+        return "Tournament Prize->"+name+"<>"+rank;
     }
 }

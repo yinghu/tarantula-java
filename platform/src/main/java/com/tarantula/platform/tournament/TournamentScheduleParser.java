@@ -25,7 +25,6 @@ public class TournamentScheduleParser extends ConfigurableObject {
     public Tournament.Schedule parse(){
         String type = header.get("type").getAsString();
         String name = header.get("name").getAsString();
-
         String _schedule = Tournament.DAILY_SCHEDULE;
         if(application.has("schedule")){
             _schedule = application.get("schedule").getAsString();
@@ -51,15 +50,20 @@ public class TournamentScheduleParser extends ConfigurableObject {
         else{
             throw new UnsupportedOperationException(_schedule+" not supported");
         }
+        schedule.distributionKey(this.distributionKey());
+        validatePrize();
         return schedule;
     }
-    private void loadPrize(){
+    private void validatePrize(){
         reference.forEach((refId)->{
-            ConfigurableObject item = new ConfigurableObject();
-            item.distributionKey(refId.getAsString());
-            this.dataStore.load(item);
-            item.dataStore(dataStore);
-            System.out.println(item.setup().toJson().toString());
+            TournamentPrize configurableObject = new TournamentPrize();
+            configurableObject.distributionKey(refId.getAsString());
+            if(dataStore.load(configurableObject)){
+                configurableObject.dataStore(dataStore);
+                if(!configurableObject.configureAndValidate()){
+                    throw new RuntimeException("No tournament prize");
+                }
+            }
         });
     }
 }

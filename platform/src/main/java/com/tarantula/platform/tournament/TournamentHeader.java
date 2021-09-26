@@ -23,6 +23,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     private static final String TOURNAMENT_REGISTER = "register";
     private static final String TOURNAMENT_PLAY = "play";
 
+    protected String scheduleId;
     protected String type;
     protected Status status = Status.SCHEDULED;
     protected LocalDateTime startTime;
@@ -40,6 +41,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     private DistributedTournamentServiceProvider tournamentServiceProvider;
 
     public TournamentHeader(Schedule schedule){
+        this.scheduleId = schedule.distributionKey();
         this.type = schedule.type();
         this.name = schedule.name();
         this.startTime = schedule.startTime();
@@ -70,6 +72,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         return startTime;
     }
     public Map<String,Object> toMap(){
+        properties.put("0",scheduleId);
         properties.put("1",type);
         properties.put("2",name);
         properties.put("3", TimeUtil.toUTCMilliseconds(startTime));
@@ -81,6 +84,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
+        this.scheduleId = (String)properties.get("0");
         this.type = (String)properties.get("1");
         this.name = (String)properties.get("2");
         this.startTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("3")).longValue());
@@ -149,6 +153,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
 
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
+        portableWriter.writeUTF("0",scheduleId);
         portableWriter.writeUTF("1",type);
         portableWriter.writeUTF("2",name);
         portableWriter.writeLong("4",TimeUtil.toUTCMilliseconds(startTime));
@@ -162,6 +167,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
+        this.scheduleId = portableReader.readUTF("0");
         this.type = portableReader.readUTF("1");
         this.name = portableReader.readUTF("2");
         this.startTime = TimeUtil.fromUTCMilliseconds(portableReader.readLong("4"));
@@ -221,7 +227,11 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     void tournamentInstanceEnded(TournamentInstanceHeader ended){
         //end tournament and prize
         TournamentInstanceHeader _ended = _instanceIndex.remove(ended.distributionKey());
-        _ended.end(new TournamentPrize[0]);
+        int rank =1;
+        for(TournamentEntry entry : _ended.end()){
+            entry.rank(rank);
+            rank++;
+        }
     }
 
 }

@@ -130,18 +130,16 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     }
     //distributed operations callbacks
     public Tournament schedule(Tournament.Schedule schedule) {
+        logger.warn("Schedule key->"+schedule.distributionKey());
         TournamentHeader tournament = new TournamentHeader(schedule);
         tournament.dataStore(dataStore);
         dataStore.create(tournament);
         lookupKey.keySet.add(tournament.distributionKey());
         dataStore.update(lookupKey);
-        listeners.forEach((k,v)->{
-            v.tournamentStarted(tournament);
-            v.tournamentClosed(tournament);
-            v.tournamentEnded(tournament);
-        });
+        listeners.forEach((k,v)-> v.tournamentStarted(tournament));
         tournament.setup(instanceIndex,this);
         tournamentIndex.put(tournament.distributionKey(),tournament);
+
         return tournament;
     }
     public Tournament tournament(String tournamentId){//schedule node

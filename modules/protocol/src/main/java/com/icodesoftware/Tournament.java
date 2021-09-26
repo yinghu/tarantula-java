@@ -73,7 +73,6 @@ public interface Tournament extends Configurable {
         LocalDateTime endTime();
         int maxEntriesPerInstance();
         int instanceDurationInMinutes();
-        List<Prize> prizeList();
     }
     interface OnEntry{
         void on(Entry entry);

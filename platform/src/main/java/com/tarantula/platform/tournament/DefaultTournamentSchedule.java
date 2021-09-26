@@ -20,6 +20,7 @@ public class DefaultTournamentSchedule extends RecoverableObject implements Tour
     private int maxEntries;
     private String schedule;
 
+
     public DefaultTournamentSchedule(){
 
     }
@@ -94,10 +95,6 @@ public class DefaultTournamentSchedule extends RecoverableObject implements Tour
     @Override
     public int getClassId() {
         return TournamentPortableRegistry.TOURNAMENT_SCHEDULE_CID;
-    }
-
-    public List<Tournament.Prize> prizeList(){
-        return new ArrayList<>();
     }
 
 }
