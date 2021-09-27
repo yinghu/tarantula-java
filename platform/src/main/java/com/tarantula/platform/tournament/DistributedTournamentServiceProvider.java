@@ -7,9 +7,7 @@ import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
-import com.tarantula.platform.inventory.ApplicationRedeemer;
 import com.tarantula.platform.inventory.InventoryServiceProvider;
-import com.tarantula.platform.item.Application;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -159,6 +157,20 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         TournamentInstanceHeader tournament = this.instanceIndex.get(instanceId);
         return tournament;
     }
+    public List<Tournament.History> history(String systemId){
+        ArrayList<Tournament.History> list = new ArrayList<>();
+        IndexSet indexSet = new IndexSet(Tournament.HISTORY_LABEL);
+        indexSet.distributionKey(systemId);
+        this.dataStore.createIfAbsent(indexSet,true);
+        indexSet.keySet.forEach((k)->{
+            TournamentHistory h = new TournamentHistory();
+            h.distributionKey(k);
+            if(dataStore.load(h)){
+                list.add(h);
+            }
+        });
+        return list;
+    }
     private boolean loadTournamentHeader(String tournamentId){
         TournamentHeader tournamentHeader = new TournamentHeader();
         tournamentHeader.distributionKey(tournamentId);
@@ -185,19 +197,17 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     }
     void monitorInstanceOnClose(TournamentHeader tournamentHeader,TournamentInstanceHeader instanceHeader){
         this.serviceContext.schedule(new TournamentInstanceCloseMonitor(tournamentHeader,instanceHeader));
-        logger.warn(">>on-close->"+instanceHeader.distributionKey());
     }
     void monitorInstanceOnEnd(TournamentHeader tournamentHeader,TournamentInstanceHeader instanceHeader){
         this.serviceContext.schedule(new TournamentInstanceEndMonitor(tournamentHeader,instanceHeader));
-        logger.warn(">>on-end->"+instanceHeader.distributionKey());
     }
     void monitorRegistry(TournamentHeader tournamentHeader,TournamentRegistry tournamentRegistry){
         this.serviceContext.schedule(new TournamentRegistryCloseMonitor(tournamentHeader,tournamentRegistry));
-        logger.warn(">>on-register->"+tournamentRegistry.distributionKey());
     }
     void onPrize(String systemId,TournamentPrize prize){
-        logger.warn("Prize->"+systemId+"<>"+prize.setup().toJson().toString());
-        boolean redeemed = inventoryServiceProvider.redeem(systemId,prize);
-        logger.warn("prize redeemed->"+redeemed);
+        logger.warn("Redeemed->"+inventoryServiceProvider.redeem(systemId,prize));
+    }
+    void log(String message){
+        logger.warn(message);
     }
 }

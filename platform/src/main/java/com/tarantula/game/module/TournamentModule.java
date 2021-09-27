@@ -7,6 +7,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.service.TournamentServiceProvider;
 import com.tarantula.game.service.GameServiceProvider;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TournamentModule implements Module , Tournament.Listener {
@@ -23,7 +24,7 @@ public class TournamentModule implements Module , Tournament.Listener {
 
         }
         else if(session.action().equals("onHistory")){
-
+            session.write(toHistory(this.tournamentServiceProvider.history(session.systemId())).toString().getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");
@@ -66,6 +67,16 @@ public class TournamentModule implements Module , Tournament.Listener {
             alist.add(tt);
         });
         jsonObject.add("tournamentList",alist);
+        return jsonObject;
+    }
+    private JsonObject toHistory(List<Tournament.History> histories){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("successful",true);
+        JsonArray alist = new JsonArray();
+        histories.forEach((h)->{
+            alist.add(h.toJson());
+        });
+        jsonObject.add("onList",alist);
         return jsonObject;
     }
 

@@ -1,15 +1,18 @@
 package com.tarantula.platform.tournament;
 
 import com.icodesoftware.SchedulingTask;
+import com.icodesoftware.util.TimeUtil;
+
+import java.time.LocalDateTime;
 
 public class TournamentRegistryCloseMonitor implements SchedulingTask {
 
     private final TournamentHeader tournamentHeader;
-    private final TournamentRegistry tournamentInstanceHeader;
+    private final TournamentRegistry tournamentRegistry;
 
-    public TournamentRegistryCloseMonitor(TournamentHeader tournamentHeader, TournamentRegistry tournamentInstanceHeader){
+    public TournamentRegistryCloseMonitor(TournamentHeader tournamentHeader, TournamentRegistry tournamentRegistry){
         this.tournamentHeader = tournamentHeader;
-        this.tournamentInstanceHeader = tournamentInstanceHeader;
+        this.tournamentRegistry = tournamentRegistry;
     }
     @Override
     public boolean oneTime() {
@@ -23,11 +26,11 @@ public class TournamentRegistryCloseMonitor implements SchedulingTask {
 
     @Override
     public long delay() {
-        return (tournamentHeader.durationMinutesPerInstance()-3)*1000*60;
+        return TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),tournamentRegistry.closeTime());
     }
 
     @Override
     public void run() {
-        tournamentHeader.tournamentRegistryClosed(tournamentInstanceHeader);
+        tournamentHeader.tournamentRegistryClosed(tournamentRegistry);
     }
 }

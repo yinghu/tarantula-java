@@ -22,6 +22,8 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
     public static final int TOURNAMENT_SCHEDULE_PARSER_CID = 14;
 
     public static final int TOURNAMENT_PRIZE_CID = 15;
+    public static final int TOURNAMENT_HISTORY_CID = 16;
+
 
     public Recoverable create(int i) {
         Recoverable pt = null;
@@ -35,7 +37,6 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
             case TOURNAMENT_ENTRY_CID:
                 pt = new TournamentEntry();
                 break;
-
             case TOURNAMENT_SCHEDULE_CID:
                 pt = new DefaultTournamentSchedule();
                 break;
@@ -50,6 +51,9 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
                 break;
             case TOURNAMENT_PRIZE_CID:
                 pt = new TournamentPrize();
+                break;
+            case TOURNAMENT_HISTORY_CID:
+                pt = new TournamentHistory();
                 break;
             default:
         }

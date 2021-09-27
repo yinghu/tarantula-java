@@ -25,10 +25,11 @@ public class IndexSet extends RecoverableObject {
 
     @Override
     public Map<String,Object> toMap(){
-       keySet.forEach((k)->{
+        properties.clear();
+        keySet.forEach((k)->{
            properties.put(k,"1");
-       });
-       return this.properties;
+        });
+        return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
