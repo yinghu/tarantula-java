@@ -7,12 +7,12 @@ import java.util.Map;
 
 public class TournamentPrize extends ConfigurableObject implements Tournament.Prize {
 
-    public int rank;
+    private int rank;
 
     public TournamentPrize(){
-        this.onEdge = true;
-        this.label = Tournament.PRIZE_LABEL;
+
     }
+
     @Override
     public Map<String,Object> toMap(){
         super.toMap();
@@ -45,4 +45,5 @@ public class TournamentPrize extends ConfigurableObject implements Tournament.Pr
     public String toString(){
         return "Tournament Prize->"+name+"<>"+rank;
     }
+
 }

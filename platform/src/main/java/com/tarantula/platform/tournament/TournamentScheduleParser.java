@@ -4,8 +4,9 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.item.ConfigurableObject;
 
-
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TournamentScheduleParser extends ConfigurableObject {
 
@@ -20,7 +21,6 @@ public class TournamentScheduleParser extends ConfigurableObject {
     public int getClassId() {
         return TournamentPortableRegistry.TOURNAMENT_SCHEDULE_PARSER_CID;
     }
-
 
     public Tournament.Schedule parse(){
         String type = header.get("type").getAsString();
@@ -65,5 +65,20 @@ public class TournamentScheduleParser extends ConfigurableObject {
                 }
             }
         });
+    }
+    public Map<Integer,TournamentPrize> prize(){
+        Map<Integer,TournamentPrize> _prizeMap = new HashMap<>();
+        reference.forEach((refId)->{
+            TournamentPrize configurableObject = new TournamentPrize();
+            configurableObject.distributionKey(refId.getAsString());
+            if(dataStore.load(configurableObject)){
+                configurableObject.dataStore(dataStore);
+                if(configurableObject.configureAndValidate()){
+                    configurableObject.configurationCategory(this.configurationCategory);
+                    _prizeMap.put(configurableObject.rank(),configurableObject);
+                }
+            }
+        });
+        return _prizeMap;
     }
 }

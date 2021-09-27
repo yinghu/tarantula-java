@@ -48,6 +48,22 @@
             <span id="tx-live-tournament-list-play-3" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-tournament-action">Play</span>
         </div>    
     </div> 
+    <div id='tx-live-tournament-list-4' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-live-tournament-list-type-4' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-live-tournament-list-name-4' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id="tx-live-tournament-list-play-4" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-tournament-action">Play</span>
+        </div>    
+    </div> 
+    <div id='tx-live-tournament-list-5' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
+        <div class="w3-container">
+            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
+            <span id='tx-live-tournament-list-type-5' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
+            <span id='tx-live-tournament-list-name-5' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Name</span>
+            <span id="tx-live-tournament-list-play-5" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-tournament-action">Play</span>
+        </div>    
+    </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -60,11 +76,13 @@
 <script>
     TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
         resp.tournamentList.forEach((t,i) => {
-            document.querySelector('#tx-live-tournament-list-type-'+i).innerHTML = t.type;
-            document.querySelector('#tx-live-tournament-list-name-'+i).innerHTML = t.name;
-            document.querySelector('#tx-live-tournament-list-play-'+i).setAttribute('tournament-id',t.tournamentId);  
-            document.querySelector("#tx-live-tournament-list-"+i).style.display = 'block';
-            document.querySelector('#tx-game-service-tournament-message').innerHTML = 'Play tournament game!';      
+            if(i<6){
+                document.querySelector('#tx-live-tournament-list-type-'+i).innerHTML = t.type;
+                document.querySelector('#tx-live-tournament-list-name-'+i).innerHTML = t.name;
+                document.querySelector('#tx-live-tournament-list-play-'+i).setAttribute('tournament-id',t.tournamentId);  
+                document.querySelector("#tx-live-tournament-list-"+i).style.display = 'block';
+                document.querySelector('#tx-game-service-tournament-message').innerHTML = 'Play tournament game!';
+            }      
         });
     });
     document.querySelectorAll('.tx-live-tournament-action').forEach((a)=>{

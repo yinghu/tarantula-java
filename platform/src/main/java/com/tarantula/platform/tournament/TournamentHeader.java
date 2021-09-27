@@ -14,6 +14,7 @@ import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -215,10 +216,11 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         payload = ((JsonElement) data.getOrDefault("payload",new JsonObject())).getAsJsonObject();
         return true;
     }
-
     void tournamentRegistryClosed(TournamentRegistry closed){
         //remove closed register
         this.pendingRegistryQueue.remove(closed);
+        tournamentRegisterIndex.keySet.remove(closed.distributionKey());
+        tournamentRegisterIndex.update();
     }
     void tournamentInstanceClosed(TournamentInstanceHeader closed){
         //close enter
@@ -226,10 +228,22 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     }
     void tournamentInstanceEnded(TournamentInstanceHeader ended){
         //end tournament and prize
+        tournamentPlayIndex.keySet.remove(ended.distributionKey());
+        tournamentPlayIndex.update();
+        TournamentScheduleParser parser = new TournamentScheduleParser();
+        parser.distributionKey(this.scheduleId);
+        Map<Integer,TournamentPrize> _prizes = new HashMap<>();
+        if(this.dataStore.load(parser)){
+            parser.dataStore(dataStore);
+            _prizes = parser.prize();
+        }
         TournamentInstanceHeader _ended = _instanceIndex.remove(ended.distributionKey());
         int rank =1;
         for(TournamentEntry entry : _ended.end()){
             entry.rank(rank);
+            entry.update();
+            TournamentPrize prize = _prizes.get(rank);
+            if(prize!=null) this.tournamentServiceProvider.onPrize(entry.systemId(),prize);
             rank++;
         }
     }

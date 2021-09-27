@@ -66,7 +66,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.configurationServiceProvider = new ItemConfigurationServiceProvider(gameCluster);
         this.configurationServiceProvider.setup(serviceContext);
         this.configurationServiceProvider.waitForData();
-        this.tournamentServiceProvider = new DistributedTournamentServiceProvider(gameCluster);
+        this.tournamentServiceProvider = new DistributedTournamentServiceProvider(gameCluster,this.inventoryServiceProvider);
         this.tournamentServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider.waitForData();
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");

@@ -5,6 +5,10 @@ import com.icodesoftware.Configurable;
 
 public class ItemRedeemer extends ApplicationRedeemer {
 
+    public ItemRedeemer(String systemId, InventoryServiceProvider inventoryServiceProvider){
+        super(systemId,inventoryServiceProvider);
+    }
+
     public ItemRedeemer(String systemId, ApplicationRedeemer inventoryRedeemer){
         super(systemId,inventoryRedeemer);
     }
@@ -12,7 +16,7 @@ public class ItemRedeemer extends ApplicationRedeemer {
     public void redeem() {
         if(!this.configurationType.equals(Configurable.ITEM_CONFIG_TYPE)) return;
         reference.forEach((ref)->{
-            ApplicationRedeemer inventoryRedeemer = new ApplicationRedeemer(systemId,this.inventoryServiceProvider);
+            ItemRedeemer inventoryRedeemer = new ItemRedeemer(systemId,this.inventoryServiceProvider);
             inventoryRedeemer.distributionKey(ref.getAsString());
             if(dataStore.load(inventoryRedeemer)){
                 if(inventoryRedeemer.configurationType().equals(Configurable.ASSET_CONFIG_TYPE)){

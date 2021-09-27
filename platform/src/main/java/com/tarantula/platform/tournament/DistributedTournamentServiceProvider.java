@@ -7,6 +7,9 @@ import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
+import com.tarantula.platform.inventory.ApplicationRedeemer;
+import com.tarantula.platform.inventory.InventoryServiceProvider;
+import com.tarantula.platform.item.Application;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,9 +31,11 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     private Configuration configuration;
     private String reloadKey;
     private GameCluster gameCluster;
-    public DistributedTournamentServiceProvider(GameCluster gameCluster){
+    private InventoryServiceProvider inventoryServiceProvider;
+    public DistributedTournamentServiceProvider(GameCluster gameCluster,InventoryServiceProvider inventoryServiceProvider){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
+        this.inventoryServiceProvider = inventoryServiceProvider;
     }
 
     @Override
@@ -180,11 +185,19 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     }
     void monitorInstanceOnClose(TournamentHeader tournamentHeader,TournamentInstanceHeader instanceHeader){
         this.serviceContext.schedule(new TournamentInstanceCloseMonitor(tournamentHeader,instanceHeader));
+        logger.warn(">>on-close->"+instanceHeader.distributionKey());
     }
     void monitorInstanceOnEnd(TournamentHeader tournamentHeader,TournamentInstanceHeader instanceHeader){
         this.serviceContext.schedule(new TournamentInstanceEndMonitor(tournamentHeader,instanceHeader));
+        logger.warn(">>on-end->"+instanceHeader.distributionKey());
     }
     void monitorRegistry(TournamentHeader tournamentHeader,TournamentRegistry tournamentRegistry){
         this.serviceContext.schedule(new TournamentRegistryCloseMonitor(tournamentHeader,tournamentRegistry));
+        logger.warn(">>on-register->"+tournamentRegistry.distributionKey());
+    }
+    void onPrize(String systemId,TournamentPrize prize){
+        logger.warn("Prize->"+systemId+"<>"+prize.setup().toJson().toString());
+        boolean redeemed = inventoryServiceProvider.redeem(systemId,prize);
+        logger.warn("prize redeemed->"+redeemed);
     }
 }

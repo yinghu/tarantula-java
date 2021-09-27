@@ -3,6 +3,7 @@ package com.tarantula.platform.inventory;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.Tournament;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.GameCluster;
@@ -67,10 +68,20 @@ public class InventoryServiceProvider implements ServiceProvider {
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(item.configurationCategory());
-        if(!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
+        if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
         redeemer.redeem();
         return true;
     }
+    public boolean redeem(String systemId, Tournament.Prize item){
+        ItemRedeemer redeemer = new ItemRedeemer(systemId,this);
+        redeemer.distributionKey(item.distributionKey());
+        GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        Descriptor app = _gc.serviceWithCategory(item.configurationCategory());
+        if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
+        redeemer.redeem();
+        return true;
+    }
+
     public Inventory inventory(String category){
         ConfigurableTemplate template = this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
         ConfigurableSetting conf = template.settings.get(category);
