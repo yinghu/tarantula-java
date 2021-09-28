@@ -27,6 +27,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     private static final int END_BUFFER_MINUTES = 3;
 
     protected String scheduleId;
+    protected String schedule;
     protected String type;
     protected Status status = Status.SCHEDULED;
     protected LocalDateTime startTime;
@@ -45,6 +46,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
 
     public TournamentHeader(Schedule schedule){
         this.scheduleId = schedule.distributionKey();
+        this.schedule = schedule.schedule();
         this.type = schedule.type();
         this.name = schedule.name();
         this.startTime = schedule.startTime();
@@ -56,6 +58,9 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
 
     public TournamentHeader(){
 
+    }
+    public String schedule(){
+        return this.schedule;
     }
     @Override
     public String type() {
@@ -75,7 +80,8 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         return startTime;
     }
     public Map<String,Object> toMap(){
-        properties.put("0",scheduleId);
+        properties.put("s0",scheduleId);
+        properties.put("s1",schedule);
         properties.put("1",type);
         properties.put("2",name);
         properties.put("3", TimeUtil.toUTCMilliseconds(startTime));
@@ -87,7 +93,8 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
-        this.scheduleId = (String)properties.get("0");
+        this.scheduleId = (String)properties.get("s0");
+        this.schedule = (String)properties.get("s1");
         this.type = (String)properties.get("1");
         this.name = (String)properties.get("2");
         this.startTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("3")).longValue());

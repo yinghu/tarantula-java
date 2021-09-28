@@ -133,16 +133,14 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     }
     //distributed operations callbacks
     public Tournament schedule(Tournament.Schedule schedule) {
-        logger.warn("Schedule key->"+schedule.distributionKey());
         TournamentHeader tournament = new TournamentHeader(schedule);
         tournament.dataStore(dataStore);
         dataStore.create(tournament);
         lookupKey.addKey(tournament.distributionKey());
         dataStore.update(lookupKey);
-        listeners.forEach((k,v)-> v.tournamentStarted(tournament));
         tournament.setup(instanceIndex,this);
         tournamentIndex.put(tournament.distributionKey(),tournament);
-
+        this.serviceContext.schedule(new TournamentStartMonitor(tournament,this));
         return tournament;
     }
     public Tournament tournament(String tournamentId){//schedule node
@@ -175,12 +173,13 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         TournamentHeader tournamentHeader = new TournamentHeader();
         tournamentHeader.distributionKey(tournamentId);
         if(!this.dataStore.load(tournamentHeader)) return false;
-        if(TimeUtil.expired(tournamentHeader.endTime)){
+        if(TimeUtil.expired(tournamentHeader.closeTime())){
             logger.warn("Tournament is expired and set to end");
             return false;
         }
         tournamentHeader.dataStore(this.dataStore);
         tournamentIndex.put(tournamentId,tournamentHeader);
+        this.serviceContext.schedule(new TournamentCloseMonitor(tournamentHeader,this));
         if(distributionTournamentService.localManaged(tournamentHeader.distributionKey())) tournamentHeader.setup(instanceIndex,this);
         return true;
     }
@@ -194,6 +193,16 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     }
     void midnightCheck(){
         //midnight close/launch daily tournaments
+    }
+    void onTournamentStart(TournamentHeader tournamentHeader){
+        listeners.forEach((k,l)->l.tournamentStarted(tournamentHeader));
+    }
+    void onTournamentClose(TournamentHeader tournamentHeader){
+        listeners.forEach((k,l)->l.tournamentClosed(tournamentHeader));
+        this.serviceContext.schedule(new TournamentEndMonitor(tournamentHeader,this));
+    }
+    void onTournamentEnd(TournamentHeader tournamentHeader){
+        listeners.forEach((k,l)->l.tournamentEnded(tournamentHeader));
     }
     void monitorInstanceOnClose(TournamentHeader tournamentHeader,TournamentInstanceHeader instanceHeader){
         this.serviceContext.schedule(new TournamentInstanceCloseMonitor(tournamentHeader,instanceHeader));
