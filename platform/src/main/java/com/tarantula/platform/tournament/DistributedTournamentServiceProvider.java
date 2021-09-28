@@ -54,9 +54,8 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     }
 
     @Override
-    public Tournament register(Tournament.Schedule schedule) {
-        Tournament tournament = distributionTournamentService.schedule(name(),schedule);
-        return tournament;
+    public boolean register(Tournament.Schedule schedule) {
+        return distributionTournamentService.schedule(name(),schedule);
     }
 
     @Override
@@ -123,6 +122,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     }
     @Override
     public void start() throws Exception {
+        this.serviceContext.schedule(new TournamentMidnightTask(this));
         this.logger.warn("distributed tournament started pending pool size->"+configuration.property("pendingTournamentPoolSize"));
     }
 
@@ -132,16 +132,35 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).unregisterReloadListener(reloadKey);
     }
     //distributed operations callbacks
-    public Tournament schedule(Tournament.Schedule schedule) {
-        TournamentHeader tournament = new TournamentHeader(schedule);
-        tournament.dataStore(dataStore);
-        dataStore.create(tournament);
-        lookupKey.addKey(tournament.distributionKey());
-        dataStore.update(lookupKey);
-        tournament.setup(instanceIndex,this);
-        tournamentIndex.put(tournament.distributionKey(),tournament);
-        this.serviceContext.schedule(new TournamentStartMonitor(tournament,this));
-        return tournament;
+    public boolean schedule(Tournament.Schedule schedule) {
+        boolean scheduled = true;
+        if(schedule.schedule().equals(Tournament.ON_DEMAND_SCHEDULE)) {
+            TournamentHeader tournament = new TournamentHeader(schedule);
+            tournament.dataStore(dataStore);
+            dataStore.create(tournament);
+            lookupKey.addKey(tournament.distributionKey());
+            dataStore.update(lookupKey);
+            tournament.setup(instanceIndex,this);
+            tournamentIndex.put(tournament.distributionKey(),tournament);
+            this.serviceContext.schedule(new TournamentStartMonitor(tournament,this));
+        }
+        else if(schedule.schedule().equals(Tournament.DAILY_SCHEDULE)){
+            
+        }
+        else if(schedule.schedule().equals(Tournament.DAILY_SCHEDULE)){
+
+        }
+        else if(schedule.schedule().equals(Tournament.MONTHLY_SCHEDULE)){
+
+        }
+        else if(schedule.schedule().equals(Tournament.MONTHLY_SCHEDULE)){
+
+        }
+        else{
+            this.logger.warn("Schedule->"+schedule.schedule()+" not supported");
+            scheduled = false;
+        }
+        return scheduled;
     }
     public Tournament tournament(String tournamentId){//schedule node
         TournamentHeader tournament = tournamentIndex.get(tournamentId);
@@ -192,7 +211,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         serviceContext.schedule(new TournamentMidnightTask(this));
     }
     void midnightCheck(){
-        //midnight close/launch daily tournaments
+        //midnight close/launch daily/weekly/monthly tournaments
     }
     void onTournamentStart(TournamentHeader tournamentHeader){
         listeners.forEach((k,l)->l.tournamentStarted(tournamentHeader));

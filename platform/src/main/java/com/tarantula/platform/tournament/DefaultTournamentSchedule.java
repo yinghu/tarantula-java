@@ -5,8 +5,6 @@ import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class DefaultTournamentSchedule extends RecoverableObject implements Tournament.Schedule {

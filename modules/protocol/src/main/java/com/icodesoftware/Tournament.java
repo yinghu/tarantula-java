@@ -10,6 +10,8 @@ public interface Tournament extends Configurable {
 
 
     String DAILY_SCHEDULE = "daily";
+    String WEEKLY_SCHEDULE = "weekly";
+    String MONTHLY_SCHEDULE = "monthly";
     String ON_DEMAND_SCHEDULE = "onDemand";
 
     enum Status{
@@ -63,13 +65,6 @@ public interface Tournament extends Configurable {
         default void tournamentStarted(Tournament tournament){}
         default void tournamentClosed(Tournament tournament){}
         default void tournamentEnded(Tournament tournament){}
-
-        //default void onStarted(Instance instance){}
-        //default void onClosed(Instance instance){}
-        //default void onEnded(Instance instance){}
-
-        //default void onCreated(Entry entry){}
-        //default void onUpdated(Entry entry){}
     }
 
     interface Schedule extends Configurable{

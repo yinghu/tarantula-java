@@ -5,6 +5,7 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.item.ConfigurableObject;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,8 +40,24 @@ public class TournamentScheduleParser extends ConfigurableObject {
             LocalDateTime _end  = _start.plusHours(hours);
             schedule = new DefaultTournamentSchedule(type,name,Tournament.ON_DEMAND_SCHEDULE,_start,_close,_end,minutes,entries);
         }
-        else if(_schedule.equals(Tournament.DAILY_SCHEDULE)){
-            LocalDateTime _start = TimeUtil.midnight();
+        else if(_schedule.equals(Tournament.DAILY_SCHEDULE)){//RUN ONE DAY FROM MIDNIGHT
+            LocalDateTime _start = TimeUtil.toMidnight(application.get("startDate").getAsString());
+            int minutes = application.get("durationMinutesPerInstance").getAsInt();
+            int entries = application.get("maxEntriesPerInstance").getAsInt();
+            LocalDateTime _close = _start.plusMinutes(24*60-minutes);
+            LocalDateTime _end  = _start.plusHours(24);
+            schedule = new DefaultTournamentSchedule(type,name,Tournament.DAILY_SCHEDULE,_start,_close,_end,minutes,entries);
+        }
+        else if(_schedule.equals(Tournament.WEEKLY_SCHEDULE)){//RUN 7 DAYS FROM START DAY
+            LocalDateTime _start = TimeUtil.toMidnight(application.get("startDate").getAsString());
+            int minutes = application.get("durationMinutesPerInstance").getAsInt();
+            int entries = application.get("maxEntriesPerInstance").getAsInt();
+            LocalDateTime _close = _start.plusMinutes(24*60-minutes);
+            LocalDateTime _end  = _start.plusHours(24);
+            schedule = new DefaultTournamentSchedule(type,name,Tournament.DAILY_SCHEDULE,_start,_close,_end,minutes,entries);
+        }
+        else if(_schedule.equals(Tournament.MONTHLY_SCHEDULE)){//RUN 30 DAYS FROM START DAY
+            LocalDateTime _start = TimeUtil.toMidnight(application.get("startDate").getAsString());
             int minutes = application.get("durationMinutesPerInstance").getAsInt();
             int entries = application.get("maxEntriesPerInstance").getAsInt();
             LocalDateTime _close = _start.plusMinutes(24*60-minutes);

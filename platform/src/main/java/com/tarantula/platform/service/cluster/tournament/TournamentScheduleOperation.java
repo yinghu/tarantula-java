@@ -15,7 +15,7 @@ public class TournamentScheduleOperation extends Operation{
 
     private String serviceName;
     private Tournament.Schedule schedule;
-    private Tournament tournament;
+    private boolean tournamentScheduled;
     public TournamentScheduleOperation() {
     }
 
@@ -27,12 +27,12 @@ public class TournamentScheduleOperation extends Operation{
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        tournament = ais.schedule(serviceName,this.schedule);
+        tournamentScheduled = ais.schedule(serviceName,this.schedule);
     }
 
     @Override
     public Object getResponse() {
-        return tournament;
+        return tournamentScheduled;
     }
 
     @Override

@@ -26,6 +26,9 @@ public class TimeUtil {
         LocalDateTime end = LocalDateTime.of(date.plusDays(1),mid);
         return Duration.between(LocalDateTime.now(),end).toMillis();
     }
+    public static LocalDateTime toMidnight(String dateStr){
+        return LocalDateTime.of(LocalDate.parse(dateStr),LocalTime.MIDNIGHT);
+    }
     public static boolean expired(LocalDateTime dateTime){
         return dateTime.isBefore(LocalDateTime.now());
     }

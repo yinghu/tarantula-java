@@ -9,7 +9,7 @@ public interface TournamentServiceProvider extends ServiceProvider{
     String registerTournamentListener(Tournament.Listener listener);
     void unregisterTournamentListener(String registryKey);
 
-    Tournament register(Tournament.Schedule schedule);
+    boolean register(Tournament.Schedule schedule);
 
     boolean available(String tournamentId);
     Tournament.Instance join(String tournamentId,String systemId);

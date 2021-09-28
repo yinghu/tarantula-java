@@ -150,7 +150,7 @@ public class GameServiceProvider implements ServiceProvider{
     public TournamentServiceProvider tournamentServiceProvider(){
         return this.tournamentServiceProvider;
     }
-    public Tournament onSchedule(Tournament.Schedule schedule) { //all nodes
+    public boolean onSchedule(Tournament.Schedule schedule) { //all nodes
         return this.tournamentServiceProvider.schedule(schedule);
     }
     public Tournament onTournament(String tournamentId){ //register node

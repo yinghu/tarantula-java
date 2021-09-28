@@ -14,7 +14,7 @@ import java.io.IOException;
 public class GameCluster extends OnApplicationHeader implements Portable {
 
     public final static String NAME="1";
-    public final static String MODE="2";//pve | pvp
+    public final static String MODE="2";//pve | pvp |tvp|tvt
     public final static String GAME_LOBBY = "3";
     public final static String GAME_SERVICE = "4";
     public final static String GAME_DATA = "5";
@@ -31,6 +31,7 @@ public class GameCluster extends OnApplicationHeader implements Portable {
     public Lobby dataLobby;
 
     public final static String TOURNAMENT_LOOKUP_INDEX = "tournament";
+    public final static String TOURNAMENT_SCHEDULE_LOOKUP_INDEX = "schedule";
 
     public final static String GAME_ASSET_CATEGORY_TEMPLATE = "game-asset-category-settings";
     public final static String GAME_COMPONENT_CATEGORY_TEMPLATE = "game-component-category-settings";
