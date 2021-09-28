@@ -121,7 +121,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
             LocalDateTime closeTime = LocalDateTime.now().plusMinutes(this.durationMinutesPerInstance()-END_BUFFER_MINUTES);
             tournamentRegistry = new TournamentRegistry(maxEntriesPerInstance,closeTime);
             this.dataStore.create(tournamentRegistry);
-            tournamentRegisterIndex.keySet.add(tournamentRegistry.distributionKey());
+            tournamentRegisterIndex.addKey(tournamentRegistry.distributionKey());
             tournamentRegisterIndex.update();
             this.tournamentServiceProvider.monitorRegistry(this,tournamentRegistry);
         }
@@ -145,7 +145,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
             instanceHeader.distributionKey(instanceId);
             this.dataStore.create(instanceHeader);
             instanceHeader.dataStore(dataStore);
-            tournamentPlayIndex.keySet.add(instanceHeader.distributionKey());
+            tournamentPlayIndex.addKey(instanceHeader.distributionKey());
             tournamentPlayIndex.update();
             this.tournamentServiceProvider.monitorInstanceOnClose(this,instanceHeader);
             return instanceHeader;
@@ -197,7 +197,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         tournamentRegisterIndex.distributionKey(this.distributionKey());
         this.dataStore.createIfAbsent(tournamentRegisterIndex,true);
         this.tournamentRegisterIndex.dataStore(dataStore);
-        this.tournamentRegisterIndex.keySet.forEach((k)->{
+        this.tournamentRegisterIndex.keySet().forEach((k)->{
             TournamentRegistry tournamentRegistry = new TournamentRegistry(this.maxEntriesPerInstance);
             tournamentRegistry.distributionKey(k);
             if(this.dataStore.load(tournamentRegistry)){
@@ -205,13 +205,17 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
                     this.tournamentServiceProvider.monitorRegistry(this,tournamentRegistry);
                     pendingRegistryQueue.offer(tournamentRegistry);
                 }
+                else{
+                    tournamentRegisterIndex.removeKey(tournamentRegistry.distributionKey());
+                    tournamentRegisterIndex.update();
+                }
             }
         });
         tournamentPlayIndex = new IndexSet(TOURNAMENT_PLAY);
         tournamentPlayIndex.distributionKey(this.distributionKey());
         this.dataStore.createIfAbsent(tournamentPlayIndex,true);
         tournamentPlayIndex.dataStore(this.dataStore);
-        this.tournamentPlayIndex.keySet.forEach((k)->{
+        this.tournamentPlayIndex.keySet().forEach((k)->{
             TournamentInstanceHeader instanceHeader = new TournamentInstanceHeader();
             instanceHeader.distributionKey(k);
             if(this.dataStore.load(instanceHeader)){
@@ -222,8 +226,8 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
                     this.tournamentServiceProvider.monitorInstanceOnClose(this,instanceHeader);
                 }
                 else{
-                    this.tournamentServiceProvider.log("ENDED->"+instanceHeader.distributionKey());
-                    this.tournamentInstanceEnded(instanceHeader);
+                    this.tournamentServiceProvider.log("Expired tournament scheduled to end->"+instanceHeader.distributionKey());
+                    this.tournamentServiceProvider.monitorInstanceOnEnd(this,instanceHeader);
                 }
             }
         });
@@ -236,7 +240,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     void tournamentRegistryClosed(TournamentRegistry closed){
         //remove closed register
         this.pendingRegistryQueue.remove(closed);
-        tournamentRegisterIndex.keySet.remove(closed.distributionKey());
+        tournamentRegisterIndex.removeKey(closed.distributionKey());
         tournamentRegisterIndex.update();
     }
     void tournamentInstanceClosed(TournamentInstanceHeader closed){
@@ -246,11 +250,8 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     void tournamentInstanceEnded(TournamentInstanceHeader ended){
         //end tournament and prize
         this.tournamentServiceProvider.log("Tournament ended->"+ended.distributionKey());
-        boolean removed = tournamentPlayIndex.keySet.remove(ended.distributionKey());
-        tournamentServiceProvider.log("INDEX1->["+removed+"]"+tournamentPlayIndex.toMap().size());
+        tournamentPlayIndex.removeKey(ended.distributionKey());
         tournamentPlayIndex.update();
-        this.dataStore.load(tournamentPlayIndex);
-        tournamentServiceProvider.log("INDEX->["+removed+"]"+tournamentPlayIndex.keySet.size());
         TournamentScheduleParser parser = new TournamentScheduleParser();
         parser.distributionKey(this.scheduleId);
         Map<Integer,TournamentPrize> _prizes = new HashMap<>();
@@ -268,7 +269,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
             this.dataStore.createIfAbsent(indexSet,true);
             TournamentHistory history = new TournamentHistory(_ended.distributionKey(),rank,entry.score(0),LocalDateTime.now());
             dataStore.create(history);
-            indexSet.keySet.add(history.distributionKey());
+            indexSet.addKey(history.distributionKey());
             dataStore.update(indexSet);
             TournamentPrize prize = _prizes.get(rank);
             if(prize!=null) this.tournamentServiceProvider.onPrize(entry.systemId(),prize);

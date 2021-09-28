@@ -63,12 +63,12 @@ public interface Tournament extends Configurable {
         default void tournamentClosed(Tournament tournament){}
         default void tournamentEnded(Tournament tournament){}
 
-        default void onStarted(Instance instance){}
-        default void onClosed(Instance instance){}
-        default void onEnded(Instance instance){}
+        //default void onStarted(Instance instance){}
+        //default void onClosed(Instance instance){}
+        //default void onEnded(Instance instance){}
 
-        default void onCreated(Entry entry){}
-        default void onUpdated(Entry entry){}
+        //default void onCreated(Entry entry){}
+        //default void onUpdated(Entry entry){}
     }
 
     interface Schedule extends Configurable{

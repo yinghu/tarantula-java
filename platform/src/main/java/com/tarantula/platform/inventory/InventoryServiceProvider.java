@@ -85,7 +85,7 @@ public class InventoryServiceProvider implements ServiceProvider {
     public Inventory inventory(String category){
         ConfigurableTemplate template = this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
         ConfigurableSetting conf = template.settings.get(category);
-        logger.warn("Inventory=>"+conf.type+"//"+ conf.name+"/"+conf.rechargeable+"/"+conf.icon);
+        //logger.warn("Inventory=>"+conf.type+"//"+ conf.name+"/"+conf.rechargeable+"/"+conf.icon);
         return new Inventory(conf.type,conf.name,conf.icon,conf.rechargeable);
     }
 }

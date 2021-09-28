@@ -56,7 +56,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			this.context.masterDataStore().update(indexSet);
 		}
 		if(this.context.masterDataStore().load(indexSet)){
-			indexSet.keySet.forEach((gc)->{
+			indexSet.keySet().forEach((gc)->{
 				deployGameCluster(gc);
 			});
 		}
@@ -69,7 +69,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			this.context.masterDataStore().update(moduleIndex);
 		}
 		if(this.context.masterDataStore().load(moduleIndex)){
-			moduleIndex.keySet.forEach((pc)->{
+			moduleIndex.keySet().forEach((pc)->{
 				deployModule(pc);
 			});
 		}

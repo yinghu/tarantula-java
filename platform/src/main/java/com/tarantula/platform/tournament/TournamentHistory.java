@@ -50,7 +50,6 @@ public class TournamentHistory extends RecoverableObject implements Tournament.H
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("historyId",distributionKey());
         jsonObject.addProperty("tournamentId",tournamentId);
         jsonObject.addProperty("rank",rank);
         jsonObject.addProperty("score",score);

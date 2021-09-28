@@ -52,7 +52,7 @@ public class AdminRoleModule implements Module{
             idx.distributionKey(user.primary()?session.systemId():user.owner());
             idx.label(Account.GameClusterLabel);
             if(account.load(idx)){
-                idx.keySet.forEach((k)->{
+                idx.keySet().forEach((k)->{
                     GameCluster g = this.deploymentServiceProvider.gameCluster(k);
                     if(g!=null){
                         adminContext.gameClusterList.add(g);
@@ -86,9 +86,9 @@ public class AdminRoleModule implements Module{
                     IndexSet idx = new IndexSet();
                     idx.distributionKey(acc.distributionKey());
                     idx.label(Account.GameClusterLabel);
-                    idx.keySet.add(gc.distributionKey());
+                    idx.addKey(gc.distributionKey());
                     if(!account.createIfAbsent(idx,true)){
-                        idx.keySet.add(gc.distributionKey());//update on existing
+                        idx.addKey(gc.distributionKey());//update on existing
                         account.update(idx);
                     }
                     acc.gameClusterCount(1);

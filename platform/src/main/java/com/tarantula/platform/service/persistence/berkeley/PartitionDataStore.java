@@ -134,7 +134,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 indexSet.fromBinary(ix);//fromMap(SystemUtil.toMap(ix));
             }
         }
-        indexSet.keySet.add(okey);
+        indexSet.addKey(okey);
         byte[] _vn = indexSet.toBinary();//SystemUtil.toJson(indexSet.toMap());
         boolean suc = _put(dos,_kn,_vn);
         if(suc){
@@ -316,7 +316,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             IndexSet indexSet = new IndexSet();
             indexSet.fromBinary(edgeList);//fromMap(SystemUtil.toMap(edgeList));
-            for(String b: indexSet.keySet){
+            for(String b: indexSet.keySet()){
                 byte[] v;
                 byte[] ka = b.getBytes();
                 DataStoreOnPartition dwso = partitions[SystemUtil.partition(ka,partition)];
@@ -360,7 +360,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             IndexSet indexSet = new IndexSet();
             indexSet.fromBinary(edgeList);//fromMap(SystemUtil.toMap(edgeList));
-            for(String b: indexSet.keySet){
+            for(String b: indexSet.keySet()){
                 T t = query.create();
                 byte[] v;
                 byte[] ka = b.getBytes();

@@ -110,14 +110,14 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     }
     @Override
     public void waitForData(){
-        ArrayList removed = new ArrayList();
-        lookupKey.keySet.forEach((k)->{
+        ArrayList<String> removed = new ArrayList();
+        lookupKey.keySet().forEach((k)->{
             if(!loadTournamentHeader(k)){
                 removed.add(k);
             }
         });
         removed.forEach((r)->{
-            lookupKey.keySet.remove(r);
+            lookupKey.removeKey(r);
         });
         this.dataStore.update(lookupKey);
     }
@@ -137,7 +137,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         TournamentHeader tournament = new TournamentHeader(schedule);
         tournament.dataStore(dataStore);
         dataStore.create(tournament);
-        lookupKey.keySet.add(tournament.distributionKey());
+        lookupKey.addKey(tournament.distributionKey());
         dataStore.update(lookupKey);
         listeners.forEach((k,v)-> v.tournamentStarted(tournament));
         tournament.setup(instanceIndex,this);
@@ -162,7 +162,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         IndexSet indexSet = new IndexSet(Tournament.HISTORY_LABEL);
         indexSet.distributionKey(systemId);
         this.dataStore.createIfAbsent(indexSet,true);
-        indexSet.keySet.forEach((k)->{
+        indexSet.keySet().forEach((k)->{
             TournamentHistory h = new TournamentHistory();
             h.distributionKey(k);
             if(dataStore.load(h)){
@@ -205,7 +205,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         this.serviceContext.schedule(new TournamentRegistryCloseMonitor(tournamentHeader,tournamentRegistry));
     }
     void onPrize(String systemId,TournamentPrize prize){
-        logger.warn("Redeemed->"+inventoryServiceProvider.redeem(systemId,prize));
+        inventoryServiceProvider.redeem(systemId,prize);
     }
     void log(String message){
         logger.warn(message);

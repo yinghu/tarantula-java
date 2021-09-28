@@ -317,7 +317,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         indexSet.label(Account.UserLabel);
         if(adataStore.load(indexSet)){
             boolean updated= false;
-            for(String k : indexSet.keySet){
+            for(String k : indexSet.keySet()){
                 if(k.equals(access.distributionKey())){
                     access.role(owner.role());
                     updated = udataStore.update(access);

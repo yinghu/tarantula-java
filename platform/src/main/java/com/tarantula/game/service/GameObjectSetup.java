@@ -34,11 +34,11 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
 
         if(!dataStore.update(t)){
             dataStore.create(t);
-            indexSet.keySet.add(t.distributionKey());
+            indexSet.addKey(t.distributionKey());
             dataStore.update(indexSet);
-            typeIndex.keySet.add(t.distributionKey());
+            typeIndex.addKey(t.distributionKey());
             dataStore.update(typeIndex);
-            typeIdIndex.keySet.add(t.distributionKey());
+            typeIdIndex.addKey(t.distributionKey());
             dataStore.update(typeIdIndex);
         }
         return true;
@@ -64,7 +64,7 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         IndexSet referenceSet = new IndexSet("reference");
         referenceSet.distributionKey(application.distributionKey());
         dataStore.load(referenceSet);
-        return referenceSet.keySet;
+        return referenceSet.keySet();
     }
 
 
@@ -105,7 +105,7 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         if(!dataStore.load(indexSet)){
             return arrayList;
         }
-        indexSet.keySet.forEach((k)->{
+        indexSet.keySet().forEach((k)->{
             T t = recoverableFactory.create();
             t.distributionKey(k);
             if(dataStore.load(t)){
