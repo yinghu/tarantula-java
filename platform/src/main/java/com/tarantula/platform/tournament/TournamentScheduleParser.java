@@ -30,10 +30,7 @@ public class TournamentScheduleParser extends ConfigurableObject {
     public Tournament.Schedule parse(){
         String type = header.get("type").getAsString();
         String name = header.get("name").getAsString();
-        String _schedule = Tournament.DAILY_SCHEDULE;
-        if(application.has("schedule")){
-            _schedule = application.get("schedule").getAsString();
-        }
+        String _schedule = header.get("schedule").getAsString();
         DefaultTournamentSchedule schedule;
         if(_schedule.equals(Tournament.ON_DEMAND_SCHEDULE)){
             LocalDateTime _start = LocalDateTime.now().plusMinutes(ON_DEMAND_START_DELAY_MINUTES);//delay 5 minutes to start
